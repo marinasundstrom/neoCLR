@@ -17922,3 +17922,21 @@ Compiling a property pattern over a value-record union alternative exposed a
 native Raven emission gap. The assistant extended checked extraction/getter
 lowering and validated 12 focused compiler tests plus a fresh interpreter/AOT/JIT
 consumer. See the [property-pattern checkpoint](experiments/native-structural-types/README.md#value-record-property-pattern-consumer-2026-10-15).
+
+
+## 2026-10-15 — Integrate structural types and retire nominal carriers
+
+The author asked to stabilize and integrate the experimental work, corrected the
+scope from structural unions to structural types as a whole, and directed:
+“The work that is in our experimental branches should be integrated and flags
+removed. The Union and Tuple classes removed.” The assistant accepted this as an
+integration/migration task covering runtime, native Raven binding/emission,
+reflection, libraries, samples and documentation. Declared nominal unions and
+ordinary .NET-target behavior remain distinct from the neoCLR ad-hoc carriers.
+
+Work began by removing the Rust structural feature gates and making their tests
+unconditional, including reduced builds. The carrier audit found Range APIs using
+nominal Tuple<int, int>, which must migrate together with consumers and generated
+library artifacts. Compiler/metadata option removal, carrier removal, refreshed
+bundle qualification and integration into the destination branches remain pending;
+this entry records direction and work underway, not completed integration.

@@ -14,7 +14,7 @@ args = parser.parse_args()
 raven = args.raven.resolve()
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
-subprocess.run(['cargo', 'build', '--features', 'experimental-compositions', '--bin', 'neoclr'], cwd=ROOT, check=True)
+subprocess.run(['cargo', 'build', '--bin', 'neoclr'], cwd=ROOT, check=True)
 subprocess.run(['dotnet', 'run', '--project', 'tools/NeoClrMetadataProbe',
     f'-p:NeoClrMetadataProject={ROOT}/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj',
     '-p:WarningLevel=0', '--', '--composition-calls',
@@ -47,7 +47,7 @@ for kind in ['Union', 'Intersection']:
 def revision(path):
     return {'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip(),
             'dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=path, text=True).strip())}
-report = {'neoclr': revision(ROOT), 'raven': revision(raven), 'feature': 'experimental-compositions',
+report = {'neoclr': revision(ROOT), 'raven': revision(raven), 'structuralTypes': 'native',
           'mode': 'interpreter', 'programs': results,
           'artifacts': {str(p.relative_to(output)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(output.rglob('*.neox'))}}
 (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

@@ -49,9 +49,9 @@ def main():
                                for name, path in [('neoclr', ROOT), ('raven', raven)]}
         report['workingTreeChanges'] = {name: subprocess.check_output(['git', 'status', '--porcelain'], cwd=path, text=True)
                                       for name, path in [('neoclr', ROOT), ('raven', raven)]}
-        run('Default runtime rejects compositions', ['cargo', 'test', '-p', 'neoclr', '--test', 'composition_constraints'])
-        run('Native structural semantics and constraint proofs', ['cargo', 'test', '-p', 'neoclr', '--features', 'experimental-compositions', '--test', 'structural_compositions', '--test', 'composition_constraints', '--test', 'self_types', '--test', 'generic_bounds'])
-        run('Build experimental interpreter', ['cargo', 'build', '-p', 'neoclr', '--features', 'experimental-compositions', '--bin', 'neoclr'])
+        run('Default runtime admits structural constraints', ['cargo', 'test', '-p', 'neoclr', '--test', 'composition_constraints'])
+        run('Native structural semantics and constraint proofs', ['cargo', 'test', '-p', 'neoclr', '--test', 'structural_compositions', '--test', 'composition_constraints', '--test', 'self_types', '--test', 'generic_bounds'])
+        run('Build native interpreter', ['cargo', 'build', '-p', 'neoclr', '--bin', 'neoclr'])
         run('Metadata authoring and negative constraints', ['dotnet', 'run', '--project', 'tools/metadata/NeoCLR.Metadata.Experimental.Tests', '--', '--authored-structural-constraints', output / 'Authored.neox'])
         for flag in ['--structural-method-constraints', '--open-constrained-calls']:
             run('Metadata ' + flag, ['dotnet', 'run', '--project', 'tools/metadata/NeoCLR.Metadata.Experimental.Tests', '--no-build', '--', flag])

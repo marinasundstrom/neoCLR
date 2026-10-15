@@ -180,3 +180,7 @@ qualification, not a published platform-wide capability.
 Int32-backed nominal enum alternatives also have focused native union checks.
 Equal underlying bits do not erase distinct enum identities; other enum widths
 remain subject to the existing native backend limits.
+
+Structural runtime admission no longer requires the experimental Cargo features,
+including in reduced builds. Compiler/metadata switch removal and nominal carrier
+retirement are being integrated; publication remains a separate step.

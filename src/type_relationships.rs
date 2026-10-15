@@ -106,7 +106,6 @@ mod tests {
         crate::assemble(".module Relations\n.type class abstract System.Object\n.end\n.interface Named\n.end\n.interface Tagged\n.implements Named\n.end\n.type class Parent\n.implements Tagged\n.end\n.type class Child\n.extends Parent\n.end\n.type class Box<T>\n.end\n").unwrap()
     }
 
-    #[cfg(feature = "experimental-compositions")]
     #[test]
     fn compositions_use_assignment_guarantees_without_inventing_ancestry() {
         let m = model();
@@ -162,13 +161,6 @@ mod tests {
             assert!(assignable(&m, ty, ty).is_err());
             assert!(assignable(&m, ty, &object).is_err());
             assert!(subclass(&m, ty, &object).is_err());
-        }
-        #[cfg(not(feature = "experimental-compositions"))]
-        {
-            let union = Type::Union(vec![Type::from_name("Parent"), Type::from_name("Child")]);
-            assert!(assignable(&m, &union, &union).is_err());
-            assert!(assignable(&m, &union, &object).is_err());
-            assert!(subclass(&m, &union, &object).is_err());
         }
     }
 

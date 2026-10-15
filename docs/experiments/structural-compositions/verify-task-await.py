@@ -15,7 +15,7 @@ parser.add_argument('--output', type=Path, default=ROOT / 'target/task-compositi
 args = parser.parse_args()
 inputs, output, raven = args.inputs.resolve(), args.output.resolve(), args.raven.resolve()
 output.mkdir(parents=True, exist_ok=True)
-subprocess.run(['cargo', 'build', '--features', 'experimental-compositions', '--bin', 'neoclr'], cwd=ROOT, check=True)
+subprocess.run(['cargo', 'build', '--bin', 'neoclr'], cwd=ROOT, check=True)
 subprocess.run(['dotnet', 'run', '--project', 'tools/NeoClrMetadataProbe',
     f'-p:NeoClrMetadataProject={ROOT}/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj',
     '-p:WarningLevel=0', '--', '--task-composition-await', str(inputs), str(output)], cwd=raven, check=True)
@@ -34,7 +34,7 @@ with ThreadPoolExecutor(max_workers=2) as executor:
 def revision(path):
     return {'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip(),
             'dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=path, text=True).strip())}
-report = {'neoclr': revision(ROOT), 'raven': revision(raven), 'feature': 'experimental-compositions',
+report = {'neoclr': revision(ROOT), 'raven': revision(raven), 'structuralTypes': 'native',
           'programs': results, 'runtimeSha256': hashlib.sha256((ROOT / 'target/debug/neoclr').read_bytes()).hexdigest(),
           'await': 'completed and pending; all alternatives; payload live across a second await',
           'artifacts': {name: hashlib.sha256((output / name).read_bytes()).hexdigest() for name in

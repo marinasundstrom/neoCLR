@@ -1498,9 +1498,11 @@ fn check_type_context_seen(
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
-    if cfg!(feature = "experimental-compositions")
-        && !crate::compositions::is_compound(ty)
-        && !matches!(ty, Type::Constructed { .. } | Type::ArrayRef(_) | Type::Function(_))
+    if !crate::compositions::is_compound(ty)
+        && !matches!(
+            ty,
+            Type::Constructed { .. } | Type::ArrayRef(_) | Type::Function(_)
+        )
         && !matches!(ty, Type::ByRef(target) | Type::ReadOnlyByRef(target) if crate::compositions::is_compound(target) || matches!(target.as_ref(), Type::Constructed { .. }))
         && crate::compositions::contains(ty)
     {
@@ -1514,11 +1516,6 @@ fn check_type_context_seen(
     let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
         Type::Tuple(parts) => {
-            if !cfg!(feature = "experimental-tuples") {
-                return Err(Fault::new(
-                    "structural tuple execution requires experimental-tuples",
-                ));
-            }
             if parts.is_empty() || parts.len() > 256 {
                 return Err(Fault::new("tuple signature requires one to 256 elements"));
             }

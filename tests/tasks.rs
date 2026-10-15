@@ -210,7 +210,6 @@ fault "Cancellation contract failed"
     );
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn structural_union_task_construction_preserves_identity_and_pending_state() {
     let ty = "union<Response<Int32>,HttpError,JsonError>";
@@ -248,10 +247,8 @@ fault "Task identity or pending state changed"
     );
 }
 
-#[cfg(feature = "experimental-compositions")]
 const STRUCTURAL_TASK_TYPES: &str = "\n.type class Response\n.field Value Int32\n.end\n.type class HttpError\n.sealed\n.field Value Int32\n.end\n.type class JsonError\n.sealed\n.field Value Int32\n.end\n.type class Outside\n.end\n";
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn structural_union_task_delivers_each_alternative() {
     let ty = "union<Response,HttpError,JsonError>";
@@ -313,7 +310,6 @@ fault "Task completion or payload identity failed"
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn structural_union_task_checks_pending_cancelled_and_invalid_payloads() {
     let ty = "union<Response,HttpError,JsonError>";

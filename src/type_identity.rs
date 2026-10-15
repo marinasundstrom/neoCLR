@@ -380,7 +380,7 @@ pub(crate) fn declaring_definition<'a>(
     })
 }
 
-#[cfg(all(test, feature = "experimental-compositions"))]
+#[cfg(test)]
 mod composition_tests {
     use super::*;
 
@@ -452,7 +452,7 @@ mod composition_tests {
     }
 }
 
-#[cfg(all(test, feature = "experimental-tuples"))]
+#[cfg(test)]
 mod tuple_tests {
     use super::*;
 

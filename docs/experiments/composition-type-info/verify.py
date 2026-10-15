@@ -17,7 +17,7 @@ out.mkdir(parents=True, exist_ok=True)
 project = out / 'Probe.rvnproj'
 project.write_text(f'''<Project Sdk="Microsoft.NET.Sdk"><Import Project="{lib}/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>CompositionInfo</AssemblyName><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="{Path(__file__).parent.resolve()}/Main.rvn" /></ItemGroup></Project>''')
 subprocess.run(['dotnet', str(a.compiler.resolve()), 'neoclr', '--project', str(project)], check=True, cwd=ROOT)
-subprocess.run(['cargo', 'run', '--features', 'experimental-compositions', '--example', 'composition_info_fixture', '--', str(out / 'bin/neoclr/CompositionInfo.dll'), str(out / 'CompositionInfo.neox')], check=True, cwd=ROOT)
+subprocess.run(['cargo', 'run', '--example', 'composition_info_fixture', '--', str(out / 'bin/neoclr/CompositionInfo.dll'), str(out / 'CompositionInfo.neox')], check=True, cwd=ROOT)
 catalog = json.loads((lib / 'bundle.json').read_text())
 command = [str(ROOT / 'target/debug/neoclr'), 'run', str(out / 'CompositionInfo.neox'), '--system', str(lib / 'System.runtime.neox'), '--object-root', str(lib / 'System.Runtime.dll'), '--execution', 'interpreter', '--instructions', '100000000']
 for name in ['System.Runtime']:

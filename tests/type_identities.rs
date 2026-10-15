@@ -175,7 +175,6 @@ fn legacy_rows_are_derived_in_their_original_modules() {
     );
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_keys_preserve_kind_constituents_and_generic_arguments() {
     use neoclr::{LoadedProgram, assembler::parse_type};
@@ -206,6 +205,11 @@ fn composition_keys_preserve_kind_constituents_and_generic_arguments() {
         panic!("expected wrapper")
     };
     assert_eq!(arguments, vec![union.clone()]);
+    let TypeIdentity::Union(value_parts) = identity("union<Int32,Left>") else {
+        panic!("expected value/reference union")
+    };
+    assert!(value_parts.contains(&identity("Int32")));
+    assert!(value_parts.contains(&left));
     let mixed = identity("union<Left,intersection<Left,Right>>");
     let TypeIdentity::Union(parts) = mixed else {
         panic!("expected mixed union")
@@ -219,24 +223,11 @@ fn composition_keys_preserve_kind_constituents_and_generic_arguments() {
     );
     assert!(
         program
-            .resolve_type_identity(&Type::Union(vec![Type::Int32, Type::from_name("Left")]))
+            .resolve_type_identity(&Type::Intersection(vec![Type::Int32, Type::from_name("Left")]))
             .is_err()
     );
 }
 
-#[cfg(not(feature = "experimental-compositions"))]
-#[test]
-fn composition_identity_resolution_stays_opt_in() {
-    let module =
-        assemble(".module Compositions\n.interface Left\n.end\n.interface Right\n.end\n").unwrap();
-    let parts = vec![Type::from_name("Left"), Type::from_name("Right")];
-    assert!(resolve_type_identity(&module, &Type::Union(parts.clone())).is_err());
-    assert!(resolve_type_identity(&module, &Type::Intersection(parts.clone())).is_err());
-    let program = neoclr::LoadedProgram::new(&module).unwrap();
-    assert!(program.describe_type(&Type::Union(parts)).is_err());
-}
-
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_descriptors_expose_recursive_constituents_separately_from_arguments() {
     use neoclr::{LoadedProgram, assembler::parse_type};
@@ -273,6 +264,9 @@ fn composition_descriptors_expose_recursive_constituents_separately_from_argumen
             .constituents
             .contains(&describe("intersection<Left,Right>"))
     );
+    let value_union = describe("union<Int32,Left>");
+    assert!(value_union.constituents.contains(&describe("Int32")));
+    assert!(value_union.constituents.contains(&describe("Left")));
     let generic_bound = describe("intersection<Box<Int32>,Left>");
     let bound = generic_bound
         .constituents
@@ -285,7 +279,7 @@ fn composition_descriptors_expose_recursive_constituents_separately_from_argumen
     assert!(describe("Left").constituents.is_empty());
     assert!(
         program
-            .describe_type(&Type::Union(vec![Type::Int32, Type::from_name("Left")]))
+            .describe_type(&Type::Intersection(vec![Type::Int32, Type::from_name("Left")]))
             .is_err()
     );
 }

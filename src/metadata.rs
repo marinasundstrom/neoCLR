@@ -62,7 +62,6 @@ pub enum Type {
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
     Ptr(Box<Type>),
     /// Ordered structural value-tuple signature, independent of nominal declarations.
-    /// Interpreter values require the explicit experimental-tuples feature.
     Tuple(TupleSignature),
 }
 

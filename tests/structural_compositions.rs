@@ -2,7 +2,7 @@ use neoclr::{
     assemble,
     metadata::{Instruction, Type},
 };
-#[cfg(feature = "experimental-compositions")]
+
 use neoclr::{Limits, LoadedProgram, Value};
 
 const TYPES: &str = "\
@@ -15,7 +15,6 @@ const TYPES: &str = "\
 .method instance Get() -> Int32\nldc.i4 1\nret\n.end\n.end\n\
 .type class Neither\n.end\n.type ValueCell\n.end\n";
 
-#[cfg(feature = "experimental-compositions")]
 fn program(body: &str, helpers: &str) -> LoadedProgram {
     let source = format!(
         ".module Compound\n.entry Main\n{TYPES}\n{helpers}\n.function Main() -> Int32\n{body}\nret\n.end"
@@ -25,7 +24,6 @@ fn program(body: &str, helpers: &str) -> LoadedProgram {
     LoadedProgram::new(&module).unwrap()
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn intersection_argument_return_and_local_preserve_dispatch() {
     let p = program(
@@ -36,7 +34,6 @@ fn intersection_argument_return_and_local_preserve_dispatch() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn union_requires_narrowing_and_checks_concrete_object() {
     let p = program(
@@ -63,7 +60,6 @@ fn union_requires_narrowing_and_checks_concrete_object() {
     assert!(bad_static.run(Limits::default()).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn compound_null_casts_and_type_tests_follow_reference_behavior() {
     let p = program(
@@ -80,7 +76,6 @@ fn compound_null_casts_and_type_tests_follow_reference_behavior() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn canonicalization_happens_before_call_binding() {
     let p = program(
@@ -97,7 +92,6 @@ fn canonicalization_happens_before_call_binding() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn unsupported_shapes_and_address_operations_fail_admission() {
     for ty in [
@@ -130,7 +124,7 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
 }
 
 #[test]
-fn serialized_compound_feature_boundary_cannot_be_bypassed_by_parser_omission() {
+fn serialized_compound_operand_checks_cannot_be_bypassed_by_parser_omission() {
     let mut module = assemble(&format!(
         ".module Raw\n.entry Main\n{TYPES}\n.function Main() -> Int32\nldc.i4 0\nret\n.end"
     ))
@@ -142,7 +136,7 @@ fn serialized_compound_feature_boundary_cannot_be_bypassed_by_parser_omission() 
         .unwrap();
     let ty = Type::Union(vec![Type::from_name("Left"), Type::from_name("Right")]);
     main.locals = vec![ty.clone()];
-    if cfg!(feature = "experimental-compositions") {
+    {
         main.body = vec![
             Instruction::SizeOf(ty),
             Instruction::Pop,
@@ -151,15 +145,10 @@ fn serialized_compound_feature_boundary_cannot_be_bypassed_by_parser_omission() 
         ];
     }
     let error = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap_err();
-    let expected = if cfg!(feature = "experimental-compositions") {
-        "compound instruction operand"
-    } else {
-        "experimental-compositions"
-    };
+    let expected = "compound instruction operand";
     assert!(error.to_string().contains(expected), "{error}");
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn compound_local_retains_allocation_across_collection() {
     let mut body =
@@ -181,7 +170,6 @@ fn compound_local_retains_allocation_across_collection() {
     assert!(result.heap.reclaimed_objects() >= 8);
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn boxed_values_do_not_enter_reference_only_compositions_through_object() {
     let p = program(
@@ -205,7 +193,6 @@ fn boxed_values_do_not_enter_reference_only_compositions_through_object() {
     assert!(p.run(Limits::default()).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn every_constituent_obeys_module_reference_and_access_checks() {
     use neoclr::assembler::assemble_modules;
@@ -236,7 +223,6 @@ fn every_constituent_obeys_module_reference_and_access_checks() {
     assert!(error.to_string().contains("access denied"), "{error}");
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn saved_consumer_roundtrips_native_envelope_and_executes() {
     let module = assemble(include_str!(
@@ -253,7 +239,6 @@ fn saved_consumer_roundtrips_native_envelope_and_executes() {
     );
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn sealed_intersection_bounds_reject_before_normalization() {
     for ty in [
@@ -269,7 +254,6 @@ fn sealed_intersection_bounds_reject_before_normalization() {
     assert!(assemble(&source).is_ok());
 }
 
-#[cfg(feature = "experimental-compositions")]
 const GENERIC_TYPES: &str = r#"
 .interface Read<T>
 .method instance Get() -> T
@@ -298,7 +282,6 @@ ret
 .end
 "#;
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn closed_generic_intersection_preserves_arguments_and_interface_dispatch() {
     let source = format!(
@@ -328,7 +311,6 @@ ret
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn generic_union_casts_use_constructed_identity() {
     for (target, succeeds) in [("Int32", true), ("Boolean", false)] {
@@ -362,7 +344,6 @@ ret
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
     for ty in [
@@ -387,7 +368,6 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn reference_wrapper_stores_and_returns_composition_arguments() {
     let source = format!(
@@ -427,7 +407,6 @@ ret
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn nested_reference_wrapper_preserves_union_payload_across_collection() {
     let allocations = "newobj Neither\npop\n".repeat(8);
@@ -471,7 +450,6 @@ ret
     assert!(result.heap.reclaimed_objects() >= 8);
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_wrappers_reject_unsupported_storage_after_substitution() {
     for (kind, field) in [("class", "T&"), ("", "T*")] {
@@ -480,7 +458,6 @@ fn composition_wrappers_reject_unsupported_storage_after_substitution() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_wrappers_preserve_invariance_and_validate_field_writes() {
     for body in [
@@ -496,7 +473,7 @@ fn composition_wrappers_preserve_invariance_and_validate_field_writes() {
 }
 
 #[test]
-fn serialized_wrapper_composition_retains_feature_gate() {
+fn serialized_wrapper_composition_loads_without_opt_in() {
     let mut module = assemble(&format!(
         ".module WrappedRaw\n.entry Main\n{TYPES}\n.type class Wrapper<T>\n.field Value T\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end"
     )).unwrap();
@@ -514,14 +491,9 @@ fn serialized_wrapper_composition_retains_feature_gate() {
             ])],
         });
     let result = neoclr::load(&serde_json::to_string(&module).unwrap());
-    assert_eq!(
-        result.is_ok(),
-        cfg!(feature = "experimental-compositions"),
-        "{result:?}"
-    );
+    assert!(result.is_ok(), "{result:?}");
 }
 
-#[cfg(feature = "experimental-compositions")]
 const WRAPPER_METHODS: &str = r#"
 .type class Wrapper<T>
 .field Value T
@@ -550,7 +522,6 @@ ret
 .end
 "#;
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_wrapper_constructor_and_instance_calls_preserve_payloads() {
     for kind in ["union", "intersection"] {
@@ -586,7 +557,6 @@ ret
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn wrapper_method_substitution_checks_transitive_bodies() {
     for operation in [
@@ -605,7 +575,6 @@ fn wrapper_method_substitution_checks_transitive_bodies() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn wrapper_calls_reject_wrong_receiver_payload_and_null() {
     for body in [
@@ -629,7 +598,6 @@ fn wrapper_calls_reject_wrong_receiver_payload_and_null() {
         .contains("null class receiver"));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn nested_wrapper_method_payload_survives_collection() {
     let allocations = "newobj Neither\npop\n".repeat(8);
@@ -668,7 +636,6 @@ ret
     assert!(result.heap.reclaimed_objects() >= 8);
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn wrapper_call_admission_deduplicates_recursive_specializations() {
     let methods = WRAPPER_METHODS.replace(
@@ -681,7 +648,6 @@ fn wrapper_call_admission_deduplicates_recursive_specializations() {
     // This body recurses at execution; admission must finish without executing it.
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn reference_composition_arrays_preserve_payloads_and_gc_roots() {
     for kind in ["union", "intersection"] {
@@ -726,7 +692,6 @@ callvirt instance Left::Get()
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_array_writes_and_element_identity_are_checked() {
     for operation in [
@@ -747,7 +712,6 @@ fn composition_array_writes_and_element_identity_are_checked() {
     assert!(p.run(Limits::default()).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn substituted_array_storage_uses_checked_reference_vectors() {
     let methods = r#"
@@ -786,7 +750,6 @@ ret
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn reserved_composition_array_slots_require_initialization_and_bounds() {
     for (body, expected) in [
@@ -807,7 +770,7 @@ fn reserved_composition_array_slots_require_initialization_and_bounds() {
 }
 
 #[test]
-fn serialized_composition_array_retains_feature_gate() {
+fn serialized_composition_array_loads_without_opt_in() {
     let mut module = assemble(&format!(
         ".module ArrayRaw\n.entry Main\n{TYPES}\n.function Main() -> Int32\nldc.i4 42\nret\n.end"
     ))
@@ -823,14 +786,9 @@ fn serialized_composition_array_retains_feature_gate() {
             Type::from_name("Right"),
         ]))));
     let result = neoclr::load(&serde_json::to_string(&module).unwrap());
-    assert_eq!(
-        result.is_ok(),
-        cfg!(feature = "experimental-compositions"),
-        "{result:?}"
-    );
+    assert!(result.is_ok(), "{result:?}");
 }
 
-#[cfg(feature = "experimental-compositions")]
 const COMPOSITION_INTERFACE_WRAPPER: &str = r#"
 .interface Reader<T>
 .method instance Get() -> T
@@ -850,7 +808,6 @@ ret
 .end
 "#;
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_arguments_preserve_inherited_interface_identity() {
     for kind in ["union", "intersection"] {
@@ -875,7 +832,6 @@ callvirt instance Left::Get()
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_interface_arguments_remain_invariant() {
     let make = "ldc.i4 42\nnewobj Both\nnewobj Cell<union<Left,Right>>";
@@ -895,7 +851,6 @@ fn composition_interface_arguments_remain_invariant() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_argument_interface_calls_remain_gated() {
     let source = format!(
@@ -905,7 +860,6 @@ fn composition_argument_interface_calls_remain_gated() {
     assert!(error.contains("interface dispatch"), "{error}");
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn compound_local_defaults_only_admit_immediate_initialization() {
     for ty in [
@@ -934,7 +888,6 @@ fn compound_local_defaults_only_admit_immediate_initialization() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn branching_into_compound_initialization_cannot_retype_a_local() {
     let p = program(
@@ -950,8 +903,6 @@ fn branching_into_compound_initialization_cannot_retype_a_local() {
     );
 }
 
-
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn closed_hierarchies_are_valid_intersection_bounds() {
     let helpers = r#"
@@ -971,7 +922,6 @@ fn closed_hierarchies_are_valid_intersection_bounds() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn reference_class_composition_fields_preserve_payload_and_reject_addresses() {
     for shape in ["union<Left,Right>", "intersection<Left,Right>"] {
@@ -1008,7 +958,6 @@ fn reference_class_composition_fields_preserve_payload_and_reject_addresses() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_type_tokens_are_runtime_known() {
     for signature in ["union<Left,Right>", "intersection<Left,Right>"] {
@@ -1018,7 +967,6 @@ fn composition_type_tokens_are_runtime_known() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn nominal_static_methods_preserve_composition_parameters_and_returns() {
     for kind in ["union", "intersection"] {
@@ -1030,7 +978,6 @@ fn nominal_static_methods_preserve_composition_parameters_and_returns() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn boxed_value_and_reference_union_alternatives_roundtrip() {
     let helpers =
@@ -1055,7 +1002,6 @@ fn boxed_value_and_reference_union_alternatives_roundtrip() {
     assert!(bad.run(Limits::default()).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn boxed_nominal_value_union_preserves_copy_on_unbox() {
     let p = program(
@@ -1066,7 +1012,6 @@ fn boxed_nominal_value_union_preserves_copy_on_unbox() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn union_value_storage_requires_boxing_and_intersections_stay_reference_only() {
     for body in [
@@ -1085,7 +1030,6 @@ fn union_value_storage_requires_boxing_and_intersections_stay_reference_only() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn union_managed_parameter_replaces_slot_without_changing_prior_copy() {
     let p = program(
@@ -1096,7 +1040,6 @@ fn union_managed_parameter_replaces_slot_without_changing_prior_copy() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn union_managed_parameter_rejects_incompatible_write() {
     let p = program(
@@ -1107,7 +1050,6 @@ fn union_managed_parameter_rejects_incompatible_write() {
     assert!(p.run(Limits::default()).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn intersection_managed_parameter_preserves_nominal_dispatch() {
     let p = program(
@@ -1118,7 +1060,6 @@ fn intersection_managed_parameter_preserves_nominal_dispatch() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callback_roundtrips_union_value_payload() {
     let p = program(
@@ -1129,14 +1070,12 @@ fn callback_roundtrips_union_value_payload() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callback_union_signature_requires_exact_target() {
     let source = format!(".module BadCallback\n.entry Main\n{TYPES}\n.function Wrong(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Int32,union<Int32,Both>> = Wrong(Int32)\npop\nldc.i4 0\nret\n.end");
     assert!(assemble(&source).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn generic_value_wrapper_retains_union_payload() {
     let p = program(
@@ -1147,7 +1086,6 @@ fn generic_value_wrapper_retains_union_payload() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn generic_value_factory_preserves_callers_parameter_scope() {
     let p = program(
@@ -1158,7 +1096,6 @@ fn generic_value_factory_preserves_callers_parameter_scope() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn generic_callback_preserves_union_payload() {
     let p = program(
@@ -1169,7 +1106,6 @@ fn generic_callback_preserves_union_payload() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callback_owner_substitution_checks_body_even_when_shape_has_no_union() {
     for invalid in [false, true] {
@@ -1188,7 +1124,6 @@ fn callback_owner_substitution_checks_body_even_when_shape_has_no_union() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn function_with_union_signature_can_be_a_nominal_generic_argument() {
     let p = program(
@@ -1199,7 +1134,6 @@ fn function_with_union_signature_can_be_a_nominal_generic_argument() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn inhabited_unit_argument_coexists_with_union_storage() {
     let p = program(
@@ -1210,7 +1144,6 @@ fn inhabited_unit_argument_coexists_with_union_storage() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn managed_value_wrapper_replacement_preserves_prior_copy() {
     let p = program(
@@ -1221,7 +1154,6 @@ fn managed_value_wrapper_replacement_preserves_prior_copy() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn union_object_extraction_checks_payload_membership() {
     for (payload, extract) in [
@@ -1250,7 +1182,6 @@ fn union_object_extraction_checks_payload_membership() {
         .contains("does not satisfy"));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn nominal_generic_call_checks_structural_arguments_without_parameters() {
     for invalid in [false, true] {
@@ -1269,7 +1200,6 @@ fn nominal_generic_call_checks_structural_arguments_without_parameters() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn open_nominal_union_constituent_uses_method_scope() {
     let p = program(
@@ -1282,7 +1212,6 @@ fn open_nominal_union_constituent_uses_method_scope() {
     assert!(assemble(&bad).is_err());
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn open_nominal_intersection_constituent_uses_method_scope() {
     let p = program(
@@ -1293,7 +1222,6 @@ fn open_nominal_intersection_constituent_uses_method_scope() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn open_nominal_union_constituent_uses_declaring_type_scope() {
     let p = program(
@@ -1304,7 +1232,6 @@ fn open_nominal_union_constituent_uses_declaring_type_scope() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callable_union_roundtrips_and_narrows() {
     let p = program(
@@ -1315,7 +1242,6 @@ fn callable_union_roundtrips_and_narrows() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callable_union_preserves_bound_receiver_during_collection() {
     let p = program(
@@ -1333,7 +1259,6 @@ fn callable_union_preserves_bound_receiver_during_collection() {
     assert!(result.heap.statistics().collections > 0);
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callable_union_checks_exact_signature_and_null() {
     let helper = ".function Echo(Int32 value) -> Int32\nldarg value\nret\n.end";
@@ -1361,7 +1286,6 @@ fn callable_union_checks_exact_signature_and_null() {
     );
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callable_union_requires_narrowing_and_rejects_callable_intersections() {
     for body in [
@@ -1375,7 +1299,6 @@ fn callable_union_requires_narrowing_and_rejects_callable_intersections() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn callable_union_can_contain_a_union_returning_function() {
     let p = program(
@@ -1386,7 +1309,6 @@ fn callable_union_can_contain_a_union_returning_function() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn direct_record_union_fields_preserve_copies_on_replacement() {
     let p = program(
@@ -1397,7 +1319,6 @@ fn direct_record_union_fields_preserve_copies_on_replacement() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn direct_record_methods_transport_and_replace_union_fields() {
     let p = program(
@@ -1408,7 +1329,6 @@ fn direct_record_methods_transport_and_replace_union_fields() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn string_union_preserves_text_identity_through_storage_and_calls() {
     let p = program(
@@ -1441,7 +1361,6 @@ ldc.i4 0
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn string_union_rejects_wrong_payload_and_intersection_bounds() {
     let p = program(

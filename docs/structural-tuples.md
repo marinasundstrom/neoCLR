@@ -1,3 +1,4 @@
+<!-- Historical checkpoints below retain their original evidence; the current runtime no longer has structural opt-in Cargo features. -->
 # Structural tuple migration (development)
 
 Author direction, 2026-10-14: continue with structural tuples and remove nominal
@@ -62,9 +63,8 @@ with the existing nominal tuple family.
    and legacy admission after the replacement consumer passes. Explicit nominal
    constructor uses must migrate; do not silently reinterpret old binaries.
 
-Native executable admission requires `experimental-tuples` for tuple signatures,
-including wrappers. Enabling `experimental-compositions` alone does not authorize
-tuple execution. The interpreter slice admits closed scalar, nominal and nested
+Native structural tuples are admitted by the standard runtime, including reduced
+builds. The former structural Cargo feature switches have been removed. The interpreter slice admits closed scalar, nominal and nested
 structural tuple elements. It rejects Void, erased Value, RuntimeTypeHandle, open
 parameters, byrefs, pointers, arrays, functions and compositions as direct elements;
 these are bounded implementation gaps, not permanent type-system restrictions. Decoding a native
@@ -77,9 +77,8 @@ Code kit binaries remain the validated union/intersection snapshot.
 `tests/structural_tuples.rs` covers declaration-free JSON/binary roundtrips, ordered
 signature equality, nested type/method/Self substitution, missing arguments, depth
 and arity limits, and explicit executable rejection. Use
-`cargo test --test structural_tuples --features experimental-compositions`.
-That configuration tests the default execution gate. With
-`--features experimental-tuples,experimental-compositions`, the same target also
+`cargo test --no-default-features --test structural_tuples`.
+This same target also
 checks construction, nested fields, copy mutation, managed element addressing,
 reference-element survival across GC and invalid element/index/store rejection.
 The guest descriptor slice below adds element reflection; Raven lowering and nominal-family removal remain pending.

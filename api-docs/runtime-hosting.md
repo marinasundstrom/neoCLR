@@ -93,7 +93,7 @@ Intersection(Vec<TypeIdentity>),
 
 `LoadedProgram::resolve_type_identity(&Type) -> Result<TypeIdentity, Fault>`
 (and the existing free resolution helpers) resolve admitted composition signatures
-with the `experimental-compositions` feature. Each constituent preserves its
+in the standard runtime. Each constituent preserves its
 resolved definition key, including module/revision, row and generic arguments.
 Union and intersection keys are distinct; same-kind flattening, sorting and
 deduplication follow existing signature normalization. Duplicate-only compositions
@@ -117,7 +117,7 @@ excluded from the guest RavenDoc selection and documented here.
 ### Host composition descriptors (development, 2026-10-14)
 
 `LoadedProgram::describe_type(&Type) -> Result<TypeDescriptor, Fault>` now supports
-admitted closed compositions with `experimental-compositions`. `TypeDescriptor`
+admitted closed compositions in the standard runtime. `TypeDescriptor`
 adds a public `constituents: Vec<TypeDescriptor>` field containing direct union
 alternatives or intersection bounds in normalized signature order. Other types
 return an empty vector. Inspect `identity` to distinguish Union from Intersection.
@@ -144,7 +144,7 @@ snapshot, native metadata encoding and CLI bridge are unchanged.
 
 ### Experimental structural generic bounds (2026-10-14)
 
-With experimental-compositions, metadata GenericConstraint.kind may hold
+In the standard runtime, metadata GenericConstraint.kind may hold
 TypeBound(Type::Union(...)) or TypeBound(Type::Intersection(...)) with the existing
 closed reference composition rules. Module::instantiated_fields and loaded generic
 method resolution enforce any-of/all-of membership after substitution, including

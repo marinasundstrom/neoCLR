@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Remove the experimental structural Cargo features: unions, intersections, tuples and their constraints now use the standard runtime rules even with `--no-default-features`. Make structural tests unconditional and update executable reproducers; 398 runtime/structural tests pass, with three existing ignored tests. Remove obsolete rejection assertions and repair a stale GC fixture. Compiler/metadata switch removal and nominal carrier retirement remain in progress.
+
 - Admit Int32-backed nominal enum union alternatives using existing inline value-record storage. Preserve enum identity, payloads and checked widening/extraction without boxes; all 14 structural backend tests pass. Other enum widths retain existing native backend limits.
 
 - Qualify a fresh Raven float/double union consumer against the v4 bundle in interpreter, AOT and managed JIT. Exact typed patterns, reordered/widened calls and an integer alternative return 42 with no native imports or arena allocation; retain reproducible source and artifact evidence.

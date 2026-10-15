@@ -17,7 +17,7 @@ out.mkdir(parents=True, exist_ok=True)
 project = out / 'Probe.rvnproj'
 project.write_text(f'''<Project Sdk="Microsoft.NET.Sdk"><Import Project="{lib}/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>TupleInfo</AssemblyName><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="{Path(__file__).parent.resolve()}/TypeInfo.rvn" /></ItemGroup></Project>''')
 subprocess.run(['dotnet', str(a.compiler.resolve()), 'neoclr', '--project', str(project)], check=True, cwd=ROOT)
-subprocess.run(['cargo', 'build', '--features', 'experimental-tuples,experimental-compositions', '--bin', 'neoclr', '--example', 'tuple_info_fixture'], check=True, cwd=ROOT)
+subprocess.run(['cargo', 'build', '--bin', 'neoclr', '--example', 'tuple_info_fixture'], check=True, cwd=ROOT)
 subprocess.run([str(ROOT / 'target/debug/examples/tuple_info_fixture'), str(out / 'bin/neoclr/TupleInfo.dll'), str(out / 'TupleInfo.neox')], check=True, cwd=ROOT)
 catalog = json.loads((lib / 'bundle.json').read_text())
 for name, digest in catalog['files'].items():

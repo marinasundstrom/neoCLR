@@ -36,11 +36,6 @@ pub(crate) fn contains(ty: &Type) -> bool {
 
 // Called before flattening so malformed/oversized source cannot normalize away.
 pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
-    if !cfg!(feature = "experimental-compositions") {
-        return Err(Fault::new(
-            "compound signatures require experimental-compositions",
-        ));
-    }
     // Generic argument syntax is distinct from a composition operand: value arguments
     // and scoped parameters are allowed inside nominal constructions. Compound
     // operands retain their own rules; bare parameter operands stay unsupported.
@@ -248,9 +243,6 @@ pub(crate) fn matches_object(module: &Module, concrete: &Type, target: &Type) ->
 // Deliberately narrow interpreter surface. Inspect before execution, including dead
 // instructions, so compiler omission is never the only enforcement boundary.
 pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
-    if !cfg!(feature = "experimental-compositions") {
-        return Ok(());
-    }
     use crate::metadata::Instruction as Op;
     for def in &module.types {
         if def.static_fields.iter().any(|f| contains(&f.ty))

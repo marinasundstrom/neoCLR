@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Structural type integration (author direction, 2026-10-15):** stabilize and
+integrate the experimental structural type work, remove experimental opt-in flags,
+and retire the nominal System.Union/System.Tuple ad-hoc carriers. Migrate dependent
+library APIs, native Raven mappings, generated metadata and documentation together.
+Declared nominal unions and ordinary .NET target behavior remain distinct. Branch
+integration and carrier removal are underway, not yet complete.
+
+
 **Structural composition experiment (author direction, 2026-10-14):** the isolated
 [closed-reference POC](experiments/structural-poc/README.md) on
 `codex/structural-union-intersection` and Raven `codex/neoclr-union-intersection`

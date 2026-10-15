@@ -1,4 +1,4 @@
-//! Native structural tuple metadata and opt-in interpreter contracts.
+//! Native structural tuple metadata and interpreter contracts.
 use neoclr::{assemble, metadata::Type, metadata_container};
 
 fn tuple_module(ty: Type) -> neoclr::Module {
@@ -84,25 +84,6 @@ fn tuple_substitution_retains_existing_depth_budget() {
     assert!(ty.substitute_type_parameters(&[Type::Int32]).is_err());
 }
 
-#[cfg(not(feature = "experimental-tuples"))]
-#[test]
-fn structural_tuple_execution_requires_explicit_opt_in() {
-    for ty in [
-        named_tuple(vec![Type::Int32], &[Some("count")]),
-        Type::Tuple(vec![Type::Int32, Type::String].into()),
-        Type::ArrayRef(Box::new(Type::Tuple(vec![Type::Int32].into()))),
-    ] {
-        let image = metadata_container::write_module(&tuple_module(ty)).unwrap();
-        let error = metadata_container::load_envelope(&image).unwrap_err();
-        assert!(
-            error
-                .to_string()
-                .contains("structural tuple execution requires experimental-tuples"),
-            "{error}"
-        );
-    }
-}
-
 #[test]
 fn invalid_tuple_arity_fails_during_scope_normalization() {
     for parts in [vec![], vec![Type::Int32; 257]] {
@@ -118,7 +99,6 @@ fn invalid_tuple_arity_fails_during_scope_normalization() {
     }
 }
 
-#[cfg(feature = "experimental-tuples")]
 fn execute(body: &str, helpers: &str) -> neoclr::Value {
     let text = format!(
         ".module TupleValues\n.entry Main\n{helpers}\n.function Main() -> Int32\n{body}\nret\n.end"
@@ -131,7 +111,6 @@ fn execute(body: &str, helpers: &str) -> neoclr::Value {
     program.run(neoclr::Limits::default()).unwrap().value
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_value_constructs_and_crosses_function_boundary() {
     assert_eq!(
@@ -143,7 +122,6 @@ fn tuple_value_constructs_and_crosses_function_boundary() {
     );
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_value_mutation_preserves_original_copy() {
     assert_eq!(
@@ -155,7 +133,6 @@ fn tuple_value_mutation_preserves_original_copy() {
     );
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_nested_elements_and_synthetic_names_work() {
     assert_eq!(
@@ -167,7 +144,6 @@ fn tuple_nested_elements_and_synthetic_names_work() {
     );
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_default_and_managed_element_address_preserve_storage() {
     assert_eq!(
@@ -179,7 +155,6 @@ fn tuple_default_and_managed_element_address_preserve_storage() {
     );
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_reference_element_survives_collection_and_retains_identity() {
     let helpers = ".type class Cell\n.field Number Int32\n.end\n.function neoCLR.Runtime.GCCollect() -> Void\n.methodimpl InternalCall\n.end";
@@ -192,7 +167,6 @@ fn tuple_reference_element_survives_collection_and_retains_identity() {
     );
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_verifier_rejects_wrong_elements_and_positions() {
     for body in [
@@ -211,7 +185,6 @@ fn tuple_verifier_rejects_wrong_elements_and_positions() {
     }
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn tuple_admission_rejects_void_borrows_and_open_elements() {
     for ty in [
@@ -324,7 +297,6 @@ fn tuple_name_validation_and_substitution_preserve_native_metadata() {
     assert_eq!(&*shape, &[Type::String, Type::Int32]);
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn named_tuple_descriptors_keep_use_site_names_with_equal_identities() {
     let module = assemble(
@@ -351,7 +323,6 @@ fn named_tuple_descriptors_keep_use_site_names_with_equal_identities() {
     assert_eq!(a.tuple_elements, b.tuple_elements);
 }
 
-#[cfg(feature = "experimental-tuples")]
 #[test]
 fn named_tuple_values_accept_renamed_parameter_signatures() {
     let mut module = assemble(".module NamedTupleValues\n.entry Main\n.function Sum(tuple<Int32,Int32> pair) -> Int32\nldarg pair\nldfld 0\nldarg pair\nldfld 1\nadd\nret\n.end\n.function Main() -> Int32\nldc.i4 40\nldc.i4 2\nnewobj tuple<Int32,Int32>\ncall Sum(tuple<Int32,Int32>)\nret\n.end").unwrap();

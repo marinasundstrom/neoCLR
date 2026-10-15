@@ -472,7 +472,7 @@ not a nominal declaration or definition token. Equality and assignment use the
 runtime's existing composition rules. IsUnion is true only for UnionTypeInfo;
 nominal declarations use NominalTypeInfo.IsUnionDeclaration.
 
-Availability requires `experimental-compositions` and the matching source-built
+Availability requires the matching source-built
 System.Runtime library. The interpreter admits closed reference compositions;
 open generics and JIT/AOT composition execution remain outside this POC.
 Member, hierarchy and custom-attribute queries on direct compositions fault

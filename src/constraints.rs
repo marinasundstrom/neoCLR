@@ -212,11 +212,6 @@ pub(crate) fn check(
                 if crate::compositions::is_compound(bound)
                     || crate::compositions::is_compound(concrete)
                 {
-                    if !cfg!(feature = "experimental-compositions") {
-                        return Err(Fault::new(
-                            "compound constraints require experimental-compositions",
-                        ));
-                    }
                     if !satisfies_composition_bound(module, concrete, bound) {
                         return Err(Fault::new(format!(
                             "generic argument {argument:?} violates {bound:?} constraint on parameter {}",
@@ -426,18 +421,14 @@ pub(crate) fn permits_view(
         ) -> bool {
             match bound {
                 Type::Union(parts) => {
-                    cfg!(feature = "experimental-compositions")
-                        && !parts.is_empty()
+                    !parts.is_empty()
                         && parts
                             .iter()
                             .all(|part| guarantees(module, part, source, target, interface))
                 }
-                Type::Intersection(parts) => {
-                    cfg!(feature = "experimental-compositions")
-                        && parts
-                            .iter()
-                            .any(|part| guarantees(module, part, source, target, interface))
-                }
+                Type::Intersection(parts) => parts
+                    .iter()
+                    .any(|part| guarantees(module, part, source, target, interface)),
                 _ if interface => crate::interfaces::closure(module, bound).is_ok_and(|types| {
                     types
                         .iter()

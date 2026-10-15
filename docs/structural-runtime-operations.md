@@ -361,3 +361,19 @@ storage. Type tests/extraction preserve enum identity even when two enum types
 share the same underlying bits; an enum alternative does not become Int32.
 Interpreter/AOT checks cover widening, payload reads and wrong-enum extraction
 with zero arena allocation. Other enum widths keep their existing backend limits.
+
+### Standard runtime admission (2026-10-15)
+
+The Rust `experimental-compositions` and `experimental-tuples` features have been
+removed. Union, intersection and tuple validation/identity/execution use the same
+rules in standard and `--no-default-features` builds. Structural constraints and
+invalid-operand checks remain enforced. Historical opt-in checkpoints above do
+not describe current build configuration. Native compiler/metadata switch removal
+and nominal carrier retirement are separate migration steps still underway.
+
+Validation of this migration: 302 runtime unit tests, five structural-constraint
+tests, 67 composition tests, 16 tuple tests and eight type-identity tests pass under
+`--no-default-features`; three existing runtime tests remain ignored. Two inherited
+identity assertions incorrectly rejected mixed value/reference unions and now
+verify their supported identities while retaining invalid-intersection checks.
+The XML documentation-only snapshot refresh leaves the reference assembly unchanged.

@@ -1,5 +1,5 @@
 use neoclr::assemble;
-#[cfg(feature = "experimental-compositions")]
+
 use neoclr::{Limits, LoadedProgram, Value, assembler::parse_type, load};
 
 const TYPES: &str = r#"
@@ -24,15 +24,6 @@ const TYPES: &str = r#"
 .end
 "#;
 
-#[cfg(not(feature = "experimental-compositions"))]
-#[test]
-fn structural_constraints_require_explicit_runtime_feature() {
-    let source =
-        format!(".module Bounds\n{TYPES}\n.type class Either<T>\n.constraint T union<A,B>\n.end");
-    assert!(assemble(&source).is_err());
-}
-
-#[cfg(feature = "experimental-compositions")]
 fn constrained_module(bound: &str) -> neoclr::Module {
     let source = format!(
         ".module Bounds\n{TYPES}\n.type class Restricted<T>\n.constraint T {bound}\n.field Value T\n.end"
@@ -41,7 +32,6 @@ fn constrained_module(bound: &str) -> neoclr::Module {
     load(&serde_json::to_string(&module).unwrap()).unwrap()
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn native_type_bounds_preserve_any_of_all_of_and_closed_satisfiers() {
     for (bound, good, bad) in [
@@ -90,7 +80,6 @@ fn native_type_bounds_preserve_any_of_all_of_and_closed_satisfiers() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn nominal_method_arguments_are_checked_even_without_verification() {
     for (bound, argument, valid) in [
@@ -120,7 +109,6 @@ fn nominal_method_arguments_are_checked_even_without_verification() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn invalid_structural_bounds_cannot_normalize_away() {
     for bound in [
@@ -137,7 +125,6 @@ fn invalid_structural_bounds_cannot_normalize_away() {
     }
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn documented_native_constraint_consumer_executes() {
     let module = assemble(include_str!(
@@ -153,7 +140,6 @@ fn documented_native_constraint_consumer_executes() {
     );
 }
 
-#[cfg(feature = "experimental-compositions")]
 #[test]
 fn generic_bodies_use_only_interfaces_guaranteed_by_structural_bounds() {
     let source = r#"

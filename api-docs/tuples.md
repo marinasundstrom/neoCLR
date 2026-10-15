@@ -61,7 +61,7 @@ assignability. Missing substitution arguments and excessive substitution depth
 return a host Fault. Scope normalization rejects zero or more than 256 elements.
 
 The Rust metadata node is separate from the guest descriptor API below. The interpreter now
-admits closed scalar, nominal and nested tuple elements with `experimental-tuples`.
+admits closed scalar, nominal and nested tuple elements in the standard runtime.
 The union/intersection feature alone does not enable tuple execution. Existing
 `Module::instantiated_fields` returns synthesized public `ItemN` views; these have
 no nominal FieldDef. Native aggregate construction, indexed element reads/writes,
@@ -74,7 +74,7 @@ CLI tuple projection does not represent this structural identity.
 
 ## Resolved host tuple descriptors (development)
 
-With `experimental-tuples`, `LoadedProgram::resolve_type_identity` returns
+In the standard runtime, `LoadedProgram::resolve_type_identity` returns
 `TypeIdentity::Tuple(Vec<TypeIdentity>)` for admitted closed tuple signatures.
 Element keys retain resolved nominal identities where applicable. Order, repeated
 elements and nesting contribute to identity; a one-element tuple differs from its
@@ -106,7 +106,7 @@ signature retains its descriptive metadata. This query does not distinguish an
 explicit `ItemN` label from the same synthesized default; host signature APIs retain
 that distinction. Identity-only handles cannot recover declared names.
 
-Requires the `experimental-tuples` runtime and the matching native source library.
+Requires the standard runtime and the matching native source library.
 There is no public constructor. The runtime selects this provider when a type handle
 contains an admitted structural tuple signature. The same arity, closedness and
 element-admission limits apply as for tuple execution. Unsupported signatures fault.

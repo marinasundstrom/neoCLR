@@ -38,12 +38,8 @@ libc = "0.2"
 windows-sys = { version = "=0.60.2", features = ["Win32_Networking_WinSock"] }
 
 [features]
-# Native structural types are part of the standard interpreter build.
-default = ["experimental-compositions", "experimental-tuples"]
-# Legacy feature name retained for reduced-profile validation; native value-union storage remains gated.
-experimental-compositions = []
-# Legacy feature name retained for reduced-profile validation; bounded native tuple storage is admitted.
-experimental-tuples = []
+# Structural signatures are part of the runtime, including reduced builds.
+default = []
 # Internal metadata support shared with the JIT/AOT backend; not a public Raven API.
 native-metadata = []
 
