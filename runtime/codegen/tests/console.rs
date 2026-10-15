@@ -12267,3 +12267,64 @@ fn structural_union_widening_preserves_collector_roots() {
         );
     verify_structural_union_gc(&[(&reference_only, 0)], 648);
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_string_union_payload_survives_native_collection() {
+    let source = r#"
+.module StringUnionGC
+.type class abstract System.Object
+.end
+.function Make() -> union<String,Int32>
+ldstr "hé🙂\u0000z"
+castclass union<String,Int32>
+ret
+.end
+.function Pressure(union<String,Int32> value) -> union<String,Int32>
+.local Int32 remaining
+ldc.i4 40
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldarg value
+ret
+.end
+.function Calculate() -> Int32
+.local union<String,Int32> value
+call Make()
+call Pressure(union<String,Int32>)
+stloc value
+ldloc value
+call Pressure(union<String,Int32>)
+stloc value
+ldloc value
+isinst String
+ref.isnull
+brtrue Bad
+ldloc value
+castclass String
+ldstr "hé🙂\u0000z"
+ceq
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#;
+    verify_structural_union_gc(&[(source, 0)], 656);
+    let scalar = source.replace("ldstr \"hé🙂\\u0000z\"\ncastclass union<String,Int32>", "ldc.i4 42\nbox Int32\ncastclass union<String,Int32>")
+        .replace("brtrue Bad\nldloc value\ncastclass String\nldstr \"hé🙂\\u0000z\"\nceq\nbrfalse Bad\nldc.i4 42", "brfalse Bad\nldloc value\nunbox.any Int32");
+    verify_structural_union_gc(&[(&scalar, 0)], 640);
+    let wrong = scalar.replace("unbox.any Int32", "castclass String\npop\nldc.i4 42");
+    verify_structural_union_gc(&[(&wrong, 11)], 640);
+}

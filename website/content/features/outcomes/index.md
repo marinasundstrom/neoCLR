@@ -163,3 +163,8 @@ Capture is bounded to 64 frames and 64 KiB with explicit truncation. Source line
 structured frame access and suspended async caller history remain incomplete.
 Faults remain terminal; capturing a stack does not introduce recovery.
 [StackTrace API and example](../../docs/stack-trace.html).
+
+On the structural feature branches, intrinsic `string` alternatives now have
+native metadata and collector checks alongside integer alternatives. String
+owners remain traced references inside a structural union value. This remains
+development work; see the [union API and limits](../../docs/unions.html).

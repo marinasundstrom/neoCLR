@@ -3969,18 +3969,34 @@ fn interpret_instructions_with_dispatch(
                             {
                                 object.view = Some(target.clone());
                             } else {
-                                return Err(Fault::new("invalid object reference cast"));
+                                return Err(Fault::coded(
+                                    crate::FaultCode::InvalidCast,
+                                    "invalid object reference cast",
+                                ));
                             }
                             object.reference.assigned()?;
                             Value::ObjectReference(object)
                         }
                         value @ Value::String(_) if *target == Type::String => value,
                         value @ Value::String(_)
-                            if crate::interfaces::interface_definition(module, target).is_ok()
+                            if crate::compositions::is_compound(target)
+                                || crate::interfaces::interface_definition(module, target)
+                                    .is_ok()
                                 || (*target == Type::from_name("System.Object")
                                     && module.is_reference_type(target)) =>
                         {
-                            if !(*target == Type::from_name("System.Object")
+                            if crate::compositions::is_compound(target) {
+                                if !crate::compositions::matches_object(
+                                    module,
+                                    &Type::String,
+                                    target,
+                                ) {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::InvalidCast,
+                                        "String does not satisfy compound reference",
+                                    ));
+                                }
+                            } else if !(*target == Type::from_name("System.Object")
                                 && module.is_reference_type(target))
                             {
                                 crate::interfaces::ensure_implementation(

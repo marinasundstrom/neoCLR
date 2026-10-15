@@ -30,10 +30,19 @@ internal static class AuthoredCompositionChecks
         if (genericUnion.Composition!.Constituents.Count != 2) throw new Exception("generic union lost");
         var main = builder.AddFunction("Main");
         main.GetILGenerator().LoadTypeToken(union); main.GetILGenerator().Emit(OpCode.Pop); main.LoadConstant(42); main.Return(); builder.EntryPoint = main;
+        var textUnion = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, PrimitiveType.String, PrimitiveType.Int32);
+        var textEcho = builder.AddFunction("TextEcho", new MethodSignature(textUnion, [textUnion]));
+        textEcho.LoadArgument(0); textEcho.Return();
+        var textInject = builder.AddFunction("TextInject", new MethodSignature(textUnion, [PrimitiveType.String]));
+        textInject.LoadArgument(0); textInject.CastReference(textUnion); textInject.Return();
+        Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, PrimitiveType.String, left));
         var image = builder.WriteNativeAssembly();
         var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(image), allowExperimentalCompositions: true);
         if (!snapshot.MainModule.Functions.Single(f => f.Name == "Echo").TryGetSignature(out var signature) || signature!.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("native structural signature lost");
+        if (!snapshot.MainModule.Functions.Single(f => f.Name == "TextEcho").TryGetSignature(out var textSignature) ||
+            !textSignature!.ReturnType.Composition!.Constituents.Any(t => t.Primitive == PrimitiveType.String))
+            throw new Exception("intrinsic String union alternative lost");
         Reject(() => builder.Write());
         var values = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, PrimitiveType.Int32);
         var valueEcho = builder.AddFunction("ValueEcho", new MethodSignature(values, [values]));

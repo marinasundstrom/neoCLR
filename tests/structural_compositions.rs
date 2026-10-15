@@ -1407,3 +1407,51 @@ fn direct_record_methods_transport_and_replace_union_fields() {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn string_union_preserves_text_identity_through_storage_and_calls() {
+    let p = program(
+        r#"
+.local String original
+.local union<String,Int32> value
+ldstr "hé🙂\u0000z"
+stloc original
+ldloc original
+castclass union<String,Int32>
+call EchoText(union<String,Int32>)
+stloc value
+ldloc value
+isinst String
+ref.isnull
+brtrue bad
+ldloc value
+castclass String
+ldloc original
+ref.eq
+brfalse bad
+ldc.i4 42
+ret
+bad:
+ldc.i4 0
+"#,
+        ".function EchoText(union<String,Int32> value) -> union<Int32,String>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn string_union_rejects_wrong_payload_and_intersection_bounds() {
+    let p = program(
+        "ldc.i4 42\nbox Int32\ncastclass union<Int32,String>\ncastclass String\npop\nldc.i4 0",
+        "",
+    );
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::InvalidCast
+    );
+    assert!(assemble(&format!(".module Invalid\n{TYPES}\n.function F(intersection<String,Left> value) -> Void\nret\n.end")).is_err());
+}

@@ -165,8 +165,8 @@ now cover record/reference/scalar payloads across calls and fault unwind with
 eager/paced nonmoving AOT collection and complete post-entry reclamation. The
 [fresh Raven consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
 also passes 32 invocations per collector mode, reclaiming all explicit objects. Enums,
-Object/scalar-interface views requiring boxing and intrinsic String alternatives
-remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
+Object/scalar-interface views requiring boxing remain unsupported by this native lowering.
+Intrinsic String alternatives now use a separate traced text slot in native union storage. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
 reflection, array elements, broader JIT/collector qualification and full Task application
 qualification remain open. These are implementation gaps, not restrictions on the

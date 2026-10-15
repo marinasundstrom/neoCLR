@@ -2773,10 +2773,15 @@ pub(crate) fn compile_into(
                     }
                     Op::CastClass(target)
                         if matches!(p.ty(target)?, Ty::ValueUnion(_))
-                            && (matches!(top(), Ty::PendingUnionScalar(_) | Ty::Callable(_))
-                                || *top() == p.ty(target)?) =>
+                            && (matches!(
+                                top(),
+                                Ty::PendingUnionScalar(_) | Ty::Callable(_) | Ty::Literal
+                            ) || *top() == p.ty(target)?) =>
                     {
-                        if matches!(top(), Ty::PendingUnionScalar(_) | Ty::Callable(_)) {
+                        if matches!(
+                            top(),
+                            Ty::PendingUnionScalar(_) | Ty::Callable(_) | Ty::Literal
+                        ) {
                             let payload_type = match top() {
                                 Ty::PendingUnionScalar(t) => p.ty(t)?,
                                 other => other.clone(),
@@ -2790,7 +2795,7 @@ pub(crate) fn compile_into(
                                 .position(|part| *part == payload_type)
                                 .expect("admitted exact payload");
                             let tag = b.ins().iconst(types::I32, active as i64 + 1);
-                            let tag = if matches!(payload_type, Ty::Callable(_)) {
+                            let tag = if matches!(payload_type, Ty::Callable(_) | Ty::Literal) {
                                 let null = b.ins().icmp_imm(IntCC::Equal, payload[0], 0);
                                 let empty = b.ins().iconst(types::I32, 0);
                                 b.ins().select(null, empty, tag)
@@ -2809,10 +2814,14 @@ pub(crate) fn compile_into(
                             }
                         }
                     }
-                    Op::IsInstance(target @ neoclr::metadata::Type::Function(_))
-                    | Op::CastClass(target @ neoclr::metadata::Type::Function(_))
-                        if matches!(top(), Ty::ValueUnion(_)) =>
-                    {
+                    Op::IsInstance(
+                        target @ (neoclr::metadata::Type::Function(_)
+                        | neoclr::metadata::Type::String),
+                    )
+                    | Op::CastClass(
+                        target @ (neoclr::metadata::Type::Function(_)
+                        | neoclr::metadata::Type::String),
+                    ) if matches!(top(), Ty::ValueUnion(_)) => {
                         let Ty::ValueUnion(parts) = top() else {
                             unreachable!()
                         };

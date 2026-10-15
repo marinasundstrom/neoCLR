@@ -1696,8 +1696,10 @@ impl<'a> Profile<'a> {
                     if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
                         && source != self.ty(t)?
                         && !self.widens_union(&source, &self.ty(t)?)
-                        && !(matches!(source, Ty::Callable(_))
-                            && parts.iter().any(|part| self.ty(part).ok().as_ref() == Some(&source)))
+                        && !(matches!(source, Ty::Callable(_) | Ty::Literal)
+                            && parts
+                                .iter()
+                                .any(|part| self.ty(part).ok().as_ref() == Some(&source)))
                         && !(matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))
                             && matches!(source, Ty::Reference(_) | Ty::Interface(_))
                             && parts.iter().any(|part| {
@@ -1863,6 +1865,7 @@ impl<'a> Profile<'a> {
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) => {
                     let source = pop(&mut stack)?;
                     if source != Ty::Literal
+                        && !matches!(source, Ty::ValueUnion(_))
                         && !(self.references
                             && matches!(
                                 source,

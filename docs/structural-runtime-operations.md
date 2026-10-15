@@ -114,8 +114,9 @@ now covers record/reference/scalar union roots across calls and fault unwind und
 eager and paced nonmoving collection in a small heap. This is bounded AOT
 qualification. The [fresh imported Raven consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
 also passes 32 invocations in each eager/paced nonmoving collector mode, with
-all explicit objects reclaimed. JIT and async retention remain open. Intrinsic String alternatives
-remain a native layout gap.
+all explicit objects reclaimed. JIT and async retention remain open. Intrinsic String alternatives now use a separate traced text slot with exact
+injection, type tests and checked extraction. String remains a reference alternative;
+the enclosing union remains a structural value.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with

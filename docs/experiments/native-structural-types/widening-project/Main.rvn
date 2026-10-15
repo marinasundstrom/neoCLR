@@ -29,7 +29,7 @@ func Main() -> int {
     }
 
     let scalar = match Extend(narrow) {
-        let number: int => number
+        int number => number
         _ => -1
     }
     if scalar != 42 {
@@ -38,7 +38,7 @@ func Main() -> int {
 
     let response: Response | int = Response(42)
     return match Echo(response) {
-        let result: Response => result.Value
+        Response result => result.Value
         _ => -3
     }
 }

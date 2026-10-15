@@ -95,7 +95,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 Ok(())
             }
             Type::Function(_) => argument(ty, depth + 1, nodes),
-            Type::Named(_) => Ok(()),
+            Type::Named(_) | Type::String => Ok(()),
             _ if scalar_union_alternative(ty) => Ok(()),
             Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
                 if arguments.len() > 256 {
@@ -187,6 +187,7 @@ pub(crate) fn validate_in_context(
                 }
                 Ok(())
             }
+            Type::String if !intersection_bound => Ok(()),
             _ if !intersection_bound && scalar_union_alternative(ty) => Ok(()),
             Type::Function(_) if !intersection_bound => {
                 crate::vm::check_type_context(ty, module, context, 0)
@@ -237,7 +238,7 @@ pub(crate) fn matches_object(module: &Module, concrete: &Type, target: &Type) ->
             .iter()
             .any(|part| concrete == part || matches_object(module, concrete, part));
     }
-    (matches!(concrete, Type::Function(_))
+    (matches!(concrete, Type::Function(_) | Type::String)
         || module
             .type_definition(concrete)
             .is_some_and(|d| d.is_reference_type && d.representation == Representation::Record))

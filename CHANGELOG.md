@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Admit intrinsic String alternatives in structural unions across interpreter, native metadata and native inline storage. Preserve text identity and traced owners without a union carrier; check UTF-8 payloads, scalar replacement and failed extraction under collection. String intersection bounds remain rejected. A fresh type-first Raven pattern consumer passes interpreter/AOT/JIT with exactly two String owners and full cleanup; retain evidence and the author’s match-arm style preference.
+
 - Retain an allocation-free scalar-union AOT microbenchmark against an explicit nominal tagged record: nine alternating 5-million-call rounds on Apple M1 show about 5.3% higher median call cost, with every result checked. Record raw samples, object sizes and limits; this does not qualify mixed/async throughput or other platforms.
 
 - Add exact-alternative native union widening across scalar, mixed, reference and record/callable payload layouts. Preserve inactive values and collector roots without allocating a carrier; reject unsupported sets. Retain a fresh Raven overload/widening consumer passing interpreter, AOT and managed JIT with zero arena use. Paired Raven lowering now emits the required explicit conversion; metadata encoding is unchanged.

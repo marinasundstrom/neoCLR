@@ -543,7 +543,7 @@ public sealed partial class NativeAssemblyDefinition
                         var scalar = leaf.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
                         Require(SupportedCompositionArgument(leaf) && (intersectionBound
                             ? localBound is { IsStatic: false, IsValueType: false } || leaf.ImportedType is { IsValueType: false }
-                            : scalar || leaf.FunctionSignature is not null || localBound is { IsStatic: false } || leaf.ImportedType is not null),
+                            : scalar || leaf.Primitive == PrimitiveType.String || leaf.FunctionSignature is not null || localBound is { IsStatic: false } || leaf.ImportedType is not null),
                             "unsupported composition alternative; intersections require nominal references");
                         if (intersectionBound)
                             Require(localBound is { } bound ? !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass

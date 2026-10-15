@@ -26,8 +26,8 @@ pub(crate) fn record(module: &Module, ty: &Type) -> bool {
 
 // Records and callable descriptors use disjoint, independently traced payload regions.
 pub(crate) fn payloads(module: &Module, ty: &Type) -> bool {
-    matches!(ty, Type::Union(parts) if parts.iter().any(|t| record(module, t) || matches!(t, Type::Function(_)))
-        && parts.iter().all(|t| tag(t).is_some() || record(module, t) || matches!(t, Type::Function(_))
+    matches!(ty, Type::Union(parts) if parts.iter().any(|t| record(module, t) || matches!(t, Type::Function(_) | Type::String))
+        && parts.iter().all(|t| tag(t).is_some() || record(module, t) || matches!(t, Type::Function(_) | Type::String)
             || module.type_definition(t).is_some_and(|d| d.is_reference_type || d.representation == Representation::Interface)))
 }
 

@@ -17901,3 +17901,12 @@ combined native execution/GC qualification. The assistant described function
 intersections as an overload-like contract outside the existing nominal bounds,
 not an implicitly supported extension. No user decision to change intersection
 rules was made. See [runtime composition limits](structural-runtime-operations.md#function-values).
+
+
+## 2026-10-15 — Type-first union pattern examples
+
+While reviewing structural union samples, the author clarified that Raven supports
+both `Type obj => ...` and `let obj: Type => ...`, and finds the type-first form
+more intuitive in match arms. The assistant adopted that form in the String and
+widening samples, retaining compilation checks. This is a presentation preference;
+no parser or pattern semantics change was requested.

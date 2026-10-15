@@ -626,3 +626,35 @@ Reproduce with `benchmark-unions.py --codegen target/debug/neoclr-codegen
 --output /fresh/output/path`; set `SDKROOT` to the matching macOS SDK if needed.
 [Raw samples and fingerprints](union-cost-results.json) retain the source, native
 objects, host, tool and commands.
+
+### Intrinsic String union alternatives (2026-10-15)
+
+Native metadata accepts String as a union alternative, while intersection bounds
+continue to exclude it. The interpreter preserves String identity through its
+existing object-reference handle; native lowering stores the text owner in a
+separate traced payload slot beside the discriminator. Numeric bits never become
+text roots. Injection and extraction add no union carrier allocation. Existing
+String owner materialization still allocates when identity is required, just as
+for other String reference views; this is not allocation-free string creation.
+
+Focused interpreter checks cover reordered calls, UTF-8 content/identity and
+wrong-payload faults. Native collector checks retain UTF-8 text (including an
+embedded NUL) across 80 allocating calls per entry under eager/paced collection.
+Eight entries reclaim exactly 656 allocations for the String case (pressure arrays
+and existing text owners) and 640 for the integer case. Failed String extraction
+is InvalidCast. Metadata authoring/reading preserves String membership and rejects
+String intersection bounds. The native tests use undefined/bounds sanitizers.
+
+The fresh Raven fixture is `string-project/Main.rvn`; reproduce compilation and
+interpreter/AOT/JIT execution using `verify-raven-union-widening.py --string-union
+--compiler /path/to/rvnc.dll --bundle target/structural-integration-libraries-v4
+--output /fresh/output/path`. This fixture checks integer and String patterns
+through reordered union signatures. Broader String mixtures, escaped async
+retention and non-macOS backends remain separate qualification work.
+
+[Retained fresh-consumer evidence](string-v4-results.json) records the exact
+compiler/runtime/library hashes. Both native backends allocate and reclaim exactly
+two existing String owners; there is no union carrier allocation. AOT runs with
+undefined/bounds sanitizers; the JIT host is not sanitizer-instrumented. All 67
+interpreter composition tests pass. The type-first String/integer patterns and the
+updated widening sample compile with the paired Raven compiler.
