@@ -3073,3 +3073,196 @@ fn structural_arguments_specialize_generic_methods_and_record_fields() {
         );
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_widening_repacks_exact_alternatives() {
+    for (source, target, payload, create, extract) in [
+        (
+            "Int32,Int64",
+            "Boolean,Int64,Int32",
+            "Int32",
+            "ldc.i4 -42",
+            "ldc.i4 -42",
+        ),
+        (
+            "Int32,Int64",
+            "Cell,Int32,Int64",
+            "Int64",
+            "ldc.i8 4294967338",
+            "ldc.i8 4294967338",
+        ),
+        (
+            "Int32,Int64",
+            "Pair,Int64,Int32",
+            "Int32",
+            "ldc.i4 -42",
+            "ldc.i4 -42",
+        ),
+        (
+            "Int32,Pair",
+            "Boolean,Pair,Int32",
+            "Pair",
+            "ldc.i4 42\nnewobj Pair",
+            "ldfld 0\nldc.i4 42",
+        ),
+        (
+            "Pair,Int32",
+            "Int32,Boolean,Pair",
+            "Int32",
+            "ldc.i4 42",
+            "ldc.i4 42",
+        ),
+        (
+            "Cell,Int32",
+            "Pair,Int32,Cell",
+            "Int32",
+            "ldc.i4 42",
+            "ldc.i4 42",
+        ),
+    ] {
+        let text = format!(
+            r#"
+.module WidenUnion
+.type class abstract System.Object
+.end
+.type class abstract Cell
+.field Number Int32
+.end
+.type Pair
+.field Number Int32
+.end
+.entry Main
+.function Widen(union<{source}> value) -> union<{target}>
+ldarg value
+castclass union<{target}>
+ret
+.end
+.function Main() -> Int32
+.local union<{target}> value
+{create}
+box {payload}
+castclass union<{source}>
+call Widen(union<{source}>)
+stloc value
+ldloc value
+unbox.any {payload}
+{extract}
+ceq
+brfalse bad
+ldc.i4 42
+ret
+bad:
+ldc.i4 0
+ret
+.end
+"#
+        );
+        let module = neoclr::assemble(&text).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+        native_mode_flags(
+            &bytes,
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_widening_preserves_inactive_values() {
+    for (source, target) in [
+        ("Int32,Int64", "Pair,Int64,Int32"),
+        ("Int32,Cell", "Pair,Int32,Cell"),
+        ("Int32,Pair", "Pair,Boolean,Int32"),
+    ] {
+        let text = format!(
+            r#"
+.module EmptyWidening
+.type class abstract System.Object
+.end
+.type class abstract Cell
+.end
+.type Pair
+.field Number Int32
+.end
+.entry Main
+.function Main() -> Int32
+.local union<{source}> empty
+ldloca empty
+initobj union<{source}>
+ldloc empty
+castclass union<{target}>
+ref.isnull
+brfalse bad
+ldc.i4 42
+ret
+bad:
+ldc.i4 0
+ret
+.end
+"#
+        );
+        let module = neoclr::assemble(&text).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+        native_mode_flags(
+            &bytes,
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+fn structural_union_widening_rejects_missing_alternatives() {
+    let source = r#"
+.module MissingAlternative
+.type class abstract System.Object
+.end
+.entry Main
+.function Main() -> Int32
+ldc.i4 42
+box Int32
+castclass union<Int32,Int64>
+castclass union<Int32,Boolean>
+pop
+ldc.i4 42
+ret
+.end
+"#;
+    let module = neoclr::assemble(source).unwrap();
+    let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+    let dir = Temp::new();
+    let result = compile_mode_flags(
+        &bytes,
+        &dir,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(!result.status.success());
+    assert!(!dir.0.join("value.o").exists());
+    let error = String::from_utf8_lossy(&result.stderr);
+    assert!(error.contains("union injection"), "{error}");
+    assert!(!error.contains("panicked"));
+}

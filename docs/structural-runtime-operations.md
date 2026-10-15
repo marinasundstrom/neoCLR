@@ -314,3 +314,28 @@ CLI carrier replacement is introduced. Runtime/storage owns the newly admitted
 operations; Raven continues emitting native structural signatures.
 
 Evidence and reproducer: [native structural experiments](experiments/native-structural-types/README.md).
+
+### Exact native union widening (2026-10-15)
+
+Native unions now widen when every source alternative occurs exactly in the target.
+Raven emits an explicit structural conversion instead of treating union widening as
+an implicit no-op. AOT/JIT preserve compatible layouts directly and otherwise
+repack the tag and active payload into the destination's private layout. Numeric
+bits remain separate from traced reference slots, inactive banks stay zero, and
+inactive/default values remain inactive. No union carrier or box is allocated.
+This does not add payload-transforming conversions or general checked narrowing;
+unsupported alternative sets remain rejected before object emission.
+
+Validation covers scalar-to-scalar/mixed/record-union layouts, reordered record
+payloads and inactive values. Callable, mixed-reference and reference-only sources
+also widen across allocating calls under eager/paced collection. The collector
+fixtures reclaim exactly 656 allocations for callable cases and 648 for object
+cases per policy (eight entries), entirely from the existing explicit objects and
+pressure allocations. They add no allocation for widening.
+
+A fresh Raven consumer checks exact-over-wider overload selection, scalar-to-record
+union widening and record union widening/reordering. Interpreter, macOS ARM64 AOT
+and managed JIT each return 42 with zero arena use. AOT has no native imports and
+passes undefined/bounds sanitizers. JIT uses the required GC/stack host and checks
+roots/heap cleanup before returning; its host is not sanitizer-built. No Runtime
+Contract or metadata encoding change is introduced.

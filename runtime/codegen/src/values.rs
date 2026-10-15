@@ -64,6 +64,99 @@ fn lanes(p: &Profile<'_>, t: &Ty) -> Vec<ir::Type> {
             .collect(),
     }
 }
+// Repack exact alternatives between private union layouts. Numeric bits and
+// traced references never share a slot, and inactive payload banks remain zero.
+fn widen_union(
+    p: &Profile<'_>,
+    b: &mut FunctionBuilder<'_>,
+    source: &Ty,
+    target: &Ty,
+    values: Vec<ir::Value>,
+) -> Vec<ir::Value> {
+    if source == target
+        || matches!(
+            (source, target),
+            (Ty::ScalarUnion(_), Ty::ScalarUnion(_))
+                | (Ty::MixedUnion(_), Ty::MixedUnion(_))
+                | (Ty::ReferenceUnion(_), Ty::ReferenceUnion(_))
+        )
+    {
+        return values;
+    }
+    let from = p.union_parts(source).expect("union source");
+    let to = p.union_parts(target).expect("union target");
+    let mut result: Vec<_> = lanes(p, target).into_iter().map(|ty| zero(b, ty)).collect();
+    let mut offset = 1;
+    for (index, part) in from.iter().enumerate() {
+        let reference = matches!(part, Ty::Reference(_) | Ty::Interface(_));
+        let scalar_tag = match part {
+            Ty::Int => 1,
+            Ty::Wide => 2,
+            Ty::Bool => 3,
+            _ => 4,
+        };
+        let (active, payload) = match source {
+            Ty::ValueUnion(_) => {
+                let active = b.ins().icmp_imm(IntCC::Equal, values[0], index as i64 + 1);
+                let payload = values[offset..offset + p.lanes(part)].to_vec();
+                offset += p.lanes(part);
+                (active, payload)
+            }
+            Ty::ReferenceUnion(_) => (
+                b.ins().icmp_imm(IntCC::NotEqual, values[0], 0),
+                vec![values[0]],
+            ),
+            Ty::ScalarUnion(_) | Ty::MixedUnion(_) => {
+                let active = b.ins().icmp_imm(IntCC::Equal, values[0], scalar_tag);
+                let bits = values[if reference { 2 } else { 1 }];
+                let payload = if matches!(part, Ty::Int | Ty::Bool) {
+                    b.ins().ireduce(types::I32, bits)
+                } else {
+                    bits
+                };
+                (active, vec![payload])
+            }
+            _ => unreachable!(),
+        };
+        let (tag, destination, payload) = match target {
+            Ty::ValueUnion(_) => {
+                // Reference alternatives share the first bank. Nominal checks
+                // inspect the referenced object's identity, not this private tag.
+                let index = to
+                    .iter()
+                    .position(|candidate| {
+                        if reference {
+                            matches!(candidate, Ty::Reference(_) | Ty::Interface(_))
+                        } else {
+                            candidate == part
+                        }
+                    })
+                    .expect("included alternative");
+                (
+                    index as i64 + 1,
+                    1 + to[..index].iter().map(|t| p.lanes(t)).sum::<usize>(),
+                    payload,
+                )
+            }
+            Ty::ScalarUnion(_) | Ty::MixedUnion(_) => {
+                let bits = if matches!(part, Ty::Int | Ty::Bool) {
+                    b.ins().uextend(types::I64, payload[0])
+                } else {
+                    payload[0]
+                };
+                (scalar_tag, if reference { 2 } else { 1 }, vec![bits])
+            }
+            _ => unreachable!("inline widening target"),
+        };
+        let tag = b.ins().iconst(types::I32, tag);
+        result[0] = b.ins().select(active, tag, result[0]);
+        for (slot, value) in payload.into_iter().enumerate() {
+            result[destination + slot] = b.ins().select(active, value, result[destination + slot]);
+        }
+    }
+    result
+}
+
 fn zero(b: &mut FunctionBuilder<'_>, ty: ir::Type) -> ir::Value {
     if ty == types::F64 {
         b.ins().f64const(0.0)
@@ -2670,6 +2763,13 @@ pub(crate) fn compile_into(
                     Op::BoxValue(_) => {
                         // The adjacent admitted union cast consumes this scalar;
                         // no Object box exists or escapes in the native program.
+                    }
+                    Op::CastClass(target)
+                        if crate::scalar_unions::inline(input, target)
+                            && p.widens_union(top(), &p.ty(target)?) =>
+                    {
+                        let values = stack.split_off(stack.len() - p.lanes(top()));
+                        stack.extend(widen_union(&p, &mut b, top(), &p.ty(target)?, values));
                     }
                     Op::CastClass(target)
                         if matches!(p.ty(target)?, Ty::ValueUnion(_))

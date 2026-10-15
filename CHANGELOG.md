@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Add exact-alternative native union widening across scalar, mixed, reference and record/callable payload layouts. Preserve inactive values and collector roots without allocating a carrier; reject unsupported sets. Retain a fresh Raven overload/widening consumer passing interpreter, AOT and managed JIT with zero arena use. Paired Raven lowering now emits the required explicit conversion; metadata encoding is unchanged.
+
 - Record paired Raven structural overload lookup correction and independently carried ordinary .NET ad-hoc carrier widening. Distinct union/intersection/tuple signatures retain lookup identity; metadata encoding and runtime operations are unchanged by this compiler slice.
 
 - Retain reproducible fresh direct and closed-generic Task union qualification in interpreter, macOS ARM64 AOT and managed JIT against v4 libraries, including completed/queued/forwarded results, eager/paced collection and host cleanup. Broader async workloads, open generics and throughput remain unqualified.

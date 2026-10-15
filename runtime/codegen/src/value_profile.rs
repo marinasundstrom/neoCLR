@@ -645,6 +645,28 @@ impl<'a> Profile<'a> {
         // otherwise valid async/TLS programs merely by sharing a signature.
         Ok(targets)
     }
+    pub fn union_parts(&self, t: &Ty) -> Option<Vec<Ty>> {
+        match t {
+            Ty::ScalarUnion(parts) => Some(
+                parts
+                    .iter()
+                    .map(|t| self.ty(t).expect("scalar alternative"))
+                    .collect(),
+            ),
+            Ty::MixedUnion(parts) | Ty::ValueUnion(parts) | Ty::ReferenceUnion(parts) => {
+                Some(parts.clone())
+            }
+            _ => None,
+        }
+    }
+
+    pub fn widens_union(&self, source: &Ty, target: &Ty) -> bool {
+        match (self.union_parts(source), self.union_parts(target)) {
+            (Some(from), Some(to)) => from.iter().all(|part| to.contains(part)),
+            _ => false,
+        }
+    }
+
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
             Type::Tuple(parts) => {
@@ -1673,6 +1695,7 @@ impl<'a> Profile<'a> {
                     }
                     if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
                         && source != self.ty(t)?
+                        && !self.widens_union(&source, &self.ty(t)?)
                         && !(matches!(source, Ty::Callable(_))
                             && parts.iter().any(|part| self.ty(part).ok().as_ref() == Some(&source)))
                         && !(matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))

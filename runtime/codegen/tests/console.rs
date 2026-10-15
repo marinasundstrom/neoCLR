@@ -12224,3 +12224,46 @@ fn structural_union_record_fields_retain_callable_receivers() {
         .replace("ldloc value\ncastclass", "ldloc value\nldfld Holder::Value\ncastclass");
     verify_structural_union_gc(&[(&source, 0)], 656);
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_widening_preserves_collector_roots() {
+    let original =
+        include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil");
+    let source = original
+        .replace("union<fn<Int32>,Int32>", "union<Payload,Int32,fn<Int32>>")
+        .replacen(
+            ".function Make() -> union<Payload,Int32,fn<Int32>>",
+            ".function Make() -> union<fn<Int32>,Int32>",
+            1,
+        )
+        .replacen(
+            "castclass union<Payload,Int32,fn<Int32>>",
+            "castclass union<fn<Int32>,Int32>",
+            1,
+        )
+        .replace(
+            "call Make()",
+            "call Make()\ncastclass union<Payload,Int32,fn<Int32>>",
+        );
+    verify_structural_union_gc(&[(&source, 0)], 656);
+    let reference = source
+        .replace("function.bind fn<Int32> = instance Cell::Read()\n", "")
+        .replace("fn<Int32>", "Cell")
+        .replace("call instance Cell::Invoke()", "call instance Cell::Read()");
+    verify_structural_union_gc(&[(&reference, 0)], 648);
+    let reference_only = reference
+        .replace(
+            ".function Make() -> union<Cell,Int32>",
+            ".function Make() -> union<Cell,System.Object>",
+        )
+        .replace(
+            "castclass union<Cell,Int32>",
+            "castclass union<Cell,System.Object>",
+        )
+        .replace(
+            "union<Payload,Int32,Cell>",
+            "union<Payload,Int32,Cell,System.Object>",
+        );
+    verify_structural_union_gc(&[(&reference_only, 0)], 648);
+}
