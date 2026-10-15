@@ -633,3 +633,12 @@ mod tuple_tests {
         );
     }
 }
+
+// The table is compiler-owned and absent from serialized programs. Checking it
+// here keeps ordinary interpreter builds independent of the native bridge feature.
+pub(crate) fn retained_descriptor(module: &Module, index: u32) -> Result<&TypeDescriptor, Fault> {
+    module
+        .native_descriptors
+        .get(index as usize)
+        .ok_or_else(|| Fault::new("metadata token has no retained descriptor"))
+}

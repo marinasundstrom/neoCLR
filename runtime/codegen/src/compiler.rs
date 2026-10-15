@@ -85,7 +85,7 @@ pub(super) fn compile_for_target(
                         || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String | Type::Tuple(_) | Type::Union(_)))
                 })
                 || f.body.iter().any(|op| {
-                    matches!(op, Op::New(Type::Tuple(_)) | Op::CastClass(Type::Union(_)) | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                    matches!(op, Op::New(Type::Tuple(_)) | Op::CastClass(Type::Union(_)) | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::LoadMetadataToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
         })

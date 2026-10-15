@@ -502,6 +502,15 @@ pub(crate) fn compile_into(
             }
         }
     }
+    let mut metadata_tokens = Vec::new();
+    for op in input.functions.iter().flat_map(|f| &f.body) {
+        if let Op::LoadMetadataToken(index) = op {
+            neoclr::native_metadata::descriptor(input, *index).map_err(|e| e.to_string())?;
+            if !metadata_tokens.contains(index) {
+                metadata_tokens.push(*index);
+            }
+        }
+    }
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
         .collect::<Result<_, _>>()?;
@@ -3141,6 +3150,11 @@ pub(crate) fn compile_into(
                     }
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
+                    Op::LoadMetadataToken(index) => {
+                        let identity = type_tokens.len() + metadata_tokens.iter()
+                            .position(|i| i == index).expect("collected metadata token") + 1;
+                        stack.push(b.ins().iconst(types::I64, identity as i64));
+                    }
                     Op::LoadTypeToken(t) => {
                         let identity = type_tokens
                             .iter()

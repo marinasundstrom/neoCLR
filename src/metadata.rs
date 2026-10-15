@@ -217,6 +217,9 @@ impl Type {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Module {
+    // Compiler-owned descriptive handles. Never accepted from serialized metadata.
+    #[serde(skip)]
+    pub(crate) native_descriptors: Vec<crate::type_identity::TypeDescriptor>,
     #[serde(skip)]
     pub(crate) friend_access: crate::friend_access::Cache,
     // Host-selected load context, never authored or trusted from serialized metadata.
@@ -934,6 +937,9 @@ pub enum Instruction {
     /// CLI-shaped type-token acquisition; method and field tokens are not supported.
     #[serde(rename = "ldtoken")]
     LoadTypeToken(Type),
+    /// Private compiler IR: indexes an authenticated, nonserialized descriptor table.
+    #[serde(rename = "$metadata.token")]
+    LoadMetadataToken(u32),
     #[serde(rename = "ref.type")]
     ReferenceType,
     #[serde(rename = "castclass")]

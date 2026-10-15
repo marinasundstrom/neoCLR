@@ -1403,6 +1403,7 @@ impl<'a> Profile<'a> {
                 | Op::Bool(_)
                 | Op::Void
                 | Op::LoadTypeToken(_)
+                | Op::LoadMetadataToken(_)
                 | Op::Load(_)
                 | Op::LocalAddress(_)
                 | Op::ArgumentAddress(_) => state.stack.push(None),
@@ -1504,6 +1505,7 @@ impl<'a> Profile<'a> {
                 | Op::Bool(_)
                 | Op::Void
                 | Op::LoadTypeToken(_)
+                | Op::LoadMetadataToken(_)
                 | Op::Dup
                 | Op::Pop
                 | Op::StaticField { .. }
@@ -1810,6 +1812,10 @@ impl<'a> Profile<'a> {
                 }
                 Op::Bool(_) => stack.push(Ty::Bool),
                 Op::Void => stack.push(Ty::Unit),
+                Op::LoadMetadataToken(index) => {
+                    neoclr::native_metadata::descriptor(self.input, *index).map_err(|e| e.to_string())?;
+                    stack.push(Ty::TypeToken);
+                }
                 Op::LoadTypeToken(t) => {
                     // A token cannot introduce open or unsupported type shapes.
                     self.ty(t)?;

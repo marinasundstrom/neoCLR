@@ -386,7 +386,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::Allocate(..) | Op::Free => &[NativeAllocation, PointerMemory],
         Op::AllocateLocal => &[FrameAllocation, PointerMemory],
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
-        Op::LoadTypeToken(..) => &[TypeInspection],
+        Op::LoadTypeToken(..) | Op::LoadMetadataToken(..) => &[TypeInspection],
         Op::ReferenceType => &[TypeInspection, SlotReferences],
         Op::BoxValue(_) | Op::UnboxAny(_) => &[ManagedHeap, ValueStorage, SlotReferences],
         Op::IsInstance(_) | Op::ReferenceIsNull | Op::CastClass(_) => {

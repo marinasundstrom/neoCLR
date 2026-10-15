@@ -110,6 +110,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
 
 fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
+        native_descriptors: vec![],
         object_root: None,
         friend_access: Default::default(),
         assemblies: vec![],

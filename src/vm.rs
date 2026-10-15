@@ -1304,6 +1304,9 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                     check(ty)?;
                     crate::interfaces::interface_definition(module, ty)?;
                 }
+                Op::LoadMetadataToken(index) => {
+                    crate::type_identity::retained_descriptor(module, *index)?;
+                }
                 Op::LoadTypeToken(ty)
                 | Op::PackValue(ty)
                 | Op::IsValue(ty)
@@ -4058,6 +4061,11 @@ fn interpret_instructions_with_dispatch(
                     reference.assigned()?;
                     frame.stack.push(Value::RuntimeTypeHandle(Box::new(
                         crate::type_identity::describe_loaded(module, &reference.stored_type()?)?,
+                    )));
+                }
+                Op::LoadMetadataToken(index) => {
+                    frame.stack.push(Value::RuntimeTypeHandle(Box::new(
+                        crate::type_identity::retained_descriptor(module, *index)?.clone(),
                     )));
                 }
                 Op::LoadTypeToken(ty) => {

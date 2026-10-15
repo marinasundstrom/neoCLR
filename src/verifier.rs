@@ -664,6 +664,7 @@ fn effect(
         | Receiver { .. }
         | Load(_)
         | LoadTypeToken(_)
+        | LoadMetadataToken(_)
         | SizeOf(_)
         | AlignOf(_)
         | NullPointer(_) => (0, 1),
@@ -1245,6 +1246,10 @@ fn typed_effect(
             })
         }
         LoadTypeToken(_) => one(Type::RuntimeTypeHandle),
+        LoadMetadataToken(index) => {
+            crate::type_identity::retained_descriptor(module, *index)?;
+            one(Type::RuntimeTypeHandle)
+        }
         ReferenceEqual => {
             for value in values {
                 require(

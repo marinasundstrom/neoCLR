@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Add compiler-owned descriptive tokens for open generic definitions and their owner-bound parameters, independent of executable layouts. Preserve the private table through native selection and nominal rewriting, reject serialized table/opcode forgery, and keep native handle identity distinct from ordinary closed-type tokens. This is internal infrastructure; guest open-definition discovery remains unfinished.
+
 - Implement TypeInfo.GetGenericArguments in the class library through the shared count/indexed handle queries, reserving one result array. Qualify sequence/indexed parity and nongeneric empty results in interpreter/AOT/JIT against a fresh bundle; open generic parameter variance still passes in the interpreter. Refresh matching API references. Native open-definition discovery and intrinsic String variance remain separate gaps.
 
 - Refresh native API documentation with RavenDoc interface variance qualifiers. All eleven annotated declarations now render in/out correctly; remove the recorded renderer omission while retaining the annotation/limits reference. The general fix was validated on Raven main and carried separately to codex/neoclr; production native rendering and snapshot checks pass.

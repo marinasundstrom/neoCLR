@@ -531,3 +531,152 @@ pub fn restore_interface_proofs(
     }
     Ok(())
 }
+
+/// Retain a descriptive open definition or one of its owner-bound parameters.
+/// This trusted compiler bridge grants no executable layout or invocation rights.
+pub fn retain_definition_token(
+    target: &mut Module,
+    source: &Module,
+    definition: &crate::metadata::TypeDefId,
+    parameter: Option<u16>,
+) -> Result<crate::metadata::Instruction, Fault> {
+    let declaration = source
+        .types
+        .iter()
+        .find(|d| d.definition.as_ref() == Some(definition))
+        .ok_or_else(|| Fault::new("unknown metadata token definition"))?;
+    if declaration.generic_parameters.is_empty() {
+        return Err(Fault::new(
+            "descriptive token requires an open generic definition",
+        ));
+    }
+    let mut value = crate::type_identity::describe_definition(source, declaration)?;
+    if let Some(index) = parameter {
+        value = value
+            .generic_arguments
+            .get(index as usize)
+            .cloned()
+            .ok_or_else(|| Fault::new("generic parameter index out of range"))?;
+    }
+    let index = if let Some(index) = target
+        .native_descriptors
+        .iter()
+        .position(|d| d.identity == value.identity)
+    {
+        index
+    } else {
+        target.native_descriptors.push(value);
+        target.native_descriptors.len() - 1
+    };
+    Ok(crate::metadata::Instruction::LoadMetadataToken(
+        u32::try_from(index).map_err(|_| Fault::new("metadata descriptor table overflow"))?,
+    ))
+}
+
+/// Read a compiler-owned descriptor; serialized programs cannot supply this table.
+pub fn descriptor(
+    module: &Module,
+    index: u32,
+) -> Result<&crate::type_identity::TypeDescriptor, Fault> {
+    crate::type_identity::retained_descriptor(module, index)
+}
+
+/// Preserve descriptive identity across a row-preserving private nominal rewrite.
+/// Executable names may change; source descriptor identities must not change.
+pub fn restore_descriptor_table(target: &mut Module, original: &Module) -> Result<(), Fault> {
+    if target.types.len() != original.types.len()
+        || target.functions.len() != original.functions.len()
+    {
+        return Err(Fault::new(
+            "descriptor restoration requires a row-preserving rewrite",
+        ));
+    }
+    target.native_descriptors = original.native_descriptors.clone();
+    Ok(())
+}
+
+#[cfg(test)]
+mod descriptor_token_tests {
+    use super::*;
+    use crate::metadata::Instruction as Op;
+    use crate::type_identity::TypeIdentity;
+
+    #[test]
+    fn descriptor_tokens_preserve_owner_identity_and_reject_serialized_forgery() {
+        let source = crate::assemble(".module Descriptors\n.entry Main\n.interface First<T>\n.variance out\n.end\n.interface Second<T>\n.end\n.type Plain\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        let first = source.types[0].definition.as_ref().unwrap();
+        let second = source.types[1].definition.as_ref().unwrap();
+        let mut target = source.clone();
+        let a = retain_definition_token(&mut target, &source, first, Some(0)).unwrap();
+        let repeated = retain_definition_token(&mut target, &source, first, Some(0)).unwrap();
+        let other = retain_definition_token(&mut target, &source, second, Some(0)).unwrap();
+        assert_eq!(
+            serde_json::to_value(&a).unwrap(),
+            serde_json::to_value(&repeated).unwrap()
+        );
+        assert_ne!(
+            serde_json::to_value(&a).unwrap(),
+            serde_json::to_value(&other).unwrap()
+        );
+        let Op::LoadMetadataToken(index) = a.clone() else {
+            panic!("descriptive token")
+        };
+        let parameter = descriptor(&target, index).unwrap();
+        assert_eq!(parameter.name, "T");
+        assert_eq!(
+            parameter.identity,
+            TypeIdentity::GenericParameter {
+                definition: first.clone(),
+                index: 0
+            }
+        );
+        let definition = retain_definition_token(&mut target, &source, first, None).unwrap();
+        let Op::LoadMetadataToken(index) = definition else {
+            panic!("definition token")
+        };
+        assert_eq!(
+            descriptor(&target, index).unwrap().generic_arguments[0].identity,
+            TypeIdentity::GenericParameter {
+                definition: first.clone(),
+                index: 0
+            }
+        );
+        assert!(retain_definition_token(&mut target, &source, first, Some(1)).is_err());
+        assert!(
+            retain_definition_token(
+                &mut target,
+                &source,
+                source.types[2].definition.as_ref().unwrap(),
+                None
+            )
+            .is_err()
+        );
+        target.functions[0].body = vec![
+            a,
+            repeated,
+            Op::Equal,
+            Op::BranchFalse(6),
+            Op::Int(42),
+            Op::Return,
+            Op::Int(1),
+            Op::Return,
+        ];
+        let program = crate::LoadedProgram::new(&target).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(crate::Limits::default()).unwrap().value,
+            Value::Int32(42)
+        );
+        let encoded = serde_json::to_value(&target).unwrap();
+        assert!(encoded.get("native_descriptors").is_none());
+        let decoded: Module = serde_json::from_value(encoded.clone()).unwrap();
+        assert!(
+            crate::LoadedProgram::new(&decoded)
+                .and_then(|p| p.verify())
+                .is_err()
+        );
+        let mut forged = encoded;
+        forged["native_descriptors"] = serde_json::json!([]);
+        assert!(serde_json::from_value::<Module>(forged).is_err());
+    }
+}

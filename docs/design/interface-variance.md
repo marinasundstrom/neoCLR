@@ -330,3 +330,32 @@ configuration are unchanged. The closed consumer checks indexed/sequence parity
 and a nongeneric empty result; the open-definition interpreter consumer checks
 all three variance annotations. Native open-definition discovery still needs the
 metadata-only handle model described above.
+
+### Descriptive native handle foundation (2026-10-16)
+
+.NET distinguishes a generic type definition from its constructions and describes
+a parameter by the type or method that declares it plus its zero-based position
+([definition](https://learn.microsoft.com/en-us/dotnet/api/system.type.isgenerictypedefinition?view=net-10.0),
+[position](https://learn.microsoft.com/en-us/dotnet/api/system.type.genericparameterposition?view=net-10.0)).
+neoCLR already uses declaring-definition identity and ordinal in its interpreter
+TypeDescriptor. Native preparation now has a separate compiler-owned descriptor
+table and private `$metadata.token` instruction for open definitions and their
+parameters. These preserve that semantic identity without synthesizing a nominal
+class, closing a generic declaration or retaining an executable layout.
+
+The table is not serialized. A serialized opcode without its compiler-owned table
+is rejected by verification, and supplying the private table as an input field is
+rejected. Only the in-repository native bridge populates it from resolved source
+definitions; nongeneric definitions keep ordinary type tokens. Cloning, selection
+and private nominal renaming preserve the table. Native lowering assigns image-local
+integer handles in a disjoint range from ordinary closed-type tokens; no object or
+adapter allocation is required to acquire a descriptive handle.
+
+This belongs to the runtime/compiler metadata boundary, not a foreign library:
+source identities and verified IR are required, and no external ABI is introduced.
+The tradeoff is a second internal token producer and a table-preservation obligation
+for native rewrites. Guest TypeInfo APIs and Runtime Contract configuration are
+unchanged. This foundation alone does not enable assembly discovery, open generic
+member substitution or invocation. Interpreter identity/forgery tests, selection
+and rewrite checks, AOT emission and synchronous macOS ARM64 JIT execution qualify
+the handle foundation; guest discovery/query wiring follows separately.

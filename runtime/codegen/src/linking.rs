@@ -1423,6 +1423,7 @@ fn rename_nominal(
         rename(&mut value, old, new, root);
         serde_json::from_value(value).map_err(|e| e.to_string())
     }).map_err(|e| e.to_string())?;
+    neoclr::native_metadata::restore_descriptor_table(&mut rewritten, module).map_err(|e| e.to_string())?;
     *module = rewritten;
     Ok(())
 }
@@ -1439,5 +1440,128 @@ mod variance_projection_tests {
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
         assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
+}
+
+#[cfg(test)]
+mod descriptor_token_tests {
+    use neoclr::metadata::{Instruction as Op, Type};
+
+    pub(super) fn fixture() -> neoclr::Module {
+        let source = neoclr::assemble(".module DescriptorTokens\n.entry Main\n.interface First<T>\n.end\n.interface Second<T>\n.end\n.type Plain\n.field Value Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        let mut target = source.clone();
+        let a = neoclr::native_metadata::retain_definition_token(
+            &mut target,
+            &source,
+            source.types[0].definition.as_ref().unwrap(),
+            Some(0),
+        )
+        .unwrap();
+        let same = neoclr::native_metadata::retain_definition_token(
+            &mut target,
+            &source,
+            source.types[0].definition.as_ref().unwrap(),
+            Some(0),
+        )
+        .unwrap();
+        let other = neoclr::native_metadata::retain_definition_token(
+            &mut target,
+            &source,
+            source.types[1].definition.as_ref().unwrap(),
+            Some(0),
+        )
+        .unwrap();
+        target.functions[0].body = vec![
+            a.clone(),
+            same,
+            Op::Equal,
+            Op::BranchFalse(14),
+            a.clone(),
+            other,
+            Op::Equal,
+            Op::BranchTrue(14),
+            a,
+            Op::LoadTypeToken(Type::from_name("Plain")),
+            Op::Equal,
+            Op::BranchTrue(14),
+            Op::Int(42),
+            Op::Return,
+            Op::Int(1),
+            Op::Return,
+        ];
+        let (mut selected, _) = crate::selection::prepare(&target, "Main").unwrap();
+        assert!(
+            !selected
+                .types
+                .iter()
+                .any(|d| d.name == "First" || d.name == "Second")
+        );
+        super::rename_nominal(&mut selected, "Unrelated", "PrivateUnrelated", "Main").unwrap();
+        selected
+    }
+
+    #[test]
+    fn descriptor_tokens_survive_selection_rewrite_and_aot_emission() {
+        let selected = fixture();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        assert!(
+            !crate::compiler::compile(&selected, "Main", false, None)
+                .unwrap()
+                .is_empty()
+        );
+    }
+
+    #[test]
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    fn descriptor_tokens_keep_identity_in_native_execution() {
+        use cranelift_codegen::{isa, settings, settings::Configurable};
+        use cranelift_jit::{JITBuilder, JITModule};
+        use cranelift_module::{FuncOrDataId, Module};
+        struct Owner(Option<JITModule>);
+        impl Drop for Owner {
+            fn drop(&mut self) {
+                if let Some(module) = self.0.take() {
+                    // SAFETY: the generated function is only called synchronously below.
+                    unsafe { module.free_memory() };
+                }
+            }
+        }
+        let input = fixture();
+        let mut flags = settings::builder();
+        flags.set("is_pic", "false").unwrap();
+        flags.set("use_colocated_libcalls", "false").unwrap();
+        let isa = isa::lookup("aarch64-apple-darwin".parse().unwrap())
+            .unwrap()
+            .finish(settings::Flags::new(flags))
+            .unwrap();
+        let mut owner = Owner(Some(JITModule::new(JITBuilder::with_isa(
+            isa,
+            cranelift_module::default_libcall_names(),
+        ))));
+        let module = owner.0.as_mut().unwrap();
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            None,
+            crate::compiler::Target::MacosArm64,
+            module,
+            true,
+        )
+        .unwrap();
+        module.finalize_definitions().unwrap();
+        let Some(FuncOrDataId::Func(id)) = module.get_name("neoclr_entry_v2") else {
+            panic!("missing entry")
+        };
+        // SAFETY: compile_into emits this exact ABI; the owner outlives the call.
+        let entry: unsafe extern "C" fn(i32, *mut i32) -> i32 =
+            unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+        let mut value = 0;
+        assert_eq!(unsafe { entry(0, &mut value) }, 0);
+        assert_eq!(value, 42);
     }
 }
