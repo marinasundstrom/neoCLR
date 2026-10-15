@@ -44,6 +44,10 @@ internal static class AuthoredCompositionChecks
         var callbackType = SignatureType.Function(new MethodSignature(values, [values]));
         var callbackEcho = builder.AddFunction("CallbackEcho", new MethodSignature(callbackType, [callbackType]));
         callbackEcho.LoadArgument(0); callbackEcho.Return();
+        var valueWrapper = builder.AddGenericValueType("Example", "ValueWrapper", ["T", "E"]);
+        var openWrapper = valueWrapper.MakeGenericInstance(SignatureType.MethodParameter(0), values);
+        var genericEcho = builder.AddFunction("GenericValueEcho", new MethodSignature(openWrapper, [openWrapper], ["T"]));
+        genericEcho.LoadArgument(0); genericEcho.Return();
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
@@ -55,6 +59,10 @@ internal static class AuthoredCompositionChecks
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "CallbackEcho").TryGetSignature(out var callbackSignature) ||
             callbackSignature!.ReturnType.FunctionSignature?.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("callback union result lost");
+        if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "GenericValueEcho").TryGetSignature(out var genericSignature) ||
+            genericSignature!.GenericParameterNames.Count != 1 ||
+            genericSignature.ReturnType.ReferencedGenericInstance?.TypeArguments[1].Composition?.Kind != ReferenceCompositionKind.Union)
+            throw new Exception("generic value wrapper structural argument lost");
         Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));

@@ -9107,3 +9107,5 @@ roundtrip covers a callback accepting and returning a union. Interpreter executi
 is bounded to exact nongeneric callback targets without composition-bearing owners;
 CLI projection of these shapes is unsupported. No nominal delegate or union type
 is synthesized.
+
+Composition-enabled native declaration reads preserve generic method scope and structural arguments in nominal value wrappers. This is metadata introspection support; callable import and runtime execution have separate admission rules. Open union constituents remain unsupported.

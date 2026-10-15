@@ -600,15 +600,15 @@ public sealed partial class NativeAssemblyDefinition
                         {
                             var external = ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length,
                                 referenceIdentities, valueTypeReferences, nativeTypeAliases);
-                            Require(!external.IsValueType && arguments.All(a => a.NestingDepth < 16),
-                                "composition wrappers require a reference type");
+                            Require(arguments.All(a => a.NestingDepth < 16),
+                                "composition wrapper nesting exceeds limit");
                             // Declaration kind and constraints are checked against the exact resolved
                             // dependency before callable import. The reader retains its identity only.
                             return new ImportedTypeReference(signatureGraph, external.AssemblyIdentity, external.Namespace,
                                 external.Name, external.GenericArity, arguments, external.IsValueType, external.DeclaringType);
                         }
                         var wrapper = signatureOwners[definition];
-                        Require(!wrapper.IsValueType && !wrapper.IsInterface && !wrapper.IsStatic &&
+                        Require(!wrapper.IsInterface && !wrapper.IsStatic &&
                             wrapper.GenericParameterNames.Count == arguments.Length &&
                             wrapper.GenericConstraints.Count == 0 && wrapper.SpecialConstraints.Count == 0 &&
                             arguments.All(a => a.NestingDepth < 16), "unsupported composition wrapper construction");
@@ -805,8 +805,8 @@ public sealed partial class NativeAssemblyDefinition
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 typeArity = ownerIndex < 0 ? 0 : types[ownerIndex].GenericNames.Length;
-                var allowComposition = (ownerIndex < 0 || !types[ownerIndex].IsValueType && !types[ownerIndex].IsInterface && !types[ownerIndex].IsStatic) &&
-                    genericArity == 0 && implementationAttributes == 0 && nativeImport is null;
+                // Declaration reads preserve structural signatures independently of execution support.
+                var allowComposition = implementationAttributes == 0 && nativeImport is null;
                 if (method.TryGetProperty("locals", out _))
                     foreach (var local in Array(method, "locals", 1024)) _ = ReadType(local, false, allowComposition: allowComposition);
                 var parameters = Array(method, "parameters", 256);
