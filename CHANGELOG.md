@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Record the structural-type design assessment against Scala 3, Julia and TypeScript, distinguishing language precedents from neoCLR representation choices and remaining validation obligations. No runtime behavior changes.
+
 - Allow explicit extraction of exact reference alternatives from native structural unions while retaining implicit all-alternative membership and unrelated-type rejection. Track structural generic arguments on nominal runtime calls with no value parameters. Validate direct and closed-generic task consumers (42 each, ten checks per consumer), 21 compiler tests and 55 runtime tests. Save an open-generic metadata rejection probe; open `Response<T>` operands and union-local closure capture remain incomplete.
 
 - Admit native union extraction from Object-stored nominal generic payloads with concrete membership checks. Validate awaited `Task<Result<Response, HttpError | JsonError>>` against the fresh bundle on completed/queued success and both imported errors (42); 54 structural runtime tests pass. Explicit whole-union boxing and final boxed identity remain unqualified.

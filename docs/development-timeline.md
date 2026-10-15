@@ -17742,3 +17742,42 @@ reinforces the existing category correction; it does not select a boxed native A
 The next validated slice preserves structural callback signatures and executes a
 callback returning a union (42). All four native source libraries now generate;
 bundle execution and generic value-wrapper support remain distinct validation work.
+
+## 2026-10-15 — Structural type direction and language precedents
+
+The author asked: “Is this direction with structural types still sound? Is there
+any language that has done similar?” The assistant assessed the architecture as
+coherent, while distinguishing that judgment from a formal type-safety proof or
+completion of the runtime ABI. Structural composition of nominal types does not
+require implicit interface conformance or duck typing.
+
+Primary-source comparisons reviewed by the assistant:
+
+- [Scala 3 unions](https://docs.scala-lang.org/scala3/reference/new-types/union-types.html)
+  and [intersections](https://docs.scala-lang.org/scala3/reference/new-types/intersection-types.html)
+  demonstrate anonymous composition of class/trait types, including generic
+  intersection bounds. They are language-semantic precedents, not evidence for
+  neoCLR's particular value-container representation or reflection contract.
+- [Julia types](https://docs.julialang.org/en/v1/manual/types/#Type-Unions) combine
+  nominal/parametric types with runtime union types. Its
+  [isbits union optimization](https://docs.julialang.org/en/v1/devdocs/isbitsunionarrays/)
+  demonstrates inline payload storage with type tags for eligible unions.
+  Julia's dynamic type model and union types are not the same as neoCLR's proposed
+  distinct union value containers; this does not select neoCLR's ABI.
+- [TypeScript compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility)
+  and [compositions](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html)
+  provide an ergonomic comparison. Its structural object compatibility differs
+  from neoCLR's explicitly implemented nominal interfaces.
+
+The assistant recommended maintaining separate contracts for type identity,
+assignability, payload/boxing identity and physical layout. Open generic
+substitution, overlapping union alternatives, variance, reflection and GC/layout
+remain validation obligations. The no-final-class intersection rule is a
+conservative project restriction, not a mathematical necessity: a final class
+already implementing an interface can have a meaningful, redundant intersection.
+No change to that author-selected restriction was made or inferred.
+
+Existing evidence remains the direct/closed generic task consumers and focused
+checks in [the qualification record](experiments/value-unions/direct-task-results.json).
+The open Response<T> probe still rejects. This discussion adds research and
+assessment only; no new implementation commitment or author response is recorded.
