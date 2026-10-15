@@ -1249,3 +1249,22 @@ fn union_object_extraction_checks_payload_membership() {
         .to_string()
         .contains("does not satisfy"));
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn nominal_generic_call_checks_structural_arguments_without_parameters() {
+    for invalid in [false, true] {
+        let operation = if invalid { "sizeof T\npop\n" } else { "" };
+        let source = format!(
+            ".module GenericCall\n.entry Main\n{TYPES}\n.type class Factory\n.method static Read<T>() -> Int32\n{operation}ldc.i4 42\nret\n.end\n.end\n.function Main() -> Int32\ncall Factory::Read<union<Int32,Both>>()\nret\n.end"
+        );
+        if invalid {
+            assert!(assemble(&source).is_err());
+        } else {
+            let module = assemble(&source).unwrap();
+            let p = LoadedProgram::new(&module).unwrap();
+            p.verify().unwrap();
+            assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+        }
+    }
+}

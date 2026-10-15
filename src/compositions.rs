@@ -386,6 +386,7 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                 Op::Construct(target) | Op::Call(target) | Op::CallVirtual(target)
                     if target.owner.is_some()
                         && (target.owner.as_ref().is_some_and(contains)
+                            || target.generic_arguments.iter().any(contains)
                             || target.parameters.iter().any(contains)) =>
                 {
                     let owner = target.owner.as_ref().unwrap();

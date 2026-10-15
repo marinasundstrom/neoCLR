@@ -33,3 +33,21 @@ An exit status of 42 means all six checks passed. The sample uses native union
 extraction from a nominal Result carrier. Explicit whole-union boxing and final
 boxed identity remain unqualified; see the integration document for the temporary
 interpreter representation.
+
+## Direct unions and generic alternatives
+
+- `direct-task-project/`: `Task<Response | HttpError | JsonError>`, exit 42.
+- `closed-generic-task-project/`: `Task<Response<int> | HttpError | JsonError>`, exit 42.
+- `open-generic-project/`: negative probe for `Response<T> | HttpError | JsonError`
+  in a generic method. Native encoding currently rejects open constituents
+  with NEOMETA003 (`composition requires bounded closed constituents`). It is not
+  a working executable sample, even when called with `T = int`.
+
+Run each with the command above, substituting the project directory. Both task
+consumers check all three alternatives through completed, queued and async-forwarded
+tasks, plus preserved reference identity (ten checks each). They use native union
+signatures with imported value errors and a reference response. The callback
+identity check captures the response reference; directly capturing a union local
+remains unsupported. `direct-task-results.json` records the successful executions
+and open-generic rejection with source/tool/bundle hashes. Focused validation passes
+21 compiler tests and 55 runtime tests.

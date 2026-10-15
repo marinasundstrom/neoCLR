@@ -119,3 +119,5 @@ Development follow-up (2026-10-15): exact native callbacks can return a structur
 Development qualification (2026-10-15): a consumer now compiles and executes HTTP-header checks against the fresh Runtime/Data/Networking/Web bundle. Focused checks cover structural arguments in nominal value wrappers and generic callback substitution; this does not establish all endpoint or backend combinations.
 
 Development qualification (2026-10-15): a fresh-bundle sample awaits `Task<Result<Response, HttpError | JsonError>>` through completed and queued tasks, checking success and both imported error alternatives. Native union extraction from the nominal result carrier is validated; whole-union boxing and final native layout remain incomplete.
+
+Development qualification (2026-10-15): direct `Task<Response | HttpError | JsonError>` and closed `Task<Response<int> | HttpError | JsonError>` samples now execute all alternatives through completed, queued and async-forwarded tasks. Open `Response<T>` union constituents still fail native metadata encoding.

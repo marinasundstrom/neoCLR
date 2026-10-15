@@ -1,0 +1,76 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+import System.Data.Json.*
+
+class Response<T> {
+    val Number: T
+
+    init(number: T) {
+        Number = number
+    }
+}
+
+func Make(choice: int) -> Response<int> | HttpError | JsonError {
+    if choice == 0 {
+        return Response<int>(42)
+    }
+    if choice == 1 {
+        return HttpError.TimedOut
+    }
+    return JsonError.InvalidIndex(42)
+}
+
+func Inspect(value: Response<int> | HttpError | JsonError, choice: int) -> int {
+    if choice == 0 {
+        let response = (Response<int>)value
+        return response.Number
+    }
+    if choice == 1 {
+        return match (HttpError)value {
+            HttpError.TimedOut => 42
+            _ => -1
+        }
+    }
+    return match (JsonError)value {
+        JsonError.InvalidIndex(let index) => index
+        _ => -1
+    }
+}
+
+func Wrap(response: Response<int>) -> Response<int> | HttpError | JsonError {
+    return response
+}
+
+async func Produce(choice: int) -> Task<Response<int> | HttpError | JsonError> {
+    let value = await Task.Run(() => Make(choice))
+    return value
+}
+
+async func Main() -> Task<int> {
+    let completedSuccess = await Task.FromResult(Make(0))
+    let completedHttp = await Task.FromResult(Make(1))
+    let completedJson = await Task.FromResult(Make(2))
+    let queuedSuccess = await Task.Run(() => Make(0))
+    let queuedHttp = await Task.Run(() => Make(1))
+    let queuedJson = await Task.Run(() => Make(2))
+    let forwardedSuccess = await Produce(0)
+    let forwardedHttp = await Produce(1)
+    let forwardedJson = await Produce(2)
+    if Inspect(completedSuccess, 0) != 42 || Inspect(completedHttp, 1) != 42 || Inspect(completedJson, 2) != 42 {
+        return 1
+    }
+    if Inspect(queuedSuccess, 0) != 42 || Inspect(queuedHttp, 1) != 42 || Inspect(queuedJson, 2) != 42 {
+        return 2
+    }
+    if Inspect(forwardedSuccess, 0) != 42 || Inspect(forwardedHttp, 1) != 42 || Inspect(forwardedJson, 2) != 42 {
+        return 3
+    }
+    let response = Response<int>(42)
+    let delivered = await Task.Run(() => Wrap(response))
+    let extracted = (Response<int>)delivered
+    if !Object.ReferenceEquals(response, extracted) {
+        return 4
+    }
+    return 42
+}
