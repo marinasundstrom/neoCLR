@@ -508,3 +508,26 @@ pub fn interface_slot_peers(module: &Module, function: &crate::metadata::Functio
 pub fn interface_shape_arguments(definition: &crate::metadata::TypeDef) -> &[Type] {
     definition.native_interface.as_ref().map(|shape| shape.arguments.as_slice()).unwrap_or(&[])
 }
+
+/// Preserve private variance facts across a row-preserving compiler metadata rewrite.
+/// The mapper must perform the same type renaming as the rewrite. Serialized input
+/// cannot supply these facts; the original must be verified compiler IR.
+pub fn restore_interface_proofs(
+    target: &mut Module,
+    original: &Module,
+    map_type: impl Fn(&Type) -> Result<Type, String>,
+) -> Result<(), Fault> {
+    if target.types.len() != original.types.len() || target.functions.len() != original.functions.len() {
+        return Err(Fault::new("variance proof restoration requires identical rows"));
+    }
+    for (target, original) in target.types.iter_mut().zip(&original.types) {
+        target.native_interface = original.native_interface.clone();
+        if let Some(shape) = &mut target.native_interface {
+            shape.arguments = shape.arguments.iter().map(&map_type).collect::<Result<_, _>>().map_err(Fault::new)?;
+        }
+    }
+    for (target, original) in target.functions.iter_mut().zip(&original.functions) {
+        target.native_interface_slot = original.native_interface_slot.clone();
+    }
+    Ok(())
+}

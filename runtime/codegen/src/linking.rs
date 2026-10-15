@@ -1417,6 +1417,27 @@ fn rename_nominal(
     }
     let mut encoded = serde_json::to_value(&*module)?;
     rename(&mut encoded, old, new, root);
-    *module = serde_json::from_value(encoded)?;
+    let mut rewritten = serde_json::from_value(encoded)?;
+    neoclr::native_metadata::restore_interface_proofs(&mut rewritten, module, |ty| {
+        let mut value = serde_json::to_value(ty).map_err(|e| e.to_string())?;
+        rename(&mut value, old, new, root);
+        serde_json::from_value(value).map_err(|e| e.to_string())
+    }).map_err(|e| e.to_string())?;
+    *module = rewritten;
     Ok(())
+}
+
+#[cfg(test)]
+mod variance_projection_tests {
+    #[test]
+    fn nominal_rename_preserves_native_variance_and_slot_identity() {
+        let source = neoclr::assemble(include_str!("../../../docs/validation/interface-variance/Main.neoil")).unwrap();
+        let (mut selected, _) = crate::selection::prepare(&source, "Main").unwrap();
+        // Even a rewrite unrelated to these interfaces used to discard all
+        // private proof fields through the serialization round trip.
+        super::rename_nominal(&mut selected, "UnrelatedStaticOwner", "PrivateStaticOwner", "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
 }

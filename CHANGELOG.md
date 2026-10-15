@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Preserve native interface variance and contract-slot facts across private nominal renaming. A row-preserving rewrite now remaps retained argument types rather than losing compiler metadata during serialization; a focused executable regression covers variant dispatch after an unrelated nominal rewrite.
+
 - Expose guest `GenericParameterTypeInfo.Variance` and `GenericVariance` for open type-definition arguments, preserving ordinary method `ParameterInfo.IsOut` semantics. Update both native/source snapshot providers, matching CLI reference and native API documentation. A fresh Raven consumer returns 42 for all three annotations and concrete closed arguments; focused query and native closed-shape tests pass. Native open-definition reflection remains a support gap, not permission to erase generic metadata; record the author's .NET-aligned preservation requirement.
 
 - Preserve verified interface variance and contract-slot identity through native specialization and selection without synthetic inheritance or wrapper allocations. Separately compiled Raven covariance/contravariance consumers return 42 in interpreter, AOT and managed JIT; the native hosts check fault state, roots and collection. Focused specialization tests include closed generic implementations and reject serialized compiler proofs.

@@ -9284,3 +9284,9 @@ in-memory facts, excluded from serialization and guest RavenDoc. Invalid shape
 indices or arity return Fault; callers must supply verified source modules and
 valid function indices. They preserve source identities through private shape
 renumbering; they do not define new nominal inheritance or public guest types.
+
+`native_metadata::restore_interface_proofs(target, original, map_type)` preserves
+trusted interface/slot facts through a row-preserving compiler rewrite. It requires
+matching type/function row counts and applies the same nominal type remapping to
+retained interface arguments. It returns Fault on row mismatch or mapping failure.
+This compiler bridge does not deserialize proof fields from external metadata.
