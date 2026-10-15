@@ -11171,3 +11171,14 @@ carried deliberately to `codex/neoclr` (`1e6771d5f`); thirteen focused tests pas
 both lines. Native nominal renaming preserves private variance facts instead of
 losing them through metadata serialization. This is a preservation bug fix, not a
 change to the reified generic model. See the retained library qualification.
+
+### Variance signature rendering follow-up (2026-10-16)
+
+Raven main `fcefb7836`, deliberately carried as `eef1ed456`, fixes generic interface
+qualifiers in shared symbol display and RavenDoc. Source/imported signatures and
+unannotated concrete arguments pass focused tests (63 main, 64 native branch).
+The API snapshot is refreshed from the existing `variance-libraries-20261016-final`
+bundle with this renderer; all eleven declaration qualifiers are checked. No
+Runtime Contract, CLI encoding, native metadata or language conversion changes
+are involved. This closes the presentation gap, not the native open-definition
+introspection or intrinsic String conversion gaps.

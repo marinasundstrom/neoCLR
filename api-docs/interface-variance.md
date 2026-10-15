@@ -1,9 +1,8 @@
 # Interface variance (development)
 
-These are the class library's exact annotated declarations. The current RavenDoc
-signature renderer omits `in`/`out` in its heading; the annotations are retained in
-native metadata and the generated type remarks. This manual reference supplies the
-missing signature qualifiers without excluding any type or member from the browser.
+These are the class library's annotated declarations. RavenDoc preserves `in`/`out`
+in generated signatures from native metadata. This reference collects the eleven
+annotations and their conversion limits; no type or member is excluded.
 
 | Namespace | Declaration |
 | --- | --- |

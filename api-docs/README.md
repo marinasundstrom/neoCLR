@@ -2172,8 +2172,10 @@ Mutable/class/value-wrapper contracts remain invariant. The matching native audi
 retains all namespace pages and updates TypeInfo assignment documentation for
 supported reference variance. See the [qualification](../docs/validation/interface-variance/library/README.md).
 
-RavenDoc currently omits `in`/`out` from interface signature headings. The
-[manual variance reference](interface-variance.md), linked from the API landing page,
-records all eleven exact declarations; generated remarks also state the annotation.
-No public type/member is excluded. Fixing the renderer qualifier omission is a
-separate documentation-tooling gap; metadata retention and compilation are tested.
+RavenDoc now preserves `in`/`out` in interface declaration signatures. Main fix
+`fcefb7836` was deliberately carried as `eef1ed456`; 63 main and 64 neoCLR-line
+focused documentation/display checks pass. The refreshed native snapshot uses
+`target/variance-qualifiers-docs-20261016` against the same bundle, with all eleven
+qualifiers checked in rendered pages and four snapshot checks passing. The
+[variance reference](interface-variance.md) remains a concise annotation/limits
+index. No public type/member is excluded; the renderer omission is closed.

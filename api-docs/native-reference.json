@@ -5,14 +5,14 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "e8dd61da1f5757219eadc5869026bea18ce0db455e0dc85c5c685ee10f409082",
+  "sha256": "de8fb77de316cc587ad5185deb4350dacbdb1a09817a65bcbe42390558f93def",
   "librarySourceRevision": "229cc95ffa817bdcf12282448b8d7d6a41de2ef5",
   "compilerRevision": "1e6771d5f",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
     "sha256": "c57bf3e183eae4d3748706adfea217b987bac345871d65fb87648c60bc27781b"
   },
-  "rendererRevision": "1e6771d5f",
+  "rendererRevision": "eef1ed456",
   "libraryArtifacts": {
     "System.Runtime.dll": "42f2ee5878fec2ad8ed663484ddd91d7c431274c291e85c17087d3717bdc3560",
     "System.Data.dll": "bc7d6318a720d9205ecb6ca2714c090130bc442710ec8dd80e7d10acf75af883",

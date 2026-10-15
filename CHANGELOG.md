@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Refresh native API documentation with RavenDoc interface variance qualifiers. All eleven annotated declarations now render in/out correctly; remove the recorded renderer omission while retaining the annotation/limits reference. The general fix was validated on Raven main and carried separately to codex/neoclr; production native rendering and snapshot checks pass.
+
 - Qualify closed generic introspection for two constructions of the same nominal definition against the annotated native bundle. One Raven image preserves concrete arguments and distinct/repeated type identity in interpreter, AOT and managed JIT, with native fault/GC cleanup checks. Retain the consumer and reproducible runner; open-definition enumeration and sequence-returning argument queries are not covered.
 
 - Retain declared method generic constraints in the native source catalogue alongside parameter names and type-level constraints/variance. A focused regression distinguishes two closed constructions while preserving their shared declaration and owner-relative method bounds. This is build-time retention; native open-definition discovery remains unsupported.
