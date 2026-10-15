@@ -23,10 +23,13 @@ def main():
     parser.add_argument('--mixed', action='store_true', help='Include a nominal reference alternative')
     parser.add_argument('--generic', action='store_true', help='Use an imported Response<int> with generic payload storage')
     parser.add_argument('--record', action='store_true', help='Use an imported nominal value-record payload')
+    parser.add_argument('--record-reference', action='store_true', help='Include a direct HttpError reference beside the value record')
     args = parser.parse_args()
+    if args.record_reference and not args.record:
+        parser.error('--record-reference requires --record')
     if args.record and (not (args.mixed and args.imported) or args.generic):
         parser.error('--record requires --mixed --imported and excludes --generic')
-    reference_payload = args.mixed and not args.record
+    reference_payload = args.mixed and (not args.record or args.record_reference)
     if args.generic and not (args.mixed and args.imported):
         parser.error('--generic requires --mixed --imported')
     project = PROJECT.parent / 'scalar-import-project' if args.imported else PROJECT
@@ -42,6 +45,10 @@ def main():
         project = PROJECT.parent / 'record-import-project'
         library = PROJECT.parent / 'record-import-library'
         library_name = 'StructuralRecordLibrary'
+    if args.record_reference:
+        project = PROJECT.parent / 'record-reference-import-project'
+        library = PROJECT.parent / 'record-reference-import-library'
+        library_name = 'StructuralRecordReferenceLibrary'
     library_artifact = library / f'bin/neoclr/{library_name}.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This AOT qualification requires macOS ARM64')
@@ -80,7 +87,7 @@ def main():
     if args.mixed:
         unions = [json.JSONDecoder().raw_decode(body[match.end():].lstrip())[0]
                   for match in re.finditer(r'"Union":', body)]
-        assert any(len(parts) == 4 and all(t in parts for t in ['Int32', 'Int64', 'Boolean'])
+        assert any(len(parts) == (5 if args.record_reference else 4) and all(t in parts for t in ['Int32', 'Int64', 'Boolean'])
                    and any(isinstance(t, dict) and ('Constructed' in t if args.generic else 'Named' in t) for t in parts) for parts in unions), "Missing native mixed union signature"
     else:
         assert '"Union":["Int32","Int64","Boolean"]' in body, "Missing native union signature"
@@ -91,7 +98,7 @@ def main():
         calls = [json.loads(line.split('call ', 1)[1]) for line in body.splitlines() if ': call ' in line]
         for name in ['Produce', 'Echo']:
             suffix = '.F_' + name.encode().hex().upper()
-            assert sum(call['name'].endswith(suffix) for call in calls) == (7 if args.mixed else 6), name
+            assert sum(call['name'].endswith(suffix) for call in calls) == (8 if args.record_reference else 7 if args.mixed else 6), name
     obj = output / 'consumer.o'
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
                 '--compile-system', '--reference-arena', *context])
@@ -133,6 +140,7 @@ int main(void) {
         'mixedPayloads': reference_payload,
         'nominalValuePayload': args.record,
         'genericPayload': args.generic,
+        'recordReferencePayloads': args.record_reference,
         'nativeImports': imports.splitlines(),
         'compilerCheckoutRevision': compiler_revision.stdout.strip() if compiler_revision.returncode == 0 else None,
         'runtimeRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -149,6 +157,8 @@ int main(void) {
                         'no JIT or collector stress',
                         'no throughput claim'],
     }
+    if args.record_reference:
+        report['checks'].append('eighth imported input preserves direct HttpError reference beside inline Response record')
     if args.generic:
         report['checks'].append('imported Response<int> preserves its generic field payload')
     if args.mixed:

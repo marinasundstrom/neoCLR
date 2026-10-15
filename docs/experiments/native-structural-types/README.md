@@ -305,3 +305,14 @@ would require boxing remain gated. Testing against an entire value-union target
 (`isinst union<...>`) also remains gated; testing individual alternatives is
 qualified here. The sum-of-regions size and 256-lane cap remain;
 this is not a compact-layout or managed collector qualification.
+
+
+A [fresh artifact-only Raven record/reference consumer](record-reference-import-project/README.md)
+also qualifies `int | long | bool | Response | HttpError`, where Response is a
+struct and HttpError is a class. Eight imported Produce/Echo calls exercise
+reordered signatures, scalar guards and distinct record/reference pattern arms.
+Interpreter and AOT return 42; the only native import is object allocation and
+arena use is exactly 16 bytes for HttpError. Sources, artifacts, tools and retained
+v3 bundle are fingerprinted in the [evidence](raven-record-reference-import-results.json).
+The bundle itself was not rebuilt. Compiler emission and Runtime Contract
+configuration are unchanged; this adds no managed JIT/GC or throughput claim.

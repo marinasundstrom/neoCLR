@@ -101,7 +101,9 @@ A [fresh imported Raven struct consumer](experiments/native-structural-types/rec
 also preserves Int32/Int64 fields through union calls and patterns with zero
 arena use and no native imports. Records can also combine with direct nominal reference alternatives: the first
 reference region stores the object, and casts/tests check its actual nominal
-conformance. Intrinsic String alternatives remain a native layout gap.
+conformance. A [fresh imported record/reference consumer](experiments/native-structural-types/record-reference-import-project/README.md)
+passes eight inputs with only its explicit HttpError allocation (16 bytes).
+Intrinsic String alternatives remain a native layout gap.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with

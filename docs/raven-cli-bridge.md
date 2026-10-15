@@ -10820,3 +10820,10 @@ configuration are unchanged. Checked reference views use actual nominal
 conformance; scalar/record queries retain exact identity. See the
 [native qualification](experiments/native-structural-types/README.md#direct-reference-alternatives-beside-records-2026-10-15).
 Boxing projections, compact layouts and managed JIT/GC qualification remain open.
+
+
+The [fresh Raven record/reference consumer](experiments/native-structural-types/record-reference-import-project/README.md)
+now passes eight imported inputs in interpreter and AOT with only the explicit
+HttpError object allocation (16 bytes). It uses the unchanged native Runtime
+Contract and compiler emission with a retained v3 bundle; the result does not
+qualify managed JIT/GC or full Task execution. Evidence fingerprints all inputs.

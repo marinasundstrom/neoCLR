@@ -28,5 +28,6 @@ compiler/runtime tools, runner and retained bundle. No compiler emission or
 Runtime Contract change was needed; bundle libraries were not rebuilt. This is
 allocation qualification, not a throughput result. The private union layout sums
 alternative sizes plus a discriminator, so copy/zero costs and overlapping storage
-still need performance work. Direct reference alternatives alongside records,
-enums, boxing, managed JIT/GC and full Task qualification remain open.
+still need performance work. Direct reference alternatives alongside records are now qualified by the
+[record/reference consumer](../record-reference-import-project/README.md). Enums,
+boxing, managed JIT/GC and full Task qualification remain open.

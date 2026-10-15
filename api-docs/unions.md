@@ -140,7 +140,10 @@ consumer also preserves Int32/Int64 fields through seven union-call/pattern chec
 returning 42 in interpreter/AOT with no native imports or arena allocation. The total layout is limited to 256 lanes;
 its size is the sum of alternatives, so overlapping-storage optimization remains
 future work. Direct nominal reference alternatives can accompany records; their
-shared reference region uses actual nominal conformance for tests and casts. Enums,
+shared reference region uses actual nominal conformance for tests and casts. A
+[fresh Raven consumer](../docs/experiments/native-structural-types/record-reference-import-project/README.md)
+passes eight imported scalar/record/reference inputs with only its explicit
+HttpError allocation (16 bytes). Enums,
 Object/scalar-interface views requiring boxing and intrinsic String alternatives
 remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
