@@ -11050,3 +11050,33 @@ reader's attribute row budget is 8,192 (boundary-tested); it accommodates the
 4,217-row valid test assembly without relaxing member or blob limits. Local-budget
 and direct-base-call tests now match existing behavior. This supersedes the earlier
 six-failure status above; native structural encoding and Runtime Contract are unchanged.
+
+## Range endpoint migration (2026-10-15)
+
+The general Raven change defines `..` as end-exclusive and `..=` as end-inclusive
+across loops, collection expansion, range patterns and slices; `..<` is removed.
+The author directed Raven main integration first, followed by deliberate carry to
+`codex/neoclr` and native semantic work. Structural-type development remains parked.
+
+On ordinary .NET, stored/sliced ranges retain the System.Range ABI. Inclusive
+System.Index ends are validated and converted with checked arithmetic to equivalent
+exclusive boundaries: `n + 1` or `^(n - 1)`. Source inclusion spelling is lost in the
+stored System.Range; selection is preserved. This general .NET lowering is not proof
+of native backend support. Raven owns syntax/binding/emission; neoCLR owns its library
+and native backend behavior. No new Runtime Contract option, structural metadata
+encoding or native opcode is introduced by this migration.
+
+Compiler API terminology separates RangeExpression/RangePattern, sequence segment/rest
+prefixes, collection spreads and slicing. The range inclusion slot is EqualsToken;
+sequence prefixes use OperatorToken for `..`/`...`; spread nodes use DotDotDotToken.
+The proposed generic Bound/Interval and progression contracts remain separate work.
+See [the design and capability boundaries](design/generic-bounds.md).
+
+Raven local main now contains `c16fca24c` (implementation) and `363d30388` (design).
+Validation: generator/build checks pass; 318 endpoint-focused tests passed before
+the terminology cleanup, followed by 207 targeted compiler checks on the final
+syntax API. All 72 baseline compiler batches pass (6,233 invocations), and the
+remaining baseline projects pass (96 invocations). Final .NET 10 hover checks pass
+7 tests with 2 existing skips. Executable loop, pattern and array-slice samples pass.
+These counts overlap and are not a unique-test total. Carry to `codex/neoclr` and
+native execution qualification are pending; no push or publication is claimed.

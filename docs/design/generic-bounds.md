@@ -1,7 +1,8 @@
 # Generic bounds and consistent Raven ranges
 
-Status: proposed design, 2026-10-15. No compiler or runtime behavior changes in this
-slice. The author requested generic bounds and consistent endpoint semantics,
+Status: generic capability/library proposal, 2026-10-15. Raven main now includes
+the general endpoint/terminology migration at `c16fca24c`; native lowering and
+generic library APIs remain pending. The author requested generic bounds and consistent endpoint semantics,
 followed by integer iteration, and explicitly parked structural-type work. The
 author then clarified that all known Raven consumers are owned by the project and
 compatibility is not a concern. A coordinated source migration is appropriate;
@@ -152,16 +153,15 @@ bounds. Negative numeric endpoints are valid interval values but invalid element
 positions; conversion must validate them. Final overload-ranking and natural-type
 rules need binder tests before implementation is considered complete.
 
-For half-open slicing, map to System.Range normally. For inclusive slicing, use a
-length-aware adapter: evaluate receiver and endpoints once, left-to-right; resolve
-from-end positions; validate the included last element; then form an exclusive limit.
-An inclusive ^0 is invalid because it denotes the boundary after the final element;
-inclusive ^1 includes the last element. Empty receivers cannot accept an included
-end element. Never implement inclusive conversion as unchecked `end + 1`, especially
-for ^n or integer maximum. Plain System.Range cannot retain an inclusive endpoint;
-conversion without sufficient context must be rejected or remain an explicit bounds
-value, never silently lose the inclusion flag. Custom indexers require a supported
-bounds contract or an explicit adapter; they cannot be assumed to have a length.
+For half-open slicing, map to System.Range normally. The Raven implementation review
+refined the original length-aware adapter proposal: inclusive Index endpoints can
+be translated algebraically without a collection length. Validate the original
+Index, then use checked `n + 1` for a start-relative end and `^(n - 1)` for a from-end
+end. Inclusive ^0 rejects, ^1 includes the last element, and an unrepresentable
+exclusive successor rejects. The consuming API still validates collection bounds.
+System.Range preserves selected positions but loses the source spelling/inclusion
+flag; proposed generic Bound values retain that flag. Custom indexers follow their
+declared contract. Native neoCLR support requires its own lowering and validation.
 
 Syntax semantics agree across targets. Runtime failure transport and text coordinates
 remain explicit platform differences: .NET APIs may throw and use UTF-16 positions;

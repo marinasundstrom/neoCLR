@@ -17993,3 +17993,31 @@ of existing Raven-repository consumers and renaming the range token slots, inclu
 patterns. The assistant set aside an uncommitted integer-overflow prototype and began
 the main-based syntax migration, using optional EqualsToken for expressions/patterns.
 Implementation/validation is in progress; no main integration is claimed here.
+
+The author asked whether “Range” was being used for constructs that are not ranges,
+then directed alignment with appropriate terms. The assistant audited the syntax
+model: RangeExpression and RangePattern describe bounds, while sequence prefixes
+and spread nodes are already separate. Documentation had mislabeled slicing examples
+as patterns. The main-based change corrects those examples and distinguishes ranges,
+slices, fixed segments, rest patterns, spreads and progressions. It also renames the
+sequence-prefix DotDotToken slot to OperatorToken because it can contain either
+`..` or `...`, and renames the parser helper to cover both segments and rest patterns.
+The author reported renaming the Raven neoCLR branch to `codex/neoclr`; main fixes
+continue separately and require deliberate native validation before carrying them.
+
+The author explicitly confirmed the subsequent integration into `codex/neoclr`,
+after Raven main, so native semantics can continue there. The assistant committed
+to carrying the general changes deliberately with separate compiler-line validation;
+this is not authorization inferred from a branch merge or a claim of native parity.
+
+Delivery: the assistant committed Raven implementation `c16fca24c` and fast-forwarded
+local main to it, including the prior design slice `363d30388`. The generator/build,
+72 compiler baseline batches and remaining baseline projects pass, as do final
+207 compiler checks and 7 hover tests (2 existing skips). Loop, range-pattern and
+array-slicing consumers run successfully. Spread slots were also aligned to
+DotDotDotToken and their factories to `...`. The initial resumed baseline build
+caught a stale factory slot definition, which was fixed before the successful build
+and remaining-project rerun. See [the integration record](raven-cli-bridge.md#range-endpoint-migration-2026-10-15).
+The `codex/neoclr` checkout is unchanged; deliberate carry and native qualification
+are the next steps. Integer advancement, generic bounds and structural work were not
+included in this implementation slice.
