@@ -54,6 +54,21 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
                 trace: Trace::ErasedText { tag_lane: 0 },
             }];
         }
+        Ty::Tuple(parts) => {
+            let mut result = vec![];
+            let mut offset = 0;
+            for ty in parts {
+                for mut slot in slots(p, ty) {
+                    slot.lane += offset;
+                    if let Trace::ErasedText { tag_lane } = &mut slot.trace {
+                        *tag_lane += offset;
+                    }
+                    result.push(slot);
+                }
+                offset += p.lanes(ty);
+            }
+            return result;
+        }
         Ty::Record(i) => {
             let mut result = vec![];
             let mut offset = 0;
@@ -208,6 +223,27 @@ mod tests {
             }]
         );
     }
+    #[test]
+    fn structural_tuple_tracing_preserves_nested_offsets_and_excludes_numeric_lanes() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::Tuple(vec![
+            Ty::Wide,
+            Ty::Tuple(vec![Ty::Double, Ty::Literal]),
+            Ty::Int,
+        ]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 2,
+                trace: Trace::Text
+            }]
+        );
+        assert_eq!(seed_lanes(&p, &ty), vec![2]);
+        assert_eq!(p.lanes(&ty), 4);
+        assert_eq!(p.bytes(&ty), 32);
+    }
+
     #[test]
     fn nested_records_preserve_reference_offsets_and_stop_at_reference_edges() {
         let mut module = module();

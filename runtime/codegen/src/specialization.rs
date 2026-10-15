@@ -79,6 +79,16 @@ impl Specializer<'_> {
             | Type::RuntimeTypeHandle => {
                 return Ok(ty.clone());
             }
+            Type::Tuple(parts) => {
+                let elements = parts
+                    .iter()
+                    .map(|t| self.lower(t))
+                    .collect::<Result<_, _>>()?;
+                return Ok(Type::Tuple(
+                    neoclr::metadata::TupleSignature::new(elements, parts.names().to_vec())
+                        .map_err(|e| e.to_string())?,
+                ));
+            }
             Type::Function(shape) => {
                 let mut shape = shape.as_ref().clone();
                 shape.parameters = shape

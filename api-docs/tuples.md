@@ -67,7 +67,7 @@ The union/intersection feature alone does not enable tuple execution. Existing
 no nominal FieldDef. Native aggregate construction, indexed element reads/writes,
 managed element addresses and default initialization preserve value copying and
 reference-element identity. Invalid element types, positions and stores fault.
-JIT/AOT and native layout remain unsupported. Open, byref, pointer, array, function
+A bounded native backend now lowers tuple storage inline (see below). Open, byref, pointer, array, function
 and composition direct elements are not admitted in this bounded slice. Existing nominal
 Tuple APIs remain available during migration; their removal is planned. Raven native source binding and guest element descriptors are described below;
 CLI tuple projection does not represent this structural identity.
@@ -180,3 +180,18 @@ still admits only closed scalar/nested elements. Legacy runtime tuple declaratio
 remain for CLI bridge consumers but are not used by native structural binding.
 These are compiler-host contracts, documented in Raven's runtime-contract and
 neoCLR integration guides; they do not add a guest class-library API.
+
+## Native execution development
+
+The structural branch admits ordered tuple storage in the shared native backend.
+macOS ARM64 AOT tests cover nested integer/floating-point tuples, copying, calls,
+returns, element mutation through managed addresses and default initialization.
+Elements use the existing private eight-byte scalar slots, capped at 256 flattened
+slots. Tuple construction itself allocates no heap carrier. Element names remain
+metadata; positional access and compatibility are unchanged.
+
+Nested tracing recipes retain reference slots and omit numeric slots. This bounded
+storage slice does not complete native tuple reflection, boxing, array storage,
+Windows qualification or full Raven application integration. JIT uses shared
+lowering but still needs dedicated structural execution qualification. These are
+integration gaps, not permanent restrictions of structural identity.

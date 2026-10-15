@@ -421,3 +421,27 @@ Open-element emission, nonlocal mutation, managed element addresses and broader
 backend support remain separate work.
 
 [Carrier-free symbol validation](experiments/structural-tuples/symbol-results.json) records the focused tests and executable consumers.
+
+## Native inline storage — 2026-10-15
+
+The native backend now models tuple elements directly, without synthesizing a
+nominal declaration. Selection traverses elements and generic specialization
+preserves signature names. Private ABI lowering flattens scalar lanes for storage
+and calls, using the same eight-byte slots as nominal value records. Construction
+and copies introduce no heap allocation. Unlike CLR ValueTuple, this identity is
+signature-based; reusing aggregate storage machinery does not change that identity.
+The benefit is allocation-free composition with existing codegen; the cost is
+padding, copying and bounded aggregate size, not yet a compact public ABI.
+
+Focused tests in `runtime/codegen/tests/values.rs` execute nested integer/Double
+copies, mutation through nested element addresses, calls/returns and default
+initialization through macOS ARM64 AOT. The 256-lane boundary executes; 272 lanes
+fail admission. Return scratch space accounts for tuple results, including results
+larger than the previous minimum buffer. Tracing recipes identify nested text
+references without treating wide numeric lanes as managed references.
+
+Native tuple reflection, boxing, tuple arrays, dedicated JIT/GC-stress consumers,
+Windows qualification and compiler-produced application qualification remain open.
+Native unions and intersections remain rejected. The author additionally requested
+performance measurement to guide optimization; comparative benchmarks are a
+separate slice and these storage checks alone are not a performance qualification.

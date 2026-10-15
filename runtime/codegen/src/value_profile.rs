@@ -16,6 +16,7 @@ pub(super) enum Ty {
     Character, // One validated extended grapheme, stored as immutable UTF-8 text.
     Literal,   // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
+    Tuple(Vec<Ty>),
     Reference(usize),
     Interface(usize),
     ByteArray,
@@ -253,9 +254,23 @@ impl<'a> Profile<'a> {
             }
             for field in fields {
                 let ty = p.stored(&field.ty)?;
-                if let Ty::Record(child) = ty {
-                    layout(p, child, states)?;
+                fn dependencies(
+                    p: &mut Profile<'_>,
+                    ty: &Ty,
+                    states: &mut [u8],
+                ) -> Result<(), Error> {
+                    match ty {
+                        Ty::Record(child) => layout(p, *child, states)?,
+                        Ty::Tuple(parts) => {
+                            for part in parts {
+                                dependencies(p, part, states)?;
+                            }
+                        }
+                        _ => (),
+                    }
+                    Ok(())
                 }
+                dependencies(p, &ty, states)?;
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
                 if !p.input.types[i].is_reference_type && width > crate::limits::INLINE_LANES {
@@ -389,7 +404,7 @@ impl<'a> Profile<'a> {
                 }
                 None
             } else {
-                Some(p.ty(&f.returns)?)
+                Some(p.stored(&f.returns)?)
             });
         }
         // Resolve all calls (even dead ones) and reject recursive native call graphs.
@@ -621,10 +636,8 @@ impl<'a> Profile<'a> {
     }
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
-            Type::Tuple(_) => {
-                return Err(
-                    "structural tuple signatures are interpreter-only in this experiment".into(),
-                );
+            Type::Tuple(parts) => {
+                Ty::Tuple(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
             }
             Type::Union(_) | Type::Intersection(_) => {
                 return Err(
@@ -716,7 +729,11 @@ impl<'a> Profile<'a> {
         matches!(t, Ty::Reference(i) if self.object_base == Some(*i))
     }
     fn stored(&self, t: &Type) -> Result<Ty, Error> {
-        self.ty(t)
+        let ty = self.ty(t)?;
+        if matches!(ty, Ty::Tuple(_)) && self.lanes(&ty) > crate::limits::INLINE_LANES {
+            return Err("structural tuple exceeds flattened inline lane limit".into());
+        }
+        Ok(ty)
     }
     pub fn stack_type(t: &Ty) -> Ty {
         if matches!(t, Ty::Byte | Ty::SByte | Ty::Short | Ty::UShort) {
@@ -731,6 +748,7 @@ impl<'a> Profile<'a> {
             Ty::SByte => vec![Some((8, true))],
             Ty::Short => vec![Some((16, true))],
             Ty::UShort => vec![Some((16, false))],
+            Ty::Tuple(parts) => parts.iter().flat_map(|t| self.narrow_lanes(t)).collect(),
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields
                 .iter()
@@ -760,6 +778,7 @@ impl<'a> Profile<'a> {
             | Ty::Size
             | Ty::Wide
             | Ty::TypeToken => vec![true],
+            Ty::Tuple(parts) => parts.iter().flat_map(|t| self.pointer_lanes(t)).collect(),
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields
                 .iter()
@@ -771,12 +790,22 @@ impl<'a> Profile<'a> {
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
             Ty::Record(i) => self.widths[*i],
+            Ty::Tuple(parts) => parts.iter().map(|t| self.lanes(t)).sum(),
             Ty::Erased => 2,
             _ => 1,
         }
     }
     pub fn call_result_bytes(&self) -> u32 {
-        (self.widths.iter().copied().max().unwrap_or(1) * 8).max(256) as u32
+        (self
+            .results
+            .iter()
+            .flatten()
+            .map(|t| self.lanes(t))
+            .chain(self.widths.iter().copied())
+            .max()
+            .unwrap_or(1)
+            * 8)
+        .max(256) as u32
     }
 
     pub fn bytes(&self, t: &Ty) -> u32 {
@@ -917,6 +946,7 @@ impl<'a> Profile<'a> {
             let ty = self.ty(&field.ty)?;
             fn zero_initializable(p: &Profile<'_>, ty: &Ty) -> bool {
                 match ty {
+                    Ty::Tuple(parts) => parts.iter().all(|t| zero_initializable(p, t)),
                     Ty::Record(i) => p.input.types[*i]
                         .fields
                         .iter()
@@ -951,6 +981,9 @@ impl<'a> Profile<'a> {
         } else {
             t
         };
+        if let Ty::Tuple(parts) = t {
+            return parts[..index].iter().map(|t| self.lanes(t)).sum();
+        }
         let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             unreachable!("checked field owner")
         };
@@ -965,6 +998,12 @@ impl<'a> Profile<'a> {
         } else {
             t
         };
+        if let Ty::Tuple(parts) = t {
+            return parts
+                .get(index)
+                .cloned()
+                .ok_or_else(|| "tuple element index out of range".into());
+        }
         let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             return Err("field access requires a value record".into());
         };
@@ -1187,12 +1226,12 @@ impl<'a> Profile<'a> {
                     continue;
                 }
                 Op::New(t) => {
-                    let Ty::Record(owner) = self.ty(t)? else {
-                        unreachable!()
+                    let count = match self.ty(t)? {
+                        Ty::Record(owner) => self.input.types[owner].fields.len(),
+                        Ty::Tuple(parts) => parts.len(),
+                        _ => unreachable!(),
                     };
-                    state
-                        .stack
-                        .truncate(state.stack.len() - self.input.types[owner].fields.len());
+                    state.stack.truncate(state.stack.len() - count);
                     state.stack.push(None);
                 }
                 Op::Pop
@@ -1535,11 +1574,17 @@ impl<'a> Profile<'a> {
                 }
                 Op::New(t) => {
                     let t = self.ty(t)?;
-                    let Ty::Record(owner) = t else {
-                        return Err(fail(pc, "reference allocation requires a constructor"));
+                    let fields = match &t {
+                        Ty::Record(owner) => self.input.types[*owner]
+                            .fields
+                            .iter()
+                            .map(|f| self.ty(&f.ty))
+                            .collect::<Result<Vec<_>, _>>()?,
+                        Ty::Tuple(parts) => parts.clone(),
+                        _ => return Err(fail(pc, "reference allocation requires a constructor")),
                     };
-                    for f in self.input.types[owner].fields.iter().rev() {
-                        take(&mut stack, &self.ty(&f.ty)?)?;
+                    for field in fields.iter().rev() {
+                        take(&mut stack, field)?;
                     }
                     stack.push(t);
                 }

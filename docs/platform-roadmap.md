@@ -7,7 +7,9 @@ covers source native signatures, structural descriptors, Task union delivery,
 intersection trait calls and closed method constraints with separate consumers.
 Written intersection bounds require interfaces or classes open to extension;
 Raven sealed hierarchies remain valid. Full open-generic integration, broader
-constraint authoring/reflection and JIT/AOT remain follow-up work. The consolidated
+constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
+Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and
+256-slot boundary checks; see [native tuple progress](structural-tuples.md#native-inline-storage--2026-10-15). The consolidated
 acceptance runner records the exact tested artifacts. This author-directed
 experiment does not change the active performance milestone.
 

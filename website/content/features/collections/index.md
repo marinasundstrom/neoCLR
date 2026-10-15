@@ -108,8 +108,9 @@ method with `Response<T>` also executes. Copying a reference payload preserves i
 object identity. Arrays retain their structural runtime shape and nominal
 `Array<T>` representation.
 
-This native work currently executes in the interpreter and requires matching
-feature-branch artifacts. Efficient AOT/JIT representation is still being developed;
+This work requires matching feature-branch artifacts. Interpreter execution is
+validated, and bounded tuple storage also runs through macOS ARM64 AOT using inline
+slots without a heap carrier. Broader AOT/JIT representation is still being developed;
 the temporary boxed union storage is not the intended final performance model.
 Bare generic-parameter union alternatives and unrestricted combinations remain
 incomplete.

@@ -839,11 +839,7 @@ fn retained_types(
     }
     while let Some(ty) = pending_types.pop() {
         match ty {
-            Type::Tuple(_) => {
-                return Err(
-                    "structural tuple signatures are interpreter-only in this experiment".into(),
-                );
-            }
+            Type::Tuple(parts) => pending_types.extend(parts.iter().cloned()),
             Type::Union(_) | Type::Intersection(_) => {
                 return Err(
                     "compound reference signatures are interpreter-only in this experiment".into(),
@@ -1198,16 +1194,15 @@ mod composition_admission_tests {
     use super::*;
 
     #[test]
-    fn structural_tuple_storage_is_rejected_before_native_selection() {
+    fn structural_tuple_storage_is_selected_without_nominal_carriers() {
         let mut module = neoclr::assemble(
             ".module TupleNative\n.entry Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end",
         )
         .unwrap();
         module.functions[0]
             .locals
-            .push(Type::Tuple(vec![Type::Int32, Type::String]));
-        let error = prepare(&module, "Main").unwrap_err().to_string();
-        assert!(error.contains("structural tuple"), "{error}");
+            .push(Type::Tuple(vec![Type::Int32, Type::String].into()));
+        prepare(&module, "Main").unwrap();
     }
 
     #[test]

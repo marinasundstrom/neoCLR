@@ -45,6 +45,7 @@ use profile::{Profile, Ty};
 
 fn lanes(p: &Profile<'_>, t: &Ty) -> Vec<ir::Type> {
     match t {
+        Ty::Tuple(parts) => parts.iter().flat_map(|t| lanes(p, t)).collect(),
         Ty::Double => vec![types::F64],
         Ty::Single => vec![types::F32],
         Ty::Record(i) if !p.input.types[*i].fields.is_empty() => p.input.types[*i]
@@ -2888,14 +2889,12 @@ pub(crate) fn compile_into(
                         write_typed(&mut b, &p, &p.ty(t)?, address, &value);
                     }
                     Op::New(t) => {
-                        let Ty::Record(owner) = p.ty(t)? else {
-                            unreachable!()
-                        };
-                        // The fields are already snapshots in declaration order.
-                        if input.types[owner].fields.is_empty() {
+                        let ty = p.ty(t)?;
+                        // Structural elements and nominal fields are ordered snapshots.
+                        if matches!(&ty, Ty::Record(owner) if input.types[*owner].fields.is_empty())
+                        {
                             stack.push(b.ins().iconst(types::I32, 0));
                         }
-                        let ty = Ty::Record(owner);
                         let value = stack.split_off(stack.len() - p.lanes(&ty));
                         stack.extend(normalize(&mut b, &p, &ty, &value));
                     }

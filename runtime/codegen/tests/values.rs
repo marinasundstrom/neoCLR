@@ -2572,3 +2572,95 @@ ret
         42,
     );
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_tuple_native_copies_nested_elements_and_call_results() {
+    let source = r#"
+.module StructuralTupleNative
+.entry Main
+.function Echo(tuple<Int32,tuple<Int32,Double>> value) -> tuple<Int32,tuple<Int32,Double>>
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local tuple<Int32,tuple<Int32,Double>> original
+.local tuple<Int32,tuple<Int32,Double>> copy
+ldc.i4 40
+ldc.i4 2
+ldc.r8 3.5
+newobj tuple<Int32,Double>
+newobj tuple<Int32,tuple<Int32,Double>>
+call Echo(tuple<Int32,tuple<Int32,Double>>)
+stloc original
+ldloc original
+stloc copy
+ldloca copy
+ldflda 1
+ldc.i4 99
+stfld 0
+pop
+ldloc original
+ldfld 0
+ldloc original
+ldfld 1
+ldfld 0
+add
+ldloc copy
+ldfld 1
+ldfld 0
+ldc.i4 99
+sub
+add
+ldloc original
+ldfld 1
+ldfld 1
+ldc.r8 3.5
+ceq
+brfalse bad
+ret
+bad:
+pop
+ldc.i4 0
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    let execution = neoclr::LoadedProgram::new(&m)
+        .unwrap()
+        .run(neoclr::Limits::default())
+        .unwrap();
+    assert_eq!(execution.value, neoclr::Value::Int32(42));
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    native(&bytes, 0, 42);
+    native_mode(&bytes, 0, 0, 42, "@entry", true);
+}
+
+#[test]
+fn structural_tuple_inline_layout_boundary_and_large_return_buffer() {
+    let leaf = format!("tuple<{}>", vec!["Int32"; 16].join(","));
+    for count in [16, 17] {
+        let wide = format!("tuple<{}>", vec![leaf.as_str(); count].join(","));
+        let source = format!(
+            ".module WideTuple\n.entry Main\n.function Echo({wide} value) -> {wide}\nldarg value\nret\n.end\n.function Main() -> Int32\n.local {wide} value\nldloca value\ninitobj {wide}\nldloca value\nldflda 15\nldflda 15\nldc.i4 42\nstobj Int32\nldloc value\ncall Echo({wide})\nldfld 15\nldfld 15\nret\n.end"
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let result = compile(&bytes, &temp);
+        if count == 16 {
+            assert!(
+                result.status.success(),
+                "{}",
+                String::from_utf8_lossy(&result.stderr)
+            );
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            native(&bytes, 0, 42);
+        } else {
+            assert!(!result.status.success());
+            assert!(
+                String::from_utf8_lossy(&result.stderr).contains("flattened inline lane limit")
+            );
+        }
+    }
+}
