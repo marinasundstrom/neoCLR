@@ -17781,3 +17781,28 @@ Existing evidence remains the direct/closed generic task consumers and focused
 checks in [the qualification record](experiments/value-unions/direct-task-results.json).
 The open Response<T> probe still rejects. This discussion adds research and
 assessment only; no new implementation commitment or author response is recorded.
+
+## 2026-10-15 — Structural data computation and backend requirements
+
+The author directed that AOT must support structural types and that both JIT and
+AOT must know about their distinct handling. Runtime optimization is desirable,
+but at least AOT support is required. The assistant distinguished interpreter
+validation from layout, GC and calling-convention support, and proposed completing
+the validated open-generic slice before inspecting AOT.
+
+The author clarified that these types primarily represent compositions of data in
+computation, not necessarily public APIs, and should be efficient when nominal
+types are unnecessary: “But they are still types, just not nominal.” The assistant
+agreed to treat identity, metadata and introspection as real type contracts, even
+where optimized execution eliminates storage. The boxed interpreter representation
+remains provisional. No specific native ABI, layout or optimization was selected.
+
+The open nominal-constituent slice now passes a Raven generic-method consumer (42)
+and 58 runtime tests; [evidence](experiments/value-unions/open-generic-results.json).
+Backend work remains to be performed and does not inherit interpreter qualification.
+
+The author also clarified that arrays are structural at runtime while representable
+through nominal `Array<T>`. The assistant distinguished the runtime shape from its
+nominal API representation, preserving one array value contract. The author requested
+that the structural-type website pages remain current; the assistant began reviewing
+those pages against the implemented feature-branch state.

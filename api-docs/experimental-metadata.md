@@ -9109,3 +9109,22 @@ CLI projection of these shapes is unsupported. No nominal delegate or union type
 is synthesized.
 
 Composition-enabled native declaration reads preserve generic method scope and structural arguments in nominal value wrappers. This is metadata introspection support; callable import and runtime execution have separate admission rules. Open union constituents remain unsupported.
+
+### Scoped generic composition constituents (development, 2026-10-15)
+
+`AssemblyBuilder.CreateExperimentalReferenceComposition(kind, types)` now accepts
+method/type parameters inside owned or imported nominal generic constituents.
+For example, a union may contain `Response<SignatureType.MethodParameter(0)>`.
+The factory checks ownership and bounded shape; the containing signature checks
+actual parameter scope through existing owner validation. Wrong-scope uses throw
+`ArgumentException`. A bare generic parameter is still not an admitted constituent.
+Unions retain value alternatives; intersections retain nominal extendable reference
+bounds. Native opt-in reads preserve scoped indices. `GenericMethodInstance.Signature`
+and `ConstructedMethodReference.Signature` now substitute inside compositions.
+Normalization remains order-independent without nominal subtype reduction.
+
+Validation: authored native roundtrips, method/owner substitutions, wrong-scope
+rejection, the Raven open-generic consumer (42), and 58 structural interpreter tests.
+No guest API selection or generated signature changes are required. CLI projection,
+JIT/AOT representation and arbitrary symbolic structural constraints remain outside
+this validated surface.

@@ -531,17 +531,17 @@ public sealed partial class NativeAssemblyDefinition
                                 operands.Select(child => ReadComposition(child, depth + 1, intersectionBound || key == "Intersection")).ToArray());
                         }
                         var leaf = ReadType(value, false);
-                        bool ClosedArgument(SignatureType argument) => argument.Primitive is { } primitive ? primitive != PrimitiveType.Void
-                            : argument.ArrayElement is { } element ? ClosedArgument(element)
-                            : argument.GenericInstance is { } generic ? generic.TypeArguments.All(ClosedArgument)
+                        bool SupportedCompositionArgument(SignatureType argument) => argument.MethodParameterIndex is not null || argument.TypeParameterIndex is not null || (argument.Primitive is { } primitive ? primitive != PrimitiveType.Void
+                            : argument.ArrayElement is { } element ? SupportedCompositionArgument(element)
+                            : argument.GenericInstance is { } generic ? generic.TypeArguments.All(SupportedCompositionArgument)
                             : argument.ClassType is { GenericParameterNames.Count: 0 }
-                            || argument.ImportedType is { } imported && imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(ClosedArgument);
+                            || argument.ImportedType is { } imported && imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(SupportedCompositionArgument));
                         var localBound = leaf.ClassType ?? leaf.GenericInstance?.Definition;
                         var scalar = leaf.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
-                        Require(ClosedArgument(leaf) && (intersectionBound
+                        Require(SupportedCompositionArgument(leaf) && (intersectionBound
                             ? localBound is { IsStatic: false, IsValueType: false } || leaf.ImportedType is { IsValueType: false }
                             : scalar || localBound is { IsStatic: false } || leaf.ImportedType is not null),
-                            "unsupported composition alternative; intersections require closed nominal references");
+                            "unsupported composition alternative; intersections require nominal references");
                         if (intersectionBound)
                             Require(localBound is { } bound ? !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass
                                 : leaf.ImportedType is { } external && ExtendableExternal(external),

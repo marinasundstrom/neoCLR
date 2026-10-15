@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Support scoped parameters inside nominal structural constituents in the companion metadata host and runtime, including recursive method/owner substitution and actual-use scope checks. The generic `Response<T> | HttpError | JsonError` consumer returns 42; host checks and 58 runtime tests pass. Bare parameter alternatives and backend support remain incomplete.
+
 - Record the structural-type design assessment against Scala 3, Julia and TypeScript, distinguishing language precedents from neoCLR representation choices and remaining validation obligations. No runtime behavior changes.
 
 - Allow explicit extraction of exact reference alternatives from native structural unions while retaining implicit all-alternative membership and unrelated-type rejection. Track structural generic arguments on nominal runtime calls with no value parameters. Validate direct and closed-generic task consumers (42 each, ten checks per consumer), 21 compiler tests and 55 runtime tests. Save an open-generic metadata rejection probe; open `Response<T>` operands and union-local closure capture remain incomplete.

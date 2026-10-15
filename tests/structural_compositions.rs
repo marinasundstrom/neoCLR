@@ -1268,3 +1268,38 @@ fn nominal_generic_call_checks_structural_arguments_without_parameters() {
         }
     }
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn open_nominal_union_constituent_uses_method_scope() {
+    let p = program(
+        "ldc.i4 42\nnewobj Response<Int32>\ncall Echo<Int32>(union<Response<Int32>,Both>)\ncastclass Response<Int32>\nldfld Response<Int32>::Value",
+        ".type class Response<T>\n.field Value T\n.end\n.function Echo<T>(union<Response<T>,Both> value) -> union<Response<T>,Both>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    let bad = format!(".module BadScope\n{TYPES}\n.type class Response<T>\n.field Value T\n.end\n.function Echo(union<Response<!!0>,Both> value) -> Int32\nldc.i4 0\nret\n.end");
+    assert!(assemble(&bad).is_err());
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn open_nominal_intersection_constituent_uses_method_scope() {
+    let p = program(
+        "ldc.i4 42\nnewobj Response<Int32>\ncall Echo<Int32>(intersection<Response<Int32>,Left>)\ncastclass Response<Int32>\nldfld Response<Int32>::Value",
+        ".type class Response<T>\n.implements Left\n.field Value T\n.method instance Get() -> Int32\nldc.i4 42\nret\n.end\n.end\n.function Echo<T>(intersection<Response<T>,Left> value) -> intersection<Response<T>,Left>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn open_nominal_union_constituent_uses_declaring_type_scope() {
+    let p = program(
+        "ldc.i4 42\nnewobj Response<Int32>\ncall Router<Int32>::Echo(union<Response<Int32>,Both>)\ncastclass Response<Int32>\nldfld Response<Int32>::Value",
+        ".type class Response<T>\n.field Value T\n.end\n.type class Router<T>\n.method static Echo(union<Response<T>,Both> value) -> union<Response<T>,Both>\nldarg value\nret\n.end\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}

@@ -30,7 +30,18 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
                 // Preserve the expression until library/dependency definitions exist;
                 // otherwise singleton collapse could erase a later-invalid operand.
                 if crate::compositions::resolved(context, &candidate) {
-                    crate::compositions::validate(context, &candidate)?;
+                    // Binding has not reached the owning signature yet. As with
+                    // nominal generic construction, retain scoped arguments here;
+                    // signature validation checks their actual owner arity later.
+                    crate::compositions::validate_in_context(
+                        context,
+                        &candidate,
+                        crate::vm::SignatureContext {
+                            types: u16::MAX as usize + 1,
+                            methods: u16::MAX as usize + 1,
+                            allow_self: false,
+                        },
+                    )?;
                     crate::compositions::normalized(matches!(ty, Type::Union(_)), parts)
                 } else {
                     candidate

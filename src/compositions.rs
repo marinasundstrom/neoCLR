@@ -43,7 +43,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
     }
     // Generic argument syntax is distinct from a composition operand: value arguments
     // and scoped parameters are allowed inside nominal constructions. Compound
-    // operands retain their own rules; open union/intersection operands stay unsupported.
+    // operands retain their own rules; bare parameter operands stay unsupported.
     fn argument(ty: &Type, depth: usize, nodes: &mut usize) -> Result<(), Fault> {
         if depth > 32 || *nodes == 0 {
             return Err(Fault::new("compound signature resource limit"));
@@ -106,7 +106,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 Ok(())
             }
             _ => Err(Fault::new(
-                "compound constituents must be closed nominal or supported scalar types",
+                "compound constituents must be nominal or supported scalar types",
             )),
         }
     }
@@ -143,8 +143,21 @@ pub(crate) fn resolved(module: &Module, ty: &Type) -> bool {
 }
 
 pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
+    validate_in_context(module, ty, 0.into())
+}
+
+pub(crate) fn validate_in_context(
+    module: &Module,
+    ty: &Type,
+    context: crate::vm::SignatureContext,
+) -> Result<(), Fault> {
     check_shape(ty)?;
-    fn visit(module: &Module, ty: &Type, intersection_bound: bool) -> Result<(), Fault> {
+    fn visit(
+        module: &Module,
+        ty: &Type,
+        intersection_bound: bool,
+        context: crate::vm::SignatureContext,
+    ) -> Result<(), Fault> {
         match ty {
             Type::Union(parts) | Type::Intersection(parts) => {
                 for part in parts {
@@ -152,13 +165,14 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
                         module,
                         part,
                         intersection_bound || matches!(ty, Type::Intersection(_)),
+                        context,
                     )?;
                 }
                 Ok(())
             }
             _ if !intersection_bound && scalar_union_alternative(ty) => Ok(()),
             Type::Named(_) | Type::Constructed { .. } => {
-                crate::vm::check_type(ty, module)?;
+                crate::vm::check_type_context(ty, module, context, 0)?;
                 let def = module
                     .type_definition(ty)
                     .ok_or_else(|| Fault::new("unknown compound constituent"))?;
@@ -181,7 +195,7 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
             _ => Err(Fault::new("unresolved compound constituent")),
         }
     }
-    visit(module, ty, false)
+    visit(module, ty, false, context)
 }
 
 pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> bool {

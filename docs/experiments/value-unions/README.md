@@ -38,10 +38,9 @@ interpreter representation.
 
 - `direct-task-project/`: `Task<Response | HttpError | JsonError>`, exit 42.
 - `closed-generic-task-project/`: `Task<Response<int> | HttpError | JsonError>`, exit 42.
-- `open-generic-project/`: negative probe for `Response<T> | HttpError | JsonError`
-  in a generic method. Native encoding currently rejects open constituents
-  with NEOMETA003 (`composition requires bounded closed constituents`). It is not
-  a working executable sample, even when called with `T = int`.
+- `open-generic-project/`: a generic method with `Response<T> | HttpError | JsonError`
+  now executes with `T = int`, exit 42. `open-generic-results.json` records the
+  successful follow-up; bare `T` alternatives remain unsupported.
 
 Run each with the command above, substituting the project directory. Both task
 consumers check all three alternatives through completed, queued and async-forwarded
@@ -49,5 +48,5 @@ tasks, plus preserved reference identity (ten checks each). They use native unio
 signatures with imported value errors and a reference response. The callback
 identity check captures the response reference; directly capturing a union local
 remains unsupported. `direct-task-results.json` records the successful executions
-and open-generic rejection with source/tool/bundle hashes. Focused validation passes
+and the historical open-generic rejection with source/tool/bundle hashes. Focused validation passes
 21 compiler tests and 55 runtime tests.

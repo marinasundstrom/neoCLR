@@ -1617,6 +1617,12 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
 }
 pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) -> Type {
     match ty {
+        Type::Union(parts) => Type::Union(
+            parts.into_iter().map(|t| bind_parameters(t, names, method)).collect(),
+        ),
+        Type::Intersection(parts) => Type::Intersection(
+            parts.into_iter().map(|t| bind_parameters(t, names, method)).collect(),
+        ),
         Type::Tuple(parts) => Type::Tuple(
             parts
                 .map_types(|t| Ok(bind_parameters(t.clone(), names, method)))

@@ -1539,7 +1539,9 @@ fn check_type_context_seen(
             }
             Ok(())
         }
-        Type::Union(_) | Type::Intersection(_) => crate::compositions::validate(module, ty),
+        Type::Union(_) | Type::Intersection(_) => {
+            crate::compositions::validate_in_context(module, ty, arity)
+        }
         Type::Function(shape) => {
             shape.validate()?;
             for parameter in &shape.parameters {

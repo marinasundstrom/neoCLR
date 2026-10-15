@@ -48,6 +48,24 @@ internal static class AuthoredCompositionChecks
         var openWrapper = valueWrapper.MakeGenericInstance(SignatureType.MethodParameter(0), values);
         var genericEcho = builder.AddFunction("GenericValueEcho", new MethodSignature(openWrapper, [openWrapper], ["T"]));
         genericEcho.LoadArgument(0); genericEcho.Return();
+        var openUnion = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union,
+            box.MakeGenericInstance(SignatureType.MethodParameter(0)), right);
+        var openEcho = builder.AddFunction("OpenEcho", new MethodSignature(openUnion, [openUnion], ["T"]));
+        openEcho.LoadArgument(0); openEcho.Return();
+        Reject(() => builder.AddFunction("OutOfScope", new MethodSignature(openUnion, [openUnion])));
+        var wrongScope = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union,
+            box.MakeGenericInstance(SignatureType.TypeParameter(0)), right);
+        Reject(() => builder.AddFunction("WrongScope", new MethodSignature(wrongScope, [wrongScope], ["T"])));
+        var closedUnion = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union,
+            box.MakeGenericInstance(PrimitiveType.Int32), right);
+        if (openEcho.MakeGenericInstance(PrimitiveType.Int32).Signature.ReturnType != closedUnion)
+            throw new Exception("method argument did not substitute inside union");
+        var ownerEcho = box.AddMethod("OwnerEcho", new MethodSignature(wrongScope, [wrongScope]));
+        ownerEcho.LoadArgument(0); ownerEcho.Return();
+        if (ownerEcho.MakeConstructedReference([PrimitiveType.Int32]).Signature.ReturnType != closedUnion)
+            throw new Exception("owner argument did not substitute inside union");
+        var closedEcho = builder.AddFunction("ClosedEcho", new MethodSignature(closedUnion, [closedUnion]));
+        closedEcho.LoadArgument(0); closedEcho.Call(openEcho.MakeGenericInstance(PrimitiveType.Int32)); closedEcho.Return();
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
@@ -63,6 +81,10 @@ internal static class AuthoredCompositionChecks
             genericSignature!.GenericParameterNames.Count != 1 ||
             genericSignature.ReturnType.ReferencedGenericInstance?.TypeArguments[1].Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("generic value wrapper structural argument lost");
+        if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "OpenEcho").TryGetSignature(out var openSignature) ||
+            openSignature!.ReturnType.Composition!.Constituents.Single(t => t.ReferencedGenericInstance is not null)
+                .ReferencedGenericInstance!.TypeArguments[0].MethodParameterIndex != 0)
+            throw new Exception("open nominal union constituent lost method scope");
         Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));
