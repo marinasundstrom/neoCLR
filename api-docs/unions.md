@@ -97,9 +97,29 @@ Native projects select structural capabilities through their Runtime Contract.
 Supported paths include scoped nominal generic constituents, value wrappers,
 locals, parameters/results, direct ref/out slots and bounded callbacks. Bare `T`
 alternatives, directly captured union locals, whole-union boxing identity and
-AOT/JIT layout remain incomplete. The interpreter's boxed value-payload storage is
+general AOT/JIT layout remain incomplete. The interpreter's boxed value-payload storage is
 provisional and is not an efficiency claim or the final ABI.
 
 The runtime branch is `codex/structural-union-intersection`, paired with Raven's
 `codex/neoclr-union-intersection`. See the
 [tested consumers and evidence](https://github.com/marinasundstrom/neoCLR/tree/codex/structural-union-intersection/docs/experiments/value-unions).
+
+## Native reference-alternative storage
+
+The structural branch now admits native unions whose alternatives are nominal
+reference classes or interfaces. macOS ARM64 AOT checks cover membership in either
+alternative, explicit extraction, copies, calls/results, null payloads and managed
+output slots, with matching interpreter diagnostics for rejected alternatives.
+
+The union remains a structural **value type**. Its current reference-only native
+representation is one payload reference slot; the concrete object's existing tag
+supports membership checks. Copying the union copies that slot and preserves the
+payload object's identity, without allocating a union carrier. This storage choice
+does not give the union nominal inheritance or make it a reference type.
+
+Native alternatives containing values still fail admission pending tagged inline
+storage. Whole-union boxing is also rejected pending structural boxed identity;
+it must not silently become a cast of the payload to Object. Native union descriptor
+reflection, array elements, dedicated JIT/collector stress and full Task application
+qualification remain open. These are implementation gaps, not restrictions on the
+union type's intended value/reference alternatives.

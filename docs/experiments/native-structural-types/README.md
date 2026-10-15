@@ -86,3 +86,34 @@ Tracing recipes retain one strong reference; collector-stress and dedicated JIT
 intersection execution still need qualification. The failed-cast path uses native
 InvalidCast status 11 and its standard message; legacy nominal cast behavior stays
 unchanged. Native structural union storage remains unsupported.
+
+## Native reference-alternative union storage
+
+The next slice represents unions of nominal reference alternatives with one payload
+reference slot. This is a structural value representation: no synthetic nominal
+union and no reference identity for the union container are introduced. The pointed
+to object's tag provides the concrete identity for any-alternative membership.
+Selection and specialization traverse native union signatures; assignment from a
+union requires every possible alternative to satisfy the destination contract.
+Extraction remains checked and explicit when a guarantee is absent.
+
+The console test derives union signatures from `intersection-views.neoil`, inserting
+an explicit View extraction before dispatch and an Echo function returning the union.
+A further run exercises implicit admission of a conforming reference into a union
+parameter. It compares eight modes for each of
+four implementation sets: both bounds, just the first, just the second and neither.
+The cases cover identity-preserving copies, calls, output slots, nulls, accepted and
+rejected casts and missing membership. A mixed Int32/interface signature is rejected
+before object emission with a tagged-storage diagnostic. A separate projection test
+ensures whole-union boxing cannot be rewritten into an Object payload cast.
+
+This extends CLR-style reference casts with a structural union value contract. The
+benefit for reference-only unions is a single slot with no carrier allocation; the
+cost is runtime membership checks when static guarantees are insufficient. Numeric
+or nominal value alternatives require tagged inline storage and conversions, still
+unimplemented. Existing scalar-box projection happens before typed aggregate
+lowering, so simply enabling mixed unions would preserve avoidable heap allocation
+or lose union identity. That pipeline must be addressed before the mixed path is
+admitted. Native reflection, array elements, JIT/collector stress and full Task
+consumer qualification remain open. No general performance claim follows from the
+single-slot layout test.

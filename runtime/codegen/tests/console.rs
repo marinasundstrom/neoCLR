@@ -1146,6 +1146,52 @@ fn structural_intersection_views_require_every_nominal_bound() {
     assert!(!dir.0.join("app.o").exists());
 }
 
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_reference_payloads_accept_either_nominal_bound() {
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
+            .replace("intersection<View,Marker>", "union<View,Marker>")
+            .replace(
+                "ldloc view\ncallvirt instance View::Get()",
+                "ldloc view\ncastclass View\ncallvirt instance View::Get()",
+            );
+    let source = source.replace(
+        "castclass union<View,Marker>\nstloc view",
+        "castclass union<View,Marker>\ncall Echo(union<View,Marker>)\nstloc view",
+    ) + "\n.function Echo(union<View,Marker> value) -> union<View,Marker>\nldarg value\nret\n.end\n";
+    verify_reference_views(&source);
+    verify_reference_views(&source.replacen(
+        "castclass union<View,Marker>\ncall Echo",
+        "call Echo",
+        1,
+    ));
+    verify_reference_views(&source.replace(".implements Marker\n", ""));
+    verify_reference_views(&source.replace(".implements View\n", ""));
+    verify_reference_views(
+        &source
+            .replace(".implements View\n", "")
+            .replace(".implements Marker\n", ""),
+    );
+    let mixed = source.replace("union<View,Marker>", "union<Int32,View>");
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let denied = compile_source(
+        &dir,
+        &seed,
+        &mixed,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(!denied.status.success());
+    assert!(
+        String::from_utf8_lossy(&denied.stderr).contains("tagged inline storage"),
+        "{}",
+        String::from_utf8_lossy(&denied.stderr)
+    );
+    assert!(!dir.0.join("app.o").exists());
+}
+
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn verify_reference_views(source: &str) {
     let dir = Temp::new();

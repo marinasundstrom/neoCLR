@@ -22,6 +22,9 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     if sites.is_empty() {
         return Ok(());
     }
+    if sites.iter().any(|(_, _, ty)| matches!(ty, Type::Union(_))) {
+        return Err("native whole-union boxing requires structural boxed identity".into());
+    }
     if report["referenceArena"] != true {
         return Err("record boxing requires --reference-arena".into());
     }
@@ -376,4 +379,26 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
     }
     report["scalarBoxQueries"] = json!(queries);
     Ok(())
+}
+
+#[cfg(test)]
+mod structural_union_tests {
+    use super::*;
+
+    #[test]
+    fn whole_union_box_is_not_projected_to_a_payload_reference_cast() {
+        let mut input =
+            neoclr::assemble(".module UnionBox\n.function Main() -> Int32\nldc.i4 42\nret\n.end")
+                .unwrap();
+        let op = Op::BoxValue(Type::Union(vec![
+            Type::Named("Left".into()),
+            Type::Named("Right".into()),
+        ]));
+        input.functions[0].body.insert(0, op.clone());
+        let error = project(&mut input, &mut json!({"referenceArena":true})).unwrap_err();
+        assert!(error.to_string().contains("structural boxed identity"));
+        assert!(
+            matches!(&input.functions[0].body[0], Op::BoxValue(Type::Union(parts)) if parts.len() == 2)
+        );
+    }
 }

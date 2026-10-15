@@ -20,6 +20,7 @@ pub(super) enum Ty {
     Reference(usize),
     Interface(usize),
     Intersection(Vec<Ty>),
+    ReferenceUnion(Vec<Ty>),
     ByteArray,
     CharacterArray,  // Same pointer-slot layout, distinct element identity.
     StringArray,     // Invocation-owned pointer slots; verified nominal backing enables views.
@@ -643,10 +644,23 @@ impl<'a> Profile<'a> {
             Type::Intersection(parts) if self.references => {
                 Ty::Intersection(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
             }
+            Type::Union(parts) if self.references => {
+                let parts = parts
+                    .iter()
+                    .map(|t| self.ty(t))
+                    .collect::<Result<Vec<_>, _>>()?;
+                if !parts
+                    .iter()
+                    .all(|t| matches!(t, Ty::Reference(_) | Ty::Interface(_)))
+                {
+                    return Err(
+                        "native union payload requires tagged inline storage or intrinsic-reference lowering".into(),
+                    );
+                }
+                Ty::ReferenceUnion(parts)
+            }
             Type::Union(_) | Type::Intersection(_) => {
-                return Err(
-                    "compound reference signatures are interpreter-only in this experiment".into(),
-                );
+                return Err("structural reference payloads require --reference-arena".into());
             }
             Type::Int32 | Type::UInt32 => Ty::Int,
             Type::Byte => Ty::Byte,
@@ -775,6 +789,7 @@ impl<'a> Profile<'a> {
             | Ty::Reference(_)
             | Ty::Interface(_)
             | Ty::Intersection(_)
+            | Ty::ReferenceUnion(_)
             | Ty::ByteArray
             | Ty::CharacterArray
             | Ty::StringArray
@@ -851,6 +866,12 @@ impl<'a> Profile<'a> {
             return true;
         }
         match (actual, expected) {
+            (Ty::ReferenceUnion(parts), _) => parts
+                .iter()
+                .all(|part| self.reference_assignable(part, expected)),
+            (_, Ty::ReferenceUnion(parts)) => parts
+                .iter()
+                .any(|part| self.reference_assignable(actual, part)),
             (_, Ty::Intersection(parts)) => parts
                 .iter()
                 .all(|part| self.reference_assignable(actual, part)),
@@ -897,6 +918,19 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
+            Ty::ReferenceUnion(_) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
+                .filter(|(index, t)| {
+                    t.is_reference_type
+                        && t.representation == Representation::Record
+                        && !t.is_abstract
+                        && self.reference_assignable(&Ty::Reference(*index), target)
+                })
+                .map(|(index, _)| index)
+                .collect(),
             Ty::Intersection(parts) => self
                 .input
                 .types
@@ -1423,7 +1457,10 @@ impl<'a> Profile<'a> {
                     if self.references
                         && (matches!(
                             self.ty(t)?,
-                            Ty::Reference(_) | Ty::Interface(_) | Ty::Intersection(_)
+                            Ty::Reference(_)
+                                | Ty::Interface(_)
+                                | Ty::Intersection(_)
+                                | Ty::ReferenceUnion(_)
                         ) || self.backing_for_array(&self.ty(t)?).is_some()) =>
                 {
                     ()
@@ -1628,6 +1665,7 @@ impl<'a> Profile<'a> {
                                 Ty::Reference(_)
                                     | Ty::Interface(_)
                                     | Ty::Intersection(_)
+                                    | Ty::ReferenceUnion(_)
                                     | Ty::ByteArray
                                     | Ty::ReferenceArray(_)
                                     | Ty::ScalarArray(_)
@@ -1643,7 +1681,10 @@ impl<'a> Profile<'a> {
                     let source = pop(&mut stack)?;
                     if !matches!(
                         source,
-                        Ty::Reference(_) | Ty::Interface(_) | Ty::Intersection(_)
+                        Ty::Reference(_)
+                            | Ty::Interface(_)
+                            | Ty::Intersection(_)
+                            | Ty::ReferenceUnion(_)
                     ) && !(source == Ty::Literal && self.references)
                         && self.backing_for_array(&source).is_none()
                     {
@@ -1666,6 +1707,7 @@ impl<'a> Profile<'a> {
                             | Ty::Reference(_)
                             | Ty::Interface(_)
                             | Ty::Intersection(_)
+                            | Ty::ReferenceUnion(_)
                             | Ty::ByteArray
                             | Ty::CharacterArray
                             | Ty::StringArray
@@ -1684,6 +1726,7 @@ impl<'a> Profile<'a> {
                                 | Ty::Reference(_)
                                 | Ty::Interface(_)
                                 | Ty::Intersection(_)
+                                | Ty::ReferenceUnion(_)
                                 | Ty::ByteArray
                                 | Ty::CharacterArray
                                 | Ty::StringArray

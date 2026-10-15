@@ -841,11 +841,7 @@ fn retained_types(
         match ty {
             Type::Tuple(parts) => pending_types.extend(parts.iter().cloned()),
             Type::Intersection(parts) => pending_types.extend(parts),
-            Type::Union(_) => {
-                return Err(
-                    "compound reference signatures are interpreter-only in this experiment".into(),
-                );
-            }
+            Type::Union(parts) => pending_types.extend(parts),
             Type::Named(name) => {
                 let candidates: Vec<_> = input
                     .types
@@ -1207,7 +1203,7 @@ mod composition_admission_tests {
     }
 
     #[test]
-    fn compound_reference_storage_is_rejected_before_native_selection() {
+    fn structural_union_signatures_are_selected_without_nominal_carriers() {
         let mut module = neoclr::assemble(
             ".module CompoundNative\n.entry Main\n.interface Left\n.end\n.interface Right\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end",
         ).unwrap();
@@ -1220,7 +1216,6 @@ mod composition_admission_tests {
             Type::from_name("Left"),
             Type::from_name("Right"),
         ]));
-        let error = prepare(&module, "Main").unwrap_err().to_string();
-        assert!(error.contains("compound"), "{error}");
+        prepare(&module, "Main").unwrap();
     }
 }

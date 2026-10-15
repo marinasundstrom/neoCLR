@@ -79,6 +79,14 @@ impl Specializer<'_> {
             | Type::RuntimeTypeHandle => {
                 return Ok(ty.clone());
             }
+            Type::Union(parts) => {
+                return Ok(Type::Union(
+                    parts
+                        .iter()
+                        .map(|t| self.lower(t))
+                        .collect::<Result<_, _>>()?,
+                ));
+            }
             Type::Intersection(parts) => {
                 return Ok(Type::Intersection(
                     parts
