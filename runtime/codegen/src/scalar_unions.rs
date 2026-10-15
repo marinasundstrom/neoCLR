@@ -26,7 +26,7 @@ pub(crate) fn supported(ty: &Type) -> bool {
 
 pub(crate) fn record(module: &Module, ty: &Type) -> bool {
     module.type_definition(ty).is_some_and(|d| {
-        !d.is_reference_type && d.representation == Representation::Record && d.enum_info.is_none()
+        !d.is_reference_type && d.representation == Representation::Record
     })
 }
 

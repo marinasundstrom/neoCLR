@@ -17,7 +17,8 @@ copy and collector checks. Managed value-record methods now admit structural sig
 closed-generic Task union consumers pass interpreter, AOT and managed JIT with
 eager/paced collection and cleanup; see the [retained Task evidence](experiments/native-structural-types/README.md#fresh-task-union-native-qualification-2026-10-15).
 Single/Double union alternatives now pass focused interpreter/AOT exact-type and widening
-checks plus a fresh Raven interpreter/AOT/JIT consumer without arena allocation. Broader primitive/enum qualification remains open.
+checks plus a fresh Raven interpreter/AOT/JIT consumer without arena allocation. Int32-backed nominal enum alternatives also have focused interpreter/AOT identity,
+payload and widening checks. Broader primitive/enum qualification remains open.
 Intrinsic String union alternatives now have metadata, interpreter and native collector checks
 with separate traced text slots; see the [String checkpoint](experiments/native-structural-types/README.md#intrinsic-string-union-alternatives-2026-10-15).
 Exact-alternative union widening now repacks differing native layouts without a

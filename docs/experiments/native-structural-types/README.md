@@ -711,3 +711,19 @@ compiler, runtime, libraries and source. Reproduce with
 This extends the earlier interpreter/AOT IL evidence to source and managed JIT;
 NaN payload preservation, broader floating workloads and other platforms remain
 unqualified. Runtime Contract configuration and metadata encoding are unchanged.
+
+### Nominal enum union alternatives (2026-10-15)
+
+Int32-backed nominal enums now reuse the native value-record union path. The
+backend's existing enum layout validation remains in force: this change removes
+an extra union-specific exclusion, not the backend's underlying-width limits.
+The union stores the enum's record identity and bits in an inline payload region.
+It does not replace enum identity with Int32 or introduce an implicit conversion.
+
+Focused interpreter/AOT checks inject either of two distinct enums with equal bits,
+widen/reorder the union, reject the other enum and Int32 in type tests, extract the
+selected enum, and read its payload through a borrowed method receiver. Wrong-enum
+extraction reports InvalidCast. The native host verifies zero arena use. This
+qualifies the runtime IL path; fresh Raven enum-source, managed JIT and other enum
+widths are not established by these checks. Native metadata and Runtime Contract
+configuration are unchanged.

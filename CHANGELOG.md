@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Admit Int32-backed nominal enum union alternatives using existing inline value-record storage. Preserve enum identity, payloads and checked widening/extraction without boxes; all 14 structural backend tests pass. Other enum widths retain existing native backend limits.
+
 - Qualify a fresh Raven float/double union consumer against the v4 bundle in interpreter, AOT and managed JIT. Exact typed patterns, reordered/widened calls and an integer alternative return 42 with no native imports or arena allocation; retain reproducible source and artifact evidence.
 
 - Qualify paired Raven value-record property patterns over native unions, using payload binding and constant member tests in the widening sample. Interpreter/AOT/JIT return 42 with zero arena use; retain artifact evidence and clarify match-only, whole-value and destructuring style guidance. Runtime metadata is unchanged.

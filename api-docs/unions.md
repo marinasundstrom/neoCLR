@@ -164,7 +164,7 @@ allocate only the two explicit objects (32 bytes). This is not collector stress.
 now cover record/reference/scalar payloads across calls and fault unwind with
 eager/paced nonmoving AOT collection and complete post-entry reclamation. The
 [fresh Raven consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
-also passes 32 invocations per collector mode, reclaiming all explicit objects. Enums,
+also passes 32 invocations per collector mode, reclaiming all explicit objects.
 Object/scalar-interface views requiring boxing remain unsupported by this native lowering.
 Intrinsic String alternatives now use a separate traced text slot in native union storage. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
@@ -241,3 +241,10 @@ A fresh Raven float/double/int pattern consumer now also passes interpreter,
 macOS ARM64 AOT and managed JIT with zero arena use. The bounded fixture checks
 reordered/widened calls and exact alternative identity, not every floating edge
 case or platform. See the [floating qualification](../docs/experiments/native-structural-types/floating-v4-results.json).
+
+Native Int32-backed nominal enums can now be union alternatives through their
+existing value-record layout. Two enums with identical underlying bits retain
+distinct identities, and neither matches Int32. Checked extraction and widening
+preserve the selected enum and bits without boxing. Other enum widths retain the
+native backend's existing admission limits; this is not implicit enum/integer
+conversion. See the enum checkpoint in the native structural experiment record.

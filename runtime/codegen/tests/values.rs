@@ -3360,3 +3360,110 @@ ret
         );
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_enum_union_preserves_nominal_identity() {
+    let source = r#"
+.module EnumUnion
+.type class abstract System.Object
+.end
+.type First
+.enum Int32
+.field private Bits Int32
+.method instance byref Read() -> Int32
+ldarg this
+ldfld First::Bits
+ret
+.end
+.end
+.type Second
+.enum Int32
+.field private Bits Int32
+.end
+.entry Main
+.function Echo(union<First,Second> value) -> union<Int32,Second,First>
+ldarg value
+castclass union<Int32,Second,First>
+ret
+.end
+.function Main() -> Int32
+.local union<Int32,Second,First> value
+.local First extracted
+ldc.i4 42
+newobj First
+box First
+castclass union<First,Second>
+call Echo(union<First,Second>)
+stloc value
+ldloc value
+isinst Second
+ref.isnull
+brfalse Bad
+ldloc value
+isinst Int32
+ref.isnull
+brfalse Bad
+ldloc value
+unbox.any First
+stloc extracted
+ldloca extracted
+call instance First::Read()
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#;
+    for source in [
+        source.to_string(),
+        source
+            .replace("First", "Temporary")
+            .replace("Second", "First")
+            .replace("Temporary", "Second"),
+    ] {
+        let module = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+        let wrong = if source.contains("unbox.any First") {
+            source.replace(
+                "unbox.any First\nstloc extracted\nldloca extracted\ncall instance First::Read()",
+                "unbox.any Second\npop\nldc.i4 42",
+            )
+        } else {
+            source.replace(
+                "unbox.any Second\nstloc extracted\nldloca extracted\ncall instance Second::Read()",
+                "unbox.any First\npop\nldc.i4 42",
+            )
+        };
+        let module = neoclr::assemble(&wrong).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap_err()
+                .code,
+            neoclr::FaultCode::InvalidCast
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            11,
+            12345,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}

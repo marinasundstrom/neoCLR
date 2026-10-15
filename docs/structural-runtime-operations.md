@@ -355,3 +355,9 @@ A fresh Raven float/double/int pattern consumer now also passes interpreter,
 macOS ARM64 AOT and managed JIT with zero arena use. The bounded fixture checks
 reordered/widened calls and exact alternative identity, not every floating edge
 case or platform. See the [floating qualification](experiments/native-structural-types/floating-v4-results.json).
+
+Int32-backed nominal enum alternatives now use existing native value-record union
+storage. Type tests/extraction preserve enum identity even when two enum types
+share the same underlying bits; an enum alternative does not become Int32.
+Interpreter/AOT checks cover widening, payload reads and wrong-enum extraction
+with zero arena allocation. Other enum widths keep their existing backend limits.

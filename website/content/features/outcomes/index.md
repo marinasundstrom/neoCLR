@@ -176,3 +176,7 @@ widening and incorrect extraction without carrier allocation.
 A fresh Raven float/double/int consumer also passes interpreter, AOT and managed
 JIT checks on macOS ARM64 with zero arena allocation. This remains feature-branch
 qualification, not a published platform-wide capability.
+
+Int32-backed nominal enum alternatives also have focused native union checks.
+Equal underlying bits do not erase distinct enum identities; other enum widths
+remain subject to the existing native backend limits.
