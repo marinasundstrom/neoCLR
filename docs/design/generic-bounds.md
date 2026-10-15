@@ -236,3 +236,28 @@ other dot tokens, including malformed/incremental edits.
 Documentation-only validation for this slice: inspect referenced source and check
 links/patch whitespace. No executable examples are presented as newly supported,
 no runtime tests are claimed, and no website publication is performed.
+
+
+## Nominal slicing and traversal follow-up (2026-10-15 proposal)
+
+The author asked to improve neoCLR Index/Range through explicit nominal capabilities,
+possibly a Sliceable interface exposing a method or indexer, and whether Range or
+Interval should be enumerable. No new public API is selected in this slice.
+
+Assistant recommendation: bounds describe positions; slicing belongs to an explicitly
+conforming receiver. Compare a Slice method with a Range indexer, including output
+shape, allocation versus view ownership, coordinate units and Fault/Option/Result
+behavior. Do not equate indexability with slicing or impose slicing on all types.
+
+Ordering does not imply stepping. Keep a potential Interval<T> independent of
+traversal and expose an enumerable progression through explicit stepping; consider
+an integer default step separately. Range's collection-relative endpoints should
+remain distinct from a numeric progression. Evaluate this against .NET Index/Range,
+IEnumerable and the runtime's nominal capability model before committing API names.
+This proposal does not change the current loop syntax or enumeration support.
+
+
+The author subsequently approved this separation direction and added safe methods
+returning Result versus faulting indexers. See the [concrete contract proposal](slicing-capabilities.md)
+for nominal generic shapes, argument-construction boundaries, receiver ownership,
+.NET/Rust comparisons and validation steps. Names and public APIs are not yet shipped.

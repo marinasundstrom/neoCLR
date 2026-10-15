@@ -18044,3 +18044,27 @@ in interpreter, AOT and managed JIT. The driver rejects inclusive stored Range w
 NEOMETA001. Exact scope and limitations are in the
 [qualification record](validation/range-endpoints/README.md). Native inclusive
 conversion, range-pattern support and overflow-safe integer advancement remain next.
+
+
+## 2026-10-15 — Nominal slicing capability and interval enumeration
+
+- Author asked to improve neoCLR Range and Index and consider a nominal capability,
+  such as Sliceable, expressed through a method or indexer. Author then asked whether
+  Range or a potential Interval type should be enumerable.
+- Assistant proposed explicit opt-in slicing, with bounds distinct from receiver
+  capabilities. Method versus indexer, result type, copy/view ownership and failure
+  behavior remain design questions. No interface was implemented or approved.
+- Assistant recommended separating ordered bounds from traversal: Range remains a
+  slicing descriptor; a potential Interval<T> can produce an enumerable progression
+  through an explicit stepping operation, with a possible integer default step.
+  This is an assistant proposal, not an author decision or shipped API. Dates,
+  decimals and user-defined types require domain-specific stepping contracts.
+- Ongoing checked inclusive conversion and integer-overflow work continues first.
+  Structural types remain parked. See [generic bounds design](design/generic-bounds.md).
+
+- Subsequent author reply: “Do so.” Assistant treats this as approval of the
+  separation direction, while concrete names/signatures remain to be validated.
+- Author further clarified that methods can return Result for safe slicing and
+  indexers may fault. Assistant adopted this failure split with shared validation
+  and explicit copy/view ownership, and recorded the construction-versus-slicing
+  distinction in [the concrete contract proposal](design/slicing-capabilities.md).
