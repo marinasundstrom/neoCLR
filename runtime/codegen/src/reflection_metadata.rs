@@ -110,7 +110,7 @@ pub fn catalogue(
                 "noResult":f.no_result,"receiverByRef":f.receiver_byref,"receiverReadonly":f.receiver_readonly,
                 "parameters":f.parameters.iter().map(|t| close(t, &arguments)).collect::<Result<Vec<_>, _>>()?,
                 "returns":close(&f.returns, &arguments)?,
-                "genericParameters":f.generic_parameters,"origin":f.origin,"customAttributes":f.custom_attributes}));
+                "genericParameters":f.generic_parameters,"genericConstraints":f.generic_constraints,"origin":f.origin,"customAttributes":f.custom_attributes}));
         }
         let properties = declaration
             .properties
@@ -636,6 +636,69 @@ mod tests {
         let report = json!({"functions":[{"name":"neoCLR.Runtime.TypeName","compiledIndex":0}],
             "sourceMetadata":{"types":[{"compiledTypeIndex":0,"name":"Original","origin":{"name":"Café"},"typeArguments":[]}]}});
         (module, report)
+    }
+
+    #[test]
+    fn catalogue_retains_generic_declarations_across_distinct_constructions() {
+        use neoclr::metadata::{ConstraintKind, GenericConstraint, Variance};
+        let mut source = neoclr::assemble(
+            ".module GenericMetadata\n.interface Producer<T>\n.end\n.function Identity() -> Int32\nldc.i4 0\nret\n.end\n",
+        ).unwrap();
+        source.types[0].generic_variance = vec![Variance::Covariant];
+        source.types[0].generic_constraints = vec![GenericConstraint {
+            parameter: 0,
+            kind: ConstraintKind::ReferenceType,
+        }];
+        let method = &mut source.functions[0];
+        method.owner = Some(Type::Constructed {
+            definition: "Producer".into(),
+            arguments: vec![Type::TypeParameter(0)],
+        });
+        method.generic_parameters = vec![Some("U".into())];
+        method.generic_constraints = vec![
+            GenericConstraint {
+                parameter: 0,
+                kind: ConstraintKind::TypeBound(Type::TypeParameter(0)),
+            },
+            GenericConstraint {
+                parameter: 0,
+                kind: ConstraintKind::DefaultConstructor,
+            },
+        ];
+        let definitions = vec![TypeDefId {
+            module: "GenericMetadata".into(),
+            revision: Some("r1".into()),
+            index: 0,
+        }];
+        let methods = vec![MemberId {
+            module: "GenericMetadata".into(),
+            revision: Some("r1".into()),
+            index: 0,
+        }];
+        let report = json!({"types":[
+            {"sourceIndex":0,"compiledIndex":0,"typeArguments":[Type::String]},
+            {"sourceIndex":0,"compiledIndex":1,"typeArguments":[Type::ArrayRef(Box::new(Type::Int32))]}
+        ]});
+        let result = catalogue(&source, &definitions, &methods, &report).unwrap();
+        let rows = result["types"].as_array().unwrap();
+        assert_eq!(rows.len(), 2);
+        assert_ne!(rows[0]["typeArguments"], rows[1]["typeArguments"]);
+        assert_eq!(rows[0]["definition"], rows[1]["definition"]);
+        for row in rows {
+            let declaration: neoclr::metadata::TypeDef =
+                serde_json::from_value(row["declaration"].clone()).unwrap();
+            assert_eq!(declaration.generic_parameters, vec![Some("T".into())]);
+            assert_eq!(declaration.generic_variance, vec![Variance::Covariant]);
+            assert_eq!(
+                declaration.generic_constraints,
+                source.types[0].generic_constraints
+            );
+            let declared = &row["declaredMethods"][0];
+            assert_eq!(declared["genericParameters"], json!(["U"]));
+            let constraints: Vec<GenericConstraint> =
+                serde_json::from_value(declared["genericConstraints"].clone()).unwrap();
+            assert_eq!(constraints, source.functions[0].generic_constraints);
+        }
     }
 
     #[test]

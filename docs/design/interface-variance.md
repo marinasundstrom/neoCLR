@@ -302,3 +302,19 @@ implied by the annotations; `Sliceable<int[]>` does not thereby become
 The retained [library consumer](../validation/interface-variance/library/Main.rvn)
 exercises imported read-only views and comparison/conversion contracts. Generic
 metadata is retained independently of executable specialization.
+
+### Native generic metadata retention follow-up (2026-10-16)
+
+The native source catalogue now retains method `genericConstraints` as well as
+`genericParameters`. Constraints remain in declaration form: a method bound on
+its owner's `T` retains that owner-relative parameter instead of being replaced
+by one specialization's argument. Each closed row retains its distinct arguments
+and the shared definition identity, original type parameters, variance and bounds.
+A focused catalogue regression checks two constructions and constructor/type bounds.
+
+This is build-time evidence shared by native preparation, not guest introspection
+completion. The assembly-enumeration consumer still fails native preparation at
+`neoCLR.Runtime.AssemblyTypes: unsupported value member contract`. Native support
+needs metadata-only, owner-bound handles for definitions and their parameters,
+separate from executable layouts, plus explicit discovery retention. The .NET-like
+requirement to preserve observable generic metadata remains unchanged.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Retain declared method generic constraints in the native source catalogue alongside parameter names and type-level constraints/variance. A focused regression distinguishes two closed constructions while preserving their shared declaration and owner-relative method bounds. This is build-time retention; native open-definition discovery remains unsupported.
+
 - Annotate eleven class-library interfaces for reference variance: Iterator/Iterable/Collection/Sequence, async iterator/source and ConvertibleInto are covariant; comparison/equality interfaces are contravariant. Keep concrete classes, mutable collections, array storage, Sliceable and Result invariant. Qualify native imported calls and async reference views in interpreter/AOT/JIT, all eleven metadata annotations, five rejected conversions and native GC cleanup. Refresh matching CLI and native API references. Raven's boxing-in-variance fix is validated on main and deliberately carried to codex/neoclr.
 
 - Preserve native interface variance and contract-slot facts across private nominal renaming. A row-preserving rewrite now remaps retained argument types rather than losing compiler metadata during serialization; a focused executable regression covers variant dispatch after an unrelated nominal rewrite.
