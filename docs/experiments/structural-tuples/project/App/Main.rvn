@@ -1,0 +1,13 @@
+func Main() -> int {
+    let alternative = Choose(Place())
+    let traits = Traits(Place())
+    if alternative is Place {
+        if traits is Place {
+            var point = Coordinates()
+            let original = point
+            point.x = 41
+            return point.x + point.y - (point.x - original.x)
+        }
+    }
+    return 1
+}

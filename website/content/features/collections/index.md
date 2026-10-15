@@ -102,3 +102,9 @@ copies. Nine-element tuples execute without a nominal carrier. Open-element
 emission and migration away from legacy runtime declarations remain pending. An explicit Raven host API
 imports named scalar/nested tuples across library boundaries. See the
 [tuple API reference](/docs/tuples.md) for the current boundary.
+
+Development branch update (2026-10-15): native Raven projects enable structural
+tuples, unions and intersections together, and the default runtime build admits
+them in the interpreter. A separate-library sample preserves named tuple copies
+and returns 42. JIT/AOT, full legacy tuple removal and broader element forms
+remain incomplete; these changes are not yet a published release.

@@ -38,9 +38,11 @@ libc = "0.2"
 windows-sys = { version = "=0.60.2", features = ["Win32_Networking_WinSock"] }
 
 [features]
-# Branch-only interpreter experiment; JIT/AOT reject compound signatures.
+# Native structural types are part of the standard interpreter build.
+default = ["experimental-compositions", "experimental-tuples"]
+# Legacy feature name retained for reduced-profile validation; JIT/AOT reject compound signatures.
 experimental-compositions = []
-# Branch-only closed structural tuple value experiment; no JIT/AOT admission.
+# Legacy feature name retained for reduced-profile validation; no JIT/AOT admission.
 experimental-tuples = []
 # Internal metadata support shared with the JIT/AOT backend; not a public Raven API.
 native-metadata = []

@@ -9052,3 +9052,14 @@ The view enables Raven's explicit native tuple import. It is distinct from guest
 names with positional ItemN defaults rather than nullable declared-name entries.
 Focused tests cover nested views and distinct return/parameter names on equal types;
 the separate Raven consumer executes imported named tuples with result 42.
+
+## Combined structural reads (2026-10-15 development)
+
+`AssemblyDefinition.ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image,
+IAssemblyResolver? resolver = null, bool allowExperimentalCompositions = false)`
+reads native tuple signatures, optionally admitting union/intersection signatures
+in the same image. Supply a resolver for external definitions. Invalid or
+unresolved signatures fail validation; this does not enable CLI projection.
+The default remains tuple-only for existing host callers. Native Raven projects
+explicitly select combined admission. This host metadata API is documented here,
+not in the guest RavenDoc type selection.

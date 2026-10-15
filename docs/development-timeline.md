@@ -17685,3 +17685,15 @@ metadata and per-signature host names, preserving positional equality/hash and
 identity. Tests verify named roundtrips, substitution, equal identities with distinct
 descriptive names and renamed parameter execution (42). C#/Raven name wiring and
 guest name queries are still pending; no attribute encoding was introduced.
+
+## 2026-10-15 — Integrating all three structural forms
+
+The author clarified that the goal is confidence sufficient to integrate the
+experiment into neoCLR and its Raven compiler version, and explicitly included
+intersections alongside unions and tuples. The assistant narrowed this slice to
+default native project/runtime admission and a combined library/consumer test,
+rather than treating broader generic support as a prerequisite. The sample
+returns 42; default runtime tests pass. Integration remains on feature branches,
+with source-library rebuild and backend limitations recorded in
+[the integration contract](raven-cli-bridge.md#native-project-integration--2026-10-15-development).
+No merge or deletion of old branches has been performed.

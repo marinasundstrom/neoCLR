@@ -32,14 +32,15 @@ public sealed partial class AssemblyDefinition
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver)
         => ReadNativeCore(image, allowExperimentalCompositions, resolver, false);
 
-    /// <summary>Reads native declarations with closed structural tuples enabled, without enabling reference compositions.</summary>
+    /// <summary>Reads native declarations with closed structural tuples enabled and optional reference compositions.</summary>
     /// <param name="image">Complete native assembly container.</param>
     /// <param name="resolver">Optional exact dependency snapshots; no implicit assembly loading.</param>
+    /// <param name="allowExperimentalCompositions">Also admit reference compositions using the same explicit resolver.</param>
     /// <returns>An immutable snapshot retaining ordered tuple shapes and the original image.</returns>
     /// <remarks>Bodies remain opaque. Callable import requires its separate explicit API. Preserves ordered elements; applies the bounded authoring profile.</remarks>
     /// <exception cref="InvalidDataException">The image or tuple signature is invalid or unsupported.</exception>
-    public static AssemblyDefinition ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null)
-        => ReadNativeCore(image, false, resolver, true);
+    public static AssemblyDefinition ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null, bool allowExperimentalCompositions = false)
+        => ReadNativeCore(image, allowExperimentalCompositions, resolver, true);
 
     private static AssemblyDefinition ReadNativeCore(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver, bool allowExperimentalTuples)
     {
