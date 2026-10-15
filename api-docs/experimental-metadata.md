@@ -9158,3 +9158,12 @@ to inspect them. Static composition fields and interface instance storage remain
 rejected. Authored signatures retain ownership checks; this does not enable CLI
 projection of structural types. Generic wrappers and direct record declarations
 now follow the same runtime storage rule. The matching runtime/backend is required.
+
+### Structural tuple method references (2026-10-15)
+
+`AssemblyBuilder.CreateMethodReference` accepts ordered structural tuple parameters
+and results, including tuples nested in imported generic arguments. Names remain
+in the signature and do not affect identity. Ownership, parameter scope and
+constructor validation still apply. These references require native output;
+`Write`/CLI projection rejects structural tuples. The imported Range consumer
+validates direct and Result-wrapped tuple results across an assembly boundary.

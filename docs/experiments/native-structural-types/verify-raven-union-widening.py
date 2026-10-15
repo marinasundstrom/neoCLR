@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--bundle', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     variants = parser.add_mutually_exclusive_group()
+    variants.add_argument('--carrier-free', action='store_true', help='Qualify imported Range structural tuples without nominal carriers')
     variants.add_argument('--floating-union', action='store_true', help='Qualify Single/Double alternatives and widening')
     variants.add_argument('--string-union', action='store_true', help='Qualify string/int alternatives instead of numeric widening')
     args = parser.parse_args()
@@ -26,7 +27,7 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     compiler, bundle = args.compiler.resolve(), args.bundle.resolve()
     project = output / 'project'
-    shutil.copytree(Path(__file__).parent / ('floating-project' if args.floating_union else 'string-project' if args.string_union else 'widening-project'), project,
+    shutil.copytree(Path(__file__).parent / ('carrier-free-project' if args.carrier_free else 'floating-project' if args.floating_union else 'string-project' if args.string_union else 'widening-project'), project,
                     ignore=shutil.ignore_patterns('bin', 'obj'))
     project_file = project / 'App.rvnproj'
     project_file.write_text(project_file.read_text().replace(
@@ -53,6 +54,8 @@ def main():
         context += ['--module', bundle / (name + '.dll')]
     run('interpreter', [runtime, 'run', artifact, '--execution', 'interpreter', *context], 42)
     flags = ['--compile-system', '--reference-arena']
+    if args.carrier_free:
+        flags += ['--bind-user-fault']
     if args.string_union:
         flags += ['--native-gc']
     obj = output / 'app.o'
@@ -138,7 +141,8 @@ int main(void) { return check(neoclr_entry_v4); }
               'runtimeDiffSha256': hashlib.sha256(subprocess.check_output(['git', 'diff'], cwd=ROOT)).hexdigest(),
               'compilerDiffSha256': hashlib.sha256(subprocess.check_output(['git', 'diff'], cwd=compiler.parent)).hexdigest(),
               'platform': platform.platform(), 'commands': commands, 'imports': imports, 'jit': measurement,
-              'checks': (['Single/Double exact patterns and widening', 'integer alternative',
+              'checks': (['imported Range named tuple and Result tuple', 'union exact extraction and tuple names ignored for compatibility',
+                          'interpreter/AOT/JIT return 42', 'no native imports and zero arena use'] if args.carrier_free else ['Single/Double exact patterns and widening', 'integer alternative',
                           'interpreter/AOT/JIT return 42', 'no native imports and zero arena use',
                           'AOT undefined/bounds sanitizers'] if args.floating_union else ['string and integer alternatives through reordered calls and typed patterns',
                           'interpreter/AOT/JIT return 42', 'native roots and heap cleared after collection',

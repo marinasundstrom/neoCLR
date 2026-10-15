@@ -90,8 +90,7 @@ and serialization errors directly. This replaces their HttpJsonError return type
 rebuild consumers and update wrapper patterns. HttpError and JsonError keep their
 meaningful nominal cases. See [HTTP JSON APIs](../../docs/json.html).
 
-The legacy CLI bridge backs two through five alternatives with nominal
-`System.Union` carriers. The native structural feature branches instead emit union
+Development neoCLR removes the nominal `System.Union` runtime carriers and emits union
 signatures and support interpreter execution, including value and reference
 alternatives. These are different representations and require matching compiler
 and library artifacts. Bounded native AOT checks now cover reference-only unions

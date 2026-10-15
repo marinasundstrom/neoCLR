@@ -727,3 +727,22 @@ extraction reports InvalidCast. The native host verifies zero arena use. This
 qualifies the runtime IL path; fresh Raven enum-source, managed JIT and other enum
 widths are not established by these checks. Native metadata and Runtime Contract
 configuration are unchanged.
+
+## Carrier-free library migration (2026-10-15)
+
+The Runtime source removes nominal Union/Tuple declarations and the generated
+Tuple slice. Range uses native `(Offset: int, Length: int)` directly and in Result.
+The [consumer](carrier-free-project/Main.rvn) imports both methods, preserves tuple
+names across renamed positional signatures, and extracts an Int32 union alternative.
+The [evidence](carrier-free-results.json) records exact binaries and working-tree
+fingerprints: all five libraries build and interpreter/AOT/managed JIT return 42,
+with zero arena allocations and AOT undefined/bounds sanitizers. `--bind-user-fault`
+is required to link Index/Range validation paths even for valid inputs.
+
+Reproduce with `verify-raven-union-widening.py --carrier-free --compiler <rvnc.dll>
+--bundle <fresh-bundle> --output <new-directory>`. The metadata-host authored-reference
+regression also covers direct/nested tuple method signatures and CLI rejection.
+Tuple alternatives in unions remain rejected by metadata authoring; this consumer
+does not qualify that combination. Full integration and native reader cleanup
+remain separate gates. Historical bridge fixture declarations do not represent
+native library APIs.

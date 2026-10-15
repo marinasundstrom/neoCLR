@@ -98,8 +98,9 @@ introspection; interface implementation stays explicit.
 The structural feature branches support native Raven tuples with ordered elements,
 value copies and local mutation. Element names are stored in the signature and
 preserved by reflection, while identity and compatibility remain positional.
-Native binding no longer needs a nominal tuple carrier. Legacy CLI Tuple types
-remain for existing consumers.
+Native binding requires no nominal tuple carrier. Development runtime libraries
+now remove `System.Tuple` and `System.Union`; rebuild consumers with the matching
+compiler. `Range` returns a named structural offset/length pair.
 
 Structural unions support both value and reference alternatives, including scoped
 nominal constituents such as `Response<T> | HttpError | JsonError`. Tested task

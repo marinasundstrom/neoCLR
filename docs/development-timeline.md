@@ -17940,3 +17940,13 @@ nominal Tuple<int, int>, which must migrate together with consumers and generate
 library artifacts. Compiler/metadata option removal, carrier removal, refreshed
 bundle qualification and integration into the destination branches remain pending;
 this entry records direction and work underway, not completed integration.
+
+The next validated slices made Raven structural binding/emission unconditional
+for the neoCLR target and removed the runtime Union/Tuple carriers. The assistant
+migrated Range's result signatures and fixed imported tuple member mapping and
+metadata method-reference admission. A fresh five-library build and imported
+Range/Result consumer pass interpreter/AOT/JIT; the native API reference was refreshed.
+A broader attempted tuple-as-union-alternative consumer still rejects during metadata
+authoring and remains an explicit gap. Destination-branch integration and reader
+profile removal have not yet been performed. See the
+[carrier-free evidence](experiments/native-structural-types/carrier-free-results.json).

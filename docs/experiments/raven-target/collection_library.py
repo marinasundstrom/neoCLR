@@ -75,7 +75,7 @@ def build(path: Path) -> str:
     if path == ROOT / 'runtime/System/Collections/List.neoil':
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
     if path == ROOT / 'runtime/System/Array.neoil':
-        return build(ROOT / 'runtime/raven/Array.neoil') + build(ROOT / 'runtime/raven/NativeMemory.neoil') + build(ROOT / 'runtime/raven/Tuple.neoil')
+        return build(ROOT / 'runtime/raven/Array.neoil') + build(ROOT / 'runtime/raven/NativeMemory.neoil')
     if path.stem == 'Function':
         # Array<T> owns ForEach in the Raven profile. There is no nominal callable declaration.
         return ''

@@ -128,6 +128,7 @@ public sealed partial class AssemblyBuilder
 
         bool Supported(SignatureType type, bool result) => type.PointerElement is not null ? true :
             type.IsSelf ? isInterface :
+            type.Tuple is { } tuple ? tuple.ElementTypes.All(t => Supported(t, false)) :
             type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
             type.ImportedType is { } nominal ? nominal.TypeArguments.All(t => Supported(t, false)) :

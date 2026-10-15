@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Remove nominal runtime `System.Union` and `System.Tuple` carriers and the generated Tuple slice. Change Range results to named structural tuples; rebuild consumers. Admit tuple-bearing native method references and pair with Raven import mapping. Validate a fresh five-library bundle and imported Range/Result consumer in interpreter/AOT/JIT with zero arena allocations; refresh native API docs and explicitly exclude retired CLI documentation scaffolds.
+
 - Record paired Raven structural target defaults: remove compiler semantic/emission and project/driver switches, preserve ordinary .NET behavior, and validate 50 compiler checks plus a fresh interpreter/AOT/JIT consumer. Native reader and carrier retirement remain in progress.
 
 - Remove the experimental structural Cargo features: unions, intersections, tuples and their constraints now use the standard runtime rules even with `--no-default-features`. Make structural tests unconditional and update executable reproducers; 398 runtime/structural tests pass, with three existing ignored tests. Remove obsolete rejection assertions and repair a stale GC fixture. Compiler/metadata switch removal and nominal carrier retirement remain in progress.

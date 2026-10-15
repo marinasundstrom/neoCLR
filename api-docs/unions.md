@@ -1,8 +1,10 @@
 # Union
 
 Raven supports named nominal unions and ad-hoc unions written as type expressions.
-The native feature-branch profile represents ad-hoc unions directly in metadata;
-legacy CLI profiles retain nominal carriers.
+The neoCLR target represents ad-hoc unions directly in native metadata without
+feature switches. The nominal `System.Union<T...>` runtime carriers have been
+removed. Rebuild consumers with matching compiler and library artifacts. Declared
+nominal unions and ordinary .NET-target carriers remain distinct supported models.
 
 ## Nominal unions
 

@@ -10,7 +10,6 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
-    "Tuple": "System.Tuple",
     'GC': 'System.Runtime.GC',
     'DateTime': 'System.Time.DateTime',
     'ZonedDateTime': 'System.Time.ZonedDateTime',
@@ -172,7 +171,6 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
-    "Tuple": "runtime/raven/src/System/Tuple.rvn",
     "Routes": "runtime/raven/src/System/Web/Http/Routes.rvn",
     'GC': 'runtime/raven/src/System/Runtime/GC.rvn',
     'DateTime': 'runtime/raven/src/System/Time/DateTime.rvn',

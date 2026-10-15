@@ -11010,3 +11010,20 @@ and managed JIT each return 42 with zero arena use. AOT has no native imports an
 passes undefined/bounds sanitizers. JIT uses the required GC/stack host and checks
 roots/heap cleanup before returning; its host is not sanitizer-built. No Runtime
 Contract or metadata encoding change is introduced.
+
+## Nominal composition carrier retirement (2026-10-15)
+
+The Runtime source and ownership manifest remove `System.Union` arities 2–5 and
+`System.Tuple` arities 1–7. The generated nominal Tuple runtime slice is removed.
+Named Raven unions, their UnionValue protocol and UnionAttribute remain supported.
+Range returns named structural tuples, directly and in Result; consumers must be
+rebuilt because native signatures change. The paired Raven emitter maps imported
+structural tuple method results without nominal-owner lookup, and the C# metadata
+host admits tuple-bearing method references recursively. CLI projection remains
+rejected. Legacy reference-bridge fixtures are not native runtime declarations.
+
+The fresh five-library bundle builds, and an imported Range/Result consumer passes
+interpreter, macOS ARM64 AOT and managed JIT with zero arena allocation and AOT
+undefined/bounds sanitizers. Host authored-reference regressions pass. Tuple
+alternatives inside structural unions are still rejected by the authoring profile;
+this is an integration gap, not a permanent type-system rule.

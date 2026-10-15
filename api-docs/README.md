@@ -2129,3 +2129,19 @@ The compiler-host `MetadataImportOptions.UseStructuralTuples` and
 with its emission gate and symbol semantics. These Raven APIs are not guest
 class-library types and are not selected for the neoCLR RavenDoc reference. No
 guest API/reference snapshot changed; the existing snapshot check still passes.
+
+## Carrier retirement (2026-10-15 development)
+
+The native Runtime library no longer declares `System.Tuple<T...>` or
+`System.Union<T...>`. The refreshed native API snapshot uses all five freshly built
+libraries, including PostgreSQL. `Range` now returns `(Offset: int, Length: int)`
+and `Result<(Offset: int, Length: int), InvalidRangeError>`; these methods remain
+in the native member reference. TupleTypeInfo/UnionTypeInfo remain public.
+
+The aggregate historical CLI bridge still describes the old carriers. Exact type
+exclusions for `System.Tuple` arities 1–7 and `System.Union` arities 2–5 prevent
+presenting those scaffolds as executable native APIs. Its DLL is not a native
+bundle and is retained for historical documentation tooling; its source-input
+fingerprints are refreshed without claiming new CLI signatures. The manual tuple
+and union family pages describe the current native forms. Full retirement of the
+legacy bridge remains separate from removing native runtime carrier declarations.

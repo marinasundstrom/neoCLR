@@ -1,76 +1,31 @@
 # Tuple
 
-The experimental native profile binds and emits Raven tuples as structural
-signatures, with native names, value copies and `TupleTypeInfo` introspection.
-Native project profiles enable this capability with matching compiler/runtime
-artifacts; compiler-host APIs retain explicit capability switches.
+Development neoCLR tuples are structural value types with ordered elements, native
+names and `TupleTypeInfo` introspection. The neoCLR target selects this representation
+without feature switches. No nominal `System.Tuple<T...>` declaration or constructor
+is required. The old runtime carriers have been removed; rebuild consumers with the
+matching compiler and library bundle. Ordinary .NET tuple representation is unchanged.
 
-The legacy CLI bridge still uses nominal generic `System.Tuple<T1,...,TN>` value
-declarations for one through seven components. These remain nominal in introspection
-and remain in the runtime library pending migration of existing consumers.
+Names are preserved in metadata and reflection but do not participate in positional
+type compatibility. Use tuple syntax such as `(offset: int, length: int)` and values
+such as `(2, 42)`. Access names or positional `Item1` / `Item2` aliases. Assignment
+copies the tuple; reference elements preserve the referenced object identity.
 
-## Legacy nominal representation
+## Range results
 
-`System.Tuple<T1,...,TN>` is neoCLR's value-tuple
-family, corresponding to .NET `System.ValueTuple`. One through seven components
-are available. These are structs with mutable public `Item1` through `ItemN` fields
-and a constructor taking each component in order.
+`System.Range.GetOffsetAndLength(length: int) -> (Offset: int, Length: int)` returns
+the validated start offset and count. Negative lengths, reversed boundaries and
+out-of-bounds ranges fault. `TryGetOffsetAndLength(length: int)` returns
+`Result<(Offset: int, Length: int), InvalidRangeError>` with the same validation.
+Both methods now use structural tuple signatures, including across library imports.
+This changes metadata compatibility: rebuild callers of the old nominal result.
 
-The [pair reference](xref:System.Tuple`2) documents the common two-component form.
-All seven arities are included in the generated reference. Assignment copies fields;
-reference components continue to share their referenced objects. Labels used in
-Raven tuple annotations are source metadata, not separately stored fields.
-
-Raven uses `()` for the existing `System.Void` unit contract. The one-component
-type requires explicit `Tuple<T>(value)` construction. The initial slice does not
-provide larger flat tuples, a `Rest` carrier, tuple-specific equality/comparison/
-formatting interfaces or `ITuple`. It does not promise full .NET ValueTuple API parity.
-
-`TupleElementNamesAttribute` exists only in compiler-reference metadata to retain
-labels; it is excluded from executable API pages with this explicit explanation.
-Use a matching development compiler, reference, importer and System library.
-
-## Current members
-
-Each arity has a constructor taking its component values in order and public
-`Item1` through `ItemN` fields of the corresponding component types. Assignment
-copies the value's fields. Member details are generated from the matching reference:
-
-- [Tuple&lt;T1&gt;](xref:System.Tuple`1)
-- [Tuple&lt;T1, T2&gt;](xref:System.Tuple`2)
-- [Tuple&lt;T1, T2, T3&gt;](xref:System.Tuple`3)
-- [Tuple&lt;T1, T2, T3, T4&gt;](xref:System.Tuple`4)
-- [Tuple&lt;T1, T2, T3, T4, T5&gt;](xref:System.Tuple`5)
-- [Tuple&lt;T1, T2, T3, T4, T5, T6&gt;](xref:System.Tuple`6)
-- [Tuple&lt;T1, T2, T3, T4, T5, T6, T7&gt;](xref:System.Tuple`7)
-
-Structural identity is ordered and positional; names are retained per signature
-without changing compatibility. General guest construction through introspection
-remains incomplete. Function's Object inheritance does not decide tuple inheritance.
+`()` remains the inhabited unit contract. Tuple-specific equality, formatting and
+general construction through introspection are not implied by structural identity.
+Tuple alternatives inside unions remain rejected by the current metadata authoring
+profile; that combination is an integration gap, not a nominal-inheritance rule.
 
 [All structural families](structural-types.md)
-
-## Structural migration: host metadata foundation
-
-The 2026-10-14 experimental runtime model adds
-`neoclr::metadata::Type::Tuple(TupleSignature)`. Its ordered element signatures have no
-nominal definition name. JSON and native binary metadata decoding preserve that
-shape, and type/method/Self substitution traverses its elements. Signature equality
-preserves order, duplicates and nesting; it is not a claim of resolved runtime
-assignability. Missing substitution arguments and excessive substitution depth
-return a host Fault. Scope normalization rejects zero or more than 256 elements.
-
-The Rust metadata node is separate from the guest descriptor API below. The interpreter now
-admits closed scalar, nominal and nested tuple elements in the standard runtime.
-The union/intersection feature alone does not enable tuple execution. Existing
-`Module::instantiated_fields` returns synthesized public `ItemN` views; these have
-no nominal FieldDef. Native aggregate construction, indexed element reads/writes,
-managed element addresses and default initialization preserve value copying and
-reference-element identity. Invalid element types, positions and stores fault.
-A bounded native backend now lowers tuple storage inline (see below). Open, byref, pointer, array, function
-and composition direct elements are not admitted in this bounded slice. Existing nominal
-Tuple APIs remain available during migration; their removal is planned. Raven native source binding and guest element descriptors are described below;
-CLI tuple projection does not represent this structural identity.
 
 ## Resolved host tuple descriptors (development)
 
@@ -166,9 +121,7 @@ invalid-name rejection and interpreter parameter compatibility (result 42).
 
 ## Raven native binding contract (development)
 
-Raven hosts now select `MetadataImportOptions.WithStructuralTuples()` alongside
-`NeoClrEmitOptions.AllowExperimentalTuples`. The binding option defaults to false
-and is neoCLR-only; the emitter requires both options. `ITupleTypeSymbol` exposes
+Raven hosts select `CompilationOptions.NeoCLR`; structural tuples require no additional switch. `ITupleTypeSymbol` exposes
 ordered fields and names with `UnderlyingTupleType == null`, no nominal declaration
 or constructors, and empty TypeArguments. Positional ItemN aliases are available.
 Names do not affect structural equality/hash; substitution preserves names. CLI
@@ -176,8 +129,8 @@ emission rejects this profile. Ordinary .NET tuple APIs are unchanged.
 
 Local-rooted element mutation supports nested writeback and preserves copies;
 immutable let roots and nonlocal roots are rejected. The current native emitter
-still admits only closed scalar/nested elements. Legacy runtime tuple declarations
-remain for CLI bridge consumers but are not used by native structural binding.
+still admits only closed scalar/nested elements. The nominal runtime tuple declarations have been removed. Historical CLI bridge
+fixtures are compatibility tooling, not executable native API declarations.
 These are compiler-host contracts, documented in Raven's runtime-contract and
 neoCLR integration guides; they do not add a guest class-library API.
 
