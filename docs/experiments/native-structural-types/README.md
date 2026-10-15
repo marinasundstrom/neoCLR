@@ -602,3 +602,27 @@ Reproducer: `verify-raven-union-widening.py --compiler /path/to/rvnc.dll
 [Retained evidence](widening-v4-results.json) fingerprints the compiler, runtime,
 libraries, input source, native object and hosts. The fixture is
 [`widening-project/Main.rvn`](widening-project/Main.rvn).
+
+### Scalar union cost measurement (2026-10-15)
+
+`benchmark-unions.py` compares alternating Int32/Int64 union payloads with an
+explicit nominal tagged record on Apple M1, macOS ARM64 AOT. Both construct,
+transport through Make/Read calls and inspect the payload; every returned value
+and the final checksum are checked. Nine alternating rounds of 5,000,000 calls
+per case exclude compilation and process startup from execution timing.
+
+The retained run measured **9.7154 ns/call** for structural unions and
+**9.2282 ns/call** for nominal tagged records (ratio **1.0528**,
+about 5.3% higher). Both have zero arena use and no native imports.
+Objects are 4,144 and 2,840 bytes respectively; object size includes metadata and
+is not a machine-code-size measurement. Structural union extraction enforces
+runtime membership; the nominal sample uses its own tag convention. The small
+absolute timing difference does not establish a general application regression.
+
+This measures valid scalar transport only, not mixed/reference/record payloads,
+boxing, GC, async workloads, managed JIT or other machines. It supports a bounded
+allocation-free scalar path and does not close those wider performance questions.
+Reproduce with `benchmark-unions.py --codegen target/debug/neoclr-codegen
+--output /fresh/output/path`; set `SDKROOT` to the matching macOS SDK if needed.
+[Raw samples and fingerprints](union-cost-results.json) retain the source, native
+objects, host, tool and commands.

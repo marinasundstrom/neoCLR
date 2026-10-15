@@ -18,7 +18,9 @@ closed-generic Task union consumers pass interpreter, AOT and managed JIT with
 eager/paced collection and cleanup; see the [retained Task evidence](experiments/native-structural-types/README.md#fresh-task-union-native-qualification-2026-10-15).
 Exact-alternative union widening now repacks differing native layouts without a
 carrier allocation and passes a fresh interpreter/AOT/JIT consumer plus collector
-checks. Broader async workloads and throughput remain open. Written intersection bounds require interfaces or classes open to extension;
+checks. A bounded scalar-union microbenchmark measures about 5.3% higher median call cost
+than an explicit nominal tagged record on Apple M1, with no native imports or
+arena allocation; mixed/async throughput remains open. Written intersection bounds require interfaces or classes open to extension;
 Raven sealed hierarchies remain valid. Full open-generic integration, broader
 constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
 Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and

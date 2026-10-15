@@ -1,0 +1,198 @@
+{
+  "runtimeRevision": "9a4992c9e8d10047314c24f2cddf6aaaadf7e6fb",
+  "runtimeDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cpu": "Apple M1",
+  "iterationsPerSample": 5000000,
+  "cases": {
+    "structural": {
+      "emissionSeconds": 0.9157614580000001,
+      "objectBytes": 4144,
+      "imports": [],
+      "samplesNsPerCall": [
+        9.334,
+        9.1608,
+        9.4368,
+        9.7362,
+        9.8468,
+        9.7978,
+        9.7932,
+        9.2408,
+        9.7154
+      ],
+      "medianNsPerCall": 9.7154
+    },
+    "nominal": {
+      "emissionSeconds": 0.6309929159999998,
+      "objectBytes": 2840,
+      "imports": [],
+      "samplesNsPerCall": [
+        8.9922,
+        8.8702,
+        9.5634,
+        9.2848,
+        9.112,
+        9.4234,
+        9.2282,
+        8.9762,
+        10.1706
+      ],
+      "medianNsPerCall": 9.2282
+    }
+  },
+  "commands": [
+    [
+      "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+      "--closed-world",
+      "--compile-system",
+      "--reference-arena",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural.neoil",
+      "Main",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural.o",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/System.neoil",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/Dependency.neoil"
+    ],
+    [
+      "nm",
+      "-u",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural.o"
+    ],
+    [
+      "clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-arch",
+      "arm64",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "-DITERATIONS=5000000",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/host.c",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural.o",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+      "--closed-world",
+      "--compile-system",
+      "--reference-arena",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal.neoil",
+      "Main",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal.o",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/System.neoil",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/Dependency.neoil"
+    ],
+    [
+      "nm",
+      "-u",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal.o"
+    ],
+    [
+      "clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-arch",
+      "arm64",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "-DITERATIONS=5000000",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/host.c",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal.o",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural"
+    ],
+    [
+      "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal"
+    ]
+  ],
+  "limitations": [
+    "one machine; macOS ARM64 AOT only",
+    "valid scalar payloads only; no references, records, GC or async",
+    "nominal carrier uses explicit tag convention, structural union uses runtime membership checks",
+    "excludes compilation and process startup; private eight-byte slots, not public ABI"
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/benchmark-unions.py": "67cca261943d081578a969bb93904ea866d5d44609bd30c324c1856319499ce0",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "200e25e6370c0a2168af077f8fdcf70141c5344878008a2349085af727210e30",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/host.c": "31c473afdb2c3817f4dd69763ae0603f5f84c48e9a0414a0d4ad0bc8e5114dee",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/System.neoil": "b3de629ea4ba552863c8df2a94a8787ae1505a49da4e890dacc23e49c75dbbbd",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/Dependency.neoil": "78d28bb3b601729415966eadf739463e4368660985d0c9b97f2942e8419d6b66",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "3840086fc3cffb71d2053c225f95526519ec81d76d3375425fd4d62bf8f0fb05",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural.neoil": "c4cf70bffbfcbf5627c01d2b0e40e82567ca0a9354cb6b721f585622e5a5256d",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural.o": "b2886701fe7c8fbe30c5d90738c13bc53e34ca53d57b63a1d8519b461b445c07",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/structural": "d3fda4e3964cd2537d8693e8b398d03d94da308a9e1f4c3bce614c90553c98f2",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal.neoil": "2615276ee0ce18ca176b82fe04a3325b6f87c58e847439b0ea7ccdc343210e0c",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal.o": "819071b2d10793c7205ed567e4b31ae819969bae32c4597af8c4bb527dcfc433",
+    "/Users/robert/Projects/neoclr/target/structural-union-cost-final/nominal": "597bb513ddf1515ed06fdcce1e57693ceb8ff20e03d2b444ec8e6c4d4ef35dbe"
+  },
+  "structuralOverNominalRatio": 1.052794694523309
+}

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Retain an allocation-free scalar-union AOT microbenchmark against an explicit nominal tagged record: nine alternating 5-million-call rounds on Apple M1 show about 5.3% higher median call cost, with every result checked. Record raw samples, object sizes and limits; this does not qualify mixed/async throughput or other platforms.
+
 - Add exact-alternative native union widening across scalar, mixed, reference and record/callable payload layouts. Preserve inactive values and collector roots without allocating a carrier; reject unsupported sets. Retain a fresh Raven overload/widening consumer passing interpreter, AOT and managed JIT with zero arena use. Paired Raven lowering now emits the required explicit conversion; metadata encoding is unchanged.
 
 - Record paired Raven structural overload lookup correction and independently carried ordinary .NET ad-hoc carrier widening. Distinct union/intersection/tuple signatures retain lookup identity; metadata encoding and runtime operations are unchanged by this compiler slice.
