@@ -200,3 +200,7 @@ Initial AOT microbenchmarks compare two- and sixteen-integer tuples with equival
 nominal records: each pair emits byte-identical native objects with no allocator
 imports. This is evidence for those copy/call workloads, not a general performance
 guarantee. Reference-bearing values, boxing and union workloads remain unmeasured.
+
+Development native specialization also admits tuples as closed generic arguments
+and inline fields of nominal records. Recursive cycles and the flattened-lane budget
+remain checked. See the [native structural qualification](../docs/experiments/native-structural-types/README.md).

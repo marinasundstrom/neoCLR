@@ -449,3 +449,27 @@ callable patterns only when the target advertises function-value support. The
 ordinary .NET default is unchanged. The fresh v4 bundle now also passes 32 entries
 per eager/paced policy in both AOT and managed JIT, with complete cleanup before
 JIT code release; see the linked consumer evidence. Async retention remains open.
+
+### Closed structural generic arguments (2026-10-15)
+
+Native specialization now recursively admits tuple, union and intersection arguments
+in closed nominal types and generic methods, preserving their signatures through
+substitution. Storage admission remains separate: scalar union and intersection
+method values use their established layouts; tuples can also be inline nominal
+record fields. Structural tuple fields retain the existing cycle and flattened-lane
+checks. This parallels CLR closed-generic specialization obligations while using
+neoCLR signature-native shapes rather than CLR nominal carrier declarations.
+
+The fresh direct `Task<Response | HttpError | JsonError>` consumer compiles from
+Raven against v4, but native specialization next encounters `ArrayRef(Union(...))`
+in the specialized library graph. Structural array storage remains an integration
+blocker; generic argument admission alone does not qualify Task execution. Direct
+union/intersection fields in value records also retain the interpreter surface gate.
+
+Validation: `structural_arguments_specialize_generic_methods_and_tuple_fields`
+passes interpreter/AOT for all three shapes; `structural_intersection_generic_transport_preserves_conformance_and_identity`
+passes the reference-view modes with and without the required nominal conformance.
+`cyclic_and_unknown_inline_layouts_never_emit`,
+`specialization_rejects_unsupported_shapes_and_preserves_verification` and
+`inline_layout_boundary_is_admitted_and_overflow_rejected` pass, including the new
+cycle through a tuple field. These checks do not qualify structural arrays.

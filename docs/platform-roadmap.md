@@ -10,7 +10,9 @@ receiver-collection checks; bounded native callable-union storage now has AOT
 receiver-retention and exact allocation checks. The artifact-only Raven callable
 consumer now passes on freshly rebuilt libraries in interpreter, AOT and managed
 JIT, including eager/paced collection and cleanup before code release. Broader
-conversions and async retention remain open. Written intersection bounds require interfaces or classes open to extension;
+conversions and async retention remain open. Closed structural generic arguments
+now pass specialization, but fresh native Task union compilation reaches the
+unsupported structural-array boundary; this remains an integration blocker. Written intersection bounds require interfaces or classes open to extension;
 Raven sealed hierarchies remain valid. Full open-generic integration, broader
 constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
 Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and

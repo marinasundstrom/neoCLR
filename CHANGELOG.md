@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Admit closed structural generic arguments in native specialization and inline tuple fields in nominal records, retaining recursive layout bounds. Qualify scalar-union, tuple and intersection generic method transport; native Task union delivery still requires structural array support.
+
 - Import function union constituents recursively into consumer ownership and admit function type-test emission. Qualify an artifact-only Raven callable/scalar union consumer with typed patterns and invocation: interpreter/AOT agree, and 32 entries per eager/paced collector mode allocate/reclaim only the explicit Cell and callable descriptors. Retain reproducible evidence. The fresh v4 library bundle also passes AOT and managed JIT under both collector policies, with cleanup before JIT code release; escaped callbacks and async retention remain unqualified.
 
 - Align host metadata callable-union authoring, native reading and reference-cast verification with runtime admission; preserve nested union-valued function signatures and reject callable intersections. Add round-trip/cast tests and correct an inherited reader test that still rejected already-supported generic composition methods. Runtime Contract and CLI encoding are unchanged.

@@ -330,13 +330,16 @@ impl Specializer<'_> {
                     | Type::Int64
                     | Type::UInt64
                     | Type::Function(_)
+                    | Type::Tuple(_)
+                    | Type::Union(_)
+                    | Type::Intersection(_)
                     | Type::Named(_)
                     | Type::Constructed { .. }
                     | Type::ArrayRef(_)
             )
         }) {
             return Err(
-                format!("generic method arguments require primitive, Function, vector or closed nominal shapes: {} {:?}", target.name, target.generic_arguments).into(),
+                format!("generic method arguments require supported closed shapes: {} {:?}", target.name, target.generic_arguments).into(),
             );
         }
         let arguments = match &target.owner {
@@ -659,7 +662,15 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
             }
             Ok(())
         }
-        Type::Constructed { arguments, .. } => {
+        Type::Tuple(elements) => {
+            for element in elements.iter() {
+                validate_argument(element, depth + 1)?;
+            }
+            Ok(())
+        }
+        Type::Union(arguments)
+        | Type::Intersection(arguments)
+        | Type::Constructed { arguments, .. } => {
             for arg in arguments {
                 validate_argument(arg, depth + 1)?;
             }

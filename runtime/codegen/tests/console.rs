@@ -1148,6 +1148,16 @@ fn structural_intersection_views_require_every_nominal_bound() {
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_intersection_generic_transport_preserves_conformance_and_identity() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
+        .replace("stloc view", "call Forward<intersection<View,Marker>>(intersection<View,Marker>)\nstloc view");
+    let source = format!("{source}\n.function Forward<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n");
+    verify_reference_views(&source);
+    verify_reference_views(&source.replace(".implements Marker\n", ""));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_union_reference_payloads_accept_either_nominal_bound() {
     let source =
         include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")

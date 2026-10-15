@@ -690,6 +690,7 @@ fn cyclic_and_unknown_inline_layouts_never_emit() {
             "recursive inline",
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
+        (".type A\n.field Child tuple<Int32,A>\n.end", "recursive inline"),
     ] {
         let source = format!(
             ".module Invalid\n.entry Main\n{fields}\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n"
@@ -3026,4 +3027,53 @@ ret
     assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
     native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
         "@entry", true, &["--compile-system", "--reference-arena"]);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_arguments_specialize_generic_methods_and_tuple_fields() {
+    for (shape, make, extract) in [
+        (
+            "tuple<Int32,Int64>",
+            "ldc.i4 42\nldc.i8 99\nnewobj tuple<Int32,Int64>",
+            "ldfld 0",
+        ),
+        (
+            "union<Int32,Int64>",
+            "ldc.i4 42\nbox Int32\ncastclass union<Int32,Int64>",
+            "stloc value\nldloc value\nunbox.any Int32",
+        ),
+        (
+            "intersection<View,Marker>",
+            "ldloca value\ninitobj intersection<View,Marker>\nldloc value",
+            "ref.isnull\nbrfalse bad\nldc.i4 42\nret\nbad:\nldc.i4 0",
+        ),
+    ] {
+        let field_roundtrip = if shape.starts_with("tuple") {
+            format!("newobj Box<{shape}>\nldfld 0\n")
+        } else {
+            String::new()
+        };
+        let source = format!(
+            ".module StructuralGeneric\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.entry Main\n.function Main() -> Int32\n.local {shape} value\n{make}\ncall Copy<{shape}>({shape})\n{field_roundtrip}{extract}\nret\n.end"
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::LoadedProgram::new(&m)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
 }

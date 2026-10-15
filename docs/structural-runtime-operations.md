@@ -268,3 +268,10 @@ the synchronous JIT host completes cleanup before generated code is released. AO
 hosts run with undefined/bounds sanitizers; the JIT hosts are not sanitizer-instrumented.
 This qualifies bounded synchronous callable-union ownership, not escaped callbacks
 or async retention. [Reproduction and evidence](experiments/native-structural-types/callable-import-project/README.md).
+
+Closed native generic specialization now preserves tuple/union/intersection arguments.
+Tuple fields in nominal records use recursive inline storage. This does not remove
+storage-family gates: arrays of unions and direct union/intersection fields in value
+records remain unsupported. In particular, fresh native Task union compilation
+currently stops at a specialized `ArrayRef(Union(...))`; interpreter Task success
+must not be read as native application qualification.
