@@ -284,7 +284,9 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .iter()
                 .enumerate()
                 .filter_map(move |(pc, op)| match op {
-                    Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean)) => {
+                    Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
+                        if !crate::scalar_unions::query(f, pc) =>
+                    {
                         Some((i, pc, t.clone(), false))
                     }
                     Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean))

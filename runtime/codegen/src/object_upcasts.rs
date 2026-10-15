@@ -105,12 +105,14 @@ pub(super) fn verify(p: &Profile<'_>, flows: &[Stacks]) -> Result<(), Error> {
     }
     // Scalar-union box/cast elision keeps the original box instruction for
     // verification. Linking renamed the Object root to a private backend name;
-    // the VM verifier still requires its canonical declaration for that opcode.
+    // the VM verifier still requires its canonical declaration for boxing and
+    // scalar isinst results, including functions that only test a null union.
     if p.input.functions.iter().any(|f| {
         f.body
             .iter()
             .enumerate()
-            .any(|(pc, _)| crate::scalar_unions::box_pair(f, pc))
+            .any(|(pc, op)| crate::scalar_unions::box_pair(f, pc) ||
+                matches!(op, Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() && crate::scalar_unions::query(f, pc)))
     }) && !p.input.types.iter().any(|t| t.name == "System.Object")
     {
         let mut object = p

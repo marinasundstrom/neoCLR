@@ -2902,3 +2902,69 @@ ret
         &["--compile-system", "--reference-arena"],
     );
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_scalar_union_pattern_tests_preserve_exact_types_and_null() {
+    let cases = [
+        ("Int32", "ldc.i4 -42"),
+        ("Int64", "ldc.i8 4294967338"),
+        ("Boolean", "ldc.bool false"),
+    ];
+    for active in 0..=cases.len() {
+        let init = if active == cases.len() {
+            "ldloca value\ninitobj union<Int32,Int64,Boolean>".to_owned()
+        } else {
+            format!(
+                "{}\nbox {}\ncastclass union<Int32,Int64,Boolean>\nstloc value",
+                cases[active].1, cases[active].0
+            )
+        };
+        let mut checks = String::new();
+        for (i, (ty, constant)) in cases.iter().enumerate() {
+            checks += &format!(
+                "ldarg value\nisinst {ty}\nref.isnull\nldc.bool false\nceq\n{} bad\n",
+                if active == i { "brfalse" } else { "brtrue" }
+            );
+            if active == i {
+                checks += &format!("ldarg value\nunbox.any {ty}\n{constant}\nceq\nbrfalse bad\n");
+            }
+        }
+        let source = format!(
+            ".module ScalarPatterns\n.type class abstract System.Object\n.end\n.entry Main\n.function Check(union<Int32,Int64,Boolean> value) -> Int32\n{checks}ldc.i4 42\nret\nbad:\nldc.i4 0\nret\n.end\n.function Main() -> Int32\n.local union<Int32,Int64,Boolean> value\n{init}\nldloc value\ncall Check(union<Int32,Int64,Boolean>)\nret\n.end"
+        );
+        if active == 0 {
+            let escaped = source.replacen(
+                "isinst Int32\nref.isnull",
+                "isinst Int32\ndup\npop\nref.isnull",
+                1,
+            );
+            let m = neoclr::assemble(&escaped).unwrap();
+            let temp = Temp::new();
+            let result = compile_mode_flags(
+                &neoclr::metadata_container::write_module(&m).unwrap(),
+                &temp,
+                "@entry",
+                true,
+                &["--compile-system", "--reference-arena"],
+            );
+            assert!(!result.status.success());
+            assert!(String::from_utf8_lossy(&result.stderr).contains("immediate null test"));
+            assert!(!temp.0.join("value.o").exists());
+        }
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}

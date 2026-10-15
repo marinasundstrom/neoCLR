@@ -806,11 +806,15 @@ fn retained_types(
         pending_types.extend(f.owner.iter().cloned());
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
         pending_types.push(f.returns.clone());
-        for op in &f.body {
+        for (pc, op) in f.body.iter().enumerate() {
             if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op {
                 pending_types.push(owner.clone());
             }
-            if matches!(op, Op::BoxValue(_)) {
+            if matches!(op, Op::BoxValue(_))
+                || matches!(op, Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() && crate::scalar_unions::query(f, pc))
+            {
+                // The VM verification view of scalar tests returns Object even
+                // when this native union never allocates a boxed payload.
                 pending_types.push(Type::Named("System.Object".into()));
             }
             if let Op::BindFunction { function_type, .. } = op {

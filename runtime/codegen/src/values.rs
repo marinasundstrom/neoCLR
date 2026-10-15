@@ -2682,6 +2682,16 @@ pub(crate) fn compile_into(
                             stack.push(payload);
                         }
                     }
+                    Op::IsInstance(target) if crate::scalar_unions::tag(target).is_some() => {
+                        pop(&mut stack); // Numeric payload is not needed for the test.
+                        let tag = pop(&mut stack);
+                        let matched = b.ins().icmp_imm(
+                            IntCC::Equal,
+                            tag,
+                            crate::scalar_unions::tag(target).unwrap(),
+                        );
+                        stack.push(b.ins().uextend(types::I32, matched));
+                    }
                     Op::UnboxAny(target) => {
                         let payload = pop(&mut stack);
                         let tag = pop(&mut stack);

@@ -138,10 +138,29 @@ payloads cannot become roots. These checks establish allocation elision in these
 closed workloads, not a general throughput or managed-GC performance result.
 
 Extraction currently accepts an immediate union local/argument load or union cast
-before `unbox.any`. More general stack producers, scalar union `isinst`, mixed
+before `unbox.any`. More general stack producers, compound-union `isinst` targets, mixed
 scalar/reference unions and nominal value alternatives remain gated. Whole-union
 boxing, native descriptors, arrays, dedicated JIT/GC stress and full Raven Task
 consumers still block integration. The codegen qualification uses closed-world
 selection, `--compile-system` and `--reference-arena` to admit the source
 System.Object declaration;
 no arena allocation is needed for the scalar payload.
+
+
+### Scalar type-pattern tests
+
+The native backend admits `isinst Int32`, `Int64` and `Boolean` on an immediate
+scalar-union local/argument load or cast when followed immediately by `ref.isnull`.
+It compares the inline tag and passes a one-lane non-null test token to the null
+test. That token is neither an Object nor a GC root; it cannot escape this pair.
+No box is allocated. Original operations remain in the verification model.
+Ordinary nominal boxed queries retain their existing lowering.
+
+`structural_scalar_union_pattern_tests_preserve_exact_types_and_null` compares
+AOT and interpreter results for each active alternative and default null, tests
+all three exact types, and extracts matched values (including false Boolean and
+wide Int64). It rejects a duplicated test result before emitting an object. The
+existing helper checks no allocator imports and zero arena usage. This extends
+the CLR-style test/null-check instruction contract to inline union tags; its cost
+is a tag comparison instead of payload allocation. General escaping test results,
+compound targets and full Raven-produced pattern applications remain unqualified.

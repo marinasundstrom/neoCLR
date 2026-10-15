@@ -89,7 +89,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
             }
             return result;
         }
-        Ty::ScalarUnion(_) | Ty::PendingUnionScalar(_) => return vec![],
+        Ty::ScalarUnion(_) | Ty::PendingUnionScalar(_) | Ty::ScalarUnionTest => return vec![],
         Ty::Int
         | Ty::Byte
         | Ty::SByte
@@ -391,6 +391,8 @@ mod tests {
             neoclr::metadata::Type::Int32,
             neoclr::metadata::Type::Int64,
         ]);
+        assert!(slots(&p, &Ty::ScalarUnionTest).is_empty());
+        assert_eq!(p.lanes(&Ty::ScalarUnionTest), 1);
         assert_eq!(p.lanes(&ty), 2);
         assert_eq!(p.bytes(&ty), 16);
         assert!(slots(&p, &ty).is_empty());

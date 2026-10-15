@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Lower scalar-union type-test/null-test pairs to inline tag comparisons without boxing; validate exact alternatives, false Boolean, null and non-escaping test results against the interpreter. Update runtime and pattern documentation; full Raven application qualification remains open.
+
 - Document structural runtime operations and record the companion Raven lowering guide, particularly union pattern tests/extraction, nominal case helpers, tuple access and callable binding/invocation; distinguish interpreter evidence from native backend gaps.
 
 - Add bounded native scalar-union tag/payload storage, eliding adjacent exact scalar box/union-cast allocation. Validate copies, calls, output replacement, null and wrong extraction; exclude numeric payloads from GC roots. Mixed payloads and full backend qualification remain open.

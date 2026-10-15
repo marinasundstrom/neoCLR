@@ -23,6 +23,7 @@ pub(super) enum Ty {
     ReferenceUnion(Vec<Ty>),
     ScalarUnion(Vec<Type>),
     PendingUnionScalar(Type),
+    ScalarUnionTest, // Ephemeral non-null discriminator, consumed only by ref.isnull.
     ByteArray,
     CharacterArray,  // Same pointer-slot layout, distinct element identity.
     StringArray,     // Invocation-owned pointer slots; verified nominal backing enables views.
@@ -1385,7 +1386,7 @@ impl<'a> Profile<'a> {
                     return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
                 }
                 Op::BoxValue(_) if crate::scalar_unions::box_pair(f, pc) => (),
-                Op::UnboxAny(t) if crate::scalar_unions::tag(t).is_some() => (),
+                Op::UnboxAny(t) | Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() => (),
                 Op::CastClass(t) if crate::scalar_unions::supported(t) => (),
                 Op::Arg(n) | Op::ArgumentAddress(n) | Op::StoreArg(n)
                     if *n < self.args[i].len() =>
@@ -1583,6 +1584,17 @@ impl<'a> Profile<'a> {
                     }
                     stack.push(self.ty(t)?);
                 }
+                Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() => {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_))
+                        || !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull))
+                    {
+                        return Err(fail(
+                            pc,
+                            "scalar union type test requires an inline union and immediate null test",
+                        ));
+                    }
+                    stack.push(Ty::ScalarUnionTest);
+                }
                 Op::UnboxAny(t) => {
                     if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_)) {
                         return Err(fail(pc, "inline union extraction requires a scalar union"));
@@ -1737,6 +1749,7 @@ impl<'a> Profile<'a> {
                     if !matches!(
                         pop(&mut stack)?,
                         Ty::ScalarUnion(_)
+                            | Ty::ScalarUnionTest
                             | Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)
                             | Ty::RecordArray(_)

@@ -119,7 +119,8 @@ does not give the union nominal inheritance or make it a reference type.
 
 Native unions of Int32, Int64 and Boolean have bounded tagged inline storage:
 an adjacent scalar box/union-cast pair avoids allocating the box, and exact
-extraction checks the discriminator. Mixed value/reference and nominal-value
+extraction checks the discriminator. Immediate scalar type-test/null-test pairs
+also compare the tag without boxing; general escaping test results remain gated. Mixed value/reference and nominal-value
 alternatives remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
 reflection, array elements, dedicated JIT/collector stress and full Task application

@@ -14,7 +14,7 @@ acceptance runner records the exact tested artifacts. This author-directed
 experiment does not change the active performance milestone. Bounded intersection
 reference views and reference-alternative union payloads now have AOT/interpreter
 differential checks. Scalar-only Int32/Int64/Boolean unions now have tagged
-inline storage and exact adjacent box/cast elision; native mixed-value union storage,
+inline storage, exact adjacent box/cast elision and bounded scalar type tests; native mixed-value union storage,
 managed stress and complete application qualification still block integration.
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass

@@ -83,9 +83,11 @@ the union's type identity.
 Native reference-only unions have bounded membership/extraction qualification.
 Scalar-only native union storage is being qualified with a private tag plus a
 numeric payload for Int32, Int64 and Boolean. An adjacent exact scalar box/union
-cast can omit the box allocation. Exact extraction is distinct from the above
-`isinst Int32` sequence: **native tagged type-test lowering remains an open step**.
-Do not treat scalar extraction tests as qualification of complete scalar patterns.
+cast can omit the box allocation. Native `isinst Int32`, `Int64` and `Boolean` followed immediately by `ref.isnull`
+now compare the inline discriminator, without boxing. Tests cover each alternative
+and default null against the interpreter. The temporary test result cannot escape
+or be duplicated. This qualifies the instruction sequence, not every Raven match
+expression or arbitrary stack producer.
 Mixed reference/value and nominal-value alternatives remain native layout gaps.
 
 The current interpreter admits a null/default union payload. Native bounded
@@ -182,7 +184,7 @@ them; the interpreter and native backends select representations, perform checks
 and preserve copy/borrowing behavior. GC maps must distinguish references from
 numeric payload bits. AOT must resolve and lay out the same admitted types without
 requiring a JIT; implementation gaps are rejected rather than silently erased.
-Whole-union boxing, mixed payloads, tagged scalar type tests, broader reflection,
+Whole-union boxing, mixed payloads, general type-test results, broader reflection,
 arrays and full application/JIT/collector validation still block integration.
 
 Raven's corresponding [lowering and pattern map](https://github.com/marinasundstrom/raven/blob/codex/neoclr-union-intersection/docs/compiler/neoclr-structural-lowering.md)
