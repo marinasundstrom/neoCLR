@@ -121,7 +121,8 @@ Native unions of Int32, Int64 and Boolean have bounded tagged inline storage:
 an adjacent scalar box/union-cast pair avoids allocating the box, and exact
 extraction checks the discriminator. Immediate scalar type-test/null-test pairs
 also compare the tag without boxing. A Raven-produced guarded match consumer
-returns 42 in interpreter and macOS ARM64 AOT with zero arena use; general escaping
+and a separate artifact-only library consumer with union returns/parameters both
+return 42 in interpreter and macOS ARM64 AOT with zero arena use; general escaping
 test results remain gated. Mixed value/reference and nominal-value
 alternatives remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor

@@ -1,0 +1,22 @@
+public func Produce(choice: int) -> int | long | bool {
+    if choice == 0 {
+        return -1
+    }
+    if choice == 1 {
+        return 42
+    }
+    if choice == 2 {
+        return 4294967338L
+    }
+    if choice == 3 {
+        return 42L
+    }
+    if choice == 4 {
+        return true
+    }
+    return false
+}
+
+public func Echo(value: bool | long | int) -> int | bool | long {
+    return value
+}

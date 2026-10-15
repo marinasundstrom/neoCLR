@@ -175,4 +175,10 @@ native object has no undefined imports and the host observes zero arena use.
 The [runner](verify-raven-scalar-patterns.py) retains fresh disassembly and the
 selection report; [compact evidence](raven-scalar-pattern-results.json) identifies
 compiler/runtime artifacts and the retained v3 bundle. This is one consumer,
-not full mixed-union, imported-call, JIT/collector or application qualification.
+not full mixed-union, JIT/collector or application qualification.
+
+The [artifact-only imported consumer](scalar-import-project/README.md) also passes
+all six inputs through a separately emitted library return and echo parameter,
+including reordered source alternatives. Interpreter and AOT return 42 with no
+native imports or arena use. [Imported evidence](raven-scalar-import-results.json)
+records both fresh artifacts against the retained v3 bundle.

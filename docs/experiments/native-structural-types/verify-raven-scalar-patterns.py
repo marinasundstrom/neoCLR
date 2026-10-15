@@ -18,7 +18,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--compiler', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--imported', action='store_true', help='Build and consume an artifact-only scalar union library')
     args = parser.parse_args()
+    project = PROJECT.parent / 'scalar-import-project' if args.imported else PROJECT
+    library = PROJECT.parent / 'scalar-import-library'
+    library_artifact = library / 'bin/neoclr/StructuralScalarLibrary.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This AOT qualification requires macOS ARM64')
     output = args.output.resolve()
@@ -39,11 +43,15 @@ def main():
             raise RuntimeError(f'{label}: expected {expected}, got {result.returncode}; see {output}')
         return result.stdout
 
-    run('raven-build', ['dotnet', compiler, 'neoclr', '--project', PROJECT / 'App.rvnproj'])
-    artifact = PROJECT / 'bin/neoclr/StructuralScalarPatterns.dll'
+    if args.imported:
+        run('raven-library', ['dotnet', compiler, 'neoclr', '--project', library / 'Library.rvnproj'])
+    run('raven-build', ['dotnet', compiler, 'neoclr', '--project', project / 'App.rvnproj'])
+    artifact = project / 'bin/neoclr/StructuralScalarPatterns.dll'
     context = ['--system', bundle / 'System.runtime.neox']
     for name in ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']:
         context += ['--module', bundle / f'{name}.dll']
+    if args.imported:
+        context += ['--module', library_artifact]
     context += ['--object-root', bundle / 'System.Runtime.dll']
     run('interpreter', [runtime, 'run', artifact, '--execution', 'interpreter', *context], 42)
     il = output / 'consumer.neoil'
@@ -53,6 +61,11 @@ def main():
     for scalar in ['Int32', 'Int64', 'Boolean']:
         assert body.count(f'isinst "{scalar}"') == 2, scalar
         assert body.count(f'unbox.any "{scalar}"') == 2, scalar
+    if args.imported:
+        calls = [json.loads(line.split('call ', 1)[1]) for line in body.splitlines() if ': call ' in line]
+        for name in ['Produce', 'Echo']:
+            suffix = '.F_' + name.encode().hex().upper()
+            assert sum(call['name'].endswith(suffix) for call in calls) == 6, name
     obj = output / 'consumer.o'
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
                 '--compile-system', '--reference-arena', *context])
@@ -75,11 +88,14 @@ int main(void) {
                  '-I', ROOT / 'docs/experiments/aot-console', host, obj, '-o', executable])
     native = run('native', [executable]).strip()
     assert native == 'status=0 result=42 arenaBytes=0 fault=0', native
-    files = [compiler, runtime, codegen, PROJECT / 'Main.rvn', PROJECT / 'App.rvnproj', artifact, obj]
+    files = [compiler, runtime, codegen, project / 'Main.rvn', project / 'App.rvnproj', artifact, obj]
+    if args.imported:
+        files += [library / 'Library.rvnproj', library / 'Main.rvn', library_artifact]
     files += sorted(bundle.glob('*.dll')) + [bundle / 'System.runtime.neox', bundle / 'NeoCLR.ClassLibrary.props', bundle / 'ownership.json']
     files += sorted(compiler.parent.glob('Raven*.dll')) + sorted(compiler.parent.glob('NeoCLR*.dll'))
     compiler_revision = subprocess.run(['git', '-C', str(compiler.parent), 'rev-parse', 'HEAD'], capture_output=True, text=True)
     report = {
+        'importedLibrary': args.imported,
         'compilerCheckoutRevision': compiler_revision.stdout.strip() if compiler_revision.returncode == 0 else None,
         'runtimeRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'platform': platform.platform(),
@@ -92,9 +108,13 @@ int main(void) {
                    'two exact tests and extractions per scalar in fresh Raven output',
                    'interpreter exit 42', 'AOT result 42', 'no native imports', 'zero arena use'],
         'limitations': ['one macOS ARM64 consumer', 'retained v3 bundle, not freshly rebuilt libraries',
-                        'no mixed payloads, imported union-returning calls, JIT or collector stress',
+                        'no mixed payloads, JIT or collector stress',
                         'no throughput claim'],
     }
+    if args.imported:
+        report['checks'].append('artifact-only library union returns and parameters with reordered alternatives')
+    else:
+        report['limitations'].append('no imported union-returning calls')
     (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
     print(native)
     print(f'Evidence: {output / "results.json"}')

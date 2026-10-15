@@ -88,7 +88,9 @@ now compare the inline discriminator, without boxing. Tests cover each alternati
 and default null against the interpreter. The temporary test result cannot escape
 or be duplicated. A [Raven-produced consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
 also validates typed bindings, guarded/fallback arms and a result join against the
-interpreter and AOT. This does not qualify every match or arbitrary stack producer.
+interpreter and AOT. A separate [artifact-only library consumer](experiments/native-structural-types/scalar-import-project/README.md)
+qualifies union returns and parameters with reordered alternatives and the same
+zero-arena result. This does not qualify every match or arbitrary stack producer.
 Mixed reference/value and nominal-value alternatives remain native layout gaps.
 
 The current interpreter admits a null/default union payload. Native bounded

@@ -18,6 +18,8 @@ inline storage, exact adjacent box/cast elision and bounded scalar type tests; n
 managed stress and complete application qualification still block integration. A
 [fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
 now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.
+An [artifact-only library consumer](experiments/native-structural-types/scalar-import-project/README.md)
+also passes union returns/parameters with reordered alternatives and zero arena use.
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass
 and instance predicates share runtime semantics across interpreter/JIT/AOT. The
