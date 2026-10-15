@@ -106,7 +106,6 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         "union<Value,Left>",
         "union<Missing,Left>",
         "union<Left>",
-        "union<Left,Right>&",
         "arrayref<union<Left,Right>>&",
         "fn<union<Left,Right>,Int32>",
     ] {
@@ -116,7 +115,6 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         assert!(assemble(&source).is_err(), "{ty}");
     }
     for body in [
-        ".local union<Left,Right> value\nldloca value\npop",
         "sizeof union<Left,Right>\npop",
         "ldc.i4 1\nnewarr union<Left,Right>\nldc.i4 0\nldelema union<Left,Right>\npop",
         "ldc.i4 1\narray.alloc union<Left,Right>\npop",
@@ -592,7 +590,6 @@ ret
 #[test]
 fn wrapper_method_substitution_checks_transitive_bodies() {
     for operation in [
-        ".local T temporary\nldloca temporary\npop\n",
         "sizeof T\npop\n",
     ] {
         let methods = WRAPPER_METHODS.replace(
@@ -928,7 +925,6 @@ fn compound_local_defaults_only_admit_immediate_initialization() {
     for body in [
         "ldloca value\ndup\ninitobj union<Left,Right>\npop",
         "ldloca value\ninitobj intersection<Left,Right>",
-        "ldloca value\npop",
         "initobj union<Left,Right>",
     ] {
         let source = format!(
@@ -1087,4 +1083,37 @@ fn union_value_storage_requires_boxing_and_intersections_stay_reference_only() {
         );
         assert!(assemble(&source).is_err());
     }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn union_managed_parameter_replaces_slot_without_changing_prior_copy() {
+    let p = program(
+        ".local union<Int32,Both> value\n.local union<Int32,Both> before\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nstloc value\nldloc value\nstloc before\nldloca value\ncall Set(union<Int32,Both>&)\nldloc value\nunbox.any Int32\nldloc before\nunbox.any Int32\nadd",
+        ".function Set(union<Int32,Both>& value) -> void\nldarg value\nldc.i4 41\nbox Int32\ncastclass union<Int32,Both>\nstobj union<Int32,Both>\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn union_managed_parameter_rejects_incompatible_write() {
+    let p = program(
+        ".local union<Int32,Both> value\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nstloc value\nldloca value\ncall Set(union<Int32,Both>&)\nldc.i4 0",
+        ".function Set(union<Int32,Both>& value) -> void\nldarg value\nnewobj Neither\nstobj union<Int32,Both>\nret\n.end",
+    );
+    assert!(p.verify().is_err());
+    assert!(p.run(Limits::default()).is_err());
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn intersection_managed_parameter_preserves_nominal_dispatch() {
+    let p = program(
+        ".local intersection<Left,Right> value\nldc.i4 1\nnewobj Both\nstloc value\nldloca value\ncall Set(intersection<Left,Right>&)\nldloca value\nldobj intersection<Left,Right>\ncastclass Left\ncallvirt instance Left::Get()",
+        ".function Set(intersection<Left,Right>& value) -> void\nldarg value\nldc.i4 42\nnewobj Both\ncastclass intersection<Left,Right>\nstobj intersection<Left,Right>\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }

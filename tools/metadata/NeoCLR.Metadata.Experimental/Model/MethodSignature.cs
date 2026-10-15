@@ -110,7 +110,7 @@ public sealed partial record SignatureType
         if (FunctionSignature is { } function) foreach (var type in function.ParameterTypes.Append(function.ReturnType)) type.ValidateOwner(assembly, genericArity, typeArity, complete);
         if (ByReferenceElement is { } target)
         {
-            if (!allowByReference || target.ContainsComposition) throw new ArgumentException("managed references require supported non-composition method parameters");
+            if (!allowByReference || target.ContainsComposition && target.Composition is null) throw new ArgumentException("managed references require supported method parameter storage");
             target.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         }
         if (ImportedType is { } imported)

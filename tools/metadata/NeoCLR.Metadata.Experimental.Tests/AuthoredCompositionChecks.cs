@@ -38,11 +38,18 @@ internal static class AuthoredCompositionChecks
         var values = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, PrimitiveType.Int32);
         var valueEcho = builder.AddFunction("ValueEcho", new MethodSignature(values, [values]));
         valueEcho.LoadArgument(0); valueEcho.Return();
+        var replace = builder.AddFunction("Replace", new MethodSignature(PrimitiveType.Void, [SignatureType.ByReference(values), values]));
+        replace.LoadArgument(0); replace.LoadArgument(1);
+        replace.GetILGenerator().StoreObject(values); replace.Return();
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
             valueSignature!.ReturnType.Composition!.Constituents.All(t => t.Primitive != PrimitiveType.Int32))
             throw new Exception("scalar union alternative lost");
+        if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "Replace").TryGetSignature(out var replaceSignature) ||
+            replaceSignature!.ParameterTypes[0].ByReferenceElement?.Composition?.Kind != ReferenceCompositionKind.Union)
+            throw new Exception("managed union parameter lost");
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));
         var foreign = new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core).AddInterface("", "Other");

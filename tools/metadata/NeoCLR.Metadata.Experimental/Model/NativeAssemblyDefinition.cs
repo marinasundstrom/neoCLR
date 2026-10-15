@@ -566,7 +566,7 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Require(allowByReference, "byref only supported in method parameters");
                     Shape(element, "ByRef");
-                    return SignatureType.ByReference(ReadType(target, false, allowSelf: allowSelf));
+                    return SignatureType.ByReference(ReadType(target, false, allowSelf: allowSelf, allowComposition: allowComposition));
                 }
                 if (element.TryGetProperty("TypeParameter", out var typeParameter))
                 {

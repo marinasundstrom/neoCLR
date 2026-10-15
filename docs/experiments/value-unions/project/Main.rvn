@@ -4,9 +4,23 @@ func Keep(value: int | Other) -> int | Other {
     return value
 }
 
+func Set(out value: int | Other) {
+    value = 41
+}
+
+func Increment(ref value: int | Other) {
+    value = (int)value + 1
+}
+
 func Main() -> int {
     let failure = CheckFailure()
-    let stored = Keep(42)
+    var stored = Keep(1)
+    let before = stored
+    Set(out stored)
+    Increment(ref stored)
+    if (int)before != 1 {
+        return 2
+    }
     let reference = Keep(Other())
     if reference is Other {
         return match failure {

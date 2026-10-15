@@ -9087,3 +9087,13 @@ explicit unboxing; this does not give the union a nominal Object/ValueType base.
 The native signature is preserved and CLI projection remains unsupported.
 See the [integration contract](../docs/raven-cli-bridge.md) for validation and
 remaining generic wrapper/byref limitations.
+
+### Managed structural parameter signatures (2026-10-15 development)
+
+`SignatureType.ByReference(elementType)` may target a direct admitted union or
+intersection in a method parameter. Ownership and structural storage admission
+remain required. Native readers preserve the wrapper when experimental composition
+reads are enabled; default reads and CLI projection reject it. Nested composition
+wrapper targets remain rejected by authoring. `IILGenerator.LoadObject` and
+`StoreObject` use the exact structural element signature; writes must satisfy that
+slot's type. These are managed interpreter slots, not native pointer/ABI support.

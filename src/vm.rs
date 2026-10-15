@@ -1501,6 +1501,7 @@ fn check_type_context_seen(
     if cfg!(feature = "experimental-compositions")
         && !crate::compositions::is_compound(ty)
         && !matches!(ty, Type::Constructed { .. } | Type::ArrayRef(_))
+        && !matches!(ty, Type::ByRef(target) | Type::ReadOnlyByRef(target) if crate::compositions::is_compound(target))
         && crate::compositions::contains(ty)
     {
         return Err(Fault::new(
@@ -1597,7 +1598,13 @@ fn check_type_context_seen(
                 // Validate storage after substitution too: a declaration's T[] or T&
                 // must not bypass the current compound value-array/byref restrictions.
                 for field in &def.fields {
-                    nested(&field.ty.substitute_type_parameters(arguments)?)?;
+                    let storage = field.ty.substitute_type_parameters(arguments)?;
+                    if matches!(&storage, Type::ByRef(t) | Type::ReadOnlyByRef(t) if crate::compositions::contains(t)) {
+                        return Err(Fault::new(
+                            "compound managed-reference fields are not supported",
+                        ));
+                    }
+                    nested(&storage)?;
                 }
             }
             for argument in arguments {

@@ -1,5 +1,5 @@
 //! Structural compositions. Value union alternatives use explicit boxing in the interpreter.
-//! Intersections remain nominal reference views; no byref or backend ABI.
+//! Intersections remain nominal reference views; direct managed parameter slots are supported.
 use crate::{
     Fault, Module,
     metadata::{Representation, Type},
@@ -216,6 +216,11 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
         }
         for field in &def.fields {
             if contains(&field.ty) {
+                if matches!(&field.ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
+                    return Err(Fault::new(
+                        "compound managed-reference fields are not supported",
+                    ));
+                }
                 if !def.is_reference_type || def.representation != Representation::Record {
                     return Err(Fault::new(
                         "compound fields require reference-class storage",
@@ -271,6 +276,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     crate::vm::check_type(ty, module)?;
                 }
                 Op::LocalAddress(i) if function.locals.get(*i).is_some_and(contains) => {
+                    if function.locals.get(*i).is_some_and(is_compound) {
+                        continue;
+                    }
                     // Admit the compiler's immediate local-default idiom only.
                     // No instruction can retain or forward this transient address.
                     if !matches!(function.body.get(index + 1), Some(Op::InitializeObject(ty))
@@ -294,6 +302,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     }
                     crate::vm::check_type(ty, module)?;
                     crate::initialization::default_value(module, ty)?;
+                }
+                Op::LoadObject(ty) | Op::StoreObject(ty) if is_compound(ty) => {
+                    crate::vm::check_type(ty, module)?;
                 }
                 Op::CastClass(_) | Op::IsInstance(_) => (),
                 Op::NewArray(ty)
