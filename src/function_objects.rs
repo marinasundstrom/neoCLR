@@ -8,7 +8,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct FunctionObject {
     pub(crate) ty: Type,
-    pub(crate) object_view: bool,
+    pub(crate) view: Option<Type>,
     pub(crate) identity: std::sync::Arc<()>,
     pub(crate) target: Option<FunctionRef>,
     pub(crate) native: Option<std::sync::Arc<crate::interop::NativeCall>>,
@@ -26,7 +26,7 @@ impl FunctionObject {
 pub(crate) fn bind_native(ty: &Type, call: crate::interop::NativeCall) -> Value {
     Value::Function(FunctionObject {
         ty: ty.clone(),
-        object_view: false,
+        view: None,
         identity: std::sync::Arc::new(()),
         target: None,
         receiver: None,
@@ -447,7 +447,7 @@ fn finish(ty: &Type, callee: Function, receiver: Option<Box<Value>>) -> Value {
     };
     Value::Function(FunctionObject {
         ty: ty.clone(),
-        object_view: false,
+        view: None,
         identity: std::sync::Arc::new(()),
         target: Some(target),
         native: None,

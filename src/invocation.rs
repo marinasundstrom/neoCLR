@@ -129,7 +129,7 @@ mod tests {
         let other = Arc::new(());
         let now = std::time::Instant::now();
         let callback = Value::Function(crate::Function {
-            object_view: false,
+            view: None,
             identity: Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: Some(crate::assembler::parse_function_ref("Ready()").unwrap()),
@@ -285,7 +285,7 @@ mod dispatch_tests {
             dispatch.bind(&mut heap).unwrap();
             dispatch.default_task_queue = Some(object(&mut heap));
             let callback = Value::Function(crate::Function {
-                object_view: false,
+                view: None,
                 identity: std::sync::Arc::new(()),
                 ty: crate::assembler::parse_type("fn<Void>").unwrap(),
                 target: Some(

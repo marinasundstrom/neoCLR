@@ -167,13 +167,7 @@ impl Value {
     pub fn ty(&self) -> Type {
         match self {
             Self::Uninitialized(ty) => ty.clone(),
-            Self::Function(d) => {
-                if d.object_view {
-                    Type::from_name("System.Object")
-                } else {
-                    d.ty.clone()
-                }
-            }
+            Self::Function(d) => d.view.as_ref().unwrap_or(&d.ty).clone(),
             Self::Void => Type::Void,
             Self::Single(_) => Type::Single,
             Self::Double(_) => Type::Double,
@@ -241,6 +235,8 @@ impl Value {
         if crate::compositions::is_compound(ty) {
             match &self {
                 Self::NullObjectReference(_) => (),
+                Self::Function(binding)
+                    if crate::compositions::matches_object(module, &binding.ty, ty) => (),
                 Self::ObjectReference(object)
                     if crate::compositions::matches_object(module, &object.concrete_type(), ty) =>
                 {
@@ -261,8 +257,8 @@ impl Value {
                     object.view = Some(ty.clone());
                     return Ok(Self::ObjectReference(object));
                 }
-                Self::Function(mut binding) if *ty == Type::from_name("System.Object") => {
-                    binding.object_view = true;
+                Self::Function(mut binding) => {
+                    binding.view = (*ty != binding.ty).then(|| ty.clone());
                     return Ok(Self::Function(binding));
                 }
                 Self::NullObjectReference(_) => return Ok(Self::NullObjectReference(ty.clone())),

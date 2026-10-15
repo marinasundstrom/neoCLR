@@ -1303,3 +1303,85 @@ fn open_nominal_union_constituent_uses_declaring_type_scope() {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callable_union_roundtrips_and_narrows() {
+    let p = program(
+        ".local union<fn<Int32,Int32>,Int32> value\nfunction.bind fn<Int32,Int32> = Echo(Int32)\ncastclass union<fn<Int32,Int32>,Int32>\ncastclass union<System.Object,Int32>\ncastclass union<fn<Int32,Int32>,Int32>\ncall Keep(union<Int32,fn<Int32,Int32>>)\nstloc value\nldloc value\ncastclass fn<Int32,Int32>\nldc.i4 42\ncall instance fn<Int32,Int32>::Invoke(Int32)",
+        ".function Echo(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Keep(union<fn<Int32,Int32>,Int32> value) -> union<Int32,fn<Int32,Int32>>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callable_union_preserves_bound_receiver_during_collection() {
+    let p = program(
+        ".local union<fn<Int32>,Int32> value\nldc.i4 42\nnewobj Both\nfunction.bind fn<Int32> = instance Both::Get()\nstloc value\nldc.i4 1\nnewobj Both\npop\nldc.i4 2\nnewobj Both\npop\nldloc value\nisinst fn<Int32>\ncall instance fn<Int32>::Invoke()",
+        "",
+    );
+    p.verify().unwrap();
+    let result = p
+        .run(Limits {
+            heap_objects: 2,
+            ..Limits::default()
+        })
+        .unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.statistics().collections > 0);
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callable_union_checks_exact_signature_and_null() {
+    let helper = ".function Echo(Int32 value) -> Int32\nldarg value\nret\n.end";
+    for source in [
+        "function.bind fn<Int32,Int32> = Echo(Int32)",
+        ".local fn<Int32,Int32> empty\nldloca empty\ninitobj fn<Int32,Int32>\nldloc empty",
+    ] {
+        let p = program(
+            &format!(
+                "{source}\ncastclass union<fn<Int32,Int32>,Int32>\nisinst fn<Int64,Int64>\nref.isnull\nbrtrue Good\nfault \"wrong callable signature matched\"\nGood:\nldc.i4 42"
+            ),
+            helper,
+        );
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+    let p = program(
+        "function.bind fn<Int32,Int32> = Echo(Int32)\ncastclass union<fn<Int32,Int32>,Int32>\ncastclass fn<Int64,Int64>\npop\nldc.i4 42",
+        helper,
+    );
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::InvalidCast
+    );
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callable_union_requires_narrowing_and_rejects_callable_intersections() {
+    for body in [
+        "function.bind fn<Int32,Int32> = Echo(Int32)\ncastclass union<fn<Int32,Int32>,Int32>\nldc.i4 42\ncall instance fn<Int32,Int32>::Invoke(Int32)",
+        "function.bind fn<Int32,Int32> = Echo(Int32)\ncastclass intersection<fn<Int32,Int32>,Left>\npop\nldc.i4 42",
+    ] {
+        let source = format!(
+            ".module Bad\n.entry Main\n{TYPES}\n.function Echo(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Main() -> Int32\n{body}\nret\n.end"
+        );
+        assert!(assemble(&source).and_then(|m| neoclr::verify(&m)).is_err());
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callable_union_can_contain_a_union_returning_function() {
+    let p = program(
+        "function.bind fn<Int32,union<Int32,Both>> = Wrap(Int32)\ncastclass union<fn<Int32,union<Int32,Both>>,fn<Int32>>\ncastclass fn<Int32,union<Int32,Both>>\nldc.i4 42\ncall instance fn<Int32,union<Int32,Both>>::Invoke(Int32)\nunbox.any Int32",
+        ".function Wrap(Int32 value) -> union<Int32,Both>\nldarg value\nbox Int32\ncastclass union<Int32,Both>\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}

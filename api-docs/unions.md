@@ -88,6 +88,12 @@ use checked casts. Conversion to one alternative is explicit unless every possib
 alternative already satisfies the target. This is membership in existing types,
 not implicit implementation of an interface or synthesis of a nominal union.
 
+On the development runtime branch, interpreter unions also accept function
+alternatives such as `union<fn<Int32,Int32>,Int32>`. Narrow to the exact function
+signature before invocation. Copies retain the target and bound receiver; wrong
+signature casts fail. Native JIT/AOT callable-union layout and Raven source
+qualification remain open. Function intersection bounds remain unsupported.
+
 `UnionTypeInfo.Types: Sequence<TypeInfo>` exposes a constituent snapshot.
 `TypeInfo.IsUnion` identifies structural unions; use
 `NominalTypeInfo.IsUnionDeclaration` for named Raven union declarations.

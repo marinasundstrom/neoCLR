@@ -3888,7 +3888,7 @@ fn interpret_instructions_with_dispatch(
                                 Value::ObjectReference(object)
                             }
                             Value::Function(mut binding) => {
-                                binding.object_view = *target == Type::from_name("System.Object");
+                                binding.view = (*target != binding.ty).then(|| target.clone());
                                 Value::Function(binding)
                             }
                             value if *target == Type::String => value,
@@ -3916,14 +3916,17 @@ fn interpret_instructions_with_dispatch(
                     crate::arrays::check_cast(&source.ty(), target)?;
                     let value = match source {
                         Value::Function(mut binding) => {
-                            if *target != binding.ty && *target != Type::from_name("System.Object")
+                            if *target != binding.ty
+                                && *target != Type::from_name("System.Object")
+                                && !(crate::compositions::is_compound(target)
+                                    && crate::compositions::matches_object(module, &binding.ty, target))
                             {
                                 return Err(Fault::coded(
                                     crate::FaultCode::InvalidCast,
                                     "invalid Function reference cast",
                                 ));
                             }
-                            binding.object_view = *target == Type::from_name("System.Object");
+                            binding.view = (*target != binding.ty).then(|| target.clone());
                             Value::Function(binding)
                         }
                         Value::ObjectReference(mut object) => {

@@ -94,6 +94,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 }
                 Ok(())
             }
+            Type::Function(_) => argument(ty, depth + 1, nodes),
             Type::Named(_) => Ok(()),
             _ if scalar_union_alternative(ty) => Ok(()),
             Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
@@ -106,7 +107,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 Ok(())
             }
             _ => Err(Fault::new(
-                "compound constituents must be nominal or supported scalar types",
+                "compound constituents must be nominal, function or supported scalar types",
             )),
         }
     }
@@ -138,6 +139,22 @@ pub(crate) fn resolved(module: &Module, ty: &Type) -> bool {
     match ty {
         Type::Union(parts) | Type::Intersection(parts) => parts.iter().all(|t| resolved(module, t)),
         Type::Named(_) | Type::Constructed { .. } => module.type_definition(ty).is_some(),
+        Type::Function(shape) => {
+            fn signature_resolved(module: &Module, ty: &Type) -> bool {
+                match ty {
+                    Type::ByRef(t) | Type::ReadOnlyByRef(t) | Type::ArrayRef(t) => {
+                        signature_resolved(module, t)
+                    }
+                    Type::TypeParameter(_) | Type::MethodTypeParameter(_) => true,
+                    _ => ty.is_primitive() || resolved(module, ty),
+                }
+            }
+            shape
+                .parameters
+                .iter()
+                .chain(std::iter::once(&shape.returns))
+                .all(|ty| signature_resolved(module, ty))
+        }
         _ => scalar_union_alternative(ty),
     }
 }
@@ -171,6 +188,9 @@ pub(crate) fn validate_in_context(
                 Ok(())
             }
             _ if !intersection_bound && scalar_union_alternative(ty) => Ok(()),
+            Type::Function(_) if !intersection_bound => {
+                crate::vm::check_type_context(ty, module, context, 0)
+            }
             Type::Named(_) | Type::Constructed { .. } => {
                 crate::vm::check_type_context(ty, module, context, 0)?;
                 let def = module
@@ -217,9 +237,10 @@ pub(crate) fn matches_object(module: &Module, concrete: &Type, target: &Type) ->
             .iter()
             .any(|part| concrete == part || matches_object(module, concrete, part));
     }
-    module
-        .type_definition(concrete)
-        .is_some_and(|d| d.is_reference_type && d.representation == Representation::Record)
+    (matches!(concrete, Type::Function(_))
+        || module
+            .type_definition(concrete)
+            .is_some_and(|d| d.is_reference_type && d.representation == Representation::Record))
         && assignable(module, concrete, target)
 }
 

@@ -171,11 +171,28 @@ boxing and complete managed JIT/collector qualification remain separate work.
 
 Composition support must be checked in both directions. Functions can describe
 structural parameter/result types; the union callback tests below qualify that
-path in the interpreter. Tuple elements can describe function types, but combined
-native execution/GC coverage is not implied by each individual feature's support.
-A function directly used as a union alternative is currently rejected by the
-compound-constituent validator. This is a composition support gap. Function
-intersections would instead describe a callable satisfying multiple signatures;
+path in the interpreter. Function alternatives are now accepted in interpreter
+union signatures: `union<fn<Int32,Int32>,Int32>` stores either a callable or an
+integer. Copies and calls preserve the callable target and bound receiver; narrow
+with `castclass fn<Int32,Int32>` or test with `isinst fn<Int32,Int32>` before
+invocation. Wrong-signature casts raise InvalidCast; signatures are exact, without
+implicit function variance. Composition admission still excludes function signatures
+containing tuple or byref parameter/result types; these remain support gaps.
+Tests cover JSON metadata round-tripping, local and
+parameter/result storage, and bound-receiver retention during interpreter collection.
+Native JIT/AOT callable-union layouts and Raven source emission remain unqualified;
+the native backend still rejects callable alternatives. Tuple/function nesting is
+representable in signatures, but the interpreter's tuple-element admission rule
+still excludes function elements. Representation alone is not execution support.
+The regression cases are in `tests/structural_compositions.rs` (`callable_union_*`),
+including a union of function shapes whose selected function returns another union.
+The round-trip also checks widening through an Object-containing union, preserving
+the callable's existing Object compatibility. Reproduce with
+`cargo test --test structural_compositions`; the existing function-object, receiver,
+generic, namespace, function-type and callback-groundwork suites cover unchanged
+callable behavior.
+
+Function intersections would instead describe a callable satisfying multiple signatures;
 that overload-like contract is outside the current nominal intersection bounds
 (interfaces and extendable reference classes). It must not be confused with a
 function whose parameter or result is an ordinary interface intersection.
