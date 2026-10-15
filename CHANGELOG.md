@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Record paired Raven structural overload lookup correction and independently carried ordinary .NET ad-hoc carrier widening. Distinct union/intersection/tuple signatures retain lookup identity; metadata encoding and runtime operations are unchanged by this compiler slice.
+
 - Retain reproducible fresh direct and closed-generic Task union qualification in interpreter, macOS ARM64 AOT and managed JIT against v4 libraries, including completed/queued/forwarded results, eager/paced collection and host cleanup. Broader async workloads, open generics and throughput remain unqualified.
 
 - Admit structural signatures on managed nominal value-record methods, preserving normal borrowed receivers and rejecting native/internal imports. Validate mutation/copy isolation and generic value-member transport. Record union overload resolution as general Raven work for main and deliberate carry to the neoCLR line.

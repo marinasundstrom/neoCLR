@@ -10949,3 +10949,23 @@ CLI carrier replacement is introduced. Runtime/storage owns the newly admitted
 operations; Raven continues emitting native structural signatures.
 
 Evidence and reproducer: [native structural experiments](experiments/native-structural-types/README.md).
+
+### Structural overload lookup identity (2026-10-15)
+
+Native structural union/intersection signatures now contribute recursively encoded,
+order-independent constituent identities to method/property lookup keys. Structural
+tuples contribute ordered element identities and ignore element names. Nested
+compositions inside nominal generic arguments retain those distinctions. Previously
+these signatures could share an empty nominal metadata name, causing lookup to
+silently discard an overload before ranking. Incomparable union overloads now
+remain candidates and report ambiguity in either declaration order; exact and
+strict-subset overloads retain normal preference.
+
+The semantic tests use native structural symbols with host reference assemblies;
+they establish lookup/ranking, not native execution. Generic and tuple identity
+checks cover reordered unions/intersections, distinct closed arguments and renamed
+versus reordered tuple elements. Two inherited assertions were updated to the
+established contract that a union is always a value, including reference variants.
+This changes compiler lookup only: Runtime Contract configuration and emitted native
+signature encoding are unchanged. Main's ordinary .NET carrier widening was fixed
+independently in `41abd72ea` and deliberately carried in `a854f086e`.
