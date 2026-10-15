@@ -265,7 +265,7 @@ public extension FieldReflectionExtensions for FieldInfo {
 public extension ConstructorReflectionExtensions for ConstructorInfo {
     func Invoke(arguments: System.Collections.Sequence<Object?>) -> Result<Object, ReflectionError> {
         let snapshot = CheckedStorage.Reserve<Object?>(arguments.Count)
-        for index in 0..<arguments.Count {
+        for index in 0..arguments.Count {
             snapshot[index] = arguments[index]
         }
         return self.Invoke(snapshot)

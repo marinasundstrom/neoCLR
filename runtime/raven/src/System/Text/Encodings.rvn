@@ -111,7 +111,7 @@ internal class Utf8Decoder : Decoder {
             pending += 1
             index += 1
             if pending == width {
-                for slot in 0..<width {
+                for slot in 0..width {
                     output.Add(carry[slot])
                 }
                 pending = 0

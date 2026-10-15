@@ -38,7 +38,7 @@ func Main(arguments: string[]) {
     })
     suite.Add("cpu.sum", () => {
         var sum = 0
-        for value in 0..<10000 {
+        for value in 0..10000 {
             sum += value
         }
         if sum != 49995000 {

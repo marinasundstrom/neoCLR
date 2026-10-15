@@ -91,7 +91,7 @@ public class SqlRow {
     }
     func Text(name: string) -> Result<Option<string>, SqlError> {
         var found = -1
-        for index in 0..<Count {
+        for index in 0..Count {
             if names[index] == name {
                 if found >= 0 {
                     return Error(SqlError.Mapping("Ambiguous column: " + name))

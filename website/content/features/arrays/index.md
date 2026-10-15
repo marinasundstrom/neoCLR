@@ -93,6 +93,13 @@ Indexing and slicing syntax are convenience APIs that may fault on invalid bound
 callers must establish valid input. `values.Get(index)` returns an `Option<T>` for
 an integer or Index. `values.Slice(range)` returns `Result<T[], InvalidRangeError>`.
 Index and Range describe positions and boundaries; applying them determines validity.
+
+The development Raven compiler now uses `..` for an exclusive end and `..=` for an
+inclusive end. Existing half-open slices retain `..`; the former `..<` spelling is
+removed. Native stored/sliced inclusive Range values currently reject pending
+checked Index conversion support. This gap does not change the half-open Range
+library contract. The new compiler carry is qualified on macOS ARM64.
+
 The array contract is tested in interpreter and macOS native AOT; the Windows JIT
 framework checks also cover array and string Index/Range operations. String range support is available in the matching development libraries, using
 grapheme boundaries. [Sequences and lists](../collections/) also support indexing

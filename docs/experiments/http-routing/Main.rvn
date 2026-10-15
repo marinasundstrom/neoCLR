@@ -68,13 +68,13 @@ func Verify() -> Result<unit, string> {
     Check(ParseStationRoute(pattern, "GET", "/stations/no/reports") is Error(_), "union conversion failure")
     Check(ParseStationRoute(pattern, "GET", "/missing")? is StationRoute.Unmatched(_), "union absence")
     var boundary = "/"
-    for index in 0..<1023 { boundary += "a" }
+    for index in 0..1023 { boundary += "a" }
     let longPattern = RoutePattern.Parse(boundary)?
     Check(longPattern.Match(boundary)? is Some(_), "byte boundary")
     Check(RoutePattern.Parse(boundary + "a") is Error(_), "pattern byte overflow")
     Check(longPattern.Match(boundary + "a") is Error(_), "target byte overflow")
     var segments = ""
-    for index in 0..<16 { segments += "/a" }
+    for index in 0..16 { segments += "/a" }
     let maxSegments = RoutePattern.Parse(segments)?
     Check(maxSegments.Match(segments)? is Some(_), "segment boundary")
     Check(RoutePattern.Parse(segments + "/a") is Error(_), "pattern segment overflow")

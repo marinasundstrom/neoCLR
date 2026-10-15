@@ -25,7 +25,7 @@ func ReadLineText(reader: StreamReader, limit: int, expected: string) -> Result<
 
 func MaximumText() -> string {
     var text = "x"
-    for index in 0..<16 {
+    for index in 0..16 {
         text = text + text
     }
     return text

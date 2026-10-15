@@ -6,7 +6,7 @@ import NeoClr.Benchmarking.*
 [Benchmark("Sum a sequence of integers")]
 func Sum() -> int {
     var total = 0
-    for value in 0..<100 {
+    for value in 0..100 {
         total += value
     }
     if total != 4950 {
@@ -18,7 +18,7 @@ func Sum() -> int {
 [Benchmark]
 func Multiply() -> int {
     var total = 1
-    for value in 1..<6 {
+    for value in 1..6 {
         total *= value
     }
     if total != 120 {

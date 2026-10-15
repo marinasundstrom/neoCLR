@@ -6,7 +6,7 @@ import System.Web.Http.*
 
 async func Main(arguments: string[]) -> Task<()> {
     let client = HttpClient()
-    for mode in 0..<9 {
+    for mode in 0..9 {
         let Ok(request) = HttpRequest.Get(arguments[0]) else { System.Fail("Request failed") }
         let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else {
             System.Fail("Headers failed")

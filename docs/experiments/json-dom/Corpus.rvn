@@ -17,7 +17,7 @@ func Integer(text: string) -> Result<string, JsonError> {
 }
 
 func Main(arguments: string[]) {
-    for index in 1..<arguments.Length {
+    for index in 1..arguments.Length {
         let result = if arguments[0] == "integer" {
             Integer(arguments[index])
         } else {

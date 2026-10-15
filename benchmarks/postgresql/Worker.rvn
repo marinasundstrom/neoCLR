@@ -82,12 +82,12 @@ async func Main(arguments: string[]) -> Task<()> {
     use connection = session
     let parameters = QueryParameters()
     Console.WriteLine("NEOBENCH/1 READY")
-    for index in 0..<warmups {
+    for index in 0..warmups {
         _ = await Run(connection, name, parameters)
     }
     Console.WriteLine("NEOBENCH/1 BEGIN")
     var checksum = 0
-    for index in 0..<operations {
+    for index in 0..operations {
         let completed = await Run(connection, name, parameters)
         checksum += completed
     }

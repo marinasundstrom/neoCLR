@@ -26,8 +26,8 @@ func CheckRanges(mode: int, sourceOffset: int) {
     // Compare every small range with an immutable snapshot oracle, including
     // overlapping aliases in both directions and separate allocations.
     var cases = 0
-    for destinationOffset in -1..<7 {
-        for count in -1..<7 {
+    for destinationOffset in -1..7 {
+        for count in -1..7 {
             let source: byte[] = [(byte)1, (byte)2, (byte)3, (byte)4, (byte)5]
             var destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
             if mode == 1 {
@@ -40,7 +40,7 @@ func CheckRanges(mode: int, sourceOffset: int) {
             } else {
                 ExpectError(result)
             }
-            for index in 0..<5 {
+            for index in 0..5 {
                 var expected = 9
                 if mode == 1 {
                     expected = index + 1
@@ -80,7 +80,7 @@ func CheckEndpoints() {
     let output = MemoryOutput(destination)
     ExpectCount(CopyAll(MemoryInput(source), output, scratch), 5)
     Check(output.Count == 5)
-    for index in 0..<5 {
+    for index in 0..5 {
         Check(destination[index] == source[index])
     }
     let empty: byte[] = []
@@ -111,7 +111,7 @@ func MakeInput() -> MemoryInput {
 
 func CheckRetention() {
     let input = MakeInput()
-    for index in 0..<1200 {
+    for index in 0..1200 {
         _ = MemoryInput([(byte)0])
     }
     let destination: byte[] = [(byte)0]

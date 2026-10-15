@@ -52,7 +52,7 @@ func Main() {
     for key in reader.Keys {
         WriteLine(key)
     }
-    for key in 0..20 {
+    for key in 0..=20 {
         writer.Set(key, "Stored")
     }
     PrintOrder(reader, 0)

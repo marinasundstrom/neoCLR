@@ -252,7 +252,7 @@ func StreamIndented() -> Result<unit, TestFailure> {
     _ = Assert.Equal(output.Count, objectOutput.Count)?
     let large = JsonArray()
     var text = ""
-    for index in 0..<1018 {
+    for index in 0..1018 {
         text += "a"
     }
     _ = large.Add(JsonString(text))

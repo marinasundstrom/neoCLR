@@ -34,7 +34,7 @@ class BoundRoute {
 
     func Construct(captures: RouteMatch) -> Result<Object, RouteMappingError> {
         let arguments = ArrayList<Object?>()
-        for index in 0..<names.Count {
+        for index in 0..names.Count {
             if integers[index] {
                 let value = match captures.GetInt32(names[index]) {
                     Ok(let number) => number

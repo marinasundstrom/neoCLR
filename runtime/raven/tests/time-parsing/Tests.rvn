@@ -32,7 +32,7 @@ func BDateErrors() -> Result<unit, TestFailure> {
 func CTimeFractions() -> Result<unit, TestFailure> {
     let inputs = ["00:00:00", "12:34:56.1", "12:34:56.12", "12:34:56.123", "12:34:56.1234", "12:34:56.12345", "12:34:56.123456", "12:34:56.1234567", "23:59:59.9999999"]
     let fractions = [0, 1000000, 1200000, 1230000, 1234000, 1234500, 1234560, 1234567, 9999999]
-    for index in 0..<inputs.Length {
+    for index in 0..inputs.Length {
         let Ok(time) = TimeOfDay.Parse(inputs[index], Culture.Invariant) else {
             return Error(TestFailure("Expected valid time", "Ok", inputs[index]))
         }

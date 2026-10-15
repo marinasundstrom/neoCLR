@@ -22,7 +22,7 @@ async func Main() -> Task<()> {
         System.Fail("Local port unavailable")
     }
     Console.WriteLine(port)
-    for index in 0..<32 {
+    for index in 0..32 {
         let result = await server.ServeOne(Respond)
         if let Error(error) = result {
             server.Close()

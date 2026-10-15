@@ -20,7 +20,7 @@ func AEpoch() -> Result<unit, TestFailure> {
 func BPrecision() -> Result<unit, TestFailure> {
     let inputs = ["1970-01-01T00:00:00.1Z", "1970-01-01T00:00:00.12Z", "1970-01-01T00:00:00.123Z", "1970-01-01T00:00:00.1234Z", "1970-01-01T00:00:00.12345Z", "1970-01-01T00:00:00.123456Z", "1970-01-01T00:00:00.1234567Z", "1969-12-31T23:59:59.9999999Z", "1970-01-01T01:02:03.0000001+01:02:03"]
     let ticks = [1000000L, 1200000L, 1230000L, 1234000L, 1234500L, 1234560L, 1234567L, -1L, 1L]
-    for index in 0..<inputs.Length {
+    for index in 0..inputs.Length {
         let Ok(value) = Instant.Parse(inputs[index]) else {
             return Error(TestFailure("Expected precise instant", "Ok", inputs[index]))
         }
@@ -33,7 +33,7 @@ func BPrecision() -> Result<unit, TestFailure> {
 func CBounds() -> Result<unit, TestFailure> {
     let inputs = ["0001-01-01T00:00:00Z", "9999-12-31T23:59:59.9999999Z", "0001-01-01T00:00:00+18:00", "9999-12-31T23:59:59.9999999-18:00:00"]
     let ticks = [-621355968000000000L, 2534023007999999999L, -621356616000000000L, 2534023655999999999L]
-    for index in 0..<inputs.Length {
+    for index in 0..inputs.Length {
         let Ok(value) = Instant.Parse(inputs[index]) else {
             return Error(TestFailure("Expected boundary instant", "Ok", inputs[index]))
         }

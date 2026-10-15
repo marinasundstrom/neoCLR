@@ -214,7 +214,7 @@ async func Main() -> Task<int> {
     await CheckDemand()
     await CheckUnstarted()
     await CheckIndependent()
-    for index in 1..8 {
+    for index in 1..=8 {
         await CheckConsumer(false)
         await CheckConsumer(true)
         await CheckCancellation()

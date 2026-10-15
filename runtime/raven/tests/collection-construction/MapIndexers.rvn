@@ -25,7 +25,7 @@ func MapIndexers() -> Result<unit, TestFailure> {
     storage.Set("method", 42)
     _ = Assert.Equal(42, reader["method"])?
     let collided = HashMap<int, string>((left, right) => left == right, key => 0)
-    for index in 0..<12 {
+    for index in 0..12 {
         collided[index] = index.ToString()
     }
     collided[7] = "replaced"

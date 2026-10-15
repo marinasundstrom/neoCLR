@@ -95,7 +95,7 @@ public class Utf8SelectedDecoder : SelectedDecoder {
             pending += 1
             index += 1
             if pending == width {
-                for slot in 0..<width {
+                for slot in 0..width {
                     output.Add(carry[slot])
                 }
                 pending = 0
@@ -259,7 +259,7 @@ public class SelectedWriter {
         }
         // Snapshot before the first output callback; caller-owned sequences cannot change it.
         let snapshot = ArrayList<byte>(count)
-        for index in 0..<count {
+        for index in 0..count {
             snapshot.Add(bytes[index])
         }
         let buffer: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
@@ -269,7 +269,7 @@ public class SelectedWriter {
             if size > buffer.Length {
                 size = buffer.Length
             }
-            for index in 0..<size {
+            for index in 0..size {
                 buffer[index] = snapshot[written + index]
             }
             var offset = 0

@@ -36,18 +36,18 @@ async func Main() -> Task<()> {
         System.Fail("Port unavailable")
     }
     Console.WriteLine(port)
-    for batch in 0..<4 {
+    for batch in 0..4 {
         let operations = ArrayList<Task<Result<System.Void, HttpError>>>()
         operations.Add(server.ServeOne(Respond))
         let headStop = CancellationTokenSource()
         let middleStop = CancellationTokenSource()
         let tailStop = CancellationTokenSource()
         let head = server.Accept(headStop.Token)
-        for index in 1..<(width / 2) {
+        for index in 1..(width / 2) {
             operations.Add(server.ServeOne(Respond))
         }
         let middle = server.Accept(middleStop.Token)
-        for index in (width / 2)..<width {
+        for index in (width / 2)..width {
             operations.Add(server.ServeOne(Respond))
         }
         let tail = server.Accept(tailStop.Token)
@@ -61,7 +61,7 @@ async func Main() -> Task<()> {
         middleStop.Dispose()
         tailStop.Dispose()
         // Repeated cancelled admissions must not accumulate queue nodes or slots.
-        for index in 0..<32 {
+        for index in 0..32 {
             let stop = CancellationTokenSource()
             let cancelled = server.Accept(stop.Token)
             stop.Cancel()
@@ -78,7 +78,7 @@ async func Main() -> Task<()> {
         }
     }
     let waiting = ArrayList<Task<Result<HttpContext, HttpError>>>()
-    for index in 0..<16 {
+    for index in 0..16 {
         waiting.Add(server.Accept())
     }
     if let Ok(_) = await server.Accept() {

@@ -93,7 +93,7 @@ internal class ObjectMapper {
             }
             if collection == 1 {
                 let sequence = JsonArray()
-                for index in 0..<count {
+                for index in 0..count {
                     let item = neoCLR.Runtime.ReflectionCollectionGet(type, present, index)
                     let child = WriteValue(item, element, depth + 1)?
                     _ = sequence.Add(child)?
@@ -101,7 +101,7 @@ internal class ObjectMapper {
                 return Ok(sequence)
             }
             let map = JsonObject()
-            for index in 0..<count {
+            for index in 0..count {
                 let key = neoCLR.Runtime.ReflectionCollectionKey(type, present, index)
                 let item = neoCLR.Runtime.ReflectionCollectionGet(type, present, index)
                 let child = WriteValue(item, element, depth + 1)?
@@ -118,7 +118,7 @@ internal class ObjectMapper {
                 return Error(JsonError.LimitExceeded("Array exceeds 31 items"))
             }
             let array = JsonArray()
-            for index in 0..<count {
+            for index in 0..count {
                 let child = ArrayReflection.GetValue(present, index)
                 let node = WriteValue(child, element, depth + 1)?
                 _ = array.Add(node)?
@@ -184,7 +184,7 @@ internal class ObjectMapper {
             if collection == 1 {
                 if value is JsonArray sequence {
                     let items = CheckedStorage.Reserve<Object>(sequence.Count)
-                    for index in 0..<sequence.Count {
+                    for index in 0..sequence.Count {
                         let child = sequence.Item(index)?
                         let mapped = ReadValue(child, element, depth + 1, construct)?
                         items[index] = mapped
@@ -199,7 +199,7 @@ internal class ObjectMapper {
             if value is JsonObject map {
                 let items = CheckedStorage.Reserve<Object>(map.Count)
                 let keys = CheckedStorage.Reserve<string>(map.Count)
-                for index in 0..<map.Count {
+                for index in 0..map.Count {
                     let key = map.Name(index)?
                     let child = map.Item(index)?
                     let mapped = ReadValue(child, element, depth + 1, construct)?
@@ -219,7 +219,7 @@ internal class ObjectMapper {
             }
             if value is JsonArray array {
                 let items = CheckedStorage.Reserve<Object>(array.Count)
-                for index in 0..<array.Count {
+                for index in 0..array.Count {
                     let child = array.Item(index)?
                     let mapped = ReadValue(child, element, depth + 1, construct)?
                     items[index] = mapped
@@ -250,7 +250,7 @@ internal class ObjectMapper {
                 Ok(let created) => created
                 Error(let reason) => return Error(JsonError.Reflection(reason))
             }
-            for index in 0..<properties.Count {
+            for index in 0..properties.Count {
                 if let Error(reason) = properties[index].SetValue(instance, values[index]) {
                     return Error(JsonError.Reflection(reason))
                 }

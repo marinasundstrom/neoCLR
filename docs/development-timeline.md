@@ -18021,3 +18021,26 @@ and remaining-project rerun. See [the integration record](raven-cli-bridge.md#ra
 The `codex/neoclr` checkout is unchanged; deliberate carry and native qualification
 are the next steps. Integer advancement, generic bounds and structural work were not
 included in this implementation slice.
+
+### Carrying range syntax into codex/neoclr — 2026-10-15
+
+Following the author's explicit main-first carry instruction and continuation, the
+assistant applied Raven main c16fca24c to codex/neoclr and committed bf5e0abe8 after
+validation. Native-only fixtures and active neoCLR Raven sources are migrated from
+`..<` to `..`; previous inclusive loop fixtures use `..=`. Historical benchmark
+evidence is retained. No structural work was resumed.
+
+The native path already consumes endpoint inclusion for integer loops. The audit
+found that native stored Range construction ignored inclusion; the compiler now
+rejects those inclusive forms explicitly until checked Index conversion is supported.
+A fresh consumer also reveals native range-pattern lowering rejects BoundAndPattern;
+that remains a gap rather than a new language restriction. Shared ordinary .NET
+support remains intact. The readonly-field defensive-copy test independently returns
+3 instead of 2 on Raven main as well; it is recorded as a general main-first candidate.
+
+Generator and native compiler builds pass, as do 169 focused compiler tests and a
+fresh five-library build. The bounded native loop/stored-bound consumer returns 42
+in interpreter, AOT and managed JIT. The driver rejects inclusive stored Range with
+NEOMETA001. Exact scope and limitations are in the
+[qualification record](validation/range-endpoints/README.md). Native inclusive
+conversion, range-pattern support and overflow-safe integer advancement remain next.

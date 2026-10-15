@@ -51,7 +51,7 @@ async func Read(values: Probe, gate: Task<int>, exit: int) -> Task<int> {
 
 async func Nested(values: Probe, gate: Task<int>, stop: bool) -> Task<int> {
     var sum = 0
-    outer: for index in 1..2 {
+    outer: for index in 1..=2 {
         for item in values {
             let value = await gate
             sum = sum + value
@@ -156,10 +156,10 @@ async func CheckCancellation() -> Task<()> {
 }
 
 async func Main() -> Task<int> {
-    for exit in 0..3 {
+    for exit in 0..=3 {
         await CheckExit(exit)
     }
-    for mode in 0..1 {
+    for mode in 0..=1 {
         await CheckNested(mode)
         await CheckNestedWhile(mode)
     }

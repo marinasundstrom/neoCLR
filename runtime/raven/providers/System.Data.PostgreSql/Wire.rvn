@@ -60,7 +60,7 @@ internal class Packet {
             return ""
         }
         let bytes = ArrayList<byte>()
-        for index in 0..<length { bytes.Add((byte)Byte()) }
+        for index in 0..length { bytes.Add((byte)Byte()) }
         return match Encodings.Utf8.Decode(bytes) {
             Ok(let text) => text
             Error(_) => {
@@ -86,8 +86,8 @@ internal class Packet {
         let header = Packet()
         if kind != 0 { header.Put(kind) }
         header.PutInteger(Bytes.Count + 4)
-        for index in 0..<prefix { result[index] = header.Bytes[index] }
-        for index in 0..<Bytes.Count { result[prefix + index] = Bytes[index] }
+        for index in 0..prefix { result[index] = header.Bytes[index] }
+        for index in 0..Bytes.Count { result[prefix + index] = Bytes[index] }
         return result
     }
 }

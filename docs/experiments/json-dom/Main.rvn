@@ -289,7 +289,7 @@ func Main() {
     let invalid: byte[] = [(byte)34, (byte)195, (byte)34]
     ReadFailure(ShortInput(invalid, -1), "InvalidUtf8")
     let tooLarge: List<byte> = ArrayList<byte>()
-    for index in 0..<1025 {
+    for index in 0..1025 {
         tooLarge.Add((byte)32)
     }
     let oversized = ShortInput(tooLarge, -1)
@@ -302,7 +302,7 @@ func Main() {
     }
     malformed.Close()
     var padding = ""
-    for index in 0..<1022 {
+    for index in 0..1022 {
         padding += "a"
     }
     let boundary = "\"" + padding + "\""
@@ -312,7 +312,7 @@ func Main() {
     }
     // UTF-8 bytes, escaped bytes and number spelling share the document budget.
     var unicode = ""
-    for index in 0..<511 {
+    for index in 0..511 {
         unicode += "é"
     }
     let Ok(_) = RoundTrip("\"" + unicode + "\"") else {
@@ -322,7 +322,7 @@ func Main() {
     Check(JsonSerializer.DeserializeNode(boundary + " ") is Error(JsonError.LimitExceeded(_)))
     Check(JsonSerializer.SerializeNode(JsonString(padding + "a")) is Error(JsonError.LimitExceeded(_)))
     var escaped = ""
-    for index in 0..<511 {
+    for index in 0..511 {
         escaped += "\\"
     }
     let Ok(encoded) = JsonSerializer.SerializeNode(JsonString(escaped)) else {
@@ -334,7 +334,7 @@ func Main() {
     Check(untouchedLarge.Count == 0 && !untouchedLarge.Closed)
     untouchedLarge.Close()
     var digits = "1"
-    for index in 0..<1023 {
+    for index in 0..1023 {
         digits += "0"
     }
     let Ok(_) = RoundTrip(digits) else {

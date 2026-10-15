@@ -11,7 +11,7 @@ import System.Text.*
 internal class CivilParser {
     private static func Digits(text: Sequence<byte>, start: int, count: int) -> int {
         var value = 0
-        for index in start..<start + count {
+        for index in start..start + count {
             let digit = (int)text[index] - 48
             if digit < 0 {
                 return -1
@@ -77,7 +77,7 @@ internal class CivilParser {
             if fraction < 0 {
                 return Error(DateTimeParseError.InvalidFormat)
             }
-            for index in length - 9..<7 {
+            for index in length - 9..7 {
                 fraction *= 10
             }
         }
@@ -263,7 +263,7 @@ internal class CivilParser {
     }
 
     private static func TimestampOffsetStart(text: Sequence<byte>) -> int {
-        for index in 19..<text.Count {
+        for index in 19..text.Count {
             if text[index] == 90 || text[index] == 43 || text[index] == 45 {
                 return index
             }

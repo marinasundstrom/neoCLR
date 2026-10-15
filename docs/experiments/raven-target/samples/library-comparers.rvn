@@ -73,7 +73,7 @@ func Main() {
         (left, right) => left % divisor == right % divisor,
         value => -2147483648)
     let buckets = HashMap<int, int>(policy)
-    for key in 0..9 {
+    for key in 0..=9 {
         Check(buckets.TryAdd(key, key + 100), "collision insertion")
     }
     Check(!buckets.TryAdd(12, 999), "custom duplicate")

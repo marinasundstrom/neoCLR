@@ -24,7 +24,7 @@ func Main() -> int {
     if first[6] != 1234567 || second[6] != 7654321 || beforeEpoch[6] != 9999999 {
         return 3
     }
-    for index in 0..<6 {
+    for index in 0..6 {
         if first[index] != second[index] {
             return 4
         }

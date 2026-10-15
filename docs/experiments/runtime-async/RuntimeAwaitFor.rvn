@@ -148,7 +148,7 @@ async func CheckNested(cancelCleanup: bool) -> Task<()> {
 }
 
 async func Outward(probe: Probe) -> Task<int> {
-    outside: for index in 0..1 {
+    outside: for index in 0..=1 {
         await for value in probe {
             break outside
         }
@@ -259,7 +259,7 @@ async func CheckMixed(cancel: bool, expression: bool) -> Task<()> {
 }
 
 async func Main() -> Task<int> {
-    for exit in 0..7 {
+    for exit in 0..=7 {
         await Check(exit)
     }
     await CheckNested(false)

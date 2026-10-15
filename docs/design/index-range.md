@@ -1,7 +1,10 @@
 # Index, Range and slicing — development
 
-The [generic bounds review](generic-bounds.md) proposes a coordinated Raven endpoint
-change across targets (2026-10-15). It does not change the implemented contracts below.
+The [generic bounds review](generic-bounds.md) separates endpoint syntax from generic
+capabilities. Raven main c16fca24c and the deliberate codex/neoclr carry bf5e0abe8
+use exclusive `..` and inclusive `..=`. Native stored/sliced inclusive Range values
+and range patterns still reject pending native lowering support; see the
+[qualification record](../validation/range-endpoints/README.md).
 
 Author direction (2026-10-10): supply runtime types for Raven's existing indexing
 and slicing syntax across arrays, strings and suitable sequences. On 2026-10-11
@@ -36,7 +39,8 @@ Raven binding already recognizes the well-known types. Native lowering needs to
 construct the same values, preserve evaluation order and call the library helper
 for array copies. Normal CLI emission must retain its existing behavior. Numeric
 range enumeration and slicing are distinct: a System.Range value describes half-open
-boundaries even where numeric `for` ranges use inclusive `..` notation.
+boundaries. Numeric loops use `..` for exclusive ends and `..=` for inclusive ends.
+The former `..<` source spelling is removed.
 
 ## Copies, views and performance
 

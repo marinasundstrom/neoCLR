@@ -9,7 +9,7 @@ import NeoClr.Testing.*
 func ADurationBounds() -> Result<unit, TestFailure> {
     let inputs = ["10675199.02:48:05.4775807", "-10675199.02:48:05.4775808", "00:00:00.0000001", "-00:00:00.0000001", "-00:00:00", "2.03:04:05"]
     let ticks = [9223372036854775807L, -9223372036854775807L - 1L, 1L, -1L, 0L, 1838450000000L]
-    for index in 0..<inputs.Length {
+    for index in 0..inputs.Length {
         let Ok(value) = Duration.Parse(inputs[index]) else {
             return Error(TestFailure("Expected duration", "Ok", inputs[index]))
         }
@@ -38,7 +38,7 @@ func CDurationGrammar() -> Result<unit, TestFailure> {
 func DDurationFractions() -> Result<unit, TestFailure> {
     let inputs = ["00:00:00.1", "00:00:00.12", "00:00:00.123", "00:00:00.1234", "00:00:00.12345", "00:00:00.123456", "00:00:00.1234567", "00000001.00:00:00"]
     let ticks = [1000000L, 1200000L, 1230000L, 1234000L, 1234500L, 1234560L, 1234567L, 864000000000L]
-    for index in 0..<inputs.Length {
+    for index in 0..inputs.Length {
         let Ok(value) = Duration.Parse(inputs[index]) else {
             return Error(TestFailure("Expected fractional duration", "Ok", inputs[index]))
         }
@@ -51,7 +51,7 @@ func DDurationFractions() -> Result<unit, TestFailure> {
 func EOffsetValues() -> Result<unit, TestFailure> {
     let inputs = ["Z", "+00:00", "-00:00", "-00:00:00", "+18:00", "-18:00:00", "+05:30", "-00:00:01", "+01:02:03"]
     let seconds = [0, 0, 0, 0, 64800, -64800, 19800, -1, 3723]
-    for index in 0..<inputs.Length {
+    for index in 0..inputs.Length {
         let Ok(value) = TimeOffset.Parse(inputs[index]) else {
             return Error(TestFailure("Expected offset", "Ok", inputs[index]))
         }

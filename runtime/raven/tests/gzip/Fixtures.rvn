@@ -10,7 +10,7 @@ func SmallData() -> byte[] {
 }
 
 func LargeData() -> byte[] {
-    let data: byte[] = [for unused in 0..<2920 => (byte)0]
+    let data: byte[] = [for unused in 0..2920 => (byte)0]
     let pattern: byte[] = [(byte)84,(byte)104,(byte)101,(byte)32,(byte)113,(byte)117,(byte)105,(byte)99,(byte)107,(byte)32,(byte)98,(byte)114,(byte)111,(byte)119,(byte)110,(byte)32,(byte)102,(byte)111,(byte)120,(byte)32,(byte)106,(byte)117,(byte)109,(byte)112,(byte)115,(byte)32,(byte)111,(byte)118,(byte)101,(byte)114,(byte)32,(byte)116,(byte)104,(byte)101,(byte)32,(byte)108,(byte)97,(byte)122,(byte)121,(byte)32,(byte)100,(byte)111,(byte)103,(byte)46,(byte)32,(byte)72,(byte)84,(byte)84,(byte)80,(byte)32,(byte)103,(byte)122,(byte)105,(byte)112,(byte)32,(byte)99,(byte)111,(byte)110,(byte)116,(byte)101,(byte)110,(byte)116,(byte)32,(byte)101,(byte)110,(byte)99,(byte)111,(byte)100,(byte)105,(byte)110,(byte)103,(byte)46,(byte)10]
     var index = 0
     while index < data.Length {

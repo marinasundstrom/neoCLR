@@ -136,7 +136,7 @@ func RoundTrip() -> Result<unit, JsonError> {
     Check(JsonContent.ReadNode(HttpContent(Utf8.Encode("{"))) is Error(JsonError.Syntax(_)))
     Check(JsonContent.ReadNode(HttpContent([(byte)255])) is Error(JsonError.Read(TextReadError.InvalidUtf8)))
     var largeText = ""
-    for index in 0..<1025 {
+    for index in 0..1025 {
         largeText += "x"
     }
     let oversized = Utf8.Encode(largeText)
@@ -208,7 +208,7 @@ func NestedRoundTrip() -> Result<unit, JsonError> {
     stream.Close()
 
     // The total encoded nested document, including names and punctuation, is bounded.
-    for index in text.GetUtf8ByteCount()..<1023 {
+    for index in text.GetUtf8ByteCount()..1023 {
         contact.Name += "a"
     }
     let below = JsonSerializer.Serialize(contact)?
@@ -311,7 +311,7 @@ func CollectionRoundTrip() -> Result<unit, JsonError> {
     Check(JsonSerializer.Deserialize<int[]>("[1,\"2\"]") is Error(JsonError.TypeMismatch(_)))
     Check(JsonSerializer.Deserialize<ReadingBatch>("{\"Values\":[]}") is Error(JsonError.MissingField(_)))
     var boundary = "[0"
-    for index in 0..<30 {
+    for index in 0..30 {
         boundary += ",0"
     }
     boundary += "]"

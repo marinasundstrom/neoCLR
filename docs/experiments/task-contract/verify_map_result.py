@@ -76,7 +76,7 @@ async func Print(task: Task<Result<int, string>>) -> Task<unit> {
         if mapped.GetResult() is Ok(let value) { WriteLine(value) }
     })
     source.Complete(Ok(41))
-    for i in 0..<1200 { let garbage = TaskQueue() }
+    for i in 0..1200 { let garbage = TaskQueue() }
     Check(!mapped.IsCompleted)
     queue.Drain()
 """, '42\n'),

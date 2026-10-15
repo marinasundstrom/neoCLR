@@ -1364,9 +1364,13 @@ is a research follow-up, not a commitment to four matching types. See the
 [contract and evidence](design/index-range.md). Windows execution is pending.
 Author-directed design follow-up (2026-10-15): review [generic bounds and consistent
 Raven endpoints](design/generic-bounds.md), then integer iteration across .NET/neoCLR.
+The syntax migration is integrated on Raven main and carried to `codex/neoclr`;
+[native qualification](validation/range-endpoints/README.md) records working loops
+and stored half-open bounds, with inclusive Range construction and range patterns
+still requiring native lowering.
 All known consumers are owned; compatibility is not a constraint. Structural work
-is parked. This is a design task, not implemented range semantics or a permanent
-change to the active milestone.
+is parked. Generic capability APIs remain design work; this direction does not
+permanently change the active milestone.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

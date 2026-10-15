@@ -41,12 +41,12 @@ internal class PostgresNamedParameters {
     }
 
     private func Parameter(name: string) -> Result<int, SqlError> {
-        for index in 0..<names.Count {
+        for index in 0..names.Count {
             if names[index] == name { return Ok(index + 1) }
         }
         var found = false
         var value = SqlValue.Null
-        for index in 0..<statement.ParameterCount {
+        for index in 0..statement.ParameterCount {
             if statement.ParameterName(index) is Some(let candidate) && candidate == name {
                 if found { return Error(SqlError.Mapping("Ambiguous SQL parameter: " + name)) }
                 value = statement.Parameter(index)

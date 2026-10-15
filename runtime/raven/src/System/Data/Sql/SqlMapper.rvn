@@ -45,7 +45,7 @@ public class SqlMapper {
     /// Maps in row order and returns no partial collection on conversion failure.
     static func Map<T>(result: SqlResult, map: (SqlRow) -> Result<T, SqlError>) -> Result<Sequence<T>, SqlError> {
         let output = ArrayList<T>()
-        for index in 0..<result.Count {
+        for index in 0..result.Count {
             let row = result.Row(index)
             let value = map(row)?
             output.Add(value)
@@ -77,7 +77,7 @@ public class SqlMapper {
             return Error(SqlError.Mapping("No writable scalar properties"))
         }
         let output = ArrayList<T>()
-        for index in 0..<result.Count {
+        for index in 0..result.Count {
             let row = result.Row(index)
             let instance = match type.CreateInstance() {
                 Ok(let created) => created

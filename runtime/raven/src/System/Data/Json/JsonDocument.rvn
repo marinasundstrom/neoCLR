@@ -170,7 +170,7 @@ internal class DocumentWriter {
     private func Line(depth: int) -> Result<unit, JsonError> {
         if indented {
             _ = Append("\n")?
-            for index in 0..<depth {
+            for index in 0..depth {
                 _ = Append("  ")?
             }
         }
@@ -216,7 +216,7 @@ internal class DocumentWriter {
         } else {
             count = ((JsonArray)value).Count
         }
-        for index in 0..<count {
+        for index in 0..count {
             if index > 0 {
                 _ = Append(",")?
             }

@@ -60,11 +60,11 @@ public async func Add(first: Task<int>, second: Task<int>) -> Task<int> {
     var answer = first.Task
     queue.Run(() => { answer = Add(first.Task, second.Task) })
     Check(!answer.IsCompleted)
-    for i in 0..<1000 { let garbage = TaskQueue() }
+    for i in 0..1000 { let garbage = TaskQueue() }
     first.Complete(20)
     queue.Drain()
     Check(!answer.IsCompleted)
-    for i in 0..<1000 { let garbage = TaskQueue() }
+    for i in 0..1000 { let garbage = TaskQueue() }
     second.Complete(22)
     queue.Drain()
     Check(answer.GetResult() == 42)

@@ -194,7 +194,7 @@ public class DocumentWriter {
         } else {
             _ = Append("[")?
         }
-        for index in 0..<value.Count {
+        for index in 0..value.Count {
             if index > 0 {
                 _ = Append(",")?
             }

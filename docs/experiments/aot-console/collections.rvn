@@ -3,7 +3,7 @@ import System.Collections.*
 
 func Main() -> int {
     let values = ArrayList<byte>()
-    for value in 0..<9 {
+    for value in 0..9 {
         values.Add((byte)value)
     }
     let sequence: Sequence<byte> = values

@@ -8,7 +8,7 @@ async func Main() -> Task<()> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16) else { System.Fail("Listen failed") }
     let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
     Console.WriteLine(port)
-    for mode in 0..<9 {
+    for mode in 0..9 {
         let Ok(context) = await server.AcceptHeaders() else { System.Fail("Headers failed") }
         let Some(stream) = context.Request.Content.TryGetStream() else { System.Fail("Missing stream") }
         // Request bodies cannot be EOF delimited; case two is fixed length here.

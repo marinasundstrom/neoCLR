@@ -40,7 +40,7 @@ func AProviders() -> Result<unit, TestFailure> {
 [Test("UTF-8 decoding preserves text at every byte split")]
 func BSplitPoints() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128]
-    for split in 0..(bytes.Length) {
+    for split in 0..=(bytes.Length) {
         let decoder = Encodings.Utf8.CreateDecoder()
         let Ok(first) = decoder.Decode(bytes, 0, split, false) else {
             return Error(TestFailure("First fragment", "Ok", "Error"))
@@ -108,7 +108,7 @@ func FProgress() -> Result<unit, TestFailure> {
     }
     _ = Assert.True(zero.BytesWritten == 0 && zero.State is EncoderState.NeedsOutput, "Explicit zero progress")?
     let output = ArrayList<byte>()
-    for index in 0..<9 {
+    for index in 0..9 {
         let Ok(step) = encoder.Drain(buffer, 1, 1) else {
             return Error(TestFailure("Drain", "Ok", "Error"))
         }
@@ -136,7 +136,7 @@ func FProgress() -> Result<unit, TestFailure> {
 [Test("Encoder chunks preserve scalars across the internal byte boundary")]
 func GChunkBoundary() -> Result<unit, TestFailure> {
     var prefix = "x"
-    for index in 0..<8 {
+    for index in 0..8 {
         prefix = prefix + prefix
     }
     let Ok(head) = prefix.SliceUtf8(0, 255) else {
@@ -148,12 +148,12 @@ func GChunkBoundary() -> Result<unit, TestFailure> {
     let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
     let output = ArrayList<byte>()
     var finished = false
-    for attempt in 0..<88 {
+    for attempt in 0..88 {
         if !finished {
             let Ok(step) = encoder.Drain(buffer, 0, 3) else {
                 return Error(TestFailure("Boundary drain", "Ok", "Error"))
             }
-            for index in 0..<step.BytesWritten {
+            for index in 0..step.BytesWritten {
                 output.Add(buffer[index])
             }
             finished = step.State is EncoderState.Finished

@@ -136,7 +136,7 @@ internal class MessageReader {
             return Error(JsonError.Syntax("Truncated Unicode escape"))
         }
         var value = 0
-        for index in 0..<4 {
+        for index in 0..4 {
             let digit = JsonSyntax.HexDigit(bytes[position])
             if digit == -1 {
                 return Error(JsonError.Syntax("Invalid Unicode escape"))

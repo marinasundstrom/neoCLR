@@ -163,7 +163,7 @@ public func ProgressChecks() {
 
 public func BoundaryChecks() {
     var prefix = "x"
-    for index in 0..<8 {
+    for index in 0..8 {
         prefix = String.Concat(prefix, prefix)
     }
     let head = match prefix.SliceUtf8(0, 255) {
@@ -178,7 +178,7 @@ public func BoundaryChecks() {
     var done = false
     while !done {
         let step = Step(encoder.Drain(buffer, 0, 3))
-        for index in 0..<step.BytesWritten {
+        for index in 0..step.BytesWritten {
             output.Add(buffer[index])
         }
         if step.State is EncoderState.Finished {
@@ -187,7 +187,7 @@ public func BoundaryChecks() {
     }
     Check(Text(output).Equals(source), "256-byte internal boundary cannot cut a scalar")
     var excessive = "x"
-    for index in 0..<17 {
+    for index in 0..17 {
         excessive = String.Concat(excessive, excessive)
     }
     let limited = Encodings.Utf8.CreateEncoder()
@@ -264,7 +264,7 @@ public class CountingSink : OutputStream {
     private var total: int = 0
     val Total: int => total
     func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
-        for index in offset..<(offset + count) {
+        for index in offset..(offset + count) {
             Check(buffer[index] == 120, "Maximum writer content")
         }
         total += count
@@ -278,7 +278,7 @@ public class CountingSink : OutputStream {
 
 public func MaximumChecks() {
     var text = "x"
-    for index in 0..<16 {
+    for index in 0..16 {
         text = String.Concat(text, text)
     }
     let sink = CountingSink()

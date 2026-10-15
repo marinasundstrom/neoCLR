@@ -112,7 +112,7 @@ public func CheckBoundaries() {
 
 public func CheckSplits(first: int, last: int) {
     let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128, (byte)101, (byte)204, (byte)129]
-    for split in first..last {
+    for split in first..=last {
         let decoder = BoundedUtf8Decoder()
         var text = ""
         var scalars = 0

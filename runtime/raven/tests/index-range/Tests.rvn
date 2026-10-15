@@ -60,7 +60,7 @@ func DArraySlices() -> Result<unit, TestFailure> {
     let suffix = values[2..]
     let all = values[..]
     let empty = values[^0..]
-    let selected: Range = 1..<3
+    let selected: Range = 1..3
     let stored = values[selected]
     let none: int[] = []
     let noneCopy = none[..]

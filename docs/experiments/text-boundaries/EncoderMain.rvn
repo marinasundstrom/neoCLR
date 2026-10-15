@@ -138,7 +138,7 @@ public func BoundaryChecks() {
     var done = false
     while !done {
         let step = Step(encoder.Drain(buffer, 0, 3))
-        for index in 0..<step.BytesWritten {
+        for index in 0..step.BytesWritten {
             output.Add(buffer[index])
         }
         if step.State is EncodeState.Finished {
@@ -147,7 +147,7 @@ public func BoundaryChecks() {
     }
     Check(Text(output).Equals(source), "32-byte internal boundary cannot cut a scalar")
     var excessive = "x"
-    for index in 0..<13 {
+    for index in 0..13 {
         excessive = String.Concat(excessive, excessive)
     }
     let limited = BoundedTextEncoder(false)

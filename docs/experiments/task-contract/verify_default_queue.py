@@ -65,7 +65,7 @@ public func Enqueue() {
 }
 ''', '''
     Enqueue()
-    for i in 0..<1200 { let garbage = TaskQueue() }
+    for i in 0..1200 { let garbage = TaskQueue() }
 ''', 'retained\n'),
     ('Explicit queue is selected while active', '', '''
     let queue = TaskQueue()

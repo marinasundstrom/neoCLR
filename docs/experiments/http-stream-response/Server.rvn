@@ -88,7 +88,7 @@ async func Main() -> Task<()> {
         System.Fail("Port failed")
     }
     Console.WriteLine(port)
-    for mode in 0..<10 {
+    for mode in 0..10 {
         let Ok(context) = await server.Accept() else {
             System.Fail("Accept failed")
         }

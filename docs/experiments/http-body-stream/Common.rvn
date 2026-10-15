@@ -61,7 +61,7 @@ async func Consume(stream: InputStream, mode: int) -> Task<()> {
             Check((await stream.Read(buffer, 1, 17)) is Ok(0))
             break
         }
-        for index in 0..<count { Check(buffer[index + 1] == 120) }
+        for index in 0..count { Check(buffer[index + 1] == 120) }
         total += count
         Check(total <= 513)
     }

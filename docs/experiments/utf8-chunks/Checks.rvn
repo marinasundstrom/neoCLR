@@ -53,7 +53,7 @@ func Main() {
     let retained = ChunkDecoder()
     let start: byte[] = [(byte)240, (byte)159]
     Check(Text(retained.Decode(start, 0, 2, false)).Equals(""))
-    for index in 0..<1200 {
+    for index in 0..1200 {
         _ = MemoryInput([(byte)0])
     }
     let end: byte[] = [(byte)152, (byte)128]

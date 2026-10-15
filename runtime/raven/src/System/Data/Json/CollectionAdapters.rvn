@@ -51,7 +51,7 @@ internal class CollectionAdapters {
             System.Fail("Collection keys and values must have equal lengths")
         }
         let map = HashMap<string, T>(StringComparer.Ordinal)
-        for index in 0..<values.Length {
+        for index in 0..values.Length {
             if !map.TryAdd(keys[index], (T)values[index]) {
                 System.Fail("Duplicate collection key")
             }

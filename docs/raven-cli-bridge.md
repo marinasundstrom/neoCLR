@@ -11080,3 +11080,12 @@ remaining baseline projects pass (96 invocations). Final .NET 10 hover checks pa
 7 tests with 2 existing skips. Executable loop, pattern and array-slice samples pass.
 These counts overlap and are not a unique-test total. Carry to `codex/neoclr` and
 native execution qualification are pending; no push or publication is claimed.
+
+The carry is now committed on `codex/neoclr` as `bf5e0abe8`. Active library/test,
+benchmark and experiment sources migrate with their original endpoint behavior.
+The fresh five-library build and native loop/stored-bound consumer pass; see the
+[range carry qualification](validation/range-endpoints/README.md). Native inclusive
+stored/sliced Range construction rejects explicitly until checked conversion exists;
+native range patterns also currently reject. These replace the pending-carry status
+above without implying completed native semantic parity. No runtime metadata or
+library API changes are introduced.

@@ -10,7 +10,7 @@ import System.Runtime.CompilerServices.*
 async func Main() -> Task<int> {
     let destination = MemoryStream()
     let gzip = GZipStream.CreateCompressor(destination, true)
-    let data: byte[] = [for unused in 0..<40000 => (byte)0]
+    let data: byte[] = [for unused in 0..40000 => (byte)0]
     var index = 0
     while index < data.Length {
         data[index] = (byte)((index * 17 + index / 251) % 256)
@@ -33,7 +33,7 @@ async func Main() -> Task<int> {
     let Ok(length) = destination.GetLength() else {
         System.Fail("Destination length unavailable")
     }
-    let encoded: byte[] = [for unused in 0..<65536 => (byte)0]
+    let encoded: byte[] = [for unused in 0..65536 => (byte)0]
     _ = destination.Seek(0)
     match await destination.Read(encoded, 0, (int)length) {
         Ok(_) => { }

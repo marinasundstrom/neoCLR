@@ -85,12 +85,12 @@ public func Diagnostic(mode: string, count: int) {
     var text = ""
     if mode.Equals("builder") {
         let builder = ReportTextBuilder(65536)
-        for index in 0..<count {
+        for index in 0..count {
             Added(builder.Append(part))
         }
         text = builder.Build()
     } else {
-        for index in 0..<count {
+        for index in 0..count {
             if part.GetUtf8ByteCount() > 65536 - text.GetUtf8ByteCount() {
                 System.Fail("Concat limit")
             }

@@ -9,7 +9,7 @@ import NeoClr.Testing.*
 
 func LargePrefix() -> string {
     var text = "x"
-    for index in 0..<16 {
+    for index in 0..16 {
         text = String.Concat(text, text)
     }
     return match text.SliceUtf8(0, 65535) {
@@ -37,7 +37,7 @@ func ALargeRoundTrip() -> Result<unit, TestFailure> {
 
 [Test("HTTP buffered text rejects malformed and truncated large bodies")]
 func BLargeErrors() -> Result<unit, TestFailure> {
-    let bytes: byte[] = [for index in 0..<65537 => (byte)120]
+    let bytes: byte[] = [for index in 0..65537 => (byte)120]
     bytes[bytes.Length - 1] = (byte)195
     _ = Assert.True(HttpContent(bytes).ReadText().GetResult() is Error(_), "Truncated final scalar")?
     bytes[bytes.Length - 1] = (byte)128

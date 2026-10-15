@@ -40,7 +40,7 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
     /// <remarks>Missing fields cause a terminal Fault. Prefer Field or Find when absence is expected. A present JsonNull is returned unchanged.</remarks>
     val self[name: string]: JsonValue {
         get {
-            for index in 0..<names.Count {
+            for index in 0..names.Count {
                 if names[index].Equals(name) {
                     return values[index]
                 }
@@ -68,14 +68,14 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
     /// <returns>An owned iterator retaining the original node references. Later additions do not alter its pairs.</returns>
     func GetIterator() -> Iterator<KeyValuePair<string, JsonValue>> {
         let pairs = ArrayList<KeyValuePair<string, JsonValue>>(names.Count)
-        for index in 0..<names.Count {
+        for index in 0..names.Count {
             pairs.Add(KeyValuePair<string, JsonValue>(names[index], values[index]))
         }
         return pairs.GetIterator()
     }
 
     func Field(name: string) -> Result<JsonValue, JsonError> {
-        for index in 0..<names.Count {
+        for index in 0..names.Count {
             if names[index].Equals(name) {
                 return Ok(values[index])
             }

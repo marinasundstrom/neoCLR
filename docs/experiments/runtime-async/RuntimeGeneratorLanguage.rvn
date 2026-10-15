@@ -489,7 +489,7 @@ func DropPendingConsumer(gate: Task<int>, counters: Counters, reached: Promise<(
 
 async func CheckAbandonedOwnership() -> Task<()> {
     let counters = Counters()
-    for index in 1..160 {
+    for index in 1..=160 {
         AbandonYielded(counters)
         await FlushNotifications()
         System.Runtime.GC.Collect()
@@ -514,7 +514,7 @@ async func CheckAbandonedOwnership() -> Task<()> {
 async func Main() -> Task<int> {
     await CheckAbandonedOwnership()
     await CheckTaskOnlyConsumers()
-    for scenario in 0..4 {
+    for scenario in 0..=4 {
         await CheckPendingCleanup(scenario)
     }
     CheckGenericClosure()
@@ -526,7 +526,7 @@ async func Main() -> Task<int> {
     await CheckDemand()
     await CheckUnstarted()
     await CheckIndependent()
-    for index in 1..8 {
+    for index in 1..=8 {
         await CheckConsumer(false)
         await CheckConsumer(true)
         await CheckCancellation()

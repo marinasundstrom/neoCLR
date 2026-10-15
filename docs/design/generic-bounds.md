@@ -1,8 +1,9 @@
 # Generic bounds and consistent Raven ranges
 
 Status: generic capability/library proposal, 2026-10-15. Raven main now includes
-the general endpoint/terminology migration at `c16fca24c`; native lowering and
-generic library APIs remain pending. The author requested generic bounds and consistent endpoint semantics,
+the general endpoint/terminology migration at `c16fca24c`, carried deliberately to
+`codex/neoclr` as `bf5e0abe8`. Native loops/stored half-open bounds are qualified;
+inclusive Range construction, range patterns and generic library APIs remain pending. The author requested generic bounds and consistent endpoint semantics,
 followed by integer iteration, and explicitly parked structural-type work. The
 author then clarified that all known Raven consumers are owned by the project and
 compatibility is not a concern. A coordinated source migration is appropriate;

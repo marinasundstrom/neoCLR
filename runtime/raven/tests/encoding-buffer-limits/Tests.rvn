@@ -7,7 +7,7 @@ import NeoClr.Testing.*
 
 [Test("UTF-8 decoder quota rejection preserves an incomplete scalar")]
 func AUtf8Quota() -> Result<unit, TestFailure> {
-    let bytes: byte[] = [for index in 0..<65537 => (byte)120]
+    let bytes: byte[] = [for index in 0..65537 => (byte)120]
     let decoder = Encodings.Utf8.CreateDecoder()
     let head: byte[] = [(byte)195]
     let Ok(prefix) = decoder.Decode(head, 0, 1, false) else {
@@ -24,7 +24,7 @@ func AUtf8Quota() -> Result<unit, TestFailure> {
 
 [Test("ASCII decoder accepts the maximum input after rejecting an oversized call")]
 func BAsciiQuota() -> Result<unit, TestFailure> {
-    let bytes: byte[] = [for index in 0..<65537 => (byte)120]
+    let bytes: byte[] = [for index in 0..65537 => (byte)120]
     let decoder = Encodings.Ascii.CreateDecoder()
     _ = Assert.True(decoder.Decode(bytes, 0, bytes.Length, true) is Error(EncodingError.LimitExceeded), "Oversized ASCII input rejected")?
     let Ok(text) = decoder.Decode(bytes, 1, 65536, true) else {
@@ -36,7 +36,7 @@ func BAsciiQuota() -> Result<unit, TestFailure> {
 
 [Test("Encoder drain quotas preserve accepted text and destination bytes")]
 func CDrainQuota() -> Result<unit, TestFailure> {
-    let bytes: byte[] = [for index in 0..<65538 => (byte)99]
+    let bytes: byte[] = [for index in 0..65538 => (byte)99]
     let encoder = Encodings.Utf8.CreateEncoder()
     _ = Assert.True(encoder.Accept("é😀", true) is Ok(_), "Accept final text")?
     _ = Assert.True(encoder.Drain(bytes, 1, 65537) is Error(EncodingError.LimitExceeded), "Oversized drain rejected")?
@@ -54,7 +54,7 @@ func CDrainQuota() -> Result<unit, TestFailure> {
 
 [Test("UTF-8 decoder maximum input counts new bytes separately from carried bytes")]
 func DCarryAtLimit() -> Result<unit, TestFailure> {
-    let bytes: byte[] = [for index in 0..<65536 => (byte)120]
+    let bytes: byte[] = [for index in 0..65536 => (byte)120]
     let head: byte[] = [(byte)240, (byte)159, (byte)152]
     let decoder = Encodings.Utf8.CreateDecoder()
     _ = Assert.True(decoder.Decode(head, 0, 3, false) is Ok(""), "Carry three bytes")?
@@ -69,22 +69,22 @@ func DCarryAtLimit() -> Result<unit, TestFailure> {
 [Test("Native buffer comprehensions preserve selector indices and range endpoints")]
 func EArrayRanges() -> Result<unit, TestFailure> {
     let seed = 7
-    let values: int[] = [for index in 2..4 => index + seed]
+    let values: int[] = [for index in 2..=4 => index + seed]
     _ = Assert.True(values.Length == 3 && values[0] == 9 && values[1] == 10 && values[2] == 11, "Inclusive range and selector")?
-    let empty: int[] = [for index in 4..<4 => index]
+    let empty: int[] = [for index in 4..4 => index]
     _ = Assert.Equal(0, empty.Length)?
-    let reversed: int[] = [for index in 4..2 => index]
+    let reversed: int[] = [for index in 4..=2 => index]
     _ = Assert.Equal(0, reversed.Length)?
-    let limit: int[] = [for index in 2147483647..2147483647 => index]
+    let limit: int[] = [for index in 2147483647..=2147483647 => index]
     return Assert.True(limit.Length == 1 && limit[0] == 2147483647, "Inclusive maximum does not overflow")
 }
 
 [Test("One-shot decoding enforces byte limits and accepts the maximum")]
 func ZOneShotLimits() -> Result<unit, TestFailure> {
-    let oversized: byte[] = [for index in 0..<65537 => (byte)120]
+    let oversized: byte[] = [for index in 0..65537 => (byte)120]
     _ = Assert.True(Encodings.Utf8.Decode(oversized) is Error(EncodingError.LimitExceeded), "UTF-8 quota")?
     _ = Assert.True(Encodings.Ascii.Decode(oversized) is Error(EncodingError.LimitExceeded), "ASCII quota")?
-    let maximum: byte[] = [for index in 0..<65536 => (byte)120]
+    let maximum: byte[] = [for index in 0..65536 => (byte)120]
     let Ok(utf8) = Encodings.Utf8.Decode(maximum) else {
         return Error(TestFailure("Maximum UTF-8 decode", "Ok", "Error"))
     }

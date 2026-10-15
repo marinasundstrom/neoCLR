@@ -78,7 +78,7 @@ func WriterChecks() -> Result<string, string> {
     let root = JsonValue.ArrayValue()
     let wide = JsonValue.ArrayValue()
     let zero = JsonValue.NumberValue("0")?
-    for index in 0..<31 {
+    for index in 0..31 {
         _ = wide.Add(zero)?
     }
     _ = root.Add(wide)?

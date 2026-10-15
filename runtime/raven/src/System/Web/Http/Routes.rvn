@@ -18,7 +18,7 @@ public class RouteMatch {
 
     /// Gets a named parameter; names are case-sensitive.
     func Get(name: string) -> Result<string, string> {
-        for index in 0..<storedNames.Count {
+        for index in 0..storedNames.Count {
             if storedNames[index] == name {
                 return Ok(storedValues[index])
             }
@@ -136,7 +136,7 @@ public class RoutePattern {
                 if bytes.Count < 3 || bytes[bytes.Count - 1] != 125 {
                     return Error("Invalid route parameter")
                 }
-                for index in 1..<(bytes.Count - 1) {
+                for index in 1..(bytes.Count - 1) {
                     let value = bytes[index]
                     if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) || value == 95 ||
                         (index > 1 && value >= 48 && value <= 57)) {
@@ -181,7 +181,7 @@ public class RoutePattern {
         if storedParts.Count != other.storedParts.Count {
             return false
         }
-        for index in 0..<storedParts.Count {
+        for index in 0..storedParts.Count {
             let leftParameter = storedNames[index] != ""
             let rightParameter = other.storedNames[index] != ""
             if !leftParameter && !rightParameter && storedParts[index] != other.storedParts[index] {
@@ -204,7 +204,7 @@ public class RoutePattern {
         }
         let bytes = HttpText.Encode(target)
         var end = bytes.Count
-        for index in 0..<bytes.Count {
+        for index in 0..bytes.Count {
             if bytes[index] == 35 {
                 return Error("Fragments are not request targets")
             }
@@ -222,7 +222,7 @@ public class RoutePattern {
         }
         let capturedNames = ArrayList<string>()
         let capturedValues = ArrayList<string>()
-        for index in 0..<storedParts.Count {
+        for index in 0..storedParts.Count {
             if storedNames[index] == "" {
                 if decoded[index] != storedParts[index] {
                     return Ok(None())

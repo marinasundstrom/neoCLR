@@ -175,7 +175,7 @@ internal class PostgresConnection : SqlConnection {
         bind.Put(0)
         bind.PutShort(0)
         bind.PutShort(statement.ParameterCount)
-        for index in 0..<statement.ParameterCount {
+        for index in 0..statement.ParameterCount {
             let value = statement.Parameter(index)
             if value is SqlValue.Null {
                 bind.PutInteger(-1)
@@ -207,7 +207,7 @@ internal class PostgresConnection : SqlConnection {
             return Error(SqlError.LimitExceeded("Request exceeds 65536 bytes"))
         }
         let output = CheckedStorage.Reserve<byte>(bytes.Count)
-        for index in 0..<bytes.Count { output[index] = bytes[index] }
+        for index in 0..bytes.Count { output[index] = bytes[index] }
         return Ok(output)
     }
 
@@ -288,7 +288,7 @@ internal class PostgresConnection : SqlConnection {
                 hasRows = true
                 let count = packet.Short()
                 if count > 64 { return Error(SqlError.LimitExceeded("More than 64 columns")) }
-                for index in 0..<count {
+                for index in 0..count {
                     columns.Add(packet.CString())
                     _ = packet.Integer()
                     _ = packet.Short()
@@ -308,7 +308,7 @@ internal class PostgresConnection : SqlConnection {
                 }
                 if rows.Count >= 1024 { return Error(SqlError.LimitExceeded("More than 1024 rows")) }
                 let cells = ArrayList<Option<string>>()
-                for index in 0..<columns.Count {
+                for index in 0..columns.Count {
                     let length = packet.Integer()
                     if length == -1 { cells.Add(None) }
                     else if length < 0 { return Error(SqlError.Protocol("Invalid cell length")) }

@@ -117,7 +117,7 @@ class CountingSink : OutputStream {
     val Total: int => total
     val AllX: bool => allX
     private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
-        for index in offset..<(offset + count) {
+        for index in offset..(offset + count) {
             if buffer[index] != 120 {
                 allX = false
             }

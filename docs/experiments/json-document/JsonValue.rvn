@@ -131,7 +131,7 @@ public sealed class JsonValue {
         if !(self is JsonObject) {
             return Error("Expected object")
         }
-        for index in 0..<names.Count {
+        for index in 0..names.Count {
             if names[index].Equals(name) {
                 return Ok(items[index])
             }

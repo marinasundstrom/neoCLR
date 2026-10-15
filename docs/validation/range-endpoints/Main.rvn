@@ -1,0 +1,24 @@
+import System.*
+
+func Main() -> int {
+    var exclusive = 0
+    for value in 1..3 {
+        exclusive += value
+    }
+    var inclusive = 0
+    for value in 1..=3 {
+        inclusive += value
+    }
+    var descending = 0
+    for value in 3..0 by -1 {
+        descending += value
+    }
+    if exclusive != 3 || inclusive != 6 || descending != 6 {
+        return 1
+    }
+    let bounds = 1..3
+    if bounds.Start.Value != 1 || bounds.End.Value != 3 {
+        return 4
+    }
+    return 42
+}
