@@ -25,8 +25,9 @@ also preserves Response<int>/Response<long> identity through nine inputs after a
 general Raven pattern comparison fix. A
 [reference-valued substitution](experiments/native-structural-types/reference-generic-record-import-project/README.md)
 also preserves shared Cell mutation through copied records with exactly the two
-explicit allocations; managed
-stress and complete application qualification still block integration. A
+explicit allocations. [Bounded native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+now preserves union-held objects through eager/paced AOT collection and fault
+unwind; broader managed JIT/async/application qualification still blocks integration. A
 [fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
 now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.
 An [artifact-only library consumer](experiments/native-structural-types/scalar-import-project/README.md)

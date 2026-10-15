@@ -109,7 +109,11 @@ fields across nine imported inputs, with the same allocation bound.
 A [reference-valued generic record consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md)
 also preserves shared Cell mutation through a copied Response<Cell>; ten imported
 inputs pass with only the two explicit object allocations (32 bytes). This arena
-host is not collector stress. Intrinsic String alternatives remain a native layout gap.
+host is not collector stress. Separate [native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+now covers record/reference/scalar union roots across calls and fault unwind under
+eager and paced nonmoving collection in a small heap. This is bounded AOT
+qualification; JIT and async retention remain open. Intrinsic String alternatives
+remain a native layout gap.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with

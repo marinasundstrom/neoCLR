@@ -355,3 +355,35 @@ library/consumer builds against the retained v3 bundle. Compiler emission, Runti
 Contract configuration and runtime layout are unchanged. This qualifies one closed
 reference-valued substitution; the arena host provides no collector or moving-GC
 stress, and broad open generic/JIT/performance qualification remains outstanding.
+
+### Native collector stress for union roots (2026-10-15)
+
+`structural_union_roots_survive_native_collection_and_unwind` in the codegen
+console tests compiles [union-gc.neoil](union-gc.neoil) and derived cases with
+`--native-gc`. This uses the existing nonmoving collector, not the arena-only
+host used by the fresh Raven consumers. Published native root frames must retain
+a Cell through a record inside a union, or as the direct reference alternative,
+while Pressure allocates and discards eighty byte arrays across two calls.
+The Cell has no independent caller reference. A scalar alternative tests inactive
+reference regions; wrong extraction tests fault output and frame removal.
+
+Each case runs eight times in a 1024-byte heap under both eager and paced
+collection. Undefined-behavior/bounds sanitizers cover the native host. The host
+requires correct results or InvalidCast, unchanged fault output, an empty root
+chain after unwind, at least 648 allocations/reclamations per case/pacing process,
+and complete heap reclamation after each invocation. Interpreter results and
+fault codes provide the semantic reference. The deliberately small heap cannot
+hold all temporary allocations at once.
+
+```sh
+cargo test -p neoclr-codegen --test console \
+  structural_union_roots_survive_native_collection_and_unwind -- --nocapture
+```
+
+Qualification is macOS ARM64 AOT for these bounded layouts. It covers published
+arguments, locals, call operands/results and unwind with a real nonmoving native
+collector. It does not qualify JIT registration/lifetime, all structural shapes,
+async retention or the fresh Raven application under collection. No new Runtime
+Contract, metadata representation or collector algorithm was introduced. Like CLR
+value storage, copying a structural value must preserve the reachability of its
+embedded references; this test checks that obligation in neoCLR's private ABI.

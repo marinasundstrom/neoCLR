@@ -10852,3 +10852,16 @@ Runtime Contract and compiler emission are unchanged; no temporary encoding was
 added. Tools, fresh library/consumer artifacts and retained v3 bundle are hashed.
 The arena does not collect objects, so managed JIT/GC and broader open generic
 qualification remain separate blockers.
+
+
+### Bounded native union collector stress (2026-10-15)
+
+[Native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+now exercises the backend's union root publication with record-held references,
+direct reference alternatives and scalars across calls and fault unwind. Eight
+invocations per case/pacing mode run in a 1024-byte heap, retain only the union
+path to the live object, and require full reclamation after frame removal. The
+reference behavior is checked with the interpreter. This uses eager/paced
+nonmoving AOT collection, without changing Raven emission, metadata or Runtime
+Contract. Fresh Raven consumers still have arena-only evidence; JIT and async
+retention remain separate qualification work.

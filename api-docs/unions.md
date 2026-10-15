@@ -149,10 +149,13 @@ also distinguishes Response<int> and Response<long> through nine imported inputs
 and preserves substituted fields with the same allocation bound. A
 [reference-valued substitution consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md)
 also preserves shared mutation through copied Response<Cell> records; ten inputs
-allocate only the two explicit objects (32 bytes). This is not collector stress. Enums,
+allocate only the two explicit objects (32 bytes). This is not collector stress. Separate
+[native collector tests](../docs/experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+now cover record/reference/scalar payloads across calls and fault unwind with
+eager/paced nonmoving AOT collection and complete post-entry reclamation. Enums,
 Object/scalar-interface views requiring boxing and intrinsic String alternatives
 remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
-reflection, array elements, dedicated JIT/collector stress and full Task application
+reflection, array elements, broader JIT/collector qualification and full Task application
 qualification remain open. These are implementation gaps, not restrictions on the
 union type's intended value/reference alternatives.

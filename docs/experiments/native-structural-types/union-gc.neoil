@@ -1,0 +1,74 @@
+.module StructuralUnionGC
+.type class abstract System.Object
+.end
+.type class Cell
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg this
+ldarg value
+stfld Cell::Value
+ret
+.end
+.end
+.type Payload
+.field Wide Int64
+.field Reference Cell
+.end
+.function Make() -> union<Payload,Int32,Cell>
+.local Payload payload
+ldloca payload
+initobj Payload
+ldloca payload
+ldc.i8 4294967338
+stfld Payload::Wide
+pop
+ldloca payload
+ldc.i4 42
+newobj.ctor instance Cell::.ctor(Int32)
+stfld Payload::Reference
+pop
+ldloc payload
+box Payload
+castclass union<Payload,Int32,Cell>
+ret
+.end
+.function Pressure(union<Payload,Int32,Cell> value) -> union<Payload,Int32,Cell>
+.local Int32 remaining
+ldc.i4 40
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldarg value
+ret
+.end
+.function Calculate() -> Int32
+.local union<Payload,Int32,Cell> value
+call Make()
+call Pressure(union<Payload,Int32,Cell>)
+stloc value
+ldloc value
+call Pressure(union<Payload,Int32,Cell>)
+stloc value
+ldloc value
+unbox.any Payload
+ldfld Payload::Wide
+ldc.i8 4294967338
+ceq
+brfalse Bad
+ldloc value
+unbox.any Payload
+ldfld Payload::Reference
+ldfld Cell::Value
+ret
+Bad:
+ldc.i4 -1
+ret
+.end

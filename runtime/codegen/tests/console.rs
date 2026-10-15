@@ -11972,3 +11972,107 @@ fn structural_record_union_reference_alternatives_use_nominal_conformance() {
         .replace("ldloc copy\nunbox.any Payload\nldfld Payload::Reference", "ldloc copy\ncastclass Cell");
     verify_reference_views_with_arena(&source, Some([16, 16, 0, 0, 16, 0, 16, 16]));
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_roots_survive_native_collection_and_unwind() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let record = include_str!("../../../docs/experiments/native-structural-types/union-gc.neoil");
+    let direct = record.replace(
+        "ldloc payload\nbox Payload",
+        "ldloc payload\nldfld Payload::Reference",
+    ).replace(
+        "ldloc value\nunbox.any Payload\nldfld Payload::Wide\nldc.i8 4294967338\nceq\nbrfalse Bad\n",
+        "",
+    ).replace("unbox.any Payload\nldfld Payload::Reference", "castclass Cell");
+    let scalar = record.replace("ldloc payload\nbox Payload", "ldc.i4 42\nbox Int32")
+        .replace("ldloc value\nunbox.any Payload\nldfld Payload::Wide\nldc.i8 4294967338\nceq\nbrfalse Bad\n", "")
+        .replace("unbox.any Payload\nldfld Payload::Reference\nldfld Cell::Value", "unbox.any Int32");
+    let fault = record.replace(
+        "ldloc value\nunbox.any Payload\nldfld Payload::Wide",
+        "ldloc value\nunbox.any Int32\nconv.i8",
+    );
+    for (source, expected_status) in [
+        (record, 0),
+        (direct.as_str(), 0),
+        (scalar.as_str(), 0),
+        (fault.as_str(), 11),
+    ] {
+        let app = neoclr::assemble(source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program
+            .resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap())
+            .unwrap();
+        let reference = method.invoke(vec![], neoclr::Limits::default());
+        if expected_status == 0 {
+            assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42));
+        } else {
+            assert_eq!(reference.unwrap_err().code, neoclr::FaultCode::InvalidCast);
+        }
+        for paced in [false, true] {
+            let dir = Temp::new();
+            let r = compile_source(
+                &dir,
+                &seed,
+                source,
+                &["--compile-system", "--reference-arena", "--native-gc"],
+                false,
+            );
+            assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+            let base = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../docs/experiments/aot-console");
+            fs::write(dir.0.join("host.c"), format!(r#"
+#include "native-gc.h"
+int main(void) {{
+    uint64_t heap[128]={{0}};
+    neoclr_aot_context ctx={{.text={{(unsigned char*)heap,sizeof(heap),0}}}};
+    for (int run=0;run<8;run++) {{
+        int32_t result=-1;
+        int status=neoclr_entry_v4(0,&result,&ctx);
+        if(status!={expected_status}) {{neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}}
+        if((!status && result!=42) || (status && (result!=-1 || ctx.fault.code!=(uint32_t)status)))return 2;
+        if(neoclr_root_probe_head_v1())return 3;
+        ctx.fault=(neoclr_aot_fault){{0}};
+        if(neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used)return 4;
+        if(neoclr_gc_entry_check_v1(&ctx))return 5;
+    }}
+    neoclr_gc_statistics stats=neoclr_gc_statistics_v1();
+    if(stats.collections<16 || stats.allocations<648 || stats.reclaimed_allocations<648)return 6;
+    return 0;
+}}
+"#)).unwrap();
+            let mut command = Command::new("clang");
+            command
+                .args([
+                    "-std=c11",
+                    "-Wall",
+                    "-Wextra",
+                    "-Werror",
+                    "-fsanitize=undefined,bounds",
+                    "-DNEOCLR_NATIVE_GC",
+                    "-I",
+                ])
+                .arg(&base);
+            if paced {
+                command.arg("-DNEOCLR_GC_PACED");
+            }
+            let r = command
+                .arg(dir.0.join("host.c"))
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"))
+                .arg(base.join("text-arena.c"))
+                .arg(base.join("../aot-fault-details/render.c"))
+                .arg(dir.0.join("app.o"))
+                .arg("-o")
+                .arg(dir.0.join("host"))
+                .output()
+                .unwrap();
+            assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+            let r = Command::new(dir.0.join("host")).output().unwrap();
+            assert!(
+                r.status.success(),
+                "paced={paced} status={expected_status}: {r:?}"
+            );
+        }
+    }
+}
