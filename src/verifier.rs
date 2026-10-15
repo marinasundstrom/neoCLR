@@ -1028,7 +1028,7 @@ fn typed_effect(
                 module.is_object_reference_type(exact(&values[0])?),
                 "unbox.any requires an object reference",
             )?;
-            one(target.clone())
+            Result::Ok(vec![loaded(target)])
         }
         IsInstance(target) => {
             if !module.is_object_reference_type(target) {

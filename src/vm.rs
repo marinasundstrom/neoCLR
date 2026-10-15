@@ -3818,7 +3818,7 @@ fn interpret_instructions_with_dispatch(
                             ));
                         }
                         Value::ObjectReference(object) if object.concrete_type() == *target => {
-                            frame.stack.push(object.reference.read()?);
+                            frame.stack.push(object.reference.read()?.on_stack());
                         }
                         _ => {
                             return Err(Fault::coded(
