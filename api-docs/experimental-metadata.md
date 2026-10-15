@@ -9258,3 +9258,18 @@ an instance method returning `SignatureType.TypeParameter(0)`. A consumer instea
 read-only API section exercises both native and CLI emission and runtime loading.
 `SetVariance` does not make arbitrary value arguments convertible or provide Result
 mapping; declaration validation and call-site reference conversions are separate.
+
+
+`AssemblyBuilder.SetInterfaceVariance(ImportedTypeReference reference,
+IEnumerable<GenericVariance> annotations)` records a resolved external interface's
+annotations before `CompleteInterfaceReference`. The open reference must belong to
+the output and have one valid annotation per parameter. Values are copied; invalid
+or conflicting annotations throw `ArgumentException`, and calls after completion
+throw `InvalidOperationException`. Like `AddInterfaceConversion`, this is an explicit
+semantic-provider assertion tied to the dependency, not independent verification.
+The runtime must validate the actual loaded definitions.
+
+SDK call/return storage checks now admit declared reference-only interface variance,
+including nested local/imported interfaces. Exact conformance wins; multiple other
+compatible views reject. Writable aliases, boxing, primitive materialization and
+mutable-array covariance remain excluded. Equal value arguments remain exact.

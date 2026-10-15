@@ -11120,3 +11120,27 @@ loop guards. Signed int/long progression terminates before out-of-domain additio
 including overshooting and minimum-valued steps. No native opcode, Runtime Contract,
 metadata-format or library API changes. See [validation and scope](validation/range-iteration/README.md).
 Generic bounds/steppers and the nominal safe-slicing API remain separate follow-ups.
+
+
+## Opt-in interface variance — 2026-10-16
+
+Raven codex/neoclr enables explicit `in`/`out` interface declarations through the
+native emission adapter's `AllowsInterfaceVariance` capability. Existing syntax and
+general variance binding are reused; unannotated parameters remain invariant. This
+capability belongs to the selected neoCLR backend and requires no extra user Runtime
+Contract option. Ordinary .NET behavior is unchanged.
+
+The native importer preserves parameter variance in symbols. Emission records
+`generic_variance`, and the SDK checks signature polarity and reference-only
+call/return conversions. CLI reference projections retain equivalent generic-parameter
+flags; they do not simulate native execution. Exact dependency bindings retain
+external annotations and interface relationships without structural conformance.
+
+Validation: Raven main's nine existing variance semantic checks pass. The focused
+`NeoClrMetadataProbe --interface-variance` compiles a library and consumer, checks
+imported flags, rejects reverse/invariant/value-argument conversions and unsafe
+producer declarations, and emits a consumer returning 42 in the interpreter.
+The broader legacy native-symbol baseline has an existing unrelated canonical
+property/accessor identity failure in ExternalNativeChecks; it is not claimed passing.
+AOT/JIT and library annotations are the next slices. Structural types and automatic
+Result/Sliceable widening remain parked.

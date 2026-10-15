@@ -8,6 +8,7 @@ internal static class InterfaceVarianceChecks
 {
     internal static void Run()
     {
+        CheckReferenceConversions();
         var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
         var graph = new AssemblyBuilder(new("VarianceSnapshot", new(1, 0, 0, 0)), core);
         var contract = graph.AddGenericInterface("Example", "Transform", ["TOut", "TIn", "TFixed"]);
@@ -76,6 +77,43 @@ internal static class InterfaceVarianceChecks
         if (Environment.GetEnvironmentVariable("NEOCLR_VARIANCE_ARTIFACT") is { } output)
             File.WriteAllBytes(output, NativeModuleContainer.WriteBinary(authored));
         Console.WriteLine("PASS native interface variance metadata, authoring, projection, immutable snapshots and polarity checks");
+    }
+    private static void CheckReferenceConversions()
+    {
+        var graph = new AssemblyBuilder(new("VarianceCalls", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var animal = graph.AddInterface("Example", "Animal");
+        var dog = graph.AddClass("Example", "Dog"); dog.AddInterfaceImplementation(animal);
+        var producer = graph.AddGenericInterface("Example", "Producer", ["T"]);
+        producer.SetVariance(0, GenericVariance.Covariant);
+        producer.AddInterfaceMethod("Get", new(SignatureType.TypeParameter(0), []));
+        var consumer = graph.AddGenericInterface("Example", "Consumer", ["T"]);
+        consumer.SetVariance(0, GenericVariance.Contravariant);
+        consumer.AddInterfaceMethod("Accept", new(PrimitiveType.Int32, [SignatureType.TypeParameter(0)]));
+        var widen = graph.AddFunction("Widen", new(producer.MakeGenericInstance(animal), [producer.MakeGenericInstance(dog)]));
+        widen.LoadArgument(0); widen.Return();
+        var narrow = graph.AddFunction("Narrow", new(consumer.MakeGenericInstance(dog), [consumer.MakeGenericInstance(animal)]));
+        narrow.LoadArgument(0); narrow.Return();
+        var main = graph.AddFunction("Main"); main.LoadConstant(42); main.Return(); graph.EntryPoint = main;
+        _ = graph.WriteNativeAssembly();
+        _ = System.Reflection.Assembly.Load(graph.Write()).GetTypes();
+        var external = graph.CreateInterfaceReference(new("External", new(1, 0, 0, 0)), graph.CoreLibrary,
+            new string('A', 64), "Example", "Producer`1", 1);
+        graph.SetInterfaceVariance(external, [GenericVariance.Covariant]);
+        Reject<ArgumentException>(() => graph.SetInterfaceVariance(external, [GenericVariance.Contravariant]));
+        Reject<ArgumentException>(() => graph.SetInterfaceVariance(external, []));
+        graph.CompleteInterfaceReference(external);
+        Reject<InvalidOperationException>(() => graph.SetInterfaceVariance(external, [GenericVariance.Covariant]));
+        var externalWiden = graph.AddFunction("ExternalWiden", new(external.MakeGenericInstance(animal), [external.MakeGenericInstance(dog)]));
+        externalWiden.LoadArgument(0); externalWiden.Return();
+        _ = graph.WriteNativeAssembly();
+        var invalid = graph.AddFunction("Reverse", new(producer.MakeGenericInstance(dog), [producer.MakeGenericInstance(animal)]));
+        invalid.LoadArgument(0); invalid.Return();
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        invalid.Definition.Body.ClearInstructions();
+        invalid.GetILGenerator().LoadDefault(producer.MakeGenericInstance(dog)); invalid.Return();
+        var values = graph.AddFunction("NoBoxing", new(producer.MakeGenericInstance(animal), [producer.MakeGenericInstance(PrimitiveType.Int32)]));
+        values.LoadArgument(0); values.Return();
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
     private static void Reject<T>(Action action) where T : Exception

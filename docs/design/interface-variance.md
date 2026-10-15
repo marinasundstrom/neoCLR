@@ -244,3 +244,15 @@ Validation uses the focused SDK variance and existing declaration/projection che
 An SDK-authored NEOX loads and returns 42 in the interpreter. Call-site conversion,
 Raven integration and AOT/JIT work are separate slices; metadata transport alone is
 not end-to-end qualification. Structural work and automatic Result mapping stay parked.
+
+
+## Raven interpreter integration (2026-10-16)
+
+Raven's native adapter now opts into interface variance using its explicit emission
+capability, preserves annotations on imported type parameters and writes SDK
+annotations. The SDK also checks reference-only call/return conversions and accepts
+explicit annotations from the compiler's resolved external contracts. A separate
+producer/consumer library and consumer return 42 under the interpreter; reverse,
+invariant and value-argument conversions reject. Unsafe declaration emission fails
+without writing an output image. See [bridge integration](../raven-cli-bridge.md).
+Native specialization and library annotations remain outstanding in this slice.

@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-16
+
+- Admit verified reference-only interface variance in metadata SDK call/return storage checks, including nested local/imported interfaces and explicit semantic-provider annotations. Preserve exact matches, reject ambiguous views and exclude boxing, writable aliases and primitive materialization. A separately compiled Raven producer/consumer fixture imports annotations and returns 42 in neoCLR; native backend qualification remains pending.
+
 ### 2026-10-15
 
 - Enable explicit SDK interface variance authoring with `SetVariance`, write-time nested polarity checks, native and CLI annotations, variance-preserving projection/import metadata and reference/runtime binding checks. Supersedes the read-only SDK projection/import restrictions below. Focused SDK variance and native-reader/projection regressions pass; an authored NEOX returns 42 in the interpreter. Native dispatch, Raven integration and library annotations are subsequent slices.

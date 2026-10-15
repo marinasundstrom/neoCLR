@@ -92,6 +92,25 @@ public sealed partial class TypeBuilder
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<ImportedTypeReference, IReadOnlyList<GenericVariance>> importedVariance = [];
+
+    /// <summary>Records variance from an explicitly resolved external interface contract.</summary>
+    /// <param name="reference">Output-owned open interface definition.</param>
+    /// <param name="annotations">One valid annotation per parameter, copied in ordinal order.</param>
+    /// <exception cref="ArgumentException">Invalid owner, arity, values or conflicting prior annotations.</exception>
+    /// <exception cref="InvalidOperationException">The interface has already been completed.</exception>
+    /// <remarks>Like AddInterfaceConversion, this is a semantic-provider assertion, not dependency verification.
+    /// It must match the runtime artifact. Complete the interface after supplying annotations, methods and bases.</remarks>
+    public void SetInterfaceVariance(ImportedTypeReference reference, IEnumerable<GenericVariance> annotations)
+    {
+        ArgumentNullException.ThrowIfNull(reference); ArgumentNullException.ThrowIfNull(annotations);
+        var values = annotations.ToArray();
+        if (!ReferenceEquals(reference.Owner, this) || reference.TypeArguments.Count != 0 || !IsAuthoredInterface(reference) ||
+            values.Length != reference.GenericArity || values.Any(v => !Enum.IsDefined(v)) ||
+            importedVariance.TryGetValue(reference, out var previous) && !previous.SequenceEqual(values))
+            throw new ArgumentException("invalid or conflicting external interface variance");
+        if (completedInterfaceContracts.ContainsKey(reference)) throw new InvalidOperationException("interface contract is complete");
+        importedVariance[reference] = Array.AsReadOnly(values);
+    }
     internal GenericVariance ImportedVariance(ImportedTypeReference type, int ordinal)
         => importedVariance.TryGetValue(InterfaceDefinition(type), out var annotations)
             ? annotations[ordinal] : GenericVariance.Invariant;
