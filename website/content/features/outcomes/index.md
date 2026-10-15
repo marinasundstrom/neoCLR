@@ -90,10 +90,11 @@ and serialization errors directly. This replaces their HttpJsonError return type
 rebuild consumers and update wrapper patterns. HttpError and JsonError keep their
 meaningful nominal cases. See [HTTP JSON APIs](../../docs/json.html).
 
-The matching development library temporarily backs two through five alternatives
-with nominal `System.Union` carriers. Native structural union values are planned;
-this bridge does not implement structural identity or normalization. Existing SDKs
-need rebuilding with the matching compiler/library changes.
+The legacy CLI bridge backs two through five alternatives with nominal
+`System.Union` carriers. The native structural feature branches instead emit union
+signatures and support interpreter execution, including value and reference
+alternatives. These are different representations and require matching compiler
+and library artifacts. Native AOT/JIT support remains incomplete.
 
 [Union API and bridge limits](../../docs/unions.html) ·
 [Tested configuration loader and validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/adhoc-error-unions)

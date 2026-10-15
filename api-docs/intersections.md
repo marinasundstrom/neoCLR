@@ -1,27 +1,44 @@
 # Intersection
 
-Proposed structural family. There is no implemented neoCLR structural Intersection
-member contract to enumerate yet. This reference entry makes the intended family
-visible without presenting a proposed API as shipped.
+An intersection `A & B` describes a value satisfying both types. It composes
+contracts without declaring another nominal type. Interface conformance remains
+explicit: an object must implement the named interfaces; matching method names
+alone is insufficient.
 
-The open design must specify component identity, compatible and conflicting member
-signatures, conversions, extension lookup and introspection construction. Absence
-of a name would not itself prevent members. It also would not automatically permit
-inheritance or imply Function's Object contract.
+## Native contract
 
-[All structural families](structural-types.md) · [Open proposals](/proposals/)
+The structural feature branch supports intersections in Raven/native signatures,
+including parameters, results and supported generic constraint positions. Inputs
+and constraints are common uses, but a result may also describe a combined view.
+An intersection does not combine two separate objects or copy their fields.
 
+Bounds must be interfaces or reference classes that permit subclassing. A class
+closed to extension in CLR terms is rejected. Raven's sealed hierarchy concept is
+different: a sealed hierarchy can participate when its bound remains extensible
+under its hierarchy rules. Value types are not intersection operands in this
+profile. This is a conservative platform restriction, not a general theorem about
+intersection types.
 
-## Branch-only reference experiment
+Constituent order and duplicates do not change identity. Guaranteed nominal
+contracts can be projected for interface dispatch. Supported scoped nominal
+constituents retain generic parameters until substitution. Import and constraint
+support remain bounded; arbitrary symbolic structural constraints are not qualified.
 
-The unpublished `codex/structural-union-intersection` branch admits neoIL
-`union<A,B>` and `intersection<A,B>` behind the `experimental-compositions` build
-feature. It supports reference locals, free-function parameters/results, checked
-casts and guaranteed interface dispatch in the interpreter. This is not Raven
-source support or a replacement for published union carriers. There are no public
-compound reflection constructors or members to enumerate yet.
+## Introspection
 
-Fields, generics, byrefs, arrays, boxed/intrinsic reference values and JIT/AOT remain
-unsupported. Typed nulls follow ordinary reference behavior; non-null membership
-preserves the same class allocation. These are experiment limits, not permanent
-platform contracts.
+`IntersectionTypeInfo.Types: Sequence<TypeInfo>` returns a snapshot of the
+constituent descriptors. The intersection is structural, with no TypeDef or nominal
+declaration name. Its runtime representation is currently a checked reference view.
+Public construction of arbitrary guest intersection descriptors is not available.
+
+<a id="branch-only-reference-experiment"></a>
+
+## Availability
+
+Native source, metadata and interpreter support live on
+`codex/structural-union-intersection` and Raven's paired
+`codex/neoclr-union-intersection` branch. Matching compiler/runtime libraries are
+required. AOT/JIT representation remains an integration requirement; interpreter
+success does not imply native backend support. No published release is claimed.
+
+[All structural families](structural-types.md) · [Union](unions.md)

@@ -8436,7 +8436,7 @@ code generation. Raven's default adapter still rejects compound declarations. It
 experimental intersection API now supports semantic inspection while rejecting
 structural unions and keeping native emission gated by default. An explicit host
 option now admits native-only forwarding between imported intersection calls. See the
-[experiment record](../docs/experiments/structural-compositions/README.md) for
+[experiment record](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md) for
 validation, remaining identity differences and the next compiler slice.
 
 The `NeoCLR.Metadata.Experimental.Introspection` facade exposes these loaded
@@ -8552,24 +8552,24 @@ all alternatives to have that category; neither selects a storage representation
 Written intersection bounds now reject sealed classes/value types before reduction.
 Member merging is deferred. These are compiler host APIs, not guest RavenDoc APIs.
 
-[POC and commands](../docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
+[POC and commands](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
 record four interpreter results and negative gates. Full open/closed generic native
 integration remains incomplete; the adapter admits closed generic reference bounds
 in nongeneric free-function calls. Open parameters remain unsupported. Closed reference-class wrappers now retain
 composition arguments in the imported free-function call profile.
 The runtime separately supports closed generic reference bounds; see the
-[generic slice](../docs/experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+[generic slice](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
 
 
 Closed generic bound call integration is covered by eight Raven interpreter consumers
-and host/compiler mismatch rejection; see the [current profile and evidence](../docs/experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+and host/compiler mismatch rejection; see the [current profile and evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
 
 
 The wrapper profile retains invariant argument identity and recursively enforces
 native-only emission and ordinary-import/storage rejection. It requires local
 unconstrained reference-class definitions; value/interface wrappers and compositions
 inside a composition bound's generic arguments remain outside this reader profile.
-[Wrapped composition contracts and validation](../docs/experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+[Wrapped composition contracts and validation](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
 
 
 ### Imported composition result locals (2026-10-14 development)
@@ -9085,7 +9085,7 @@ open types and structural tuple alternatives remain outside this bounded factory
 Value payload construction requires explicit boxing and extraction copies through
 explicit unboxing; this does not give the union a nominal Object/ValueType base.
 The native signature is preserved and CLI projection remains unsupported.
-See the [integration contract](../docs/raven-cli-bridge.md) for validation and
+See the [integration contract](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/raven-cli-bridge.md) for validation and
 remaining generic wrapper/byref limitations.
 
 ### Managed structural parameter signatures (2026-10-15 development)

@@ -152,4 +152,4 @@ full coverage of union arguments. Invalid arguments fault; bypassing verificatio
 does not bypass method constraint checks. Default builds reject structural bounds.
 The metadata preserves the structural bound, not multiple conjunctive nominal rows.
 No new guest constraint reflection API is introduced. See
-[validation and limits](../docs/experiments/composition-constraints/README.md).
+[validation and limits](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/composition-constraints/README.md).

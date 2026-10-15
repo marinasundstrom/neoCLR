@@ -88,36 +88,32 @@ and hashing. Avoid changing a key in ways that affect equality while it is store
 <a id="value-tuples-development"></a>
 
 
-Development direction: structural tuple signatures will replace the nominal tuple
-family. The feature branch currently preserves ordered tuple signatures in native
-metadata and provides opt-in native interpreter values with positional element
-access. Host inspection exposes resolved identities and ordered element descriptors.
-Guest `TupleTypeInfo.ElementTypes` exposes ordered recursive snapshots. An explicit
-experimental Raven host option emits scalar/nested source tuples natively, including
-source-local named reads. Explicit native structural binding now needs no nominal tuple declaration. Native Rust
-signatures and host descriptors preserve element names without affecting type
-equality. C# authoring/import and Raven emission preserve those names. Guest `ElementNames` exposes per-signature names with positional defaults; names
-do not affect equality. Local tuple element mutation supports nested writeback while preserving earlier
-copies. Nine-element tuples execute without a nominal carrier. Open-element
-emission and migration away from legacy runtime declarations remain pending. An explicit Raven host API
-imports named scalar/nested tuples across library boundaries. See the
-[tuple API reference](/docs/tuples.md) for the current boundary.
+## Structural data composition
 
-Development branch update (2026-10-15): native Raven projects enable structural
-tuples, unions and intersections together, and the default runtime build admits
-them in the interpreter. A separate-library sample preserves named tuple copies
-and returns 42. JIT/AOT, full legacy tuple removal and broader element forms
-remain incomplete; these changes are not yet a published release.
+Use structural types when data needs a shape but not a new nominal declaration.
+Tuples combine values, unions represent alternatives, and intersections describe
+simultaneous nominal contracts. They remain real types with native metadata and
+introspection; interface implementation stays explicit.
 
-Development follow-up: structural unions are intended for both value and reference
-alternatives. The interpreter now has explicit boxed scalar/nominal value storage
-and copied extraction; native compiler exact conversions and metadata host authoring now support these bounded alternatives. Direct native ref/out slots now support replacement and reads; generic value-wrapper integration is still incomplete. Intersections
-retain nominal interface and extendable-reference bounds.
+The structural feature branches support native Raven tuples with ordered elements,
+value copies and local mutation. Element names are stored in the signature and
+preserved by reflection, while identity and compatibility remain positional.
+Native binding no longer needs a nominal tuple carrier. Legacy CLI Tuple types
+remain for existing consumers.
 
-Development follow-up (2026-10-15): exact native callbacks can return a structural union value; the executable callback sample returns 42. All four source libraries now generate, with full bundle execution still requiring qualification.
+Structural unions support both value and reference alternatives, including scoped
+nominal constituents such as `Response<T> | HttpError | JsonError`. Tested task
+consumers deliver all alternatives with `Response` and `Response<int>`; a generic
+method with `Response<T>` also executes. Copying a reference payload preserves its
+object identity. Arrays retain their structural runtime shape and nominal
+`Array<T>` representation.
 
-Development qualification (2026-10-15): a consumer now compiles and executes HTTP-header checks against the fresh Runtime/Data/Networking/Web bundle. Focused checks cover structural arguments in nominal value wrappers and generic callback substitution; this does not establish all endpoint or backend combinations.
+This native work currently executes in the interpreter and requires matching
+feature-branch artifacts. Efficient AOT/JIT representation is still being developed;
+the temporary boxed union storage is not the intended final performance model.
+Bare generic-parameter union alternatives and unrestricted combinations remain
+incomplete.
 
-Development qualification (2026-10-15): a fresh-bundle sample awaits `Task<Result<Response, HttpError | JsonError>>` through completed and queued tasks, checking success and both imported error alternatives. Native union extraction from the nominal result carrier is validated; whole-union boxing and final native layout remain incomplete.
-
-Development qualification (2026-10-15): direct `Task<Response | HttpError | JsonError>` and closed `Task<Response<int> | HttpError | JsonError>` samples now execute all alternatives through completed, queued and async-forwarded tasks. A follow-up now supports scoped parameters inside nominal constituents: a generic `Response<T> | HttpError | JsonError` method executes with `T = int`. Bare parameter alternatives and native AOT/JIT representation remain incomplete.
+[Structural families](../../docs/structural-types.html) ·
+[Tuple contract](../../docs/tuples.html) · [Union contract](../../docs/unions.html) ·
+[Intersection contract](../../docs/intersections.html)

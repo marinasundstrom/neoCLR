@@ -25,6 +25,19 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-15 — Structural integration quality gate
+
+- **Author:** directs keeping structural-type website pages current, then working
+  toward integration into neoCLR main and Raven's neoCLR track. Explicitly rejects
+  half-completed or inefficient integration and requests separate commits per slice.
+- **Assistant:** treats AOT/JIT execution, correct managed-reference tracing, value
+  layout costs, metadata/reflection and compiler interoperability as integration
+  obligations. Interpreter success alone is insufficient evidence for integration.
+- **Action:** refreshes website descriptions of data composition, structural value
+  semantics, explicit nominal intersection conformance and Array<T> representation.
+  Native backend qualification and implementation remain in progress; no merge or
+  publication is claimed.
+
 ## 2026-10-14 — Structural tuples replace nominal tuple direction
 
 - **Author:** “Let's continue with structural tuples, which means that we will have

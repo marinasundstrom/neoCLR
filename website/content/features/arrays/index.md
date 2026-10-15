@@ -2,6 +2,11 @@
 
 An array is fixed-size managed storage. Assigning it shares the same array; changing an element is visible through its aliases. neoCLR keeps these familiar .NET behaviors while giving arrays a generic API shape and invariant element types.
 
+Arrays have a structural runtime shape and a nominal `Array<T>` representation.
+Both describe the same intrinsic array; `Array<T>` does not wrap or copy it.
+[Structural type families](../../docs/structural-types.html) explain how this differs
+from tuples, unions, intersections and functions.
+
 <a id="example"></a>
 
 ## Array aliasing and copying

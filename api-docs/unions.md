@@ -1,7 +1,8 @@
 # Union
 
 Raven supports named nominal unions and ad-hoc unions written as type expressions.
-A native structural union representation remains a separate design direction.
+The native feature-branch profile represents ad-hoc unions directly in metadata;
+legacy CLI profiles retain nominal carriers.
 
 ## Nominal unions
 
@@ -50,24 +51,55 @@ for an inactive default carrier. Prefer typed patterns over boxed inspection.
 
 This is a temporary bridge, not native structural identity, normalization,
 order-independent equality or union introspection construction. The two-to-five
-arity bound belongs to the bridge, not the intended platform semantics. Native
-structural union metadata and value operations will replace the carrier encoding;
+arity bound belongs to the bridge, not the intended platform semantics. The native feature-branch profile replaces this carrier encoding with structural
+signatures;
 consumers must use matching compiler/library artifacts and rebuild when that
 representation changes. No structural union type is being advertised as shipped.
 
 [All structural families](structural-types.md)
 
 
-## Branch-only reference experiment
+<a id="branch-only-reference-experiment"></a>
 
-The unpublished `codex/structural-union-intersection` branch admits neoIL
-`union<A,B>` and `intersection<A,B>` behind the `experimental-compositions` build
-feature. It supports reference locals, free-function parameters/results, checked
-casts and guaranteed interface dispatch in the interpreter. This is not Raven
-source support or a replacement for published union carriers. There are no public
-compound reflection constructors or members to enumerate yet.
+## Native structural unions
 
-Fields, generics, byrefs, arrays, boxed/intrinsic reference values and JIT/AOT remain
-unsupported. Typed nulls follow ordinary reference behavior; non-null membership
-preserves the same class allocation. These are experiment limits, not permanent
-platform contracts.
+A structural union is a value type whose signature lists its alternatives. The
+alternatives may themselves be values or references. Copying a reference alternative
+preserves the referenced object's identity. The union has no nominal declaration
+or base type, and does not acquire members through nominal inheritance.
+
+For example, the tested native task consumers use:
+
+```raven
+func Echo<T>(value: Response<T> | HttpError | JsonError) -> Response<T> | HttpError | JsonError {
+    return value
+}
+```
+
+The generic method executes with `T = int`. Separate consumers deliver all three
+alternatives through `Task<Response | HttpError | JsonError>` and
+`Task<Response<int> | HttpError | JsonError>`, including completed, queued and
+async-forwarded paths. These are useful data-composition types; their use is not
+restricted to API results.
+
+Identity ignores alternative order and duplicates. Exact value alternatives use
+checked boxing/extraction in the current interpreter; exact reference alternatives
+use checked casts. Conversion to one alternative is explicit unless every possible
+alternative already satisfies the target. This is membership in existing types,
+not implicit implementation of an interface or synthesis of a nominal union.
+
+`UnionTypeInfo.Types: Sequence<TypeInfo>` exposes a constituent snapshot.
+`TypeInfo.IsUnion` identifies structural unions; use
+`NominalTypeInfo.IsUnionDeclaration` for named Raven union declarations.
+`IsValueType` is true even when every alternative is a reference.
+
+Native projects select structural capabilities through their Runtime Contract.
+Supported paths include scoped nominal generic constituents, value wrappers,
+locals, parameters/results, direct ref/out slots and bounded callbacks. Bare `T`
+alternatives, directly captured union locals, whole-union boxing identity and
+AOT/JIT layout remain incomplete. The interpreter's boxed value-payload storage is
+provisional and is not an efficiency claim or the final ABI.
+
+The runtime branch is `codex/structural-union-intersection`, paired with Raven's
+`codex/neoclr-union-intersection`. See the
+[tested consumers and evidence](https://github.com/marinasundstrom/neoCLR/tree/codex/structural-union-intersection/docs/experiments/value-unions).

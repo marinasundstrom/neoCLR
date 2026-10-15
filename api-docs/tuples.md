@@ -2,7 +2,8 @@
 
 The experimental native profile binds and emits Raven tuples as structural
 signatures, with native names, value copies and `TupleTypeInfo` introspection.
-It requires explicit compiler/runtime opt-in; see the native binding contract below.
+Native project profiles enable this capability with matching compiler/runtime
+artifacts; compiler-host APIs retain explicit capability switches.
 
 The legacy CLI bridge still uses nominal generic `System.Tuple<T1,...,TN>` value
 declarations for one through seven components. These remain nominal in introspection
@@ -43,8 +44,9 @@ copies the value's fields. Member details are generated from the matching refere
 - [Tuple&lt;T1, T2, T3, T4, T5, T6&gt;](xref:System.Tuple`6)
 - [Tuple&lt;T1, T2, T3, T4, T5, T6, T7&gt;](xref:System.Tuple`7)
 
-Future structural tuple identity and construction through introspection need their
-own contracts. Function's Object inheritance does not decide tuple inheritance.
+Structural identity is ordered and positional; names are retained per signature
+without changing compatibility. General guest construction through introspection
+remains incomplete. Function's Object inheritance does not decide tuple inheritance.
 
 [All structural families](structural-types.md)
 
@@ -67,8 +69,8 @@ managed element addresses and default initialization preserve value copying and
 reference-element identity. Invalid element types, positions and stores fault.
 JIT/AOT and native layout remain unsupported. Open, byref, pointer, array, function
 and composition direct elements are not admitted in this bounded slice. Existing nominal
-Tuple APIs remain available during migration; their removal is planned. No new Raven
-source syntax, CLI tuple projection or guest reflection member is shipped here.
+Tuple APIs remain available during migration; their removal is planned. Raven native source binding and guest element descriptors are described below;
+CLI tuple projection does not represent this structural identity.
 
 ## Resolved host tuple descriptors (development)
 
@@ -109,10 +111,10 @@ There is no public constructor. The runtime selects this provider when a type ha
 contains an admitted structural tuple signature. The same arity, closedness and
 element-admission limits apply as for tuple execution. Unsupported signatures fault.
 Nominal `System.Tuple<T...>` descriptors do not implement this interface. Synthesized
-field/constructor introspection, nominal module ownership, native layout and general
+field/constructor introspection, nominal module ownership, native layout and unrestricted
 Raven tuple emission remain incomplete. Do not infer those APIs from ElementTypes.
 
-The executable [Raven consumer](../docs/experiments/structural-tuples/TypeInfo.rvn)
+The executable [Raven consumer](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-tuples/TypeInfo.rvn)
 checks ordered duplicates, nested names, value classification, equal renamed types and
 repeated snapshot queries. A documented test fixture substitutes two native tokens;
 this validates guest introspection, not compiler tuple lowering.
