@@ -171,3 +171,11 @@ it must not silently become a cast of the payload to Object. Native union descri
 reflection, array elements, broader JIT/collector qualification and full Task application
 qualification remain open. These are implementation gaps, not restrictions on the
 union type's intended value/reference alternatives.
+
+The fresh v4 Runtime/Data/Networking/Web bundle also passes this consumer in AOT
+and managed JIT (32 invocations per eager/paced collector policy in each backend).
+Each policy reclaims all 64 explicit allocations and leaves no roots or heap objects;
+the synchronous JIT host completes cleanup before generated code is released. AOT
+hosts run with undefined/bounds sanitizers; the JIT hosts are not sanitizer-instrumented.
+This qualifies bounded synchronous callable-union ownership, not escaped callbacks
+or async retention. [Reproduction and evidence](../docs/experiments/native-structural-types/callable-import-project/README.md).

@@ -446,5 +446,6 @@ Interpreter and AOT agree; eager/paced native collection passes 32 invocations p
 mode with exactly the explicit Cell/callable allocations and full reclamation.
 The fix aligns host metadata function import/type-test admission and enables typed
 callable patterns only when the target advertises function-value support. The
-ordinary .NET default is unchanged. JIT lifetime and a fresh library bundle remain
-separate integration gates.
+ordinary .NET default is unchanged. The fresh v4 bundle now also passes 32 entries
+per eager/paced policy in both AOT and managed JIT, with complete cleanup before
+JIT code release; see the linked consumer evidence. Async retention remains open.

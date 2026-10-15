@@ -260,3 +260,11 @@ Raven's corresponding [lowering and pattern map](https://github.com/marinasundst
 records the frontend path separately. Runtime instruction snippets here are
 illustrations derived from the linked implementation/tests, not standalone sample
 files or an assertion that every combination has been validated.
+
+The fresh v4 Runtime/Data/Networking/Web bundle also passes this consumer in AOT
+and managed JIT (32 invocations per eager/paced collector policy in each backend).
+Each policy reclaims all 64 explicit allocations and leaves no roots or heap objects;
+the synchronous JIT host completes cleanup before generated code is released. AOT
+hosts run with undefined/bounds sanitizers; the JIT hosts are not sanitizer-instrumented.
+This qualifies bounded synchronous callable-union ownership, not escaped callbacks
+or async retention. [Reproduction and evidence](experiments/native-structural-types/callable-import-project/README.md).
