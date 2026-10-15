@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Add checked native reserved arrays for structural tuple, union and intersection elements, reusing inline snapshot storage and initialization checks without element boxing. Default allocation, element borrows and nominal array views remain gated; collection retains the existing conservative array scan.
+
 - Admit closed structural generic arguments in native specialization and inline tuple fields in nominal records, retaining recursive layout bounds. Qualify scalar-union, tuple and intersection generic method transport; native Task union delivery still requires structural array support.
 
 - Import function union constituents recursively into consumer ownership and admit function type-test emission. Qualify an artifact-only Raven callable/scalar union consumer with typed patterns and invocation: interpreter/AOT agree, and 32 entries per eager/paced collector mode allocate/reclaim only the explicit Cell and callable descriptors. Retain reproducible evidence. The fresh v4 library bundle also passes AOT and managed JIT under both collector policies, with cleanup before JIT code release; escaped callbacks and async retention remain unqualified.

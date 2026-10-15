@@ -11,6 +11,7 @@ enum Trace {
     CallableArray,
     ReferenceArray(usize),
     RecordArray(usize),
+    StructuralArray(neoclr::metadata::Type),
     ScalarArray(neoclr::metadata::Type),
     Object(usize),
     Interface(usize),
@@ -33,6 +34,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         Ty::CallableArray(_) => Trace::CallableArray,
         Ty::ReferenceArray(i) => Trace::ReferenceArray(*i),
         Ty::RecordArray(i) => Trace::RecordArray(*i),
+        Ty::StructuralArray(t) => Trace::StructuralArray(t.clone()),
         Ty::ScalarArray(t) => Trace::ScalarArray(t.clone()),
         Ty::Literal | Ty::Character => Trace::Text,
         Ty::Reference(i) if p.is_array_backing(*i) => {
@@ -140,6 +142,7 @@ fn encode(slots: Vec<Slot>) -> Vec<Value> {
         let recipe = match slot.trace {
             Trace::ReferenceArray(i) => json!({"kind": "reference-array", "typeIndex": i, "elements": "initialized-strong-reference-slots"}),
             Trace::RecordArray(i) => json!({"kind": "record-array", "typeIndex": i, "elements": "initialized-value-snapshots"}),
+            Trace::StructuralArray(t) => json!({"kind": "structural-array", "elementType": t, "elements": "initialized-value-snapshots"}),
             Trace::ScalarArray(t) => json!({"kind": "scalar-array", "elementType": t, "elements": "atomic-initialized-scalars"}),
             Trace::CallableArray => json!({"kind": "callable-array", "elements": "initialized-callback-slots"}),
             Trace::Callable => json!({"kind": "callable", "receiver": "strong-heap-owner"}),

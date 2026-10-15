@@ -179,3 +179,9 @@ the synchronous JIT host completes cleanup before generated code is released. AO
 hosts run with undefined/bounds sanitizers; the JIT hosts are not sanitizer-instrumented.
 This qualifies bounded synchronous callable-union ownership, not escaped callbacks
 or async retention. [Reproduction and evidence](../docs/experiments/native-structural-types/callable-import-project/README.md).
+
+Development native checked reservation now supports admitted structural union array
+elements as inline snapshots, with indexed copy/replacement and initialization checks.
+Default array allocation, borrowed element access and nominal array views remain
+unqualified. Collection currently uses the existing conservative record-array scan;
+see [storage details](../docs/experiments/native-structural-types/README.md).

@@ -275,3 +275,10 @@ storage-family gates: arrays of unions and direct union/intersection fields in v
 records remain unsupported. In particular, fresh native Task union compilation
 currently stops at a specialized `ArrayRef(Union(...))`; interpreter Task success
 must not be read as native application qualification.
+
+Native checked reserved arrays now admit supported structural elements without a
+nominal element carrier. Indexed stores publish initialization after the whole value
+is copied; loads reject null, out-of-range and unwritten slots. Native ordinary
+default allocation, element borrows and nominal Array<T> views remain gated.
+The collector reuses conservative initialized-snapshot scanning, not precise
+per-alternative tracing. See the native structural experiment for qualification.

@@ -12025,7 +12025,13 @@ fn verify_structural_union_gc(cases: &[(&str, i32)], expected_allocations: u64) 
         if expected_status == 0 {
             assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42));
         } else {
-            assert_eq!(reference.unwrap_err().code, neoclr::FaultCode::InvalidCast);
+            let expected = match expected_status {
+                3 => neoclr::FaultCode::RuntimeError,
+                8 => neoclr::FaultCode::IndexOutOfRange,
+                11 => neoclr::FaultCode::InvalidCast,
+                _ => panic!("unexpected native status {expected_status}"),
+            };
+            assert_eq!(reference.unwrap_err().code, expected);
         }
         for paced in [false, true] {
             let dir = Temp::new();
@@ -12122,4 +12128,85 @@ fn structural_callable_union_roots_survive_native_collection() {
         ],
         656,
     );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_reserved_arrays_retain_callable_receivers() {
+    let prefix = include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
+        .split(".function Pressure").next().unwrap();
+    let source = format!("{prefix}{}", r#"
+.function MakeArray() -> arrayref<union<fn<Int32>,Int32>>
+.local arrayref<union<fn<Int32>,Int32>> items
+ldc.i4 1
+array.reserve union<fn<Int32>,Int32>
+stloc items
+ldloc items
+ldc.i4 0
+call Make()
+stelem union<fn<Int32>,Int32>
+ldloc items
+ret
+.end
+.function Pressure(arrayref<union<fn<Int32>,Int32>> items) -> union<fn<Int32>,Int32>
+.local Int32 remaining
+ldc.i4 80
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldarg items
+ldc.i4 0
+ldelem union<fn<Int32>,Int32>
+ret
+.end
+.function Calculate() -> Int32
+.local union<fn<Int32>,Int32> value
+call MakeArray()
+call Pressure(arrayref<union<fn<Int32>,Int32>>)
+stloc value
+ldloc value
+castclass fn<Int32>
+call instance fn<Int32>::Invoke()
+ret
+.end
+"#);
+    let uninitialized = source.replace("stelem union<fn<Int32>,Int32>", "pop\npop\npop");
+    let outside = source.replace("ldarg items\nldc.i4 0\nldelem", "ldarg items\nldc.i4 1\nldelem");
+    verify_structural_union_gc(&[(&source, 0), (&uninitialized, 3), (&outside, 8)], 664);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_reserved_arrays_copy_initialized_tuple_and_scalar_elements() {
+    for (shape, make, extract) in [
+        ("tuple<Int32,Int64>", "ldc.i4 42\nldc.i8 99\nnewobj tuple<Int32,Int64>", "ldfld 0"),
+        ("union<Int32,Int64>", "ldc.i4 42\nbox Int32\ncastclass union<Int32,Int64>", "stloc value\nldloc value\nunbox.any Int32"),
+        ("intersection<View,Marker>", "ldloca value\ninitobj intersection<View,Marker>\nldloc value", "ref.isnull\nbrfalse Bad\nldc.i4 42\nret\nBad:\nldc.i4 -1"),
+    ] {
+        let source = format!(".module StructuralArrays\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.function Calculate() -> Int32\n.local arrayref<{shape}> items\n.local {shape} value\n.local Int32 remaining\nldc.i4 1\narray.reserve {shape}\nstloc items\nldloc items\nldc.i4 0\n{make}\nstelem {shape}\nldc.i4 80\nstloc remaining\nLoop:\nldc.i4 128\nnewarr Byte\npop\nldloc remaining\nldc.i4 1\nsub\nstloc remaining\nldloc remaining\nbrtrue Loop\nldloc items\nldc.i4 0\nldelem {shape}\n{extract}\nret\n.end");
+        verify_structural_union_gc(&[(&source, 0)], 648);
+    }
+}
+
+#[test]
+fn structural_arrays_reject_default_allocation_and_element_borrows() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for shape in ["tuple<Int32,Int64>", "union<Int32,Int64>"] {
+        for body in [format!("ldc.i4 1\nnewarr {shape}\npop"), format!("ldc.i4 1\narray.reserve {shape}\nldc.i4 0\nldelema {shape}\npop")] {
+            let source = format!(".module InvalidStructuralArray\n.function Calculate() -> Int32\n{body}\nldc.i4 0\nret\n.end");
+            let dir = Temp::new();
+            let result = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+            assert!(!result.status.success());
+            assert!(!dir.0.join("app.o").exists());
+            assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+        }
+    }
 }

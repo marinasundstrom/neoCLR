@@ -894,7 +894,7 @@ fn retained_types(
             {
                 ()
             }
-            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => {
+            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
                 pending_types.push(*t)
             }
             Type::ArrayRef(t) if *t == Type::Byte => {

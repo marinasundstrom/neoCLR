@@ -129,7 +129,7 @@ impl Specializer<'_> {
             Type::ArrayRef(t)
                 if matches!(
                     **t,
-                    Type::Function(_) | Type::Named(_) | Type::Constructed { .. }
+                    Type::Function(_) | Type::Named(_) | Type::Constructed { .. } | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
                 ) =>
             {
                 let lowered = self.lower(t)?;

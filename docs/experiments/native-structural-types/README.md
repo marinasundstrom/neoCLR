@@ -473,3 +473,31 @@ passes the reference-view modes with and without the required nominal conformanc
 `specialization_rejects_unsupported_shapes_and_preserves_verification` and
 `inline_layout_boundary_is_admitted_and_overflow_rejected` pass, including the new
 cycle through a tuple field. These checks do not qualify structural arrays.
+
+### Reserved structural array storage (2026-10-15)
+
+The native backend reuses checked snapshot arrays for admitted tuple, union and
+intersection elements. `array.reserve`, indexed copies, replacement, length and
+null tests use the established record-array allocator and initialization markers.
+No nominal element carrier or per-element box is introduced. Default `newarr`,
+element borrows and nominal Array<T>/interface projections remain separate gates.
+
+As with existing record arrays, the current nonmoving collector conservatively
+scans initialized eight-byte lanes. This retains embedded references and callable
+receivers, but address-like numeric bits can retain unrelated objects; it is not
+precise tracing or a compact union representation. The existing 256-lane element,
+65,536-element and host heap limits remain in effect. Relative to .NET arrays,
+reads still copy inline values; checked reservation deliberately rejects unwritten
+slots rather than providing a default value. See [array storage research and ABI](../aot-console/record-arrays.md).
+
+All 12 focused native structural console tests pass, including eager/paced
+sanitizer-backed array collection. Callable union arrays retain their receiver with
+no other live payload owner, then reclaim all 664 explicit allocations per policy
+across eight invocations. Unwritten and out-of-range reads agree with the interpreter
+and clean up roots after faults. Tuple/scalar-union/intersection array cases reclaim
+648 allocations per policy; default allocation and element borrows are rejected.
+
+The fresh Task union consumer now passes structural-array selection and reaches the
+next gate: the specialized nominal `TaskOutcome<T>.Completed` record contains a
+structural union field, which the native record profile rejects. Full Task AOT/JIT
+execution remains unqualified.

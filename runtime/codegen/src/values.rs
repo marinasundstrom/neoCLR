@@ -1410,7 +1410,7 @@ pub(crate) fn compile_into(
         && input.functions.iter().any(|f| {
             f.body
                 .iter()
-                .any(|op| matches!(op, Op::ReserveArray(neoclr::metadata::Type::Named(_))))
+                .any(|op| matches!(op, Op::ReserveArray(neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::Tuple(_) | neoclr::metadata::Type::Union(_) | neoclr::metadata::Type::Intersection(_))))
         }) {
         let mut sig = module.make_signature();
         sig.params
@@ -3200,7 +3200,7 @@ pub(crate) fn compile_into(
                         }
                         stack.push(array);
                     }
-                    Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
+                    Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::Tuple(_) | neoclr::metadata::Type::Union(_) | neoclr::metadata::Type::Intersection(_)) => {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                         let output = b.ins().stack_addr(types::I64, call_result, 0);
@@ -3299,7 +3299,7 @@ pub(crate) fn compile_into(
                         stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
                     }
                     Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                        if matches!(t, neoclr::metadata::Type::Named(_))
+                        if matches!(t, neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::Tuple(_) | neoclr::metadata::Type::Union(_) | neoclr::metadata::Type::Intersection(_))
                             || crate::selection::scalar_array_element(t) =>
                     {
                         let ty = p.ty(t)?;

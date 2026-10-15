@@ -37,6 +37,7 @@ pub(super) enum Ty {
     Double,
     Single,
     ReferenceArray(usize), // Default-null or reserved slots retaining nominal object identity.
+    StructuralArray(Type), // Checked snapshots of signature-native value/view storage.
     RecordArray(usize),    // Checked reserved snapshots of a closed value record.
     ScalarArray(Type),     // Atomic one-lane slots; exact element identity retained.
     CallableArray(Type),   // Initialized/reserved pointer slots of one exact Function shape.
@@ -219,7 +220,7 @@ impl<'a> Profile<'a> {
                     f.deferred
                         || !(matches!(f.ty, Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_) | Type::Tuple(_))
                             || (references && matches!(&f.ty, Type::Function(_)))
-                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
                 return Err(format!("{}: value profile requires supported closed records (inline values have at most sixteen fields)", t.name).into());
@@ -736,6 +737,13 @@ impl<'a> Profile<'a> {
                 self.ty(t)?;
                 Ty::CallableArray(t.as_ref().clone())
             }
+            Type::ArrayRef(t) if self.references && matches!(**t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+                let element = self.ty(t)?;
+                if self.lanes(&element) > crate::limits::INLINE_LANES {
+                    return Err("structural array element exceeds flattened inline lane limit".into());
+                }
+                Ty::StructuralArray(t.as_ref().clone())
+            }
             Type::ArrayRef(t) if self.references && matches!(**t, Type::Named(_)) => {
                 match self.ty(t)? {
                     Ty::Record(index) => Ty::RecordArray(index),
@@ -832,6 +840,7 @@ impl<'a> Profile<'a> {
             Ty::ScalarArray(_)
             | Ty::ReferenceArray(_)
             | Ty::RecordArray(_)
+            | Ty::StructuralArray(_)
             | Ty::CallableArray(_)
             | Ty::Callable(_)
             | Ty::Literal
@@ -1587,6 +1596,11 @@ impl<'a> Profile<'a> {
                 {
                     ()
                 }
+                Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
+                    if self.references && matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                {
+                    self.ty(&Type::ArrayRef(Box::new(t.clone())))?;
+                }
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
@@ -1915,6 +1929,7 @@ impl<'a> Profile<'a> {
                             | Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)
                             | Ty::RecordArray(_)
+                            | Ty::StructuralArray(_)
                             | Ty::Callable(_)
                             | Ty::CallableArray(_)
                             | Ty::Literal
@@ -1960,19 +1975,23 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
+                Op::ReserveArray(t) if matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
+                }
                 Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, Type::Named(_)) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
                 Op::ArrayElement(t)
-                    if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) =>
+                    if matches!(t, Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
                     stack.push(Self::stack_type(&self.ty(t)?));
                 }
                 Op::StoreArrayElement(t)
-                    if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) =>
+                    if matches!(t, Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &self.ty(t)?)?;
                     take(&mut stack, &Ty::Int)?;
@@ -2022,6 +2041,7 @@ impl<'a> Profile<'a> {
                         Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)
                             | Ty::RecordArray(_)
+                            | Ty::StructuralArray(_)
                             | Ty::CallableArray(_)
                             | Ty::ByteArray
                             | Ty::CharacterArray
