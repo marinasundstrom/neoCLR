@@ -840,7 +840,8 @@ fn retained_types(
     while let Some(ty) = pending_types.pop() {
         match ty {
             Type::Tuple(parts) => pending_types.extend(parts.iter().cloned()),
-            Type::Union(_) | Type::Intersection(_) => {
+            Type::Intersection(parts) => pending_types.extend(parts),
+            Type::Union(_) => {
                 return Err(
                     "compound reference signatures are interpreter-only in this experiment".into(),
                 );

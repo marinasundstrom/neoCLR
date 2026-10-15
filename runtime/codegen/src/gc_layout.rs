@@ -14,6 +14,7 @@ enum Trace {
     ScalarArray(neoclr::metadata::Type),
     Object(usize),
     Interface(usize),
+    Intersection,
     ByteArray,
     StringArray,
     ByteValues,
@@ -42,6 +43,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         }
         Ty::Reference(i) => Trace::Object(*i),
         Ty::Interface(i) => Trace::Interface(*i),
+        Ty::Intersection(_) => Trace::Intersection,
         Ty::ByteArray => Trace::ByteArray,
         Ty::StringArray | Ty::CharacterArray | Ty::CharacterValues => Trace::StringArray,
         Ty::ByteValues => Trace::ByteValues,
@@ -124,6 +126,7 @@ fn encode(slots: Vec<Slot>) -> Vec<Value> {
             Trace::Callable => json!({"kind": "callable", "receiver": "strong-heap-owner"}),
             Trace::Text => json!({"kind": "text", "storage": "image-or-arena"}),
             Trace::Object(i) => json!({"kind": "object-view", "typeIndex": i, "stringTagMask": 1}),
+            Trace::Intersection => json!({"kind": "intersection-view", "stringTagMask": 1}),
             Trace::Interface(i) => json!({"kind": "interface-view", "typeIndex": i, "stringTagMask": 1}),
             Trace::ByteArray => json!({"kind": "byte-array"}),
             Trace::StringArray => json!({"kind": "string-array", "elements": "initialized-text-slots"}),
@@ -223,6 +226,23 @@ mod tests {
             }]
         );
     }
+    #[test]
+    fn intersection_views_use_one_strong_reference_slot() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::Intersection(vec![Ty::Interface(0), Ty::Interface(1)]);
+        assert_eq!(p.lanes(&ty), 1);
+        assert_eq!(p.bytes(&ty), 8);
+        assert_eq!(seed_lanes(&p, &ty), vec![0]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 0,
+                trace: Trace::Intersection
+            }]
+        );
+    }
+
     #[test]
     fn structural_tuple_tracing_preserves_nested_offsets_and_excludes_numeric_lanes() {
         let module = module();

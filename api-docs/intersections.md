@@ -38,7 +38,14 @@ Public construction of arbitrary guest intersection descriptors is not available
 Native source, metadata and interpreter support live on
 `codex/structural-union-intersection` and Raven's paired
 `codex/neoclr-union-intersection` branch. Matching compiler/runtime libraries are
-required. AOT/JIT representation remains an integration requirement; interpreter
-success does not imply native backend support. No published release is claimed.
+required. The native backend now supports bounded reference views, with macOS ARM64
+AOT checks for interface conjunctions, extendable class/interface bounds, identity,
+nulls, managed output slots and explicit interface dispatch. Missing conformance
+produces the same InvalidCast diagnostic as interpretation. Views use one reference
+slot and allocate no carrier. Final-class bounds remain rejected.
+
+Native descriptor reflection, managed collector stress, dedicated intersection JIT
+execution and compiler-produced application qualification remain integration work.
+No published release is claimed.
 
 [All structural families](structural-types.md) · [Union](unions.md)

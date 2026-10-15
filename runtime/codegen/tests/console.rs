@@ -1117,9 +1117,39 @@ int main(int argc, char **argv) {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn interface_views_preserve_identity_nulls_and_invalid_cast_faults() {
+    verify_reference_views(include_str!(
+        "../../../docs/experiments/aot-console/interface-views.neoil"
+    ));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_intersection_views_require_every_nominal_bound() {
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil");
+    verify_reference_views(source);
+    // Matching one interface is insufficient; remove the second explicit conformance.
+    verify_reference_views(&source.replace(".implements Marker\n", ""));
+    let class_bound = source.replace("intersection<View,Marker>", "intersection<Cell,View>");
+    verify_reference_views(&class_bound);
+    let final_bound = class_bound.replace(".type class Cell\n", ".type class Cell\n.sealed\n");
     let dir = Temp::new();
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
-    let source = include_str!("../../../docs/experiments/aot-console/interface-views.neoil");
+    let denied = compile_source(
+        &dir,
+        &seed,
+        &final_bound,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(!denied.status.success());
+    assert!(!dir.0.join("app.o").exists());
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn verify_reference_views(source: &str) {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let denied = compile_source(&dir, &seed, source, &["--compile-system"], false);
     assert!(!denied.status.success() && !dir.0.join("app.o").exists());
     let r = compile_source(
@@ -1142,7 +1172,7 @@ int main(int argc, char **argv) {
     int32_t result=-99;
     int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
     if (status) {
-        if (status!=3 || result!=-99 || ctx.fault.code!=3) return 92;
+        if ((status!=3 && status!=11) || result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
         neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
     }
     printf("%d\n",result);return 0;

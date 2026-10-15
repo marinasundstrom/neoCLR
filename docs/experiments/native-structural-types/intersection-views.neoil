@@ -1,0 +1,142 @@
+.module IntersectionViews
+.interface Marker
+.end
+.interface View
+.method instance Get() -> Int32
+.end
+.end
+.interface OtherView
+.end
+.type class Cell
+.method instance Get() -> Int32
+ldarg this
+ldfld Cell::Value
+ret
+.end
+.implements View
+.implements Marker
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg 0
+ldarg value
+stfld 0
+ret
+.end
+.end
+.type class Other
+.implements OtherView
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+.function Copy(intersection<View,Marker> input, out intersection<View,Marker>& output) -> Void
+ldarg output
+ldarg input
+stobj intersection<View,Marker>
+ldvoid
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Cell cell
+.local intersection<View,Marker> view
+.local intersection<View,Marker> copy
+.local Other other
+ldarg mode
+ldc.i4 2
+beq Null
+ldarg mode
+ldc.i4 6
+beq NullClass
+ldc.i4 42
+newobj.ctor instance Cell::.ctor(Int32)
+stloc cell
+ldloc cell
+castclass intersection<View,Marker>
+stloc view
+ldarg mode
+ldc.i4 1
+beq Invalid
+ldarg mode
+ldc.i4 3
+beq InvalidView
+ldarg mode
+ldc.i4 4
+beq Missing
+ldarg mode
+ldc.i4 5
+beq Alias
+ldarg mode
+ldc.i4 7
+beq Same
+; A mismatched isinst must return null.
+ldloc view
+isinst Other
+ref.isnull
+brfalse Wrong
+ldloc view
+isinst OtherView
+ref.isnull
+brfalse Wrong
+ldloc view
+callvirt instance View::Get()
+ret
+Invalid:
+ldloc view
+castclass Other
+pop
+br Wrong
+InvalidView:
+newobj.ctor instance Other::.ctor()
+castclass intersection<View,Marker>
+pop
+br Wrong
+Missing:
+newobj.ctor instance Other::.ctor()
+isinst intersection<View,Marker>
+ref.isnull
+brtrue Yes
+br Wrong
+Alias:
+ldloc view
+ldloca copy
+call Copy(intersection<View,Marker>, intersection<View,Marker>&)
+pop
+ldloc view
+ldloc copy
+ref.eq
+brfalse Wrong
+ldloc copy
+castclass Cell
+ldc.i4 99
+stfld Cell::Value
+ldloc cell
+ldfld Cell::Value
+ret
+Same:
+ldloc cell
+isinst Cell
+ldfld Cell::Value
+ret
+Null:
+ldloca view
+initobj intersection<View,Marker>
+ldloc view
+castclass Other
+ref.isnull
+brtrue Yes
+br Wrong
+NullClass:
+ldloca cell
+initobj Cell
+ldloc cell
+isinst intersection<View,Marker>
+ref.isnull
+brtrue Yes
+br Wrong
+Yes:
+ldc.i4 1
+ret
+Wrong:
+ldc.i4 -1
+ret
+.end

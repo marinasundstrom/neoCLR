@@ -65,4 +65,24 @@ cargo test --release -p neoclr-codegen --lib structural_tuple_jit_costs \
 This explicit ignored performance test owns JIT code until synchronous invocation
 finishes, then frees it. It validates direct backend construction, copying and
 calls; the full managed host, reference-bearing tuples and collector stress remain
-unqualified. Native unions and intersections remain the next backend obligations.
+unqualified. Native intersections progress in the following slice; native unions remain a backend obligation.
+
+## Native intersection reference views
+
+The next backend slice preserves intersections as one checked reference slot.
+Selection/specialization retain the complete bounds. Static assignment requires
+all expected bounds; dynamic casts accept only concrete classes satisfying every
+bound through explicit nominal conformance. Interface dispatch projects a guaranteed
+nominal view. No member-name matching or carrier allocation is introduced. This
+extends CLR-style explicit interface reference views with a conjunction signature;
+it does not introduce a trait implementation model.
+
+`intersection-views.neoil` and the focused console test compare AOT and interpreter
+results/diagnostics across eight modes, including nulls, identity, interface calls,
+managed output slots, missing interfaces and unrelated casts. The test repeats with
+the second implementation removed, and with an extendable class/interface bound.
+A closed-to-extension class bound is rejected before emitting an object file.
+Tracing recipes retain one strong reference; collector-stress and dedicated JIT
+intersection execution still need qualification. The failed-cast path uses native
+InvalidCast status 11 and its standard message; legacy nominal cast behavior stays
+unchanged. Native structural union storage remains unsupported.

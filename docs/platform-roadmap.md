@@ -11,7 +11,9 @@ constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
 Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and
 256-slot boundary checks; see [native tuple progress](structural-tuples.md#native-inline-storage--2026-10-15). The consolidated
 acceptance runner records the exact tested artifacts. This author-directed
-experiment does not change the active performance milestone.
+experiment does not change the active performance milestone. Bounded intersection
+reference views now have AOT/interpreter differential checks; native union storage,
+managed stress and complete application qualification still block integration.
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass
 and instance predicates share runtime semantics across interpreter/JIT/AOT. The

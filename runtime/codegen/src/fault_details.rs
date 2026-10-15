@@ -1071,7 +1071,7 @@ pub struct Data {
     frames: Vec<DataId>,
     frame_table: Option<DataId>,
     messages: HashMap<(usize, usize), DataId>,
-    defaults: [DataId; 9],
+    defaults: [DataId; 10],
 }
 fn literal(module: &mut impl Module, name: &str, text: &str) -> Result<DataId, Error> {
     let id = module.declare_data(name, Linkage::Local, false, false)?;
@@ -1183,6 +1183,11 @@ impl Data {
                     .standard_message()
                     .unwrap(),
             )?,
+            literal(
+                module,
+                "fault_invalid_cast",
+                neoclr::FaultCode::InvalidCast.standard_message().unwrap(),
+            )?,
         ];
         Ok(Self {
             hidden_frames: options.class_dispatch_thunks.clone(),
@@ -1233,7 +1238,7 @@ pub struct Site {
     context: ir::Value,
     frame: ir::Value,
     pc: usize,
-    defaults: [ir::Value; 9],
+    defaults: [ir::Value; 10],
     pub message: Option<ir::Value>,
     pub capture_frame: bool,
 }
@@ -1267,7 +1272,9 @@ impl Site {
             let stack = b.ins().icmp_imm(IntCC::Equal, status, 9);
             let message = b.ins().select(stack, self.defaults[7], message);
             let intern = b.ins().icmp_imm(IntCC::Equal, status, 10);
-            b.ins().select(intern, self.defaults[8], message)
+            let message = b.ins().select(intern, self.defaults[8], message);
+            let invalid_cast = b.ins().icmp_imm(IntCC::Equal, status, 11);
+            b.ins().select(invalid_cast, self.defaults[9], message)
         };
         b.ins().store(MemFlags::new(), status, self.context, 0);
         b.ins().store(MemFlags::new(), message, self.context, 8);

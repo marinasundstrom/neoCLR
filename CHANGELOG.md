@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Add bounded native intersection reference views with all-bound nominal conformance, checked casts, interface dispatch and one-slot tracing. AOT/interpreter checks cover identity, nulls, managed output slots, missing bounds and extendable class bounds; final classes remain rejected. Emit the matching InvalidCast diagnostic for failed intersections and supply its standard native message. Native unions and broader integration qualification remain open.
+
 - Qualify direct JIT structural tuple calls and copies against nominal records using an explicit optimized performance test, with synchronous code ownership and saved raw measurements. Pair and sixteen-integer costs are comparable; managed-host/collector and union/intersection qualification remain open.
 
 - Measure native structural tuple construction/copy/call costs against equivalent nominal records with interleaved samples. Two- and sixteen-element workloads emit byte-identical native objects with no undefined allocator imports; retain raw timings, hashes and reproduction script. This AOT microbenchmark does not qualify unions, JIT or managed-reference workloads.

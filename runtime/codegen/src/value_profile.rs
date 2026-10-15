@@ -19,6 +19,7 @@ pub(super) enum Ty {
     Tuple(Vec<Ty>),
     Reference(usize),
     Interface(usize),
+    Intersection(Vec<Ty>),
     ByteArray,
     CharacterArray,  // Same pointer-slot layout, distinct element identity.
     StringArray,     // Invocation-owned pointer slots; verified nominal backing enables views.
@@ -639,6 +640,9 @@ impl<'a> Profile<'a> {
             Type::Tuple(parts) => {
                 Ty::Tuple(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
             }
+            Type::Intersection(parts) if self.references => {
+                Ty::Intersection(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
+            }
             Type::Union(_) | Type::Intersection(_) => {
                 return Err(
                     "compound reference signatures are interpreter-only in this experiment".into(),
@@ -770,6 +774,7 @@ impl<'a> Profile<'a> {
             | Ty::Address(_)
             | Ty::Reference(_)
             | Ty::Interface(_)
+            | Ty::Intersection(_)
             | Ty::ByteArray
             | Ty::CharacterArray
             | Ty::StringArray
@@ -842,7 +847,16 @@ impl<'a> Profile<'a> {
         false
     }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
+        if actual == expected {
+            return true;
+        }
         match (actual, expected) {
+            (_, Ty::Intersection(parts)) => parts
+                .iter()
+                .all(|part| self.reference_assignable(actual, part)),
+            (Ty::Intersection(parts), _) => parts
+                .iter()
+                .any(|part| self.reference_assignable(part, expected)),
             // Interface views retain the original object reference. Every managed
             // interface reference is assignable to the verified Object base, but
             // not to arbitrary concrete classes without an explicit cast.
@@ -883,6 +897,21 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
+            Ty::Intersection(parts) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
+                .filter(|(index, t)| {
+                    t.is_reference_type
+                        && t.representation == Representation::Record
+                        && !t.is_abstract
+                        && parts
+                            .iter()
+                            .all(|part| self.reference_assignable(&Ty::Reference(*index), part))
+                })
+                .map(|(index, _)| index)
+                .collect(),
             Ty::ByteArray
             | Ty::ReferenceArray(_)
             | Ty::ScalarArray(_)
@@ -1392,8 +1421,10 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t)
                     if self.references
-                        && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
-                            || self.backing_for_array(&self.ty(t)?).is_some()) =>
+                        && (matches!(
+                            self.ty(t)?,
+                            Ty::Reference(_) | Ty::Interface(_) | Ty::Intersection(_)
+                        ) || self.backing_for_array(&self.ty(t)?).is_some()) =>
                 {
                     ()
                 }
@@ -1596,6 +1627,7 @@ impl<'a> Profile<'a> {
                                 source,
                                 Ty::Reference(_)
                                     | Ty::Interface(_)
+                                    | Ty::Intersection(_)
                                     | Ty::ByteArray
                                     | Ty::ReferenceArray(_)
                                     | Ty::ScalarArray(_)
@@ -1609,8 +1641,10 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
                     let source = pop(&mut stack)?;
-                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_))
-                        && !(source == Ty::Literal && self.references)
+                    if !matches!(
+                        source,
+                        Ty::Reference(_) | Ty::Interface(_) | Ty::Intersection(_)
+                    ) && !(source == Ty::Literal && self.references)
                         && self.backing_for_array(&source).is_none()
                     {
                         return Err(fail(
@@ -1631,6 +1665,7 @@ impl<'a> Profile<'a> {
                             | Ty::Literal
                             | Ty::Reference(_)
                             | Ty::Interface(_)
+                            | Ty::Intersection(_)
                             | Ty::ByteArray
                             | Ty::CharacterArray
                             | Ty::StringArray
@@ -1648,6 +1683,7 @@ impl<'a> Profile<'a> {
                                 | Ty::ReferenceArray(_)
                                 | Ty::Reference(_)
                                 | Ty::Interface(_)
+                                | Ty::Intersection(_)
                                 | Ty::ByteArray
                                 | Ty::CharacterArray
                                 | Ty::StringArray

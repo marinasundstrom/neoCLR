@@ -427,15 +427,19 @@ pub(crate) fn compile_into(
     let string_interfaces = details.and_then(|d| d.string_interfaces.as_ref());
     if text_identity {
         let interface_casts = input.functions.iter().any(|f| f.body.iter().any(|op| {
-            matches!(op, Op::CastClass(t) | Op::IsInstance(t) if matches!(p.ty(t), Ok(Ty::Interface(_))))
+            matches!(op, Op::CastClass(t) | Op::IsInstance(t) if matches!(p.ty(t), Ok(Ty::Interface(_) | Ty::Intersection(_))))
         }));
         if interface_casts && string_interfaces.is_none() {
             return Err("String interface views require verified load-set conformance".into());
         }
     }
-    let string_view = |ty: &Ty| {
+    let nominal_string_view = |ty: &Ty| {
         p.is_object_base(ty)
             || matches!(ty, Ty::Interface(i) if string_interfaces.is_some_and(|indices| indices.contains(i)))
+    };
+    let string_view = |ty: &Ty| match ty {
+        Ty::Intersection(parts) => parts.iter().all(nominal_string_view),
+        _ => nominal_string_view(ty),
     };
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
@@ -2709,7 +2713,12 @@ pub(crate) fn compile_into(
                             let absent = b.ins().icmp_imm(IntCC::Equal, result, 0);
                             let present = b.ins().icmp_imm(IntCC::NotEqual, value, 0);
                             let invalid = b.ins().band(absent, present);
-                            let status = b.ins().iconst(types::I32, 3); // Existing interpreter class/interface cast contract
+                            let code = if matches!(target_ty, Ty::Intersection(_)) {
+                                11
+                            } else {
+                                3
+                            };
+                            let status = b.ins().iconst(types::I32, code);
                             return_if_detailed(&mut b, invalid, status, site.as_ref());
                         }
                         stack.push(result);

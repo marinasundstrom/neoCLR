@@ -23,7 +23,8 @@ implementation limits are separate from those semantic contracts.
 Native unions, intersections and tuples are implemented on the structural feature
 branches in neoCLR and the Raven neoCLR compiler, using matching native metadata
 and libraries. They execute in the interpreter. Bounded tuple storage also has
-macOS ARM64 AOT execution checks; broader AOT/JIT support and efficient native
+macOS ARM64 AOT execution checks, as do bounded intersection reference views.
+Broader AOT/JIT support and efficient native
 layout remain integration requirements. Legacy CLI
 bridge carriers remain available for existing consumers; those are nominal types.
 This feature-branch work is not a published release.

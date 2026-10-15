@@ -79,6 +79,14 @@ impl Specializer<'_> {
             | Type::RuntimeTypeHandle => {
                 return Ok(ty.clone());
             }
+            Type::Intersection(parts) => {
+                return Ok(Type::Intersection(
+                    parts
+                        .iter()
+                        .map(|t| self.lower(t))
+                        .collect::<Result<_, _>>()?,
+                ));
+            }
             Type::Tuple(parts) => {
                 let elements = parts
                     .iter()

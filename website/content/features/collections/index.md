@@ -110,7 +110,8 @@ object identity. Arrays retain their structural runtime shape and nominal
 
 This work requires matching feature-branch artifacts. Interpreter execution is
 validated, and bounded tuple storage also runs through macOS ARM64 AOT using inline
-slots without a heap carrier. Broader AOT/JIT representation is still being developed;
+slots without a heap carrier. Bounded intersection views also have AOT checks and
+retain one object reference. Broader AOT/JIT representation is still being developed;
 the temporary boxed union storage is not the intended final performance model.
 Bare generic-parameter union alternatives and unrestricted combinations remain
 incomplete.
