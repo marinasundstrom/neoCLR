@@ -1,0 +1,66 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+
+func ReadSlice(source: Sliceable<int[]>, range: Range) -> int {
+    if source.Slice(range) is Ok(let values) {
+        return values.Length
+    }
+    return -1
+}
+
+func Main() -> int {
+    let list = ArrayList<int>(16)
+    list.Add(10)
+    list.Add(20)
+    list.Add(30)
+    if ReadSlice(list, 1..^0) != 2 {
+        return 1
+    }
+    if ReadSlice(list, 3..3) != 0 {
+        return 2
+    }
+    if ReadSlice(list, 0..0) != 0 {
+        return 3
+    }
+    if ReadSlice(list, 2..1) != -1 {
+        return 4
+    }
+    if ReadSlice(list, 0..4) != -1 {
+        return 5
+    }
+    if ReadSlice(list, ^4..^0) != -1 {
+        return 6
+    }
+    if ReadSlice(list, 0..^4) != -1 {
+        return 7
+    }
+    let copy = list[1..^0]
+    if copy.Length != 2 || copy[0] != 20 || copy[1] != 30 {
+        return 8
+    }
+    copy[0] = 99
+    if list[1] != 20 {
+        return 9
+    }
+    let array: int[] = [10, 20, 30]
+    if ReadSlice(array, 1..^0) != 2 {
+        return 10
+    }
+    if ReadSlice(array, 3..3) != 0 {
+        return 11
+    }
+    if ReadSlice(array, 0..4) != -1 {
+        return 12
+    }
+    let arrayCopy = array[1..3]
+    arrayCopy[0] = 77
+    if array[1] != 20 {
+        return 13
+    }
+    let empty = ArrayList<int>()
+    if ReadSlice(empty, Range.All) != 0 {
+        return 14
+    }
+    return 42
+}

@@ -3,7 +3,9 @@ static class CollectionDeclarations
 {
     public const string Source = """
         // Interface metadata for CLI vectors; allocation still uses newarr.
-        public sealed class Array<T> : Collections.MutableSequence<T> {
+        public interface Sliceable<TSlice> { Result<TSlice, InvalidRangeError> Slice(Range range); }
+        public sealed class Array<T> : Collections.MutableSequence<T>, Sliceable<T[]> {
+            public T[] this[Range range] => default;
             public Option<T> Get(int index) => default;
             public Option<T> Get(Index index) => default;
             public Result<T[], InvalidRangeError> Slice(Range range) => default;
@@ -136,7 +138,8 @@ static class CollectionDeclarations
                 public static Option<T> Get<T>(this Sequence<T> source, Index index) => default;
                 public static Result<T[], InvalidRangeError> Slice<T>(this Sequence<T> source, Range range) => default;
             }
-            public class ArrayList<T> : List<T> {
+            public class ArrayList<T> : List<T>, Sliceable<T[]> {
+                public Result<T[], InvalidRangeError> Slice(Range range) => default;
                 public T this[Index index] { get => default; set { } }
                 public T[] this[Range range] => default;
                 public ArrayList() { }

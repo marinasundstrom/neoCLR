@@ -4841,4 +4841,7 @@ and [signed integer domain termination](validation/range-iteration/README.md), w
 main-first compiler work carried separately to the native line. The author's
 [approved capability direction](design/slicing-capabilities.md) separates Result-based
 safe slicing, optional faulting indexers, bounds and explicit enumerable progressions.
-Public capability APIs and other numeric-domain stepping are not yet implemented.
+System.Sliceable<TSlice> now provides the nominal safe slicing capability, with
+Array<T>/ArrayList<T> implementations and faulting range indexers sharing Range
+validation; see [native qualification](validation/sliceable/README.md). Generic
+Interval/progression APIs and other numeric-domain stepping remain unimplemented.

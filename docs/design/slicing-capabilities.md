@@ -1,8 +1,7 @@
 # Nominal slicing capabilities and explicit traversal
 
-Status: author-approved separation of responsibilities (2026-10-15); concrete API
-spellings below are a proposal, not implemented or published APIs. Structural-type
-work remains parked. This refines [generic bounds](generic-bounds.md).
+Status: nominal slicing implemented as a development API (2026-10-15); generic
+Interval/progression shapes below remain proposals. Structural-type work remains parked. This refines [generic bounds](generic-bounds.md).
 
 ## Direction and existing behavior
 
@@ -14,11 +13,11 @@ against a receiver length. Its GetOffsetAndLength faults on invalid bounds;
 TryGetOffsetAndLength returns Result with InvalidRangeError. The new capabilities
 must build on that validation rather than introduce a second interpretation.
 
-## Proposed contract
+## Contract and remaining proposals
 
 | Responsibility | Proposed shape | Meaning |
 | --- | --- | --- |
-| Safe slicing | Sliceable<TSlice>.Slice(bounds: Range) -> Result<TSlice, SliceError> | Explicit nominal conformance; invalid receiver-relative bounds are recoverable. |
+| Safe slicing | Sliceable<TSlice>.Slice(range: Range) -> Result<TSlice, InvalidRangeError> | Explicit nominal conformance; invalid receiver-relative bounds are recoverable. |
 | Convenient slicing | receiver[range] -> TSlice | Optional concrete range indexer; invalid bounds may produce a terminal Fault. |
 | Ordered bounds | Interval<T> with Bound<T> endpoints | Endpoint inclusion is data; ordering supports membership, not implicit stepping. |
 | Traversal | interval.StepBy(step, stepper) -> Progression<T, ...> | Explicit stepping produces an enumerable value with fresh state per enumeration. |
@@ -40,8 +39,8 @@ coordinate units. String uses neoCLR's grapheme coordinates; array slices count
 elements. Success must not silently clamp invalid bounds. Empty ranges at a valid
 boundary succeed. Invalid/reversed/out-of-bounds selections return Error through
 the safe method and Fault through the indexer. Validation must precede allocation,
-mutation or publication of the resulting view. SliceError naming and reuse versus
-wrapping of InvalidRangeError remain open pending the first concrete implementations.
+mutation or publication of the resulting view. The implementation reuses InvalidRangeError;
+a second error type would add no distinction for receiver-relative bounds failures.
 
 Safe slicing guarantees recoverable *slice validation* after its arguments exist.
 It cannot catch a terminal fault during argument evaluation: Index(-1) and an
@@ -102,3 +101,21 @@ See [Range](https://doc.rust-lang.org/std/range/struct.Range.html) and
    repeatable enumeration with the same domain termination as direct loops.
 5. Update both compiler integration docs and public API snapshots when APIs ship.
    No interface or progression API is claimed as shipped by this design document.
+
+## Implemented slicing slice
+
+System.Sliceable<TSlice> requires only the safe method. Array<T> and ArrayList<T>
+explicitly implement Sliceable<T[]> and return independent shallow array copies.
+ArrayList resolves against Count, never Capacity. Neither collection gains a view
+or changes mutation semantics. The interface itself implies no indexer.
+
+The declared range indexers delegate to Slice. Intrinsic T[] indexing retains the
+compiler's RuntimeHelpers.GetSubArray lowering. Both routes ultimately use
+Range.TryGetOffsetAndLength: the faulting GetOffsetAndLength now delegates to it,
+preserving the existing negative-length and invalid-bounds fault messages.
+There is no compiler contract or opcode change, and ordinary .NET is unaffected.
+The CLI documentation bridge describes nominal interface/member signatures;
+production libraries use native metadata. No special bridge encoding is required.
+
+[Qualification](../validation/sliceable/README.md) records the fresh native bundle,
+interface dispatch, independent copies, invalid bounds and fault propagation.

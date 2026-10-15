@@ -59,7 +59,14 @@ A byte array is a useful I/O buffer, but being managed does not make it safe for
 
 The API includes Length, Count, indexed access, iteration, Empty and ForEach, with the runtime’s supported element types. The generic shape is not a promise that every possible element signature or .NET Array helper is admitted. Direct array loops use indexed access; Iterable consumers use the declared interface contract.
 
-Bounds failures are terminal, so validate user-supplied ranges before accessing elements when invalid input should produce a recoverable Result. Array size and allocation are also constrained by runtime budgets.
+Development slicing API: `Array<T>` explicitly implements `Sliceable<T[]>`.
+`Slice(range)` returns `Result<T[], InvalidRangeError>`; the range indexer returns a
+shallow copy and faults on invalid bounds. Both use the same Range validator.
+Valid empty ranges succeed, from-end boundaries resolve against Length, and bounds
+are never clamped. Copies have independent slots but share referenced elements.
+Array size and allocation remain constrained by runtime budgets; the Result handles
+invalid slice bounds, not every possible runtime fault.
+See the [slicing API contract](../../docs/arrays.html).
 
 Span/Memory APIs, general interface variance and immutable or frozen array families are not introduced by this implementation.
 

@@ -3582,5 +3582,27 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
     <member name="T:System.Introspection.TupleTypeInfo"><summary>A structural value tuple described by its ordered element types.</summary><remarks>Development structural API requiring a matching source library; no runtime feature switch. No nominal tuple definition is implied.</remarks></member>
     <member name="P:System.Introspection.TupleTypeInfo.ElementNames"><summary>Gets a snapshot of effective element names in positional order.</summary><remarks>Preserves native signature names. Unnamed elements use ItemN, starting at Item1. Names do not affect tuple equality; equal types can expose different names. Requires matching source libraries; no runtime feature switch.</remarks></member>
     <member name="P:System.Introspection.TupleTypeInfo.ElementTypes"><summary>Gets a snapshot of element types in positional order.</summary><remarks>Preserves duplicates and nested tuple descriptors. Labels do not affect identity. Elements are not generic arguments.</remarks></member>
+<member name="T:System.Sliceable`1">
+  <summary>Explicit nominal capability for recoverable collection-relative slicing.</summary>
+  <typeparam name="TSlice">The slice result type. The receiver specifies copy or view ownership and coordinate units.</typeparam>
+  <remarks>Development API. Does not imply indexing, enumeration or mutation. Range construction can fault before this method is called.</remarks>
+</member>
+<member name="M:System.Sliceable`1.Slice(System.Range)">
+  <summary>Returns a slice or InvalidRangeError for invalid receiver-relative bounds.</summary>
+  <param name="range">Inclusive start and exclusive end boundaries, resolved against the receiver.</param>
+  <returns>Ok for valid bounds, including empty boundary ranges; Error for reversed or out-of-bounds selections.</returns>
+  <remarks>Does not clamp bounds. Validate before allocating or publishing a result. Allocation and unrelated runtime faults remain terminal.</remarks>
+</member>
+<member name="M:System.Collections.ArrayList`1.Slice(System.Range)">
+  <summary>Returns an independent shallow array copy or InvalidRangeError.</summary>
+  <param name="range">Bounds in element units, resolved against Count rather than Capacity.</param>
+  <returns>Ok with a fresh array, or Error before allocating a slice when bounds are invalid.</returns>
+  <remarks>Referenced elements remain shared. No concurrent mutation guarantee. The range indexer calls this method and faults on Error.</remarks>
+</member>
+<member name="P:System.Array`1.Item(System.Range)">
+  <summary>Returns an independent shallow array copy; invalid bounds fault.</summary>
+  <param name="range">Half-open element bounds, including from-end boundaries.</param>
+  <remarks>Delegates to Slice, sharing receiver-relative validation. Referenced elements remain shared.</remarks>
+</member>
 </members>
 </doc>

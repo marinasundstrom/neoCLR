@@ -3,8 +3,9 @@ module System.Collections
 import System.*
 
 import System.Option.*
+import System.Result.*
 
-public open class ArrayList<T> : List<T> {
+public open class ArrayList<T> : List<T>, Sliceable<T[]> {
     private field data: T[]
     private field count: int
 
@@ -59,9 +60,21 @@ public open class ArrayList<T> : List<T> {
     /// Returns an independent shallow array copy; invalid bounds fault.
     val self[range: Range]: T[] {
         get {
-            let bounds = range.GetOffsetAndLength(count)
-            return System.Runtime.CompilerServices.RuntimeHelpers.CopyRange<T>(data, bounds.Item1, bounds.Item2)
+            if Slice(range) is Ok(let slice) {
+                return slice
+            }
+            System.Fail("Range is outside the value")
+            return Array<T>.Empty
         }
+    }
+
+    /// Returns an independent shallow array copy, resolving bounds against Count, not Capacity.
+    /// Invalid bounds return InvalidRangeError before allocating the result.
+    func Slice(range: Range) -> Result<T[], InvalidRangeError> {
+        if range.TryGetOffsetAndLength(count) is Ok(let bounds) {
+            return Ok(System.Runtime.CompilerServices.RuntimeHelpers.CopyRange<T>(data, bounds.Item1, bounds.Item2))
+        }
+        return Error(InvalidRangeError())
     }
 
     func Add(value: T) {

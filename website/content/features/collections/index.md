@@ -27,6 +27,15 @@ iterables for initialization or copying where the contract provides that overloa
 The complete sample reads arrays and lists, replaces elements through MutableSequence
 and grows a List. [Download it](/samples/library-collection-capabilities.rvn).
 
+## Recoverable slicing (development)
+
+Array and ArrayList explicitly implement `Sliceable<T[]>`: `Slice(range)` returns
+`Result<T[], InvalidRangeError>`, while their range indexers fault for invalid
+bounds. ArrayList resolves boundaries against Count, not Capacity. Results are
+independent shallow array copies. The capability does not imply enumeration,
+mutation or indexing; a similarly named method alone does not provide conformance.
+See the [API contract](../../docs/arrays.html).
+
 ## Filter and transform
 
 Import the query operators to compose iterable work:

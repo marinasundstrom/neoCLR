@@ -18068,3 +18068,25 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   indexers may fault. Assistant adopted this failure split with shared validation
   and explicit copy/view ownership, and recorded the construction-versus-slicing
   distinction in [the concrete contract proposal](design/slicing-capabilities.md).
+
+
+## 2026-10-15 — Nominal safe slicing and interface variance follow-up
+
+- **Author:** requested the nominal Sliceable contract, a safe method returning
+  Result and a faulting range indexer with shared bounds validation; repeated the
+  instruction to commit each validated slice and keep structural types parked.
+- **Assistant implementation:** reused InvalidRangeError and the existing Array
+  safe method, added explicit Sliceable<T[]> conformance to Array and ArrayList,
+  and made declared range indexers delegate to Slice. Intrinsic array syntax keeps
+  RuntimeHelpers.GetSubArray, whose faulting Range resolver now calls the safe
+  validator. ArrayList resolves against Count rather than capacity. Copies retain
+  independent slots and shallow element semantics.
+- **Evidence:** [slicing qualification](validation/sliceable/README.md) and the
+  [updated design](design/slicing-capabilities.md) distinguish implementation from
+  the still-proposed Interval/progression APIs.
+- **Author follow-up:** “We perhaps should look at Covariance and Contravariance
+  in interfaces.” **Assistant response:** Sliceable is a useful output-position
+  example, but covariance also depends on Result and native interface conversions;
+  finish this slicing slice first, then assess variance separately. This is an
+  investigation direction, not a decision to introduce variance or change mutable
+  collection contracts. Structural work remains parked.

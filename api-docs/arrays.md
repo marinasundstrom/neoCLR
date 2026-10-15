@@ -15,6 +15,8 @@ shape with a nominal API representation.
 | `Length: int` | Number of element slots; does not change after creation. |
 | `Count: int` | The same number of slots through the sequence contract. |
 | `self[index: int]: T` | Reads or replaces an element. An index outside the array bounds fails. |
+| `Slice(range: Range): Result<T[], InvalidRangeError>` | Safe shallow copy; invalid bounds return Error. |
+| `self[range: Range]: T[]` | Shallow copy using the same validation; invalid bounds fault. |
 | `Empty: T[]` | Static library property returning an empty array of the element type. |
 | `ForEach(action: (T) -> Void)` | Invokes the callback once per element, in index order. |
 | `GetIterator(): Iterator<T>` | Traverses elements through the collection iterator contract. |
@@ -26,3 +28,15 @@ The [array guide](/features/arrays/) contains executable examples and the curren
 storage, mutation and Object conversion limits.
 
 [All structural families](structural-types.md)
+
+## Nominal slicing (development)
+
+Array and ArrayList explicitly implement [Sliceable&lt;TSlice&gt;](xref:System.Sliceable`1)
+with `TSlice = T[]`. The safe method accepts empty ranges at valid boundaries,
+resolves from-end boundaries against Length (Array) or Count (ArrayList), and
+rejects reversed/out-of-bounds ranges without clamping. Result allocation follows
+validation. Copies have independent element slots but retain shared referenced
+elements. The interface does not imply enumeration or a range indexer.
+
+Declared range indexers delegate to the safe method and fault on Error. Intrinsic
+T[] range syntax uses RuntimeHelpers.GetSubArray and the same Range validator.

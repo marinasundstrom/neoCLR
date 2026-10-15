@@ -29,20 +29,11 @@ public struct Range : EquatableTo<Range> {
         if length < 0 {
             Fail("Range length must be nonnegative")
         }
-        let first = start
-        let last = end
-        let offset = first.GetOffset(length)
-        let limit = last.GetOffset(length)
-        if offset < 0 {
-            Fail("Range is outside the value")
+        if TryGetOffsetAndLength(length) is Ok(let bounds) {
+            return bounds
         }
-        if limit < offset {
-            Fail("Range is outside the value")
-        }
-        if limit > length {
-            Fail("Range is outside the value")
-        }
-        return (offset, limit - offset)
+        Fail("Range is outside the value")
+        return (0, 0)
     }
 
     /// Resolves offset and count, returning InvalidRangeError for invalid bounds or a negative length.

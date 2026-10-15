@@ -3,7 +3,7 @@ module System
 import System.Option.*
 import System.Result.*
 
-public class Array<T> : Collections.MutableSequence<T> {
+public class Array<T> : Collections.MutableSequence<T>, Sliceable<T[]> {
     #pragma warning disable-next-line RAV9032
     private field m_value: T[]
 
@@ -39,6 +39,17 @@ public class Array<T> : Collections.MutableSequence<T> {
             return Ok(Runtime.CompilerServices.RuntimeHelpers.CopyRange<T>(m_value, bounds.Item1, bounds.Item2))
         }
         return Error(InvalidRangeError())
+    }
+
+    /// Returns an independent shallow copy; invalid receiver-relative bounds fault.
+    val self[range: Range]: T[] {
+        get {
+            if Slice(range) is Ok(let slice) {
+                return slice
+            }
+            Fail("Range is outside the value")
+            return Array<T>.Empty
+        }
     }
 
     func ForEach(action: (T) -> Void) {

@@ -1,0 +1,20 @@
+import System.*
+import System.Collections.*
+
+func Main(args: string[]) -> int {
+    let list = ArrayList<int>(16)
+    list.Add(10)
+    list.Add(20)
+    list.Add(30)
+    if args.Length == 1 {
+        return list[0..4].Length
+    }
+    if args.Length == 2 {
+        return list[2..1].Length
+    }
+    if args.Length == 3 {
+        return list[^4..^0].Length
+    }
+    let array: int[] = [10, 20, 30]
+    return array[0..4].Length
+}
