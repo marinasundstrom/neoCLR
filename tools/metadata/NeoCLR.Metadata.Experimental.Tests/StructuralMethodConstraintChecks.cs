@@ -43,8 +43,7 @@ internal static class StructuralMethodConstraintChecks
             foreach (var binary in new[] { false, true })
             {
                 var image = Image(bound, binary);
-                Reject(() => AssemblyDefinition.ReadNativeAssembly(image));
-                var snapshot = AssemblyDefinition.ReadNativeAssembly(image, true);
+                var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
                 Check(snapshot.Write().SequenceEqual(image), "original image preserved");
                 var method = snapshot.MainModule.Functions.Single(m => m.Name == "Answer");
                 var constraint = method.TypeConstraints.Single();
@@ -61,22 +60,22 @@ internal static class StructuralMethodConstraintChecks
                 Reject(() => consumer.ImportExperimentalCompositionReference(method, core));
                 Reject(() => RuntimeAssemblyContainer.Write(NativeModuleContainer.Read(image), core));
             }
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, ordinal: -1), true));
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, ordinal: 1), true));
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, duplicate: true), true));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, ordinal: -1)));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, ordinal: 1)));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, duplicate: true)));
             foreach (var invalid in new JsonNode[] { JsonValue.Create(kind == "Union" ? "Void" : "Int32")!, new JsonObject { ["MethodParameter"] = 0 }, new JsonObject { ["Named"] = "Missing" } })
-                Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(Compose(kind, nominal, invalid)), true));
+                Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(Compose(kind, nominal, invalid))));
             var mixed = Compose(kind, nominal, Compose(kind == "Union" ? "Intersection" : "Union", nominal, other));
-            var mixedRead = AssemblyDefinition.ReadNativeAssembly(Image(mixed), true);
+            var mixedRead = AssemblyDefinition.ReadNativeAssembly(Image(mixed));
             Check(mixedRead.MainModule.Functions[0].TypeConstraints[0].Bound.Composition!.Constituents[1].Composition is not null, "mixed grouping retained");
-            var collapsed = AssemblyDefinition.ReadNativeAssembly(Image(Compose(kind, nominal, nominal)), true);
+            var collapsed = AssemblyDefinition.ReadNativeAssembly(Image(Compose(kind, nominal, nominal)));
             Check(collapsed.MainModule.Functions[0].TypeConstraints[0].Bound.ReferencedType!.Name == "A", "duplicate normalization");
             Reject(() => _ = collapsed.MainModule.Functions[0].InterfaceConstraints);
         }
         JsonNode Named(int index) => new JsonObject { ["Named"] = original["types"]![index]!["name"]!.DeepClone() };
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(Compose("Intersection", nominal, Named(2))), true));
-        _ = AssemblyDefinition.ReadNativeAssembly(Image(Compose("Union", nominal, Named(2))), true);
-        _ = AssemblyDefinition.ReadNativeAssembly(Image(Compose("Intersection", nominal, Named(3))), true);
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(Compose("Intersection", nominal, Named(2)))));
+        _ = AssemblyDefinition.ReadNativeAssembly(Image(Compose("Union", nominal, Named(2))));
+        _ = AssemblyDefinition.ReadNativeAssembly(Image(Compose("Intersection", nominal, Named(3))));
         var nominalRead = AssemblyDefinition.ReadNativeAssembly(Image(nominal));
         var nominalMethod = nominalRead.MainModule.Functions[0];
         Check(nominalMethod.InterfaceConstraints.Count == 1 && nominalMethod.TypeConstraints.Count == 1, "nominal API compatibility");

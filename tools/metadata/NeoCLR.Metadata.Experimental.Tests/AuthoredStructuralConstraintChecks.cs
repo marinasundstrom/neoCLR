@@ -76,12 +76,12 @@ internal static class AuthoredStructuralConstraintChecks
         main.Return(); graph.EntryPoint = main;
         var native = graph.WriteNativeAssembly();
         var image = NativeModuleContainer.WriteBinary(native);
-        var snapshot = AssemblyDefinition.ReadNativeAssembly(image, true);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
         if (snapshot.MainModule.Functions.Single(m => m.Name == "All").TypeConstraints.Single().Bound.Composition?.Kind != ReferenceCompositionKind.Intersection)
             throw new Exception("authored grouping lost");
         graph.EntryPoint = null;
         var libraryImage = NativeModuleContainer.WriteLibraryBinary(graph.WriteNativeAssembly());
-        snapshot = AssemblyDefinition.ReadNativeAssembly(libraryImage, true);
+        snapshot = AssemblyDefinition.ReadNativeAssembly(libraryImage);
         graph.EntryPoint = main;
         if (output is not null) File.WriteAllBytes(output + ".library.neox", libraryImage);
         var consumer = new AssemblyBuilder(new("ConstraintConsumer", new Version(1, 0, 0, 0)), graph.CoreLibrary);
@@ -106,7 +106,6 @@ internal static class AuthoredStructuralConstraintChecks
         if (output is not null) File.WriteAllBytes(output + ".consumer.neox", consumerImage);
         Reject(() => consumer.Write());
         Reject(() => graph.Write());
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image));
         if (output is not null) File.WriteAllBytes(output, image);
         // Recheck already-emitted calls after a late declaration change.
         either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Intersection, a, b);
@@ -201,7 +200,7 @@ internal static class AuthoredStructuralConstraintChecks
         weak.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
         Reject(() => weak.GetILGenerator().CallConstrained(parameter, read.MakeConstructedReference([PrimitiveType.Int32])));
         weak.LoadConstant(0); weak.Return();
-        var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(graph.WriteNativeAssembly()), true);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(graph.WriteNativeAssembly()));
         var bound = snapshot.MainModule.Functions.Single(m => m.Name == "Either").TypeConstraints.Single().Bound;
         if (bound.Composition?.Kind != ReferenceCompositionKind.Union || !bound.Composition.Constituents.Any(t => t.ReferencedGenericInstance is { } c && c.TypeArguments.Single().Primitive == PrimitiveType.Int32))
             throw new Exception("external union constraint identity lost");

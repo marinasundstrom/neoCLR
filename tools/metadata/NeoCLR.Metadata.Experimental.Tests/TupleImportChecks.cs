@@ -17,9 +17,7 @@ internal static class TupleImportChecks
         producer["entry"] = "";
         var image = NativeModuleContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(producer.ToJsonString()));
         File.WriteAllBytes(Path.Combine(output, "TupleProducer.neox"), image);
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image));
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, true));
-        var snapshot = AssemblyDefinition.ReadExperimentalTupleAssembly(image);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
         if (!snapshot.Write().SequenceEqual(image)) throw new Exception("immutable image changed");
         var echo = snapshot.MainModule.Functions.Single(m => m.Name == "Echo");
         if (!echo.TryGetSignature(out var signature) || signature!.ReturnType.Tuple?.ElementTypes.Count != 3 || signature.ReturnType.Tuple.ElementTypes[0].Tuple?.ElementTypes.Count != 2)
@@ -62,7 +60,7 @@ internal static class TupleImportChecks
         var consumerImage = consumer.WriteNativeAssembly();
         File.WriteAllBytes(Path.Combine(output, "TupleConsumer.neox"), NativeModuleContainer.WriteBinary(consumerImage));
         Reject(() => consumer.Write());
-        var reread = AssemblyDefinition.ReadExperimentalTupleAssembly(NativeModuleContainer.WriteBinary(consumerImage));
+        var reread = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(consumerImage));
         if (!reread.MainModule.Functions.Single(m => m.Name == "Echo").TryGetSignature(out var copied) || copied!.ReturnType != signature.ReturnType)
             throw new Exception("imported tuple signature changed");
         if (!reread.MainModule.Functions.Single(m => m.Name == "EchoNamed").TryGetSignature(out var namedCopy)) throw new Exception("named echo missing");
@@ -81,7 +79,7 @@ internal static class TupleImportChecks
         {
             var changed = json.DeepClone();
             changed["functions"]![0]!["returns"] = new JsonObject { ["Tuple"] = invalid.DeepClone() };
-            Reject(() => AssemblyDefinition.ReadExperimentalTupleAssembly(NativeModuleContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(changed.ToJsonString()))));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(changed.ToJsonString()))));
         }
         CheckInvalidOperations(core);
         Console.WriteLine("PASS native tuple snapshots, imports and value operations");

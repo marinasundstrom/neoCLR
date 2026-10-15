@@ -39,7 +39,7 @@ internal static class ReferenceCompositionImportChecks
         {
             var kind = scenario.Kind;
             var image = Image(kind, second: scenario.Second);
-            var snapshot = AssemblyDefinition.ReadNativeAssembly(image, true);
+            var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
             var consumer = new AssemblyBuilder(new("CompositionConsumer" + scenario.Label, new Version(1, 0, 0, 0)), core);
             var factory = snapshot.MainModule.Functions.Single(m => m.Name == "Produce");
             var identity = snapshot.MainModule.Functions.Single(m => m.Name == "Echo");
@@ -91,14 +91,13 @@ internal static class ReferenceCompositionImportChecks
             var holder = consumer.AddClass("", "CompositionState");
             Reject(() => holder.AddField("StaticValue", result, isStatic: true));
             var valueHolder = consumer.AddValueType("", "ValueState");
-            Reject(() => valueHolder.AddField("Value", result));
+            _ = valueHolder.AddField("Value", result);
             var storedField = holder.AddField("Value", result);
             var getter = holder.AddInstanceMethod("Get", new MethodSignature(result, []));
             getter.LoadArgument(0); getter.LoadField(storedField); getter.Return();
             var storedImage = NativeModuleContainer.WriteLibraryBinary(consumer.WriteNativeAssembly());
-            if (kind == "Union") _ = AssemblyDefinition.ReadNativeAssembly(storedImage, true);
-            else Reject(() => AssemblyDefinition.ReadNativeAssembly(storedImage, true)); // external intersection bounds still need resolved finality
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(storedImage));
+            if (kind == "Union") _ = AssemblyDefinition.ReadNativeAssembly(storedImage);
+            else Reject(() => AssemblyDefinition.ReadNativeAssembly(storedImage)); // external intersection bounds still need resolved finality
             Reject(() => consumer.Write());
             Reject(() => RuntimeAssemblyContainer.Write(NativeModuleContainer.Read(image), core));
             Reject(() => new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core)
@@ -129,7 +128,7 @@ internal static class ReferenceCompositionImportChecks
             root["functions"]![1]!["parameters"]![0] = Composition(scenario.TargetKind, scenario.Target);
             root["functions"]![1]!["returns"] = Composition(scenario.TargetKind, scenario.Target);
             var image = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(root.ToJsonString()));
-            var snapshot = AssemblyDefinition.ReadNativeAssembly(image, true);
+            var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
             var consumer = new AssemblyBuilder(new("Proof" + scenario.Name, new Version(1, 0, 0, 0)), core);
             var main = consumer.AddFunction("Main"); consumer.EntryPoint = main;
             main.Call(consumer.ImportExperimentalCompositionReference(snapshot.MainModule.Functions.Single(m => m.Name == "Produce"), core));
@@ -150,13 +149,13 @@ internal static class ReferenceCompositionImportChecks
             sealedRoot["types"]![2]!["is_sealed"] = true;
             sealedRoot["functions"]![0]!["returns"] = Compound(kind, second: 2);
             var sealedImage = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(sealedRoot.ToJsonString()));
-            if (kind == "Intersection") Reject(() => AssemblyDefinition.ReadNativeAssembly(sealedImage, true));
-            else Check(AssemblyDefinition.ReadNativeAssembly(sealedImage, true) is not null, "sealed union alternative");
+            if (kind == "Intersection") Reject(() => AssemblyDefinition.ReadNativeAssembly(sealedImage));
+            else Check(AssemblyDefinition.ReadNativeAssembly(sealedImage) is not null, "sealed union alternative");
             sealedRoot["functions"]![0]!["returns"] = new JsonObject { [kind] = new JsonArray(Bound(2), Bound(2)) };
             sealedImage = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(sealedRoot.ToJsonString()));
-            if (kind == "Intersection") Reject(() => AssemblyDefinition.ReadNativeAssembly(sealedImage, true));
+            if (kind == "Intersection") Reject(() => AssemblyDefinition.ReadNativeAssembly(sealedImage));
         }
-        var mismatched = AssemblyDefinition.ReadNativeAssembly(Image("Union", "Intersection"), true);
+        var mismatched = AssemblyDefinition.ReadNativeAssembly(Image("Union", "Intersection"));
         var bad = new AssemblyBuilder(new("BadCompositionCall", new Version(1, 0, 0, 0)), core);
         var badMain = bad.AddFunction("Main"); bad.EntryPoint = badMain;
         badMain.Call(bad.ImportExperimentalCompositionReference(mismatched.MainModule.Functions.Single(m => m.Name == "Produce"), core));

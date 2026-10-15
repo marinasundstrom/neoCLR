@@ -35,10 +35,9 @@ internal static class ExternalIntersectionConstraintChecks
         var onlyA = graph.AddInterface("Example", "OnlyA");
         // Definition imports and completed interface contracts serve distinct purposes.
         var image = NativeModuleContainer.WriteBinary(graph.WriteNativeAssembly());
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, true));
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, true, new Resolver(null)));
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, false, new Resolver(snapshot)));
-        var loaded = AssemblyDefinition.ReadNativeAssembly(image, true, new Resolver(snapshot));
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(image));
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, new Resolver(null)));
+        var loaded = AssemblyDefinition.ReadNativeAssembly(image, new Resolver(snapshot));
         if (loaded.MainModule.Functions.Single(m => m.Name == "Both").TypeConstraints.Single().Bound.Composition?.Kind != ReferenceCompositionKind.Intersection)
             throw new Exception("external intersection grouping lost");
         var replacement = new AssemblyBuilder(provider.Identity, core);
@@ -47,21 +46,21 @@ internal static class ExternalIntersectionConstraintChecks
         replacement.AddClass("Example", "Open");
         replacement.AddClosedClass("Example", "Hierarchy");
         var finalSnapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(replacement.WriteNativeAssembly()));
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, true, new Resolver(finalSnapshot)));
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, new Resolver(finalSnapshot)));
         var valueReplacement = new AssemblyBuilder(provider.Identity, core);
         valueReplacement.AddValueType("Example", "A");
         valueReplacement.AddGenericInterface("Example", "B", ["T"]);
         valueReplacement.AddClass("Example", "Open");
         valueReplacement.AddClosedClass("Example", "Hierarchy");
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(valueReplacement.WriteNativeAssembly()));
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, true, new Resolver(valueSnapshot)));
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, new Resolver(valueSnapshot)));
         var wrong = new AssemblyBuilder(new("WrongIdentity", new Version(1, 0, 0, 0)), core);
         wrong.AddInterface("Example", "A");
         wrong.AddGenericInterface("Example", "B", ["T"]);
         wrong.AddClass("Example", "Open");
         wrong.AddClosedClass("Example", "Hierarchy");
         var wrongSnapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(wrong.WriteNativeAssembly()));
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, true, new Resolver(wrongSnapshot)));
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(image, new Resolver(wrongSnapshot)));
         Reject(() => method.MakeGenericInstance(onlyA));
         Reject(() => graph.Write());
         Console.WriteLine("PASS resolved external intersection constraints");

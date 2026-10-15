@@ -4,50 +4,21 @@ public sealed partial class AssemblyDefinition
 {
     /// <summary>Reads authoritative native assembly-level-function and bounded class/value/interface declarations directly from PE/#Neo or standalone NEOX.</summary>
     /// <param name="image">Complete schema-1/2/3 PE runtime container or schema-2/3 standalone NEOX with an assembly manifest.</param>
+    /// <param name="resolver">Explicit dependency snapshots for external structural bounds; no implicit loading.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
     /// <remarks>This materialization profile admits nongeneric methods and static generic methods/functions with supported nongeneric interface bounds and scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under generic or nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
+    /// Admits supported union, intersection and named tuple signatures without opt-in. External intersection operands require exact resolver snapshots.
     /// Public value-type ToString overrides retain their inherited CLI slot flags and native call name.
     /// Writable ref/out parameters retain their element signature and output indices; readonly modes and byref constructors remain unsupported.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
-    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
-        => ReadNativeAssembly(image, allowExperimentalCompositions: false);
-
-    /// <summary>Reads native declarations with an explicit opt-in for read-only experimental reference compositions.</summary>
-    /// <param name="image">Complete PE/#Neo or standalone NEOX native assembly image.</param>
-    /// <param name="allowExperimentalCompositions">Explicitly admits bounded read-only Union/Intersection signatures; false preserves the default profile.</param>
-    /// <returns>An immutable declaration snapshot retaining the original image.</returns>
-    /// <remarks>The experimental profile admits closed reference compositions in nongeneric free-function and reference-class member signatures, locals and record instance fields. Bodies remain opaque. Callable import and storage require their separate explicit APIs.</remarks>
-    /// <exception cref="InvalidDataException">The image or composition is invalid or outside the admitted subset.</exception>
-    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)
-        => ReadNativeAssembly(image, allowExperimentalCompositions, null);
-
-    /// <summary>Reads native declarations and resolves external intersection operands against explicit dependency snapshots.</summary>
-    /// <param name="image">Complete native assembly image.</param>
-    /// <param name="allowExperimentalCompositions">Explicit native composition opt-in.</param>
-    /// <param name="resolver">Required for external intersection operands; no implicit assembly loading occurs.</param>
-    /// <returns>An immutable snapshot retaining the original image.</returns>
-    /// <exception cref="InvalidDataException">Metadata is invalid, a dependency is absent/mismatched, or an intersection operand is final or a value type.</exception>
-    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver)
-        => ReadNativeCore(image, allowExperimentalCompositions, resolver, false);
-
-    /// <summary>Reads native declarations with closed structural tuples enabled and optional reference compositions.</summary>
-    /// <param name="image">Complete native assembly container.</param>
-    /// <param name="resolver">Optional exact dependency snapshots; no implicit assembly loading.</param>
-    /// <param name="allowExperimentalCompositions">Also admit reference compositions using the same explicit resolver.</param>
-    /// <returns>An immutable snapshot retaining ordered tuple shapes and the original image.</returns>
-    /// <remarks>Bodies remain opaque. Callable import requires its separate explicit API. Preserves ordered elements; applies the bounded authoring profile.</remarks>
-    /// <exception cref="InvalidDataException">The image or tuple signature is invalid or unsupported.</exception>
-    public static AssemblyDefinition ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null, bool allowExperimentalCompositions = false)
-        => ReadNativeCore(image, allowExperimentalCompositions, resolver, true);
-
-    private static AssemblyDefinition ReadNativeCore(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver, bool allowExperimentalTuples)
+    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null)
     {
         if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
         var native = NativeAssemblyDefinition.ReadLibraryAssembly(owned.AsSpan().StartsWith("NEOX"u8)
-            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), allowExperimentalCompositions, resolver, allowExperimentalTuples);
+            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), resolver);
         return native.MaterializeDeclarations(owned);
     }
 

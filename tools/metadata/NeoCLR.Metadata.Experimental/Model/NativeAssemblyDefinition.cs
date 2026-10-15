@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>Read-only declaration snapshot of the bounded metadata writer's native format-5 output.</summary>
-/// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
+/// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. Structural signatures use the native admission rules; unsupported shapes reject.</remarks>
 public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType)
@@ -57,10 +57,10 @@ public sealed partial class NativeAssemblyDefinition
     public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image)
         => ReadCore(image, MetadataArtifactReader.MaxImageSize);
 
-    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null, bool allowExperimentalTuples = false)
-        => ReadCore(image, 32 * 1024 * 1024, allowExperimentalCompositions, resolver, allowExperimentalTuples);
+    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null)
+        => ReadCore(image, 32 * 1024 * 1024, resolver);
 
-    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null, bool allowExperimentalTuples = false)
+    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, IAssemblyResolver? resolver = null)
     {
         var resolvedIntersections = new Dictionary<AssemblyIdentity, AssemblyDefinition>();
         bool ExtendableExternal(ImportedTypeReference external)
@@ -502,7 +502,7 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 if (element.TryGetProperty("Tuple", out var tupleShape))
                 {
-                    Require(allowExperimentalTuples && element.EnumerateObject().Count() == 1, "experimental tuple is disabled or malformed");
+                    Require(element.EnumerateObject().Count() == 1, "malformed structural tuple");
                     if (tupleShape.ValueKind == JsonValueKind.Array)
                         return signatureGraph.CreateExperimentalTuple(Array(element, "Tuple", 256).Select(t => ReadType(t, false)).ToArray());
                     Require(tupleShape.ValueKind == JsonValueKind.Object && tupleShape.EnumerateObject().Count() == 2 && tupleShape.TryGetProperty("elements", out _) && tupleShape.TryGetProperty("names", out _), "malformed named tuple");
@@ -515,7 +515,7 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 if (element.TryGetProperty("Union", out _) || element.TryGetProperty("Intersection", out _))
                 {
-                    Require(allowExperimentalCompositions && allowComposition, "experimental composition is disabled or unsupported in this position");
+                    Require(allowComposition, "unsupported structural composition in this position");
                     var nodes = 0;
                     return ReadComposition(element, 0, false);
                     SignatureType ReadComposition(JsonElement value, int depth, bool intersectionBound)
@@ -597,8 +597,8 @@ public sealed partial class NativeAssemblyDefinition
                     {
                         // Read-only snapshot construction; ordinary builder construction
                         // deliberately continues to reject composition storage.
-                        Require(allowExperimentalCompositions && allowComposition,
-                            "composition wrappers require experimental signature admission");
+                        Require(allowComposition,
+                            "composition wrapper is unsupported in this signature position");
                         if (definition < 0)
                         {
                             var external = ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length,
@@ -698,7 +698,7 @@ public sealed partial class NativeAssemblyDefinition
                 for (int fieldIndex = 0; fieldIndex < type.Fields.Length; fieldIndex++)
                 {
                     var field = type.Fields[fieldIndex];
-                    var storage = ReadType(field.Type, false, allowComposition: allowExperimentalCompositions && !type.IsInterface);
+                    var storage = ReadType(field.Type, false, allowComposition: !type.IsInterface);
                     if (storage.ContainsComposition) signatureGraph.RegisterCompositionStorage(storage);
                     type.Fields[fieldIndex] = field with { Signature = storage };
                     if (type.EnumMembers is null) signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);

@@ -9167,3 +9167,20 @@ in the signature and do not affect identity. Ownership, parameter scope and
 constructor validation still apply. These references require native output;
 `Write`/CLI projection rejects structural tuples. The imported Range consumer
 validates direct and Result-wrapped tuple results across an assembly boundary.
+
+## Unified native metadata reads (2026-10-15)
+
+`AssemblyDefinition.ReadNativeAssembly(image, resolver)` and Raven's
+`NeoClrMetadataReference.ReadAssembly(image, bootstrap, resolver)` now read admitted
+nominal, union, intersection and tuple signatures together. The composition Boolean
+and separate experimental reader entry points are removed. `NeoClrReferenceCatalog.Read`
+and `ReadNative` no longer accept composition/tuple flags. Migrate callers to these
+normal APIs. Selected dependency resolution remains explicit and order-independent;
+missing, mismatched or non-extendable intersection bounds still reject. CLI projection
+remains a separate restricted contract, not a substitute native representation.
+
+Focused checks cover tuple authoring/import, union/intersection authoring/import,
+external structural constraints, source tuple mutation and source constrained library
+consumers. The legacy full metadata suite has six pre-existing failures around host
+core attribute limits and stale Object/local-budget expectations; these do not qualify
+as passing coverage and are tracked for integration cleanup.

@@ -22,13 +22,3 @@ with tempfile.TemporaryDirectory(prefix='structural-project-') as temporary:
     result = subprocess.run(command + ['--run', str(root / 'target/debug/neoclr')], capture_output=True, text=True)
     assert result.returncode == 42, result.stdout + result.stderr
     print('Combined union/intersection/named-tuple library consumer: 42')
-    original = app.read_text()
-    outputs = {p: p.read_bytes() for p in (project / 'App/bin').rglob('*.dll')}
-    assert outputs, 'Expected native output'
-    for setting, expected in [('false', 'tuple'), ('invalid', 'must be true or false')]:
-        app.write_text(original.replace('<PropertyGroup>', '<PropertyGroup>\n<RavenNeoClrStructuralTuples>' + setting + '</RavenNeoClrStructuralTuples>', 1))
-        result = subprocess.run(command, capture_output=True, text=True)
-        assert result.returncode != 0, 'Reduced/invalid profile unexpectedly succeeded'
-        assert expected in (result.stdout + result.stderr).lower(), result.stdout + result.stderr
-        assert all(p.read_bytes() == content for p, content in outputs.items()), 'Failed build changed output'
-        print(f'Tuple profile {setting}: rejected without changing app output')

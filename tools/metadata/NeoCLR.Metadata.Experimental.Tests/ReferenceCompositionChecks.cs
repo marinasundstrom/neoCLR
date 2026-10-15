@@ -38,8 +38,7 @@ internal static class ReferenceCompositionChecks
             foreach (var binary in new[] { false, true })
             {
                 var image = Image(SetSignature(bound, reversed), binary);
-                Reject(() => AssemblyDefinition.ReadNativeAssembly(image));
-                var snapshot = AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions: true);
+                var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
                 Check(snapshot.Write().SequenceEqual(image), "original image preservation");
                 var method = snapshot.MainModule.Functions.Single(m => m.Name == "Echo");
                 Check(method.TryGetSignature(out var signature), "materialized signature");
@@ -68,49 +67,48 @@ internal static class ReferenceCompositionChecks
                 var consumer = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), core);
                 Reject(() => consumer.ImportReference(method, core));
                 Reject(() => consumer.AddFunction("Bad", new MethodSignature(input, Array.Empty<SignatureType>())));
-                var another = AssemblyDefinition.ReadNativeAssembly(image, true);
+                var another = AssemblyDefinition.ReadNativeAssembly(image);
                 Check(another.MainModule.Functions[0].TryGetSignature(out var other), "separate snapshot");
                 Check(input != other!.ParameterTypes[0], "snapshot identity is not display-name identity");
             }
             var distinctKinds = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(bound,
-                Compose(kind == "Union" ? "Intersection" : "Union", originalType, otherType))), true);
+                Compose(kind == "Union" ? "Intersection" : "Union", originalType, otherType))));
             Check(distinctKinds.MainModule.Functions[0].TryGetSignature(out var distinctSignature), "distinct kind signature");
             var distinctContext = new MetadataLoadContext([distinctKinds]);
             Check(!ReferenceEquals(distinctContext.ResolveSignature(distinctSignature!.ReturnType),
                 distinctContext.ResolveSignature(distinctSignature.ParameterTypes[0])), "kind participates in canonical identity");
             var mixed = Compose(kind, originalType, Compose(kind == "Union" ? "Intersection" : "Union", originalType, otherType));
-            var mixedRead = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(mixed)), true);
+            var mixedRead = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(mixed)));
             Check(mixedRead.MainModule.Functions[0].TryGetSignature(out var mixedSignature) && mixedSignature!.ReturnType.Composition!.Constituents[1].Composition is not null, "preserve mixed composition");
             var mixedContext = new MetadataLoadContext([mixedRead]);
             var mixedView = (ReferenceCompositionTypeInfo)mixedContext.ResolveSignature(mixedSignature!.ReturnType);
             Check(mixedView.Constituents[1] is ReferenceCompositionTypeInfo inner && inner.Kind != mixedView.Kind, "mixed view retains distinct kinds");
             var nested = Compose(kind, originalType, Compose(kind, otherType, originalType));
-            var read = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(nested, bound)), true);
+            var read = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(nested, bound)));
             Check(read.MainModule.Functions[0].TryGetSignature(out var flattened) && flattened!.ReturnType == flattened.ParameterTypes[0], "flatten and deduplicate");
-            var singleton = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(Compose(kind, originalType, originalType))), true);
+            var singleton = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(Compose(kind, originalType, originalType))));
             Check(singleton.MainModule.Functions[0].TryGetSignature(out var single) && single!.ReturnType.Composition is null, "singleton collapse");
             foreach (var bad in new[] { Compose(kind, originalType), Compose(kind, originalType, JsonValue.Create(kind == "Union" ? "Void" : "Int32")!), Compose(kind, originalType, new JsonObject { ["Named"] = "Missing" }) })
-                Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(bad)), true));
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(new JsonObject { ["ArrayRef"] = bound.DeepClone() })), true));
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(new JsonObject { ["ByRef"] = bound.DeepClone() })), true));
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(Compose(kind, Enumerable.Repeat(originalType, 257).ToArray()))), true));
+                Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(bad))));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(new JsonObject { ["ArrayRef"] = bound.DeepClone() }))));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(new JsonObject { ["ByRef"] = bound.DeepClone() }))));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(Compose(kind, Enumerable.Repeat(originalType, 257).ToArray())))));
             var wide = Compose(kind, Enumerable.Repeat(Compose(kind, Enumerable.Repeat(originalType, 256).ToArray()), 17).ToArray());
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(wide)), true));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(wide))));
             var generic = SetSignature(bound);
             generic["functions"]![0]!["generic_parameters"] = new JsonArray("T");
-            var genericRead = AssemblyDefinition.ReadNativeAssembly(Image(generic), true);
+            var genericRead = AssemblyDefinition.ReadNativeAssembly(Image(generic));
             Check(genericRead.MainModule.Functions[0].TryGetSignature(out var genericSignature) &&
                 genericSignature!.GenericParameterNames.SequenceEqual(new[] { "T" }) &&
                 genericSignature.ReturnType.Composition is not null, "generic method retains structural signature");
             var local = source.DeepClone();
             local["functions"]![0]!["locals"] = new JsonArray(bound.DeepClone());
-            _ = AssemblyDefinition.ReadNativeAssembly(Image(local), true);
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(local)));
+            _ = AssemblyDefinition.ReadNativeAssembly(Image(local));
             var malformed = bound.DeepClone().AsObject(); malformed["Unexpected"] = true;
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(malformed)), true));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(malformed))));
             var deep = bound;
             for (var i = 0; i < 34; i++) deep = Compose(i % 2 == 0 ? "Union" : "Intersection", originalType, deep);
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(deep)), true));
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(deep))));
         }
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }

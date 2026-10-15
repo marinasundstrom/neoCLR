@@ -37,7 +37,7 @@ internal static class AuthoredCompositionChecks
         textInject.LoadArgument(0); textInject.CastReference(textUnion); textInject.Return();
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, PrimitiveType.String, left));
         var image = builder.WriteNativeAssembly();
-        var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(image), allowExperimentalCompositions: true);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(image));
         if (!snapshot.MainModule.Functions.Single(f => f.Name == "Echo").TryGetSignature(out var signature) || signature!.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("native structural signature lost");
         if (!snapshot.MainModule.Functions.Single(f => f.Name == "TextEcho").TryGetSignature(out var textSignature) ||
@@ -92,7 +92,7 @@ internal static class AuthoredCompositionChecks
         record.AddField("Intersection", intersection);
         Reject(() => record.AddField("StaticUnion", values, isStatic: true));
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
-        var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
+        var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage);
         var importedRecord = valueSnapshot.MainModule.Types.Single(t => t.Name == "StructuralFields");
         if (importedRecord.Fields.Count != 2 ||
             !importedRecord.Fields.Single(f => f.Name == "Union").TryGetSignature(out var unionField) ||
@@ -127,7 +127,6 @@ internal static class AuthoredCompositionChecks
         var importedShape = importedCallable.Signature.ReturnType.Composition!.Constituents.Single(t => t.FunctionSignature is not null).FunctionSignature!;
         if (importedShape.ReturnType.Composition!.Constituents.Single(t => t.ImportedType is not null).ImportedType!.Owner != consumer)
             throw new Exception("callable union nested return did not import to consumer ownership");
-        Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));
         var foreign = new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core).AddInterface("", "Other");

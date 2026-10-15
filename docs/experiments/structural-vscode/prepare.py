@@ -41,7 +41,7 @@ for name in ['Unions', 'Intersections', 'Contracts', 'ExternalBounds']:
     <OutputType>{'Library' if name == 'Contracts' else 'Exe'}</OutputType>
     <AssemblyName>{name}</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <RavenNeoClrStructuralCompositions>true</RavenNeoClrStructuralCompositions>
+
     <RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper>
   </PropertyGroup>
   <ItemGroup>
