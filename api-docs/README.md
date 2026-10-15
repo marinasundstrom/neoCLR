@@ -2151,3 +2151,14 @@ The experimental C# metadata SDK is outside the guest RavenDoc reference assembl
 Its native generic variance enum, definition list and generic-parameter introspection
 property are covered in the [manual SDK reference](experimental-metadata.md#read-only-variance-api--development).
 No guest API selection or reference assembly change is required for this host-only slice.
+
+### Generic parameter variance (2026-10-16)
+
+`GenericParameterTypeInfo.Variance` and `GenericVariance` are included in the
+public type inventory, XML reference bridge and native documentation snapshot.
+The native snapshot uses `target/variance-introspection-20261016-final`, built
+with Raven `44bbd2934`, including PostgreSQL to preserve the complete existing
+namespace reference. The descriptor reflects declaration annotations; ordinary
+method ParameterInfo flags remain separate. See [reflection](reflection.md).
+The native open-definition discovery gap remains explicit and is not an intentional
+generic erasure policy.

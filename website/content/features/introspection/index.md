@@ -108,3 +108,10 @@ including generic-body trait calls. Host tools expose their complete signatures;
 guest constraint reflection remains pending. Member/hierarchy queries and JIT/AOT
 remain under development. This is not part of the published
 release; see the [descriptor contract](/docs/introspection.html#structural-composition-descriptors-experimental-2026-10-14).
+
+Development generic type parameters expose `GenericParameterTypeInfo.Variance`:
+`Invariant`, `Covariant` (`out`) or `Contravariant` (`in`). Obtain parameters from
+an open definition's generic arguments. Closed constructions expose actual argument
+types. Method `ParameterInfo.IsOut` continues to describe an output argument.
+Open-definition discovery currently uses interpreter reflection; native reflection
+continues to require closed types. See the [reflection reference](/docs/reflection.html).

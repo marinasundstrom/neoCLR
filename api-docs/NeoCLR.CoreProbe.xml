@@ -4,6 +4,12 @@
     <name>NeoCLR.CoreProbe</name>
   </assembly>
   <members>
+    <member name="T:System.Introspection.GenericVariance"><summary>The declared variance of an interface type parameter.</summary></member>
+    <member name="F:System.Introspection.GenericVariance.Invariant"><summary>No variance conversion is declared.</summary></member>
+    <member name="F:System.Introspection.GenericVariance.Covariant"><summary>The parameter is declared out.</summary></member>
+    <member name="F:System.Introspection.GenericVariance.Contravariant"><summary>The parameter is declared in.</summary></member>
+    <member name="T:System.Introspection.GenericParameterTypeInfo"><summary>An unbound generic type parameter discovered through an open type definition.</summary><remarks>Closed constructions expose actual argument types instead. Method parameter IsOut describes a separate calling convention.</remarks></member>
+    <member name="P:System.Introspection.GenericParameterTypeInfo.Variance"><summary>Gets the declaration's variance, defaulting to Invariant.</summary></member>
     <member name="T:System.ParamArrayAttribute"><summary>Marks a parameter that accepts a variable number of arguments.</summary><remarks>Development compiler-reference metadata marker, using the CLI parameter-array convention. It is not an executable runtime service.</remarks></member>
     <member name="M:System.ParamArrayAttribute.#ctor"><summary>Creates the parameter-array metadata marker.</summary></member>
     <member name="T:System.Runtime.CompilerServices.IsExternalInit"><summary>Metadata marker identifying an init-only property setter.</summary><remarks>Development compiler contract. It is not an executable service or a runtime initialization lock. Raven checks initialization-only assignment; the importer recognizes this exact core marker on setter return signatures.</remarks></member>

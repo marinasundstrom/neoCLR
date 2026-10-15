@@ -219,6 +219,28 @@ impl Query {
                 crate::assembly_info::type_module_value(module, d)
             }
             Self::Shape => Ok(Value::Boolean(match argument {
+                17 => matches!(handle.identity, TypeIdentity::GenericParameter { .. }),
+                18 | 19 => match &handle.identity {
+                    TypeIdentity::GenericParameter { definition, index } => {
+                        let owner = module
+                            .types
+                            .iter()
+                            .find(|d| d.definition.as_ref() == Some(definition))
+                            .ok_or_else(|| Fault::new("missing generic parameter owner"))?;
+                        let variance = owner
+                            .generic_variance
+                            .get(usize::from(*index))
+                            .copied()
+                            .unwrap_or(crate::metadata::Variance::Invariant);
+                        variance
+                            == if argument == 18 {
+                                crate::metadata::Variance::Covariant
+                            } else {
+                                crate::metadata::Variance::Contravariant
+                            }
+                    }
+                    _ => false,
+                },
                 12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
                 13 => matches!(handle.identity, TypeIdentity::Function { .. }),
                 14 => matches!(handle.identity, TypeIdentity::Union(_)),
@@ -1512,6 +1534,9 @@ pub(crate) fn materialize(
                             if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Definition { .. }))
                             {
                                 "System.Introspection.RuntimeNominalTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::GenericParameter { .. }))
+                            {
+                                "System.Introspection.RuntimeGenericParameterTypeInfo"
                             } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Function { .. }))
                             {
                                 "System.Introspection.RuntimeFunctionTypeInfo"
@@ -1656,6 +1681,50 @@ fn publicly_visible(module: &Module, ty: &Type) -> bool {
 #[cfg(test)]
 mod visibility_tests {
     use super::*;
+
+    #[test]
+    fn generic_parameter_variance_follows_declaration_identity() {
+        let module = crate::assemble(".module VarianceInfo\n.interface Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.type class Fixed<T>\n.end\n").unwrap();
+        for (i, expected) in [
+            (0, [true, true, false]),
+            (1, [true, false, true]),
+            (2, [true, false, false]),
+        ] {
+            let descriptor =
+                crate::type_identity::describe_definition(&module, &module.types[i]).unwrap();
+            let parameter = &descriptor.generic_arguments[0];
+            for (selector, expected) in (17..20).zip(expected) {
+                assert_eq!(
+                    Query::Shape
+                        .invoke(
+                            &module,
+                            &[
+                                Value::RuntimeTypeHandle(Box::new(parameter.clone())),
+                                Value::Int32(selector)
+                            ],
+                            &Limits::default()
+                        )
+                        .unwrap(),
+                    Value::Boolean(expected)
+                );
+            }
+            for selector in 17..20 {
+                assert_eq!(
+                    Query::Shape
+                        .invoke(
+                            &module,
+                            &[
+                                Value::RuntimeTypeHandle(Box::new(descriptor.clone())),
+                                Value::Int32(selector)
+                            ],
+                            &Limits::default()
+                        )
+                        .unwrap(),
+                    Value::Boolean(false)
+                );
+            }
+        }
+    }
 
     #[test]
     fn nominal_union_marker_uses_source_identity_and_is_not_structural() {

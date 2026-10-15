@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "scope": "Guest generic-parameter variance introspection through both argument APIs; closed argument is not a parameter declaration",
+  "ravenRevision": "44bbd2934",
+  "runtimeBaseRevision": "8bffeaee9",
+  "runtimeChanges": "src/reflection.rs and src/reflection_source.rs in this slice",
+  "interpreter": {
+    "exitCode": 42,
+    "output": "=> Int32(42)"
+  },
+  "nativeReflectionLimitation": "Open-definition inventory is not yet supported by the closed-world native reflection profile. This is a support gap, not semantic erasure.",
+  "sha256": {
+    "docs/validation/interface-variance/introspection/Main.rvn": "5275ee5cc6880f0d8a3209100bb02586d0a9c7f5e19d00016b7e589ccc2fab25",
+    "target/variance-introspection-consumer/bin/neoclr/VarianceIntrospection.dll": "961a108c9cda11f910cbdb27dfd8a4ef8f3c831c9fd56579e239e28446f956c6",
+    "target/variance-introspection-20261016-final/bundle.json": "18650c567c95b603d4a340593810bb3daf68ff44c348db7941b5504969735ab9",
+    "target/variance-introspection-20261016-final/System.Runtime.dll": "616ba3b3aefdfdb032d0b0d3de28f83551fbffe435fd958eef96142280ae2ab7",
+    "target/variance-introspection-20261016-final/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/debug/neoclr": "ddb5b04d3b30a52368a57c2c6cc6f025151b5ed575b0775bd1adcaf9bd6c59fb"
+  }
+}

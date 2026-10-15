@@ -1,0 +1,47 @@
+module VarianceIntrospection
+
+import System.*
+import System.Introspection.*
+import System.Runtime.*
+
+interface Producer<out T> {
+    func Get() -> T
+}
+
+interface Consumer<in T> {
+    func Accept(value: T) -> ()
+}
+
+class Fixed<T> { }
+
+func Main() -> int {
+    var invariant = 0
+    var covariant = 0
+    var contravariant = 0
+    for type in RuntimeContext.Current.ExecutingAssembly.GetTypes() {
+        if type is NominalTypeInfo nominal && nominal.Namespace == "VarianceIntrospection" && type.GenericArgumentCount == 1 {
+            let parameter = type.GetGenericArguments()[0]
+            if parameter is GenericParameterTypeInfo info {
+                if !info.Equals(type.GetGenericArgument(0)) {
+                    return 1
+                }
+                if info.Variance == GenericVariance.Invariant {
+                    invariant += 1
+                } else if info.Variance == GenericVariance.Covariant {
+                    covariant += 1
+                } else if info.Variance == GenericVariance.Contravariant {
+                    contravariant += 1
+                }
+            } else {
+                return 2
+            }
+        }
+    }
+    if invariant != 1 || covariant != 1 || contravariant != 1 {
+        return 3
+    }
+    if typeof(Fixed<int>).GetGenericArgument(0) is GenericParameterTypeInfo {
+        return 4
+    }
+    return 42
+}

@@ -186,6 +186,8 @@
   "System.Introspection.CustomAttributeTypedArgument",
   "System.Introspection.FieldInfo",
   "System.Introspection.FunctionTypeInfo",
+  "System.Introspection.GenericParameterTypeInfo",
+  "System.Introspection.GenericVariance",
   "System.Introspection.IntersectionTypeInfo",
   "System.Introspection.MemberInfo",
   "System.Introspection.MethodInfo",

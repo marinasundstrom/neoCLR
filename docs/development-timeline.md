@@ -18183,3 +18183,31 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   the previous deliberately blocked SDK projection/import paths. Native-reader and
   projection regressions pass; an SDK-authored NEOX returns 42 in the interpreter.
 - **Outstanding:** compiler wiring, native dispatch and library annotation/qualification.
+
+## 2026-10-16 — Inspect generic parameter variance
+
+- **Author:** requested that introspection parameter information show variance.
+- **Assistant:** distinguished generic type parameters from method parameters,
+  whose `IsOut` describes an output argument. Added a guest
+  `GenericParameterTypeInfo.Variance` enum-valued property alongside the existing
+  metadata SDK descriptor. Open definitions expose the annotation; constructed
+  arguments retain their actual type descriptors.
+- **Validation scope:** fresh library and interpreter consumer qualification;
+  native closed-type shape queries must continue to work. Open-definition native
+  reflection and method-generic definition discovery remain existing gaps, not new
+  variance semantics. Structural work remains parked.
+
+## 2026-10-16 — Generic metadata must survive native specialization
+
+- **Author:** corrected terminology about generic information being erased: the
+  runtime must retain appropriate generic information and match .NET in this regard.
+- **Assistant:** agreed that executable specialization is an implementation detail;
+  definitions, constructed arguments, constraints and variance remain semantic type
+  information. Observable loss is a bug or an implementation gap, not a deliberate
+  alternative contract. Existing native open-definition introspection restrictions
+  must be tracked as gaps rather than used to justify semantic erasure.
+- **Inspection:** native selection retains complete source type declarations and
+  constructed arguments in its source catalogue, while private executable shapes
+  clear their generic parameter list. That build-time catalogue alone does not
+  establish full runtime reflection parity. Runtime generic-definition discovery
+  still needs qualification beyond the current closed-token native profile.

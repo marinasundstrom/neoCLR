@@ -471,6 +471,9 @@ internal open class RuntimeTypeInfo : TypeInfo {
     }
 
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
+        if RuntimeServices.TypeShape(handle, 17) {
+            return RuntimeGenericParameterTypeInfo.Create(handle)
+        }
         if RuntimeServices.TypeShape(handle, 12) {
             return RuntimeNominalTypeInfo.FromHandle(handle)
         }
@@ -1072,5 +1075,39 @@ internal static class TypeRelationships {
 
     static func Subclass(source: TypeInfo, target: TypeInfo) -> bool {
         return RuntimeServices.ReflectionSubclass(Handle(source), Handle(target))
+    }
+}
+
+/// Declared variance of a nominal interface type parameter.
+public enum GenericVariance {
+    Invariant = 0
+    Covariant = 1
+    Contravariant = 2
+}
+
+/// An unbound generic type parameter discovered on an open type definition.
+/// Closed generic arguments describe their actual types instead.
+public sealed interface GenericParameterTypeInfo : TypeInfo {
+    /// The declaration's variance; invariant when no annotation is present.
+    val Variance: GenericVariance { get }
+}
+
+internal class RuntimeGenericParameterTypeInfo : RuntimeTypeInfo, GenericParameterTypeInfo {
+    private init(handle: RuntimeTypeHandle) : base(handle) { }
+
+    internal static func Create(handle: RuntimeTypeHandle) -> GenericParameterTypeInfo {
+        return RuntimeGenericParameterTypeInfo(handle)
+    }
+
+    val Variance: GenericVariance {
+        get {
+            if RuntimeServices.TypeShape(ExecutionHandle, 18) {
+                return GenericVariance.Covariant
+            }
+            if RuntimeServices.TypeShape(ExecutionHandle, 19) {
+                return GenericVariance.Contravariant
+            }
+            return GenericVariance.Invariant
+        }
     }
 }

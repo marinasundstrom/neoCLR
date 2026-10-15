@@ -11144,3 +11144,14 @@ The broader legacy native-symbol baseline has an existing unrelated canonical
 property/accessor identity failure in ExternalNativeChecks; it is not claimed passing.
 AOT/JIT and library annotations are the next slices. Structural types and automatic
 Result/Sliceable widening remain parked.
+
+### Generic parameter introspection (2026-10-16)
+
+Guest `GenericParameterTypeInfo.Variance` exposes native declaration annotations.
+The temporary CLI documentation bridge projects the descriptor interface and enum;
+its metadata is documentation/reference input, not an executable provider. Native
+Raven declarations use the actual runtime descriptor. RuntimeServices.TypeShape
+selectors 17/18/19 identify generic parameters/covariance/contravariance; use a
+matching runtime/library bundle. Existing Runtime Contract configuration is unchanged.
+Native closed-world queries return false for these selectors on closed types;
+open-definition inventory remains an interpreter reflection capability.

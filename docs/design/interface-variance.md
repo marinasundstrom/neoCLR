@@ -268,3 +268,13 @@ The [native evidence](../validation/interface-variance/README.md#native-qualific
 qualifies separately compiled Raven producer/consumer calls in interpreter, AOT and
 managed JIT, including native GC cleanup. Library annotations and guest introspection
 remain follow-ups; value-result widening remains deferred.
+
+### Generic metadata preservation requirement (2026-10-16)
+
+Author direction: match .NET's reified generic type model. Native specialization
+may change executable shapes, but must not erase observable generic definitions,
+arguments, constraints or variance. Complete source type declarations and closed
+arguments are retained in the current native source catalogue; a build-time report
+alone is not runtime introspection support. The current open-definition native
+reflection restriction remains a correctness/coverage gap to close, not intended
+neoCLR semantics. This requirement does not resume structural experiments.

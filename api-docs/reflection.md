@@ -149,3 +149,26 @@ compile-time element type. Initializing from supplied values avoids exposing par
 initialized value storage. The cost is a copy and a narrower API; this is not a claim
 of better performance. A future checked Result API remains possible without exposing
 the internal RuntimeServices surface. Introspection descriptors alone stay non-executable.
+
+## Generic parameter variance (development)
+
+`System.Introspection.GenericParameterTypeInfo : TypeInfo` represents an unbound
+type parameter returned by an open definition's `GetGenericArguments()` or
+`GetGenericArgument(index)`. Its read-only `Variance: GenericVariance` property
+returns `Invariant = 0`, `Covariant = 1` (`out`) or `Contravariant = 2` (`in`).
+Missing annotations mean invariant. Parameter identity remains declaring definition
+plus ordinal; variance is declaration information, not a new type identity.
+
+For example, discover a definition through `AssemblyInfo.GetTypes()` and match
+its argument with `GenericParameterTypeInfo parameter => parameter.Variance`.
+The [executable consumer](https://github.com/marinasundstrom/neoclr/blob/main/docs/validation/interface-variance/introspection/Main.rvn)
+checks all three values. Closed `Producer<Animal>` exposes Animal as its argument,
+not the declaration's parameter. Ordinary `ParameterInfo.IsOut` remains the method
+output-argument convention and does not mean covariance.
+
+This follows .NET's placement of variance on generic parameter metadata, with a
+specialized descriptor and enum instead of the combined GenericParameterAttributes
+flags. It does not add method generic-definition discovery. Open definition
+inventory is currently an interpreter reflection capability; the native closed-world
+reflection profile still requires closed types. Native interface variance execution
+is supported independently of that existing reflection restriction.
