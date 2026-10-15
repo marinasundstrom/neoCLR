@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
-- Enable structural unions, intersections and tuples in the default interpreter build and companion native project profile. Add combined native signature reads and a separate-library editable sample (42). Retain explicit reduced profiles, interpreter-only execution and source-library rebuild limitations.
+- Enable structural unions, intersections and tuples in the default interpreter build and companion native project profile. Add combined native signature reads and a separate-library editable sample (42). Retain explicit reduced profiles, interpreter-only execution and source-library rebuild limitations. Fix companion intersection-cast lookahead so parenthesized bitwise expressions remain expressions (17 parser tests). A fresh source-library rebuild now reaches native emission but hits the application-sized JSON limit; library-budget wiring remains pending.
 
 ### 2026-10-14
 
