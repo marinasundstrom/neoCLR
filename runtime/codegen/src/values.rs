@@ -2673,11 +2673,14 @@ pub(crate) fn compile_into(
                     }
                     Op::CastClass(target)
                         if matches!(p.ty(target)?, Ty::ValueUnion(_))
-                            && (matches!(top(), Ty::PendingUnionScalar(_))
+                            && (matches!(top(), Ty::PendingUnionScalar(_) | Ty::Callable(_))
                                 || *top() == p.ty(target)?) =>
                     {
-                        if let Ty::PendingUnionScalar(payload_type) = top() {
-                            let payload_type = p.ty(payload_type)?;
+                        if matches!(top(), Ty::PendingUnionScalar(_) | Ty::Callable(_)) {
+                            let payload_type = match top() {
+                                Ty::PendingUnionScalar(t) => p.ty(t)?,
+                                other => other.clone(),
+                            };
                             let Ty::ValueUnion(parts) = p.ty(target)? else {
                                 unreachable!()
                             };
@@ -2686,7 +2689,15 @@ pub(crate) fn compile_into(
                                 .iter()
                                 .position(|part| *part == payload_type)
                                 .expect("admitted exact payload");
-                            stack.push(b.ins().iconst(types::I32, active as i64 + 1));
+                            let tag = b.ins().iconst(types::I32, active as i64 + 1);
+                            let tag = if matches!(payload_type, Ty::Callable(_)) {
+                                let null = b.ins().icmp_imm(IntCC::Equal, payload[0], 0);
+                                let empty = b.ins().iconst(types::I32, 0);
+                                b.ins().select(null, empty, tag)
+                            } else {
+                                tag
+                            };
+                            stack.push(tag);
                             for (index, part) in parts.iter().enumerate() {
                                 if index == active {
                                     stack.extend(payload.iter().copied());
@@ -2697,6 +2708,37 @@ pub(crate) fn compile_into(
                                 }
                             }
                         }
+                    }
+                    Op::IsInstance(target @ neoclr::metadata::Type::Function(_))
+                    | Op::CastClass(target @ neoclr::metadata::Type::Function(_))
+                        if matches!(top(), Ty::ValueUnion(_)) =>
+                    {
+                        let Ty::ValueUnion(parts) = top() else {
+                            unreachable!()
+                        };
+                        let values = stack.split_off(stack.len() - p.lanes(top()));
+                        let target_type = p.ty(target)?;
+                        let active = parts.iter().position(|part| *part == target_type);
+                        let expected = active.map_or(-1, |i| i as i64 + 1);
+                        let matched = b.ins().icmp_imm(IntCC::Equal, values[0], expected);
+                        let null = b.ins().iconst(types::I64, 0);
+                        if matches!(op, Op::CastClass(_)) {
+                            let occupied = b.ins().icmp_imm(IntCC::NotEqual, values[0], 0);
+                            let mismatch = b.ins().icmp_imm(IntCC::NotEqual, values[0], expected);
+                            let invalid = b.ins().band(occupied, mismatch);
+                            let status = b.ins().iconst(types::I32, 11);
+                            return_if_detailed(&mut b, invalid, status, site.as_ref());
+                        }
+                        let payload = if let Some(index) = active {
+                            let offset = 1 + parts[..index]
+                                .iter()
+                                .map(|part| p.lanes(part))
+                                .sum::<usize>();
+                            values[offset]
+                        } else {
+                            null
+                        };
+                        stack.push(b.ins().select(matched, payload, null));
                     }
                     Op::IsInstance(target) | Op::UnboxAny(target)
                         if matches!(top(), Ty::ValueUnion(_))

@@ -91,7 +91,10 @@ not implicit implementation of an interface or synthesis of a nominal union.
 On the development runtime branch, interpreter unions also accept function
 alternatives such as `union<fn<Int32,Int32>,Int32>`. Narrow to the exact function
 signature before invocation. Copies retain the target and bound receiver; wrong
-signature casts fail. Native JIT/AOT callable-union layout and Raven source
+signature casts fail. Bounded macOS ARM64 AOT storage now uses an inline tag and
+separate callable slots, with receiver retention checked under eager/paced native
+collection. Injection adds no union carrier allocation; binding retains its ordinary
+callable-descriptor allocation. JIT lifetime, native Object widening and Raven source
 qualification remain open. Function intersection bounds remain unsupported.
 
 `UnionTypeInfo.Types: Sequence<TypeInfo>` exposes a constituent snapshot.

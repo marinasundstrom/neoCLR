@@ -6,8 +6,9 @@
 covers source native signatures, structural descriptors, Task union delivery,
 intersection trait calls and closed method constraints with separate consumers.
 Interpreter callable union alternatives now have focused storage/narrowing and
-receiver-collection checks; native callable-union layout and Raven source qualification
-remain open. Written intersection bounds require interfaces or classes open to extension;
+receiver-collection checks; bounded native callable-union storage now has AOT
+receiver-retention and exact allocation checks. JIT lifetime, broader conversions
+and Raven source qualification remain open. Written intersection bounds require interfaces or classes open to extension;
 Raven sealed hierarchies remain valid. Full open-generic integration, broader
 constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
 Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and

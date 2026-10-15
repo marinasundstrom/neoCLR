@@ -658,7 +658,7 @@ impl<'a> Profile<'a> {
             {
                 Ty::ScalarUnion(parts.clone())
             }
-            Type::Union(parts) if crate::scalar_unions::records(self.input, t) => {
+            Type::Union(parts) if crate::scalar_unions::payloads(self.input, t) => {
                 let parts = parts
                     .iter()
                     .map(|t| self.ty(t))
@@ -1531,6 +1531,7 @@ impl<'a> Profile<'a> {
                                 | Ty::Interface(_)
                                 | Ty::Intersection(_)
                                 | Ty::ReferenceUnion(_)
+                                | Ty::Callable(_)
                         ) || self.backing_for_array(&self.ty(t)?).is_some()) =>
                 {
                     ()
@@ -1658,6 +1659,8 @@ impl<'a> Profile<'a> {
                     }
                     if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
                         && source != self.ty(t)?
+                        && !(matches!(source, Ty::Callable(_))
+                            && parts.iter().any(|part| self.ty(part).ok().as_ref() == Some(&source)))
                         && !(matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))
                             && matches!(source, Ty::Reference(_) | Ty::Interface(_))
                             && parts.iter().any(|part| {
@@ -1840,6 +1843,12 @@ impl<'a> Profile<'a> {
                         return Err(fail(pc, "String casts require text or managed references"));
                     }
                     stack.push(Ty::Literal);
+                }
+                Op::IsInstance(t @ Type::Function(_)) | Op::CastClass(t @ Type::Function(_))
+                    if matches!(stack.last(), Some(Ty::ValueUnion(_))) =>
+                {
+                    pop(&mut stack)?;
+                    stack.push(self.ty(t)?);
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
                     if matches!(op, Op::IsInstance(_)) && matches!(self.ty(t)?, Ty::ValueUnion(_)) {

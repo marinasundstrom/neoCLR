@@ -1,0 +1,65 @@
+.module StructuralUnionGC
+.type class abstract System.Object
+.end
+.type class Cell
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg this
+ldarg value
+stfld Cell::Value
+ret
+.end
+.method instance Read() -> Int32
+ldarg this
+ldfld Cell::Value
+ret
+.end
+.end
+.type Payload
+.field Wide Int64
+.field Reference Cell
+.end
+.function Make() -> union<fn<Int32>,Int32>
+ldc.i4 42
+newobj.ctor instance Cell::.ctor(Int32)
+function.bind fn<Int32> = instance Cell::Read()
+castclass union<fn<Int32>,Int32>
+ret
+.end
+.function Pressure(union<fn<Int32>,Int32> value) -> union<fn<Int32>,Int32>
+.local Int32 remaining
+ldc.i4 40
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldarg value
+ret
+.end
+.function Calculate() -> Int32
+.local union<fn<Int32>,Int32> value
+call Make()
+call Pressure(union<fn<Int32>,Int32>)
+stloc value
+ldloc value
+call Pressure(union<fn<Int32>,Int32>)
+stloc value
+ldloc value
+isinst fn<Int32>
+ref.isnull
+brtrue Bad
+ldloc value
+castclass fn<Int32>
+call instance fn<Int32>::Invoke()
+ret
+Bad:
+ldc.i4 -1
+ret
+.end

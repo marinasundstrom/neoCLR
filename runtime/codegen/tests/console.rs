@@ -11976,7 +11976,6 @@ fn structural_record_union_reference_alternatives_use_nominal_conformance() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_union_roots_survive_native_collection_and_unwind() {
-    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let record = include_str!("../../../docs/experiments/native-structural-types/union-gc.neoil");
     let direct = record.replace(
         "ldloc payload\nbox Payload",
@@ -11992,12 +11991,21 @@ fn structural_union_roots_survive_native_collection_and_unwind() {
         "ldloc value\nunbox.any Payload\nldfld Payload::Wide",
         "ldloc value\nunbox.any Int32\nconv.i8",
     );
-    for (source, expected_status) in [
-        (record, 0),
-        (direct.as_str(), 0),
-        (scalar.as_str(), 0),
-        (fault.as_str(), 11),
-    ] {
+    verify_structural_union_gc(
+        &[
+            (record, 0),
+            (direct.as_str(), 0),
+            (scalar.as_str(), 0),
+            (fault.as_str(), 11),
+        ],
+        648,
+    );
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn verify_structural_union_gc(cases: &[(&str, i32)], expected_allocations: u64) {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for &(source, expected_status) in cases {
         let app = neoclr::assemble(source).unwrap();
         let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
         let method = program
@@ -12037,7 +12045,7 @@ int main(void) {{
         if(neoclr_gc_entry_check_v1(&ctx))return 5;
     }}
     neoclr_gc_statistics stats=neoclr_gc_statistics_v1();
-    if(stats.collections<16 || stats.allocations<648 || stats.reclaimed_allocations<648)return 6;
+    if(stats.collections<16 || stats.allocations!={expected_allocations} || stats.reclaimed_allocations!={expected_allocations})return 6;
     return 0;
 }}
 "#)).unwrap();
@@ -12075,4 +12083,33 @@ int main(void) {{
             );
         }
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_callable_union_roots_survive_native_collection() {
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil");
+    let expanded = source.replace(
+        "union<fn<Int32>,Int32>",
+        "union<fn<Int32>,fn<Int32,Int32>,Payload,Int32>",
+    );
+    let fault = expanded.replace(
+        "castclass fn<Int32>\ncall instance fn<Int32>::Invoke()",
+        "castclass fn<Int32,Int32>\nldc.i4 1\ncall instance fn<Int32,Int32>::Invoke(Int32)",
+    );
+    let scalar = source.replace("castclass union<fn<Int32>,Int32>\nret", "pop\nldc.i4 42\nbox Int32\ncastclass union<fn<Int32>,Int32>\nret")
+        .replace("ldloc value\nisinst fn<Int32>\nref.isnull\nbrtrue Bad\nldloc value\ncastclass fn<Int32>\ncall instance fn<Int32>::Invoke()", "ldloc value\nisinst fn<Int32>\nref.isnull\nbrfalse Bad\nldloc value\nunbox.any Int32");
+    let null = source.replace(".function Make() -> union<fn<Int32>,Int32>", ".function Make() -> union<fn<Int32>,Int32>\n.local fn<Int32> empty").replace("castclass union<fn<Int32>,Int32>\nret", "pop\nldloca empty\ninitobj fn<Int32>\nldloc empty\ncastclass union<fn<Int32>,Int32>\nret")
+        .replace("ldloc value\nisinst fn<Int32>\nref.isnull\nbrtrue Bad\nldloc value\ncastclass fn<Int32>\ncall instance fn<Int32>::Invoke()", "ldloc value\ncastclass fn<Int32>\nref.isnull\nbrfalse Bad\nldc.i4 42");
+    verify_structural_union_gc(
+        &[
+            (source, 0),
+            (&expanded, 0),
+            (&fault, 11),
+            (&scalar, 0),
+            (&null, 0),
+        ],
+        656,
+    );
 }

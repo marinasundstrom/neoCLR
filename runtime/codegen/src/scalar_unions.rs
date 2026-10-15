@@ -24,14 +24,15 @@ pub(crate) fn record(module: &Module, ty: &Type) -> bool {
     })
 }
 
-pub(crate) fn records(module: &Module, ty: &Type) -> bool {
-    matches!(ty, Type::Union(parts) if parts.iter().any(|t| record(module, t))
-        && parts.iter().all(|t| tag(t).is_some() || record(module, t)
+// Records and callable descriptors use disjoint, independently traced payload regions.
+pub(crate) fn payloads(module: &Module, ty: &Type) -> bool {
+    matches!(ty, Type::Union(parts) if parts.iter().any(|t| record(module, t) || matches!(t, Type::Function(_)))
+        && parts.iter().all(|t| tag(t).is_some() || record(module, t) || matches!(t, Type::Function(_))
             || module.type_definition(t).is_some_and(|d| d.is_reference_type || d.representation == Representation::Interface)))
 }
 
 pub(crate) fn inline(module: &Module, ty: &Type) -> bool {
-    supported(ty) || records(module, ty)
+    supported(ty) || payloads(module, ty)
 }
 
 // Preserve both original instructions and their diagnostic positions. The native

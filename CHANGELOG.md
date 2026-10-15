@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Add bounded native callable union alternatives with exact tagged injection/narrowing and separate callable tracing slots. Validate AOT/interpreter agreement, receiver retention under eager/paced collection, null/scalar replacement, wrong-signature faults and exact allocations without a union carrier. Native Object widening, JIT lifetime and Raven source qualification remain open.
+
 - Admit function alternatives in interpreter structural unions, retaining callable identity and receiver across union storage, copies and checked narrowing. Validate metadata round-trips, calls, collection and invalid use; preserve explicit narrowing and reject callable intersection bounds. Native callable-union layout and Raven source qualification remain open; no Runtime Contract or CLI encoding change.
 
 - Add bounded native collector stress for structural unions: retain record-held and direct references across allocating calls, keep scalar alternatives valid, and remove roots after normal/fault unwind. Check interpreter agreement, eager/paced nonmoving AOT collection in a small heap, fault output and full reclamation with native sanitizers. A fresh imported Raven Response<Cell> consumer also passes 32 invocations per eager/paced collector mode, reclaiming all 64 explicit allocations per mode; record reproducible source/artifact hashes and document current function-composition gaps. This does not qualify JIT or async retention; Runtime Contract and layouts are unchanged.

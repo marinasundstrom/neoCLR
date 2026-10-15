@@ -401,3 +401,38 @@ This qualifies the imported scalar/closed-generic record/direct-reference consum
 under nonmoving AOT collection. Runtime hooks are explicitly allowlisted; no layout,
 compiler emission or Runtime Contract change was needed. JIT lifetime, async
 retention, broader structural combinations and throughput remain open.
+
+
+### Native callable union storage (2026-10-15)
+
+[callable-union-gc.neoil](callable-union-gc.neoil) stores a bound instance function
+in `union<fn<Int32>,Int32>`, passes/returns it through allocating calls, narrows it,
+and invokes the retained receiver. The `structural_callable_union_roots_survive_native_collection`
+regression also tests a second callable signature and inactive record region,
+wrong-signature extraction (InvalidCast), replacement with an integer, and null.
+It compares interpreter results with macOS ARM64 AOT under eager and paced native
+collection, using bounds/undefined-behavior sanitizers.
+
+Each of five cases runs eight times per collector mode in a 1024-byte heap. Each
+host checks exactly 656 allocations and reclamations: 80 temporary arrays plus a
+Cell and callable descriptor per invocation. Union injection/copy/calls add no
+allocation. Roots and heap must be empty after each invocation, including fault
+unwind. This is an allocation assertion, not a throughput benchmark.
+
+Reproduce on macOS ARM64 with the configured Xcode SDK:
+
+```sh
+cargo test -p neoclr-codegen --test console structural_callable_union_roots -- --nocapture
+```
+
+The private ABI reuses the bounded disjoint-region value-union layout, with an
+exact tag and a separate descriptor-pointer slot for each callable alternative.
+Inactive regions are zero; callable slots use the callable tracing recipe, which
+retains the receiver, rather than the nominal-object union tracing recipe. This
+preserves the CLR-style obligation to trace references embedded in value storage;
+the signature-native union itself is a deliberate neoCLR extension.
+
+The 256-lane limit and admitted function-shape limits still apply. Explicit
+injection and exact narrowing are qualified; native Object widening, conversion
+between different union layouts, JIT lifetime, async retention and Raven source
+qualification remain open. Function intersections are still not admitted.

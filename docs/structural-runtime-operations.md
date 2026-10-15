@@ -180,8 +180,14 @@ implicit function variance. Composition admission still excludes function signat
 containing tuple or byref parameter/result types; these remain support gaps.
 Tests cover JSON metadata round-tripping, local and
 parameter/result storage, and bound-receiver retention during interpreter collection.
-Native JIT/AOT callable-union layouts and Raven source emission remain unqualified;
-the native backend still rejects callable alternatives. Tuple/function nesting is
+The native backend now admits bounded callable alternatives using a separate traced
+payload slot per function signature and an inline union tag. Injection adds no union
+carrier allocation; binding still allocates the ordinary callable descriptor. Exact
+`castclass`/`isinst` narrowing preserves the descriptor and receiver. The
+[collector test](experiments/native-structural-types/README.md#native-callable-union-storage-2026-10-15)
+qualifies macOS ARM64 AOT copies/calls, wrong signatures, null and scalar replacement.
+Native Object widening, cross-union layout conversion, JIT lifetime and Raven source
+emission remain unqualified. Tuple/function nesting is
 representable in signatures, but the interpreter's tuple-element admission rule
 still excludes function elements. Representation alone is not execution support.
 The regression cases are in `tests/structural_compositions.rs` (`callable_union_*`),
