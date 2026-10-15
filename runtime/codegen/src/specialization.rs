@@ -164,10 +164,6 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
-        if definition.generic_variance.iter()
-            .any(|v| *v != neoclr::metadata::Variance::Invariant) {
-            return Err("native variant interface specialization requires conversion-aware dispatch; annotations cannot be erased".into());
-        }
         if !definition.generic_constraints.is_empty()
             || definition.generic_parameters.len() != arguments.len()
         {
@@ -782,6 +778,7 @@ pub fn expand_with_host_roots(
                 &instance.methods,
                 &mut pending,
             )?;
+            neoclr::native_metadata::retain_interface_slot(&mut function, input, instance.source);
             if !instance.methods.is_empty() {
                 function.name = clone_name(&function.name, instance.row);
             }
@@ -956,6 +953,24 @@ pub fn expand_with_host_roots(
                 {
                     return Err("interface dispatch requires constructed classes".into());
                 }
+                if contract.owner.as_ref().is_some_and(|target| neoclr::native_metadata::interface_has_variance(input, target)) {
+                    let view = neoclr::native_metadata::interface_view(input, owner, contract.owner.as_ref().unwrap())
+                        .map_err(|e| e.to_string())?;
+                    if Some(&view) != contract.owner.as_ref() {
+                        let template = input.functions.iter().find(|f| f.definition == contract.definition && f.name == contract.name)
+                            .ok_or("missing original variant contract")?;
+                        let arguments = match &view {
+                            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => arguments.as_slice(),
+                            _ => &[],
+                        };
+                        let actual = super::selection::closed_signature(template, arguments)?;
+                        let peer = context.resolve(&FunctionRef {
+                            definition: actual.definition, name: actual.name, owner: actual.owner,
+                            instance: actual.instance, generic_arguments: vec![], parameters: actual.parameters,
+                        })?;
+                        if !visited.contains(&peer.row) { pending.push(peer); }
+                    }
+                }
                 let (_, reference) = if super::selection::object_dispatch_contract(&contract) {
                     let Some(target) =
                         super::selection::object_value_override(input, owner, &contract)?
@@ -1028,6 +1043,9 @@ pub fn expand_with_host_roots(
                 });
             }
         }
+        let native_arguments = shape.arguments.iter().map(|argument| context.lower(argument)).collect::<Result<Vec<_>, _>>()?;
+        neoclr::native_metadata::retain_interface_shape(&mut t, input, shape.source, native_arguments)
+            .map_err(|e| e.to_string())?;
         t.generic_parameters.clear();
         t.generic_variance.clear();
         for field in &mut t.fields {
@@ -1246,10 +1264,56 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn variant_interfaces_reject_before_erasing_generic_identity() {
-        let module = neoclr::assemble(".module VarianceNative\n.entry Main\n.type class Item\n.end\n.interface Producer<T>\n.variance out\n.end\n.type class Source\n.implements Producer<Item>\n.end\n.function Main() -> Int32\n.local Producer<Item> view\nnewobj Source\ncastclass Producer<Item>\nstloc view\nldc.i4 42\nret\n.end").unwrap();
-        let error = super::expand(&module, "Main").unwrap_err().to_string();
-        assert!(error.contains("annotations cannot be erased"), "{error}");
+    fn variant_interfaces_preserve_dispatch_and_identity_after_specialization() {
+        let input = neoclr::assemble(include_str!("../../../docs/validation/interface-variance/Main.neoil")).unwrap();
+        let (expanded, _) = super::expand(&input, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        let outcome = program.run(neoclr::Limits::default()).unwrap();
+        assert_eq!(outcome.value, neoclr::Value::Int32(42));
+    }
+
+    #[test]
+    fn variant_interface_dispatch_closes_generic_implementations() {
+        let input = neoclr::assemble(r#".module GenericVariance
+.entry Main
+.type class Base
+.end
+.type class Derived
+.extends Base
+.end
+.interface Producer<T>
+.variance out
+.method instance Get() -> T
+.end
+.end
+.type class Box<T>
+.implements Producer<T>
+.field Item T
+.method instance Get() -> T
+ldarg this
+ldfld 0
+ret
+.end
+.end
+.function Main() -> Int32
+newobj Derived
+newobj Box<Derived>
+castclass Producer<Base>
+callvirt instance Producer<Base>::Get()
+pop
+ldc.i4 42
+ret
+.end"#).unwrap();
+        let (selected, _) = super::super::selection::prepare(&input, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        // Serialized artifacts cannot install the native compiler's trusted proof.
+        let mut json = serde_json::to_value(&input).unwrap();
+        json["types"][0]["native_interface"] = serde_json::json!({"arguments": []});
+        assert!(serde_json::from_value::<neoclr::Module>(json).is_err());
     }
 
     use super::*;

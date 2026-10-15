@@ -8,7 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
-- Admit verified reference-only interface variance in metadata SDK call/return storage checks, including nested local/imported interfaces and explicit semantic-provider annotations. Preserve exact matches, reject ambiguous views and exclude boxing, writable aliases and primitive materialization. A separately compiled Raven producer/consumer fixture imports annotations and returns 42 in neoCLR; native backend qualification remains pending.
+- Preserve verified interface variance and contract-slot identity through native specialization and selection without synthetic inheritance or wrapper allocations. Separately compiled Raven covariance/contravariance consumers return 42 in interpreter, AOT and managed JIT; the native hosts check fault state, roots and collection. Focused specialization tests include closed generic implementations and reject serialized compiler proofs.
+
+- Admit verified reference-only interface variance in metadata SDK call/return storage checks, including nested local/imported interfaces and explicit semantic-provider annotations. Preserve exact matches, reject ambiguous views and exclude boxing, writable aliases and primitive materialization. A separately compiled Raven producer/consumer fixture imports annotations and returns 42 in neoCLR; native backend qualification is recorded below.
 
 ### 2026-10-15
 

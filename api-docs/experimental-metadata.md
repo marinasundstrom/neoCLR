@@ -9273,3 +9273,14 @@ SDK call/return storage checks now admit declared reference-only interface varia
 including nested local/imported interfaces. Exact conformance wins; multiple other
 compatible views reject. Writable aliases, boxing, primitive materialization and
 mutable-array covariance remain excluded. Equal value arguments remain exact.
+
+### Native compiler variance bridge — development
+
+The unstable Rust `native_metadata` bridge exposes `retain_interface_shape` and
+`retain_interface_slot` for verified source definitions, `interface_has_variance`
+and `interface_view` for resolution, and `interface_slot_peers` and
+`interface_shape_arguments` for selection dependencies. These are compiler-only
+in-memory facts, excluded from serialization and guest RavenDoc. Invalid shape
+indices or arity return Fault; callers must supply verified source modules and
+valid function indices. They preserve source identities through private shape
+renumbering; they do not define new nominal inheritance or public guest types.

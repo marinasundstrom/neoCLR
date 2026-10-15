@@ -840,6 +840,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        native_interface: None,
                         static_fields: vec![],
                         primitive_reference: false,
                         is_reference_type,
@@ -976,6 +977,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     };
                     function = Some(PendingFunction {
                         function: Function {
+                            native_interface_slot: None,
                             namespace: String::new(),
                             sequence_points: vec![],
                             visibility,

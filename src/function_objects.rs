@@ -76,6 +76,7 @@ pub(crate) fn structural_contract(ty: &Type) -> Result<Function, Fault> {
     if let Type::Function(shape) = ty {
         shape.validate()?;
         return Ok(Function {
+            native_interface_slot: None,
             origin: None,
             sequence_points: vec![],
             visibility: crate::metadata::Visibility::Public,

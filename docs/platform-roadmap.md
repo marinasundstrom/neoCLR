@@ -4853,8 +4853,7 @@ using Sliceable<int[]> to Sliceable<Iterable<int>> as an acceptance case. Retain
 restrictions that protect writable state and validate nested parameter positions.
 The [research and staged plan](design/interface-variance.md) now has validated
 runtime metadata and bounded interpreter reference conversions, with a
-[retained consumer](validation/interface-variance/README.md). Native specialization
-rejects used variant interfaces pending dispatch adaptation. SDK annotation authoring, inspection, CLI/native projection and snapshot round trips
-are supported. Raven transport and native dispatch qualification remain in progress. The current author-directed scope is minimal
+[retained consumer](validation/interface-variance/README.md). Native specialization now retains verified interface/slot identities; the separately compiled Raven consumer passes interpreter, AOT and managed JIT. SDK annotation authoring, inspection, CLI/native projection and snapshot round trips
+are supported. Raven annotation transport and native dispatch qualification are validated; library annotations and guest introspection remain. The current author-directed scope is minimal
 reference-only interface variance; result-value widening is deferred. Standard library interfaces and Result remain invariant. This does not resume
 structural-type work or change unrelated milestone priorities.

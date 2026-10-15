@@ -256,3 +256,15 @@ producer/consumer library and consumer return 42 under the interpreter; reverse,
 invariant and value-argument conversions reject. Unsafe declaration emission fails
 without writing an output image. See [bridge integration](../raven-cli-bridge.md).
 Native specialization and library annotations remain outstanding in this slice.
+
+## Native execution qualification — 2026-10-16
+
+Superseding the earlier rejection boundary, private native shapes retain verified
+source interface identity, argument types, annotations and contract-slot identity.
+Selection retains all reached compatible peers, including closed generic
+implementations, and reuses nominal exact-first/unambiguous resolution. The proof
+is not serializable metadata and introduces no artificial inheritance or allocation.
+The [native evidence](../validation/interface-variance/README.md#native-qualification--2026-10-16)
+qualifies separately compiled Raven producer/consumer calls in interpreter, AOT and
+managed JIT, including native GC cleanup. Library annotations and guest introspection
+remain follow-ups; value-result widening remains deferred.

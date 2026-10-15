@@ -447,3 +447,64 @@ fault "test body must not execute"
         assert!(module_function_attributes(&module, "Package", "Example.Tests", &id).is_ok());
     }
 }
+
+
+/// Retain a verified interface's source identity in a private native compiler shape.
+/// These facts are in-memory compiler IR, not serialized metadata or new inheritance.
+pub fn retain_interface_shape(
+    target: &mut crate::metadata::TypeDef,
+    source: &Module,
+    index: usize,
+    arguments: Vec<Type>,
+) -> Result<(), Fault> {
+    let original = source.types.get(index).ok_or_else(|| Fault::new("missing source interface"))?;
+    if original.representation != crate::metadata::Representation::Interface ||
+        !original.generic_variance.iter().any(|v| *v != crate::metadata::Variance::Invariant) {
+        return Ok(());
+    }
+    if arguments.len() != original.generic_parameters.len() {
+        return Err(Fault::new("native interface argument arity mismatch"));
+    }
+    target.native_interface = Some(crate::variance::NativeInterface {
+        source: original.definition.clone().unwrap_or(crate::metadata::TypeDefId {
+            module: source.name.clone(), revision: source.revision.clone(), index: index as u32,
+        }),
+        arguments,
+        annotations: original.generic_variance.clone(),
+    });
+    Ok(())
+}
+
+/// Preserve a variant contract slot across closed owner specialization.
+pub fn retain_interface_slot(target: &mut crate::metadata::Function, source: &Module, index: usize) {
+    let original = &source.functions[index];
+    if original.owner.as_ref().is_some_and(|owner| interface_has_variance(source, owner)) {
+        target.native_interface_slot = Some(original.definition.clone().unwrap_or(crate::metadata::MemberId {
+            module: source.name.clone(), revision: source.revision.clone(), index: index as u32,
+        }));
+    }
+}
+
+/// Whether a source or private specialized interface carries declared variance.
+pub fn interface_has_variance(module: &Module, interface: &Type) -> bool {
+    module.type_definition(interface).is_some_and(|definition|
+        definition.native_interface.is_some() || definition.generic_variance.iter()
+            .any(|v| *v != crate::metadata::Variance::Invariant))
+}
+
+/// Resolve the declared interface view used to satisfy a reference conversion.
+pub fn interface_view(module: &Module, source: &Type, target: &Type) -> Result<Type, Fault> {
+    crate::variance::implemented_view(module, source, target)
+}
+
+/// Closed contract peers needed to preserve a specialized interface slot.
+pub fn interface_slot_peers(module: &Module, function: &crate::metadata::Function) -> Vec<usize> {
+    let Some(slot) = &function.native_interface_slot else { return vec![]; };
+    module.functions.iter().enumerate().filter_map(|(i, f)|
+        (f.native_interface_slot.as_ref() == Some(slot)).then_some(i)).collect()
+}
+
+/// Type dependencies of the private native interface proof.
+pub fn interface_shape_arguments(definition: &crate::metadata::TypeDef) -> &[Type] {
+    definition.native_interface.as_ref().map(|shape| shape.arguments.as_slice()).unwrap_or(&[])
+}

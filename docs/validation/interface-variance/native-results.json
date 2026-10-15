@@ -1,0 +1,105 @@
+{
+  "passed": true,
+  "scope": "separately compiled Raven nominal reference covariance and contravariance; interpreter, AOT and managed JIT",
+  "ravenRevision": "44bbd2934",
+  "bundle": "/Users/robert/Projects/neoclr/target/sliceable-libraries-20261015-final",
+  "interpreter": {
+    "exitCode": 42,
+    "output": "=> Int32(42)"
+  },
+  "nativeHostChecks": "success result, no fault, empty root chain and no retained heap storage after collection",
+  "hostCommands": [
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/interface-variance-native-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/interface-variance-native-20261016/app"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "run-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/interface-variance-native-20261016/app"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/interface-variance-native-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.492021334,
+    "guestExitCode": 42,
+    "invocationSeconds": 4.525e-05,
+    "metadataLoadSeconds": 0.318354167,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 5.729855333
+  },
+  "logs": {
+    "/Users/robert/Projects/neoclr/target/interface-variance-native-20261016/aot.log": "508468d9d3facb3003eb900cbf64c69396c0e52d1056fc42cf0db7e27a76fe06",
+    "/Users/robert/Projects/neoclr/target/interface-variance-native-20261016/jit.log": "d82c4871c19c20a22aac3258c4feeb98fd4f3f2f6149c8fa21c7996e05406b38"
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/VarianceLibrary.rvn": "514f35723ff9d1eef855d2f4d88b334c7cd4e7b791015caa9ab2b05e2d7433be",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/VarianceConsumer.rvn": "61f1c91778241684db636cb6fa50d75f17b8b7e40534e95546fde018e67e6dd0",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "e583702a97619293ac554ad2c5bef38a27bf4b104b8b1c795deedb05e2aece6f",
+    "/tmp/raven-variance-native/VarianceLibrary.dll": "bab2002c3e7202252a8e2505425f6f6ad2f9ae8a76dd445613a8ebb3422d623e",
+    "/tmp/raven-variance-native/VarianceConsumer.dll": "ad0824a65234e0375f6ee2239dc762a7cb7ef29fa9651acf957493ec41ca04bd",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "48801a441f5da762016c00c47c73b6dd7e73454bb115233980299948649561b9",
+    "/Users/robert/Projects/neoclr/target/sliceable-libraries-20261015-final/bundle.json": "06310faa3afaa09dedba794ab55e8a492dd31ff80f0b93c7c6e022af25c0fae2"
+  }
+}

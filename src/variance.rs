@@ -4,6 +4,15 @@ use crate::{
     metadata::{Representation, Type, TypeDef, Variance},
 };
 
+// Closed native shapes retain source identity and argument variance even though
+// their executable owners have private nongeneric names. This is compiler IR only.
+#[derive(Debug, Clone)]
+pub(crate) struct NativeInterface {
+    pub source: crate::metadata::TypeDefId,
+    pub arguments: Vec<Type>,
+    pub annotations: Vec<Variance>,
+}
+
 pub(crate) fn parameter(def: &TypeDef, index: usize) -> Variance {
     def.generic_variance
         .get(index)
@@ -176,32 +185,48 @@ fn compatible_at(module: &Module, source: &Type, target: &Type, depth: usize) ->
     let Some(def) = module.type_definition(source) else {
         return false;
     };
+    let Some(destination) = module.type_definition(target) else {
+        return false;
+    };
     if def.representation != Representation::Interface
-        || !module
-            .type_definition(target)
-            .is_some_and(|d| std::ptr::eq(d, def))
+        || destination.representation != Representation::Interface
     {
         return false;
     }
-    source
-        .generic_arguments()
-        .iter()
-        .zip(target.generic_arguments())
-        .enumerate()
-        .all(|(index, (a, b))| {
-            if a == b {
-                return true;
-            }
-            // Identity for value arguments remains legal; differing value arguments never box.
-            if !ordinary_reference(module, a) || !ordinary_reference(module, b) {
-                return false;
-            }
-            match parameter(def, index) {
-                Variance::Invariant => false,
-                Variance::Covariant => reference_conversion(module, a, b, depth + 1),
-                Variance::Contravariant => reference_conversion(module, b, a, depth + 1),
-            }
-        })
+    let (from, to, annotations) = match (&def.native_interface, &destination.native_interface) {
+        (Some(a), Some(b)) if a.source == b.source => (
+            a.arguments.as_slice(),
+            b.arguments.as_slice(),
+            a.annotations.as_slice(),
+        ),
+        (None, None) if std::ptr::eq(def, destination) => (
+            source.generic_arguments(),
+            target.generic_arguments(),
+            def.generic_variance.as_slice(),
+        ),
+        _ => return false,
+    };
+    if from.len() != to.len() {
+        return false;
+    }
+    from.iter().zip(to).enumerate().all(|(index, (a, b))| {
+        if a == b {
+            return true;
+        }
+        // Identity for value arguments remains legal; differing value arguments never box.
+        if !ordinary_reference(module, a) || !ordinary_reference(module, b) {
+            return false;
+        }
+        match annotations
+            .get(index)
+            .copied()
+            .unwrap_or(Variance::Invariant)
+        {
+            Variance::Invariant => false,
+            Variance::Covariant => reference_conversion(module, a, b, depth + 1),
+            Variance::Contravariant => reference_conversion(module, b, a, depth + 1),
+        }
+    })
 }
 
 pub(crate) fn compatible(module: &Module, source: &Type, target: &Type) -> bool {

@@ -1,7 +1,6 @@
 # Runtime interface variance — 2026-10-15
 
-Development runtime metadata and interpreter qualification. This is not Raven
-compiler/SDK support or native AOT/JIT qualification. Structural work stays parked.
+Development runtime metadata and interpreter qualification. The original interpreter evidence is retained below; the 2026-10-16 section adds Raven and native qualification. Structural work stays parked.
 
 `Main.neoil` declares a producer of Derived and a consumer of Base, then uses them
 through Producer<Base> and Consumer<Derived>. It checks receiver/payload identity;
@@ -32,7 +31,7 @@ cargo test --lib variance::tests
 cargo test --test nominal_interfaces --test boxed_interfaces \
   --test explicit_interfaces --test default_interfaces --test interface_inheritance
 cargo test -p neoclr-codegen --lib \
-  variant_interfaces_reject_before_erasing_generic_identity
+  variant_interface
 ```
 
 The checks cover metadata defaults/round-trip, malformed annotations, nested
@@ -49,9 +48,30 @@ Reference-only here excludes implicit boxing; an explicitly boxed receiver may
 reuse its existing box. Intrinsic String widening needs separate materialization
 support and remains excluded. Borrowed slot/pointer view conversion remains exact.
 
-Native specialization rejects used variant interfaces before dropping their
-annotations. The test verifies the explicit diagnostic; it does not claim native
-execution. The SDK now inspects annotations and preserves native snapshots; its
-authoring/emission import, AOT/JIT dispatch adaptation and Raven emission remain
-next stages. Sliceable and Result remain invariant. Structural compositions
-containing variant interfaces have not been qualified by this slice.
+## Native qualification — 2026-10-16
+
+Native specialization now preserves the original interface definition, lowered
+arguments, annotations and contract slot as private compiler facts. Selection
+retains compatible contract peers and uses the same exact-first, unambiguous
+nominal resolution as the interpreter. These facts cannot be supplied by serialized
+metadata and do not add declared inheritance edges.
+
+`VarianceLibrary.rvn` and `VarianceConsumer.rvn` are separately compiled by Raven
+revision `44bbd2934`. The consumer exercises both directions of declared variance.
+It returns 42 in interpreter, macOS arm64 AOT and managed JIT using the bundle
+`target/sliceable-libraries-20261015-final`. `native-results.json` retains artifact
+hashes, host commands and results. `native-host.c` checks no fault, an empty root
+chain and complete collection; AOT runs with undefined/bounds sanitizers.
+
+The compiler probe reproduces these images with `NeoClrMetadataProbe
+--interface-variance <NeoCLR.CoreProbe.dll> <output>`. Supply both library images,
+the bundle's `System.Runtime.dll` as module and object root, and
+`System.runtime.neox` as system when running. Native compilation uses
+`--closed-world`, `--compile-system`, `--reference-arena`, `--bind-user-fault`,
+`--native-gc` and `--native-stack-budget`; managed JIT adds `--jit-managed`.
+
+Codegen library regression tests pass (62 passed, one ignored at qualification),
+plus the subsequent focused generic-implementation test. Existing runtime
+interface suites pass. This does not widen Result/Sliceable or resume structural
+work. Standard-library annotations and guest generic-parameter introspection are
+subsequent slices.

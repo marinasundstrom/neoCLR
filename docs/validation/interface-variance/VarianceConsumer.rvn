@@ -1,0 +1,8 @@
+import Variance.*
+func Main() -> int {
+    let producer: Producer<Animal> = MakeProducer()
+    let consumer: Consumer<Dog> = MakeConsumer()
+    let animal = producer.Get()
+    if animal.Value != 42 { return 1 }
+    return consumer.Accept(Dog())
+}

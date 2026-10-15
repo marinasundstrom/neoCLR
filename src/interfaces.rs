@@ -443,7 +443,12 @@ pub(crate) fn implementation(
         return Err(Fault::new("callvirt requires an interface member"));
     }
     let adapted;
-    let contract = if view != *interface {
+    let contract = if view != *interface && contract.native_interface_slot.is_some() {
+        adapted = module.functions.iter().find(|method|
+            method.owner.as_ref() == Some(&view) && method.native_interface_slot == contract.native_interface_slot)
+            .ok_or_else(|| Fault::new("missing specialized variant interface slot"))?.clone();
+        &adapted
+    } else if view != *interface {
         let template = module
             .functions
             .iter()

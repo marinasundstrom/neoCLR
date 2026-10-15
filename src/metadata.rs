@@ -271,6 +271,9 @@ pub enum Variance {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    // Trusted, in-memory native compiler proof; never accepted from serialized metadata.
+    #[serde(skip)]
+    pub(crate) native_interface: Option<crate::variance::NativeInterface>,
     /// Memberless bootstrap storage declaration; not an executable owner.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub primitive_reference: bool,
@@ -439,6 +442,8 @@ pub struct StaticField {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Function {
+    #[serde(skip)]
+    pub(crate) native_interface_slot: Option<MemberId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<crate::metadata_origin::MetadataOrigin>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
