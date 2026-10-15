@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Bind native name/count/indexed-argument/metadata-token/shape queries for retained open generic descriptors, using interpreter source facts for variance. Preserve argument-result identity, mixed closed/open dispatch and invalid-selector/index faults; explicitly reject unqualified open relationship queries. Focused query tests pass interpreter/native execution and AOT emission. Guest assembly/module discovery remains unfinished.
+
 - Add compiler-owned descriptive tokens for open generic definitions and their owner-bound parameters, independent of executable layouts. Preserve the private table through native selection and nominal rewriting, reject serialized table/opcode forgery, and keep native handle identity distinct from ordinary closed-type tokens. This is internal infrastructure; guest open-definition discovery remains unfinished.
 
 - Implement TypeInfo.GetGenericArguments in the class library through the shared count/indexed handle queries, reserving one result array. Qualify sequence/indexed parity and nongeneric empty results in interpreter/AOT/JIT against a fresh bundle; open generic parameter variance still passes in the interpreter. Refresh matching API references. Native open-definition discovery and intrinsic String variance remain separate gaps.

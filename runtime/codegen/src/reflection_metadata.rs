@@ -339,6 +339,49 @@ pub fn bind_queries(
     if queries.is_empty() {
         return Ok(vec![]);
     }
+    let mut open_tokens = Vec::new();
+    for op in input.functions.iter().flat_map(|f| &f.body) {
+        if let Op::LoadMetadataToken(index) = op {
+            if !open_tokens.contains(index) {
+                open_tokens.push(*index);
+            }
+        }
+    }
+    // An open definition's argument handles are descriptive, never executable
+    // specializations. Close this inventory before binding shape/name queries.
+    if queries
+        .iter()
+        .any(|r| r["name"] == "neoCLR.Runtime.TypeArgument")
+    {
+        let mut next = 0;
+        while next < open_tokens.len() {
+            let descriptor = neoclr::native_metadata::descriptor(input, open_tokens[next])
+                .map_err(|e| e.to_string())?
+                .clone();
+            for parameter in &descriptor.generic_arguments {
+                let neoclr::TypeIdentity::GenericParameter { definition, index } =
+                    &parameter.identity
+                else {
+                    return Err("open definition has a non-parameter argument".into());
+                };
+                let Op::LoadMetadataToken(index) =
+                    neoclr::native_metadata::retain_definition_token(
+                        input,
+                        source,
+                        definition,
+                        Some(*index),
+                    )
+                    .map_err(|e| e.to_string())?
+                else {
+                    return Err("expected descriptive argument token".into());
+                };
+                if !open_tokens.contains(&index) {
+                    open_tokens.push(index);
+                }
+            }
+            next += 1;
+        }
+    }
     let mut tokens = vec![];
     for f in &input.functions {
         for op in &f.body {
@@ -483,6 +526,7 @@ pub fn bind_queries(
                 }
             }
         }
+        let prefix = open_query_prefix(input, source, &open_tokens, row["name"].as_str().unwrap())?;
         let f = &mut input.functions[index];
         let metadata_tokens = row["name"] == "neoCLR.Runtime.TypeMetadataToken";
         let names = row["name"] == "neoCLR.Runtime.TypeName";
@@ -617,11 +661,25 @@ pub fn bind_queries(
         // All guest token producers are enumerated above. Foreign/forged handles
         // are not admitted by this closed profile; never fabricate an empty name.
         body.push(Op::Fault("Unknown native type descriptor".into()));
+        if !prefix.is_empty() {
+            let offset = prefix.len();
+            for op in &mut body {
+                match op {
+                    Op::Branch(target) | Op::BranchTrue(target) | Op::BranchFalse(target) => {
+                        *target += offset
+                    }
+                    _ => (),
+                }
+            }
+            let mut combined = prefix;
+            combined.extend(body);
+            body = combined;
+        }
         f.impl_flags = 0;
         f.body = body;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
             "implementation":if assignable { "type-assignable-closed-v1" } else if subclass { "type-subclass-closed-v1" } else if metadata_tokens { "type-metadata-token-closed-v1" } else if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
-            "descriptorCount":descriptors.len(),"policy":"closed token producers; semantic source names; no accessor reachability"}));
+            "descriptorCount":descriptors.len(),"openDescriptorCount":open_tokens.len(),"policy":"closed tokens and retained descriptive definitions/parameters; semantic source names; no accessor reachability"}));
     }
     Ok(bindings)
 }
@@ -1042,6 +1100,373 @@ mod object_tests {
                     .unwrap_err()
                     .to_string()
                     .contains("exact reserved")
+            );
+        }
+    }
+}
+
+// Prefix source-owned open descriptor cases ahead of the established closed-token
+// dispatcher. Unknown handles still reach its checked failure path.
+fn open_query_prefix(
+    input: &mut neoclr::Module,
+    source: &neoclr::Module,
+    tokens: &[u32],
+    query: &str,
+) -> Result<Vec<neoclr::metadata::Instruction>, Error> {
+    use neoclr::metadata::Instruction as Op;
+    let mut body = Vec::new();
+    if query == "neoCLR.Runtime.TypeShape" && !tokens.is_empty() {
+        body.extend([
+            Op::Arg(1),
+            Op::Int(0),
+            Op::Less,
+            Op::BranchFalse(5),
+            Op::Fault("unknown type shape query".into()),
+            Op::Arg(1),
+            Op::Int(20),
+            Op::Less,
+            Op::BranchTrue(10),
+            Op::Fault("unknown type shape query".into()),
+        ]);
+    }
+    let relationship = matches!(
+        query,
+        "neoCLR.Runtime.ReflectionAssignable" | "neoCLR.Runtime.ReflectionSubclass"
+    );
+    for index in tokens {
+        let descriptor = neoclr::native_metadata::descriptor(input, *index)
+            .map_err(|e| e.to_string())?
+            .clone();
+        // Do not silently return false for a relationship whose open substitution
+        // semantics have not been admitted, including an open target of a closed source.
+        if relationship {
+            for argument in [0, 1] {
+                let skip = body.len() + 3;
+                body.extend([
+                    Op::Arg(argument),
+                    Op::LoadMetadataToken(*index),
+                    Op::Equal,
+                    Op::BranchFalse(0),
+                    Op::Fault("native open generic relationship queries are not supported".into()),
+                ]);
+                body[skip] = Op::BranchFalse(body.len());
+            }
+            continue;
+        }
+        let skip = body.len() + 3;
+        body.extend([
+            Op::Arg(0),
+            Op::LoadMetadataToken(*index),
+            Op::Equal,
+            Op::BranchFalse(0),
+        ]);
+        match query {
+            "neoCLR.Runtime.TypeName" => body.extend([Op::String(descriptor.name), Op::Return]),
+            "neoCLR.Runtime.TypeArgumentCount" => body.extend([
+                Op::Int(descriptor.generic_arguments.len() as i32),
+                Op::Return,
+            ]),
+            "neoCLR.Runtime.TypeMetadataToken" => body.extend([
+                Op::Int(
+                    neoclr::native_metadata::descriptor_metadata_token(source, &descriptor)
+                        .map_err(|e| e.to_string())?,
+                ),
+                Op::Return,
+            ]),
+            "neoCLR.Runtime.TypeArgument" => {
+                for (ordinal, parameter) in descriptor.generic_arguments.iter().enumerate() {
+                    let neoclr::TypeIdentity::GenericParameter { definition, index } =
+                        &parameter.identity
+                    else {
+                        return Err("open argument lacks declaring identity".into());
+                    };
+                    let token = neoclr::native_metadata::retain_definition_token(
+                        input,
+                        source,
+                        definition,
+                        Some(*index),
+                    )
+                    .map_err(|e| e.to_string())?;
+                    let next = body.len() + 6;
+                    body.extend([
+                        Op::Arg(1),
+                        Op::Int(ordinal as i32),
+                        Op::Equal,
+                        Op::BranchFalse(next),
+                        token,
+                        Op::Return,
+                    ]);
+                }
+                body.push(Op::Fault("generic argument index out of range".into()));
+            }
+            "neoCLR.Runtime.TypeShape" => {
+                for selector in 0..20 {
+                    let fact =
+                        neoclr::native_metadata::descriptor_shape(source, &descriptor, selector)
+                            .map_err(|e| e.to_string())?;
+                    if fact {
+                        let next = body.len() + 6;
+                        body.extend([
+                            Op::Arg(1),
+                            Op::Int(selector),
+                            Op::Equal,
+                            Op::BranchFalse(next),
+                            Op::Bool(true),
+                            Op::Return,
+                        ]);
+                    }
+                }
+                body.extend([Op::Bool(false), Op::Return]);
+            }
+            _ => return Err("unsupported open descriptor query".into()),
+        }
+        body[skip] = Op::BranchFalse(body.len());
+    }
+    Ok(body)
+}
+
+#[cfg(test)]
+mod open_query_tests {
+    use super::*;
+    use neoclr::metadata::{FunctionRef, Instruction as Op};
+
+    fn fixture() -> (neoclr::Module, neoclr::Module, Value) {
+        let source = neoclr::assemble(".module OpenQueries\n.entry Main\n.interface Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.interface Fixed<T>\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeMetadataToken(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        let mut input = source.clone();
+        let definition = source.types[0].definition.as_ref().unwrap();
+        let open =
+            neoclr::native_metadata::retain_definition_token(&mut input, &source, definition, None)
+                .unwrap();
+        let mut parameters = vec![];
+        for ty in &source.types {
+            parameters.push(
+                neoclr::native_metadata::retain_definition_token(
+                    &mut input,
+                    &source,
+                    ty.definition.as_ref().unwrap(),
+                    Some(0),
+                )
+                .unwrap(),
+            );
+        }
+        let call = |suffix: &str| {
+            let f = source
+                .functions
+                .iter()
+                .find(|f| f.name == format!("neoCLR.Runtime.{suffix}"))
+                .unwrap();
+            Op::Call(FunctionRef {
+                definition: f.definition.clone(),
+                name: f.name.clone(),
+                owner: None,
+                instance: false,
+                parameters: f.parameters.clone(),
+                generic_arguments: vec![],
+            })
+        };
+        let mut body = vec![];
+        let mut failures = vec![];
+        let mut check = |code: Vec<Op>, expected: Op| {
+            body.extend(code);
+            body.extend([expected, Op::Equal]);
+            failures.push(body.len());
+            body.push(Op::BranchFalse(0));
+        };
+        check(vec![open.clone(), call("TypeArgumentCount")], Op::Int(1));
+        check(
+            vec![open.clone(), Op::Int(0), call("TypeArgument")],
+            parameters[0].clone(),
+        );
+        check(
+            vec![open.clone(), call("TypeName")],
+            Op::String("Producer".into()),
+        );
+        check(
+            vec![open.clone(), call("TypeMetadataToken")],
+            Op::Int(0x02000001),
+        );
+        for (index, parameter) in parameters.iter().enumerate() {
+            check(
+                vec![parameter.clone(), call("TypeArgumentCount")],
+                Op::Int(0),
+            );
+            check(
+                vec![parameter.clone(), call("TypeName")],
+                Op::String("T".into()),
+            );
+            check(
+                vec![parameter.clone(), call("TypeMetadataToken")],
+                Op::Int(0),
+            );
+            for (selector, expected) in [(17, true), (18, index == 0), (19, index == 1)] {
+                check(
+                    vec![parameter.clone(), Op::Int(selector), call("TypeShape")],
+                    Op::Bool(expected),
+                );
+            }
+        }
+        body.extend([Op::Int(42), Op::Return]);
+        let fail = body.len();
+        body.extend([Op::Int(1), Op::Return]);
+        for i in failures {
+            body[i] = Op::BranchFalse(fail);
+        }
+        input.functions.last_mut().unwrap().body = body;
+        let report = json!({"functions":source.functions.iter().enumerate().take(5).map(|(i,f)| json!({"compiledIndex":i,"name":f.name,"definition":f.definition})).collect::<Vec<_>>()});
+        (input, source, report)
+    }
+
+    // These have become ordinary generated bodies. Give the test copies local
+    // names so interpreter loading does not collide with bundled System facades.
+    fn localize_bound_queries(input: &mut neoclr::Module) {
+        for function in &mut input.functions {
+            function.name = function.name.replace("neoCLR.Runtime.", "BoundQuery.");
+            for op in &mut function.body {
+                if let Op::Call(target) = op {
+                    target.name = target.name.replace("neoCLR.Runtime.", "BoundQuery.");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn open_queries_preserve_source_metadata_without_executable_types() {
+        let (mut input, source, report) = fixture();
+        bind_queries(&mut input, &source, &report).unwrap();
+        localize_bound_queries(&mut input);
+        let (selected, _) = crate::selection::prepare(&input, "Main").unwrap();
+        assert!(selected.types.is_empty());
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        assert!(
+            !crate::compiler::compile(&selected, "Main", false, None)
+                .unwrap()
+                .is_empty()
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        crate::linking::descriptor_token_tests::assert_native_result(&selected, 42);
+    }
+
+    #[test]
+    fn open_argument_results_extend_the_inventory_and_coexist_with_closed_tokens() {
+        let (mut input, mut source, mut report) = fixture();
+        let mut plain =
+            neoclr::assemble(".module PlainSource\n.type Plain\n.field Value Int32\n.end\n")
+                .unwrap()
+                .types
+                .remove(0);
+        plain.definition = Some(TypeDefId {
+            module: source.name.clone(),
+            revision: None,
+            index: 3,
+        });
+        source.types.push(plain.clone());
+        input.types.push(plain);
+        report["sourceMetadata"] =
+            json!({"types":[{"compiledTypeIndex":3,"name":"Plain","typeArguments":[]}]});
+        let token = neoclr::native_metadata::retain_definition_token(
+            &mut input,
+            &source,
+            source.types[0].definition.as_ref().unwrap(),
+            None,
+        )
+        .unwrap();
+        let call = |name: &str| {
+            let f = source
+                .functions
+                .iter()
+                .find(|f| f.name == format!("neoCLR.Runtime.{name}"))
+                .unwrap();
+            Op::Call(FunctionRef {
+                definition: f.definition.clone(),
+                name: f.name.clone(),
+                owner: None,
+                instance: false,
+                parameters: f.parameters.clone(),
+                generic_arguments: vec![],
+            })
+        };
+        // The parameter handle appears only as a query result, not as an input token.
+        input.functions.last_mut().unwrap().body = vec![
+            token,
+            Op::Int(0),
+            call("TypeArgument"),
+            Op::Int(18),
+            call("TypeShape"),
+            Op::BranchFalse(14),
+            Op::LoadTypeToken(Type::from_name("Plain")),
+            Op::Int(12),
+            call("TypeShape"),
+            Op::BranchFalse(14),
+            Op::Int(42),
+            Op::Return,
+            Op::Int(1),
+            Op::Return,
+            Op::Int(2),
+            Op::Return,
+        ];
+        bind_queries(&mut input, &source, &report).unwrap();
+        localize_bound_queries(&mut input);
+        let (selected, _) = crate::selection::prepare(&input, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        crate::linking::descriptor_token_tests::assert_native_result(&selected, 42);
+    }
+
+    #[test]
+    fn open_queries_preserve_invalid_selector_and_argument_faults() {
+        for (name, selector, expected) in [
+            ("TypeShape", 20, "unknown type shape query"),
+            ("TypeArgument", -1, "generic argument index out of range"),
+        ] {
+            let (mut input, source, report) = fixture();
+            let token = neoclr::native_metadata::retain_definition_token(
+                &mut input,
+                &source,
+                source.types[0].definition.as_ref().unwrap(),
+                None,
+            )
+            .unwrap();
+            let f = input
+                .functions
+                .iter()
+                .find(|f| f.name == format!("neoCLR.Runtime.{name}"))
+                .unwrap();
+            let call = FunctionRef {
+                definition: f.definition.clone(),
+                name: f.name.clone(),
+                owner: None,
+                instance: false,
+                parameters: f.parameters.clone(),
+                generic_arguments: vec![],
+            };
+            input.functions.last_mut().unwrap().body = vec![
+                token,
+                Op::Int(selector),
+                Op::Call(call),
+                Op::Pop,
+                Op::Int(42),
+                Op::Return,
+            ];
+            bind_queries(&mut input, &source, &report).unwrap();
+            localize_bound_queries(&mut input);
+            let program = neoclr::LoadedProgram::new(&input).unwrap();
+            program.verify().unwrap();
+            assert!(
+                program
+                    .run(neoclr::Limits::default())
+                    .unwrap_err()
+                    .to_string()
+                    .contains(expected)
             );
         }
     }

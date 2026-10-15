@@ -1444,7 +1444,7 @@ mod variance_projection_tests {
 }
 
 #[cfg(test)]
-mod descriptor_token_tests {
+pub(crate) mod descriptor_token_tests {
     use neoclr::metadata::{Instruction as Op, Type};
 
     pub(super) fn fixture() -> neoclr::Module {
@@ -1519,6 +1519,11 @@ mod descriptor_token_tests {
     #[test]
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     fn descriptor_tokens_keep_identity_in_native_execution() {
+        assert_native_result(&fixture(), 42);
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    pub(crate) fn assert_native_result(input: &neoclr::Module, expected: i32) {
         use cranelift_codegen::{isa, settings, settings::Configurable};
         use cranelift_jit::{JITBuilder, JITModule};
         use cranelift_module::{FuncOrDataId, Module};
@@ -1531,7 +1536,6 @@ mod descriptor_token_tests {
                 }
             }
         }
-        let input = fixture();
         let mut flags = settings::builder();
         flags.set("is_pic", "false").unwrap();
         flags.set("use_colocated_libcalls", "false").unwrap();
@@ -1562,6 +1566,6 @@ mod descriptor_token_tests {
             unsafe { std::mem::transmute(module.get_finalized_function(id)) };
         let mut value = 0;
         assert_eq!(unsafe { entry(0, &mut value) }, 0);
-        assert_eq!(value, 42);
+        assert_eq!(value, expected);
     }
 }

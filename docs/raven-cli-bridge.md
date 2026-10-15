@@ -11191,3 +11191,18 @@ ordinary bounded array-fill loop; no compiler mapping, Runtime Contract setting
 or new CLI/native encoding is required. The existing public sequence contract is
 unchanged. This closes the closed-type native snapshot-binding gap while leaving
 open-definition discovery explicitly unsupported by the native profile.
+
+### Open generic native descriptors and queries (2026-10-16)
+
+Native preparation now retains open definitions and owner/ordinal parameter
+identities in a compiler-owned descriptor table, separate from executable type
+shapes. Its private token instruction is not a Raven emission format: serialized
+programs cannot supply the table, and tokens without it fail verification. Native
+name/count/indexed-argument/metadata-token/shape queries use source declaration
+facts, including variance. Selection and private nominal rewrites retain identity;
+focused interpreter, AOT emission and macOS ARM64 JIT checks pass.
+
+Raven lowering, CLI bridge encoding and Runtime Contract settings are unchanged.
+Guest assembly/module discovery and open generic member/relationship operations
+remain unqualified; this infrastructure does not imply new discovery or invocation
+rights. Structural work remains parked.

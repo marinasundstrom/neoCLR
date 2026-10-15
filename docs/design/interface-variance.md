@@ -359,3 +359,22 @@ unchanged. This foundation alone does not enable assembly discovery, open generi
 member substitution or invocation. Interpreter identity/forgery tests, selection
 and rewrite checks, AOT emission and synchronous macOS ARM64 JIT execution qualify
 the handle foundation; guest discovery/query wiring follows separately.
+
+### Descriptive native queries (2026-10-16)
+
+The native query binder now handles retained open-definition and parameter tokens
+for names, generic-argument counts, indexed argument identity, source metadata
+tokens and shape flags (including all three variance states). It closes the token
+inventory over parameters returned by argument queries, even when no explicit
+parameter token occurs in the caller. Shape facts and metadata tokens come from
+the interpreter's source metadata rules. Unknown selectors and argument indices
+retain their faults. Mixed open/closed token dispatch is qualified as well.
+
+Open-source or open-target assignability/subclass queries explicitly fault in this
+native subset; no result is fabricated while open substitution semantics remain
+unqualified. The guest assembly/module discovery path is still unfinished, so this
+is backend query support rather than a claim that AssemblyInfo.GetTypes already
+works in native programs. Tests execute the generated query bodies in the
+interpreter and macOS ARM64 JIT and emit AOT objects without retaining the open
+interfaces as executable types. The focused reflection-metadata suite passes eleven
+checks. No Raven syntax, emitted source metadata or Runtime Contract option changes.

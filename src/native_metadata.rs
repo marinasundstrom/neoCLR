@@ -680,3 +680,31 @@ mod descriptor_token_tests {
         assert!(serde_json::from_value::<Module>(forged).is_err());
     }
 }
+
+/// Evaluate a descriptive shape fact using the interpreter's source metadata rules.
+pub fn descriptor_shape(
+    module: &Module,
+    descriptor: &crate::TypeDescriptor,
+    selector: i32,
+) -> Result<bool, Fault> {
+    match crate::reflection::Query::Shape.invoke_profile(
+        module,
+        &[
+            Value::RuntimeTypeHandle(Box::new(descriptor.clone())),
+            Value::Int32(selector),
+        ],
+        &Limits::default(),
+        true,
+    )? {
+        Value::Boolean(value) => Ok(value),
+        _ => Err(Fault::new("invalid descriptor shape result")),
+    }
+}
+
+/// Preserve source definition tokens; parameters have no TypeDef token.
+pub fn descriptor_metadata_token(
+    module: &Module,
+    descriptor: &crate::TypeDescriptor,
+) -> Result<i32, Fault> {
+    crate::metadata_tokens::type_token(module, &descriptor.identity)
+}
