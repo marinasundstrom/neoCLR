@@ -210,5 +210,10 @@ explicit Cell/Other allocation, with no union carrier or scalar box allocation.
 Tracing recipes are tested independently; they are not managed collector stress.
 Reproduce with `cargo test -p neoclr-codegen --lib --test console mixed_union`.
 This is macOS ARM64 qualification, without a throughput or managed-JIT claim.
-Raven's Runtime Contract and emitted metadata/instructions are unchanged; a fresh
-mixed Raven consumer and broader native application qualification remain next.
+Raven's Runtime Contract and emitted metadata/instructions are unchanged.
+The [fresh Raven mixed consumer](mixed-pattern-project/README.md) now also passes
+seven typed-pattern inputs in interpreter and AOT. Its only native import allocates
+the explicit Response object; exact arena use is 16 bytes, without scalar boxes or
+union carriers. [Artifact evidence](raven-mixed-pattern-results.json) identifies
+the compiler, native tools, consumer and retained v3 bundle. Imported mixed calls
+and broader native application qualification remain next.

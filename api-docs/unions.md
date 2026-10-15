@@ -126,7 +126,9 @@ return 42 in interpreter and macOS ARM64 AOT with zero arena use; general escapi
 test results remain gated. Mixed Int32/Int64/Boolean and nominal reference alternatives now use three private
 slots (tag, numeric bits, reference), tracing only the reference slot. AOT checks
 cover copies, calls, replacement, null and failed casts with only explicit object
-allocations. Object/scalar-interface views requiring boxing, nominal-value and
+allocations. A fresh Raven `int | long | bool | Response` match consumer returns
+42 in interpreter and AOT, using 16 arena bytes only for its explicit Response.
+Object/scalar-interface views requiring boxing, nominal-value and
 intrinsic String alternatives remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
 reflection, array elements, dedicated JIT/collector stress and full Task application

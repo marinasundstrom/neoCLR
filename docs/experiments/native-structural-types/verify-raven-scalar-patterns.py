@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -18,9 +19,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--compiler', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--imported', action='store_true', help='Build and consume an artifact-only scalar union library')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--imported', action='store_true', help='Build and consume an artifact-only scalar union library')
+    mode.add_argument('--mixed', action='store_true', help='Include a nominal reference alternative')
     args = parser.parse_args()
     project = PROJECT.parent / 'scalar-import-project' if args.imported else PROJECT
+    if args.mixed:
+        project = PROJECT.parent / 'mixed-pattern-project'
     library = PROJECT.parent / 'scalar-import-library'
     library_artifact = library / 'bin/neoclr/StructuralScalarLibrary.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
@@ -57,7 +62,13 @@ def main():
     il = output / 'consumer.neoil'
     run('disassemble', [runtime, 'disassemble', artifact, il])
     body = il.read_text()
-    assert '"Union":["Int32","Int64","Boolean"]' in body, "Missing native union signature"
+    if args.mixed:
+        unions = [json.JSONDecoder().raw_decode(body[match.end():].lstrip())[0]
+                  for match in re.finditer(r'"Union":', body)]
+        assert any(len(parts) == 4 and all(t in parts for t in ['Int32', 'Int64', 'Boolean'])
+                   and any(isinstance(t, dict) and 'Named' in t for t in parts) for parts in unions), "Missing native mixed union signature"
+    else:
+        assert '"Union":["Int32","Int64","Boolean"]' in body, "Missing native union signature"
     for scalar in ['Int32', 'Int64', 'Boolean']:
         assert body.count(f'isinst "{scalar}"') == 2, scalar
         assert body.count(f'unbox.any "{scalar}"') == 2, scalar
@@ -70,7 +81,8 @@ def main():
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
                 '--compile-system', '--reference-arena', *context])
     imports = run('imports', ['nm', '-u', obj])
-    assert not imports.strip(), f'Unexpected native imports: {imports}'
+    expected_imports = ['_neoclr_allocate_object_v1'] if args.mixed else []
+    assert imports.split() == expected_imports, f'Unexpected native imports: {imports}'
     host = output / 'host.c'
     host.write_text('''#include "text-arena.h"
 #include <stdio.h>
@@ -83,12 +95,19 @@ int main(void) {
     return status || result != 42 || ctx.text.used || ctx.fault.code;
 }
 ''')
+    if args.mixed:
+        host.write_text(host.read_text().replace('neoclr_aot_context ctx = {0};',
+            'uint64_t storage[32] = {0};\n    neoclr_aot_context ctx = {.text = {(unsigned char*)storage, sizeof(storage), 0}};')
+            .replace('|| ctx.text.used ||', '|| ctx.text.used != 16 ||'))
     executable = output / 'consumer'
     run('link', ['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror',
-                 '-I', ROOT / 'docs/experiments/aot-console', host, obj, '-o', executable])
+                 '-I', ROOT / 'docs/experiments/aot-console', host, obj, *([ROOT / 'docs/experiments/aot-console/text-arena.c'] if args.mixed else []), '-o', executable])
     native = run('native', [executable]).strip()
-    assert native == 'status=0 result=42 arenaBytes=0 fault=0', native
-    files = [compiler, runtime, codegen, project / 'Main.rvn', project / 'App.rvnproj', artifact, obj]
+    arena_bytes = 16 if args.mixed else 0
+    assert native == f'status=0 result=42 arenaBytes={arena_bytes} fault=0', native
+    files = [Path(__file__).resolve(), host, compiler, runtime, codegen, project / 'Main.rvn', project / 'App.rvnproj', artifact, obj]
+    if args.mixed:
+        files += [ROOT / 'docs/experiments/aot-console/text-arena.c']
     if args.imported:
         files += [library / 'Library.rvnproj', library / 'Main.rvn', library_artifact]
     files += sorted(bundle.glob('*.dll')) + [bundle / 'System.runtime.neox', bundle / 'NeoCLR.ClassLibrary.props', bundle / 'ownership.json']
@@ -96,6 +115,8 @@ int main(void) {
     compiler_revision = subprocess.run(['git', '-C', str(compiler.parent), 'rev-parse', 'HEAD'], capture_output=True, text=True)
     report = {
         'importedLibrary': args.imported,
+        'mixedPayloads': args.mixed,
+        'nativeImports': imports.splitlines(),
         'compilerCheckoutRevision': compiler_revision.stdout.strip() if compiler_revision.returncode == 0 else None,
         'runtimeRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'platform': platform.platform(),
@@ -106,11 +127,15 @@ int main(void) {
         'native': native,
         'checks': ['native union signature preserved', 'six guarded/fallback scalar match inputs return expected values',
                    'two exact tests and extractions per scalar in fresh Raven output',
-                   'interpreter exit 42', 'AOT result 42', 'no native imports', 'zero arena use'],
+                   'interpreter exit 42', 'AOT result 42', 'exact native import allowlist', f'arena bytes: {arena_bytes}'],
         'limitations': ['one macOS ARM64 consumer', 'retained v3 bundle, not freshly rebuilt libraries',
-                        'no mixed payloads, JIT or collector stress',
+                        'no JIT or collector stress',
                         'no throughput claim'],
     }
+    if args.mixed:
+        report['checks'].append('nominal reference alternative through a typed match arm')
+    else:
+        report['limitations'].append('no mixed payloads')
     if args.imported:
         report['checks'].append('artifact-only library union returns and parameters with reordered alternatives')
     else:
