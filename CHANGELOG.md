@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Propose generic bounds and target-consistent Raven endpoint semantics, followed by overflow-safe integer iteration. Record the author’s compatibility clarification and parked structural work; no language/runtime behavior changes in this design slice.
+
 - Integrate the validated structural-type branch into main, preserving mainline TypeInfo relationships. Runtime/compiler/reader flags and nominal Union/Tuple carriers are removed; Raven integration targets its neoCLR line separately from Raven main. Record 175/175 metadata checks and fresh carrier-free Task union AOT/JIT/GC qualification, with unsupported combinations explicitly tracked. This is development integration, not a release.
 
 - Raise the bounded CLI metadata reader custom-attribute budget to 8,192 for valid larger assemblies (the test assembly contains 4,217 rows), with 8,192/8,193 boundary coverage. Align stale tests with existing 1,024-local and concrete virtual direct-call behavior. All 175 host metadata contract tests pass.

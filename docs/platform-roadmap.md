@@ -1362,6 +1362,11 @@ requested a memory-view design investigation after this slice (2026-10-11): comp
 allocation/reference model, including lifetime, GC, async and CLI tradeoffs. This
 is a research follow-up, not a commitment to four matching types. See the
 [contract and evidence](design/index-range.md). Windows execution is pending.
+Author-directed design follow-up (2026-10-15): review [generic bounds and consistent
+Raven endpoints](design/generic-bounds.md), then integer iteration across .NET/neoCLR.
+All known consumers are owned; compatibility is not a constraint. Structural work
+is parked. This is a design task, not implemented range semantics or a permanent
+change to the active milestone.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

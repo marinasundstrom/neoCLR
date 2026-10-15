@@ -17962,3 +17962,21 @@ The assistant integrated the tested tree into neoCLR main and advanced the Raven
 neoCLR line separately from Raven main. Remaining unsupported forms are documented
 as gaps rather than claimed complete. See the
 [integration record](validation/structural-integration-20261015.md).
+
+### Generic bounds and Raven endpoint review — 2026-10-15
+
+The author parked structural-type work and requested a generic-bounds/endpoint design,
+followed by integer iteration, asking whether Raven should align across .NET and
+neoCLR. The assistant identified contextual inclusive-loop/exclusive-slice behavior
+and recommended exclusive `..` plus explicit inclusive `..=` on both targets. The
+author clarified: “Compatibility is not a concern”, because all known Raven consumers
+are project-owned. The assistant consequently proposed a coordinated migration with
+no legacy mode, removal of `..<`, nominal generic bounds and separate integer
+progressions. The source audit also found unguarded loop advancement; overflow-safe
+termination is a design requirement, not a completed fix.
+
+The [design](design/generic-bounds.md) records comparisons with .NET, Rust and Noda
+Time, alternatives, provisional API/inference choices and validation steps. The
+endpoint spelling is an assistant recommendation, not a recorded final author choice.
+No compiler/runtime behavior changed in this slice; structural development remains
+parked.

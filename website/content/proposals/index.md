@@ -129,3 +129,11 @@ The [SQL development slice](../features/sql/) introduces a small session and row
 API with a local PostgreSQL provider. Password authentication, TLS, remote connections,
 streaming and more providers remain open work. The older SQLite-first proposal is
 historical input, not the current implementation specification.
+
+## Generic bounds and ranges
+
+A design review considers generic included/excluded/unbounded endpoints and consistent
+Raven range syntax across .NET and neoCLR, followed by overflow-safe integer iteration.
+These are proposals; existing slicing behavior is unchanged.
+
+[Range design](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/generic-bounds.md)

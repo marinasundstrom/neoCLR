@@ -1,5 +1,8 @@
 # Index, Range and slicing — development
 
+The [generic bounds review](generic-bounds.md) proposes a coordinated Raven endpoint
+change across targets (2026-10-15). It does not change the implemented contracts below.
+
 Author direction (2026-10-10): supply runtime types for Raven's existing indexing
 and slicing syntax across arrays, strings and suitable sequences. On 2026-10-11
 the author also requested attention to performance, with span-like facilities or
