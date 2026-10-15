@@ -156,4 +156,4 @@ guarantee. Reference-bearing values, boxing and union workloads remain unmeasure
 
 Development native specialization also admits tuples as closed generic arguments
 and inline fields of nominal records. Recursive cycles and the flattened-lane budget
-remain checked. See the [native structural qualification](../docs/experiments/native-structural-types/README.md).
+remain checked. See the [native structural qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/README.md).

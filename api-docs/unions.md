@@ -32,31 +32,13 @@ Review existing aggregation-only wrappers too, weighing clarity against public
 signature compatibility and the meaning of named cases.
 See the [configuration example](../features/outcomes/#adhoc-errors).
 
-## Temporary carrier reference
+## Retired carrier reference
 
-The matching development library provides these ordinary nominal backing types
-in System.Runtime; prefer Raven's `A | B` spelling in source:
-
-| Source alternatives | Carrier |
-| --- | --- |
-| `A | B` | [Union&lt;T1, T2&gt;](xref:System.Union`2) |
-| `A | B | C` | [Union&lt;T1, T2, T3&gt;](xref:System.Union`3) |
-| `A | B | C | D` | [Union&lt;T1, T2, T3, T4&gt;](xref:System.Union`4) |
-| `A | B | C | D | E` | [Union&lt;T1, T2, T3, T4, T5&gt;](xref:System.Union`5) |
-
-Each carrier has one constructor and `TryGetValue(out value)` overload per
-alternative. A successful extraction returns true and assigns the value; an
-unsuccessful extraction returns false and clears the output to its default.
-`HasValue` reports an active alternative. `Value` returns its boxed value, or null
-for an inactive default carrier. Prefer typed patterns over boxed inspection.
-`ToString()` is diagnostic text, not an alternative discriminant.
-
-This is a temporary bridge, not native structural identity, normalization,
-order-independent equality or union introspection construction. The two-to-five
-arity bound belongs to the bridge, not the intended platform semantics. The native feature-branch profile replaces this carrier encoding with structural
-signatures;
-consumers must use matching compiler/library artifacts and rebuild when that
-representation changes. No structural union type is being advertised as shipped.
+Older CLI bridge bundles used nominal System.Union carriers. Those carriers are
+not part of the current native runtime API. Any remaining carrier declarations in
+the aggregate CLI documentation assembly are transport scaffolding and are excluded
+from the published type reference. Use the native structural contract below and
+rebuild older consumers with matching compiler/library artifacts.
 
 [All structural families](structural-types.md)
 
@@ -142,7 +124,7 @@ allocations. A fresh Raven `int | long | bool | Response` match consumer returns
 42 in interpreter and AOT, using 16 arena bytes only for its explicit Response.
 A separate artifact-only library consumer also passes mixed union returns and
 parameters with reordered alternatives and the same explicit-object allocation.
-An imported Response<int> alternative also preserves its generic field value
+An imported `Response<int>` alternative also preserves its generic field value
 through the union return, parameter and typed pattern.
 Closed nominal value records, optionally combined with Int32/Int64/Boolean, now
 use a tag and disjoint inline payload regions, with inactive regions zeroed.
@@ -153,19 +135,19 @@ returning 42 in interpreter/AOT with no native imports or arena allocation. The 
 its size is the sum of alternatives, so overlapping-storage optimization remains
 future work. Direct nominal reference alternatives can accompany records; their
 shared reference region uses actual nominal conformance for tests and casts. A
-[fresh Raven consumer](../docs/experiments/native-structural-types/record-reference-import-project/README.md)
+[fresh Raven consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/record-reference-import-project/README.md)
 passes eight imported scalar/record/reference inputs with only its explicit
 HttpError allocation (16 bytes). The
-[closed-generic variant](../docs/experiments/native-structural-types/generic-record-reference-import-project/README.md)
-also distinguishes Response<int> and Response<long> through nine imported inputs
+[closed-generic variant](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/generic-record-reference-import-project/README.md)
+also distinguishes `Response<int>` and `Response<long>` through nine imported inputs
 and preserves substituted fields with the same allocation bound. A
-[reference-valued substitution consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md)
-also preserves shared mutation through copied Response<Cell> records; ten inputs
+[reference-valued substitution consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/reference-generic-record-import-project/README.md)
+also preserves shared mutation through copied `Response<Cell>` records; ten inputs
 allocate only the two explicit objects (32 bytes). This is not collector stress. Separate
-[native collector tests](../docs/experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+[native collector tests](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
 now cover record/reference/scalar payloads across calls and fault unwind with
 eager/paced nonmoving AOT collection and complete post-entry reclamation. The
-[fresh Raven consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
+[fresh Raven consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
 also passes 32 invocations per collector mode, reclaiming all explicit objects.
 Object/scalar-interface views requiring boxing remain unsupported by this native lowering.
 Intrinsic String alternatives now use a separate traced text slot in native union storage. Whole-union boxing is also rejected pending structural boxed identity;
@@ -180,13 +162,13 @@ Each policy reclaims all 64 explicit allocations and leaves no roots or heap obj
 the synchronous JIT host completes cleanup before generated code is released. AOT
 hosts run with undefined/bounds sanitizers; the JIT hosts are not sanitizer-instrumented.
 This qualifies bounded synchronous callable-union ownership, not escaped callbacks
-or async retention. [Reproduction and evidence](../docs/experiments/native-structural-types/callable-import-project/README.md).
+or async retention. [Reproduction and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/callable-import-project/README.md).
 
 Development native checked reservation now supports admitted structural union array
 elements as inline snapshots, with indexed copy/replacement and initialization checks.
 Default array allocation, borrowed element access and nominal array views remain
 unqualified. Collection currently uses the existing conservative record-array scan;
-see [storage details](../docs/experiments/native-structural-types/README.md).
+see [storage details](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/README.md).
 
 ### Fresh Task union native qualification (2026-10-15)
 
@@ -207,7 +189,7 @@ Runtime Contract configuration and native signature encoding are unchanged; no
 CLI carrier replacement is introduced. Runtime/storage owns the newly admitted
 operations; Raven continues emitting native structural signatures.
 
-Evidence and reproducer: [native structural experiments](../docs/experiments/native-structural-types/README.md).
+Evidence and reproducer: [native structural experiments](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/README.md).
 
 ### Exact native union widening (2026-10-15)
 
@@ -242,7 +224,7 @@ primitive/enum alternatives and broader floating workloads remain open.
 A fresh Raven float/double/int pattern consumer now also passes interpreter,
 macOS ARM64 AOT and managed JIT with zero arena use. The bounded fixture checks
 reordered/widened calls and exact alternative identity, not every floating edge
-case or platform. See the [floating qualification](../docs/experiments/native-structural-types/floating-v4-results.json).
+case or platform. See the [floating qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-structural-types/floating-v4-results.json).
 
 Native Int32-backed nominal enums can now be union alternatives through their
 existing value-record layout. Two enums with identical underlying bits retain

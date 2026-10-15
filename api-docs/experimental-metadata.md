@@ -8377,7 +8377,7 @@ signature/marshalling combinations throw InvalidDataException. Graph validation 
 later mutations, including an import used as the entry point. SetInternalCall rejects
 an already imported declaration. Native JSON/binary preserve all descriptors; executable
 CLI writing rejects imports while reference projections retain throwing stubs.
-See [the runtime contract](../docs/native-interop.md).
+See [the runtime contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-interop.md).
 
 `Introspection.MethodInfo.GetMethodImplementationFlags(): System.Reflection.MethodImplAttributes`
 returns recorded implementation bits without loading code. Native snapshots currently
@@ -9141,7 +9141,7 @@ components retain the current composition admission limits. CLI carrier projecti
 is unchanged. `--authored-compositions` verifies native round-trip and checked-cast
 authoring; `--reference-compositions` verifies reader admission, including existing
 generic-method support. Runtime/backend limits remain separately documented in
-[structural operations](../docs/structural-runtime-operations.md#function-values).
+[structural operations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/structural-runtime-operations.md#function-values).
 
 Function constituents now recursively import into consumer ownership through
 `ImportExperimentalCompositionReference`, retaining the existing composition opt-in.
