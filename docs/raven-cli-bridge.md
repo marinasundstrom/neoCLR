@@ -10915,3 +10915,16 @@ checks pass. The broader host suite reports 169/175 versus 168/175 on an untouch
 copy of the prior branch. The six remaining inherited failures cover Object-root
 expectations, local-contract expectations and custom-attribute fixtures; they are
 not reported as passing or as callable-union regressions.
+
+## 2026-10-15 — Imported Raven callable-union patterns
+
+A separately compiled Raven library/consumer now passes callable/scalar union typed
+patterns, invocation and AOT collection. Host metadata recursively imports callable
+constituents into consumer ownership and admits function IsInstance targets. Raven's
+shared planner permits typed callable patterns only with AllowsFunctionValues;
+ordinary .NET defaults are unchanged. Native signatures remain Union/Function;
+there is no CLI-carrier or Runtime Contract change. Validation: host authoring/import
+checks, 78 focused compiler tests, interpreter exit 42 and 32 AOT invocations per
+eager/paced collector mode with exact allocation counts and sanitizers. The retained
+v3 libraries are not a fresh bundle; JIT and bundle qualification follow separately.
+See `docs/experiments/native-structural-types/callable-import-project/README.md`.

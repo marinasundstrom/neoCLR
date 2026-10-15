@@ -436,3 +436,15 @@ The 256-lane limit and admitted function-shape limits still apply. Explicit
 injection and exact narrowing are qualified; native Object widening, conversion
 between different union layouts, JIT lifetime, async retention and Raven source
 qualification remain open. Function intersections are still not admitted.
+
+
+### Imported Raven callable unions (2026-10-15)
+
+The [artifact-only callable consumer](callable-import-project/README.md) now passes
+source emission, native import, typed patterns, checked narrowing and invocation.
+Interpreter and AOT agree; eager/paced native collection passes 32 invocations per
+mode with exactly the explicit Cell/callable allocations and full reclamation.
+The fix aligns host metadata function import/type-test admission and enables typed
+callable patterns only when the target advertises function-value support. The
+ordinary .NET default is unchanged. JIT lifetime and a fresh library bundle remain
+separate integration gates.

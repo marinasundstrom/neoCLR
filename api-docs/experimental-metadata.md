@@ -9142,3 +9142,9 @@ is unchanged. `--authored-compositions` verifies native round-trip and checked-c
 authoring; `--reference-compositions` verifies reader admission, including existing
 generic-method support. Runtime/backend limits remain separately documented in
 [structural operations](../docs/structural-runtime-operations.md#function-values).
+
+Function constituents now recursively import into consumer ownership through
+`ImportExperimentalCompositionReference`, retaining the existing composition opt-in.
+`Emit(OpCode.Isinst, functionType)`/`IsInstance(functionType)` accept function shapes;
+ordinary stack verification still requires a reference-compatible input. The host
+regression covers import ownership, type-test emission and nested union results.

@@ -186,8 +186,10 @@ carrier allocation; binding still allocates the ordinary callable descriptor. Ex
 `castclass`/`isinst` narrowing preserves the descriptor and receiver. The
 [collector test](experiments/native-structural-types/README.md#native-callable-union-storage-2026-10-15)
 qualifies macOS ARM64 AOT copies/calls, wrong signatures, null and scalar replacement.
-Native Object widening, cross-union layout conversion, JIT lifetime and Raven source
-emission remain unqualified. Tuple/function nesting is
+An [imported Raven consumer](experiments/native-structural-types/callable-import-project/README.md)
+also qualifies typed callable/scalar patterns and invocation under AOT collection.
+Native Object widening, cross-union layout conversion and JIT lifetime remain
+unqualified. Tuple/function nesting is
 representable in signatures, but the interpreter's tuple-element admission rule
 still excludes function elements. Representation alone is not execution support.
 The regression cases are in `tests/structural_compositions.rs` (`callable_union_*`),

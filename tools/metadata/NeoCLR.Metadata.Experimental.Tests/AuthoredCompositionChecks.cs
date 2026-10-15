@@ -74,6 +74,9 @@ internal static class AuthoredCompositionChecks
         functionWiden.LoadArgument(0); functionWiden.CastReference(callableUnion); functionWiden.Return();
         var functionNarrow = builder.AddFunction("FunctionNarrow", new MethodSignature(callbackType, [callableUnion]));
         functionNarrow.LoadArgument(0); functionNarrow.CastReference(callbackType); functionNarrow.Return();
+        var functionTest = builder.AddFunction("FunctionTest", new MethodSignature(PrimitiveType.Boolean, [callableUnion]));
+        functionTest.LoadArgument(0); functionTest.Emit(OpCode.Isinst, callbackType);
+        functionTest.GetILGenerator().IsNull(); functionTest.Return();
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, callbackType, left));
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
@@ -98,6 +101,12 @@ internal static class AuthoredCompositionChecks
             callableUnionSignature!.ReturnType.Composition!.Constituents.Single(t => t.FunctionSignature is not null)
                 .FunctionSignature!.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("union callable alternative or its union return lost");
+        var consumer = new AssemblyBuilder(new("CallableUnionConsumer", new Version(1, 0, 0, 0)), core);
+        var importedCallable = consumer.ImportExperimentalCompositionReference(
+            valueSnapshot.MainModule.Functions.Single(f => f.Name == "CallableUnionEcho"), core);
+        var importedShape = importedCallable.Signature.ReturnType.Composition!.Constituents.Single(t => t.FunctionSignature is not null).FunctionSignature!;
+        if (importedShape.ReturnType.Composition!.Constituents.Single(t => t.ImportedType is not null).ImportedType!.Owner != consumer)
+            throw new Exception("callable union nested return did not import to consumer ownership");
         Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));

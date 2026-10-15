@@ -1,0 +1,22 @@
+public class Cell {
+    val Number: int
+
+    init(number: int) {
+        Number = number
+    }
+
+    func Read() -> int => Number
+}
+
+public func Produce(choice: int) -> (() -> int) | int {
+    if choice == 0 {
+        let cell = Cell(42)
+        let callback: () -> int = cell.Read
+        return callback
+    }
+    return 43
+}
+
+public func Echo(value: int | (() -> int)) -> (() -> int) | int {
+    return value
+}

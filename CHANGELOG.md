@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Import function union constituents recursively into consumer ownership and admit function type-test emission. Qualify an artifact-only Raven callable/scalar union consumer with typed patterns and invocation: interpreter/AOT agree, and 32 entries per eager/paced collector mode allocate/reclaim only the explicit Cell and callable descriptors. Retain reproducible evidence; fresh-bundle and JIT qualification remain separate.
+
 - Align host metadata callable-union authoring, native reading and reference-cast verification with runtime admission; preserve nested union-valued function signatures and reject callable intersections. Add round-trip/cast tests and correct an inherited reader test that still rejected already-supported generic composition methods. Runtime Contract and CLI encoding are unchanged.
 
 - Add bounded native callable union alternatives with exact tagged injection/narrowing and separate callable tracing slots. Validate AOT/interpreter agreement, receiver retention under eager/paced collection, null/scalar replacement, wrong-signature faults and exact allocations without a union carrier. Native Object widening, JIT lifetime and Raven source qualification remain open.

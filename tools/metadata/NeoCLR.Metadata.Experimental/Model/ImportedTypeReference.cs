@@ -110,6 +110,9 @@ public sealed partial class AssemblyBuilder
             ? allowCompositions
                 ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(t => ImportNativeSignatureType(t, core, resolver, true)))
                 : throw new InvalidDataException("experimental composition callable import requires explicit opt-in")
+            : type.FunctionSignature is { } function ? SignatureType.Function(new MethodSignature(
+                ImportNativeSignatureType(function.ReturnType, core, resolver, allowCompositions, allowTuples),
+                function.ParameterTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions, allowTuples))))
             : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
             ? ImportNativeConstruction(constructed, core, resolver, allowCompositions, allowTuples)

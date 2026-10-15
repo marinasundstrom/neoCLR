@@ -247,7 +247,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         }
         if (opCode == OpCode.Isinst)
         {
-            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
+            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf)
                 throw new ArgumentException("Isinst requires a storage type or scoped generic parameter", nameof(elementType));
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
             if (!IsReferenceSignature(elementType)) _ = Assembly.ObjectType;

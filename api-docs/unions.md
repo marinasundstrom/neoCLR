@@ -94,8 +94,9 @@ signature before invocation. Copies retain the target and bound receiver; wrong
 signature casts fail. Bounded macOS ARM64 AOT storage now uses an inline tag and
 separate callable slots, with receiver retention checked under eager/paced native
 collection. Injection adds no union carrier allocation; binding retains its ordinary
-callable-descriptor allocation. JIT lifetime, native Object widening and Raven source
-qualification remain open. Function intersection bounds remain unsupported.
+callable-descriptor allocation. A separately compiled Raven library/consumer now
+qualifies typed callable/scalar patterns and invocation under AOT collection.
+JIT lifetime and native Object widening remain open. Function intersection bounds remain unsupported.
 
 `UnionTypeInfo.Types: Sequence<TypeInfo>` exposes a constituent snapshot.
 `TypeInfo.IsUnion` identifies structural unions; use
