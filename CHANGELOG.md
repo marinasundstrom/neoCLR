@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Raise the bounded CLI metadata reader custom-attribute budget to 8,192 for valid larger assemblies (the test assembly contains 4,217 rows), with 8,192/8,193 boundary coverage. Align stale tests with existing 1,024-local and concrete virtual direct-call behavior. All 175 host metadata contract tests pass.
+
 - Unify native metadata reading for nominal and structural signatures; remove composition admission flags and the separate tuple reader. Keep explicit dependency validation and CLI projection restrictions. Migrate paired Raven catalogs and executable fixtures; focused structural import/constraint checks pass.
 
 - Remove nominal runtime `System.Union` and `System.Tuple` carriers and the generated Tuple slice. Change Range results to named structural tuples; rebuild consumers. Admit tuple-bearing native method references and pair with Raven import mapping. Validate a fresh five-library bundle and imported Range/Result consumer in interpreter/AOT/JIT with zero arena allocations; refresh native API docs and explicitly exclude retired CLI documentation scaffolds.

@@ -371,7 +371,7 @@ public sealed partial class AssemblyDefinition
                 signatureBytes += length;
                 memberReferences.Add(new((uint)MetadataTokens.GetToken(handle), parent, ReadName(member.Name), reader.GetBlobBytes(member.Signature)));
             }
-            if (reader.CustomAttributes.Count > 4096) throw new InvalidDataException("too many custom attributes");
+            if (reader.CustomAttributes.Count > 8192) throw new InvalidDataException("too many custom attributes");
             var result = new AssemblyDefinition(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, fields, properties, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
             int attributeBytes = 0;
             List<CustomAttributeDefinition> ReadAttributes(CustomAttributeHandleCollection handles)

@@ -9184,3 +9184,13 @@ external structural constraints, source tuple mutation and source constrained li
 consumers. The legacy full metadata suite has six pre-existing failures around host
 core attribute limits and stale Object/local-budget expectations; these do not qualify
 as passing coverage and are tracked for integration cleanup.
+
+### Metadata reader integration qualification (2026-10-15)
+
+The CLI declaration reader accepts at most 8,192 custom-attribute rows, increased
+from 4,096 because the valid tooling test assembly now has 4,217 rows. Per-member
+256-attribute limits, image/signature/blob budgets and structural validation remain
+unchanged. Boundary tests accept 8,192 and reject 8,193 attributes in persisted CLR
+metadata. This is a bounded tooling capacity change, not a native type-system limit.
+The full host metadata suite now passes 175/175, including corrected expectations
+for the existing 1,024-local limit and concrete public virtual direct calls.

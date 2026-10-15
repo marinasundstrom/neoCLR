@@ -11044,3 +11044,9 @@ external structural constraints, source tuple mutation and source constrained li
 consumers. The legacy full metadata suite has six pre-existing failures around host
 core attribute limits and stale Object/local-budget expectations; these do not qualify
 as passing coverage and are tracked for integration cleanup.
+
+The metadata integration cleanup now passes all 175 host contract tests. The CLI
+reader's attribute row budget is 8,192 (boundary-tested); it accommodates the
+4,217-row valid test assembly without relaxing member or blob limits. Local-budget
+and direct-base-call tests now match existing behavior. This supersedes the earlier
+six-failure status above; native structural encoding and Runtime Contract are unchanged.
