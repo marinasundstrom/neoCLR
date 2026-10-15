@@ -132,3 +132,22 @@ request to restart structural-type work.
 The immediate next task is the metadata/conversion inventory and a small
 reference-only interface proof, not changing the slicing API or adding implicit
 value conversions without backend support.
+
+## Runtime metadata slice (2026-10-15)
+
+Native runtime TypeDef metadata now accepts `generic_variance`, either omitted/
+empty (all invariant) or an arity-aligned vector of `invariant`, `covariant`, and
+`contravariant`. NeoIL authors can write `.variance out in invariant` inside a
+corresponding interface declaration. This is runtime metadata, not new Raven syntax
+or an SDK builder API. The existing C# native-metadata SDK rejects the new field
+until its importer/writer support is deliberately added; it does not erase it.
+
+The loader verifies interface-only admission and nested input/output polarity.
+Invariant generic wrappers (including Result), mutable array elements, byrefs and
+structural signatures cannot carry a varying parameter. Default bodies, static
+contracts, Self and generic methods on variant interfaces remain rejected in this
+bounded profile. Invariant existing declarations retain their behavior. Primitive
+reference stubs cannot hide variance metadata; native specialization clears the
+open parameter annotations together with the parameters on its private closed
+shapes. This slice records declarations only; it does not yet change assignment or
+dispatch.

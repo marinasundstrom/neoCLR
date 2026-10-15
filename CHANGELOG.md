@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Add runtime interface variance metadata and NeoIL `.variance` declarations with invariant defaults, arity checks and nested signature-polarity validation. Reject writable/structural occurrences and unsupported contract forms; preserve primitive-stub validation and clear open annotations on native specialized shapes. Three focused metadata tests and 21 existing interface tests pass. Metadata-only slice: assignment, dispatch and Raven/SDK support remain unchanged.
+
 - Record the author-directed variance investigation: use Sliceable<int[]> to Sliceable<Iterable<int>> as an acceptance case, compare .NET and Scala, retain mutable-slot invariance and distinguish interface reference views from Result value conversions. Document metadata, propagation/output-slot, dispatch, backend and performance requirements; no variance implementation is claimed.
 
 - Repair API reference links left behind by nominal carrier retirement: remove retired Union carrier xrefs, format generic names as code and link repository-only qualification documents to their source pages. Website validation passes all 4,333 pages; runtime behavior is unchanged.

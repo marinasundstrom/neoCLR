@@ -1025,6 +1025,7 @@ pub fn expand_with_host_roots(
             }
         }
         t.generic_parameters.clear();
+        t.generic_variance.clear();
         for field in &mut t.fields {
             field.ty = context.close(&field.ty, &shape.arguments)?;
         }

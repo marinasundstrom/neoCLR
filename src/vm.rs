@@ -1443,6 +1443,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
     }
     crate::access::validate_types(module)?;
     crate::inheritance::validate(module)?;
+    crate::variance::validate(module)?;
     crate::interfaces::validate(module)?;
     if !module.entry.is_empty() {
         let mut candidates = module.functions.iter().filter(|f| {

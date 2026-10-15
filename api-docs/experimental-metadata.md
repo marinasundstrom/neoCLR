@@ -9194,3 +9194,13 @@ unchanged. Boundary tests accept 8,192 and reject 8,193 attributes in persisted 
 metadata. This is a bounded tooling capacity change, not a native type-system limit.
 The full host metadata suite now passes 175/175, including corrected expectations
 for the existing 1,024-local limit and concrete public virtual direct calls.
+
+## Runtime interface variance metadata — development
+
+The runtime TypeDef JSON schema accepts an optional `generic_variance` vector:
+`invariant`, `covariant`, `contravariant`, aligned with `generic_parameters`.
+An absent/empty vector preserves invariance. The loader rejects arity mismatch,
+unknown values, variant class/value declarations and unsafe interface signature
+positions. This does not add variance to the C# metadata builder or Raven compiler;
+the SDK reader continues to reject unsupported fields instead of silently dropping
+them. No new managed API is introduced by this metadata slice.

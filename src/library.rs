@@ -311,6 +311,7 @@ fn resolve_primitive_references(module: &mut Module) -> Result<(), Fault> {
             || !reference.properties.is_empty()
             || !reference.generic_parameters.is_empty()
             || !reference.generic_constraints.is_empty()
+            || !reference.generic_variance.is_empty()
             || reference.declaring_type.is_some()
             || reference.enum_info.is_some()
             || reference.packing.is_some()

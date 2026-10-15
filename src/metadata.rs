@@ -259,6 +259,15 @@ pub struct GenericConstraint {
     pub kind: ConstraintKind,
 }
 
+/// Declared generic interface parameter variance. Omitted metadata is invariant.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Variance {
+    Invariant,
+    Covariant,
+    Contravariant,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
@@ -304,6 +313,10 @@ pub struct TypeDef {
     pub representation: Representation,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub generic_parameters: Vec<Option<String>>,
+    /// Empty means invariant; otherwise one entry per generic parameter.
+    /// Non-invariant entries are admitted only on verified interface declarations.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_variance: Vec<Variance>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub generic_constraints: Vec<GenericConstraint>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

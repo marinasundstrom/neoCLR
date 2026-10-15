@@ -32,6 +32,7 @@ mod inheritance;
 mod initialization;
 mod input;
 mod interfaces;
+mod variance;
 mod slots;
 pub use execution::{CancellationToken, ExecutionOptions};
 pub use gc::{CollectionEvent, CollectionReason, GcStatistics, ManagedHeap};

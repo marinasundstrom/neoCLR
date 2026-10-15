@@ -354,6 +354,18 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     ));
                     return Ok(());
                 }
+                if word == ".variance" {
+                    if !def.generic_variance.is_empty() || rest.trim().is_empty() {
+                        return Err(Fault::new("duplicate or empty .variance"));
+                    }
+                    def.generic_variance = rest.split_whitespace().map(|word| match word {
+                        "invariant" => Ok(crate::metadata::Variance::Invariant),
+                        "out" => Ok(crate::metadata::Variance::Covariant),
+                        "in" => Ok(crate::metadata::Variance::Contravariant),
+                        _ => Err(Fault::new("expected invariant, out or in variance")),
+                    }).collect::<Result<Vec<_>, _>>()?;
+                    return Ok(());
+                }
                 if word == ".implements" {
                     def.implements.push(bind_type_parameters(
                         parse_type(rest)?,
@@ -839,6 +851,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         origin: None,
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
+                        generic_variance: vec![],
                         generic_constraints: vec![],
                         fields: vec![],
                         implements: vec![],

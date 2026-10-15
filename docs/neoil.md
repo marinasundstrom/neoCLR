@@ -759,3 +759,16 @@ separate from instance layout. Stack effects are 0→1 and 1→0. Textual assemb
 syntax and type initialization are not yet implemented. These operations are
 currently interpreter-only; see [static storage progress](runtime-static-storage.md)
 for GC ownership, generic identity, restrictions and the remaining compiler/backend work.
+
+### Interface parameter variance metadata (development)
+
+Within `.interface Producer<T>`, `.variance out` declares a covariant parameter;
+`in` denotes contravariance and `invariant` retains exact matching. A nonempty list
+must match the declared arity. Omission remains invariant. Runtime JSON records
+these as `generic_variance` entries `covariant`, `contravariant`, or `invariant`.
+
+Declarations are checked for input/output polarity, including nested generic
+interfaces and inherited interfaces. Writable/borrowed slots, arrays, invariant
+wrappers and structural signatures are not variance-enabled positions. Only
+bodyless instance contracts without Self or method generics are currently admitted.
+See the [variance design and current scope](design/interface-variance.md).
