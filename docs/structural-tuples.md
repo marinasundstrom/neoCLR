@@ -440,7 +440,7 @@ fail admission. Return scratch space accounts for tuple results, including resul
 larger than the previous minimum buffer. Tracing recipes identify nested text
 references without treating wide numeric lanes as managed references.
 
-Native tuple reflection, boxing, tuple arrays, dedicated JIT/GC-stress consumers,
+Native tuple reflection, boxing, tuple arrays, managed-host JIT/GC-stress consumers,
 Windows qualification and compiler-produced application qualification remain open.
 Native unions and intersections remain rejected. The author additionally requested
 performance measurement to guide optimization; comparative benchmarks are a

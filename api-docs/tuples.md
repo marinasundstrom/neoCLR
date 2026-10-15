@@ -192,8 +192,8 @@ metadata; positional access and compatibility are unchanged.
 
 Nested tracing recipes retain reference slots and omit numeric slots. This bounded
 storage slice does not complete native tuple reflection, boxing, array storage,
-Windows qualification or full Raven application integration. JIT uses shared
-lowering but still needs dedicated structural execution qualification. These are
+Windows qualification or full Raven application integration. Direct JIT tests also execute two- and sixteen-integer tuple copy/call workloads;
+managed-host and collector qualification remain open. These are
 integration gaps, not permanent restrictions of structural identity.
 
 Initial AOT microbenchmarks compare two- and sixteen-integer tuples with equivalent

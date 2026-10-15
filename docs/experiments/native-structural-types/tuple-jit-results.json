@@ -1,0 +1,93 @@
+{
+  "runtime_revision": "5e59f2e7d4d88ac4bb18df1c6ae2f6e3a028417b",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "harness_source_sha256": "a9abe4ca196aa680e689dc667aa5f5a03613afbc9072d2080cb6f80cd924fd8f",
+  "test_binary_sha256": "948c0d7904e6adfa178f444757faa724dfa89de35fbdc439a39cbf0c4dca18d1",
+  "cases": [
+    {
+      "elements": 2,
+      "harness_debug_assertions": false,
+      "iterations": 1000000,
+      "limitations": [
+        "Rust timing harness includes status checks and checksum",
+        "no managed references or GC",
+        "one host",
+        "no timing threshold assertion"
+      ],
+      "nominal": {
+        "compile_seconds": 0.028726334,
+        "samples_ns_per_call": [
+          3.93375,
+          3.935125,
+          3.933875,
+          3.933625,
+          3.935833,
+          4.004125,
+          3.93375,
+          3.942417,
+          3.935958
+        ],
+        "median_ns_per_call": 3.935125
+      },
+      "structural": {
+        "compile_seconds": 0.034039708,
+        "samples_ns_per_call": [
+          3.93575,
+          3.933375,
+          3.935541,
+          3.933791,
+          3.93375,
+          3.941041,
+          3.937333,
+          3.937333,
+          3.953458
+        ],
+        "median_ns_per_call": 3.93575
+      },
+      "ratio": 1.0001588259585146
+    },
+    {
+      "elements": 16,
+      "harness_debug_assertions": false,
+      "iterations": 1000000,
+      "limitations": [
+        "Rust timing harness includes status checks and checksum",
+        "no managed references or GC",
+        "one host",
+        "no timing threshold assertion"
+      ],
+      "nominal": {
+        "compile_seconds": 0.029141625,
+        "samples_ns_per_call": [
+          13.886833,
+          13.885792,
+          13.894833,
+          13.903875,
+          13.899166,
+          13.891209,
+          13.888209,
+          13.901375,
+          13.883166
+        ],
+        "median_ns_per_call": 13.891209
+      },
+      "structural": {
+        "compile_seconds": 0.029234708,
+        "samples_ns_per_call": [
+          13.859875,
+          13.902292,
+          13.876917,
+          14.005792,
+          13.868667,
+          13.870334,
+          13.864375,
+          13.873,
+          13.863917
+        ],
+        "median_ns_per_call": 13.870334
+      },
+      "ratio": 0.9984972510312097
+    }
+  ],
+  "scope": "Direct shared JIT backend, synchronous calls, no managed host or collector"
+}

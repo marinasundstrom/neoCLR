@@ -4286,3 +4286,107 @@ mod windows_frame_tests {
         }
     }
 }
+
+#[cfg(all(test, target_os = "macos", target_arch = "aarch64"))]
+mod structural_jit_tests {
+    use super::*;
+    use cranelift_jit::{JITBuilder, JITModule};
+    use cranelift_module::FuncOrDataId;
+    use std::time::Instant;
+
+    struct OwnedCode(Option<JITModule>);
+    impl Drop for OwnedCode {
+        fn drop(&mut self) {
+            if let Some(module) = self.0.take() {
+                // SAFETY: this test invokes code synchronously; no address escapes.
+                unsafe { module.free_memory() };
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "explicit native performance qualification; runs millions of calls"]
+    fn structural_tuple_jit_costs_match_nominal_records() {
+        type Entry = unsafe extern "C" fn(i32, *mut i32) -> i32;
+        for (elements, structural, nominal) in [
+            (
+                2,
+                include_str!(
+                    "../../../docs/experiments/native-structural-types/structural-pair.neoil"
+                ),
+                include_str!(
+                    "../../../docs/experiments/native-structural-types/nominal-pair.neoil"
+                ),
+            ),
+            (
+                16,
+                include_str!(
+                    "../../../docs/experiments/native-structural-types/structural-16.neoil"
+                ),
+                include_str!("../../../docs/experiments/native-structural-types/nominal-16.neoil"),
+            ),
+        ] {
+            let mut cases = Vec::new();
+            for source in [structural, nominal] {
+                let input = neoclr::assemble(source).unwrap();
+                let started = Instant::now();
+                let mut flags = settings::builder();
+                flags.set("is_pic", "false").unwrap();
+                flags.set("use_colocated_libcalls", "false").unwrap();
+                let target = super::super::Target::MacosArm64;
+                target.configure_stack(&mut flags).unwrap();
+                let isa = isa::lookup(target.triple().parse().unwrap())
+                    .unwrap()
+                    .finish(settings::Flags::new(flags))
+                    .unwrap();
+                let builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
+                let mut owner = OwnedCode(Some(JITModule::new(builder)));
+                let module = owner.0.as_mut().unwrap();
+                compile_into(&input, "Main", None, target, module, true).unwrap();
+                module.finalize_definitions().unwrap();
+                let Some(FuncOrDataId::Func(id)) = module.get_name("neoclr_entry_v2") else {
+                    panic!("missing entry")
+                };
+                // SAFETY: compile_into emits this exact entry ABI. The code owner
+                // stays alive throughout every invocation and is released last.
+                let entry: Entry =
+                    unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+                cases.push((owner, entry, started.elapsed().as_secs_f64(), Vec::new()));
+            }
+            let iterations = 1_000_000;
+            for sample in 0..10 {
+                for index in if sample % 2 == 0 { [0, 1] } else { [1, 0] } {
+                    let (_, entry, _, samples) = &mut cases[index];
+                    let start = Instant::now();
+                    let mut sum = 0i64;
+                    for i in 0..iterations {
+                        let mut value = 0;
+                        // SAFETY: entry is owned by the live module in this case.
+                        let status = unsafe { entry(i & 1023, &mut value) };
+                        assert_eq!(status, 0);
+                        sum += i64::from(value);
+                    }
+                    let ns = start.elapsed().as_nanos() as f64 / f64::from(iterations);
+                    assert_eq!(
+                        sum,
+                        (0..iterations)
+                            .map(|i| i64::from((i & 1023) + 2))
+                            .sum::<i64>()
+                    );
+                    if sample != 0 {
+                        samples.push(ns);
+                    }
+                }
+            }
+            println!(
+                "STRUCTURAL_JIT_BENCH {}",
+                serde_json::json!({
+                    "elements": elements, "iterations": iterations, "harness_debug_assertions": cfg!(debug_assertions),
+                    "structural": { "compile_seconds": cases[0].2, "samples_ns_per_call": cases[0].3 },
+                    "nominal": { "compile_seconds": cases[1].2, "samples_ns_per_call": cases[1].3 },
+                    "limitations": ["Rust timing harness includes status checks and checksum", "no managed references or GC", "one host", "no timing threshold assertion"]
+                })
+            );
+        }
+    }
+}

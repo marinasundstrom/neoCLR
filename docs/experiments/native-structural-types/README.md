@@ -46,3 +46,23 @@ The script preserves previous output directories. A flat nominal record currentl
 admits at most sixteen fields; larger comparisons need equally nested layouts.
 There is no packed-layout, cache-pressure, managed-reference/GC, boxing, union,
 interpreter or JIT qualification in this result. These remain explicit follow-ups.
+
+## Direct JIT tuple execution
+
+The shared JIT backend also executes both workloads successfully, with one million
+calls per sample, nine interleaved measured samples after warmup and checked
+results. The optimized Rust harness measured approximately 3.94 ns/call for the pair
+and 13.9 ns/call for sixteen integers in both representations. These are comparable
+within noise. Timing includes status checks/checksum but excludes compilation and
+finalization. These measurements do not directly compare JIT and AOT speed because
+the timing hosts differ. [Raw JIT samples and hashes](tuple-jit-results.json).
+
+```sh
+cargo test --release -p neoclr-codegen --lib structural_tuple_jit_costs \
+  -- --ignored --nocapture
+```
+
+This explicit ignored performance test owns JIT code until synchronous invocation
+finishes, then frees it. It validates direct backend construction, copying and
+calls; the full managed host, reference-bearing tuples and collector stress remain
+unqualified. Native unions and intersections remain the next backend obligations.
