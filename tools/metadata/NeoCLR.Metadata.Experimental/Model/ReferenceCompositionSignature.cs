@@ -64,7 +64,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="types">Two to 256 output-owned constituents; copied and normalized.</param>
     /// <returns>The structural signature, or the surviving constituent after duplicate normalization.</returns>
     /// <exception cref="ArgumentException">A constituent is foreign, open, unsupported, or a final intersection bound.</exception>
-    /// <remarks>Native-only; CLI projection remains disabled. Value, pointer and function bounds are not admitted.</remarks>
+    /// <remarks>Native-only; CLI projection remains disabled. Union value alternatives use explicit boxing; intersections exclude values. Pointer and function bounds are not admitted.</remarks>
     public SignatureType CreateExperimentalReferenceComposition(ReferenceCompositionKind kind, params SignatureType[] types)
     {
         ArgumentNullException.ThrowIfNull(types);
@@ -89,8 +89,11 @@ public sealed partial class AssemblyBuilder
                 return;
             }
             var local = type.ClassType ?? type.GenericInstance?.Definition;
-            if (local is not { IsStatic: false, IsValueType: false } && type.ImportedType is not { IsValueType: false })
-                throw new ArgumentException("composition requires nominal reference bounds", nameof(types));
+            var scalar = type.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
+            if (intersection
+                ? local is not { IsStatic: false, IsValueType: false } && type.ImportedType is not { IsValueType: false }
+                : !scalar && local is not { IsStatic: false } && type.ImportedType is null)
+                throw new ArgumentException("unsupported composition alternative; intersections require nominal references", nameof(types));
             if (intersection)
             {
                 var extendable = local is not null ? (local.Definition.Attributes & 0x100) == 0

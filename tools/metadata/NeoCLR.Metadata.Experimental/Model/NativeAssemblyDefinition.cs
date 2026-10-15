@@ -537,8 +537,11 @@ public sealed partial class NativeAssemblyDefinition
                             : argument.ClassType is { GenericParameterNames.Count: 0 }
                             || argument.ImportedType is { } imported && imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(ClosedArgument);
                         var localBound = leaf.ClassType ?? leaf.GenericInstance?.Definition;
-                        Require(localBound is { IsStatic: false, IsValueType: false } && ClosedArgument(leaf) ||
-                            leaf.ImportedType is { IsValueType: false } && ClosedArgument(leaf), "composition requires closed nominal reference bounds");
+                        var scalar = leaf.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
+                        Require(ClosedArgument(leaf) && (intersectionBound
+                            ? localBound is { IsStatic: false, IsValueType: false } || leaf.ImportedType is { IsValueType: false }
+                            : scalar || localBound is { IsStatic: false } || leaf.ImportedType is not null),
+                            "unsupported composition alternative; intersections require closed nominal references");
                         if (intersectionBound)
                             Require(localBound is { } bound ? !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass
                                 : leaf.ImportedType is { } external && ExtendableExternal(external),

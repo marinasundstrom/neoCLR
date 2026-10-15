@@ -261,13 +261,13 @@ impl Query {
                     | Type::Value
                     | Type::RuntimeTypeHandle
                     | Type::Array(_)
-                    | Type::Tuple(_) => true,
+                    | Type::Tuple(_)
+                    | Type::Union(_) => true,
                     Type::Named(_) | Type::Constructed { .. } | Type::Scoped { .. } => definition
                         .is_some_and(|d| {
                             !d.is_reference_type && d.representation != Representation::Interface
                         }),
                     Type::String
-                    | Type::Union(_)
                     | Type::Intersection(_)
                     | Type::Function(_)
                     | Type::ByRef(_)

@@ -111,5 +111,5 @@ remain incomplete; these changes are not yet a published release.
 
 Development follow-up: structural unions are intended for both value and reference
 alternatives. The interpreter now has explicit boxed scalar/nominal value storage
-and copied extraction; compiler integration is still incomplete. Intersections
+and copied extraction; native compiler exact conversions and metadata host authoring now support these bounded alternatives. Generic wrapper/out-parameter integration is still incomplete. Intersections
 retain nominal interface and extendable-reference bounds.

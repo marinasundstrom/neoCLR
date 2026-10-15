@@ -64,7 +64,7 @@ internal static class StructuralMethodConstraintChecks
             Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, ordinal: -1), true));
             Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, ordinal: 1), true));
             Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(bound, duplicate: true), true));
-            foreach (var invalid in new JsonNode[] { JsonValue.Create("Int32")!, new JsonObject { ["MethodParameter"] = 0 }, new JsonObject { ["Named"] = "Missing" } })
+            foreach (var invalid in new JsonNode[] { JsonValue.Create(kind == "Union" ? "Void" : "Int32")!, new JsonObject { ["MethodParameter"] = 0 }, new JsonObject { ["Named"] = "Missing" } })
                 Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(Compose(kind, nominal, invalid)), true));
             var mixed = Compose(kind, nominal, Compose(kind == "Union" ? "Intersection" : "Union", nominal, other));
             var mixedRead = AssemblyDefinition.ReadNativeAssembly(Image(mixed), true);

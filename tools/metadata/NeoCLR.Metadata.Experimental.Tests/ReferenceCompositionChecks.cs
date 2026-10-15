@@ -89,7 +89,7 @@ internal static class ReferenceCompositionChecks
             Check(read.MainModule.Functions[0].TryGetSignature(out var flattened) && flattened!.ReturnType == flattened.ParameterTypes[0], "flatten and deduplicate");
             var singleton = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(Compose(kind, originalType, originalType))), true);
             Check(singleton.MainModule.Functions[0].TryGetSignature(out var single) && single!.ReturnType.Composition is null, "singleton collapse");
-            foreach (var bad in new[] { Compose(kind, originalType), Compose(kind, originalType, JsonValue.Create("Int32")!), Compose(kind, originalType, new JsonObject { ["Named"] = "Missing" }) })
+            foreach (var bad in new[] { Compose(kind, originalType), Compose(kind, originalType, JsonValue.Create(kind == "Union" ? "Void" : "Int32")!), Compose(kind, originalType, new JsonObject { ["Named"] = "Missing" }) })
                 Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(bad)), true));
             Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(new JsonObject { ["ArrayRef"] = bound.DeepClone() })), true));
             Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(new JsonObject { ["ByRef"] = bound.DeepClone() })), true));

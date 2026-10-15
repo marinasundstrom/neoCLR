@@ -17715,3 +17715,20 @@ The assistant proposed normal dispatch on the current payload, keeping duck typi
 as a separate possible compiler feature. No subsequent author decision on that
 proposal is available. Neither approach is implemented for union formatting here.
 See [the integration notes](raven-cli-bridge.md#value-and-reference-union-alternatives--2026-10-15-development).
+
+## 2026-10-15 — Structural value classification and boxing cost
+
+The author clarified that structural unions and tuples remain value types outside
+the nominal inheritance hierarchy. The assistant corrected union compiler symbols
+and guest reflection, while preserving the interpreter's payload representation.
+The author asked whether mixed union alternatives require method variants by value
+size, then asked about boxing performance. The assistant explained that one union
+representation can serve all active alternatives, and identified allocation, GC,
+indirection and copying costs in the current implementation. Inline tagged storage
+was proposed as a future option, not selected as a finalized ABI. The author said
+“Ok continue”; no layout or formatting policy was thereby finalized.
+
+Host authoring and compiler conversions now admit bounded value alternatives.
+Focused validation passes; the full host harness has six unresolved failures.
+System.Web reaches an out-parameter emission boundary; integration remains on the
+feature branches. See the integration notes for evidence and remaining scope.

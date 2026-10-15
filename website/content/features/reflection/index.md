@@ -95,3 +95,5 @@ with preparation, repeated construction and rejection checks. The [attributed HT
 combines this execution support with startup schema validation and cached route bindings.
 See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflectionExtensions)
 for signatures and limitations.
+
+Development branch update (2026-10-15): structural unions report `IsValueType` even when all alternatives are references; this classification adds no nominal base type.

@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-15",
+  "runtime_base": "5cdcdf78e",
+  "compiler_base": "06d8523d3",
+  "revision_note": "Bases plus companion working changes committed with this evidence",
+  "source_consumer_exit": 42,
+  "combined_structural_consumer_exit": 42,
+  "compiler_focused_tests": 4,
+  "host_full_harness": "169/175; six unresolved failures, baseline attribution unknown",
+  "api_snapshot": "passed",
+  "system_web_blocker": "TryGetResidual(out HttpError | JsonError) native invocation emission",
+  "sha256": {
+    "docs/experiments/value-unions/project/Main.rvn": "a2a35a5faddf211019b8359578f48fc95035a29c0b1d41cb6eaf9f07fc830a12",
+    "docs/experiments/value-unions/project/bin/neoclr/ValueUnionSource.dll": "cc68587c97761b6e66fa05eb946183db3c3a6e1bb004ea8506365fab93293fd5",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "ab86bf0db6af099f8e7216b482399cfbcbf42d5c439897b4038aa7d6d9a9adcf",
+    "target/debug/neoclr": "f994bb8c6c4477889335d10447ab5da4dc9f41f05632e8ad4a974c75fc4118d2"
+  }
+}

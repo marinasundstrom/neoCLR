@@ -35,7 +35,15 @@ internal static class AuthoredCompositionChecks
         if (!snapshot.MainModule.Functions.Single(f => f.Name == "Echo").TryGetSignature(out var signature) || signature!.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("native structural signature lost");
         Reject(() => builder.Write());
-        Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, PrimitiveType.Int32));
+        var values = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, PrimitiveType.Int32);
+        var valueEcho = builder.AddFunction("ValueEcho", new MethodSignature(values, [values]));
+        valueEcho.LoadArgument(0); valueEcho.Return();
+        var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
+        var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
+        if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
+            valueSignature!.ReturnType.Composition!.Constituents.All(t => t.Primitive != PrimitiveType.Int32))
+            throw new Exception("scalar union alternative lost");
+        Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));
         var foreign = new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core).AddInterface("", "Other");
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, foreign));

@@ -153,7 +153,9 @@ fn value_type_classification_uses_type_category_not_addressing_mode() {
         ("Int32&", false),
         ("Int32*", false),
         ("System.Option<Int32>", true),
-    ] {
+    ].into_iter().chain(if cfg!(feature = "experimental-compositions") {
+        vec![("union<Item,Point>", true), ("union<Item,System.Introspection.TypeInfo>", true), ("union<Point,Int32>", true)]
+    } else { vec![] }) {
         let app = assemble(&format!(
             r#"
 .module Categories

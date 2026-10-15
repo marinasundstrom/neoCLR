@@ -9074,3 +9074,16 @@ NEOX bounded to 16 MiB. It preserves native structural signatures without a CLI
 projection. Null throws `ArgumentNullException`; invalid graphs or exceeded
 bounds throw `InvalidDataException`. Application writer budgets are unchanged.
 This host API is covered by this manual reference, outside guest RavenDoc.
+
+### Closed value union alternatives (2026-10-15 development)
+
+`CreateExperimentalReferenceComposition` retains its legacy API name but now
+admits closed scalar and nominal value alternatives for `Union`, including imported
+value definitions. Native reads apply the same rule. `Intersection` continues to
+reject value operands. Void, erased Value, RuntimeTypeHandle, intrinsic String,
+open types and structural tuple alternatives remain outside this bounded factory.
+Value payload construction requires explicit boxing and extraction copies through
+explicit unboxing; this does not give the union a nominal Object/ValueType base.
+The native signature is preserved and CLI projection remains unsupported.
+See the [integration contract](../docs/raven-cli-bridge.md) for validation and
+remaining generic wrapper/byref limitations.

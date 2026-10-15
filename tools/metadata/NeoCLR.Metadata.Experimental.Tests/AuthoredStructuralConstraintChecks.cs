@@ -45,7 +45,7 @@ internal static class AuthoredStructuralConstraintChecks
         Reject(() => either.AddExperimentalStructuralConstraint(1, ReferenceCompositionKind.Union, a, b));
         Reject(() => either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Intersection, both, a));
         Reject(() => either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, SignatureType.MethodParameter(0), a));
-        Reject(() => either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, PrimitiveType.Int32, a));
+        Reject(() => either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, PrimitiveType.Void, a));
         Reject(() => _ = either.InterfaceConstraints);
         var forwarding = graph.AddFunction("Forward", new MethodSignature(PrimitiveType.Int32, [], ["T"]));
         forwarding.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
