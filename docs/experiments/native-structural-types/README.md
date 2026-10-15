@@ -675,3 +675,20 @@ unboxing now uses the existing normalized evaluation-stack representation in bot
 interpreter and verifier; all 11 boxed-interface tests pass, including seven
 primitive regression cases. This does not yet qualify every primitive/enum union,
 NaN payload preservation, floating throughput or every backend/platform.
+
+### Value-record property-pattern consumer (2026-10-15)
+
+The paired Raven compiler now supports `Response { Value: let payload }` and
+`Response { Value: 42 }` over a structural union containing a value-record Response.
+It tests the alternative first, extracts a snapshot once, then borrows that local
+for property getters. Nonmatching scalar alternatives skip extraction/getters.
+The updated `widening-project` fixture checks payload bindings, constant property
+patterns, false cases and reordered/widened union calls. This does not qualify
+arbitrary positional patterns or every possible nested pattern.
+
+[Fresh retained evidence](property-pattern-v4-results.json) records interpreter,
+macOS ARM64 AOT and managed JIT returning 42 with zero arena use. AOT has no native
+imports and passes undefined/bounds sanitizers; the JIT host checks cleanup and is
+not sanitizer-instrumented. Reproduce with `verify-raven-union-widening.py` and the
+fresh v4 bundle as above. The compiler's 12 portable pattern tests also pass.
+Runtime Contract configuration and native signature encoding are unchanged.

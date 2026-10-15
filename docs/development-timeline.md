@@ -17910,3 +17910,15 @@ both `Type obj => ...` and `let obj: Type => ...`, and finds the type-first form
 more intuitive in match arms. The assistant adopted that form in the String and
 widening samples, retaining compilation checks. This is a presentation preference;
 no parser or pattern semantics change was requested.
+
+
+## 2026-10-15 — Capture and destructure according to the arm's needs
+
+The author clarified that member-only match arms can use supported positional or
+property destructuring, while a type-only pattern (`int => ...`, `() => ...`) and
+whole-value capture (`int no => ...`, `Foo foo => ...`) remain appropriate for
+other arms. The assistant treated these as styles rather than semantic changes.
+Compiling a property pattern over a value-record union alternative exposed a
+native Raven emission gap. The assistant extended checked extraction/getter
+lowering and validated 12 focused compiler tests plus a fresh interpreter/AOT/JIT
+consumer. See the [property-pattern checkpoint](experiments/native-structural-types/README.md#value-record-property-pattern-consumer-2026-10-15).

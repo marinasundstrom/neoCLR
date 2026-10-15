@@ -345,3 +345,8 @@ Native Single/Double union alternatives now use distinct inline numeric regions,
 with exact tests/extraction and allocation-free widening. Interpreter/AOT
 qualification covers calls, fractional values and wrong extraction; other
 primitive/enum alternatives and broader floating workloads remain open.
+
+Raven value-record property patterns over structural unions first test membership,
+then extract a local snapshot and borrow it for getters. Binding and constant
+member patterns now pass a fresh interpreter/AOT/JIT consumer; see the
+[property-pattern evidence](experiments/native-structural-types/property-pattern-v4-results.json).

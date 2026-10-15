@@ -228,7 +228,12 @@ type. Payload-free construction currently uses `None()` in these target samples.
 
 For a typed binding in a match arm, prefer `Type name => ...` (for example,
 `string text => ...`). Raven also supports `let name: Type => ...`; the author
-prefers the type-first form in this position (2026-10-15).
+prefers the type-first form in this position (2026-10-15). When only a payload
+is needed, prefer a supported positional pattern (`Response(let value)`) or a
+property pattern (`Response { Value: let value }`) to binding the whole object
+and immediately accessing a member. Use a type-only pattern (`int => ...`, `() => ...`) when no value is needed,
+and a whole-value capture (`int no => ...`, `Foo foo => ...`) when the arm needs
+the value itself. These are style preferences, not semantic rules.
 
 Prefer a case pattern or destructuring over `IsSome` followed by
 `GetSomeCase().Value`:
