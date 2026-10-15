@@ -56,6 +56,11 @@ fn native_type_bounds_preserve_any_of_all_of_and_closed_satisfiers() {
             vec!["OnlyA", "OnlyB", "union<OnlyA,OnlyB>"],
         ),
         (
+            "union<Int32,A>",
+            vec!["Int32", "OnlyA", "union<Int32,OnlyA>"],
+            vec!["Int64", "OnlyB", "union<Int32,OnlyB>"],
+        ),
+        (
             "union<Box<OnlyA>,B>",
             vec!["Box<OnlyA>", "OnlyB"],
             vec!["Box<OnlyB>", "OnlyA"],
@@ -121,7 +126,7 @@ fn invalid_structural_bounds_cannot_normalize_away() {
     for bound in [
         "intersection<Both,A>",
         "intersection<Both,Both>",
-        "union<Int32,A>",
+        "union<Void,A>",
         "union<Unknown,A>",
         "union<Box<T>,A>",
     ] {

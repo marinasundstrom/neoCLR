@@ -17697,3 +17697,21 @@ returns 42; default runtime tests pass. Integration remains on feature branches,
 with source-library rebuild and backend limitations recorded in
 [the integration contract](raven-cli-bridge.md#native-project-integration--2026-10-15-development).
 No merge or deletion of old branches has been performed.
+
+## 2026-10-15 — Union value alternatives and formatting
+
+The author clarified: “Unions have to support both value types and reference
+variant types,” contrasting intersections as mostly reference/interface views.
+The assistant identified the real Web integration gap: declared HttpError and
+JsonError unions are value types. An attempted unsupported-value diagnostic was
+discarded before commit; it must not become the permanent source contract.
+The assistant began runtime admission through existing explicit boxing and exact
+unboxing, retaining native structural signatures and leaving compiler integration
+pending. This is a provisional implementation representation, not an author
+choice of a permanent boxed ABI.
+
+The author then raised string representation and proposed duck-typed ToString.
+The assistant proposed normal dispatch on the current payload, keeping duck typing
+as a separate possible compiler feature. No subsequent author decision on that
+proposal is available. Neither approach is implemented for union formatting here.
+See [the integration notes](raven-cli-bridge.md#value-and-reference-union-alternatives--2026-10-15-development).

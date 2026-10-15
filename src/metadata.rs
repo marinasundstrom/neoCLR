@@ -1024,7 +1024,8 @@ impl Module {
     /// Implicit ordinary-reference upcast; byrefs and array covariance are excluded.
     pub(crate) fn reference_assignable(&self, source: &Type, target: &Type) -> bool {
         if crate::compositions::is_compound(source) || crate::compositions::is_compound(target) {
-            return crate::compositions::assignable(self, source, target);
+            return self.is_object_reference_type(source)
+                && crate::compositions::assignable(self, source, target);
         }
         self.is_object_reference_type(source)
             && ((self.array_nominal(source).as_ref() == Some(target))

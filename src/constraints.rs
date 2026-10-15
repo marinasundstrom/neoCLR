@@ -261,6 +261,9 @@ pub(crate) fn check(
 // Constraint membership never performs a value conversion. Preserve each union
 // alternative and each intersection requirement, including nominal Self contracts.
 fn satisfies_composition_bound(module: &crate::Module, argument: &Type, bound: &Type) -> bool {
+    if argument == bound && argument.is_primitive() {
+        return true;
+    }
     match (argument, bound) {
         (Type::Union(parts), _) => parts
             .iter()

@@ -108,3 +108,8 @@ tuples, unions and intersections together, and the default runtime build admits
 them in the interpreter. A separate-library sample preserves named tuple copies
 and returns 42. JIT/AOT, full legacy tuple removal and broader element forms
 remain incomplete; these changes are not yet a published release.
+
+Development follow-up: structural unions are intended for both value and reference
+alternatives. The interpreter now has explicit boxed scalar/nominal value storage
+and copied extraction; compiler integration is still incomplete. Intersections
+retain nominal interface and extendable-reference bounds.

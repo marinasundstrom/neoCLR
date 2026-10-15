@@ -101,9 +101,9 @@ fn canonicalization_happens_before_call_binding() {
 #[test]
 fn unsupported_shapes_and_address_operations_fail_admission() {
     for ty in [
-        "union<Int32,Left>",
+        "union<Void,Left>",
         "intersection<ValueCell,Left>",
-        "union<ValueCell,ValueCell>",
+        "union<Value,Left>",
         "union<Missing,Left>",
         "union<Left>",
         "union<Left,Right>&",
@@ -1031,5 +1031,60 @@ fn nominal_static_methods_preserve_composition_parameters_and_returns() {
         let p = program(&body, &helpers);
         p.verify().unwrap();
         assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn boxed_value_and_reference_union_alternatives_roundtrip() {
+    let helpers =
+        ".function Keep(union<Int32,Both> value) -> union<Both,Int32>\nldarg value\nret\n.end";
+    let p = program(
+        ".local union<Int32,Both> value\nldc.i4 42\nbox Int32\ncastclass union<Int32,Both>\ncall Keep(union<Both,Int32>)\nstloc value\nldloc value\nunbox.any Int32",
+        helpers,
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    let p = program(
+        "ldc.i4 42\nnewobj Both\ncall Keep(union<Int32,Both>)\ncastclass Both\ncallvirt instance Left::Get()",
+        helpers,
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    let bad = program(
+        "ldc.i4 1\nbox Int32\ncastclass union<ValueCell,Both>\npop\nldc.i4 0",
+        "",
+    );
+    bad.verify().unwrap();
+    assert!(bad.run(Limits::default()).is_err());
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn boxed_nominal_value_union_preserves_copy_on_unbox() {
+    let p = program(
+        ".local union<Cell,Both> value\n.local Cell copy\nldc.i4 42\nnewobj Cell\nbox Cell\ncastclass union<Cell,Both>\nstloc value\nldloc value\nunbox.any Cell\nstloc copy\nldloca copy\nldc.i4 7\nstfld Cell::Number\npop\nldloc value\nunbox.any Cell\nldfld Cell::Number",
+        ".type Cell\n.field Number Int32\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn union_value_storage_requires_boxing_and_intersections_stay_reference_only() {
+    for body in [
+        ".local union<ValueCell,Both> value\nnewobj ValueCell\nstloc value\nldc.i4 0",
+        ".local union<Int32,Both> value\nldc.i4 42\nstloc value\nldc.i4 0",
+    ] {
+        let p = program(body, "");
+        assert!(p.verify().is_err());
+        assert!(p.run(Limits::default()).is_err());
+    }
+    for shape in ["intersection<Int32,Left>", "intersection<ValueCell,Left>"] {
+        let source = format!(
+            ".module Bad\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local {shape} value\nldc.i4 0\nret\n.end"
+        );
+        assert!(assemble(&source).is_err());
     }
 }

@@ -1,8 +1,17 @@
-//! Branch-only reference compositions. No value layout, byref or backend ABI.
+//! Structural compositions. Value union alternatives use explicit boxing in the interpreter.
+//! Intersections remain nominal reference views; no byref or backend ABI.
 use crate::{
     Fault, Module,
     metadata::{Representation, Type},
 };
+
+fn scalar_union_alternative(ty: &Type) -> bool {
+    ty.is_primitive()
+        && !matches!(
+            ty,
+            Type::Void | Type::Value | Type::RuntimeTypeHandle | Type::String
+        )
+}
 
 pub(crate) fn is_compound(ty: &Type) -> bool {
     matches!(ty, Type::Union(_) | Type::Intersection(_))
@@ -34,7 +43,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
     }
     // Generic argument syntax is distinct from a composition operand: value arguments
     // are allowed inside a reference construction. Compound arguments retain the
-    // same reference-only operand rules; open parameters remain unsupported.
+    // same operand rules; open parameters remain unsupported.
     fn argument(ty: &Type, depth: usize, nodes: &mut usize) -> Result<(), Fault> {
         if depth > 32 || *nodes == 0 {
             return Err(Fault::new("compound signature resource limit"));
@@ -43,6 +52,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
         match ty {
             Type::Union(_) | Type::Intersection(_) => visit(ty, depth, nodes),
             Type::Named(_) => Ok(()),
+            _ if scalar_union_alternative(ty) => Ok(()),
             Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
                 if arguments.len() > 256 {
                     return Err(Fault::new("too many compound generic arguments"));
@@ -75,6 +85,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 Ok(())
             }
             Type::Named(_) => Ok(()),
+            _ if scalar_union_alternative(ty) => Ok(()),
             Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
                 if arguments.len() > 256 {
                     return Err(Fault::new("too many compound generic arguments"));
@@ -85,7 +96,7 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 Ok(())
             }
             _ => Err(Fault::new(
-                "compound constituents must be closed nominal references",
+                "compound constituents must be closed nominal or supported scalar types",
             )),
         }
     }
@@ -117,7 +128,7 @@ pub(crate) fn resolved(module: &Module, ty: &Type) -> bool {
     match ty {
         Type::Union(parts) | Type::Intersection(parts) => parts.iter().all(|t| resolved(module, t)),
         Type::Named(_) | Type::Constructed { .. } => module.type_definition(ty).is_some(),
-        _ => false,
+        _ => scalar_union_alternative(ty),
     }
 }
 
@@ -135,6 +146,7 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
                 }
                 Ok(())
             }
+            _ if !intersection_bound && scalar_union_alternative(ty) => Ok(()),
             Type::Named(_) | Type::Constructed { .. } => {
                 crate::vm::check_type(ty, module)?;
                 let def = module
@@ -146,12 +158,13 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
                     ));
                 }
                 if def.representation == Representation::Interface
-                    || (def.representation == Representation::Record && def.is_reference_type)
+                    || (def.representation == Representation::Record
+                        && (def.is_reference_type || !intersection_bound))
                 {
                     Ok(())
                 } else {
                     Err(Fault::new(
-                        "compound constituents must be class or interface references",
+                        "compound constituents must be records or interfaces; intersections require references",
                     ))
                 }
             }
@@ -165,12 +178,6 @@ pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> bool 
     if source == target {
         return true;
     }
-    if is_compound(target)
-        && !is_compound(source)
-        && !matches!(source, Type::Named(_) | Type::Constructed { .. })
-    {
-        return false;
-    }
     match (source, target) {
         (Type::Union(parts), _) => parts.iter().all(|p| assignable(module, p, target)),
         (_, Type::Intersection(parts)) => parts.iter().all(|p| assignable(module, source, p)),
@@ -181,6 +188,11 @@ pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> bool 
 }
 
 pub(crate) fn matches_object(module: &Module, concrete: &Type, target: &Type) -> bool {
+    if let Type::Union(parts) = target {
+        return parts
+            .iter()
+            .any(|part| concrete == part || matches_object(module, concrete, part));
+    }
     module
         .type_definition(concrete)
         .is_some_and(|d| d.is_reference_type && d.representation == Representation::Record)
