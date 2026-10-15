@@ -5,6 +5,22 @@
 
 # Raven CLI bridge
 
+## Standard structural compiler contract (2026-10-15)
+
+The paired Raven neoCLR branch now binds and emits structural unions, intersections
+and tuples by target contract, without semantic/emitter, project or driver opt-ins.
+Native metadata output uses NEOX. Remove `WithStructuralCompositions`,
+`WithStructuralTuples`, experimental emission options, `--structural-tuples` and
+`RavenNeoClrStructuralCompositions` / `RavenNeoClrStructuralTuples` settings from
+callers. Ordinary .NET target representations and declared nominal unions remain
+unchanged. Native reader profiles and nominal carrier retirement are the next
+integration slices; branches have not yet merged. Dated experiment notes below
+record their original configuration.
+
+Validation: 50 focused compiler symbol/constraint/pattern checks pass. A fresh
+mixed-union consumer against v4 libraries returns 42 with interpreter, macOS ARM64
+AOT and managed JIT and zero arena allocations.
+
 See [structural runtime operations](structural-runtime-operations.md) for signatures, payload tests, extraction, tuples and callable invocation.
 
 ## Structural reference composition experiment — 2026-10-14
