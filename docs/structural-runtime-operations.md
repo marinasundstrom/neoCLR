@@ -97,7 +97,9 @@ A [fresh mixed Raven consumer](experiments/native-structural-types/mixed-pattern
 passes seven scalar/reference inputs in interpreter and AOT, allocating only its
 explicit Response object. Closed nominal value-record alternatives now have bounded inline storage with
 exact identity tests and copied field snapshots; see the [record-union qualification](experiments/native-structural-types/README.md#nominal-value-record-union-alternatives-2026-10-15).
-Combining records with direct reference alternatives and intrinsic String alternatives
+A [fresh imported Raven struct consumer](experiments/native-structural-types/record-import-project/README.md)
+also preserves Int32/Int64 fields through union calls and patterns with zero
+arena use and no native imports. Combining records with direct reference alternatives and intrinsic String alternatives
 remain native layout gaps.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)

@@ -16,7 +16,8 @@ reference views and reference-alternative union payloads now have AOT/interprete
 differential checks. Scalar-only Int32/Int64/Boolean unions now have tagged
 inline storage, exact adjacent box/cast elision and bounded scalar type tests; bounded mixed scalar/reference storage now has interpreter/AOT checks with a
 separate traced reference slot. Closed nominal value-record unions now have bounded copy/extraction and embedded
-reference checks. Records combined with direct reference alternatives, managed
+reference checks. A [fresh imported Raven struct consumer](experiments/native-structural-types/record-import-project/README.md)
+passes seven cases with no native imports or arena use. Records combined with direct reference alternatives, managed
 stress and complete application qualification still block integration. A
 [fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
 now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.

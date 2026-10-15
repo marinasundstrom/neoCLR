@@ -274,7 +274,14 @@ cargo test -p neoclr-codegen --test values --test console structural_record_unio
 
 Qualification is macOS ARM64 with the existing native fixture hosts. Native
 verification also retains/restores Object for unbox-only entry points, preserving
-the VM verifier contract without emitting an Object allocation. A fresh Raven
-record-union consumer, records combined with direct reference alternatives, enums,
+the VM verifier contract without emitting an Object allocation. Records combined with direct reference alternatives, enums,
 whole-union boxing, managed JIT/GC and full Task/throughput qualification remain
 open. Compiler emission and Runtime Contract configuration are unchanged.
+
+The [fresh artifact-only Raven record consumer](record-import-project/README.md)
+now also qualifies imported `int | long | bool | Response`, where Response is a
+struct with Int32 and Int64 fields. Seven inputs preserve reordered union
+parameters/results and the wide payload; interpreter and AOT return 42 with no
+native imports and zero arena use. [Record consumer evidence](raven-record-import-results.json)
+records both fresh artifacts and the retained v3 bundle. No throughput claim follows
+from eliminating boxing in this bounded consumer.

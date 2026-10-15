@@ -135,7 +135,9 @@ through the union return, parameter and typed pattern.
 Closed nominal value records, optionally combined with Int32/Int64/Boolean, now
 use a tag and disjoint inline payload regions, with inactive regions zeroed.
 Tests cover exact nominal identity, field snapshots and embedded reference
-identity with no payload-box allocation. The total layout is limited to 256 lanes;
+identity with no payload-box allocation. A fresh artifact-only Raven struct
+consumer also preserves Int32/Int64 fields through seven union-call/pattern checks,
+returning 42 in interpreter/AOT with no native imports or arena allocation. The total layout is limited to 256 lanes;
 its size is the sum of alternatives, so overlapping-storage optimization remains
 future work. Records combined with direct reference alternatives, enums,
 Object/scalar-interface views requiring boxing and intrinsic String alternatives

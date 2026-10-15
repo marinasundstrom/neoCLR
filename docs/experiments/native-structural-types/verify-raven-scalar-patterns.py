@@ -22,7 +22,11 @@ def main():
     parser.add_argument('--imported', action='store_true', help='Build and consume an artifact-only union library')
     parser.add_argument('--mixed', action='store_true', help='Include a nominal reference alternative')
     parser.add_argument('--generic', action='store_true', help='Use an imported Response<int> with generic payload storage')
+    parser.add_argument('--record', action='store_true', help='Use an imported nominal value-record payload')
     args = parser.parse_args()
+    if args.record and (not (args.mixed and args.imported) or args.generic):
+        parser.error('--record requires --mixed --imported and excludes --generic')
+    reference_payload = args.mixed and not args.record
     if args.generic and not (args.mixed and args.imported):
         parser.error('--generic requires --mixed --imported')
     project = PROJECT.parent / 'scalar-import-project' if args.imported else PROJECT
@@ -34,6 +38,10 @@ def main():
         project = PROJECT.parent / 'generic-mixed-import-project'
         library = PROJECT.parent / 'generic-mixed-import-library'
         library_name = 'StructuralGenericMixedLibrary'
+    if args.record:
+        project = PROJECT.parent / 'record-import-project'
+        library = PROJECT.parent / 'record-import-library'
+        library_name = 'StructuralRecordLibrary'
     library_artifact = library / f'bin/neoclr/{library_name}.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This AOT qualification requires macOS ARM64')
@@ -88,7 +96,7 @@ def main():
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
                 '--compile-system', '--reference-arena', *context])
     imports = run('imports', ['nm', '-u', obj])
-    expected_imports = ['_neoclr_allocate_object_v1'] if args.mixed else []
+    expected_imports = ['_neoclr_allocate_object_v1'] if reference_payload else []
     assert imports.split() == expected_imports, f'Unexpected native imports: {imports}'
     host = output / 'host.c'
     host.write_text('''#include "text-arena.h"
@@ -102,18 +110,18 @@ int main(void) {
     return status || result != 42 || ctx.text.used || ctx.fault.code;
 }
 ''')
-    if args.mixed:
+    if reference_payload:
         host.write_text(host.read_text().replace('neoclr_aot_context ctx = {0};',
             'uint64_t storage[32] = {0};\n    neoclr_aot_context ctx = {.text = {(unsigned char*)storage, sizeof(storage), 0}};')
             .replace('|| ctx.text.used ||', '|| ctx.text.used != 16 ||'))
     executable = output / 'consumer'
     run('link', ['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror',
-                 '-I', ROOT / 'docs/experiments/aot-console', host, obj, *([ROOT / 'docs/experiments/aot-console/text-arena.c'] if args.mixed else []), '-o', executable])
+                 '-I', ROOT / 'docs/experiments/aot-console', host, obj, *([ROOT / 'docs/experiments/aot-console/text-arena.c'] if reference_payload else []), '-o', executable])
     native = run('native', [executable]).strip()
-    arena_bytes = 16 if args.mixed else 0
+    arena_bytes = 16 if reference_payload else 0
     assert native == f'status=0 result=42 arenaBytes={arena_bytes} fault=0', native
     files = [Path(__file__).resolve(), host, compiler, runtime, codegen, project / 'Main.rvn', project / 'App.rvnproj', artifact, obj]
-    if args.mixed:
+    if reference_payload:
         files += [ROOT / 'docs/experiments/aot-console/text-arena.c']
     if args.imported:
         files += [library / 'Library.rvnproj', library / 'Main.rvn', library_artifact]
@@ -122,7 +130,8 @@ int main(void) {
     compiler_revision = subprocess.run(['git', '-C', str(compiler.parent), 'rev-parse', 'HEAD'], capture_output=True, text=True)
     report = {
         'importedLibrary': args.imported,
-        'mixedPayloads': args.mixed,
+        'mixedPayloads': reference_payload,
+        'nominalValuePayload': args.record,
         'genericPayload': args.generic,
         'nativeImports': imports.splitlines(),
         'compilerCheckoutRevision': compiler_revision.stdout.strip() if compiler_revision.returncode == 0 else None,
@@ -143,7 +152,7 @@ int main(void) {
     if args.generic:
         report['checks'].append('imported Response<int> preserves its generic field payload')
     if args.mixed:
-        report['checks'].append('nominal reference alternative through a typed match arm')
+        report['checks'].append('nominal value-record alternative with wide field and distinct typed match result' if args.record else 'nominal reference alternative through a typed match arm')
     else:
         report['limitations'].append('no mixed payloads')
     if args.imported:
