@@ -236,3 +236,8 @@ Native Single/Double union alternatives now use distinct inline numeric regions,
 with exact tests/extraction and allocation-free widening. Interpreter/AOT
 qualification covers calls, fractional values and wrong extraction; other
 primitive/enum alternatives and broader floating workloads remain open.
+
+A fresh Raven float/double/int pattern consumer now also passes interpreter,
+macOS ARM64 AOT and managed JIT with zero arena use. The bounded fixture checks
+reordered/widened calls and exact alternative identity, not every floating edge
+case or platform. See the [floating qualification](../docs/experiments/native-structural-types/floating-v4-results.json).

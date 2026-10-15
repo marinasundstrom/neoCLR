@@ -16,7 +16,9 @@ def main():
     parser.add_argument('--compiler', required=True, type=Path)
     parser.add_argument('--bundle', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--string-union', action='store_true', help='Qualify string/int alternatives instead of numeric widening')
+    variants = parser.add_mutually_exclusive_group()
+    variants.add_argument('--floating-union', action='store_true', help='Qualify Single/Double alternatives and widening')
+    variants.add_argument('--string-union', action='store_true', help='Qualify string/int alternatives instead of numeric widening')
     args = parser.parse_args()
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This qualification requires macOS ARM64')
@@ -24,7 +26,7 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     compiler, bundle = args.compiler.resolve(), args.bundle.resolve()
     project = output / 'project'
-    shutil.copytree(Path(__file__).parent / ('string-project' if args.string_union else 'widening-project'), project,
+    shutil.copytree(Path(__file__).parent / ('floating-project' if args.floating_union else 'string-project' if args.string_union else 'widening-project'), project,
                     ignore=shutil.ignore_patterns('bin', 'obj'))
     project_file = project / 'App.rvnproj'
     project_file.write_text(project_file.read_text().replace(
@@ -136,7 +138,9 @@ int main(void) { return check(neoclr_entry_v4); }
               'runtimeDiffSha256': hashlib.sha256(subprocess.check_output(['git', 'diff'], cwd=ROOT)).hexdigest(),
               'compilerDiffSha256': hashlib.sha256(subprocess.check_output(['git', 'diff'], cwd=compiler.parent)).hexdigest(),
               'platform': platform.platform(), 'commands': commands, 'imports': imports, 'jit': measurement,
-              'checks': (['string and integer alternatives through reordered calls and typed patterns',
+              'checks': (['Single/Double exact patterns and widening', 'integer alternative',
+                          'interpreter/AOT/JIT return 42', 'no native imports and zero arena use',
+                          'AOT undefined/bounds sanitizers'] if args.floating_union else ['string and integer alternatives through reordered calls and typed patterns',
                           'interpreter/AOT/JIT return 42', 'native roots and heap cleared after collection',
                           'AOT undefined/bounds sanitizers'] if args.string_union else ['exact overload selected over wider union', 'scalar to record-union widening',
                          'record union widening/reordering preserves payload', 'interpreter/AOT/JIT return 42',

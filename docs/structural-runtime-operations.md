@@ -350,3 +350,8 @@ Raven value-record property patterns over structural unions first test membershi
 then extract a local snapshot and borrow it for getters. Binding and constant
 member patterns now pass a fresh interpreter/AOT/JIT consumer; see the
 [property-pattern evidence](experiments/native-structural-types/property-pattern-v4-results.json).
+
+A fresh Raven float/double/int pattern consumer now also passes interpreter,
+macOS ARM64 AOT and managed JIT with zero arena use. The bounded fixture checks
+reordered/widened calls and exact alternative identity, not every floating edge
+case or platform. See the [floating qualification](experiments/native-structural-types/floating-v4-results.json).

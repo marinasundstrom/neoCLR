@@ -172,3 +172,7 @@ development work; see the [union API and limits](../../docs/unions.html).
 Development native unions also admit Single/Double payloads with exact alternative
 identity and inline numeric storage; focused interpreter/AOT checks cover calls,
 widening and incorrect extraction without carrier allocation.
+
+A fresh Raven float/double/int consumer also passes interpreter, AOT and managed
+JIT checks on macOS ARM64 with zero arena allocation. This remains feature-branch
+qualification, not a published platform-wide capability.

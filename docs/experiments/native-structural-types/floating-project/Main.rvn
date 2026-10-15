@@ -1,0 +1,30 @@
+func Extend(value: float | double) -> int | double | float {
+    return value
+}
+
+func Read(value: int | double | float) -> int {
+    return match value {
+        float number => if number == -1.25f {
+            42
+        } else {
+            -1
+        }
+        double number => if number == 4294967338.25 {
+            42
+        } else {
+            -2
+        }
+        int number => number
+        _ => -3
+    }
+}
+
+func Main() -> int {
+    if Read(Extend(-1.25f)) != 42 {
+        return -4
+    }
+    if Read(42) != 42 {
+        return -5
+    }
+    return Read(Extend(4294967338.25))
+}

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Qualify a fresh Raven float/double union consumer against the v4 bundle in interpreter, AOT and managed JIT. Exact typed patterns, reordered/widened calls and an integer alternative return 42 with no native imports or arena allocation; retain reproducible source and artifact evidence.
+
 - Qualify paired Raven value-record property patterns over native unions, using payload binding and constant member tests in the widening sample. Interpreter/AOT/JIT return 42 with zero arena use; retain artifact evidence and clarify match-only, whole-value and destructuring style guidance. Runtime metadata is unchanged.
 
 - Add native Single/Double union alternatives in distinct inline numeric payload regions. Preserve exact type tests, checked extraction, copies/calls and widening without boxes or arena allocation; 13 focused native structural tests pass. Other primitive/enum alternatives and wider floating workloads remain unqualified.

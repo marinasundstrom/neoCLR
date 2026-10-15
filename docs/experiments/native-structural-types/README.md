@@ -692,3 +692,22 @@ imports and passes undefined/bounds sanitizers; the JIT host checks cleanup and 
 not sanitizer-instrumented. Reproduce with `verify-raven-union-widening.py` and the
 fresh v4 bundle as above. The compiler's 12 portable pattern tests also pass.
 Runtime Contract configuration and native signature encoding are unchanged.
+
+### Fresh Raven floating union consumer (2026-10-15)
+
+`floating-project/Main.rvn` uses whole-value captures (`float number`,
+`double number`, `int number`) because each arm computes from the matched value.
+It transports Single and Double through reordered/widened union calls and checks
+negative fractional Single, a Double larger than Int32 and the integer alternative.
+The fresh compiler/v4 bundle consumer returns 42 in interpreter, macOS ARM64 AOT
+and managed JIT. AOT has no native imports; both native hosts use zero arena memory.
+AOT passes undefined/bounds sanitizers; JIT checks root/heap cleanup but its host
+is not sanitizer-instrumented.
+
+[Retained hashes and commands](floating-v4-results.json) identify the actual tested
+compiler, runtime, libraries and source. Reproduce with
+`verify-raven-union-widening.py --floating-union --compiler /path/to/rvnc.dll
+--bundle target/structural-integration-libraries-v4 --output /fresh/output/path`.
+This extends the earlier interpreter/AOT IL evidence to source and managed JIT;
+NaN payload preservation, broader floating workloads and other platforms remain
+unqualified. Runtime Contract configuration and metadata encoding are unchanged.
