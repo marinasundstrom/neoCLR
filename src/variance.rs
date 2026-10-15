@@ -82,6 +82,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             return Err(Fault::new("variance requires an interface declaration"));
         }
         for base in &def.implements {
+            if base.contains_self() {
+                return Err(Fault::new("variant interface bases cannot contain Self"));
+            }
             position(module, def, base, 1)?;
         }
         // Bounds and storage are not variance-enabled positions in this first slice.
@@ -118,4 +121,166 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
     }
     Ok(())
+}
+
+fn ordinary_reference(module: &Module, ty: &Type) -> bool {
+    // Intrinsic text has a distinct payload representation; widening it to an
+    // object/interface needs materialization, not just a reference view.
+    if matches!(ty, Type::String) {
+        return false;
+    }
+    matches!(ty, Type::ArrayRef(_))
+        || module
+            .type_definition(ty)
+            .is_some_and(|d| d.is_reference_type || d.representation == Representation::Interface)
+}
+
+fn reference_conversion(module: &Module, source: &Type, target: &Type, depth: usize) -> bool {
+    if source == target {
+        return true;
+    }
+    if depth >= 64 || !ordinary_reference(module, source) || !ordinary_reference(module, target) {
+        return false;
+    }
+    if *target == Type::from_name("System.Object") && module.is_reference_type(target) {
+        return true;
+    }
+    if module.array_nominal(source).as_ref() == Some(target) {
+        return true;
+    }
+    if module
+        .type_definition(target)
+        .is_some_and(|d| d.representation == Representation::Interface)
+    {
+        return crate::interfaces::closure(module, source).is_ok_and(|interfaces| {
+            interfaces.contains(target)
+                || interfaces
+                    .iter()
+                    .filter(|i| compatible_at(module, i, target, depth + 1))
+                    .count()
+                    == 1
+        });
+    }
+    module.is_reference_type(source)
+        && module.is_reference_type(target)
+        && crate::inheritance::require_base(module, source, target).is_ok()
+}
+
+fn compatible_at(module: &Module, source: &Type, target: &Type, depth: usize) -> bool {
+    if source == target {
+        return true;
+    }
+    if depth >= 64 {
+        return false;
+    }
+    let Some(def) = module.type_definition(source) else {
+        return false;
+    };
+    if def.representation != Representation::Interface
+        || !module
+            .type_definition(target)
+            .is_some_and(|d| std::ptr::eq(d, def))
+    {
+        return false;
+    }
+    source
+        .generic_arguments()
+        .iter()
+        .zip(target.generic_arguments())
+        .enumerate()
+        .all(|(index, (a, b))| {
+            if a == b {
+                return true;
+            }
+            // Identity for value arguments remains legal; differing value arguments never box.
+            if !ordinary_reference(module, a) || !ordinary_reference(module, b) {
+                return false;
+            }
+            match parameter(def, index) {
+                Variance::Invariant => false,
+                Variance::Covariant => reference_conversion(module, a, b, depth + 1),
+                Variance::Contravariant => reference_conversion(module, b, a, depth + 1),
+            }
+        })
+}
+
+pub(crate) fn compatible(module: &Module, source: &Type, target: &Type) -> bool {
+    compatible_at(module, source, target, 0)
+}
+
+/// Exact conformance wins. Multiple distinct variant views are deliberately ambiguous.
+pub(crate) fn implemented_view(
+    module: &Module,
+    source: &Type,
+    target: &Type,
+) -> Result<Type, Fault> {
+    let interfaces = crate::interfaces::closure(module, source)?;
+    if interfaces.contains(target) {
+        return Ok(target.clone());
+    }
+    // The caller controls the storage category. Ordinary assignment requires a
+    // reference, while an existing boxed receiver may reuse its box here.
+    let mut candidates = interfaces
+        .into_iter()
+        .filter(|i| compatible(module, i, target));
+    let candidate = candidates
+        .next()
+        .ok_or_else(|| Fault::new("no compatible nominal interface view"))?;
+    if candidates.next().is_some() {
+        return Err(Fault::new("ambiguous variant interface view"));
+    }
+    Ok(candidate)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn reference_relationships_compose_without_numeric_boxing_or_array_covariance() {
+        let module = crate::assembler::parse_module(".module VarianceRelations\n.type class System.Object\n.end\n.type class Base\n.extends System.Object\n.end\n.type class Derived\n.extends Base\n.end\n.interface Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.interface Fixed<T>\n.end\n.interface System.Collections.Iterable<T>\n.end\n").unwrap();
+        for (source, target, expected) in [
+            ("Producer<Derived>", "Producer<Base>", true),
+            ("Producer<Base>", "Producer<Derived>", false),
+            ("Consumer<Base>", "Consumer<Derived>", true),
+            (
+                "Producer<Consumer<Base>>",
+                "Producer<Consumer<Derived>>",
+                true,
+            ),
+            (
+                "Producer<Consumer<Derived>>",
+                "Producer<Consumer<Base>>",
+                false,
+            ),
+            (
+                "Producer<arrayref<Int32>>",
+                "Producer<System.Collections.Iterable<Int32>>",
+                true,
+            ),
+            (
+                "Producer<arrayref<Derived>>",
+                "Producer<arrayref<Base>>",
+                false,
+            ),
+            ("Producer<Int32>", "Producer<Int32>", true),
+            ("Producer<Int32>", "Producer<System.Object>", false),
+            ("Producer<String>", "Producer<System.Object>", false),
+            ("Fixed<Derived>", "Fixed<Base>", false),
+            ("Producer<Fixed<Derived>>", "Producer<Fixed<Base>>", false),
+        ] {
+            let source = crate::assembler::parse_type(source).unwrap();
+            let target = crate::assembler::parse_type(target).unwrap();
+            assert_eq!(
+                module.reference_assignable(&source, &target),
+                expected,
+                "{source:?} -> {target:?}"
+            );
+            assert_eq!(
+                crate::type_relationships::assignable(&module, &source, &target).unwrap(),
+                expected
+            );
+            if source != target {
+                assert!(!crate::type_relationships::subclass(&module, &source, &target).unwrap());
+            }
+        }
+    }
 }

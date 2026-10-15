@@ -131,3 +131,11 @@ incomplete.
 [Structural families](../../docs/structural-types.html) ·
 [Tuple contract](../../docs/tuples.html) · [Union contract](../../docs/unions.html) ·
 [Intersection contract](../../docs/intersections.html)
+
+## Interface variance investigation
+
+Development runtime work now validates variance metadata and supports bounded
+nominal reference conversions in the interpreter. Native specialization explicitly
+rejects variant interfaces until its dispatch support is ready. Raven interfaces
+remain invariant; this does not yet permit widening Sliceable through its Result
+return type. Writable collections and array elements keep invariant contracts.

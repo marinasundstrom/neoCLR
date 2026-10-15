@@ -1,0 +1,76 @@
+.module Variance
+.entry Main
+
+.type class System.Object
+.end
+.type class Base
+.extends System.Object
+.end
+.type class Derived
+.extends Base
+.end
+.interface Producer<T>
+.variance out
+.method instance Get() -> T
+.end
+.end
+.interface Consumer<T>
+.variance in
+.method instance Accept(T) -> Int32
+.end
+.end
+.type class Source
+.implements Producer<Derived>
+.field Item Derived
+.method instance Get() -> Derived
+ldarg this
+ldfld 0
+ret
+.end
+.end
+.type class Sink
+.implements Consumer<Base>
+.method instance Accept(Base value) -> Int32
+newobj Base
+starg value
+ldc.i4 42
+ret
+.end
+.end
+
+.function Main() -> Int32
+.local Derived item
+.local Source source
+.local Producer<Base> producer
+.local Base result
+.local Consumer<Derived> consumer
+newobj Derived
+stloc item
+ldloc item
+newobj Source
+stloc source
+ldloc source
+castclass Producer<Base>
+stloc producer
+ldloc producer
+callvirt instance Producer<Base>::Get()
+stloc result
+ldloc result
+ldloc item
+ref.eq
+brfalse failed
+ldloc producer
+ldloc source
+ref.eq
+brfalse failed
+newobj Sink
+castclass Consumer<Derived>
+stloc consumer
+ldloc consumer
+ldloc item
+callvirt instance Consumer<Derived>::Accept(Derived)
+ret
+failed:
+ldc.i4 1
+ret
+.end

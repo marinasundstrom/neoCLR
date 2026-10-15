@@ -1,7 +1,8 @@
 # Interface variance and result-value conversion
 
-Status: author-directed investigation, 2026-10-15. No variance implementation or
-new source syntax is claimed. Structural-type work stays parked. This follows the
+Status: runtime metadata and bounded interpreter reference conversions implemented
+in development, 2026-10-15. Raven syntax/SDK transport and native execution are not
+yet supported; the wider Result proposal remains unimplemented. Structural-type work stays parked. This follows the
 [implemented slicing contract](slicing-capabilities.md).
 
 ## Concrete requirement
@@ -129,9 +130,9 @@ request to restart structural-type work.
    and throughput before making efficiency claims. Keep each validated slice and
    its changelog/API documentation separate.
 
-The immediate next task is the metadata/conversion inventory and a small
-reference-only interface proof, not changing the slicing API or adding implicit
-value conversions without backend support.
+The initial bounded task was the metadata/conversion inventory and a small
+reference-only interface proof. Runtime progress and remaining backend work are
+recorded below; the slicing API and implicit value conversions are unchanged.
 
 ## Runtime metadata slice (2026-10-15)
 
@@ -142,7 +143,9 @@ corresponding interface declaration. This is runtime metadata, not new Raven syn
 or an SDK builder API. The existing C# native-metadata SDK rejects the new field
 until its importer/writer support is deliberately added; it does not erase it.
 
-The loader verifies interface-only admission and nested input/output polarity.
+Existing artifacts omit the field and retain invariance. Older schema readers
+reject annotated artifacts rather than silently erase their variance. The loader
+verifies interface-only admission and nested input/output polarity.
 Invariant generic wrappers (including Result), mutable array elements, byrefs and
 structural signatures cannot carry a varying parameter. Default bodies, static
 contracts, Self and generic methods on variant interfaces remain rejected in this
@@ -151,3 +154,46 @@ reference stubs cannot hide variance metadata; native specialization clears the
 open parameter annotations together with the parameters on its private closed
 shapes. This slice records declarations only; it does not yet change assignment or
 dispatch.
+
+
+## Reference-only interpreter slice (2026-10-15)
+
+Reference assignment, casts, type tests and descriptive assignment queries now
+recognize declared interface variance. Exact constructed identities remain distinct;
+interface closure/reflection enumeration still reports declared relationships, not
+an unbounded set of possible widened views. An exact implementation wins; multiple
+other compatible views are rejected as ambiguous. This conservative rule avoids
+silently choosing between distinct implementations and is a documented restriction
+relative to broader CLR dispatch behavior.
+
+A producer returns a narrower nominal reference; a consumer accepts a wider nominal
+reference. Calls resolve the original, explicitly implemented contract before
+selecting the body. The interpreter retypes argument slots to the implementation's
+signature and returned references to the caller's signature without changing the
+referenced object's identity. This matters when a consumer replaces its argument
+slot. Closed nominal reference and array-reference arguments compose through other
+variant interfaces; differing value arguments, numeric conversion, implicit boxing, mutable
+array-element covariance and borrowed receiver conversion remain excluded.
+Intrinsic String also remains excluded from *differing* argument conversions: its
+payload requires materialization when becoming an Object/interface view. It must
+not be admitted as an identity-preserving nominal reference by accident.
+
+The [retained consumer and evidence](../validation/interface-variance/README.md)
+cover producer/consumer calls, receiver and payload identity, allocation counts,
+collection, malformed declarations, ambiguity and rejected directions. Nongeneric class and already-boxed implementations are included in interface
+reachability. Generic implementations execute when closed, but variant call-graph
+analysis rejects them until it can enumerate all compatible closed instantiations.
+Inferring only the target arguments would miss narrower implementations. An
+explicitly boxed receiver reuses its box; variance never inserts a box.
+
+Native specialization currently rejects used variant interfaces with a specific
+conversion-aware-dispatch diagnostic before erasing their generic identity. A
+focused backend test enforces that boundary. There is no claim of AOT/JIT support.
+The C# SDK continues to reject unsupported variance fields; Raven does not emit
+these annotations. Existing invariant APIs, including Sliceable and Result, retain
+their current contracts. General .NET behavior is unchanged.
+
+Next: retain variance and its concrete implementation mapping through native
+specialization, qualify AOT/JIT reference calls and GC, then wire the metadata SDK
+and Raven native importer/emitter. Only after those layers agree should standard
+interfaces be annotated. Result-value conversion remains a separate stage.

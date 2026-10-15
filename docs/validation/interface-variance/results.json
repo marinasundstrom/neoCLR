@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "scope": "runtime metadata and reference-only interpreter conversions; native execution explicitly rejected",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/Main.neoil",
+        "/Users/robert/Projects/neoclr/target/interface-variance/Variance.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled Variance -> /Users/robert/Projects/neoclr/target/interface-variance/Variance.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/interface-variance/Variance.neox",
+        "--execution",
+        "interpreter",
+        "--gc-stats"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "GC: allocated=4 live=0 peak=4 collections=1 reclaimed=4\n"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/Main.neoil": "8a1507485aa3c64aa74481b1a0be0541d878f258c44a02ab88695e51562431b3",
+    "/Users/robert/Projects/neoclr/target/interface-variance/Variance.neox": "9f1775f5b077688882c8d63716bc60c66ddaf124551b0d5accf73c9c4a9fff3d",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "2fd94f287a7d24698a9c412489ba88ce91a00f4cd498aa91ac72a961b9b8d4a1",
+    "/Users/robert/Projects/neoclr/src/variance.rs": "936e3826432652fc191adebea8da24940b0471116210a22a799908681beafb50",
+    "/Users/robert/Projects/neoclr/src/interfaces.rs": "d93bb6939d68527e21b386f03de55d8244216283fac4365fc375c6d9170ddc5f",
+    "/Users/robert/Projects/neoclr/src/vm.rs": "494b4aa80e895299f2ad2d8da5b666e8772dbdecadedec4118ef1d80d2d3f747",
+    "/Users/robert/Projects/neoclr/src/metadata.rs": "6769448dd238f14cf70a6fc2cb9d4c30bd6dd1e5f965d24a515069ae49b16140",
+    "/Users/robert/Projects/neoclr/src/type_relationships.rs": "92b9182a903dcb303f577078ebe1ecf15a2d8484e9168a5fa8b237495fdd8d46",
+    "/Users/robert/Projects/neoclr/src/verifier.rs": "8645fac24742b8d456a6f6b0ce2e2d4db61a7c34094adc21731ce2bb0ff6207e"
+  }
+}

@@ -1186,7 +1186,7 @@ fn typed_effect(
                             "compound receiver requires narrowing before interface dispatch",
                         )?;
                     } else {
-                        crate::interfaces::ensure_implementation(module, actual, &interface)?;
+                        crate::interfaces::ensure_reference_implementation(module, actual, &interface)?;
                     }
                 }
                 T::ByRef(actual)

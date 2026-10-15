@@ -164,6 +164,10 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
+        if definition.generic_variance.iter()
+            .any(|v| *v != neoclr::metadata::Variance::Invariant) {
+            return Err("native variant interface specialization requires conversion-aware dispatch; annotations cannot be erased".into());
+        }
         if !definition.generic_constraints.is_empty()
             || definition.generic_parameters.len() != arguments.len()
         {
@@ -1241,6 +1245,13 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn variant_interfaces_reject_before_erasing_generic_identity() {
+        let module = neoclr::assemble(".module VarianceNative\n.entry Main\n.type class Item\n.end\n.interface Producer<T>\n.variance out\n.end\n.type class Source\n.implements Producer<Item>\n.end\n.function Main() -> Int32\n.local Producer<Item> view\nnewobj Source\ncastclass Producer<Item>\nstloc view\nldc.i4 42\nret\n.end").unwrap();
+        let error = super::expand(&module, "Main").unwrap_err().to_string();
+        assert!(error.contains("annotations cannot be erased"), "{error}");
+    }
+
     use super::*;
 
     #[test]

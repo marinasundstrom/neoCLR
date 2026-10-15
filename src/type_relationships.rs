@@ -60,7 +60,7 @@ pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> Resul
         if module.type_definition(source).is_none() {
             return Ok(false);
         }
-        return Ok(crate::interfaces::closure(module, source)?.contains(target));
+        return Ok(crate::variance::implemented_view(module, source, target).is_ok());
     }
     subclass(module, source, target)
 }

@@ -18107,3 +18107,23 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   positive/error/fault consumers pass interpreter, AOT and JIT, with native
   post-call collection checks. `d51531378` separately repairs stale API links;
   the complete website check passes 4,333 pages. Structural implementation stays parked.
+
+
+## 2026-10-15 — Variance metadata and reference conversion implementation
+
+- **Author:** directed beginning interface variance with metadata and reference-only
+  conversions, preserving Sliceable implications, parked structural work and
+  separate validated commits.
+- **Assistant:** committed runtime annotation/polarity validation as `8c228f6f9`;
+  then added bounded interpreter conversions and original-implementation dispatch.
+  Exact matches take precedence; ambiguous alternative views fail. Argument slots
+  use the implementation's declared type, and result views use the caller's type.
+- **Boundaries found:** intrinsic String requires separate materialization;
+  inferred generic target arguments do not enumerate every variant implementation;
+  native specialization erases constructed interface identity. The implementation
+  rejects unsupported materialization, incomplete generic call graphs and native
+  variant specialization explicitly. Already-boxed receivers reuse their box.
+- **Evidence:** [runtime qualification](validation/interface-variance/README.md)
+  retains the NEOX consumer and focused checks. SDK/Raven transport and AOT/JIT
+  dispatch remain subsequent slices. Sliceable's Result conversion is still a
+  separate unresolved capability; structural implementation work was not resumed.

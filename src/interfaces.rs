@@ -373,6 +373,11 @@ pub(crate) fn ensure_implementation(
     let nominal = module.array_nominal(concrete);
     let concrete = nominal.as_ref().unwrap_or(concrete);
     declared(module, concrete, interface)?;
+    ensure_members(module, concrete, interface)
+}
+
+// Both callers have already established the exact declared interface view.
+fn ensure_members(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fault> {
     if interface_definition(module, concrete).is_ok() {
         return Ok(());
     }
@@ -410,6 +415,18 @@ pub(crate) fn ensure_implementation(
     Ok(())
 }
 
+/// Reference views may widen only a verified, explicitly implemented interface.
+pub(crate) fn ensure_reference_implementation(
+    module: &Module,
+    concrete: &Type,
+    interface: &Type,
+) -> Result<(), Fault> {
+    let nominal = module.array_nominal(concrete);
+    let concrete = nominal.as_ref().unwrap_or(concrete);
+    let view = crate::variance::implemented_view(module, concrete, interface)?;
+    ensure_members(module, concrete, &view)
+}
+
 pub(crate) fn implementation(
     module: &Module,
     concrete: &Type,
@@ -418,13 +435,39 @@ pub(crate) fn implementation(
 ) -> Result<Function, Fault> {
     let nominal = module.array_nominal(concrete);
     let concrete = nominal.as_ref().unwrap_or(concrete);
-    declared(module, concrete, interface)?;
+    let view = crate::variance::implemented_view(module, concrete, interface)?;
     if !is_contract(module, contract)
         || contract.owner.as_ref() != Some(interface)
         || !contract.interface_implementations.is_empty()
     {
         return Err(Fault::new("callvirt requires an interface member"));
     }
+    let adapted;
+    let contract = if view != *interface {
+        let template = module
+            .functions
+            .iter()
+            .find(|method| {
+                method.name == contract.name
+                    && method.definition == contract.definition
+                    && method
+                        .owner
+                        .as_ref()
+                        .and_then(|o| module.type_definition(o))
+                        .zip(module.type_definition(interface))
+                        .is_some_and(|(a, b)| std::ptr::eq(a, b))
+                    && method
+                        .map_types(|t| t.substitute_type_parameters(arguments(interface)))
+                        .is_ok_and(|m| {
+                            m.parameters == contract.parameters && m.returns == contract.returns
+                        })
+            })
+            .ok_or_else(|| Fault::new("missing variant interface contract template"))?;
+        adapted = template.map_types(|t| t.substitute_type_parameters(arguments(&view)))?;
+        &adapted
+    } else {
+        contract
+    };
     let mapped = select(module, concrete, contract)?;
     if is_bodyless(module, &mapped) && is_contract(module, &mapped) {
         return Err(Fault::new(
@@ -773,8 +816,22 @@ pub(crate) fn dispatch_targets(
             continue;
         }
         for implemented in &closure(module, &definition.open_type())? {
+            if !definition.generic_parameters.is_empty()
+                && implemented.definition_name() == interface.definition_name()
+                && interface_definition(module, interface)?
+                    .generic_variance
+                    .iter()
+                    .any(|v| *v != crate::metadata::Variance::Invariant)
+            {
+                return Err(Fault::new(
+                    "closed variant dispatch graph requires nongeneric implementing types",
+                ));
+            }
             let mut bindings = vec![None; definition.generic_parameters.len()];
-            if !infer(implemented, interface, &mut bindings) {
+            if !infer(implemented, interface, &mut bindings)
+                && !(definition.generic_parameters.is_empty()
+                    && crate::variance::compatible(module, implemented, interface))
+            {
                 continue;
             }
             let arguments = bindings

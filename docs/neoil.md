@@ -772,3 +772,9 @@ interfaces and inherited interfaces. Writable/borrowed slots, arrays, invariant
 wrappers and structural signatures are not variance-enabled positions. Only
 bodyless instance contracts without Self or method generics are currently admitted.
 See the [variance design and current scope](design/interface-variance.md).
+
+The interpreter admits reference-only variant interface assignment/casts and calls.
+Exact implementations win; multiple non-exact compatible views are ambiguous.
+Value-argument changes, intrinsic String widening, borrowed views and mutable-array
+covariance are excluded. Native specialization rejects used variant declarations
+until conversion-aware dispatch is implemented; Raven/SDK transport remains pending.

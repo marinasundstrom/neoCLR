@@ -9204,3 +9204,9 @@ unknown values, variant class/value declarations and unsafe interface signature
 positions. This does not add variance to the C# metadata builder or Raven compiler;
 the SDK reader continues to reject unsupported fields instead of silently dropping
 them. No new managed API is introduced by this metadata slice.
+
+Interpreter reference conversion now uses the verified annotations for nominal
+interface views and calls, retaining receiver identity. Native specialization
+explicitly rejects used variant interfaces before erasing generic identity. These
+are low-level runtime capabilities; existing Raven public interfaces, including
+Sliceable, remain invariant, and Result payload conversion is not implemented.

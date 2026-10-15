@@ -1671,6 +1671,8 @@ fn restrict_reference_arguments(
 }
 
 struct Frame {
+    // Caller-visible reference result for variant interface dispatch.
+    return_view: Option<Type>,
     queue_callback: bool,
     runtime_callback: bool,
     // Travels with this frame when its activation is parked or restored.
@@ -1742,6 +1744,7 @@ impl Frame {
             .map(|ty| crate::slots::Slot::cell(ty.clone(), None))
             .collect();
         Ok(Self {
+            return_view: None,
             function: std::rc::Rc::new(function),
             pc: 0,
             trace_pc: 0,
@@ -3653,7 +3656,7 @@ fn interpret_instructions_with_dispatch(
                                 ));
                             }
                         } else {
-                            crate::interfaces::ensure_implementation(
+                            crate::interfaces::ensure_reference_implementation(
                                 module,
                                 object.target(),
                                 interface,
@@ -3666,6 +3669,16 @@ fn interpret_instructions_with_dispatch(
                             interface,
                             &contract,
                         )?;
+                        // Variant contracts can consume a narrower reference than the
+                        // implementation. Give each argument slot its implementation type;
+                        // otherwise starg or an address of that slot would retain the view's type.
+                        if callee.instance && callee.parameters != contract.parameters {
+                            args = args
+                                .into_iter()
+                                .zip(&callee.parameters)
+                                .map(|(value, ty)| value.for_storage_in(module, ty))
+                                .collect::<Result<Vec<_>, _>>()?;
+                        }
                         if callee.receiver_byref {
                             if module.is_reference_type(object.reference.target()) {
                                 return Err(Fault::new("boxed dispatch requires a value payload"));
@@ -3695,7 +3708,11 @@ fn interpret_instructions_with_dispatch(
                                 "frame limit exceeded",
                             ));
                         }
-                        frames.push(Frame::new(callee, args)?);
+                        let return_view = (callee.returns != contract.returns)
+                            .then(|| contract.returns.clone());
+                        let mut called = Frame::new(callee, args)?;
+                        called.return_view = return_view;
+                        frames.push(called);
                         return Ok(None);
                     }
                     let (interface, concrete, storage) = match frame.pop()? {
@@ -3871,7 +3888,7 @@ fn interpret_instructions_with_dispatch(
                             || *target == Type::Named("System.Object".into())
                             || module.reference_assignable(&concrete, target)
                             || (crate::interfaces::interface_definition(module, target).is_ok()
-                                && crate::interfaces::ensure_implementation(
+                                && crate::interfaces::ensure_reference_implementation(
                                     module, &concrete, target,
                                 )
                                 .is_ok())
@@ -3946,7 +3963,9 @@ fn interpret_instructions_with_dispatch(
                             } else if crate::interfaces::interface_definition(module, target)
                                 .is_ok()
                             {
-                                crate::interfaces::ensure_implementation(module, concrete, target)?;
+                                crate::interfaces::ensure_reference_implementation(
+                                    module, concrete, target,
+                                )?;
                                 object.view = Some(target.clone());
                             } else if *target == Type::from_name("System.Object") {
                                 object.view = Some(target.clone());
@@ -3997,7 +4016,7 @@ fn interpret_instructions_with_dispatch(
                             } else if !(*target == Type::from_name("System.Object")
                                 && module.is_reference_type(target))
                             {
-                                crate::interfaces::ensure_implementation(
+                                crate::interfaces::ensure_reference_implementation(
                                     module,
                                     &Type::String,
                                     target,
@@ -5078,6 +5097,11 @@ fn interpret_instructions_with_dispatch(
                         frame.pop()?
                     };
                     let value = value.for_storage_in(module, &function.returns)?;
+                    let value = if let Some(view) = &frame.return_view {
+                        value.for_storage_in(module, view)?
+                    } else {
+                        value
+                    };
                     assigned_reference(&value)?;
                     frame.check_reference_return(&value)?;
                     for (output, conditional) in &frame.outputs {
