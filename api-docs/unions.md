@@ -146,7 +146,10 @@ passes eight imported scalar/record/reference inputs with only its explicit
 HttpError allocation (16 bytes). The
 [closed-generic variant](../docs/experiments/native-structural-types/generic-record-reference-import-project/README.md)
 also distinguishes Response<int> and Response<long> through nine imported inputs
-and preserves substituted fields with the same allocation bound. Enums,
+and preserves substituted fields with the same allocation bound. A
+[reference-valued substitution consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md)
+also preserves shared mutation through copied Response<Cell> records; ten inputs
+allocate only the two explicit objects (32 bytes). This is not collector stress. Enums,
 Object/scalar-interface views requiring boxing and intrinsic String alternatives
 remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor

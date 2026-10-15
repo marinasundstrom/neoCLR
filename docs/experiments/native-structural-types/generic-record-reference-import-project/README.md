@@ -31,6 +31,8 @@ and union storage introduce no boxes or carriers.
 sources, freshly emitted library/consumer artifacts, compiler/runtime tools and
 the retained bundle. No compiler emission or Runtime Contract change was needed.
 This qualifies these closed generic value instantiations, not all open generic
-execution or reference-valued T substitutions. The bundle was not rebuilt.
+execution. A [separate consumer](../reference-generic-record-import-project/README.md)
+now qualifies the closed Response<Cell> reference-valued substitution. The bundle
+was not rebuilt.
 Managed JIT/GC, compact layouts, throughput, boxing and full Task application
 qualification remain open.

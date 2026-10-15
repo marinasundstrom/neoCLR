@@ -24,7 +24,10 @@ def main():
     parser.add_argument('--generic', action='store_true', help='Use an imported Response<int> with generic payload storage')
     parser.add_argument('--record', action='store_true', help='Use an imported nominal value-record payload')
     parser.add_argument('--record-reference', action='store_true', help='Include a direct HttpError reference beside the value record')
+    parser.add_argument('--reference-generic', action='store_true', help='Include Response<Cell> with a shared mutable reference field')
     args = parser.parse_args()
+    if args.reference_generic and not (args.record_reference and args.generic):
+        parser.error('--reference-generic requires --record-reference --generic')
     if args.record_reference and not args.record:
         parser.error('--record-reference requires --record')
     if args.record and (not (args.mixed and args.imported) or (args.generic and not args.record_reference)):
@@ -53,6 +56,13 @@ def main():
         project = PROJECT.parent / 'generic-record-reference-import-project'
         library = PROJECT.parent / 'generic-record-reference-import-library'
         library_name = 'StructuralGenericRecordReferenceLibrary'
+    if args.reference_generic:
+        project = PROJECT.parent / 'reference-generic-record-import-project'
+        library = PROJECT.parent / 'reference-generic-record-import-library'
+        library_name = 'StructuralReferenceGenericRecordLibrary'
+    alternative_count = 7 if args.reference_generic else 6 if args.record_reference and args.generic else 5 if args.record_reference else 4
+    input_count = 10 if args.reference_generic else 9 if args.record_reference and args.generic else 8 if args.record_reference else 7 if args.mixed else 6
+    arena_bytes = 32 if args.reference_generic else 16 if reference_payload else 0
     library_artifact = library / f'bin/neoclr/{library_name}.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This AOT qualification requires macOS ARM64')
@@ -91,7 +101,7 @@ def main():
     if args.mixed:
         unions = [json.JSONDecoder().raw_decode(body[match.end():].lstrip())[0]
                   for match in re.finditer(r'"Union":', body)]
-        assert any(len(parts) == (6 if args.record_reference and args.generic else 5 if args.record_reference else 4) and all(t in parts for t in ['Int32', 'Int64', 'Boolean'])
+        assert any(len(parts) == alternative_count and all(t in parts for t in ['Int32', 'Int64', 'Boolean'])
                    and any(isinstance(t, dict) and ('Constructed' in t if args.generic else 'Named' in t) for t in parts) for parts in unions), "Missing native mixed union signature"
     else:
         assert '"Union":["Int32","Int64","Boolean"]' in body, "Missing native union signature"
@@ -102,7 +112,7 @@ def main():
         calls = [json.loads(line.split('call ', 1)[1]) for line in body.splitlines() if ': call ' in line]
         for name in ['Produce', 'Echo']:
             suffix = '.F_' + name.encode().hex().upper()
-            assert sum(call['name'].endswith(suffix) for call in calls) == (9 if args.record_reference and args.generic else 8 if args.record_reference else 7 if args.mixed else 6), name
+            assert sum(call['name'].endswith(suffix) for call in calls) == input_count, name
     obj = output / 'consumer.o'
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
                 '--compile-system', '--reference-arena', *context])
@@ -124,12 +134,11 @@ int main(void) {
     if reference_payload:
         host.write_text(host.read_text().replace('neoclr_aot_context ctx = {0};',
             'uint64_t storage[32] = {0};\n    neoclr_aot_context ctx = {.text = {(unsigned char*)storage, sizeof(storage), 0}};')
-            .replace('|| ctx.text.used ||', '|| ctx.text.used != 16 ||'))
+            .replace('|| ctx.text.used ||', f'|| ctx.text.used != {arena_bytes} ||'))
     executable = output / 'consumer'
     run('link', ['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror',
                  '-I', ROOT / 'docs/experiments/aot-console', host, obj, *([ROOT / 'docs/experiments/aot-console/text-arena.c'] if reference_payload else []), '-o', executable])
     native = run('native', [executable]).strip()
-    arena_bytes = 16 if reference_payload else 0
     assert native == f'status=0 result=42 arenaBytes={arena_bytes} fault=0', native
     files = [Path(__file__).resolve(), host, compiler, runtime, codegen, project / 'Main.rvn', project / 'App.rvnproj', artifact, obj]
     if reference_payload:
@@ -145,6 +154,7 @@ int main(void) {
         'nominalValuePayload': args.record,
         'genericPayload': args.generic,
         'recordReferencePayloads': args.record_reference,
+        'referenceGenericPayload': args.reference_generic,
         'nativeImports': imports.splitlines(),
         'compilerCheckoutRevision': compiler_revision.stdout.strip() if compiler_revision.returncode == 0 else None,
         'runtimeRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -161,6 +171,8 @@ int main(void) {
                         'no JIT or collector stress',
                         'no throughput claim'],
     }
+    if args.reference_generic:
+        report['checks'].append('Response<Cell> preserves substituted reference field and shared mutation across record copy')
     if args.record_reference:
         report['checks'].append('eighth imported input preserves direct HttpError reference beside inline Response record')
     if args.generic and args.record_reference:

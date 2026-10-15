@@ -1,0 +1,60 @@
+public struct Response<T> {
+    val Number: T
+    val Wide: long
+
+    init(number: T, wide: long) {
+        Number = number
+        Wide = wide
+    }
+}
+
+public class Cell {
+    var Number: int
+
+    init(number: int) {
+        Number = number
+    }
+}
+
+public class HttpError {
+    val Code: int
+
+    init(code: int) {
+        Code = code
+    }
+}
+
+public func Produce(choice: int) -> int | long | bool | Response<int> | Response<long> | Response<Cell> | HttpError {
+    if choice == 0 {
+        return -1
+    }
+    if choice == 1 {
+        return 42
+    }
+    if choice == 2 {
+        return 4294967338L
+    }
+    if choice == 3 {
+        return 42L
+    }
+    if choice == 4 {
+        return true
+    }
+    if choice == 5 {
+        return false
+    }
+    if choice == 6 {
+        return Response<int>(42, 4294967338L)
+    }
+    if choice == 7 {
+        return HttpError(44)
+    }
+    if choice == 8 {
+        return Response<long>(4294967341L, 42L)
+    }
+    return Response<Cell>(Cell(41), 4294967338L)
+}
+
+public func Echo(value: HttpError | Response<long> | Response<Cell> | Response<int> | bool | long | int) -> int | Response<int> | HttpError | Response<long> | Response<Cell> | bool | long {
+    return value
+}

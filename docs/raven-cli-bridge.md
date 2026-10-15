@@ -10840,3 +10840,15 @@ as df02f07ad; each line passed 195 match/identity tests. The native compiler was
 rebuilt, but the v3 class-library bundle was retained. Runtime Contract and
 emission are unchanged. Open generics, managed JIT/GC and throughput remain
 unqualified by this consumer; the native layout is still private and bounded.
+
+
+### Reference-valued generic record alternative (2026-10-15)
+
+The [Response<Cell> imported consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md)
+passes ten inputs through the seven-alternative native union. Copying the record
+preserves shared mutation of its embedded Cell. Interpreter/AOT agree (42) and
+only explicit HttpError/Cell objects allocate (32 bytes). Native signatures,
+Runtime Contract and compiler emission are unchanged; no temporary encoding was
+added. Tools, fresh library/consumer artifacts and retained v3 bundle are hashed.
+The arena does not collect objects, so managed JIT/GC and broader open generic
+qualification remain separate blockers.

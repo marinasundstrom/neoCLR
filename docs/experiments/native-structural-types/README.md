@@ -341,3 +341,17 @@ merged or advanced. Runtime Contract configuration and native emission are uncha
 This is closed Int32/Int64 substitution coverage, not qualification of every open
 generic or reference-valued T. Managed JIT/GC, boxing, compact layout performance
 and full Task application execution remain open.
+
+
+### Reference-valued generic record payload (2026-10-15)
+
+The [reference-valued generic record consumer](reference-generic-record-import-project/README.md)
+adds Response<Cell> beside Response<int>, Response<long>, scalars and HttpError.
+All ten imported inputs pass interpreter/AOT, including a copied Response<Cell>
+whose embedded reference observes shared mutation. Exactly 32 arena bytes account
+for the explicit Cell and HttpError instances; no union/record boxes are allocated.
+[Evidence](raven-reference-generic-record-import-results.json) fingerprints fresh
+library/consumer builds against the retained v3 bundle. Compiler emission, Runtime
+Contract configuration and runtime layout are unchanged. This qualifies one closed
+reference-valued substitution; the arena host provides no collector or moving-GC
+stress, and broad open generic/JIT/performance qualification remains outstanding.

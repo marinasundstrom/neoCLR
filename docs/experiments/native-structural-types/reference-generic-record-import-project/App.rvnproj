@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../target/structural-integrated-libraries-v3/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>StructuralScalarPatterns</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="StructuralReferenceGenericRecordLibrary">
+      <HintPath>../reference-generic-record-import-library/bin/neoclr/StructuralReferenceGenericRecordLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

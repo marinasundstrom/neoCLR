@@ -106,7 +106,10 @@ passes eight inputs with only its explicit HttpError allocation (16 bytes).
 A [closed generic record consumer](experiments/native-structural-types/generic-record-reference-import-project/README.md)
 also preserves distinct Response<int>/Response<long> identities and substituted
 fields across nine imported inputs, with the same allocation bound.
-Intrinsic String alternatives remain a native layout gap.
+A [reference-valued generic record consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md)
+also preserves shared Cell mutation through a copied Response<Cell>; ten imported
+inputs pass with only the two explicit object allocations (32 bytes). This arena
+host is not collector stress. Intrinsic String alternatives remain a native layout gap.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with
