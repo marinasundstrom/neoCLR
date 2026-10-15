@@ -195,3 +195,8 @@ storage slice does not complete native tuple reflection, boxing, array storage,
 Windows qualification or full Raven application integration. JIT uses shared
 lowering but still needs dedicated structural execution qualification. These are
 integration gaps, not permanent restrictions of structural identity.
+
+Initial AOT microbenchmarks compare two- and sixteen-integer tuples with equivalent
+nominal records: each pair emits byte-identical native objects with no allocator
+imports. This is evidence for those copy/call workloads, not a general performance
+guarantee. Reference-bearing values, boxing and union workloads remain unmeasured.

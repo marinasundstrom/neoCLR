@@ -1,0 +1,58 @@
+{
+  "revision": "4fe78429bfc21149db2443516db36a439c09bf78",
+  "working_tree_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cpu": "Apple M1",
+  "iterations_per_sample": 1000000,
+  "elements": 16,
+  "codegen_sha256": "b22535790db3e1b2f64e9d824df45f5ded1250f9a8a66286ff890f6d4a386e9f",
+  "cases": {
+    "structural": {
+      "emission_seconds": 0.44384545899999994,
+      "object_bytes": 1352,
+      "object_sha256": "0ae7989692fd2c6a888f637e57e44bb4342b16e79eaee4d4c9513406b687b74a",
+      "source_sha256": "97428c6766615c562ecc7289afcd4d5279f46fccb19e425a8418f9a4388e09f7",
+      "undefined_symbols": [],
+      "samples_ns_per_call": [
+        15.585,
+        13.12,
+        13.153,
+        13.135,
+        13.124,
+        13.115,
+        13.12,
+        13.124,
+        13.115
+      ],
+      "median_ns_per_call": 13.124
+    },
+    "nominal": {
+      "emission_seconds": 0.42652966699999995,
+      "object_bytes": 1352,
+      "object_sha256": "0ae7989692fd2c6a888f637e57e44bb4342b16e79eaee4d4c9513406b687b74a",
+      "source_sha256": "c674fc1ab4e1209343dcaa5010b20aabd9dd1dc6dd1aae36c9c71beb72a46a14",
+      "undefined_symbols": [],
+      "samples_ns_per_call": [
+        13.905,
+        13.291,
+        13.18,
+        13.139,
+        13.122,
+        13.116,
+        13.115,
+        13.114,
+        13.121
+      ],
+      "median_ns_per_call": 13.122
+    }
+  },
+  "limitations": [
+    "one machine",
+    "microbenchmark of integer tuple construction, copy and call",
+    "does not measure boxed unions, GC pressure, interpreter or JIT",
+    "compilation is timed separately; execution excludes process startup",
+    "eight-byte private slots are not a packed or public aggregate ABI"
+  ],
+  "identical_native_objects": true,
+  "structural_over_nominal_ratio": 1.000152415790276
+}

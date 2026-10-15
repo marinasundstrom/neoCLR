@@ -445,3 +445,11 @@ Windows qualification and compiler-produced application qualification remain ope
 Native unions and intersections remain rejected. The author additionally requested
 performance measurement to guide optimization; comparative benchmarks are a
 separate slice and these storage checks alone are not a performance qualification.
+
+### Initial native cost comparison
+
+The [AOT measurements](experiments/native-structural-types/README.md) compare
+structural tuples with equivalent nominal records. Both the two-element and
+sixteen-element integer workloads emit byte-identical native objects. This rules
+out representation-specific execution overhead for these compiled workloads; it
+does not establish full runtime performance or justify extrapolating to unions.

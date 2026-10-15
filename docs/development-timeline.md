@@ -33,6 +33,10 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Assistant:** treats AOT/JIT execution, correct managed-reference tracing, value
   layout costs, metadata/reflection and compiler interoperability as integration
   obligations. Interpreter success alone is insufficient evidence for integration.
+- **Author follow-up:** requests performance measurements of structural types to
+  identify optimization opportunities. The assistant compares equivalent structural
+  tuples and nominal records under AOT, separating emission from execution time;
+  [raw evidence](experiments/native-structural-types/README.md) records the bounded result.
 - **Action:** refreshes website descriptions of data composition, structural value
   semantics, explicit nominal intersection conformance and Array<T> representation.
   Native backend qualification and implementation remain in progress; no merge or

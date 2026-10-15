@@ -1,0 +1,19 @@
+.module PairCost
+.function Echo(tuple<Int32,Int32> value) -> tuple<Int32,Int32>
+ldarg value
+ret
+.end
+.function Main(Int32 value) -> Int32
+.local tuple<Int32,Int32> pair
+ldarg value
+ldc.i4 2
+newobj tuple<Int32,Int32>
+call Echo(tuple<Int32,Int32>)
+stloc pair
+ldloc pair
+ldfld 0
+ldloc pair
+ldfld 1
+add
+ret
+.end

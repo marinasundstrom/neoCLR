@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Measure native structural tuple construction/copy/call costs against equivalent nominal records with interleaved samples. Two- and sixteen-element workloads emit byte-identical native objects with no undefined allocator imports; retain raw timings, hashes and reproduction script. This AOT microbenchmark does not qualify unions, JIT or managed-reference workloads.
+
 - Add bounded native structural tuple storage without nominal carriers: inline copies, nested element addresses, calls/returns, signature-preserving specialization and recursive tracing recipes. macOS ARM64 AOT tests cover mixed numeric values and the 256-slot layout boundary. Native reflection, boxing, broader JIT/GC qualification and structural union/intersection backend support remain incomplete.
 
 - Refresh structural family, union, intersection, tuple, array and function documentation and feature summaries. Explain structural data computation, explicit nominal conformance, Array<T> representation, scoped nominal generics and the remaining AOT/JIT work; remove obsolete future-only and blanket unsupported claims.
