@@ -1,0 +1,73 @@
+{
+  "passed": false,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/numerics-complex-generic-20261016/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "3be821f6b9e8ce16bc61a44505803c49230b606f780cededd1f4914170d162ca",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/numerics-complex-generic-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/numerics-complex-generic-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/numerics-complex-generic-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/numerics-complex-generic-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 1,
+      "logSha256": "f6470ff0f6529093d54c91929aee39e75e7488deae5e7981f6124edaf30aa748",
+      "output": "(selection manifest in local aot.log)"
+    }
+  ]
+}

@@ -154,3 +154,45 @@ constrained dispatch use existing runtime semantics; .NET controls continue to p
 See the system-compilation-strategy generic Number checkpoint and its executable evidence.
 This does not extend the public Number API, add parsing to Number, or complete every
 constraint/category in the compiler. No performance comparison is claimed.
+
+
+## Minimal System.Numerics capabilities and Complex experiment — 2026-10-16
+
+Author direction: move toward minimal numeric interfaces in addition to Number,
+in System.Numerics, and implement a useful additional number type to exercise the
+model. The assistant selected a Complex demo because arithmetic does not imply a
+natural total ordering. This follows [.NET Complex](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.complex),
+which implements arithmetic interfaces and INumberBase rather than INumber's
+ordered-number contract. [.NET generic math](https://learn.microsoft.com/en-us/dotnet/standard/generics/math)
+provides separate operator capabilities that Number-like aggregates compose.
+
+The [executable experiment](../validation/numerics-interfaces/README.md) defines
+four source-local interfaces under System.Numerics: AdditionOperators,
+SubtractionOperators, MultiplicationOperators and DivisionOperators. Each declares
+one binary static operator with Self operands and result. These are candidate names
+and shapes, not installed class-library APIs. .NET calls its multiplication
+interface IMultiplyOperators; settle the final Raven naming before publication.
+The existing native Self model removes repetitive self-type parameters, but this
+minimal profile cannot express .NET's independent operand/result types. Mixed-type
+contracts, identities and checked operator defaults remain explicit follow-ups.
+
+Proposed composition: Number inherits the four capabilities and retains
+ComparableTo<Self>, Zero and One. Preserve existing Number member identities during
+migration until import and constrained dispatch are qualified. Complex explicitly
+implements just the four arithmetic capabilities. It must not acquire an arbitrary
+CompareTo solely to satisfy Number. A future NumberBase-like aggregate may be useful,
+but this experiment does not introduce one or redefine Number.
+
+The candidate class-library declarations and Number inheritance compiled in a local
+full-bundle probe, but were not retained as shipped source: constrained method
+specialization rejects nominal interface bounds in AOT. The interpreter accepts the
+source-local generic consumer; class-contained constrained methods also encounter
+an existing Raven emission gate. Close these concrete gaps before public API adoption,
+then refresh native/CLI documentation artifacts and validate external consumers.
+
+Complex uses double components and textbook arithmetic for finite, moderate inputs.
+Scaled division, zero-divisor policy, NaN/infinity/extreme magnitudes, equality/hash,
+formatting and performance are unqualified; this is a model test, not numerical
+library parity. Safe Result-returning arithmetic remains a separate contract from
+operator support. No structural type work, new runtime opcode or .NET compiler
+behavior is introduced.

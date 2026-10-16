@@ -150,3 +150,8 @@ checked expression support does not provide recoverable errors.
 A source-local integer addition experiment now exercises recoverable overflow
 through nominal Result values. This is an API-design prototype, not a new System
 arithmetic API; existing Int32.Divide already provides recoverable division errors.
+
+Minimal System.Numerics arithmetic capabilities are being explored with a source-local
+Complex demo. Complex supports arithmetic without imposing Number's ordering
+contract. Generic native backend support remains incomplete; these are not yet
+installed class-library APIs.

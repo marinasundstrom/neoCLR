@@ -5100,3 +5100,12 @@ safe-method/faulting-operation distinction used by slicing and indexing. A
 checks this policy using existing nominal Result and the existing safe Int32.Divide
 API. Public numeric API adoption and performance qualification remain pending;
 this does not unblock or reprioritize broader structural work.
+
+
+Author-directed numerics follow-up (2026-10-16): investigate minimal System.Numerics
+operator capabilities alongside Number and exercise them with a Complex demo.
+[Scope, evidence and blockers](validation/numerics-interfaces/README.md) keep the
+candidate contracts separate from installed APIs. Next prerequisite is nominal
+interface bounds in native generic method specialization, followed by constrained
+Self dispatch validation and public library/API-reference integration. Number's
+ordering contract is unchanged; structural work remains parked.

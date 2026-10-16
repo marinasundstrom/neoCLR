@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "nominal-required",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/numerics-conformance-20261016/nominal-required/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/numerics-conformance-20261016/nominal-required/Main.rvn(79,14): error RAV1501: No overload for method 'Add' takes 2 arguments\n/Users/robert/Projects/neoclr/target/numerics-conformance-20261016/nominal-required/Main.rvn(79,18): error RAV0320: The type 'Complex' must satisfy the 'AdditionOperators' constraint for type parameter 'T' of 'static Add<T>(left: T, right: T) -> T'\n",
+      "sourceSha256": "6ed5419a1a6ece5a2746abf6c5f1d8a4b9f0a96c268b2753f1ec36308430f3a1"
+    },
+    {
+      "case": "number-not-implied",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/numerics-conformance-20261016/number-not-implied/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/numerics-conformance-20261016/number-not-implied/Main.rvn(79,14): error RAV1501: No overload for method 'Add' takes 2 arguments\n/Users/robert/Projects/neoclr/target/numerics-conformance-20261016/number-not-implied/Main.rvn(79,18): error RAV0320: The type 'Complex' must satisfy the 'Number' constraint for type parameter 'T' of 'static Add<T>(left: T, right: T) -> T'\n",
+      "sourceSha256": "5108997ce1102fcb6277b5c00aba47db74563e5a8f11df309d814d83101202c4"
+    }
+  ]
+}

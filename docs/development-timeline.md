@@ -18528,3 +18528,19 @@ remain open. This is implementation of the earlier platform convention direction
   [Validation and remaining scope](validation/recoverable-arithmetic/README.md)
   distinguish the prototype from a public class-library API. Broader structural
   work remains parked.
+
+
+## 2026-10-16 — Minimal numerics capabilities and a new number demo
+
+- Author: requested minimal interfaces in System.Numerics alongside Number, then
+  requested another useful number type to demonstrate and test the model.
+- Assistant proposal/action: selected independent same-type arithmetic capabilities
+  using native Self, and a Complex demo without artificial ordering. Compared .NET's
+  Complex/INumberBase distinction with the existing ordered Number contract.
+- Findings: direct complex arithmetic and explicit nominal conformance checks are
+  captured in the [experiment](validation/numerics-interfaces/README.md). Generic
+  addition succeeds in the interpreter; AOT rejects nominal method bounds. A
+  class-contained constrained method hits a Raven emission gate. A local library
+  declaration build succeeded, but no new class-library APIs were retained before
+  backend qualification. Public names, identity capabilities, mixed operand/result
+  shapes and production complex edge semantics remain open.

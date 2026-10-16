@@ -1,0 +1,101 @@
+module System.Numerics
+
+import System.*
+
+
+/// Nominal capability for same-type addition; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface AdditionOperators {
+    /// Applies addition to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func +(left: Self, right: Self) -> Self
+}
+
+
+/// Nominal capability for same-type division; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface DivisionOperators {
+    /// Applies division to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func /(left: Self, right: Self) -> Self
+}
+
+
+/// Nominal capability for same-type multiplication; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface MultiplicationOperators {
+    /// Applies multiplication to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func *(left: Self, right: Self) -> Self
+}
+
+
+/// Nominal capability for same-type subtraction; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface SubtractionOperators {
+    /// Applies subtraction to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func -(left: Self, right: Self) -> Self
+}
+
+
+/// Finite, moderate-magnitude complex arithmetic demo, not a production numerical library.
+/// No ordering contract: complex numbers have no natural total order.
+public struct Complex : AdditionOperators, SubtractionOperators, MultiplicationOperators, DivisionOperators {
+    val Real: double
+    val Imaginary: double
+
+    init(real: double, imaginary: double) {
+        Real = real
+        Imaginary = imaginary
+    }
+
+    static func +(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real + right.Real, left.Imaginary + right.Imaginary)
+
+    static func -(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real - right.Real, left.Imaginary - right.Imaginary)
+
+    static func *(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real * right.Real - left.Imaginary * right.Imaginary,
+                left.Real * right.Imaginary + left.Imaginary * right.Real)
+
+    static func /(left: Complex, right: Complex) -> Complex {
+        // Textbook division: scaled division and extreme floating values are deferred.
+        let denominator = right.Real * right.Real + right.Imaginary * right.Imaginary
+        return Complex((left.Real * right.Real + left.Imaginary * right.Imaginary) / denominator,
+                       (left.Imaginary * right.Real - left.Real * right.Imaginary) / denominator)
+    }
+}
+
+func Same(value: Complex, real: double, imaginary: double) -> bool =>
+    value.Real == real && value.Imaginary == imaginary
+
+func Main() -> int {
+    let left = Complex(3.0, 2.0)
+    let right = Complex(1.0, -4.0)
+    if !Same(left + right, 4.0, -2.0) {
+        return 1
+    }
+    if !Same(left - right, 2.0, 6.0) {
+        return 2
+    }
+    if !Same(left * right, 11.0, -10.0) {
+        return 3
+    }
+    if !Same(Complex(6.0, 4.0) / Complex(2.0, 0.0), 3.0, 2.0) {
+        return 4
+    }
+    let i = Complex(0.0, 1.0)
+    if !Same(i * i, -1.0, 0.0) {
+        return 5
+    }
+    if !Same(left * Complex(3.0, -2.0), 13.0, 0.0) {
+        return 6
+    }
+    // A small polynomial demonstrates ordinary composition of arithmetic operators.
+    if !Same(i * i + Complex(1.0, 0.0), 0.0, 0.0) {
+        return 7
+    }
+    return 42
+}

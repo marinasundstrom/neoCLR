@@ -1,0 +1,29 @@
+{
+  "command": [
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+    "--jit-managed",
+    "--closed-world",
+    "/Users/robert/Projects/neoclr/target/numerics-complex-generic-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll",
+    "@entry",
+    "/Users/robert/Projects/neoclr/target/numerics-complex-20261016/host.dylib",
+    "--system",
+    "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+    "--object-root",
+    "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+    "--compile-system",
+    "--reference-arena",
+    "--bind-user-fault",
+    "--native-gc",
+    "--native-stack-budget"
+  ],
+  "exitCode": 1,
+  "output": "neoclr-codegen: unsupported generic method constraint\n"
+}
