@@ -9649,3 +9649,26 @@ reject constraint introspection instead of inventing empty constraints.
 No metadata schema change. Constrained generic methods, interface/constructed nominal
 type bounds and constrained interface/value owner imports remain outside this slice.
 See [qualification](../docs/validation/imported-special-constraints/README.md).
+
+## Native function-kind constraint (feature branch, 2026-10-16)
+
+`TypeParameterConstraints.FunctionType` (32) means a native structural function
+signature, with any parameter/result signature. It is not a CLI flag or a nominal
+System.Delegate bound. `TypeBuilder.SetSpecialConstraints` and
+`AssemblyBuilder.SetSpecialConstraints(ImportedTypeReference, int, TypeParameterConstraints)`
+accept it as a standalone requirement in this initial profile; combinations and
+nominal bounds reject with ArgumentException. Generic arguments must be
+`SignatureType.Function(...)`; nominal types, arrays of functions and primitives
+do not satisfy it. Scoped symbolic arguments are checked after substitution and
+symbolic base requirements use the existing proof checks.
+
+Native metadata stores `FunctionType`. `ReadNativeAssembly` and
+`GenericParameterTypeInfo.SpecialConstraints` retain it. Use
+`NativeModuleContainer.WriteLibraryBinary` for authored containers. CLI export
+and reference projection throw InvalidDataException rather than invent a CLR
+encoding or erase this requirement. Older native readers reject the unknown kind.
+No new invocation operation is introduced; exact function signatures stay intact.
+
+This is isolated feature-branch groundwork. Raven syntax, function-list APIs and
+dynamic invocation are not delivered by this SDK addition. See
+[qualification](../docs/validation/function-kind-constraint/README.md).

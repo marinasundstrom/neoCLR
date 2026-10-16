@@ -33,7 +33,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(reference); ArgumentNullException.ThrowIfNull(baseType);
         if (!ReferenceEquals(reference.Owner, this) || reference.TypeArguments.Count != 0 || reference.DeclaringType is not null || reference.IsValueType || IsAuthoredInterface(reference) ||
             parameterIndex < 0 || parameterIndex >= reference.GenericArity || !ReferenceEquals(baseType.Owner, this) || baseType.GenericArity != 0 || baseType.IsValueType || IsAuthoredInterface(baseType) ||
-            reference.SpecialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType))
+            (reference.SpecialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) || reference.SpecialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.FunctionType)))
             throw new ArgumentException("requires a generic reference class and nominal class bound");
         if (!importedBounds.TryGetValue(reference, out var bounds)) importedBounds.Add(reference, bounds = []);
         if (bounds.TryGetValue(parameterIndex, out var previous) && previous != (SignatureType)baseType)
@@ -48,7 +48,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Registers a resolved special requirement on an imported generic class definition.</summary>
     /// <param name="reference">Output-owned unconstructed top-level generic reference class.</param>
     /// <param name="parameterIndex">Definition parameter ordinal.</param>
-    /// <param name="constraints">ReferenceType, ValueType, DefaultConstructor or compatible combinations.</param>
+    /// <param name="constraints">ReferenceType, ValueType, DefaultConstructor or compatible combinations; native FunctionType alone.</param>
     /// <exception cref="ArgumentException">Wrong owner, ordinal, category or unsupported flags.</exception>
     /// <exception cref="InvalidDataException">A different requirement was already registered for this parameter.</exception>
     /// <remarks>The host supplies dependency facts without reader access. Repeating an identical registration is allowed.
@@ -59,10 +59,11 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(reference);
         if (!ReferenceEquals(reference.Owner, this) || reference.TypeArguments.Count != 0 || reference.DeclaringType is not null ||
             reference.IsValueType || IsAuthoredInterface(reference) || parameterIndex < 0 || parameterIndex >= reference.GenericArity ||
-            constraints == TypeParameterConstraints.None || ((int)constraints & ~28) != 0 ||
+            constraints == TypeParameterConstraints.None || ((int)constraints & ~60) != 0 ||
+            constraints.HasFlag(TypeParameterConstraints.FunctionType) && constraints != TypeParameterConstraints.FunctionType ||
             (constraints & (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType)) == (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType))
             throw new ArgumentException("requires an owned generic class definition and compatible special constraints");
-        if (constraints.HasFlag(TypeParameterConstraints.ValueType) && ImportedBounds(reference).ContainsKey(parameterIndex))
+        if ((constraints.HasFlag(TypeParameterConstraints.ValueType) || constraints.HasFlag(TypeParameterConstraints.FunctionType)) && ImportedBounds(reference).ContainsKey(parameterIndex))
             throw new ArgumentException("value constraint conflicts with nominal class bound");
         if (!importedSpecialConstraints.TryGetValue(reference, out var registered))
             importedSpecialConstraints.Add(reference, registered = []);

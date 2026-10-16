@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>A nominal class bound for one declaring-type parameter.</summary>
 public sealed record GenericTypeConstraint(int ParameterIndex, TypeBuilder BaseType);
 
-/// <summary>Supported CLI-compatible special type-parameter requirements.</summary>
+/// <summary>Special type-parameter requirements; FunctionType is native-only.</summary>
 [Flags]
 public enum TypeParameterConstraints
 {
@@ -14,7 +14,9 @@ public enum TypeParameterConstraints
     /// <summary>A nonnullable value type.</summary>
     ValueType = 8,
     /// <summary>A value type or concrete class with a public parameterless constructor.</summary>
-    DefaultConstructor = 16
+    DefaultConstructor = 16,
+    /// <summary>A native structural function signature; not a nominal delegate. Native emission only.</summary>
+    FunctionType = 32
 }
 
 public sealed partial class TypeBuilder
@@ -24,13 +26,14 @@ public sealed partial class TypeBuilder
     public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => Definition.SpecialConstraints;
     /// <summary>Sets special requirements without changing nominal bounds.</summary>
     /// <param name="parameterIndex">Declared parameter ordinal.</param>
-    /// <param name="constraints">ReferenceType, ValueType, DefaultConstructor, or compatible combinations; None clears flags.</param>
+    /// <param name="constraints">ReferenceType, ValueType, DefaultConstructor or compatible combinations; native FunctionType alone. None clears flags.</param>
     /// <exception cref="ArgumentException">Invalid index/bits or conflicting reference/value/base requirements.</exception>
     public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
     {
-        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || ((int)constraints & ~28) != 0 ||
+        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || ((int)constraints & ~60) != 0 ||
+            constraints.HasFlag(TypeParameterConstraints.FunctionType) && constraints != TypeParameterConstraints.FunctionType ||
             (constraints & (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType)) == (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType) ||
-            constraints.HasFlag(TypeParameterConstraints.ValueType) && genericConstraints.Any(c => c.ParameterIndex == parameterIndex))
+            (constraints.HasFlag(TypeParameterConstraints.ValueType) || constraints.HasFlag(TypeParameterConstraints.FunctionType)) && genericConstraints.Any(c => c.ParameterIndex == parameterIndex))
             throw new ArgumentException("invalid or conflicting special constraints");
         if (constraints == TypeParameterConstraints.None) specialConstraints.Remove(parameterIndex);
         else specialConstraints[parameterIndex] = constraints;
@@ -47,7 +50,7 @@ public sealed partial class TypeBuilder
     public void AddBaseTypeConstraint(int parameterIndex, TypeBuilder baseType)
     {
         ArgumentNullException.ThrowIfNull(baseType);
-        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || genericConstraints.Any(c => c.ParameterIndex == parameterIndex) || specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) ||
+        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || genericConstraints.Any(c => c.ParameterIndex == parameterIndex) || (specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) || specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.FunctionType)) ||
             !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.IsInterface || baseType.IsValueType || baseType.GenericParameterNames.Count != 0)
             throw new ArgumentException("one owned nongeneric class bound per declared type parameter required");
         genericConstraints.Add(new(parameterIndex, baseType));
@@ -117,6 +120,8 @@ public sealed partial class TypeBuilder
     internal static void ValidateSpecialTypeArgument(SignatureType type, TypeParameterConstraints flags, bool complete)
     {
         if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) return;
+        if (flags.HasFlag(TypeParameterConstraints.FunctionType) && type.FunctionSignature is null)
+            throw new ArgumentException("type argument must be a structural function type");
         bool value = type.Primitive is PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.Byte or PrimitiveType.SByte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 or PrimitiveType.UInt64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr or PrimitiveType.Single or PrimitiveType.Double ||
             type.ImportedType?.IsValueType == true || type.ClassType?.IsValueType == true || type.GenericInstance?.Definition.IsValueType == true;
         bool reference = type.Primitive == PrimitiveType.String || type.ClassType is { IsValueType: false } || type.ImportedType is { IsValueType: false } || type.GenericInstance?.Definition is { IsValueType: false } || type.ArrayElement is not null;

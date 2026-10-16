@@ -236,7 +236,7 @@ public sealed partial class NativeAssemblyDefinition
                         var kind = constraint.GetProperty("kind");
                         if (kind.ValueKind == JsonValueKind.String)
                         {
-                            var flag = kind.GetString() switch { "ReferenceType" => TypeParameterConstraints.ReferenceType, "ValueType" => TypeParameterConstraints.ValueType, "DefaultConstructor" => TypeParameterConstraints.DefaultConstructor, _ => throw new InvalidDataException("unsupported special constraint") };
+                            var flag = kind.GetString() switch { "ReferenceType" => TypeParameterConstraints.ReferenceType, "ValueType" => TypeParameterConstraints.ValueType, "DefaultConstructor" => TypeParameterConstraints.DefaultConstructor, "FunctionType" => TypeParameterConstraints.FunctionType, _ => throw new InvalidDataException("unsupported special constraint") };
                             var existing = specialConstraints.GetValueOrDefault(parameter);
                             Require(!existing.HasFlag(flag), "duplicate special constraint"); specialConstraints[parameter] = existing | flag;
                             continue;

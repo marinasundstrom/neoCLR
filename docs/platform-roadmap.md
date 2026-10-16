@@ -4889,3 +4889,12 @@ validate reference/value/default-constructor requirements before specializing cl
 record/class constructions. The [retained consumer](validation/special-type-constraints/README.md)
 covers inherited and nested constructions; negative tests cover invalid arguments.
 Nongeneric nominal class bounds now also validate before specialization. Raven dependency import/use of the existing reference-class special/nominal constraint profile is qualified by the [separate-provider fixture](validation/imported-special-constraints/raven/README.md). Constrained methods, constructed/interface bounds and external source-bound authoring remain open. This does not resume structural types or broaden the variance scope.
+
+
+**Author-directed function-kind groundwork (2026-10-16, feature branch only):**
+`func` is intended to constrain structural function types for ordinary library
+function lists/signals, without event metadata. Native runtime/host SDK groundwork
+is isolated on `codex/function-kind-constraint`; Raven syntax awaits distinct
+structural function symbols across the bridge. Invocation decisions are explicitly
+postponed. This is not a resumption of the broader structural roadmap. See
+[direction](proposals/structural-types.md#20-generic-constraints-on-function-types).

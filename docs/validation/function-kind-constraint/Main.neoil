@@ -1,0 +1,24 @@
+.module FunctionConstraint
+.entry Main
+.type class Signal<F>
+.constraint F func
+.field Callback F
+.method instance .ctor(F callback) -> noresult
+ldarg 0
+ldarg 1
+stfld Signal<F>::Callback
+ret
+.end
+.end
+.function Identity(Int32) -> Int32
+ldarg 0
+ret
+.end
+.function Main() -> Int32
+function.bind fn<Int32,Int32> = Identity(Int32)
+newobj instance Signal<fn<Int32,Int32>>::.ctor(fn<Int32,Int32>)
+ldfld Signal<fn<Int32,Int32>>::Callback
+ldc.i4 42
+call instance fn<Int32,Int32>::Invoke(Int32)
+ret
+.end

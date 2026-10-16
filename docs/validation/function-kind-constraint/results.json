@@ -1,0 +1,260 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "assemble",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/Main.neoil",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "logSha256": "5ef20d29db09842ca1b26004c1369b83823ae2ef78c9899f3e1410e538baa5cf",
+      "output": "Assembled FunctionConstraint -> /Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "25f84bd0a64d4dbee2fba13a198b91ce1d70a7adda523209652641658ef0db46",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "a0eb534c731694f6d72839357685edf0087a4c49fa1d542fe1107a0744e1713c",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.417697583,\"guestExitCode\":42,\"invocationSeconds\":0.000051083,\"metadataLoadSeconds\":0.314355667,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":5.737945958}\n"
+    }
+  ],
+  "retainedConstraintMetadata": [
+    {
+      "base": null,
+      "compiledTypeIndex": 0,
+      "declaration": {
+        "definition": {
+          "index": 0,
+          "module": "FunctionConstraint"
+        },
+        "fields": [
+          {
+            "name": "Callback",
+            "ty": {
+              "TypeParameter": 0
+            }
+          }
+        ],
+        "generic_constraints": [
+          {
+            "kind": "FunctionType",
+            "parameter": 0
+          }
+        ],
+        "generic_parameters": [
+          "F"
+        ],
+        "is_abstract": false,
+        "is_reference_type": true,
+        "name": "Signal",
+        "representation": "Record"
+      },
+      "declaredMethods": [
+        {
+          "abstract": false,
+          "customAttributes": [],
+          "definition": {
+            "index": 0,
+            "module": "FunctionConstraint"
+          },
+          "genericConstraints": [],
+          "genericParameters": [],
+          "instance": true,
+          "name": "Signal..ctor",
+          "noResult": true,
+          "origin": null,
+          "override": false,
+          "parameters": [
+            {
+              "Function": {
+                "parameters": [
+                  "Int32"
+                ],
+                "returns": "Int32"
+              }
+            }
+          ],
+          "receiverByRef": false,
+          "receiverReadonly": false,
+          "returns": "Void",
+          "virtual": false,
+          "visibility": "public"
+        }
+      ],
+      "declaringType": null,
+      "definition": {
+        "index": 0,
+        "module": "FunctionConstraint"
+      },
+      "interfaces": [],
+      "name": "Signal",
+      "origin": null,
+      "properties": [],
+      "typeArguments": [
+        {
+          "Function": {
+            "parameters": [
+              "Int32"
+            ],
+            "returns": "Int32"
+          }
+        }
+      ],
+      "visibility": "public"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.417697583,
+    "guestExitCode": 42,
+    "invocationSeconds": 5.1083e-05,
+    "metadataLoadSeconds": 0.314355667,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 5.737945958
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/Main.neoil": "f6fb5b754f793d3b91646b13ec5e8e59a5ef22e4920f4ae304ee3d86fc95588a",
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/run.py": "9407e3a146be9a65e682b11807633a22154de693c2503d71fee72306ba15585f",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "4daef691cf371d1e6c472256e204cb4039dfeff58408200b13f902cbbf358767",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "c511e2816c0004d9101f56745fe96037a945f24eb339691671273688e40c3528",
+    "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox": "99cf474f13a041916e910533b8ad1f763f8055f53183f9daae7526d4b883ef53",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
+  }
+}

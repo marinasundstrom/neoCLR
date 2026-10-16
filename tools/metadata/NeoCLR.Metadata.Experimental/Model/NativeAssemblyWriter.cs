@@ -353,7 +353,7 @@ public sealed partial class AssemblyBuilder
         {
             var result = type.GenericConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = new { Named = TypeName(c.BaseType) } } }).ToList();
             foreach (var (parameter, flags) in type.SpecialConstraints.OrderBy(p => p.Key))
-                foreach (var flag in new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor })
+                foreach (var flag in new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor, TypeParameterConstraints.FunctionType })
                     if (flags.HasFlag(flag)) result.Add(new { parameter, kind = flag.ToString() });
             return result.Count == 0 ? null : result.ToArray();
         }

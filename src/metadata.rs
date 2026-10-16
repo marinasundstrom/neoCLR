@@ -252,6 +252,8 @@ pub enum ConstraintKind {
     ValueType,
     /// Value initialization or a public parameterless constructor on a concrete class.
     DefaultConstructor,
+    /// A structural function signature, independent of nominal delegate ancestry.
+    FunctionType,
     TypeBound(Type),
 }
 

@@ -406,6 +406,8 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteImage(bool referenceOnly)
     {
+        if (types.Any(t => t.SpecialConstraints.Values.Any(flags => flags.HasFlag(TypeParameterConstraints.FunctionType))))
+            throw new InvalidDataException("function-kind constraints require native emission without CLI projection");
         if (experimentalTuples.Count != 0) throw new InvalidDataException("structural tuples require native emission without CLI projection");
         if (experimentalStorageCompositions.Count != 0 || importedReferences.Values.Any(reference => reference.Signature.ParameterTypes.Append(reference.Signature.ReturnType).Any(t => t.ContainsComposition)))
             throw new InvalidDataException("experimental composition signatures require native emission without CLI projection");

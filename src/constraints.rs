@@ -27,6 +27,7 @@ pub(crate) fn parse(text: &str, names: &[Option<String>]) -> Result<Vec<GenericC
                 "reference" => ConstraintKind::ReferenceType,
                 "value" => ConstraintKind::ValueType,
                 "new" => ConstraintKind::DefaultConstructor,
+                "func" => ConstraintKind::FunctionType,
                 _ => ConstraintKind::TypeBound(crate::assembler::parse_type(word)?),
             };
             Ok(GenericConstraint { parameter, kind })
@@ -54,6 +55,11 @@ pub(crate) fn validate(constraints: &[GenericConstraint], arity: usize) -> Resul
                 )
         }) {
             return Err(Fault::new("conflicting reference/value constraints"));
+        }
+        if constraint.kind == ConstraintKind::FunctionType && constraints.iter().any(|other|
+            other.parameter == constraint.parameter && other.kind != ConstraintKind::FunctionType)
+        {
+            return Err(Fault::new("function-kind constraint cannot be combined with other constraints"));
         }
         if constraints[..index].contains(constraint) {
             return Err(Fault::new("duplicate generic constraint"));
@@ -155,6 +161,12 @@ pub(crate) fn check(
             .get(constraint.parameter as usize)
             .ok_or_else(|| Fault::new("generic constraint argument missing"))?;
         let violates = match &constraint.kind {
+            ConstraintKind::FunctionType => {
+                if matches!(argument, Type::TypeParameter(_) | Type::MethodTypeParameter(_)) {
+                    continue;
+                }
+                !matches!(argument, Type::Function(_))
+            }
             ConstraintKind::NotVoid => matches!(argument, Type::Void),
             ConstraintKind::NotReference => {
                 module.is_reference_type(argument)
@@ -310,6 +322,7 @@ pub(crate) fn emit(constraints: &[GenericConstraint], names: &[String]) -> Resul
                     ConstraintKind::ReferenceType => "reference".to_string(),
                     ConstraintKind::ValueType => "value".to_string(),
                     ConstraintKind::DefaultConstructor => "new".to_string(),
+                    ConstraintKind::FunctionType => "func".to_string(),
                     ConstraintKind::TypeBound(bound) =>
                         crate::type_identity::signature_name(bound)?,
                 }

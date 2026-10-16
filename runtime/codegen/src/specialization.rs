@@ -227,7 +227,8 @@ impl Specializer<'_> {
             match &constraint.kind {
                 neoclr::metadata::ConstraintKind::ReferenceType
                 | neoclr::metadata::ConstraintKind::ValueType
-                | neoclr::metadata::ConstraintKind::DefaultConstructor => false,
+                | neoclr::metadata::ConstraintKind::DefaultConstructor
+                | neoclr::metadata::ConstraintKind::FunctionType => false,
                 neoclr::metadata::ConstraintKind::TypeBound(bound) => !matches!(bound, Type::Named(_))
                     || !self.source.type_definition(bound).is_some_and(|owner|
                         owner.is_reference_type && owner.generic_parameters.is_empty()
@@ -1345,6 +1346,18 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn function_kind_constraint_preserves_typed_calls_after_specialization() {
+        let source = neoclr::assemble(include_str!("../../../docs/validation/function-kind-constraint/Main.neoil")).unwrap();
+        let original = serde_json::to_value(&source).unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(serde_json::to_value(&source).unwrap(), original);
+    }
+
     #[test]
     fn special_type_constraints_are_checked_before_specialization() {
         let source = neoclr::assemble(include_str!("../../../docs/validation/special-type-constraints/Main.neoil")).unwrap();

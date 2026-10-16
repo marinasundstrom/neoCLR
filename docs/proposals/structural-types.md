@@ -764,7 +764,23 @@ It must be a structural function type such as:
 (object, EventArgs) -> ()
 ```
 
-The exact spelling of `func` remains a language-level design question, but the underlying neoCLR constraint should exist independently of Raven syntax.
+**Author clarification, 2026-10-16:** the intended Raven spelling is `where T: func`,
+and on neoCLR it admits only structural function types. Nominal delegates and objects
+with an `Invoke` member do not satisfy this category. The concrete parameter/result
+signature is preserved; the constraint itself does not reveal a callable signature
+inside the generic body.
+
+The motivating use is an ordinary library-owned function list or `Signal<T>` with
+event-like subscriptions, without introducing event-specific runtime metadata.
+The author explicitly postponed decisions about invocation. Sections 21–23 below
+remain proposals: no `Invoke`, `DynamicInvoke`, multicast policy or dynamic ABI is
+approved or implemented by this clarification. Typed visitor dispatch was an
+assistant suggestion, not an adopted API.
+
+Native runtime/host SDK groundwork is isolated on `codex/function-kind-constraint`;
+Raven syntax/import integration remains pending a reliable distinction between
+structural function symbols and nominal delegate transport. Broader structural
+work remains parked.
 
 ---
 
@@ -1030,3 +1046,13 @@ A language such as Raven may decide that any type containing an appropriate:
 ```text
 Invoke(...)
 ```
+
+**Subsequent author proposal (2026-10-16):** provide a reflection helper analogous
+to the array helper, conceptually `Reflection.InvokeFunction(functionObj, args)`.
+The assistant agrees this is a plausible explicit dynamic boundary. The function
+value retains its signature and bound receiver/closure; dispatch must use that
+value, not substitute a bare method descriptor. A future helper must define the
+argument/result value carrier, count/type and ref/out validation, fault behavior,
+and AOT-compatible dispatch adapters. This does not require event metadata or a
+nominal function superclass. The exact API and invocation semantics remain
+unimplemented and deferred; this proposal does not implicitly approve them.

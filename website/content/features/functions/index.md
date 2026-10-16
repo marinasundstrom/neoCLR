@@ -71,3 +71,13 @@ copies retain it.
 
 Typed invocation and property access use the Function object's bound target.
 Null member access raises NullReference.
+
+
+### Function-kind constraint groundwork (feature branch)
+
+Native `FunctionType` constraint groundwork on `codex/function-kind-constraint`
+restricts a generic argument to a structural function signature. Nominal delegates
+and objects with an `Invoke` member do not qualify. The intended Raven spelling is
+`where T: func`; compiler support is still pending. Function-list/event-like APIs
+would be ordinary library types, but invocation and multicast decisions are
+postponed. This is development work, not a published capability.

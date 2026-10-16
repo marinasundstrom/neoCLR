@@ -2221,3 +2221,10 @@ reference assembly. Full signatures, errors and limits are in the
 [manual SDK reference](experimental-metadata.md#imported-class-constraints-development-2026-10-16).
 No guest reference assembly, type selection, XML sidecar or native snapshot input
 changed; validate the existing snapshot without regenerating it.
+
+### Native function-kind flag (2026-10-16, feature branch)
+
+The new host `TypeParameterConstraints.FunctionType` flag uses the existing explicit
+host-SDK RavenDoc exclusion and [manual reference](experimental-metadata.md#native-function-kind-constraint-feature-branch-2026-10-16).
+No guest API/reference assembly/type selection changed. Invocation APIs remain
+postponed; this does not add a guest reflection method.

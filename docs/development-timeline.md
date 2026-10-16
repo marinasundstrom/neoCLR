@@ -18298,3 +18298,28 @@ This is a bounded completion of the existing class-constraint profile, not a per
 roadmap reprioritization or resumption of structural types. Constrained methods and
 broader bound profiles remain recorded gaps. Validation evidence is retained in
 [the constraint fixture](validation/imported-special-constraints/README.md).
+
+## 2026-10-16 — Structural function-kind constraint; invocation postponed
+
+- **Author:** requested a `func` constraint for `Signal<T> where T: func` and clarified
+  “Only structural function types in neoclr”. The motivation is a function list with
+  .NET-event-like behavior without event-specific metadata.
+- **Assistant:** separated category admission from invocation: `func` does not expose
+  an arbitrary signature to a generic body. Suggested typed visitor dispatch as one
+  alternative to reflective invocation; discussed dynamic invocation as a separate
+  checked API. These were proposals, not implemented or approved APIs.
+- **Author:** explicitly asked to postpone decisions about how function values are
+  invoked. No multicast, Emit, DynamicInvoke or subscription policy was selected.
+- **Action:** isolated native metadata/runtime/host SDK constraint groundwork on
+  `codex/function-kind-constraint`. Raven prototype investigation found existing
+  nominal delegate transport conflates source function signatures with nominal
+  delegate identity; global replacement broke source runtime-provider binding.
+  The compiler prototype was not integrated. Its future work is tracked in the
+  [integration notes](raven-cli-bridge.md#function-kind-constraint-direction-2026-10-16-feature-branch).
+  Broader structural work remains parked.
+
+- **Subsequent author proposal:** a reflection class, analogous to the array helper,
+  with `.InvokeFunction(functionObj, args)`. **Assistant response:** accepted it as
+  a candidate explicit dynamic boundary using the retained function signature and
+  bound receiver/closure. Exact argument/result carriers, validation/fault behavior
+  and AOT adapters remain deferred. No helper API was implemented.
