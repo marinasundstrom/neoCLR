@@ -330,7 +330,7 @@ public sealed partial class AssemblyBuilder
         object TypeOrigin(TypeBuilder type, int index)
         {
             var name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name;
-            if (type.Fields.Count == 0 && type.Properties.Count == 0 && type.Definition.DeclaringType is null)
+            if (!type.MetadataFields.Any() && type.Properties.Count == 0 && type.Definition.DeclaringType is null)
                 return Origin(name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public);
             var origin = new Dictionary<string, object>
             {
@@ -339,7 +339,7 @@ public sealed partial class AssemblyBuilder
                 ["name"] = name,
                 ["token"] = 0x02000002 + index,
                 ["publicly_visible"] = type.Visibility == TypeVisibility.Public,
-                ["field_tokens"] = type.Fields.Select(f => fieldTokens[f]).ToArray(),
+                ["field_tokens"] = (type.IsEnum ? type.Fields : type.MetadataFields).Select(f => fieldTokens[f]).ToArray(),
                 ["field_access"] = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
                 ["field_readonly"] = type.Fields.Select(f => f.IsReadOnly).ToArray()
             };

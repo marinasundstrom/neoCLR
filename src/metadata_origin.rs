@@ -144,7 +144,11 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         if ty.literal_fields.len() > 256
             || !ty.literal_fields.is_empty()
                 && (ty.enum_info.is_some()
-                    || matches!(ty.representation, crate::metadata::Representation::Interface | crate::metadata::Representation::Runtime)
+                    || matches!(
+                        ty.representation,
+                        crate::metadata::Representation::Interface
+                            | crate::metadata::Representation::Runtime
+                    )
                     || ty.primitive_reference)
         {
             return Err(Fault::new("unsupported literal field owner or count"));
@@ -345,18 +349,25 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         Ok(())
     };
-    for (origin, fields, properties, parameters, table) in module
+    for (origin, fields, all_fields, properties, parameters, table) in module
         .types
         .iter()
         .filter_map(|t| {
-            t.origin
-                .as_ref()
-                .map(|o| (o, t.fields.len(), t.properties.len(), 0, 0x02))
+            t.origin.as_ref().map(|o| {
+                (
+                    o,
+                    t.fields.len(),
+                    t.fields.len() + t.static_fields.len() + t.literal_fields.len(),
+                    t.properties.len(),
+                    0,
+                    0x02,
+                )
+            })
         })
         .chain(module.functions.iter().filter_map(|f| {
             f.origin
                 .as_ref()
-                .map(|o| (o, 0, 0, f.parameters.len(), 0x06))
+                .map(|o| (o, 0, 0, 0, f.parameters.len(), 0x06))
         }))
     {
         if !text(&origin.name)
@@ -366,7 +377,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 .any(|a| a.full_name == origin.assembly && a.modules.contains(&origin.module))
             || !origin.field_access.is_empty() && origin.field_access.len() != fields
             || !origin.field_readonly.is_empty() && origin.field_readonly.len() != fields
-            || origin.field_tokens.len() != fields
+            || (origin.field_tokens.len() != fields && origin.field_tokens.len() != all_fields)
             || origin.property_tokens.len() != properties
             || origin.parameter_tokens.len() != parameters
         {

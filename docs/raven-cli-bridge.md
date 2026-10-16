@@ -12432,3 +12432,13 @@ source readonly, explicit/generic and separate-provider consumers in neoCLR's
 `docs/validation/compound-operators/StaticInitialization*.rvn`. Runtime storage remains
 invocation-owned, with terminal Faults; intrinsic initializer admission and guest
 reflection integration are separate runtime responsibilities.
+
+### Native field source identities (2026-10-16)
+
+The native metadata SDK exports module-scoped tokens for instance, static and literal
+fields in descriptor order. Runtime descriptors preserve them independently of storage
+indices. Old instance-only token origins remain readable, with absent static/literal
+tokens reported as None. Instance access/readonly origin arrays remain instance-only.
+The CLI reference projection retains standard FieldDef identity; no new Raven Runtime
+Contract switch or ordinary .NET emission change is required. SDK static-field and
+class-constant roundtrips and the native interpreter consumer validate this contract.

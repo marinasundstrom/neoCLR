@@ -28,7 +28,14 @@ internal static class StaticFieldChecks
             if (!Equals(42, assembly.EntryPoint!.Invoke(null, null))) throw new Exception("CLR static separation failed");
         }
         finally { context.Unload(); }
-        var native = RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), core);
+        var description = graph.WriteNativeAssembly();
+        var document = System.Text.Json.Nodes.JsonNode.Parse(description)!;
+        var origins = document["types"]!.AsArray();
+        if (origins[0]!["origin"]!["field_tokens"]![0]!.GetValue<int>() != 0x04000001 ||
+            origins[1]!["origin"]!["field_tokens"]!.AsArray().Count != 2 ||
+            origins[1]!["origin"]!["field_tokens"]![1]!.GetValue<int>() != 0x04000003)
+            throw new Exception("Static field source tokens lost");
+        var native = RuntimeAssemblyContainer.WriteBinary(description, core);
         var snapshot = AssemblyDefinition.ReadNativeAssembly(native);
         var loaded = snapshot.MainModule.Types.Single(t => t.Name == "Cache`1");
         if (loaded.Fields.Count != 2 || loaded.Fields[0].Attributes != 1 || loaded.Fields[1].Attributes != 0x16)

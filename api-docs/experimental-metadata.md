@@ -9944,3 +9944,13 @@ Interface initializers are excluded from required implementation methods. Native
 storage/state remain invocation-owned; failed initialization retains the terminal
 Fault instead of a CLR exception wrapper. These host SDK APIs remain manually
 referenced here, outside the guest RavenDoc selection; no guest API snapshot changes.
+
+### Native field origin tokens (development)
+
+Native source `field_tokens` now contains instance fields, static storage and
+non-enum literal declarations, in that order. `field_access` and `field_readonly`
+continue to describe instance storage; static and literal declarations carry their
+own flags. Readers accept legacy instance-only token tables. Guest introspection
+reports no source token for a legacy static/literal declaration instead of inventing
+one. Metadata ordinals are separate from instance/static storage indices. SDK static
+field and class-constant roundtrip tests cover the emitted/projection contract.

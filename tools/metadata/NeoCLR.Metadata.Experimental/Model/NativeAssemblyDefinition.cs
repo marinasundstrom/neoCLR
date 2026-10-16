@@ -407,7 +407,7 @@ public sealed partial class NativeAssemblyDefinition
                     originFields.AddRange(["field_tokens", "field_access", "field_readonly"]);
                     Shape(origin, originFields.ToArray());
                     var tokens = Array(origin, "field_tokens", 256); var fieldAccess = Array(origin, "field_access", 256); var readOnly = Array(origin, "field_readonly", 256);
-                    Require(tokens.Length == fieldRows.Count && fieldAccess.Length == fieldRows.Count && readOnly.Length == fieldRows.Count, "field origin count mismatch");
+                    Require((tokens.Length == fieldRows.Count || tokens.Length == fieldRows.Count + staticRows.Length + literalRows.Length) && tokens.Select((t, i) => t.GetInt32() == nextFieldToken + i).All(v => v) && fieldAccess.Length == fieldRows.Count && readOnly.Length == fieldRows.Count, "field origin count mismatch");
                     for (int f = 0; f < fieldRows.Count; f++)
                     {
                         Require(tokens[f].GetInt32() == nextFieldToken + f && fieldAccess[f].GetString() ==

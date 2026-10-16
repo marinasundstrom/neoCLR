@@ -55,6 +55,14 @@ pub(crate) fn member(
     property: bool,
 ) -> Result<i32, Fault> {
     if let Some(origin) = &owner.origin {
+        // Legacy producers recorded only instance-field origins. Missing static
+        // tokens are absent metadata, never invented CLI table rows.
+        if !property
+            && index >= owner.fields.len()
+            && origin.field_tokens.len() == owner.fields.len()
+        {
+            return Ok(0);
+        }
         return (if property {
             &origin.property_tokens
         } else {
@@ -81,7 +89,7 @@ pub(crate) fn member(
             if property {
                 d.properties.len()
             } else {
-                d.fields.len()
+                d.fields.len() + d.static_fields.len() + d.literal_fields.len()
             }
         })
         .sum();
