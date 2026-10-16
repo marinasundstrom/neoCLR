@@ -28,6 +28,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="visibility">Public by default; Protected is admitted only for constructors and requires a direct derived constructor call.</param>
     /// <param name="isVirtual">True for an ordinary nongeneric method slot on a reference class, including a generic class.</param>
     /// <param name="isAbstract">True for a bodyless new class slot, including on a generic owner; requires isVirtual.</param>
+    /// <param name="interfaceBounds">Optional method parameter bounds, limited to output-owned nongeneric nominal interface references. Requires a static generic method.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
@@ -37,8 +38,8 @@ public sealed partial class AssemblyBuilder
     /// Authored interfaces require nongeneric abstract contracts. Instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false)
-        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false, visibility, isVirtual, isAbstract);
+        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null)
+        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false, visibility, isVirtual, isAbstract, interfaceBounds);
 
     /// <summary>Authors a virtual ToString, GetHashCode or Equals reference on the explicitly selected external Object root.</summary>
     /// <remarks>No dependency is loaded. The host supplies the selected root; runtime linking validates its actual slot. Use Callvirt, not Call.</remarks>
@@ -55,11 +56,18 @@ public sealed partial class AssemblyBuilder
     }
 
     private ImportedMethodReference CreateMethodReferenceCore(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false)
+        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(signature);
+        var bounds = interfaceBounds?.ToArray() ?? [];
+        if (bounds.Length > 128 || bounds.Distinct().Count() != bounds.Length || bounds.Any(c => c is null ||
+            c.ParameterIndex < 0 || c.ParameterIndex >= signature.GenericParameterNames.Count ||
+            c.Bound?.ImportedType is not { } bound || !ReferenceEquals(bound.Owner, this) ||
+            bound.GenericArity != 0 || bound.TypeArguments.Count != 0 || !IsAuthoredInterface(bound)) ||
+            bounds.Length != 0 && !isStatic)
+            throw new ArgumentException("invalid imported method interface bounds", nameof(interfaceBounds));
         if (visibility != MethodVisibility.Public && !(visibility == MethodVisibility.Protected && name == ".ctor" && !isStatic))
             throw new ArgumentException("only constructors may use protected reference visibility");
         if (!ReferenceEquals(declaringType.Owner, this) ||
@@ -95,7 +103,7 @@ public sealed partial class AssemblyBuilder
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.Target.IsAbstract != (isAbstract || isInterface) || (existing.Target.IsVirtual != (isVirtual || isInterface)) || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (!existing.Target.Definition.TypeConstraints.SequenceEqual(bounds) || existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.Target.IsAbstract != (isAbstract || isInterface) || (existing.Target.IsVirtual != (isVirtual || isInterface)) || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -117,6 +125,8 @@ public sealed partial class AssemblyBuilder
             ? new MethodBuilder(graph.Graph, new MethodDefinition(name, (ushort)(6 | 0x40 | (isOverride ? 0 : 0x100) | (isAbstract ? 0x400 : 0)), signature), owner)
             : new MethodBuilder(graph.Graph, owner, name, signature, visibility: visibility, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isVirtual || isOverride && !declaringType.IsValueType) && !isStatic };
+        reference.Target.ConstraintOwner = this;
+        reference.Target.Definition.AuthoredStructuralConstraints.AddRange(bounds);
         reference.Target.NativeValueOverride = isOverride;
         reference.Target.NativeImportObjectSlot = isObjectSlot;
         reference.Target.NativeImportObjectOwner = Equals(ExternalObjectRoot, declaringType);

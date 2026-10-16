@@ -154,5 +154,5 @@ arithmetic API; existing Int32.Divide already provides recoverable division erro
 Minimal System.Numerics arithmetic capabilities are being explored with a source-local
 Complex demo. Complex supports arithmetic without imposing Number's ordering
 contract. Local generic arithmetic functions and class methods now pass interpreter/JIT/AOT;
-imported constrained contracts remain an integration gap. These are not yet
+separate-provider constrained calls now pass too, with invalid type arguments rejected. These are not yet
 installed class-library APIs.

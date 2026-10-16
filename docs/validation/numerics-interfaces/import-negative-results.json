@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "imported-bound-required",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/numerics-import-negative-20261016/imported-bound-required/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/numerics-import-negative-20261016/imported-bound-required/Main.rvn(11,14): error RAV0320: The type 'int' must satisfy the 'AdditionOperators' constraint for type parameter 'T' of 'static Add<T>(left: T, right: T) -> T'\n",
+      "sourceSha256": "0a0affe1862933c7d030667992fbe64c1ff649d2b038ca15dcd7929ca52d0a17"
+    }
+  ]
+}

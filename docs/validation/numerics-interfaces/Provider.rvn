@@ -1,0 +1,73 @@
+module System.Numerics
+
+import System.*
+
+
+/// Nominal capability for same-type addition; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface AdditionOperators {
+    /// Applies addition to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func +(left: Self, right: Self) -> Self
+}
+
+
+/// Nominal capability for same-type division; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface DivisionOperators {
+    /// Applies division to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func /(left: Self, right: Self) -> Self
+}
+
+
+/// Nominal capability for same-type multiplication; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface MultiplicationOperators {
+    /// Applies multiplication to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func *(left: Self, right: Self) -> Self
+}
+
+
+/// Nominal capability for same-type subtraction; does not imply Number conformance.
+/// The implementation defines overflow and domain behavior. This is not a recoverable operation.
+public interface SubtractionOperators {
+    /// Applies subtraction to two values of the implementing type.
+    /// Returns a value of the same type; failures follow the implementation's operator policy.
+    static func -(left: Self, right: Self) -> Self
+}
+
+
+/// Finite, moderate-magnitude complex arithmetic demo, not a production numerical library.
+/// No ordering contract: complex numbers have no natural total order.
+public struct Complex : AdditionOperators, SubtractionOperators, MultiplicationOperators, DivisionOperators {
+    val Real: double
+    val Imaginary: double
+
+    init(real: double, imaginary: double) {
+        Real = real
+        Imaginary = imaginary
+    }
+
+    static func +(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real + right.Real, left.Imaginary + right.Imaginary)
+
+    static func -(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real - right.Real, left.Imaginary - right.Imaginary)
+
+    static func *(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real * right.Real - left.Imaginary * right.Imaginary,
+                left.Real * right.Imaginary + left.Imaginary * right.Real)
+
+    static func /(left: Complex, right: Complex) -> Complex {
+        // Textbook division: scaled division and extreme floating values are deferred.
+        let denominator = right.Real * right.Real + right.Imaginary * right.Imaginary
+        return Complex((left.Real * right.Real + left.Imaginary * right.Imaginary) / denominator,
+                       (left.Imaginary * right.Real - left.Real * right.Imaginary) / denominator)
+    }
+}
+
+public class Arithmetic {
+    static func Add<T>(left: T, right: T) -> T where T: AdditionOperators => left + right
+}

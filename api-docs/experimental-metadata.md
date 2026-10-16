@@ -9857,3 +9857,25 @@ slice, alongside existing function-kind bounds. Constructed interface bounds,
 instance Self adaptation and other generic method restrictions remain separate.
 These Rust-only functions have no RavenDoc guest type selection or CLI representation;
 this manual entry and Rustdoc are their API reference.
+
+
+### Symbol-authored method interface bounds — development 2026-10-16
+
+`AssemblyBuilder.CreateMethodReference` adds the optional final parameter
+`IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null`. Bounds are
+copied, limited to 128, and admitted only on static generic methods. Each bound
+must name an output-owned nongeneric nominal interface via SignatureType.ImportedType,
+with a valid method parameter ordinal. Null entries, duplicates, foreign ownership,
+noninterface or constructed/generic bounds reject with ArgumentException. A reference
+with the same callable identity but a different bound sequence rejects with
+InvalidDataException rather than silently reusing an unconstrained contract.
+
+ImportedMethodReference.MakeGenericInstance checks these declared bounds; open
+forwarding is checked when emitting the caller. Native emission retains the bound
+in the imported method contract; actual dependency identity, membership and member
+signatures are checked again by runtime linking/specialization. Creating a reference
+does not load or verify the dependency. Use the existing dependency hash/core identity
+contract and CompleteInterfaceReference workflow. No guest API or CLI bridge encoding
+is added. The validated use is a static class method with a nongeneric nominal
+interface bound and a separate-provider Complex consumer on interpreter/JIT/AOT.
+This SDK extension does not admit new structural constraint forms.

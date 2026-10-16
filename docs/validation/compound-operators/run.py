@@ -13,6 +13,7 @@ parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--source', type=Path, help='Alternate focused operator consumer')
+parser.add_argument('--reference', type=Path, action='append', default=[], help='Additional native provider assembly')
 parser.add_argument('--overflow', action='store_true', help='Expect checked arithmetic overflow and an untouched result slot on native backends')
 parser.add_argument('--value-arrays', action='store_true', help='Qualify interpreter support and the current AOT rejection for nominal value arrays')
 
@@ -29,11 +30,13 @@ host = SOURCE.parent / 'interface-variance/native-host.c'
 (project / 'Main.rvn').write_text(source.read_text())
 (project / 'Primitive.rvn').unlink(missing_ok=True)
 from xml.sax.saxutils import escape
+providers = [p.resolve() for p in args.reference]
+provider_items = ''.join(f'<Reference Include="{escape(p.stem)}"><HintPath>{escape(str(p))}</HintPath></Reference>' for p in providers)
 (project / 'App.rvnproj').write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="{escape(str(bundle / 'NeoCLR.ClassLibrary.props'))}"/>
   <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType>
     <AssemblyName>{name}</AssemblyName></PropertyGroup>
-</Project>\n''')
+<ItemGroup>{provider_items}</ItemGroup></Project>\n''')
 report = {'passed': False, 'commands': []}
 def run(label, command, expected=0):
     command = list(map(str, command))
@@ -55,6 +58,8 @@ image = project / 'bin/neoclr' / (name + '.dll')
 references = ['--system', bundle / 'System.runtime.neox', '--object-root', bundle / 'System.Runtime.dll']
 for library in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
     references += ['--module', bundle / (library + '.dll')]
+for provider in providers:
+    references += ['--module', provider]
 interpreter = [ROOT / 'target/debug/neoclr', 'run', image, '--execution', 'interpreter', *references]
 interpreted = run('interpreter', interpreter, None if args.overflow else 42)
 if args.overflow:
@@ -88,6 +93,6 @@ assert report['jit']['guestExitCode'] == expected
 if args.overflow:
     assert 'status=2 fault=2 result=-1' in result.stderr
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
-    (source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+    (*providers, source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
 report['passed'] = True
 (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')

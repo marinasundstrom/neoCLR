@@ -16,7 +16,7 @@ public sealed class ImportedGenericMethodReference
 
 public sealed partial class ImportedMethodReference
 {
-    /// <summary>Instantiates an imported method with consumer-scoped arguments, checking explicitly imported structural bounds.</summary>
+    /// <summary>Instantiates an imported method with consumer-scoped arguments, checking explicitly imported type bounds.</summary>
     /// <param name="typeArguments">Exactly one non-Void type per method parameter; copied. Caller-scoped parameters are checked on emission.</param>
     /// <returns>An immutable reference owned by the same consumer.</returns>
     /// <exception cref="ArgumentNullException">Argument array is null.</exception>

@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--authored-method-bounds"]) { AuthoredMethodBoundChecks.Run(); return 0; }
+
 if (args is ["--external-constructed-bases"]) { ExternalConstructedBaseChecks.Run(); return 0; }
 
 if (args is ["--function-kind-constraint"]) { FunctionKindConstraintChecks.Run(); return 0; }

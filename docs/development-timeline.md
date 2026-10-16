@@ -18544,3 +18544,18 @@ remain open. This is implementation of the earlier platform convention direction
   declaration build succeeded, but no new class-library APIs were retained before
   backend qualification. Public names, identity capabilities, mixed operand/result
   shapes and production complex edge semantics remain open.
+
+
+### Numerics integration follow-up — fill the exposed gaps
+
+- Author directed: “Fill any gap you find.” This applies to the active numerics
+  integration; structural work remains parked.
+- Actions: added exact nominal interface method-bound validation and static Self
+  resolution, retained original value conformance through native layout lowering,
+  removed Raven's class-contained constraint syntax gate, and authored imported
+  method bounds through the SDK's symbol contract.
+- Outcomes: 18 specialization tests and SDK malformed-contract tests pass. Complex
+  generic top-level, class-contained and separate-provider calls pass interpreter,
+  JIT and AOT; the imported invalid type argument is rejected. Commits and evidence
+  are linked in the [qualification](validation/numerics-interfaces/README.md).
+  Public numeric interface adoption and production Complex semantics remain separate.

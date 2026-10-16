@@ -1,0 +1,35 @@
+module System.Numerics
+
+import System.*
+
+func Same(value: Complex, real: double, imaginary: double) -> bool =>
+    value.Real == real && value.Imaginary == imaginary
+
+func Main() -> int {
+    let left = Complex(3.0, 2.0)
+    let right = Complex(1.0, -4.0)
+    if !Same(Arithmetic.Add<Complex>(left, right), 4.0, -2.0) {
+        return 1
+    }
+    if !Same(left - right, 2.0, 6.0) {
+        return 2
+    }
+    if !Same(left * right, 11.0, -10.0) {
+        return 3
+    }
+    if !Same(Complex(6.0, 4.0) / Complex(2.0, 0.0), 3.0, 2.0) {
+        return 4
+    }
+    let i = Complex(0.0, 1.0)
+    if !Same(i * i, -1.0, 0.0) {
+        return 5
+    }
+    if !Same(left * Complex(3.0, -2.0), 13.0, 0.0) {
+        return 6
+    }
+    // A small polynomial demonstrates ordinary composition of arithmetic operators.
+    if !Same(i * i + Complex(1.0, 0.0), 0.0, 0.0) {
+        return 7
+    }
+    return 42
+}

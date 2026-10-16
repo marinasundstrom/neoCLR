@@ -12317,3 +12317,9 @@ The existing metadata carries both constraints and Self; no Runtime Contract swi
 CLI bridge encoding, guest API or opcode is introduced. Interpreter behavior is reused.
 Instance/borrowed calls and constructed method bounds remain separate. See
 [numerics qualification](validation/numerics-interfaces/README.md).
+
+Imported nominal method follow-up: Raven `2e4776f7d` authors static class-method
+interface bounds from symbols into the SDK's explicit reference contract. The
+separate Complex consumer passes interpreter/JIT/AOT and rejects an invalid int
+argument at binding. No reader fallback or Runtime Contract switch is introduced;
+see the retained import evidence in the numerics qualification.

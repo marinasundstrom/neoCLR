@@ -2271,3 +2271,8 @@ in the [manual SDK/host reference](experimental-metadata.md#static-self-speciali
 and Rustdoc. They are not guest APIs and therefore do not add RavenDoc types or alter
 the guest assembly/snapshot. The exclusion is host-language scope, not missing
 signature rendering.
+
+The host SDK's optional CreateMethodReference.interfaceBounds contract is documented
+in the [manual reference](experimental-metadata.md#symbol-authored-method-interface-bounds--development-2026-10-16)
+and XML summaries. The existing host-only RavenDoc exclusion applies; no guest API
+snapshot inputs change. Focused SDK and separate-provider validation accompany it.

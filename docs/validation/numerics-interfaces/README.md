@@ -97,3 +97,28 @@ and method-results.json). Raven `38fb410df` removes the class-method syntax gate
 its callable capability checks remain active and the .NET generic math test passes.
 A separate-provider compile now identifies the next gap: imported constrained
 methods require a complete symbol-authored SDK contract. This remains unqualified.
+
+
+## Separate-provider follow-up
+
+Raven `2e4776f7d` and the SDK's symbol-authored interfaceBounds contract close the
+imported static class-method gap for nongeneric nominal interfaces. Provider.rvn
+contains the public Complex/capabilities/Arithmetic declarations; Consumer.rvn
+uses them through a separately built NumericProvider.dll. import-results.json
+records interpreter/JIT/AOT exit 42 and fingerprints the provider assembly.
+import-negative-results.json records RAV0320 when the imported Add is instantiated
+with int, which does not implement the prototype AdditionOperators.
+
+To reproduce, build Provider.rvn as a Library project importing the same bundle's
+NeoCLR.ClassLibrary.props, with AssemblyName NumericProvider. Run the shared
+operator runner with --source Consumer.rvn and --reference <NumericProvider.dll>.
+Run check-conformance.py with --provider <NumericProvider.dll> for the invalid call.
+The provider was compiled with Raven 38fb410df; the consumer uses 2e4776f7d.
+The compiler/library bundle otherwise remains the same as the preceding checks.
+The new runner option adds an exact project reference and runtime module; it does
+not copy provider source into the consumer.
+
+Focused SDK checks (--authored-method-bounds) cover reference interning, defensive
+copying, wrong type arguments, missing/different bounds on the same callable,
+invalid ordinals, duplicate bounds, noninterfaces and foreign output ownership.
+No dependency reader fallback or structural interface conformance is introduced.
