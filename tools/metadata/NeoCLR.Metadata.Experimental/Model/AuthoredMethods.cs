@@ -157,7 +157,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported override contract, duplicate signature or method limit.</exception>
     /// <exception cref="InvalidOperationException">Owner is static, an interface, or the Equals argument has the wrong core identity.</exception>
-    /// <remarks>CLI emission reuses the corresponding inherited virtual slot. Ordinary class overrides require a local nongeneric base and are validated on write. For implicit Object overrides, native encoding uses a complete explicitly authored Object root, or requires one explicit BindNativeLibrary System binding with a matching Object slot. Equals must use the selected ObjectType identity. Generic value owners are supported; generic override methods are not.</remarks>
+    /// <remarks>CLI emission reuses the corresponding inherited virtual slot. Ordinary class overrides require an exact inherited base contract after substituting owner arguments and are validated on write. For implicit Object overrides, native encoding uses a complete explicitly authored Object root, or requires one explicit BindNativeLibrary System binding with a matching Object slot. Equals must use the selected ObjectType identity. Generic value owners are supported; generic override methods are not.</remarks>
     public MethodBuilder AddOverride(string name, MethodSignature signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
@@ -244,8 +244,8 @@ public sealed partial class TypeBuilder
         if (IsNativeObjectRoot && slotFlags != 0 && (slotFlags != 0x140 || !MethodDefinition.IsNativeObjectSlot(definition.Name, signature, this)))
             throw new InvalidOperationException("native Object slots require their exact root signature");
         if (slotFlags != 0 && !IsInterface && !IsNativeObjectRoot &&
-            (IsStatic || !IsValueType && GenericParameterNames.Count != 0 || IsValueType && (slotFlags != 0x40 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))))
-            throw new InvalidOperationException("virtual slots require a nongeneric reference class or supported Object value override");
+            (IsStatic || IsValueType && (slotFlags != 0x40 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))))
+            throw new InvalidOperationException("virtual slots require a reference class or supported Object value override");
         if (definition.Producer is null && (IsInterface && slotFlags != 0x540 || !IsInterface && slotFlags == 0x540 && (!IsAbstract || definition.IsStatic)))
             throw new InvalidOperationException("abstract methods require an abstract class or interface");
         if (definition.Name == ".ctor" && definition.AuthoredSignature!.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new InvalidOperationException("byref constructor parameters unsupported");

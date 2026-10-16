@@ -871,7 +871,7 @@ public sealed partial class NativeAssemblyDefinition
                 Require(!isAbstract || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract method");
                 Require(!isVirtual || instance && visibility == MethodVisibility.Public && genericArity == 0 && name != ".ctor" &&
-                    (interfaceOwner || types[ownerIndex].GenericNames.Length == 0 && !types[ownerIndex].IsValueType || isOverride && types[ownerIndex].IsValueType), "unsupported virtual method");
+                    (interfaceOwner || !types[ownerIndex].IsValueType || isOverride && types[ownerIndex].IsValueType), "unsupported virtual method");
                 Require(!isOverride || isVirtual && !interfaceOwner && !types[ownerIndex].IsObjectRoot && !isAbstract, "invalid override flags");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
@@ -1001,16 +1001,28 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var method in methods.Where(m => m.Override))
             {
                 MethodRow? inherited = null;
-                bool hasExternalBase = types[method.Owner].ExternalBase is not null;
+                MethodSignature? inheritedSignature = null;
+                SignatureType current = signatureOwners[method.Owner].OpenSignature;
+                int child = method.Owner;
+                bool hasExternalBase = types[child].ExternalBase is not null;
                 for (int parent = types[method.Owner].BaseIndex; parent >= 0; parent = types[parent].BaseIndex)
                 {
+                    var edge = types[child].BaseSignature!;
+                    current = current.GenericInstance is { } instance ? instance.Substitute(edge) : edge;
+                    SignatureType Project(SignatureType type) => current.GenericInstance?.Substitute(type) ?? type;
                     hasExternalBase |= types[parent].ExternalBase is not null;
                     inherited = methods.SingleOrDefault(m => m.Owner == parent && m.Instance && m.Name == method.Name &&
-                        m.Signature.ParameterTypes.SequenceEqual(method.Signature.ParameterTypes));
-                    if (inherited is not null) break;
+                        m.Signature.ParameterTypes.Select(Project).SequenceEqual(method.Signature.ParameterTypes));
+                    if (inherited is not null)
+                    {
+                        inheritedSignature = new MethodSignature(Project(inherited.Signature.ReturnType),
+                            inherited.Signature.ParameterTypes.Select(Project), inherited.Signature.GenericParameterNames, inherited.Signature.OutParameters);
+                        break;
+                    }
+                    child = parent;
                 }
                 // External slots are checked against exact dependency definitions by the native linker.
-                Require(inherited is not null ? inherited.Virtual && inherited.Signature.Matches(method.Signature) : hasExternalBase ||
+                Require(inherited is not null ? inherited.Virtual && inheritedSignature!.Matches(method.Signature) : hasExternalBase ||
                     MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? externalRootAlias?.Assembly : identity, signatureGraph.NativeObjectRoot) &&
                     (signatureGraph.NativeObjectRoot is not null || externalRootAlias is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
             }

@@ -57,14 +57,14 @@ public sealed partial class MethodBuilder
     public void NewObject(ConstructedMethodReference constructor) => GetILGenerator().NewObject(constructor);
     /// <summary>Calls a method on a constructed generic owner, or initializes the exact direct constructed base from a constructor.</summary>
     public void Call(ConstructedMethodReference method) => GetILGenerator().Call(method);
-    /// <summary>Dispatches an owned constructed interface method.</summary>
-    /// <param name="method">A constructed interface contract from this assembly.</param>
+    /// <summary>Dispatches an owned constructed interface or virtual reference-class method.</summary>
+    /// <param name="method">A constructed interface or virtual reference-class contract from this assembly.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
-    /// <exception cref="ArgumentException">Foreign owner, noninterface method or invalid caller scope.</exception>
+    /// <exception cref="ArgumentException">Foreign owner, nonvirtual method or invalid caller scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
     public void CallVirtual(ConstructedMethodReference method) => GetILGenerator().CallVirtual(method);
     /// <summary>Appends Call, Callvirt or Newobj with a constructed owner/method reference.</summary>
-    /// <param name="opCode">Newobj for allocation, Call for the current constructor's exact direct base, Callvirt for interface contracts, Call otherwise.</param>
+    /// <param name="opCode">Newobj for allocation, Call for the current constructor's exact direct base, Callvirt for interface or virtual reference-class contracts, Call for direct concrete calls.</param>
     /// <param name="operand">Owned reference, valid in the caller's type/method scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Foreign owner, wrong opcode or invalid caller scope.</exception>

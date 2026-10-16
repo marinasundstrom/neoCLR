@@ -18,6 +18,65 @@ struct Shape {
     row: usize,
     name: String,
 }
+// Follow the exact closed base chain. Owner parameter ordinals can change at
+// every edge, so matching open signatures (or reusing child arguments) is unsafe.
+fn closed_virtual_base_contracts(
+    input: &neoclr::Module,
+    original: &Function,
+    arguments: &[Type],
+) -> Result<Vec<FunctionRef>, Error> {
+    if !super::selection::class_contract(input, original) || !original.is_override {
+        return Ok(vec![]);
+    }
+    let method = super::selection::closed_signature(original, arguments)?;
+    let mut owner = method.owner.clone().ok_or("override requires owner")?;
+    for _ in 0..64 {
+        let definition = input
+            .type_definition(&owner)
+            .ok_or("override owner unavailable")?;
+        let Some(base) = &definition.base else {
+            return Ok(vec![]);
+        };
+        let owner_arguments = match &owner {
+            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
+                arguments.as_slice()
+            }
+            _ => &[],
+        };
+        owner = base
+            .substitute_type_parameters(owner_arguments)
+            .map_err(|e| e.to_string())?;
+        let base_arguments = match &owner {
+            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
+                arguments.as_slice()
+            }
+            _ => &[],
+        };
+        for candidate in &input.functions {
+            if !candidate.instance
+                || !candidate.is_virtual
+                || candidate.owner.as_ref().and_then(Type::definition_name)
+                    != owner.definition_name()
+                || candidate.name.rsplit('.').next() != method.name.rsplit('.').next()
+            {
+                continue;
+            }
+            let closed = super::selection::closed_signature(candidate, base_arguments)?;
+            if closed.parameters == method.parameters && closed.returns == method.returns {
+                return Ok(vec![FunctionRef {
+                    definition: closed.definition,
+                    name: closed.name,
+                    owner: closed.owner,
+                    instance: true,
+                    generic_arguments: vec![],
+                    parameters: closed.parameters,
+                }]);
+            }
+        }
+    }
+    Err("class base nesting exceeds 64".into())
+}
+
 struct Specializer<'a> {
     source: &'a neoclr::Module,
     shapes: Vec<Shape>,
@@ -755,18 +814,11 @@ pub fn expand_with_host_roots(
             if !visited.insert(instance.row) {
                 continue;
             }
-            for base in
-                super::selection::virtual_base_contracts(input, &input.functions[instance.source])
-            {
-                let f = &input.functions[base];
-                let reference = FunctionRef {
-                    definition: f.definition.clone(),
-                    name: f.name.clone(),
-                    owner: f.owner.clone(),
-                    instance: true,
-                    generic_arguments: vec![],
-                    parameters: f.parameters.clone(),
-                };
+            for reference in closed_virtual_base_contracts(
+                input,
+                &input.functions[instance.source],
+                &instance.types,
+            )? {
                 let inherited = context.resolve(&reference)?;
                 if !visited.contains(&inherited.row) {
                     pending.push(inherited);
@@ -1274,6 +1326,41 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn generic_class_override_without_base_call_retains_closed_slot() {
+        let source = neoclr::assemble(r#"
+.module GenericVirtual
+.entry Main
+.type class Base<T>
+.method instance virtual Echo(T) -> T
+ldarg 1
+ret
+.end
+.end
+.type class Derived<Unused,T>
+.extends Base<T>
+.field Value T
+.method instance override Echo(T) -> T
+ldarg 0
+ldfld Derived<Unused,T>::Value
+ret
+.end
+.end
+.function Main() -> Int32
+ldc.i4 42
+newobj Derived<Boolean,Int32>
+ldc.i4 99
+callvirt instance Derived<Boolean,Int32>::Echo(Int32)
+ret
+.end
+"#).unwrap();
+        let (expanded, _) = expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
+
     #[test]
     fn variant_interfaces_preserve_dispatch_and_identity_after_specialization() {
         let input = neoclr::assemble(include_str!("../../../docs/validation/interface-variance/Main.neoil")).unwrap();

@@ -149,14 +149,14 @@ public interface IILGenerator
     void NewObject(ConstructedMethodReference constructor);
     /// <summary>Calls a method on a constructed generic owner.</summary>
     void Call(ConstructedMethodReference method);
-    /// <summary>Dispatches an owned constructed interface method.</summary>
-    /// <param name="method">A constructed interface contract from this assembly.</param>
+    /// <summary>Dispatches an owned constructed interface or virtual reference-class method.</summary>
+    /// <param name="method">A constructed interface or virtual reference-class contract from this assembly.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
-    /// <exception cref="ArgumentException">Foreign owner, noninterface method or invalid caller scope.</exception>
+    /// <exception cref="ArgumentException">Foreign owner, nonvirtual method or invalid caller scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
     void CallVirtual(ConstructedMethodReference method);
     /// <summary>Appends Call, Callvirt or Newobj with a constructed owner/method reference.</summary>
-    /// <param name="opCode">Newobj for constructors, Callvirt for interface contracts, Call otherwise.</param>
+    /// <param name="opCode">Newobj for constructors, Callvirt for interface or virtual reference-class contracts, Call for direct concrete calls.</param>
     /// <param name="operand">Owned reference, valid in the caller's type/method scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Foreign owner, wrong opcode or invalid caller scope.</exception>

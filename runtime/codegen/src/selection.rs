@@ -143,7 +143,6 @@ pub(super) fn class_contract(input: &neoclr::Module, f: &neoclr::metadata::Funct
             .is_some_and(|t| {
                 t.is_reference_type
                     && t.representation == neoclr::metadata::Representation::Record
-                    && t.generic_parameters.is_empty()
             })
 }
 

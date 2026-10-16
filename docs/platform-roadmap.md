@@ -4873,3 +4873,10 @@ Raven source classes over external generic bases, including recursive arguments
 and protected initialization, also pass a separate-provider interpreter/AOT/JIT
 consumer. Generic class virtual slots and broader constrained dependency contracts
 remain open; structural work stays parked.
+
+**Generic virtual slots (2026-10-16):** concrete generic reference-class SDK
+slots/overrides and native closed dispatch are qualified in CLR/interpreter/AOT/JIT,
+including reordered generic base parameters and direct base calls. See
+[retained evidence](validation/generic-class-virtual/README.md). Raven emission/import,
+abstract generic classes and broader constrained dependency contracts remain open.
+Structural work remains parked.
