@@ -1,0 +1,213 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "8867e85a578099360724ed8982cd4446a32984bc0396e1d97955639ccb8c0566",
+      "output": "Native build output: /Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll\n/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/Main.rvn(8,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/Main.rvn(12,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/Main.rvn(13,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/Main.rvn(15,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/Main.rvn(16,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "metadata",
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr",
+        "disassemble",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/metadata.neoil"
+      ],
+      "exitCode": 0,
+      "logSha256": "fadee1d7a26ce9d55ce250b6d11cbc1193ac88d84576f002f2fc0aa61c7ed8cf",
+      "output": "Disassembled /Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll -> /Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/metadata.neoil\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll",
+        "@entry",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/app.o",
+        "--reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/roots.json",
+        "--system",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "8a26da254d764c401f7d9785eb8b867984255b02d164819b56d9fb8e9b165c65",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/native-host.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/app.o",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/native-gc.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/root-probe.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/text-arena.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/native-stack.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/native-host.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/native-gc.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/root-probe.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/text-arena.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-console/native-stack.c",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll",
+        "@entry",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/host.dylib",
+        "--reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/roots.json",
+        "--system",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "afbe9f5c4f8d5c05bc3302c9fa8a699516d27fbbf0bdc273118432e520ccb0ac",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":4.300827209,\"guestExitCode\":42,\"invocationSeconds\":0.000898584,\"metadataLoadSeconds\":0.636253542,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":19.998852625}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 4.300827209,
+    "guestExitCode": 42,
+    "invocationSeconds": 0.000898584,
+    "metadataLoadSeconds": 0.636253542,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 19.998852625
+  },
+  "files": {
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/roots.json": "255719cad8952b6e2e93e29d792deeb7ef80d383e9bef793e43bc439097ed495",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/samples/reflection/Main.rvn": "753770465912e3bea36757e2b6dd1797df5974664819eb6ffc640a83cf9431c9",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/tools/validate-reflection.py": "d692822437e5c33ff2f4507e9d30df6ed689570502e6d3ffb8f43995ce819147",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/.support/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/rvnc.dll": "62be1fd87a94a899c5dd3503e9716bc3e84c7d3de660c14c116212e91a2b12ba",
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "c531d976ae3a240261bf43e76774e9509412d0d94c220e590be0c0710289a796",
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/Raven.CodeAnalysis.dll": "fa67022e1b5231dcd29b8c53703d5ad864c04804755be4eb9dcc1a82ddaa785a",
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "520d33fe8bd4b5ffa7bf04ced6f27c0219247a1b98131d2322a96b60c444892f",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr-codegen": "3a4d31d79de1b1406b964ca6b25af1642b3bd11f895ce893fef81e4862c35240",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr": "f5f3a8ede5b361f75f421ff1759569e3a7049b2fab758698a2ca33c8d6a683e8",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/project/bin/neoclr/FieldReflectionRaven.dll": "019cb24c7c64c95cdc838d8881af875c39139fd5e1aa8ffd13261c9d56617fca",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/bundle.json": "aa0dab3a1f60b78bd86d1d1eee50cb65c10090b789bc5444642ab04a95cb0f23"
+  }
+}

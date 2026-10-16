@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-17
+
+- Prepare a local macOS ARM64 Raven SDK and VS Code reflection preview with matching native libraries and isolated editor state. Include an editable field/type-initializer consumer and a task that validates interpreter, JIT and sanitized AOT execution; record installed artifact hashes and editor validation. This is a local development installation, not a release or website publication.
+
 ### 2026-10-16
 
 - Close the guest field/type-initializer reflection slice: expose FieldInfo IsInitOnly, IsLiteral and ConstantValue, and TypeInfo IsBeforeFieldInit/TypeInitializer. Enumerate static/literal fields and static constructors without executing initialization; keep constructors out of ordinary methods and function/array initializers absent. Add public static field reflection through normal initialization guards, rejecting readonly/literal writes and private access before execution. Add explicit schema-7 JIT/AOT field/constructor metadata retention and field access lowering. Qualify successful access, reflected construction and terminal initializer overflow in interpreter/JIT/sanitized AOT, and preserve the legacy System.Type field descriptor layout. Refresh matching API reference and website/integration docs. Matching System.Runtime provider layouts are required; generic reflection execution and arbitrary boxed value payloads remain bounded, and structural work stays parked.

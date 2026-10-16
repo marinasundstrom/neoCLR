@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-17",
+  "previewRoot": "/Users/robert/.neoclr/experiments/preview-20261017-reflection",
+  "sdkPath": "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1",
+  "sdkVersion": "0.1.15-neoclr.20261017.1",
+  "extensionVersion": "0.1.15-neoclr.20261017.1",
+  "runtimeRevision": "d5d95ac3a4afd4e301e1a19d8b79f0181e9b0222",
+  "compilerRevision": "6c96f5dba",
+  "highlightingMainCommit": "71b59b66a",
+  "highlightingNativeCommit": "4d3cc2549",
+  "globalSdkDefaultChanged": false,
+  "globalExtensionChanged": false,
+  "editorWindow": "Main.rvn \u2014 reflection",
+  "backendValidation": {
+    "passed": true,
+    "interpreterExitCode": 42,
+    "aotExitCode": 42,
+    "jitGuestExitCode": 42
+  },
+  "editorValidation": {
+    "passed": true,
+    "check": "native TypeInitializer hover",
+    "hover": {
+      "contents": {
+        "kind": "markdown",
+        "value": "```raven\nval TypeInitializer: Option<ConstructorInfo>\n```\n\nProperty in `sealed interface TypeInfo`\n\n---\n\nDescribes the runtime-owned initializer without executing it."
+      },
+      "range": {
+        "start": {
+          "line": 29,
+          "character": 36
+        },
+        "end": {
+          "line": 29,
+          "character": 51
+        }
+      }
+    }
+  },
+  "files": {
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/rvnc.dll": "62be1fd87a94a899c5dd3503e9716bc3e84c7d3de660c14c116212e91a2b12ba",
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "c531d976ae3a240261bf43e76774e9509412d0d94c220e590be0c0710289a796",
+    "/Users/robert/.raven/sdk/0.1.15-neoclr.20261017.1/tools/language-server/Raven.LanguageServer.dll": "3f6685034eb341db20bd4bbb3fcf2c191fcafb3f88a1a01fcb64bf13c7c1f1df",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr": "f5f3a8ede5b361f75f421ff1759569e3a7049b2fab758698a2ca33c8d6a683e8",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/bin/neoclr-codegen": "3a4d31d79de1b1406b964ca6b25af1642b3bd11f895ce893fef81e4862c35240",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/editor/raven-vscode.vsix": "323610df582c08f54d1e12943ebd8765954845d5730810e89fba76d3a030e9eb",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/lib/bundle.json": "aa0dab3a1f60b78bd86d1d1eee50cb65c10090b789bc5444642ab04a95cb0f23",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/tools/validate-reflection.py": "d692822437e5c33ff2f4507e9d30df6ed689570502e6d3ffb8f43995ce819147",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/samples/reflection/Main.rvn": "753770465912e3bea36757e2b6dd1797df5974664819eb6ffc640a83cf9431c9",
+    "/Users/robert/.neoclr/experiments/preview-20261017-reflection/validation/results.json": "c2c805611688740897a3ee90bbd5b56a8204bf98b2822dbf266a4b886ad1c5e0"
+  }
+}
