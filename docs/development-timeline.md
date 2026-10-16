@@ -18323,3 +18323,19 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   a candidate explicit dynamic boundary using the retained function signature and
   bound receiver/closure. Exact argument/result carriers, validation/fault behavior
   and AOT adapters remain deferred. No helper API was implemented.
+
+- **Further author clarification (2026-10-16):** distinguish ordinary Raven/.NET
+  behavior from what neoCLR provides. Later event infrastructure should use types
+  and reuse properties for an observer-pattern-style design with function values.
+  **Assistant response:** preserve explicit target boundaries, record this library
+  direction, and leave subscription/invocation APIs deferred. **Action:** address
+  silent native function-constraint erasure in Raven's imported semantic symbols;
+  source syntax and the function-symbol identity bridge remain separate work.
+
+- **Signature-bound author examples:** `func Foo<T>(f: () -> T) -> T` and
+  `func Foo<T, T2>(f: T) -> T2 where T: () -> T2`; the author wants neoCLR
+  function types to serve as generic arguments and bounds describing a particular
+  structure. **Assistant response:** distinguish function-kind admission from a
+  known callable signature. A signature bound could make `f()` statically typed;
+  exact versus variant matching, inference and lowering remain design work.
+  **Action:** recorded the examples as direction, not implemented syntax.
