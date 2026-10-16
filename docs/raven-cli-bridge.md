@@ -12323,3 +12323,13 @@ interface bounds from symbols into the SDK's explicit reference contract. The
 separate Complex consumer passes interpreter/JIT/AOT and rejects an invalid int
 argument at binding. No reader fallback or Runtime Contract switch is introduced;
 see the retained import evidence in the numerics qualification.
+
+
+Numerics class-library integration: System.Numerics.AdditionOperators,
+SubtractionOperators, MultiplyOperators and DivisionOperators use native Self
+signatures; Number inherits them and preserves its own declared operators. Raven
+2e4776f7d and the matched numerics-public-libraries-20261016 bundle are the validation
+inputs. No new Runtime Contract setting or opcode is required. The documentation
+CLI projection uses the established compiler Self marker; native metadata retains
+real Self and nominal interfaces. Mixed operand/result contracts remain outside
+this first surface; no .NET primitive or interface is modified.

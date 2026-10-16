@@ -1,7 +1,9 @@
 module System
 
+import System.Numerics.*
+
 /// Basic arithmetic and ordering for numeric values. Parsing is a separate capability.
-public interface Number : ComparableTo<Self> {
+public interface Number : ComparableTo<Self>, AdditionOperators, SubtractionOperators, MultiplyOperators, DivisionOperators {
     /// The additive identity.
     static val Zero: Self { get; }
     /// The multiplicative identity.

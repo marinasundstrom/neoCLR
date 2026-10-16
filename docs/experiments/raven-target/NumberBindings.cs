@@ -19,6 +19,16 @@ static class NumberBindings
         var comparable = new GenericInstanceType(module.GetType("System.ComparableTo`1"));
         comparable.GenericArguments.Add(parameter);
         contract.Interfaces.Add(new InterfaceImplementation(comparable));
+        foreach (var (name, operation) in new[] { ("AdditionOperators", "op_Addition"), ("SubtractionOperators", "op_Subtraction"), ("MultiplyOperators", "op_Multiply"), ("DivisionOperators", "op_Division") })
+        {
+            var capability = new TypeDefinition("System.Numerics", name, TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract);
+            module.Types.Add(capability);
+            var method = new MethodDefinition(operation, MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot, parameter);
+            method.Parameters.Add(new ParameterDefinition("left", ParameterAttributes.None, parameter));
+            method.Parameters.Add(new ParameterDefinition("right", ParameterAttributes.None, parameter));
+            capability.Methods.Add(method);
+            contract.Interfaces.Add(new InterfaceImplementation(capability));
+        }
         AddMembers(contract, parameter, true);
         foreach (var name in Types)
         {
@@ -53,7 +63,7 @@ static class NumberBindings
         var type = module.GetType(Contract);
         if (type is null || !type.IsPublic || !type.IsInterface || !type.IsAbstract || type.HasFields || type.HasEvents
             || type.HasGenericParameters
-            || type.Interfaces.Count != 1 || type.Interfaces[0].InterfaceType.FullName != "System.ComparableTo`1<System.Runtime.CompilerServices.Self>"
+            || type.Interfaces.Count != 5 || type.Interfaces[0].InterfaceType.FullName != "System.ComparableTo`1<System.Runtime.CompilerServices.Self>"
             || type.Methods.Count != 6 || type.Methods.Select(m => m.Name).Distinct().Count() != 6
             || type.Properties.Count != 2 || !type.Properties.Select(p => p.Name).Order().SequenceEqual(new[] { "One", "Zero" })
             || type.Properties.Any(p => p.SetMethod is not null || p.GetMethod != type.Methods.SingleOrDefault(m => m.Name == "get_" + p.Name) || p.PropertyType.FullName != "System.Runtime.CompilerServices.Self"))

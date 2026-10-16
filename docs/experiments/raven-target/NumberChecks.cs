@@ -32,9 +32,19 @@ static class NumberChecks
         zero.IsStatic = false;
         Reject("Number rejects instance identity", () => NumberBindings.Validate(module));
         zero.IsStatic = true;
+        var self = zero.ReturnType;
         zero.ReturnType = module.TypeSystem.Int32;
-        Reject("Number rejects non-generic identity result", () => NumberBindings.Validate(module));
-        zero.ReturnType = contract.GenericParameters[0];
+        Reject("Number rejects non-Self identity result", () => NumberBindings.Validate(module));
+        zero.ReturnType = self;
+        foreach (var (name, op) in new[] { ("AdditionOperators", "op_Addition"), ("SubtractionOperators", "op_Subtraction"), ("MultiplyOperators", "op_Multiply"), ("DivisionOperators", "op_Division") })
+        {
+            var capability = module.GetType("System.Numerics." + name);
+            Check(name + " inherited by Number", contract.Interfaces.Any(i => i.InterfaceType == capability));
+            Check(name + " exact static Self operator", capability.IsInterface && capability.Methods.Count == 1 &&
+                capability.Methods[0].Name == op && capability.Methods[0].IsStatic && capability.Methods[0].IsAbstract &&
+                capability.Methods[0].ReturnType == self && capability.Methods[0].Parameters.Count == 2 &&
+                capability.Methods[0].Parameters.All(p => p.ParameterType == self));
+        }
         foreach (var name in NumberBindings.Types.Append("Boolean"))
         {
             var type = module.GetType("System." + name);

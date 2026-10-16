@@ -1,0 +1,8 @@
+module System.Numerics
+
+/// Nominal capability for same-type division; does not imply ordering or Number conformance.
+public interface DivisionOperators {
+    /// Applies division to two values of the implementing type.
+    /// The implementing operator defines overflow and domain behavior; failure is not returned as Result.
+    static func /(left: Self, right: Self) -> Self
+}

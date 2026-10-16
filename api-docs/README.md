@@ -2276,3 +2276,11 @@ The host SDK's optional CreateMethodReference.interfaceBounds contract is docume
 in the [manual reference](experimental-metadata.md#symbol-authored-method-interface-bounds--development-2026-10-16)
 and XML summaries. The existing host-only RavenDoc exclusion applies; no guest API
 snapshot inputs change. Focused SDK and separate-provider validation accompany it.
+
+
+2026-10-16: the four public System.Numerics operator interfaces and Number's inherited
+contracts are included in the refreshed reference assembly, types.json and the native
+snapshot from numerics-public-libraries-20261016 / numerics-docs-20261016. Each operator
+has a rendered member page and native Self signature. The [numeric guide](text-numbers.md)
+records same-type scope, errors, forwarding and custom implementers. No new API is
+excluded; the Complex sample remains a demo rather than a library API.

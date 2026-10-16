@@ -106,3 +106,36 @@ non-empty; empty search faults with RuntimeError. Matching uses UTF-8 without cu
 or normalization. Unlike .NET's nullable replacement overload, use empty text for
 deletion. The shared service has interpreter and experimental ARM64 coverage; full
 native core bootstrap remains work in progress.
+
+
+## Minimal arithmetic capabilities (development)
+
+System.Numerics now provides four public nominal interfaces in System.Runtime:
+AdditionOperators (`+`), SubtractionOperators (`-`), MultiplyOperators (`*`) and
+DivisionOperators (`/`). Each has one static operator with signature
+`(left: Self, right: Self) -> Self`. Self means the implementing type; both operands
+and the result have that type. Implementations must explicitly declare conformance
+and supply the exact operator. Supporting an operator alone does not establish
+interface membership. These contracts do not provide ordering, parsing or conversions.
+
+Number inherits all four and retains ComparableTo<Self>, Zero, One and its existing
+operator declarations. The eight fixed-width integer types, Single and Double gain
+these capabilities through Number; their arithmetic behavior is unchanged. Integer
+addition/subtraction/multiplication wrap and invalid integer division faults. Floating
+operations keep their existing semantics. Custom types choose and document their
+operator domain/failure policy. No interface here promises recoverable Result errors.
+
+For example, the validated native consumer uses:
+
+```raven
+static func Add<T>(left: T, right: T) -> T where T: AdditionOperators => left + right
+```
+
+The [consumer](../docs/validation/numerics-interfaces/LibraryConsumer.rvn) also forwards
+Number-constrained parameters to Add and implements the capabilities on a Complex
+demo without imposing ordering. Native interpreter/JIT/AOT support closed nongeneric
+interface bounds and static Self dispatch, including imported static class methods.
+Mixed operand/result types, checked default interface operators, instance Self
+specialization and production Complex semantics are outside this initial surface.
+Rebuild consumers against the matching library/compiler bundle. Ordinary Raven/.NET
+continues using the platform's System.Numerics APIs; these interfaces are NeoCLR APIs.

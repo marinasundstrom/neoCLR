@@ -1,0 +1,8 @@
+module System.Numerics
+
+/// Nominal capability for same-type multiplication; does not imply ordering or Number conformance.
+public interface MultiplyOperators {
+    /// Applies multiplication to two values of the implementing type.
+    /// The implementing operator defines overflow and domain behavior; failure is not returned as Result.
+    static func *(left: Self, right: Self) -> Self
+}

@@ -1,6 +1,7 @@
 # Minimal numerics contracts and Complex demo — 2026-10-16
 
-This is a source-local experiment, not a new System.Runtime public API. It responds
+This began as a source-local experiment; the public library adoption and its
+qualification are recorded below. It responds
 to the author's request for minimal System.Numerics interfaces and another useful
 number type to test the model. See the [design comparison](../../design/numeric-contracts.md#minimal-systemnumerics-capabilities-and-complex-experiment--2026-10-16).
 
@@ -10,7 +11,7 @@ struct implementing them. No ordering is invented: Complex does not implement th
 current System.Number contract. Candidate interface names and their same-type-only
 scope are provisional. Number remains unchanged in the installed library.
 
-## Qualified behavior
+## Initial experiment (historical)
 
 The direct consumer returns 42 on interpreter, managed JIT and AOT on macOS ARM64.
 It checks addition, subtraction, multiplication, finite nonzero division, i squared,
@@ -59,7 +60,7 @@ consumer's host with the generic image. Matching compiler: Raven codex/neoclr
 No compiler/runtime changes, Runtime Contract switch, CLI encoding or native opcode
 is introduced. Ordinary Raven/.NET and broader structural work remain unchanged.
 
-## Limits and next work
+## Initial limits and next work (historical)
 
 The textbook complex division formula is for finite, moderate magnitudes; production
 scaled division, zero divisors, NaN/infinities, extreme magnitudes, equality/hash,
@@ -122,3 +123,30 @@ Focused SDK checks (--authored-method-bounds) cover reference interning, defensi
 copying, wrong type arguments, missing/different bounds on the same callable,
 invalid ordinals, duplicate bounds, noninterfaces and foreign output ownership.
 No dependency reader fallback or structural interface conformance is introduced.
+
+
+## Public library adoption
+
+The development System.Runtime library now provides AdditionOperators,
+SubtractionOperators, MultiplyOperators and DivisionOperators in System.Numerics.
+Number inherits all four while retaining its declared members and identities.
+The final multiplication capability follows the .NET MultiplyOperators spelling;
+older source-local fixtures above preserve their experimental name.
+
+LibraryConsumer.rvn imports the actual library interfaces. It checks all four
+operations across ten primitive number types, forwarding a Number bound to an
+AdditionOperators helper, plus the custom Complex implementation without ordering.
+`library-results.json` records successful interpreter, managed JIT and sanitized
+AOT execution (42) against the freshly built five-library bundle
+`target/numerics-public-libraries-20261016`. Raven revision: `2e4776f7d`; runtime/SDK
+revision: `57c31e9bc` plus this slice's library declarations. The manifest fingerprints
+the compiler, runtime, source and bundle. Production Complex edge behavior remains
+outside this demo's qualification.
+
+`number-signatures.json` records 218 passing reference signature checks, including
+the four inherited capabilities and their exact static Self signatures. The
+reference assembly inventory and native RavenDoc snapshot include all four public
+types and operators. The native rendering audit and four snapshot tests pass.
+No new Runtime Contract switch or serialized opcode is required. The native
+signature uses Self; the documentation CLI projection uses the existing Self
+marker. Ordinary Raven/.NET behavior remains unchanged.

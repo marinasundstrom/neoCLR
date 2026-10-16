@@ -151,8 +151,8 @@ A source-local integer addition experiment now exercises recoverable overflow
 through nominal Result values. This is an API-design prototype, not a new System
 arithmetic API; existing Int32.Divide already provides recoverable division errors.
 
-Minimal System.Numerics arithmetic capabilities are being explored with a source-local
-Complex demo. Complex supports arithmetic without imposing Number's ordering
-contract. Local generic arithmetic functions and class methods now pass interpreter/JIT/AOT;
-separate-provider constrained calls now pass too, with invalid type arguments rejected. These are not yet
-installed class-library APIs.
+Development System.Numerics now provides AdditionOperators, SubtractionOperators,
+MultiplyOperators and DivisionOperators using native Self. Number inherits these
+same-type capabilities; generic algorithms can ask for only the operation they need.
+A Complex demo exercises arithmetic without imposing ordering. Mixed-type contracts
+and production Complex edge semantics remain future work.

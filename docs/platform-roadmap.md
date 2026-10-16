@@ -5117,3 +5117,11 @@ The [qualification](validation/numerics-interfaces/README.md) retains the origin
 rejections and subsequent evidence separately. This does not yet publish the
 candidate System.Numerics APIs; broader constraint forms and imported consumers
 must be qualified in subsequent slices.
+
+
+Initial numerics library adoption: add the four same-type static operator interfaces
+in System.Numerics and compose Number with them, preserving its member identities.
+The [library consumer](validation/numerics-interfaces/LibraryConsumer.rvn) covers ten
+primitive implementers and the Complex demo. API reference inventory/rendering is
+refreshed with the matching five-library bundle. Mixed-type contracts and identity
+interfaces remain separately scoped; no broader structural work is resumed.

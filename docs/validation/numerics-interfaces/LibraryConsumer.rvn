@@ -1,0 +1,136 @@
+module Demo.Numerics
+
+import System.*
+import System.Numerics.*
+
+/// Finite, moderate-magnitude complex arithmetic demo, not a production numerical library.
+/// No ordering contract: complex numbers have no natural total order.
+public struct Complex : AdditionOperators, SubtractionOperators, MultiplyOperators, DivisionOperators {
+    val Real: double
+    val Imaginary: double
+
+    init(real: double, imaginary: double) {
+        Real = real
+        Imaginary = imaginary
+    }
+
+    static func +(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real + right.Real, left.Imaginary + right.Imaginary)
+
+    static func -(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real - right.Real, left.Imaginary - right.Imaginary)
+
+    static func *(left: Complex, right: Complex) -> Complex =>
+        Complex(left.Real * right.Real - left.Imaginary * right.Imaginary,
+                left.Real * right.Imaginary + left.Imaginary * right.Real)
+
+    static func /(left: Complex, right: Complex) -> Complex {
+        // Textbook division: scaled division and extreme floating values are deferred.
+        let denominator = right.Real * right.Real + right.Imaginary * right.Imaginary
+        return Complex((left.Real * right.Real + left.Imaginary * right.Imaginary) / denominator,
+                       (left.Imaginary * right.Real - left.Real * right.Imaginary) / denominator)
+    }
+}
+
+func Same(value: Complex, real: double, imaginary: double) -> bool =>
+    value.Real == real && value.Imaginary == imaginary
+
+class Arithmetic {
+    static func Subtract<T>(left: T, right: T) -> T where T: SubtractionOperators => left - right
+    static func Multiply<T>(left: T, right: T) -> T where T: MultiplyOperators => left * right
+    static func Divide<T>(left: T, right: T) -> T where T: DivisionOperators => left / right
+    static func Forward<T>(left: T, right: T) -> T where T: Number => Add<T>(left, right)
+    static func Add<T>(left: T, right: T) -> T where T: AdditionOperators => left + right
+}
+
+func Main() -> int {
+    let left = Complex(3.0, 2.0)
+    let right = Complex(1.0, -4.0)
+    if !Same(Arithmetic.Add<Complex>(left, right), 4.0, -2.0) {
+        return 1
+    }
+    if !Same(left - right, 2.0, 6.0) {
+        return 2
+    }
+    if !Same(left * right, 11.0, -10.0) {
+        return 3
+    }
+    if !Same(Complex(6.0, 4.0) / Complex(2.0, 0.0), 3.0, 2.0) {
+        return 4
+    }
+    let i = Complex(0.0, 1.0)
+    if !Same(i * i, -1.0, 0.0) {
+        return 5
+    }
+    if !Same(left * Complex(3.0, -2.0), 13.0, 0.0) {
+        return 6
+    }
+    // A small polynomial demonstrates ordinary composition of arithmetic operators.
+    if !Same(i * i + Complex(1.0, 0.0), 0.0, 0.0) {
+        return 7
+    }
+    if Arithmetic.Add<int>(20, 22) != 42 {
+        return 8
+    }
+    if Arithmetic.Forward<sbyte>((sbyte)20, (sbyte)22) != (sbyte)42 ||
+       Arithmetic.Subtract<sbyte>((sbyte)44, (sbyte)2) != (sbyte)42 ||
+       Arithmetic.Multiply<sbyte>((sbyte)21, (sbyte)2) != (sbyte)42 ||
+       Arithmetic.Divide<sbyte>((sbyte)84, (sbyte)2) != (sbyte)42 {
+        return 9
+    }
+    if Arithmetic.Forward<byte>((byte)20, (byte)22) != (byte)42 ||
+       Arithmetic.Subtract<byte>((byte)44, (byte)2) != (byte)42 ||
+       Arithmetic.Multiply<byte>((byte)21, (byte)2) != (byte)42 ||
+       Arithmetic.Divide<byte>((byte)84, (byte)2) != (byte)42 {
+        return 10
+    }
+    if Arithmetic.Forward<short>((short)20, (short)22) != (short)42 ||
+       Arithmetic.Subtract<short>((short)44, (short)2) != (short)42 ||
+       Arithmetic.Multiply<short>((short)21, (short)2) != (short)42 ||
+       Arithmetic.Divide<short>((short)84, (short)2) != (short)42 {
+        return 11
+    }
+    if Arithmetic.Forward<ushort>((ushort)20, (ushort)22) != (ushort)42 ||
+       Arithmetic.Subtract<ushort>((ushort)44, (ushort)2) != (ushort)42 ||
+       Arithmetic.Multiply<ushort>((ushort)21, (ushort)2) != (ushort)42 ||
+       Arithmetic.Divide<ushort>((ushort)84, (ushort)2) != (ushort)42 {
+        return 12
+    }
+    if Arithmetic.Forward<int>((int)20, (int)22) != (int)42 ||
+       Arithmetic.Subtract<int>((int)44, (int)2) != (int)42 ||
+       Arithmetic.Multiply<int>((int)21, (int)2) != (int)42 ||
+       Arithmetic.Divide<int>((int)84, (int)2) != (int)42 {
+        return 13
+    }
+    if Arithmetic.Forward<uint>((uint)20, (uint)22) != (uint)42 ||
+       Arithmetic.Subtract<uint>((uint)44, (uint)2) != (uint)42 ||
+       Arithmetic.Multiply<uint>((uint)21, (uint)2) != (uint)42 ||
+       Arithmetic.Divide<uint>((uint)84, (uint)2) != (uint)42 {
+        return 14
+    }
+    if Arithmetic.Forward<long>((long)20, (long)22) != (long)42 ||
+       Arithmetic.Subtract<long>((long)44, (long)2) != (long)42 ||
+       Arithmetic.Multiply<long>((long)21, (long)2) != (long)42 ||
+       Arithmetic.Divide<long>((long)84, (long)2) != (long)42 {
+        return 15
+    }
+    if Arithmetic.Forward<ulong>((ulong)20, (ulong)22) != (ulong)42 ||
+       Arithmetic.Subtract<ulong>((ulong)44, (ulong)2) != (ulong)42 ||
+       Arithmetic.Multiply<ulong>((ulong)21, (ulong)2) != (ulong)42 ||
+       Arithmetic.Divide<ulong>((ulong)84, (ulong)2) != (ulong)42 {
+        return 16
+    }
+    if Arithmetic.Forward<float>((float)20, (float)22) != (float)42 ||
+       Arithmetic.Subtract<float>((float)44, (float)2) != (float)42 ||
+       Arithmetic.Multiply<float>((float)21, (float)2) != (float)42 ||
+       Arithmetic.Divide<float>((float)84, (float)2) != (float)42 {
+        return 17
+    }
+    if Arithmetic.Forward<double>((double)20, (double)22) != (double)42 ||
+       Arithmetic.Subtract<double>((double)44, (double)2) != (double)42 ||
+       Arithmetic.Multiply<double>((double)21, (double)2) != (double)42 ||
+       Arithmetic.Divide<double>((double)84, (double)2) != (double)42 {
+        return 18
+    }
+    return 42
+}

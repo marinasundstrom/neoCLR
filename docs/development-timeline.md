@@ -18559,3 +18559,10 @@ remain open. This is implementation of the earlier platform convention direction
   JIT and AOT; the imported invalid type argument is rejected. Commits and evidence
   are linked in the [qualification](validation/numerics-interfaces/README.md).
   Public numeric interface adoption and production Complex semantics remain separate.
+
+- Subsequent outcome: installed the four minimal System.Numerics arithmetic
+  capabilities and composed Number with them after backend qualification. A fresh
+  five-library bundle passes ten-primitive and custom Complex consumers on the
+  interpreter, JIT and AOT. Updated public API inventory/native documentation and
+  repaired a stale pre-Self reference test; 218 signature checks pass. Complex
+  remains a tested demo, not a production library API.

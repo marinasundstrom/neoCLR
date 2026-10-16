@@ -196,3 +196,22 @@ formatting and performance are unqualified; this is a model test, not numerical
 library parity. Safe Result-returning arithmetic remains a separate contract from
 operator support. No structural type work, new runtime opcode or .NET compiler
 behavior is introduced.
+
+
+### Initial library adoption
+
+The four minimal contracts are now development class-library APIs in System.Numerics:
+AdditionOperators, SubtractionOperators, MultiplyOperators and DivisionOperators.
+MultiplyOperators follows .NET's IMultiplyOperators spelling; the earlier experiment's
+MultiplicationOperators name remains only in historical source-local fixtures.
+Number inherits these contracts while retaining its existing declared operators,
+Zero/One and ordering. All ten existing Number primitives therefore participate;
+there is no change to arithmetic or overflow semantics. The separate recoverable
+arithmetic design remains distinct.
+
+The library consumer tests all four operations on the ten primitive types, Number
+constraint forwarding, and a custom Complex implementation. Complete API references
+include all four types and their operators, with source/CLI/native snapshots updated.
+See the [qualification](../validation/numerics-interfaces/README.md). This closes the
+initial same-type capability slice, not mixed-type generic math or numerical parity
+for the Complex demo.
