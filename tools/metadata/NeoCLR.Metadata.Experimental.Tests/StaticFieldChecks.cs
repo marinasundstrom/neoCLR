@@ -46,6 +46,17 @@ internal static class StaticFieldChecks
         var read = consumer.AddFunction("Main"); consumer.EntryPoint = read;
         read.LoadField(imported.MakeConstructedReference(PrimitiveType.Int32)); read.Return();
         _ = consumer.WriteNativeAssembly(); _ = consumer.Write();
+        var mixed = new AssemblyBuilder(new("MixedFields", new Version(1, 0, 0, 0)), core);
+        var mixedOwner = mixed.AddClass("Example", "Mixed");
+        for (int i = 0; i < 128; i++)
+        {
+            mixedOwner.AddField($"Instance{i}", PrimitiveType.Int32);
+            mixedOwner.AddField($"Static{i}", PrimitiveType.Int32, isStatic: true);
+        }
+        mixedOwner.Definition.Fields.Add(new FieldDefinition("Literal", 0x8056, PrimitiveType.Int32, 42));
+        var mixedSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(mixed));
+        if (mixedSnapshot.MainModule.Types.Single(t => t.Name == "Mixed").Fields.Count != 257)
+            throw new Exception("Combined field origins incorrectly use a single storage-category limit");
         Console.WriteLine("PASS CLR static storage, native declaration roundtrip and constructed field import");
     }
 }

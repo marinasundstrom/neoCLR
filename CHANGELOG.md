@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
-- Preserve module-scoped source field tokens for native static storage and Int32 literals, in descriptor order after instance fields. Accept legacy instance-only origin tables without inventing missing static tokens; retain instance-only access/readonly flag arrays. Validate SDK static/literal roundtrips and the interpreter reflection consumer.
+- Preserve module-scoped source field tokens for native static storage and Int32 literals, in descriptor order after instance fields. Accept legacy instance-only origin tables without inventing missing static tokens; retain instance-only access/readonly flag arrays. Validate SDK static/literal roundtrips and the interpreter reflection consumer. Allow combined origin tables up to the sum of the three storage-category limits; validate a 257-field mixed declaration.
 
 - Emit Raven native static field initializers and explicit static constructors through canonical `.cctor` metadata, reusing bound initializer order and lowering. Preserve strict explicit-constructor timing and relaxed synthesized timing; import the static-constructor symbol. Qualify readonly fields, explicit initialization, distinct closed generic state and a separate-provider consumer on interpreter, JIT and sanitized AOT. Ordinary .NET behavior is unchanged; structural work remains parked.
 
