@@ -9,6 +9,7 @@ internal static class InterfaceVarianceChecks
     internal static void Run()
     {
         CheckReferenceConversions();
+        CheckExternalBaseConversions();
         var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
         var graph = new AssemblyBuilder(new("VarianceSnapshot", new(1, 0, 0, 0)), core);
         var contract = graph.AddGenericInterface("Example", "Transform", ["TOut", "TIn", "TFixed"]);
@@ -113,6 +114,59 @@ internal static class InterfaceVarianceChecks
         invalid.GetILGenerator().LoadDefault(producer.MakeGenericInstance(dog)); invalid.Return();
         var values = graph.AddFunction("NoBoxing", new(producer.MakeGenericInstance(animal), [producer.MakeGenericInstance(PrimitiveType.Int32)]));
         values.LoadArgument(0); values.Return();
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+    }
+    private static void CheckExternalBaseConversions()
+    {
+        var host = typeof(object).Assembly.GetName();
+        var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
+        var library = new AssemblyBuilder(new("VarianceBaseLibrary", new(1, 0, 0, 0)), core);
+        var parent = library.AddClass("Example", "Base");
+        parent.SetAbstractClass();
+        parent.AddConstructor([], MethodVisibility.Protected).Return();
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(library));
+        var graph = new AssemblyBuilder(new("VarianceBaseConsumer", new(1, 0, 0, 0)), core);
+        var external = graph.ImportReference(snapshot.MainModule.Types.Single(), core);
+        graph.DeclareFieldlessClassBase(external);
+        var derived = graph.AddClass("Example", "Derived", external);
+        var leaf = graph.AddClass("Example", "Leaf", derived);
+        var unrelated = graph.AddClass("Example", "Unrelated");
+        var producer = graph.AddGenericInterface("Example", "Producer", ["T"]);
+        producer.SetVariance(0, GenericVariance.Covariant);
+        producer.AddInterfaceMethod("Get", new(SignatureType.TypeParameter(0), []));
+        var consumer = graph.AddGenericInterface("Example", "Consumer", ["T"]);
+        consumer.SetVariance(0, GenericVariance.Contravariant);
+        consumer.AddInterfaceMethod("Accept", new(PrimitiveType.Void, [SignatureType.TypeParameter(0)]));
+        void Conversion(string name, SignatureType from, SignatureType to)
+        {
+            var method = graph.AddFunction(name, new(to, [from]));
+            method.LoadArgument(0); method.Return();
+        }
+        Conversion("Direct", producer.MakeGenericInstance(derived), producer.MakeGenericInstance(external));
+        Conversion("Transitive", producer.MakeGenericInstance(leaf), producer.MakeGenericInstance(external));
+        Conversion("Contravariant", consumer.MakeGenericInstance(external), consumer.MakeGenericInstance(leaf));
+        Conversion("Nested", producer.MakeGenericInstance(consumer.MakeGenericInstance(external)),
+            producer.MakeGenericInstance(consumer.MakeGenericInstance(leaf)));
+        var image = graph.WriteNativeAssembly();
+        Check(AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(image)).MainModule.Types.Count == 5,
+            "external-base variance image retains nominal declarations");
+        var context = new System.Runtime.Loader.AssemblyLoadContext("variance-external-base", true);
+        try
+        {
+            context.LoadFromStream(new MemoryStream(library.Write()));
+            var loaded = context.LoadFromStream(new MemoryStream(graph.Write()));
+            foreach (var name in new[] { "Direct", "Transitive", "Contravariant", "Nested" })
+            {
+                var method = loaded.ManifestModule.GetMethods().Single(m => m.Name == name);
+                Check(method.Invoke(null, [null]) is null, "CLR external-base variance " + name);
+            }
+        }
+        finally { context.Unload(); }
+        var invalid = graph.AddFunction("Invalid", new(producer.MakeGenericInstance(external), [producer.MakeGenericInstance(unrelated)]));
+        invalid.LoadArgument(0); invalid.Return();
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        invalid.ClearBody(); invalid.GetILGenerator().LoadDefault(producer.MakeGenericInstance(external)); invalid.Return();
+        Conversion("Reverse", producer.MakeGenericInstance(external), producer.MakeGenericInstance(derived));
         Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }

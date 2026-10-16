@@ -472,3 +472,23 @@ binding and token validation; there is no compiler workaround or new source/CLI
 encoding. Explicit type-catalog retention remains required. Open member and
 relationship operations, method generic-definition discovery and intrinsic String
 variance materialization remain gaps. Structural types remain parked.
+
+### SDK variance across imported class bases (2026-10-16)
+
+A focused regression exposed a mismatch between ordinary SDK reference conversion
+and its variance argument check: a local `Derived : ExternalBase` could be used as
+ExternalBase directly, but `Producer<Derived>` could not widen to
+`Producer<ExternalBase>`. The SDK now reuses the explicit imported-base ancestry
+proof, including local transitive inheritance. No declaration or interface
+conformance is inferred from matching names. Dependency facts remain explicit and
+the native loader still verifies the actual linked definitions.
+
+The focused `--interface-variance` regression failed on the direct widening before
+the fix and passes afterward. Tests cover direct/transitive covariance,
+contravariance and nested variance, native metadata writing/reading, and invocation
+of the emitted conversion functions on .NET using null reference arguments. Reverse
+and unrelated-class conversions still reject. Existing metadata/projection checks
+also pass. This restores .NET-aligned nominal reference variance; it does not add
+adapters, boxing, generic class-base support or String materialization. Runtime
+call dispatch is unchanged; these tests qualify the SDK admission fix, not a new
+Raven/AOT consumer. Runtime Contract configuration and metadata encodings are unchanged.

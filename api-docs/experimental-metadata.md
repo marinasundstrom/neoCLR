@@ -9273,6 +9273,10 @@ SDK call/return storage checks now admit declared reference-only interface varia
 including nested local/imported interfaces. Exact conformance wins; multiple other
 compatible views reject. Writable aliases, boxing, primitive materialization and
 mutable-array covariance remain excluded. Equal value arguments remain exact.
+Local class arguments with explicitly registered imported bases now use the same
+ancestry proof as ordinary reference conversion, including transitive local bases.
+This applies in covariant, contravariant and nested interface positions; reverse
+and unrelated-class conversions still reject. Generic class bases remain unsupported.
 
 ### Native compiler variance bridge — development
 

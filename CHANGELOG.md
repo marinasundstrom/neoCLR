@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Fix SDK interface variance validation for local classes inheriting an explicitly registered imported base. Reuse the ordinary reference-conversion ancestry proof for direct/transitive covariance, contravariance and nested variance; keep reverse and unrelated-class conversions rejected. Focused metadata regressions and emitted CLR calls pass. Generic class-base and intrinsic String widening support are unchanged.
+
 - Qualify Raven open generic discovery across interpreter, AOT and managed JIT with explicit assembly/module catalogs: all variance states, parameter identity, indexed/sequence parity, namespace filtering, closed arguments and module/assembly identity pass. Retain a reproducible runner and artifact evidence, verify native fault/GC cleanup and AOT sanitizer checks, and update website/API support guidance. Open member/relationship queries and intrinsic String variance remain gaps.
 
 - Permit ordinary native type tokens for supported static owners without admitting static values or instance receivers. A focused regression verifies token identity in interpreter/JIT and AOT emission while rejecting static local storage; this clears a token-validation blocker exposed by assembly discovery.

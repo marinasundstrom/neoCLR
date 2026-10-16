@@ -11237,3 +11237,14 @@ is required; module names require moduleCatalogs. Native host fault/root/collect
 checks and AOT UBSan/bounds checks pass. No Raven lowering, source metadata, bridge
 encoding or Runtime Contract change is involved. Open member/relationship queries,
 method generic-definition discovery and intrinsic String variance remain gaps.
+
+### SDK variance and imported bases (2026-10-16)
+
+The SDK now admits local-to-imported class ancestry inside variant interface
+arguments using its existing explicit external-base contract. This fixes a native
+writer rejection of otherwise supported covariance/contravariance, including
+transitive local ancestry and nested variance. Focused SDK native round-trip and
+CLR conversion-call checks pass; Raven source and AOT integration for this specific
+case are not newly qualified by those checks. No source lowering, CLI/native encoding
+or Runtime Contract changes are required. Generic class bases and intrinsic String
+widening remain unsupported; no adapter or implicit box is added.

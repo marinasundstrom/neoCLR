@@ -9,6 +9,9 @@ public sealed partial class AssemblyBuilder
         if (source == target) return true;
         if (depth >= 64 || !Reference(source) || !Reference(target)) return false;
         if (source.ClassType is { } derived && target.ClassType is { } ancestor && derived.DerivesFrom(ancestor)) return true;
+        // Local subclasses retain an explicit dependency base contract. Reuse the
+        // ordinary reference-conversion proof, including transitive local ancestry.
+        if (source.ClassType is { } local && target.ImportedType is { } dependency && local.HasExternalBase(dependency)) return true;
         if (source.ImportedType is { } imported && target.ImportedType is { } external && HasDeclaredClassBase(imported, external)) return true;
         if (target.ClassType is { IsNativeObjectRoot: true } || target.ImportedType is { } root && Equals(root, ExternalObjectRoot)) return true;
         if (!Interface(target)) return false;

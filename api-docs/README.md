@@ -2203,3 +2203,11 @@ summary or class-library input changed, so the matching reference assemblies and
 native signature snapshot remain valid. Reference fingerprint validation and all
 four native snapshot checks pass. See the
 [qualification evidence](../docs/validation/interface-variance/introspection/README.md).
+
+### SDK variance ancestry fix (2026-10-16)
+
+The host SDK's existing variance authoring/reference-conversion behavior now
+recognizes explicitly registered imported bases of local class arguments. The
+[manual SDK reference](experimental-metadata.md#explicit-interface-variance-authoring--development)
+records the contract and remaining limits. No guest public signature, reference
+assembly, XML sidecar, type selection or native API snapshot input changed.
