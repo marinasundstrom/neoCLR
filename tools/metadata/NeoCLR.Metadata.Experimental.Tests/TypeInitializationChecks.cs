@@ -10,6 +10,9 @@ internal static class TypeInitializationChecks
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
         AssemblyBuilder Graph(string name) => new(new(name, new Version(1, 0, 0, 0)), core);
+        var rootGraph = Graph("RootTiming");
+        rootGraph.AddNativeObjectRoot().SetBeforeFieldInit();
+        _ = rootGraph.WriteNativeAssembly();
         var graph = Graph("Initializers");
         var owner = graph.AddClass("Example", "State");
         var field = owner.AddField("Value", PrimitiveType.Int32, FieldVisibility.Public, isReadOnly: true, isStatic: true);

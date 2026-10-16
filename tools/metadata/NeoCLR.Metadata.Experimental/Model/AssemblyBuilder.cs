@@ -205,14 +205,14 @@ public sealed partial class AssemblyBuilder
                 else if (validateBodies)
                 {
                     try { method.Validate(); }
-                    catch (InvalidDataException error)
+                    catch (Exception error) when (error is InvalidDataException or ArgumentException)
                     {
                         throw new InvalidDataException($"{method.DeclaringType?.Name ?? method.Namespace}.{method.Name}: {error.Message}", error);
                     }
                 }
             }
         }
-        catch (ArgumentException error) { throw new InvalidDataException("invalid generic argument contract", error); }
+        catch (ArgumentException error) { throw new InvalidDataException("invalid generic argument contract: " + error.Message, error); }
         return methods;
     }
     /// <summary>Gets or sets a local Int32 or no-result entry point with no parameters or one String vector; null writes a library.</summary>

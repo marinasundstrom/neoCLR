@@ -28,7 +28,7 @@ public sealed partial class TypeDefinition
     internal void ValidateNativeObjectRoot()
     {
         if (authoredFields is null) throw new InvalidOperationException("loaded Object declarations are immutable");
-        if (Namespace != "System" || Name != "Object" || Attributes != 0x81 || GenericArity != 0 ||
+        if (Namespace != "System" || Name != "Object" || (Attributes & ~0x100000u) != 0x81 || GenericArity != 0 ||
             DeclaringType is not null || IsValueType || NativePrimitive is not null || IsClosedHierarchy || Fields.Count != 0)
             throw new ArgumentException("native Object root requires a public abstract nongeneric top-level System.Object without storage");
     }
