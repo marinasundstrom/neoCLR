@@ -1,7 +1,7 @@
 # Function-kind constraint groundwork — 2026-10-16
 
 Feature branch: `codex/function-kind-constraint`. This is native runtime and host
-SDK groundwork, not enabled Raven syntax or a function-list/event API.
+SDK groundwork plus the separately qualified Raven class-constraint slice below. It is not a function-list/event API.
 
 The `.constraint F func` IL restriction maps to native `FunctionType`. It accepts
 structural function signatures, preserves their exact parameter/result signature,
@@ -10,7 +10,8 @@ profile requires the category constraint alone. No nominal interface, delegate
 ancestry, dynamic invocation operation or event metadata is introduced.
 
 The retained consumer stores a typed callback in `Signal<F>`, retrieves it and uses
-the existing typed invocation operation. It returns 42 in interpreter/AOT/JIT.
+the existing typed invocation operation after forwarding through `Keep<F>` and
+`Forward<F>`, each with a method-level `func` constraint. It returns 42 in interpreter/AOT/JIT.
 AOT uses UBSan/bounds; the native hosts check cleanup. Source metadata retains the
 constraint after specialization. [Results](results.json) record exact source,
 binary and bundle hashes on macOS ARM64.
@@ -31,12 +32,17 @@ native round-trip introspection, and CLI-export rejection. The full host SDK sui
 passes 183/183 checks. API fingerprint validation passes; guest API inputs do not
 change.
 
-Raven syntax remains pending structural-versus-nominal function symbol identity
-through the compiler bridge. An experimental global symbol substitution broke
-RuntimeAwait/RuntimeGenerator binding and was not integrated. The intended spelling
-is `where T: func`, only for structural functions in neoCLR. Invocation APIs are
-postponed; the subsequently proposed `Reflection.InvokeFunction(functionObj, args)`
-is a candidate only. See [direction](../../proposals/structural-types.md#20-generic-constraints-on-function-types).
+Raven now distinguishes native function symbols from nominal delegates and supports
+`where T: func` on generic classes. Invocation APIs remain postponed; the proposed
+`Reflection.InvokeFunction(functionObj, args)` is a candidate only. See
+[direction](../../proposals/structural-types.md#20-generic-constraints-on-function-types).
+
+Native AOT/JIT admit function-kind method constraints only. Closed method arguments
+are checked before specialization reuse; proven constraints are removed from the
+executable clone while the source declaration remains intact. Other method bound
+categories stay gated. The focused codegen regression verifies forwarding, source
+preservation and rejection of an invalid integer construction, including a call
+that bypasses assembler validation.
 
 
 ## Raven source and separate provider
@@ -49,4 +55,5 @@ that an integer cannot be substituted for the constrained parameter.
 Run `python3 raven/run.py --compiler /path/to/rvnc.dll --bundle /path/to/bundle
 --output /path/to/output --imported` as one command. The retained bundle is
 `target/variance-argument-sequence-20261016`. This is a test holder, not an observer
-or event API. Native method constraints and signature bounds remain separate gaps.
+or event API. Raven method emission and signature bounds remain separate gaps. Native method
+category specialization is qualified by the IL fixture above.

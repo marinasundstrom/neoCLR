@@ -14,10 +14,22 @@ ret
 ldarg 0
 ret
 .end
+.function Keep<F>(F) -> F
+.constraint F func
+ldarg 0
+ret
+.end
+.function Forward<F>(F) -> F
+.constraint F func
+ldarg 0
+call Keep<F>(F)
+ret
+.end
 .function Main() -> Int32
 function.bind fn<Int32,Int32> = Identity(Int32)
 newobj instance Signal<fn<Int32,Int32>>::.ctor(fn<Int32,Int32>)
 ldfld Signal<fn<Int32,Int32>>::Callback
+call Forward<fn<Int32,Int32>>(fn<Int32,Int32>)
 ldc.i4 42
 call instance fn<Int32,Int32>::Invoke(Int32)
 ret

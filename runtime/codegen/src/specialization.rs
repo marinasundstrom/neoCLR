@@ -18,6 +18,21 @@ struct Shape {
     row: usize,
     name: String,
 }
+// Only the function category is admitted here; no invocation signature is implied.
+fn check_method_constraints(function: &Function, arguments: &[Type]) -> Result<(), Error> {
+    for constraint in &function.generic_constraints {
+        if constraint.kind != neoclr::metadata::ConstraintKind::FunctionType {
+            return Err("unsupported generic method constraint".into());
+        }
+        if !matches!(
+            arguments.get(constraint.parameter as usize),
+            Some(Type::Function(_))
+        ) {
+            return Err("generic method argument violates function-kind constraint".into());
+        }
+    }
+    Ok(())
+}
 // Follow the exact closed base chain. Owner parameter ordinals can change at
 // every edge, so matching open signatures (or reusing child arguments) is unsafe.
 fn closed_virtual_base_contracts(
@@ -460,6 +475,7 @@ impl Specializer<'_> {
             .into());
         };
         let i = *i;
+        check_method_constraints(&self.source.functions[i], &target.generic_arguments)?;
         if let Some(instance) = self.instances.iter().find(|v| {
             v.source == i && v.types == arguments && v.methods == target.generic_arguments
         }) {
@@ -498,15 +514,16 @@ impl Specializer<'_> {
         pending: &mut Vec<Instance>,
     ) -> Result<Function, Error> {
         if f.generic_parameters.len() != methods.len()
-            || !f.generic_constraints.is_empty()
             || !f.generic_arguments.is_empty()
         {
             return Err(
-                "generic method arity, constraints or pre-instantiated bodies are unsupported"
+                "generic method arity or pre-instantiated bodies are unsupported"
                     .into(),
             );
         }
+        check_method_constraints(f, methods)?;
         let mut result = f.clone();
+        result.generic_constraints.clear();
         if super::selection::object_dispatch_contract(f) {
             result.body = super::selection::object_placeholder(f);
             result.locals.clear();
@@ -1298,7 +1315,7 @@ pub fn expand_with_host_roots(
         })
         .map(|shape| shape.row)
         .collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; no method constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; function-kind method constraints only", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -1356,6 +1373,14 @@ mod tests {
         program.verify().unwrap();
         assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
         assert_eq!(serde_json::to_value(&source).unwrap(), original);
+        assert!(selected.functions.iter().all(|f| f.generic_constraints.is_empty()));
+        let constrained = source.functions.iter().find(|f| f.name == "Keep").unwrap();
+        assert!(super::check_method_constraints(constrained, &[super::Type::Int32]).is_err());
+        assert!(super::check_method_constraints(constrained, &[super::Type::MethodTypeParameter(0)]).is_err());
+        assert!(super::check_method_constraints(constrained, &[]).is_err());
+        let mut invalid = neoclr::assemble(".module Invalid\n.entry Main\n.function Keep<F>(F) -> F\nldarg 0\nret\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Keep<Int32>(Int32)\nret\n.end").unwrap();
+        invalid.functions[0].generic_constraints = constrained.generic_constraints.clone();
+        assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("function-kind"));
     }
 
     #[test]

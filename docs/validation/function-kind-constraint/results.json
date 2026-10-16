@@ -7,20 +7,20 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "assemble",
         "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/Main.neoil",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/FunctionConstraint.neox",
         "--format",
         "neox"
       ],
       "exitCode": 0,
-      "logSha256": "5ef20d29db09842ca1b26004c1369b83823ae2ef78c9899f3e1410e538baa5cf",
-      "output": "Assembled FunctionConstraint -> /Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox\n"
+      "logSha256": "f7bca9341a37ef5d78d59d2df0b02b4c0b3992a032bfe68133ca4dbbb9d96d30",
+      "output": "Assembled FunctionConstraint -> /Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/FunctionConstraint.neox\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/FunctionConstraint.neox",
         "--execution",
         "interpreter",
         "--system",
@@ -39,9 +39,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/FunctionConstraint.neox",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -55,7 +55,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "25f84bd0a64d4dbee2fba13a198b91ce1d70a7adda523209652641658ef0db46",
+      "logSha256": "745a080a5921b4b164b992015a25258bf879f606cfa25898c4df6d9e00d81534",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -76,14 +76,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -92,7 +92,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/app"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -123,7 +123,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -135,9 +135,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/FunctionConstraint.neox",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -151,8 +151,8 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "a0eb534c731694f6d72839357685edf0087a4c49fa1d542fe1107a0744e1713c",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.417697583,\"guestExitCode\":42,\"invocationSeconds\":0.000051083,\"metadataLoadSeconds\":0.314355667,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":5.737945958}\n"
+      "logSha256": "ee1c44d3e5d7399f0fead2854f3d59337676132c347254b4e544709a482c02e5",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.499158291,\"guestExitCode\":42,\"invocationSeconds\":0.00005275,\"metadataLoadSeconds\":0.345359292,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":7.04945275}\n"
     }
   ],
   "retainedConstraintMetadata": [
@@ -241,20 +241,20 @@
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.417697583,
+    "compileAndFinalizeSeconds": 0.499158291,
     "guestExitCode": 42,
-    "invocationSeconds": 5.1083e-05,
-    "metadataLoadSeconds": 0.314355667,
+    "invocationSeconds": 5.275e-05,
+    "metadataLoadSeconds": 0.345359292,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 5.737945958
+    "selectionAndVerificationSeconds": 7.04945275
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/Main.neoil": "f6fb5b754f793d3b91646b13ec5e8e59a5ef22e4920f4ae304ee3d86fc95588a",
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/Main.neoil": "2a8d871462c8013ad03af928a8128b98b5b7d27e1b1cb574e811db9ddc8fc9a0",
     "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/run.py": "9407e3a146be9a65e682b11807633a22154de693c2503d71fee72306ba15585f",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
-    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "4daef691cf371d1e6c472256e204cb4039dfeff58408200b13f902cbbf358767",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "773200a067a6927c7da5a4922d8a6367f787dce659f73ed8f12900bc7f2ad592",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "c511e2816c0004d9101f56745fe96037a945f24eb339691671273688e40c3528",
-    "/Users/robert/Projects/neoclr/target/function-kind-native-20261016/FunctionConstraint.neox": "99cf474f13a041916e910533b8ad1f763f8055f53183f9daae7526d4b883ef53",
+    "/Users/robert/Projects/neoclr/target/function-kind-method-runtime-20261016/FunctionConstraint.neox": "6b6731ab4e8d2d1553a06c0640c7bf7280509927a0d63fa10edf29d963a7e4f1",
     "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
   }
 }

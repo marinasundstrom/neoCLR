@@ -12010,5 +12010,5 @@ structural function signatures and forwarded caller guarantees, including write-
 revalidation. CLI projection rejects them; there is no temporary CLI encoding.
 This matches .NET's preservation of generic parameter requirements, with an explicit
 native category instead of a nominal Delegate bound. Runtime Contracts are unchanged.
-Raven method emission and AOT/JIT method specialization remain gated until the next
-slice qualifies execution. The focused SDK function-kind checks cover this prerequisite.
+The native IL fixture now qualifies AOT/JIT function-kind method specialization
+and forwarding; Raven method emission remains gated until its source qualification. The focused SDK function-kind checks cover this prerequisite.

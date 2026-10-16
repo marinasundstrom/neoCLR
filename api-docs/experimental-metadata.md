@@ -9690,8 +9690,8 @@ these requirements. `MakeGenericInstance` rejects nonfunction arguments. Forward
 method parameters require a caller function constraint when emitting a call;
 writing revalidates this proof after edits. CLI executable/reference output rejects
 these native-only contracts. Unlike .NET's nominal Delegate constraint, no delegate
-inheritance or invocation signature is implied. AOT/JIT method specialization and
-Raven method emission remain gated pending their own qualification.
+inheritance or invocation signature is implied. AOT/JIT function-kind method specialization is separately qualified by the native IL
+fixture. Raven method emission remains gated pending its own qualification.
 
 Validation: `NeoCLR.Metadata.Experimental.Tests --function-kind-constraint`
 covers accepted signatures, rejected nominal/primitive arguments, forwarding,
