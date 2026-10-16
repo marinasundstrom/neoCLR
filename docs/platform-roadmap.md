@@ -4960,3 +4960,15 @@ Integration checks passed: 62 focused Raven syntax/semantic/runtime tests, the h
 SDK function-kind authoring/import/introspection checks, the reference fingerprint
 check and four native API snapshot checks. No code or public signature changed
 during integration, so the retained interpreter/JIT/AOT consumers were not rerun.
+
+
+### Author-directed compound operators (2026-10-16)
+
+After function integration, the author requested C# 14-style compound overloads in
+Raven main and the neoCLR compiler line. The initial supported-token slice now uses
+in-place instance calls on both targets, with explicit SDK managed element-address
+authoring. [Validation and boundaries](validation/compound-operators/README.md)
+include .NET and interpreter/JIT/AOT evidence, with nominal struct arrays remaining
+interpreter-only. Remaining token/checked/extension/interface/virtual coverage is
+follow-up work. This bounded language improvement does not reprioritize unrelated
+milestones or resume broader structural work.

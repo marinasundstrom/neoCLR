@@ -12141,3 +12141,24 @@ Integration checks passed: 62 focused Raven syntax/semantic/runtime tests, the h
 SDK function-kind authoring/import/introspection checks, the reference fingerprint
 check and four native API snapshot checks. No code or public signature changed
 during integration, so the retained interpreter/JIT/AOT consumers were not rerun.
+
+
+## Explicit compound operator integration (2026-10-16)
+
+Author-directed shared language improvement: Raven main `7819e2fea` adds public
+instance compound operators; the deliberate `codex/neoclr` carry (`164ebf81f`) admits their native
+callable plans and calls. The native metadata representation is an ordinary instance
+method with a standard operator name and no-result signature. CLI output uses
+special-name void instance methods. No temporary carrier, Runtime Contract switch,
+runtime opcode or container version is added. Native managed array receiver lowering
+uses SDK `OpCode.Ldelema`, added in `1b4561f3b`, to preserve actual element storage.
+Raven owns syntax, overload selection and receiver lowering; the SDK owns authoring
+validation and encoding; the runtime retains normal managed-reference/bounds checks.
+
+[Qualification](validation/compound-operators/README.md) records 70 main .NET tests,
+interpreter/JIT/AOT local consumers, and a separate interpreter-only nominal value
+array consumer with explicit AOT rejection. That allocation gap remains open; no
+native imported-library or all-platform claim is made. No new guest public API means
+no guest reference assembly refresh; the host API manual is updated and its snapshot
+check passes. Checked/extension/interface/virtual forms and the remaining assignment
+tokens are follow-up work. Broader structural work remains parked.

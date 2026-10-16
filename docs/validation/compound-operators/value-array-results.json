@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "9e7f66c2b2eb9550ce16bb358dee79e9ca088955aade34ecb0d1824dbdf0298f",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll\n/Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/project/Main.rvn(2,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/project/Main.rvn(12,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot-rejection",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/project/bin/neoclr/CompoundOperatorsRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/compound-operators-value-arrays-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 1,
+      "logSha256": "98ec7e189f4c385a598f0a56085e0a1773c46cf0c31515972324eda88759c377",
+      "output": "neoclr-codegen: NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4D61696E instruction 33: unsupported value instruction: NewArray(Named(\"NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__56616C7565436F756E746572\"))\n"
+    }
+  ],
+  "limitation": "Nominal value arrays are interpreter-only; AOT rejects allocation explicitly.",
+  "sourceSha256": "cba73a2d6de94bd70f662e6b4c4c3777cdcffb07597338c6480966121e66b075"
+}

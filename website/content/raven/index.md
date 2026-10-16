@@ -47,6 +47,12 @@ Patterns expose a case and bind its payload. There is no need for a special meth
 
 For properties, `val` expresses read-only access. Explicit mutability helps readers distinguish a stable local binding from state that may change.
 
+Development Raven also supports explicit in-place compound operators such as
+`func +=(amount: int)` on classes and structs. These preserve reference identity and
+mutate value storage. The current native class, struct-local and reference-array
+consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-only.
+Checked and extension/interface forms remain follow-up work.
+
 <a id="targets"></a>
 
 ## The .NET and neoCLR targets

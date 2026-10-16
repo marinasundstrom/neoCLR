@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
-- Add metadata-SDK `OpCode.Ldelema` authoring with managed-reference stack validation and standard CLI/native encoding, closing the array-element-address bridge needed by Raven compound operators. Validate CLI/native interpreter mutation and reject mismatched element types. Native AOT nominal-struct-array allocation remains an existing limitation; no runtime opcode or container version changes.
+- Add metadata-SDK `OpCode.Ldelema` authoring with managed-reference stack validation and standard CLI/native encoding, closing the array-element-address bridge needed by Raven compound operators. Validate CLI/native interpreter mutation and reject mismatched element types. Native AOT nominal-struct-array allocation remains an existing limitation; no runtime opcode or container version changes. Qualify the paired Raven compound-operator carry with interpreter/JIT/AOT class/struct-local/reference-array consumers and retain interpreter success plus explicit AOT rejection for nominal struct arrays; record reproduction evidence and update integration/website direction.
 
 - Integrate the validated function-kind constraints, function patterns/reflection and provisional FunctionReflection API into main, paired with Raven codex/neoclr. Preserve slice history, remove completed local feature branches and update development status; broader structural work stays parked and the invocation API remains provisional. No release or remote publication is implied.
 

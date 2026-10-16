@@ -18394,3 +18394,18 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   parked remote structural experiments are retained. **Outcome:** local integration,
   with no push/release/publication. Prior backend consumer evidence remains applicable;
   focused compiler/metadata and API snapshot checks qualify the integrated state.
+
+
+- **Compound operator direction (2026-10-16):** the author requested the next
+  improvement in Raven and its neoCLR branch, linking Damir's article about C# 14
+  user-defined compound operators. **Assistant proposal/action:** follow the primary
+  C# in-place instance-operator model, retain Raven's unit-valued assignments, develop
+  shared support on main and carry it deliberately to the native line. Implemented
+  the seven existing compound tokens, fixed CLI special-name flags and struct-array
+  receiver addressing, and exposed the runtime's existing `ldelema` through the SDK.
+  **Outcome:** 70 focused .NET tests pass; the local native class/struct/reference-array
+  consumer passes interpreter/JIT/AOT. Nominal struct arrays pass the interpreter,
+  while AOT allocation is explicitly rejected and remains open. Checked forms,
+  extensions/interfaces/virtual declarations and missing assignment tokens remain
+  follow-up work; no user approval of those future details is inferred. See
+  [evidence](validation/compound-operators/README.md). Structural work stays parked.

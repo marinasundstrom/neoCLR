@@ -1,0 +1,54 @@
+class Counter {
+    public var Value: int = 0
+
+    func +=(amount: int) {
+        Value = Value + amount
+    }
+
+    static func +(left: Counter, right: int) -> Counter => Counter()
+}
+
+struct ValueCounter {
+    public var Value: int = 0
+
+    func +=(amount: int) {
+        Value = Value + amount
+    }
+}
+
+class IndexCounter {
+    private var calls: int = 0
+    val Calls: int => calls
+
+    func Index() -> int {
+        calls = calls + 1
+        return 0
+    }
+}
+
+class Program {
+
+    static func Main() -> int {
+        var counter = Counter()
+        let alias = counter
+        counter += 10
+        if alias.Value != 10 {
+            return 1
+        }
+
+        var value = ValueCounter()
+        value += 12
+        if value.Value != 12 {
+            return 2
+        }
+
+        let indexes = IndexCounter()
+        let values: Counter[] = [Counter()]
+        values[indexes.Index()] += 20
+        if values[0].Value != 20 || indexes.Calls != 1 {
+            return 3
+        }
+
+        return alias.Value + value.Value + values[0].Value
+    }
+}
