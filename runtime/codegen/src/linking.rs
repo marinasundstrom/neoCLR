@@ -1433,6 +1433,53 @@ fn rename_nominal(
 #[cfg(test)]
 mod variance_projection_tests {
     #[test]
+    fn array_argument_variance_preserves_closed_nominal_conformance() {
+        use neoclr::metadata::Type;
+        let mut source = neoclr::assemble(".module ArrayVariance\n.type class Backing<T>\n.end\n.type class Element\n.end\n.interface View\n.end\n.interface Producer<T>\n.variance out\n.end\n").unwrap();
+        source.assemblies[0].array_backing = source.types[0].definition.clone();
+        let mut target = source.clone();
+        neoclr::native_metadata::retain_array_shape(
+            &mut target.types[0],
+            &source,
+            0,
+            &[Type::Named("Element".into())],
+        )
+        .unwrap();
+        target.types[0].generic_parameters.clear();
+        target.types[0].implements = vec![Type::Named("View".into())];
+        target.assemblies[0].array_backing = None;
+        let parse = |s| neoclr::assembler::parse_type(s).unwrap();
+        let wide = parse("Producer<View>");
+        let narrow = parse("Producer<arrayref<Element>>");
+        assert!(neoclr::native_metadata::assignable(&target, &narrow, &wide).unwrap());
+        assert!(!neoclr::native_metadata::assignable(&target, &wide, &narrow).unwrap());
+        assert!(
+            !neoclr::native_metadata::assignable(&target, &parse("Producer<arrayref<Int32>>"), &wide)
+                .unwrap()
+        );
+        let encoded = serde_json::to_value(&target).unwrap();
+        assert!(encoded["types"][0].get("native_array_element").is_none());
+        let decoded = serde_json::from_value(encoded.clone()).unwrap();
+        assert!(!neoclr::native_metadata::assignable(&decoded, &narrow, &wide).unwrap());
+        let mut forged = encoded;
+        forged["types"][0]["native_array_element"] = serde_json::json!("Int32");
+        assert!(serde_json::from_value::<neoclr::Module>(forged).is_err());
+        target.types[1].name = "PrivateElement".into();
+        super::rename_nominal(&mut target, "Element", "PrivateElement", "Main").unwrap();
+        assert!(
+            neoclr::native_metadata::assignable(
+                &target,
+                &parse("Producer<arrayref<PrivateElement>>"),
+                &wide
+            )
+            .unwrap()
+        );
+        assert!(
+            neoclr::native_metadata::retain_array_shape(&mut target.types[0], &source, 0, &[]).is_err()
+        );
+    }
+
+    #[test]
     fn object_argument_variance_survives_private_root_renaming() {
         let mut source = neoclr::assemble(".module ObjectVariance\n.type class System.Object\n.end\n.interface View\n.end\n.interface Producer<T>\n.variance out\n.end\n").unwrap();
         let narrow = neoclr::assembler::parse_type("Producer<View>").unwrap();

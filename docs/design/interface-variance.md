@@ -1,8 +1,9 @@
 # Interface variance and result-value conversion
 
-Status: runtime metadata and bounded interpreter reference conversions implemented
-in development, 2026-10-15. SDK annotation authoring, inspection and CLI/native metadata transport are implemented.
-Raven native integration and AOT/JIT execution are being completed. The wider Result
+Status: development implementation, updated 2026-10-16. Runtime metadata, bounded
+reference conversions, SDK annotation transport and Raven interpreter/AOT/JIT
+integration are qualified for the cases recorded below. Intrinsic String variance
+and open generic member/relationship reflection remain gaps. The wider Result
 proposal remains unimplemented. Structural-type work stays parked. This follows the
 [implemented slicing contract](slicing-capabilities.md).
 
@@ -551,3 +552,25 @@ element types remain invariant; this does not permit `int[]` to `Object[]`.
 The unchanged bundle is `variance-argument-sequence-20261016`, using the compiler
 rebuilt against SDK `2c98cbd1b` and the backend Object-root fix `81701e5aa`.
 Evidence is retained in `docs/validation/interface-variance/imported-base/results.json`.
+
+### Native array-interface variance preservation (2026-10-16)
+
+The imported Raven consumer exposed a native-only fault when converting
+`Producer<int[]>` to `Producer<Iterable<int>>`: interpreter execution succeeded,
+but AOT faulted in WidenIterable. Specialization retained the array layout but lost
+the closed backing's nominal conformance during generic owner erasure.
+
+The backend now retains the verified backing's closed element identity as private
+compiler metadata. Variance uses that identity to follow the existing nominal
+interface graph, preserving it through selection and nominal rewrites. Serialized
+input cannot supply the marker. No element covariance, boxing, adapter, new layout,
+Runtime Contract option or native/CLI encoding is introduced. This follows the
+existing reference-conversion rule; Sliceable and Result remain invariant.
+
+The extended consumer exercises both Producer<int[]> to Producer<Iterable<int>>
+and Consumer<Iterable<int>> to Consumer<int[]> with identity and iterator calls.
+Interpreter, AOT and managed JIT return 42; native cleanup and AOT sanitizer checks
+pass. Focused tests cover renamed element identities, reverse and wrong-element
+rejection, serialization/forgery and malformed proof arity. Evidence uses the
+unchanged `variance-argument-sequence-20261016` bundle and the compiler rebuilt
+against SDK `2c98cbd1b`; commands and binary hashes are retained with the consumer.

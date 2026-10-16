@@ -1,4 +1,5 @@
 import System.*
+import System.Collections.*
 import ImportedVariance.*
 
 open class Derived : Base {
@@ -46,6 +47,27 @@ class ArraySource : Producer<int[]> {
     func Get() -> int[] => value
 }
 
+class IterableSink : Consumer<Iterable<int>> {
+    private val expected: int[]
+
+    init(expected: int[]) {
+        self.expected = expected
+    }
+
+    func Accept(value: Iterable<int>) -> int {
+        if !Object.ReferenceEquals(value, expected) {
+            return 1
+        }
+        let iterator = value.GetIterator()
+        var total = 0
+        while iterator.MoveNext() {
+            total += iterator.Current
+        }
+        iterator.Dispose()
+        return total
+    }
+}
+
 class ObjectSink : Consumer<Object> {
     private val expected: Object
 
@@ -66,6 +88,9 @@ func Narrow(value: Consumer<Base>) -> Consumer<Leaf> => value
 func NarrowObject(value: Consumer<Object>) -> Consumer<Consumer<Base>> => value
 func WidenObject(value: Producer<Consumer<Base>>) -> Producer<Object> => value
 func Nest(value: Producer<Consumer<Base>>) -> Producer<Consumer<Leaf>> => value
+
+func WidenIterable(value: Producer<int[]>) -> Producer<Iterable<int>> => value
+func NarrowIterable(value: Consumer<Iterable<int>>) -> Consumer<int[]> => value
 
 func WidenArray(value: Producer<int[]>) -> Producer<Object> => value
 func NarrowArray(value: Consumer<Object>) -> Consumer<int[]> => value
@@ -109,6 +134,20 @@ func Main() -> int {
     let arrayConsumer = NarrowArray(ObjectSink(numbers))
     if arrayConsumer.Accept(numbers) != 42 {
         return 8
+    }
+    let iterableProducer = WidenIterable(arraySource)
+    let iterable = iterableProducer.Get()
+    if !Object.ReferenceEquals(iterable, numbers) {
+        return 10
+    }
+    let iterator = iterable.GetIterator()
+    if !iterator.MoveNext() || iterator.Current != 40 {
+        return 11
+    }
+    iterator.Dispose()
+    let iterableConsumer = NarrowIterable(IterableSink(numbers))
+    if iterableConsumer.Accept(numbers) != 42 {
+        return 12
     }
     numbers[0] = 42
     if arraySource.Get()[0] != 42 {

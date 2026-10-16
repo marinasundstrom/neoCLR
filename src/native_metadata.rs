@@ -535,6 +535,33 @@ pub fn retain_interface_shape(
     Ok(())
 }
 
+/// Retain a verified array backing's closed element in private compiler IR.
+/// This records nominal conformance, not a new array layout or element conversion.
+pub fn retain_array_shape(
+    target: &mut crate::metadata::TypeDef,
+    source: &Module,
+    index: usize,
+    arguments: &[Type],
+) -> Result<(), Fault> {
+    let original = source
+        .types
+        .get(index)
+        .ok_or_else(|| Fault::new("missing source array backing"))?;
+    if !source
+        .array_backing()
+        .is_some_and(|backing| std::ptr::eq(backing, original))
+    {
+        return Ok(());
+    }
+    if arguments.len() != 1 || original.generic_parameters.len() != 1 || !original.is_reference_type
+    {
+        return Err(Fault::new(
+            "native array proof requires a verified unary reference backing",
+        ));
+    }
+    target.native_array_element = Some(arguments[0].clone());
+    Ok(())
+}
 /// Preserve a variant contract slot across closed owner specialization.
 pub fn retain_interface_slot(target: &mut crate::metadata::Function, source: &Module, index: usize) {
     let original = &source.functions[index];
@@ -599,6 +626,7 @@ pub fn restore_interface_proofs(
     }
     for (target, original) in target.types.iter_mut().zip(&original.types) {
         target.native_object_root = original.native_object_root;
+        target.native_array_element = original.native_array_element.as_ref().map(&map_type).transpose().map_err(Fault::new)?;
         target.native_interface = original.native_interface.clone();
         if let Some(shape) = &mut target.native_interface {
             shape.arguments = shape.arguments.iter().map(&map_type).collect::<Result<_, _>>().map_err(Fault::new)?;

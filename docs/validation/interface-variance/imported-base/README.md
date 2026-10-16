@@ -46,3 +46,9 @@ Producer<Object>, and Consumer<Object> narrows to Consumer<int[]>. Calls preserv
 array identity, and a mutation is visible through the original producer. Array
 element storage remains invariant. This extends the retained three-backend evidence
 without a runtime or compiler code change.
+
+The consumer also widens Producer<int[]> to Producer<Iterable<int>> and narrows
+Consumer<Iterable<int>> to Consumer<int[]>, checking identity and actual iteration.
+This exposed and now covers native loss of closed array-backing conformance during
+specialization. The backend retains private nominal conformance facts; the bundle,
+source compiler and metadata encodings are unchanged.

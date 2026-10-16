@@ -44,3 +44,7 @@ Array references are also supported as variant arguments: Producer<int[]> can
 widen to Producer<Object>, and Consumer<Object> can narrow to Consumer<int[]>.
 The calls retain the same array; element storage remains invariant. Both directions
 are qualified in Raven interpreter, AOT and managed JIT.
+
+Array arguments may also widen to their declared Iterable<int> contract: producer
+and consumer conversions between int[] and Iterable<int> preserve array identity
+and support iteration in interpreter/AOT/JIT. Result and Sliceable remain invariant.

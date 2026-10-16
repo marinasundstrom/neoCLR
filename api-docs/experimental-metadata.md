@@ -9292,9 +9292,9 @@ valid function indices. They preserve source identities through private shape
 renumbering; they do not define new nominal inheritance or public guest types.
 
 `native_metadata::restore_interface_proofs(target, original, map_type)` preserves
-trusted interface/slot and native Object-root facts through a row-preserving compiler rewrite. It requires
+trusted interface/slot, closed array-backing and native Object-root facts through a row-preserving compiler rewrite. It requires
 matching type/function row counts and applies the same nominal type remapping to
-retained interface arguments. It returns Fault on row mismatch or mapping failure.
+retained interface arguments and array elements. It returns Fault on row mismatch or mapping failure.
 This compiler bridge does not deserialize proof fields from external metadata.
 
 `native_metadata::retain_object_reference_root(definition)` records the verified
@@ -9304,3 +9304,11 @@ Fault. The private marker survives row-preserving rewrites but is omitted on
 serialization; attempts to inject it into external metadata reject. This preserves
 interface-to-Object conversions inside variance without adding boxing or changing
 String's distinct representation. It does not install a second Object slot registry.
+
+`native_metadata::retain_array_shape(target, source, index, arguments)` retains the
+closed element identity of the verified source array backing on its private native
+shape. Callers must supply verified compiler IR. A missing source row or malformed
+backing arity/reference kind returns Fault; a non-backing row is ignored. The marker
+is omitted by serialization, rejected in external metadata and remapped through
+`restore_interface_proofs`. It allows variance to follow the backing's existing
+nominal interfaces after specialization; it adds no array-element conversion or layout.

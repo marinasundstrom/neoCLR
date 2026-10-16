@@ -843,6 +843,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     typedef = Some(TypeDef {
                         native_interface: None,
                         native_object_root: false,
+                        native_array_element: None,
                         static_fields: vec![],
                         primitive_reference: false,
                         is_reference_type,

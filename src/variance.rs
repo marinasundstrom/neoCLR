@@ -157,6 +157,19 @@ fn reference_conversion(module: &Module, source: &Type, target: &Type, depth: us
     }) {
         return true;
     }
+    // Native selection erases generic owners and the source array-backing registry.
+    // Recover only the verified closed nominal view, never element covariance.
+    if let Type::ArrayRef(element) = source {
+        let mut backings = module.types.iter().filter(|definition| {
+            definition.native_array_element.as_ref() == Some(element.as_ref())
+        });
+        if let Some(backing) = backings.next() {
+            if backings.next().is_some() {
+                return false;
+            }
+            return reference_conversion(module, &Type::Named(backing.name.clone()), target, depth + 1);
+        }
+    }
     if module.array_nominal(source).as_ref() == Some(target) {
         return true;
     }

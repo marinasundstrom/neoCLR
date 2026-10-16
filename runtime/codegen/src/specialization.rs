@@ -1044,6 +1044,8 @@ pub fn expand_with_host_roots(
             }
         }
         let native_arguments = shape.arguments.iter().map(|argument| context.lower(argument)).collect::<Result<Vec<_>, _>>()?;
+        neoclr::native_metadata::retain_array_shape(&mut t, input, shape.source, &native_arguments)
+            .map_err(|e| e.to_string())?;
         neoclr::native_metadata::retain_interface_shape(&mut t, input, shape.source, native_arguments)
             .map_err(|e| e.to_string())?;
         t.generic_parameters.clear();
