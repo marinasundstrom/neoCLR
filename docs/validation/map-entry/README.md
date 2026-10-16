@@ -9,10 +9,14 @@ retain their existing names. GetItem/list helpers are deferred. See the
 ## Inputs and reproduction
 
 Raven.Core main commit: `513b24eb6` (main-based development commit `aa04eb38e`).
-Deliberate native-line library carry: `e7ba9f6ad` on `codex/collection-entry-native`,
+Integrated native-line library carry: `afd5fe6e3` on `codex/neoclr`, with all 13
+focused .NET 10 checks passing on that branch. Helper sources match Raven main.
+The initial carry was `e7ba9f6ad` on `codex/collection-entry-native`,
 based on `cb83fb9dd`. The shared native checkout had concurrent compiler edits, so
 this carry was developed and validated independently rather than merging branches
-or including those changes. No compiler semantic change is part of this slice.
+or including those changes. After the author identified the incomplete integration,
+the carry was applied to codex/neoclr above its checked-expression commit, preserving
+that work. No compiler semantic change is part of this slice.
 
 The native five-library bundle is
 `target/collection-entry-libraries-final-20261016`, compiled with Raven `cb83fb9dd`.

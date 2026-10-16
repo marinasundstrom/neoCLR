@@ -70,6 +70,14 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   [design](collection-entry-design.md) for alternatives and migration costs. No list
   helper, collection rename, broader structural change or publication is implied.
 
+- **Integration correction:** the author reports that the changes do not seem
+  integrated everywhere. The assistant verifies that neoCLR main and Raven main
+  contain the work, but the native carry remained isolated. Once the shared native
+  checkout is clean, integrates it onto Raven `codex/neoclr` as `afd5fe6e3`, preserving
+  newer checked-expression changes. All 13 focused tests pass on the actual target
+  branch; helper sources match Raven main. Updates the qualification record to
+  distinguish the earlier isolated validation from completed branch integration.
+
 ## 2026-10-15 — Union overload resolution belongs in Raven
 
 - **Author:** notes that union-typed method parameters affect overload resolution

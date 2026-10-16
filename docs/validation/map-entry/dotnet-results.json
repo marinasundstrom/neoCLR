@@ -16,6 +16,13 @@
     "nativeCarry": {
       "sha256": "cdfe7967c1c3a4bfd0c9c4d64f3f8e2fc6a4442301043fc46c5c16373342355a",
       "result": "Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 1 s - Raven.Core.Tests.dll (net10.0)"
+    },
+    "integratedNative": {
+      "sha256": "abdbe5eff69f7ddf479f6986ca58deb396735ec164c89824180b7b0feb447e2e",
+      "result": "Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 1 s - Raven.Core.Tests.dll (net10.0)"
     }
-  }
+  },
+  "integratedNativeRevision": "afd5fe6e3",
+  "integratedNativeBranch": "codex/neoclr",
+  "integratedNativePassed": true
 }

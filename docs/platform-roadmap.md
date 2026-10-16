@@ -3,7 +3,9 @@
 **Mutable collection helper slice (author direction, 2026-10-16):** implemented
 `MutableMap<K,V>.Entry(key)` and `MutableSet<T>.GetOrInsert(value)` as extensions,
 with live key locators, explicit synchronous callback semantics and canonical set
-lookup. Concrete collection names stay unchanged; GetItem/list work is deferred.
+lookup. Integrated on neoCLR main, Raven main and Raven `codex/neoclr`
+(`afd5fe6e3`); 13 focused tests pass on the final Raven target branch.
+Concrete collection names stay unchanged; GetItem/list work is deferred.
 See the [contract and .NET/Rust comparison](collection-entry-design.md) and
 [qualification record](validation/map-entry/README.md). This bounded library task
 does not reprioritize the active milestone or the parked structural work.
