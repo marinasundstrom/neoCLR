@@ -157,7 +157,7 @@ public sealed partial class AssemblyBuilder
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition) is { Visibility: MethodVisibility.Protected } familyTarget &&
                         (method.DeclaringType is not { } callerType ||
                          !ReferenceEquals(callerType, familyTarget.DeclaringType) && !callerType.DerivesFrom(familyTarget.DeclaringType!) &&
-                         !(instruction.Op == "call" && method.IsConstructor && callerType.IsDirectBaseConstructor(familyTarget, instruction.Type))))
+                         !(instruction.Op is ("call" or "call.constructed") && method.IsConstructor && callerType.IsDirectBaseConstructor(familyTarget, instruction.Type))))
                         throw new InvalidDataException("protected constructor requires a declaring-family caller");
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed" or "call.constrained" or "function.bind"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
@@ -966,7 +966,7 @@ public sealed partial class AssemblyBuilder
         foreach (var type in types)
         {
             var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.ExternalBase is { } externalBase ? ImportedTypeHandle(externalBase) : type.LocalBaseSignature is { } parentType ? MetadataTokens.EntityHandle(ElementToken(parentType)) : objectType,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.ExternalBase is { } externalBase ? MetadataTokens.EntityHandle(ElementToken(externalBase)) : type.LocalBaseSignature is { } parentType ? MetadataTokens.EntityHandle(ElementToken(parentType)) : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));

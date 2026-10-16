@@ -6,8 +6,8 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<ImportedTypeReference, ImportedMethodReference[]> externalClassContracts = [];
     private readonly Dictionary<ImportedTypeReference, int> externalClassFieldCounts = [];
 
-    /// <summary>Completes a nongeneric external class base contract from resolved dependency member facts.</summary>
-    /// <param name="type">Owned public, nonsealed, nongeneric top-level class reference.</param>
+    /// <summary>Completes an external class definition base contract from resolved dependency member facts.</summary>
+    /// <param name="type">Owned public, nonsealed, unconstructed top-level class definition reference.</param>
     /// <param name="methods">All declared public instance methods, including abstract/virtual slots and property accessors; excludes constructors.</param>
     /// <param name="declaredInstanceFieldCount">The dependency class’s own instance storage count, including private fields; 0–256.</param>
     /// <remarks>The host supplies validated symbol facts, including direct base and interface edges. Fields remain owned by the dependency and are laid out only after linking its exact artifact. This does not copy storage or infer it from names.</remarks>
@@ -17,8 +17,8 @@ public sealed partial class AssemblyBuilder
     {
         ArgumentNullException.ThrowIfNull(type); ArgumentNullException.ThrowIfNull(methods);
         if (!ReferenceEquals(type.Owner, this) || type.IsValueType || IsAuthoredInterface(type) ||
-            type.GenericArity != 0 || type.TypeArguments.Count != 0 || type.DeclaringType is not null)
-            throw new ArgumentException("external base requires a nongeneric top-level class reference", nameof(type));
+            type.TypeArguments.Count != 0 || type.DeclaringType is not null)
+            throw new ArgumentException("external base contract requires an unconstructed top-level class reference", nameof(type));
         if (declaredInstanceFieldCount is < 0 or > 256) throw new ArgumentOutOfRangeException(nameof(declaredInstanceFieldCount));
         var members = methods.ToArray();
         if (members.Length > 4096 || members.Distinct().Count() != members.Length || members.Any(m =>
@@ -33,7 +33,7 @@ public sealed partial class AssemblyBuilder
         externalClassFieldCounts.Add(type, declaredInstanceFieldCount);
     }
 
-    internal bool HasClassBaseContract(ImportedTypeReference type) => fieldlessClassBases.Contains(type) || externalClassContracts.ContainsKey(type);
+    internal bool HasClassBaseContract(ImportedTypeReference type) => type.TypeArguments.Count == type.GenericArity && (fieldlessClassBases.Contains(InterfaceDefinition(type)) || externalClassContracts.ContainsKey(InterfaceDefinition(type)));
 
     internal int ExternalClassFieldCount(ImportedTypeReference type)
     {
@@ -41,23 +41,24 @@ public sealed partial class AssemblyBuilder
         for (ImportedTypeReference? current = type; current is not null; current = DeclaredClassBase(current))
         {
             if (!HasClassBaseContract(current)) throw new InvalidDataException("external ancestor requires a complete layout contract");
-            count = checked(count + externalClassFieldCounts.GetValueOrDefault(current));
+            count = checked(count + externalClassFieldCounts.GetValueOrDefault(InterfaceDefinition(current)));
         }
         return count;
     }
 
-    internal IEnumerable<MethodBuilder> ExternalClassMethods(ImportedTypeReference type)
+    internal IEnumerable<(MethodBuilder Method, MethodSignature Signature)> ExternalClassMethods(ImportedTypeReference type)
     {
         for (ImportedTypeReference? current = type; current is not null; current = DeclaredClassBase(current))
-            if (externalClassContracts.TryGetValue(current, out var methods))
-                foreach (var method in methods) yield return method.Target;
+            if (externalClassContracts.TryGetValue(InterfaceDefinition(current), out var methods))
+                foreach (var method in methods)
+                    yield return (method.Target, current.GenericArity == 0 ? method.Signature : method.MakeConstructedReference(current.TypeArguments).Signature);
     }
 
     internal IEnumerable<SignatureType> ExternalClassInterfaces(ImportedTypeReference type)
     {
         for (ImportedTypeReference? current = type; current is not null; current = DeclaredClassBase(current))
-            if (authoredInterfaceBases.TryGetValue(current, out var interfaces))
-                foreach (var contract in interfaces) yield return contract;
+            if (authoredInterfaceBases.TryGetValue(InterfaceDefinition(current), out var interfaces))
+                foreach (var contract in interfaces) yield return SubstituteClassArgument(current, contract);
     }
 
     /// <summary>Declares an explicitly imported public, nonsealed, fieldless class hierarchy as an external base contract.</summary>
@@ -87,6 +88,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(baseType);
         if (!Enum.IsDefined(visibility) || !HasClassBaseContract(baseType))
             throw new ArgumentException("external base requires a complete explicit contract", nameof(baseType));
+        ((SignatureType)baseType).ValidateOwner(this);
         var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u,
             Definition.MainModule.ImportReference(baseType.AssemblyIdentity, baseType.Namespace, baseType.Name))
         { AuthoredExternalBase = baseType };
@@ -97,16 +99,31 @@ public sealed partial class AssemblyBuilder
 
 public sealed partial class TypeDefinition
 {
-    internal ImportedTypeReference? AuthoredExternalBase { get; init; }
+    internal ImportedTypeReference? AuthoredExternalBase { get; set; }
+    internal void BindExternalBase(ImportedTypeReference baseType)
+    {
+        authoredBaseType = Module!.ImportReference(baseType.AssemblyIdentity, baseType.Namespace, baseType.Name);
+        AuthoredExternalBase = baseType;
+    }
 }
 
 public sealed partial class TypeBuilder
 {
     internal ImportedTypeReference? ExternalBase => Definition.AuthoredExternalBase;
     internal bool HasExplicitClassBase => LocalBase is not null || ExternalBase is not null;
-    internal bool HasExternalBase(ImportedTypeReference target) => ExternalBase is { } parent
-        ? parent.Equals(target) || Assembly.HasDeclaredClassBase(parent, target)
-        : LocalBase?.HasExternalBase(target) == true;
+    internal bool HasExternalBase(ImportedTypeReference target)
+    {
+        SignatureType current = OpenSignature;
+        var owner = this;
+        while (owner.LocalBaseSignature is { } parent)
+        {
+            current = current.GenericInstance is { } instance ? instance.Substitute(parent) : parent;
+            owner = current.GenericInstance?.Definition ?? current.ClassType!;
+        }
+        if (owner.ExternalBase is not { } external) return false;
+        var bound = current.GenericInstance is { } construction ? external.Substitute(construction.Substitute) : external;
+        return bound.Equals(target) || Assembly.HasDeclaredClassBase(bound, target);
+    }
     internal bool IsDirectBaseConstructor(MethodBuilder target, SignatureType? receiver = null)
         => ReferenceEquals(LocalBase, target.DeclaringType) && LocalBase is not null &&
             (LocalBaseSignature?.GenericInstance is null ? receiver is null : receiver == LocalBaseSignature) ||

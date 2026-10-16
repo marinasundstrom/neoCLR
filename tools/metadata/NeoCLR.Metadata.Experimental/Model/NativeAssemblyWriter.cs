@@ -371,7 +371,7 @@ public sealed partial class AssemblyBuilder
             revision = d.NativeBinding is null ? d.Identity.Version.ToString() : d.NativeBinding.Revision
         }).ToArray();
         if (moduleBindings.Length != 0) manifest["native_module_bindings"] = moduleBindings;
-        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || types.Any(owner => Equals(owner.ExternalBase, t)) || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t =>
+        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || types.Any(owner => owner.ExternalBase is { } parent && Equals(InterfaceDefinition(parent), t)) || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t =>
         {
             var row = new Dictionary<string, object?> {
                 ["native_name"] = ExternalName(t), ["assembly"] = IdentityText(t.AssemblyIdentity),

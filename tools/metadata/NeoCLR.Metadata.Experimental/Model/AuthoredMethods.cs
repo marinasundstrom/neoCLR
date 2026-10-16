@@ -199,7 +199,7 @@ public sealed partial class TypeBuilder
                 yield return (method, new MethodSignature(Project(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Project), method.Signature.GenericParameterNames, method.Signature.OutParameters));
         }
         if (owner.ExternalBase is { } external)
-            foreach (var method in Assembly.ExternalClassMethods(external)) yield return (method, method.Signature);
+            foreach (var method in Assembly.ExternalClassMethods(current.GenericInstance is { } instance ? external.Substitute(instance.Substitute) : external)) yield return method;
     }
 
     internal MethodBuilder? FindInheritedMethod(string name, MethodSignature signature)

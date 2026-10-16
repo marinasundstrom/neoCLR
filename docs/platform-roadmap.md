@@ -4864,3 +4864,8 @@ structural-type work or change unrelated milestone priorities.
 passes CLR/interpreter/AOT/JIT self-reference storage checks and rejects actual
 inheritance cycles. See [retained evidence](validation/constructed-class-base/README.md).
 Raven integration and external constructed base authoring remain next steps.
+
+**External generic base authoring (2026-10-16):** SDK construction, initialization,
+inherited storage and nominal interface dispatch now pass CLR/interpreter/AOT/JIT.
+See [the qualification record](validation/external-constructed-class-base/README.md).
+Raven consumer wiring is the next slice; generic class virtual slots remain open.

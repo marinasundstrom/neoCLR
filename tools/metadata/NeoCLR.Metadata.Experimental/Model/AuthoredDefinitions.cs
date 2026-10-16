@@ -131,7 +131,7 @@ public sealed partial class TypeDefinition
     /// <exception cref="NotSupportedException">CLI base signatures have not been materialized.</exception>
     public SignatureType? BaseTypeSignature => Producer is null && Module?.Assembly.IsNative == false
         ? throw new NotSupportedException("CLI base signatures are not materialized")
-        : AuthoredBaseSignature ?? nativeBaseSignature?.Value ??
+        : AuthoredBaseSignature ?? (AuthoredExternalBase is { } external ? (SignatureType)external : null) ?? nativeBaseSignature?.Value ??
         (BaseType is { } parent ? SignatureType.FromReference(parent) : null);
 
     /// <summary>Gets the authored or materialized nominal base reference without resolving dependencies.</summary>
@@ -204,9 +204,10 @@ public sealed partial class AssemblyBuilder
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
             else if (!definition.IsNativeObjectRoot && !(definition.AuthoredExternalBase is { } externalBase &&
-                HasClassBaseContract(externalBase) && definition.GenericArity == 0 && definition.DeclaringType is null && category is 0 or 0x80 or 0x100) && !(category is 0 or 0x80 or 0x100 && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && (IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && definition.AuthoredBaseSignature?.GenericInstance is { } construction && ReferenceEquals(construction.Definition, parent)) && (definition.DeclaringType is null || parent.IsNativeObjectRoot)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+                HasClassBaseContract(externalBase) && definition.DeclaringType is null && category is 0 or 0x80 or 0x100) && !(category is 0 or 0x80 or 0x100 && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && (IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && definition.AuthoredBaseSignature?.GenericInstance is { } construction && ReferenceEquals(construction.Definition, parent)) && (definition.DeclaringType is null || parent.IsNativeObjectRoot)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
                 baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum)))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
+            if (definition.AuthoredExternalBase is { } externalSignature) ((SignatureType)externalSignature).ValidateOwner(this, typeArity: definition.GenericArity);
             definition.AuthoredBaseSignature?.ValidateOwner(this, typeArity: definition.GenericArity);
             // Validate pending fields before attaching any ownership or writer handles.
             foreach (var field in definition.Fields)

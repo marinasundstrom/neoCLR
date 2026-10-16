@@ -46,11 +46,18 @@ public sealed partial class AssemblyBuilder
     {
         if (!declaredClassBases.TryGetValue(InterfaceDefinition(type), out var parent)) return null;
         if (type.TypeArguments.Count == 0) return parent;
-        SignatureType Substitute(SignatureType part) => part.TypeParameterIndex is { } index ? type.TypeArguments[index]
+        return parent.Substitute(part => SubstituteClassArgument(type, part));
+    }
+
+    internal static SignatureType SubstituteClassArgument(ImportedTypeReference owner, SignatureType part)
+    {
+        if (owner.TypeArguments.Count == 0) return part;
+        SignatureType Substitute(SignatureType value) => SubstituteClassArgument(owner, value);
+        return part.TypeParameterIndex is { } index ? owner.TypeArguments[index]
             : part.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
+            : part.ByReferenceElement is { } reference ? SignatureType.ByReference(Substitute(reference))
             : part.GenericInstance is { } local ? local.Definition.MakeGenericInstance(local.TypeArguments.Select(Substitute).ToArray())
             : part.ImportedType is { } imported ? imported.Substitute(Substitute) : part;
-        return parent.Substitute(Substitute);
     }
 
     internal bool HasDeclaredClassBase(ImportedTypeReference type, ImportedTypeReference target)

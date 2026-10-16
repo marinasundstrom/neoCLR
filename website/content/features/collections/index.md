@@ -195,3 +195,8 @@ Development SDK authoring also supports recursive nominal base arguments such as
 `Node : Base<Node>` through deferred base binding. Actual inheritance cycles remain
 invalid. CLR/interpreter/AOT/JIT storage checks pass. Raven also emits recursive generic
 and nongeneric base arguments, with native inherited-call execution checks.
+
+Development SDK classes can also derive from explicitly completed external generic
+base contracts, retaining arguments, inherited private storage and nominal interfaces.
+A separate-dependency consumer passes CLR/interpreter/AOT/JIT checks; generic class
+virtual slots remain unsupported. Raven source qualification follows separately.

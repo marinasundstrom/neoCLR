@@ -16,6 +16,11 @@ public sealed partial class AssemblyBuilder
             ancestorView = ancestorView.GenericInstance is { } construction ? construction.Substitute(next) : next;
             if (ancestorView == target) return true;
         }
+        if ((ancestorView.GenericInstance?.Definition ?? ancestorView.ClassType)?.ExternalBase is { } externalBase && target.ImportedType is { } externalTarget)
+        {
+            var bound = ancestorView.GenericInstance is { } instance ? externalBase.Substitute(instance.Substitute) : externalBase;
+            if (bound.Equals(externalTarget) || HasDeclaredClassBase(bound, externalTarget)) return true;
+        }
         if (source.GenericInstance is { } constructed && target.ClassType is { } parent && constructed.Definition.DerivesFrom(parent)) return true;
         if (source.ClassType is { } derived && target.ClassType is { } ancestor && derived.DerivesFrom(ancestor)) return true;
         // Local subclasses retain an explicit dependency base contract. Reuse the

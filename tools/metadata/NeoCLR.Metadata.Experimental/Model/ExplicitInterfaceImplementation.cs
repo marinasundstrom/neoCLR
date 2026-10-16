@@ -92,7 +92,7 @@ public sealed partial class TypeBuilder
         if (declared is not null) return declared;
         var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner, LocalBaseSignature is { } parent ? Project(parent).GenericInstance : null)
             ?? (ExternalBase is { } external ? Assembly.ExternalClassMethods(external).FirstOrDefault(m =>
-                m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public && m.Name == name && Matches(m.Signature)) : null);
+                m.Method.IsStatic == isStatic && m.Method.Visibility == MethodVisibility.Public && m.Method.Name == name && Matches(m.Signature)).Method : null);
         if (inherited?.Definition.ExplicitInterfaceImplementations.Count > 0)
             throw new InvalidDataException("inherited explicit interface reimplementation is not supported");
         return inherited;
