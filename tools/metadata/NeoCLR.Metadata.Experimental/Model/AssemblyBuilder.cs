@@ -830,7 +830,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => method.Instructions[i].Target!.IsStatic || method.Instructions[i].Target!.IsAbstract ? 12 : 11,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "type.token" or "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "type.token" or "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "array.address" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "argument.address" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" or "less.unordered" or "greater.unordered" => 2,
@@ -853,7 +853,8 @@ public sealed partial class AssemblyBuilder
                     case "array.new":
                     case "array.load":
                     case "array.store":
-                        code.WriteByte(instruction.Op == "array.new" ? (byte)0x8d : instruction.Op == "array.load" ? (byte)0xa3 : (byte)0xa4);
+                    case "array.address":
+                        code.WriteByte(instruction.Op == "array.new" ? (byte)0x8d : instruction.Op == "array.load" ? (byte)0xa3 : instruction.Op == "array.address" ? (byte)0x8f : (byte)0xa4);
                         code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "duplicate": code.WriteByte(0x25); break;
                     case "new.object": code.WriteByte(0x73); code.WriteInt32(ImportMethod(instruction.Target!)); break;

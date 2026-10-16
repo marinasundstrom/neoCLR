@@ -222,9 +222,11 @@ public sealed partial class MethodBuilder
                     Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;
                 case "array.load":
                 case "array.store":
+                case "array.address":
                     if (instruction.Op == "array.store") Pop(instruction.Type!);
                     Pop(PrimitiveType.Int32); Pop(SignatureType.ArrayOf(instruction.Type!));
                     if (instruction.Op == "array.load") stack.Add(instruction.Type!);
+                    if (instruction.Op == "array.address") stack.Add(SignatureType.ByReference(instruction.Type!));
                     break;
                 case "array.length":
                     if (stack.Count == 0 || stack[^1].ArrayElement is null) throw new InvalidDataException("array length requires a vector");

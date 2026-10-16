@@ -154,6 +154,8 @@ public enum OpCode
     ValueIs,
     /// <summary>Extracts a matching payload from erased Value; a mismatched tag faults. Native-only.</summary>
     ValueUnpack,
+    /// <summary>Loads a checked managed vector-element address; requires the exact element SignatureType.</summary>
+    Ldelema,
 
 }
 

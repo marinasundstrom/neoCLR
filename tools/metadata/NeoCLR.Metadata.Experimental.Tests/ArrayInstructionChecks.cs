@@ -11,6 +11,15 @@ internal static class ArrayInstructionChecks
         var graph = ArraySignatureChecks.Create();
         var main = graph.EntryPoint!;
         main.ClearBody();
+        if (scenario == "address")
+        {
+            var vector = main.DeclareLocal(SignatureType.ArrayOf(PrimitiveType.Int32));
+            main.LoadConstant(1); main.NewArray(PrimitiveType.Int32); main.StoreLocal(vector);
+            main.LoadLocal(vector); main.LoadConstant(0); main.Emit(OpCode.Ldelema, PrimitiveType.Int32);
+            main.LoadConstant(42); main.Emit(OpCode.Stobj, PrimitiveType.Int32);
+            main.LoadLocal(vector); main.LoadConstant(0); main.LoadArrayElement(PrimitiveType.Int32);
+            main.Return(); return graph;
+        }
         if (scenario is "negative" or "bounds" or "empty")
         {
             main.LoadConstant(scenario == "negative" ? -1 : 0); main.NewArray(PrimitiveType.Int32);
@@ -45,29 +54,32 @@ internal static class ArrayInstructionChecks
 
     internal static void Run()
     {
-        foreach (var scenario in new[] { "valid", "empty", "negative", "bounds" })
+        foreach (var scenario in new[] { "valid", "address", "empty", "negative", "bounds" })
         {
             var loaded = Assembly.Load(Create(scenario).Write());
             try
             {
                 var result = loaded.EntryPoint!.Invoke(null, null);
-                if (!Equals(result, scenario == "valid" ? 42 : 0) || scenario is "negative" or "bounds") throw new Exception("array execution " + scenario);
+                if (!Equals(result, scenario is "valid" or "address" ? 42 : 0) || scenario is "negative" or "bounds") throw new Exception("array execution " + scenario);
             }
             catch (TargetInvocationException e) when (scenario == "negative" && e.InnerException is OverflowException || scenario == "bounds" && e.InnerException is IndexOutOfRangeException) { }
         }
         var bad = Create("empty"); var entry = bad.EntryPoint!; entry.ClearBody();
         entry.LoadConstant(1); entry.NewArray(PrimitiveType.Int32); entry.LoadConstant(0); entry.LoadArrayElement(PrimitiveType.Boolean); entry.Emit(OpCode.Pop); entry.LoadConstant(0); entry.Return();
         try { bad.Write(); throw new Exception("wrong array element accepted"); } catch (InvalidDataException) { }
+        entry.ClearBody(); entry.LoadConstant(1); entry.NewArray(PrimitiveType.Int32); entry.LoadConstant(0);
+        entry.Emit(OpCode.Ldelema, PrimitiveType.Boolean); entry.Emit(OpCode.Pop); entry.LoadConstant(0); entry.Return();
+        try { bad.Write(); throw new Exception("wrong array address element accepted"); } catch (InvalidDataException) { }
         entry.ClearBody(); entry.LoadConstant(1); entry.NewArray(PrimitiveType.Int32); entry.Emit(OpCode.Ldlen); entry.Return();
         try { bad.Write(); throw new Exception("native-size array length accepted as Int32"); } catch (InvalidDataException) { }
     }
 
-    internal static async Task RunRuntime(string runtime, string output)
+    internal static async Task RunRuntime(string runtime, string output, bool addressesOnly = false)
     {
         Run();
         if (Directory.Exists(output)) throw new IOException("output must be fresh");
         Directory.CreateDirectory(output);
-        foreach (var scenario in new[] { "valid", "empty", "negative", "bounds" })
+        foreach (var scenario in addressesOnly ? new[] { "address" } : new[] { "valid", "address", "empty", "negative", "bounds" })
         {
             var graph = Create(scenario);
             var path = Path.Combine(output, scenario + ".dll");
@@ -76,14 +88,15 @@ internal static class ArrayInstructionChecks
             {
                 var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
                 start.ArgumentList.Add(command); start.ArgumentList.Add(path);
+                if (addressesOnly && command == "run") { start.ArgumentList.Add("--execution"); start.ArgumentList.Add("interpreter"); }
                 using var process = Process.Start(start)!;
                 var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
                 await process.WaitForExitAsync(); var text = await stdout + await stderr;
-                var expected = command == "verify" || scenario == "empty" ? 0 : scenario == "valid" ? 42 : -1;
+                var expected = command == "verify" || scenario == "empty" ? 0 : scenario is "valid" or "address" ? 42 : -1;
                 if (expected >= 0 ? process.ExitCode != expected : process.ExitCode == 0 || !text.Contains(scenario == "negative" ? "non-negative" : "IndexOutOfRange", StringComparison.OrdinalIgnoreCase))
                     throw new Exception(scenario + " " + command + ": " + text);
             }
         }
-        Console.WriteLine("PASS binary arrays: primitive/nominal storage and aliasing 42, empty 0, negative length and bounds fault");
+        Console.WriteLine(addressesOnly ? "PASS array address: CLI and native interpreter mutation returns 42" : "PASS binary arrays: primitive/nominal storage and aliasing 42, empty 0, negative length and bounds fault");
     }
 }

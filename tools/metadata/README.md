@@ -350,3 +350,16 @@ Call-site conversions remain a separate validation layer. See the [manual API re
 
 Run the bounded checks with
 `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --interface-variance`.
+
+
+### Managed array addresses (2026-10-16)
+
+The typed `Emit` overload now accepts `OpCode.Ldelema`, producing a managed element
+reference with normal null/bounds checks. CLI and native output use the standard
+existing instruction. See the [host API reference](../../api-docs/experimental-metadata.md#managed-array-element-addresses-development-2026-10-16).
+Run the focused check with a fresh output directory:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --array-address-integration target/debug/neoclr target/array-address-check
+```

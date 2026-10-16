@@ -2685,7 +2685,7 @@ void MethodBuilder.StoreArrayElement(SignatureType elementType);
 void MethodBuilder.LoadArrayLength();
 ```
 
-The typed Emit overload accepts Newarr, Ldelem and Stelem with scalar element types
+The typed Emit overload accepts Newarr, Ldelem, Ldelema and Stelem with scalar element types
 accepted by ArrayOf. Wrong opcode/element/ownership throws ArgumentException; null
 throws ArgumentNullException, with no body mutation. Helpers have the same validation.
 Allocation consumes Int32 length and pushes a reference array with default-initialized
@@ -9709,3 +9709,27 @@ borrowed and Self tokens remain rejected. CLI executable/reference export reject
 these tokens with `InvalidDataException` rather than substituting nominal Func/Action
 identity. Other existing function transport remains unchanged. Focused function-kind
 SDK checks validate native token encoding/readback and CLI rejection.
+
+
+## Managed array-element addresses (development, 2026-10-16)
+
+`OpCode.Ldelema` is accepted by `MethodBuilder.Emit(OpCode, SignatureType)` and
+`IILGenerator.Emit(OpCode, SignatureType)`. It consumes a vector reference followed
+by an Int32 index and produces a managed reference to the specified element type.
+The element type must be a valid, owned array storage signature; Void and invalid
+owners are rejected. Stack validation rejects mismatched array/element types.
+Runtime null and bounds checks apply before the address is used. An address may
+be consumed by typed loads/stores or value-type instance calls; it is not an
+unmanaged pointer and does not bypass the runtime's reference/lifetime rules.
+
+CLI emission uses standard `ldelema` (0x8f plus element token); native emission uses
+the existing `ldelema` instruction. No runtime opcode or container version changes.
+This closes an authoring gap relative to .NET, with no deliberate semantic divergence.
+The enum member is appended to preserve existing values. The general typed `Emit`
+overload is the public entry point; no convenience method is added.
+
+Validation: `--array-address-integration` runs the CLI array checks, verifies a
+native consumer and executes an Int32 array-address/store/read returning 42 in the
+interpreter. Wrong-element address authoring is rejected. Raven also exercises a
+nominal struct array in the interpreter. Native AOT allocation of nominal struct
+arrays remains unsupported; array-address authoring does not remove that allocation limitation.

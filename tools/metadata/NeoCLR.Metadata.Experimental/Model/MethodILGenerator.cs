@@ -313,6 +313,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             OpCode.Newarr => "array.new",
             OpCode.ReserveArray => "array.reserve",
             OpCode.Ldelem => "array.load",
+            OpCode.Ldelema => "array.address",
             OpCode.Stelem => "array.store",
             _ => throw OperandError(opCode)
         }, Type: elementType));

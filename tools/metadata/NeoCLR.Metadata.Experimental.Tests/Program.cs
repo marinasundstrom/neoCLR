@@ -406,6 +406,12 @@ if (args.Length == 3 && args[0] == "--indexer-integration")
     return 0;
 }
 
+if (args.Length == 3 && args[0] == "--array-address-integration")
+{
+    await ArrayInstructionChecks.RunRuntime(args[1], args[2], addressesOnly: true);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--array-integration")
 {
     await ArrayInstructionChecks.RunRuntime(args[1], args[2]);
