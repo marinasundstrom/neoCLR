@@ -104,7 +104,7 @@ or loading its dependencies. Its output is a diagnostic listing, not reassemblab
 
 The native target does not support every Raven or .NET feature. Local and imported concrete generic class
 virtual slots and overrides now pass development interpreter/JIT/AOT consumers.
-Generic virtual methods and abstract generic class authoring remain unsupported. An explicit development compiler option now exercises ordinary
+Abstract generic bases are also qualified with local and imported slots. Generic virtual methods remain unsupported. An explicit development compiler option now exercises ordinary
 async methods through retained runtime frames. The POC now qualifies interpreter
 execution and macOS ARM64 JIT/AOT HTTP application bodies, with cleanup and GC checks.
 [Runtime-async POC details](../features/tasks/#direction) describe the temporary native

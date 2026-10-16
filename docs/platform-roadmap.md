@@ -4882,5 +4882,4 @@ Structural work remains parked.
 
 **Abstract generic bases (2026-10-16):** SDK authoring and native execution now pass
 CLR/interpreter/AOT/JIT, including inherited abstract slots and rejection checks.
-See [qualification](validation/generic-class-virtual/README.md). Raven and imported
-abstract contracts remain the next bounded follow-up; structural work stays parked.
+See [qualification](validation/generic-class-virtual/README.md). Raven local/imported abstract contracts now pass the [native consumers](validation/generic-class-virtual/raven/README.md), with capability/CLR tests and exact generic arguments. Broader constrained dependency contracts remain open; structural work stays parked.

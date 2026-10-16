@@ -18,6 +18,18 @@ reference payload dispatch preserves identity. Expected result: 42.
 
 `results.json` and `imported-results.json` retain compiler/SDK/runtime/bundle
 fingerprints and interpreter/AOT/JIT commands, including native cleanup and AOT
-sanitizers. This is macOS ARM64 development evidence. Abstract generic classes,
-generic virtual methods, generic Object overrides and constrained dependency
-imports are not qualified by this fixture. Structural types remain parked.
+sanitizers. This is macOS ARM64 development evidence. The original concrete fixture does not qualify generic virtual methods, generic Object overrides or constrained dependency imports. Abstract generic bases are covered by the additional fixture below. Structural types remain parked.
+
+## Abstract generic bases
+
+With Raven `8f5967d41`, add `--abstract` (and optionally `--imported`) to run `AbstractLibrary.rvn` and
+`AbstractMain.rvn`. `Base<T>.Select` is abstract; both the provider and consumer
+supply concrete overrides with reordered owner parameters. Their bodies call the
+concrete `base.Echo` directly. Calls through integer/reference base views must use
+the overrides and preserve reference identity. Expected result: 42.
+
+`abstract-results.json` and `abstract-imported-results.json` retain the matching
+interpreter/AOT/JIT evidence and toolchain fingerprints. SDK negatives cover
+abstract construction, missing implementations and direct abstract calls; Raven's
+focused tests cover the default-off capability and CLR execution. Generic virtual
+methods, generic closed hierarchies and constrained dependency imports remain gaps.

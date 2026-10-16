@@ -55,6 +55,15 @@ internal static class GenericClassVirtualChecks
             throw new Exception("generic base argument lost");
         if (abstractBase)
         {
+            var consumer = new AssemblyBuilder(new("AbstractConsumer", new(1, 0, 0, 0)), core);
+            var imported = consumer.CreateTypeReference(graph.Identity, core,
+                Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(native)), "Example", "Base`1", 1);
+            var importedSlot = consumer.CreateMethodReference(imported, "Get", new(t, []), isVirtual: true, isAbstract: true);
+            var call = consumer.AddFunction("Read", new(PrimitiveType.Int32, [imported.MakeGenericInstance(PrimitiveType.Int32)]));
+            call.LoadArgument(0); call.CallVirtual(importedSlot.MakeConstructedReference([PrimitiveType.Int32])); call.Return();
+            consumer.WriteNativeAssembly();
+            try { call.Call(importedSlot.MakeConstructedReference([PrimitiveType.Int32])); throw new Exception("direct imported abstract call accepted"); }
+            catch (ArgumentException) { }
             if ((snapshot.MainModule.Types.Single(t => t.Name == "Base`1").Attributes & 0x80) == 0)
                 throw new Exception("abstract generic flag lost");
             var invalidNew = graph.AddFunction("InvalidNew", new(PrimitiveType.Void, []));

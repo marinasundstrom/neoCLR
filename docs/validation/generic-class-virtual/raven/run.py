@@ -14,14 +14,16 @@ parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--imported', action='store_true', help='Compile the generic owner in a separate native library')
 
+parser.add_argument('--abstract', action='store_true', help='Qualify abstract generic base slots')
 args = parser.parse_args()
 compiler, bundle, output = (p.resolve() for p in (args.compiler, args.bundle, args.output))
 project = output / 'project'
 project.mkdir(parents=True, exist_ok=True)
 name = 'GenericVirtualRaven'
-source = SOURCE / 'Main.rvn'
+source = SOURCE / ('AbstractMain.rvn' if args.abstract else 'Main.rvn')
+library_source = SOURCE / ('AbstractLibrary.rvn' if args.abstract else 'Library.rvn')
 host = SOURCE.parents[1] / 'interface-variance/native-host.c'
-(project / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + source.read_text())
+(project / 'Main.rvn').write_text(('' if args.imported else library_source.read_text()) + source.read_text())
 from xml.sax.saxutils import escape
 (project / 'App.rvnproj').write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="{escape(str(bundle / 'NeoCLR.ClassLibrary.props'))}"/>
@@ -48,7 +50,7 @@ library_image = None
 if args.imported:
     library_project = output / 'library'
     library_project.mkdir(exist_ok=True)
-    (library_project / 'Main.rvn').write_text((SOURCE / 'Library.rvn').read_text())
+    (library_project / 'Main.rvn').write_text(library_source.read_text())
     (library_project / 'Library.rvnproj').write_text((project / 'App.rvnproj').read_text()
         .replace('<OutputType>Exe</OutputType>', '<OutputType>Library</OutputType>')
         .replace(name, 'GenericVirtualLibrary'))
@@ -82,7 +84,7 @@ result = run('jit', [codegen, '--jit-managed', '--closed-world', image, '@entry'
 report['jit'] = json.loads(result.stderr.split('JIT_RESULT ', 1)[1])
 assert report['jit']['guestExitCode'] == 42
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
-    (source, SOURCE / 'Library.rvn', SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+    (source, library_source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
 if library_image is not None:
     report['files'][str(library_image)] = hashlib.sha256(library_image.read_bytes()).hexdigest()
 report['passed'] = True

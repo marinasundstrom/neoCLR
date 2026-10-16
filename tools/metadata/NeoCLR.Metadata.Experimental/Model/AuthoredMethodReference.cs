@@ -27,7 +27,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="nativePrimitive">Explicit canonical numeric or String owner representation, or null for an ordinary owner.</param>
     /// <param name="visibility">Public by default; Protected is admitted only for constructors and requires a direct derived constructor call.</param>
     /// <param name="isVirtual">True for an ordinary nongeneric method slot on a reference class, including a generic class.</param>
-    /// <param name="isAbstract">True for a bodyless new class slot; requires isVirtual.</param>
+    /// <param name="isAbstract">True for a bodyless new class slot, including on a generic owner; requires isVirtual.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
@@ -70,7 +70,7 @@ public sealed partial class AssemblyBuilder
             declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
         if ((isVirtual || isAbstract) && (isStatic || declaringType.IsValueType || IsAuthoredInterface(declaringType) ||
-            isAbstract && declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" ||
+            declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" ||
             signature.GenericParameterNames.Count != 0 || isAbstract && (!isVirtual || isOverride)))
             throw new ArgumentException("class slot requires an ordinary nongeneric instance method");
         if (isOverride && !isVirtual && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))
