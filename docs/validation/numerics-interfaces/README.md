@@ -1,175 +1,81 @@
-# Minimal numerics contracts and Complex demo — 2026-10-16
+# Numerics qualification
 
-This began as a source-local experiment; the public library adoption and its
-qualification are recorded below. It responds
-to the author's request for minimal System.Numerics interfaces and another useful
-number type to test the model. See the [design comparison](../../design/numeric-contracts.md#minimal-systemnumerics-capabilities-and-complex-experiment--2026-10-16).
+The development System.Runtime library provides AdditionOperators,
+SubtractionOperators, MultiplyOperators and DivisionOperators in System.Numerics.
+Number inherits them; the Complex demo implements arithmetic without ordering.
+See the [design](../../design/numeric-contracts.md) for current contracts and limits.
 
-`Complex.rvn` defines four explicit nominal static operator interfaces in
-System.Numerics, using native Self operands/results, and a double-component Complex
-struct implementing them. No ordering is invented: Complex does not implement the
-current System.Number contract. Candidate interface names and their same-type-only
-scope are provisional. Number remains unchanged in the installed library.
+## Current evidence
 
-## Initial experiment (historical)
+| Consumer/check | Coverage | Evidence |
+| --- | --- | --- |
+| LibraryConsumer.rvn | Four operations across ten primitive types, Number-bound forwarding, custom Complex | [library-results.json](library-results.json) |
+| FunctionProvider.rvn + FunctionConsumer.rvn | Imported top-level operations on int/double and Number-bound forwarding | [function-results.json](function-results.json) |
+| Invalid imported function argument | Add<string> rejects with RAV0320 | [function-negative-results.json](function-negative-results.json) |
+| Provider.rvn + Consumer.rvn | Imported static class method with custom nominal interface bounds | [import-results.json](import-results.json) |
+| Invalid imported class-method argument | Rejects int against the provider's source-local interface | [import-negative-results.json](import-negative-results.json) |
+| ComplexGeneric.rvn / ComplexGenericMethod.rvn | Source-local top-level and class-contained generic calls | [generic-fixed-results.json](generic-fixed-results.json), [method-results.json](method-results.json) |
+| Reference signatures | 218 checks, including exact static Self contracts | [number-signatures.json](number-signatures.json) |
 
-The direct consumer returns 42 on interpreter, managed JIT and AOT on macOS ARM64.
-It checks addition, subtraction, multiplication, finite nonzero division, i squared,
-conjugate multiplication and a polynomial. The AOT host uses undefined-behavior and
-bounds sanitizers. `direct-results.json` retains commands and source/tool/bundle hashes.
+Positive consumers return 42 on interpreter, managed JIT and AOT on macOS ARM64.
+AOT hosts use undefined-behavior and bounds sanitizers. Manifests retain commands,
+source/tool/bundle hashes and outcomes; they are not cross-platform qualification.
 
-`check-conformance.py` verifies two compile-time failures: an addition operator
-without explicit AdditionOperators conformance does not satisfy the generic bound;
-and implementing the arithmetic capabilities does not satisfy Number.
-`conformance-results.json` retains diagnostics and generated source hashes.
-
-`ComplexGeneric.rvn` differs by routing addition through a top-level constrained
-function. Compilation and interpreter execution succeed, but AOT and JIT reject
-`unsupported generic method constraint`. `generic-results.json` intentionally has
-passed=false: it records the blocker, not successful full qualification. The shared
-specializer currently admits only function-kind method bounds in
-runtime/codegen/src/specialization.rs::check_method_constraints. Admission must
-validate nominal conformance and then resolve constrained Self calls; removing the
-gate without those checks is not a fix.
-
-A preliminary generic method inside a class also failed the Raven native emitter's
-ConstraintClauses gate in Int32Emitter. Top-level syntax isolates the runtime gap;
-it does not close class-contained generic method support. A local full library build
-with candidate interfaces and Number inheritance succeeded, but those library edits
-were withdrawn pending useful cross-backend constrained calls and API documentation.
-The unqualified local bundle target/numerics-libraries-20261016 is not a release artifact.
+LibraryConsumer uses the five-library bundle
+`target/numerics-public-libraries-20261016`, built with Raven `2e4776f7d` and neoCLR
+`57c31e9bc` plus the library declarations committed in `c8bebcbfd`. Imported function
+qualification uses Raven `ab010c687` and SDK `0cdfb228b` against that same bundle.
+The complete public API inventory and native RavenDoc snapshot include all four
+types and their operators; the rendering audit and four snapshot checks pass.
 
 ## Reproduce
 
 ```sh
 python3 docs/validation/compound-operators/run.py \
   --compiler ../Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll \
-  --bundle target/function-reflection-library-validated-20261016 \
-  --source docs/validation/numerics-interfaces/Complex.rvn \
-  --output target/numerics-complex-check
-python3 docs/validation/numerics-interfaces/check-conformance.py \
-  --compiler ../Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll \
-  --bundle target/function-reflection-library-validated-20261016 \
-  --output target/numerics-conformance-check
+  --bundle target/numerics-public-libraries-20261016 \
+  --source docs/validation/numerics-interfaces/LibraryConsumer.rvn \
+  --output target/numerics-library-check
 ```
 
-Use ComplexGeneric.rvn with a different output directory to reproduce the AOT
-failure after interpreter success. The recorded JIT rejection uses the direct
-consumer's host with the generic image. Matching compiler: Raven codex/neoclr
-371363a67; runtime/SDK baseline 1f1e99af3, neoCLR source 76e67df6c plus these samples.
-No compiler/runtime changes, Runtime Contract switch, CLI encoding or native opcode
-is introduced. Ordinary Raven/.NET and broader structural work remain unchanged.
+For imported functions, compile FunctionProvider.rvn as a separate Library project
+with AssemblyName NumericFunctions and the same bundle's NeoCLR.ClassLibrary.props.
+Run the shared runner with FunctionConsumer.rvn and `--reference <NumericFunctions.dll>`.
+Run check-conformance.py with `--function-provider <NumericFunctions.dll>` to check
+invalid arguments. For the source-local interface/class-method fixture, use
+Provider.rvn, AssemblyName NumericProvider, Consumer.rvn and `--provider` instead.
+That fixture uses the bundle recorded in import-results.json; its source-local
+interfaces must not be substituted for the installed library's interfaces.
 
-## Initial limits and next work (historical)
+Focused SDK checks:
 
-The textbook complex division formula is for finite, moderate magnitudes; production
-scaled division, zero divisors, NaN/infinities, extreme magnitudes, equality/hash,
-formatting and performance are not qualified. Do not treat this as System.Numerics.Complex
-parity or an allocation/performance claim. Exact component comparisons in the tests
-use deliberately exactly representable results.
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-method-bounds
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-references
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --structural-method-constraints
+```
 
-First close nominal interface bounds and constrained Self dispatch in JIT/AOT,
-including invalid implementation rejection and imported contracts. Then add the
-small public interfaces, compose Number with them, and refresh the complete API
-reference. Independent operand/result types, identity capabilities and a possible
-unordered NumberBase-like aggregate require separate decisions. Recoverable
-Result-returning methods remain distinct from operator support.
+The bound checks cover both callable forms, copied input, interning conflicts,
+invalid ordinals, duplicates, noninterfaces and foreign owners. Scalar arguments
+are rejected before owner selection and before nominal membership is declared,
+then accepted with explicit conformance. Existing method-constraint checks guard
+the shared validation code; they do not extend the parked structural feature scope.
 
+StaticSelf.neoil and 18 native specialization tests cover exact conformance,
+selected implementations, unchanged original metadata, and rejection of undeclared
+membership, private or wrong-return implementations and missing bounds.
 
-## Nominal-bound specialization follow-up
+## Limits
 
-The native specializer now admits closed nongeneric nominal interface method bounds
-and resolves static Self calls through the runtime's exact nominal conformance
-checks before lowering to ordinary concrete calls. It preserves original metadata
-and reuses the interpreter's implementation resolution. Instance/borrowed Self,
-constructed interface bounds and other method constraint categories remain gated.
-The old generic-results.json and jit-rejection.json remain historical failure evidence;
-follow-up results are stored separately. No new serialized opcode or metadata encoding.
+Complex arithmetic is qualified for finite, moderate magnitudes. Scaled division,
+zero divisors, NaN/infinities, extreme magnitudes, equality/hash, formatting and
+performance are unqualified. Exact comparisons use exactly representable results.
+This demo is not a production System.Numerics.Complex implementation.
 
-StaticSelf.neoil exercises the same contract at the metadata layer. The specialization
-regression checks executable selected code, unchanged original metadata, and rejection
-of undeclared membership, private or wrong-return implementations, and missing bounds.
-The existing function-kind and type-constraint regressions run alongside it.
+Constructed interface bounds, instance/borrowed Self specialization, mixed operand/
+result contracts and separate identity capabilities remain outside this slice.
+Recoverable Result-returning methods are distinct from faulting operators.
 
-Follow-up qualification: 18 focused specialization tests pass, including the linked
-value-conformance projection regression. Both ComplexGeneric and
-ComplexGenericMethod return 42 in interpreter/JIT/AOT (generic-fixed-results.json
-and method-results.json). Raven `38fb410df` removes the class-method syntax gate;
-its callable capability checks remain active and the .NET generic math test passes.
-A separate-provider compile now identifies the next gap: imported constrained
-methods require a complete symbol-authored SDK contract. This remains unqualified.
-
-
-## Separate-provider follow-up
-
-Raven `2e4776f7d` and the SDK's symbol-authored interfaceBounds contract close the
-imported static class-method gap for nongeneric nominal interfaces. Provider.rvn
-contains the public Complex/capabilities/Arithmetic declarations; Consumer.rvn
-uses them through a separately built NumericProvider.dll. import-results.json
-records interpreter/JIT/AOT exit 42 and fingerprints the provider assembly.
-import-negative-results.json records RAV0320 when the imported Add is instantiated
-with int, which does not implement the prototype AdditionOperators.
-
-To reproduce, build Provider.rvn as a Library project importing the same bundle's
-NeoCLR.ClassLibrary.props, with AssemblyName NumericProvider. Run the shared
-operator runner with --source Consumer.rvn and --reference <NumericProvider.dll>.
-Run check-conformance.py with --provider <NumericProvider.dll> for the invalid call.
-The provider was compiled with Raven 38fb410df; the consumer uses 2e4776f7d.
-The compiler/library bundle otherwise remains the same as the preceding checks.
-The new runner option adds an exact project reference and runtime module; it does
-not copy provider source into the consumer.
-
-Focused SDK checks (--authored-method-bounds) cover reference interning, defensive
-copying, wrong type arguments, missing/different bounds on the same callable,
-invalid ordinals, duplicate bounds, noninterfaces and foreign output ownership.
-No dependency reader fallback or structural interface conformance is introduced.
-
-
-## Public library adoption
-
-The development System.Runtime library now provides AdditionOperators,
-SubtractionOperators, MultiplyOperators and DivisionOperators in System.Numerics.
-Number inherits all four while retaining its declared members and identities.
-The final multiplication capability follows the .NET MultiplyOperators spelling;
-older source-local fixtures above preserve their experimental name.
-
-LibraryConsumer.rvn imports the actual library interfaces. It checks all four
-operations across ten primitive number types, forwarding a Number bound to an
-AdditionOperators helper, plus the custom Complex implementation without ordering.
-`library-results.json` records successful interpreter, managed JIT and sanitized
-AOT execution (42) against the freshly built five-library bundle
-`target/numerics-public-libraries-20261016`. Raven revision: `2e4776f7d`; runtime/SDK
-revision: `57c31e9bc` plus this slice's library declarations. The manifest fingerprints
-the compiler, runtime, source and bundle. Production Complex edge behavior remains
-outside this demo's qualification.
-
-`number-signatures.json` records 218 passing reference signature checks, including
-the four inherited capabilities and their exact static Self signatures. The
-reference assembly inventory and native RavenDoc snapshot include all four public
-types and operators. The native rendering audit and four snapshot tests pass.
-No new Runtime Contract switch or serialized opcode is required. The native
-signature uses Self; the documentation CLI projection uses the existing Self
-marker. Ordinary Raven/.NET behavior remains unchanged.
-
-
-## Imported top-level function follow-up
-
-FunctionProvider.rvn exports Add, Subtract, Multiply, Divide and a Number-constrained
-Forward function. FunctionConsumer.rvn exercises the imported operations with int
-and double and calls Forward<int>. The initial compiler rejected this path with
-NEOMETA001 (unsupported symbol-only contract). Preserving the bounds exposed another
-SDK gap: scalar signatures were not resolved to their selected nominal owner during
-imported-bound validation. Both paths now use explicit nominal conformance; no
-operator-based inference or dependency-reader fallback is added.
-
-`function-results.json` records the separate-provider interpreter/JIT/AOT run against
-`target/numerics-public-libraries-20261016`; `function-negative-results.json` records
-rejection of Add<string>. The provider is compiled separately as a library with
-AssemblyName NumericFunctions, using the existing bundle props. Reproduce with the
-shared operator runner's --reference option and check-conformance.py's
---function-provider option. Compiler and SDK hashes are retained in the results.
-
-The SDK --authored-method-bounds check now covers both callable forms, defensive
-copying, conflicting interning, malformed bounds and scalar arguments before/after
-explicit nominal conformance. Existing authored-reference and method-constraint
-regressions also pass. Constructed interface bounds remain outside this slice.
+Raw failure manifests and source-local fixtures remain regression evidence only.
+`generic-results.json` and `jit-rejection.json` record resolved failures, not current
+limitations. The older MultiplicationOperators fixture name is not a public API.

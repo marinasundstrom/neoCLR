@@ -55,11 +55,11 @@ Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
 zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
 postfix mutation; consumed postfix uses the static overload. Checked mutation
 operators and extension/interface forms remain follow-up work. Paired `true`/`false` overloads
-support conditions and short-circuit logical operations through `&`/`|`; direct
-`&&`/`||` overload declarations must migrate to that .NET-compatible convention.
+support conditions and short-circuit logical operations through `&`/`|`, following
+.NET conventions. Direct `&&`/`||` overload declarations are not supported.
 The shared operator sample also checks arithmetic, bitwise, shifts, comparisons,
-unary operations and conversions on .NET 11 and native interpreter/JIT/AOT. Nominal System.Numerics
-capabilities are a future layer over this operator support.
+unary operations and conversions on .NET 11 and native interpreter/JIT/AOT. System.Numerics
+provides nominal arithmetic capabilities for constrained generic algorithms.
 
 Checked operator declarations (`func checked`) export distinct standard method
 names and require a matching ordinary declaration. Development checked expressions
@@ -151,8 +151,9 @@ A source-local integer addition experiment now exercises recoverable overflow
 through nominal Result values. This is an API-design prototype, not a new System
 arithmetic API; existing Int32.Divide already provides recoverable division errors.
 
-Development System.Numerics now provides AdditionOperators, SubtractionOperators,
-MultiplyOperators and DivisionOperators using native Self. Number inherits these
+In the development class library, System.Numerics provides AdditionOperators,
+SubtractionOperators, MultiplyOperators and DivisionOperators using native Self. Number inherits these
 same-type capabilities; generic algorithms can ask for only the operation they need.
-A Complex demo exercises arithmetic without imposing ordering. Mixed-type contracts
-and production Complex edge semantics remain future work.
+Constrained calls work in source code and across library boundaries on the
+interpreter, JIT and AOT. A Complex demo exercises arithmetic without imposing
+ordering. Mixed-type contracts and production Complex edge semantics remain future work.

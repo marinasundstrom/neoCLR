@@ -5098,37 +5098,19 @@ Recoverable arithmetic follow-up (2026-10-16): the author confirmed the same
 safe-method/faulting-operation distinction used by slicing and indexing. A
 [source-local addition prototype](validation/recoverable-arithmetic/README.md)
 checks this policy using existing nominal Result and the existing safe Int32.Divide
-API. Public numeric API adoption and performance qualification remain pending;
+API. Public recoverable arithmetic API adoption and performance qualification remain pending;
 this does not unblock or reprioritize broader structural work.
 
 
-Author-directed numerics follow-up (2026-10-16): investigate minimal System.Numerics
-operator capabilities alongside Number and exercise them with a Complex demo.
-[Scope, evidence and blockers](validation/numerics-interfaces/README.md) keep the
-candidate contracts separate from installed APIs. Next prerequisite is nominal
-interface bounds in native generic method specialization, followed by constrained
-Self dispatch validation and public library/API-reference integration. Number's
-ordering contract is unchanged; structural work remains parked.
+## Minimal numerics capabilities
 
+System.Numerics provides AdditionOperators, SubtractionOperators, MultiplyOperators
+and DivisionOperators using native Self. Number composes them with ordering and
+identities. The [qualification](validation/numerics-interfaces/README.md) covers ten
+primitive implementers, a Complex demo, source-local and imported constrained calls,
+and interpreter/JIT/AOT execution. Public API references include the four interfaces.
 
-Numerics prerequisite follow-up: closed nongeneric nominal interface method bounds
-and static Self implementation resolution now have native specialization support.
-The [qualification](validation/numerics-interfaces/README.md) retains the original
-rejections and subsequent evidence separately. This does not yet publish the
-candidate System.Numerics APIs; broader constraint forms and imported consumers
-must be qualified in subsequent slices.
-
-
-Initial numerics library adoption: add the four same-type static operator interfaces
-in System.Numerics and compose Number with them, preserving its member identities.
-The [library consumer](validation/numerics-interfaces/LibraryConsumer.rvn) covers ten
-primitive implementers and the Complex demo. API reference inventory/rendering is
-refreshed with the matching five-library bundle. Mixed-type contracts and identity
-interfaces remain separately scoped; no broader structural work is resumed.
-
-
-Numerics import completion: symbol-authored nominal bounds also cover imported
-assembly-level functions, including primitive arguments through their selected
-nominal owners. Separate-provider qualification and negative conformance evidence
-are recorded with the numerics samples. This closes the top-level import gap for
-the minimal same-type capabilities; constructed interface bounds remain deferred.
+Mixed operand/result contracts, additional identity interfaces, constructed interface
+method bounds and production Complex semantics remain separately scoped. This
+author-directed capability work does not reprioritize the active milestone or resume
+parked structural types.

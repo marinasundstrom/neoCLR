@@ -110,7 +110,7 @@ native core bootstrap remains work in progress.
 
 ## Minimal arithmetic capabilities (development)
 
-System.Numerics now provides four public nominal interfaces in System.Runtime:
+System.Numerics provides four public nominal interfaces in System.Runtime:
 AdditionOperators (`+`), SubtractionOperators (`-`), MultiplyOperators (`*`) and
 DivisionOperators (`/`). Each has one static operator with signature
 `(left: Self, right: Self) -> Self`. Self means the implementing type; both operands
@@ -134,7 +134,7 @@ static func Add<T>(left: T, right: T) -> T where T: AdditionOperators => left + 
 The [consumer](../docs/validation/numerics-interfaces/LibraryConsumer.rvn) also forwards
 Number-constrained parameters to Add and implements the capabilities on a Complex
 demo without imposing ordering. Native interpreter/JIT/AOT support closed nongeneric
-interface bounds and static Self dispatch, including imported static class methods.
+interface bounds and static Self dispatch, including imported top-level functions and static class methods.
 Mixed operand/result types, checked default interface operators, instance Self
 specialization and production Complex semantics are outside this initial surface.
 Rebuild consumers against the matching library/compiler bundle. Ordinary Raven/.NET

@@ -1,217 +1,106 @@
-# Number and concrete parsing
+# Numeric contracts and parsing
 
-**Implemented in development, 2026-09-27.** The author requested
-Number and Parsable interfaces, then confirmed the proposed scope: the eight
-fixed-width integer types, Single and Double implement the numeric contract;
-Boolean receives a concrete parser only. The author then put Parsable on hold,
-selecting Number plus concrete Parse methods. A narrower ParsableNumber<T> is a
-future design candidate, not part of this implementation; it should remain separate
-from arithmetic conformance. The author subsequently selected NumberParseError for all numeric parsers.
+The development class library provides basic arithmetic capabilities in
+System.Numerics, the ordered System.Number aggregate, and concrete parsing methods.
+The eight fixed-width integer types, Single and Double implement Number. Char
+represents a grapheme and is not a numeric implementer.
 
-The Number scope is basic arithmetic, ordering, Zero and One. It is not
-a complete .NET generic-math hierarchy: native-sized integers, Decimal, transcendental
-functions, numeric conversion modes and culture-sensitive parsing are not selected.
-Char represents a grapheme and is not a numeric implementer.
+## Arithmetic capabilities
 
-## Prerequisites and comparison
+| Interface | Static operator |
+| --- | --- |
+| AdditionOperators | `+(left: Self, right: Self) -> Self` |
+| SubtractionOperators | `-(left: Self, right: Self) -> Self` |
+| MultiplyOperators | `*(left: Self, right: Self) -> Self` |
+| DivisionOperators | `/(left: Self, right: Self) -> Self` |
+
+These are nominal interfaces: types explicitly declare conformance and provide the
+required operator. An operator with a matching shape alone does not establish
+membership. Generic algorithms can require only the capability they use.
+
+Number inherits all four interfaces and ComparableTo<Self>, and declares Zero,
+One and its arithmetic operators. It does not require parsing. Native
+[Self](../self-types.md) denotes the implementing type in operands and results.
 
 [.NET generic math](https://learn.microsoft.com/en-us/dotnet/standard/generics/math)
-uses static abstract interface members to make numeric algorithms type-generic.
-[IParsable](https://learn.microsoft.com/en-us/dotnet/api/system.iparsable-1?view=net-10.0)
-provides parsing with provider and failure conventions. Sources retrieved 2026-09-27.
-neoCLR retains familiar constrained generic calls while using Result<T,E> rather
-than exceptions/out parameters and retaining explicit parsing grammars.
+also separates operator capabilities from numeric aggregates. NeoCLR uses Self
+instead of a repeated self-type parameter. This simplifies same-type contracts but
+does not express .NET's independent operand/result types. Mixed-type contracts,
+separate identity interfaces, checked default operators and a NumberBase-like
+aggregate remain unimplemented. Native-sized integers, Decimal, transcendental
+functions and numeric conversion modes are outside this minimal surface.
 
-Initial probes exposed authored-static, inherited-constraint and target-metadata
-emission gaps in Raven, plus neoCLR's generic-call admission gap. General Raven
-fixes were validated independently on a main-based branch before integration.
-The runtime validates exact nominal static conformance; Number is not a marker
-interface accepted by name alone. The [focused consumer and metadata checks](../experiments/numeric-contracts/README.md)
-cover the implemented development surface and its explicit admission limits.
+Ordinary integer arithmetic wraps; invalid integer division faults. Floating
+arithmetic and existing CompareTo semantics are retained, including NaN ordering
+distinct from IEEE equality. Custom operators define their domain and failure
+policy. Operator conformance does not promise recoverable errors; the existing
+Result-returning Int32.Divide and proposed recoverable arithmetic APIs are separate.
 
-The 2026-09-30 development migration replaces the former `Number<T>` with
-nongeneric `Number`. Static operands, results and Zero/One use native `Self`,
-and ordering is inherited from `ComparableTo<Self>`. Existing `where T: Number<T>`
-consumers must change to `where T: Number`. See [native Self](../self-types.md)
-for the runtime representation, comparison with .NET and current limitations.
+## Compiler and runtime support
 
-## Selected contracts and tradeoffs
+Raven's NeoCLR target emits native generic method bounds and Self signatures.
+Closed nongeneric nominal interface bounds and static Self calls work in the
+interpreter, managed JIT and AOT. Source-local generic functions, class-contained
+static methods and imported versions of both are qualified. Imported references
+carry bounds from compiler symbols through explicit SDK contracts; no dependency
+reader fallback supplies missing semantic information.
 
-Number inherits ComparableTo<Self> and adds static Zero/One plus binary +, -, *, /.
-It deliberately omits parsing, conversion modes, transcendental functions and the
-large .NET generic-math interface hierarchy. The benefit is a small first arithmetic
-consumer; the cost is that algorithms cannot yet express finer capabilities such
-as addition-only or floating-only constraints. Ordinary integer arithmetic wraps;
-integer division retains terminal Fault behavior. This does not replace the existing
-Result-returning Int32.Divide. Floating arithmetic and existing CompareTo semantics
-are retained, including NaN ordering distinct from IEEE equality operators.
+Primitive arguments retain their selected nominal owner's declared interfaces.
+JIT/AOT specialization checks conformance against original metadata before resolving
+static Self calls to concrete implementations. Constructed interface method bounds
+and instance/borrowed Self specialization are not covered by this capability path.
+Ordinary Raven/.NET continues to use .NET contracts and delegate/runtime conventions.
+See the [integration contract](../raven-cli-bridge.md#nominal-numeric-constraints)
+for ownership and representation details.
 
-Concrete parsing uses whole-text, culture-independent ASCII grammar. All numeric
-types admit an optional sign; unsigned negative nonzero values overflow, while -0
-is zero. Single/Double admit decimal mantissas and exponents plus exact NaN and
-Infinity spellings. Numeric floating overflow is an error; underflow can round to
-signed zero. Boolean accepts ASCII case-insensitive true/false. No parser silently
-trims, decodes bytes or accepts grouping. Whole grammar validation precedes range.
+## Complex demo
 
-New numeric parsers return NumberParseError (InvalidFormat/Overflow); Boolean has
-BooleanParseError (InvalidFormat only). The author requested one numeric error contract, so Int32/Int64 parsing also uses
-NumberParseError; their former development error types are removed from the Raven
-reference surface. Archived Neo parsing retains its legacy carrier boundary.
-A common error type is a design choice, not evidence that general parsing cannot be
-abstracted: Rust's [FromStr](https://doc.rust-lang.org/std/str/trait.FromStr.html)
-uses an associated error type. Raven's available contract mechanisms and actual
-consumers should determine whether such generality is useful here.
+The [library consumer](../validation/numerics-interfaces/LibraryConsumer.rvn) defines
+a Complex struct with double components and explicit arithmetic capabilities.
+It does not implement Number or invent an ordering. This follows the distinction in
+[.NET Complex](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.complex),
+which implements arithmetic interfaces and INumberBase rather than ordered INumber.
 
-### Proposed numeric parsing capability
+The demo covers finite, moderate inputs. Scaled division, zero-divisor policy,
+NaN/infinity/extreme magnitudes, equality/hash, formatting and performance remain
+unqualified. Complex is a model test, not a production class-library numeric type.
 
-The author clarified the purpose of ParsableNumber<T>: let a generic method
-require that its numeric type parameter supplies a static Parse method. The
-proposed contract associates T with Number<T> and exposes Parse(text) returning
-Result<T, NumberParseError>. A constrained method could then call T.Parse(text)
-and handle known numeric errors without repeating an error-type parameter.
-This is a proposal; the interface is still on hold and is not implemented.
+## Concrete parsing
 
-This capability is useful even when the generic method only parses: it establishes
-the available operation and its result contract. Number alone intentionally
-does not promise parsing. Keeping the capability separate also lets arithmetic
-algorithms accept numeric types without requiring a text representation.
+Parsing uses whole-text, culture-independent ASCII grammar. All numeric types admit
+an optional sign; unsigned negative nonzero values overflow, while -0 is zero.
+Single/Double admit decimal mantissas and exponents plus exact NaN and Infinity
+spellings. Numeric floating overflow is an error; underflow can round to signed zero.
+Boolean accepts ASCII case-insensitive true/false. Parsers do not trim, decode bytes
+or accept grouping. Whole grammar validation precedes range validation.
 
-Compared with .NET IParsable<T>, the proposed interface fixes the domain and typed
-error contract rather than adopting exception/out-parameter failure conventions.
-Compared with Parsable<T, TError>, it avoids carrying a redundant error parameter
-through numeric consumers. The cost is a domain-specific interface that cannot
-describe arbitrary parsers or numeric parsers with different errors. General typed
-parsing remains possible in principle; the question is how to associate its error
-type ergonomically, not whether exceptions are required.
-
-Before implementation, validate constrained T.Parse calls and the relationship
-to Number<T> through Raven and the importer. The current specialization path admits
-only Number constraints, so documenting this proposal does not establish target
-support for ParsableNumber<T>. A focused generic parsing consumer should prove
-successful parsing, shared error handling and rejection of missing implementations.
-
-Unlike [default .NET Double.Parse](https://learn.microsoft.com/en-us/dotnet/api/system.double.parse?view=net-10.0),
-this grammar has no ambient culture or grouping, uses typed errors rather than
+Numeric parsers return Result values with NumberParseError (InvalidFormat/Overflow).
+Boolean uses BooleanParseError (InvalidFormat only). Unlike
+[default .NET Double.Parse](https://learn.microsoft.com/en-us/dotnet/api/system.double.parse?view=net-10.0),
+this contract has no ambient culture or grouping, uses typed errors rather than
 exceptions, and rejects numeric overflow instead of producing infinity. The benefit
 is predictable configuration/protocol parsing; the cost is less convenient human
 input and no .NET parsing compatibility promise. UTF-8 storage does not dictate
-numeric grammar or require a byte-oriented Parse signature. These primary sources
-were reviewed 2026-09-27.
+numeric grammar or require a byte-oriented Parse signature.
 
-## Interface implementation boundaries
+### Proposed numeric parsing capability
 
-General Raven fixes are isolated and independently validated on the main-based
-`codex/static-interface-contracts` branch before integration into Raven main and
-its neoCLR branch. They cover authored static contracts, inherited constrained
-members, constrained methods/property reads/operators and metadata-only constraint
-classification. The subsequent native Self integration is separately enabled by
-`RavenSelfAssemblyName` and `RavenSelfType`; see [native Self](../self-types.md).
+A separate numeric parsing interface remains on hold. Its purpose would be to let
+a generic algorithm require a static Parse operation returning
+Result<T, NumberParseError>, independently of arithmetic. Its final name and Self
+shape are undecided; it is not an available API.
 
-The current target integration specializes closed static application functions
-whose type parameters have exactly Number as their constraint, for the ten selected
-primitive types. It retains the ordinary importer checks after closing the body;
-the runtime validates exact nominal static member conformance. This is bounded
-compile-time specialization (maximum 128 copies), the application import boundary remains bounded. Numeric calls now retain native
-`callself` dispatch against nongeneric Number; the runtime also supports open
-generic static Self dispatch independently of this importer restriction. It trades duplicated bodies for a small verifiable first consumer.
-Custom numeric types, additional constraints, generic classes and generic delegates
-remain unsupported by that path. No performance improvement is claimed.
+Compared with [.NET IParsable](https://learn.microsoft.com/en-us/dotnet/api/system.iparsable-1?view=net-10.0),
+a fixed numeric error contract avoids exceptions/out parameters but cannot describe
+arbitrary parsers with different errors. Rust's
+[FromStr](https://doc.rust-lang.org/std/str/trait.FromStr.html) demonstrates an
+associated error type. A future contract needs focused generic parsing and import
+validation before adoption; existing arithmetic support does not establish it.
 
-The author explicitly wants static/default/access-controlled interface capabilities
-in general. The [runtime tracker](../tracking/runtime-language.md#interfaces-as-a-platform-capability)
-owns that direction; these restrictions are interim admission limits, not the
-intended public interface model. Existing native default bodies and explicit mappings
-supply useful foundations but do not prove all Raven default/private helper behavior.
+## Validation and reference
 
-
-## Validation
-
-- Raven: 15 focused compiler tests for authored/imported static contracts,
-  inherited members, metadata-only constraint emission and invalid implementations.
-- Native: three parsing test groups, two static-contract tests, 12 existing
-  default-interface regressions and four archived parsing checks.
-- Target: one nested generic arithmetic/ordering consumer over ten numeric types;
-  concrete success/error parsing including Int32/Int64's shared error, JSON's
-  dependent Int32 conversion, and rejection of Boolean/additional constraints.
-- Exact core member checks: 210 assertions; source/bootstrap hashes and matching
-  RavenDoc reference snapshots checked. The earlier casing/Int64 consumer is updated
-  for NumberParseError and revalidated. No full suite or website build.
-
-The historical runtime-api inventory audit still references the already-missing
-`runtime/raven/generated/File.methods.neoil`; its old audit cannot be refreshed
-without separate inventory maintenance. This does not substitute for the current
-RavenDoc type/member selection and snapshot checks used here.
-
-
-## Native metadata compiler checkpoint — 2026-10-04
-
-The preceding CLI/JSON importer restrictions are historical bridge limitations. The
-native compiler now retains bounded generic methods rather than specializing copies.
-A separately compiled algorithms library uses every Number member and inherited
-CompareTo across all ten source-built numeric implementations. A consumer compiled
-without library sources verifies and runs with exit 42. Static and managed instance
-constrained dispatch use existing runtime semantics; .NET controls continue to pass.
-See the system-compilation-strategy generic Number checkpoint and its executable evidence.
-This does not extend the public Number API, add parsing to Number, or complete every
-constraint/category in the compiler. No performance comparison is claimed.
-
-
-## Minimal System.Numerics capabilities and Complex experiment — 2026-10-16
-
-Author direction: move toward minimal numeric interfaces in addition to Number,
-in System.Numerics, and implement a useful additional number type to exercise the
-model. The assistant selected a Complex demo because arithmetic does not imply a
-natural total ordering. This follows [.NET Complex](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.complex),
-which implements arithmetic interfaces and INumberBase rather than INumber's
-ordered-number contract. [.NET generic math](https://learn.microsoft.com/en-us/dotnet/standard/generics/math)
-provides separate operator capabilities that Number-like aggregates compose.
-
-The [executable experiment](../validation/numerics-interfaces/README.md) defines
-four source-local interfaces under System.Numerics: AdditionOperators,
-SubtractionOperators, MultiplicationOperators and DivisionOperators. Each declares
-one binary static operator with Self operands and result. These are candidate names
-and shapes, not installed class-library APIs. .NET calls its multiplication
-interface IMultiplyOperators; settle the final Raven naming before publication.
-The existing native Self model removes repetitive self-type parameters, but this
-minimal profile cannot express .NET's independent operand/result types. Mixed-type
-contracts, identities and checked operator defaults remain explicit follow-ups.
-
-Proposed composition: Number inherits the four capabilities and retains
-ComparableTo<Self>, Zero and One. Preserve existing Number member identities during
-migration until import and constrained dispatch are qualified. Complex explicitly
-implements just the four arithmetic capabilities. It must not acquire an arbitrary
-CompareTo solely to satisfy Number. A future NumberBase-like aggregate may be useful,
-but this experiment does not introduce one or redefine Number.
-
-The candidate class-library declarations and Number inheritance compiled in a local
-full-bundle probe, but were not retained as shipped source: constrained method
-specialization rejects nominal interface bounds in AOT. The interpreter accepts the
-source-local generic consumer; class-contained constrained methods also encounter
-an existing Raven emission gate. Close these concrete gaps before public API adoption,
-then refresh native/CLI documentation artifacts and validate external consumers.
-
-Complex uses double components and textbook arithmetic for finite, moderate inputs.
-Scaled division, zero-divisor policy, NaN/infinity/extreme magnitudes, equality/hash,
-formatting and performance are unqualified; this is a model test, not numerical
-library parity. Safe Result-returning arithmetic remains a separate contract from
-operator support. No structural type work, new runtime opcode or .NET compiler
-behavior is introduced.
-
-
-### Initial library adoption
-
-The four minimal contracts are now development class-library APIs in System.Numerics:
-AdditionOperators, SubtractionOperators, MultiplyOperators and DivisionOperators.
-MultiplyOperators follows .NET's IMultiplyOperators spelling; the earlier experiment's
-MultiplicationOperators name remains only in historical source-local fixtures.
-Number inherits these contracts while retaining its existing declared operators,
-Zero/One and ordering. All ten existing Number primitives therefore participate;
-there is no change to arithmetic or overflow semantics. The separate recoverable
-arithmetic design remains distinct.
-
-The library consumer tests all four operations on the ten primitive types, Number
-constraint forwarding, and a custom Complex implementation. Complete API references
-include all four types and their operators, with source/CLI/native snapshots updated.
-See the [qualification](../validation/numerics-interfaces/README.md). This closes the
-initial same-type capability slice, not mixed-type generic math or numerical parity
-for the Complex demo.
+The [numerics qualification](../validation/numerics-interfaces/README.md) records
+ten-primitive arithmetic, Number-bound forwarding, Complex, separate-provider calls,
+invalid conformance rejection and interpreter/JIT/AOT results. The reference
+signature checks cover 218 assertions. The [API reference](../../api-docs/text-numbers.md)
+and native documentation snapshot describe the public types and members.

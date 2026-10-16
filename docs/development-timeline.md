@@ -18566,3 +18566,15 @@ remain open. This is implementation of the earlier platform convention direction
   interpreter, JIT and AOT. Updated public API inventory/native documentation and
   repaired a stale pre-Self reference test; 218 signature checks pass. Complex
   remains a tested demo, not a production library API.
+
+
+## 2026-10-16 — Current-state numerics documentation
+
+- Author asked whether docs and website needed updating and requested removal of
+  historical data and change notices.
+- Assistant identified conflicting descriptions of installed numerics APIs as future
+  work and resolved native generic constraints as current blockers. Consolidated
+  the numeric design, roadmap, compiler integration notes and website around current
+  behavior, with a compact qualification index. Raw regression evidence, published
+  release notes, changelog and this conversation record remain separate from the
+  feature narrative. No runtime or public API behavior changed.

@@ -12306,48 +12306,26 @@ work alongside compiler completion, not an implemented API or a permanent roadma
 reprioritization.
 
 
-### Nominal numeric method bounds and static Self specialization (2026-10-16)
+### Nominal numeric constraints
 
-Native JIT/AOT specialization admits closed nongeneric nominal interface bounds
-on generic methods, using the runtime's exact declaration/signature/Self checks.
-Static Self calls resolve to concrete implementations before ordinary body selection.
-This brings the bounded numeric capability experiment closer to .NET static abstract
-interface dispatch without adopting erased interfaces or structural conformance.
-The existing metadata carries both constraints and Self; no Runtime Contract switch,
-CLI bridge encoding, guest API or opcode is introduced. Interpreter behavior is reused.
-Instance/borrowed calls and constructed method bounds remain separate. See
-[numerics qualification](validation/numerics-interfaces/README.md).
+Native generic methods may use closed nongeneric nominal interface bounds and
+static Self dispatch. The interpreter validates nominal conformance; JIT/AOT retain
+original conformance metadata through layout lowering, validate exact implementations,
+and resolve static Self calls before concrete body selection.
 
-Imported nominal method follow-up: Raven `2e4776f7d` authors static class-method
-interface bounds from symbols into the SDK's explicit reference contract. The
-separate Complex consumer passes interpreter/JIT/AOT and rejects an invalid int
-argument at binding. No reader fallback or Runtime Contract switch is introduced;
-see the retained import evidence in the numerics qualification.
+Raven's native emitter supports source-local functions and static class methods,
+including imported versions of both. CreateMethodReference and CreateFunctionReference
+carry parameter ordinals and output-owned interface bounds from semantic symbols.
+The SDK checks scope, ownership, duplicate and conflicting contracts. Primitive
+arguments use their selected nominal owner's declared conformance. Operator shape
+alone never establishes membership.
 
+System.Numerics provides four same-type operator interfaces; Number inherits them.
+Native metadata retains real Self and nominal constraints. The reference-only CLI
+projection uses the established Self marker and is not an executable replacement for
+native metadata. No new Runtime Contract switch or opcode is required; ordinary
+Raven/.NET behavior is unchanged. Constructed interface method bounds and
+instance/borrowed Self specialization remain outside this path.
 
-Numerics class-library integration: System.Numerics.AdditionOperators,
-SubtractionOperators, MultiplyOperators and DivisionOperators use native Self
-signatures; Number inherits them and preserves its own declared operators. Raven
-2e4776f7d and the matched numerics-public-libraries-20261016 bundle are the validation
-inputs. No new Runtime Contract setting or opcode is required. The documentation
-CLI projection uses the established compiler Self marker; native metadata retains
-real Self and nominal interfaces. Mixed operand/result contracts remain outside
-this first surface; no .NET primitive or interface is modified.
-
-
-### Imported nominal bounds on assembly-level functions (2026-10-16)
-
-Native emission now carries nongeneric nominal interface method bounds on imported
-top-level functions through the symbol-authored SDK CreateFunctionReference contract,
-matching imported static class methods. Raven supplies resolved nominal identities
-and bounds; the SDK validates ownership, parameter scope and conflicting contracts.
-Native metadata retains ordinary generic type constraints, and the existing runtime
-specializer checks nominal conformance before static Self dispatch. No new Runtime
-Contract switch, CLI encoding or opcode is introduced; ordinary .NET is unchanged.
-Constructed interface bounds and other unsupported constraint categories remain gaps.
-Qualification uses a separate NumericFunctions provider, four arithmetic operations
-on int/double, Number-bound forwarding and invalid string argument rejection.
-Primitive arguments retain their selected nominal owner for imported bound validation;
-this requires explicit interface membership and does not infer capabilities from
-arithmetic syntax. The SDK regression rejects a scalar before owner selection and
-before interface declaration, then accepts it after declared conformance.
+See [numerics qualification](validation/numerics-interfaces/README.md) for tested
+compiler/SDK revisions, library bundles, positive consumers and rejection evidence.
