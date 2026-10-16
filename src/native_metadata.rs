@@ -102,6 +102,30 @@ pub fn assembly_modules(module: &Module, identity: &str) -> Result<Value, Fault>
     )
 }
 
+/// Describe all type definitions in an explicitly retained assembly catalog.
+/// Includes open generic definitions; does not retain executable layouts or bodies.
+pub fn assembly_types(module: &Module, identity: &str) -> Result<Value, Fault> {
+    assembly_modules(module, identity)?;
+    crate::assembly_info::Query::Types.invoke_profile(
+        module,
+        &[Value::String(identity.into())],
+        &Limits::default(),
+        true,
+    )
+}
+
+/// Describe definitions in an exact assembly-local logical module, including empty ones.
+/// Requires explicit module metadata and shares the interpreter's ownership checks.
+pub fn module_types(module: &Module, identity: &str, name: &str) -> Result<Value, Fault> {
+    assembly_modules(module, identity)?;
+    crate::assembly_info::Query::ModuleTypes.invoke_profile(
+        module,
+        &[Value::String(identity.into()), Value::String(name.into())],
+        &Limits::default(),
+        true,
+    )
+}
+
 /// Select free-function definition identities in metadata order, without invocation.
 /// Requires an explicit assembly-local module catalog, not a legacy projection.
 /// This unstable backend bridge grants no AOT body or attribute retention rights.
@@ -707,4 +731,67 @@ pub fn descriptor_metadata_token(
     descriptor: &crate::TypeDescriptor,
 ) -> Result<i32, Fault> {
     crate::metadata_tokens::type_token(module, &descriptor.identity)
+}
+
+#[cfg(test)]
+mod type_catalog_tests {
+    use super::*;
+
+    fn handles(value: Value) -> Vec<crate::TypeDescriptor> {
+        let Value::Array { elements, .. } = value else {
+            panic!("type array")
+        };
+        elements
+            .into_iter()
+            .map(|value| {
+                let Value::Object { fields, .. } = value else {
+                    panic!("type snapshot")
+                };
+                let [Value::RuntimeTypeHandle(handle)] = fields.as_slice() else {
+                    panic!("type handle")
+                };
+                (**handle).clone()
+            })
+            .collect()
+    }
+
+    #[test]
+    fn discovery_preserves_open_definitions_and_exact_module_ownership() {
+        let mut source = crate::assemble(".module Catalog\n.interface Example.Producer<T>\n.variance out\n.end\n.type Other.Plain\n.end\n").unwrap();
+        source.assemblies = serde_json::from_value(serde_json::json!([
+            {"name":"Package", "full_name":"Package, Version=1.0.0.0", "modules":["Catalog"], "references":[],
+             "declaration_modules":{"version":1,"names":["Example","Other","Empty"]}},
+            {"name":"Foreign", "full_name":"Foreign", "modules":["Foreign.dll"], "references":[],
+             "declaration_modules":{"version":1,"names":["ForeignOnly"]}},
+            {"name":"Legacy", "full_name":"Legacy", "modules":["Legacy.dll"], "references":[]}
+        ])).unwrap();
+        let identity = "Package, Version=1.0.0.0";
+        let all = handles(assembly_types(&source, identity).unwrap());
+        assert_eq!(all.len(), 2);
+        for (actual, definition) in all.iter().zip(&source.types) {
+            assert_eq!(
+                *actual,
+                crate::type_identity::describe_definition(&source, definition).unwrap()
+            );
+        }
+        assert_eq!(all[0].generic_arguments.len(), 1);
+        assert_eq!(all[0].generic_arguments[0].name, "T");
+        assert!(descriptor_shape(&source, &all[0].generic_arguments[0], 18).unwrap());
+        assert!(all[1].generic_arguments.is_empty());
+        assert_eq!(
+            handles(module_types(&source, identity, "Example").unwrap()),
+            vec![all[0].clone()]
+        );
+        assert_eq!(
+            handles(module_types(&source, identity, "Other").unwrap()),
+            vec![all[1].clone()]
+        );
+        assert!(handles(module_types(&source, identity, "Empty").unwrap()).is_empty());
+        assert!(handles(assembly_types(&source, "Foreign").unwrap()).is_empty());
+        for bad in ["Package", "Missing", "Legacy"] {
+            assert!(assembly_types(&source, bad).is_err());
+        }
+        assert!(module_types(&source, identity, "ForeignOnly").is_err());
+        assert!(module_types(&source, identity, "Missing").is_err());
+    }
 }

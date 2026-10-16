@@ -378,3 +378,19 @@ works in native programs. Tests execute the generated query bodies in the
 interpreter and macOS ARM64 JIT and emit AOT objects without retaining the open
 interfaces as executable types. The focused reflection-metadata suite passes eleven
 checks. No Raven syntax, emitted source metadata or Runtime Contract option changes.
+
+### Native discovery recipes (2026-10-16)
+
+The compiler bridge can now obtain assembly-wide or logical-module type snapshot
+recipes through the interpreter's discovery queries. Like .NET Assembly.GetTypes,
+the result includes generic definitions as definitions, alongside nongeneric types;
+it does not substitute an arbitrary constructed instance or discard generic facts.
+Metadata order, owner-bound arguments and variance are preserved. Module discovery
+requires an exact assembly identity and an explicit declaration-module catalog;
+empty declared modules return empty arrays and foreign module names fault.
+
+These are build-time recipes, not executable reflection permissions. Native guest
+GetTypes binding and explicit discovery retention are still pending. Focused tests
+cover mixed generic/nongeneric catalogs, variance, exact identity, empty modules,
+legacy metadata rejection and foreign-module rejection. No public class-library
+API, Raven lowering, Runtime Contract configuration or CLI encoding changes.

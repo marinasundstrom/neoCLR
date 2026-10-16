@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Add native compiler discovery recipes for assembly and logical-module type catalogs, preserving open generic definitions, parameter identity/variance, nongeneric declarations and metadata order through shared interpreter queries. Reject missing/legacy catalogs and cross-assembly module scopes; this does not yet bind guest native GetTypes calls.
+
 - Bind native name/count/indexed-argument/metadata-token/shape queries for retained open generic descriptors, using interpreter source facts for variance. Preserve argument-result identity, mixed closed/open dispatch and invalid-selector/index faults; explicitly reject unqualified open relationship queries. Focused query tests pass interpreter/native execution and AOT emission. Guest assembly/module discovery remains unfinished.
 
 - Add compiler-owned descriptive tokens for open generic definitions and their owner-bound parameters, independent of executable layouts. Preserve the private table through native selection and nominal rewriting, reject serialized table/opcode forgery, and keep native handle identity distinct from ordinary closed-type tokens. This is internal infrastructure; guest open-definition discovery remains unfinished.
