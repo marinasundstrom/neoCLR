@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Qualify Raven checked conversions from main 0c272f423 and native compiler c290f2536: preserve source signedness for checked numeric casts and select checked explicit operator pairs. Classify imported op_CheckedExplicit symbols as conversions so separate-provider lookup retains checked selection. Qualify the shared consumer and native narrowing/unsigned/floating overflow faults; retain terminal ArithmeticOverflow rather than exception semantics. No runtime opcode, metadata format or Runtime Contract switch is added.
+
+
 - Consolidate numerics documentation around current contracts and qualification. Remove superseded experiment/blocker notices and migration chronology from the design, roadmap, integration notes and website; retain raw validation evidence, changelog and development history. Correct the website's obsolete future-capability claim and document imported top-level support.
 
 

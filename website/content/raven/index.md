@@ -63,18 +63,17 @@ provides nominal arithmetic capabilities for constrained generic algorithms.
 
 Checked operator declarations (`func checked`) export distinct standard method
 names and require a matching ordinary declaration. Development checked expressions
-now use `checked(...)` / `unchecked(...)` for integer binary addition, subtraction
-and multiplication, signed unary negation, and checked unary/binary overload
-selection with ordinary fallback.
+use `checked(...)` / `unchecked(...)` for integer binary addition, subtraction
+and multiplication, signed unary negation, and numeric casts. Checked unary/binary
+operators and explicit conversions follow .NET overload-selection conventions.
 The nearest context wins; a method's body is not implicitly checked merely because
 it declares a checked operator.
 
 The same consumer is qualified on .NET 11 and native interpreter/JIT/AOT. Native
 arithmetic overflow is a terminal fault; .NET uses OverflowException. Checked
-blocks, conversions, mutation operators and lifted arithmetic remain
-compiler gaps, with explicit diagnostics for unimplemented checked operations.
-The SDK/runtime also support checked numeric conversions independently. See the
-[qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-expression-follow-up).
+blocks, nullable/pointer conversions, mutation operators and lifted arithmetic
+remain compiler gaps, with explicit diagnostics for unimplemented checked operations. See the
+[qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-conversions).
 
 <a id="targets"></a>
 

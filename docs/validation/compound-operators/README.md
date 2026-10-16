@@ -247,3 +247,43 @@ arithmetic remain follow-up work.
 
 Native faults are terminal, not recoverable exceptions. See the separate
 [recoverable arithmetic proposal](../../design/checked-arithmetic.md).
+
+
+## Checked conversions
+
+CheckedConversions.rvn checks narrowing, unsigned widening, floating truncation,
+nested unchecked contexts and ordinary/checked user-defined conversion selection.
+The shared .NET runner and native runner use the same source. The native overflow
+runner's --conversions mode checks signed narrowing, an unsigned-source boundary
+and floating-to-integer overflow. Overflow is terminal ArithmeticOverflow on
+NeoCLR, not an exception or Result; native fault hosts also check the result slot
+is untouched.
+
+The compiler retains checked context through bound rewriting and exposes
+IConversionOperation.IsChecked. Conversion lookup replaces matching ordinary
+explicit declarations with checked declarations before selecting the best candidate;
+unpaired ordinary and implicit conversions still participate. .NET uses conv.ovf
+instructions; the native adapter maps the same intent to existing SDK instructions.
+No metadata format or Runtime Contract switch changes. Nullable/pointer checked
+casts and checked user-defined expression trees remain diagnosed; checked mutation,
+blocks and compile-time overflow evaluation remain separate work.
+
+
+Validation records: [ordinary .NET](checked-conversions-dotnet-results.json),
+[native source-local](checked-conversions-native-results.json),
+[native imported provider](checked-conversions-import-results.json), and
+[native overflow cases](checked-conversions-overflow-results.json). Main revision
+`0c272f423` passes 106 focused tests and the 421-test overload-resolution suite.
+The native carry also passes the 106 focused tests. Native consumers use the
+`numerics-public-libraries-20261016` bundle and retain exact tool/source hashes.
+The source-local result predates only the imported-symbol classification correction;
+the imported consumer and overflow cases use the corrected adapter.
+
+To reproduce imported conversions, compile CheckedConversionProvider.rvn as a
+Library project with AssemblyName CheckedConversionProvider and the bundle's
+NeoCLR.ClassLibrary.props. Run run.py with CheckedConversionConsumer.rvn and
+--reference <CheckedConversionProvider.dll>. To reproduce fault checks, use
+run-checked-overflow.py --conversions with the same compiler and bundle.
+
+The completed native compiler carry is `c290f2536`. All three fault cases pass on
+interpreter/JIT/AOT; ordinary .NET and both positive native consumers return 42.

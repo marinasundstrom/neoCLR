@@ -5037,8 +5037,8 @@ Native checked conversion follow-up (2026-10-16): all 20 conversions now use sha
 JIT/AOT lowering with exact integer range checks, floating truncation and ordered
 bounds checks, and existing ArithmeticOverflow fault propagation. The [native matrix](validation/checked-conversions/README.md#native-jitaot-lowering-follow-up)
 qualifies macOS ARM64; Windows profile restrictions are unchanged. This supersedes
-the backend rejection noted above. Raven checked contexts and operator selection
-remain the next compiler step; no Runtime Contract, encoding or library change.
+the backend rejection noted above. Raven maps checked contexts and conversion selection to these operations;
+no Runtime Contract, encoding or library change is required.
 
 
 ## Checked expression qualification (2026-10-16)
@@ -5056,18 +5056,17 @@ called methods. Checked binary candidates are resolved first, with ordinary
 fallback only if none applies; ambiguity remains an error. The compiler owns this
 lookup; the SDK/runtime own checked instruction validation and execution.
 
-Checked blocks, constant arithmetic evaluation, explicit conversions, unary minus,
-mutation operators, lifted/pointer arithmetic and expression trees remain gaps.
-Unimplemented checked conversions/unary/mutation/lifted/pointer operations receive
-RAV0373 rather than silently executing unchecked. SDK conversion support remains
-available independently. Existing native primitive admission limits are unchanged.
+Checked blocks, constant arithmetic evaluation, mutation operators, nullable/pointer
+conversions, lifted arithmetic and checked binary expression trees remain gaps.
+Unsupported checked operations receive RAV0373 rather than silently executing
+unchecked. Numeric casts and signed unary negation are supported. Existing native
+primitive admission limits are unchanged.
 Broader structural work remains parked.
 
 See [the reproducible compiler qualification](validation/compound-operators/README.md#checked-expression-follow-up)
-for matched compiler revisions, bundle, source and backend evidence. This supersedes
-the earlier statement that all Raven checked contexts are still pending. The next
-bounded compiler slice is checked conversions/unary operations and their overload
-selection, followed by mutation forms and block contexts.
+for matched compiler revisions, bundle, source and backend evidence. The next
+bounded compiler slice is checked mutation, followed by block contexts and
+compile-time overflow evaluation.
 
 
 ### Checked unary negation follow-up (2026-10-16)
@@ -5083,9 +5082,9 @@ operations. The .NET compiler also maps checked unary expression trees to
 
 The [operator qualification](validation/compound-operators/README.md#checked-unary-follow-up)
 records the matching builds, tests, standalone consumer and minimum-value overflow
-checks. This closes unary negation from the remaining list above. Checked
-conversions are the next bounded slice; mutations, blocks, constant evaluation and
-checked binary expression trees remain gaps. Broader structural work stays parked.
+checks. Unary negation and numeric conversions are supported; mutations, blocks,
+constant evaluation and checked binary expression trees remain gaps.
+Broader structural work stays parked.
 
 The native unary carry is `371363a67`; all positive and unary-overflow backend
 checks pass. The author's exception-free recovery question is recorded in the
@@ -5114,3 +5113,11 @@ Mixed operand/result contracts, additional identity interfaces, constructed inte
 method bounds and production Complex semantics remain separately scoped. This
 author-directed capability work does not reprioritize the active milestone or resume
 parked structural types.
+
+
+Checked conversion qualification: Raven main `0c272f423` supports range-checked
+numeric casts and checked explicit conversion pairs. The native adapter uses
+existing checked instructions, and imported checked conversion symbols retain
+conversion classification. [Evidence](validation/compound-operators/README.md#checked-conversions)
+covers .NET, interpreter/JIT/AOT, separate-provider selection and narrowing,
+unsigned-source and floating overflow faults. Recoverable arithmetic remains separate.

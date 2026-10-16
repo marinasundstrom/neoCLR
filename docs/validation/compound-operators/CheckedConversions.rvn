@@ -1,0 +1,31 @@
+class Box {
+    static func explicit(value: Box) -> int => 1
+    static func checked explicit(value: Box) -> int => 42
+}
+
+class Runner {
+    static func Narrow(value: int) -> byte => checked((byte)value)
+    static func Signed(value: uint) -> long => checked((long)value)
+    static func Floating(value: double) -> int => checked((int)value)
+    static func Unchecked(value: int) -> byte => checked(unchecked((byte)value))
+}
+
+func Main() -> int {
+    if Runner.Narrow(255) != (byte)255 {
+        return 1
+    }
+    if Runner.Signed((uint)4294967295L) != 4294967295L {
+        return 2
+    }
+    if Runner.Floating(-42.75) != -42 {
+        return 3
+    }
+    if Runner.Unchecked(256) != (byte)0 {
+        return 4
+    }
+    let box = Box()
+    if unchecked((int)box) != 1 {
+        return 5
+    }
+    return checked((int)box)
+}

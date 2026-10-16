@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedConversions.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/checked-conversions-dotnet-final-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "d97319fe06dd12be0ea277e3e3bdfb5ae195b94af768021d4c5b458a3e913b3e"
+    },
+    {
+      "label": "execute",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/checked-conversions-dotnet-final-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedConversions.rvn": "c91cf0e27a215945d5fe72e85900afb84bd8420443ad5ec4f4dee512cc032ce7",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-dotnet.py": "9a26b57b6262443bfbbcb040ba2006e5f3027f097d9eb0690f0b38ae3908650c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "69b6dffaa0c5034a100f04a36448e5ee3dfda996d884b8841b26159fed6ce10c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "7d65fc09c15cd12ddfc94af5d27795f9c2c89fd29993613516aabc24b0c505a0",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll": "cca6f73a30d293f5c50660a710752333507a72a6b33a1054961171c38374dca1",
+    "/Users/robert/Projects/neoclr/target/checked-conversions-dotnet-final-20261016/OperatorMatrix.dll": "4913e60bfb566b64e82dd5b348c283b0bec7e114c18d767b5ffece5b0cf6eaf1"
+  }
+}

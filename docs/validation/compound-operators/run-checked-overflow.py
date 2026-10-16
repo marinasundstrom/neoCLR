@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile Raven checked-overflow consumers and validate all six native instructions."""
+"""Compile Raven checked arithmetic/conversion consumers and validate native overflow faults."""
 import argparse
 import json
 from pathlib import Path
@@ -9,7 +9,9 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
-parser.add_argument('--unary', action='store_true', help='Qualify signed int/long unary negation instead of the binary matrix')
+mode = parser.add_mutually_exclusive_group()
+mode.add_argument('--unary', action='store_true', help='Qualify signed int/long unary negation instead of the binary matrix')
+mode.add_argument('--conversions', action='store_true', help='Qualify narrowing, unsigned-source and floating conversions')
 args = parser.parse_args()
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=False)
@@ -25,14 +27,21 @@ cases = [
 if args.unary:
     cases = [('negate-int', 'int', '-', '-2147483648', None),
              ('negate-long', 'long', '-', '-9223372036854775808L', None)]
+if args.conversions:
+    cases = [('narrow-byte', 'int', 'byte', '256', None),
+             ('unsigned-to-signed', 'uint', 'int', '(uint)4294967295L', None),
+             ('floating-to-int', 'double', 'int', '2147483648.0', None)]
 reports = []
 for name, kind, operator, left, right in cases:
     source = output / (name + '.rvn')
     parameters = f'a: {kind}, b: {kind}' if right is not None else f'a: {kind}'
     expression = f'a {operator} b' if right is not None else '-a'
+    result_type = operator if args.conversions else kind
+    if args.conversions:
+        expression = f'({result_type})a'
     arguments = f'{left}, {right}' if right is not None else left
     source.write_text(f'''class Program {{
-    static func Overflow({parameters}) -> {kind} => checked({expression})
+    static func Overflow({parameters}) -> {result_type} => checked({expression})
     static func Main() -> int {{
         let result = Overflow({arguments})
         return 42

@@ -1,0 +1,6 @@
+module CheckedConversionProvider
+
+public class Box {
+    static func explicit(value: Box) -> int => 1
+    static func checked explicit(value: Box) -> int => 42
+}

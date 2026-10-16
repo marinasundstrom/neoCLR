@@ -84,3 +84,17 @@ remain follow-ups. Before adoption, measure result construction and branch costs
 the disassembly contains nominal constructors and is not evidence of zero heap
 allocation or optimized machine-overflow-flag use. No .NET compiler semantics or
 Runtime Contract configuration changes are needed for this experiment.
+
+
+## Checked conversion semantics
+
+Raven checked casts validate fixed-width numeric destination ranges, preserving
+source signedness and rejecting out-of-range floating-to-integer conversions.
+User-defined checked explicit conversions replace matching ordinary declarations
+in the candidate set, with unpaired ordinary and implicit conversions still
+participating. This follows the [.NET conversion specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/conversions#1055-user-defined-explicit-conversions).
+The distinction from checked arithmetic overload search matters when different
+conversion result types compete. .NET emits standard conversion operations;
+NeoCLR maps the same intent to existing terminal-fault instructions. Safe arithmetic
+methods and their Result contracts remain independent. See the
+[qualification](../validation/compound-operators/README.md#checked-conversions).
