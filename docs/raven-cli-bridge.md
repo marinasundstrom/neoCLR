@@ -12280,3 +12280,27 @@ lifetime behavior; the compiler/metadata/backend retain their existing responsib
 The native class-library bundle and its documentation replace the scaffold for execution
 and current native signatures. See [the contract](collection-entry-design.md) and
 [validation](validation/map-entry/README.md). List helpers remain deferred.
+
+
+### Checked unary negation follow-up (2026-10-16)
+
+Raven main `307f3b55c` adds signed integer unary negation in checked expressions and
+checked unary overload lookup with ordinary fallback. The native carry emits a
+width-correct zero and existing checked subtraction after evaluating the operand
+once, including ordinary small-integer promotion. Floating-point negation retains
+its existing behavior. No Runtime Contract switch, new opcode, metadata version or
+class-library API is introduced; this is compiler integration of existing runtime
+operations. The .NET compiler also maps checked unary expression trees to
+`Expression.NegateChecked` and exposes `IUnaryOperation.IsChecked`.
+
+The [operator qualification](validation/compound-operators/README.md#checked-unary-follow-up)
+records the matching builds, tests, standalone consumer and minimum-value overflow
+checks. This closes unary negation from the remaining list above. Checked
+conversions are the next bounded slice; mutations, blocks, constant evaluation and
+checked binary expression trees remain gaps. Broader structural work stays parked.
+
+The native unary carry is `371363a67`; all positive and unary-overflow backend
+checks pass. The author's exception-free recovery question is recorded in the
+[recoverable arithmetic proposal](design/checked-arithmetic.md). This is design
+work alongside compiler completion, not an implemented API or a permanent roadmap
+reprioritization.

@@ -64,13 +64,14 @@ capabilities are a future layer over this operator support.
 Checked operator declarations (`func checked`) export distinct standard method
 names and require a matching ordinary declaration. Development checked expressions
 now use `checked(...)` / `unchecked(...)` for integer binary addition, subtraction
-and multiplication and checked binary overload selection with ordinary fallback.
+and multiplication, signed unary negation, and checked unary/binary overload
+selection with ordinary fallback.
 The nearest context wins; a method's body is not implicitly checked merely because
 it declares a checked operator.
 
 The same consumer is qualified on .NET 11 and native interpreter/JIT/AOT. Native
 arithmetic overflow is a terminal fault; .NET uses OverflowException. Checked
-blocks, conversions, unary negation, mutation operators and lifted arithmetic remain
+blocks, conversions, mutation operators and lifted arithmetic remain
 compiler gaps, with explicit diagnostics for unimplemented checked operations.
 The SDK/runtime also support checked numeric conversions independently. See the
 [qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-expression-follow-up).
@@ -141,3 +142,7 @@ unfinished.
 
 [Install and run →](../try/) · [HTTP application case →](../cases/http-server/) ·
 [API reference →](../docs/)
+
+Recoverable arithmetic methods are being considered separately from terminal
+native checked faults. Option/Result API shapes remain design work; the current
+checked expression support does not provide recoverable errors.

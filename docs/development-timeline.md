@@ -18497,3 +18497,21 @@ direct logical declarations with .NET-style bitwise operators plus truth tests.
 The [consumer record](validation/compound-operators/README.md) links independent
 interpreter/JIT/AOT outcomes; checked forms and broader declaration modifiers
 remain open. This is implementation of the earlier platform convention direction.
+
+
+## 2026-10-16 — Recoverable arithmetic on an exception-free runtime
+
+- Author: questioned transferring checked behavior to NeoCLR because it has no
+  exceptions, suggested safe methods returning success/failure, and requested
+  comparison with Rust. This was exploratory, not a final API decision.
+- Assistant: clarified that existing native checked instructions report terminal
+  ArithmeticOverflow while .NET throws OverflowException. Recommended separating
+  explicit recoverable methods from faulting scalar expressions; compared Rust's
+  Option-returning methods and other overflow policies. Result may retain useful
+  failure reasons, but names, error types and numeric capabilities remain open.
+- Action/outcome: completed the already-running unary slice, main `307f3b55c` and
+  native `371363a67`, with 73 focused tests per compiler line and successful
+  .NET/interpreter/JIT/AOT consumers plus native int/long overflow checks.
+  Recorded [research and proposed validation](design/checked-arithmetic.md).
+  Recoverable arithmetic methods have not been implemented; no author acceptance
+  of a specific API is inferred. Structural work remains parked.

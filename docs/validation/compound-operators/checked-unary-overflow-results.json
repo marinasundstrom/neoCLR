@@ -1,0 +1,405 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "negate-int",
+      "source": "class Program {\n    static func Overflow(a: int) -> int => checked(-a)\n    static func Main() -> int {\n        let result = Overflow(-2147483648)\n        return 42\n    }\n}\n",
+      "result": {
+        "passed": true,
+        "commands": [
+          {
+            "label": "compile",
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/project/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "logSha256": "d72a2da8d3fc78982004dbed3381fd3e6e297e91d7c7851b5829cd10f39e4c79",
+            "output": "Native build output: /Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/project/bin/neoclr/CompoundOperatorsRaven.dll\n"
+          },
+          {
+            "label": "interpreter",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "--execution",
+              "interpreter",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll"
+            ],
+            "exitCode": 1,
+            "logSha256": "ce7fdf549bfce0e6330ad49664163739b29ba84a32e94265010d0dbe3f31984c",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4F766572666C6F77 [instruction 2]\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4D61696E [instruction 1]\n"
+          },
+          {
+            "label": "aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "0208b23fcf017ef349be6a06e37fc973bf3468f9d7eb7ec49569cc343c2477ab",
+            "output": "(selection manifest in local aot.log)"
+          },
+          {
+            "label": "link-aot",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-fsanitize=undefined,bounds",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/app.o",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/app"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "execute-aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/app"
+            ],
+            "exitCode": 2,
+            "logSha256": "6764cd4f8e6845c25cb5646682547bd48d669127c01ad121d9098996ed938c2c",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 2]\n   at Program.Main [instruction 1]\nstatus=2 fault=2 result=-1\n"
+          },
+          {
+            "label": "link-jit",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-DJIT_HOST",
+              "-dynamiclib",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/host.dylib"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "jit",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--jit-managed",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/host.dylib",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "23a84070104e84839d104d7adf77eec4ad32a1ebad3074716a554eb002729584",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 2]\n   at Program.Main [instruction 1]\nstatus=2 fault=2 result=-1\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.377148875,\"guestExitCode\":2,\"invocationSeconds\":0.000047542,\"metadataLoadSeconds\":0.631954416,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.437985834}\n"
+          }
+        ],
+        "jit": {
+          "compileAndFinalizeSeconds": 0.377148875,
+          "guestExitCode": 2,
+          "invocationSeconds": 4.7542e-05,
+          "metadataLoadSeconds": 0.631954416,
+          "profile": "macos-arm64-jit-managed-v1",
+          "selectionAndVerificationSeconds": 14.437985834
+        },
+        "files": {
+          "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int.rvn": "70249cd2cdeee6a36040bc55ce80352502797113131f1e2c33015efe2525a3f9",
+          "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run.py": "27de61ab13000adf7d37b4bb6e5a67fbe6a1c287a23de1859b2f271f13baf13f",
+          "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "113a54cc5deca08192cc5d7f5e360165f58f748f84667206b84ba2215ebedd8c",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "67b51f43ef0acd8476cae80cf0a603db45236d938603412ab92397634bafd0ff",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "c2990e51f961c8c67c32b6e01032f5a6360db8a61a4be832daecfba66e64fb19",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "113ba393b1a0a4885d075ce850ca263e5e6c7ae325b9190f0228543ecbf76b6f",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "7feb8699b64d78a94db69691d6a3d972e4ad060df6a648995a582c16e012a8ac",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr": "916259e50faa34b833939602261c098426e2d1fd14f0116faccc8e727e65924c",
+          "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-int/project/bin/neoclr/CompoundOperatorsRaven.dll": "abcaf246b4e7db541b25b7a7fd4d08fd59b8b26501c14baff3ac4be928d02c51",
+          "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/bundle.json": "dc92e3f835797fb7ab7f1bfbcda4fffec81901f7096a031978844f56bb4b4418"
+        }
+      }
+    },
+    {
+      "name": "negate-long",
+      "source": "class Program {\n    static func Overflow(a: long) -> long => checked(-a)\n    static func Main() -> int {\n        let result = Overflow(-9223372036854775808L)\n        return 42\n    }\n}\n",
+      "result": {
+        "passed": true,
+        "commands": [
+          {
+            "label": "compile",
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/project/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "logSha256": "1d2c921e41344afbed27d54ead472c35869fb2fb4dab61944b5f233ae4659add",
+            "output": "Native build output: /Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/project/bin/neoclr/CompoundOperatorsRaven.dll\n"
+          },
+          {
+            "label": "interpreter",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "--execution",
+              "interpreter",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll"
+            ],
+            "exitCode": 1,
+            "logSha256": "ce7fdf549bfce0e6330ad49664163739b29ba84a32e94265010d0dbe3f31984c",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4F766572666C6F77 [instruction 2]\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4D61696E [instruction 1]\n"
+          },
+          {
+            "label": "aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "c492d13a4289bc30eb1dfb83a0afb7fd75add0639b38d46e3bcbfb7c31c23da6",
+            "output": "(selection manifest in local aot.log)"
+          },
+          {
+            "label": "link-aot",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-fsanitize=undefined,bounds",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/app.o",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/app"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "execute-aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/app"
+            ],
+            "exitCode": 2,
+            "logSha256": "6764cd4f8e6845c25cb5646682547bd48d669127c01ad121d9098996ed938c2c",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 2]\n   at Program.Main [instruction 1]\nstatus=2 fault=2 result=-1\n"
+          },
+          {
+            "label": "link-jit",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-DJIT_HOST",
+              "-dynamiclib",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/host.dylib"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "jit",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--jit-managed",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/host.dylib",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "bc82d0fbfdf15e7e94af1bd8ec5c43913e9408c4414c3ed3b9ba41c2b1b8e5ce",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 2]\n   at Program.Main [instruction 1]\nstatus=2 fault=2 result=-1\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.373814708,\"guestExitCode\":2,\"invocationSeconds\":0.000042208,\"metadataLoadSeconds\":0.613018959,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.660604458}\n"
+          }
+        ],
+        "jit": {
+          "compileAndFinalizeSeconds": 0.373814708,
+          "guestExitCode": 2,
+          "invocationSeconds": 4.2208e-05,
+          "metadataLoadSeconds": 0.613018959,
+          "profile": "macos-arm64-jit-managed-v1",
+          "selectionAndVerificationSeconds": 13.660604458
+        },
+        "files": {
+          "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long.rvn": "58facd2cdb800132f56b338899bd65fdf6416b5db48a64eaab729e13e647287c",
+          "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run.py": "27de61ab13000adf7d37b4bb6e5a67fbe6a1c287a23de1859b2f271f13baf13f",
+          "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "113a54cc5deca08192cc5d7f5e360165f58f748f84667206b84ba2215ebedd8c",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "67b51f43ef0acd8476cae80cf0a603db45236d938603412ab92397634bafd0ff",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "c2990e51f961c8c67c32b6e01032f5a6360db8a61a4be832daecfba66e64fb19",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "113ba393b1a0a4885d075ce850ca263e5e6c7ae325b9190f0228543ecbf76b6f",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "7feb8699b64d78a94db69691d6a3d972e4ad060df6a648995a582c16e012a8ac",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr": "916259e50faa34b833939602261c098426e2d1fd14f0116faccc8e727e65924c",
+          "/Users/robert/Projects/neoclr/target/checked-unary-overflow-20261016/negate-long/project/bin/neoclr/CompoundOperatorsRaven.dll": "b23164febb3ad23c86565c53b5bfcfb62cc3f85b812d0b0194e5012a27f5fe40",
+          "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/bundle.json": "dc92e3f835797fb7ab7f1bfbcda4fffec81901f7096a031978844f56bb4b4418"
+        }
+      }
+    }
+  ]
+}

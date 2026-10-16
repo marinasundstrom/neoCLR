@@ -224,3 +224,26 @@ unary/mutation and lifted/pointer operations instead of silently ignoring contex
 The current native primitive admission profile is unchanged. Structural work stays
 parked. Imported operator selection is covered in compiler tests; this fixture
 does not add native separate-provider qualification.
+
+## Checked unary follow-up
+
+Raven main `307f3b55c` and deliberate native carry `371363a67` add checked
+signed unary negation and checked unary overload selection with ordinary fallback.
+Each compiler line passes 73 focused tests, including floating negative zero,
+small-integer promotion, nested unchecked behavior and .NET NegateChecked trees.
+The expanded CheckedExpressions consumer returns 42 on .NET 11 and native
+interpreter, managed JIT and AOT on macOS ARM64. The checked-unary-*-results.json
+files retain exact commands and hashes. Earlier binary results describe the earlier
+sample revision; these files qualify the expanded source.
+
+Run the existing positive consumer command with CheckedExpressions.rvn; pass
+`--unary` to run-checked-overflow.py for separate int/long minimum-negation cases.
+Both cases fault on all three native backends; JIT/AOT preserve the result slot.
+Runtime/SDK baseline `1f1e99af3` and bundle
+`target/function-reflection-library-validated-20261016` are unchanged. No runtime
+opcode or Runtime Contract switch is added. Unary negation is no longer a compiler
+gap; checked binary expression trees, conversions, mutation, blocks and constant
+arithmetic remain follow-up work.
+
+Native faults are terminal, not recoverable exceptions. See the separate
+[recoverable arithmetic proposal](../../design/checked-arithmetic.md).

@@ -1,4 +1,6 @@
 class Number {
+    static func -(value: Number) -> int => 1
+    static func checked -(value: Number) -> int => 42
     static func +(left: Number, right: Number) -> int => 1
     static func checked +(left: Number, right: Number) -> int => 42
     static func -(left: Number, right: Number) -> int => 1
@@ -17,6 +19,12 @@ class Program {
     static func UnsignedAdd(left: ulong, right: ulong) -> ulong => checked(left + right)
     static func Wrap(left: int, right: int) -> int => checked(unchecked(left + right))
 
+    static func Negate(value: int) -> int => checked(-value)
+    static func NegateLong(value: long) -> long => checked(-value)
+    static func NegateSmall(value: sbyte) -> int => checked(-value)
+    static func NegateFloat(value: double) -> double => checked(-value)
+    static func WrapNegate(value: int) -> int => checked(unchecked(-value))
+
     static func Main() -> int {
         let left = Number()
         let right = Number()
@@ -32,6 +40,13 @@ class Program {
         if Multiply((uint)21, (uint)2) != (uint)42 { return 10 }
         if UnsignedAdd((ulong)40, (ulong)2) != (ulong)42 { return 11 }
         if Wrap(2147483647, 1) != -2147483648 { return 12 }
+        if checked(-left) != 42 { return 13 }
+        if unchecked(-left) != 1 { return 14 }
+        if Negate(-42) != 42 { return 15 }
+        if NegateLong(-42L) != 42L { return 16 }
+        if NegateSmall((sbyte)-128) != 128 { return 17 }
+        if NegateFloat(1.5) != -1.5 { return 18 }
+        if WrapNegate(-2147483648) != -2147483648 { return 19 }
         return 42
     }
 }
