@@ -6,6 +6,7 @@ internal static class FunctionKindConstraintChecks
 {
     internal static void Run()
     {
+        MethodConstraints();
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
         var assembly = new AssemblyBuilder(new("FunctionConstraint", new(1, 0, 0, 0)), core);
@@ -36,6 +37,72 @@ internal static class FunctionKindConstraintChecks
         try { assembly.Write(); throw new Exception("CLI export erased native constraint"); }
         catch (InvalidDataException) { }
         Console.WriteLine("PASS native function-kind constraint and introspection");
+    }
+    private static void MethodConstraints()
+    {
+        var graph = new AssemblyBuilder(new("FunctionMethods", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var method = graph.AddFunction("Keep", new(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["F"]));
+        method.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType);
+        method.LoadArgument(0); method.Return();
+        var function = SignatureType.Function(new(PrimitiveType.Int32, [PrimitiveType.Int32]));
+        method.MakeGenericInstance(function);
+        Reject(() => method.MakeGenericInstance(PrimitiveType.Int32));
+        Reject(() => method.MakeGenericInstance(graph.AddClass("Example", "NotFunction")));
+        Reject(() => method.SetSpecialConstraints(1, TypeParameterConstraints.FunctionType));
+        Reject(() => method.SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType));
+        var contract = graph.AddInterface("Example", "Contract");
+        Reject(() => method.AddInterfaceConstraint(0, contract));
+        method.SetSpecialConstraints(0, TypeParameterConstraints.None);
+        method.AddInterfaceConstraint(0, contract);
+        Reject(() => method.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType));
+        var keep = graph.AddFunction("Identity", new(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["F"]));
+        keep.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType);
+        keep.LoadArgument(0); keep.Return();
+        var forward = graph.AddFunction("Forward", new(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["F"]));
+        forward.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType);
+        forward.LoadArgument(0); forward.GetILGenerator().Call(keep.MakeGenericInstance(SignatureType.MethodParameter(0))); forward.Return();
+        var unbounded = graph.AddFunction("Unbounded", new(PrimitiveType.Int32, [], ["F"]));
+        Reject(() => unbounded.GetILGenerator().Call(keep.MakeGenericInstance(SignatureType.MethodParameter(0))));
+        unbounded.LoadConstant(0); unbounded.Return();
+        var native = NativeModuleContainer.WriteLibraryBinary(graph);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(native);
+        var definition = snapshot.MainModule.Functions.Single(m => m.Name == "Identity");
+        var context = new MetadataLoadContext([snapshot]);
+        var parameter = (MethodGenericParameterTypeInfo)context.Resolve(definition).GetGenericArguments().Single();
+        if (parameter.SpecialConstraints != TypeParameterConstraints.FunctionType || parameter.GetTypeConstraints().Count != 0)
+            throw new Exception("lost method category constraint");
+        Expect<InvalidDataException>(() => parameter.GetInterfaceConstraints());
+        Expect<InvalidOperationException>(() => definition.SetSpecialConstraints(0, TypeParameterConstraints.None));
+        Expect<InvalidDataException>(() => graph.Write());
+        Expect<NotSupportedException>(() => NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly()).CreateReferenceAssembly(graph.CoreLibrary));
+        var consumer = new AssemblyBuilder(new("MethodConsumer", new(1, 0, 0, 0)), graph.CoreLibrary);
+        var imported = consumer.ImportReference(definition, graph.CoreLibrary);
+        imported.MakeGenericInstance(function);
+        Reject(() => imported.MakeGenericInstance(PrimitiveType.Int32));
+        var forwardedImport = imported.MakeGenericInstance(SignatureType.MethodParameter(0));
+        var importedCaller = consumer.AddFunction("Forward", new(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["F"]));
+        importedCaller.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType);
+        importedCaller.LoadArgument(0); importedCaller.Call(forwardedImport); importedCaller.Return();
+        NativeModuleContainer.WriteLibraryBinary(consumer);
+        importedCaller.SetSpecialConstraints(0, TypeParameterConstraints.None);
+        Expect<InvalidDataException>(() => NativeModuleContainer.WriteLibraryBinary(consumer));
+        var json = graph.WriteNativeAssembly();
+        foreach (var invalid in new[] { "duplicate", "ordinal", "category", "mixed" })
+        {
+            var tree = System.Text.Json.Nodes.JsonNode.Parse(json)!;
+            var constraints = tree["functions"]!.AsArray().First(m => m!["generic_constraints"]?.AsArray().Any(c => c!["kind"]?.ToString() == "FunctionType") == true)!["generic_constraints"]!.AsArray();
+            if (invalid == "duplicate") constraints.Add(constraints[0]!.DeepClone());
+            else if (invalid == "ordinal") constraints[0]!["parameter"] = 10;
+            else if (invalid == "category") constraints[0]!["kind"] = "ReferenceType";
+            else constraints.Add(new System.Text.Json.Nodes.JsonObject { ["parameter"] = 0, ["kind"] = new System.Text.Json.Nodes.JsonObject { ["TypeBound"] = new System.Text.Json.Nodes.JsonObject { ["Named"] = "Example.Contract" } } });
+            Expect<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(tree.ToJsonString())));
+        }
+        Console.WriteLine("PASS native method function-kind authoring, forwarding, import, introspection and CLI rejection");
+    }
+    private static void Expect<T>(Action action) where T : Exception
+    {
+        try { action(); } catch (T) { return; }
+        throw new Exception("expected " + typeof(T).Name);
     }
     private static void Reject(Action action)
     {

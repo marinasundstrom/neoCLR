@@ -199,6 +199,8 @@ public sealed partial class AssemblyBuilder
             if (definition.GenericArity != 0) throw new InvalidDataException("generic internal-call imports are unsupported");
             reference.Target.SetInternalCall();
         }
+        foreach (var constraint in definition.SpecialConstraints)
+            reference.Target.SetSpecialConstraints(constraint.Key, constraint.Value);
         if (allowStructuralConstraints)
         {
             reference.Target.ConstraintOwner = this;

@@ -4897,6 +4897,6 @@ function lists/signals, without event metadata. Native runtime/host SDK groundwo
 is isolated on `codex/function-kind-constraint`. Raven now separates structural
 function symbols from nominal delegates and emits `where T: func` for native
 generic classes, including separate-provider import. See the [consumer evidence](validation/function-kind-constraint/README.md).
-Method-level native constraint emission and signature bounds remain open. Invocation decisions are explicitly
+The host SDK now retains method FunctionType constraints through authoring, snapshots, introspection and imports, with argument/proof validation and fail-closed CLI export. Raven method emission, backend specialization and signature bounds remain open. Invocation decisions are explicitly
 postponed. This is not a resumption of the broader structural roadmap. See
 [direction](proposals/structural-types.md#20-generic-constraints-on-function-types).

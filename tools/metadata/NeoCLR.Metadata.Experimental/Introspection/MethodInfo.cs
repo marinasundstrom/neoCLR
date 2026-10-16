@@ -141,6 +141,8 @@ public sealed class MethodGenericParameterTypeInfo : TypeInfo
     public MethodInfo DeclaringMethod { get; }
     /// <summary>Gets its zero-based method scope ordinal.</summary>
     public int Position { get; }
+    /// <summary>Gets native category requirements without projecting them into CLI flags.</summary>
+    public TypeParameterConstraints SpecialConstraints => DeclaringMethod.Definition.SpecialConstraints.GetValueOrDefault(Position);
     /// <summary>Resolves the local or external nongeneric interface bounds for this method parameter.</summary>
     /// <remarks>Inference, language conversions and generic argument admission belong to the caller.</remarks>
     public IReadOnlyList<NominalTypeInfo> GetInterfaceConstraints() => Array.AsReadOnly(DeclaringMethod.Definition.InterfaceConstraints

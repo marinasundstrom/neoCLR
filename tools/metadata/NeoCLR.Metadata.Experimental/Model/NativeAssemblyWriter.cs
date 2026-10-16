@@ -373,9 +373,13 @@ public sealed partial class AssemblyBuilder
         if (moduleBindings.Length != 0) manifest["native_module_bindings"] = moduleBindings;
         var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || types.Any(owner => owner.ExternalBase is { } parent && Equals(InterfaceDefinition(parent), t)) || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t =>
         {
-            var row = new Dictionary<string, object?> {
-                ["native_name"] = ExternalName(t), ["assembly"] = IdentityText(t.AssemblyIdentity),
-                ["namespace"] = t.Namespace, ["name"] = t.Name, ["arity"] = t.GenericArity,
+            var row = new Dictionary<string, object?>
+            {
+                ["native_name"] = ExternalName(t),
+                ["assembly"] = IdentityText(t.AssemblyIdentity),
+                ["namespace"] = t.Namespace,
+                ["name"] = t.Name,
+                ["arity"] = t.GenericArity,
                 ["value_type"] = t.IsValueType,
                 ["declaring"] = t.DeclaringType is null ? null : ExternalName(t.DeclaringType)
             };
@@ -439,7 +443,7 @@ public sealed partial class AssemblyBuilder
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.Definition.TypeConstraints.Count == 0 ? null : method.Definition.TypeConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.Bound) } }).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, MethodAttributes(method), method.Definition.NativeImport)).ToArray()
+                method.Definition.TypeConstraints.Count == 0 && method.Definition.SpecialConstraints.Count == 0 ? null : method.Definition.TypeConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.Bound) } }).Concat(method.Definition.SpecialConstraints.OrderBy(c => c.Key).Select(c => (object)new { parameter = c.Key, kind = "FunctionType" })).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, MethodAttributes(method), method.Definition.NativeImport)).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > maxImageSize) throw new InvalidDataException("output image exceeds limit");

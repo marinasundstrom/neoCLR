@@ -12000,3 +12000,15 @@ slot returns 42 in interpreter, AOT with UBSan/bounds, and managed JIT.
 The retained source bundle is `variance-argument-sequence-20261016`. No website
 build or guest API snapshot refresh was needed: this adds compiler syntax and
 native metadata mapping, not a new guest class-library API.
+
+
+### Method function-category metadata prerequisite (2026-10-16)
+
+On the function feature branch, the SDK can now author, read, introspect and import
+native method `FunctionType` constraints. Local/imported argument validation checks
+structural function signatures and forwarded caller guarantees, including write-time
+revalidation. CLI projection rejects them; there is no temporary CLI encoding.
+This matches .NET's preservation of generic parameter requirements, with an explicit
+native category instead of a nominal Delegate bound. Runtime Contracts are unchanged.
+Raven method emission and AOT/JIT method specialization remain gated until the next
+slice qualifies execution. The focused SDK function-kind checks cover this prerequisite.

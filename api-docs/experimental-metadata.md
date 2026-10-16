@@ -9672,3 +9672,28 @@ No new invocation operation is introduced; exact function signatures stay intact
 This is isolated feature-branch groundwork. Raven syntax, function-list APIs and
 dynamic invocation are not delivered by this SDK addition. See
 [qualification](../docs/validation/function-kind-constraint/README.md).
+
+### Method category constraints
+
+`MethodBuilder.SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)`
+and `MethodDefinition.SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)`
+accept standalone `FunctionType`; `None` clears it. Invalid ordinals, other flags,
+and combinations with type bounds throw `ArgumentException`. Loaded definitions
+are immutable (`InvalidOperationException`). `MethodDefinition.SpecialConstraints`
+exposes a read-only dictionary by ordinal; `MethodGenericParameterTypeInfo.SpecialConstraints`
+returns the flags for that parameter. Type bounds remain separately available through
+`TypeConstraints`/`GetTypeConstraints`; the legacy interface-only query rejects a
+function-kind constraint rather than return an incomplete constraint view.
+
+Native authoring, snapshot reads and `AssemblyBuilder.ImportReference` preserve
+these requirements. `MakeGenericInstance` rejects nonfunction arguments. Forwarded
+method parameters require a caller function constraint when emitting a call;
+writing revalidates this proof after edits. CLI executable/reference output rejects
+these native-only contracts. Unlike .NET's nominal Delegate constraint, no delegate
+inheritance or invocation signature is implied. AOT/JIT method specialization and
+Raven method emission remain gated pending their own qualification.
+
+Validation: `NeoCLR.Metadata.Experimental.Tests --function-kind-constraint`
+covers accepted signatures, rejected nominal/primitive arguments, forwarding,
+separate snapshots/imports, malformed metadata, introspection and CLI rejection.
+No guest API or RavenDoc input changes; this host SDK manual entry is its reference.

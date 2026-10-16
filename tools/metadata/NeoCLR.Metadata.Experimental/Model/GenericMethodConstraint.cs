@@ -12,6 +12,25 @@ public sealed record GenericMethodTypeConstraint(int ParameterIndex, SignatureTy
 
 public sealed partial class MethodDefinition
 {
+    private readonly Dictionary<int, TypeParameterConstraints> specialConstraints = [];
+    /// <summary>Gets native method parameter category constraints, keyed by ordinal.</summary>
+    public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(specialConstraints);
+
+    /// <summary>Sets a standalone native FunctionType requirement, or clears it with None.</summary>
+    /// <exception cref="ArgumentException">Invalid ordinal, category or combination with a type bound.</exception>
+    /// <exception cref="InvalidOperationException">The definition is a loaded immutable snapshot.</exception>
+    public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
+    {
+        if (AuthoredSignature is null) throw new InvalidOperationException("loaded method constraints are immutable");
+        if (parameterIndex < 0 || parameterIndex >= GenericArity ||
+            constraints is not (TypeParameterConstraints.None or TypeParameterConstraints.FunctionType) ||
+            constraints != TypeParameterConstraints.None && (TypeConstraints.Any(c => c.ParameterIndex == parameterIndex) ||
+                !specialConstraints.ContainsKey(parameterIndex) && specialConstraints.Count + TypeConstraints.Count >= 128))
+            throw new ArgumentException("invalid method category constraint");
+        if (constraints == TypeParameterConstraints.None) specialConstraints.Remove(parameterIndex);
+        else specialConstraints[parameterIndex] = constraints;
+    }
+
     private readonly List<GenericMethodInterfaceConstraint> authoredInterfaceConstraints = [];
     internal readonly List<GenericMethodTypeConstraint> AuthoredStructuralConstraints = [];
     internal IReadOnlyList<GenericMethodInterfaceConstraint> NominalInterfaceConstraints => authoredInterfaceConstraints;
@@ -31,7 +50,7 @@ public sealed partial class MethodDefinition
     /// <summary>Gets method-scoped interface bounds, preserving parameter ordinals.</summary>
     /// <remarks>Supports nominal nongeneric interfaces only; use TypeConstraints for structural bounds. A structural bound causes this query to throw rather than return an incomplete set.</remarks>
     /// <exception cref="InvalidDataException">Loaded metadata contains unsupported constraints; no partial constraint set is returned.</exception>
-    public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => unsupportedGenericParameters || loadedStructuralConstraints.Length != 0 || AuthoredStructuralConstraints.Count != 0
+    public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => specialConstraints.Count != 0 || unsupportedGenericParameters || loadedStructuralConstraints.Length != 0 || AuthoredStructuralConstraints.Count != 0
         ? throw new InvalidDataException("method has unsupported generic parameter constraints")
         : AuthoredSignature is not null
         ? authoredInterfaceConstraints.AsReadOnly()
@@ -60,7 +79,7 @@ public sealed partial class MethodDefinition
         ArgumentNullException.ThrowIfNull(interfaceType);
         if (AuthoredSignature is null) throw new InvalidOperationException("loaded method constraints are immutable");
         var signature = ConstraintSignature(interfaceType);
-        if (authoredInterfaceConstraints.Count + AuthoredStructuralConstraints.Count >= 128 || parameterIndex < 0 || parameterIndex >= GenericArity ||
+        if (specialConstraints.ContainsKey(parameterIndex) || specialConstraints.Count + authoredInterfaceConstraints.Count + AuthoredStructuralConstraints.Count >= 128 || parameterIndex < 0 || parameterIndex >= GenericArity ||
             TypeConstraints.Any(c => c.ParameterIndex == parameterIndex && c.Bound == signature))
             throw new ArgumentException("invalid method interface constraint");
         authoredInterfaceConstraints.Add(new(parameterIndex, interfaceType));
@@ -84,6 +103,11 @@ public sealed partial class MethodDefinition
 
 public sealed partial class MethodBuilder
 {
+    /// <summary>Sets a standalone native FunctionType requirement, or clears it with None.</summary>
+    /// <exception cref="ArgumentException">Invalid ordinal, category or existing type bound.</exception>
+    public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
+        => Definition.SetSpecialConstraints(parameterIndex, constraints);
+
     /// <summary>Gets the canonical definition's method interface bounds.</summary>
     public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => Definition.InterfaceConstraints;
     /// <summary>Adds an owned nongeneric interface bound; definition and builder authoring share validation.</summary>
@@ -105,7 +129,7 @@ public sealed partial class MethodBuilder
     public void AddExperimentalStructuralConstraint(int parameterIndex, ReferenceCompositionKind kind, params SignatureType[] constituents)
     {
         ArgumentNullException.ThrowIfNull(constituents);
-        if (parameterIndex < 0 || parameterIndex >= Signature.GenericParameterNames.Count || Definition.TypeConstraints.Count >= 128)
+        if (Definition.SpecialConstraints.ContainsKey(parameterIndex) || parameterIndex < 0 || parameterIndex >= Signature.GenericParameterNames.Count || Definition.SpecialConstraints.Count + Definition.TypeConstraints.Count >= 128)
             throw new ArgumentException("invalid method constraint ordinal or count");
         var bound = Assembly.CreateExperimentalReferenceComposition(kind, constituents);
         if (bound.Composition is null)
@@ -155,6 +179,14 @@ public sealed partial class MethodBuilder
 
     internal void ValidateMethodArguments(IReadOnlyList<SignatureType> arguments, MethodBuilder? caller = null, bool deferOpen = false)
     {
+        foreach (var constraint in Definition.SpecialConstraints)
+        {
+            var argument = arguments[constraint.Key];
+            if (argument.FunctionSignature is not null) continue;
+            if (argument.MethodParameterIndex is { } parameter &&
+                (caller is null && deferOpen || caller?.Definition.SpecialConstraints.GetValueOrDefault(parameter) == TypeParameterConstraints.FunctionType)) continue;
+            throw new ArgumentException("generic method argument must be a structural function type");
+        }
         foreach (var constraint in Definition.AuthoredStructuralConstraints)
         {
             var argument = arguments[constraint.ParameterIndex];
@@ -180,7 +212,7 @@ public sealed partial class MethodBuilder
                     throw new ArgumentException("forwarded method argument lacks required interface bounds");
                 }
                 if (caller is not null && parameter < caller.Signature.GenericParameterNames.Count &&
-                    caller.InterfaceConstraints.Any(c => c.ParameterIndex == parameter &&
+                    caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == parameter &&
                         (required.ClassType is { } requiredLocal ? caller.Definition.ConstraintSignature(c.InterfaceType).ClassType?.ConformsTo(requiredLocal) == true
                          : Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), required.ImportedType!, argument)))) continue;
                 throw new ArgumentException("forwarded method argument lacks required interface bounds");
