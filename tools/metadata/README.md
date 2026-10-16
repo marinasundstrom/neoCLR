@@ -381,3 +381,8 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
 
 The output directory must be fresh. Omitting it runs the CLI execution and native
 write validation without saving images. The check is also in the normal SDK suite.
+
+Checked conversions are also available through all 20 Conv_Ovf_* codes. Run
+`--checked-conversions [fresh-output]` for the .NET/native-emission matrix.
+The interpreter supports these operations; JIT/AOT still reject them. See the
+[conversion qualification](../../docs/validation/checked-conversions/README.md).

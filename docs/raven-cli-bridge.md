@@ -12216,3 +12216,12 @@ and reports overflow without writing the result. See the [qualification matrix](
 and SDK API reference. No Runtime Contract or library API change is required.
 Raven checked contexts, overload selection/fallback and checked numeric conversions
 remain the next compiler/SDK work; structural work stays parked.
+
+
+Checked conversion authoring (2026-10-16): the SDK now exposes all 20 standard
+checked integer conversion instructions, preserving signedness and destination
+width with existing CLI/native encodings. The [.NET/interpreter matrix](validation/checked-conversions/README.md)
+covers boundary values and floating-point truncation/overflow. JIT/AOT still reject
+these operations; native lowering is the next prerequisite before Raven checked
+contexts and narrowing can be qualified. No Runtime Contract configuration, native
+encoding version or compiler behavior changes in this SDK slice.

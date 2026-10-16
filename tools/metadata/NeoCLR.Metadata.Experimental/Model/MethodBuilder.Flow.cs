@@ -255,6 +255,36 @@ public sealed partial class MethodBuilder
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
                 case "constantSingle": stack.Add(PrimitiveType.Single); break;
                 case "constantDouble": stack.Add(PrimitiveType.Double); break;
+                case "convert.checked.i1":
+                case "convert.checked.u1":
+                case "convert.checked.i2":
+                case "convert.checked.u2":
+                case "convert.checked.i4":
+                case "convert.checked.u4":
+                case "convert.checked.i8":
+                case "convert.checked.u8":
+                case "convert.checked.i":
+                case "convert.checked.u":
+                case "convert.checked.i1.un":
+                case "convert.checked.u1.un":
+                case "convert.checked.i2.un":
+                case "convert.checked.u2.un":
+                case "convert.checked.i4.un":
+                case "convert.checked.u4.un":
+                case "convert.checked.i8.un":
+                case "convert.checked.u8.un":
+                case "convert.checked.i.un":
+                case "convert.checked.u.un":
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr or PrimitiveType.Single or PrimitiveType.Double))
+                        throw new InvalidDataException("checked numeric conversion requires an integer or floating value");
+                    stack[^1] = instruction.Op switch
+                    {
+                        "convert.checked.i8" or "convert.checked.i8.un" or "convert.checked.u8" or "convert.checked.u8.un" => PrimitiveType.Int64,
+                        "convert.checked.i" or "convert.checked.i.un" => PrimitiveType.IntPtr,
+                        "convert.checked.u" or "convert.checked.u.un" => PrimitiveType.UIntPtr,
+                        _ => PrimitiveType.Int32
+                    };
+                    break;
                 case "convertSingle":
                 case "convertDouble":
                 case "convertSByte":

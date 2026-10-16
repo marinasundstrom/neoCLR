@@ -76,3 +76,7 @@ them. This qualification is for 64-bit ARM64; it does not establish a 32-bit
 native backend. No performance claim is made. SDK checked numeric conversions,
 Raven checked expression/block contexts, overload selection/fallback and checked
 narrowing are still follow-up work. Structural type work remains parked.
+
+Subsequent SDK slice: [checked conversion authoring](../checked-conversions/README.md)
+is now qualified on .NET and the interpreter. Shared JIT/AOT conversion lowering
+remains open. The arithmetic evidence above is unchanged.

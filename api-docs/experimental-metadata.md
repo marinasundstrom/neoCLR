@@ -9779,7 +9779,57 @@ This closes an SDK authoring gap relative to [.NET checked addition](https://lea
 and its unsigned form. Enum members are appended, preserving previous numeric
 values. There is no new convenience method or automatic checked context. Raven
 must still choose these operations during checked-expression lowering. Checked
-numeric conversion authoring remains a separate gap.
+numeric conversion authoring is described below; native JIT/AOT lowering remains a gap.
 
 See [checked arithmetic validation](../docs/validation/checked-arithmetic/README.md)
 for the compiled SDK consumer, rejection cases and execution-mode evidence.
+
+## Checked numeric conversions (development, 2026-10-16)
+
+The operand-free MethodBuilder.Emit(OpCode) and IILGenerator.Emit(OpCode) overloads
+accept the following appended enum members. Existing enum values are unchanged.
+
+| Signed-source opcode | Unsigned-source opcode | Destination |
+| --- | --- | --- |
+| Conv_Ovf_I1 | Conv_Ovf_I1_Un | SByte |
+| Conv_Ovf_U1 | Conv_Ovf_U1_Un | Byte |
+| Conv_Ovf_I2 | Conv_Ovf_I2_Un | Int16 |
+| Conv_Ovf_U2 | Conv_Ovf_U2_Un | UInt16 |
+| Conv_Ovf_I4 | Conv_Ovf_I4_Un | Int32 |
+| Conv_Ovf_U4 | Conv_Ovf_U4_Un | UInt32 |
+| Conv_Ovf_I8 | Conv_Ovf_I8_Un | Int64 |
+| Conv_Ovf_U8 | Conv_Ovf_U8_Un | UInt64 |
+| Conv_Ovf_I | Conv_Ovf_I_Un | IntPtr |
+| Conv_Ovf_U | Conv_Ovf_U_Un | UIntPtr |
+
+Each consumes one integer or floating evaluation value. Sources may have Int32,
+Int64, IntPtr, UIntPtr, Single or Double evaluation categories; unsigned fixed-width
+signatures already normalize to the matching integer category. The _Un suffix
+interprets integer source bits as unsigned, independently of signature signedness.
+Floating inputs truncate toward zero; NaN, infinities and unrepresentable
+truncated results overflow. Pointer-sized destinations use the execution target width.
+
+Destinations of up to 32 bits produce Int32 stack values, 64-bit destinations
+produce Int64, and native destinations produce IntPtr/UIntPtr. Small signed
+results sign-extend. The conversion validates the destination range before that
+stack promotion. An empty stack or nonnumeric source rejects with InvalidDataException
+when writing CLI or native output; ordinary emission still defers flow validation.
+No array-length marker, reference, Boolean or managed pointer conversion is implied.
+
+CLI uses standard conv.ovf.*[.un] instructions and OverflowException. Native
+emission uses the existing identically named operations and ArithmeticOverflow.
+The interpreter implements them; native JIT/AOT lowering remains unsupported and
+rejects explicitly. SDK authoring is not a backend capability guarantee.
+
+For a method with an Int64 argument and Int32 result, for example:
+
+```csharp
+var il = method.GetILGenerator();
+il.LoadArgument(0);
+il.Emit(OpCode.Conv_Ovf_I4);
+il.Return();
+```
+
+Use RuntimeAssemblyContainer.WriteBinary(assemblyBuilder) for floating literal
+fixtures: that overload selects the existing schema needed for unsigned Double
+bits. See [qualification and remaining work](../docs/validation/checked-conversions/README.md).

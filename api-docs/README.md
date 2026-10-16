@@ -2248,3 +2248,7 @@ forms are covered by XML summaries and the linked experimental metadata referenc
 They extend the existing `Emit(OpCode)` surface; no guest public type/member or
 RavenDoc assembly inventory changes. The host/guest snapshot exclusion above
 continues to apply. Native guest API snapshots remain unchanged.
+
+2026-10-16: the 20 host-only Conv_Ovf_* enum members and their Emit contracts are
+covered in the experimental metadata reference and XML summaries. The existing
+host-only RavenDoc exclusion applies; no guest API inventory or snapshot changes.

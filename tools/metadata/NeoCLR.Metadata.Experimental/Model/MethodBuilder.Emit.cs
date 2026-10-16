@@ -169,12 +169,53 @@ public enum OpCode
     /// <summary>Multiplies matching integer values with unsigned overflow checking; faults if the result is out of range.</summary>
     Mul_Ovf_Un,
 
+    /// <summary>Converts a numeric value to SByte with overflow checking.</summary>
+    Conv_Ovf_I1,
+    /// <summary>Converts a numeric value to Byte with overflow checking.</summary>
+    Conv_Ovf_U1,
+    /// <summary>Converts a numeric value to Int16 with overflow checking.</summary>
+    Conv_Ovf_I2,
+    /// <summary>Converts a numeric value to UInt16 with overflow checking.</summary>
+    Conv_Ovf_U2,
+    /// <summary>Converts a numeric value to Int32 with overflow checking.</summary>
+    Conv_Ovf_I4,
+    /// <summary>Converts a numeric value to UInt32 with overflow checking.</summary>
+    Conv_Ovf_U4,
+    /// <summary>Converts a numeric value to Int64 with overflow checking.</summary>
+    Conv_Ovf_I8,
+    /// <summary>Converts a numeric value to UInt64 with overflow checking.</summary>
+    Conv_Ovf_U8,
+    /// <summary>Converts a numeric value to IntPtr with overflow checking.</summary>
+    Conv_Ovf_I,
+    /// <summary>Converts a numeric value to UIntPtr with overflow checking.</summary>
+    Conv_Ovf_U,
+    /// <summary>Converts a numeric value to SByte with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_I1_Un,
+    /// <summary>Converts a numeric value to Byte with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_U1_Un,
+    /// <summary>Converts a numeric value to Int16 with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_I2_Un,
+    /// <summary>Converts a numeric value to UInt16 with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_U2_Un,
+    /// <summary>Converts a numeric value to Int32 with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_I4_Un,
+    /// <summary>Converts a numeric value to UInt32 with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_U4_Un,
+    /// <summary>Converts a numeric value to Int64 with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_I8_Un,
+    /// <summary>Converts a numeric value to UInt64 with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_U8_Un,
+    /// <summary>Converts a numeric value to IntPtr with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_I_Un,
+    /// <summary>Converts a numeric value to UIntPtr with overflow checking and unsigned integer source interpretation.</summary>
+    Conv_Ovf_U_Un,
+
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, their _Ovf/_Ovf_Un checked forms, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, their _Ovf/_Ovf_Un checked forms, Conv_Ovf_* checked integer conversions, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
