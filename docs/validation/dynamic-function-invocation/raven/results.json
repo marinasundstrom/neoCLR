@@ -8,18 +8,18 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/project/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/project/App.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "0a62cd02bfe32501a1dd8939743b7ae8008e59329f44416b3f10ff3f91df82ac",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll\n"
+      "logSha256": "d9ef52ac2b2f80154f87590b272a1a445e67c55c38451f2201d5703285ec1799",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll",
         "--execution",
         "interpreter",
         "--system",
@@ -44,9 +44,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -66,7 +66,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "90e9db2e27f04946bc2ff660b3639466593a330d647133a1b547becaff2e8d3d",
+      "logSha256": "8968c9198cab872d4bf26caacf9ad308447e92838cf2759caa14c7d142ec2cd9",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -87,14 +87,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/app"
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -103,7 +103,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/app"
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -134,7 +134,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -146,9 +146,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -168,30 +168,30 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "3da4c82fb5ec12688651dbbd0abb2ac3c3b70520b4d238907cfd4ed12a592223",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.807532083,\"guestExitCode\":42,\"invocationSeconds\":0.000075875,\"metadataLoadSeconds\":0.644274541,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.813097333}\n"
+      "logSha256": "8e7dbcf17d0b37fca1a0865b743ccdb15b7183e86d9b1a15b08a4fc90f8f3df5",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":1.018678083,\"guestExitCode\":42,\"invocationSeconds\":0.0001005,\"metadataLoadSeconds\":0.606746334,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.487190459}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.807532083,
+    "compileAndFinalizeSeconds": 1.018678083,
     "guestExitCode": 42,
-    "invocationSeconds": 7.5875e-05,
-    "metadataLoadSeconds": 0.644274541,
+    "invocationSeconds": 0.0001005,
+    "metadataLoadSeconds": 0.606746334,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 14.813097333
+    "selectionAndVerificationSeconds": 13.487190459
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/dynamic-function-invocation/raven/Main.rvn": "59e2eed429583b4ee139cf57b653ddbaf8c5ade96659b0f497291a96cda703cf",
+    "/Users/robert/Projects/neoclr/docs/validation/dynamic-function-invocation/raven/Main.rvn": "e0c2748c8a6624f5a9910a3e8e0f765cffab575053d8cd4bc382805f7f52d2be",
     "/Users/robert/Projects/neoclr/docs/validation/dynamic-function-invocation/raven/Primitive.rvn": "1a4591b3fa8981129d474ed9d84605d668152cb8b748d2d246ebaa6b28145d38",
     "/Users/robert/Projects/neoclr/docs/validation/dynamic-function-invocation/raven/run.py": "55b713b1689d2c99237f0a32ff986af60646037e835840cd929335a41712d3e1",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ec9c56d8ae11f5dc4c5e952f0282e761b45aa706cb61bd3f1912e724fa2fad4f",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "6675fa93a4d46eb6ec2439787e67b8c38c3d0f505b2dd816852cd3236d25acd2",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "be10bdb620046454003e556cacb93a3aa15a8d7d6ab9b3cc3a2895f694ada05c",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "bd8074d5bacde56cdf70600a1978505caf987dffe3dfa1a4b12d1c0ec89fdc54",
-    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "a0ad7c0233d6b7849a7300daa69f85e9395cafeae741c62aced27e6c183fd418",
-    "/Users/robert/Projects/neoclr/target/debug/neoclr": "b6ddaf93c1cec48948054cb804432dae5929206bad780e9f51b5143b3f4cea7d",
-    "/Users/robert/Projects/neoclr/target/dynamic-function-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll": "48237986fc6375632b5fb8168816d3fb22f42496ec1d256d8b92df3edef7a3fc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "2309522eb2f0a68360b5695a9b15aebee747839abdff6a9279e10d6c8bed3d75",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "05f287fb4561499fd22a988878258c604d2c2a17b3615b9d22b3192615b3e338",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "98ed0934a400c55d559048bd1ded74cf5c8162f3362d937a527108a05ed11065",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "88fa08a2b15ce33fc276fce329244f8cc8fa7580264e8620ef96fc3e1a86cd6e",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "2b8140951bbe766b4deee39c8a3ba4f3780b7e64e0ff7fedcedb6d3cd29d1655",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "73768f15001d5a668c3fbcb34c7f31edd01fcf1a23369e57b792c0bef7754d5d",
+    "/Users/robert/Projects/neoclr/target/dynamic-function-reflection-raven-20261016/project/bin/neoclr/DynamicFunctionRaven.dll": "0b485e12d7e840315dcd56fd4dd3f28e9acd645efec2d70d63e84f75fd0691cb",
     "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
   }
 }

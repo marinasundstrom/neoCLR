@@ -1033,6 +1033,16 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
             targets.push(json!({"typeCompiledIndex":index,"token":token}));
         }
     }
+    let mut function_tokens = vec![];
+    for function in &input.functions {
+        for op in &function.body {
+            if let Op::BindFunction { function_type, .. } = op {
+                if !function_tokens.contains(function_type) {
+                    function_tokens.push(function_type.clone());
+                }
+            }
+        }
+    }
     for row in rows {
         let index = row["compiledIndex"]
             .as_u64()
@@ -1079,11 +1089,14 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
                 Op::Pop,
             ]);
         }
+        for token in &function_tokens {
+            f.body.extend([Op::LoadTypeToken(token.clone()), Op::Pop]);
+        }
         f.body
             .push(Op::Fault("unreachable native object query body".into()));
         report["nativeBindings"].as_array_mut().unwrap().push(json!({"compiledIndex":index,
-            "name":row["name"],"implementation":"object-type-closed-v1", "targets":targets,
-            "policy":"source class/box tags, intrinsic String and retained vector tokens; other compounds fail closed"}));
+            "name":row["name"],"implementation":"object-type-closed-v1", "targets":targets, "functionTokens":function_tokens,
+            "policy":"source class/box tags, selected Function bindings, intrinsic String and retained vector tokens; other compounds fail closed"}));
     }
     Ok(())
 }
@@ -1091,6 +1104,20 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
 #[cfg(test)]
 mod object_tests {
     use super::*;
+    #[test]
+    fn object_query_retains_exact_function_shapes_without_nominal_rows() {
+        let mut source = neoclr::assemble(".module Test\n.type class abstract System.Object\n.end\n.function neoCLR.Runtime.ObjectTypeHandle(System.Object) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function Identity(Int32) -> Int32\nldarg 0\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Int32,Int32> = Identity(Int32)\npop\nfunction.bind fn<Int32,Int32> = Identity(Int32)\npop\nldc.i4 42\nret\n.end").unwrap();
+        let shape = neoclr::assembler::parse_type("fn<Int32,Int32>").unwrap();
+        let mut report = json!({"objectBaseProjection":{"compiledIndex":0},
+            "nativeBindings":[], "functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.ObjectTypeHandle"}],
+            "sourceMetadata":{"types":[]}});
+        bind_object_type(&mut source, &mut report).unwrap();
+        assert_eq!(report["nativeBindings"][0]["functionTokens"], json!([shape.clone()]));
+        assert_eq!(report["nativeBindings"][0]["targets"], json!([]));
+        assert!(source.functions[0].body.iter().any(|op| matches!(op,
+            neoclr::metadata::Instruction::LoadTypeToken(t) if t == &shape)));
+    }
+
     #[test]
     fn object_query_requires_exact_contract_and_excludes_private_backings() {
         let original = neoclr::assemble(".module Test\n.type class abstract System.Object\n.end\n.type class Model\n.end\n.type class ArrayStorage\n.end\n.function neoCLR.Runtime.ObjectTypeHandle(System.Object) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n").unwrap();

@@ -30,7 +30,9 @@ and execution frames are runtime invariants; an FFI helper would expose those in
 
 `Main.neoil` checks dynamic no-result mutation and integer invocation on the same
 receiver, returning 42. The Raven fixture invokes a bound callback through a
-sample-local `FunctionReflection.Invoke` facade. Both run in interpreter/AOT/JIT;
+sample-local `FunctionReflection.Invoke` facade, checks its runtime type through
+Object.GetType against a structural typeof token, and dynamically passes a function
+as an argument/result through a second callback before invoking it. Both run in interpreter/AOT/JIT;
 AOT uses UBSan/bounds and the native host checks root/heap cleanup. Negative cases
 check wrong counts, wrong boxed types and target faults in all three backends.
 
@@ -49,3 +51,12 @@ Results retain binary/source/bundle hashes. The bundle is the existing
 this branch's primitive. No guest API snapshot inputs change in this slice: the
 facade is sample-local and the host lowering helper has a manual API entry.
 Function signature bounds and multicast/event policies remain outside this slice.
+
+
+The follow-up native reflection slice retains one token per selected function shape,
+not a fabricated nominal declaration. ObjectTypeHandle checks the descriptor header
+and bound target identity, then returns that exact signature token. Focused codegen
+checks cover deduplication and malformed service contracts; the source sample
+qualifies runtime identity, nested function values and execution across all backends.
+Raven's host SDK permits native Function ldtoken and rejects its CLI projection.
+Detailed method-snapshot/native generic reflection coverage remains separate.

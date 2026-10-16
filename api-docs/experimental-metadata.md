@@ -9698,3 +9698,14 @@ Validation: `NeoCLR.Metadata.Experimental.Tests --function-kind-constraint`
 covers accepted signatures, rejected nominal/primitive arguments, forwarding,
 separate snapshots/imports, malformed metadata, introspection and CLI rejection.
 No guest API or RavenDoc input changes; this host SDK manual entry is its reference.
+
+
+### Native Function type tokens (2026-10-16)
+
+`MethodILGenerator.LoadTypeToken(SignatureType.Function(signature))` and
+`Emit(OpCode.Ldtoken, ...)` now preserve a complete structural function signature in
+native `ldtoken` metadata. Ordinary ownership/scope validation still applies; Void,
+borrowed and Self tokens remain rejected. CLI executable/reference export rejects
+these tokens with `InvalidDataException` rather than substituting nominal Func/Action
+identity. Other existing function transport remains unchanged. Focused function-kind
+SDK checks validate native token encoding/readback and CLI rejection.

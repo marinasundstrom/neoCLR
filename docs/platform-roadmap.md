@@ -4908,3 +4908,8 @@ function invocation without freezing the API. The runtime primitive and sample-l
 Raven facade use checked boxed arguments and existing typed calls, qualified in
 interpreter/JIT/AOT. See [evidence and .NET comparison](validation/dynamic-function-invocation/README.md).
 This bounded work does not resume general structural types or add event policy.
+
+The function follow-up also qualifies native structural `typeof` tokens and
+Object.GetType recovery from selected function bindings. The Raven consumer checks
+exact type identity and dynamically forwards a function argument/result before
+invocation. Detailed native method-snapshot/generic reflection remains separate.

@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
-- Add a provisional dynamic Function invocation primitive with checked Object-array arguments, typed invocation and boxed/reference results. Preserve bound receiver state and no-result calls; reject count/type mismatches before calling and propagate target faults. Interpreter/JIT/AOT fixtures and a sample-local Raven facade qualify the primitive. Native function/Object casts now check descriptor identity safely. No permanent class-library invocation API or multicast policy is introduced.
+- Add a provisional dynamic Function invocation primitive with checked Object-array arguments, typed invocation and boxed/reference results. Preserve bound receiver state and no-result calls; reject count/type mismatches before calling and propagate target faults. Interpreter/JIT/AOT fixtures and a sample-local Raven facade qualify the primitive. Native function/Object casts now check descriptor identity safely. Function type tokens retain structural signatures with explicit CLI rejection, and native Object.GetType recovers selected function shapes. The Raven consumer checks type identity and dynamically forwards a function argument/result before invoking it. No permanent class-library invocation API or multicast policy is introduced.
 
 - Record Raven native function-symbol separation and retain the separate-provider callback fixture: interpreter/AOT/JIT return 42, including current await/generator provider compilation. Native metadata/ABI and ordinary Raven/.NET mapping are unchanged; native generic-class category constraints are qualified separately.
 

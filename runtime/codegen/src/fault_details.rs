@@ -119,6 +119,7 @@ pub struct Options {
     pub reflection_construction: Vec<usize>,
     pub reflection_array_sites: HashMap<(usize, usize), usize>,
     pub object_type_queries: HashMap<usize, Vec<(usize, neoclr::metadata::Type)>>,
+    pub object_function_queries: HashMap<usize, Vec<neoclr::metadata::Type>>,
     pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
     pub boolean_boxes: HashMap<usize, usize>,
     pub int64_boxes: HashMap<usize, usize>,
@@ -280,6 +281,14 @@ impl Options {
                         && r["name"] == "neoCLR.Runtime.ReflectionConstruct"
                 })
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            object_function_queries: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "object-type-closed-v1")
+                .map(|r| (r["compiledIndex"].as_u64().unwrap() as usize,
+                    r["functionTokens"].as_array().into_iter().flatten()
+                        .map(|t| serde_json::from_value(t.clone()).unwrap()).collect()))
                 .collect(),
             object_type_queries: report
                 .and_then(|r| r["nativeBindings"].as_array())

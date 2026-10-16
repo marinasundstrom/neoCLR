@@ -1670,6 +1670,34 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.switch_to_block(object_block);
                 let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
+                if let Some(tokens) = details.and_then(|d| d.object_function_queries.get(&i)) {
+                    let function = b.create_block();
+                    let ordinary = b.create_block();
+                    let callable = b.ins().icmp_imm(IntCC::Equal, tag, u32::MAX as i64);
+                    b.ins().brif(callable, function, &[], ordinary, &[]);
+                    b.switch_to_block(function);
+                    let target = b.ins().load(types::I64, MemFlags::new(), receiver, 8);
+                    for token in tokens {
+                        let mut exact = b.ins().iconst(types::I8, 0);
+                        for index in p.callable_targets(token)? {
+                            let equal = b.ins().icmp_imm(IntCC::Equal, target, (index + 1) as i64);
+                            exact = b.ins().bor(exact, equal);
+                        }
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        b.ins().brif(exact, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let identity = type_tokens.iter().position(|t| t == token)
+                            .ok_or("missing function token producer")? + 1;
+                        let value = b.ins().iconst(types::I64, identity as i64);
+                        write(&mut b, output, &[value]);
+                        let zero = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[zero]);
+                        b.switch_to_block(next);
+                    }
+                    b.ins().jump(ordinary, &[]);
+                    b.switch_to_block(ordinary);
+                }
                 for (index, token) in targets {
                     let matched = b.create_block();
                     let next = b.create_block();

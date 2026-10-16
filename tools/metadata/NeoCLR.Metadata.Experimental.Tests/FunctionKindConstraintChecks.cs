@@ -6,6 +6,7 @@ internal static class FunctionKindConstraintChecks
 {
     internal static void Run()
     {
+        FunctionTypeTokens();
         MethodConstraints();
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
@@ -38,6 +39,20 @@ internal static class FunctionKindConstraintChecks
         catch (InvalidDataException) { }
         Console.WriteLine("PASS native function-kind constraint and introspection");
     }
+    private static void FunctionTypeTokens()
+    {
+        var graph = new AssemblyBuilder(new("FunctionTokens", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var shape = SignatureType.Function(new(PrimitiveType.Int32, [PrimitiveType.Int32]));
+        var token = graph.AddFunction("Token", new(PrimitiveType.RuntimeTypeHandle, []));
+        token.GetILGenerator().LoadTypeToken(shape); token.Return();
+        var json = System.Text.Json.Nodes.JsonNode.Parse(graph.WriteNativeAssembly())!;
+        var instruction = json["functions"]![0]!["body"]![0]!;
+        if (instruction["op"]!.ToString() != "ldtoken" || instruction["arg"]!["Function"] is null)
+            throw new Exception("native function token lost its structural signature");
+        AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(graph));
+        Expect<InvalidDataException>(() => graph.Write());
+    }
+
     private static void MethodConstraints()
     {
         var cliSnapshot = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(typeof(FunctionKindConstraintChecks).Assembly.Location), expectedExtended: false);

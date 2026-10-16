@@ -100,3 +100,8 @@ mismatches reject before invocation; target faults propagate. Exact boxed scalar
 and supported reference signatures are the initial profile; ref/out, coercion and
 arbitrary value marshalling remain gaps. The facade is provisional, not a permanent
 class-library member. Function-list/event policy remains separate.
+
+The same source sample checks Object.GetType against the exact structural function
+type and dynamically passes a function through another function as an argument and
+result. Native `typeof` tokens preserve function signatures. This qualifies runtime
+type identity; it does not imply every reflective member query is supported by AOT.

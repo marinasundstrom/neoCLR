@@ -241,6 +241,9 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
 
     public void CallVirtual(MethodBuilder target) => Emit(OpCode.Callvirt, target);
 
+    /// <summary>Emits a type token preserving its signature; structural Function tokens require native output.</summary>
+    /// <exception cref="ArgumentException">Void, borrowed, Self or an incorrectly scoped type is supplied.</exception>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
     public void LoadTypeToken(SignatureType type) => Emit(OpCode.Ldtoken, type);
 
     public void Emit(OpCode opCode, SignatureType elementType)
@@ -248,8 +251,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(elementType);
         if (opCode == OpCode.Ldtoken)
         {
-            if (elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
-                throw new ArgumentException("type token requires a concrete nominal, primitive, vector or scoped parameter", nameof(elementType));
+            if (elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf)
+                throw new ArgumentException("type token requires a concrete nominal, primitive, vector, function or scoped parameter", nameof(elementType));
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
             Append(new("type.token", Type: elementType)); return;
         }

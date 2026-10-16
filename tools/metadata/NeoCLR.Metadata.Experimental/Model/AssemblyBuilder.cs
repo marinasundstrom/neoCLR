@@ -414,6 +414,8 @@ public sealed partial class AssemblyBuilder
         if (!referenceOnly && assemblyConstants.Count != 0)
             throw new InvalidDataException("assembly-level constants require native emission");
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (methods.Any(m => m.Instructions.Any(i => i.Op == "type.token" && i.Type?.FunctionSignature is not null)))
+            throw new InvalidDataException("structural function type tokens require native emission without CLI projection");
         if (methods.Any(m => m.Definition.SpecialConstraints.Count != 0) || importedReferences.Values.Concat(authoredCallableReferences).Any(r => r.Target.Definition.SpecialConstraints.Count != 0))
             throw new InvalidDataException("function-kind method constraints require native emission without CLI projection");
         if (!referenceOnly && methods.Any(m => m.Definition.NativeImport is not null))

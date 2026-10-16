@@ -168,3 +168,12 @@ primitive and sample-local Raven facade, not a permanent class-library API.
 Interpreter/JIT/AOT qualification and restrictions are recorded in the
 [dynamic invocation fixture](../docs/validation/dynamic-function-invocation/README.md).
 This does not turn a MethodInfo descriptor into a bound function or add multicast policy.
+
+
+The native reflection slice now recovers the exact selected function shape through
+an Object view's GetType. Raven `typeof((int) -> int)` emits a structural native type
+token; it does not acquire a nominal Func identity. The retained sample checks
+IsFunctionType, IsNominalType=false and type equality before dynamically forwarding
+a callback as both an argument and a result. Interpreter/JIT/AOT return 42. This
+qualification covers type identity and dynamic invocation; it does not claim new
+AOT support for every MethodInfo snapshot/query or generic reflection operation.

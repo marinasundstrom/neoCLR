@@ -1,4 +1,5 @@
 import System.*
+import System.Introspection.*
 
 class Counter {
     private val value: int
@@ -17,11 +18,24 @@ static class FunctionReflection {
     }
 }
 
+func Keep(callback: (int) -> int) -> (int) -> int => callback
+
 func Main() -> int {
     let counter = Counter(40)
     let callback: (int) -> int = counter.Add
+    let reference: Object = callback
+    let shape = reference.GetType()
+    if !shape.IsFunctionType || shape.IsNominalType || !shape.Equals(typeof((int) -> int)) {
+        return 1
+    }
+    let keeper: ((int) -> int) -> (int) -> int = Keep
+    let callbackArguments: Object?[] = [reference]
+    let forwarded = FunctionReflection.Invoke(keeper, callbackArguments)
+    if forwarded is not Object function {
+        return 2
+    }
     let arguments: Object?[] = [2]
-    let result = FunctionReflection.Invoke(callback, arguments)
+    let result = FunctionReflection.Invoke(function, arguments)
     return result match {
         int value => value
         _ => 0
