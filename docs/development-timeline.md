@@ -18436,3 +18436,11 @@ recorded that as the intended next layer, retaining explicit conformance and
 generic-dispatch validation as work still to do. The remainder/shift slice
 passed 101 main tests, 104 native-line compiler tests and interpreter/JIT/AOT
 consumer execution; Raven commits are `b5e6bb0d3` and `57c567509`.
+
+**Continued implementation:** At the author's request to complete remaining
+operator support on both targets, the assistant implemented and validated instance
+increment/decrement and paired truth/short-circuit operators. The latter replaces
+direct logical declarations with .NET-style bitwise operators plus truth tests.
+The [consumer record](validation/compound-operators/README.md) links independent
+interpreter/JIT/AOT outcomes; checked forms and broader declaration modifiers
+remain open. This is implementation of the earlier platform convention direction.

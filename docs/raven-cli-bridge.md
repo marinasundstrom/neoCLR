@@ -12178,3 +12178,10 @@ Prefix capture/writeback and postfix result selection belong to Raven; there is
 no new temporary encoding, Runtime Contract flag or runtime instruction.
 The [consumer record](validation/compound-operators/README.md#instance-increment-follow-up)
 includes interpreter/JIT/AOT evidence and existing boundaries.
+
+Truth/logical follow-up: Raven main `7039b3e23`, native `198c22bea`. Native
+metadata contains standard static truth/bitwise method names; captured-left
+conditional lowering belongs to Raven. There is no bridge encoding, lost type
+information, new opcode or Runtime Contract switch. Interpreter/JIT/AOT
+[qualification](validation/compound-operators/README.md#truth-and-short-circuit-follow-up)
+passes. Direct logical overload declarations now require the documented migration.

@@ -4983,3 +4983,8 @@ implicit consequence of supporting an operator spelling.
 Instance increment slice: Raven main `94f133cab`, native `a28fe52ed`, with 231/233
 focused tests and native interpreter/JIT/AOT success. Prefix and postfix selection
 follow .NET conventions; checked and declaration-modifier support remain open.
+
+Truth/logical slice: Raven `7039b3e23`/`198c22bea`, 107/109 focused tests and
+interpreter/JIT/AOT success. Both targets use paired truth methods and conditional
+bitwise calls, following .NET conventions; direct logical declarations require
+migration. Checked forms and broader interface/virtual operator coverage remain open.

@@ -42,6 +42,26 @@ class IndexCounter {
     }
 }
 
+class Truth {
+    public var State: int = 0
+
+    static func true(value: Truth) -> bool => value.State > 0
+    static func false(value: Truth) -> bool => value.State < 0
+    static func &(left: Truth, right: Truth) -> Truth => right
+    static func |(left: Truth, right: Truth) -> Truth => right
+}
+
+class TruthProbe {
+    public var Calls: int = 0
+
+    func Make(state: int) -> Truth {
+        Calls = Calls + 1
+        let value = Truth()
+        value.State = state
+        return value
+    }
+}
+
 class Program {
 
     static func Main() -> int {
@@ -105,6 +125,16 @@ class Program {
         if updated.Value != 2 || number.Value != 2 { return 10 }
         number--
         if number.Value != 1 { return 11 }
+
+        let probe = TruthProbe()
+        let stopped = probe.Make(-1) && probe.Make(42)
+        if probe.Calls != 1 || stopped.State != -1 { return 12 }
+        let continued = probe.Make(0) && probe.Make(42)
+        if probe.Calls != 3 || continued.State != 42 { return 13 }
+        let accepted = probe.Make(1) || probe.Make(0)
+        if probe.Calls != 4 || accepted.State != 1 { return 14 }
+        while accepted { accepted.State = 0 }
+        if accepted { return 15 }
 
         return alias.Value + value.Value + values[0].Value
     }

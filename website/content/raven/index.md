@@ -54,7 +54,9 @@ consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-on
 Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
 zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
 postfix mutation; consumed postfix uses the static overload. Checked and
-extension/interface forms remain follow-up work. Nominal System.Numerics
+extension/interface forms remain follow-up work. Paired `true`/`false` overloads
+support conditions and short-circuit logical operations through `&`/`|`; direct
+`&&`/`||` overload declarations must migrate to that .NET-compatible convention. Nominal System.Numerics
 capabilities are a future layer over this operator support.
 
 <a id="targets"></a>

@@ -88,3 +88,16 @@ ordinary calls. No Runtime Contract switch or runtime opcode is added.
 records interpreter/JIT/AOT return 42 with class/struct prefix values, discarded
 postfix mutation and consumed-postfix fallback. Existing array-allocation limits
 remain unchanged.
+
+## Truth and short-circuit follow-up
+
+Raven main `7039b3e23`, native carry `198c22bea`: paired static `true`/`false`
+use standard metadata names. `if`/`while` use truth testing; `&&`/`and` and
+`||`/`or` call `&`/`|` only when the left truth test requires the right operand.
+Direct logical overload declarations are rejected and must migrate to the truth
+pair plus bitwise methods. No new Runtime Contract setting or native opcode.
+
+107 focused main tests and 109 native-line tests pass. `truth-results.json`
+records interpreter/JIT/AOT return 42, including evaluation counts and the case
+where both truth tests return false. The source consumer remains an ordinary
+nominal class example; this does not resume structural-type work.
