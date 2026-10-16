@@ -9892,3 +9892,17 @@ contract and CompleteInterfaceReference workflow. No guest API or CLI bridge enc
 is added. The validated use is a static class method with a nongeneric nominal
 interface bound and a separate-provider Complex consumer on interpreter/JIT/AOT.
 This SDK extension does not admit new structural constraint forms.
+
+
+### Int32 class constants (development)
+
+`FieldDefinition(string name, ushort attributes, SignatureType fieldType, int? constant)`
+now accepts Int32 literal fields on nominal class/value owners as well as enum members.
+Use Static | Literal | HasDefault (`0x8050`) plus Public (`6`), Assembly (`3`) or
+Private (`1`), and `PrimitiveType.Int32`. Attach through `TypeDefinition.Fields`.
+`IsLiteral`, `Constant`, signature, name and access survive CLI/native reads and
+reference projection. Literal fields allocate neither instance nor static storage.
+Duplicate names, invalid flags/types, interface owners and more than 256 literals
+are rejected. Other constant types and literal custom attributes remain unsupported.
+Native artifacts use the optional `literal_fields` metadata list; older runtimes
+reject that schema rather than silently ignoring it. Use the matching SDK/runtime.

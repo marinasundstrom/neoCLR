@@ -150,12 +150,12 @@ public sealed partial class FieldDefinition
     public SignatureType? FieldType { get; }
     /// <summary>Creates a detached instance field using CLI access and optional InitOnly flags.</summary>
     public FieldDefinition(string name, ushort attributes, SignatureType fieldType) : this(name, attributes, fieldType, null) { }
-    /// <summary>Creates a detached field, including an Int32 enum literal with Static, Literal and HasDefault flags.</summary>
+    /// <summary>Creates a detached field, including an Int32 constant or enum literal with Static, Literal and HasDefault flags.</summary>
     /// <exception cref="ArgumentException">The flags, signature or constant combination is unsupported.</exception>
     public FieldDefinition(string name, ushort attributes, SignatureType fieldType, int? constant)
     {
         ArgumentNullException.ThrowIfNull(fieldType); CheckName(name);
-        if ((attributes & ~0x37) != 0 && attributes is not (0x606 or 0x8056) || (attributes & 7) is not (1 or 3 or 6) || fieldType.Primitive == PrimitiveType.Void ||
+        if ((attributes & ~0x37) != 0 && attributes is not (0x606 or 0x8051 or 0x8053 or 0x8056) || (attributes & 7) is not (1 or 3 or 6) || fieldType.Primitive == PrimitiveType.Void ||
             ((attributes & 0x40) != 0) != constant.HasValue)
             throw new ArgumentException("unsupported field attributes or signature");
         this.name = name; Attributes = attributes; FieldType = fieldType; Constant = constant; signature = [];

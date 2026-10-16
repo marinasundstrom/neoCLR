@@ -2284,3 +2284,8 @@ snapshot from numerics-public-libraries-20261016 / numerics-docs-20261016. Each 
 has a rendered member page and native Self signature. The [numeric guide](text-numbers.md)
 records same-type scope, errors, forwarding and custom implementers. No new API is
 excluded; the Complex sample remains a demo rather than a library API.
+
+Development Int32 class constants extend the host FieldDefinition constructor's
+accepted contract without adding guest APIs. The manual [metadata SDK reference](experimental-metadata.md#int32-class-constants-development)
+documents flags, metadata preservation and storage exclusion. Host C# SDK types
+retain their existing RavenDoc exclusion; guest reference/snapshot inputs are unchanged.

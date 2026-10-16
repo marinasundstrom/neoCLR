@@ -459,7 +459,7 @@ public sealed partial class AssemblyBuilder
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new NativeProperty(p.Name, !p.IsStatic, p.ParameterTypes.Select(SignatureValue).ToArray(), SignatureValue(p.PropertyType), Accessor(p.GetMethod), Accessor(p.SetMethod), p.Definition.IsInitOnly)).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), type.Definition.GenericParameterVariance?.Any(v => v != GenericVariance.Invariant) == true ? type.Definition.GenericParameterVariance.Select(v => v.ToString().ToLowerInvariant()).ToArray() : null, Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, TypeAttributes(type), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null,
-                type.StaticFields.Count == 0 ? null : type.StaticFields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant(), @readonly = f.IsReadOnly }).ToArray())).ToArray(),
+                type.StaticFields.Count == 0 ? null : type.StaticFields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant(), @readonly = f.IsReadOnly }).ToArray(), type.IsEnum || !type.MetadataFields.Any(f => f.Definition.IsLiteral) ? null : type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => (object)new { name = f.Name, value = f.Definition.Constant!.Value, visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -536,6 +536,8 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object? enum_info,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object[]? static_fields);
+        object[]? static_fields,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? literal_fields);
 
 }

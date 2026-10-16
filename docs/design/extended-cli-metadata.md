@@ -2620,3 +2620,19 @@ add synthetic callable surface and bypass the missing ownership capability. It w
 prototyped locally and removed. Normal nested ownership preserves direct field access
 without extra calls. No performance advantage is claimed; executable checks cover
 equivalent CLR behavior, native metadata round-trips and runtime access enforcement.
+
+## Int32 class literal fields
+
+Native types can carry `literal_fields`, a bounded list of name, signed Int32 value
+and visibility. These declarations allocate no instance/static storage and cannot
+be addressed or mutated. The SDK preserves CLI Static/Literal/HasDefault field
+metadata and canonical per-type field ordering in native readers and reference
+projection. This follows .NET compile-time constants rather than static readonly
+initialization. No new execution instruction or type initializer is required.
+
+The initial contract admits nominal class/value owners and Int32 values; enums
+retain enum_info. Interface/runtime-primitive owners, duplicate names and excessive
+counts reject. Other literal payload types and guest field-reflection enumeration
+remain explicit gaps. Old strict readers reject the additive metadata field;
+compiler/runtime bundles must be paired. SDK metadata introspection retains the
+field's identity, access and value. See the [host API reference](../../api-docs/experimental-metadata.md#int32-class-constants-development).

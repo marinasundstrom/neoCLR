@@ -310,6 +310,9 @@ pub struct TypeDef {
     /// Per-closed-type storage; never part of an instance's layout.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub static_fields: Vec<StaticField>,
+    /// Compile-time Int32 literals; never allocated in static or instance storage.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub literal_fields: Vec<LiteralField>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub implements: Vec<Type>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -338,6 +341,15 @@ pub struct TypeDef {
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub minimum_size: Option<u32>,
+}
+
+/// Storage-free Int32 constant declared by a nominal type.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LiteralField {
+    pub name: String,
+    pub value: i32,
+    pub visibility: Visibility,
 }
 
 /// Preview Int32-backed enum contract. Named values do not restrict the value domain.

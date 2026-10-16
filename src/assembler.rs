@@ -846,6 +846,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         native_array_element: None,
                         native_string_view: false,
                         static_fields: vec![],
+                        literal_fields: vec![],
                         primitive_reference: false,
                         is_reference_type,
                         enum_info: None,

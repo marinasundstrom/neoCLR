@@ -97,6 +97,9 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var field in types[owner].StaticFields)
                 fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, field.Name,
                     (ushort)(0x10 | (field.IsReadOnly ? 0x20 : 0) | (field.Visibility == FieldVisibility.Public ? 6 : field.Visibility == FieldVisibility.Internal ? 3 : 1)), [], Copy(field.Signature!)));
+            foreach (var field in types[owner].LiteralFields)
+                fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, field.Name,
+                    field.Attributes, [], new(PrimitiveType.Int32, 0), field.Value));
             if (types[owner].EnumMembers is { } members)
                 foreach (var member in members)
                     fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, member.Name,

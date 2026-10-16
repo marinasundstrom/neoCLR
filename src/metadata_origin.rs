@@ -134,6 +134,32 @@ fn text(value: &str) -> bool {
 }
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
+    for ty in &module.types {
+        let mut names: HashSet<&str> = ty
+            .fields
+            .iter()
+            .map(|f| f.name.as_str())
+            .chain(ty.static_fields.iter().map(|f| f.name.as_str()))
+            .collect();
+        if ty.literal_fields.len() > 256
+            || !ty.literal_fields.is_empty()
+                && (ty.enum_info.is_some()
+                    || matches!(ty.representation, crate::metadata::Representation::Interface | crate::metadata::Representation::Runtime)
+                    || ty.primitive_reference)
+        {
+            return Err(Fault::new("unsupported literal field owner or count"));
+        }
+        for field in &ty.literal_fields {
+            if field.name.is_empty()
+                || field.name.len() > 1024
+                || field.name.chars().any(char::is_control)
+                || !names.insert(&field.name)
+            {
+                return Err(Fault::new("invalid or duplicate literal field"));
+            }
+        }
+    }
+
     let bindings: Vec<_> = module
         .assemblies
         .iter()
@@ -474,4 +500,31 @@ pub(crate) fn field_access(owner: &crate::metadata::TypeDef, index: usize) -> So
             crate::metadata::Visibility::Internal => SourceAccess::Assembly,
             crate::metadata::Visibility::Protected => SourceAccess::Family,
         })
+}
+
+#[cfg(test)]
+mod literal_field_tests {
+    use super::*;
+
+    #[test]
+    fn class_literals_roundtrip_without_storage_and_reject_duplicate_names() {
+        let mut module =
+            crate::assembler::parse_module(".module Constants\n.references ()\n").unwrap();
+        module.types.push(
+            serde_json::from_value(serde_json::json!({
+                "name": "Constants", "fields": [], "is_reference_type": true,
+                "literal_fields": [{"name": "Answer", "value": 42, "visibility": "public"}]
+            }))
+            .unwrap(),
+        );
+        validate(&module).unwrap();
+        let restored: Module =
+            serde_json::from_slice(&serde_json::to_vec(&module).unwrap()).unwrap();
+        assert_eq!(restored.types[0].literal_fields[0].value, 42);
+        assert!(restored.types[0].fields.is_empty());
+        assert!(restored.types[0].static_fields.is_empty());
+        let literal = module.types[0].literal_fields[0].clone();
+        module.types[0].literal_fields.push(literal);
+        assert!(validate(&module).is_err());
+    }
 }

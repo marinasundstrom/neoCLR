@@ -13,6 +13,7 @@ public sealed partial class NativeAssemblyDefinition
     {
         internal GenericVariance[] Variance { get; init; } = [];
         internal FieldRow[] StaticFields { get; init; } = [];
+        internal (string Name, int Value, ushort Attributes)[] LiteralFields { get; init; } = [];
         internal (string Name, int Value)[]? EnumMembers { get; init; }
         internal bool IsClosedHierarchy { get; init; }
         internal bool IsObjectRoot { get; init; }
@@ -208,6 +209,7 @@ public sealed partial class NativeAssemblyDefinition
                 var typeFields = new List<string> { "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin" };
                 bool closedHierarchy = type.TryGetProperty("is_closed_hierarchy", out var closedFlag) && closedFlag.GetBoolean();
                 if (type.TryGetProperty("static_fields", out _)) typeFields.Add("static_fields");
+                if (type.TryGetProperty("literal_fields", out _)) typeFields.Add("literal_fields");
                 if (type.TryGetProperty("is_closed_hierarchy", out _)) typeFields.Add("is_closed_hierarchy");
                 if (type.TryGetProperty("base", out _)) typeFields.Add("base");
                 var typeNames = type.TryGetProperty("generic_parameters", out _) ? Array(type, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null type parameter name")).ToArray() : [];
@@ -334,6 +336,14 @@ public sealed partial class NativeAssemblyDefinition
                     var access = Text(field, "visibility") switch { "public" => FieldVisibility.Public, "internal" => FieldVisibility.Internal, "private" => FieldVisibility.Private, _ => throw new InvalidDataException("unsupported static field visibility") };
                     return new FieldRow(fieldName, field.GetProperty("ty").Clone(), access, field.GetProperty("readonly").GetBoolean());
                 }).ToArray() : [];
+                var literalRows = type.TryGetProperty("literal_fields", out _) ? Array(type, "literal_fields", 256).Select(field =>
+                {
+                    Shape(field, "name", "value", "visibility");
+                    var access = Text(field, "visibility") switch { "public" => 6, "internal" => 3, "private" => 1, _ => throw new InvalidDataException("invalid literal visibility") };
+                    return (Name: Text(field, "name"), Value: field.GetProperty("value").GetInt32(), Attributes: (ushort)(0x8050 | access));
+                }).ToArray() : [];
+                Require(literalRows.Length == 0 || !isInterface && !isPrimitive && enumMembers is null, "unsupported literal field owner");
+                Require(fieldRows.Select(f => f.Name).Concat(staticRows.Select(f => f.Name)).Concat(literalRows.Select(f => f.Name)).Distinct().Count() == fieldRows.Count + staticRows.Length + literalRows.Length, "duplicate literal field name");
                 Require(staticRows.Length == 0 || !isInterface && !isPrimitive && enumMembers is null, "unsupported static field owner");
                 Require(fieldRows.Select(f => f.Name).Concat(staticRows.Select(f => f.Name)).Distinct().Count() == fieldRows.Count + staticRows.Length, "duplicate field name");
                 if (enumMembers is not null)
@@ -342,7 +352,7 @@ public sealed partial class NativeAssemblyDefinition
                     fieldRows[0] = fieldRows[0] with { Visibility = FieldVisibility.Public };
                 }
                 Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
-                Require(nextFieldToken + fieldRows.Count + staticRows.Length + (enumMembers?.Length ?? 0) <= 0x04001001, "too many fields");
+                Require(nextFieldToken + fieldRows.Count + staticRows.Length + literalRows.Length + (enumMembers?.Length ?? 0) <= 0x04001001, "too many fields");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
                 Require(isObjectRoot || isPrimitive || nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
                 string ns, name;
@@ -403,10 +413,10 @@ public sealed partial class NativeAssemblyDefinition
                     }
                 }
                 Require(enumMembers is null || fieldRows.All(f => !f.IsReadOnly) && propertyElements.Length == 0, "unsupported enum storage flags or properties");
-                nextFieldToken += fieldRows.Count + staticRows.Length + (enumMembers?.Length ?? 0);
+                nextFieldToken += fieldRows.Count + staticRows.Length + literalRows.Length + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { Variance = variance, StaticFields = staticRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -738,6 +748,9 @@ public sealed partial class NativeAssemblyDefinition
                     signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly, isStatic: true);
                 }
             }
+            for (int i = 0; i < types.Count; i++)
+                foreach (var field in types[i].LiteralFields)
+                    signatureOwners[i].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, PrimitiveType.Int32, field.Value));
             signatureGraph.ValidateValueLayouts();
             typeArity = 0;
             string TypeKey(SignatureType type) => type.Tuple is { } tuple ? "tuple:" + JsonSerializer.Serialize(tuple.ElementTypes.Select(TypeKey)) : type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
@@ -1175,6 +1188,7 @@ public sealed partial class NativeAssemblyDefinition
         {
             if (types[t].EnumMembers is null) foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
             foreach (var field in types[t].StaticFields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly, isStatic: true);
+            foreach (var field in types[t].LiteralFields) owners[t].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, PrimitiveType.Int32, field.Value));
         }
         var mappedOwners = new Dictionary<TypeBuilder, TypeBuilder>();
         TypeBuilder RemapOwner(TypeBuilder original)
