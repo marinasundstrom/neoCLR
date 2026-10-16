@@ -908,14 +908,8 @@ fn type_contract(module: &QueryContext) -> &'static str {
         "System.Type"
     }
 }
-pub(crate) fn wrap_type(module: &Module, descriptor: TypeDescriptor) -> Value {
-    snapshot_type(
-        &QueryContext {
-            module,
-            source: false,
-        },
-        descriptor,
-    )
+pub(crate) fn wrap_type(module: &Module, descriptor: TypeDescriptor, source: bool) -> Value {
+    snapshot_type(&QueryContext { module, source }, descriptor)
 }
 fn snapshot_type(module: &QueryContext, descriptor: TypeDescriptor) -> Value {
     record(

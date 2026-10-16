@@ -394,3 +394,32 @@ GetTypes binding and explicit discovery retention are still pending. Focused tes
 cover mixed generic/nongeneric catalogs, variance, exact identity, empty modules,
 legacy metadata rejection and foreign-module rejection. No public class-library
 API, Raven lowering, Runtime Contract configuration or CLI encoding changes.
+
+### Explicit native discovery binding (2026-10-16)
+
+Native reflection-root schema 6 adds `typeCatalogs`, an array of exact assembly
+identities, alongside the existing `types`, `moduleCatalogs` and `moduleFunctions`
+arrays. Unlike `moduleCatalogs` (names only), this explicitly retains complete type
+snapshot recipes for AssemblyInfo.GetTypes and ModuleInfo.GetTypes. The binder
+validates exact InternalCall signatures, returns empty arrays for retained empty
+modules and faults for unretained assemblies or foreign module scopes. It neither
+grants constructors/member invocation nor changes existing schema 1–5 behavior.
+
+Snapshot factories emit descriptive handles for open definitions and their
+owner-bound parameters. Nongeneric/closed types keep ordinary type tokens, avoiding
+a second identity for types also obtained through typeof or object introspection.
+Consequently ordinary discovered types still require supported executable type
+shapes; eliminating that layout dependency is not part of this slice. Partially
+open constructions remain unsupported. This is explicit AOT retention, rather than
+a change to Raven syntax, Runtime Contract settings or CLI/native metadata encoding.
+Focused catalog tests qualify retention admission, exact query contracts, empty
+results, unretained faults and snapshot token identity. Full Raven native discovery
+qualification remains a separate acceptance gate.
+
+The original `VarianceIntrospection` consumer was retried with schema 6 against
+`target/variance-argument-sequence-20261016` (Raven `eef1ed456`). This exposed and
+fixed a source-recipe contract mismatch: assembly discovery now propagates the
+source profile to TypeInfo snapshots instead of selecting legacy System.Type.
+The retry passes that stage but stops at `$aot_linked_65: unsupported value member
+contract`; no AOT/JIT success is claimed. Nine backend catalog checks and the
+runtime catalog regression pass, including an explicit TypeInfo recipe assertion.

@@ -11206,3 +11206,12 @@ Raven lowering, CLI bridge encoding and Runtime Contract settings are unchanged.
 Guest assembly/module discovery and open generic member/relationship operations
 remain unqualified; this infrastructure does not imply new discovery or invocation
 rights. Structural work remains parked.
+
+Native discovery preparation now accepts reflection-root schema 6 with explicit
+`typeCatalogs` (full assembly identities) and the existing `types`, `moduleCatalogs`
+and `moduleFunctions` arrays. It binds AssemblyTypes/ModuleTypes snapshot recipes;
+module-name retention alone does not grant type discovery. Open definitions use
+private descriptive handles and ordinary closed types retain ordinary token
+identity. Existing Raven source metadata and library calls require no encoding or
+Runtime Contract changes. Native end-to-end consumer qualification is still pending;
+ordinary catalog entries still require supported native type shapes.

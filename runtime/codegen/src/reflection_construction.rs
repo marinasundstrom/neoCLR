@@ -20,16 +20,18 @@ pub fn bind(
         .and_then(Value::as_u64)
         .unwrap_or(0);
     if config.len()
-        != if version == 5 {
+        != if version == 6 {
+            5
+        } else if version == 5 {
             4
         } else if version >= 4 {
             3
         } else {
             2
         }
-        || !matches!(version, 1 | 2 | 3 | 4 | 5)
+        || !matches!(version, 1 | 2 | 3 | 4 | 5 | 6)
     {
-        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, or 5 with moduleCatalogs and moduleFunctions".into());
+        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, 5 with moduleCatalogs and moduleFunctions, or 6 additionally with typeCatalogs".into());
     }
     let roots = config
         .get("types")
@@ -56,8 +58,29 @@ pub fn bind(
             catalogs.push(identity);
         }
     }
+    let mut type_catalogs = vec![];
+    if version >= 6 {
+        let requested = config
+            .get("typeCatalogs")
+            .and_then(Value::as_array)
+            .ok_or("typeCatalogs must be an array of full assembly identities")?;
+        if requested.len() > 64 {
+            return Err("typeCatalogs admits at most 64 assemblies".into());
+        }
+        for entry in requested {
+            let identity = entry
+                .as_str()
+                .ok_or("typeCatalogs requires String identities")?;
+            if type_catalogs.contains(&identity) {
+                return Err("duplicate type catalog identity".into());
+            }
+            neoclr::native_metadata::assembly_types(source, identity)
+                .map_err(|error| error.to_string())?;
+            type_catalogs.push(identity);
+        }
+    }
     let mut function_modules = vec![];
-    if version == 5 {
+    if version >= 5 {
         let requested = config
             .get("moduleFunctions")
             .and_then(Value::as_array)
@@ -92,7 +115,11 @@ pub fn bind(
             function_modules.push(entry.clone());
         }
     }
-    if (roots.is_empty() && catalogs.is_empty() && function_modules.is_empty()) || roots.len() > 64
+    if (roots.is_empty()
+        && catalogs.is_empty()
+        && function_modules.is_empty()
+        && type_catalogs.is_empty())
+        || roots.len() > 64
     {
         return Err("reflection roots require one to 64 types, an explicit module catalog or a function scope".into());
     }
@@ -297,8 +324,11 @@ pub fn bind(
     if version >= 4 {
         result["moduleCatalogs"] = json!(catalogs);
     }
-    if version == 5 {
+    if version >= 5 {
         result["moduleFunctions"] = json!(function_modules);
+    }
+    if version >= 6 {
+        result["typeCatalogs"] = json!(type_catalogs);
     }
     Ok(result)
 }
@@ -306,6 +336,40 @@ pub fn bind(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn type_catalog_retention_is_explicit_and_does_not_select_layouts() {
+        let mut source =
+            neoclr::assemble(".module Catalog\n.interface Producer<T>\n.end\n").unwrap();
+        source.assemblies = serde_json::from_value(json!([
+            {"name":"One","full_name":"One","modules":["Catalog"],"references":[],
+             "declaration_modules":{"version":1,"names":[""]}}
+        ]))
+        .unwrap();
+        let valid = json!({"schemaVersion":6,"types":[],"moduleCatalogs":[],"moduleFunctions":[],"typeCatalogs":["One"]});
+        let mut input = source.clone();
+        let result = bind(&mut input, &source, &[], &[], &valid).unwrap();
+        assert_eq!(result["typeCatalogs"], json!(["One"]));
+        assert_eq!(result["types"], json!([]));
+        assert_eq!(
+            serde_json::to_value(input).unwrap(),
+            serde_json::to_value(&source).unwrap()
+        );
+        for value in [
+            json!([]),
+            json!(["Missing"]),
+            json!(["One", "One"]),
+            json!([3]),
+            json!(false),
+        ] {
+            let mut invalid = valid.clone();
+            invalid["typeCatalogs"] = value;
+            assert!(bind(&mut source.clone(), &source, &[], &[], &invalid).is_err());
+        }
+        let mut invalid = valid;
+        invalid["schemaVersion"] = json!(5);
+        assert!(bind(&mut source.clone(), &source, &[], &[], &invalid).is_err());
+    }
 
     #[test]
     fn function_retention_requires_exact_module_scope_and_attribute_policy() {

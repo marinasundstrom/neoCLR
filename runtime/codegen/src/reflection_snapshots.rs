@@ -87,12 +87,10 @@ impl Factory<'_> {
             V::Int32(n) if *expected == Type::Int32 => self.body.push(Op::Int(*n)),
             V::Boolean(b) if *expected == Type::Boolean => self.body.push(Op::Bool(*b)),
             V::String(s) if *expected == Type::String => self.body.push(Op::String(s.to_string())),
-            V::RuntimeTypeHandle(h) if *expected == Type::RuntimeTypeHandle => {
-                self.body.push(Op::LoadTypeToken(
-                    neoclr::native_metadata::handle_type(self.source, h)
-                        .map_err(|e| e.to_string())?,
-                ))
-            }
+            V::RuntimeTypeHandle(h) if *expected == Type::RuntimeTypeHandle => self.body.push(
+                neoclr::native_metadata::snapshot_token(self.input, self.source, h)
+                    .map_err(|e| e.to_string())?,
+            ),
             V::Erased(value) => {
                 if !self.source.is_object_reference_type(expected) {
                     return Err("snapshot boxed value requires object reference".into());
@@ -235,10 +233,8 @@ impl Factory<'_> {
                         generic_arguments: vec![],
                     };
                     self.body.extend([
-                        Op::LoadTypeToken(
-                            neoclr::native_metadata::handle_type(self.source, handle)
-                                .map_err(|e| e.to_string())?,
-                        ),
+                        neoclr::native_metadata::snapshot_token(self.input, self.source, handle)
+                            .map_err(|e| e.to_string())?,
                         Op::Call(call),
                     ]);
                 } else {
@@ -394,6 +390,8 @@ pub fn bind(
                     | "neoCLR.Runtime.ModuleAssembly"
                     | "neoCLR.Runtime.AssemblyName"
                     | "neoCLR.Runtime.AssemblyModules"
+                    | "neoCLR.Runtime.AssemblyTypes"
+                    | "neoCLR.Runtime.ModuleTypes"
                     | "neoCLR.Runtime.TypeElementType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
                     | "neoCLR.Runtime.ModuleMemberCustomAttributes"
@@ -491,6 +489,8 @@ pub fn bind(
         let module_assembly = f.name.ends_with("ModuleAssembly");
         let assembly_name = f.name.ends_with("AssemblyName");
         let assembly_modules = f.name.ends_with("AssemblyModules");
+        let assembly_types = f.name == "neoCLR.Runtime.AssemblyTypes";
+        let module_types = f.name == "neoCLR.Runtime.ModuleTypes";
         let properties = f.name.ends_with("Properties");
         let attributes = f.name == "neoCLR.Runtime.MemberCustomAttributes";
         let module_attributes = f.name == "neoCLR.Runtime.ModuleMemberCustomAttributes";
@@ -506,9 +506,9 @@ pub fn bind(
                 && f.parameters
                     != if module_attributes {
                         vec![Type::String, Type::String, Type::Int32]
-                    } else if module_assembly || module_functions {
+                    } else if module_assembly || module_functions || module_types {
                         vec![Type::String, Type::String]
-                    } else if assembly_name || assembly_modules {
+                    } else if assembly_name || assembly_modules || assembly_types {
                         vec![Type::String]
                     } else if properties {
                         vec![Type::RuntimeTypeHandle, Type::Int32]
@@ -543,7 +543,63 @@ pub fn bind(
             locals: vec![],
             trusted: vec![],
         };
-        if module_attributes || module_functions {
+        if assembly_types || module_types {
+            let Type::ArrayRef(element) = &expected else {
+                return Err("type discovery requires TypeInfo vector".into());
+            };
+            if name(source, element) != Some("System.Introspection.TypeInfo") {
+                return Err("type discovery requires scoped TypeInfo vector".into());
+            }
+            for identity in retention["typeCatalogs"].as_array().into_iter().flatten() {
+                let identity = identity.as_str().ok_or("invalid type catalog identity")?;
+                let first = factory.body.len() + 3;
+                factory.body.extend([
+                    Op::Arg(0),
+                    Op::String(identity.into()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
+                ]);
+                if assembly_types {
+                    let recipe = neoclr::native_metadata::assembly_types(source, identity)
+                        .map_err(|e| e.to_string())?;
+                    factory.emit(&recipe, &expected)?;
+                    factory.body.push(Op::Return);
+                } else {
+                    let V::Array { elements, .. } =
+                        neoclr::native_metadata::assembly_modules(source, identity)
+                            .map_err(|e| e.to_string())?
+                    else {
+                        return Err("invalid module catalog".into());
+                    };
+                    for module in elements {
+                        let V::Object { fields, .. } = module else {
+                            return Err("invalid module recipe".into());
+                        };
+                        let [V::String(_), V::String(module_name)] = fields.as_slice() else {
+                            return Err("invalid module identity".into());
+                        };
+                        let second = factory.body.len() + 3;
+                        factory.body.extend([
+                            Op::Arg(1),
+                            Op::String(module_name.to_string()),
+                            Op::Equal,
+                            Op::BranchFalse(0),
+                        ]);
+                        let recipe = neoclr::native_metadata::module_types(
+                            source,
+                            identity,
+                            module_name.as_str(),
+                        )
+                        .map_err(|e| e.to_string())?;
+                        factory.emit(&recipe, &expected)?;
+                        factory.body.push(Op::Return);
+                        factory.body[second] = Op::BranchFalse(factory.body.len());
+                    }
+                }
+                factory.body[first] = Op::BranchFalse(factory.body.len());
+            }
+            factory.body.push(Op::Fault("native type catalog was not retained or module is not owned by assembly; configure --reflection-roots".into()));
+        } else if module_attributes || module_functions {
             let Type::ArrayRef(element) = &expected else {
                 return Err("module member query requires a vector result".into());
             };
@@ -1167,6 +1223,103 @@ fn bind_attributes(
 #[cfg(test)]
 mod catalog_tests {
     use super::*;
+
+    #[test]
+    fn type_discovery_requires_retention_and_exact_contracts() {
+        let mut source = neoclr::assemble(".module Catalog\n.function neoCLR.Runtime.AssemblyTypes(String) -> arrayref<System.Introspection.TypeInfo>\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.ModuleTypes(String,String) -> arrayref<System.Introspection.TypeInfo>\n.methodimpl InternalCall\n.end\n").unwrap();
+        source.assemblies = serde_json::from_value(json!([
+            {"name":"One","full_name":"One","modules":["Catalog"],"references":[],
+             "declaration_modules":{"version":1,"names":["Empty"]}}
+        ]))
+        .unwrap();
+        let mut retention = json!({"types":[],"typeCatalogs":["One"]});
+        let mut input = source.clone();
+        bind(&mut input, &source, &[], &mut retention).unwrap();
+        for f in &input.functions {
+            assert!(f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
+            assert!(
+                matches!(f.body.last(), Some(Op::Fault(message)) if message.contains("type catalog was not retained"))
+            );
+        }
+        let mut unretained = source.clone();
+        bind(
+            &mut unretained,
+            &source,
+            &[],
+            &mut json!({"types":[],"moduleCatalogs":["One"]}),
+        )
+        .unwrap();
+        for f in &unretained.functions {
+            assert!(matches!(f.body.as_slice(), [Op::Fault(_)]));
+        }
+        let mut invalid = source.clone();
+        invalid.functions[1].parameters[1] = Type::Int32;
+        assert!(bind(&mut invalid, &source, &[], &mut retention).is_err());
+        let mut invalid = source.clone();
+        invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
+        assert!(bind(&mut invalid, &source, &[], &mut retention).is_err());
+    }
+
+    #[test]
+    fn snapshot_tokens_keep_closed_identity_and_open_parameter_owners() {
+        let source = neoclr::assemble(
+            ".module Catalog\n.interface Producer<T>\n.variance out\n.end\n.type Plain\n.end\n",
+        )
+        .unwrap();
+        let mut target = source.clone();
+        let id = source.types[0].definition.as_ref().unwrap();
+        let Op::LoadMetadataToken(index) =
+            neoclr::native_metadata::retain_definition_token(&mut target, &source, id, None)
+                .unwrap()
+        else {
+            panic!("open token")
+        };
+        let open = neoclr::native_metadata::descriptor(&target, index)
+            .unwrap()
+            .clone();
+        let mut factory = Factory {
+            input: &mut target,
+            source: &source,
+            body: vec![],
+            locals: vec![],
+            trusted: vec![],
+        };
+        factory
+            .emit(
+                &V::RuntimeTypeHandle(Box::new(open.clone())),
+                &Type::RuntimeTypeHandle,
+            )
+            .unwrap();
+        factory
+            .emit(
+                &V::RuntimeTypeHandle(Box::new(open.generic_arguments[0].clone())),
+                &Type::RuntimeTypeHandle,
+            )
+            .unwrap();
+        assert!(matches!(factory.body[0], Op::LoadMetadataToken(i) if i == index));
+        let Op::LoadMetadataToken(parameter) = factory.body[1] else {
+            panic!("parameter token")
+        };
+        assert_eq!(
+            neoclr::native_metadata::descriptor(factory.input, parameter).unwrap(),
+            &open.generic_arguments[0]
+        );
+        // The source descriptor of a nongeneric type must still use ordinary ldtoken.
+        let mut catalog = source.clone();
+        catalog.assemblies = serde_json::from_value(json!([{"name":"One","full_name":"One","modules":["Catalog"],"references":[],"declaration_modules":{"version":1,"names":[""]}}])).unwrap();
+        let V::Array { elements, .. } =
+            neoclr::native_metadata::assembly_types(&catalog, "One").unwrap()
+        else {
+            panic!("catalog")
+        };
+        let V::Object { fields, .. } = &elements[1] else {
+            panic!("snapshot")
+        };
+        factory.emit(&fields[0], &Type::RuntimeTypeHandle).unwrap();
+        assert!(
+            matches!(factory.body.last(), Some(Op::LoadTypeToken(Type::Named(name))) if name == "Plain")
+        );
+    }
 
     #[test]
     fn empty_function_scope_is_explicit_and_preserves_unretained_faults() {

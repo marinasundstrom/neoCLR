@@ -215,6 +215,42 @@ pub fn handle_type(module: &Module, handle: &crate::TypeDescriptor) -> Result<Ty
     crate::reflection::from_identity(module, &handle.identity)
 }
 
+/// Emit a snapshot handle without giving closed types a second native identity.
+/// Open declarations and their parameters use authenticated descriptive tokens.
+pub fn snapshot_token(
+    target: &mut Module,
+    source: &Module,
+    handle: &crate::TypeDescriptor,
+) -> Result<crate::metadata::Instruction, Fault> {
+    use crate::type_identity::TypeIdentity;
+    match &handle.identity {
+        TypeIdentity::GenericParameter { definition, index } => {
+            retain_definition_token(target, source, definition, Some(*index))
+        }
+        TypeIdentity::Definition { definition, .. }
+            if handle
+                .generic_arguments
+                .iter()
+                .any(|arg| matches!(arg.identity, TypeIdentity::GenericParameter { .. })) =>
+        {
+            let declaration = source
+                .types
+                .iter()
+                .find(|d| d.definition.as_ref() == Some(definition))
+                .ok_or_else(|| Fault::new("unknown snapshot definition"))?;
+            if *handle != crate::type_identity::describe_definition(source, declaration)? {
+                return Err(Fault::new(
+                    "partially open snapshot tokens are not supported",
+                ));
+            }
+            retain_definition_token(target, source, definition, None)
+        }
+        _ => Ok(crate::metadata::Instruction::LoadTypeToken(handle_type(
+            source, handle,
+        )?)),
+    }
+}
+
 /// Resolve the exact scoped runtime provider used by interpreter materialization.
 pub fn provider(module: &Module, contract: &Type, fields: &[Value]) -> Result<Type, Fault> {
     crate::reflection_source::provider(module, contract, fields)
@@ -744,9 +780,10 @@ mod type_catalog_tests {
         elements
             .into_iter()
             .map(|value| {
-                let Value::Object { fields, .. } = value else {
+                let Value::Object { fields, ty } = value else {
                     panic!("type snapshot")
                 };
+                assert_eq!(ty, Type::Named("System.Introspection.TypeInfo".into()));
                 let [Value::RuntimeTypeHandle(handle)] = fields.as_slice() else {
                     panic!("type handle")
                 };

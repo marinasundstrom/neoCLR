@@ -141,7 +141,7 @@ impl Query {
                     }
                     types.push(
                         crate::type_identity::describe_definition(module, definition)
-                            .map(|descriptor| crate::reflection::wrap_type(module, descriptor))?,
+                            .map(|descriptor| crate::reflection::wrap_type(module, descriptor, source))?,
                     );
                 }
                 crate::reflection::array(

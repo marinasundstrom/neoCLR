@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Bind native assembly/module type discovery through explicit schema-6 typeCatalogs retention. Preserve ordinary token identity for closed types and descriptive identity for open definitions/parameters; validate exact query contracts and unretained/foreign scope faults. Preserve the source TypeInfo recipe contract rather than the legacy System.Type contract. Ten focused catalog checks pass; the original Raven consumer advances to a later unsupported native member contract, so complete qualification remains pending.
+
 - Add native compiler discovery recipes for assembly and logical-module type catalogs, preserving open generic definitions, parameter identity/variance, nongeneric declarations and metadata order through shared interpreter queries. Reject missing/legacy catalogs and cross-assembly module scopes; this does not yet bind guest native GetTypes calls.
 
 - Bind native name/count/indexed-argument/metadata-token/shape queries for retained open generic descriptors, using interpreter source facts for variance. Preserve argument-result identity, mixed closed/open dispatch and invalid-selector/index faults; explicitly reject unqualified open relationship queries. Focused query tests pass interpreter/native execution and AOT emission. Guest assembly/module discovery remains unfinished.
