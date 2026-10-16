@@ -84,6 +84,10 @@ public sealed partial class AssemblyBuilder
                     : part.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : part;
                 if (owner is not null)
                     foreach (var parent in owner.InheritedContracts()) pending.Push(Substitute(parent));
+                // A class inherits its base's nominal interface views. Traverse
+                // only registered dependency ancestry; do not infer it from names.
+                if (current.ImportedType is { } externalClass && declaredClassBases.TryGetValue(externalClass, out var baseClass))
+                    pending.Push(baseClass);
                 if (current.ImportedType is { } authoredOwner && authoredInterfaceBases.TryGetValue(InterfaceDefinition(authoredOwner), out var edges))
                     foreach (var parent in edges) pending.Push(parent.Substitute(Substitute));
                 if (current.ImportedType is { } importedOwner && nativeImportedDefinitions.TryGetValue(InterfaceDefinition(importedOwner), out var definition))

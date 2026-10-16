@@ -10,6 +10,7 @@ internal static class InterfaceVarianceChecks
     {
         CheckReferenceConversions();
         CheckExternalBaseConversions();
+        CheckInheritedClassInterfaceConversions();
         CheckStringConversions();
         var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
         var graph = new AssemblyBuilder(new("VarianceSnapshot", new(1, 0, 0, 0)), core);
@@ -117,6 +118,57 @@ internal static class InterfaceVarianceChecks
         values.LoadArgument(0); values.Return();
         Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
     }
+    private static void CheckInheritedClassInterfaceConversions()
+    {
+        var host = typeof(object).Assembly.GetName();
+        var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
+        var library = new AssemblyBuilder(new("InheritedVarianceLibrary", new(1, 0, 0, 0)), core);
+        var view = library.AddInterface("Example", "View");
+        var parent = library.AddClass("Example", "Base");
+        parent.AddInterfaceImplementation(view);
+        var middle = library.AddClass("Example", "Middle", parent);
+        var leaf = library.AddClass("Example", "Leaf", middle);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(library));
+        var graph = new AssemblyBuilder(new("InheritedVarianceConsumer", new(1, 0, 0, 0)), core);
+        ImportedTypeReference Import(string name) => graph.ImportReference(snapshot.MainModule.Types.Single(t => t.Name == name), core);
+        var importedView = Import("View");
+        var importedBase = Import("Base");
+        var importedMiddle = Import("Middle");
+        var importedLeaf = Import("Leaf");
+        var producer = graph.AddGenericInterface("Example", "Producer", ["T"]);
+        producer.SetVariance(0, GenericVariance.Covariant);
+        producer.AddInterfaceMethod("Get", new(SignatureType.TypeParameter(0), []));
+        var consumer = graph.AddGenericInterface("Example", "Consumer", ["T"]);
+        consumer.SetVariance(0, GenericVariance.Contravariant);
+        consumer.AddInterfaceMethod("Accept", new(PrimitiveType.Void, [SignatureType.TypeParameter(0)]));
+        void Conversion(string name, SignatureType from, SignatureType to)
+        {
+            var method = graph.AddFunction(name, new(to, [from]));
+            method.LoadArgument(0); method.Return();
+        }
+        Conversion("Produce", producer.MakeGenericInstance(importedLeaf), producer.MakeGenericInstance(importedView));
+        Conversion("Consume", consumer.MakeGenericInstance(importedView), consumer.MakeGenericInstance(importedLeaf));
+        // Importing the names alone does not assert ancestry. The host must supply
+        // the explicit relationship contracts, and linking verifies dependency facts.
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        graph.DeclareClassBase(importedLeaf, importedMiddle);
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        graph.DeclareClassBase(importedMiddle, importedBase);
+        _ = graph.WriteNativeAssembly();
+        var context = new System.Runtime.Loader.AssemblyLoadContext("variance-inherited-interface", true);
+        try
+        {
+            context.LoadFromStream(new MemoryStream(library.Write()));
+            var loaded = context.LoadFromStream(new MemoryStream(graph.Write()));
+            foreach (var name in new[] { "Produce", "Consume" })
+                Check(loaded.ManifestModule.GetMethods().Single(m => m.Name == name).Invoke(null, [null]) is null,
+                    "CLR inherited interface variance " + name);
+        }
+        finally { context.Unload(); }
+        Conversion("Reverse", producer.MakeGenericInstance(importedView), producer.MakeGenericInstance(importedLeaf));
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+    }
+
     private static void CheckStringConversions()
     {
         var graph = new AssemblyBuilder(new("StringVariance", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));

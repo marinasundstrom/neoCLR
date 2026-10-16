@@ -1,0 +1,50 @@
+import System.*
+import ImportedVariance.*
+
+class Source : Producer<Leaf> {
+    private val value: Leaf
+
+    init(value: Leaf) {
+        self.value = value
+    }
+
+    func Get() -> Leaf => value
+}
+
+class Sink : Consumer<Readable> {
+    private val expected: Readable
+
+    init(expected: Readable) {
+        self.expected = expected
+    }
+
+    func Accept(value: Readable) -> int {
+        if !Object.ReferenceEquals(value, expected) {
+            return 1
+        }
+        return value.Read()
+    }
+}
+
+func Widen(value: Producer<Leaf>) -> Producer<Readable> => value
+func Narrow(value: Consumer<Readable>) -> Consumer<Leaf> => value
+
+func Main() -> int {
+    let leaf = Leaf(41)
+    let source = Source(leaf)
+    let producer = Widen(source)
+    let view = producer.Get()
+    if !Object.ReferenceEquals(producer, source) || !Object.ReferenceEquals(view, leaf) {
+        return 1
+    }
+    if view.Read() != 41 {
+        return 2
+    }
+    leaf.Number = 42
+    let sink = Sink(view)
+    let consumer = Narrow(sink)
+    if !Object.ReferenceEquals(consumer, sink) || consumer.Accept(leaf) != 42 {
+        return 3
+    }
+    return view.Read()
+}

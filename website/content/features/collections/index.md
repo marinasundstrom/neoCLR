@@ -168,3 +168,7 @@ String. Text identity is preserved. Native conversions use the existing tagged
 pointer; interpreter conversions use ordinary String view handles without copying
 UTF-8 bytes. See the [variance reference](/docs/interface-variance.html) for costs
 and limitations.
+
+Variance also follows nominal interfaces inherited through imported class bases.
+The metadata writer uses explicit dependency ancestry; it does not infer
+conformance from matching members. Result and Sliceable remain invariant.

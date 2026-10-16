@@ -1,0 +1,31 @@
+namespace ImportedVariance
+
+public interface Readable {
+    func Read() -> int
+}
+
+public open class Base : Readable {
+    public field Number: int
+
+    public init(number: int) {
+        Number = number
+    }
+
+    public func Read() -> int => Number
+}
+
+public open class Middle : Base {
+    public init(number: int) : base(number) { }
+}
+
+public class Leaf : Middle {
+    public init(number: int) : base(number) { }
+}
+
+public interface Producer<out T> {
+    func Get() -> T
+}
+
+public interface Consumer<in T> {
+    func Accept(value: T) -> int
+}

@@ -1,0 +1,10 @@
+import System.*
+import ImportedVariance.*
+
+class Unrelated { }
+
+func Reverse(value: Producer<Readable>) -> Producer<Leaf> => value
+func ReverseConsumer(value: Consumer<Leaf>) -> Consumer<Readable> => value
+func MissingConformance(value: Producer<Unrelated>) -> Producer<Readable> => value
+
+func Main() -> int => 42

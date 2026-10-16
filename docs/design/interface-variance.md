@@ -646,3 +646,15 @@ The final String consumer returns 42 in interpreter, AOT and managed JIT. All si
 source rejections, native fault/root/collection checks and AOT sanitizer checks
 pass. The retained results fingerprint the rebuilt compiler, SDK, runtime, native
 backend, text archive, sources and emitted images.
+
+### Imported class ancestors' interface views (2026-10-16)
+
+The SDK variance walker previously visited an imported class's direct interfaces
+but omitted explicitly declared class bases. It now traverses registered ancestry
+using the same deduplication and graph limit as interface edges. This matches
+.NET's inherited nominal interface conformance; it adds no structural matching,
+boxing or new adapter. The regression rejects absent/incomplete ancestry, accepts
+both producer and consumer conversions through a complete transitive chain, and
+rejects reverse widening. Emitted CLI conversion methods also load and execute.
+See the [Raven consumer](../validation/interface-variance/inherited-interface/README.md)
+for separately compiled dependency and native qualification.

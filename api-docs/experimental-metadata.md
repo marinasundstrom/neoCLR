@@ -9283,6 +9283,11 @@ This applies in covariant, contravariant and nested interface positions; reverse
 and unrelated-class conversions still reject. A separately compiled Raven
 consumer qualifies this through interpreter, AOT and managed JIT with actual
 object identity and inherited storage mutation. Generic class bases remain unsupported.
+Imported class arguments also inherit interface views through explicitly registered
+`DeclareClassBase` chains. The metadata writer requires the complete chain; a
+matching name or an unregistered ancestor is insufficient. This applies to both
+producer and consumer conversions and preserves reverse-conversion rejection.
+
 
 ### Native compiler variance bridge — development
 

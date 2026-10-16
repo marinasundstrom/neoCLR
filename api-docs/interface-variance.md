@@ -55,3 +55,7 @@ Consumer<string>. The interpreter allocates an ordinary view handle while sharin
 the UTF-8 owner; native dispatch adapts its pointer tag without allocating a wrapper
 or copying text. Nominal conformance remains explicit, and reverse/value-boxing
 conversions reject. See the retained String consumer for source and validation.
+
+Imported class arguments may also widen to interfaces inherited through explicitly
+registered class ancestors. Producer and consumer conversions preserve nominal
+conformance; the SDK requires the complete dependency ancestry contract.

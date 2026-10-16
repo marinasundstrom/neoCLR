@@ -1,0 +1,230 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile-library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/Library.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "7370a28603f29eefe44fd65ef08ae64d83d6795696705c9b33519754a92ab0c6",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/Main.rvn(8,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/Main.rvn(10,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/Main.rvn(14,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/Main.rvn(18,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/Main.rvn(22,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "035d8f98eaa418f1132ea5dcd82a89cb1bc6ccf9f3dff1389fc315acb4afe3ae",
+      "output": "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/rejected/Main.rvn(6,62): error RAV1503: Cannot convert from 'Producer<Readable>' to 'Producer<Leaf>'\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/rejected/Main.rvn(7,70): error RAV1503: Cannot convert from 'Consumer<Leaf>' to 'Consumer<Readable>'\n/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/rejected/Main.rvn(8,78): error RAV1503: Cannot convert from 'Producer<Unrelated>' to 'Producer<Readable>'\n"
+    },
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "bf892aa7f54f1c272f861484929014cee544a529d2e5f9dfe21722015e3abf94",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/project/bin/neoclr/InheritedInterfaceVariance.dll\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/project/bin/neoclr/InheritedInterfaceVariance.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/project/bin/neoclr/InheritedInterfaceVariance.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "e8303c52345bcb980c39ed1aa3fcba3650eec8696b8a1d45da8ca3ab7cb0455c",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/project/bin/neoclr/InheritedInterfaceVariance.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "547664f84bccc9aad6be2e90c305a0aafc898b5603aa7ff65036b386735c53df",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.539849125,\"guestExitCode\":42,\"invocationSeconds\":0.000067541,\"metadataLoadSeconds\":0.640572792,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.921718667}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.539849125,
+    "guestExitCode": 42,
+    "invocationSeconds": 6.7541e-05,
+    "metadataLoadSeconds": 0.640572792,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 13.921718667
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/inherited-interface/Main.rvn": "26d24223fff77d8715dfe7271586aee7da347ec32ed7b3bfbc77005098d25ded",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/inherited-interface/Library.rvn": "aa0185723cb73b30e4f739a2fd6e686e120bd6db4cd7088f73b3971a944240fa",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/inherited-interface/Rejected.rvn": "812f2e48ca2dbd6f366842385abd466e27904928e59ea0f5b875a57dc1c704c7",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/inherited-interface/run.py": "22eb2ae2188805e935623751dcbfc5607a41b7e0d3d35b697906b1ea165cfbc5",
+    "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll": "17e271d8b9662b6be92cb59b6e72d47a0ed5ff0ee35aef8c80c3cd503980a235",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "84ec9fda305ddd982443f70250ae4318aa680ca9f7722f9fb045fbd939023b85",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "665e236dd88be25b425b3c132631101ca2523dd11f5dcdedaa2527a6b7212cd7",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "59e44b8feba3fca75b6a1d1c323e2f468a329f708298f7076437c0dbc015d497",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "99a0676be6d1e87d7c58329221c09382b734d0a21779a344ba716a7ce7fd3371",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
+    "/Users/robert/Projects/neoclr/target/variance-inherited-interface-20261016/project/bin/neoclr/InheritedInterfaceVariance.dll": "00ef608ad57c3adb21502f220eca26219a02fa0b25e52f465a564a28935590e9",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
+  }
+}

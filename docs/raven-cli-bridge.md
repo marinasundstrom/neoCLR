@@ -11354,3 +11354,21 @@ The final String consumer returns 42 in interpreter, AOT and managed JIT. All si
 source rejections, native fault/root/collection checks and AOT sanitizer checks
 pass. The retained results fingerprint the rebuilt compiler, SDK, runtime, native
 backend, text archive, sources and emitted images.
+
+### Imported class ancestors in variance checks (2026-10-16)
+
+The metadata SDK now follows explicitly registered dependency class bases when
+finding interface views for reference-only variance. A library's `Leaf : Middle :
+Base : Readable` can be used through `Producer<Readable>` from `Producer<Leaf>`,
+and through the corresponding contravariant consumer. The compiler supplies
+nominal relationship contracts; the runtime still validates loaded definitions.
+No conformance is inferred from member names.
+
+This is an SDK validation correction. Runtime Contract settings, temporary CLI
+reference encoding, native generic signatures and dispatch representation are
+unchanged. No Raven semantic/emission code change is required; rebuild the native
+compiler against the corrected SDK. Generic class bases remain unsupported by the
+SDK contract. Sliceable/Result variance and structural work stay deferred.
+The [retained consumer](validation/interface-variance/inherited-interface/README.md)
+checks actual calls, identity, inherited-field mutation and three invalid source
+conversions against the existing `variance-argument-sequence-20261016` bundle.

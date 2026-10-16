@@ -87,3 +87,8 @@ widening does not cross unannotated interfaces or nominal value wrappers, even
 inside variant contracts, and accepts each exact-signature control. Existing
 String, array and imported-base executable evidence remains applicable; this
 checkpoint changes no runtime ABI or compiler contract.
+
+The [imported ancestor interface consumer](inherited-interface/README.md) closes
+the SDK traversal gap for imported classes inheriting nominal interface views
+through registered class bases. Interpreter/AOT/JIT calls, identity, mutation,
+source rejections and native cleanup/sanitizer checks pass.
