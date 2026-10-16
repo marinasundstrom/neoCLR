@@ -8,6 +8,14 @@ public sealed partial class AssemblyBuilder
     {
         if (source == target) return true;
         if (depth >= 64 || !Reference(source) || !Reference(target)) return false;
+        var ancestorView = source;
+        var bases = new HashSet<SignatureType>();
+        while ((ancestorView.GenericInstance?.Definition ?? ancestorView.ClassType)?.LocalBaseSignature is { } next)
+        {
+            if (!bases.Add(ancestorView) || bases.Count > 64) throw new InvalidDataException("class inheritance exceeds limit");
+            ancestorView = ancestorView.GenericInstance is { } construction ? construction.Substitute(next) : next;
+            if (ancestorView == target) return true;
+        }
         if (source.GenericInstance is { } constructed && target.ClassType is { } parent && constructed.Definition.DerivesFrom(parent)) return true;
         if (source.ClassType is { } derived && target.ClassType is { } ancestor && derived.DerivesFrom(ancestor)) return true;
         // Local subclasses retain an explicit dependency base contract. Reuse the

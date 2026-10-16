@@ -186,41 +186,46 @@ public sealed partial class TypeBuilder
         return MethodBuilder.ForDefinition(definition);
     }
 
-    private IEnumerable<MethodBuilder> InheritedClassMethods()
+    private IEnumerable<(MethodBuilder Method, MethodSignature Signature)> InheritedClassMethods()
     {
-        var current = this;
-        while (current.LocalBase is { } parent)
+        SignatureType current = OpenSignature;
+        var owner = this;
+        while (owner.LocalBaseSignature is { } parent)
         {
-            foreach (var method in parent.Methods) yield return method;
-            current = parent;
+            current = current.GenericInstance is { } instance ? instance.Substitute(parent) : parent;
+            owner = current.GenericInstance?.Definition ?? current.ClassType!;
+            SignatureType Project(SignatureType type) => current.GenericInstance?.Substitute(type) ?? type;
+            foreach (var method in owner.Methods)
+                yield return (method, new MethodSignature(Project(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Project), method.Signature.GenericParameterNames, method.Signature.OutParameters));
         }
-        if (current.ExternalBase is { } external)
-            foreach (var method in Assembly.ExternalClassMethods(external)) yield return method;
+        if (owner.ExternalBase is { } external)
+            foreach (var method in Assembly.ExternalClassMethods(external)) yield return (method, method.Signature);
     }
 
     internal MethodBuilder? FindInheritedMethod(string name, MethodSignature signature)
-        => InheritedClassMethods().FirstOrDefault(m => !m.IsStatic && m.Name == name &&
-            m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes));
+        => InheritedClassMethods().FirstOrDefault(m => !m.Method.IsStatic && m.Method.Name == name &&
+            m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)).Method;
 
     internal void ValidateClassSlots()
     {
         if (IsInterface || IsStatic) return;
+        var inheritedMethods = InheritedClassMethods().ToArray();
         foreach (var method in Methods.Where(m => !m.IsStatic && !m.IsConstructor))
         {
-            var inherited = FindInheritedMethod(method.Name, method.Signature);
+            var inherited = inheritedMethods.FirstOrDefault(m => !m.Method.IsStatic && m.Method.Name == method.Name && m.Signature.ParameterTypes.SequenceEqual(method.Signature.ParameterTypes));
             if (method.IsOverride)
             {
-                if (inherited is not null ? !inherited.IsVirtual || !inherited.Signature.Matches(method.Signature) :
+                if (inherited.Method is not null ? !inherited.Method.IsVirtual || !inherited.Signature.Matches(method.Signature) :
                     !MethodDefinition.IsObjectOverride(method.Name, method.Signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))
                     throw new InvalidDataException("override requires an exact inherited virtual contract");
             }
-            else if (inherited is not null) throw new InvalidDataException("inherited method hiding is unsupported");
+            else if (inherited.Method is not null) throw new InvalidDataException("inherited method hiding is unsupported");
         }
         if (IsAbstract) return;
-        foreach (var contract in InheritedClassMethods().Where(m => m.IsAbstract))
+        foreach (var contract in inheritedMethods.Where(m => m.Method.IsAbstract))
         {
-            var implementation = Methods.SingleOrDefault(m => m.Name == contract.Name && m.Signature.Matches(contract.Signature))
-                ?? FindInheritedMethod(contract.Name, contract.Signature);
+            var implementation = Methods.SingleOrDefault(m => m.Name == contract.Method.Name && m.Signature.Matches(contract.Signature))
+                ?? FindInheritedMethod(contract.Method.Name, contract.Signature);
             if (implementation is null || implementation.IsAbstract)
                 throw new InvalidDataException("concrete class must implement inherited abstract methods");
         }

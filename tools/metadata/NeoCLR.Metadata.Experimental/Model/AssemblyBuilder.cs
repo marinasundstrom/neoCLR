@@ -100,12 +100,14 @@ public sealed partial class AssemblyBuilder
         {
             foreach (var type in types)
             {
+                type.LocalBaseSignature?.ValidateOwner(this, typeArity: type.GenericParameterNames.Count, complete: true);
+                type.ValidateLocalBaseConstraints();
                 type.ValidateEnum(); type.ValidatePrimitiveRepresentation(); type.ValidateClassSlots(); type.ValidateVariance();
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
-                if (type.LocalBase is { } parent && (!(IsOrdinaryDerived(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
-                    throw new InvalidDataException("derived classes require ordinary reference owners and nongeneric bases");
+                if (type.LocalBase is { } parent && (!(IsOrdinaryDerived(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType) || !(IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && type.LocalBaseSignature?.GenericInstance is not null) || (parent.Definition.Attributes & 0x100) != 0))
+                    throw new InvalidDataException("derived classes require ordinary reference owners and complete base signatures");
             }
             ValidateValueLayouts();
             foreach (var type in types)
@@ -336,6 +338,46 @@ public sealed partial class AssemblyBuilder
         if (!ReferenceEquals(baseType.Assembly, this) || !IsOrdinaryBase(baseType) || (baseType.Definition.Attributes & 0x100) != 0 || !Enum.IsDefined(visibility))
             throw new ArgumentException("generic derived classes require an owned nonsealed nongeneric reference base");
         var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u, baseType.Definition.ToReference(), genericParameterNames);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
+
+    /// <summary>Adds a generic reference class with an owned constructed class base.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Simple name without CLI arity.</param>
+    /// <param name="genericParameterNames">One through 32 unique parameter names.</param>
+    /// <param name="baseType">Owned generic reference class construction, in the new declaration's parameter scope.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>The attached generic class builder.</returns>
+    /// <exception cref="ArgumentNullException">The base or parameter sequence is null.</exception>
+    /// <remarks>Base arguments are scoped to the new class parameters. Constructors must explicitly call the matching constructed base initializer.</remarks>
+    /// <exception cref="ArgumentException">The base is foreign, sealed, nested, nonclass or has out-of-scope arguments.</exception>
+    public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, GenericTypeInstance baseType, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(genericParameterNames);
+        return AddConstructedDerivedClass(@namespace, name, genericParameterNames, baseType, visibility);
+    }
+
+    /// <summary>Adds a nongeneric reference class with an owned closed generic class base.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Metadata name without generic arity.</param>
+    /// <param name="baseType">Owned closed generic reference class construction.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>The attached nongeneric class builder.</returns>
+    /// <exception cref="ArgumentNullException">The base is null.</exception>
+    /// <exception cref="ArgumentException">The base is foreign, sealed, nested, nonclass or contains unbound arguments.</exception>
+    public TypeBuilder AddClass(string @namespace, string name, GenericTypeInstance baseType, TypeVisibility visibility = TypeVisibility.Public)
+        => AddConstructedDerivedClass(@namespace, name, null, baseType, visibility);
+
+    private TypeBuilder AddConstructedDerivedClass(string ns, string name, IEnumerable<string>? parameters, GenericTypeInstance baseType, TypeVisibility visibility)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        var parent = baseType.Definition;
+        if (!ReferenceEquals(parent.Assembly, this) || !IsOrdinaryDerived(parent) || (parent.Definition.Attributes & 0x100) != 0 || !Enum.IsDefined(visibility))
+            throw new ArgumentException("constructed base requires an owned nonsealed top-level reference class");
+        var definition = parameters is null
+            ? new TypeDefinition(ns, name, visibility == TypeVisibility.Public ? 1u : 0u, parent.Definition.ToReference()) { AuthoredBaseSignature = baseType }
+            : new TypeDefinition(ns, name, visibility == TypeVisibility.Public ? 1u : 0u, parent.Definition.ToReference(), parameters) { AuthoredBaseSignature = baseType };
         Definition.MainModule.Types.Add(definition);
         return definition.Producer!;
     }
@@ -924,7 +966,7 @@ public sealed partial class AssemblyBuilder
         foreach (var type in types)
         {
             var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.ExternalBase is { } externalBase ? ImportedTypeHandle(externalBase) : type.LocalBase is { } parentType ? typeHandles[parentType] : objectType,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.ExternalBase is { } externalBase ? ImportedTypeHandle(externalBase) : type.LocalBaseSignature is { } parentType ? MetadataTokens.EntityHandle(ElementToken(parentType)) : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));

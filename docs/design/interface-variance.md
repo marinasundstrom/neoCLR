@@ -753,3 +753,15 @@ The retained consumer records native qualification. Helper calls, stores and
 control flow in base expressions remain unsupported backend forms to address,
 not deliberate .NET divergences. Constructed generic base authoring and Raven
 hierarchy emission remain open; deferred structural/Result/Sliceable work is unchanged.
+
+### Owned constructed class bases (2026-10-16)
+
+SDK authoring now carries complete class-base signatures, substituting inherited
+class/interface contracts in each derived owner's scope. This follows the existing
+.NET constructed-member substitution research above; classes remain invariant
+and interface conformance stays nominal. The retained constructed-class-base
+fixture qualifies CLR/interpreter/AOT/JIT storage and interface dispatch with
+reordered type parameters and both value/reference payloads. Declaration checks
+also require symbolic base arguments to prove their constraints. Raven emission
+and external constructed base authoring remain pending; this does not resume
+structural work or Sliceable/Result variance.

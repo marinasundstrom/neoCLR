@@ -135,11 +135,15 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, ConstructedMethodReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        if (opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.IsAbstract ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("constructor requires Newobj, interface contract Callvirt, other members Call");
+        SignatureType? receiver = operand.Definition.IsConstructor
+            ? (SignatureType)operand.Definition.DeclaringType!.MakeGenericInstance(operand.DeclaringTypeArguments.ToArray()) : null;
+        var baseConstructor = operand.Definition.IsConstructor && opCode == OpCode.Call && bodyBuilder.IsConstructor &&
+            DeclaringType?.IsDirectBaseConstructor(operand.Definition, receiver) == true;
+        if (!baseConstructor && opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.IsAbstract ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("constructor requires Newobj, interface contract Callvirt, other members Call");
         if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("constructed calls require an owned definition");
         foreach (var type in operand.DeclaringTypeArguments.Concat(operand.MethodArguments))
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new(operand.Definition.IsConstructor ? "new.constructed" : operand.Definition.IsAbstract ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition, ConstructedTarget: operand));
+        Append(new(baseConstructor ? "call.constructed" : operand.Definition.IsConstructor ? "new.constructed" : operand.Definition.IsAbstract ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition, ConstructedTarget: operand, Type: baseConstructor ? receiver : null));
     }
 
     public void BindFunction(SignatureType functionType, MethodBuilder target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));

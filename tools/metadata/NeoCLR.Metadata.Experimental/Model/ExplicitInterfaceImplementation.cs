@@ -73,23 +73,26 @@ public sealed partial class MethodBuilder
 
 public sealed partial class TypeBuilder
 {
-    internal MethodBuilder? FindInterfaceImplementation(string name, MethodSignature signature, bool isStatic, SignatureType owner)
+    internal MethodBuilder? FindInterfaceImplementation(string name, MethodSignature signature, bool isStatic, SignatureType owner, GenericTypeInstance? construction = null)
     {
+        SignatureType Project(SignatureType type) => construction?.Substitute(type) ?? type;
+        bool Matches(MethodSignature actual) => actual.GenericParameterNames.Count == signature.GenericParameterNames.Count &&
+            Project(actual.ReturnType) == signature.ReturnType && actual.ParameterTypes.Select(Project).SequenceEqual(signature.ParameterTypes) && actual.OutParameters.SequenceEqual(signature.OutParameters);
         var explicitBodies = Methods.Where(m => m.Definition.ExplicitInterfaceImplementations.Any(e =>
-            e.MemberName == name && Equals(m.ExplicitOwner(e), owner)) && m.Signature.Matches(signature)).ToArray();
+            e.MemberName == name && Equals(Project(m.ExplicitOwner(e)), owner)) && Matches(m.Signature)).ToArray();
         if (explicitBodies.Length > 1) throw new InvalidDataException("ambiguous explicit interface implementation");
         if (explicitBodies.Length == 1)
         {
             var body = explicitBodies[0];
-            if (isStatic || !body.Signature.Matches(signature)) throw new InvalidDataException("incompatible explicit interface implementation");
+            if (isStatic || !Matches(body.Signature)) throw new InvalidDataException("incompatible explicit interface implementation");
             return body;
         }
         var declared = Methods.SingleOrDefault(m => m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public &&
-            m.Name == name && m.Signature.GenericParameterNames.Count == 0 && m.Signature.Matches(signature));
+            m.Name == name && m.Signature.GenericParameterNames.Count == 0 && Matches(m.Signature));
         if (declared is not null) return declared;
-        var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner)
+        var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner, LocalBaseSignature is { } parent ? Project(parent).GenericInstance : null)
             ?? (ExternalBase is { } external ? Assembly.ExternalClassMethods(external).FirstOrDefault(m =>
-                m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public && m.Name == name && m.Signature.Matches(signature)) : null);
+                m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public && m.Name == name && Matches(m.Signature)) : null);
         if (inherited?.Definition.ExplicitInterfaceImplementations.Count > 0)
             throw new InvalidDataException("inherited explicit interface reimplementation is not supported");
         return inherited;

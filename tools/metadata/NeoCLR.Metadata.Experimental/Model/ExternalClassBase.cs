@@ -108,7 +108,8 @@ public sealed partial class TypeBuilder
         ? parent.Equals(target) || Assembly.HasDeclaredClassBase(parent, target)
         : LocalBase?.HasExternalBase(target) == true;
     internal bool IsDirectBaseConstructor(MethodBuilder target, SignatureType? receiver = null)
-        => ReferenceEquals(LocalBase, target.DeclaringType) && LocalBase is not null ||
+        => ReferenceEquals(LocalBase, target.DeclaringType) && LocalBase is not null &&
+            (LocalBaseSignature?.GenericInstance is null ? receiver is null : receiver == LocalBaseSignature) ||
             ExternalBase is { } external && Equals(receiver?.ImportedType, external) && target.IsConstructor &&
             target.Assembly.Identity.Equals(external.AssemblyIdentity) && target.DeclaringType?.Namespace == external.Namespace &&
             target.DeclaringType?.Name == external.Name;

@@ -9421,3 +9421,43 @@ Raven emitter eligibility remain open. Native AOT constructor lowering now accep
 supported arithmetic/conversions before the leading base call, in addition to
 forwarded arguments. Receiver access, helper calls, stores and branches in that
 prefix remain backend gaps, not an alternative to .NET semantics.
+
+## Constructed class base authoring (development, 2026-10-16)
+
+The following overloads retain an owned constructed class base:
+
+```csharp
+TypeBuilder AssemblyBuilder.AddClass(string @namespace, string name,
+    GenericTypeInstance baseType, TypeVisibility visibility = TypeVisibility.Public);
+TypeBuilder AssemblyBuilder.AddGenericClass(string @namespace, string name,
+    IEnumerable<string> genericParameterNames, GenericTypeInstance baseType,
+    TypeVisibility visibility = TypeVisibility.Public);
+```
+
+The base must be an attached nonsealed, top-level reference class in this output.
+Nongeneric children require closed arguments. Generic children interpret type
+parameter ordinals in the child's declaration scope, including reordered and
+nested arguments. Method parameters, out-of-scope arguments, foreign owners,
+interfaces, value types and sealed classes reject with ArgumentException; null
+bases/parameter sequences throw ArgumentNullException. These overloads do not
+enable external constructed base authoring or generic class virtual slots.
+
+`TypeDefinition.BaseTypeSignature` retains the authored construction;
+`BaseType` still identifies its definition. Native output writes the constructed
+base signature; CLI output uses a TypeSpec extends entry. No encoding version or
+Runtime Contract change is needed. Ancestry conversions and inherited interface
+contracts substitute each edge, with exact class arguments: classes remain
+invariant. Closed inherited storage and calls retain their owning construction.
+
+`MethodBuilder.Call(ConstructedMethodReference)` and its IL generator/Emit(Call)
+equivalents can initialize the current constructor's exact direct constructed
+base. The reference must name the right definition and arguments. Initialization
+must occur exactly once before receiver access/escape or return; Write validates
+flow and rejects invalid initialization with InvalidDataException. NewObject
+continues to allocate a new instance. Native backend initializer-expression
+limits remain in force.
+
+The executable fixture in `docs/validation/constructed-class-base` covers reordered
+parameters, a closed leaf over a generic intermediate base, integer/reference
+storage, nominal upcasts, inherited generic interfaces and rejection boundaries.
+Raven emission of constructed bases remains the next integration step.

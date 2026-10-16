@@ -53,6 +53,33 @@ public sealed partial class TypeBuilder
         genericConstraints.Add(new(parameterIndex, baseType));
         genericConstraints.Sort((a, b) => a.ParameterIndex.CompareTo(b.ParameterIndex));
     }
+    // A base declaration must prove symbolic requirements before any closed use.
+    // Checking only closed construction arguments would admit invalid CLR metadata.
+    internal void ValidateLocalBaseConstraints()
+    {
+        void Visit(SignatureType type)
+        {
+            if (type.GenericInstance is { } instance)
+            {
+                foreach (var (index, required) in instance.Definition.SpecialConstraints)
+                {
+                    if (instance.TypeArguments[index].TypeParameterIndex is not { } parameter) continue;
+                    var actual = specialConstraints.GetValueOrDefault(parameter);
+                    if (actual.HasFlag(TypeParameterConstraints.ValueType)) actual |= TypeParameterConstraints.DefaultConstructor;
+                    if (genericConstraints.Any(c => c.ParameterIndex == parameter && !c.BaseType.IsNativeObjectRoot)) actual |= TypeParameterConstraints.ReferenceType;
+                    if ((actual & required) != required) throw new InvalidDataException("base argument does not prove required special constraints");
+                }
+                foreach (var required in instance.Definition.GenericConstraints)
+                    if (instance.TypeArguments[required.ParameterIndex].TypeParameterIndex is { } parameter &&
+                        !genericConstraints.Any(c => c.ParameterIndex == parameter && ReferenceEquals(c.BaseType, required.BaseType)))
+                        throw new InvalidDataException("base argument does not prove required nominal constraint");
+                foreach (var argument in instance.TypeArguments) Visit(argument);
+            }
+            if (type.ArrayElement is { } element) Visit(element);
+        }
+        if (LocalBaseSignature is { } signature) Visit(signature);
+    }
+
     internal void ValidateTypeArguments(IReadOnlyList<SignatureType> arguments, bool complete = false)
     {
         foreach (var (index, flags) in specialConstraints)

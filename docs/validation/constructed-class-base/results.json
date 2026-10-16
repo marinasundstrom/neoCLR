@@ -1,0 +1,176 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "sdk-clr",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "-p:WarningLevel=0",
+        "--",
+        "--constructed-class-bases"
+      ],
+      "exitCode": 0,
+      "logSha256": "968dcd948da2cb5b235ac23d1aff8325dc8adc1e8bb7a69a860581a9437e73e7",
+      "output": "PASS constructed class base authoring, reordered arguments, transitive storage and CLR dispatch\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/ConstructedClassBase.neox",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/ConstructedClassBase.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "eb1901cd4d900fe79e71394ecd54c95ca884edd9a7f39c008be16e75961b050d",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/ConstructedClassBase.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "6fff9c44f52c77d8079c3c585a965b021ee2f8851edc8ddc6d56c1e9e3bce679",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.39518425,\"guestExitCode\":42,\"invocationSeconds\":0.000046209,\"metadataLoadSeconds\":0.3277605,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":5.983309833}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.39518425,
+    "guestExitCode": 42,
+    "invocationSeconds": 4.6209e-05,
+    "metadataLoadSeconds": 0.3277605,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 5.983309833
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ConstructedClassBaseChecks.cs": "98ead507ef4eb9b50242661be24bbb5cf3634cca31a774d345f346b1d2db74ad",
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/run.py": "be66e07bf3f0fe66a5bb6d2575d6571f0ea181d2bb295852a914b458364b3155",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "81c91ad3fafff14430f1d95e1c1d7a22789461b0d0f5b3ca24919e3429de9f51",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
+    "/Users/robert/Projects/neoclr/target/constructed-class-base-final-20261016/ConstructedClassBase.neox": "949644021d31e19afe891dd2724403fad462b9cd6b696fdc6d6cbf363c7368d4",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
+  }
+}
