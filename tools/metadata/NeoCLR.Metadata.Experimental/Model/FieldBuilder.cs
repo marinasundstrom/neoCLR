@@ -51,7 +51,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid name/type/access, unsupported value-type storage, duplicate name or exceeded field limit.</exception>
     /// <exception cref="InvalidOperationException">This is a static class.</exception>
-    /// <remarks>At most 256 fields per storage category per type and 4096 per assembly. Static storage is default-initialized; static readonly stores and type initializers are not admitted. Value-type fields support nominal, constructed and experimental structural payloads. Direct self storage rejects on attachment; indirect inline cycles and bounded layout expansion reject when writing.</remarks>
+    /// <remarks>At most 256 fields per storage category per type and 4096 per assembly. Static storage is default-initialized; static readonly stores require the exact owning type initializer. Value-type fields support nominal, constructed and experimental structural payloads. Direct self storage rejects on attachment; indirect inline cycles and bounded layout expansion reject when writing.</remarks>
     public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false, bool isStatic = false)
     {
         var definition = new FieldDefinition(name, (ushort)((visibility switch { FieldVisibility.Public => 6, FieldVisibility.Internal => 3, FieldVisibility.Private => 1, _ => throw new ArgumentOutOfRangeException(nameof(visibility)) }) | (isReadOnly ? 0x20 : 0) | (isStatic ? 0x10 : 0)), type);

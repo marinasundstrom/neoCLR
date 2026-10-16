@@ -169,4 +169,5 @@ ordering. Mixed-type contracts and production Complex edge semantics remain futu
 
 Native static readonly field initialization is still in development. Interpreter, JIT and AOT
 have per-type initializer execution and readonly write checks, including generic
-owners and GC-safe calls. Raven emission and metadata SDK authoring are not yet enabled.
+owners and GC-safe calls. The metadata SDK can author and inspect initializers with
+strict or relaxed timing. Raven source emission is not yet enabled.

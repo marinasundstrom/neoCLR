@@ -9906,3 +9906,41 @@ Duplicate names, invalid flags/types, interface owners and more than 256 literal
 are rejected. Other constant types and literal custom attributes remain unsupported.
 Native artifacts use the optional `literal_fields` metadata list; older runtimes
 reject that schema rather than silently ignoring it. Use the matching SDK/runtime.
+
+
+### Type initializers (development)
+
+- `TypeBuilder.AddTypeInitializer() -> MethodBuilder` adds the unique private static
+  parameterless `.cctor` with no result. Duplicate methods throw `ArgumentException`;
+  intrinsic primitive/enum owners throw `InvalidOperationException`.
+- `MethodBuilder.IsTypeInitializer` distinguishes runtime initialization from instance
+  `.ctor` construction. `MethodDefinition(".cctor", 0x1811, signature)` is the equivalent
+  detached declaration; the signature must be nongeneric, parameterless and Void.
+- `TypeDefinition.IsBeforeFieldInit` reads the CLI timing flag on authored or loaded
+  definitions. `TypeDefinition.SetBeforeFieldInit(bool value = true)` and
+  `TypeBuilder.SetBeforeFieldInit(bool value = true)` select relaxed timing on an
+  attached authored type; loaded/detached mutation throws `InvalidOperationException`.
+  False is strict timing and the builder default. Native relaxed initialization uses
+  first static-field access; strict triggers follow the
+  [runtime contract](../docs/design/readonly-fields.md).
+
+```csharp
+var state = assembly.AddClass("Example", "State");
+var value = state.AddField("Value", PrimitiveType.Int32, FieldVisibility.Public,
+    isReadOnly: true, isStatic: true);
+var initializer = state.AddTypeInitializer();
+initializer.LoadConstant(42);
+initializer.StoreField(value);
+initializer.Return();
+```
+
+Readonly static writes are legal only in the exact owning initializer, including
+its generic arguments. Calls, function bindings and entry-point selection cannot
+invoke `.cctor` directly; graph validation throws `InvalidDataException`. Native
+emission uses canonical `owner..cctor` and `before_field_init`, requiring matching
+runtime/SDK readers. CLI/native snapshots and reference projection preserve timing
+and readonly flags. Reference assemblies retain declarations, not executable bodies.
+Interface initializers are excluded from required implementation methods. Native
+storage/state remain invocation-owned; failed initialization retains the terminal
+Fault instead of a CLR exception wrapper. These host SDK APIs remain manually
+referenced here, outside the guest RavenDoc selection; no guest API snapshot changes.

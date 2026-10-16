@@ -90,7 +90,7 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.MetadataFields.Count()) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.Definition.NativeImport is not null || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.IsTypeInitializer || EntryPoint.Definition.NativeImport is not null || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local Int32 or no-result method with no parameters or one String vector");
         var importedTargets = importedReferences.Values.Concat(authoredCallableReferences).Select(reference => reference.Target).ToHashSet();
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
@@ -149,6 +149,8 @@ public sealed partial class AssemblyBuilder
                 }
                 foreach (var instruction in method.Instructions)
                 {
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsTypeInitializer == true)
+                        throw new InvalidDataException("type initializers cannot be called or bound directly");
                     if (instruction.Op == "local.address" && instruction.Value >= 0 && instruction.Value < method.Locals.Count &&
                         method.Locals[instruction.Value].CompositionSource is not null)
                         throw new InvalidDataException("experimental composition result local addresses are not supported");
@@ -185,7 +187,7 @@ public sealed partial class AssemblyBuilder
                 }
                 if (method.Definition.NativeImport is { } import)
                 {
-                    if (!method.IsStatic || method.IsAbstract || method.IsVirtual || method.IsConstructor || arity != 0 ||
+                    if (!method.IsStatic || method.IsAbstract || method.IsVirtual || method.IsConstructor || method.IsTypeInitializer || arity != 0 ||
                         method.Definition.ImplementationAttributes != 0 || method.Instructions.Count != 0 || method.Locals.Count != 0 || method.Definition.Body.Labels.Count != 0)
                         throw new InvalidDataException("native imports require empty nongeneric static declarations");
                     import.Validate(method.Signature);
@@ -1186,6 +1188,16 @@ public sealed partial class TypeBuilder
         if (signature.ReturnType != PrimitiveType.Void) throw new ArgumentException("constructor must have no result", nameof(signature));
         return AddMethodCore(".ctor", signature, visibility, false, true);
     }
+    /// <summary>Adds the unique private static parameterless type initializer.</summary>
+    /// <remarks>Invoked implicitly by the runtime, never by an ordinary call. Strict timing is the default; SetBeforeFieldInit enables relaxed field-triggered timing.</remarks>
+    /// <exception cref="ArgumentException">An initializer already exists or the method limit is exceeded.</exception>
+    /// <exception cref="InvalidOperationException">The owner is an intrinsic primitive or enum.</exception>
+    public MethodBuilder AddTypeInitializer()
+    {
+        var definition = new MethodDefinition(".cctor", 0x1811, new MethodSignature(PrimitiveType.Void, Array.Empty<SignatureType>()));
+        Definition.Methods.Add(definition);
+        return MethodBuilder.ForDefinition(definition);
+    }
     private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor, bool abstractContract = false)
     {
         if (IsInterface != abstractContract) throw new InvalidOperationException("interface owners require abstract contract methods");
@@ -1229,6 +1241,8 @@ public sealed partial class MethodBuilder
     public bool IsStatic => Definition.IsStatic;
     /// <summary>Gets whether this is an instance .ctor with no result.</summary>
     public bool IsConstructor => !IsStatic && Name == ".ctor";
+    /// <summary>Gets whether this is the runtime-invoked type initializer.</summary>
+    public bool IsTypeInitializer => IsStatic && Name == ".cctor";
     internal int ArgumentCount => ParameterCount + (IsStatic ? 0 : 1);
     /// <summary>Gets the function namespace or the declaring type namespace; empty for the global namespace.</summary>
     public string Namespace => Definition.Namespace!;

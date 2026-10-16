@@ -26,7 +26,7 @@ more than admitting a readonly modifier in metadata.
 Raven/.NET already emits both forms; the shared ReadonlyFields consumer returns 42.
 Native metadata carries instance readonly and static readonly flags, and access
 validation restricts instance writes to constructors/init accessors. The interpreter admits stores from a verified owning `.cctor`; ordinary writes
-still reject. The metadata SDK still rejects `.cctor`, and Raven still rejects static
+still reject. The metadata SDK authors and imports `.cctor`, preserving initialization timing; Raven still rejects static
 field initializers. Shared JIT/AOT lowering executes retained initializers through private guards. This is not yet end-to-end Raven support.
 
 1. Qualify instance constructor initialization, declaration initialization,
@@ -125,3 +125,48 @@ both a static reference and a pending caller reference. Failure preserves the ca
 result slot; the host checks that GC roots and invocation storage are released. Existing
 native static-storage tests additionally cover repeated entry/reset and arena/GC modes.
 No Raven consumer or public SDK `.cctor` API is claimed by these runtime fixtures.
+
+
+## Metadata SDK authoring and projection
+
+`TypeBuilder.AddTypeInitializer()` creates a private static parameterless no-result
+method, distinct from instance construction. Detached `.cctor` declarations use the
+same signature/flag validation. `SetBeforeFieldInit(bool)` selects relaxed field-triggered
+initialization; strict timing is the default. Native emission uses the canonical owner
+name plus `..cctor` and the optional `before_field_init` fact. Native declaration reads
+and CLI reference projections retain that fact and the constructor flags instead of
+inventing relaxed timing. Reference bodies remain nonexecutable placeholders.
+
+Readonly static stores require the declaring initializer and its exact open generic
+owner; an initializer cannot write another closed construction. Direct calls/bindings
+and entry selection reject. Interface initializers are not implementation contracts.
+Intrinsic primitive/enum initializer authoring remains unsupported. The host SDK APIs
+are covered by the [manual metadata reference](../../api-docs/experimental-metadata.md).
+`dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --type-initialization`
+checks executable CLR behavior, CLI/native/reference declarations and invalid stores,
+methods and entry points. Runtime backend qualification above is unchanged. Raven
+source emission and imported-consumer qualification remain the next integration step.
+
+## Guest introspection and reflection follow-through
+
+The host SDK's declaration support is not guest API parity. A source audit on
+2026-10-16 found these remaining integration requirements:
+
+- `src/reflection.rs` enumerates only `TypeDef.fields`; static storage and literal
+  declarations need distinct descriptor identities/ordinals and binding filters.
+- Guest `System.Introspection.FieldInfo` exposes type/access/static facts, but no
+  `IsInitOnly`, `IsLiteral` or raw-constant accessor. Follow the corresponding .NET
+  FieldInfo concepts while retaining Result for fallible execution.
+- Guest constructor discovery recognizes only `..ctor`. Exclude `..cctor` from
+  ordinary method discovery and expose a dedicated type-initializer description,
+  plus initialization timing. Description must not execute initialization or grant
+  ordinary invocation authority.
+- `src/reflection_members.rs` executes public instance-field access only. Static
+  reads/writes need the same runtime initialization guards as ordinary code; readonly
+  writes must remain rejected. Qualify reflective method calls and construction
+  against strict initialization in interpreter, JIT and AOT, including failures.
+
+These are tracked gaps, not implemented guest APIs. .NET's load-context lifetime and
+exception wrapping remain distinct from neoCLR's current invocation-owned state and
+terminal Fault contract. The existing SDK/runtime tests do not establish reflection
+execution support for these additions.

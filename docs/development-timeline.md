@@ -18619,3 +18619,19 @@ The subsequent native slice adds guarded JIT/AOT execution, closed-world initial
 retention and closed-generic specialization. Runtime fixtures validate the modes
 without claiming compiler integration. SDK and Raven production remain the next
 integration work; native contexts retain their existing thread-affine lifetime.
+
+### 2026-10-16 — Reflection coverage after recent additions
+
+- Author asked: “How about introspection and reflection support? Are we lacking
+  anything for what we have added since last release?”
+- Assistant inspected current guest descriptors, member enumeration/execution and
+  the reflection reference, using Preview 15 (2026-10-14) as the published baseline.
+  Reported gaps: static/literal field discovery, readonly/literal classification and
+  constants, initializer discovery/timing, static reflection execution and generic
+  constraint discovery. Generic variance and function inspection/dynamic invocation
+  already have guest surfaces; their documented execution/signature limits remain.
+- The concurrent SDK slice adds initializer authoring/native reads/reference
+  projection, not guest reflection parity. Requirements are recorded in
+  [readonly initialization](design/readonly-fields.md#guest-introspection-and-reflection-follow-through).
+  No new reflection API or broader structural restart was authorized or implemented
+  by this question; Raven source emission and reflection qualification remain open.

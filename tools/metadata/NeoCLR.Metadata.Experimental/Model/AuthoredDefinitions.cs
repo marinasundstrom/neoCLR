@@ -195,7 +195,7 @@ public sealed partial class AssemblyBuilder
             var attributes = definition.Attributes;
             if (definition.DeclaringType is null ? (attributes & 7) is not (0 or 1) : (attributes & 7) is not (2 or 5))
                 throw new ArgumentException("visibility does not match lexical ownership");
-            var category = attributes & ~7u;
+            var category = attributes & ~0x100007u;
             if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x80 or 0x180 or 0x108 or 0xa0 or 0x100)) throw new ArgumentException("unsupported manual type shape");
             if (category == 0x80 && (definition.GenericArity != 0 || definition.DeclaringType is not null) || definition.IsClosedHierarchy && (category is not (0x80 or 0xa0) || definition.GenericArity != 0 || definition.DeclaringType is not null))
                 throw new ArgumentException("abstract classes and closed families require supported nongeneric top-level owners");

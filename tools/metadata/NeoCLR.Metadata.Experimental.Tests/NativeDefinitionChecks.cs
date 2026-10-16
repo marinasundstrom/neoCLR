@@ -70,7 +70,7 @@ internal static class NativeDefinitionChecks
         privateMethod.Return();
         var staticRead = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(staticLibrary.WriteNativeAssembly(), core));
         var readType = staticRead.MainModule.Types.Single();
-        Check(readType.MetadataToken == 0x02000002 && readType.Attributes == 0x100181 && !readType.IsValueType, "static type origin/category");
+        Check(readType.MetadataToken == 0x02000002 && readType.Attributes == 0x181 && !readType.IsValueType, "static type origin/category");
         Check(staticRead.MainModule.Functions.Count == 0 && readType.Methods.Count == 2 && ReferenceEquals(readType, readType.Methods[0].DeclaringType), "static method ownership");
         Check((readType.Methods[1].Attributes & 7) == 1, "private member access retained");
         Check(ReferenceEquals(readType, readType.ToReference().Resolve()), "native type reference identity");
@@ -99,7 +99,7 @@ internal static class NativeDefinitionChecks
         Check(instanceDefinition.Fields[0].MetadataToken == 0x04000001, "native field origin token");
         var ctorDefinition = instanceDefinition.Methods.Single(m => m.Name == ".ctor");
         var valueDefinition = instanceDefinition.Methods.Single(m => m.Name == "Value");
-        Check(instanceDefinition.Attributes == 0x100001 && !ctorDefinition.IsStatic && (ctorDefinition.Attributes & 0x1800) == 0x1800, "instance and constructor attributes");
+        Check(instanceDefinition.Attributes == 1 && !ctorDefinition.IsStatic && (ctorDefinition.Attributes & 0x1800) == 0x1800, "instance and constructor attributes");
         Check(valueDefinition.TryGetSignature(out var valueSignature) && valueSignature!.ReturnType.Primitive == PrimitiveType.Int32, "instance logical signature");
         Check(!valueDefinition.TryGetStaticInt32Signature(out _, out _) && !valueDefinition.TryGetStaticPrimitiveSignature(out _) && !valueDefinition.TryGetStaticValueSignature(out _), "static helpers reject instance methods");
         var ctorImport = consumer.ImportReference(ctorDefinition, core);

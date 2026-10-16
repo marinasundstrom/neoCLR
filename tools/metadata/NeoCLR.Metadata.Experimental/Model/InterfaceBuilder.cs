@@ -135,7 +135,7 @@ public sealed partial class TypeBuilder
     internal IEnumerable<(string Name, MethodSignature Signature, bool IsStatic, MethodBuilder Declaration, SignatureType Owner)> RequiredInterfaceMethods =>
         InheritedContracts().SelectMany(owner =>
             (owner.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
-                (owner.GenericInstance?.Definition ?? owner.ClassType!).Methods.Select(method => (method.Name, Signature:
+                (owner.GenericInstance?.Definition ?? owner.ClassType!).Methods.Where(method => !method.IsTypeInitializer).Select(method => (method.Name, Signature:
                     owner.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature,
                     method.IsStatic, Declaration: method)))
             .Select(contract => (contract.Name, new MethodSignature(ResolveImplementationSelf(contract.Signature.ReturnType),
@@ -172,7 +172,7 @@ public sealed partial class TypeBuilder
     internal bool ConformsTo(GenericTypeInstance contract) => InheritedContracts().Any(t => Equals(t.GenericInstance, contract));
     internal IEnumerable<TypeBuilder> InterfaceContracts => baseInterfaces.Concat(implementedInterfaces);
     internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InheritedContracts().Any(t => ReferenceEquals(t.ClassType, contract));
-    internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Concat(i.InterfaceMethods)).Distinct();
+    internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Where(method => !method.IsTypeInitializer).Concat(i.InterfaceMethods)).Distinct();
     internal bool Implements(MethodBuilder method) => !method.IsStatic && method.Visibility == MethodVisibility.Public &&
         Assembly.Types.Where(t => ReferenceEquals(t, this) || t.DerivesFrom(this)).Any(t =>
             t.RequiredInterfaceMethods.Any(c => !c.IsStatic && c.Name == method.Name && c.Signature.Matches(method.Signature) &&
@@ -242,5 +242,5 @@ public sealed partial class MethodBuilder
     public void CallVirtual(MethodBuilder target) => GetILGenerator().CallVirtual(target);
 
     /// <summary>Gets whether this is a bodyless abstract class or interface method.</summary>
-    public bool IsAbstract => DeclaringType?.IsInterface == true || (Definition.DeclarationAttributes & 0x400) != 0;
+    public bool IsAbstract => DeclaringType?.IsInterface == true && !IsTypeInitializer || (Definition.DeclarationAttributes & 0x400) != 0;
 }

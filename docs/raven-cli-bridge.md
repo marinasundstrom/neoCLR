@@ -12410,8 +12410,9 @@ The interpreter now supports verified native `.cctor` methods and the optional
 `before_field_init` TypeDef fact, with runtime-only invocation and exact-owner
 readonly writes. See [the execution contract](design/readonly-fields.md). This is a
 native metadata capability, not temporary CLI substitution. Matching runtimes are
-required for the new fact. No Runtime Contract switch changes. SDK `.cctor` authoring
-and Raven initializer-body emission remain unsupported. Shared JIT/AOT now retain
+required for the new fact. No Runtime Contract switch changes. SDK `.cctor` authoring and declaration reads now preserve canonical native identity,
+readonly write authority and strict/relaxed timing, including CLI reference projection.
+Raven initializer-body emission remains unsupported. Shared JIT/AOT now retain
 and guard native initializers, including closed generic owners and GC-safe implicit
 calls; raw-metadata consumers qualify the runtime in all three execution modes. Existing
 readonly instance and class-constant consumer evidence is unaffected.

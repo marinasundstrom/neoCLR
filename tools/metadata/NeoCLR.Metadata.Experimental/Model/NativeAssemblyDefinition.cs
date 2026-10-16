@@ -11,6 +11,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType)
     {
+        internal bool BeforeFieldInit { get; init; }
         internal GenericVariance[] Variance { get; init; } = [];
         internal FieldRow[] StaticFields { get; init; } = [];
         internal (string Name, int Value, ushort Attributes)[] LiteralFields { get; init; } = [];
@@ -207,6 +208,8 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var type in typeElements)
             {
                 var typeFields = new List<string> { "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin" };
+                if (type.TryGetProperty("before_field_init", out _)) typeFields.Add("before_field_init");
+                bool beforeFieldInit = type.TryGetProperty("before_field_init", out var timing) && timing.GetBoolean();
                 bool closedHierarchy = type.TryGetProperty("is_closed_hierarchy", out var closedFlag) && closedFlag.GetBoolean();
                 if (type.TryGetProperty("static_fields", out _)) typeFields.Add("static_fields");
                 if (type.TryGetProperty("literal_fields", out _)) typeFields.Add("literal_fields");
@@ -416,7 +419,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + staticRows.Length + literalRows.Length + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { BeforeFieldInit = beforeFieldInit, Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -888,16 +891,20 @@ public sealed partial class NativeAssemblyDefinition
                 bool objectSlot = ownerIndex >= 0 && types[ownerIndex].IsObjectRoot && isVirtual && !isOverride;
                 Require(!objectSlot || instance && !isAbstract && visibility == MethodVisibility.Public &&
                     MethodDefinition.IsNativeObjectSlot(name, new(resultType, parameterTypes, genericNames), signatureGraph.Types[ownerIndex]), "invalid native Object slot");
-                Require(!interfaceOwner || isAbstract && isVirtual == instance, "interface method flags mismatch");
+                Require(!interfaceOwner || name == ".cctor" || isAbstract && isVirtual == instance, "interface method flags mismatch");
                 Require(!isAbstract || interfaceOwner || instance && types[ownerIndex].IsAbstractClass && isVirtual && !isOverride, "abstract method requires an abstract owner");
                 Require(!isAbstract || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract method");
                 Require(!isVirtual || instance && visibility == MethodVisibility.Public && genericArity == 0 && name != ".ctor" &&
                     (interfaceOwner || !types[ownerIndex].IsValueType || isOverride && types[ownerIndex].IsValueType), "unsupported virtual method");
                 Require(!isOverride || isVirtual && !interfaceOwner && !types[ownerIndex].IsObjectRoot && !isAbstract, "invalid override flags");
+                var initializer = name == ".cctor";
+                Require(!initializer || ownerIndex >= 0 && !instance && !isVirtual && !isAbstract && !isOverride &&
+                    visibility == MethodVisibility.Private && resultType == PrimitiveType.Void && parameters.Length == 0 &&
+                    genericArity == 0 && implementationAttributes == 0 && nativeImport is null, "invalid type initializer");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
-                var expectedName = implementationAttributes == 0x1000 ? (ns.Length == 0 ? name : ns + "." + name) : isVirtual && !interfaceOwner ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
+                var expectedName = implementationAttributes == 0x1000 ? (ns.Length == 0 ? name : ns + "." + name) : isVirtual && !interfaceOwner ? types[ownerIndex].NativeName + "." + name : constructor || initializer ? types[ownerIndex].NativeName + "." + name : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName || ownerIndex >= 0 && (types[ownerIndex].IsObjectRoot || types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme) &&
                     Text(method, "name") == types[ownerIndex].NativeName + "." + name, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
@@ -1109,7 +1116,7 @@ public sealed partial class NativeAssemblyDefinition
             uint entryPointToken = 0;
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].ImplementationAttributes == 0 && methods[p.index].NativeImport is null && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && (methods[p.index].Signature.ParameterTypes.Count == 0 || methods[p.index].Signature.ParameterTypes is [{ ArrayElement.Primitive: PrimitiveType.String }]) && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Name != ".cctor" && methods[p.index].ImplementationAttributes == 0 && methods[p.index].NativeImport is null && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && (methods[p.index].Signature.ParameterTypes.Count == 0 || methods[p.index].Signature.ParameterTypes is [{ ArrayElement.Primitive: PrimitiveType.String }]) && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
@@ -1209,6 +1216,7 @@ public sealed partial class NativeAssemblyDefinition
         {
             var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap), method.Signature.GenericParameterNames, method.Signature.OutParameters);
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
+                : method.Name == ".cctor" ? owners[method.Owner].AddTypeInitializer()
                 : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature, !method.Instance)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
                 : method.ObjectSlot ? owners[method.Owner].AddNativeObjectSlot(method.Name, signature)
@@ -1291,6 +1299,7 @@ public sealed partial class NativeAssemblyDefinition
                 : type.GenericNames.Length == 0 ? result[type.DeclaringType].AddNestedClass(type.Name, type.Visibility) : result[type.DeclaringType].AddNestedGenericClass(type.Name[..type.Name.LastIndexOf('`')], type.GenericNames, type.Visibility);
             for (int parameter = 0; parameter < type.Variance.Length; parameter++)
                 result[i].SetVariance(parameter, type.Variance[parameter]);
+            result[i].SetBeforeFieldInit(type.BeforeFieldInit);
             if (type.IsSealedClass) result[i].SetSealedClass();
             if (type.IsAbstractClass && !type.IsObjectRoot && !type.IsClosedHierarchy) result[i].SetAbstractClass();
         }

@@ -5172,5 +5172,10 @@ work stays parked, and these author-directed slices do not reorder other milesto
 
 Author-directed readonly prerequisite (2026-10-16): the interpreter and shared JIT/AOT now execute
 verified per-closed-type initializers with readonly write authority and retained
-faults. [Raven/SDK production and remaining admission gaps](design/readonly-fields.md) remain
+faults. [Raven production and remaining admission gaps](design/readonly-fields.md) remain
 open; this does not change the milestone order or unpark structural work.
+
+The metadata SDK now authors/imports initializers and preserves timing in native and CLI
+reference metadata; focused CLR execution and metadata rejection checks pass. Raven
+source-body integration remains pending. This author-directed prerequisite does not
+change the milestone order.

@@ -42,7 +42,7 @@ public sealed partial class MethodDefinition
         ArgumentNullException.ThrowIfNull(signature);
         FunctionNamespaceEncoding.Validate(@namespace);
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
-        if (string.IsNullOrEmpty(name) ||
+        if (string.IsNullOrEmpty(name) || name is ".ctor" or ".cctor" ||
             name.StartsWith(FunctionNamespaceEncoding.Prefix, StringComparison.Ordinal) || @namespace.Length + name.Length > 1024)
             throw new ArgumentException("invalid assembly function declaration");
         Name = name; authoredNamespace = @namespace; AuthoredSignature = signature;
@@ -66,7 +66,7 @@ public sealed partial class MethodDefinition
         };
     }
     /// <summary>Creates a detached type method, constructor, virtual slot, override or abstract contract with CLI attributes.</summary>
-    /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
+    /// <param name="name">Nonempty name, .ctor or private static parameterless .cctor. Unique by signature on attachment.</param>
     /// <param name="attributes">Public, Assembly, Private or constructor-only Family; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. Public Object overrides use Virtual without Abstract or NewSlot. Reference-class slots use Virtual and NewSlot; abstract slots also require Abstract.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
@@ -75,18 +75,20 @@ public sealed partial class MethodDefinition
     public MethodDefinition(string name, ushort attributes, MethodSignature signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
-        if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" ||
-            (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 4 or 6))
+        if (string.IsNullOrEmpty(name) || name.Length > 1024 || (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 4 or 6))
             throw new ArgumentException("invalid type-method declaration");
         var slotFlags = attributes & 0x540;
         if (slotFlags is not (0 or 0x40 or 0x140 or 0x540) ||
-            slotFlags != 0 && ((attributes & 7) != 6 || name == ".ctor" || signature.GenericParameterNames.Count != 0 ||
+            slotFlags != 0 && ((attributes & 7) != 6 || name is (".ctor" or ".cctor") || signature.GenericParameterNames.Count != 0 ||
                 (attributes & 0x10) != 0 && slotFlags != 0x540))
             throw new ArgumentException("invalid virtual method flags or signature");
         bool constructor = name == ".ctor";
+        bool initializer = name == ".cctor";
+        if (initializer && ((attributes & 0x17) != 0x11 || signature.ReturnType != PrimitiveType.Void || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
+            throw new ArgumentException("type initializer must be private static parameterless nongeneric Void");
         if ((attributes & 7) == 4 && !constructor) throw new ArgumentException("Family visibility currently requires a constructor");
         if (constructor && ((attributes & 0x10) != 0 || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
-            (attributes & 0x1800) != 0 && (!constructor || (attributes & 0x1800) != 0x1800))
+            (attributes & 0x1800) != 0 && (!(constructor || initializer) || (attributes & 0x1800) != 0x1800))
             throw new ArgumentException("invalid constructor signature or special-name flags");
         Name = name; authoredNamespace = ""; AuthoredSignature = signature;
         GenericArity = signature.GenericParameterNames.Count;
@@ -128,7 +130,7 @@ public sealed partial class MethodBuilder
         var flags = (MethodAttributes)Definition.DeclarationAttributes | MethodAttributes.HideBySig;
         if (IsAbstract) flags |= MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot;
         else if (!IsVirtual && (DeclaringType?.Implements(this) == true || Definition.ExplicitInterfaceImplementations.Count != 0)) flags |= MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot;
-        if (IsConstructor) flags |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
+        if (IsConstructor || IsTypeInitializer) flags |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
         else if (special) flags |= MethodAttributes.SpecialName;
         return (ushort)flags;
     }
@@ -236,6 +238,8 @@ public sealed partial class TypeBuilder
         if (!definition.IsTypeDeclaration || definition.AuthoredSignature is not { } signature ||
             definition.Producer is { } producer && !ReferenceEquals(producer.DeclaringType, this))
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
+        if (definition.Name == ".cctor" && (NativePrimitive is not null || NativeGrapheme || IsEnum))
+            throw new InvalidOperationException("type initializers require a nonintrinsic nominal owner");
         var slotFlags = definition.DeclarationAttributes & 0x540;
         if (slotFlags == 0x40 && (IsInterface || IsStatic || IsNativeObjectRoot ||
             (!HasExplicitClassBase || MethodDefinition.IsObjectOverride(definition.Name, signature)) &&
@@ -246,7 +250,7 @@ public sealed partial class TypeBuilder
         if (slotFlags != 0 && !IsInterface && !IsNativeObjectRoot &&
             (IsStatic || IsValueType && (slotFlags != 0x40 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))))
             throw new InvalidOperationException("virtual slots require a reference class or supported Object value override");
-        if (definition.Producer is null && (IsInterface && slotFlags != 0x540 || !IsInterface && slotFlags == 0x540 && (!IsAbstract || definition.IsStatic)))
+        if (definition.Producer is null && (IsInterface && definition.Name != ".cctor" && slotFlags != 0x540 || !IsInterface && slotFlags == 0x540 && (!IsAbstract || definition.IsStatic)))
             throw new InvalidOperationException("abstract methods require an abstract class or interface");
         if (definition.Name == ".ctor" && definition.AuthoredSignature!.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new InvalidOperationException("byref constructor parameters unsupported");
         if (!definition.IsStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic owner");
