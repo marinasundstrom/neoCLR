@@ -56,7 +56,9 @@ zero-filling `>>>` are also qualified on those backends. Parameterless instance 
 postfix mutation; consumed postfix uses the static overload. Checked and
 extension/interface forms remain follow-up work. Paired `true`/`false` overloads
 support conditions and short-circuit logical operations through `&`/`|`; direct
-`&&`/`||` overload declarations must migrate to that .NET-compatible convention. Nominal System.Numerics
+`&&`/`||` overload declarations must migrate to that .NET-compatible convention.
+The shared operator sample also checks arithmetic, bitwise, shifts, comparisons,
+unary operations and conversions on .NET 11 and native interpreter/JIT/AOT. Nominal System.Numerics
 capabilities are a future layer over this operator support.
 
 <a id="targets"></a>

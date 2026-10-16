@@ -12185,3 +12185,11 @@ conditional lowering belongs to Raven. There is no bridge encoding, lost type
 information, new opcode or Runtime Contract switch. Interpreter/JIT/AOT
 [qualification](validation/compound-operators/README.md#truth-and-short-circuit-follow-up)
 passes. Direct logical overload declarations now require the documented migration.
+
+Full ordinary-operator matrix: Raven main `75607f005`, native `8a82d185b`.
+Both lines pass 87 parser/operator regressions. The same source passes .NET 11
+and interpreter/macOS ARM64 JIT/AOT, covering arithmetic, bitwise, shifts,
+comparisons, unary operators, conversions, increments and truth-based logic.
+See [reproduction and limits](validation/compound-operators/README.md#full-ordinary-operator-matrix).
+No Runtime Contract, metadata encoding, SDK or backend change is needed for this
+parser slice. Checked forms and wider operator declarations remain open.

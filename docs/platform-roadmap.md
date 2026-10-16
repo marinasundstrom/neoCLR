@@ -4988,3 +4988,9 @@ Truth/logical slice: Raven `7039b3e23`/`198c22bea`, 107/109 focused tests and
 interpreter/JIT/AOT success. Both targets use paired truth methods and conditional
 bitwise calls, following .NET conventions; direct logical declarations require
 migration. Checked forms and broader interface/virtual operator coverage remain open.
+
+The ordinary operator matrix now passes on .NET 11 and native interpreter/JIT/AOT
+with Raven `75607f005`/`8a82d185b`. Parser regressions exposed by composition are
+fixed and retained in 87 focused tests per line. The qualification record separates
+this result from still-open checked contexts/forms, wider declaration modifiers,
+System.Numerics conformance and native imported-provider coverage.

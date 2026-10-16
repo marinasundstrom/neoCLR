@@ -1,4 +1,4 @@
-# Raven compound operator qualification (2026-10-16)
+# Raven operator qualification (2026-10-16)
 
 Development support, paired with Raven main `7819e2fea` and its deliberate carry to
 `codex/neoclr` at `164ebf81f`; metadata SDK element-address support is neoCLR `1b4561f3b`.
@@ -101,3 +101,35 @@ pair plus bitwise methods. No new Runtime Contract setting or native opcode.
 records interpreter/JIT/AOT return 42, including evaluation counts and the case
 where both truth tests return false. The source consumer remains an ordinary
 nominal class example; this does not resume structural-type work.
+
+## Full ordinary-operator matrix
+
+Parser fixes on Raven main `75607f005` and native `8a82d185b` resolve logical-not
+declarations versus bang macros, member access on parenthesized bitwise results
+versus casts, and relational/logical chains versus generic arguments. Both lines
+pass 87 focused parser/operator tests. Native intersection parsing is preserved.
+
+The current `Main.rvn` exercises arithmetic `+ - * / %`, bitwise `& | ^`, shifts
+`<< >> >>>`, unary `+ - ~ !`, all six comparisons, static and instance `++`/`--`,
+implicit/explicit conversions, compound instance methods and truth-based logical
+operations. The same source returns 42 on ordinary .NET 11 and on native
+interpreter/macOS ARM64 JIT/AOT. Native AOT uses the existing sanitizer host.
+See `matrix-dotnet-results.json` and `matrix-native-results.json` for commands
+and fingerprints. Older result files describe the source revisions they tested.
+
+The native command above remains valid. For ordinary .NET:
+
+```sh
+python3 docs/validation/compound-operators/run-dotnet.py \
+  --compiler ../raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll \
+  --core ../raven-ranges/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll \
+  --output target/operator-matrix-dotnet-check
+```
+
+The helper copies the matching Raven.Core dependency beside the executable;
+without it, direct `dotnet` execution fails to resolve Raven.Core.
+
+This completes the tested ordinary operator spelling matrix, not every operator
+form: checked contexts/overloads, compound virtual/interface/extension declarations,
+System.Numerics interface conformance/generic dispatch, and native imported-provider
+coverage remain distinct work. No platform capability is inferred from spelling.
