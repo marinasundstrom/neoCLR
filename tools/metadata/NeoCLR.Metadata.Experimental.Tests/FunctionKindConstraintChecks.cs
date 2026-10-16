@@ -40,6 +40,9 @@ internal static class FunctionKindConstraintChecks
     }
     private static void MethodConstraints()
     {
+        var cliSnapshot = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(typeof(FunctionKindConstraintChecks).Assembly.Location), expectedExtended: false);
+        var cliMethod = cliSnapshot.MainModule.Types.Single(t => t.Name == nameof(FunctionKindConstraintChecks)).Methods.Single(m => m.Name == nameof(ReferenceOnly));
+        Expect<InvalidDataException>(() => _ = cliMethod.SpecialConstraints);
         var graph = new AssemblyBuilder(new("FunctionMethods", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var method = graph.AddFunction("Keep", new(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["F"]));
         method.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType);
@@ -99,6 +102,8 @@ internal static class FunctionKindConstraintChecks
         }
         Console.WriteLine("PASS native method function-kind authoring, forwarding, import, introspection and CLI rejection");
     }
+    private static T ReferenceOnly<T>(T value) where T : class => value;
+
     private static void Expect<T>(Action action) where T : Exception
     {
         try { action(); } catch (T) { return; }

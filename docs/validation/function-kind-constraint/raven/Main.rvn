@@ -8,10 +8,12 @@ class Incrementer {
     func Apply(value: int) -> int => value + step
 }
 
+func Forward<F>(callback: F) -> F where F: func => Keep<F>(callback)
+
 func Main() -> int {
     let incrementer = Incrementer(2)
     let callback: (int) -> int = incrementer.Apply
     let slot = FunctionSlot<(int) -> int>(callback)
-    let function = slot.Get()
+    let function = Forward<(int) -> int>(slot.Get())
     return function(40)
 }

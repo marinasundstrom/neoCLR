@@ -7,3 +7,5 @@ public class FunctionSlot<T> where T: func {
 
     func Get() -> T => callback
 }
+
+public func Keep<F>(callback: F) -> F where F: func => callback

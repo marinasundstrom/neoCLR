@@ -1,1 +1,4 @@
 func Invalid(value: FunctionSlot<int>) -> int => 0
+
+func InvalidMethod() -> int => Keep<int>(42)
+func InvalidForward<F>(callback: F) -> F => Keep<F>(callback)

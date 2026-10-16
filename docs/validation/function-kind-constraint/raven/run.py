@@ -62,7 +62,7 @@ rejected.mkdir(exist_ok=True)
 (rejected / 'App.rvnproj').write_text((project / 'App.rvnproj').read_text())
 (rejected / 'Main.rvn').write_text(('' if args.imported else library_source.read_text()) + (SOURCE / 'Rejected.rvn').read_text())
 negative = run('rejected', ['dotnet', compiler, 'neoclr', '--project', rejected / 'App.rvnproj'], 1)
-assert (negative.stdout + negative.stderr).count('error RAV0320:') == 1
+assert (negative.stdout + negative.stderr).count('error RAV0320:') == 3
 
 run('compile', ['dotnet', compiler, 'neoclr', '--project', project / 'App.rvnproj'])
 image = project / 'bin/neoclr' / (name + '.dll')

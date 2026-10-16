@@ -50,10 +50,13 @@ that bypasses assembler validation.
 `raven/Library.rvn` defines `FunctionSlot<T> where T: func`. The consumer stores a
 bound `Incrementer.Apply` function, retrieves it as `(int) -> int` and invokes it,
 returning 42. The receiver's state supplies the increment. `Rejected.rvn` verifies
-that an integer cannot be substituted for the constrained parameter.
+that an integer cannot be substituted for the constrained class or method parameter,
+and that unconstrained method forwarding rejects. The provider also exports
+`Keep<F> where F: func`; the consumer forwards its callback through a constrained
+method and the external provider before invoking the concrete signature.
 
 Run `python3 raven/run.py --compiler /path/to/rvnc.dll --bundle /path/to/bundle
 --output /path/to/output --imported` as one command. The retained bundle is
 `target/variance-argument-sequence-20261016`. This is a test holder, not an observer
-or event API. Raven method emission and signature bounds remain separate gaps. Native method
-category specialization is qualified by the IL fixture above.
+or event API. Method emission/import and interpreter/AOT/JIT execution are qualified in
+[raven/results.json](raven/results.json). Signature bounds remain a separate gap.

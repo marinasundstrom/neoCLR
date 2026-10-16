@@ -9680,7 +9680,8 @@ and `MethodDefinition.SetSpecialConstraints(int parameterIndex, TypeParameterCon
 accept standalone `FunctionType`; `None` clears it. Invalid ordinals, other flags,
 and combinations with type bounds throw `ArgumentException`. Loaded definitions
 are immutable (`InvalidOperationException`). `MethodDefinition.SpecialConstraints`
-exposes a read-only dictionary by ordinal; `MethodGenericParameterTypeInfo.SpecialConstraints`
+exposes a read-only dictionary by ordinal (unsupported loaded CLI constraints throw
+`InvalidDataException` instead of appearing empty); `MethodGenericParameterTypeInfo.SpecialConstraints`
 returns the flags for that parameter. Type bounds remain separately available through
 `TypeConstraints`/`GetTypeConstraints`; the legacy interface-only query rejects a
 function-kind constraint rather than return an incomplete constraint view.
@@ -9691,7 +9692,7 @@ method parameters require a caller function constraint when emitting a call;
 writing revalidates this proof after edits. CLI executable/reference output rejects
 these native-only contracts. Unlike .NET's nominal Delegate constraint, no delegate
 inheritance or invocation signature is implied. AOT/JIT function-kind method specialization is separately qualified by the native IL
-fixture. Raven method emission remains gated pending its own qualification.
+fixture. Raven method emission/import is qualified by the separate-provider Raven fixture.
 
 Validation: `NeoCLR.Metadata.Experimental.Tests --function-kind-constraint`
 covers accepted signatures, rejected nominal/primitive arguments, forwarding,

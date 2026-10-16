@@ -14,7 +14,10 @@ public sealed partial class MethodDefinition
 {
     private readonly Dictionary<int, TypeParameterConstraints> specialConstraints = [];
     /// <summary>Gets native method parameter category constraints, keyed by ordinal.</summary>
-    public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(specialConstraints);
+    /// <exception cref="InvalidDataException">Loaded metadata contains unsupported generic constraints.</exception>
+    public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => unsupportedGenericParameters
+        ? throw new InvalidDataException("method has unsupported generic parameter constraints")
+        : new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(specialConstraints);
 
     /// <summary>Sets a standalone native FunctionType requirement, or clears it with None.</summary>
     /// <exception cref="ArgumentException">Invalid ordinal, category or combination with a type bound.</exception>

@@ -76,14 +76,16 @@ Null member access raises NullReference.
 ### Function-kind constraints (feature branch)
 
 On `codex/function-kind-constraint`, Raven supports `where T: func` for native
-generic classes. It restricts a generic argument to a structural function signature;
+generic classes and functions/methods. It restricts a generic argument to a structural function signature;
 nominal delegates and objects with `Invoke` do not qualify. The constraint does not
 supply an invocation signature to the generic body. A tested function slot stores
 and returns a function that the consumer invokes after its signature is concrete.
 
 Raven distinguishes native function signatures from nominal delegate symbols,
 including generic substitution and imported callback signatures. Normal Raven/.NET
-mapping is unchanged, and the .NET target rejects `func` constraints. Native method
-constraint emission and signature bounds such as `where T: () -> T2` remain gaps.
+mapping is unchanged, and the .NET target rejects `func` constraints. A separately
+compiled provider and consumer forward a callback through a constrained generic
+function and return 42 in interpreter/AOT/JIT. Signature bounds such as
+`where T: () -> T2` remain a gap.
 Function-list/observer APIs and dynamic invocation remain deferred. This is feature
 branch development, not a published capability.

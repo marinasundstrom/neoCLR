@@ -8,11 +8,11 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/library/Library.rvnproj"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/library/Library.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "b07a1836af2ead2f3e357b9dc1424b864367d1eea877041d1743c29cbd9e44c1",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/function-kind-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll\n"
+      "logSha256": "748bb5bf719956e4a276f39732b2ba8cf3da3e0b84f292966ee570e2d9480f92",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll\n"
     },
     {
       "label": "rejected",
@@ -21,11 +21,11 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/rejected/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/rejected/App.rvnproj"
       ],
       "exitCode": 1,
-      "logSha256": "b3bfd8c796c1a5dbaf202915bd72d8350bf423dcd498614c935828fa28ec87a2",
-      "output": "error RAV1014: Entry point 'Main' not found\n/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/rejected/Main.rvn(1,21): error RAV0320: The type 'int' must satisfy the 'func' constraint for type parameter 'T' of 'FunctionSlot<int>'\n"
+      "logSha256": "86c2a2c903989e8c210a4a3eb6bb4f57d1b18d4114b130e9f51a2a15f7725a51",
+      "output": "error RAV1014: Entry point 'Main' not found\n/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/rejected/Main.rvn(1,21): error RAV0320: The type 'int' must satisfy the 'func' constraint for type parameter 'T' of 'FunctionSlot<int>'\n/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/rejected/Main.rvn(3,37): error RAV0320: The type 'int' must satisfy the 'func' constraint for type parameter 'F' of 'static Keep<F>(callback: F) -> F'\n/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/rejected/Main.rvn(4,50): error RAV0320: The type 'F' must satisfy the 'func' constraint for type parameter 'F' of 'static Keep<F>(callback: F) -> F'\n"
     },
     {
       "label": "compile",
@@ -34,18 +34,18 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/project/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/project/App.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "8cb5871fe6e3bd2186d673521a9bf53724ae07409a9f7a9bab74cbbc4b7659d3",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/function-kind-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll\n"
+      "logSha256": "baa53ca583a0e455f81791120e4ba7f8e29e5e141abcffc33ae61d806f3aa9a6",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll",
         "--execution",
         "interpreter",
         "--system",
@@ -61,7 +61,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -72,9 +72,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -88,7 +88,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -96,7 +96,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "1548598cda2eaa6d2c3e33c4f3374b77ad96edc0b1590ce9c563851821f0842f",
+      "logSha256": "00a7b6e8d253f9763becb0337db8fd09e19156b1fec1483e0c58e64ed9803a39",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -117,14 +117,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/app"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -133,7 +133,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/app"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -164,7 +164,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -176,9 +176,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -192,7 +192,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll",
+        "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -200,32 +200,32 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "c10580ef1e4e9edd6e91abb858c5aeaee406d217f85496e178fb5866cd2f1986",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.509929542,\"guestExitCode\":42,\"invocationSeconds\":0.000060958,\"metadataLoadSeconds\":0.775403167,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":17.25484725}\n"
+      "logSha256": "9c1024815a416c275ffdb23a58787a3aa1b39c79b88ccb6c9085d97265b36d7d",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.426835875,\"guestExitCode\":42,\"invocationSeconds\":0.000055042,\"metadataLoadSeconds\":0.7162585,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":19.08668825}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.509929542,
+    "compileAndFinalizeSeconds": 0.426835875,
     "guestExitCode": 42,
-    "invocationSeconds": 6.0958e-05,
-    "metadataLoadSeconds": 0.775403167,
+    "invocationSeconds": 5.5042e-05,
+    "metadataLoadSeconds": 0.7162585,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 17.25484725
+    "selectionAndVerificationSeconds": 19.08668825
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/Main.rvn": "fb0cc020664af608c220e21d7c0ad9cc9b1cc4f1896fc61296cde6c18df4afdd",
-    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/Library.rvn": "7cf9981a79de346381adc818071af20b5080e0992e1859d52ed71e5d6f589852",
-    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/Rejected.rvn": "1ea3c96440133d8528a648646af4506d7d6a83df315611e67ee0224d7fad3f86",
-    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/run.py": "9f6043d2ba6aaa19dbff4976189bcfab6341e1c401d3148558bea8f33a9a5fbc",
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/Main.rvn": "466af8a2d4407b513860252a25c374d82bbd08db987e3163b140f65b0d38d467",
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/Library.rvn": "e77108063083df0c3545c3d4e57b9f1923561a6998f6c6c05ca294ea48d1a8fd",
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/Rejected.rvn": "4f332065ac4ed2734196b708b2246d4a70dfddbc309ad60defe2402e5c23669d",
+    "/Users/robert/Projects/neoclr/docs/validation/function-kind-constraint/raven/run.py": "7a44173ac0aa9add7ffe8fbe7515eee717924caf7963fe31f1db709fa3c2c46b",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ac6a3e5b84d9087f2373a4b6d96fe81a2283eb166e8cbaf926909e258d415c5d",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "890857bf5af658875e7f2dd87dc56a8eeb3e050d81ca7e4fe336a9a707b01876",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "cb6cb8e94b2bd85f6217916a2eea58011ddbee00886764e0db15c012f3bfbd42",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "94fea41cfe3c4ba1ca4a99f381826452e4594666e6541c09408e28e7a3156036",
-    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "4daef691cf371d1e6c472256e204cb4039dfeff58408200b13f902cbbf358767",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ec9c56d8ae11f5dc4c5e952f0282e761b45aa706cb61bd3f1912e724fa2fad4f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "6675fa93a4d46eb6ec2439787e67b8c38c3d0f505b2dd816852cd3236d25acd2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "be10bdb620046454003e556cacb93a3aa15a8d7d6ab9b3cc3a2895f694ada05c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "bd8074d5bacde56cdf70600a1978505caf987dffe3dfa1a4b12d1c0ec89fdc54",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "773200a067a6927c7da5a4922d8a6367f787dce659f73ed8f12900bc7f2ad592",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "c511e2816c0004d9101f56745fe96037a945f24eb339691671273688e40c3528",
-    "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll": "4e62c0efde5c442ed9b80c350487e4a82b03cad3d2aca3e69830dc586af4b925",
+    "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/project/bin/neoclr/FunctionConstraintRaven.dll": "f1a84577d81ad601c63bfb08b286cffce6d2c1f7cfa8874d1d8d717c06acba9a",
     "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a",
-    "/Users/robert/Projects/neoclr/target/function-kind-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll": "f59131f7073604818750a91d254751af7ea6eb0e7d5f25c37a4210c1c66c0f5d"
+    "/Users/robert/Projects/neoclr/target/function-kind-method-raven-20261016/library/bin/neoclr/ConstraintLibrary.dll": "eaae5374d4cff4903a833fa5d023e9341ee5d4bd6d5bbb1cdd74ecb06745abaa"
   }
 }

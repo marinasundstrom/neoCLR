@@ -18339,3 +18339,12 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   known callable signature. A signature bound could make `f()` statically typed;
   exact versus variant matching, inference and lowering remain design work.
   **Action:** recorded the examples as direction, not implemented syntax.
+
+- **Reflection follow-up (2026-10-16):** after the function constraint works, the
+  author directed work toward the reflection API. **Assistant response:** finish
+  the validated category-constraint commits, then address reflection views of
+  function signatures and generic constraints; dynamic invocation behavior remains
+  undecided. **Outcome so far:** separate-provider Raven method forwarding returns
+  42 in interpreter/AOT/JIT; host metadata introspection preserves the method flag.
+  Guest reflection follow-up is pending. See the
+  [retained consumer](validation/function-kind-constraint/README.md).
