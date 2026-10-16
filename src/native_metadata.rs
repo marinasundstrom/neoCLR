@@ -761,6 +761,35 @@ pub fn descriptor_shape(
     }
 }
 
+/// Query full display names or namespaces using source descriptor identity.
+pub fn descriptor_display_name(
+    module: &Module,
+    descriptor: &crate::TypeDescriptor,
+    selector: i32,
+) -> Result<String, Fault> {
+    match crate::reflection::Query::DisplayName.invoke_profile(
+        module,
+        &[
+            Value::RuntimeTypeHandle(Box::new(descriptor.clone())),
+            Value::Int32(selector),
+        ],
+        &Limits::default(),
+        true,
+    )? {
+        Value::String(value) => Ok(value.to_string()),
+        _ => Err(Fault::new("invalid descriptor display name result")),
+    }
+}
+
+/// Query the display name of an ordinary closed type without losing source identity.
+pub fn type_display_name(module: &Module, owner: &Type, selector: i32) -> Result<String, Fault> {
+    descriptor_display_name(
+        module,
+        &crate::type_identity::describe_loaded(module, owner)?,
+        selector,
+    )
+}
+
 /// Preserve source definition tokens; parameters have no TypeDef token.
 pub fn descriptor_metadata_token(
     module: &Module,

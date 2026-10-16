@@ -11215,3 +11215,8 @@ private descriptive handles and ordinary closed types retain ordinary token
 identity. Existing Raven source metadata and library calls require no encoding or
 Runtime Contract changes. Native end-to-end consumer qualification is still pending;
 ordinary catalog entries still require supported native type shapes.
+
+TypeDisplayName now binds source display names and namespaces for open and closed
+descriptors. Eleven focused metadata tests pass. The original consumer advances
+past the unbound query to static-owner token validation; full native discovery
+qualification remains pending. Raven emission and Runtime Contract are unchanged.

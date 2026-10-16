@@ -325,6 +325,7 @@ pub fn bind_queries(
                 r["name"].as_str(),
                 Some(
                     "neoCLR.Runtime.TypeName"
+                        | "neoCLR.Runtime.TypeDisplayName"
                         | "neoCLR.Runtime.TypeArgumentCount"
                         | "neoCLR.Runtime.TypeMetadataToken"
                         | "neoCLR.Runtime.TypeArgument"
@@ -530,9 +531,10 @@ pub fn bind_queries(
         let f = &mut input.functions[index];
         let metadata_tokens = row["name"] == "neoCLR.Runtime.TypeMetadataToken";
         let names = row["name"] == "neoCLR.Runtime.TypeName";
+        let display = row["name"] == "neoCLR.Runtime.TypeDisplayName";
         let shapes = row["name"] == "neoCLR.Runtime.TypeShape";
         let arguments = row["name"] == "neoCLR.Runtime.TypeArgument";
-        let result = if names {
+        let result = if names || display {
             Type::String
         } else if arguments {
             Type::RuntimeTypeHandle
@@ -543,7 +545,7 @@ pub fn bind_queries(
         };
         let parameters = if relationship {
             vec![Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]
-        } else if shapes || arguments {
+        } else if shapes || arguments || display {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {
             vec![Type::RuntimeTypeHandle]
@@ -571,7 +573,7 @@ pub fn bind_queries(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken/ReflectionAssignable/ReflectionSubclass InternalCall contract".into());
+            return Err("native descriptor query requires exact reserved TypeName/TypeDisplayName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken/ReflectionAssignable/ReflectionSubclass InternalCall contract".into());
         }
         // Validate the selector once, then emit only true flags per descriptor.
         // Emitting all fourteen Boolean branches exceeded the bounded backend's
@@ -628,6 +630,25 @@ pub fn bind_queries(
                     ]);
                 }
                 body.push(Op::Fault("generic argument index out of range".into()));
+            } else if display {
+                for selector in 0..2 {
+                    let name = neoclr::native_metadata::type_display_name(
+                        source,
+                        &semantic_types[descriptor],
+                        selector,
+                    )
+                    .map_err(|e| e.to_string())?;
+                    let next = body.len() + 6;
+                    body.extend([
+                        Op::Arg(1),
+                        Op::Int(selector),
+                        Op::Equal,
+                        Op::BranchFalse(next),
+                        Op::String(name),
+                        Op::Return,
+                    ]);
+                }
+                body.push(Op::Fault("unknown type name query".into()));
             } else if shapes {
                 for (selector, value) in flags.iter().enumerate() {
                     if !value {
@@ -1162,6 +1183,26 @@ fn open_query_prefix(
         ]);
         match query {
             "neoCLR.Runtime.TypeName" => body.extend([Op::String(descriptor.name), Op::Return]),
+            "neoCLR.Runtime.TypeDisplayName" => {
+                for selector in 0..2 {
+                    let name = neoclr::native_metadata::descriptor_display_name(
+                        source,
+                        &descriptor,
+                        selector,
+                    )
+                    .map_err(|e| e.to_string())?;
+                    let next = body.len() + 6;
+                    body.extend([
+                        Op::Arg(1),
+                        Op::Int(selector),
+                        Op::Equal,
+                        Op::BranchFalse(next),
+                        Op::String(name),
+                        Op::Return,
+                    ]);
+                }
+                body.push(Op::Fault("unknown type name query".into()));
+            }
             "neoCLR.Runtime.TypeArgumentCount" => body.extend([
                 Op::Int(descriptor.generic_arguments.len() as i32),
                 Op::Return,
@@ -1231,7 +1272,7 @@ mod open_query_tests {
     use neoclr::metadata::{FunctionRef, Instruction as Op};
 
     fn fixture() -> (neoclr::Module, neoclr::Module, Value) {
-        let source = neoclr::assemble(".module OpenQueries\n.entry Main\n.interface Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.interface Fixed<T>\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeMetadataToken(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        let source = neoclr::assemble(".module OpenQueries\n.entry Main\n.interface Example.Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.interface Fixed<T>\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeMetadataToken(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeDisplayName(RuntimeTypeHandle,Int32) -> String\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
         let mut input = source.clone();
         let definition = source.types[0].definition.as_ref().unwrap();
         let open =
@@ -1272,6 +1313,18 @@ mod open_query_tests {
             failures.push(body.len());
             body.push(Op::BranchFalse(0));
         };
+        check(
+            vec![open.clone(), Op::Int(0), call("TypeDisplayName")],
+            Op::String("Example.Producer".into()),
+        );
+        check(
+            vec![open.clone(), Op::Int(1), call("TypeDisplayName")],
+            Op::String("Example".into()),
+        );
+        check(
+            vec![parameters[0].clone(), Op::Int(0), call("TypeDisplayName")],
+            Op::String("T".into()),
+        );
         check(vec![open.clone(), call("TypeArgumentCount")], Op::Int(1));
         check(
             vec![open.clone(), Op::Int(0), call("TypeArgument")],
@@ -1279,7 +1332,7 @@ mod open_query_tests {
         );
         check(
             vec![open.clone(), call("TypeName")],
-            Op::String("Producer".into()),
+            Op::String("Example.Producer".into()),
         );
         check(
             vec![open.clone(), call("TypeMetadataToken")],
@@ -1312,7 +1365,7 @@ mod open_query_tests {
             body[i] = Op::BranchFalse(fail);
         }
         input.functions.last_mut().unwrap().body = body;
-        let report = json!({"functions":source.functions.iter().enumerate().take(5).map(|(i,f)| json!({"compiledIndex":i,"name":f.name,"definition":f.definition})).collect::<Vec<_>>()});
+        let report = json!({"functions":source.functions.iter().enumerate().take(6).map(|(i,f)| json!({"compiledIndex":i,"name":f.name,"definition":f.definition})).collect::<Vec<_>>()});
         (input, source, report)
     }
 
@@ -1354,11 +1407,12 @@ mod open_query_tests {
     #[test]
     fn open_argument_results_extend_the_inventory_and_coexist_with_closed_tokens() {
         let (mut input, mut source, mut report) = fixture();
-        let mut plain =
-            neoclr::assemble(".module PlainSource\n.type Plain\n.field Value Int32\n.end\n")
-                .unwrap()
-                .types
-                .remove(0);
+        let mut plain = neoclr::assemble(
+            ".module PlainSource\n.type Example.Plain\n.field Value Int32\n.end\n",
+        )
+        .unwrap()
+        .types
+        .remove(0);
         plain.definition = Some(TypeDefId {
             module: source.name.clone(),
             revision: None,
@@ -1367,7 +1421,7 @@ mod open_query_tests {
         source.types.push(plain.clone());
         input.types.push(plain);
         report["sourceMetadata"] =
-            json!({"types":[{"compiledTypeIndex":3,"name":"Plain","typeArguments":[]}]});
+            json!({"types":[{"compiledTypeIndex":3,"name":"Example.Plain","typeArguments":[]}]});
         let token = neoclr::native_metadata::retain_definition_token(
             &mut input,
             &source,
@@ -1397,11 +1451,17 @@ mod open_query_tests {
             call("TypeArgument"),
             Op::Int(18),
             call("TypeShape"),
-            Op::BranchFalse(14),
-            Op::LoadTypeToken(Type::from_name("Plain")),
+            Op::BranchFalse(20),
+            Op::LoadTypeToken(Type::from_name("Example.Plain")),
             Op::Int(12),
             call("TypeShape"),
-            Op::BranchFalse(14),
+            Op::BranchFalse(20),
+            Op::LoadTypeToken(Type::from_name("Example.Plain")),
+            Op::Int(1),
+            call("TypeDisplayName"),
+            Op::String("Example".into()),
+            Op::Equal,
+            Op::BranchFalse(20),
             Op::Int(42),
             Op::Return,
             Op::Int(1),
@@ -1426,6 +1486,8 @@ mod open_query_tests {
     fn open_queries_preserve_invalid_selector_and_argument_faults() {
         for (name, selector, expected) in [
             ("TypeShape", 20, "unknown type shape query"),
+            ("TypeDisplayName", -1, "unknown type name query"),
+            ("TypeDisplayName", 2, "unknown type name query"),
             ("TypeArgument", -1, "generic argument index out of range"),
         ] {
             let (mut input, source, report) = fixture();

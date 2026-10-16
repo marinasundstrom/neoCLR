@@ -423,3 +423,23 @@ source profile to TypeInfo snapshots instead of selecting legacy System.Type.
 The retry passes that stage but stops at `$aot_linked_65: unsupported value member
 contract`; no AOT/JIT success is claimed. Nine backend catalog checks and the
 runtime catalog regression pass, including an explicit TypeInfo recipe assertion.
+
+### Native display names and namespaces (2026-10-16)
+
+The native descriptor binder now handles TypeDisplayName selectors 0 (display
+name) and 1 (namespace) through shared interpreter source-metadata queries. This
+covers the Namespace property used by the original variance discovery consumer.
+Open definitions and owner-bound parameters use their retained descriptors; closed
+types are queried through their original semantic types before native renaming.
+Unknown selectors fault, and the reserved query requires its exact two-argument
+InternalCall signature. This follows the existing .NET-aligned introspection
+contract without changing Raven lowering or runtime type identity.
+
+Eleven focused metadata tests pass, including nonempty namespaces, open parameter
+names, mixed open/closed queries, invalid selectors, interpreter execution, AOT
+object emission and macOS ARM64 JIT execution. No public API or CLI encoding changes.
+
+Retrying the original consumer now passes the unbound native query and reaches
+`static owners cannot be used as values or instance receivers`: a discovered static
+type's ordinary token is incorrectly checked as value storage. This is the next
+native qualification blocker; the full consumer is not yet AOT/JIT qualified.
