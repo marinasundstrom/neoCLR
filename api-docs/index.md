@@ -19,7 +19,7 @@ member for parameters, return values, errors and usage notes.
 | Area | Starting points |
 | --- | --- |
 | Text and numbers | [String](xref:System.String) · [Char](xref:System.Char) · [System.Math](xref:System.Math) · [Text and numeric contracts](text-numbers.md) |
-| Collections and queries | [System.Collections](xref:System.Collections) · [System.Linq](xref:System.Linq) · [Arrays](arrays.md) · [Interface variance](interface-variance.md) |
+| Collections and queries | [System.Collections](xref:System.Collections) · [System.Linq](xref:System.Linq) · [Arrays](arrays.md) · [Mutable entry helpers](collection-entries.md) · [Interface variance](interface-variance.md) |
 | Outcomes and values | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Object and value contracts](objects.md) · [Tuples](tuples.md) |
 | Functions | [Function shapes and objects](functions.md) · [Callbacks](callbacks.md) |
 | Gzip compression | [GZipStream](xref:System.IO.Compression.GZipStream) · [Compression contracts](compression.md) |

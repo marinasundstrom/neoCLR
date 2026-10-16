@@ -1,0 +1,19 @@
+module System.Collections
+
+import System.Option.*
+
+/// <summary>Convenience operations using the public mutable set contract.</summary>
+public extension MutableSetExtensions<T> for MutableSet<T> {
+    /// <summary>Returns the stored equivalent value, inserting the supplied value when absent.</summary>
+    /// <param name="self">The mutable set to query or update.</param>
+    /// <param name="value">The eagerly evaluated candidate, compared using the set's own policy.</param>
+    /// <returns>The stored equivalent value, preserving its identity, or the inserted candidate.</returns>
+    /// <remarks>Does not replace an equivalent element. Requires exclusive external synchronization when shared; the lookup and insertion are not an atomic transaction.</remarks>
+    func GetOrInsert(value: T) -> T {
+        if self.Find(value) is Some(let stored) {
+            return stored
+        }
+        self.Add(value)
+        return value
+    }
+}

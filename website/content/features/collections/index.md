@@ -27,6 +27,17 @@ iterables for initialization or copying where the contract provides that overloa
 The complete sample reads arrays and lists, replaces elements through MutableSequence
 and grows a List. [Download it](/samples/library-collection-capabilities.rvn).
 
+## Fluent mutable access (development)
+
+`map.Entry(key).AndModify(value => value + 1).OrInsert(2)` modifies an existing
+value or inserts the fallback. `OrInsertWith` evaluates its factory only when absent.
+The reusable handle resolves current map state on each operation and exposes no
+storage reference. `set.GetOrInsert(candidate)` returns the stored equivalent element
+or inserts the candidate, preserving stored identity. These extensions target
+MutableMap and MutableSet; they add no synchronization or atomicity.
+
+See [member contracts and callback rules](/docs/collection-entries.html).
+
 ## Recoverable slicing (development)
 
 Array and ArrayList explicitly implement `Sliceable<T[]>`: `Slice(range)` returns

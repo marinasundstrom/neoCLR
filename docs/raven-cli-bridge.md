@@ -12233,3 +12233,21 @@ bounds checks, and existing ArithmeticOverflow fault propagation. The [native ma
 qualifies macOS ARM64; Windows profile restrictions are unchanged. This supersedes
 the backend rejection noted above. Raven checked contexts and operator selection
 remain the next compiler step; no Runtime Contract, encoding or library change.
+
+## Mutable collection helpers — 2026-10-16
+
+`MutableMap.Entry` and `MutableSet.GetOrInsert` are library extensions. MapEntry is
+an ordinary managed class retaining its map/key; native callbacks use existing
+Function signatures and ordinary generic interface dispatch. No Runtime Contract
+switch, borrow checker, opcode or storage-reference capability is added.
+
+The documentation/reference-only CollectionDeclarations scaffold includes MapEntry,
+the extension containers and MutableSet/HashSet.Find. It represents callbacks with
+CLI Func and extensions with static extension methods; these stubs are not executable
+native implementations and convey neither live-locator safety nor atomicity through
+metadata. Raven.Core separately uses ordinary .NET IDictionary/HashSet/SortedSet and
+standard delegate encoding. The owning library sources define callback ordering and
+lifetime behavior; the compiler/metadata/backend retain their existing responsibilities.
+The native class-library bundle and its documentation replace the scaffold for execution
+and current native signatures. See [the contract](collection-entry-design.md) and
+[validation](validation/map-entry/README.md). List helpers remain deferred.

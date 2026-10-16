@@ -1,0 +1,97 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+class Counter {
+    var Value: int = 0
+}
+
+class Item {
+    val Id: int
+    init(id: int) {
+        Id = id
+    }
+}
+
+func Check(condition: bool) {
+    if !condition {
+        Fail("map entry check failed")
+    }
+}
+
+func Main() -> int {
+    let storage = HashMap<int, int>((a, b) => a == b, key => key)
+    let map: MutableMap<int, int> = storage
+    let entry = map.Entry(7)
+    Check(map.Count == 0)
+    Check(entry.Key == 7)
+    Check(entry.Find() is None)
+    Check(entry.OrInsert(2) == 2)
+    Check(entry.OrInsert(99) == 2)
+    Check(entry.Value == 2)
+    entry.Set(4).AndModify(value => value + 1)
+    Check(entry.Value == 5)
+    map.Set(7, 10)
+    Check(entry.Value == 10)
+
+    let calls = Counter()
+    Check(entry.OrInsertWith(() => {
+        calls.Value = calls.Value + 1
+        return 100
+    }) == 10)
+    Check(calls.Value == 0)
+    let missing = map.Entry(8)
+    missing.AndModify(value => {
+        calls.Value = calls.Value + 1
+        return value + 1
+    })
+    Check(calls.Value == 0)
+    Check(missing.OrInsertWith(() => {
+        calls.Value = calls.Value + 1
+        return 20
+    }) == 20)
+    Check(calls.Value == 1)
+    Check(map.Entry(9).OrInsertWith(() => {
+        map.Set(9, 30)
+        return 40
+    }) == 30)
+    entry.AndModify(value => {
+        Check(entry.Value == value)
+        entry.Set(90)
+        return value + 1
+    })
+    Check(entry.Value == 11)
+    entry.AndModify(value => entry.AndModify(inner => inner + 2).Value + 3)
+    Check(entry.Value == 16)
+    var index = 100
+    while index < 200 {
+        map.Set(index, index)
+        index = index + 1
+    }
+    Check(entry.OrInsert(90) == 16)
+    if entry.Find() is Some(let current) {
+        Check(current == 16)
+    } else {
+        Fail("entry lookup lost value")
+    }
+    let words = HashMap<string, int>(StringComparer.OrdinalIgnoreCase)
+    words.Set("Test", 12)
+    Check(words.Entry("TEST").OrInsert(30) == 12)
+    words.Entry("test").AndModify(value => value + 1)
+    Check(words.Count == 1)
+    Check(words["Test"] == 13)
+    let first = Item(1)
+    let equivalent = Item(1)
+    let items = HashSet<Item>(FunctionEqualityComparer<Item>((a, b) => a.Id == b.Id, item => item.Id))
+    let set: MutableSet<Item> = items
+    Check(Object.ReferenceEquals(set.GetOrInsert(first), first))
+    Check(Object.ReferenceEquals(set.GetOrInsert(equivalent), first))
+    Check(set.Count == 1)
+    Check(set.Find(Item(2)) is None)
+    set.Remove(equivalent)
+    Check(Object.ReferenceEquals(set.GetOrInsert(equivalent), equivalent))
+    set.Clear()
+    Check(set.Find(first) is None)
+    Check(Object.ReferenceEquals(set.GetOrInsert(first), first))
+    return 42
+}

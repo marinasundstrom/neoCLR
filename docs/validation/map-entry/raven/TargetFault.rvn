@@ -1,0 +1,11 @@
+import System.*
+import System.Collections.*
+
+func Main() -> int {
+    let map = HashMap<int, int>((a, b) => a == b, key => key)
+    map.Entry(1).OrInsertWith(() => {
+        Fail("entry factory failed")
+        return 1
+    })
+    return 0
+}

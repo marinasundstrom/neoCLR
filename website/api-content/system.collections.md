@@ -18,3 +18,9 @@ same comparer as `Find` and `Set`, retaining the originally stored equivalent ke
 when replacing a value. A getter for an absent key causes a terminal Fault: prefer
 `Find` for lookup when the key may be absent. Indexing adds no concurrent or atomic
 update guarantee.
+
+Development fluent helpers extend MutableMap with `Entry(key)` and MutableSet with
+`GetOrInsert(value)`. MapEntry is a reusable live locator, with Find, Value, Set,
+OrInsert, OrInsertWith and AndModify. MutableSet.Find returns the stored equivalent
+value. See [the full contracts](/docs/collection-entries.html), including callback
+reentry, failures, allocation and the lack of atomicity.

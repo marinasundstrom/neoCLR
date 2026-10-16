@@ -8,4 +8,8 @@ public interface MutableSet<T> : Set<T> {
     func Remove(value: T) -> bool
     /// Removes all elements.
     func Clear()
+    /// <summary>Looks up the stored equivalent value using this set's equality policy.</summary>
+    /// <param name="value">The value to match.</param>
+    /// <returns>Some containing the stored value, including a permitted null; otherwise None.</returns>
+    func Find(value: T) -> System.Option<T>
 }

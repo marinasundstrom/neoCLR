@@ -68,6 +68,19 @@ public class HashSet<T> : MutableSet<T> {
         return found
     }
 
+    /// <summary>Returns the stored equivalent value using this set's comparer.</summary>
+    /// <param name="value">The value to match; never replaces an existing element.</param>
+    /// <returns>Some containing the stored value, or None if absent.</returns>
+    func Find(value: T) -> Option<T> {
+        Enter()
+        let index = Locate(value, Hash(value))
+        Leave()
+        if index < 0 {
+            return None
+        }
+        return items[index]
+    }
+
     private func Grow() {
         if count < buckets.Length {
             return

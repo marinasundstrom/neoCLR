@@ -3623,5 +3623,68 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
   <returns>Ok with a boxed result, preserved reference or null; otherwise InvalidReceiver, InvalidArguments or UnsupportedType.</returns>
   <remarks>Exact scalar boxes and compatible references only. No coercion, ref/out copyback or arbitrary value marshalling. Target faults are not converted to errors.</remarks>
 </member>
+    <member name="T:System.Collections.MapEntry`2">
+<summary>A reusable live key locator, not a borrowed storage reference or snapshot.</summary>
+<remarks>Retains the map and key. Each operation resolves current state through the map's comparer. No atomicity, synchronization or rollback is provided. Keys must obey the map's stability requirements.</remarks>
+    </member>
+    <member name="M:System.Collections.MapEntry`2.#ctor(System.Collections.MutableMap{`0,`1},`0)">
+<summary>Creates a live locator without reading or changing the map.</summary>
+<param name="map">The mutable map retained by this locator.</param>
+<param name="key">The key used for every operation.</param>
+    </member>
+    <member name="P:System.Collections.MapEntry`2.Key">
+<summary>Gets the supplied lookup key, which need not be the stored canonical key.</summary>
+    </member>
+    <member name="P:System.Collections.MapEntry`2.Value">
+<summary>Gets the current value; a missing key follows the map's indexer fault contract.</summary>
+    </member>
+    <member name="M:System.Collections.MapEntry`2.Find">
+<summary>Looks up the current value, preserving the distinction between absence and a present null.</summary>
+<returns>Some for a present key; otherwise None.</returns>
+    </member>
+    <member name="M:System.Collections.MapEntry`2.Set(`1)">
+<summary>Inserts or replaces the value and returns this locator.</summary>
+<param name="value">The value to store.</param>
+<returns>This reusable locator.</returns>
+    </member>
+    <member name="M:System.Collections.MapEntry`2.OrInsert(`1)">
+<summary>Inserts the supplied value only when the key is absent.</summary>
+<param name="value">The eagerly evaluated fallback value.</param>
+<returns>The existing or inserted value, not a reference to its storage slot.</returns>
+    </member>
+    <member name="M:System.Collections.MapEntry`2.OrInsertWith(System.Func{`1})">
+<summary>Calls the factory once only when absent, then inserts if still absent.</summary>
+<param name="factory">A synchronous factory; may reenter the map.</param>
+<returns>The current value if present after the factory; otherwise its inserted result.</returns>
+<remarks>Callback insertion wins. A callback fault propagates before this helper writes; callback side effects are not rolled back.</remarks>
+    </member>
+    <member name="M:System.Collections.MapEntry`2.AndModify(System.Func{`1,`1})">
+<summary>Transforms a present value once and writes back the result.</summary>
+<param name="transform">A synchronous replacement callback; skipped when absent.</param>
+<returns>This reusable locator, including when absent.</returns>
+<remarks>The returned value wins over callback writes, and recreates a key removed by the callback on maps supporting removal. A callback fault prevents this helper's write; reference mutations and other callback effects remain. Chained calls independently resolve current state.</remarks>
+    </member>
+    <member name="T:System.Collections.MutableMapExtensions">
+<summary>Fluent operations using the public mutable map contract.</summary>
+    </member>
+    <member name="M:System.Collections.MutableMapExtensions.Entry``2(System.Collections.MutableMap{``0,``1},``0)">
+<summary>Creates a reusable live locator without looking up or inserting the key.</summary>
+<param name="self">The mutable map retained by the locator.</param>
+<param name="key">The key to resolve on each operation.</param>
+<returns>A managed MapEntry retaining the map and key.</returns>
+<remarks>No storage references, lock, reservation or atomic transaction. The locator remains usable after growth and replacement.</remarks>
+    </member>
+    <member name="T:System.Collections.MutableSetExtensions">
+<summary>Convenience operations using the public mutable set contract.</summary>
+    </member>
+    <member name="M:System.Collections.MutableSetExtensions.GetOrInsert``1(System.Collections.MutableSet{``0},``0)">
+<summary>Returns the stored equivalent value, inserting the supplied value when absent.</summary>
+<param name="self">The mutable set to query or update.</param>
+<param name="value">The eagerly evaluated candidate, compared using the set's own policy.</param>
+<returns>The stored equivalent value, preserving its identity, or the inserted candidate.</returns>
+<remarks>Does not replace an equivalent element. Requires exclusive external synchronization when shared; the lookup and insertion are not an atomic transaction.</remarks>
+    </member>
+    <member name="M:System.Collections.MutableSet`1.Find(`0)"><summary>Returns the stored equivalent element using the set's own equality policy.</summary><param name="value">Candidate to match.</param><returns>Some containing the stored value, or None when absent.</returns></member>
+    <member name="M:System.Collections.HashSet`1.Find(`0)"><summary>Returns the stored equivalent element using the set's own equality policy.</summary><param name="value">Candidate to match.</param><returns>Some containing the stored value, or None when absent.</returns></member>
 </members>
 </doc>

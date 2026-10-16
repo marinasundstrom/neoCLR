@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Mutable collection helper slice (author direction, 2026-10-16):** implemented
+`MutableMap<K,V>.Entry(key)` and `MutableSet<T>.GetOrInsert(value)` as extensions,
+with live key locators, explicit synchronous callback semantics and canonical set
+lookup. Concrete collection names stay unchanged; GetItem/list work is deferred.
+See the [contract and .NET/Rust comparison](collection-entry-design.md) and
+[qualification record](validation/map-entry/README.md). This bounded library task
+does not reprioritize the active milestone or the parked structural work.
+
 **Structural type integration (author direction, 2026-10-15):** stabilize and
 integrate the experimental structural type work, remove experimental opt-in flags,
 and retire the nominal System.Union/System.Tuple ad-hoc carriers. Migrate dependent

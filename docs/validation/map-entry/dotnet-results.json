@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-16",
+  "mainRevision": "513b24eb6",
+  "nativeCarryRevision": "e7ba9f6ad",
+  "framework": "net10.0",
+  "tests": 13,
+  "filter": "FullyQualifiedName~MapEntryExtensionsTest|FullyQualifiedName~SetExtensionsTest|FullyQualifiedName~TryGetExtensionsTest",
+  "mainPassed": true,
+  "nativeCarryPassed": true,
+  "sampleExitCode": 42,
+  "logs": {
+    "main": {
+      "sha256": "e21a379374cb6ca6a5425f8c4aa6505775cbd3d7f158f56133c3b3651813e517",
+      "result": "Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 2 s - Raven.Core.Tests.dll (net10.0)"
+    },
+    "nativeCarry": {
+      "sha256": "cdfe7967c1c3a4bfd0c9c4d64f3f8e2fc6a4442301043fc46c5c16373342355a",
+      "result": "Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 1 s - Raven.Core.Tests.dll (net10.0)"
+    }
+  }
+}

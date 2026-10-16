@@ -2252,3 +2252,15 @@ continues to apply. Native guest API snapshots remain unchanged.
 2026-10-16: the 20 host-only Conv_Ovf_* enum members and their Emit contracts are
 covered in the experimental metadata reference and XML summaries. The existing
 host-only RavenDoc exclusion applies; no guest API inventory or snapshot changes.
+
+### Mutable collection entries — 2026-10-16
+
+MapEntry, MutableMapExtensions and MutableSetExtensions are included in the public
+inventory, refreshed CLI reference/XML and native snapshot from
+`target/collection-entry-libraries-final-20261016`, rendered by
+`target/collection-entry-docs-20261016`. MutableSet.Find and HashSet.Find are covered
+alongside all helper members. No new type/member is excluded. The manual
+[entry reference](collection-entries.md) records lifetime, callback and concurrency
+contracts and the required Find implementation for custom mutable sets. No interface
+is renamed, and the read-only Set contract is unchanged. Focused snapshot validation
+replaces a routine full website build; publication remains separate.

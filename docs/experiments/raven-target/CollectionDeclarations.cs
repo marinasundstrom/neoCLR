@@ -59,11 +59,13 @@ static class CollectionDeclarations
                 bool Contains(T value);
             }
             public interface MutableSet<T> : Set<T> {
+                Option<T> Find(T value);
                 bool Add(T value);
                 bool Remove(T value);
                 void Clear();
             }
             public class HashSet<T> : MutableSet<T> {
+                public Option<T> Find(T value) => default;
                 public HashSet(EqualityComparer<T> comparer) { }
                 public HashSet(Iterable<T> items, EqualityComparer<T> comparer) { }
                 public int Count => default;
@@ -90,6 +92,22 @@ static class CollectionDeclarations
                 new V this[K key] { get; set; }
                 bool TryAdd(K key, V value);
                 void Set(K key, V value);
+            }
+            public sealed class MapEntry<K, V> {
+                public MapEntry(MutableMap<K, V> map, K key) { }
+                public K Key => default;
+                public V Value => default;
+                public Option<V> Find() => default;
+                public MapEntry<K, V> Set(V value) => default;
+                public V OrInsert(V value) => default;
+                public V OrInsertWith(Func<V> factory) => default;
+                public MapEntry<K, V> AndModify(Func<V, V> transform) => default;
+            }
+            public static class MutableMapExtensions {
+                public static MapEntry<K, V> Entry<K, V>(this MutableMap<K, V> self, K key) => default;
+            }
+            public static class MutableSetExtensions {
+                public static T GetOrInsert<T>(this MutableSet<T> self, T value) => default;
             }
             public sealed class HashMap<K, V> : MutableMap<K, V> {
                 public V this[K key] { get => default; set { } }

@@ -25,6 +25,51 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-16 — Fluent map entry proposal
+
+- **Author:** suggests a Rust-inspired collection interface, illustrated by
+  `map.GetEntry("test").OrInsert(2)`, and asks for the assistant's assessment.
+- **Assistant proposal:** start with mutable maps and a key-bound entry abstraction;
+  retain existing lookup/indexer/TryAdd/Set contracts. Consider `OrInsert(value)`,
+  lazy `OrInsertWith(factory)` and `AndModify(transform)` with a `(V) -> V`
+  replacement callback. Return the resulting value from insertion operations rather
+  than expose a mutable storage reference initially. These are proposed semantics,
+  not approved or implemented APIs.
+- **Comparison:** [Rust Entry](https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html)
+  represents occupied/vacant entries and returns mutable references from insertion
+  helpers. Its exclusive borrowing does not transfer automatically to neoCLR.
+  [.NET CollectionsMarshal.GetValueRefOrAddDefault](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.collectionsmarshal.getvaluereforadddefault?view=net-10.0)
+  exposes dictionary storage by reference with restrictions on adding/removing
+  entries while the reference is used. A managed fluent abstraction could make
+  conditional updates clearer, at the cost of extra API surface and potentially
+  copying, allocation or repeated lookup; no performance benefit is established.
+- **Initial action/outcome:** inspected current MutableMap and HashMap sources and primary
+  API documentation. Recorded this discussion only; no runtime/compiler change or
+  roadmap reprioritization. Entry reuse/invalidation, callback reentry/failure,
+  concurrency guarantees, representation costs and broader .NET design research
+  remain open before selecting an implementation contract.
+
+- **Author follow-up:** directs implementation and validation in Raven.Core and
+  neoCLR as extensions, initially also suggesting GetItem for a mutable list, then
+  explicitly narrows to the mutable-map helper first. Subsequently selects
+  `MutableMap<K,V>.Entry(key)` and `MutableSet<T>.GetOrInsert(value)`, corrects the
+  accidental MutableHashMap spelling, confirms neoCLR should target the Mutable*
+  contracts, and requests commits when done.
+- **Selected implementation:** reusable live map/key locator, no borrowed slot,
+  synchronous at-most-once callbacks per operation, callback insertion winning for
+  OrInsertWith and returned transform value winning for AndModify. No atomicity or
+  rollback. Add canonical Find only to MutableSet (implemented by HashSet), leaving
+  read-only Set unchanged. .NET uses IDictionary and concrete HashSet/SortedSet,
+  whose existing lookup contracts can retrieve canonical values.
+- **Action:** implement the helper libraries, focused tests, reference metadata and
+  member documentation. Raven.Core is committed on main as `513b24eb6`; a deliberate
+  native-line carry is prepared as `e7ba9f6ad` on `codex/collection-entry-native`.
+  Concurrent compiler edits prevented a carry into the shared neoCLR checkout, so
+  it is isolated rather than mixed into that work. See the
+  [qualification record](validation/map-entry/README.md) for execution results and
+  [design](collection-entry-design.md) for alternatives and migration costs. No list
+  helper, collection rename, broader structural change or publication is implied.
+
 ## 2026-10-15 — Union overload resolution belongs in Raven
 
 - **Author:** notes that union-typed method parameters affect overload resolution
