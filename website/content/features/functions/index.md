@@ -105,3 +105,10 @@ The same source sample checks Object.GetType against the exact structural functi
 type and dynamically passes a function through another function as an argument and
 result. Native `typeof` tokens preserve function signatures. This qualifies runtime
 type identity; it does not imply every reflective member query is supported by AOT.
+
+
+On the development function branch, Raven type patterns support function signatures:
+`if obj is () -> T { }` tests a signature using an in-scope generic parameter, while
+`() -> T callback => callback()` captures and invokes it in a match arm. The native
+sample validates these forms in interpreter/JIT/AOT. The shared Raven parser also
+supports the .NET target, using its standard delegate representation.

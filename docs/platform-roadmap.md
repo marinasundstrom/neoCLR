@@ -4913,3 +4913,10 @@ The function follow-up also qualifies native structural `typeof` tokens and
 Object.GetType recovery from selected function bindings. The Raven consumer checks
 exact type identity and dynamically forwards a function argument/result before
 invocation. Detailed native method-snapshot/generic reflection remains separate.
+
+
+The bounded function follow-up also qualifies Raven source-level type patterns,
+including generic `() -> T` tests and capture/invocation. The shared parser fix was
+validated on Raven main using standard .NET delegates, then carried deliberately to
+the native feature branch; the retained invocation consumer covers all three native
+execution backends. No broader structural milestone or new variance rule is implied.

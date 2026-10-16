@@ -60,3 +60,13 @@ checks cover deduplication and malformed service contracts; the source sample
 qualifies runtime identity, nested function values and execution across all backends.
 Raven's host SDK permits native Function ldtoken and rejects its CLI projection.
 Detailed method-snapshot/native generic reflection coverage remains separate.
+
+
+The Raven sample additionally qualifies source-level function patterns:
+`obj is () -> T` in a generic method, `(int) -> int captured` with receiver-preserving
+invocation, and `() -> T callback => callback()` in a generic match arm. Negative
+checks include null, a nominal object, and different parameter or result types.
+The corresponding shared parser fix is on Raven main (`0c8cda8dc`), where 40 focused
+parser/runtime tests pass using ordinary .NET delegates. Native validation uses the
+feature-branch compiler and the same bundle/profile above, returning 42 in all three
+backends; this does not introduce function variance or resume other structural work.

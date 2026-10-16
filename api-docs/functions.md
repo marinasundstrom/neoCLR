@@ -177,3 +177,11 @@ IsFunctionType, IsNominalType=false and type equality before dynamically forward
 a callback as both an argument and a result. Interpreter/JIT/AOT return 42. This
 qualification covers type identity and dynamic invocation; it does not claim new
 AOT support for every MethodInfo snapshot/query or generic reflection operation.
+
+
+Raven native function values can also be tested and captured using ordinary type
+patterns, including generic signatures: `if obj is () -> T { }` and
+`() -> T callback => callback()` in a match arm. Null and incompatible signatures
+fail the test; a successful capture remains callable with its original receiver.
+See the retained source consumer above. These are language operations over existing
+function metadata, not additional reflection API members.

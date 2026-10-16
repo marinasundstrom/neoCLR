@@ -20,10 +20,51 @@ static class FunctionReflection {
 
 func Keep(callback: (int) -> int) -> (int) -> int => callback
 
+func IsFactory<T>(obj: Object?) -> bool {
+    if obj is () -> T {
+        return true
+    }
+    return false
+}
+
+func ReadFactory<T>(obj: Object, fallback: T) -> T {
+    return obj match {
+        () -> T callback => callback()
+        _ => fallback
+    }
+}
+
+func Answer() -> int => 42
+
 func Main() -> int {
+    let factory: () -> int = Answer
+    if !IsFactory<int>(factory) || IsFactory<string>(factory) || IsFactory<int>(null) {
+        return 8
+    }
+    if ReadFactory<int>(factory, 0) != 42 || ReadFactory<string>(factory, "fallback") != "fallback" {
+        return 9
+    }
     let counter = Counter(40)
     let callback: (int) -> int = counter.Add
     let reference: Object = callback
+    if reference is not (int) -> int {
+        return 3
+    }
+    if reference is (string) -> int || reference is (int) -> string {
+        return 4
+    }
+    let missing: Object? = null
+    let ordinary: Object = counter
+    if missing is (int) -> int || ordinary is (int) -> int {
+        return 5
+    }
+    if reference is (int) -> int captured {
+        if captured(2) != 42 {
+            return 6
+        }
+    } else {
+        return 7
+    }
     let shape = reference.GetType()
     if !shape.IsFunctionType || shape.IsNominalType || !shape.Equals(typeof((int) -> int)) {
         return 1

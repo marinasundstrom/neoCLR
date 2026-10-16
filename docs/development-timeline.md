@@ -18359,3 +18359,15 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   are qualified across backends. The .NET comparison and current restrictions are
   recorded in the [fixture](validation/dynamic-function-invocation/README.md).
   Function signature constraints and event policy remain separate work.
+
+
+- **Function pattern clarification (2026-10-16):** the author asked whether `is`
+  works for functions, emphasized its usefulness with generics, supplied
+  `if obj is () -> T { }`, and directed that .NET also support it through standard
+  delegates. **Assistant finding/action:** runtime `isinst` was already used by
+  dynamic invocation, but direct Raven syntax was misparsed as positional patterns.
+  The shared parser fix was developed and committed on main, then carried to the
+  native feature branch. **Validation:** 40 focused .NET parser/runtime tests and
+  the [native consumer](validation/dynamic-function-invocation/README.md), covering
+  generic tests, captures, invocation and negative cases. This keeps native function
+  experiments separate and adds no new signature variance semantics.
