@@ -2,24 +2,37 @@
   "passed": true,
   "commands": [
     {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "35df98611baefdd746ab048e633c2a003bbf446c64dc1df128f8ab22df88af60",
+      "output": "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(2,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(12,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(16,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(18,42): error RAV1503: Cannot convert from 'Base' to 'Box<int>'\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(19,59): error RAV1503: Cannot convert from 'Box<Base>' to 'Box<object>'\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/rejected/Main.rvn(20,49): error RAV1503: Cannot convert from 'Box<int>' to 'Box<bool>'\n"
+    },
+    {
       "label": "compile",
       "command": [
         "dotnet",
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/App.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "bb7b0d166e6c460111bd8b7da2ac0474e5ff57660d13e4c1eda9995a37c31bea",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/bin/neoclr/GenericClassBaseRaven.dll\n/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/Main.rvn(2,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/Main.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/Main.rvn(12,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/Main.rvn(16,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+      "logSha256": "1421df599fff9940197aeedf3c5f3c61b3a00b08864910df434c4e7b514fc437",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/bin/neoclr/GenericClassBaseRaven.dll\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/Main.rvn(2,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/Main.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/Main.rvn(12,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/Main.rvn(16,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/bin/neoclr/GenericClassBaseRaven.dll",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/bin/neoclr/GenericClassBaseRaven.dll",
         "--execution",
         "interpreter",
         "--system",
@@ -44,9 +57,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/bin/neoclr/GenericClassBaseRaven.dll",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/bin/neoclr/GenericClassBaseRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -66,7 +79,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "adf343eb7930e612603572a7b627308e80e50a1a4121c300bfcf9e3bb609cc5b",
+      "logSha256": "9d876f7a8fe47cca95ba78ef0dfc590150391ff1c96bc9b1ce1c442893b2bf2f",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -87,14 +100,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/app"
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -103,7 +116,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/app"
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -134,7 +147,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -146,9 +159,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/bin/neoclr/GenericClassBaseRaven.dll",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/bin/neoclr/GenericClassBaseRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -168,28 +181,32 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "32d6f763db2d69114ee7fd69d4f1bb236efde50c633cfc6371d293ec6cfd1a54",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.487215709,\"guestExitCode\":42,\"invocationSeconds\":0.000048625,\"metadataLoadSeconds\":0.596158208,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.581971041}\n"
+      "logSha256": "3b8bed1653a09bec03876e721931e602a859fce19a11b8ed6d76ec50d5948e6f",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.334385,\"guestExitCode\":42,\"invocationSeconds\":0.000047917,\"metadataLoadSeconds\":0.6155055,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.752208625}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.487215709,
+    "compileAndFinalizeSeconds": 0.334385,
     "guestExitCode": 42,
-    "invocationSeconds": 4.8625e-05,
-    "metadataLoadSeconds": 0.596158208,
+    "invocationSeconds": 4.7917e-05,
+    "metadataLoadSeconds": 0.6155055,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 13.581971041
+    "selectionAndVerificationSeconds": 13.752208625
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/generic-class-base/raven/Main.rvn": "d5c390b09a7d6a6eb7ef35eaa53d7f28d0632df1cee0e0fe9f19d26a7e01e09b",
-    "/Users/robert/Projects/neoclr/docs/validation/generic-class-base/raven/run.py": "434d4a1a716d2ddfbce8935de9f6a6f1c31c61bc71d4643554350f89e944866a",
+    "/Users/robert/Projects/neoclr/docs/validation/generic-class-base/raven/Main.rvn": "c818422176ad4ea608984cea49aa1d2fd0f679fed3084f028224f2738552fcc8",
+    "/Users/robert/Projects/neoclr/docs/validation/generic-class-base/raven/Library.rvn": "ac5e85c90f6f502e6afc349e897c028eeb816f40cfe7244664ba4dfe88bc4964",
+    "/Users/robert/Projects/neoclr/docs/validation/generic-class-base/raven/Rejected.rvn": "d5b0b1cdca81c3150902a61e0e51d3cd670514cb8596989dbf1e56a8c89e7bc0",
+    "/Users/robert/Projects/neoclr/docs/validation/generic-class-base/raven/run.py": "620da23525c2ef609c9f1bb70222539621011f36262548c7c620dd157f2cc018",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "48a581334fd610625cdb2eefe9df871fbc5eca9fa49a29686de78346590dbb06",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "3972e4ff3aeca626780462736a6d1286a8211aaf5037db3524d3fee139db9a38",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "7162e3b8196c68f0dfeb44178fa5b06705af229a5a39daa9b7b39906f6151cfb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "17f12f69ca7181d80cf77939e754e22966acb5950318b55949b23a32683e3d87",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ff083c7e2733f0bcb4256b317ac152ea8b2fe42b2c89736543969356c93febc5",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "9055fe7e2128fe0477396350ade6ee28e69618aa623239069a0918ad63c4b64d",
     "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "81c91ad3fafff14430f1d95e1c1d7a22789461b0d0f5b3ca24919e3429de9f51",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
-    "/Users/robert/Projects/neoclr/target/raven-generic-base-payloads-20261016/project/bin/neoclr/GenericClassBaseRaven.dll": "0b3ed841ecf96585a7eeb42509b29f37d9df16d31b3bd9f3b29c856970d413db",
-    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
-  }
+    "/Users/robert/Projects/neoclr/target/raven-generic-base-local-20261016/project/bin/neoclr/GenericClassBaseRaven.dll": "fe2ad9dc73a0dbeafb7ec9b256cbb28a4c6997b1b66d0a0e2d58cf75728d68ee",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "9586c3abf40e53de5bce689acef23333e11d63e1cb4826c4d59d4a189f87a7cd"
+  },
+  "evidenceNote": "Native adapter hash added after execution; runner file list updated to capture it on subsequent runs. Executed compiler artifacts unchanged."
 }

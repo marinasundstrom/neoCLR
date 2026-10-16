@@ -1,0 +1,5 @@
+func Reverse(value: Base) -> Box<int> => value
+func Invariant(value: Box<Base>) -> Box<System.Object> => value
+func Different(value: Box<int>) -> Box<bool> => value
+
+func Main() -> int => 42

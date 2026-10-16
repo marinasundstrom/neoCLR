@@ -1,0 +1,17 @@
+public open class Base {
+    public field Number: int
+
+    public init(number: int) {
+        Number = number
+    }
+}
+
+public class Box<T> : Base {
+    private var value: T
+
+    public init(number: int, value: T) : base(number + 1) {
+        self.value = value
+    }
+
+    public func Get() -> T => value
+}

@@ -25,7 +25,25 @@ NEOMETA001 on `Box<T>`; no metadata format or Runtime Contract setting changed.
 
 The native emitter still rejects reference `!=` here; the sample deliberately
 uses `Object.ReferenceEquals` to express the identity check. Reference comparison
-coverage is separate from this generic-inheritance qualification. Imported
-generic derived-owner admission, constructed generic bases, and helper/control
-flow in base initializer expressions remain open. Structural work and
+coverage is separate from this generic-inheritance qualification. Constructed
+generic bases and helper/control flow in base initializer expressions remain open. Structural work and
 Sliceable/Result variance remain deferred.
+
+## Separately compiled library
+
+Pass `--imported` to compile `Library.rvn` to a native library first, then compile
+`Main.rvn` against that exact dependency. Without the flag, the runner combines
+both sources in one compilation. Both modes also require three source conversion
+errors: Base to Box<int>, Box<Base> to Box<Object>, and Box<int> to Box<bool>.
+Generic classes remain invariant even when their arguments are reference types.
+
+Native import now admits generic class definitions with a nongeneric class base;
+it preserves exact dependency identity and registers the declared base edge.
+This is importing a completed generic hierarchy, not authoring a new generic
+class over an external base. The latter and constructed generic bases remain gaps.
+
+Both modes return 42 in interpreter, AOT and managed JIT. Native cleanup and
+AOT sanitizer checks pass. `results.json` records the local run;
+`imported-results.json` records the separate-library run with dependency hashes.
+Before the import fix, library compilation passed but the consumer rejected
+the generic Box definition with NEOMETA001 (unsupported symbol-only emission contract).

@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--imported', action='store_true', help='Compile the generic owner in a separate native library')
 
 args = parser.parse_args()
 compiler, bundle, output = (p.resolve() for p in (args.compiler, args.bundle, args.output))
@@ -21,7 +22,7 @@ project.mkdir(parents=True, exist_ok=True)
 name = 'GenericClassBaseRaven'
 source = SOURCE / 'Main.rvn'
 host = SOURCE.parents[1] / 'interface-variance/native-host.c'
-shutil.copyfile(source, project / 'Main.rvn')
+(project / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + source.read_text())
 from xml.sax.saxutils import escape
 (project / 'App.rvnproj').write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="{escape(str(bundle / 'NeoCLR.ClassLibrary.props'))}"/>
@@ -44,11 +45,32 @@ def run(label, command, expected=0):
         raise RuntimeError(result.stdout[-3000:] + result.stderr[-3000:])
     return result
 
+library_image = None
+if args.imported:
+    library_project = output / 'library'
+    library_project.mkdir(exist_ok=True)
+    shutil.copyfile(SOURCE / 'Library.rvn', library_project / 'Main.rvn')
+    (library_project / 'Library.rvnproj').write_text((project / 'App.rvnproj').read_text()
+        .replace('<OutputType>Exe</OutputType>', '<OutputType>Library</OutputType>')
+        .replace(name, 'GenericBaseLibrary'))
+    run('compile-library', ['dotnet', compiler, 'neoclr', '--project', library_project / 'Library.rvnproj'])
+    library_image = library_project / 'bin/neoclr/GenericBaseLibrary.dll'
+    (project / 'App.rvnproj').write_text((project / 'App.rvnproj').read_text().replace('</Project>',
+        f'<ItemGroup><Reference Include="GenericBaseLibrary"><HintPath>{escape(str(library_image))}</HintPath></Reference></ItemGroup></Project>'))
+rejected = output / 'rejected'
+rejected.mkdir(exist_ok=True)
+shutil.copyfile(project / 'App.rvnproj', rejected / 'App.rvnproj')
+(rejected / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + (SOURCE / 'Rejected.rvn').read_text())
+negative = run('rejected', ['dotnet', compiler, 'neoclr', '--project', rejected / 'App.rvnproj'], 1)
+assert negative.stdout.count('error RAV1503:') + negative.stderr.count('error RAV1503:') == 3
+
 run('compile', ['dotnet', compiler, 'neoclr', '--project', project / 'App.rvnproj'])
 image = project / 'bin/neoclr' / (name + '.dll')
 references = ['--system', bundle / 'System.runtime.neox', '--object-root', bundle / 'System.Runtime.dll']
 for library in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
     references += ['--module', bundle / (library + '.dll')]
+if library_image is not None:
+    references += ['--module', library_image]
 interpreter = [ROOT / 'target/debug/neoclr', 'run', image, '--execution', 'interpreter', *references]
 run('interpreter', interpreter, 42)
 codegen = ROOT / 'target/debug/neoclr-codegen'
@@ -68,6 +90,8 @@ result = run('jit', [codegen, '--jit-managed', '--closed-world', image, '@entry'
 report['jit'] = json.loads(result.stderr.split('JIT_RESULT ', 1)[1])
 assert report['jit']['guestExitCode'] == 42
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
-    (source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+    (source, SOURCE / 'Library.rvn', SOURCE / 'Rejected.rvn', SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+if library_image is not None:
+    report['files'][str(library_image)] = hashlib.sha256(library_image.read_bytes()).hexdigest()
 report['passed'] = True
 (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
