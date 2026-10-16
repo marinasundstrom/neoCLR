@@ -35,3 +35,8 @@ and bundle `variance-argument-sequence-20261016`. Both assemblies compile, all t
 execution modes return 42, and the three negative cases reject. Native and compiler
 binaries, SDK DLL, sources and both emitted assemblies are fingerprinted in the
 retained results. This qualifies the SDK fix through actual native Raven calls.
+
+The consumer additionally checks interface-valued arguments widening to Object in
+both producer and consumer variance positions. These checks exposed loss of the
+native Object-root role during private renaming; the native fix retains that fact
+without changing nominal identity or adding a conversion wrapper.

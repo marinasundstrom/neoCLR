@@ -151,7 +151,10 @@ fn reference_conversion(module: &Module, source: &Type, target: &Type, depth: us
     if depth >= 64 || !ordinary_reference(module, source) || !ordinary_reference(module, target) {
         return false;
     }
-    if *target == Type::from_name("System.Object") && module.is_reference_type(target) {
+    if module.type_definition(target).is_some_and(|definition| {
+        definition.is_reference_type
+            && (definition.name == "System.Object" || definition.native_object_root)
+    }) {
         return true;
     }
     if module.array_nominal(source).as_ref() == Some(target) {

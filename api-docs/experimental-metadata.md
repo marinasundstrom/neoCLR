@@ -9292,7 +9292,15 @@ valid function indices. They preserve source identities through private shape
 renumbering; they do not define new nominal inheritance or public guest types.
 
 `native_metadata::restore_interface_proofs(target, original, map_type)` preserves
-trusted interface/slot facts through a row-preserving compiler rewrite. It requires
+trusted interface/slot and native Object-root facts through a row-preserving compiler rewrite. It requires
 matching type/function row counts and applies the same nominal type remapping to
 retained interface arguments. It returns Fault on row mismatch or mapping failure.
 This compiler bridge does not deserialize proof fields from external metadata.
+
+`native_metadata::retain_object_reference_root(definition)` records the verified
+Object root's reference role before a private native rename. Callers must supply
+verified compiler IR; a non-Object name, value type or generic declaration returns
+Fault. The private marker survives row-preserving rewrites but is omitted on
+serialization; attempts to inject it into external metadata reject. This preserves
+interface-to-Object conversions inside variance without adding boxing or changing
+String's distinct representation. It does not install a second Object slot registry.

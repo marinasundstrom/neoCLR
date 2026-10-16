@@ -36,8 +36,25 @@ class NestedSource : Producer<Consumer<Base>> {
     func Get() -> Consumer<Base> => value
 }
 
+class ObjectSink : Consumer<Object> {
+    private val expected: Object
+
+    init(expected: Object) {
+        self.expected = expected
+    }
+
+    func Accept(value: Object) -> int {
+        if Object.ReferenceEquals(value, expected) {
+            return 42
+        }
+        return 1
+    }
+}
+
 func Widen(value: Producer<Leaf>) -> Producer<Base> => value
 func Narrow(value: Consumer<Base>) -> Consumer<Leaf> => value
+func NarrowObject(value: Consumer<Object>) -> Consumer<Consumer<Base>> => value
+func WidenObject(value: Producer<Consumer<Base>>) -> Producer<Object> => value
 func Nest(value: Producer<Consumer<Base>>) -> Producer<Consumer<Leaf>> => value
 
 func Main() -> int {
@@ -53,7 +70,16 @@ func Main() -> int {
     if consumer.Accept(leaf) != 41 || leaf.Number != 41 {
         return 2
     }
-    let nested = Nest(NestedSource(sink))
+    let nestedSource = NestedSource(sink)
+    let objectProducer = WidenObject(nestedSource)
+    if !Object.ReferenceEquals(objectProducer.Get(), sink) {
+        return 5
+    }
+    let objectConsumer = NarrowObject(ObjectSink(sink))
+    if objectConsumer.Accept(sink) != 42 {
+        return 6
+    }
+    let nested = Nest(nestedSource)
     let nestedConsumer = nested.Get()
     if !Object.ReferenceEquals(nestedConsumer, sink) {
         return 3

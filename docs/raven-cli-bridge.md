@@ -11257,3 +11257,17 @@ and payload identity, inherited-field mutation, native cleanup and AOT sanitizer
 checks. Three invalid source conversions reject. The bundle remains
 `variance-argument-sequence-20261016`; retained evidence includes the compiler's SDK
 DLL hash. This changes no Runtime Contract or bridge encoding.
+
+### Object-root identity inside native variance (2026-10-16)
+
+Native preparation now retains the verified Object root's reference role through
+private nominal renaming. Without this compiler-owned fact, an accepted Raven
+`Producer<Consumer<Base>>` to `Producer<Object>` conversion passed the interpreter
+but faulted in AOT. The marker is private IR, survives trusted rewrites and cannot
+be authored through native or CLI metadata. Raven lowering and Runtime Contract
+configuration do not change; no adapter, implicit boxing or String widening is added.
+
+The extended imported-base consumer qualifies both producer and consumer Object
+views in interpreter/AOT/managed JIT, including identity and native cleanup. Its
+retained results now fingerprint the fixed backend; three invalid source conversions
+continue to reject. Structural work remains parked.

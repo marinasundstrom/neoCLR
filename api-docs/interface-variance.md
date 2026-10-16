@@ -34,3 +34,8 @@ Variance also follows explicitly declared local-to-imported class ancestry. The
 separately compiled Raven consumer validates producer/consumer and nested views in
 interpreter/AOT/JIT, preserving receiver/payload identity and inherited-field writes.
 Reverse and unrelated-class conversions reject; this does not enable generic class bases.
+
+Interface-valued reference arguments may widen to Object in the declared variance
+direction. Native lowering preserves the verified Object-root role through private
+renaming; producer and consumer paths are qualified with actual identity checks in
+interpreter/AOT/JIT. This does not admit value boxing or intrinsic String widening.

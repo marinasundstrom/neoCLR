@@ -149,3 +149,6 @@ Development validation also covers local classes inheriting an imported base:
 producer, consumer and nested variance calls preserve object identity and inherited
 storage in interpreter, AOT and managed JIT. Reverse and unrelated-class conversions
 remain rejected. See the [variance reference](/docs/interface-variance.html).
+
+Interface-valued arguments can also widen to Object in the declared variance
+direction; native producer and consumer paths preserve reference identity.

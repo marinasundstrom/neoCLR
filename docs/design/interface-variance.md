@@ -510,3 +510,27 @@ No source compiler change, Runtime Contract setting, metadata encoding, adapter,
 boxing or expanded variance rule was needed beyond the SDK ancestry correction.
 Generic class bases and intrinsic String variance materialization remain gaps;
 Result and Sliceable remain invariant. Structural work stays parked.
+
+### Native Object-root variance preservation (2026-10-16)
+
+Extending the imported-base Raven consumer with
+`Producer<Consumer<Base>>` to `Producer<Object>` exposed a native divergence:
+interpreter execution returned 42, while AOT faulted at WidenObject. Private nominal
+renaming had discarded Object's reference role, so the variance check no longer
+recognized the interface argument's ordinary Object upcast. This is a correctness
+fix to the existing .NET-aligned reference conversion rule, not a new variance rule.
+
+Native preparation now records a compiler-owned Object-root marker before renaming
+and preserves it with interface proofs through row-preserving rewrites. The runtime
+variance check accepts that role independently of the private name. The marker
+cannot be supplied by serialized metadata and does not install another Object slot
+registry. Reverse conversion, value-argument boxing and intrinsic String widening
+remain excluded. Focused tests cover renamed-root conversion, existing interface
+proof restoration, rejected directions and serialization/forgery boundaries.
+
+The extended Raven consumer now passes interpreter/AOT/managed-JIT execution in
+both producer and consumer variance positions involving an interface and Object.
+Receiver/payload identity, native cleanup and AOT sanitizer checks pass; the three
+existing unsafe source conversions still reject. Updated artifact hashes and
+commands are retained with the sample. Two native proof tests and the existing
+runtime reference-conversion regression also pass. Structural types remain parked.

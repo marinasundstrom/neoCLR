@@ -8,11 +8,24 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/Library.rvnproj"
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/Library.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "deb8ca869a39c9a75d352e468cb39ee92ce47e45b454dcbc7a859c5e584161e6",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll\n/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/Main.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+      "logSha256": "79e854f2288e98ebba549b30b4fa1eed21c06519d5db2f9118924840054c7d0e",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll\n/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/Main.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "a3be2dd5ca79d96054b493326a0ae3276073d643b78fa409f28214696377431e",
+      "output": "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/rejected/Main.rvn(9,61): error RAV1503: Cannot convert from 'Producer<Base>' to 'Producer<Derived>'\n/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/rejected/Main.rvn(10,73): error RAV1503: Cannot convert from 'Producer<Unrelated>' to 'Producer<Base>'\n/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/rejected/Main.rvn(11,69): error RAV1503: Cannot convert from 'Consumer<Derived>' to 'Consumer<Base>'\n"
     },
     {
       "label": "compile",
@@ -21,18 +34,18 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/project/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/project/App.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "a71fe5310451c5d54443688d1cc1909e36e02ab35d088b19e493ab1ee8695119",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/imported-base-variance-20261016/project/bin/neoclr/ImportedBaseVariance.dll\n"
+      "logSha256": "f3224df41ca3cc431483340a0fe033fcf6d27923a8941d46afefcd4a330bd298",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/project/bin/neoclr/ImportedBaseVariance.dll\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/project/bin/neoclr/ImportedBaseVariance.dll",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/project/bin/neoclr/ImportedBaseVariance.dll",
         "--execution",
         "interpreter",
         "--system",
@@ -48,7 +61,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll"
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -59,9 +72,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/project/bin/neoclr/ImportedBaseVariance.dll",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/project/bin/neoclr/ImportedBaseVariance.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -75,7 +88,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -83,7 +96,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "fc461b0245dd19c9ab1735746ebd73045adae25ed85fb304a46e77f6938364a3",
+      "logSha256": "aeeccb9ffb1a21bfe10e90444bb23dc8582d8180e86e59fbeffb812f0a4cba4f",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -104,14 +117,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/app"
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -120,7 +133,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/app"
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -151,7 +164,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -163,9 +176,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/project/bin/neoclr/ImportedBaseVariance.dll",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/project/bin/neoclr/ImportedBaseVariance.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -179,7 +192,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
+        "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -187,44 +200,31 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "018c72eba9bcfdbbf813192c38bc3da41226805c771f93deab11d448bdf34a24",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.571712959,\"guestExitCode\":42,\"invocationSeconds\":0.000054833,\"metadataLoadSeconds\":0.590776625,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.545615125}\n"
-    },
-    {
-      "label": "rejected",
-      "command": [
-        "dotnet",
-        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
-        "neoclr",
-        "--project",
-        "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/rejected/App.rvnproj"
-      ],
-      "exitCode": 1,
-      "logSha256": "d8a6b988c6d6a4d1f520ea147533112548390dcbb3680c008ee83c47dce7aaec",
-      "output": "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/rejected/Main.rvn(9,61): error RAV1503: Cannot convert from 'Producer<Base>' to 'Producer<Derived>'\n/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/rejected/Main.rvn(10,73): error RAV1503: Cannot convert from 'Producer<Unrelated>' to 'Producer<Base>'\n/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/rejected/Main.rvn(11,69): error RAV1503: Cannot convert from 'Consumer<Derived>' to 'Consumer<Base>'\n"
+      "logSha256": "521d1176c02226f0a6b7ec73b2c2c1b8ccf66e5fa84c544eb67945ce34b5d9d2",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.640513166,\"guestExitCode\":42,\"invocationSeconds\":0.000072833,\"metadataLoadSeconds\":0.596987333,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.481735958}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.571712959,
+    "compileAndFinalizeSeconds": 0.640513166,
     "guestExitCode": 42,
-    "invocationSeconds": 5.4833e-05,
-    "metadataLoadSeconds": 0.590776625,
+    "invocationSeconds": 7.2833e-05,
+    "metadataLoadSeconds": 0.596987333,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 13.545615125
+    "selectionAndVerificationSeconds": 13.481735958
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/Main.rvn": "2f6e2fe298e58d03959041f08bba1f29844034d63163c1f950989807edd2cbae",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/Main.rvn": "a0652e1825a77c41493448b6237f33996bd75d3b73d46eca2c4e67452b269ede",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/Library.rvn": "9de069c00068ec60b4bdf80393de6c8d113e303a39de1c85b88a386b1e3f6443",
-    "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll": "317cc62646bdadd82efb146774a264573b5166c638043d42f4d2d6688210cc8f",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/Rejected.rvn": "37819aa50592080ef9e752cba511c33e953771ec4b23e3d94b90fc26dc0b40f5",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/run.py": "6cb04e07fdf40aa0166c576bf57ee8b7954c7fa44b3b4d9509c01fd5ff89fe46",
+    "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll": "317cc62646bdadd82efb146774a264573b5166c638043d42f4d2d6688210cc8f",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f453997add8091423fe3d7ba6409703305a81adeaf89a2851bb81183dfbd2786",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "72f4273f6ffa78268db21f37141bacea5ecb1dc144a41e01103c58995e58484d",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "b37deabdddb5c8df5d29159e56a1a31143c7b6a6883bad4ab5c6832f99ff019f",
-    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "98cabed0d2da65b9ff86836d2b7b3a067ef0d547749ab2fb89ba8d35cfb8fd5b",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "abeb56fff44249ab23bf167066685a1ed274f4e19b0d08c90b8e6f2c505df5d8",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "ddb5b04d3b30a52368a57c2c6cc6f025151b5ed575b0775bd1adcaf9bd6c59fb",
-    "/Users/robert/Projects/neoclr/target/imported-base-variance-20261016/project/bin/neoclr/ImportedBaseVariance.dll": "89763082fc0022bedacc3b0febd55b9ceaa7e463bc2a04f3926cc8f5d73a22b9",
-    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a",
-    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/Rejected.rvn": "37819aa50592080ef9e752cba511c33e953771ec4b23e3d94b90fc26dc0b40f5",
-    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/imported-base/run.py": "6cb04e07fdf40aa0166c576bf57ee8b7954c7fa44b3b4d9509c01fd5ff89fe46"
+    "/Users/robert/Projects/neoclr/target/imported-base-object-variance-fixed-20261016/project/bin/neoclr/ImportedBaseVariance.dll": "e3a6fdd031b70882f322d34705521a08949d23de47c9a74fb0a60a50410376a1",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
   }
 }

@@ -277,6 +277,9 @@ pub struct TypeDef {
     // Trusted, in-memory native compiler proof; never accepted from serialized metadata.
     #[serde(skip)]
     pub(crate) native_interface: Option<crate::variance::NativeInterface>,
+    // Verified Object identity retained through a private native nominal rename.
+    #[serde(skip)]
+    pub(crate) native_object_root: bool,
     /// Memberless bootstrap storage declaration; not an executable owner.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub primitive_reference: bool,

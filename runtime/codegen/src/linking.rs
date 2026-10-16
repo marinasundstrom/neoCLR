@@ -1050,6 +1050,8 @@ pub fn prepare(
             // Keep the ordinary empty base and constructor, but do not ask the
             // backend verifier to install a second runtime Object slot registry.
             // The complete original Object contract was verified above.
+            neoclr::native_metadata::retain_object_reference_root(&mut selected.types[index])
+                .map_err(|error| error.to_string())?;
             selected.types[index].name = name.clone();
             rename_nominal(&mut selected, "System.Object", &name, root)?;
             report["objectBaseProjection"] = json!({"compiledIndex": index, "sourceName": "System.Object", "compiledName": name,
@@ -1430,6 +1432,30 @@ fn rename_nominal(
 
 #[cfg(test)]
 mod variance_projection_tests {
+    #[test]
+    fn object_argument_variance_survives_private_root_renaming() {
+        let mut source = neoclr::assemble(".module ObjectVariance\n.type class System.Object\n.end\n.interface View\n.end\n.interface Producer<T>\n.variance out\n.end\n").unwrap();
+        let narrow = neoclr::assembler::parse_type("Producer<View>").unwrap();
+        let wide = neoclr::assembler::parse_type("Producer<System.Object>").unwrap();
+        assert!(neoclr::native_metadata::assignable(&source, &narrow, &wide).unwrap());
+        neoclr::native_metadata::retain_object_reference_root(&mut source.types[0]).unwrap();
+        source.types[0].name = "PrivateRoot".into();
+        super::rename_nominal(&mut source, "System.Object", "PrivateRoot", "Main").unwrap();
+        let wide = neoclr::assembler::parse_type("Producer<PrivateRoot>").unwrap();
+        assert!(neoclr::native_metadata::assignable(&source, &narrow, &wide).unwrap());
+        assert!(!neoclr::native_metadata::assignable(&source, &wide, &narrow).unwrap());
+        let value = neoclr::assembler::parse_type("Producer<Int32>").unwrap();
+        assert!(!neoclr::native_metadata::assignable(&source, &value, &wide).unwrap());
+        let encoded = serde_json::to_value(&source).unwrap();
+        assert!(encoded["types"][0].get("native_object_root").is_none());
+        let decoded: neoclr::Module = serde_json::from_value(encoded.clone()).unwrap();
+        assert!(!neoclr::native_metadata::assignable(&decoded, &narrow, &wide).unwrap());
+        let mut forged = encoded;
+        forged["types"][0]["native_object_root"] = serde_json::json!(true);
+        assert!(serde_json::from_value::<neoclr::Module>(forged).is_err());
+        assert!(neoclr::native_metadata::retain_object_reference_root(&mut source.types[1]).is_err());
+    }
+
     #[test]
     fn nominal_rename_preserves_native_variance_and_slot_identity() {
         let source = neoclr::assemble(include_str!("../../../docs/validation/interface-variance/Main.neoil")).unwrap();

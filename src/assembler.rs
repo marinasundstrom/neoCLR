@@ -842,6 +842,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
                         native_interface: None,
+                        native_object_root: false,
                         static_fields: vec![],
                         primitive_reference: false,
                         is_reference_type,
