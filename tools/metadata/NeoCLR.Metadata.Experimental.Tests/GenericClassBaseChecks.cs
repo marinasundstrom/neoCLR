@@ -15,8 +15,11 @@ internal static class GenericClassBaseChecks
         var box = graph.AddGenericClass("Example", "Box", ["T"], parent);
         var field = box.AddField("Value", SignatureType.TypeParameter(0), FieldVisibility.Public);
         var ctor = box.AddConstructor(new MethodSignature(PrimitiveType.Void, [PrimitiveType.Int32, SignatureType.TypeParameter(0)]));
-        ctor.LoadArgument(0); ctor.LoadArgument(1); ctor.Call(parentCtor);
+        ctor.LoadArgument(0); ctor.LoadArgument(1); ctor.LoadConstant(1); ctor.Add(); ctor.Call(parentCtor);
         ctor.LoadArgument(0); ctor.LoadArgument(2); ctor.StoreField(field); ctor.Return();
+        var constantCtor = box.AddConstructor(new MethodSignature(PrimitiveType.Void, [SignatureType.TypeParameter(0)]));
+        constantCtor.LoadArgument(0); constantCtor.LoadConstant(2); constantCtor.Call(parentCtor);
+        constantCtor.LoadArgument(0); constantCtor.LoadArgument(1); constantCtor.StoreField(field); constantCtor.Return();
         var upcast = graph.AddFunction("Upcast", new(parent, [box.MakeGenericInstance(PrimitiveType.Int32)]));
         upcast.LoadArgument(0); upcast.Return();
         var producer = graph.AddGenericInterface("Example", "Producer", ["T"]);
@@ -26,8 +29,11 @@ internal static class GenericClassBaseChecks
         widen.LoadArgument(0); widen.Return();
         var main = graph.AddFunction("Main"); graph.EntryPoint = main;
         var local = main.DeclareLocal(box.MakeGenericInstance(PrimitiveType.Int32));
-        main.LoadConstant(2); main.LoadConstant(40); main.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); main.StoreLocal(local);
+        main.LoadConstant(1); main.LoadConstant(20); main.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); main.StoreLocal(local);
         main.LoadLocal(local); main.LoadField(field.MakeConstructedReference(PrimitiveType.Int32));
+        main.LoadLocal(local); main.Call(upcast); main.LoadField(number); main.Add();
+        main.LoadConstant(18); main.NewObject(constantCtor.MakeConstructedReference([PrimitiveType.Int32])); main.StoreLocal(local);
+        main.LoadLocal(local); main.LoadField(field.MakeConstructedReference(PrimitiveType.Int32)); main.Add();
         main.LoadLocal(local); main.Call(upcast); main.LoadField(number); main.Add(); main.Return();
         var image = RuntimeAssemblyContainer.WriteBinary(graph);
         var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
@@ -38,11 +44,11 @@ internal static class GenericClassBaseChecks
         if (!Equals(actual, 42)) throw new Exception("generic inherited storage failed: " + actual);
 
         var constructed = loaded.GetType("Example.Box`1")!.MakeGenericType(typeof(int));
-        var value = Activator.CreateInstance(constructed, 2, 40);
+        var value = Activator.CreateInstance(constructed, 1, 40);
         if (!ReferenceEquals(loaded.ManifestModule.GetMethods().Single(m => m.Name == "Upcast").Invoke(null, [value]), value))
             throw new Exception("generic base upcast changed identity");
         var strings = loaded.GetType("Example.Box`1")!.MakeGenericType(typeof(string));
-        var text = Activator.CreateInstance(strings, 2, "kept");
+        var text = Activator.CreateInstance(strings, 1, "kept");
         if (!Equals(strings.GetField("Value")!.GetValue(text), "kept") || !Equals(strings.GetField("Number")!.GetValue(text), 2))
             throw new Exception("generic reference and inherited fields overlap");
         if (Environment.GetEnvironmentVariable("NEOCLR_GENERIC_BASE_ARTIFACT") is { } path) File.WriteAllBytes(path, image);

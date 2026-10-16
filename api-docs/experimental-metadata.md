@@ -9417,6 +9417,7 @@ storage. Native signatures retain the existing named base edge.
 SDK/CLR tests cover integer/reference storage, base initialization, upcast identity
 and existing generic-class/Object-root behavior. See the retained native consumer
 under docs/validation/generic-class-base. Generic base construction authoring and
-Raven emitter eligibility remain open. Native AOT constructor lowering currently
-requires leading forwarded base arguments; computed/constant base arguments are
-a backend gap, not an alternative to .NET semantics.
+Raven emitter eligibility remain open. Native AOT constructor lowering now accepts independent scalar constants and
+supported arithmetic/conversions before the leading base call, in addition to
+forwarded arguments. Receiver access, helper calls, stores and branches in that
+prefix remain backend gaps, not an alternative to .NET semantics.

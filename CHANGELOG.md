@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Admit native constant and scalar arithmetic/conversion arguments before the unconditional direct-base constructor call. Protect the uninitialized receiver from prefix operations and reject branches back into initialization. Focused profile checks and the updated CLR/interpreter/AOT/JIT consumer pass, including native cleanup and sanitizers; helper calls, stores and control flow in base expressions remain unsupported. Runtime Contracts and metadata encoding are unchanged.
+
 - Allow SDK generic classes over owned nonsealed nongeneric class bases, preserving constructor initialization checks, inherited storage and nominal upcasts/variance. Fix CLI field access on generic owners to retain their construction, preventing lost derived-field values with inherited storage. SDK/CLR regression checks and the retained interpreter/AOT/JIT consumer pass, including native cleanup/sanitizers; constructed base authoring and Raven emission remain open. AOT constant/computed base-constructor arguments remain an explicit backend gap.
 
 - Preserve external constructed class bases through arity-matched native bindings. Host metadata introspection substitutes open/closed arguments and inherits generic interfaces across exact dependency identities; local/external reader and variance regressions pass. Missing/invalid bindings and argument scope reject. Native encoding is unchanged; generic layout authoring and Raven execution remain open.

@@ -1,9 +1,9 @@
 # Generic class over an ordinary nongeneric base
 
 The SDK fixture GenericClassBaseChecks authors Base with an integer field and
-Box<T> with its own T field. The constructor forwards the base argument, then
-initializes its own storage. Main constructs Box<int>, upcasts it to Base and
-sums both fields to 42. SDK/CLR checks additionally preserve object identity and
+Box<T> with its own T field. One constructor computes its base argument with addition; another passes a
+constant. Each then initializes its own storage. Main constructs both Box<int>
+forms, upcasts them to Base and sums their fields (20 + 2 + 18 + 2) to 42. SDK/CLR checks additionally preserve object identity and
 validate Box<string>, reject missing base initialization, and validate a producer
 conversion through generic-to-base ancestry. Existing generic class/Object-root
 checks run alongside the fixture.
@@ -24,10 +24,12 @@ The CLR check initially returned 2 because the generic field remained zero. Usin
 an open constructed-owner field reference fixes the inherited-storage offset;
 integer and reference payloads now retain their values.
 
-The AOT path currently requires a leading base call with forwarded arguments.
-An earlier constant argument reproduced the existing diagnostic “reference
-constructor requires an unconditional leading base constructor call with
-forwarded arguments”. Constant/computed arguments remain a backend gap, not a
-language restriction. Constructed generic base authoring and Raven generic
-hierarchy emission are also unfinished. Structural work and Sliceable/Result
-variance remain deferred.
+The original AOT path rejected constant/computed base arguments. The updated
+consumer reproduced that failure before the fix. Native qualification now admits
+an unconditional leading base call preceded by independent argument loads, scalar
+constants and supported arithmetic/conversions. Receiver access/duplication,
+stores, helper calls and branching before initialization remain excluded. Branches
+back into the initialization prefix reject. Those remaining expression forms
+are backend gaps, not intended language restrictions. Constructed generic base
+authoring and Raven hierarchy emission are also unfinished. Structural work and
+Sliceable/Result variance remain deferred.

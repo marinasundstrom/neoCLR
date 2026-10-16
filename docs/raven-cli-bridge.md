@@ -11431,3 +11431,23 @@ consumer uses forwarded base arguments, which the AOT constructor lowerer curren
 requires. Constant/computed base arguments remain a backend gap. Raven owner
 eligibility/emission and authoring constructed generic bases still require work;
 this does not yet establish Raven source support for the hierarchy.
+
+### Native base initializer scalar expressions (2026-10-16)
+
+The native backend now accepts constants and supported scalar arithmetic/conversions
+in the unconditional prefix leading to a direct base-constructor call. It preserves
+the receiver below independently evaluated arguments, leaving ordinary type checks
+and arithmetic fault behavior intact. No Runtime Contract or native/CLI encoding
+changes are required. The SDK consumer now includes constant and computed forms;
+Raven source generic hierarchy emission is still a separate follow-up.
+
+Receiver access/duplication, stores, helper calls, branching before the base call,
+and branches re-entering initialization remain rejected. These are remaining
+backend coverage gaps, not permanent language rules. Structural work and
+Sliceable/Result variance stay deferred.
+
+The refreshed generic-class-base consumer passes CLR, interpreter, AOT and managed
+JIT against bundle variance-argument-sequence-20261016, including native cleanup
+and AOT sanitizer checks. The pre-fix AOT run reproduced the forwarded-arguments
+diagnostic. Sources, commands and current backend hashes are retained with the
+consumer evidence.

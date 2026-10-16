@@ -734,3 +734,22 @@ AOT also exposed its existing restriction to leading forwarded base-constructor
 arguments. The qualified native sample uses that path; constant/computed base
 arguments remain an explicit backend gap to fix. Raven generic hierarchy emission,
 constructed base authoring and guest reflection qualification remain open.
+
+### Native scalar base-initializer expressions (2026-10-16)
+
+Native profile validation now admits scalar constants and supported arithmetic or
+conversions before an unconditional leading direct-base initializer. It tracks
+argument-stack values above the uninitialized receiver; no operation may consume,
+duplicate, expose or replace that receiver. The typed-stack verifier remains
+responsible for expression and parameter types, and normal generated arithmetic
+retains its existing fault semantics. Later branches cannot re-enter the prefix.
+No expression is evaluated at compile time or reordered.
+
+The updated generic-base consumer exercises both constant and computed argument
+constructors. CLR and interpreter passed before the fix, while AOT reproduced its
+forwarded-arguments diagnostic. Focused profile tests cover positive expressions
+and rejection of receiver reuse, underflow, field access, stores and branches.
+The retained consumer records native qualification. Helper calls, stores and
+control flow in base expressions remain unsupported backend forms to address,
+not deliberate .NET divergences. Constructed generic base authoring and Raven
+hierarchy emission remain open; deferred structural/Result/Sliceable work is unchanged.

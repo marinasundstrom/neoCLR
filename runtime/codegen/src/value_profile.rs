@@ -425,23 +425,11 @@ impl<'a> Profile<'a> {
             let reference_constructor = f.instance
                 && f.name.ends_with("..ctor")
                 && owner.is_some_and(|t| t.is_reference_type);
-            // Only an unconditional prefix forwarding receiver/arguments to the
-            // direct base initializer is admitted; original verification checked types.
+            // Keep the uninitialized receiver below independently evaluated arguments.
+            // The ordinary typed-stack verifier still checks operand and call types.
             let base_initializer = if reference_constructor && owner.unwrap().base.is_some() {
-                let base = owner.unwrap().base.as_ref().unwrap();
-                let prefix = f
-                    .body
-                    .iter()
-                    .take_while(|op| matches!(op, Op::Arg(_)))
-                    .count();
-                if !matches!(f.body.first(), Some(Op::Arg(0)))
-                    || !matches!(f.body.get(prefix), Some(Op::Call(target))
-                    if target.instance && target.owner.as_ref() == Some(base) && target.name.ends_with("..ctor")
-                    && prefix == target.parameters.len() + 1)
-                {
-                    return Err("reference constructor requires an unconditional leading base constructor call with forwarded arguments".into());
-                }
-                Some(prefix)
+                Some(leading_base_initializer(&f.body, owner.unwrap().base.as_ref().unwrap())
+                    .ok_or("reference constructor requires an unconditional leading base initializer with receiver-independent scalar arguments")?)
             } else {
                 None
             };
@@ -2346,9 +2334,110 @@ impl<'a> Profile<'a> {
     }
 }
 
+// Recognize only a straight-line, side-effect-free argument prefix. Counting
+// values above this protects the receiver from arithmetic, duplication or escape.
+fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
+    if !matches!(body.first(), Some(Op::Arg(0))) {
+        return None;
+    }
+    let mut arguments = 0usize;
+    for (pc, op) in body.iter().enumerate().skip(1) {
+        match op {
+            Op::Arg(n) if *n != 0 => arguments += 1,
+            Op::Int(_) | Op::Int64(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::Bool(_) => {
+                arguments += 1
+            }
+            Op::Add
+            | Op::Sub
+            | Op::Mul
+            | Op::Divide
+            | Op::DivideUnsigned
+            | Op::Remainder
+            | Op::RemainderUnsigned
+            | Op::AddChecked
+            | Op::SubChecked
+            | Op::MulChecked
+            | Op::AddCheckedUnsigned
+            | Op::SubCheckedUnsigned
+            | Op::MulCheckedUnsigned
+            | Op::BitAnd
+            | Op::BitOr
+            | Op::BitXor
+            | Op::ShiftLeft
+            | Op::ShiftRight
+            | Op::ShiftRightUnsigned
+                if arguments >= 2 =>
+            {
+                arguments -= 1
+            }
+            Op::Negate
+            | Op::BitNot
+            | Op::ConvertInt32
+            | Op::ConvertUInt32
+            | Op::ConvertInt64
+            | Op::ConvertUInt64
+            | Op::ConvertFloat32
+            | Op::ConvertFloat64
+                if arguments >= 1 =>
+            {
+                ()
+            }
+            Op::Call(target)
+                if target.instance
+                    && target.owner.as_ref() == Some(base)
+                    && target.name.ends_with("..ctor")
+                    && arguments == target.parameters.len() =>
+            {
+                // A later branch cannot re-enter the initialization prefix.
+                if body.iter().skip(pc + 1).any(|op| matches!(op,
+                    Op::Branch(target) | Op::BranchTrue(target) | Op::BranchFalse(target) if *target <= pc)) {
+                    return None;
+                }
+                return Some(pc);
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod object_assignment_tests {
     use super::*;
+
+    #[test]
+    fn base_initializer_accepts_independent_scalar_expressions_only() {
+        let base = Type::Named("Base".into());
+        let call =
+            Op::Call(neoclr::assembler::parse_function_ref("instance Base::.ctor(Int32)").unwrap());
+        assert_eq!(
+            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call.clone()], &base),
+            Some(2)
+        );
+        assert_eq!(
+            leading_base_initializer(
+                &[Op::Arg(0), Op::Arg(1), Op::Int(1), Op::Add, call.clone()],
+                &base
+            ),
+            Some(4)
+        );
+        for prefix in [
+            vec![Op::Arg(0), Op::Arg(0)],
+            vec![Op::Arg(0), Op::Int(1), Op::Add],
+            vec![Op::Arg(0), Op::Dup],
+            vec![Op::Arg(0), Op::Field(0)],
+            vec![Op::Arg(0), Op::Int(1), Op::Store(0)],
+            vec![Op::Arg(0), Op::Branch(2), Op::Int(1)],
+        ] {
+            let mut body = prefix;
+            body.push(call.clone());
+            assert_eq!(leading_base_initializer(&body, &base), None, "{body:?}");
+        }
+        assert_eq!(
+            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call, Op::Branch(0)], &base),
+            None
+        );
+    }
 
     #[test]
     fn interface_upcast_requires_the_explicit_object_base() {
