@@ -11629,3 +11629,30 @@ base and own storage, closed value/reference payloads, transitive upcasts and
 inherited generic-interface dispatch. CLR/interpreter/AOT/JIT return 42 with native
 cleanup and AOT sanitizers; all 179 SDK checks and API snapshot checks pass.
 Raven source qualification follows separately. Structural work remains parked.
+
+### Raven external constructed bases (2026-10-16)
+
+The native adapter opts into `AllowsGenericExternalClassInheritance`; the shared
+plan default remains false and ordinary .NET emission is unchanged. The compiler
+registers dependency layout/member contracts on original definitions and retains
+the full constructed signature when binding a source class base. Imported direct
+base calls carry exact declaring-type arguments, including protected constructors.
+Deferred binding also supports recursive external base arguments.
+
+The retained `docs/validation/constructed-class-base/raven` `--external` consumer
+compiles its provider separately, then authors both `ExternalLeaf : Derived<bool, int>`
+and `ExternalGeneric<Unused, T> : Base<T>`. It checks inherited private payloads,
+derived/public field offsets and mutation, reference identity, transitive upcasts
+and inherited `View<T>` calls with value and reference arguments. A protected
+`ExternalRoot<T>` constructor also qualifies
+`ExternalRecursive<T> : ExternalRoot<ExternalRecursive<T>>`. Reverse conversion,
+invariant base arguments and mismatched child arguments produce three RAV1503
+errors. Interpreter, AOT and managed JIT return 42 with cleanup/AOT sanitizers.
+The focused capability/CLR suite passes 4/4; the SDK suite passes 179/179.
+
+No Runtime Contract, native format or ABI change is needed. The temporary CLI
+projection uses TypeSpec extends entries; native metadata is authoritative and
+retains exact dependency identity, arguments and nominal edges. Generic class
+virtual slots and broader constrained dependency contracts remain separate gaps.
+Structural types and Sliceable/Result variance remain parked. This is macOS ARM64
+development qualification, not a release/platform-matrix claim.

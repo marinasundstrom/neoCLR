@@ -1,0 +1,3 @@
+func Reverse(value: Base<int>) -> ExternalLeaf => value
+func Invariant(value: ExternalGeneric<bool, int>) -> Base<bool> => value
+func DifferentOwnerArgument(value: ExternalGeneric<bool, int>) -> ExternalGeneric<int, int> => value

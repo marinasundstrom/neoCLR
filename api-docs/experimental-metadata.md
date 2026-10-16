@@ -127,9 +127,10 @@ full System output remains pending. [Source acceptance](https://github.com/marin
 `AssemblyBuilder.AddGenericClass(namespace, name, genericParameterNames, baseType,
 visibility)` accepts this output's explicitly designated native Object root. The matching
 manual `TypeDefinition` constructor accepts the same local base reference. The base must
-already be attached; foreign roots and ordinary class bases reject. This bounded overload
-does not admit constructed or generic bases, nested derived types or general generic
-class inheritance. Existing core-backed generic classes retain their behavior.
+already be attached; foreign roots reject. The initial Object-root-only scope has
+expanded to ordinary local bases and constructed bases; see the constructed and
+deferred base APIs below for current authoring contracts. Existing core-backed
+generic classes retain their behavior.
 
 Constructors must explicitly call the root constructor exactly once before ordinary
 receiver access. Signature validation retains the full open generic receiver identity.
@@ -9461,8 +9462,9 @@ The executable fixture in `docs/validation/constructed-class-base` covers reorde
 parameters, a closed leaf over a generic intermediate base, integer/reference
 storage, nominal upcasts, inherited generic interfaces and rejection boundaries.
 Raven's neoCLR adapter now emits owned constructed bases and imports those
-hierarchies from native dependencies. External constructed base authoring,
-recursive source base binding and generic class virtual slots remain gaps.
+hierarchies from native dependencies. The deferred binding and external authoring
+APIs below also support recursive source base arguments. Generic class virtual
+slots remain a gap.
 
 ### Deferred constructed base binding (2026-10-16)
 
@@ -9515,4 +9517,6 @@ covers a protected generic base constructor, reordered child parameters, private
 base and own storage, closed value/reference payloads, transitive upcasts and
 inherited generic-interface dispatch. CLR/interpreter/AOT/JIT return 42 with native
 cleanup and AOT sanitizers; all 179 SDK checks and API snapshot checks pass.
-Raven source qualification follows separately. Structural work remains parked.
+Raven source qualification now also passes for a separate-provider consumer,
+including recursive external base arguments and protected initialization; see
+`docs/validation/constructed-class-base/raven`. Structural work remains parked.

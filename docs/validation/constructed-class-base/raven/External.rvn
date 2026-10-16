@@ -1,0 +1,41 @@
+public class ExternalLeaf : Derived<bool, int> {
+    public field Extra: int
+    init(value: int) : base(value, 2) {
+        Extra = 5
+    }
+}
+
+public class ExternalGeneric<Unused, T> : Base<T> {
+    public field Count: int
+    init(value: T, count: int) : base(value) {
+        Count = count
+    }
+}
+
+public class ExternalRecursive<T> : ExternalRoot<ExternalRecursive<T>> {
+    private var value: T
+    init(value: T) : base() {
+        self.value = value
+    }
+    func Get() -> T => value
+}
+
+func Main() -> int {
+    let recursive = ExternalRecursive<int>(42)
+    if recursive.Echo(recursive).Get() != 42 {
+        return 3
+    }
+    let leaf = ExternalLeaf(40)
+    let parent: Base<int> = leaf
+    let view: View<int> = leaf
+    let references = ExternalGeneric<bool, Base<int>>(parent, 2)
+    let inherited: View<Base<int>> = references
+    if !System.Object.ReferenceEquals(inherited.Echo(references.Get()), parent) {
+        return 1
+    }
+    leaf.Count = 3
+    if parent.Get() != 40 || leaf.Extra != 5 || references.Count != 2 {
+        return 2
+    }
+    return parent.Get() + view.Echo(leaf.Count) + leaf.Extra - 6
+}

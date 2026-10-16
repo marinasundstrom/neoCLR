@@ -1,0 +1,4 @@
+public open class ExternalRoot<T> {
+    protected init() { }
+    func Echo(value: T) -> T => value
+}

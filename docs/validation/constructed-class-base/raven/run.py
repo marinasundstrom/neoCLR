@@ -15,12 +15,15 @@ parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--imported', action='store_true', help='Compile the generic owner in a separate native library')
 
+parser.add_argument('--external', action='store_true', help='Derive new source classes from the separately compiled generic bases')
 args = parser.parse_args()
+if args.external:
+    args.imported = True
 compiler, bundle, output = (p.resolve() for p in (args.compiler, args.bundle, args.output))
 project = output / 'project'
 project.mkdir(parents=True, exist_ok=True)
 name = 'ConstructedClassBaseRaven'
-source = SOURCE / 'Main.rvn'
+source = SOURCE / ('External.rvn' if args.external else 'Main.rvn')
 host = SOURCE.parents[1] / 'interface-variance/native-host.c'
 (project / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + (SOURCE / 'Recursive.rvn').read_text() + source.read_text())
 from xml.sax.saxutils import escape
@@ -49,7 +52,7 @@ library_image = None
 if args.imported:
     library_project = output / 'library'
     library_project.mkdir(exist_ok=True)
-    shutil.copyfile(SOURCE / 'Library.rvn', library_project / 'Main.rvn')
+    (library_project / 'Main.rvn').write_text((SOURCE / 'Library.rvn').read_text() + ((SOURCE / 'ExternalRoot.rvn').read_text() if args.external else ''))
     (library_project / 'Library.rvnproj').write_text((project / 'App.rvnproj').read_text()
         .replace('<OutputType>Exe</OutputType>', '<OutputType>Library</OutputType>')
         .replace(name, 'ConstructedBaseLibrary'))
@@ -60,7 +63,9 @@ if args.imported:
 rejected = output / 'rejected'
 rejected.mkdir(exist_ok=True)
 shutil.copyfile(project / 'App.rvnproj', rejected / 'App.rvnproj')
-(rejected / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + (SOURCE / 'Rejected.rvn').read_text())
+rejection_source = SOURCE / ('ExternalRejected.rvn' if args.external else 'Rejected.rvn')
+rejection_owners = source.read_text().split('func Main()', 1)[0] if args.external else ('' if args.imported else (SOURCE / 'Library.rvn').read_text())
+(rejected / 'Main.rvn').write_text(rejection_owners + rejection_source.read_text())
 negative = run('rejected', ['dotnet', compiler, 'neoclr', '--project', rejected / 'App.rvnproj'], 1)
 assert negative.stdout.count('error RAV1503:') + negative.stderr.count('error RAV1503:') == 3
 
@@ -90,7 +95,9 @@ result = run('jit', [codegen, '--jit-managed', '--closed-world', image, '@entry'
 report['jit'] = json.loads(result.stderr.split('JIT_RESULT ', 1)[1])
 assert report['jit']['guestExitCode'] == 42
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
-    (source, SOURCE / 'Library.rvn', SOURCE / 'Rejected.rvn', SOURCE / 'Recursive.rvn', SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+    (source, SOURCE / 'Library.rvn', rejection_source, SOURCE / 'Recursive.rvn', SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+if args.external:
+    report['files'][str(SOURCE / 'ExternalRoot.rvn')] = hashlib.sha256((SOURCE / 'ExternalRoot.rvn').read_bytes()).hexdigest()
 if library_image is not None:
     report['files'][str(library_image)] = hashlib.sha256(library_image.read_bytes()).hexdigest()
 report['passed'] = True

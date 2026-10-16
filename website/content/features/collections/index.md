@@ -173,30 +173,16 @@ Variance also follows nominal interfaces inherited through imported class bases.
 The metadata writer uses explicit dependency ancestry; it does not infer
 conformance from matching members. Result and Sliceable remain invariant.
 
-Generic dependency ancestry substitution is implemented in the metadata SDK and
-validated against CLR behavior. Local native generic base signatures and host introspection are now preserved;
-external constructed bases are supported by host introspection too. Layout
-authoring and Raven execution still need completion; this is not yet an end-to-end supported feature.
+Generic base signatures preserve their arguments through native metadata and host
+introspection. Raven's neoCLR target now supports local and external constructed
+bases, including reordered parameters, recursive arguments such as
+`Node<T> : Base<Node<T>>`, and separately compiled dependencies. Classes remain
+invariant; inherited interface conformance comes from explicit nominal contracts.
 
-SDK-authored generic classes over ordinary nongeneric bases now pass CLR and
-native interpreter/AOT/JIT checks, including inherited storage. Constructed generic
-bases now pass SDK CLR/interpreter/AOT/JIT checks with transitive storage and
-inherited interface dispatch. Raven now emits these owned constructed bases,
-including reordered parameters and source declarations before their bases.
-Separate native consumers import these constructed hierarchies with complete
-inherited field offsets. Recursive source base arguments remain open.
-Raven emits generic classes over local nongeneric
-bases and imports these owners from separately compiled native libraries, retaining
-value/reference payloads and inherited storage. Generic external-base authoring
-remains open. Native base-constructor expressions support scalar constants and
-arithmetic; helper calls and control flow remain backend gaps.
-
-Development SDK authoring also supports recursive nominal base arguments such as
-`Node : Base<Node>` through deferred base binding. Actual inheritance cycles remain
-invalid. CLR/interpreter/AOT/JIT storage checks pass. Raven also emits recursive generic
-and nongeneric base arguments, with native inherited-call execution checks.
-
-Development SDK classes can also derive from explicitly completed external generic
-base contracts, retaining arguments, inherited private storage and nominal interfaces.
-A separate-dependency consumer passes CLR/interpreter/AOT/JIT checks; generic class
-virtual slots remain unsupported. Raven source qualification follows separately.
+Development consumers cover protected base initialization, inherited private and
+public storage, field mutation, value/reference arguments and inherited generic
+interface dispatch. SDK CLR checks and Raven interpreter/AOT/JIT checks pass on
+macOS ARM64. Actual inheritance cycles and reverse/invariant conversions reject.
+Generic reference-class virtual slots remain unsupported. Base-constructor
+expressions support scalar constants and arithmetic; helper calls and control
+flow remain backend gaps. Structural work and Sliceable/Result variance are parked.
