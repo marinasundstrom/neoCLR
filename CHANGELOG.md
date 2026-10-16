@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
-- Author owned constructed generic class bases with exact declaration-scoped arguments, TypeSpec CLI bases and native constructed signatures. Validate direct base initialization and symbolic constraint proofs; substitute ancestry, inherited method/interface contracts and storage references. CLR/interpreter/AOT/JIT tests cover reordered parameters, transitive bases, value/reference payloads and inherited interface dispatch. External constructed base authoring and Raven emission remain separate gaps.
+- Author owned constructed generic class bases with exact declaration-scoped arguments, TypeSpec CLI bases and native constructed signatures. Validate direct base initialization and symbolic constraint proofs; substitute ancestry, inherited method/interface contracts and storage references. CLR/interpreter/AOT/JIT tests cover reordered parameters, transitive bases, value/reference payloads and inherited interface dispatch. Raven now emits owned constructed bases with original-definition scheduling and exact constructor arguments. Retain native source execution and rejection evidence; external constructed base authoring, recursive base binding and imported hierarchy emission remain separate gaps.
 
 - Retain the Raven native consumer for generic classes over local nongeneric bases, covering computed base initialization, generic payload storage, upcasts and inherited-field mutation. The compiler capability is enabled on Raven `codex/neoclr`, including import of separately compiled generic derived owners. Add reverse/invariant conversion rejection checks and local/imported execution reports; constructed/external generic base authoring remains open.
 

@@ -1,0 +1,9 @@
+public class Recursive : RecursiveRoot<Recursive> {
+    init() : base() { }
+}
+
+public open class RecursiveRoot<T> {
+    init() { }
+}
+
+func Main() -> int => 42

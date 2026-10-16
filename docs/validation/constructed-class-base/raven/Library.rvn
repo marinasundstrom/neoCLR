@@ -1,0 +1,26 @@
+public class Leaf : Derived<bool, int> {
+    init(value: int) : base(value, 2) { }
+}
+
+public open class Derived<Unused, T> : Base<T> {
+    public field Count: int
+
+    init(value: T, count: int) : base(value) {
+        Count = count
+    }
+}
+
+public open class Base<T> : View<T> {
+    private var value: T
+
+    init(value: T) {
+        self.value = value
+    }
+
+    func Get() -> T => value
+    func Echo(value: T) -> T => value
+}
+
+public interface View<T> {
+    func Echo(value: T) -> T
+}

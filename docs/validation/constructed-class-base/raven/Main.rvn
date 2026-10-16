@@ -1,0 +1,10 @@
+func Main() -> int {
+    let leaf = Leaf(40)
+    let parent: Base<int> = leaf
+    let view: View<int> = leaf
+    let references = Derived<bool, Base<int>>(parent, 2)
+    if !System.Object.ReferenceEquals(references.Get(), parent) {
+        return 1
+    }
+    return references.Get().Get() + view.Echo(leaf.Count)
+}

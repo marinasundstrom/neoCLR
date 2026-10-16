@@ -1,0 +1,5 @@
+func Reverse(value: Base<int>) -> Leaf => value
+func Invariant(value: Base<int>) -> Base<bool> => value
+func Different(value: Derived<bool, int>) -> Derived<int, int> => value
+
+func Main() -> int => 42
