@@ -1,9 +1,25 @@
 public class Recursive : RecursiveRoot<Recursive> {
-    init() : base() { }
+    public field Count: int
+    init() : base() {
+        Count = 40
+    }
+}
+
+public class RecursiveGeneric<T> : RecursiveRoot<RecursiveGeneric<T>> {
+    private var value: T
+    init(value: T) : base() {
+        self.value = value
+    }
+    func Get() -> T => value
 }
 
 public open class RecursiveRoot<T> {
     init() { }
+    func Echo(value: T) -> T => value
 }
 
-func Main() -> int => 42
+func RecursiveCheck() -> int {
+    let node = Recursive()
+    let generic = RecursiveGeneric<int>(2)
+    return node.Echo(node).Count + generic.Echo(generic).Get()
+}

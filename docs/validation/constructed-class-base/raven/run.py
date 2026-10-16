@@ -22,7 +22,7 @@ project.mkdir(parents=True, exist_ok=True)
 name = 'ConstructedClassBaseRaven'
 source = SOURCE / 'Main.rvn'
 host = SOURCE.parents[1] / 'interface-variance/native-host.c'
-(project / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + source.read_text())
+(project / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + (SOURCE / 'Recursive.rvn').read_text() + source.read_text())
 from xml.sax.saxutils import escape
 (project / 'App.rvnproj').write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="{escape(str(bundle / 'NeoCLR.ClassLibrary.props'))}"/>
@@ -63,13 +63,6 @@ shutil.copyfile(project / 'App.rvnproj', rejected / 'App.rvnproj')
 (rejected / 'Main.rvn').write_text(('' if args.imported else (SOURCE / 'Library.rvn').read_text()) + (SOURCE / 'Rejected.rvn').read_text())
 negative = run('rejected', ['dotnet', compiler, 'neoclr', '--project', rejected / 'App.rvnproj'], 1)
 assert negative.stdout.count('error RAV1503:') + negative.stderr.count('error RAV1503:') == 3
-
-recursive = output / 'recursive'
-recursive.mkdir(exist_ok=True)
-shutil.copyfile(project / 'App.rvnproj', recursive / 'App.rvnproj')
-shutil.copyfile(SOURCE / 'Recursive.rvn', recursive / 'Main.rvn')
-unsupported = run('recursive-base-gap', ['dotnet', compiler, 'neoclr', '--project', recursive / 'App.rvnproj'], 1)
-assert 'recursive constructed base arguments require deferred base binding' in unsupported.stdout + unsupported.stderr
 
 run('compile', ['dotnet', compiler, 'neoclr', '--project', project / 'App.rvnproj'])
 image = project / 'bin/neoclr' / (name + '.dll')

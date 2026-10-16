@@ -1,4 +1,7 @@
 func Main() -> int {
+    if RecursiveCheck() != 42 {
+        return 3
+    }
     let leaf = Leaf(40)
     let parent: Base<int> = leaf
     let view: View<int> = leaf

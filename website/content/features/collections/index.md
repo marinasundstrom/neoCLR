@@ -193,4 +193,5 @@ arithmetic; helper calls and control flow remain backend gaps.
 
 Development SDK authoring also supports recursive nominal base arguments such as
 `Node : Base<Node>` through deferred base binding. Actual inheritance cycles remain
-invalid. CLR/interpreter/AOT/JIT storage checks pass; Raven wiring is a separate step.
+invalid. CLR/interpreter/AOT/JIT storage checks pass. Raven also emits recursive generic
+and nongeneric base arguments, with native inherited-call execution checks.
