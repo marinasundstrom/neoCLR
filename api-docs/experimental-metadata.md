@@ -9276,7 +9276,9 @@ mutable-array covariance remain excluded. Equal value arguments remain exact.
 Local class arguments with explicitly registered imported bases now use the same
 ancestry proof as ordinary reference conversion, including transitive local bases.
 This applies in covariant, contravariant and nested interface positions; reverse
-and unrelated-class conversions still reject. Generic class bases remain unsupported.
+and unrelated-class conversions still reject. A separately compiled Raven
+consumer qualifies this through interpreter, AOT and managed JIT with actual
+object identity and inherited storage mutation. Generic class bases remain unsupported.
 
 ### Native compiler variance bridge — development
 

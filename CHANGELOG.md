@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Qualify imported-base interface variance through a separately compiled Raven library and consumer. Covariant, contravariant and nested calls preserve receiver/payload identity and inherited-field mutation in interpreter/AOT/JIT; three reverse/unrelated source conversions reject. Retain the runner, binary hashes and native fault/GC/sanitizer checks, closing the SDK fix’s source/native qualification gap.
+
 - Fix SDK interface variance validation for local classes inheriting an explicitly registered imported base. Reuse the ordinary reference-conversion ancestry proof for direct/transitive covariance, contravariance and nested variance; keep reverse and unrelated-class conversions rejected. Focused metadata regressions and emitted CLR calls pass. Generic class-base and intrinsic String widening support are unchanged.
 
 - Qualify Raven open generic discovery across interpreter, AOT and managed JIT with explicit assembly/module catalogs: all variance states, parameter identity, indexed/sequence parity, namespace filtering, closed arguments and module/assembly identity pass. Retain a reproducible runner and artifact evidence, verify native fault/GC cleanup and AOT sanitizer checks, and update website/API support guidance. Open member/relationship queries and intrinsic String variance remain gaps.

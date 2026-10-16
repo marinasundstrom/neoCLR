@@ -144,3 +144,8 @@ Raven imports and emits these annotations into native metadata. The runtime keep
 nominal conformance explicit; variance does not box elements or widen Result values.
 Sliceable, mutable collections and array storage remain invariant. Generic metadata
 must remain available independently of native executable specialization.
+
+Development validation also covers local classes inheriting an imported base:
+producer, consumer and nested variance calls preserve object identity and inherited
+storage in interpreter, AOT and managed JIT. Reverse and unrelated-class conversions
+remain rejected. See the [variance reference](/docs/interface-variance.html).

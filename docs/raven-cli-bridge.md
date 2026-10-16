@@ -11248,3 +11248,12 @@ CLR conversion-call checks pass; Raven source and AOT integration for this speci
 case are not newly qualified by those checks. No source lowering, CLI/native encoding
 or Runtime Contract changes are required. Generic class bases and intrinsic String
 widening remain unsupported; no adapter or implicit box is added.
+
+The [imported-base variance consumer](validation/interface-variance/imported-base/README.md)
+subsequently closes that source/native qualification gap. Raven `9854031b8`, rebuilt
+against SDK `2c98cbd1b`, emits a library and consumer independently. Covariant,
+contravariant and nested calls return 42 in interpreter/AOT/managed JIT with receiver
+and payload identity, inherited-field mutation, native cleanup and AOT sanitizer
+checks. Three invalid source conversions reject. The bundle remains
+`variance-argument-sequence-20261016`; retained evidence includes the compiler's SDK
+DLL hash. This changes no Runtime Contract or bridge encoding.

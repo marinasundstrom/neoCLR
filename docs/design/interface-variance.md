@@ -492,3 +492,21 @@ also pass. This restores .NET-aligned nominal reference variance; it does not ad
 adapters, boxing, generic class-base support or String materialization. Runtime
 call dispatch is unchanged; these tests qualify the SDK admission fix, not a new
 Raven/AOT consumer. Runtime Contract configuration and metadata encodings are unchanged.
+
+### Raven imported-base variance qualification (2026-10-16)
+
+The [separately compiled consumer](../validation/interface-variance/imported-base/README.md)
+now closes the source/native qualification gap above. Raven `9854031b8` was rebuilt
+against SDK fix `2c98cbd1b`, using the unchanged
+`variance-argument-sequence-20261016` class-library bundle. The library owns Base and
+the producer/consumer contracts; the consumer owns Derived, Leaf and implementations.
+Widening, narrowing and nested variance calls preserve actual object identity and
+mutations of inherited storage. One emitted consumer returns 42 in interpreter,
+AOT and managed JIT. Three reverse/unrelated conversions produce RAV1503 diagnostics.
+Native host fault/root/collection checks and AOT UBSan/bounds checks pass. Commands
+and hashes of both images, sources, compiler, SDK and runtime/backend are retained.
+
+No source compiler change, Runtime Contract setting, metadata encoding, adapter,
+boxing or expanded variance rule was needed beyond the SDK ancestry correction.
+Generic class bases and intrinsic String variance materialization remain gaps;
+Result and Sliceable remain invariant. Structural work stays parked.

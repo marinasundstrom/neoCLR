@@ -29,3 +29,8 @@ Inspect a declaration through [GenericParameterTypeInfo.Variance](reflection.md#
 Native open-definition discovery supports explicitly retained type catalogs; open
 member/relationship queries and intrinsic String variance materialization remain
 implementation gaps. Annotations do not imply support for those missing operations.
+
+Variance also follows explicitly declared local-to-imported class ancestry. The
+separately compiled Raven consumer validates producer/consumer and nested views in
+interpreter/AOT/JIT, preserving receiver/payload identity and inherited-field writes.
+Reverse and unrelated-class conversions reject; this does not enable generic class bases.

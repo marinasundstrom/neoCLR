@@ -1,0 +1,17 @@
+namespace ImportedVariance
+
+public open class Base {
+    public field Number: int
+
+    public init(number: int) {
+        Number = number
+    }
+}
+
+public interface Producer<out T> {
+    func Get() -> T
+}
+
+public interface Consumer<in T> {
+    func Accept(value: T) -> int
+}

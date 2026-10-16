@@ -1,0 +1,13 @@
+import ImportedVariance.*
+
+class Derived : Base {
+    init(number: int) : base(number) { }
+}
+
+class Unrelated { }
+
+func Reverse(value: Producer<Base>) -> Producer<Derived> => value
+func UnrelatedWidening(value: Producer<Unrelated>) -> Producer<Base> => value
+func ReverseConsumer(value: Consumer<Derived>) -> Consumer<Base> => value
+
+func Main() -> int => 42

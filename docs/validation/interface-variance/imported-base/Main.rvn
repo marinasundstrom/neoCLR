@@ -1,0 +1,65 @@
+import System.*
+import ImportedVariance.*
+
+open class Derived : Base {
+    init(number: int) : base(number) { }
+}
+
+class Leaf : Derived {
+    init(number: int) : base(number) { }
+}
+
+class Source : Producer<Leaf> {
+    private val value: Leaf
+
+    init(value: Leaf) {
+        self.value = value
+    }
+
+    func Get() -> Leaf => value
+}
+
+class Sink : Consumer<Base> {
+    func Accept(value: Base) -> int {
+        value.Number += 1
+        return value.Number
+    }
+}
+
+class NestedSource : Producer<Consumer<Base>> {
+    private val value: Consumer<Base>
+
+    init(value: Consumer<Base>) {
+        self.value = value
+    }
+
+    func Get() -> Consumer<Base> => value
+}
+
+func Widen(value: Producer<Leaf>) -> Producer<Base> => value
+func Narrow(value: Consumer<Base>) -> Consumer<Leaf> => value
+func Nest(value: Producer<Consumer<Base>>) -> Producer<Consumer<Leaf>> => value
+
+func Main() -> int {
+    let leaf = Leaf(40)
+    let source = Source(leaf)
+    let producer = Widen(source)
+    let result = producer.Get()
+    if !Object.ReferenceEquals(result, leaf) || !Object.ReferenceEquals(producer, source) {
+        return 1
+    }
+    let sink = Sink()
+    let consumer = Narrow(sink)
+    if consumer.Accept(leaf) != 41 || leaf.Number != 41 {
+        return 2
+    }
+    let nested = Nest(NestedSource(sink))
+    let nestedConsumer = nested.Get()
+    if !Object.ReferenceEquals(nestedConsumer, sink) {
+        return 3
+    }
+    if nestedConsumer.Accept(leaf) != 42 || leaf.Number != 42 {
+        return 4
+    }
+    return 42
+}
