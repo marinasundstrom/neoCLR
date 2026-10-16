@@ -699,3 +699,18 @@ also pass. CLI base inspection and inheritance projection remain explicitly
 unsupported. Native external generic bases, layout authoring and a Raven executable
 consumer remain follow-ups; host metadata inspection is not guest reflection or
 JIT/AOT qualification. Sliceable/Result variance and structural work remain deferred.
+
+### External constructed-base metadata (2026-10-16)
+
+The reader now selects external base bindings by their construction arity and
+retains the complete imported base signature. Both open and closed host metadata
+views substitute arguments across the explicit dependency boundary; inherited
+interface enumeration follows the resulting constructed base. This extends the
+same .NET substitution model across assemblies, without changing native encoding.
+
+Local/external reader tests pass, including library/executable NEOX preservation,
+missing bindings/dependencies, wrong arity, bad parameter scope and value-base
+rejection. Variance/introspection regressions also pass. Native class layout
+authoring and Raven eligibility/emission/executable qualification remain open;
+host metadata support does not close guest reflection gaps. Sliceable/Result
+variance and structural work remain deferred.

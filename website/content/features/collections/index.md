@@ -175,4 +175,5 @@ conformance from matching members. Result and Sliceable remain invariant.
 
 Generic dependency ancestry substitution is implemented in the metadata SDK and
 validated against CLR behavior. Local native generic base signatures and host introspection are now preserved;
-external generic bases, layout authoring and Raven execution still need completion; this is not yet an end-to-end supported feature.
+external constructed bases are supported by host introspection too. Layout
+authoring and Raven execution still need completion; this is not yet an end-to-end supported feature.

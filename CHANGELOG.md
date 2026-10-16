@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Preserve external constructed class bases through arity-matched native bindings. Host metadata introspection substitutes open/closed arguments and inherits generic interfaces across exact dependency identities; local/external reader and variance regressions pass. Missing/invalid bindings and argument scope reject. Native encoding is unchanged; generic layout authoring and Raven execution remain open.
+
 - Preserve local native constructed class bases in TypeDefinition.BaseTypeSignature. Resolve open and closed BaseType views with canonical generic argument identity, and enumerate interfaces inherited through native class ancestors. Reject malformed/unsafe bases and unsupported CLI inspection/projection; SDK reader, metadata-context and constructed-interface checks pass. External generic bases, layout authoring and Raven/native execution remain open.
 
 - Support scoped generic dependency base contracts in DeclareClassBase, substituting arguments through transitive reference and interface-variance checks in line with .NET. Reject unbound/out-of-scope bases, conflicting edges and definition cycles; generic classes remain invariant. SDK and emitted CLR checks pass. Native generic base materialization, layout authoring and Raven/native qualification remain open.

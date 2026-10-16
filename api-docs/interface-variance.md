@@ -68,3 +68,7 @@ Host metadata introspection now retains local native generic base signatures,
 substitutes open/closed arguments, and includes class-inherited interfaces in
 GetInterfaces. This does not yet qualify guest reflection or Raven/native execution
 for generic class hierarchies. See the experimental metadata API reference.
+
+Constructed external class bases are now retained and substituted by host metadata
+introspection as well, using exact registered dependencies. Generic layout authoring
+and Raven executable qualification remain pending.

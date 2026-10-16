@@ -11403,3 +11403,16 @@ base-signature inspection, and CreateReferenceAssembly still rejects inheritance
 projection; no lossy fallback is added. SDK reader/introspection regression checks
 pass. This does not yet qualify a Raven executable hierarchy: external constructed
 bases, SDK layout authoring and native emitter support remain explicit gaps.
+
+### External generic bases in native reader metadata (2026-10-16)
+
+The SDK now preserves constructed external class bases using arity-matched native
+bindings and exact dependency identities. Host BaseType views substitute open and
+closed arguments and enumerate inherited generic interfaces across assemblies.
+The existing native signature and Runtime Contract encoding is unchanged. Reader
+and variance/introspection regressions pass; no implicit dependency loading occurs.
+
+Generic class-layout authoring and Raven owner eligibility/emission remain open.
+CLI inheritance projection continues to reject unsupported hierarchies rather
+than erasing arguments. This metadata slice is not Raven/native executable or
+guest reflection qualification. Sliceable/Result variance remains postponed.

@@ -9367,8 +9367,32 @@ expanding generic cycles, reject rather than recursively expanding indefinitely.
 ReadNativeAssembly accepts these local native base constructions and preserves the
 original immutable image on Write. Wrong arity, unbound base definitions,
 out-of-scope parameters, sealed bases and invalid base categories reject with
-InvalidDataException. Existing supported external nongeneric bases remain valid;
-constructed external bases and generic class-layout authoring remain gaps.
+InvalidDataException. Explicitly bound external constructed bases also preserve their arguments and
+exact assembly scope. Generic class-layout authoring remains a gap.
 CreateReferenceAssembly still rejects class inheritance rather than projecting
 an incomplete hierarchy. These are metadata-only APIs, not guest native execution
 qualification. SDK reader/introspection and existing context/inheritance checks pass.
+
+### External constructed class bases (development, 2026-10-16)
+
+ReadNativeAssembly also accepts a constructed external class base when its native
+binding matches the definition name and argument arity. The binding must describe
+a top-level reference type in an explicitly registered dependency. BaseTypeSignature
+preserves declaration-scoped arguments; BaseType retains the definition reference.
+NominalTypeInfo.BaseType and ConstructedTypeInfo.BaseType resolve and substitute the
+full signature through the caller's explicit MetadataLoadContext. GetInterfaces
+follows that substituted dependency base and its inherited interface contracts.
+
+For `Child<T> : Dependency.Base<T[]>`, Child<int>'s base is the canonical
+Dependency.Base<int[]> in the same context. No metadata is fetched implicitly.
+Missing/mismatched bindings, invalid argument scope and value-type bindings reject
+with InvalidDataException. Missing/wrong-version dependencies reject at resolution.
+Dependency declaration legality remains subject to runtime verification; the
+consumer binding alone does not prove a base is extendable. Both library and
+executable NEOX wrappers retain exact image bytes on Write. Inheritance CLI
+projection and generic class-layout authoring remain unsupported.
+
+Focused reader checks exercise open/closed identity, inherited generic interfaces,
+round trips and invalid bindings, alongside existing local/nongeneric external
+base and metadata-introspection regressions. This is host metadata support, not a
+new guest reflection or Raven/native execution claim.

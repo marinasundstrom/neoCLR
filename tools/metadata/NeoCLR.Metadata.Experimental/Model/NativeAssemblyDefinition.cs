@@ -415,10 +415,12 @@ public sealed partial class NativeAssemblyDefinition
                 type.BaseIndex = types.FindIndex(candidate => candidate.NativeName == type.BaseName);
                 if (type.BaseIndex < 0)
                 {
+                    int baseArity = type.RawBase!.Value.TryGetProperty("Constructed", out var baseConstruction)
+                        ? Array(baseConstruction, "arguments", 32).Length : 0;
                     Require(IsOrdinaryClass(type) && !type.IsClosedHierarchy &&
-                        nativeTypeAliases.TryGetValue((type.BaseName, 0), out var alias) &&
+                        nativeTypeAliases.TryGetValue((type.BaseName, baseArity), out var alias) &&
                         !alias.ValueType && alias.Declaring is null,
-                        "external base requires an explicit nongeneric top-level reference binding and ordinary class owner");
+                        "external base requires an explicit arity-matched top-level reference binding and ordinary class owner");
                     continue;
                 }
                 var parent = types[type.BaseIndex];
@@ -441,8 +443,6 @@ public sealed partial class NativeAssemblyDefinition
             }
             foreach (var alias in nativeTypeAliases.Values)
                 _ = ImportExternalType(signatureGraph, alias.NativeName, alias.Arity, referenceIdentities, valueTypeReferences, nativeTypeAliases);
-            foreach (var type in types.Where(t => t.BaseName is not null && t.BaseIndex < 0))
-                type.ExternalBase = ImportExternalType(signatureGraph, type.BaseName!, 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             int genericArity = 0; int typeArity = 0;
             var signatureOwners = DefineTypes(signatureGraph, types);
             for (int i = 0; i < types.Count; i++)
@@ -450,6 +450,7 @@ public sealed partial class NativeAssemblyDefinition
                 if (types[i].RawBase is not { } rawBase) continue;
                 typeArity = types[i].GenericNames.Length;
                 types[i].BaseSignature = ReadType(rawBase, false);
+                if (types[i].BaseIndex < 0) types[i].ExternalBase = types[i].BaseSignature!.ImportedType;
                 typeArity = 0;
             }
 
