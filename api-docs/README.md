@@ -2228,3 +2228,16 @@ The new host `TypeParameterConstraints.FunctionType` flag uses the existing expl
 host-SDK RavenDoc exclusion and [manual reference](experimental-metadata.md#native-function-kind-constraint-feature-branch-2026-10-16).
 No guest API/reference assembly/type selection changed. Invocation APIs remain
 postponed; this does not add a guest reflection method.
+
+
+### Provisional FunctionReflection (2026-10-16)
+
+FunctionReflection in System.Runtime.Reflection is included in type selection, the
+matching reference bridge/XML, and the native snapshot from
+`target/function-reflection-library-validated-20261016`. Its Result-returning Invoke
+reports invalid receivers/arguments and unsupported signatures; target faults propagate.
+The [manual reference](functions.md#functionreflectioninvoke-provisional-development-api)
+records the full contract and future generic-overload boundary. RavenDoc currently
+renders the Invoke name as `self(...)` under Operators (the existing Invoke renderer
+limitation); its parameters, Result return, summaries and errors are retained. The
+manual reference supplies the intended spelling; no member is excluded.

@@ -19,14 +19,17 @@ pub fn bind(
         })
         .collect();
     for index in 0..input.functions.len() {
-        if input.functions[index].name != "neoCLR.Runtime.InvokeFunction" {
+        if !matches!(
+            input.functions[index].name.as_str(),
+            "neoCLR.Runtime.InvokeFunction" | "neoCLR.Runtime.InvokeFunctionCheck"
+        ) {
             continue;
         }
         input.functions[index] =
             neoclr::function_invocation::lower(input, &input.functions[index], &shapes)
                 .map_err(|error| error.to_string())?;
         report["nativeBindings"].as_array_mut().ok_or("missing native binding inventory")?.push(json!({
-            "compiledIndex": index, "name": "neoCLR.Runtime.InvokeFunction", "implementation": "dynamic-function-closed-v1",
+            "compiledIndex": index, "name": input.functions[index].name, "implementation": "dynamic-function-closed-v1",
             "policy": "selected closed function bindings; checked boxed arguments and typed invocation; no runtime code generation"
         }));
     }

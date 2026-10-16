@@ -73,3 +73,18 @@ fn target_fault_is_not_wrapped() {
             .contains("dynamic target entered")
     );
 }
+
+#[test]
+fn invocation_check_returns_errors_without_entering_target() {
+    let prefix = SOURCE.split(".function Main()").next().unwrap();
+    let header = ".function neoCLR.Runtime.InvokeFunctionCheck(System.Object, arrayref<System.Object>) -> Int32\n.methodimpl InternalCall\n.end\n";
+    for (count, value, expected) in [
+        (1, "ldc.i4 2\nbox Int32", 0),
+        (2, "ldc.i4 2\nbox Int32", 8),
+        (1, "ldc.bool true\nbox Boolean", 8),
+    ] {
+        let source = format!("{prefix}{header}.function Main() -> Int32\n.local arrayref<System.Object> args\nldc.i4 {count}\narray.reserve System.Object\nstloc args\nldloc args\nldc.i4 0\n{value}\nstelem System.Object\nldc.i4 40\nnewobj instance Counter::.ctor(Int32)\nfunction.bind fn<Int32,Int32> = instance Counter::Add(Int32)\ncastclass System.Object\nldloc args\ncall neoCLR.Runtime.InvokeFunctionCheck(System.Object,arrayref<System.Object>)\nret\n.end")
+            .replace("ldarg 1\nadd\nret", "fault \"check must not enter target\"");
+        assert_eq!(run(&source).unwrap().value, Value::Int32(expected));
+    }
+}

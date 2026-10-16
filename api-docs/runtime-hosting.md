@@ -173,3 +173,11 @@ inputs and signatures fault when the adapter executes. It neither executes code 
 changes its inputs. It preserves the service identity and signature, clears the
 InternalCall flag and supplies the adapter body and initialized result local.
 See [the primitive contract and validation](../docs/validation/dynamic-function-invocation/README.md).
+
+
+The provisional `function_invocation::lower` adapter also accepts the reserved
+`neoCLR.Runtime.InvokeFunctionCheck(Object, Object[]) -> Int32` contract. It performs
+no target call: status 0 means valid, 2 unsupported signature, 6 invalid receiver,
+and 8 invalid arguments. JIT/AOT use the same closed-shape adapter as the interpreter.
+This internal status protocol supports the public Result-returning FunctionReflection
+facade and is not a stable host ABI.

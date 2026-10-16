@@ -6,6 +6,7 @@ static class ReflectionBindings
 {
     public static readonly string[] ReferenceTypes = ["System.Introspection.CustomAttributeData", "System.Introspection.CustomAttributeTypedArgument", "System.Introspection.CustomAttributeNamedArgument", "System.Introspection.AssemblyInfo", "System.Introspection.ModuleInfo", "System.Runtime.RuntimeContext", "System.Introspection.TypeInfo", "System.Introspection.NominalTypeInfo", "System.Introspection.FunctionTypeInfo", "System.Introspection.UnionTypeInfo", "System.Introspection.IntersectionTypeInfo", "System.Introspection.TupleTypeInfo", "System.Introspection.GenericParameterTypeInfo", "System.Introspection.ParameterInfo", "System.Introspection.MemberInfo", "System.Introspection.FieldInfo", "System.Introspection.MethodInfo", "System.Introspection.ConstructorInfo", "System.Introspection.PropertyInfo"];
     static readonly (string Owner, string Name, string[] Args, string Result, bool Static)[] Members = [
+        ("System.Runtime.Reflection.FunctionReflection", "Invoke", ["System.Object", "System.Object[]"], "System.Result<System.Object,System.Runtime.Reflection.ReflectionError>", true),
         ("System.Runtime.Reflection.ArrayReflection", "GetLength", ["System.Object"], "Int32", true),
         ("System.Runtime.Reflection.ArrayReflection", "GetValue", ["System.Object", "Int32"], "System.Object", true),
         ("System.Runtime.Reflection.ArrayReflection", "Create", ["System.Introspection.TypeInfo", "System.Object[]"], "System.Object", true),
@@ -144,6 +145,9 @@ static class ReflectionBindings
     public const string Declarations = "\n" + """
         #nullable enable annotations
         namespace Runtime.Reflection {
+            public static class FunctionReflection {
+                public static Result<object?, ReflectionError> Invoke(object? function, object?[] arguments) => default;
+            }
             public static class ArrayReflection {
                 public static int GetLength(object array) => default;
                 public static object? GetValue(object array, int index) => default;
@@ -225,7 +229,7 @@ static class ReflectionBindings
     {
         if (type is ArrayType { IsVector: true } array && ReferenceTypes.Contains(array.ElementType.FullName)) return $"arrayref<{array.ElementType.FullName}>";
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
-        if ((ReferenceTypes.Contains(type.FullName) || type.FullName is "System.Runtime.Reflection.ArrayReflection" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions") && !type.IsValueType) return type.FullName;
+        if ((ReferenceTypes.Contains(type.FullName) || type.FullName is "System.Runtime.Reflection.FunctionReflection" or "System.Runtime.Reflection.ArrayReflection" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions") && !type.IsValueType) return type.FullName;
         return type.IsValueType && type.FullName is "System.RuntimeTypeHandle" or "System.Introspection.BindingFlags" ? type.FullName : null;
     }
     public static void Validate(ModuleDefinition module)

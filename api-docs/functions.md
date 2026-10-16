@@ -158,16 +158,39 @@ names are retained independently of lowered implementation names. Null member ac
 raises NullReference. This Object inheritance contract applies to Functions;
 structural identity alone does not imply the same behavior for other type families.
 
-## Provisional dynamic invocation primitive
+## FunctionReflection.Invoke (provisional development API)
 
-On `codex/function-kind-constraint`, an existing function reference can be invoked
-through `neoCLR.Runtime.InvokeFunction(function, arguments)` with a non-null Object
-argument array. Exact scalar boxes are unboxed; references use checked casts. Results
-are boxed/reference-preserving, with null for no-result calls. This is a native
-primitive and sample-local Raven facade, not a permanent class-library API.
-Interpreter/JIT/AOT qualification and restrictions are recorded in the
-[dynamic invocation fixture](../docs/validation/dynamic-function-invocation/README.md).
-This does not turn a MethodInfo descriptor into a bound function or add multicast policy.
+Import `System.Runtime.Reflection.*` and use
+[FunctionReflection](xref:System.Runtime.Reflection.FunctionReflection):
+
+```raven
+static func Invoke(function: Object?, arguments: Object?[])
+    -> Result<Object?, ReflectionError>
+```
+
+The argument is an existing native structural function reference, retaining its bound
+receiver/captures. Supply a non-null argument array, including an empty array for a
+zero-parameter function. A successful call returns `Ok` with the boxed scalar result,
+original reference, or null for a no-result call. Null reference arguments/results
+are supported when the signature admits reference values.
+
+| Result error | Meaning |
+| --- | --- |
+| `InvalidReceiver` | The value is null or is not a function. |
+| `InvalidArguments` | Argument count or type does not match; a null argument array also rejects. |
+| `UnsupportedType` | The function signature requires unsupported marshalling. |
+
+Validation does not enter the target. Exact scalar boxes and assignable references
+are supported; numeric coercion, optional arguments, ref/out copyback and arbitrary
+value record/tuple/union marshalling are not. **Faults raised by the function itself
+propagate**, rather than becoming `ReflectionError`. Generic overloads remain future
+work; this provisional API does not infer a return type from an Object reference.
+
+The library uses `neoCLR.Runtime.InvokeFunctionCheck` followed by the checked
+`InvokeFunction` primitive. The check returns a status without calling the function;
+the invocation primitive retains its runtime checks. Interpreter/JIT/AOT validation
+and restrictions are recorded in the [fixture](../docs/validation/dynamic-function-invocation/README.md).
+This does not turn a MethodInfo into a bound function or add multicast policy.
 
 
 The native reflection slice now recovers the exact selected function shape through

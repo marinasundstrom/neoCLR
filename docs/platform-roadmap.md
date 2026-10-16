@@ -4926,3 +4926,10 @@ The same retained consumer now compares source-level function patterns with
 TypeInfo.IsInstanceOfType, including closed generic signatures and negative cases.
 This is qualification of the existing reflection relationship contract, not a new
 function variance or dynamic invocation API.
+
+
+Author-directed public facade (2026-10-16): provisional FunctionReflection now lives
+in System.Runtime.Reflection with a Result<Object?, ReflectionError> Invoke. Input
+validation is shared across interpreter/JIT/AOT, with target faults still propagating.
+The consumer imports the fresh five-library bundle and the API reference is refreshed.
+Generic overloads remain future work; this does not resume the wider structural plan.

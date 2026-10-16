@@ -1,5 +1,6 @@
 import System.*
 import System.Introspection.*
+import System.Runtime.Reflection.*
 
 class Counter {
     private val value: int
@@ -11,12 +12,7 @@ class Counter {
     func Add(increment: int) -> int => value + increment
 }
 
-// This facade is deliberately sample-local while its API evolves.
-static class FunctionReflection {
-    static func Invoke(function: Object, arguments: Object?[]) -> Object? {
-        return neoCLR.Runtime.InvokeFunction(function, arguments)
-    }
-}
+func KeepObject(value: Object?) -> Object? => value
 
 func Keep(callback: (int) -> int) -> (int) -> int => callback
 
@@ -86,13 +82,29 @@ func Main() -> int {
     let keeper: ((int) -> int) -> (int) -> int = Keep
     let callbackArguments: Object?[] = [reference]
     let forwarded = FunctionReflection.Invoke(keeper, callbackArguments)
-    if forwarded is not Object function {
+    if forwarded is not .Ok(Object function) {
         return 2
+    }
+    let wrongCount: Object?[] = []
+    let wrongType: Object?[] = [true]
+    let nullValue: Object?[] = [null]
+    if FunctionReflection.Invoke(function, wrongCount) is not .Error(.InvalidArguments) ||
+        FunctionReflection.Invoke(function, wrongType) is not .Error(.InvalidArguments) ||
+        FunctionReflection.Invoke(function, nullValue) is not .Error(.InvalidArguments) {
+        return 12
+    }
+    if FunctionReflection.Invoke(null, wrongCount) is not .Error(.InvalidReceiver) ||
+        FunctionReflection.Invoke(ordinary, wrongCount) is not .Error(.InvalidReceiver) {
+        return 13
+    }
+    let keepObject: (Object?) -> Object? = KeepObject
+    if FunctionReflection.Invoke(keepObject, nullValue) is not .Ok(null) {
+        return 14
     }
     let arguments: Object?[] = [2]
     let result = FunctionReflection.Invoke(function, arguments)
     return result match {
-        int value => value
+        .Ok(int value) => value
         _ => 0
     }
 }

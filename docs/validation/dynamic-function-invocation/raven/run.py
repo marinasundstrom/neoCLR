@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--case', choices=('success', 'target-fault'), default='success')
 
 
 args = parser.parse_args()
@@ -19,11 +20,12 @@ compiler, bundle, output = (p.resolve() for p in (args.compiler, args.bundle, ar
 project = output / 'project'
 project.mkdir(parents=True, exist_ok=True)
 name = 'DynamicFunctionRaven'
-source = SOURCE / 'Main.rvn'
-library_source = SOURCE / 'Primitive.rvn'
+negative = args.case == 'target-fault'
+expected = 2 if negative else 42
+source = SOURCE / ('TargetFault.rvn' if negative else 'Main.rvn')
 host = SOURCE.parents[1] / 'interface-variance/native-host.c'
 (project / 'Main.rvn').write_text(source.read_text())
-(project / 'Primitive.rvn').write_text(library_source.read_text())
+(project / 'Primitive.rvn').unlink(missing_ok=True)
 from xml.sax.saxutils import escape
 (project / 'App.rvnproj').write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="{escape(str(bundle / 'NeoCLR.ClassLibrary.props'))}"/>
@@ -52,7 +54,9 @@ references = ['--system', bundle / 'System.runtime.neox', '--object-root', bundl
 for library in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
     references += ['--module', bundle / (library + '.dll')]
 interpreter = [ROOT / 'target/debug/neoclr', 'run', image, '--execution', 'interpreter', *references]
-run('interpreter', interpreter, 42)
+interpreted = run('interpreter', interpreter, 1 if negative else 42)
+if negative:
+    assert 'public function target entered' in interpreted.stderr
 codegen = ROOT / 'target/debug/neoclr-codegen'
 obj = output / 'app.o'
 obj.unlink(missing_ok=True)
@@ -64,12 +68,16 @@ link = ['clang', '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall',
 support = [console / f for f in ('native-gc.c', 'root-probe.c', 'text-arena.c', 'native-stack.c')]
 support += [ROOT / 'docs/experiments/aot-fault-details/render.c']
 run('link-aot', [*link, '-fsanitize=undefined,bounds', host, obj, *support, '-o', output / 'app'])
-run('execute-aot', [output / 'app'], 42)
+executed = run('execute-aot', [output / 'app'], expected)
+if negative:
+    assert 'public function target entered' in executed.stdout + executed.stderr
 run('link-jit', [*link, '-DJIT_HOST', '-dynamiclib', host, *support, '-o', output / 'host.dylib'])
 result = run('jit', [codegen, '--jit-managed', '--closed-world', image, '@entry', output / 'host.dylib', *options])
 report['jit'] = json.loads(result.stderr.split('JIT_RESULT ', 1)[1])
-assert report['jit']['guestExitCode'] == 42
+assert report['jit']['guestExitCode'] == expected
+if negative:
+    assert 'public function target entered' in result.stdout + result.stderr
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
-    (source, library_source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
+    (source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
 report['passed'] = True
 (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')

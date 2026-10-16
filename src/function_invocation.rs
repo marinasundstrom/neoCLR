@@ -4,16 +4,21 @@ use crate::{
     metadata::{Function, FunctionRef, Instruction as Op, Type},
 };
 
-/// Build a checked adapter for the reserved InvokeFunction service over closed shapes.
+/// Build an adapter for InvokeFunction or its non-invoking InvokeFunctionCheck service.
+///
+/// Check returns 0 for valid input, 2 for unsupported signatures, 6 for invalid
+/// receivers and 8 for invalid arguments; it never enters the target function.
 ///
 /// Experimental compiler/runtime primitive, not a stable hosting ABI. Arguments use
 /// Object[] with exact boxed scalar types or assignable references; no coercion,
 /// ref/out copyback or binder policy is provided. A no-result call returns null.
 /// The supplied shape inventory must cover all reachable function bindings.
-/// Unsupported shapes and invalid inputs fault before entering the target.
+/// Invoke faults on invalid inputs; Check returns a status before entering the target.
 pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Function, Fault> {
-    let object = service.returns.clone();
-    if service.name != "neoCLR.Runtime.InvokeFunction"
+    let check = service.name == "neoCLR.Runtime.InvokeFunctionCheck";
+    let object = service.parameters.first().cloned().unwrap_or(Type::Void);
+    if (!check && service.name != "neoCLR.Runtime.InvokeFunction")
+        || service.returns != if check { Type::Int32 } else { object.clone() }
         || service.instance
         || service.owner.is_some()
         || service.parameters != [object.clone(), Type::ArrayRef(Box::new(object.clone()))]
@@ -40,6 +45,11 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
         Op::BranchFalse(4),
         Op::Fault("function arguments require a non-null Object array".into()),
     ];
+    if check {
+        body[3] = Op::Int(8);
+        body.insert(4, Op::Return);
+        body[2] = Op::BranchFalse(5);
+    }
     let mut seen = vec![];
     for ty in shapes {
         let Type::Function(shape) = ty else {
@@ -63,7 +73,47 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
             .all(|t| crate::reflection_properties::supported_value(module, t))
             && (shape.no_result
                 || crate::reflection_properties::supported_value(module, &shape.returns));
-        if supported {
+        if supported && check {
+            let count_ok = body.len() + 8;
+            body.extend([
+                Op::Arg(1),
+                Op::ArrayLength,
+                Op::ConvertInt32,
+                Op::Int(shape.parameters.len() as i32),
+                Op::Equal,
+                Op::BranchTrue(count_ok),
+                Op::Int(8),
+                Op::Return,
+            ]);
+            for (i, parameter) in shape.parameters.iter().enumerate() {
+                let mut null_branch = None;
+                if module.is_object_reference_type(parameter) {
+                    body.extend([
+                        Op::Arg(1),
+                        Op::Int(i as i32),
+                        Op::ArrayElement(object.clone()),
+                        Op::ReferenceIsNull,
+                    ]);
+                    null_branch = Some(body.len());
+                    body.push(Op::BranchTrue(0));
+                }
+                let valid = body.len() + 8;
+                body.extend([
+                    Op::Arg(1),
+                    Op::Int(i as i32),
+                    Op::ArrayElement(object.clone()),
+                    Op::IsInstance(parameter.clone()),
+                    Op::ReferenceIsNull,
+                    Op::BranchFalse(valid),
+                    Op::Int(8),
+                    Op::Return,
+                ]);
+                if let Some(index) = null_branch {
+                    body[index] = Op::BranchTrue(body.len());
+                }
+            }
+            body.extend([Op::Int(0), Op::Return]);
+        } else if supported {
             let arity_ok = body.len() + 7;
             body.extend([
                 Op::Arg(1),
@@ -108,14 +158,20 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
                 body.push(Op::BoxValue(shape.returns.clone()));
             }
             body.push(Op::Return);
+        } else if check {
+            body.extend([Op::Int(2), Op::Return]);
         } else {
             body.push(Op::Fault("unsupported dynamic function signature".into()));
         }
         body[branch] = Op::BranchTrue(body.len());
     }
-    body.push(Op::Fault(
-        "dynamic invocation requires a supported non-null function".into(),
-    ));
+    if check {
+        body.extend([Op::Int(6), Op::Return]);
+    } else {
+        body.push(Op::Fault(
+            "dynamic invocation requires a supported non-null function".into(),
+        ));
+    }
     result.body = body;
     Ok(result)
 }

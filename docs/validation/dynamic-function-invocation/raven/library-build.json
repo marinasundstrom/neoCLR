@@ -1,0 +1,83 @@
+{
+  "sourceBaseCommit": "4edf8f3e38a66d5d04895d2fcea6403117408ad4",
+  "sourceWorkingTree": true,
+  "compilerCommit": "e4acca9cf",
+  "compilerNote": "Compiled before commit; same callback parameter implementation, subsequently formatted and committed.",
+  "bundle": "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+        "/Users/robert/Projects/neoclr/target/tuple-info-bootstrap/System.retained.json",
+        "/Users/robert/Projects/neoclr/target/function-reflection-library-validated-20261016/System.runtime.neox",
+        "--reference",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "sources": {
+    "runtime/raven/src/System/Runtime/Reflection/FunctionReflection.rvn": "361dbd8e4d07ad07fb2a0382f4d3c9af0f4a429bb699e7ea83409d866696911c",
+    "runtime/raven/native/RuntimeIntrospectionCalls.rvn": "ecab06c08021f54819999e05f37cfb8c6bf3e0dd62f16cbd61e3c7078739c960",
+    "runtime/raven/native/RuntimeIntrospectionServices.rvn": "0f2a2143f1f4c0e84988cb3d5b7b8f17b1060ca488589ebc7e10db4ad916201c",
+    "src/function_invocation.rs": "d8472f2374b6301f307105d6f126e26895d10221ae1d8522a9a0d70a9ebdfc31",
+    "src/native.rs": "a0dd8bbd3c92bc500a8702d6a0e9fec0f4f2968b1f8db791a785fd3d79a96db5",
+    "runtime/codegen/src/function_invocation.rs": "cacfeab35a2dbc83e34fc6cd6c6df5761f3245c1bc021e8a845a3d17be5f2e43"
+  },
+  "bundleManifestSha256": "dc92e3f835797fb7ab7f1bfbcda4fffec81901f7096a031978844f56bb4b4418"
+}

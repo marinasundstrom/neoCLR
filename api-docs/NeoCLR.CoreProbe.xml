@@ -3612,5 +3612,16 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
   <param name="range">Half-open element bounds, including from-end boundaries.</param>
   <remarks>Delegates to Slice, sharing receiver-relative validation. Referenced elements remain shared.</remarks>
 </member>
+<member name="T:System.Runtime.Reflection.FunctionReflection">
+  <summary>Checked dynamic invocation of native structural function values.</summary>
+  <remarks>Provisional development API. Faults raised by the target propagate unchanged.</remarks>
+</member>
+<member name="M:System.Runtime.Reflection.FunctionReflection.Invoke(System.Object,System.Object[])">
+  <summary>Validates arguments and invokes a bound function.</summary>
+  <param name="function">The function reference, including its bound receiver or captures.</param>
+  <param name="arguments">Arguments in signature order; use an empty array for no parameters.</param>
+  <returns>Ok with a boxed result, preserved reference or null; otherwise InvalidReceiver, InvalidArguments or UnsupportedType.</returns>
+  <remarks>Exact scalar boxes and compatible references only. No coercion, ref/out copyback or arbitrary value marshalling. Target faults are not converted to errors.</remarks>
+</member>
 </members>
 </doc>

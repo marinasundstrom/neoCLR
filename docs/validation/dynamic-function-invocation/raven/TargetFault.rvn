@@ -1,0 +1,17 @@
+import System.*
+import System.Runtime.Reflection.*
+
+func Explode() -> int {
+    System.Fail("public function target entered")
+}
+
+func Main() -> int {
+    let callback: () -> int = Explode
+    let arguments: Object?[] = []
+    let result = FunctionReflection.Invoke(callback, arguments)
+    // Reaching either Result branch would incorrectly swallow the target fault.
+    return result match {
+        .Ok(_) => 21
+        .Error(_) => 22
+    }
+}

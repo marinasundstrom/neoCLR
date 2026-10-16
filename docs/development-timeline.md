@@ -18371,3 +18371,15 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   the [native consumer](validation/dynamic-function-invocation/README.md), covering
   generic tests, captures, invocation and negative cases. This keeps native function
   experiments separate and adds no new signature variance semantics.
+
+
+- **Public function reflection direction (2026-10-16):** the author requested a
+  FunctionReflection class in System.Runtime.Reflection, suggested future generic
+  overloads, and raised Result errors for incorrect arguments. **Assistant decision:**
+  use the existing ReflectionError convention for validation failures, while allowing
+  target faults to propagate. **Action:** implemented a provisional public Invoke,
+  shared non-invoking validation primitive and a separate-consumer fixture; refreshed
+  API reference artifacts. A fresh library rebuild exposed the reserved bootstrap
+  callback-symbol gap; its target-specific fix preserves ordinary .NET delegates.
+  Generic overloads and broader marshalling remain open. See the
+  [validation record](validation/dynamic-function-invocation/README.md).

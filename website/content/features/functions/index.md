@@ -93,13 +93,14 @@ branch development, not a published capability.
 ### Provisional dynamic invocation (feature branch)
 
 A native primitive now accepts a function reference and an Object argument array,
-validates/converts the arguments and invokes its existing bound target. A Raven
-sample-local facade demonstrates interpreter/JIT/AOT execution. Scalar results are
+validates/converts the arguments and invokes its existing bound target. The public Raven
+FunctionReflection consumer demonstrates interpreter/JIT/AOT execution. Scalar results are
 boxed, reference identity is retained, and no-result calls return null. Count/type
 mismatches reject before invocation; target faults propagate. Exact boxed scalar
 and supported reference signatures are the initial profile; ref/out, coercion and
-arbitrary value marshalling remain gaps. The facade is provisional, not a permanent
-class-library member. Function-list/event policy remains separate.
+arbitrary value marshalling remain gaps. The provisional class-library `System.Runtime.Reflection.FunctionReflection.Invoke`
+now returns `Result<Object?, ReflectionError>` for input validation. Target faults
+still propagate; generic overloads remain future work. Function-list/event policy remains separate.
 
 The same source sample checks Object.GetType against the exact structural function
 type and dynamically passes a function through another function as an argument and
@@ -118,3 +119,9 @@ The retained native sample also checks that `TypeInfo.IsInstanceOfType` agrees w
 function-type `is` patterns, including closed generic signatures, null, nominal
 objects and mismatched signatures. Reflection uses the existing exact native
 function signature relationship.
+
+
+The public function invocation consumer imports the fresh class-library API and
+checks wrong argument counts/types, null and non-function receivers, plus successful
+null reference results. Validation errors are ordinary Result values; no event or
+multicast policy is implied.

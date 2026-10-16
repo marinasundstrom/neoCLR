@@ -344,10 +344,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         return Ok(Binding::ReflectionCollection(kind as u8));
     }
-    if function.name == "neoCLR.Runtime.InvokeFunction" {
+    if matches!(
+        function.name.as_str(),
+        "neoCLR.Runtime.InvokeFunction" | "neoCLR.Runtime.InvokeFunctionCheck"
+    ) {
         let object = Type::from_name("System.Object");
-        if function.parameters != [object.clone(), Type::ArrayRef(Box::new(object.clone()))]
-            || function.returns != object || function.no_result {
+        let returns = if function.name.ends_with("Check") { Type::Int32 } else { object.clone() };
+        if function.parameters != [object.clone(), Type::ArrayRef(Box::new(object))]
+            || function.returns != returns || function.no_result {
             return Err(Fault::new("dynamic function invocation signature mismatch"));
         }
         return Ok(Binding::InvokeFunction);

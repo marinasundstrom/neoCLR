@@ -124,6 +124,8 @@ static partial class RuntimeServiceBindings
             ("ObjectIdentityHash", ["System.Object"], "Int32"),
             ("ReflectionArrayLength", ["System.Object"], "Int32"),
             ("ReflectionArrayGet", ["System.Object", "Int32"], "System.Object"),
+            ("InvokeFunction", ["System.Object", "arrayref<System.Object>"], "System.Object"),
+            ("InvokeFunctionCheck", ["System.Object", "arrayref<System.Object>"], "Int32"),
             ("ReflectionArrayCreate", ["System.Introspection.TypeInfo", "arrayref<System.Object>"], "System.Object"),
             ("ReflectionAssignable", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
             ("ReflectionSubclass", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),

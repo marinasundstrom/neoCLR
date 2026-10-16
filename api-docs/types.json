@@ -297,6 +297,7 @@
   "System.Runtime.Reflection.ArrayReflection",
   "System.Runtime.Reflection.ConstructorReflectionExtensions",
   "System.Runtime.Reflection.FieldReflectionExtensions",
+  "System.Runtime.Reflection.FunctionReflection",
   "System.Runtime.Reflection.MethodReflectionExtensions",
   "System.Runtime.Reflection.PropertyReflectionExtensions",
   "System.Runtime.Reflection.ReflectionError",

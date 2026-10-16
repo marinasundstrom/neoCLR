@@ -1,8 +1,0 @@
-import System.*
-import System.Runtime.CompilerServices.*
-
-module neoCLR.Runtime
-
-// Provisional runtime primitive; this declaration is local to the experiment.
-[MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func InvokeFunction(function: Object, arguments: Object?[]) -> Object?;

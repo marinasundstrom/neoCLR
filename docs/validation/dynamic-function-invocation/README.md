@@ -3,8 +3,9 @@
 Feature branch: `codex/function-kind-constraint`. The reserved native primitive is
 `neoCLR.Runtime.InvokeFunction(System.Object, arrayref<System.Object>) -> System.Object`.
 It takes an existing function reference, not a method descriptor or name. The
-reference retains its bound receiver/closure. The Raven sample supplies a local
-InternalCall declaration and facade; no permanent class-library API is introduced.
+reference retains its bound receiver/closure. The Raven sample now imports the provisional class-library
+`System.Runtime.Reflection.FunctionReflection` API; it has no local facade or
+InternalCall declaration.
 
 The interpreter lowers each invocation to ordinary checked IL. JIT/AOT use the same
 adapter builder over selected closed function bindings, then compile ordinary
@@ -23,14 +24,15 @@ faults propagate through the existing runtime mechanism, without wrapping.
 .NET comparison: [Delegate.DynamicInvoke](https://learn.microsoft.com/en-us/dotnet/api/system.delegate.dynamicinvoke?view=net-10.0)
 provides the analogous boxed argument/result boundary. Our provisional divergence
 uses structural function references, exact conversions, a required argument array,
-and existing terminal faults instead of reflection exceptions/target wrappers.
+and Result-based validation errors instead of reflection exceptions. Target faults
+still propagate without wrapping.
 These restrictions keep the primitive usable without defining a permanent binder
 policy. The runtime owns this operation because checked function bindings, GC roots
 and execution frames are runtime invariants; an FFI helper would expose those internals.
 
 `Main.neoil` checks dynamic no-result mutation and integer invocation on the same
 receiver, returning 42. The Raven fixture invokes a bound callback through a
-sample-local `FunctionReflection.Invoke` facade, checks its runtime type through
+public `FunctionReflection.Invoke` API, checks its runtime type through
 Object.GetType against a structural typeof token, and dynamically passes a function
 as an argument/result through a second callback before invoking it. Both run in interpreter/AOT/JIT;
 AOT uses UBSan/bounds and the native host checks root/heap cleanup. Negative cases
@@ -46,10 +48,13 @@ python3 docs/validation/dynamic-function-invocation/raven/run.py \
 cargo test --test dynamic_function_invocation
 ```
 
-Results retain binary/source/bundle hashes. The bundle is the existing
-`variance-argument-sequence-20261016`; the runtime/compiler backend must include
-this branch's primitive. No guest API snapshot inputs change in this slice: the
-facade is sample-local and the host lowering helper has a manual API entry.
+Results retain binary/source/bundle hashes. The raw primitive fixtures retain their
+original `variance-argument-sequence-20261016` evidence. The public Raven consumer
+uses the fresh `function-reflection-library-validated-20261016` five-library bundle,
+including the API and native service declarations. Its matching compiler includes
+reserved bootstrap RuntimeServices Func/Action parameter projection; ordinary CLI
+delegates remain nominal. Guest reference/type selection/XML and native API snapshot
+are refreshed for the new public class.
 Function signature bounds and multicast/event policies remain outside this slice.
 
 
@@ -79,3 +84,17 @@ nominal-object, parameter-mismatch and return-mismatch cases are retained. The
 consumer explicitly compares the generic reflection result with the language `is`
 result. Both use existing runtime relationship rules; no new API or compiler
 lowering is introduced by this validation slice.
+
+
+The public consumer verifies `Error(InvalidArguments)` for wrong counts, wrong boxes
+and null in a scalar slot; `Error(InvalidReceiver)` for null/nominal receivers; and
+`Ok(null)` for a valid null reference argument/result. The focused runtime test also
+proves `InvokeFunctionCheck` never enters the target, even for valid inputs. Existing
+raw-primitive target-fault/no-result tests remain applicable. Unsupported marshalling
+returns `UnsupportedType`; generic overloads are not introduced.
+
+
+Run the public target-fault consumer with `raven/run.py --case target-fault` and a
+fresh output directory. It verifies that a fault raised inside the function propagates
+through the Result-returning facade in interpreter/JIT/AOT, rather than becoming Ok
+or Error. The positive consumer remains the default case.

@@ -6,6 +6,14 @@ module System.Runtime.CompilerServices
 
 // Native adapter additions; seed-owned primitives remain on the selected bootstrap.
 internal extension IntrospectionRuntimeServices for RuntimeServices {
+    static func InvokeFunction(function: Object?, arguments: Object?[]) -> Object? {
+        return neoCLR.Runtime.InvokeFunction(function, arguments)
+    }
+
+    static func InvokeFunctionCheck(function: Object?, arguments: Object?[]) -> int {
+        return neoCLR.Runtime.InvokeFunctionCheck(function, arguments)
+    }
+
     static func AssemblyMetadataToken(arg0: string) -> int {
         return neoCLR.Runtime.AssemblyMetadataToken(arg0)
     }

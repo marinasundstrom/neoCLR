@@ -195,3 +195,15 @@ interpreter, AOT and managed JIT by the
 The sibling open-definition consumer qualifies declaration parameters and variance
 in interpreter, AOT and managed JIT through explicit type-catalog retention. This
 does not grant construction or reflective invocation rights.
+
+
+## Function invocation (provisional)
+
+[FunctionReflection](xref:System.Runtime.Reflection.FunctionReflection) provides
+`Invoke(function: Object?, arguments: Object?[]) -> Result<Object?, ReflectionError>`
+for native structural function values. It validates receiver, count and argument
+types before calling. Invalid input is a Result error; target faults propagate.
+See [function invocation](functions.md#functionreflectioninvoke-provisional-development-api)
+for supported signatures, null/no-result behavior and limits. Generic overloads are
+future work. This differs from .NET Delegate.DynamicInvoke's exception contract and
+uses the existing neoCLR reflection error convention.
