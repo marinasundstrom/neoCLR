@@ -12304,3 +12304,16 @@ checks pass. The author's exception-free recovery question is recorded in the
 [recoverable arithmetic proposal](design/checked-arithmetic.md). This is design
 work alongside compiler completion, not an implemented API or a permanent roadmap
 reprioritization.
+
+
+### Nominal numeric method bounds and static Self specialization (2026-10-16)
+
+Native JIT/AOT specialization admits closed nongeneric nominal interface bounds
+on generic methods, using the runtime's exact declaration/signature/Self checks.
+Static Self calls resolve to concrete implementations before ordinary body selection.
+This brings the bounded numeric capability experiment closer to .NET static abstract
+interface dispatch without adopting erased interfaces or structural conformance.
+The existing metadata carries both constraints and Self; no Runtime Contract switch,
+CLI bridge encoding, guest API or opcode is introduced. Interpreter behavior is reused.
+Instance/borrowed calls and constructed method bounds remain separate. See
+[numerics qualification](validation/numerics-interfaces/README.md).

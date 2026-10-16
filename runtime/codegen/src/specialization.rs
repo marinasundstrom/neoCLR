@@ -18,17 +18,24 @@ struct Shape {
     row: usize,
     name: String,
 }
-// Only the function category is admitted here; no invocation signature is implied.
-fn check_method_constraints(function: &Function, arguments: &[Type]) -> Result<(), Error> {
+// Admit only closed nongeneric nominal interface bounds and the existing function category.
+fn check_method_constraints(module: &neoclr::Module, function: &Function, arguments: &[Type]) -> Result<(), Error> {
     for constraint in &function.generic_constraints {
-        if constraint.kind != neoclr::metadata::ConstraintKind::FunctionType {
-            return Err("unsupported generic method constraint".into());
-        }
-        if !matches!(
-            arguments.get(constraint.parameter as usize),
-            Some(Type::Function(_))
-        ) {
-            return Err("generic method argument violates function-kind constraint".into());
+        let argument = arguments.get(constraint.parameter as usize)
+            .ok_or("generic method constraint argument missing")?;
+        match &constraint.kind {
+            neoclr::metadata::ConstraintKind::FunctionType => {
+                if !matches!(argument, Type::Function(_)) {
+                    return Err("generic method argument violates function-kind constraint".into());
+                }
+            }
+            neoclr::metadata::ConstraintKind::TypeBound(bound @ Type::Named(_))
+                if module.type_definition(bound).is_some_and(|t|
+                    t.representation == neoclr::metadata::Representation::Interface && t.generic_parameters.is_empty()) => {
+                neoclr::native_metadata::validate_self_interface_bound(module, argument, bound)
+                    .map_err(|e| format!("method {} bound {bound:?} for {argument:?}: {e}", function.name))?;
+            }
+            _ => return Err("unsupported generic method constraint".into()),
         }
     }
     Ok(())
@@ -93,6 +100,7 @@ fn closed_virtual_base_contracts(
 }
 
 struct Specializer<'a> {
+    conformance: &'a neoclr::Module,
     source: &'a neoclr::Module,
     shapes: Vec<Shape>,
     type_clones: usize,
@@ -475,7 +483,7 @@ impl Specializer<'_> {
             .into());
         };
         let i = *i;
-        check_method_constraints(&self.source.functions[i], &target.generic_arguments)?;
+        check_method_constraints(self.conformance, &self.source.functions[i], &target.generic_arguments)?;
         if let Some(instance) = self.instances.iter().find(|v| {
             v.source == i && v.types == arguments && v.methods == target.generic_arguments
         }) {
@@ -521,7 +529,7 @@ impl Specializer<'_> {
                     .into(),
             );
         }
-        check_method_constraints(f, methods)?;
+        check_method_constraints(self.conformance, f, methods)?;
         let mut result = f.clone();
         result.generic_constraints.clear();
         if super::selection::object_dispatch_contract(f) {
@@ -607,6 +615,24 @@ impl Specializer<'_> {
             if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op {
                 *owner =
                     self.lower(&substitute(owner, arguments, methods).map_err(|e| e.to_string())?)?;
+            }
+            if let Op::CallSelf { borrowed, self_type, target } = op {
+                if *borrowed || target.instance {
+                    return Err("instance Self specialization is unsupported".into());
+                }
+                let concrete = substitute(self_type, arguments, methods).map_err(|e| e.to_string())?;
+                let mut contract = target.clone();
+                contract.owner = contract.owner.as_ref().map(|t| substitute(t, arguments, methods)).transpose().map_err(|e| e.to_string())?;
+                let implementation = neoclr::native_metadata::resolve_static_self_call(self.conformance, &concrete, &contract)
+                    .map_err(|e| format!("static Self call {contract:?} for {concrete:?}: {e}"))?;
+                *op = Op::Call(FunctionRef {
+                    definition: implementation.definition,
+                    name: implementation.name,
+                    owner: implementation.owner,
+                    instance: false,
+                    generic_arguments: vec![],
+                    parameters: implementation.parameters,
+                });
             }
             let virtual_call = matches!(op, Op::CallVirtual(_));
             match op {
@@ -783,6 +809,14 @@ pub fn expand_with_host_roots(
     root: &str,
     host_roots: &[usize],
 ) -> Result<(neoclr::Module, Value), Error> {
+    expand_with_conformance(input, input, root, host_roots)
+}
+pub(crate) fn expand_with_conformance(
+    input: &neoclr::Module,
+    conformance: &neoclr::Module,
+    root: &str,
+    host_roots: &[usize],
+) -> Result<(neoclr::Module, Value), Error> {
     if input.types.len() > crate::limits::INPUT_TYPES
         || input.functions.len() > crate::limits::INPUT_FUNCTIONS
     {
@@ -805,6 +839,7 @@ pub fn expand_with_host_roots(
         row: *root,
     };
     let mut context = Specializer {
+        conformance,
         source: input,
         shapes: vec![],
         type_clones: 0,
@@ -1315,7 +1350,7 @@ pub fn expand_with_host_roots(
         })
         .map(|shape| shape.row)
         .collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; function-kind method constraints only", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; function-kind and nongeneric nominal interface method constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -1364,6 +1399,39 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 #[cfg(test)]
 mod tests {
     #[test]
+    fn nominal_static_self_methods_specialize_without_erasing_conformance() {
+        let source = neoclr::assemble(include_str!("../../../docs/validation/numerics-interfaces/StaticSelf.neoil")).unwrap();
+        let original = serde_json::to_value(&source).unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(serde_json::to_value(&source).unwrap(), original);
+        assert!(selected.functions.iter().all(|f| f.generic_constraints.is_empty() &&
+            !f.body.iter().any(|op| matches!(op, super::Op::CallSelf { .. }))));
+        // Native linking keeps value conformance as proof, not executable interface views.
+        let mut projected = source.clone();
+        projected.types.iter_mut().find(|t| t.name == "Count").unwrap().implements.clear();
+        let (expanded, _) = super::expand_with_conformance(&projected, &source, "Main", &[]).unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        assert_eq!(neoclr::LoadedProgram::new(&selected).unwrap().run(neoclr::Limits::default()).unwrap().value,
+                   neoclr::Value::Int32(42));
+        // Mutate linked metadata directly: do not rely on source-language diagnostics.
+        for mutation in 0..4 {
+            let mut invalid = source.clone();
+            match mutation {
+                0 => invalid.types.iter_mut().find(|t| t.name == "Count").unwrap().implements.clear(),
+                1 => invalid.functions.iter_mut().find(|f| f.name == "Count.Add").unwrap().visibility = neoclr::metadata::Visibility::Private,
+                2 => invalid.functions.iter_mut().find(|f| f.name == "Count.Add").unwrap().returns = super::Type::Int32,
+                _ => invalid.functions.iter_mut().find(|f| f.name == "Sum").unwrap().generic_constraints[0].kind =
+                    neoclr::metadata::ConstraintKind::TypeBound(super::Type::Named("Missing".into())),
+            }
+            assert!(super::expand(&invalid, "Main").is_err(), "mutation {mutation} accepted");
+        }
+    }
+
+    #[test]
     fn function_kind_constraint_preserves_typed_calls_after_specialization() {
         let source = neoclr::assemble(include_str!("../../../docs/validation/function-kind-constraint/Main.neoil")).unwrap();
         let original = serde_json::to_value(&source).unwrap();
@@ -1375,9 +1443,9 @@ mod tests {
         assert_eq!(serde_json::to_value(&source).unwrap(), original);
         assert!(selected.functions.iter().all(|f| f.generic_constraints.is_empty()));
         let constrained = source.functions.iter().find(|f| f.name == "Keep").unwrap();
-        assert!(super::check_method_constraints(constrained, &[super::Type::Int32]).is_err());
-        assert!(super::check_method_constraints(constrained, &[super::Type::MethodTypeParameter(0)]).is_err());
-        assert!(super::check_method_constraints(constrained, &[]).is_err());
+        assert!(super::check_method_constraints(&source, constrained, &[super::Type::Int32]).is_err());
+        assert!(super::check_method_constraints(&source, constrained, &[super::Type::MethodTypeParameter(0)]).is_err());
+        assert!(super::check_method_constraints(&source, constrained, &[]).is_err());
         let mut invalid = neoclr::assemble(".module Invalid\n.entry Main\n.function Keep<F>(F) -> F\nldarg 0\nret\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Keep<Int32>(Int32)\nret\n.end").unwrap();
         invalid.functions[0].generic_constraints = constrained.generic_constraints.clone();
         assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("function-kind"));

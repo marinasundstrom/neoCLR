@@ -596,6 +596,34 @@ pub fn interface_view(module: &Module, source: &Type, target: &Type) -> Result<T
     crate::variance::implemented_view(module, source, target)
 }
 
+/// Validate an exact closed nominal interface bound before native specialization.
+/// Requires complete linked metadata; structural matching and variant conversions do not qualify.
+/// Self contracts must be declared for this implementing type, including exact member signatures.
+pub fn validate_self_interface_bound(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fault> {
+    if crate::constraints::symbolic(concrete) || crate::constraints::symbolic(interface) {
+        return Err(Fault::new("interface specialization requires closed types"));
+    }
+    crate::vm::check_type(concrete, module)?;
+    crate::vm::check_type(interface, module)?;
+    crate::interfaces::ensure_implementation(module, concrete, interface)?;
+    if !crate::interfaces::satisfies_self_bound(module, concrete, interface)? {
+        return Err(Fault::new("interface specialization requires exact Self conformance"));
+    }
+    Ok(())
+}
+
+/// Resolve a closed static Self contract to its nominal implementation for code generation.
+/// This does not execute code; instance and borrowed receiver adaptation remain unsupported here.
+pub fn resolve_static_self_call(module: &Module, concrete: &Type, target: &crate::metadata::FunctionRef) -> Result<crate::metadata::Function, Fault> {
+    if crate::constraints::symbolic(concrete) || target.instance {
+        return Err(Fault::new("static Self specialization requires a closed implementing type"));
+    }
+    let contract = crate::vm::resolve(module, target)?;
+    let interface = contract.owner.as_ref().ok_or_else(|| Fault::new("Self contract requires an owner"))?;
+    validate_self_interface_bound(module, concrete, interface)?;
+    crate::self_types::implementation(module, concrete, target)
+}
+
 /// Closed contract peers needed to preserve a specialized interface slot.
 pub fn interface_slot_peers(module: &Module, function: &crate::metadata::Function) -> Vec<usize> {
     let Some(slot) = &function.native_interface_slot else { return vec![]; };

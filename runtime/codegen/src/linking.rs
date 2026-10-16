@@ -310,8 +310,8 @@ pub fn prepare(
             .iter()
             .any(|f| !f.generic_parameters.is_empty())
     {
-        Some(super::specialization::expand_with_host_roots(
-            &joined,
+        Some(super::specialization::expand_with_conformance(
+            &joined, &source_conformance,
             root,
             &reflection_roots,
         )?)
@@ -381,8 +381,8 @@ pub fn prepare(
         }
         if !host_roots.is_empty() {
             host_roots.extend_from_slice(&reflection_roots);
-            specialized = Some(super::specialization::expand_with_host_roots(
-                &joined,
+            specialized = Some(super::specialization::expand_with_conformance(
+                &joined, &source_conformance,
                 root,
                 &host_roots,
             )?);
@@ -412,8 +412,8 @@ pub fn prepare(
         if !roots.contains(&getter) {
             roots.push(getter);
         }
-        specialized = Some(super::specialization::expand_with_host_roots(
-            &joined, root, &roots,
+        specialized = Some(super::specialization::expand_with_conformance(
+            &joined, &source_conformance, root, &roots,
         )?);
         let expanded = &specialized.as_ref().unwrap().0;
         (selected, report) = super::selection::select_inventory_with_host_roots(

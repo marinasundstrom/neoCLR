@@ -2264,3 +2264,10 @@ alongside all helper members. No new type/member is excluded. The manual
 contracts and the required Find implementation for custom mutable sets. No interface
 is renamed, and the read-only Set contract is unchanged. Focused snapshot validation
 replaces a routine full website build; publication remains separate.
+
+
+2026-10-16: Rust-only native_metadata static Self specialization helpers are covered
+in the [manual SDK/host reference](experimental-metadata.md#static-self-specialization-helpers--development-2026-10-16)
+and Rustdoc. They are not guest APIs and therefore do not add RavenDoc types or alter
+the guest assembly/snapshot. The exclusion is host-language scope, not missing
+signature rendering.

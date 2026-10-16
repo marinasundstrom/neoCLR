@@ -73,3 +73,27 @@ small public interfaces, compose Number with them, and refresh the complete API
 reference. Independent operand/result types, identity capabilities and a possible
 unordered NumberBase-like aggregate require separate decisions. Recoverable
 Result-returning methods remain distinct from operator support.
+
+
+## Nominal-bound specialization follow-up
+
+The native specializer now admits closed nongeneric nominal interface method bounds
+and resolves static Self calls through the runtime's exact nominal conformance
+checks before lowering to ordinary concrete calls. It preserves original metadata
+and reuses the interpreter's implementation resolution. Instance/borrowed Self,
+constructed interface bounds and other method constraint categories remain gated.
+The old generic-results.json and jit-rejection.json remain historical failure evidence;
+follow-up results are stored separately. No new serialized opcode or metadata encoding.
+
+StaticSelf.neoil exercises the same contract at the metadata layer. The specialization
+regression checks executable selected code, unchanged original metadata, and rejection
+of undeclared membership, private or wrong-return implementations, and missing bounds.
+The existing function-kind and type-constraint regressions run alongside it.
+
+Follow-up qualification: 18 focused specialization tests pass, including the linked
+value-conformance projection regression. Both ComplexGeneric and
+ComplexGenericMethod return 42 in interpreter/JIT/AOT (generic-fixed-results.json
+and method-results.json). Raven `38fb410df` removes the class-method syntax gate;
+its callable capability checks remain active and the .NET generic math test passes.
+A separate-provider compile now identifies the next gap: imported constrained
+methods require a complete symbol-authored SDK contract. This remains unqualified.

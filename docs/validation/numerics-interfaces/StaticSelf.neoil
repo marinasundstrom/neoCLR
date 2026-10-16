@@ -1,0 +1,36 @@
+
+.module NativeSelf
+.entry Main
+.interface Number
+.method static Add(Self left, Self right) -> Self
+.end
+.end
+.type Count
+.implements Number
+.field Value Int32
+.method static Add(Count left, Count right) -> Count
+ldarg left
+ldfld Count::Value
+ldarg right
+ldfld Count::Value
+add
+newobj Count
+ret
+.end
+.end
+.function Sum<T>(T left, T right) -> T
+.constraint T Number
+ldarg left
+ldarg right
+callself T = Number::Add(Self,Self)
+ret
+.end
+.function Main() -> Int32
+ldc.i4 20
+newobj Count
+ldc.i4 22
+newobj Count
+call Sum<Count>(Count,Count)
+ldfld Count::Value
+ret
+.end

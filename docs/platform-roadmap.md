@@ -5109,3 +5109,11 @@ candidate contracts separate from installed APIs. Next prerequisite is nominal
 interface bounds in native generic method specialization, followed by constrained
 Self dispatch validation and public library/API-reference integration. Number's
 ordering contract is unchanged; structural work remains parked.
+
+
+Numerics prerequisite follow-up: closed nongeneric nominal interface method bounds
+and static Self implementation resolution now have native specialization support.
+The [qualification](validation/numerics-interfaces/README.md) retains the original
+rejections and subsequent evidence separately. This does not yet publish the
+candidate System.Numerics APIs; broader constraint forms and imported consumers
+must be qualified in subsequent slices.

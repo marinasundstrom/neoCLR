@@ -9834,3 +9834,26 @@ il.Return();
 Use RuntimeAssemblyContainer.WriteBinary(assemblyBuilder) for floating literal
 fixtures: that overload selects the existing schema needed for unsigned Double
 bits. See [qualification and remaining work](../docs/validation/checked-conversions/README.md).
+
+
+### Static Self specialization helpers — development 2026-10-16
+
+The unstable Rust host `native_metadata` module exposes two code-generation helpers:
+
+- `validate_self_interface_bound(&Module, &Type, &Type) -> Result<(), Fault>` requires
+  closed types and complete linked metadata, exact nominal interface declaration,
+  matching member signatures, and implementing-type Self conformance. It rejects
+  symbolic arguments, missing metadata and structural lookalikes. Variance does not
+  substitute for an exact declared bound.
+- `resolve_static_self_call(&Module, &Type, &FunctionRef) -> Result<Function, Fault>`
+  resolves a closed static interface contract to its nominal concrete implementation
+  without executing it. It uses the same conformance rules and rejects instance
+  targets. Borrowed receiver adaptation is outside this helper's contract.
+
+Callers must supply validated linked metadata and preserve its declaration identities;
+these are compiler services, not guest reflection or an unchecked invocation API.
+The code generator admits only nongeneric nominal interface method bounds in this
+slice, alongside existing function-kind bounds. Constructed interface bounds,
+instance Self adaptation and other generic method restrictions remain separate.
+These Rust-only functions have no RavenDoc guest type selection or CLI representation;
+this manual entry and Rustdoc are their API reference.
