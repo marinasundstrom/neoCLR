@@ -53,13 +53,20 @@ mutate value storage. The current native class, struct-local and reference-array
 consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-only.
 Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
 zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
-postfix mutation; consumed postfix uses the static overload. Checked and
-extension/interface forms remain follow-up work. Paired `true`/`false` overloads
+postfix mutation; consumed postfix uses the static overload. Checked expression
+contexts and extension/interface forms remain follow-up work. Paired `true`/`false` overloads
 support conditions and short-circuit logical operations through `&`/`|`; direct
 `&&`/`||` overload declarations must migrate to that .NET-compatible convention.
 The shared operator sample also checks arithmetic, bitwise, shifts, comparisons,
 unary operations and conversions on .NET 11 and native interpreter/JIT/AOT. Nominal System.Numerics
 capabilities are a future layer over this operator support.
+
+Checked operator declarations (`func checked`) now export distinct standard method
+names and require a matching ordinary declaration. This is a development metadata
+foundation qualified by explicit calls on .NET and interpreter/JIT/AOT. Raven
+expressions still select ordinary overloads, and checked bodies
+do not automatically enable overflow checks. Checked contexts and primitive overflow
+behavior remain separate implementation work.
 
 <a id="targets"></a>
 

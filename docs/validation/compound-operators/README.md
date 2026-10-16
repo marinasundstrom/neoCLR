@@ -133,3 +133,46 @@ This completes the tested ordinary operator spelling matrix, not every operator
 form: checked contexts/overloads, compound virtual/interface/extension declarations,
 System.Numerics interface conformance/generic dispatch, and native imported-provider
 coverage remain distinct work. No platform capability is inferred from spelling.
+
+
+## Checked declaration and metadata foundation
+
+Raven main `29a458e27`, native carry `cb83fb9dd`: `func checked` declares the
+standard checked arithmetic, explicit conversion, compound-assignment and
+increment/decrement methods. Each requires an ordinary counterpart with matching
+parameter/ref and return types. Source/import symbol identities are distinct;
+checked explicit conversions import as conversions. Ordinary Raven expressions
+continue to select ordinary methods. This follows .NET metadata conventions and
+requires no runtime opcode, SDK change or Runtime Contract switch.
+
+Both compiler lines pass 98 focused tests and the required syntax-generator build.
+The tests invoke all 14 checked method identities, check invalid/unpaired forms,
+partial generic declarations and imported metadata, and exercise a C# consumer of
+checked arithmetic/explicit conversions. The repository's Roslyn 4.12 dependency
+predates C# 14, so that consumer does not qualify instance operator syntax.
+Operator arrow bodies also use the normal body lowering path, fixing invalid IL
+for unit block expressions discovered by this matrix.
+
+[CheckedDeclarations.rvn](CheckedDeclarations.rvn) directly calls the metadata
+names to force each checked method to execute. It returns 42 on .NET 11 and native
+interpreter/macOS ARM64 JIT/AOT, with the existing sanitizer host for AOT. These
+calls qualify method representation and execution, **not** Raven checked lookup or
+primitive overflow behavior. Ordinary arithmetic and conversion selection are
+checked separately in the same sample. Exact commands and hashes are retained in
+`checked-declarations-dotnet-results.json` and
+`checked-declarations-native-results.json`.
+
+Reproduce using the earlier native/.NET commands with the additional argument:
+
+```sh
+--source docs/validation/compound-operators/CheckedDeclarations.rvn
+```
+
+Use a fresh output directory. The native bundle remains
+`target/function-reflection-library-validated-20261016`.
+
+Remaining checked work: expression/block contexts; checked overload selection and
+ordinary fallback; constant evaluation; built-in overflow checks and conversions
+across interpreter/JIT/AOT. A checked declaration does not itself change arithmetic
+inside its body. Broader interface/virtual/extension compound declarations and
+System.Numerics capability implementation remain separate. Structural work stays parked.

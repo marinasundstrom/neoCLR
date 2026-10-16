@@ -1,0 +1,106 @@
+// Metadata-call qualification only; Raven checked expression contexts remain future work.
+class Box {
+    public var Value: int = 0
+    static func +(left: Box, right: Box) -> int => 1
+    static func checked +(left: Box, right: Box) -> int => 42
+    static func -(left: Box, right: Box) -> int => 1
+    static func checked -(left: Box, right: Box) -> int => 42
+    static func *(left: Box, right: Box) -> int => 1
+    static func checked *(left: Box, right: Box) -> int => 42
+    static func /(left: Box, right: Box) -> int => 1
+    static func checked /(left: Box, right: Box) -> int => 42
+    static func -(value: Box) -> int => 1
+    static func explicit(value: Box) -> int => 1
+    static func checked -(value: Box) -> int => 42
+    static func checked explicit(value: Box) -> int => 42
+    static func ++(value: Box) -> Box {
+        value.Value = 1
+        return value
+    }
+    static func checked ++(value: Box) -> Box {
+        value.Value = 42
+        return value
+    }
+    static func --(value: Box) -> Box {
+        value.Value = 1
+        return value
+    }
+    static func checked --(value: Box) -> Box {
+        value.Value = 42
+        return value
+    }
+    func +=(right: Box) {
+        Value = 1
+    }
+    func checked +=(right: Box) {
+        Value = 42
+    }
+    func -=(right: Box) {
+        Value = 1
+    }
+    func checked -=(right: Box) {
+        Value = 42
+    }
+    func *=(right: Box) {
+        Value = 1
+    }
+    func checked *=(right: Box) {
+        Value = 42
+    }
+    func /=(right: Box) {
+        Value = 1
+    }
+    func checked /=(right: Box) {
+        Value = 42
+    }
+    func ++() {
+        Value = 1
+    }
+    func checked ++() {
+        Value = 42
+    }
+    func --() {
+        Value = 1
+    }
+    func checked --() {
+        Value = 42
+    }
+}
+
+class Program {
+    static func Main() -> int {
+        let a = Box()
+        let b = Box()
+        if Box.op_CheckedAddition(a, b) != 42 { return 1 }
+        if Box.op_CheckedSubtraction(a, b) != 42 { return 1 }
+        if Box.op_CheckedMultiply(a, b) != 42 { return 1 }
+        if Box.op_CheckedDivision(a, b) != 42 { return 1 }
+        if Box.op_CheckedUnaryNegation(a) != 42 { return 2 }
+        if Box.op_CheckedExplicit(a) != 42 { return 2 }
+        let resultIncrement = Box.op_CheckedIncrement(a)
+        if resultIncrement.Value != 42 { return 3 }
+        let resultDecrement = Box.op_CheckedDecrement(a)
+        if resultDecrement.Value != 42 { return 3 }
+        a.Value = 0
+        a.op_CheckedAdditionAssignment(b)
+        if a.Value != 42 { return 4 }
+        a.Value = 0
+        a.op_CheckedSubtractionAssignment(b)
+        if a.Value != 42 { return 4 }
+        a.Value = 0
+        a.op_CheckedMultiplicationAssignment(b)
+        if a.Value != 42 { return 4 }
+        a.Value = 0
+        a.op_CheckedDivisionAssignment(b)
+        if a.Value != 42 { return 4 }
+        a.Value = 0
+        a.op_CheckedIncrementAssignment()
+        if a.Value != 42 { return 4 }
+        a.Value = 0
+        a.op_CheckedDecrementAssignment()
+        if a.Value != 42 { return 4 }
+        if a + b != 1 { return 5 }
+        if (int)a != 1 { return 6 }
+        return 42
+    }
+}

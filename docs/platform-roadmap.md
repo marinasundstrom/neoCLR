@@ -4994,3 +4994,12 @@ with Raven `75607f005`/`8a82d185b`. Parser regressions exposed by composition ar
 fixed and retained in 87 focused tests per line. The qualification record separates
 this result from still-open checked contexts/forms, wider declaration modifiers,
 System.Numerics conformance and native imported-provider coverage.
+
+
+Checked declaration foundation: Raven `29a458e27`/`cb83fb9dd`, with 98 focused
+tests on each line and all 14 checked metadata identities executed on .NET 11 and
+native interpreter/JIT/AOT. This closes declaration/export and symbol-import support,
+not checked expression semantics. Next bounded work is checked contexts, overload
+selection/fallback and built-in overflow handling; the qualification record above
+lists limits. No runtime API or metadata-container change, and no structural-work
+resumption, is involved.

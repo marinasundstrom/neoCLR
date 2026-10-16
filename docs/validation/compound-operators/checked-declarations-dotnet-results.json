@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedDeclarations.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/raven-ranges/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/checked-declarations-dotnet-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "60f712ebd1c67f56c13ea5c00643fc997a7928cc88e9c51de5d022c9c0b3e13a"
+    },
+    {
+      "label": "execute",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/checked-declarations-dotnet-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedDeclarations.rvn": "842aab45793781e92b6ae6191feee809519afeb79a198bd55e82277352e35e91",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-dotnet.py": "9a26b57b6262443bfbbcb040ba2006e5f3027f097d9eb0690f0b38ae3908650c",
+    "/Users/robert/Projects/raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "0a5ef265a8208adc8db8f027ca728594babf91af1388b8e3036d4af79558447a",
+    "/Users/robert/Projects/raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "05f722a543e45b31f1dea6e6cf2f90e7d2c92ed8cf45440d78c3af73e57cb696",
+    "/Users/robert/Projects/raven-ranges/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll": "3b016fe87c5268eadfc1a75826cf2dec69d98a064099cb1494f8a5dbc222b340",
+    "/Users/robert/Projects/neoclr/target/checked-declarations-dotnet-20261016/OperatorMatrix.dll": "19c35231826231f8e1ab6d8780d31ef9c1c9a888deb5c3aa6a3f1893159c6d78"
+  }
+}

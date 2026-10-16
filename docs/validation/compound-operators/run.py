@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--source', type=Path, help='Alternate focused operator consumer')
 parser.add_argument('--value-arrays', action='store_true', help='Qualify interpreter support and the current AOT rejection for nominal value arrays')
 
 
@@ -22,7 +23,7 @@ project = output / 'project'
 project.mkdir(parents=True, exist_ok=True)
 name = 'CompoundOperatorsRaven'
 expected = 42
-source = SOURCE / ('ValueArrays.rvn' if args.value_arrays else 'Main.rvn')
+source = args.source.resolve() if args.source else SOURCE / ('ValueArrays.rvn' if args.value_arrays else 'Main.rvn')
 host = SOURCE.parent / 'interface-variance/native-host.c'
 (project / 'Main.rvn').write_text(source.read_text())
 (project / 'Primitive.rvn').unlink(missing_ok=True)

@@ -12193,3 +12193,17 @@ comparisons, unary operators, conversions, increments and truth-based logic.
 See [reproduction and limits](validation/compound-operators/README.md#full-ordinary-operator-matrix).
 No Runtime Contract, metadata encoding, SDK or backend change is needed for this
 parser slice. Checked forms and wider operator declarations remain open.
+
+
+Checked declaration foundation: Raven main `29a458e27`, native `cb83fb9dd`.
+Both lines preserve standard checked method identities, enforce ordinary pairing,
+and pass 98 focused tests. The [metadata-call consumer](validation/compound-operators/README.md#checked-declaration-and-metadata-foundation)
+executes all 14 forms on .NET and native interpreter/JIT/AOT. Raven owns syntax,
+validation and eventual checked selection; the metadata emitter and runtimes use
+existing ordinary static/instance calls. There is no temporary encoding, lost
+signature information, new native instruction or Runtime Contract configuration.
+Checked expression contexts and primitive overflow behavior are still compiler
+work; direct metadata-name calls are validation scaffolding, not evidence that
+Raven checked expressions are implemented. The existing validated function-reflection
+bundle remains the matching library dependency; exact fingerprints are retained
+with the consumer results.

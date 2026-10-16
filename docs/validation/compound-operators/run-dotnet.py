@@ -11,10 +11,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--core', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--source', type=Path, help='Alternate focused operator consumer')
 args = parser.parse_args()
 compiler, core, output = (p.resolve() for p in (args.compiler, args.core, args.output))
 output.mkdir(parents=True, exist_ok=True)
-source = Path(__file__).resolve().with_name('Main.rvn')
+source = args.source.resolve() if args.source else Path(__file__).resolve().with_name('Main.rvn')
 assembly = output / 'OperatorMatrix.dll'
 report = {'passed': False, 'commands': []}
 for label, command, expected in (
