@@ -3467,3 +3467,46 @@ ret
         );
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn checked_wide_and_native_arithmetic_matches_interpreter_and_preserves_fault_results() {
+    for (ty, conversion) in [("Int64", ""), ("IntPtr", "conv.i"), ("UIntPtr", "conv.u")] {
+        for (opcode, safe_left, safe_right, overflow_left, overflow_right) in [
+            ("add.ovf", 40, 2, i64::MAX, 1),
+            ("sub.ovf", 44, 2, i64::MIN, 1),
+            ("mul.ovf", 6, 7, i64::MAX, 2),
+            ("add.ovf.un", 40, 2, -1, 1),
+            ("sub.ovf.un", 44, 2, 0, 1),
+            ("mul.ovf.un", 6, 7, -1, 2),
+        ] {
+            for (left, right, overflow) in [
+                (safe_left, safe_right, false),
+                (overflow_left, overflow_right, true),
+            ] {
+                let source = format!(
+                    ".module CheckedWidths\n.entry Main\n.type Marker\n.field Value Int64\n.end\n\
+                     .function Operation({ty} left, {ty} right) -> {ty}\n\
+                     ldarg left\nldarg right\n{opcode}\nret\n.end\n\
+                     .function Main() -> Int32\nldc.i8 {left}\n{conversion}\n\
+                     ldc.i8 {right}\n{conversion}\ncall Operation({ty}, {ty})\nconv.i4\nret\n.end\n"
+                );
+                let m = neoclr::assemble(&source).unwrap();
+                let interpreted = neoclr::run(&m, neoclr::Limits::default());
+                if overflow {
+                    assert_eq!(
+                        interpreted.unwrap_err().code,
+                        neoclr::FaultCode::ArithmeticOverflow
+                    );
+                } else {
+                    assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(42));
+                }
+                native(
+                    &neoclr::metadata_container::write_module(&m).unwrap(),
+                    if overflow { 2 } else { 0 },
+                    if overflow { 12345 } else { 42 },
+                );
+            }
+        }
+    }
+}

@@ -406,6 +406,12 @@ if (args.Length == 3 && args[0] == "--indexer-integration")
     return 0;
 }
 
+if (args is ["--checked-arithmetic"] or ["--checked-arithmetic", _])
+{
+    CheckedArithmeticChecks.Run(args.Length == 2 ? args[1] : null);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--array-address-integration")
 {
     await ArrayInstructionChecks.RunRuntime(args[1], args[2], addressesOnly: true);
@@ -658,6 +664,7 @@ var tests = new (string Name, Action Body)[]
     ("Property accessor metadata and projection", PropertyChecks.Run),
     ("Root class construction and instance field bodies", InstanceObjectChecks.Run),
     ("Signed integer remainder results and faults", IntegerArithmeticChecks.Remainder),
+    ("Checked integer arithmetic results and faults", () => CheckedArithmeticChecks.Run()),
     ("Signed integer division results and faults", IntegerArithmeticChecks.Division),
     ("Type visibility and projection", TypeVisibilityChecks.Run),
     ("Typed argument stores bounds and caller isolation", ArgumentStoreChecks.Run),

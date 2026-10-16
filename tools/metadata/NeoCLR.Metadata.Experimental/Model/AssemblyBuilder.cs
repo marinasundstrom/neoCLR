@@ -923,6 +923,12 @@ public sealed partial class AssemblyBuilder
                     case "local.load": code.WriteByte(0xfe); code.WriteByte(0x0c); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.store": code.WriteByte(0xfe); code.WriteByte(0x0e); code.WriteUInt16((ushort)instruction.Value); break;
                     case "add": code.WriteByte(0x58); break;
+                    case "add.checked": code.WriteByte(0xd6); break;
+                    case "add.checked.unsigned": code.WriteByte(0xd7); break;
+                    case "subtract.checked": code.WriteByte(0xda); break;
+                    case "subtract.checked.unsigned": code.WriteByte(0xdb); break;
+                    case "multiply.checked": code.WriteByte(0xd8); break;
+                    case "multiply.checked.unsigned": code.WriteByte(0xd9); break;
                     case "subtract": code.WriteByte(0x59); break;
                     case "multiply": code.WriteByte(0x5a); break;
                     case "divide": code.WriteByte(0x5b); break;

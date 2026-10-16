@@ -363,3 +363,21 @@ Run the focused check with a fresh output directory:
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
   --array-address-integration target/debug/neoclr target/array-address-check
 ```
+
+
+### Checked arithmetic authoring (2026-10-16)
+
+The operand-free `Emit` overload accepts `Add_Ovf`, `Sub_Ovf`, `Mul_Ovf` and their
+`_Un` forms, with matching integer stack validation and standard CLI/native
+encoding. Signedness comes from the opcode. This enables compiler emission of
+checked operations; it does not add Raven checked syntax or numeric conversions.
+See the [host reference](../../api-docs/experimental-metadata.md#checked-integer-arithmetic-development-2026-10-16)
+and [execution evidence](../../docs/validation/checked-arithmetic/README.md).
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --checked-arithmetic target/checked-arithmetic-images
+```
+
+The output directory must be fresh. Omitting it runs the CLI execution and native
+write validation without saving images. The check is also in the normal SDK suite.

@@ -631,34 +631,17 @@ fn checked_arithmetic(
             _ => unreachable!(),
         };
     }
-    let unsigned = matches!(
-        op,
-        Op::AddCheckedUnsigned | Op::SubCheckedUnsigned | Op::MulCheckedUnsigned
-    );
-    let (left, right) = if unsigned {
-        (
-            builder.ins().uextend(types::I64, left),
-            builder.ins().uextend(types::I64, right),
-        )
-    } else {
-        (
-            builder.ins().sextend(types::I64, left),
-            builder.ins().sextend(types::I64, right),
-        )
-    };
-    let wide = match op {
-        Op::AddChecked | Op::AddCheckedUnsigned => builder.ins().iadd(left, right),
-        Op::SubChecked | Op::SubCheckedUnsigned => builder.ins().isub(left, right),
-        Op::MulChecked | Op::MulCheckedUnsigned => builder.ins().imul(left, right),
+    // Keep the operation at its evaluation width. Widening through I64 only
+    // detects I32 overflow and cannot represent an I64 product or carry.
+    let (result, overflow) = match op {
+        Op::AddChecked => builder.ins().sadd_overflow(left, right),
+        Op::SubChecked => builder.ins().ssub_overflow(left, right),
+        Op::MulChecked => builder.ins().smul_overflow(left, right),
+        Op::AddCheckedUnsigned => builder.ins().uadd_overflow(left, right),
+        Op::SubCheckedUnsigned => builder.ins().usub_overflow(left, right),
+        Op::MulCheckedUnsigned => builder.ins().umul_overflow(left, right),
         _ => unreachable!(),
     };
-    let result = builder.ins().ireduce(types::I32, wide);
-    let restored = if unsigned {
-        builder.ins().uextend(types::I64, result)
-    } else {
-        builder.ins().sextend(types::I64, result)
-    };
-    let overflow = builder.ins().icmp(IntCC::NotEqual, wide, restored);
     return_if_detailed(builder, overflow, overflow_status, site);
     result
 }

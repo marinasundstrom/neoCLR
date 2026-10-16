@@ -340,6 +340,16 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("bitwise operands require matching integer or Boolean types");
                     var bitwiseType = stack[^1]; Pop(bitwiseType); Pop(bitwiseType); stack.Add(bitwiseType); break;
+                case "add.checked":
+                case "add.checked.unsigned":
+                case "subtract.checked":
+                case "subtract.checked.unsigned":
+                case "multiply.checked":
+                case "multiply.checked.unsigned":
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr))
+                        throw new InvalidDataException("checked arithmetic requires matching integer evaluation types");
+                    var checkedIntegerType = stack[^1];
+                    Pop(checkedIntegerType); Pop(checkedIntegerType); stack.Add(checkedIntegerType); break;
                 case "add":
                 case "subtract":
                 case "multiply":

@@ -12207,3 +12207,12 @@ work; direct metadata-name calls are validation scaffolding, not evidence that
 Raven checked expressions are implemented. The existing validated function-reflection
 bundle remains the matching library dependency; exact fingerprints are retained
 with the consumer results.
+
+
+Checked arithmetic prerequisite (2026-10-16): the SDK now authors all six checked
+integer add/subtract/multiply operations with standard CLI and existing native
+encoding. Shared JIT/AOT lowering now preserves 32-bit, 64-bit and native widths
+and reports overflow without writing the result. See the [qualification matrix](validation/checked-arithmetic/README.md)
+and SDK API reference. No Runtime Contract or library API change is required.
+Raven checked contexts, overload selection/fallback and checked numeric conversions
+remain the next compiler/SDK work; structural work stays parked.

@@ -9733,3 +9733,53 @@ native consumer and executes an Int32 array-address/store/read returning 42 in t
 interpreter. Wrong-element address authoring is rejected. Raven also exercises a
 nominal struct array in the interpreter. Native AOT allocation of nominal struct
 arrays remains unsupported; array-address authoring does not remove that allocation limitation.
+
+
+## Checked integer arithmetic (development, 2026-10-16)
+
+`MethodBuilder.Emit(OpCode)` and `IILGenerator.Emit(OpCode)` accept these additional
+operand-free codes:
+
+| Code | Operation | Overflow interpretation |
+| --- | --- | --- |
+| `Add_Ovf` | Addition | Signed |
+| `Sub_Ovf` | Subtraction | Signed |
+| `Mul_Ovf` | Multiplication | Signed |
+| `Add_Ovf_Un` | Addition | Unsigned |
+| `Sub_Ovf_Un` | Subtraction | Unsigned |
+| `Mul_Ovf_Un` | Multiplication | Unsigned |
+
+Each consumes two matching integer evaluation values and pushes one value of the
+same evaluation type. Supported categories are Int32, Int64, IntPtr and UIntPtr;
+UInt32/UInt64 signatures use the existing Int32/Int64 evaluation categories.
+The opcode determines signedness independently of the signature. Native width is
+the execution target's pointer width. Floating-point, Boolean, reference, empty
+and mismatched evaluation stacks are rejected with `InvalidDataException` when
+writing either CLI or native output. Normal numeric promotion/conversion must
+happen before these instructions. Subword values use their promoted evaluation
+width; this does not check subsequent narrowing to byte or short.
+
+```csharp
+// In a method taking two Int32 arguments and returning Int32:
+var il = method.GetILGenerator();
+il.LoadArgument(0);
+il.LoadArgument(1);
+il.Emit(OpCode.Add_Ovf);
+il.Return();
+```
+
+CLI uses the standard `add.ovf`, `sub.ovf`, `mul.ovf` and `.un` encodings.
+Native emission uses the existing instructions with those same spellings; no
+container or runtime opcode is added. Overflow throws `OverflowException` on
+.NET and reports the existing `ArithmeticOverflow` fault on NeoCLR. Native host
+fault status terminates the invocation without publishing a result; it does not
+throw a CLR exception across the host boundary.
+
+This closes an SDK authoring gap relative to [.NET checked addition](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.add_ovf)
+and its unsigned form. Enum members are appended, preserving previous numeric
+values. There is no new convenience method or automatic checked context. Raven
+must still choose these operations during checked-expression lowering. Checked
+numeric conversion authoring remains a separate gap.
+
+See [checked arithmetic validation](../docs/validation/checked-arithmetic/README.md)
+for the compiled SDK consumer, rejection cases and execution-mode evidence.

@@ -2226,6 +2226,22 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(Ty::Int);
                 }
+                Op::AddChecked
+                | Op::SubChecked
+                | Op::MulChecked
+                | Op::AddCheckedUnsigned
+                | Op::SubCheckedUnsigned
+                | Op::MulCheckedUnsigned => {
+                    let t = pop(&mut stack)?;
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Size) {
+                        return Err(fail(
+                            pc,
+                            "checked arithmetic requires matching integer operands",
+                        ));
+                    }
+                    take(&mut stack, &t)?;
+                    stack.push(t);
+                }
                 Op::Add | Op::Sub | Op::Mul => {
                     let t = pop(&mut stack)?;
                     if !matches!(t, Ty::Int | Ty::Wide | Ty::Single | Ty::Double) {

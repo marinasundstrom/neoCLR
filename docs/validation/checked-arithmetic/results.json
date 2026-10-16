@@ -1,0 +1,800 @@
+{
+  "date": "2026-10-16",
+  "platform": "macOS ARM64",
+  "passed": true,
+  "counts": {
+    "cli": 108,
+    "interpreter": 108,
+    "aot": 108,
+    "managedJit": 18,
+    "wideNativeRustCases": 36,
+    "apiSnapshotTests": 4
+  },
+  "fullReport": "target/checked-arithmetic-native-20261016-final/results.json",
+  "fullReportSha256": "6db665ed51d931f1d9c421d2149e5c8760f546185568cc0ada8d3626efd72aef",
+  "files": {
+    "docs/validation/checked-arithmetic/host.c": "09925bd1735890dbc062f3f54b7276fcb9ee0afa6f890c132281b334d528608a",
+    "docs/validation/checked-arithmetic/run.py": "984a1cf7edadb045862bc387c17686f5553851aa3b30fd6da66b2eec5ceda93d",
+    "target/checked-arithmetic-sdk-20261016-final/cases.json": "beb562e16fcfba3aa401c35bbdaae561f69cce1615fa18317fe8bd3b223cf238",
+    "target/debug/neoclr": "916259e50faa34b833939602261c098426e2d1fd14f0116faccc8e727e65924c",
+    "target/debug/neoclr-codegen": "b60ce440675f2b5a33c47a76627a671e983e692dd93ff25d6850ed6f0426cc70",
+    "target/function-reflection-library-validated-20261016/bundle.json": "dc92e3f835797fb7ab7f1bfbcda4fffec81901f7096a031978844f56bb4b4418",
+    "tools/metadata/NeoCLR.Metadata.Experimental/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "2c99bf830c1595b2547007239d1caf8426c6bff3233bf65e1981c2e63391c756"
+  },
+  "logs": {
+    "/tmp/checked-sdk-final.log": {
+      "sha256": "86cc2c96d3d98152d417cc6b50d9aa04775d2422c83669cb43a9bc63d9f65f88",
+      "result": "PASS checked arithmetic: 108 CLI executions and native images; invalid stack categories rejected"
+    },
+    "/tmp/checked-codegen-widths-final.log": {
+      "sha256": "353779f1d4a05937ee6f04afdfe5519217a6383b36a06be050516f012a785f34",
+      "result": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 72 filtered out; finished in 38.66s"
+    },
+    "/tmp/checked-scalar-final.log": {
+      "sha256": "30520489a629e8d8ef974d7d324e455b324fe488f04a600d46270359e75e71ea",
+      "result": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 23 filtered out; finished in 59.93s"
+    },
+    "/tmp/checked-api-snapshot.log": {
+      "sha256": "9d654695c0a90577e252109954dd749137ace81d33f39cf1a31990e7f48cf31d",
+      "result": "OK"
+    }
+  },
+  "cases": [
+    {
+      "name": "Int32-Add_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "240b3c65ab953802363aeb379b54ea25ecffa33cac8a126666e373f92c4c720c"
+    },
+    {
+      "name": "Int32-Add_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "d88c49f55f35472ee27f8d854b47e904dac947d1b35602c46c62f0cf4cae4aa3"
+    },
+    {
+      "name": "Int32-Add_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "6a9388f79ba40c5774297e0055e4a794399b96fca76709eaa628dbf0380df075"
+    },
+    {
+      "name": "Int32-Sub_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "9e2436f3ed572c630f3d45034ffbe18c8fc33489813eea127bcf33575e97c9a9"
+    },
+    {
+      "name": "Int32-Sub_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "f38bc6a408963d5cebdd6ba9a925fea3341d347b17a7e309f560e6c427748be9"
+    },
+    {
+      "name": "Int32-Sub_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "2da6e1b2e31388d00af3e9bc11dddddf58fc0db523bffc8f515c77846bd0f683"
+    },
+    {
+      "name": "Int32-Mul_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "185d5b75d2587162aed41b00821e739653b5b7fc7aefccaf4454a4cb9045aba3"
+    },
+    {
+      "name": "Int32-Mul_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "d01c12cb96e1213a26a5c1284f8bc37ae2b1b6a23af5cce83e509ec09807d053"
+    },
+    {
+      "name": "Int32-Mul_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "47aa34a6d33f2e54d1a77adeb4c4d4c63b57cd17fd71ca6cdb8a7d73c8adf768"
+    },
+    {
+      "name": "Int32-Add_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "264207adfa8e0958c098895890ac7474f7fe9990963ee32aae8cff7f4f4f908e"
+    },
+    {
+      "name": "Int32-Add_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "49b6f84092dc26903963e2470a8c222cee53a0daa3943f816153e1b47f8a0668"
+    },
+    {
+      "name": "Int32-Add_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "9f8424ce8e43e6acda4c7c7112593ec78bb6843c3eee59c7c0ebc5749397532e"
+    },
+    {
+      "name": "Int32-Sub_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "6c6b002d5a0861856da36503e15cba47edb7a92b5f31a09782c22dae6e2eaac6"
+    },
+    {
+      "name": "Int32-Sub_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "0dab72eb50145150d0a42f8ad7cad1d3ca5a9caa0a27d1536d1d4498c9bce86b"
+    },
+    {
+      "name": "Int32-Sub_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "3afa911c75f4429cbd5eb65a5d955f16cab95edd6a7bf304997bf037f9a9eb68"
+    },
+    {
+      "name": "Int32-Mul_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "042dc0af9630629c7db6d2a7484a989d89e86852445b94fdb5713d084a0ad494"
+    },
+    {
+      "name": "Int32-Mul_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "4c81cb482a68bda749e99205012cd916eb2771a29af19a382b620c8cda21cc66"
+    },
+    {
+      "name": "Int32-Mul_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "65baa9cb9dbacce2dd345b78de298a55c8355ceff41e70270e5deb07710047de"
+    },
+    {
+      "name": "UInt32-Add_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "9b86bde6123cb4ac7b2c5250ba9dff4ba0c457c4e7ca4c597703348d151281f6"
+    },
+    {
+      "name": "UInt32-Add_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "775b378aaf18055d5d20203bca0fc97ad8d6e4f717777a9f299e19ae5553686d"
+    },
+    {
+      "name": "UInt32-Add_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "a062efa2a66edf05b984e67205c1a05eb24eee192e1c25bfcd1d5788b4cb4402"
+    },
+    {
+      "name": "UInt32-Sub_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "20519bd8ab774de822890e7606b88223620758271c9397832f63f171fa9289b4"
+    },
+    {
+      "name": "UInt32-Sub_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "59da0964f9e2e95a3812966a8c6706157fc225079de44359d7f4ff71be3c7652"
+    },
+    {
+      "name": "UInt32-Sub_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "122e7a21a1603f8dba93058b6d45de704ae53804830d978ad23a6359c622d0ff"
+    },
+    {
+      "name": "UInt32-Mul_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "61a62f41a5299f3f8345cb8ae634265b67c320b4ad9b6028f6214aa9b1d4941f"
+    },
+    {
+      "name": "UInt32-Mul_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "c4572a580446d7ea1841526e99909f3c4fef16505e72029c86b8b96a5dd3ec71"
+    },
+    {
+      "name": "UInt32-Mul_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "1f3c3475195a929911cd8bb7e8a73623aa141e02fb134d310073aceb72d30516"
+    },
+    {
+      "name": "UInt32-Add_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "470c8109b951bcc7f905b6edc9c778ae59039ee97f0750f54e8c3837e0e36f9b"
+    },
+    {
+      "name": "UInt32-Add_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "0a641eee0e8919ee4e9856626c5ee5f40e51ccbe012ed007fd0c171e3052805a"
+    },
+    {
+      "name": "UInt32-Add_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "21c1a5df0723e3e8ca1bb16547b1ca1690340ec27de2bf2084f72d4462654db6"
+    },
+    {
+      "name": "UInt32-Sub_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "4de00f9c2851367e55aabff9abba1536cbed3e4c1b897e03f60f4b5368c0f262"
+    },
+    {
+      "name": "UInt32-Sub_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "43b816994b1850be6c7a89dbc6ecab8ac7a8ca40a10d5546a13a3b89e3b45871"
+    },
+    {
+      "name": "UInt32-Sub_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "326d2af068337ac2008184675dbb980cc41b139f0c28c5a96213953c8258fc8c"
+    },
+    {
+      "name": "UInt32-Mul_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "7a115465bbc7af3917b102b459949965929145c300a0a7063532752a849b35ea"
+    },
+    {
+      "name": "UInt32-Mul_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "a8f7fd0d1844b4efd5ebddcd6f417da3fe84a07a2589d09ed7dbff55a7b71c83"
+    },
+    {
+      "name": "UInt32-Mul_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "73238bbafaeb6b9adee5f17451b1339a02dec4afbb0cd3ee2a8e8f26e93be269"
+    },
+    {
+      "name": "Int64-Add_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "53ab17c3bb95dff9e3af2acefd03b7a26d5b8046cc07903d84e72c9b6d8652e0"
+    },
+    {
+      "name": "Int64-Add_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "31eba7d40666543ff13968383e59ef065387f8a89cd0ffa413426503c1cddfae"
+    },
+    {
+      "name": "Int64-Add_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "652294e0b3d3c10d7d1ad56e9554e2f626a50b980f4c2c7c7fa04fe4e967cc2c"
+    },
+    {
+      "name": "Int64-Sub_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "d7fc9f63287d9ead55fdf1eca52b1fdcc34d95573b517ea8f3cd910829b3881b"
+    },
+    {
+      "name": "Int64-Sub_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "35d3057361376f770f05e0d52e6115947fa7519df3f759da922657abbd145022"
+    },
+    {
+      "name": "Int64-Sub_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "553d3dfac3e06ade2193e5dbfe509bdc030a118f038c90cb431fdebf7aa44a31"
+    },
+    {
+      "name": "Int64-Mul_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "8e62cb8f6d4a44f09af769a4a933cb289de9f794b996a79d6bd20a3833c830db"
+    },
+    {
+      "name": "Int64-Mul_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "2a4c9c8143b1bafb16b8a9631ac5458d75ba0e6ab2a16292222cad505894fd3c"
+    },
+    {
+      "name": "Int64-Mul_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "b2fd8cccb2b17dcbbf54578910facdeab0e1b784404411482e81ff740d38ea5c"
+    },
+    {
+      "name": "Int64-Add_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "553b4b16de959c3b55b89181370f594a47b1af86fedb19c75b16547abf92caf5"
+    },
+    {
+      "name": "Int64-Add_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "91d2fdd522b4a77f5eea3cda92194d4f855c9af6a14d33e5fa068694b8903360"
+    },
+    {
+      "name": "Int64-Add_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "05526c9190a24b6dc5ecbf615af1ba2d8ef6d8d7f35728df9ff7bef7bb0581b2"
+    },
+    {
+      "name": "Int64-Sub_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "95ef598ce220c6bf2cbe49f6f3ec1d64b30f9273c9e34b586c64ad8cd54e816e"
+    },
+    {
+      "name": "Int64-Sub_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "94c202a8c22234338056e30c5a7c2e74984d2a8069bf9c7bebadfa25155fae13"
+    },
+    {
+      "name": "Int64-Sub_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "362e77a25d04b4d96b086283d67c68f79f3f42ee58701b4ba4577756eccf9ae6"
+    },
+    {
+      "name": "Int64-Mul_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "24fddcba3c3fc98925289c00594454d2e531df242891c287ca40edfea84c47e1"
+    },
+    {
+      "name": "Int64-Mul_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "52d90290ca8b1d568156cdc8c5fb3f83e3fcb5a60eff0cf7ea814cccbc8be5a3"
+    },
+    {
+      "name": "Int64-Mul_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "d3845711c5d305950c115f9858b753959de6ab0ff75b5ad12b0dc1481c42b63d"
+    },
+    {
+      "name": "UInt64-Add_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "c2f7843d086d214d5b91f509d251af784007a5fc1b91e2bff497312164b2e0e5"
+    },
+    {
+      "name": "UInt64-Add_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "29756e164f4d03eed1b09936806200fb943f9153204145bffc6d8606b524425e"
+    },
+    {
+      "name": "UInt64-Add_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "750db66c2053199b1dce6b9ff88f8e052be85626d28ebbbd4d102c3b07fec3b1"
+    },
+    {
+      "name": "UInt64-Sub_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "d0bdbbf7bb4c22b82ccbe9771b2027df18616f2cc67a32663a99d5ea6f7fd657"
+    },
+    {
+      "name": "UInt64-Sub_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "63ee7bec74dca2244b2728512d62d5155b5c2d71f50c6648ee487dce24e39f2e"
+    },
+    {
+      "name": "UInt64-Sub_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "228ef42d9597b6e4db1bba61dd9561ade79baebb185d1860ce66dcbae8847013"
+    },
+    {
+      "name": "UInt64-Mul_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "a4e1152d1347388ec1aa2ec8ce41689aa8d3ff780a637993e67f0e61cf1ad4b3"
+    },
+    {
+      "name": "UInt64-Mul_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "be491ee6e82e9f4b250adeb626c80730b951334d520ec6691a345ca98caaeb6f"
+    },
+    {
+      "name": "UInt64-Mul_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "68c4b07e40b5ab8dcc11bb243b016264a5c43055fda76d03874d9097ed28c2a0"
+    },
+    {
+      "name": "UInt64-Add_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "640f34296f35d0acbca2b5f29be68217d1808140971f45bc10f1bd30485c8c75"
+    },
+    {
+      "name": "UInt64-Add_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "2f5605475de2daed2130d5872bc3333f3c4b5312efc23f8525678d5b5b9daaa9"
+    },
+    {
+      "name": "UInt64-Add_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "2ebeb32c90f5a1dd03d07566fd935b91218505505a045b1e38b070dcac731b9e"
+    },
+    {
+      "name": "UInt64-Sub_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "4eb8aee09670c509a479a13e254150e7fde8b5ea7c21ec35ac1bc990ed9361ee"
+    },
+    {
+      "name": "UInt64-Sub_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "234bcef7cca420d458b4f36e71b06a6bca83fe375d4c7391a21200f9d1a42931"
+    },
+    {
+      "name": "UInt64-Sub_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "3f5dc0eaacb45f850928a88447a22a69d957e38b9c57d03f414a97c196e879f1"
+    },
+    {
+      "name": "UInt64-Mul_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "394edbd125b770cfc84f211bb79fb27b7612dc68c39b1e8a5d8463febbc7e92e"
+    },
+    {
+      "name": "UInt64-Mul_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "7b8df499b319c2e0be97fea89f22db1eb725a80f010f99373ea1b704836f27ff"
+    },
+    {
+      "name": "UInt64-Mul_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "a7b3bc55838421cd6ec036e9fbb45f1c7fd805df7e31f39d75d685a5b64e50aa"
+    },
+    {
+      "name": "IntPtr-Add_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "5db4239512834f502b86f4e973777999402b777b763afcc37e050d77b2c1b75d"
+    },
+    {
+      "name": "IntPtr-Add_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "6edff00f050395c1dd2d0c367199dd26f40d57f93c6d8673933e48f1d39e4a2c"
+    },
+    {
+      "name": "IntPtr-Add_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "7602566f528e4bfed31d70a72220061bb56b963004644b54a518f2e4f574562e"
+    },
+    {
+      "name": "IntPtr-Sub_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "b4564c02e899e47cd4e22dc25852b8e68dca68bb5d72ff89fccd6cda28ff9b3f"
+    },
+    {
+      "name": "IntPtr-Sub_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "46d3b92f6e7417bcada541dfce7dba020f4df2c42c2efa95cd6f976dca83ae1c"
+    },
+    {
+      "name": "IntPtr-Sub_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "283c70ce50265099cd446f3b3ebd8ddbddf06ddfcd3d9d12a1744781578f58db"
+    },
+    {
+      "name": "IntPtr-Mul_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "6af1999b3e482e6eeade2fc7657d63ed891159fd6ee3c13b0bb68615b98cf089"
+    },
+    {
+      "name": "IntPtr-Mul_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "04007cd24a32bf68fd353fdc58c487f1b3a671662fd9118e94e991b87e8cf9e0"
+    },
+    {
+      "name": "IntPtr-Mul_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "5cec4b058c8b65a031095201f2c35b8717d0b16c299ff27f554348b285618553"
+    },
+    {
+      "name": "IntPtr-Add_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "d662af950ab81d5856f83fb1b83d435ce406661ec685d81919a544abd0df8e8d"
+    },
+    {
+      "name": "IntPtr-Add_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "44edfac4a15de259b0c6802a531f861c9435e0c2c9f12cae5a0e85b7a6e7097a"
+    },
+    {
+      "name": "IntPtr-Add_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "e64ac6870bc720c996398da5754c4b374de6ca061558fd82cdf6d2a66ab9dd57"
+    },
+    {
+      "name": "IntPtr-Sub_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "12a28c66ec2dad220876370a689d818b0c0ed3367bd2a7335e47d7d66429bb09"
+    },
+    {
+      "name": "IntPtr-Sub_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "ad511f653a0318c763265e1263d5a2b1b5a33e9ca25e741ae7964b040fa5c811"
+    },
+    {
+      "name": "IntPtr-Sub_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "e11afeefc68a334d9cbdcc57fff7907868d16d9cf0147c0c1b62a63762ba97b7"
+    },
+    {
+      "name": "IntPtr-Mul_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "28dc70c287f52ebca62b460a9c2a5cb449a88716a3663591cd377639c18a03b8"
+    },
+    {
+      "name": "IntPtr-Mul_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "ca91e193b786dec5355f3762d3017c910666dc2652e31dd291a0c465540a424f"
+    },
+    {
+      "name": "IntPtr-Mul_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "b218fa118407f119dd15bcca0c6e7d6a1a31259c8996846e0f0e9bfa7b0d959b"
+    },
+    {
+      "name": "UIntPtr-Add_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "745efb66a15d8e3622c30bed26876f833ead9c6b49c61d065e35cc0d092a383d"
+    },
+    {
+      "name": "UIntPtr-Add_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "387a7d521e956014431047ebe1092048fadee174c246e78f902e471ff3d3ff1c"
+    },
+    {
+      "name": "UIntPtr-Add_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "74c456f148f2b2e28fd60a1282398f5fd2308fab21445352428fec645195e57d"
+    },
+    {
+      "name": "UIntPtr-Sub_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "35e202ae3685e76ced0bf586a996e878b7e1017482ac9d92835d910203740aed"
+    },
+    {
+      "name": "UIntPtr-Sub_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "2169f0c7134b809515d3da2e55eac558a105b0b191fb2668b2d487e40ef36d80"
+    },
+    {
+      "name": "UIntPtr-Sub_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "d87279c76e9f544e52eee668d5adb1a6a5e8b3c12a6e617ce9d30f5d9cd654c5"
+    },
+    {
+      "name": "UIntPtr-Mul_Ovf-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "8f477e5375002d3172d7c9a83dfe62f17283dbacc2d3433125366d2af216016a"
+    },
+    {
+      "name": "UIntPtr-Mul_Ovf-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "646a5dc6c47e3ac0125eb1f1832579d3a9f80bce11889d30234f714066a5cbbf"
+    },
+    {
+      "name": "UIntPtr-Mul_Ovf-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "e887a79436ad807a5ea74e1bb53e621f70f068b5c249ff7f55a66c6af726dcf6"
+    },
+    {
+      "name": "UIntPtr-Add_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "65639b9c165517692d1573c6674bd4e349034840829f8b16994404a2f7f52119"
+    },
+    {
+      "name": "UIntPtr-Add_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "6e0e5877d07622827a9cfff93b0b012e0f86eedd03e919d7f3de8a4f2a32b5db"
+    },
+    {
+      "name": "UIntPtr-Add_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "9287acd3b97905df2388ba9a7f60dc06ac759c549991d48560fa18acb1883cc6"
+    },
+    {
+      "name": "UIntPtr-Sub_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "03928bc9dab54e9fe989dcb31bed918f5e1d16090cde6dd18bcf45d8c3fefe51"
+    },
+    {
+      "name": "UIntPtr-Sub_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "90b9dc43dcf89fb4627e2c83b97174b25c140a635ad5a1c086fff706d93b8db8"
+    },
+    {
+      "name": "UIntPtr-Sub_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": false,
+      "imageSha256": "1ecaca5f941649bda2e5c8a8e333ff8ce64aae49353685b735b45c305f6483b9"
+    },
+    {
+      "name": "UIntPtr-Mul_Ovf_Un-valid",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "6c3a3eb3a1f577cf67aafc2b89b6d1d437546e5e9709fa130b4728e04415eeaf"
+    },
+    {
+      "name": "UIntPtr-Mul_Ovf_Un-overflow",
+      "overflow": true,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "380d73c8d48dc87dd963ac64c7b7f7759a97022ac784c5346f7bd0eee6ab0cce"
+    },
+    {
+      "name": "UIntPtr-Mul_Ovf_Un-bits",
+      "overflow": false,
+      "passed": true,
+      "jitChecked": true,
+      "imageSha256": "e3d178686891110bb6ef719040240b0cb52517c4c31d570aba62dc1fb3e0d8cc"
+    }
+  ]
+}

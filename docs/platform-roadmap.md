@@ -5003,3 +5003,12 @@ not checked expression semantics. Next bounded work is checked contexts, overloa
 selection/fallback and built-in overflow handling; the qualification record above
 lists limits. No runtime API or metadata-container change, and no structural-work
 resumption, is involved.
+
+
+Checked arithmetic prerequisite (2026-10-16): the SDK now authors all six checked
+integer add/subtract/multiply operations with standard CLI and existing native
+encoding. Shared JIT/AOT lowering now preserves 32-bit, 64-bit and native widths
+and reports overflow without writing the result. See the [qualification matrix](validation/checked-arithmetic/README.md)
+and SDK API reference. No Runtime Contract or library API change is required.
+Raven checked contexts, overload selection/fallback and checked numeric conversions
+remain the next compiler/SDK work; structural work stays parked.

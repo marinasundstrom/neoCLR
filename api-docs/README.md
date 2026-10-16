@@ -2241,3 +2241,10 @@ records the full contract and future generic-overload boundary. RavenDoc current
 renders the Invoke name as `self(...)` under Operators (the existing Invoke renderer
 limitation); its parameters, Result return, summaries and errors are retained. The
 manual reference supplies the intended spelling; no member is excluded.
+
+
+2026-10-16: host-only `OpCode.Add_Ovf`, `Sub_Ovf`, `Mul_Ovf` and their `_Un`
+forms are covered by XML summaries and the linked experimental metadata reference.
+They extend the existing `Emit(OpCode)` surface; no guest public type/member or
+RavenDoc assembly inventory changes. The host/guest snapshot exclusion above
+continues to apply. Native guest API snapshots remain unchanged.

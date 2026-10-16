@@ -67,6 +67,9 @@ foundation qualified by explicit calls on .NET and interpreter/JIT/AOT. Raven
 expressions still select ordinary overloads, and checked bodies
 do not automatically enable overflow checks. Checked contexts and primitive overflow
 behavior remain separate implementation work.
+The metadata SDK now provides checked integer addition, subtraction and multiplication;
+native JIT/AOT preserve 32-bit, 64-bit and pointer-sized overflow semantics.
+This backend prerequisite does not yet enable Raven checked contexts.
 
 <a id="targets"></a>
 

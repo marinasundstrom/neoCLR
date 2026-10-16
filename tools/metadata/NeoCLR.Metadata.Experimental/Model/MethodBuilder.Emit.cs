@@ -156,13 +156,25 @@ public enum OpCode
     ValueUnpack,
     /// <summary>Loads a checked managed vector-element address; requires the exact element SignatureType.</summary>
     Ldelema,
+    /// <summary>Adds matching integer values with signed overflow checking; faults if the result is out of range.</summary>
+    Add_Ovf,
+    /// <summary>Adds matching integer values with unsigned overflow checking; faults if the result is out of range.</summary>
+    Add_Ovf_Un,
+    /// <summary>Subtracts matching integer values with signed overflow checking; faults if the result is out of range.</summary>
+    Sub_Ovf,
+    /// <summary>Subtracts matching integer values with unsigned overflow checking; faults if the result is out of range.</summary>
+    Sub_Ovf_Un,
+    /// <summary>Multiplies matching integer values with signed overflow checking; faults if the result is out of range.</summary>
+    Mul_Ovf,
+    /// <summary>Multiplies matching integer values with unsigned overflow checking; faults if the result is out of range.</summary>
+    Mul_Ovf_Un,
 
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, their _Ovf/_Ovf_Un checked forms, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
