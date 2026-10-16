@@ -21,18 +21,33 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
     public int GenericArity { get; }
     /// <summary>Gets copied construction arguments, or an empty list for a definition reference.</summary>
     public IReadOnlyList<SignatureType> TypeArguments { get; }
+    /// <summary>Gets registered reference/value requirements by definition parameter ordinal, shared by all constructions.</summary>
+    public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => Owner.ImportedSpecialConstraints(this);
+    /// <summary>Gets registered nominal class bounds by parameter ordinal.</summary>
+    public IReadOnlyDictionary<int, SignatureType> TypeConstraints => Owner.ImportedBounds(this);
+    internal void ValidateTypeArguments(bool complete = false)
+    {
+        if (TypeArguments.Count == 0) return;
+        foreach (var (index, flags) in SpecialConstraints)
+            TypeBuilder.ValidateSpecialTypeArgument(TypeArguments[index], flags, complete);
+        foreach (var (index, bound) in TypeConstraints)
+            if (TypeArguments[index].TypeParameterIndex is null && TypeArguments[index].MethodParameterIndex is null && !Owner.HasVariantReferenceConversion(TypeArguments[index], bound))
+                throw new ArgumentException("type argument does not satisfy nominal class bound");
+    }
     /// <summary>Constructs this generic definition with types belonging to the consumer.</summary>
     /// <param name="arguments">Exactly one non-Void type per parameter; copied.</param>
     /// <returns>An immutable constructed reference.</returns>
     /// <exception cref="ArgumentNullException">Arguments are null.</exception>
-    /// <exception cref="ArgumentException">Wrong arity, already constructed, unsupported scope or excessive depth.</exception>
+    /// <exception cref="ArgumentException">Wrong arity, already constructed, unsupported scope, violated registered special constraints or excessive depth.</exception>
     public ImportedTypeReference MakeGenericInstance(params SignatureType[] arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
         if (GenericArity == 0 || TypeArguments.Count != 0 || arguments.Length != GenericArity ||
             arguments.Any(t => t is null || t.PointerElement is not null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16)) throw new ArgumentException("invalid imported type construction", nameof(arguments));
         foreach (var argument in arguments) argument.ValidateOwner(Owner, 32, 32, allowSelf: true);
-        return new(Owner, AssemblyIdentity, Namespace, Name, GenericArity, (SignatureType[])arguments.Clone(), IsValueType, DeclaringType);
+        var result = new ImportedTypeReference(Owner, AssemblyIdentity, Namespace, Name, GenericArity, (SignatureType[])arguments.Clone(), IsValueType, DeclaringType);
+        result.ValidateTypeArguments();
+        return result;
     }
     internal ImportedTypeReference Substitute(Func<SignatureType, SignatureType> substitute) => TypeArguments.Count == 0 ? this
         : Owner.ImportTypeIdentity(AssemblyIdentity, Namespace, Name, GenericArity, IsValueType, DeclaringType).MakeGenericInstance(TypeArguments.Select(substitute).ToArray());

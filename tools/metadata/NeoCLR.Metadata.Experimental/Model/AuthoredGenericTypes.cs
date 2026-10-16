@@ -6,14 +6,14 @@ public sealed partial class TypeDefinition
     internal List<GenericTypeConstraint> GenericConstraintStorage { get; } = [];
     private IReadOnlyDictionary<int, TypeParameterConstraints>? specialConstraintView;
     private IReadOnlyList<GenericTypeConstraint>? genericConstraintView;
-    /// <summary>Gets a read-only view of authored special constraints, or the validated empty constraints of a supported native snapshot.</summary>
+    /// <summary>Gets a read-only view of authored or materialized native special constraints.</summary>
     /// <exception cref="NotSupportedException">CLI and unsupported native constraint materialization is pending.</exception>
     public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => GenericParameterNames is null
         ? throw new NotSupportedException("loaded generic constraints are not materialized yet")
         : specialConstraintView ??= new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(SpecialConstraintStorage);
-    /// <summary>Gets a read-only view of authored nominal constraints, or the validated empty constraints of a supported native snapshot.</summary>
+    /// <summary>Gets authored nominal bounds, or empty bounds for an unconstrained native snapshot. Use GenericParameterTypeInfo.GetTypeConstraints for loaded nominal bounds.</summary>
     /// <exception cref="NotSupportedException">CLI and unsupported native constraint materialization is pending.</exception>
-    public IReadOnlyList<GenericTypeConstraint> GenericConstraints => GenericParameterNames is null
+    public IReadOnlyList<GenericTypeConstraint> GenericConstraints => GenericParameterNames is null || NativeTypeConstraints is { Length: > 0 }
         ? throw new NotSupportedException("loaded generic constraints are not materialized yet")
         : genericConstraintView ??= GenericConstraintStorage.AsReadOnly();
     /// <summary>Creates a detached generic type using a simple name and copied parameter names.</summary>

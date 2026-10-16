@@ -9608,3 +9608,44 @@ This is development support on Raven `codex/neoclr` with the matching NeoCLR mai
 SDK/runtime, not a Raven-main merge. Generic virtual methods, generic closed
 hierarchies and broader constrained dependency imports remain separate work.
 Structural types and Sliceable/Result variance stay parked.
+
+## Imported class constraints (development, 2026-10-16)
+
+These are host SDK APIs, not guest reflection APIs. They follow CLR generic class
+constraint semantics within the bounded profile described below.
+
+| API | Contract |
+| --- | --- |
+| `AssemblyBuilder.SetSpecialConstraints(ImportedTypeReference reference, int parameterIndex, TypeParameterConstraints constraints)` | Register nonzero ReferenceType, ValueType, DefaultConstructor or compatible combinations on an output-owned unconstructed top-level generic reference class. ReferenceType and ValueType conflict; ValueType conflicts with a nominal class bound. Unlike the local builder setter, None does not clear dependency facts. |
+| `AssemblyBuilder.AddBaseTypeConstraint(ImportedTypeReference reference, int parameterIndex, ImportedTypeReference baseType)` | Register one nongeneric nominal class bound per parameter. Both references belong to the output. Closed arguments must have the bound's nominal ancestry. No structural conformance is inferred. |
+| `AssemblyBuilder.DeclareDefaultConstructor(ImportedTypeReference reference, bool available)` | Record whether a dependency reference class is concrete and has a public parameterless constructor. The host inspects the actual declaration. Value/interface, constructed, nested and foreign references reject. |
+| `ImportedTypeReference.SpecialConstraints` | Read-only dictionary of registered flags by definition parameter ordinal. Constructions query the same definition contract. |
+| `ImportedTypeReference.TypeConstraints` | Read-only dictionary of registered nominal bound signatures by definition parameter ordinal. |
+| `GenericParameterTypeInfo.SpecialConstraints` | Native reference/value/default-constructor flags for the declaring parameter. |
+| `GenericParameterTypeInfo.GetTypeConstraints()` | Read-only list of native nominal bound type views, resolved in the same metadata context with exact identity. |
+
+Registration is idempotent for identical facts; conflicting repeated facts throw
+InvalidDataException. Invalid owners, indices, categories, combinations and bounds
+throw ArgumentException; null references throw ArgumentNullException. A false
+constructor fact remains an explicit fact; unknown external constructors cannot
+satisfy `new()`. These registrations do not load dependencies or alter provider
+metadata. The provider's native declarations remain authoritative at linking.
+
+`MakeGenericInstance` checks known closed requirements immediately. Use/write repeats
+validation, including after late registrations; local constructor completeness is
+checked once the declaration graph is complete. Invalid arguments throw
+ArgumentException (write paths may wrap this in InvalidDataException). Symbolic base
+arguments must prove requirements before emission. Value types satisfy constructor
+requirements; abstract classes and nonpublic/nonzero-arity constructors do not.
+
+`ReadNativeAssembly` now materializes special flags and the existing owned nongeneric
+class-bound profile. Legacy `ImportReference(TypeDefinition, ...)` rejects constrained
+owners; use the explicit contracts above. Loaded nominal bounds are inspected through
+`GenericParameterTypeInfo.GetTypeConstraints`; the authoring-oriented
+`TypeDefinition.GenericConstraints` still throws NotSupportedException for those
+snapshots rather than returning an empty list. Unsupported snapshot formats likewise
+reject constraint introspection instead of inventing empty constraints.
+
+No metadata schema change. Constrained generic methods, interface/constructed nominal
+type bounds and constrained interface/value owner imports remain outside this slice.
+See [qualification](../docs/validation/imported-special-constraints/README.md).

@@ -224,12 +224,16 @@ impl Specializer<'_> {
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
         if definition.generic_constraints.iter().any(|constraint| {
-            !matches!(
-                constraint.kind,
+            match &constraint.kind {
                 neoclr::metadata::ConstraintKind::ReferenceType
-                    | neoclr::metadata::ConstraintKind::ValueType
-                    | neoclr::metadata::ConstraintKind::DefaultConstructor
-            )
+                | neoclr::metadata::ConstraintKind::ValueType
+                | neoclr::metadata::ConstraintKind::DefaultConstructor => false,
+                neoclr::metadata::ConstraintKind::TypeBound(bound) => !matches!(bound, Type::Named(_))
+                    || !self.source.type_definition(bound).is_some_and(|owner|
+                        owner.is_reference_type && owner.generic_parameters.is_empty()
+                            && owner.representation == neoclr::metadata::Representation::Record),
+                _ => true,
+            }
         })
             || definition.generic_parameters.len() != arguments.len()
         {
@@ -1293,7 +1297,7 @@ pub fn expand_with_host_roots(
         })
         .map(|shape| shape.row)
         .collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new type constraints; no method or nominal constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; no method constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -1366,6 +1370,25 @@ mod tests {
             }
             assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("violates"));
         }
+    }
+
+    #[test]
+    fn nominal_class_constraints_are_checked_before_specialization() {
+        let text = include_str!("../../../docs/validation/special-type-constraints/Main.neoil")
+            .replace(".constraint T reference new", ".constraint T reference new Payload");
+        let source = neoclr::assemble(&(text + "\n.type class Other\n.end\n")).unwrap();
+        let original = serde_json::to_value(&source).unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(serde_json::to_value(&source).unwrap(), original);
+        let mut invalid = source.clone();
+        let owner = invalid.types.iter_mut().find(|t| t.name == "ReferenceBox").unwrap();
+        let bound = owner.generic_constraints.iter_mut().find(|c| matches!(c.kind, neoclr::metadata::ConstraintKind::TypeBound(_))).unwrap();
+        bound.kind = neoclr::metadata::ConstraintKind::TypeBound(super::Type::Named("Other".into()));
+        assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("violates"));
     }
 
     #[test]

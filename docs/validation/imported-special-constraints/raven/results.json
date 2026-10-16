@@ -1,0 +1,231 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile-library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/library/Library.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "820e19b97ebdbbf060feb421e3074dae1f1f710f324fa2ba4a515bf833dcce48",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/library/bin/neoclr/ConstraintLibrary.dll\n"
+    },
+    {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "cf5b04560213f20d548babc656c8681854f19cbc7d92b45555fd4f7a7f9daa5f",
+      "output": "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(1,40): error RAV0320: The type 'T' must satisfy the 'class' constraint for type parameter 'T' of 'ReferenceBox<T>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(5,39): error RAV0320: The type 'int' must satisfy the 'class' constraint for type parameter 'T' of 'ReferenceBox<T>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(6,31): error RAV0320: The type 'string' must satisfy the 'new()' constraint for type parameter 'T' of 'ValueBox<T>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(6,31): error RAV0320: The type 'string' must satisfy the 'struct' constraint for type parameter 'T' of 'ValueBox<T>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(7,45): error RAV0320: The type 'string' must satisfy the 'new()' constraint for type parameter 'T' of 'ConstructorBox<T>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(8,35): error RAV0320: The type 'string' must satisfy the 'Bound' constraint for type parameter 'T' of 'NominalBox<T>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(12,30): error RAV0320: The type 'AbstractPayload' must satisfy the 'new()' constraint for type parameter 'T' of 'ConstructorBox<AbstractPayload>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(13,29): error RAV0320: The type 'PrivatePayload' must satisfy the 'new()' constraint for type parameter 'T' of 'ConstructorBox<PrivatePayload>'\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/rejected/Main.rvn(15,53): error RAV0320: The type 'T' must satisfy the 'new()' constraint for type parameter 'T' of 'ConstructorBox<T>'\n"
+    },
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "830e8e9042a8acbc004e21abb2fb594670889073074adcc877b3009e2ca165b5",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/bin/neoclr/SpecialConstraintRaven.dll\n/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/Main.rvn(2,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/bin/neoclr/SpecialConstraintRaven.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/library/bin/neoclr/ConstraintLibrary.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/bin/neoclr/SpecialConstraintRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/library/bin/neoclr/ConstraintLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "b6367d9889445cf9cb09ebfbd58c923120b5b0c1378b36117da1c23f986eb737",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/bin/neoclr/SpecialConstraintRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/library/bin/neoclr/ConstraintLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "6353b23b40456fc1eebb56bd2a5a42466a854ffddf3b30d708571f4f22828521",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.470845625,\"guestExitCode\":42,\"invocationSeconds\":0.000073291,\"metadataLoadSeconds\":0.615483458,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.5645195}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.470845625,
+    "guestExitCode": 42,
+    "invocationSeconds": 7.3291e-05,
+    "metadataLoadSeconds": 0.615483458,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 13.5645195
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/imported-special-constraints/raven/Main.rvn": "16aa322b24c79ee09a2796ffa14be23dcf489062e5f2319508f56ba4f4c2123b",
+    "/Users/robert/Projects/neoclr/docs/validation/imported-special-constraints/raven/Library.rvn": "f8e0506bfdf4063a9cdd8e977d9739631f16f81f872f4714b9d4b09a8056eb94",
+    "/Users/robert/Projects/neoclr/docs/validation/imported-special-constraints/raven/Rejected.rvn": "60b27dfad518c8333be0bb72507656d66c0c48b95ba5f84d109aa1001ae46951",
+    "/Users/robert/Projects/neoclr/docs/validation/imported-special-constraints/raven/run.py": "4a448fc8db4b66ebe28c8c343108e24a4f4b53dd509f97af90206fc7509693aa",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "2e8be86529b91bda545ebb55d8fc87d4bda66a71e613e23acd25df2caab9c989",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "078bd4ee18a2b38d73654ced9c0d5734b216ecbe53646e29d604b339e7eb5d52",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "314f6a7c529aad9a1083cb34b1e32764b44d3cdc4524e0a2edac771f5e09a745",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "aafee40337665a8e8a8ace4d5a1ecc083e5b1d655743d86b3da5044ebf8fb901",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "45dc76e53d1551e34a3004966a40dfc0d52f412b78babd5607b37548b49626cc",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
+    "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/project/bin/neoclr/SpecialConstraintRaven.dll": "c3433a7e78d34884cc51481631427a7c34f87b330c5607774840103f37fed753",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a",
+    "/Users/robert/Projects/neoclr/target/raven-all-constraints-final-20261016/library/bin/neoclr/ConstraintLibrary.dll": "8918a43ab7f44ae7e667846ad9ad003fca1422e38e1fc088e30f249e2b0dc4b2"
+  }
+}

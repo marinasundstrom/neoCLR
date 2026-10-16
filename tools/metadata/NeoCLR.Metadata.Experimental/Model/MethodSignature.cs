@@ -116,6 +116,7 @@ public sealed partial record SignatureType
         if (ImportedType is { } imported)
         {
             if (!ReferenceEquals(imported.Owner, assembly)) throw new ArgumentException("imported type belongs to another output");
+            imported.ValidateTypeArguments(complete);
             foreach (var argument in imported.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         }
         if (MethodParameterIndex is { } index && index >= genericArity) throw new ArgumentException("method type parameter outside declared scope");

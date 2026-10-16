@@ -1,0 +1,43 @@
+public class Payload {
+    public val Number: int
+    init(number: int) {
+        Number = number
+    }
+}
+
+public class Derived<Unused, T> : ReferenceBox<T> where T: class {
+    init(value: T) : base(value) { }
+}
+
+public class Child : Bound {
+    init() : base() { }
+}
+
+public class DefaultPayload {
+    init() { }
+}
+
+public class ConstructorDerived<T> : ConstructorBox<T> where T: new() {
+    init(value: T) : base(value) { }
+}
+
+func Main() -> int {
+    let child = Child()
+    let nominal = NominalBox<Child>(child)
+    let local = DefaultPayload()
+    let constructor = ConstructorDerived<DefaultPayload>(local)
+    let external = Constructible()
+    let imported = ConstructorBox<Constructible>(external)
+    if !System.Object.ReferenceEquals(nominal.Get(), child) ||
+        !System.Object.ReferenceEquals(constructor.Get(), local) ||
+        !System.Object.ReferenceEquals(imported.Get(), external) {
+        return 3
+    }
+    let payload = Payload(40)
+    let reference = Derived<bool, Payload>(payload)
+    let value = ValueBox<int>(2)
+    if !System.Object.ReferenceEquals(reference.Get(), payload) {
+        return 1
+    }
+    return reference.Get().Number + value.Get()
+}

@@ -1,0 +1,47 @@
+public open class ReferenceBox<T> where T: class {
+    private var value: T
+    init(value: T) {
+        self.value = value
+    }
+    func Get() -> T => value
+}
+
+public open class ValueBox<T> where T: struct {
+    private var value: T
+    init(value: T) {
+        self.value = value
+    }
+    func Get() -> T => value
+}
+
+public open class Bound {
+    init() { }
+}
+
+public class Constructible {
+    init() { }
+}
+
+public open class ConstructorBox<T> where T: new() {
+    private var value: T
+    init(value: T) {
+        self.value = value
+    }
+    func Get() -> T => value
+}
+
+public open class NominalBox<T> where T: Bound {
+    private var value: T
+    init(value: T) {
+        self.value = value
+    }
+    func Get() -> T => value
+}
+
+public abstract class AbstractPayload {
+    init() { }
+}
+
+public class PrivatePayload {
+    private init() { }
+}

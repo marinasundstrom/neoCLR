@@ -2211,3 +2211,13 @@ recognizes explicitly registered imported bases of local class arguments. The
 [manual SDK reference](experimental-metadata.md#explicit-interface-variance-authoring--development)
 records the contract and remaining limits. No guest public signature, reference
 assembly, XML sidecar, type selection or native API snapshot input changed.
+
+### Host imported constraint APIs (2026-10-16)
+
+The existing explicit host-SDK RavenDoc exclusion also covers the imported constraint
+registration APIs, read-only contracts and GenericParameterTypeInfo special/nominal
+constraint queries. These are .NET host tooling, not members of the Raven guest
+reference assembly. Full signatures, errors and limits are in the
+[manual SDK reference](experimental-metadata.md#imported-class-constraints-development-2026-10-16).
+No guest reference assembly, type selection, XML sidecar or native snapshot input
+changed; validate the existing snapshot without regenerating it.

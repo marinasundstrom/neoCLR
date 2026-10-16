@@ -18285,3 +18285,16 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
 - **Still open:** native generic base materialization/layout authoring and a Raven
   native consumer, plus open generic relationship/member reflection. This SDK
   slice does not claim to close those layers or introduce different semantics.
+
+## 2026-10-16 — Complete the remaining class constraint forms before wrapping up
+
+The author first asked to wrap up if the work was good enough. The assistant proposed
+stopping after reference/value dependency constraints and deferring constructor and
+nominal bounds. The author then directed: “Finish the other constraints and then wrap
+up”. The assistant extended the current class-constraint slice to preserve/import
+`new()` and nongeneric nominal class bounds, added explicit external constructor
+facts, and enabled nominal class-bound validation before native specialization.
+This is a bounded completion of the existing class-constraint profile, not a permanent
+roadmap reprioritization or resumption of structural types. Constrained methods and
+broader bound profiles remain recorded gaps. Validation evidence is retained in
+[the constraint fixture](validation/imported-special-constraints/README.md).

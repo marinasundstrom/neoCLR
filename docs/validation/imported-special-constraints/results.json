@@ -1,0 +1,183 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "sdk-clr",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "-p:WarningLevel=0",
+        "--",
+        "--imported-special-constraints"
+      ],
+      "exitCode": 0,
+      "logSha256": "ad84cb45fdd3f0353c46d8652082f1ac7e1c709854ad7fe9e1ebe46a7117afd4",
+      "output": "PASS imported special/nominal constraints, constructor facts, symbolic base proofs, late checks and CLR execution\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/Library.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/App.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/Library.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "1a4368296a687cc425f615773287c38148925330003411426842bd65d5668825",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/App.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/Library.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "b8c704e447f07fa3a83ab1b542b7751ee14f6569b9d8892e974b99e12107ce09",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.396257958,\"guestExitCode\":42,\"invocationSeconds\":0.000039125,\"metadataLoadSeconds\":0.322189416,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":5.865782375}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.396257958,
+    "guestExitCode": 42,
+    "invocationSeconds": 3.9125e-05,
+    "metadataLoadSeconds": 0.322189416,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 5.865782375
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ImportedSpecialConstraintChecks.cs": "fe88a252fb49fb6c0ae582686e8860cda42941eb75496faff4869176282031fe",
+    "/Users/robert/Projects/neoclr/docs/validation/imported-special-constraints/run.py": "b98351ecd2b5f46f7acd0934b47047679e66db6153a32297916ab2ac03061068",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "45dc76e53d1551e34a3004966a40dfc0d52f412b78babd5607b37548b49626cc",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
+    "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/App.dll": "db9317313207c0fb1fe1db2731927ca317c4367e38e6d6c86ccb389a233fbbca",
+    "/Users/robert/Projects/neoclr/target/imported-all-constraints-20261016/Library.dll": "051932af39bf83f36208ad9d5b56ec227363f929606f7d958947a313dec70e80",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
+  }
+}

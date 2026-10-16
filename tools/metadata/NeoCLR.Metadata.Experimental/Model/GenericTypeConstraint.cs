@@ -75,9 +75,26 @@ public sealed partial class TypeBuilder
                         throw new InvalidDataException("base argument does not prove required nominal constraint");
                 foreach (var argument in instance.TypeArguments) Visit(argument);
             }
+            if (type.ImportedType is { } external)
+            {
+                foreach (var (index, required) in external.SpecialConstraints)
+                {
+                    if (external.TypeArguments[index].TypeParameterIndex is not { } parameter) continue;
+                    var actual = specialConstraints.GetValueOrDefault(parameter);
+                    if (actual.HasFlag(TypeParameterConstraints.ValueType)) actual |= TypeParameterConstraints.DefaultConstructor;
+                    if (genericConstraints.Any(c => c.ParameterIndex == parameter && !c.BaseType.IsNativeObjectRoot)) actual |= TypeParameterConstraints.ReferenceType;
+                    if ((actual & required) != required) throw new InvalidDataException("external base argument does not prove required special constraints");
+                }
+                foreach (var (index, bound) in external.TypeConstraints)
+                    if (external.TypeArguments[index].TypeParameterIndex is { } parameter &&
+                        !genericConstraints.Any(c => c.ParameterIndex == parameter && Assembly.HasVariantReferenceConversion(c.BaseType, bound)))
+                        throw new InvalidDataException("external base argument does not prove nominal bound");
+                foreach (var argument in external.TypeArguments) Visit(argument);
+            }
             if (type.ArrayElement is { } element) Visit(element);
         }
         if (LocalBaseSignature is { } signature) Visit(signature);
+        if (ExternalBase is { } external) Visit(external);
     }
 
     internal void ValidateTypeArguments(IReadOnlyList<SignatureType> arguments, bool complete = false)
@@ -86,22 +103,29 @@ public sealed partial class TypeBuilder
         {
             var type = arguments[index];
             if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) continue;
-            bool value = type.Primitive is PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.Byte or PrimitiveType.SByte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 or PrimitiveType.UInt64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr or PrimitiveType.Single or PrimitiveType.Double ||
-                type.ImportedType?.IsValueType == true || type.ClassType?.IsValueType == true || type.GenericInstance?.Definition.IsValueType == true;
-            bool reference = type.Primitive == PrimitiveType.String || type.ClassType is { IsValueType: false } || type.ImportedType is { IsValueType: false } || type.GenericInstance?.Definition is { IsValueType: false } || type.ArrayElement is not null;
-            var definition = type.ClassType ?? type.GenericInstance?.Definition;
-            bool constructible = value || definition is not null && (!complete || definition.Methods.Any(m => m.IsConstructor && m.ParameterCount == 0 && m.Visibility == MethodVisibility.Public));
-            if (flags.HasFlag(TypeParameterConstraints.ReferenceType) && !reference || flags.HasFlag(TypeParameterConstraints.ValueType) && !value ||
-                flags.HasFlag(TypeParameterConstraints.DefaultConstructor) && !constructible)
-                throw new ArgumentException("type argument does not satisfy special constraints");
+            ValidateSpecialTypeArgument(type, flags, complete);
         }
         foreach (var constraint in genericConstraints)
         {
             var type = arguments[constraint.ParameterIndex];
             // Symbolic arguments are checked after substitution by the runtime.
             if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) continue;
-            if (!ReferenceEquals(type.ClassType, constraint.BaseType))
+            if (!Assembly.HasVariantReferenceConversion(type, constraint.BaseType))
                 throw new ArgumentException("type argument does not satisfy the nominal class bound");
         }
     }
+    internal static void ValidateSpecialTypeArgument(SignatureType type, TypeParameterConstraints flags, bool complete)
+    {
+        if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) return;
+        bool value = type.Primitive is PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.Byte or PrimitiveType.SByte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 or PrimitiveType.UInt64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr or PrimitiveType.Single or PrimitiveType.Double ||
+            type.ImportedType?.IsValueType == true || type.ClassType?.IsValueType == true || type.GenericInstance?.Definition.IsValueType == true;
+        bool reference = type.Primitive == PrimitiveType.String || type.ClassType is { IsValueType: false } || type.ImportedType is { IsValueType: false } || type.GenericInstance?.Definition is { IsValueType: false } || type.ArrayElement is not null;
+        var definition = type.ClassType ?? type.GenericInstance?.Definition;
+        bool constructible = value || definition is { IsAbstract: false, IsInterface: false, IsStatic: false } && (!complete || definition.Methods.Any(m => m.IsConstructor && m.ParameterCount == 0 && m.Visibility == MethodVisibility.Public)) ||
+            type.ImportedType is { } imported && imported.Owner.HasDefaultConstructor(imported);
+        if (flags.HasFlag(TypeParameterConstraints.ReferenceType) && !reference || flags.HasFlag(TypeParameterConstraints.ValueType) && !value ||
+            flags.HasFlag(TypeParameterConstraints.DefaultConstructor) && !constructible)
+            throw new ArgumentException("type argument does not satisfy special constraints");
+    }
+
 }

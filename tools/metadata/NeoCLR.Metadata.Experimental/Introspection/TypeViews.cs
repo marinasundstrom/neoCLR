@@ -87,6 +87,18 @@ public sealed class GenericParameterTypeInfo : TypeInfo
     /// <remarks>This is metadata inspection; it does not enable assignment conversions in the host SDK.</remarks>
     public GenericVariance Variance => DeclaringType.Definition.GenericParameterVariance is { } variance
         ? variance[Position] : throw new NotSupportedException("generic variance is not materialized for this snapshot");
+    /// <summary>Gets native reference/value/default-constructor requirements for this parameter.</summary>
+    /// <exception cref="NotSupportedException">Constraint flags are not materialized for this snapshot format.</exception>
+    public TypeParameterConstraints SpecialConstraints => DeclaringType.Definition.SpecialConstraints.GetValueOrDefault(Position);
+    /// <summary>Gets declared nominal bounds for this native type parameter, preserving dependency identity.</summary>
+    /// <exception cref="NotSupportedException">The snapshot format does not materialize type constraints.</exception>
+    public IReadOnlyList<TypeInfo> GetTypeConstraints()
+    {
+        var definition = DeclaringType.Definition;
+        if (definition.NativeTypeConstraints is not { } constraints) throw new NotSupportedException("type constraints are not materialized for this snapshot");
+        return Array.AsReadOnly(constraints.Where(c => c.Parameter == Position)
+            .Select(c => Context.ResolveSignature(definition.Module.GetNativeSignatureType(c.Interface))).ToArray());
+    }
     /// <inheritdoc/>
     public override string DisplayName => "!" + Position;
     /// <inheritdoc/>

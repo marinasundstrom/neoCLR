@@ -1,0 +1,17 @@
+public class Missing<T> : ReferenceBox<T> {
+    init(value: T) : base(value) { }
+}
+func Main() -> int {
+    let wrongReference = ReferenceBox<int>(1)
+    let wrongValue = ValueBox<string>("no")
+    let missingConstructor = ConstructorBox<string>("no")
+    let wrongNominal = NominalBox<string>("no")
+    return 0
+}
+
+func AbstractArgument(value: ConstructorBox<AbstractPayload>) -> int => 0
+func PrivateArgument(value: ConstructorBox<PrivatePayload>) -> int => 0
+
+public class MissingConstructor<T> : ConstructorBox<T> {
+    init(value: T) : base(value) { }
+}

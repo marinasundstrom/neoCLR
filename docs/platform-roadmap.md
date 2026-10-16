@@ -4888,5 +4888,4 @@ See [qualification](validation/generic-class-virtual/README.md). Raven local/imp
 validate reference/value/default-constructor requirements before specializing closed
 record/class constructions. The [retained consumer](validation/special-type-constraints/README.md)
 covers inherited and nested constructions; negative tests cover invalid arguments.
-Nominal bounds, constrained methods and Raven dependency constraint import remain
-open. This does not resume structural types or broaden the variance scope.
+Nongeneric nominal class bounds now also validate before specialization. Raven dependency import/use of the existing reference-class special/nominal constraint profile is qualified by the [separate-provider fixture](validation/imported-special-constraints/raven/README.md). Constrained methods, constructed/interface bounds and external source-bound authoring remain open. This does not resume structural types or broaden the variance scope.

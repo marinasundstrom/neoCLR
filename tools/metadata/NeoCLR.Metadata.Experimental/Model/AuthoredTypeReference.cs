@@ -8,13 +8,13 @@ public sealed partial class AssemblyBuilder
     /// <param name="artifactSha256">64 hexadecimal SHA-256 digits for the selected native image.</param>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Metadata name, including the arity suffix for a generic definition.</param>
-    /// <param name="genericArity">Number of invariant, unconstrained parameters, from zero to 32.</param>
+    /// <param name="genericArity">Number of invariant parameters, from zero to 32; register supported requirements with SetSpecialConstraints.</param>
     /// <returns>An interned output-owned definition reference; construct generic references before signature use.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">The digest is malformed.</exception>
     /// <exception cref="InvalidDataException">Unsupported identity/name/arity/core, snapshot conflict or resource limit.</exception>
     /// <remarks>The caller asserts a public top-level reference class with no required inheritance or interface conversions.
-    /// This does not load or check the dependency, import members, or preserve inheritance/constraint information.
+    /// This does not load or check the dependency or import members. Register inheritance and supported special constraints explicitly.
     /// The digest is an output-local consistency check, not an encoded runtime integrity guarantee.</remarks>
     public ImportedTypeReference CreateTypeReference(AssemblyIdentity dependency, AssemblyIdentity dependencyCoreLibrary,
         string artifactSha256, string @namespace, string name, int genericArity = 0)
