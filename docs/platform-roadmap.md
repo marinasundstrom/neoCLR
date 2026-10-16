@@ -5125,3 +5125,10 @@ The [library consumer](validation/numerics-interfaces/LibraryConsumer.rvn) cover
 primitive implementers and the Complex demo. API reference inventory/rendering is
 refreshed with the matching five-library bundle. Mixed-type contracts and identity
 interfaces remain separately scoped; no broader structural work is resumed.
+
+
+Numerics import completion: symbol-authored nominal bounds also cover imported
+assembly-level functions, including primitive arguments through their selected
+nominal owners. Separate-provider qualification and negative conformance evidence
+are recorded with the numerics samples. This closes the top-level import gap for
+the minimal same-type capabilities; constructed interface bounds remain deferred.

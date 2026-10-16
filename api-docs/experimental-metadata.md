@@ -4953,7 +4953,7 @@ encoding is reused. No synthetic CLI blobs or reflection types are introduced.
 
 `AssemblyBuilder.CreateFunctionReference(AssemblyIdentity dependency,
 AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
-string name, MethodSignature signature) -> ImportedMethodReference` creates a native
+string name, MethodSignature signature, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null) -> ImportedMethodReference` creates a native
 assembly-level function reference from resolved values. It needs no reader,
 MethodDefinition or resolver. The returned reference is owned by the output builder;
 matching name/parameter/arity contracts are interned. Use Call or MakeGenericInstance
@@ -4988,6 +4988,19 @@ main.LoadConstant(42);
 main.Call(call);
 main.Return();
 ```
+
+Optional interfaceBounds preserve nominal generic constraints on assembly-level
+functions (development, 2026-10-16). Each bound must name an output-owned,
+unconstructed nongeneric authored interface, with a valid method parameter ordinal.
+The list is copied; duplicates, null entries, foreign bounds and more than 128 entries
+throw ArgumentException. Conflicting bounds for an interned callable throw
+InvalidDataException. MakeGenericInstance validates declared nominal membership;
+operator shape alone does not satisfy a bound. The host must author the relevant
+interface conversions as well as the function signature. The same validation is
+shared with CreateMethodReference. Primitive arguments use the consuming output's
+explicitly selected nominal scalar owner and declared conformance, including inherited
+interfaces. Missing owner or membership is rejected. This adds no CLI representation
+or runtime opcode.
 
 The C# AuthoredFunctionReferenceChecks exercises creation without a reader and rejection
 contracts. NativeGenericMethodChecks reconstructs a generic vector reference from

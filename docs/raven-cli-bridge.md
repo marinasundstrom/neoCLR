@@ -12333,3 +12333,21 @@ inputs. No new Runtime Contract setting or opcode is required. The documentation
 CLI projection uses the established compiler Self marker; native metadata retains
 real Self and nominal interfaces. Mixed operand/result contracts remain outside
 this first surface; no .NET primitive or interface is modified.
+
+
+### Imported nominal bounds on assembly-level functions (2026-10-16)
+
+Native emission now carries nongeneric nominal interface method bounds on imported
+top-level functions through the symbol-authored SDK CreateFunctionReference contract,
+matching imported static class methods. Raven supplies resolved nominal identities
+and bounds; the SDK validates ownership, parameter scope and conflicting contracts.
+Native metadata retains ordinary generic type constraints, and the existing runtime
+specializer checks nominal conformance before static Self dispatch. No new Runtime
+Contract switch, CLI encoding or opcode is introduced; ordinary .NET is unchanged.
+Constructed interface bounds and other unsupported constraint categories remain gaps.
+Qualification uses a separate NumericFunctions provider, four arithmetic operations
+on int/double, Number-bound forwarding and invalid string argument rejection.
+Primitive arguments retain their selected nominal owner for imported bound validation;
+this requires explicit interface membership and does not infer capabilities from
+arithmetic syntax. The SDK regression rejects a scalar before owner selection and
+before interface declaration, then accepts it after declared conformance.

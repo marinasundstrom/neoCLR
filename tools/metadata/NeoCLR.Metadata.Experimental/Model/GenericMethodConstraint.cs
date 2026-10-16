@@ -156,6 +156,16 @@ public sealed partial class MethodBuilder
         if (actual.Composition is { Kind: ReferenceCompositionKind.Intersection } sourceIntersection)
             return sourceIntersection.Constituents.Any(t => SatisfiesStructuralBound(t, bound, depth + 1));
         if (actual == bound) return true;
+        // Scalar signatures retain the capabilities of their explicitly selected nominal owner.
+        // Imported callable definitions live in a private graph, so use the consuming owner.
+        if (actual.Primitive is { } primitive && (bound.ImportedType is not null || bound.ClassType is not null))
+        {
+            var owner = ConstraintOwner ?? Assembly;
+            if (owner.Types.SingleOrDefault(t => t.NativePrimitive == primitive) is { } localPrimitive)
+                actual = localPrimitive;
+            else if (owner.ExternalPrimitive(primitive) is { } importedPrimitive)
+                actual = importedPrimitive;
+        }
         if (bound.ImportedType is { } external)
         {
             var owner = ConstraintOwner ?? Assembly;

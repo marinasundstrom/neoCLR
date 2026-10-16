@@ -11,6 +11,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="namespace">Function namespace; empty for global functions.</param>
     /// <param name="name">Simple function name.</param>
     /// <param name="signature">Primitive, bounded unmanaged pointer, method-parameter, external top-level nominal construction and single-vector signature; no byrefs.</param>
+    /// <param name="interfaceBounds">Optional generic parameter bounds limited to output-owned nongeneric nominal interface references.</param>
     /// <returns>An interned output-owned callable reference.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid name, namespace, digest or signature scope.</exception>
@@ -19,7 +20,7 @@ public sealed partial class AssemblyBuilder
     /// The digest detects conflicts within this output; it is not an encoded runtime digest binding.
     /// Native format-5 linking uses namespace/name and signature. Ordinary CLI output rejects global call references.</remarks>
     public ImportedMethodReference CreateFunctionReference(AssemblyIdentity dependency, AssemblyIdentity dependencyCoreLibrary,
-        string artifactSha256, string @namespace, string name, MethodSignature signature)
+        string artifactSha256, string @namespace, string name, MethodSignature signature, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null)
     {
         ArgumentNullException.ThrowIfNull(dependency);
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
@@ -27,6 +28,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(@namespace);
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(signature);
+        var bounds = ValidateAuthoredInterfaceBounds(signature, interfaceBounds);
         if (artifactSha256.Length != 64 || !artifactSha256.All(Uri.IsHexDigit))
             throw new ArgumentException("expected SHA-256 hexadecimal digest", nameof(artifactSha256));
         if (!CoreLibrary.Equals(dependencyCoreLibrary) || dependency.Equals(Identity) || dependency.PublicKeyToken.Length != 0 || dependency.Flags != 0)
@@ -45,7 +47,7 @@ public sealed partial class AssemblyBuilder
             if (!existing.AssemblyIdentity.Equals(dependency) || existing.Namespace != (@namespace.Length == 0 ? null : @namespace) ||
                 existing.DeclaringTypeName is not null || existing.Name != name || existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (!existing.Signature.Matches(signature)) throw new InvalidDataException("conflicting function contract");
+            if (!existing.Signature.Matches(signature) || !existing.Target.Definition.TypeConstraints.SequenceEqual(bounds)) throw new InvalidDataException("conflicting function contract");
             return existing;
         }
         if (authoredCallableReferences.Count + importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
@@ -56,6 +58,8 @@ public sealed partial class AssemblyBuilder
             importedGraphs.Add(dependency, graph);
         }
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, null, name, signature, @namespace: @namespace));
+        reference.Target.ConstraintOwner = this;
+        reference.Target.Definition.AuthoredStructuralConstraints.AddRange(bounds);
         authoredCallableReferences.Add(reference);
         return reference;
 

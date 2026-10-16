@@ -1,0 +1,10 @@
+module NumericFunctions
+
+import System.*
+import System.Numerics.*
+
+public func Add<T>(left: T, right: T) -> T where T: AdditionOperators => left + right
+public func Subtract<T>(left: T, right: T) -> T where T: SubtractionOperators => left - right
+public func Multiply<T>(left: T, right: T) -> T where T: MultiplyOperators => left * right
+public func Divide<T>(left: T, right: T) -> T where T: DivisionOperators => left / right
+public func Forward<T>(left: T, right: T) -> T where T: Number => Add<T>(left, right)

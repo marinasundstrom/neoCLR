@@ -11,6 +11,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--provider', type=Path, help='Check an imported constrained method instead of source-local bounds')
+parser.add_argument('--function-provider', type=Path, help='Check an imported constrained top-level function')
 parser.add_argument('--output', type=Path, required=True)
 args = parser.parse_args()
 source = Path(__file__).with_name('ComplexGeneric.rvn').read_text()
@@ -26,6 +27,9 @@ if args.provider:
     imported = Path(__file__).with_name('Consumer.rvn').read_text()
     cases = [('imported-bound-required', imported.replace('Arithmetic.Add<Complex>(left, right)', 'Arithmetic.Add<int>(20, 22)'))]
     provider_items = f'<ItemGroup><Reference Include="NumericProvider"><HintPath>{escape(str(args.provider.resolve()))}</HintPath></Reference></ItemGroup>'
+if args.function_provider:
+    cases = [('imported-function-bound-required', 'import NumericFunctions.*\nfunc Main() -> int {\n    let value = Add<string>("a", "b")\n    return 0\n}\n')]
+    provider_items = f'<ItemGroup><Reference Include="NumericFunctions"><HintPath>{escape(str(args.function_provider.resolve()))}</HintPath></Reference></ItemGroup>'
 for name, text in cases:
     project = output / name
     project.mkdir()

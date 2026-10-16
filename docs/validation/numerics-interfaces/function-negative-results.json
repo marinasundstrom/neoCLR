@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "imported-function-bound-required",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/numerics-function-negative-20261016/imported-function-bound-required/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/numerics-function-negative-20261016/imported-function-bound-required/Main.rvn(3,21): error RAV0320: The type 'string' must satisfy the 'AdditionOperators' constraint for type parameter 'T' of 'static Add<T>(left: T, right: T) -> T'\n",
+      "sourceSha256": "148fa5d1627542ef70996a37ceb7106caa68cf4a6cc157a382e7226db2983633"
+    }
+  ]
+}

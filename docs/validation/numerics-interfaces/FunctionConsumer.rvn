@@ -1,0 +1,17 @@
+import NumericFunctions.*
+
+func Main() -> int {
+    if Add<int>(20, 22) != 42 || Subtract<int>(50, 8) != 42 {
+        return 1
+    }
+    if Multiply<int>(6, 7) != 42 || Divide<int>(84, 2) != 42 {
+        return 2
+    }
+    if Add<double>(20.0, 22.0) != 42.0 || Subtract<double>(50.0, 8.0) != 42.0 {
+        return 3
+    }
+    if Multiply<double>(6.0, 7.0) != 42.0 || Divide<double>(84.0, 2.0) != 42.0 {
+        return 4
+    }
+    return Forward<int>(20, 22)
+}

@@ -150,3 +150,26 @@ types and operators. The native rendering audit and four snapshot tests pass.
 No new Runtime Contract switch or serialized opcode is required. The native
 signature uses Self; the documentation CLI projection uses the existing Self
 marker. Ordinary Raven/.NET behavior remains unchanged.
+
+
+## Imported top-level function follow-up
+
+FunctionProvider.rvn exports Add, Subtract, Multiply, Divide and a Number-constrained
+Forward function. FunctionConsumer.rvn exercises the imported operations with int
+and double and calls Forward<int>. The initial compiler rejected this path with
+NEOMETA001 (unsupported symbol-only contract). Preserving the bounds exposed another
+SDK gap: scalar signatures were not resolved to their selected nominal owner during
+imported-bound validation. Both paths now use explicit nominal conformance; no
+operator-based inference or dependency-reader fallback is added.
+
+`function-results.json` records the separate-provider interpreter/JIT/AOT run against
+`target/numerics-public-libraries-20261016`; `function-negative-results.json` records
+rejection of Add<string>. The provider is compiled separately as a library with
+AssemblyName NumericFunctions, using the existing bundle props. Reproduce with the
+shared operator runner's --reference option and check-conformance.py's
+--function-provider option. Compiler and SDK hashes are retained in the results.
+
+The SDK --authored-method-bounds check now covers both callable forms, defensive
+copying, conflicting interning, malformed bounds and scalar arguments before/after
+explicit nominal conformance. Existing authored-reference and method-constraint
+regressions also pass. Constructed interface bounds remain outside this slice.

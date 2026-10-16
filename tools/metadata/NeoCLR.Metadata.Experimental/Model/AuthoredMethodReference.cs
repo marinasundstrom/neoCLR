@@ -61,12 +61,8 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(signature);
-        var bounds = interfaceBounds?.ToArray() ?? [];
-        if (bounds.Length > 128 || bounds.Distinct().Count() != bounds.Length || bounds.Any(c => c is null ||
-            c.ParameterIndex < 0 || c.ParameterIndex >= signature.GenericParameterNames.Count ||
-            c.Bound?.ImportedType is not { } bound || !ReferenceEquals(bound.Owner, this) ||
-            bound.GenericArity != 0 || bound.TypeArguments.Count != 0 || !IsAuthoredInterface(bound)) ||
-            bounds.Length != 0 && !isStatic)
+        var bounds = ValidateAuthoredInterfaceBounds(signature, interfaceBounds);
+        if (bounds.Length != 0 && !isStatic)
             throw new ArgumentException("invalid imported method interface bounds", nameof(interfaceBounds));
         if (visibility != MethodVisibility.Public && !(visibility == MethodVisibility.Protected && name == ".ctor" && !isStatic))
             throw new ArgumentException("only constructors may use protected reference visibility");
@@ -145,4 +141,17 @@ public sealed partial class AssemblyBuilder
             type.MethodParameterIndex is not null || type.TypeParameterIndex is not null ||
             type.ArrayElement is { ArrayElement: null } element && Supported(element, false);
     }
+
+    private GenericMethodTypeConstraint[] ValidateAuthoredInterfaceBounds(MethodSignature signature,
+        IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds)
+    {
+        var bounds = interfaceBounds?.ToArray() ?? [];
+        if (bounds.Length > 128 || bounds.Distinct().Count() != bounds.Length || bounds.Any(c => c is null ||
+            c.ParameterIndex < 0 || c.ParameterIndex >= signature.GenericParameterNames.Count ||
+            c.Bound?.ImportedType is not { } bound || !ReferenceEquals(bound.Owner, this) ||
+            bound.GenericArity != 0 || bound.TypeArguments.Count != 0 || !IsAuthoredInterface(bound)))
+            throw new ArgumentException("invalid imported callable interface bounds", nameof(interfaceBounds));
+        return bounds;
+    }
+
 }
