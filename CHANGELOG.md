@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
-- Qualify Raven source-level function type patterns in interpreter/JIT/AOT, including generic `obj is () -> T`, captured invocation and negative signature/null/object checks. Record the shared parser fix on Raven main and its deliberate native-branch carry; .NET keeps standard delegate lowering.
+- Qualify Raven source-level function type patterns in interpreter/JIT/AOT, including generic `obj is () -> T`, captured invocation and negative signature/null/object checks. Also qualify agreement with TypeInfo.IsInstanceOfType for concrete and generic signatures, using the existing reflection contract. Record the shared parser fix on Raven main and its deliberate native-branch carry; .NET keeps standard delegate lowering.
 
 - Add a provisional dynamic Function invocation primitive with checked Object-array arguments, typed invocation and boxed/reference results. Preserve bound receiver state and no-result calls; reject count/type mismatches before calling and propagate target faults. Interpreter/JIT/AOT fixtures and a sample-local Raven facade qualify the primitive. Native function/Object casts now check descriptor identity safely. Function type tokens retain structural signatures with explicit CLI rejection, and native Object.GetType recovers selected function shapes. The Raven consumer checks type identity and dynamically forwards a function argument/result before invoking it. No permanent class-library invocation API or multicast policy is introduced.
 

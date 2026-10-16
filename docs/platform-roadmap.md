@@ -4920,3 +4920,9 @@ including generic `() -> T` tests and capture/invocation. The shared parser fix 
 validated on Raven main using standard .NET delegates, then carried deliberately to
 the native feature branch; the retained invocation consumer covers all three native
 execution backends. No broader structural milestone or new variance rule is implied.
+
+
+The same retained consumer now compares source-level function patterns with
+TypeInfo.IsInstanceOfType, including closed generic signatures and negative cases.
+This is qualification of the existing reflection relationship contract, not a new
+function variance or dynamic invocation API.

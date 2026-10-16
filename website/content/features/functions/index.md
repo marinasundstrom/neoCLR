@@ -112,3 +112,9 @@ On the development function branch, Raven type patterns support function signatu
 `() -> T callback => callback()` captures and invokes it in a match arm. The native
 sample validates these forms in interpreter/JIT/AOT. The shared Raven parser also
 supports the .NET target, using its standard delegate representation.
+
+
+The retained native sample also checks that `TypeInfo.IsInstanceOfType` agrees with
+function-type `is` patterns, including closed generic signatures, null, nominal
+objects and mismatched signatures. Reflection uses the existing exact native
+function signature relationship.

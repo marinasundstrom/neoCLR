@@ -34,6 +34,10 @@ func ReadFactory<T>(obj: Object, fallback: T) -> T {
     }
 }
 
+func FactoryChecksAgree<T>(obj: Object?) -> bool {
+    return IsFactory<T>(obj) == typeof(() -> T).IsInstanceOfType(obj)
+}
+
 func Answer() -> int => 42
 
 func Main() -> int {
@@ -43,6 +47,10 @@ func Main() -> int {
     }
     if ReadFactory<int>(factory, 0) != 42 || ReadFactory<string>(factory, "fallback") != "fallback" {
         return 9
+    }
+    if !FactoryChecksAgree<int>(factory) || !FactoryChecksAgree<string>(factory) ||
+        !FactoryChecksAgree<int>(null) {
+        return 11
     }
     let counter = Counter(40)
     let callback: (int) -> int = counter.Add
@@ -64,6 +72,12 @@ func Main() -> int {
         }
     } else {
         return 7
+    }
+    let expectedShape = typeof((int) -> int)
+    if !expectedShape.IsInstanceOfType(reference) || expectedShape.IsInstanceOfType(missing) ||
+        expectedShape.IsInstanceOfType(ordinary) || typeof((string) -> int).IsInstanceOfType(reference) ||
+        typeof((int) -> string).IsInstanceOfType(reference) {
+        return 10
     }
     let shape = reference.GetType()
     if !shape.IsFunctionType || shape.IsNominalType || !shape.Equals(typeof((int) -> int)) {

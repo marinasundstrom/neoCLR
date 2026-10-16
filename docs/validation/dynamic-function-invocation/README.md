@@ -70,3 +70,12 @@ The corresponding shared parser fix is on Raven main (`0c8cda8dc`), where 40 foc
 parser/runtime tests pass using ordinary .NET delegates. Native validation uses the
 feature-branch compiler and the same bundle/profile above, returning 42 in all three
 backends; this does not introduce function variance or resume other structural work.
+
+
+Reflection/type-pattern agreement is also checked through
+`typeof((int) -> int).IsInstanceOfType(value)` and the generic
+`typeof(() -> T).IsInstanceOfType(obj)`. Positive bound functions and negative null,
+nominal-object, parameter-mismatch and return-mismatch cases are retained. The
+consumer explicitly compares the generic reflection result with the language `is`
+result. Both use existing runtime relationship rules; no new API or compiler
+lowering is introduced by this validation slice.

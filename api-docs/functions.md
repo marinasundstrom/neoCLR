@@ -185,3 +185,12 @@ patterns, including generic signatures: `if obj is () -> T { }` and
 fail the test; a successful capture remains callable with its original receiver.
 See the retained source consumer above. These are language operations over existing
 function metadata, not additional reflection API members.
+
+
+`TypeInfo.IsInstanceOfType(Object?)` also recognizes function values. In the native
+profile, `typeof((int) -> int).IsInstanceOfType(value)` succeeds for that exact
+function signature, independently of the bound receiver. Null, nominal objects and
+functions with different parameter or return types do not match. The source consumer
+compares `obj is () -> T` with `typeof(() -> T).IsInstanceOfType(obj)` for closed
+generic instantiations, including mismatches and null. This qualification uses the
+existing reflection API; it adds no coercion or function variance conversions.
