@@ -1,6 +1,7 @@
 # Provisional dynamic Function invocation — 2026-10-16
 
-Feature branch: `codex/function-kind-constraint`. The reserved native primitive is
+Integrated on 2026-10-16 into neoCLR `main` and Raven `codex/neoclr`; the completed
+`codex/function-kind-constraint` branches were removed. The reserved native primitive is
 `neoCLR.Runtime.InvokeFunction(System.Object, arrayref<System.Object>) -> System.Object`.
 It takes an existing function reference, not a method descriptor or name. The
 reference retains its bound receiver/closure. The Raven sample now imports the provisional class-library

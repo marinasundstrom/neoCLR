@@ -1,6 +1,7 @@
 # Function-kind constraint groundwork — 2026-10-16
 
-Feature branch: `codex/function-kind-constraint`. This is native runtime and host
+Integrated on 2026-10-16 into neoCLR `main` and Raven `codex/neoclr`; the completed
+`codex/function-kind-constraint` branches were removed. This is native runtime and host
 SDK groundwork plus the separately qualified Raven class-constraint slice below. It is not a function-list/event API.
 
 The `.constraint F func` IL restriction maps to native `FunctionType`. It accepts

@@ -160,6 +160,9 @@ structural identity alone does not imply the same behavior for other type famili
 
 ## FunctionReflection.Invoke (provisional development API)
 
+Integrated on neoCLR `main` with Raven `codex/neoclr` on 2026-10-16. Integration does
+not freeze this API or imply a published release.
+
 Import `System.Runtime.Reflection.*` and use
 [FunctionReflection](xref:System.Runtime.Reflection.FunctionReflection):
 

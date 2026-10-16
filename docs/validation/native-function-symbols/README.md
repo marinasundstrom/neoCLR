@@ -1,4 +1,6 @@
-# Native function symbols (feature branch, 2026-10-16)
+# Native function symbols (integrated, 2026-10-16)
+
+Integrated into neoCLR `main` and Raven `codex/neoclr`; original validation hashes below remain unchanged.
 
 Run `python3 raven/run.py --compiler /path/to/rvnc.dll --bundle /path/to/bundle
 --output /path/to/output --imported` from this directory (one command line).

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Integrate the validated function-kind constraints, function patterns/reflection and provisional FunctionReflection API into main, paired with Raven codex/neoclr. Preserve slice history, remove completed local feature branches and update development status; broader structural work stays parked and the invocation API remains provisional. No release or remote publication is implied.
+
 - Add provisional System.Runtime.Reflection.FunctionReflection.Invoke returning Result<Object?, ReflectionError>. Validate receiver, count and argument types without entering the target; report unsupported signatures, while target faults propagate. Qualify the public consumer against a fresh five-library bundle in interpreter/JIT/AOT, and refresh API reference artifacts. Generic overloads remain deferred. Record the target-specific Raven bootstrap Func/Action mapping needed to rebuild the library.
 
 - Qualify Raven source-level function type patterns in interpreter/JIT/AOT, including generic `obj is () -> T`, captured invocation and negative signature/null/object checks. Also qualify agreement with TypeInfo.IsInstanceOfType for concrete and generic signatures, using the existing reflection contract. Record the shared parser fix on Raven main and its deliberate native-branch carry; .NET keeps standard delegate lowering.

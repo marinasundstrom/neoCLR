@@ -17,8 +17,10 @@
 - Keep Raven main and the neoCLR compiler branch separate (author direction,
   2026-10-11). Develop general fixes on main and carry them deliberately to the
   neoCLR line with its own validation; a full branch merge is not the default plan.
-  Native Self integration is authorized. Keep structural Function experiments on
-  feature branches in both repositories until native metadata/compiler support is ready.
+  Native Self integration is authorized. The validated structural Function work is
+  integrated into neoCLR main and Raven codex/neoclr (author direction, 2026-10-16).
+  Keep broader structural work parked; provisional APIs and remaining gaps are
+  documented separately from integration status.
 - Keep target-specific mappings and capability checks behind explicit contracts;
   ordinary .NET behavior remains the default. Document temporary bridge encoding,
   its limitations, validation and eventual native metadata/backend replacement.

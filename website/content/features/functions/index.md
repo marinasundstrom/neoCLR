@@ -73,9 +73,9 @@ Typed invocation and property access use the Function object's bound target.
 Null member access raises NullReference.
 
 
-### Function-kind constraints (feature branch)
+### Function-kind constraints (development)
 
-On `codex/function-kind-constraint`, Raven supports `where T: func` for native
+On Raven `codex/neoclr` with neoCLR `main`, Raven supports `where T: func` for native
 generic classes and functions/methods. It restricts a generic argument to a structural function signature;
 nominal delegates and objects with `Invoke` do not qualify. The constraint does not
 supply an invocation signature to the generic body. A tested function slot stores
@@ -87,10 +87,9 @@ mapping is unchanged, and the .NET target rejects `func` constraints. A separate
 compiled provider and consumer forward a callback through a constrained generic
 function and return 42 in interpreter/AOT/JIT. Signature bounds such as
 `where T: () -> T2` remain a gap.
-Function-list/observer APIs remain deferred; provisional dynamic invocation is described below. This is feature
-branch development, not a published capability.
+Function-list/observer APIs remain deferred; provisional dynamic invocation is described below. This is integrated development work, not a published release capability.
 
-### Provisional dynamic invocation (feature branch)
+### Provisional dynamic invocation (development)
 
 A native primitive now accepts a function reference and an Object argument array,
 validates/converts the arguments and invokes its existing bound target. The public Raven
@@ -108,7 +107,7 @@ result. Native `typeof` tokens preserve function signatures. This qualifies runt
 type identity; it does not imply every reflective member query is supported by AOT.
 
 
-On the development function branch, Raven type patterns support function signatures:
+On the neoCLR compiler line, Raven type patterns support function signatures:
 `if obj is () -> T { }` tests a signature using an in-scope generic parameter, while
 `() -> T callback => callback()` captures and invokes it in a match arm. The native
 sample validates these forms in interpreter/JIT/AOT. The shared Raven parser also

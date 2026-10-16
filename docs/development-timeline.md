@@ -18383,3 +18383,14 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   callback-symbol gap; its target-specific fix preserves ordinary .NET delegates.
   Generic overloads and broader marshalling remain open. See the
   [validation record](validation/dynamic-function-invocation/README.md).
+
+
+- **Integration and cleanup (2026-10-16):** the author requested integration of the
+  completed work and cleanup of feature branches. **Assistant action:** checked
+  clean worktrees and fetched remote references; fast-forwarded neoCLR main and
+  Raven codex/neoclr to the validated function-feature tips, preserving all slice
+  commits. Removed both completed local function-kind branches and Raven's obsolete
+  consistent-ranges branch after proving ancestry. Raven main remains separate;
+  parked remote structural experiments are retained. **Outcome:** local integration,
+  with no push/release/publication. Prior backend consumer evidence remains applicable;
+  focused compiler/metadata and API snapshot checks qualify the integrated state.
