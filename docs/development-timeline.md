@@ -18254,3 +18254,19 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   The interpreter's per-conversion handle allocation remains explicit; no String
   payload copy or native wrapper allocation is introduced. Result/Sliceable
   variance is deferred.
+
+## 2026-10-16 — Defer Sliceable and Result variance
+
+- **Author:** directed, “Continue. We will postpone Sliceable and Result variance
+  for now.”
+- **Assistant action:** kept both declarations invariant, separated the original
+  motivating example and staged proposal from current reference-only scope, and
+  corrected stale baseline/String support descriptions. Added runtime regression
+  coverage for invariant boundaries nested inside variant interfaces, with exact
+  signature controls.
+- **Scope:** existing interpreter/AOT/JIT evidence remains the qualification for
+  the bounded interface feature. Result value conversion and Sliceable adapters
+  are deferred; open generic member/relationship reflection remains a documented
+  separate gap. Structural work remains parked.
+- **Validation:** all 11 focused `interface_variance` runtime tests pass. No
+  production behavior changed; existing native consumer evidence is reused.

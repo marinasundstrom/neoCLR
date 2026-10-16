@@ -3,11 +3,33 @@
 Status: development implementation, updated 2026-10-16. Runtime metadata, bounded
 reference conversions, SDK annotation transport and Raven interpreter/AOT/JIT
 integration are qualified for the cases recorded below, including String reference
-views. Open generic member/relationship reflection remains a gap. The wider Result
-proposal remains unimplemented. Structural-type work stays parked. This follows the
+views. Open generic member/relationship reflection remains a gap. The author
+explicitly postponed both Sliceable and Result variance on 2026-10-16; they remain
+invariant and are not acceptance criteria for the current slice. Structural-type
+work stays parked. This follows the
 [implemented slicing contract](slicing-capabilities.md).
 
-## Concrete requirement
+## Current scope and qualification
+
+The bounded feature follows .NET's reference-only interface variance model:
+explicit `in`/`out`, checked declaration polarity, nominal conformance, exact
+value arguments, and no implicit boxing or writable-storage covariance. The
+[qualification record](../validation/interface-variance/README.md) links the
+separately compiled Raven consumers for interpreter, AOT and managed JIT,
+including imported bases, arrays and String. Generic introspection preserves
+variance and construction identity within the documented query support.
+
+The current slice is qualified for these recorded cases. Open generic
+member/relationship reflection remains a separate gap, not erased metadata or
+permission to advertise complete reflection support. Default interface bodies,
+method generics, Self and borrowed variant views retain their documented limits.
+No further value-conversion or Sliceable adapter work is implied by completing
+reference-only variance. Invariant nested interfaces and nominal value wrappers
+remain boundaries even inside a covariant producer or contravariant consumer;
+`reference_variance_does_not_cross_invariant_boundaries` checks rejection alongside
+valid exact-signature controls.
+
+## Original motivating example (deferred)
 
 The author proposed using a `Sliceable<int[]>` as a
 `Sliceable<Iterable<int>>`, then directed exploring beyond .NET's restrictions,
@@ -45,17 +67,19 @@ declared variant in C#. Separate CLI metadata/runtime guarantees from C# syntax
 when implementing neoCLR; this investigation does not claim a CLR implementation
 experiment has been run.
 
-neoCLR's current metadata builder explicitly exposes invariant generic interfaces
+At the start of the investigation, neoCLR's metadata builder exposed invariant
+generic interfaces
 (`tools/metadata/NeoCLR.Metadata.Experimental/Model/InterfaceBuilder.cs`).
-`Iterable<T>` produces `Iterator<T>`, which produces T; those contracts are also
-currently invariant. `Result<T,E>` is a nominal union implementing
+`Iterable<T>` produces `Iterator<T>`, which produces T; those contracts were also
+invariant. They now opt into output variance; the historical baseline below does
+not describe their current annotations. `Result<T,E>` is a nominal union implementing
 `Propagatable<Result<T,E>,T,E>`, with output extraction through `out` parameters.
 Its full inherited and generated member surface needs auditing before variance can
 be advertised. Read-only case data alone does not prove a declaration is safe.
 
 ## Preserve the safety restrictions
 
-Provisional constraints for the next implementation design:
+Safety constraints:
 
 1. Validate explicit declaration-site intent across all instance members, base
    interfaces and substituted generic signatures. Compose nested input/output
@@ -92,9 +116,11 @@ only on whether a parameter appears in the outermost return type.
 | Validated result-value widening plus interface call adapters | Supports the requested case without changing Result into an interface or erasing cases | Metadata, conversion planning, dispatch, GC and backend work; no blanket zero-cost claim |
 | Treat generic values as layout-compatible aliases | Superficially cheap | Reject: different payload layouts, output slots and mutable state can make this unsound |
 
-Proposed direction: establish ordinary nominal interface variance first, then add
-explicitly validated conversion of immutable nominal result values. An interface
-view whose return requires value conversion needs a conversion-aware call adapter;
+The original proposed direction was ordinary nominal interface variance followed
+by validated conversion of immutable nominal result values. The author has now
+postponed the latter, including Sliceable variance. The following adapter design
+is retained as an exploratory alternative, not scheduled implementation work.
+An interface view whose return requires value conversion needs a conversion-aware call adapter;
 its metadata must describe the actual implementation signature and required
 conversion. Reuse an existing reference where possible, but measure and disclose
 adapter allocation, payload-copy and dispatch costs. Decide source syntax only
@@ -113,7 +139,7 @@ requires explicit mapping/adapters, document that difference rather than accepti
 source it cannot safely emit. This is a proposal for a target capability, not a
 request to restart structural-type work.
 
-## Acceptance and next bounded slices
+## Original staged plan (Result/Sliceable steps deferred)
 
 1. Inventory native generic metadata, importer/emitter flags and runtime type
    relationships; specify variance metadata and malformed-image rejection.

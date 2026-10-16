@@ -151,6 +151,34 @@ fn reversed_and_value_argument_variance_are_rejected() {
 }
 
 #[test]
+fn reference_variance_does_not_cross_invariant_boundaries() {
+    let declarations =
+        format!("{REFERENCES}\n.interface Fixed<T>\n.end\n.type Payload<T>\n.end");
+    for (source, target) in [
+        ("Fixed<Derived>", "Fixed<Base>"),
+        ("Fixed<Base>", "Fixed<Derived>"),
+        ("Producer<Fixed<Derived>>", "Producer<Fixed<Base>>"),
+        ("Consumer<Fixed<Base>>", "Consumer<Fixed<Derived>>"),
+        ("Producer<Payload<Derived>>", "Producer<Payload<Base>>"),
+    ] {
+        // Verify the same signature first: rejection must come from widening,
+        // not from an unsupported signature or an invalid declaration.
+        for (result, accepted) in [(source, true), (target, false)] {
+            let module = image(&format!(
+                "{declarations}\n.function Convert({source} value) -> {result}\nldarg value\nret\n.end"
+            ));
+            assert_eq!(
+                LoadedProgram::new(&module)
+                    .and_then(|p| p.verify())
+                    .is_ok(),
+                accepted,
+                "{source} -> {result}"
+            );
+        }
+    }
+}
+
+#[test]
 fn exact_view_wins_and_ambiguous_widening_fails() {
     for exact in [false, true] {
         let extra = if exact {

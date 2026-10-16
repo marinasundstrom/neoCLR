@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Record the author-directed deferral of Sliceable and Result variance, separating the original proposal from qualified reference-only interface variance. Add rejection coverage for invariant interfaces and nominal value wrappers nested in variant contracts, with valid exact-signature controls. Correct historical baseline and String qualification descriptions; no runtime ABI or compiler contract change.
+
 - Support intrinsic String in nominal interface variance. Adapt variant call arguments/results through ordinary heap-budgeted interpreter view handles and native tagged text pointers, preserving UTF-8 owner identity without payload copies. Retain private String conformance through specialization, skip unrelated explicit mappings during selection, and admit SDK String relationships through authored/imported nominal interfaces. Value boxing remains excluded; Runtime Contract and metadata encodings are unchanged. The rebuilt Raven consumer passes interpreter/AOT/JIT, nullable calls, six rejected conversions and native cleanup/sanitizer checks; the general nullable compiler correction is validated independently on Raven main and codex/neoclr.
 
 - Fix native array-interface variance by retaining closed array-backing conformance through specialization and renaming. Raven producer/consumer conversions between int[] and Iterable<int> preserve identity and support iterator calls in interpreter/AOT/JIT; proof-boundary tests and native cleanup/sanitizer checks pass. Array storage, Result and Sliceable remain invariant.

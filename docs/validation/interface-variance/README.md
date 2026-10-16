@@ -45,8 +45,9 @@ checks retain inherited/default/explicit and boxed behavior.
 The runtime keeps distinct constructed type identities and declared interface
 closures. A widened reference view does not change the type's declared interfaces.
 Reference-only here excludes implicit boxing; an explicitly boxed receiver may
-reuse its existing box. Intrinsic String widening needs separate materialization
-support and remains excluded. Borrowed slot/pointer view conversion remains exact.
+reuse its existing box. The original qualification excluded intrinsic String;
+[String qualification](strings/README.md) now covers identity-preserving
+materialization and its interpreter allocation cost. Borrowed slot/pointer view conversion remains exact.
 
 ## Native qualification — 2026-10-16
 
@@ -75,3 +76,14 @@ plus the subsequent focused generic-implementation test. Existing runtime
 interface suites pass. This does not widen Result/Sliceable or resume structural
 work. Standard-library annotations and guest generic-parameter introspection are
 subsequent slices.
+
+## Bounded scope checkpoint — 2026-10-16
+
+The author postponed Sliceable and Result variance. Both remain invariant; their
+adapter/value-conversion proposals are not pending acceptance gates for the
+reference-only interface feature. The runtime regression
+`reference_variance_does_not_cross_invariant_boundaries` verifies that reference
+widening does not cross unannotated interfaces or nominal value wrappers, even
+inside variant contracts, and accepts each exact-signature control. Existing
+String, array and imported-base executable evidence remains applicable; this
+checkpoint changes no runtime ABI or compiler contract.
