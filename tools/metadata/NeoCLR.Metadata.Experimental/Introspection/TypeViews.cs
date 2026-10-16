@@ -122,6 +122,12 @@ public sealed class ConstructedTypeInfo : TypeInfo
     }
     /// <summary>Gets the canonical open declaration.</summary>
     public NominalTypeInfo Definition { get; }
+    /// <summary>Gets the native nominal base with this construction's arguments substituted.</summary>
+    /// <exception cref="NotSupportedException">CLI base relationships are not materialized.</exception>
+    public TypeInfo? BaseType => !Definition.Definition.Module!.Assembly.IsNative
+        ? throw new NotSupportedException("CLI base relationships are not materialized")
+        : Definition.Definition.BaseTypeSignature is { } parent ? Context.ResolveSignature(parent, TypeArguments) : null;
+
     /// <summary>Gets copied arguments, which may retain caller-scoped parameters.</summary>
     public IReadOnlyList<TypeInfo> TypeArguments { get; }
     /// <summary>Gets declared field views with simultaneous owner-argument substitution.</summary>

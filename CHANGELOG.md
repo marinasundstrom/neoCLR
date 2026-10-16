@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Preserve local native constructed class bases in TypeDefinition.BaseTypeSignature. Resolve open and closed BaseType views with canonical generic argument identity, and enumerate interfaces inherited through native class ancestors. Reject malformed/unsafe bases and unsupported CLI inspection/projection; SDK reader, metadata-context and constructed-interface checks pass. External generic bases, layout authoring and Raven/native execution remain open.
+
 - Support scoped generic dependency base contracts in DeclareClassBase, substituting arguments through transitive reference and interface-variance checks in line with .NET. Reject unbound/out-of-scope bases, conflicting edges and definition cycles; generic classes remain invariant. SDK and emitted CLR checks pass. Native generic base materialization, layout authoring and Raven/native qualification remain open.
 
 - Fix SDK reference-only variance through interfaces inherited by imported classes: traverse explicitly registered dependency class bases, rejecting absent/incomplete ancestry and reverse conversions. Focused SDK/CLR checks and a separately compiled Raven interpreter/AOT/JIT consumer pass, including inherited interface calls, identity, mutation and native cleanup/sanitizers. No Runtime Contract, encoding or ABI change; Sliceable/Result variance remains deferred.

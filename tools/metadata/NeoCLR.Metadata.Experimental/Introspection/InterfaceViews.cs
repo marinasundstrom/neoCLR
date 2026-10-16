@@ -20,7 +20,7 @@ public sealed partial class MetadataLoadContext
             if (active.Contains(definition)) throw new InvalidDataException("cyclic metadata interface inheritance");
             if (!seen.Add(next.View)) continue;
             if (seen.Count > 4096) throw new InvalidDataException("metadata interface expansion limit exceeded");
-            result.Add(next.View);
+            if (definition.IsInterface) result.Add(next.View);
             active.Add(definition);
             pending.Push((next.View, true));
             PushEdges(next.View);
@@ -35,6 +35,11 @@ public sealed partial class MetadataLoadContext
                 ConstructedTypeInfo constructed => constructed.GetDeclaredInterfaces(),
                 _ => throw new InvalidDataException("non-nominal metadata interface owner")
             };
+            if (DefinitionOf(view).Definition.Module!.Assembly.IsNative)
+            {
+                var parent = view is NominalTypeInfo nominal ? nominal.BaseType : ((ConstructedTypeInfo)view).BaseType;
+                if (parent is not null) pending.Push((parent, false));
+            }
             for (var i = direct.Count - 1; i >= 0; i--) pending.Push((direct[i], false));
         }
         static NominalTypeInfo DefinitionOf(TypeInfo view) => view switch

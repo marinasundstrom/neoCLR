@@ -20,6 +20,8 @@ public sealed partial class NativeAssemblyDefinition
         internal bool IsAbstractClass { get; init; }
         internal bool IsFlagsEnum { get; init; }
         internal string? BaseName { get; init; }
+        internal JsonElement? RawBase { get; init; }
+        internal SignatureType? BaseSignature { get; set; }
         internal int BaseIndex { get; set; } = -1;
         internal ImportedTypeReference? ExternalBase { get; set; }
         internal PrimitiveType? NativePrimitive { get; init; }
@@ -404,7 +406,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + staticRows.Length + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { Variance = variance, StaticFields = staticRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { Variance = variance, StaticFields = staticRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -443,6 +445,14 @@ public sealed partial class NativeAssemblyDefinition
                 type.ExternalBase = ImportExternalType(signatureGraph, type.BaseName!, 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             int genericArity = 0; int typeArity = 0;
             var signatureOwners = DefineTypes(signatureGraph, types);
+            for (int i = 0; i < types.Count; i++)
+            {
+                if (types[i].RawBase is not { } rawBase) continue;
+                typeArity = types[i].GenericNames.Length;
+                types[i].BaseSignature = ReadType(rawBase, false);
+                typeArity = 0;
+            }
+
             for (int i = 0; i < types.Count; i++)
                 foreach (var inherited in types[i].BaseInterfaces)
                 {
@@ -1381,9 +1391,15 @@ public sealed partial class NativeAssemblyDefinition
         Require(text == canonical, "noncanonical native identity"); return identity;
     }
     private static bool IsOrdinaryClass(TypeRow type) => !type.IsStatic && !type.IsInterface && !type.IsValueType &&
-        type.NativePrimitive is null && !type.NativeGrapheme && type.GenericNames.Length == 0 && type.DeclaringType < 0;
+        type.NativePrimitive is null && !type.NativeGrapheme && type.DeclaringType < 0;
     private static string ReadBaseName(JsonElement node)
     {
+        if (node.TryGetProperty("Constructed", out var construction))
+        {
+            Shape(node, "Constructed");
+            Shape(construction, "definition", "arguments");
+            return Text(construction, "definition");
+        }
         Shape(node, "Named");
         return Text(node, "Named");
     }

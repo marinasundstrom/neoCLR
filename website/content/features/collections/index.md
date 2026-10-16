@@ -174,5 +174,5 @@ The metadata writer uses explicit dependency ancestry; it does not infer
 conformance from matching members. Result and Sliceable remain invariant.
 
 Generic dependency ancestry substitution is implemented in the metadata SDK and
-validated against CLR behavior. Native generic base metadata and Raven support
-still need completion; this is not yet an end-to-end supported feature.
+validated against CLR behavior. Local native generic base signatures and host introspection are now preserved;
+external generic bases, layout authoring and Raven execution still need completion; this is not yet an end-to-end supported feature.

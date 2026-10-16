@@ -119,8 +119,17 @@ public sealed partial class TypeDefinition
     public bool IsClosedHierarchy => Producer is null && Module is not null && !Module.Assembly.IsNative
         ? throw new NotSupportedException("CLI closed-family attributes are not materialized") : closedHierarchy;
     private TypeReference? authoredBaseType;
+    /// <summary>Gets the nominal base signature, preserving native generic arguments in declaration scope.</summary>
+    /// <remarks>Native local constructed bases and supported external bases retain exact signature identity.
+    /// CLI bases are not yet materialized. Null means no recorded native/authored base.</remarks>
+    /// <exception cref="NotSupportedException">CLI base signatures have not been materialized.</exception>
+    public SignatureType? BaseTypeSignature => Producer is null && Module?.Assembly.IsNative == false
+        ? throw new NotSupportedException("CLI base signatures are not materialized")
+        : nativeBaseSignature?.Value ??
+        (BaseType is { } parent ? SignatureType.FromReference(parent) : null);
+
     /// <summary>Gets the authored or materialized nominal base reference without resolving dependencies.</summary>
-    /// <remarks>Native snapshots support local bases and explicitly scoped external nongeneric top-level class bases. External references require an explicit resolver; dependency legality is verified separately. Null means no recorded base.</remarks>
+    /// <remarks>Native snapshots support local bases and explicitly scoped external nongeneric top-level class bases. This property returns the definition; BaseTypeSignature preserves construction arguments. External references require an explicit resolver; dependency legality is verified separately. Null means no recorded base.</remarks>
     public TypeReference? BaseType => authoredBaseType ?? (loadedBaseTypeToken == 0 ? null :
         Module!.GetTypeDefinition(loadedBaseTypeToken)?.ToReference()
             ?? Module.TypeReferences.SingleOrDefault(reference => reference.MetadataToken == loadedBaseTypeToken)

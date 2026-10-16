@@ -63,3 +63,8 @@ conformance; the SDK requires the complete dependency ancestry contract.
 The metadata SDK can now register generic dependency base templates and substitute
 arguments for variance checks. This is validated at the SDK/CLR level; complete
 Raven/native generic base support is not yet qualified.
+
+Host metadata introspection now retains local native generic base signatures,
+substitutes open/closed arguments, and includes class-inherited interfaces in
+GetInterfaces. This does not yet qualify guest reflection or Raven/native execution
+for generic class hierarchies. See the experimental metadata API reference.

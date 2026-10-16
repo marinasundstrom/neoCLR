@@ -9,6 +9,8 @@ if (args is ["--interface-variance"])
     InterfaceVarianceChecks.Run();
     NativeDefinitionChecks.Run();
     NativeReaderChecks.Run();
+    MetadataLoadContextChecks.Run();
+    ConstructedInheritanceChecks.Run();
     Console.WriteLine("PASS existing native declaration and projection regression checks");
     return 0;
 }

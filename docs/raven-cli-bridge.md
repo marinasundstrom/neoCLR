@@ -11388,3 +11388,18 @@ native consumer: the native reader's generic base-signature materialization and
 SDK generic layout authoring still require implementation. Raven's existing host
 registration path can use scoped generic templates once those metadata layers
 preserve them. These are temporary coverage gaps, not permanent platform rules.
+
+### Local generic base signatures in native metadata (2026-10-16)
+
+The SDK reader retains a native local constructed base in BaseTypeSignature.
+Nominal metadata views resolve its declaration-scoped parameters; constructed views
+substitute arguments. Native interface enumeration includes interfaces inherited
+through class bases. Raven's native symbol importer consumes the nominal view's
+BaseType, so it can receive a constructed base instead of a bare definition once
+its remaining owner eligibility/layout restrictions are lifted.
+
+Native encoding and Runtime Contracts are unchanged. CLI snapshots still reject
+base-signature inspection, and CreateReferenceAssembly still rejects inheritance
+projection; no lossy fallback is added. SDK reader/introspection regression checks
+pass. This does not yet qualify a Raven executable hierarchy: external constructed
+bases, SDK layout authoring and native emitter support remain explicit gaps.

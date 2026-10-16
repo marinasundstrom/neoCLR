@@ -3512,7 +3512,8 @@ It implements only the assembly/type/field part of the definition-first plan abo
 | `AssemblyBuilder.Definition` / `AssemblyBuilder.ForDefinition(AssemblyDefinition)` | Returns the same assembly/facade without copying declarations. Null input throws `ArgumentNullException`; loaded input throws `InvalidOperationException`. |
 | `ModuleDefinition.ImportReference(AssemblyIdentity scope, string namespace, string name)` | Creates an explicitly scoped reference; does not load a dependency or consult host reflection. Invalid/null arguments reject. Explicit resolution requires matching assembly identity. |
 | `TypeDefinition(string namespace, string name, uint attributes, TypeReference? baseType)` | Creates a detached declaration. Attachment admits nongeneric root classes, static classes or sealed sequential value types with the same module's explicitly imported core Object/ValueType base. Unsupported shape, foreign ownership or duplicate name throws `ArgumentException`. |
-| `TypeDefinition.BaseType` | Authored base reference or a loaded local/scoped external native base; CLI base decoding remains pending. |
+| `TypeDefinition.BaseType` | Base definition reference; use BaseTypeSignature to retain native construction arguments. CLI base decoding remains pending. |
+| `TypeDefinition.BaseTypeSignature` | Native/authored base signature with declaration-scoped generic arguments; null when absent. CLI snapshots throw NotSupportedException. |
 | `FieldDefinition(string name, ushort attributes, SignatureType fieldType)` | Creates a detached instance field. Supports Private, Assembly or Public access and optional InitOnly; nonvoid signature required. Value-type storage retains existing primitive/generic-payload restrictions. |
 | `FieldDefinition.FieldType` | Authored signature; null for opaque loaded signatures. `GetSignature()` rejects authored fields until encoded/read; use FieldType instead. |
 | `FieldDefinition.Name` | Authored fields can be renamed with Unicode/name and duplicate checks. Loaded edits throw `InvalidOperationException`. |
@@ -9340,3 +9341,34 @@ survives trusted row-preserving rewrites; serialization omits it and external
 metadata cannot supply it. It grants neither structural conformance nor a new
 String layout. Native dispatch separately adapts String arguments/results to the
 existing Object/interface pointer representation.
+
+## Constructed native class bases (development, 2026-10-16)
+
+`Model.TypeDefinition.BaseTypeSignature: SignatureType?` preserves local native
+constructed class bases, including nested nominal/array arguments and owner-scoped
+type parameters. The existing BaseType property identifies the base definition;
+it does not carry construction arguments. Null from BaseTypeSignature means no
+recorded native/authored base. CLI snapshots throw NotSupportedException because
+base-signature materialization is not implemented there.
+
+`Introspection.NominalTypeInfo.BaseType: TypeInfo?` now resolves the full signature
+using that definition's canonical parameter views.
+`Introspection.ConstructedTypeInfo.BaseType: TypeInfo?` substitutes that
+construction's arguments. For `Middle<T> : Base<T[]>`, the open view contains
+Middle's T and Middle<int>'s base contains int[]. Repeated queries use canonical
+same-context type identities. Missing dependencies fail through the explicit
+metadata resolver; no assembly is loaded implicitly.
+
+Both nominal and constructed GetInterfaces include interfaces inherited through
+native class ancestors, with substitution at every edge. GetDeclaredInterfaces
+continues to return only declared relationships. Inheritance cycles, including
+expanding generic cycles, reject rather than recursively expanding indefinitely.
+
+ReadNativeAssembly accepts these local native base constructions and preserves the
+original immutable image on Write. Wrong arity, unbound base definitions,
+out-of-scope parameters, sealed bases and invalid base categories reject with
+InvalidDataException. Existing supported external nongeneric bases remain valid;
+constructed external bases and generic class-layout authoring remain gaps.
+CreateReferenceAssembly still rejects class inheritance rather than projecting
+an incomplete hierarchy. These are metadata-only APIs, not guest native execution
+qualification. SDK reader/introspection and existing context/inheritance checks pass.

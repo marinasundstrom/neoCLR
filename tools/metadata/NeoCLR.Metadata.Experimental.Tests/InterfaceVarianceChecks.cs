@@ -12,6 +12,7 @@ internal static class InterfaceVarianceChecks
         CheckExternalBaseConversions();
         CheckInheritedClassInterfaceConversions();
         CheckGenericClassBaseConversions();
+        CheckNativeGenericBaseSignatures();
         CheckStringConversions();
         var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
         var graph = new AssemblyBuilder(new("VarianceSnapshot", new(1, 0, 0, 0)), core);
@@ -221,6 +222,66 @@ internal static class InterfaceVarianceChecks
                 "CLR generic base variance " + name);
         Conversion("WrongArguments", from, parent.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int64)));
         Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+    }
+
+    private static void CheckNativeGenericBaseSignatures()
+    {
+        var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
+        var graph = new AssemblyBuilder(new("GenericBaseMetadata", new(1, 0, 0, 0)), core);
+        var parent = graph.AddGenericClass("Example", "Base", ["T"]);
+        graph.AddGenericClass("Example", "Middle", ["T"]);
+        graph.AddGenericClass("Example", "Leaf", ["T"]);
+        var view = graph.AddGenericInterface("Example", "View", ["T"]);
+        parent.AddInterfaceImplementation(view.MakeGenericInstance(SignatureType.TypeParameter(0)));
+        var json = JsonNode.Parse(graph.WriteNativeAssembly())!;
+        var rows = json["types"]!.AsArray();
+        JsonObject Construction(string name, JsonNode argument) => new() {
+            ["Constructed"] = new JsonObject { ["definition"] = name, ["arguments"] = new JsonArray(argument) }
+        };
+        var parentName = rows[0]!["name"]!.GetValue<string>();
+        var middleName = rows[1]!["name"]!.GetValue<string>();
+        rows[1]!["base"] = Construction(parentName, new JsonObject { ["ArrayRef"] = new JsonObject { ["TypeParameter"] = 0 } });
+        rows[2]!["base"] = Construction(middleName, new JsonObject { ["TypeParameter"] = 0 });
+        byte[] Bytes(JsonNode node) => NativeModuleContainer.WriteBinary(Encoding.UTF8.GetBytes(node.ToJsonString()));
+        var cli = AssemblyDefinition.ReadAssembly(graph.Write(), expectedExtended: false);
+        Reject<NotSupportedException>(() => { _ = cli.MainModule.Types.First().BaseTypeSignature; });
+        var image = Bytes(json);
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
+        var middle = snapshot.MainModule.Types.Single(t => t.Name == "Middle`1");
+        Check(middle.BaseTypeSignature!.ReferencedGenericInstance!.TypeArguments.Single().ArrayElement!.TypeParameterIndex == 0,
+            "native base retains nested declaration parameter");
+        var context = new MetadataLoadContext([snapshot]);
+        var definitions = context.Resolve(snapshot.Identity).GetTypes();
+        var baseView = definitions.Single(t => t.Name == "Base`1");
+        var middleView = definitions.Single(t => t.Name == "Middle`1");
+        var leafView = definitions.Single(t => t.Name == "Leaf`1");
+        var openBase = (ConstructedTypeInfo)middleView.BaseType!;
+        Check(ReferenceEquals(((ArrayTypeInfo)openBase.TypeArguments.Single()).ElementType, middleView.GetGenericArguments().Single()),
+            "open base parameter belongs to derived definition");
+        var integer = context.ResolveSignature(PrimitiveType.Int32);
+        var closedLeaf = leafView.MakeGenericType(integer);
+        var closedMiddle = (ConstructedTypeInfo)closedLeaf.BaseType!;
+        var closedBase = (ConstructedTypeInfo)closedMiddle.BaseType!;
+        Check(ReferenceEquals(closedMiddle, middleView.MakeGenericType(integer)) && ReferenceEquals(closedBase.Definition, baseView) &&
+            ReferenceEquals(((ArrayTypeInfo)closedBase.TypeArguments.Single()).ElementType, integer), "closed transitive base substitution");
+        Check(ReferenceEquals(closedMiddle.BaseType, closedBase), "base view canonical identity");
+        var inherited = (ConstructedTypeInfo)closedLeaf.GetInterfaces().Single();
+        Check(inherited.Definition.Name == "View`1" &&
+            ReferenceEquals(((ArrayTypeInfo)inherited.TypeArguments.Single()).ElementType, integer),
+            "interface closure follows substituted class ancestors");
+
+        Check(snapshot.Write().SequenceEqual(image), "native base image retained");
+        Reject<NotSupportedException>(() => NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(json.ToJsonString())).CreateReferenceAssembly(core));
+        foreach (Action<JsonNode> mutate in new Action<JsonNode>[] {
+            n => n["types"]![1]!["base"] = Construction(parentName, new JsonObject { ["TypeParameter"] = 1 }),
+            n => n["types"]![1]!["base"] = new JsonObject { ["Named"] = parentName },
+            n => n["types"]![0]!["is_sealed"] = true,
+            n => n["types"]![0]!["base"] = Construction(middleName, new JsonObject { ["TypeParameter"] = 0 }),
+        })
+        {
+            var invalid = json.DeepClone(); mutate(invalid);
+            Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(Bytes(invalid)));
+        }
     }
 
     private static void CheckStringConversions()

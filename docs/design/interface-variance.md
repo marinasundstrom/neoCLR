@@ -681,3 +681,21 @@ base materialization, generic class layout authoring and Raven source/native
 qualification remain gaps to close, not intended .NET divergences. Open generic
 relationship reflection remains separate. Sliceable/Result variance and structural
 work stay deferred.
+
+### Native local generic-base metadata and introspection (2026-10-16)
+
+The native declaration reader now accepts local constructed class base signatures
+and retains them in TypeDefinition.BaseTypeSignature, rather than dropping their
+arguments into a definition-only token. NominalTypeInfo.BaseType preserves open
+owner-parameter identity; ConstructedTypeInfo.BaseType substitutes actual arguments
+through each edge. GetInterfaces now traverses native class ancestors as well as
+interface ancestors. This follows .NET's constructed type/introspection model and
+introduces no alternate conversion semantics.
+
+Focused tests cover Base<T[]>, transitive closed ancestry, canonical identity,
+inherited generic interfaces, immutable image round-trip, bad scope/unbound bases,
+sealed bases and cycles. Existing metadata-context and constructed-interface tests
+also pass. CLI base inspection and inheritance projection remain explicitly
+unsupported. Native external generic bases, layout authoring and a Raven executable
+consumer remain follow-ups; host metadata inspection is not guest reflection or
+JIT/AOT qualification. Sliceable/Result variance and structural work remain deferred.
