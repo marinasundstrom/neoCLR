@@ -102,9 +102,9 @@ and compiler. Library XML and Markdown sidecars supply API descriptions where av
 `neoclr disassemble` inspects metadata and instructions without executing the assembly
 or loading its dependencies. Its output is a diagnostic listing, not reassemblable neoIL.
 
-The native target does not support every Raven or .NET feature. Local nongeneric class
-virtual dispatch is supported; external class overrides and generic virtual classes
-remain limited. An explicit development compiler option now exercises ordinary
+The native target does not support every Raven or .NET feature. Local and imported concrete generic class
+virtual slots and overrides now pass development interpreter/JIT/AOT consumers.
+Generic virtual methods and abstract generic class authoring remain unsupported. An explicit development compiler option now exercises ordinary
 async methods through retained runtime frames. The POC now qualifies interpreter
 execution and macOS ARM64 JIT/AOT HTTP application bodies, with cleanup and GC checks.
 [Runtime-async POC details](../features/tasks/#direction) describe the temporary native

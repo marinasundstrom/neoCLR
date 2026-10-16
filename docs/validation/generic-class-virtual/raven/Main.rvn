@@ -1,0 +1,14 @@
+public class Consumer<Unused, T> : Base<T> {
+    init(value: T) : base(value) { }
+    public override func Echo(value: T) -> T => base.Echo(Get())
+}
+
+func Main() -> int {
+    let first: Base<int> = Derived<bool, int>(40)
+    let second: Base<int> = Consumer<bool, int>(2)
+    let references: Base<Base<int>> = Consumer<bool, Base<int>>(first)
+    if !System.Object.ReferenceEquals(references.Echo(second), first) {
+        return 1
+    }
+    return first.Echo(99) + second.Echo(99)
+}

@@ -1,0 +1,13 @@
+public open class Base<T> {
+    private var value: T
+    init(value: T) {
+        self.value = value
+    }
+    func Get() -> T => value
+    public virtual func Echo(value: T) -> T => value
+}
+
+public open class Derived<Unused, T> : Base<T> {
+    init(value: T) : base(value) { }
+    public override func Echo(value: T) -> T => base.Echo(Get())
+}
