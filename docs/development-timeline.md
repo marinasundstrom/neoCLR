@@ -18409,3 +18409,30 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   extensions/interfaces/virtual declarations and missing assignment tokens remain
   follow-up work; no user approval of those future details is inferred. See
   [evidence](validation/compound-operators/README.md). Structural work stays parked.
+
+## 2026-10-16 — Operator conventions and purpose-specific capabilities
+
+**Author direction:** The .NET target must follow .NET platform conventions.
+NeoCLR may define its own conventions where useful or necessary. The author
+described nominal operator capabilities analogous to System.Numerics interfaces
+and the proposed Sliceable contract, emphasizing that numeric addition and `+`
+on nonnumeric types have different meanings and may use different interfaces.
+
+**Assistant response:** Separate operator lookup/invocation mechanics from explicit
+nominal capability contracts. An operator spelling alone does not establish a
+numeric contract or algebraic guarantees. More purposeful interfaces remain
+design work; no implicit structural conformance or universal addition trait was
+introduced. The author then requested continued operator implementation.
+
+**Action:** Implement the next remainder/shift slice on Raven main and carry it
+deliberately to codex/neoclr, using existing .NET metadata names and native shift
+operations. No divergence was needed for this slice. The [qualification record](validation/compound-operators/README.md) records outcomes and remaining boundaries.
+Structural work remains parked; this author-directed slice does not reorder the
+rest of the platform roadmap.
+
+**Subsequent clarification:** The author said this NeoCLR operator work will
+eventually support the numerics interfaces in System.Numerics. The assistant
+recorded that as the intended next layer, retaining explicit conformance and
+generic-dispatch validation as work still to do. The remainder/shift slice
+passed 101 main tests, 104 native-line compiler tests and interpreter/JIT/AOT
+consumer execution; Raven commits are `b5e6bb0d3` and `57c567509`.

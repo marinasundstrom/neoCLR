@@ -51,7 +51,10 @@ Development Raven also supports explicit in-place compound operators such as
 `func +=(amount: int)` on classes and structs. These preserve reference identity and
 mutate value storage. The current native class, struct-local and reference-array
 consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-only.
-Checked and extension/interface forms remain follow-up work.
+Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
+zero-filling `>>>` are also qualified on those backends. Checked and
+extension/interface forms remain follow-up work. Nominal System.Numerics
+capabilities are a future layer over this operator support.
 
 <a id="targets"></a>
 

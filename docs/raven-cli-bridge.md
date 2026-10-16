@@ -12160,5 +12160,14 @@ interpreter/JIT/AOT local consumers, and a separate interpreter-only nominal val
 array consumer with explicit AOT rejection. That allocation gap remains open; no
 native imported-library or all-platform claim is made. No new guest public API means
 no guest reference assembly refresh; the host API manual is updated and its snapshot
-check passes. Checked/extension/interface/virtual forms and the remaining assignment
-tokens are follow-up work. Broader structural work remains parked.
+check passes. Checked/extension/interface/virtual forms and instance increment/decrement
+are follow-up work. Broader structural work remains parked.
+
+Remainder/shift carry (2026-10-16): Raven main `b5e6bb0d3`, native compiler
+`57c567509`. `%=` / `<<=` / `>>=` / `>>>=` use the standard operator method
+names with ordinary native instance dispatch. Binary `>>>` reuses the native
+unsigned-shift operation. No new bridge encoding, information loss, Runtime
+Contract setting or runtime opcode is introduced. Raven owns parsing/binding
+and lowering; existing runtime backends execute the operations. The expanded
+[consumer](validation/compound-operators/README.md#remaindershift-follow-up) passes
+interpreter, macOS ARM64 JIT and AOT; exact hashes are in `shift-results.json`.

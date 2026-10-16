@@ -5,6 +5,11 @@ class Counter {
         Value = Value + amount
     }
 
+    func %=(amount: int) { Value = Value % amount }
+    func <<=(count: int) { Value = Value << count }
+    func >>=(count: int) { Value = Value >> count }
+    func >>>=(count: int) { Value = Value >>> count }
+
     static func +(left: Counter, right: int) -> Counter => Counter()
 }
 
@@ -47,6 +52,31 @@ class Program {
         values[indexes.Index()] += 20
         if values[0].Value != 20 || indexes.Calls != 1 {
             return 3
+        }
+
+        var shifts = Counter()
+        shifts += 85
+        shifts %= 43
+        shifts <<= 2
+        shifts >>= 1
+        shifts >>>= 1
+        if shifts.Value != 42 {
+            return 4
+        }
+
+        var signed = -1
+        signed >>>= 1
+        if signed != 2147483647 || (-1 >>> -1) != 1 || (-1 >>> 32) != -1 {
+            return 5
+        }
+
+        var wide: long = -1
+        wide >>>= 63
+        wide <<= 6
+        wide >>= 1
+        wide %= 21
+        if wide != 11 {
+            return 6
         }
 
         return alias.Value + value.Value + values[0].Value

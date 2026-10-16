@@ -4969,6 +4969,13 @@ Raven main and the neoCLR compiler line. The initial supported-token slice now u
 in-place instance calls on both targets, with explicit SDK managed element-address
 authoring. [Validation and boundaries](validation/compound-operators/README.md)
 include .NET and interpreter/JIT/AOT evidence, with nominal struct arrays remaining
-interpreter-only. Remaining token/checked/extension/interface/virtual coverage is
+interpreter-only. Remaining checked/extension/interface/virtual coverage is
 follow-up work. This bounded language improvement does not reprioritize unrelated
 milestones or resume broader structural work.
+
+Remainder and shift follow-up: Raven main `b5e6bb0d3`, native carry `57c567509`,
+101/104 focused tests respectively, and the expanded interpreter/JIT/AOT consumer
+pass. See the linked qualification record. The author clarified that NeoCLR
+operator work is intended to support the System.Numerics interfaces; nominal
+capability contracts and their generic dispatch remain the next layer, not an
+implicit consequence of supporting an operator spelling.

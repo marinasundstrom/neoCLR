@@ -4,7 +4,8 @@ Development support, paired with Raven main `7819e2fea` and its deliberate carry
 `codex/neoclr` at `164ebf81f`; metadata SDK element-address support is neoCLR `1b4561f3b`.
 Broader structural work remains parked. Nothing here declares a release.
 
-Raven's initial compound overloads are `+=`, `-=`, `*=`, `/=`, `&=`, `|=` and `^=`.
+Raven compound overloads are `+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `|=`, `^=`,
+`<<=`, `>>=` and `>>>=`. Binary `>>>` is also supported.
 A declaration such as `func +=(amount: int)` is a public instance method with one
 by-value parameter and unit result. Applicable operators mutate writable variables;
 ordinary properties/indexers keep binary-plus-setter fallback. Assignments retain
@@ -53,8 +54,23 @@ install or publish a bundle.
 ## Remaining boundaries
 
 Checked forms, compound extension/interface/virtual declarations, instance
-increment/decrement, and missing remainder/shift compound tokens are follow-up
-work. Native imported-library compound calls and other architectures are not
+increment/decrement are follow-up work. Native imported-library compound calls and other architectures are not
 claimed by this fixture. The SDK is a host API documented in the
 [manual reference](../../../api-docs/experimental-metadata.md#managed-array-element-addresses-development-2026-10-16);
 no Raven class-library API or reference snapshot changed.
+
+## Remainder/shift follow-up
+
+Shared Raven main `b5e6bb0d3` and deliberate native carry `57c567509` add remainder
+and shift assignments plus zero-filling binary `>>>`. Main passes 101 focused
+tests; the native compiler line passes 104. The expanded `Main.rvn` passes
+interpreter, macOS ARM64 AOT with sanitizers, and managed JIT, all returning 42.
+It exercises the four additional explicit compound methods, int64 shift counts,
+zero fill and masking of negative/width-sized int32 counts.
+`shift-results.json` records this run; `results.json` retains the initial slice.
+The same validated bundle is used. No runtime change or new opcode is required.
+
+The .NET target follows .NET metadata conventions. NeoCLR uses those names for
+this slice too; purposeful nominal capability contracts remain separate. The
+author intends this operator work to support System.Numerics interfaces on
+NeoCLR next. Implementing a plus operator alone does not make a type numeric.
