@@ -12416,3 +12416,19 @@ Raven initializer-body emission remains unsupported. Shared JIT/AOT now retain
 and guard native initializers, including closed generic owners and GC-safe implicit
 calls; raw-metadata consumers qualify the runtime in all three execution modes. Existing
 readonly instance and class-constant consumer evidence is unaffected.
+
+
+### Native static initialization (2026-10-16)
+
+The native emitter reuses bound field initializer expressions and declaration order,
+then lowers any explicit static constructor body. The SDK emits canonical private
+static parameterless `.cctor` with no result. Explicit constructors use strict runtime
+initialization; synthesized initializer-only bodies use `before_field_init`. Native
+imports expose `StaticConstructor`. This is native metadata, not a CLI carrier or
+new Runtime Contract switch; ordinary .NET emission and semantic binding are unchanged.
+Matching neoCLR main runtime/SDK support is required. Native readonly stores remain
+restricted to the exact owning initializer. Interpreter, JIT and sanitized AOT qualify
+source readonly, explicit/generic and separate-provider consumers in neoCLR's
+`docs/validation/compound-operators/StaticInitialization*.rvn`. Runtime storage remains
+invocation-owned, with terminal Faults; intrinsic initializer admission and guest
+reflection integration are separate runtime responsibilities.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Retain explicit native admission limits for optional parameters and static initialization."""
+"""Retain explicit native admission limits for optional parameters."""
 import argparse
 import hashlib
 import json
@@ -15,7 +15,7 @@ args = parser.parse_args()
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=False)
 report = {'passed': False, 'cases': []}
-for name, reason in [('ConstantDefaults', 'callable declaration'), ('ReadonlyFields', 'static field initializers')]:
+for name, reason in [('ConstantDefaults', 'callable declaration')]:
     source = Path(__file__).resolve().with_name(name + '.rvn')
     project = output / name
     project.mkdir()

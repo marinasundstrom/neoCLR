@@ -1,0 +1,19 @@
+public class Counter {
+    static field Count: int
+    static func Next() -> int {
+        Count += 1
+        return Count
+    }
+}
+
+public class Cache<T> {
+    static readonly field Value: int = Counter.Next()
+}
+
+public class State {
+    static readonly field Value: int = 10
+    static init() {
+        Value += 30
+    }
+    static func Read() -> int => Value
+}

@@ -1,0 +1,7 @@
+func Main() -> int {
+    if Cache<int>.Value != 1 { return 1 }
+    if Cache<string>.Value != 2 { return 2 }
+    if Cache<int>.Value != 1 { return 3 }
+    if Counter.Count != 2 { return 4 }
+    return State.Read() + Counter.Count
+}
