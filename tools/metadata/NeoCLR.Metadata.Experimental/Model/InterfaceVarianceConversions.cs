@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     // Reference views only. This is also used for nested argument conversion; it
-    // deliberately excludes primitive materialization, boxing and writable aliases.
+    // admits String reference views adapted by runtime dispatch, but excludes value boxing and writable aliases.
     internal bool HasVariantReferenceConversion(SignatureType source, SignatureType target, int depth = 0)
     {
         if (source == target) return true;
@@ -19,13 +19,15 @@ public sealed partial class AssemblyBuilder
         if (views.Contains(target)) return true;
         return views.Count(view => Compatible(view, target)) == 1;
 
-        bool Reference(SignatureType type) => type.ArrayElement is not null ||
+        bool Reference(SignatureType type) => type.Primitive == PrimitiveType.String || type.ArrayElement is not null ||
+            type.ClassType is { IsStatic: false, IsValueType: false, NativePrimitive: PrimitiveType.String } ||
             type.ClassType is { IsStatic: false, IsValueType: false, NativePrimitive: null } ||
             type.GenericInstance is { Definition.IsStatic: false, Definition.IsValueType: false } ||
             type.ImportedType is { IsValueType: false } imported &&
-                !(nativeImportedDefinitions.TryGetValue(InterfaceDefinition(imported), out var definition) && definition.NativePrimitive is not null);
+                !(nativeImportedDefinitions.TryGetValue(InterfaceDefinition(imported), out var definition) && definition.NativePrimitive is not null and not PrimitiveType.String);
         bool Interface(SignatureType type) => type.ClassType?.IsInterface == true ||
-            type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { } imported && IsAuthoredInterface(imported);
+            type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { } imported &&
+                (IsAuthoredInterface(imported) || nominalKinds.TryGetValue(InterfaceDefinition(imported), out var isInterface) && isInterface);
         bool Compatible(SignatureType actual, SignatureType expected)
         {
             IReadOnlyList<SignatureType> from, to;
@@ -59,6 +61,20 @@ public sealed partial class AssemblyBuilder
             {
                 if (!seen.Add(current)) continue;
                 if (seen.Count > 4096) throw new InvalidDataException("variant interface conversion graph exceeds limit");
+                if (current.Primitive == PrimitiveType.String)
+                {
+                    // Intrinsic signatures carry no nominal owner. Only use the
+                    // explicitly authored/imported String declaration's contracts.
+                    var local = types.Where(t => t.NativePrimitive == PrimitiveType.String).Take(2).ToArray();
+                    var imported = nativeImportedDefinitions.Where(p => p.Value.NativePrimitive == PrimitiveType.String)
+                        .Select(p => p.Key).Take(2).ToArray();
+                    if (local.Length + imported.Length == 1)
+                    {
+                        if (local.Length == 1)
+                            foreach (var parent in local[0].InheritedContracts()) pending.Push(parent);
+                        else pending.Push(imported[0]);
+                    }
+                }
                 if (Interface(current)) yield return current;
                 var owner = current.GenericInstance?.Definition ?? current.ClassType;
                 var arguments = current.GenericInstance?.TypeArguments ?? current.ImportedType?.TypeArguments ?? [];

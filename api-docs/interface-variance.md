@@ -20,15 +20,15 @@ annotations and their conversion limits; no type or member is excluded.
 
 Covariant interfaces produce T; contravariant interfaces consume T. Differing
 arguments require supported reference conversions; identical value arguments remain
-valid. Conversions preserve the receiver and do not allocate adapters or box elements.
+valid. Conversions preserve the receiver and do not box elements. String argument/result
+views use the existing representation adaptation described below.
 Concrete classes, mutable collections, array storage, Option/Result and Sliceable
 remain invariant. A class may still expose a wider read-only interface through its
 explicit implementations.
 
 Inspect a declaration through [GenericParameterTypeInfo.Variance](reflection.md#generic-parameter-variance-development).
 Native open-definition discovery supports explicitly retained type catalogs; open
-member/relationship queries and intrinsic String variance materialization remain
-implementation gaps. Annotations do not imply support for those missing operations.
+member/relationship queries remain implementation gaps. Annotations do not imply support for those missing operations.
 
 Variance also follows explicitly declared local-to-imported class ancestry. The
 separately compiled Raven consumer validates producer/consumer and nested views in
@@ -38,7 +38,7 @@ Reverse and unrelated-class conversions reject; this does not enable generic cla
 Interface-valued reference arguments may widen to Object in the declared variance
 direction. Native lowering preserves the verified Object-root role through private
 renaming; producer and consumer paths are qualified with actual identity checks in
-interpreter/AOT/JIT. This does not admit value boxing or intrinsic String widening.
+interpreter/AOT/JIT. This does not admit value boxing.
 
 Array references are also supported as variant arguments: Producer<int[]> can
 widen to Producer<Object>, and Consumer<Object> can narrow to Consumer<int[]>.
@@ -48,3 +48,10 @@ are qualified in Raven interpreter, AOT and managed JIT.
 Array arguments may also widen to their declared Iterable<int> contract: producer
 and consumer conversions between int[] and Iterable<int> preserve array identity
 and support iteration in interpreter/AOT/JIT. Result and Sliceable remain invariant.
+
+String is also a reference argument. Producer<string> can widen to Producer<Object>
+or Producer<Iterable<char>>, and the corresponding consumers narrow to
+Consumer<string>. The interpreter allocates an ordinary view handle while sharing
+the UTF-8 owner; native dispatch adapts its pointer tag without allocating a wrapper
+or copying text. Nominal conformance remains explicit, and reverse/value-boxing
+conversions reject. See the retained String consumer for source and validation.

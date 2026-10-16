@@ -134,6 +134,8 @@ fn reversed_and_value_argument_variance_are_rejected() {
         ("Consumer<Derived>", "Consumer<Base>"),
         ("Producer<Int32>", "Producer<System.Object>"),
         ("Producer<Int32>", "Producer<Int64>"),
+        ("Producer<System.Object>", "Producer<String>"),
+        ("Consumer<String>", "Consumer<System.Object>"),
     ] {
         let text = format!(
             ".module Variance\n.entry Main\n{REFERENCES}\n.function Convert({source} value) -> {target}\nldarg value\nret\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end"
@@ -322,4 +324,117 @@ ret
     let result = p.run(Limits::default()).unwrap();
     assert_eq!(result.value, Value::Int32(42));
     assert_eq!(result.heap.statistics().allocated_objects, 2);
+}
+
+#[test]
+fn string_variant_calls_materialize_identity_preserving_views() {
+    let module = assemble(
+        r#"
+.module StringVariance
+.entry Main
+.type class System.Object
+.end
+.interface Producer<T>
+.variance out
+.method instance Get() -> T
+.end
+.end
+.interface Consumer<T>
+.variance in
+.method instance Accept(T value) -> Int32
+.end
+.end
+.type class Source
+.implements Producer<String>
+.field Text String
+.method instance Get() -> String
+ldarg this
+ldfld 0
+ret
+.end
+.end
+.type class Sink
+.implements Consumer<System.Object>
+.field Expected String
+.method instance Accept(System.Object value) -> Int32
+ldarg value
+ldarg this
+ldfld 0
+ref.eq
+brfalse Failed
+ldarga value
+initobj System.Object
+ldc.i4 42
+ret
+Failed:
+ldc.i4 1
+ret
+.end
+.end
+.function Main() -> Int32
+.local String text
+.local Producer<System.Object> producer
+.local System.Object first
+ldstr "hé😀"
+stloc text
+ldloc text
+newobj Source
+castclass Producer<System.Object>
+stloc producer
+ldloc producer
+callvirt instance Producer<System.Object>::Get()
+stloc first
+ldloc first
+ldloc text
+ref.eq
+brfalse Failed
+ldloc first
+ldloc producer
+callvirt instance Producer<System.Object>::Get()
+ref.eq
+brfalse Failed
+ldloc text
+newobj Sink
+castclass Consumer<String>
+ldloc text
+callvirt instance Consumer<String>::Accept(String)
+ret
+Failed:
+ldc.i4 2
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    let result = program.run(Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    // Two receivers and three ordinary String view handles; no text owner copy.
+    assert_eq!(result.heap.statistics().allocated_objects, 5);
+    let fault = program
+        .run(Limits {
+            heap_objects: 1,
+            ..Limits::default()
+        })
+        .unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::HeapLimitExceeded);
+    let mut failing = module.clone();
+    failing
+        .functions
+        .iter_mut()
+        .find(|f| f.name == "Source.Get")
+        .unwrap()
+        .body = vec![neoclr::metadata::Instruction::Fault(
+        "string producer failed".into(),
+    )];
+    let failing = LoadedProgram::new(&failing).unwrap();
+    failing.verify().unwrap();
+    assert!(
+        failing
+            .run(Limits::default())
+            .unwrap_err()
+            .to_string()
+            .contains("string producer failed")
+    );
 }

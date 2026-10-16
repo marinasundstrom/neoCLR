@@ -11310,3 +11310,47 @@ pass. Focused tests cover renamed element identities, reverse and wrong-element
 rejection, serialization/forgery and malformed proof arity. Evidence uses the
 unchanged `variance-argument-sequence-20261016` bundle and the compiler rebuilt
 against SDK `2c98cbd1b`; commands and binary hashes are retained with the consumer.
+
+### Intrinsic String variance (2026-10-16)
+
+Author direction extends the reference-only feature through String. String remains
+a reference type even though neoCLR stores its immutable UTF-8 owner separately
+from nominal object records. Like .NET reference variance, Producer<string> may
+widen to Producer<Object> or a nominal interface implemented by String; a consumer
+of those views may narrow to Consumer<string>. No value boxing or duck typing is
+introduced. Result and Sliceable remain invariant; structural work stays parked.
+
+Interpreter variant dispatch now materializes the same heap-budgeted view handle
+as an ordinary String cast when adapting an argument or result. The UTF-8 owner is
+shared, preserving reference identity across repeated calls. This costs one handle
+per such adaptation in the interpreter, unlike the CLR's direct object reference.
+Native dispatch uses the existing null-preserving tagged text pointer: it allocates
+no adapter and copies no payload at conversion. A failed callee's output is never
+read. Literal identity still follows the native text profile's existing allocation
+rules. These are private implementation representations, not metadata erasure.
+
+Native specialization retains verified String/interface conformance on closed
+interface shapes before source primitive declarations leave the selected inventory.
+The private fact survives nominal rewrites and cannot be supplied by serialized
+metadata. Dispatch also skips unrelated explicit source mappings before resolution;
+this prevents a stale, unselected Collection.Count template from blocking String's
+Iterable contract. Source validation continues to validate all authored mappings.
+
+The SDK admits intrinsic String arguments using the explicitly authored/imported
+String declaration and known interface classification. Its focused checks cover
+local and imported producer/consumer conversions and reverse rejection. The
+[retained Raven consumer](validation/interface-variance/strings/README.md)
+uses the existing bundle `variance-argument-sequence-20261016`, with the compiler
+rebuilt against the matching SDK. Runtime Contract settings and native/CLI encoding
+are unchanged; native iteration enables the existing UTF-8 and character bindings.
+
+Nullable reference variance required Raven main fix `f8679d6f3`, carried separately
+as `e17fb32c4` to codex/neoclr. Both lines pass 51 focused conversion tests. The
+String consumer includes nullable Object views and six invalid source conversions;
+these retain Raven's directional nullability checks without changing native or CLI
+runtime signatures. The matching compiler is rebuilt against the updated SDK.
+
+The final String consumer returns 42 in interpreter, AOT and managed JIT. All six
+source rejections, native fault/root/collection checks and AOT sanitizer checks
+pass. The retained results fingerprint the rebuilt compiler, SDK, runtime, native
+backend, text archive, sources and emitted images.

@@ -1,0 +1,253 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile-library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/Library.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "a8c3bd2e16128e9c243ddaedf0c9b9bff20f2dcf1217aa15b50431baeb9a1936",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/Main.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "f67266b5f8da7b980c3887cc21057a49c909296a866b568282073a3a52d251e4",
+      "output": "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/Main.rvn(5,62): error RAV1503: Cannot convert from 'Producer<object>' to 'Producer<string>'\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/Main.rvn(6,70): error RAV1503: Cannot convert from 'Consumer<string>' to 'Consumer<object>'\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/Main.rvn(7,71): error RAV1503: Cannot convert from 'Producer<string>' to 'Producer<Iterable<int>>'\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/Main.rvn(8,63): error RAV1503: Cannot convert from 'Producer<int>' to 'Producer<object>'\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/Main.rvn(10,68): error RAV1503: Cannot convert from 'Producer<string?>' to 'Producer<object>'\n/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/rejected/Main.rvn(11,76): error RAV1503: Cannot convert from 'Consumer<object>' to 'Consumer<string?>'\n"
+    },
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "1d580a68cf952c30dcc05297b2298c34689cd1bb1dd35fb70c72e49a1512cfba",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/project/bin/neoclr/StringVariance.dll\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/project/bin/neoclr/StringVariance.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/project/bin/neoclr/StringVariance.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-utf8-text",
+        "--bind-character-text"
+      ],
+      "exitCode": 0,
+      "logSha256": "0ca553faf3d1bd6f8143f4691f09d94def81caab8d8ff74e95115508889047f2",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "build-text",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/Cargo.toml",
+        "--release"
+      ],
+      "exitCode": 0,
+      "logSha256": "376a48f02bf305a0c383aa68e8f2d8c5df3ec64cbee6a09491a649aa453baba9",
+      "output": "    Finished `release` profile [optimized] target(s) in 0.00s\n"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/release/libneoclr_aot_native_text.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/release/libneoclr_aot_native_text.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/project/bin/neoclr/StringVariance.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-utf8-text",
+        "--bind-character-text"
+      ],
+      "exitCode": 0,
+      "logSha256": "127d6bfb68171cc2d078e5df868b78d5fb546e6d85883cb64ba6ba88e605ff37",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.747517083,\"guestExitCode\":42,\"invocationSeconds\":0.000186959,\"metadataLoadSeconds\":0.630722916,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":15.481521875}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.747517083,
+    "guestExitCode": 42,
+    "invocationSeconds": 0.000186959,
+    "metadataLoadSeconds": 0.630722916,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 15.481521875
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/release/libneoclr_aot_native_text.a": "879b51f57271186ad14e9226762fd8f6739d9dffd3db62c3229ef1192d2d68b4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "e47d4aa3f40e2bb631e3f3f4534b2238e1f710cb1fa8f1b556cbd8399b1d9ff5",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/strings/Main.rvn": "4a95afc0fa9ab3e73fa5e928820d3244acfc9c939de629cd539e45f27e4fd61d",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/strings/Library.rvn": "9de069c00068ec60b4bdf80393de6c8d113e303a39de1c85b88a386b1e3f6443",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/strings/Rejected.rvn": "7d44f2d4390d5f83b6e6751520053bfb95048292b2a191b844ecf6d01a466c4b",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/strings/run.py": "b5ad3741f9283f6fe1c08cc477039599720d4031617d9658c98c3e3f8896ca96",
+    "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/library/bin/neoclr/ImportedVarianceLibrary.dll": "5668d6656fa543ebe22df77421847cef55336e098c82dd2245233f95eeac4583",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "7c29e28eb755edbb89fdbab0c006c8207a8367795637ad675e456b78d84f8886",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "69835f9d0d555c4da2ebb165760ae318ba6bc60dff6639db69cd87081b244403",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "d13bbea98a96185ce72899094aedb004cbe22212cbc8b644664889bc9b649e9f",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "99a0676be6d1e87d7c58329221c09382b734d0a21779a344ba716a7ce7fd3371",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
+    "/Users/robert/Projects/neoclr/target/variance-strings-qualified-final-20261016/project/bin/neoclr/StringVariance.dll": "e852d4cecb5de3c50936434c3c1e6b77cfd3f3752b0c089e3151f62502a965db",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
+  }
+}

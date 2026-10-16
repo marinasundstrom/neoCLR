@@ -1,0 +1,13 @@
+import System.*
+import System.Collections.*
+import ImportedVariance.*
+
+func Reverse(value: Producer<Object>) -> Producer<string> => value
+func ReverseConsumer(value: Consumer<string>) -> Consumer<Object> => value
+func WrongView(value: Producer<string>) -> Producer<Iterable<int>> => value
+func ValueBoxing(value: Producer<int>) -> Producer<Object> => value
+
+func NullableLoss(value: Producer<string?>) -> Producer<Object> => value
+func NullableConsumerLoss(value: Consumer<Object>) -> Consumer<string?> => value
+
+func Main() -> int => 42

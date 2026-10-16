@@ -1433,6 +1433,32 @@ fn rename_nominal(
 #[cfg(test)]
 mod variance_projection_tests {
     #[test]
+    fn string_conformance_survives_private_projection() {
+        let source = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(".module TextVariance\n.type System.String\n.implements View\n.end\n.interface View\n.end\n.interface Producer<T>\n.variance out\n.end\n")], &neoclr::assemble(".module System").unwrap()).unwrap().remove(0);
+        let mut target = source.clone();
+        let parse = |s| neoclr::assembler::parse_type(s).unwrap();
+        neoclr::native_metadata::retain_string_view(&mut target.types[1], &source, &parse("View"));
+        target.types[0].implements.clear();
+        let narrow = parse("Producer<String>");
+        let wide = parse("Producer<View>");
+        assert!(neoclr::native_metadata::assignable(&target, &narrow, &wide).unwrap());
+        assert!(!neoclr::native_metadata::assignable(&target, &wide, &narrow).unwrap());
+        let encoded = serde_json::to_value(&target).unwrap();
+        assert!(encoded["types"][1].get("native_string_view").is_none());
+        let decoded = serde_json::from_value(encoded.clone()).unwrap();
+        assert!(!neoclr::native_metadata::assignable(&decoded, &narrow, &wide).unwrap());
+        let mut forged = encoded;
+        forged["types"][1]["native_string_view"] = serde_json::json!(true);
+        assert!(serde_json::from_value::<neoclr::Module>(forged).is_err());
+        target.types[1].name = "PrivateView".into();
+        super::rename_nominal(&mut target, "View", "PrivateView", "Main").unwrap();
+        assert!(
+            neoclr::native_metadata::assignable(&target, &narrow, &parse("Producer<PrivateView>"))
+                .unwrap()
+        );
+    }
+
+    #[test]
     fn array_argument_variance_preserves_closed_nominal_conformance() {
         use neoclr::metadata::Type;
         let mut source = neoclr::assemble(".module ArrayVariance\n.type class Backing<T>\n.end\n.type class Element\n.end\n.interface View\n.end\n.interface Producer<T>\n.variance out\n.end\n").unwrap();

@@ -1043,6 +1043,15 @@ pub fn expand_with_host_roots(
                 });
             }
         }
+        let source_interface = if shape.arguments.is_empty() {
+            Type::Named(input.types[shape.source].name.clone())
+        } else {
+            Type::Constructed {
+                definition: input.types[shape.source].name.clone(),
+                arguments: shape.arguments.clone(),
+            }
+        };
+        neoclr::native_metadata::retain_string_view(&mut t, input, &source_interface);
         let native_arguments = shape.arguments.iter().map(|argument| context.lower(argument)).collect::<Result<Vec<_>, _>>()?;
         neoclr::native_metadata::retain_array_shape(&mut t, input, shape.source, &native_arguments)
             .map_err(|e| e.to_string())?;
@@ -1411,6 +1420,57 @@ ret
                 .run(neoclr::Limits::default())
                 .unwrap()
                 .value,
+            neoclr::Value::Int32(42)
+        );
+    }
+
+    #[test]
+    fn variant_selection_ignores_unrelated_explicit_source_templates() {
+        let source = neoclr::assemble(
+            r#"
+    .module UnrelatedMapping
+    .entry Main
+    .type class System.Object
+    .end
+    .interface Producer<T>
+    .variance out
+    .method instance Get() -> T
+    .end
+    .end
+    .interface Other<T>
+    .method instance Count() -> Int32
+    .end
+    .end
+    .type class Source
+    .implements Producer<String>
+    .implements Other<Int32>
+    .method private instance Count() -> Int32
+    .override instance Other<Int32>::Count()
+    ldc.i4 1
+    ret
+    .end
+    .method instance Get() -> String
+    ldstr "text"
+    ret
+    .end
+    .end
+    .function Main() -> Int32
+    newobj Source
+    castclass Producer<System.Object>
+    callvirt instance Producer<System.Object>::Get()
+    pop
+    ldc.i4 42
+    ret
+    .end
+    "#,
+        )
+        .unwrap();
+        let (expanded, _) = expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
             neoclr::Value::Int32(42)
         );
     }

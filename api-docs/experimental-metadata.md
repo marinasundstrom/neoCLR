@@ -9271,8 +9271,12 @@ The runtime must validate the actual loaded definitions.
 
 SDK call/return storage checks now admit declared reference-only interface variance,
 including nested local/imported interfaces. Exact conformance wins; multiple other
-compatible views reject. Writable aliases, boxing, primitive materialization and
+compatible views reject. Writable aliases, value boxing, numeric conversions and
 mutable-array covariance remain excluded. Equal value arguments remain exact.
+Intrinsic String reference arguments use the explicitly authored/imported String
+declaration for nominal interface relationships. SDK validation recognizes imported
+interface definitions as well as authored contracts; runtime dispatch adapts the
+String representation without copying its UTF-8 payload.
 Local class arguments with explicitly registered imported bases now use the same
 ancestry proof as ordinary reference conversion, including transitive local bases.
 This applies in covariant, contravariant and nested interface positions; reverse
@@ -9292,7 +9296,7 @@ valid function indices. They preserve source identities through private shape
 renumbering; they do not define new nominal inheritance or public guest types.
 
 `native_metadata::restore_interface_proofs(target, original, map_type)` preserves
-trusted interface/slot, closed array-backing and native Object-root facts through a row-preserving compiler rewrite. It requires
+trusted interface/slot, closed array-backing, String-interface and native Object-root facts through a row-preserving compiler rewrite. It requires
 matching type/function row counts and applies the same nominal type remapping to
 retained interface arguments and array elements. It returns Fault on row mismatch or mapping failure.
 This compiler bridge does not deserialize proof fields from external metadata.
@@ -9312,3 +9316,12 @@ backing arity/reference kind returns Fault; a non-backing row is ignored. The ma
 is omitted by serialization, rejected in external metadata and remapped through
 `restore_interface_proofs`. It allows variance to follow the backing's existing
 nominal interfaces after specialization; it adds no array-element conversion or layout.
+
+`native_metadata::retain_string_view(target, source, interface)` retains verified
+intrinsic String conformance on a closed native interface shape. Callers supply
+verified source IR and its original unlowered interface identity. A non-interface
+or an interface String does not implement records no conformance. The private flag
+survives trusted row-preserving rewrites; serialization omits it and external
+metadata cannot supply it. It grants neither structural conformance nor a new
+String layout. Native dispatch separately adapts String arguments/results to the
+existing Object/interface pointer representation.

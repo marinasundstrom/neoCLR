@@ -514,7 +514,13 @@ pub(crate) fn compile_into(
     let flows: Vec<_> = (0..input.functions.len())
         .map(|i| p.analyze(i))
         .collect::<Result<_, _>>()?;
-    let text_identity = input.functions.iter().enumerate().any(|(i, f)| {
+    let string_variance = p.dispatch.iter().any(|(contract, targets)| {
+        targets.iter().any(|(_, target)| {
+            p.args[*contract].iter().zip(&p.args[*target]).any(|(from, to)| *from == Ty::Literal && from != to)
+                || p.results[*target] == Some(Ty::Literal) && p.results[*contract] != Some(Ty::Literal)
+        })
+    });
+    let text_identity = string_variance || input.functions.iter().enumerate().any(|(i, f)| {
         f.body.iter().enumerate().any(|(pc, op)| {
             let Some(shape) = flows[i].get(pc).and_then(Option::as_ref) else {
                 return false;
@@ -1889,9 +1895,36 @@ pub(crate) fn compile_into(
                     let equal = matches_type(&mut b, &p, tag, type_index);
                     b.ins().brif(equal, matched, &[], next, &[]);
                     b.switch_to_block(matched);
+                    let mut adapted = parameters.clone();
+                    let mut offset = 0;
+                    for (from, to) in p.args[i].iter().zip(&p.args[target]) {
+                        if *from == Ty::Literal && from != to {
+                            if !string_view(to) {
+                                return Err("variant String argument requires a verified reference view".into());
+                            }
+                            adapted[offset] = text_object_view(&mut b, adapted[offset]);
+                        }
+                        offset += p.lanes(from);
+                    }
+                    let string_result = p.results[target] == Some(Ty::Literal) && p.results[i] != Some(Ty::Literal);
+                    if string_result && !p.results[i].as_ref().is_some_and(&string_view) {
+                        return Err("variant String result requires a verified reference view".into());
+                    }
                     let target = module.declare_func_in_func(ids[target], b.func);
-                    let call = b.ins().call(target, &parameters);
+                    let call = b.ins().call(target, &adapted);
                     let status = b.inst_results(call)[0];
+                    if string_result {
+                        // A failed call has no initialized result to read or convert.
+                        let success = b.create_block();
+                        let failed = b.create_block();
+                        b.ins().brif(status, failed, &[], success, &[]);
+                        b.switch_to_block(failed);
+                        b.ins().return_(&[status]);
+                        b.switch_to_block(success);
+                        let value = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        let view = text_object_view(&mut b, value);
+                        b.ins().store(MemFlags::new(), view, output, 0);
+                    }
                     b.ins().return_(&[status]);
                     b.switch_to_block(next);
                 }

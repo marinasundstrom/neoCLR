@@ -282,6 +282,8 @@ pub struct TypeDef {
     pub(crate) native_object_root: bool,
     #[serde(skip)]
     pub(crate) native_array_element: Option<Type>,
+    #[serde(skip)]
+    pub(crate) native_string_view: bool,
     /// Memberless bootstrap storage declaration; not an executable owner.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub primitive_reference: bool,

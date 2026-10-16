@@ -1673,6 +1673,34 @@ fn restrict_reference_arguments(
     Ok(())
 }
 
+// Interface variance changes the caller's view, not the String's UTF-8 owner.
+// Match ordinary castclass materialization and its heap budget at call boundaries.
+fn variant_reference_view(
+    value: Value,
+    module: &Module,
+    target: &Type,
+    heap: &mut crate::shared_heap::Access<'_>,
+    limits: &Limits,
+) -> Result<Value, Fault> {
+    if matches!(value, Value::String(_))
+        && *target != Type::String
+        && module.reference_assignable(&Type::String, target)
+    {
+        if heap.len() >= limits.heap_objects {
+            return Err(Fault::coded(
+                crate::FaultCode::HeapLimitExceeded,
+                "heap object limit exceeded",
+            ));
+        }
+        let index = heap.allocate(value)?;
+        return Ok(Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(index)?,
+            view: Some(target.clone()),
+        }));
+    }
+    value.for_storage_in(module, target)
+}
+
 struct Frame {
     // Caller-visible reference result for variant interface dispatch.
     return_view: Option<Type>,
@@ -3679,7 +3707,7 @@ fn interpret_instructions_with_dispatch(
                             args = args
                                 .into_iter()
                                 .zip(&callee.parameters)
-                                .map(|(value, ty)| value.for_storage_in(module, ty))
+                                .map(|(value, ty)| variant_reference_view(value, module, ty, heap, &limits))
                                 .collect::<Result<Vec<_>, _>>()?;
                         }
                         if callee.receiver_byref {
@@ -5106,7 +5134,7 @@ fn interpret_instructions_with_dispatch(
                     };
                     let value = value.for_storage_in(module, &function.returns)?;
                     let value = if let Some(view) = &frame.return_view {
-                        value.for_storage_in(module, view)?
+                        variant_reference_view(value, module, view, heap, &limits)?
                     } else {
                         value
                     };

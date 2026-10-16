@@ -161,3 +161,10 @@ are qualified in Raven interpreter, AOT and managed JIT.
 Array arguments may also widen to their declared Iterable<int> contract: producer
 and consumer conversions between int[] and Iterable<int> preserve array identity
 and support iteration in interpreter/AOT/JIT. Result and Sliceable remain invariant.
+
+String arguments support the same reference variance: producer views can expose
+Object or String's nominal Iterable<char> contract, while consumer views accept
+String. Text identity is preserved. Native conversions use the existing tagged
+pointer; interpreter conversions use ordinary String view handles without copying
+UTF-8 bytes. See the [variance reference](/docs/interface-variance.html) for costs
+and limitations.

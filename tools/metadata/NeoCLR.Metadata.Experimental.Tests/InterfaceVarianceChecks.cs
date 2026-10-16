@@ -10,6 +10,7 @@ internal static class InterfaceVarianceChecks
     {
         CheckReferenceConversions();
         CheckExternalBaseConversions();
+        CheckStringConversions();
         var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
         var graph = new AssemblyBuilder(new("VarianceSnapshot", new(1, 0, 0, 0)), core);
         var contract = graph.AddGenericInterface("Example", "Transform", ["TOut", "TIn", "TFixed"]);
@@ -116,6 +117,49 @@ internal static class InterfaceVarianceChecks
         values.LoadArgument(0); values.Return();
         Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
     }
+    private static void CheckStringConversions()
+    {
+        var graph = new AssemblyBuilder(new("StringVariance", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var root = graph.AddNativeObjectRoot();
+        var view = graph.AddInterface("Example", "TextView");
+        var text = graph.AddClass("System", "String", root);
+        text.SetNativePrimitive(PrimitiveType.String);
+        text.AddInterfaceImplementation(view);
+        var producer = graph.AddGenericInterface("Example", "Producer", ["T"]);
+        producer.SetVariance(0, GenericVariance.Covariant);
+        producer.AddInterfaceMethod("Get", new(SignatureType.TypeParameter(0), []));
+        var consumer = graph.AddGenericInterface("Example", "Consumer", ["T"]);
+        consumer.SetVariance(0, GenericVariance.Contravariant);
+        consumer.AddInterfaceMethod("Accept", new(PrimitiveType.Int32, [SignatureType.TypeParameter(0)]));
+        void Conversion(string name, SignatureType from, SignatureType to)
+        {
+            var method = graph.AddFunction(name, new(to, [from]));
+            method.LoadArgument(0); method.Return();
+        }
+        Conversion("ObjectProducer", producer.MakeGenericInstance(PrimitiveType.String), producer.MakeGenericInstance(root));
+        Conversion("ObjectConsumer", consumer.MakeGenericInstance(root), consumer.MakeGenericInstance(PrimitiveType.String));
+        Conversion("InterfaceProducer", producer.MakeGenericInstance(PrimitiveType.String), producer.MakeGenericInstance(view));
+        Conversion("InterfaceConsumer", consumer.MakeGenericInstance(view), consumer.MakeGenericInstance(PrimitiveType.String));
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+        var imported = new AssemblyBuilder(new("ImportedStringVariance", new(1, 0, 0, 0)), graph.CoreLibrary);
+        ImportedTypeReference Import(string name) => imported.ImportReference(snapshot.MainModule.Types.Single(t => t.Name == name), graph.CoreLibrary);
+        _ = Import("String");
+        var importedView = Import("TextView");
+        var importedProducer = Import("Producer`1");
+        var importedConsumer = Import("Consumer`1");
+        foreach (var (name, from, to) in new (string, SignatureType, SignatureType)[] {
+            ("View", importedProducer.MakeGenericInstance(PrimitiveType.String), importedProducer.MakeGenericInstance(importedView)),
+            ("Consumer", importedConsumer.MakeGenericInstance(importedView), importedConsumer.MakeGenericInstance(PrimitiveType.String)),
+        })
+        {
+            var method = imported.AddFunction(name, new(to, [from]));
+            method.LoadArgument(0); method.Return();
+        }
+        _ = imported.WriteNativeAssembly();
+        Conversion("Reverse", producer.MakeGenericInstance(root), producer.MakeGenericInstance(PrimitiveType.String));
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+    }
+
     private static void CheckExternalBaseConversions()
     {
         var host = typeof(object).Assembly.GetName();

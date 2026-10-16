@@ -535,6 +535,18 @@ pub fn retain_interface_shape(
     Ok(())
 }
 
+/// Retain verified intrinsic String conformance on a closed native interface shape.
+/// Callers supply verified source IR and its original (unlowered) interface type.
+pub fn retain_string_view(
+    target: &mut crate::metadata::TypeDef,
+    source: &Module,
+    interface: &Type,
+) {
+    target.native_string_view = crate::interfaces::interface_definition(source, interface).is_ok()
+        && crate::interfaces::ensure_reference_implementation(source, &Type::String, interface)
+            .is_ok();
+}
+
 /// Retain a verified array backing's closed element in private compiler IR.
 /// This records nominal conformance, not a new array layout or element conversion.
 pub fn retain_array_shape(
@@ -626,6 +638,7 @@ pub fn restore_interface_proofs(
     }
     for (target, original) in target.types.iter_mut().zip(&original.types) {
         target.native_object_root = original.native_object_root;
+        target.native_string_view = original.native_string_view;
         target.native_array_element = original.native_array_element.as_ref().map(&map_type).transpose().map_err(Fault::new)?;
         target.native_interface = original.native_interface.clone();
         if let Some(shape) = &mut target.native_interface {

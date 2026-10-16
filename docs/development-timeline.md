@@ -18232,3 +18232,25 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   materialization in differing variant arguments remain documented support gaps;
   no generic-erasure policy or structural work is authorized by these changes.
   [Retained evidence](validation/interface-variance/library/README.md).
+
+## 2026-10-16 — Continue variance through String
+
+- **Author:** directed, “Continue through variance in strings,” while array-interface
+  variance qualification was being completed. Structural types remain parked.
+- **Assistant action:** committed the validated native array-backing conformance
+  fix (`08330946a`) and Raven integration notes (`9b118ef8d`). Continued into String
+  arguments/results, using ordinary String view handles in the interpreter and
+  tagged text pointers in native dispatch, preserving the immutable UTF-8 owner.
+- **Findings:** String interface calls exposed an unrelated explicit mapping left
+  in native specialization; nullable source examples exposed a general Raven bug
+  rejecting safe views and accepting loss of nullability. The general fix was
+  validated with 51 focused tests and committed on Raven main (`f8679d6f3`), then
+  carried separately to the neoCLR compiler line for its own validation.
+- **Outcome:** runtime variance tests, native proof tests and SDK checks pass.
+  Raven carry `e17fb32c4` independently passes 51 conversion tests. The rebuilt
+  compiler's String consumer passes interpreter/AOT/managed JIT, including nullable
+  calls, six rejected conversions, native cleanup and sanitizer checks.
+  [Retained evidence](validation/interface-variance/strings/README.md).
+  The interpreter's per-conversion handle allocation remains explicit; no String
+  payload copy or native wrapper allocation is introduced. Result/Sliceable
+  variance is deferred.

@@ -133,12 +133,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
 }
 
 fn ordinary_reference(module: &Module, ty: &Type) -> bool {
-    // Intrinsic text has a distinct payload representation; widening it to an
-    // object/interface needs materialization, not just a reference view.
-    if matches!(ty, Type::String) {
-        return false;
-    }
-    matches!(ty, Type::ArrayRef(_))
+    // String is a reference argument. Dispatch adapts its intrinsic payload to
+    // the ordinary Object/interface representation at the contract boundary.
+    matches!(ty, Type::String | Type::ArrayRef(_))
         || module
             .type_definition(ty)
             .is_some_and(|d| d.is_reference_type || d.representation == Representation::Interface)
@@ -155,6 +152,9 @@ fn reference_conversion(module: &Module, source: &Type, target: &Type, depth: us
         definition.is_reference_type
             && (definition.name == "System.Object" || definition.native_object_root)
     }) {
+        return true;
+    }
+    if *source == Type::String && module.type_definition(target).is_some_and(|d| d.native_string_view) {
         return true;
     }
     // Native selection erases generic owners and the source array-backing registry.
@@ -304,7 +304,7 @@ mod tests {
             ),
             ("Producer<Int32>", "Producer<Int32>", true),
             ("Producer<Int32>", "Producer<System.Object>", false),
-            ("Producer<String>", "Producer<System.Object>", false),
+            ("Producer<String>", "Producer<System.Object>", true),
             ("Fixed<Derived>", "Fixed<Base>", false),
             ("Producer<Fixed<Derived>>", "Producer<Fixed<Base>>", false),
         ] {

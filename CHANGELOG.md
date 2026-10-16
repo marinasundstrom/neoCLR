@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Support intrinsic String in nominal interface variance. Adapt variant call arguments/results through ordinary heap-budgeted interpreter view handles and native tagged text pointers, preserving UTF-8 owner identity without payload copies. Retain private String conformance through specialization, skip unrelated explicit mappings during selection, and admit SDK String relationships through authored/imported nominal interfaces. Value boxing remains excluded; Runtime Contract and metadata encodings are unchanged. The rebuilt Raven consumer passes interpreter/AOT/JIT, nullable calls, six rejected conversions and native cleanup/sanitizer checks; the general nullable compiler correction is validated independently on Raven main and codex/neoclr.
+
 - Fix native array-interface variance by retaining closed array-backing conformance through specialization and renaming. Raven producer/consumer conversions between int[] and Iterable<int> preserve identity and support iterator calls in interpreter/AOT/JIT; proof-boundary tests and native cleanup/sanitizer checks pass. Array storage, Result and Sliceable remain invariant.
 
 - Qualify array-valued interface variance through imported Raven contracts: Producer<int[]> widens to Producer<Object> and Consumer<Object> narrows to Consumer<int[]> with array identity preserved. Interpreter/AOT/JIT and native cleanup/sanitizer checks pass; array storage remains invariant. No compiler/runtime behavior change.

@@ -1,0 +1,91 @@
+import System.*
+import System.Collections.*
+import ImportedVariance.*
+
+class TextSource : Producer<string> {
+    private val text: string
+
+    init(text: string) {
+        self.text = text
+    }
+
+    func Get() -> string => text
+}
+
+class NullSource : Producer<string?> {
+    func Get() -> string? => null
+}
+
+class NullSink : Consumer<Object?> {
+    func Accept(value: Object?) -> int {
+        if value is null {
+            return 42
+        }
+        return 1
+    }
+}
+
+class ObjectSink : Consumer<Object> {
+    private val expected: string
+
+    init(expected: string) {
+        self.expected = expected
+    }
+
+    func Accept(value: Object) -> int {
+        if Object.ReferenceEquals(value, expected) {
+            return 42
+        }
+        return 1
+    }
+}
+
+class TextViewSink : Consumer<Iterable<char>> {
+    func Accept(value: Iterable<char>) -> int {
+        let iterator = value.GetIterator()
+        var count = 0
+        while iterator.MoveNext() {
+            count += 1
+        }
+        iterator.Dispose()
+        return count
+    }
+}
+
+func WidenNull(value: Producer<string?>) -> Producer<Object?> => value
+func NarrowNull(value: Consumer<Object?>) -> Consumer<string?> => value
+
+func Widen(value: Producer<string>) -> Producer<Object> => value
+func Narrow(value: Consumer<Object>) -> Consumer<string> => value
+func WidenView(value: Producer<string>) -> Producer<Iterable<char>> => value
+func NarrowView(value: Consumer<Iterable<char>>) -> Consumer<string> => value
+
+func Main() -> int {
+    let text = "hé😀"
+    let source = TextSource(text)
+    let producer = Widen(source)
+    let first = producer.Get()
+    let second = producer.Get()
+    if !Object.ReferenceEquals(first, text) || !Object.ReferenceEquals(first, second) {
+        return 1
+    }
+    let consumer = Narrow(ObjectSink(text))
+    if consumer.Accept(text) != 42 {
+        return 2
+    }
+    let view = WidenView(source).Get()
+    if !Object.ReferenceEquals(view, text) {
+        return 3
+    }
+    let viewConsumer = NarrowView(TextViewSink())
+    if viewConsumer.Accept(text) != 3 {
+        return 4
+    }
+    if !Object.ReferenceEquals(WidenNull(NullSource()).Get(), null) {
+        return 5
+    }
+    if NarrowNull(NullSink()).Accept(null) != 42 {
+        return 6
+    }
+    return 42
+}

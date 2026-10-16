@@ -254,6 +254,11 @@ fn member(
             }
             let body = method.map_types(|ty| ty.substitute_type_parameters(arguments(owner)))?;
             for target in &body.interface_implementations {
+                // Unrelated contracts cannot select this member. Native projections
+                // may retain their unselected source templates until final trimming.
+                if target.owner != contract.owner {
+                    continue;
+                }
                 let declaration = crate::vm::resolve(module, target)?;
                 if declaration.definition == contract.definition
                     && declaration.owner == contract.owner
@@ -554,6 +559,11 @@ fn select(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
             }
             let body = method.map_types(|t| t.substitute_type_parameters(arguments(&interface)))?;
             for target in &body.interface_implementations {
+                // Unrelated contracts cannot select this member. Native projections
+                // may retain their unselected source templates until final trimming.
+                if target.owner != contract.owner {
+                    continue;
+                }
                 let declaration = crate::vm::resolve(module, target)?;
                 if declaration.definition == contract.definition
                     && declaration.owner == contract.owner
