@@ -22,6 +22,7 @@ mod selection;
 mod scalar_unions;
 mod specialization;
 mod string_projection;
+mod type_initialization;
 
 use std::{
     fs,

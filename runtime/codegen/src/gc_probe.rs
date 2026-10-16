@@ -175,7 +175,7 @@ impl Probes {
                 let Some(stack) = &flows[i][pc] else {
                     continue;
                 };
-                let Some(plan) = gc_points::point(p, op, stack)? else {
+                let Some(plan) = gc_points::point_at(p, i, pc, stack)? else {
                     continue;
                 };
                 use neoclr::metadata::Instruction as Op;

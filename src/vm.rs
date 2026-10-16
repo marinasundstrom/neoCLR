@@ -2664,6 +2664,10 @@ fn interpret_instructions_with_dispatch(
         owner,
         ..
     } = dispatch;
+    let has_initializers = module
+        .functions
+        .iter()
+        .any(crate::type_initialization::is_initializer);
     let mut executed = 0;
     reap_async(heap, parked_activations, async_operations);
     'execution: loop {
@@ -3068,53 +3072,58 @@ fn interpret_instructions_with_dispatch(
         })?;
         // Do not consume operands or advance the triggering instruction until the
         // initializer returns. Its frame participates in ordinary budgets and GC roots.
-        let entry_owner = if pc == 0 {
-            crate::type_initialization::entry_owner(module, &function).cloned()
-        } else {
-            None
-        };
-        let field_owner = match op {
-            Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => Some(owner.clone()),
-            _ => None,
-        };
-        // Native/PInvoke bodies do not push an interpreter frame, but their strict
-        // declaring type still has to initialize before the call executes.
-        let call_owner = match op {
-            Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
-                let callee = resolve(module, target)?;
-                crate::type_initialization::entry_owner(module, &callee).cloned()
-            }
-            _ => None,
-        };
-        for owner in entry_owner.into_iter().chain(field_owner).chain(call_owner) {
-            if let Some(initializer) = crate::type_initialization::initializer(module, &owner)? {
-                let begin = invocation.statics.lock().unwrap().begin_initialization(
-                    module,
-                    &owner,
-                    dispatch_identity,
-                    heap,
-                    &limits,
-                )?;
-                match begin {
-                    crate::type_initialization::Begin::Run => {
-                        let mut initializer = Frame::new(initializer, vec![])?;
-                        initializer.initializing_type = Some(owner);
-                        frames.push(initializer);
-                        continue 'execution;
+        if has_initializers {
+            let entry_owner = if pc == 0 {
+                crate::type_initialization::entry_owner(module, &function).cloned()
+            } else {
+                None
+            };
+            let field_owner = match op {
+                Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => {
+                    Some(owner.clone())
+                }
+                _ => None,
+            };
+            // Native/PInvoke bodies do not push an interpreter frame, but their strict
+            // declaring type still has to initialize before the call executes.
+            let call_owner = match op {
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                    let callee = resolve(module, target)?;
+                    crate::type_initialization::entry_owner(module, &callee).cloned()
+                }
+                _ => None,
+            };
+            for owner in entry_owner.into_iter().chain(field_owner).chain(call_owner) {
+                if let Some(initializer) = crate::type_initialization::initializer(module, &owner)?
+                {
+                    let begin = invocation.statics.lock().unwrap().begin_initialization(
+                        module,
+                        &owner,
+                        dispatch_identity,
+                        heap,
+                        &limits,
+                    )?;
+                    match begin {
+                        crate::type_initialization::Begin::Run => {
+                            let mut initializer = Frame::new(initializer, vec![])?;
+                            initializer.initializing_type = Some(owner);
+                            frames.push(initializer);
+                            continue 'execution;
+                        }
+                        crate::type_initialization::Begin::Wait => {
+                            heap.publish(execution_roots(
+                                frames,
+                                parked_activations,
+                                async_operations,
+                                scheduler,
+                                default_task_queue.as_ref(),
+                                invocation_result.as_ref(),
+                            ))?;
+                            return Ok(InstructionProgress::Waiting);
+                        }
+                        crate::type_initialization::Begin::Ready
+                        | crate::type_initialization::Begin::Recursive => {}
                     }
-                    crate::type_initialization::Begin::Wait => {
-                        heap.publish(execution_roots(
-                            frames,
-                            parked_activations,
-                            async_operations,
-                            scheduler,
-                            default_task_queue.as_ref(),
-                            invocation_result.as_ref(),
-                        ))?;
-                        return Ok(InstructionProgress::Waiting);
-                    }
-                    crate::type_initialization::Begin::Ready
-                    | crate::type_initialization::Begin::Recursive => {}
                 }
             }
         }

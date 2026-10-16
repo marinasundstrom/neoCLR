@@ -201,6 +201,38 @@ pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Val
     ))
 }
 
+pub(super) fn point_at(
+    p: &Profile<'_>,
+    function: usize,
+    pc: usize,
+    stack: &[Ty],
+) -> Result<Option<Value>, Error> {
+    let f = &p.input.functions[function];
+    let mut plan = point(p, &f.body[pc], stack)?;
+    if pc == 0 {
+        if let Some(cctor) = crate::type_initialization::entry_owner(p.input, f)
+            .and_then(|owner| crate::type_initialization::initializer(p.input, owner))
+        {
+            let f = &p.input.functions[cctor];
+            if plan.is_none() {
+                let target = neoclr::metadata::FunctionRef {
+                    definition: f.definition.clone(),
+                    name: f.name.clone(),
+                    owner: f.owner.clone(),
+                    instance: false,
+                    generic_arguments: vec![],
+                    parameters: vec![],
+                };
+                plan = point(p, &Op::Call(target), stack)?;
+            }
+            if let Some(plan) = plan.as_mut() {
+                plan["typeInitializerBeforeEntry"] = json!(f.name);
+            }
+        }
+    }
+    Ok(plan)
+}
+
 pub(super) fn report(
     p: &Profile<'_>,
     details: Option<&crate::fault_details::Options>,
@@ -216,11 +248,11 @@ pub(super) fn report(
         }
         let shapes = p.analyze(i)?;
         let mut points = vec![];
-        for (pc, op) in f.body.iter().enumerate() {
+        for pc in 0..f.body.len() {
             let Some(shape) = &shapes[pc] else {
                 continue;
             };
-            if let Some(mut plan) = point(p, op, shape)? {
+            if let Some(mut plan) = point_at(p, i, pc, shape)? {
                 plan["instruction"] = json!(pc);
                 points.push(plan);
             }

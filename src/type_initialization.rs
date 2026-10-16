@@ -71,7 +71,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         let d = module
             .type_definition(owner)
             .ok_or_else(|| Fault::new("type initializer owner is missing"))?;
-        if !owners.insert(&d.name)
+        if !owners.insert((&d.name, d.generic_parameters.len()))
             || f.instance
             || f.visibility != Visibility::Private
             || !f.parameters.is_empty()
@@ -87,6 +87,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || f.pinvoke.is_some()
             || !f.interface_implementations.is_empty()
             || d.primitive_reference
+            || matches!(owner, Type::ArrayRef(_))
             || !matches!(
                 d.representation,
                 Representation::Record | Representation::Interface

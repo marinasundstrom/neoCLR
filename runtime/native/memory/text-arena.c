@@ -161,7 +161,9 @@ static int32_t allocate_object(neoclr_aot_text_arena *arena, uint32_t type,
 /* Static data has the same nonmoving, conservative word tracing as ordinary
  * object storage. The table is a context root, never a process-global dictionary.
  * Generated code supplies the specialized image's exact type index and lane count.
- * Context execution is thread-affine; no callback/yield occurs during publication. */
+ * Context execution is thread-affine; no callback/yield occurs during publication.
+ * The high word of each storage header starts at zero and is reserved for the
+ * generated type-initialization guard. It is not part of the traced field payload. */
 static int32_t static_storage(neoclr_aot_context *context, uint32_t type,
     uint32_t count, uint32_t bytes, void **output, int rooted) {
     if (!context || !output || !count || count > NEOCLR_NATIVE_TYPE_LIMIT || type >= count ||

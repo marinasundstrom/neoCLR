@@ -12411,6 +12411,7 @@ The interpreter now supports verified native `.cctor` methods and the optional
 readonly writes. See [the execution contract](design/readonly-fields.md). This is a
 native metadata capability, not temporary CLI substitution. Matching runtimes are
 required for the new fact. No Runtime Contract switch changes. SDK `.cctor` authoring
-and Raven initializer-body emission remain unsupported, and shared JIT/AOT admission
-rejects initializer-bearing modules until native guards are available. Existing
+and Raven initializer-body emission remain unsupported. Shared JIT/AOT now retain
+and guard native initializers, including closed generic owners and GC-safe implicit
+calls; raw-metadata consumers qualify the runtime in all three execution modes. Existing
 readonly instance and class-constant consumer evidence is unaffected.

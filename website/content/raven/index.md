@@ -167,6 +167,6 @@ interpreter, JIT and AOT. A Complex demo exercises arithmetic without imposing
 ordering. Mixed-type contracts and production Complex edge semantics remain future work.
 
 
-Native static readonly field initialization is still in development. The interpreter
-has per-type initializer execution and readonly write checks; Raven emission and
-JIT/AOT execution are not yet enabled for this feature.
+Native static readonly field initialization is still in development. Interpreter, JIT and AOT
+have per-type initializer execution and readonly write checks, including generic
+owners and GC-safe calls. Raven emission and metadata SDK authoring are not yet enabled.

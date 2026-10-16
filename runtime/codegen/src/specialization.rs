@@ -936,6 +936,35 @@ pub(crate) fn expand_with_conformance(
             }
             expanded.functions[instance.row] = function;
         }
+        // Initializers are implicit runtime roots for every retained closed owner.
+        for shape in context.shapes.clone() {
+            let definition = &input.types[shape.source];
+            let owner = if shape.arguments.is_empty() {
+                Type::Named(definition.name.clone())
+            } else {
+                Type::Constructed {
+                    definition: definition.name.clone(),
+                    arguments: shape.arguments.clone(),
+                }
+            };
+            if let Some(source) = crate::type_initialization::initializer(
+                input,
+                &crate::type_initialization::owner_type(definition),
+            ) {
+                let f = &input.functions[source];
+                let instance = context.resolve(&FunctionRef {
+                    definition: f.definition.clone(),
+                    name: f.name.clone(),
+                    owner: Some(owner),
+                    instance: false,
+                    generic_arguments: vec![],
+                    parameters: vec![],
+                })?;
+                if !visited.contains(&instance.row) {
+                    pending.push(instance);
+                }
+            }
+        }
         // Recover closed source contracts before erasing their owner arguments.
         // Dispatch may discover new constructors and further closed interfaces.
         let mut constructed = vec![];

@@ -231,3 +231,9 @@ fn initializing_one_closed_type_cannot_write_anothers_readonly_field() {
             .contains("readonly static field")
     );
 }
+
+#[test]
+fn distinct_generic_arities_do_not_share_initializer_identity() {
+    let module = assemble(".module InitializerArity\n.entry Main\n.type class Cache\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.type class Cache<T>\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end").unwrap();
+    assert_eq!(result(&module), 42);
+}

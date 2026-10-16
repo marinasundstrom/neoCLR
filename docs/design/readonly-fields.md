@@ -1,7 +1,7 @@
 # Readonly fields and type initialization
 
-Status: interpreter type initialization implemented; native codegen and compiler
-producer integration remain implementation gaps. Author direction: support both instance and static
+Status: interpreter and shared JIT/AOT type initialization implemented; compiler
+producer integration remains an implementation gap. Author direction: support both instance and static
 readonly fields, keeping .NET semantics as the default model.
 
 ## Contract
@@ -27,8 +27,7 @@ Raven/.NET already emits both forms; the shared ReadonlyFields consumer returns 
 Native metadata carries instance readonly and static readonly flags, and access
 validation restricts instance writes to constructors/init accessors. The interpreter admits stores from a verified owning `.cctor`; ordinary writes
 still reject. The metadata SDK still rejects `.cctor`, and Raven still rejects static
-field initializers. Shared JIT/AOT admission explicitly rejects initializer-bearing
-modules until its guards are implemented. This is not yet end-to-end Raven support.
+field initializers. Shared JIT/AOT lowering executes retained initializers through private guards. This is not yet end-to-end Raven support.
 
 1. Qualify instance constructor initialization, declaration initialization,
    imported reads, defensive copies of mutable value fields, and rejected writes.
@@ -88,5 +87,41 @@ not a CLR load context; failures are the original terminal Fault, not catchable
 TypeInitializationException wrappers. They are not promises of permanent divergence.
 The registry tests cover ownership, retained failures and multi-context wait cycles;
 interpreter consumers cover triggers, closed generics, recursion, metadata round trips
-and rejected writes/calls. Native compiler production, JIT/AOT execution, threaded
-managed consumers and initializer-created reference pressure still need qualification.
+and rejected writes/calls. Native compiler production and threaded managed consumers still need qualification.
+Runtime consumers also qualify initializer-created reference pressure in all three modes.
+
+
+## Native guards and qualification
+
+Closed-world selection retains each selected owner's initializer, and generic
+specialization retains the corresponding body for each closed owner. Shared JIT/AOT
+code emits private guarded calls at static accesses and strict method/constructor
+boundaries. Even a type without fields receives initialization state. Relaxed types
+retain their initializer but ordinary static calls do not trigger it.
+
+The current native context is thread-affine and its static storage is invocation-owned.
+A private static-storage header word distinguishes unstarted, running, complete and
+failed states. Recursive calls observe running state without invoking the body again.
+A fault status is cached; the original detailed fault remains in the terminal invocation
+context. The header is not guest-addressable and does not change instance layouts,
+field offsets, context ABI or the C static-storage allocation service. Native contexts
+must not share this table across threads; broader shared native initialization is not
+established by this qualification. Interpreter ownership/wait-cycle handling remains
+separate from this thread-affine protocol.
+
+Implicit calls publish caller arguments, locals and pending stack operands before
+allocation or initializer execution. Entry root plans describe their implicit initializer,
+and cctor bodies use ordinary GC-visible frames. The storage table remains a context
+root. Internal guard calls bypass ordinary method-access checks only after metadata
+verification; guest calls to `.cctor` remain forbidden. Intrinsic primitive/array
+initializers and strict initializers on special native replacement bodies are rejected
+rather than silently bypassed; this is an admission gap, not a new language rule.
+
+`cargo test -p neoclr-codegen --test type_initialization` exercises the same native
+metadata in interpreter, managed JIT and sanitized macOS ARM64 AOT. Cases cover readonly
+storage, same-type recursion, two-type cycles, separate closed generic state,
+fieldless strict initialization failure, relaxed timing and collection pressure with
+both a static reference and a pending caller reference. Failure preserves the caller's
+result slot; the host checks that GC roots and invocation storage are released. Existing
+native static-storage tests additionally cover repeated entry/reset and arena/GC modes.
+No Raven consumer or public SDK `.cctor` API is claimed by these runtime fixtures.

@@ -18614,3 +18614,8 @@ initialization and failure retention, and implemented the interpreter protocol i
 [the readonly design](design/readonly-fields.md). Native codegen and compiler production
 remain open in this slice; native admission explicitly rejects these modules instead
 of executing with missing guards. This direction does not unpark structural types.
+
+The subsequent native slice adds guarded JIT/AOT execution, closed-world initializer
+retention and closed-generic specialization. Runtime fixtures validate the modes
+without claiming compiler integration. SDK and Raven production remain the next
+integration work; native contexts retain their existing thread-affine lifetime.

@@ -1379,9 +1379,10 @@ pub(crate) fn compile_into(
         None
     };
     let static_service = if input.functions.iter().any(|f| {
-        f.body
-            .iter()
-            .any(|op| matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }))
+        f.name.ends_with("..cctor")
+            || f.body
+                .iter()
+                .any(|op| matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }))
     }) {
         if !references {
             return Err("static storage requires a native context".into());
@@ -1575,6 +1576,14 @@ pub(crate) fn compile_into(
     } else {
         None
     };
+    let initialization_guards = compile_initialization_guards(
+        module,
+        &p,
+        &ids,
+        static_service,
+        stack_budget,
+        long_range_calls,
+    )?;
     let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
         Some(gc_probe::Probes::prepare(module, &p, &flows, details)?)
     } else {
@@ -1598,6 +1607,14 @@ pub(crate) fn compile_into(
             let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
             let fault_context = details.map(|_| *parameters.last().unwrap());
             if gc_points::native_body(&p, i, details) {
+                if crate::type_initialization::entry_owner(input, f)
+                    .and_then(|owner| owner.definition_name())
+                    .is_some_and(|name| initialization_guards.contains_key(name))
+                {
+                    return Err(
+                        "type initialization on a native replacement body is not supported".into(),
+                    );
+                }
                 if let Some(probes) = &root_probes {
                     // Native wrappers keep typed argument copies visible across service
                     // calls/dispatch. These frames do not enter the guest fault trace.
@@ -2737,6 +2754,22 @@ pub(crate) fn compile_into(
                     true,
                 );
             }
+            if let Some(guard) = crate::type_initialization::entry_owner(input, f)
+                .and_then(|owner| owner.definition_name())
+                .and_then(|name| initialization_guards.get(name))
+            {
+                if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                    probes.emit(module, &mut b, i, 0, spill, probe_frame.unwrap(), &[]);
+                }
+                let callee = module.declare_func_in_func(*guard, b.func);
+                let call = b.ins().call(callee, &[fault_context.unwrap()]);
+                let status = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                let site = diagnostic_data
+                    .as_ref()
+                    .map(|d| d.site(module, &mut b, fault_context.unwrap(), i, 0));
+                return_if_detailed(&mut b, failed, status, site.as_ref());
+            }
             let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
             for (pc, stack) in flows[i].iter().enumerate() {
                 if let Some(stack) = stack {
@@ -2778,6 +2811,45 @@ pub(crate) fn compile_into(
                 if !matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }) {
                     if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
                         probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
+                    }
+                }
+                if !initialization_guards.is_empty() {
+                    let initialization_owner = match op {
+                        Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => {
+                            Some(owner)
+                        }
+                        Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target)
+                            if crate::selection::callable_invoke(target).is_none() =>
+                        {
+                            crate::type_initialization::entry_owner(
+                                input,
+                                &input.functions[p.callee(target)?],
+                            )
+                        }
+                        _ => None,
+                    };
+                    if let Some(guard) = initialization_owner
+                        .and_then(|owner| owner.definition_name())
+                        .and_then(|name| initialization_guards.get(name))
+                    {
+                        if matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }) {
+                            if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                                probes.emit(
+                                    module,
+                                    &mut b,
+                                    i,
+                                    pc,
+                                    spill,
+                                    probe_frame.unwrap(),
+                                    &stack,
+                                );
+                            }
+                        }
+                        let callee = module.declare_func_in_func(*guard, b.func);
+                        let call = b.ins().call(callee, &[fault_context.unwrap()]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
                     }
                 }
                 match op {
@@ -3643,12 +3715,12 @@ pub(crate) fn compile_into(
                         // slots for every unrelated selected type on each collection.
                         let type_index = input.types[..owner_index]
                             .iter()
-                            .filter(|t| !t.static_fields.is_empty())
+                            .filter(|t| crate::type_initialization::needs_storage(input, t))
                             .count();
                         let static_count = input
                             .types
                             .iter()
-                            .filter(|t| !t.static_fields.is_empty())
+                            .filter(|t| crate::type_initialization::needs_storage(input, t))
                             .count();
                         // Warm static access neither allocates nor calls managed code.
                         // Publish the pending operands only on the cold allocation path.
@@ -4856,4 +4928,117 @@ mod structural_jit_tests {
             );
         }
     }
+}
+
+// Static storage is context-owned and thread-affine. Its private eight-byte
+// header reserves the high word for initialization: 0 unstarted, 1 running,
+// 2 complete, 3 + terminal fault code failed. No guest address exposes this header.
+fn compile_initialization_guards(
+    module: &mut impl Module,
+    p: &Profile<'_>,
+    ids: &[cranelift_module::FuncId],
+    allocator: Option<cranelift_module::FuncId>,
+    stack_budget: bool,
+    long_range_calls: bool,
+) -> Result<std::collections::HashMap<String, cranelift_module::FuncId>, Error> {
+    let mut guards = std::collections::HashMap::new();
+    let owners: Vec<_> = p
+        .input
+        .types
+        .iter()
+        .filter(|t| crate::type_initialization::needs_storage(p.input, t))
+        .collect();
+    for (ordinal, owner) in owners.iter().enumerate() {
+        let ty = crate::type_initialization::owner_type(owner);
+        let Some(initializer) = crate::type_initialization::initializer(p.input, &ty) else {
+            continue;
+        };
+        let bytes = if owner.static_fields.is_empty() {
+            8
+        } else {
+            p.static_field(&ty, owner.static_fields.len() - 1)?.3
+        };
+        let mut signature = module.make_signature();
+        signature.params.push(AbiParam::new(types::I64));
+        signature.returns.push(AbiParam::new(types::I32));
+        let id = module.declare_function(
+            &format!("neoclr_type_init_{ordinal}"),
+            Linkage::Local,
+            &signature,
+        )?;
+        guards.insert(owner.name.clone(), id);
+        let mut context = module.make_context();
+        context.func.signature = signature;
+        let mut fb = FunctionBuilderContext::new();
+        {
+            let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+            let entry = b.create_block();
+            b.append_block_params_for_function_params(entry);
+            b.switch_to_block(entry);
+            let ctx = b.block_params(entry)[0];
+            let cold = b.create_block();
+            let lookup = b.create_block();
+            let ready = b.create_block();
+            b.append_block_param(ready, types::I64);
+            let table = b.ins().load(types::I64, MemFlags::new(), ctx, 1072);
+            let missing = b.ins().icmp_imm(IntCC::Equal, table, 0);
+            b.ins().brif(missing, cold, &[], lookup, &[]);
+            b.switch_to_block(lookup);
+            let cached = b.ins().load(
+                types::I64,
+                MemFlags::new(),
+                table,
+                ((ordinal + 1) * 8) as i32,
+            );
+            let missing = b.ins().icmp_imm(IntCC::Equal, cached, 0);
+            b.ins().brif(missing, cold, &[], ready, &[cached.into()]);
+            b.switch_to_block(cold);
+            let output_slot = slot(&mut b, 8);
+            let output = b.ins().stack_addr(types::I64, output_slot, 0);
+            let allocator = module.declare_func_in_func(
+                allocator.ok_or("initializer requires native static storage")?,
+                b.func,
+            );
+            let index = b.ins().iconst(types::I32, ordinal as i64);
+            let count = b.ins().iconst(types::I32, owners.len() as i64);
+            let size = b.ins().iconst(types::I32, bytes as i64);
+            let call = b.ins().call(allocator, &[ctx, index, count, size, output]);
+            let status = b.inst_results(call)[0];
+            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+            return_if_detailed(&mut b, failed, status, None);
+            let storage = b.ins().load(types::I64, MemFlags::new(), output, 0);
+            b.ins().jump(ready, &[storage.into()]);
+            b.switch_to_block(ready);
+            let storage = b.block_params(ready)[0];
+            let state = b.ins().load(types::I32, MemFlags::new(), storage, 4);
+            let start = b.create_block();
+            let previous = b.create_block();
+            let missing = b.ins().icmp_imm(IntCC::Equal, state, 0);
+            b.ins().brif(missing, start, &[], previous, &[]);
+            b.switch_to_block(previous);
+            let failed = b.ins().icmp_imm(IntCC::UnsignedGreaterThan, state, 2);
+            let status = b.ins().iadd_imm(state, -3);
+            let zero = b.ins().iconst(types::I32, 0);
+            let status = b.ins().select(failed, status, zero);
+            b.ins().return_(&[status]);
+            b.switch_to_block(start);
+            let running = b.ins().iconst(types::I32, 1);
+            b.ins().store(MemFlags::new(), running, storage, 4);
+            let scratch = slot(&mut b, 8);
+            let scratch = b.ins().stack_addr(types::I64, scratch, 0);
+            let callee = module.declare_func_in_func(ids[initializer], b.func);
+            let call = b.ins().call(callee, &[scratch, ctx]);
+            let status = b.inst_results(call)[0];
+            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+            let cached_failure = b.ins().iadd_imm(status, 3);
+            let complete = b.ins().iconst(types::I32, 2);
+            let state = b.ins().select(failed, cached_failure, complete);
+            b.ins().store(MemFlags::new(), state, storage, 4);
+            b.ins().return_(&[status]);
+            b.seal_all_blocks();
+            b.finalize();
+        }
+        define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
+    }
+    Ok(guards)
 }

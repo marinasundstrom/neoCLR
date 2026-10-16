@@ -745,9 +745,6 @@ pub(super) fn dispatch_targets_with_array(
 }
 
 pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> Result<(), Error> {
-    if input.functions.iter().any(|f| f.name.ends_with("..cctor")) {
-        return Err("native type initializer lowering is not yet supported".into());
-    }
     if input.functions.len() > crate::limits::INPUT_FUNCTIONS
         || input.types.len() > crate::limits::INPUT_TYPES
     {
@@ -1019,6 +1016,16 @@ pub(super) fn select_inventory_with_host_roots(
             }
         }
         let conformance_types = retained_types(input, &functions, reference_backings)?;
+        for &ty in &conformance_types {
+            if let Some(initializer) = crate::type_initialization::initializer(
+                input,
+                &crate::type_initialization::owner_type(&input.types[ty]),
+            ) {
+                if !functions.contains(&initializer) {
+                    pending.push(initializer);
+                }
+            }
+        }
         for &contract in &functions {
             if let Some(target) = string_dispatch_target(input, contract)? {
                 if !functions.contains(&target) {
@@ -1228,19 +1235,5 @@ mod composition_admission_tests {
             Type::from_name("Right"),
         ]));
         prepare(&module, "Main").unwrap();
-    }
-}
-
-#[cfg(test)]
-mod type_initialization_admission_tests {
-    #[test]
-    fn initializer_modules_are_not_silently_emitted_without_guards() {
-        let module = neoclr::assemble(".module Initializers\n.entry Main\n.type class Cache\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end").unwrap();
-        assert!(
-            super::prepare(&module, "Main")
-                .unwrap_err()
-                .to_string()
-                .contains("type initializer lowering")
-        );
     }
 }
