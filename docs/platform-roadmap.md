@@ -4879,3 +4879,8 @@ slots/overrides and native closed dispatch are qualified in CLR/interpreter/AOT/
 including reordered generic base parameters and direct base calls. See
 [retained evidence](validation/generic-class-virtual/README.md). Imported generic virtual contracts and direct base calls also pass the separate-provider [fixture](validation/external-constructed-class-base/README.md). Raven emission/import now passes local and separate-provider [native consumers](validation/generic-class-virtual/raven/README.md), including direct base calls and value/reference dispatch. Abstract generic classes and broader constrained dependency contracts remain open.
 Structural work remains parked.
+
+**Abstract generic bases (2026-10-16):** SDK authoring and native execution now pass
+CLR/interpreter/AOT/JIT, including inherited abstract slots and rejection checks.
+See [qualification](validation/generic-class-virtual/README.md). Raven and imported
+abstract contracts remain the next bounded follow-up; structural work stays parked.

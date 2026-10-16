@@ -304,7 +304,7 @@ public sealed partial class NativeAssemblyDefinition
                     Array(type, "fields", 256).Length == 0 && !type.TryGetProperty("base", out _), "invalid native Object root declaration");
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean() && type.GetProperty("is_sealed").GetBoolean();
                 var isAbstractClass = !isInterface && !isStatic && type.GetProperty("is_abstract").GetBoolean();
-                Require(!isAbstractClass || !isPrimitive && typeNames.Length == 0 && declaringType < 0, "unsupported abstract class shape");
+                Require(!isAbstractClass || !isPrimitive && declaringType < 0, "unsupported abstract class shape");
                 Require(!closedHierarchy || !isPrimitive && typeNames.Length == 0 && declaringType < 0 &&
                     (isInterface || type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean()) && !type.GetProperty("is_sealed").GetBoolean(), "unsupported closed family");
                 var isRuntimeString = isPrimitive && Text(type, "name") == "System.String";

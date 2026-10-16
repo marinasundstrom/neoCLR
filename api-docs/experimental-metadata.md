@@ -9565,3 +9565,22 @@ virtual `Get` and `Echo` overrides, direct imported base calls, integer/referenc
 payloads and inherited interface dispatch. CLR, interpreter, AOT and managed JIT
 return 42, including native cleanup and AOT sanitizers. No encoding, ABI or
 Runtime Contract change. Raven emission/import remains the next integration step.
+
+### Abstract generic class authoring (2026-10-16)
+
+`TypeBuilder.SetAbstractClass` and `TypeDefinition.SetAbstractClass` now accept
+ordinary top-level generic reference classes. The native reader preserves the
+abstract flag alongside owner parameters. Public nongeneric abstract slots use
+the existing virtual contract, with inherited signatures substituted through each
+base edge, including reordered parameters. This follows CLR abstract-class rules;
+there is no new metadata encoding, ABI or Runtime Contract configuration.
+
+The `generic-class-virtual/run.py --abstract` SDK consumer returns 42 in CLR,
+interpreter, AOT and managed JIT, with native cleanup and AOT sanitizers. It covers
+an abstract `Base<T>`, concrete `Derived<Unused,T>`, abstract and concrete slot
+calls, direct concrete base calls, and integer/reference payloads. SDK checks reject
+constructing an abstract generic type, leaving an inherited abstract slot
+unimplemented on a concrete child, and calling an abstract method directly.
+An abstract child may defer implementation. Generic methods, nested abstract
+classes and generic closed hierarchies remain outside this slice. Raven admission
+and imported abstract contracts still need separate qualification.

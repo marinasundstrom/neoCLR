@@ -6,6 +6,7 @@ using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition
 
 if (args is ["--external-constructed-bases"]) { ExternalConstructedBaseChecks.Run(); return 0; }
 
+if (args is ["--abstract-generic-classes"]) { GenericClassVirtualChecks.RunAbstract(); return 0; }
 if (args is ["--generic-class-virtuals"]) { GenericClassVirtualChecks.Run(); return 0; }
 
 if (args is ["--constructed-class-bases"]) { ConstructedClassBaseChecks.Run(); return 0; }
@@ -614,6 +615,7 @@ var tests = new (string Name, Action Body)[]
     ("Generic class with ordinary base", GenericClassBaseChecks.Run),
     ("External constructed class bases", ExternalConstructedBaseChecks.Run),
     ("Generic class virtual slots", GenericClassVirtualChecks.Run),
+    ("Abstract generic classes", GenericClassVirtualChecks.RunAbstract),
     ("Constructed class bases", ConstructedClassBaseChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),

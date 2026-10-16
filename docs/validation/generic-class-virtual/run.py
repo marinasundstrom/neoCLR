@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 
+parser.add_argument('--abstract', action='store_true', help='Qualify an abstract generic base and inherited abstract slot')
 args = parser.parse_args()
 bundle, output = (p.resolve() for p in (args.bundle, args.output))
 output.mkdir(parents=True, exist_ok=True)
@@ -36,7 +37,7 @@ def run(label, command, expected=0):
 
 import os
 os.environ['NEOCLR_GENERIC_VIRTUAL_ARTIFACT'] = str(image)
-run('sdk-clr', ['dotnet', 'run', '--project', ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental.Tests', '-p:WarningLevel=0', '--', '--generic-class-virtuals'])
+run('sdk-clr', ['dotnet', 'run', '--project', ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental.Tests', '-p:WarningLevel=0', '--', '--abstract-generic-classes' if args.abstract else '--generic-class-virtuals'])
 references = ['--system', bundle / 'System.runtime.neox', '--object-root', bundle / 'System.Runtime.dll', '--module', bundle / 'System.Runtime.dll']
 interpreter = [ROOT / 'target/debug/neoclr', 'run', image, '--execution', 'interpreter', *references]
 run('interpreter', interpreter, 42)
