@@ -12250,8 +12250,8 @@ called methods. Checked binary candidates are resolved first, with ordinary
 fallback only if none applies; ambiguity remains an error. The compiler owns this
 lookup; the SDK/runtime own checked instruction validation and execution.
 
-Checked blocks, constant arithmetic evaluation, nullable/pointer
-conversions and mutations, lifted arithmetic and checked binary expression trees remain gaps.
+Broader constant-expression coverage, nullable/pointer conversions and mutations,
+lifted arithmetic and checked binary expression trees remain gaps.
 Unsupported checked operations receive RAV0373 rather than silently executing
 unchecked. Numeric casts and signed unary negation are supported. Existing native
 primitive admission limits are unchanged.
@@ -12294,8 +12294,8 @@ operations. The .NET compiler also maps checked unary expression trees to
 
 The [operator qualification](validation/compound-operators/README.md#checked-unary-follow-up)
 records the matching builds, tests, standalone consumer and minimum-value overflow
-checks. Unary negation, numeric conversions and checked mutations are supported; blocks,
-constant evaluation and checked binary expression trees remain gaps.
+checks. Unary negation, numeric conversions, checked mutations and blocks are supported;
+checked binary expression trees and broader constant-expression coverage remain gaps.
 Broader structural work stays parked.
 
 The native unary carry is `371363a67`; all positive and unary-overflow backend
@@ -12356,5 +12356,31 @@ validation and execution. Native failures remain terminal ArithmeticOverflow.
 
 See [the shared consumer and fault qualification](validation/compound-operators/README.md#checked-mutation).
 The checked mutation path preserves the existing numeric admission profile;
-nullable/pointer mutation, checked blocks and constant evaluation remain gaps.
+nullable/pointer mutation and broader constant-expression coverage remain gaps.
 Structural work remains parked.
+
+### Checked blocks and constant numeric evaluation
+
+Raven main `3fa828516` / native `48b0b6f75` bind checked/unchecked statement blocks
+to ordinary blocks. Lexical context selects existing checked arithmetic/conversion
+instructions; nested functions and member bodies start fresh. No metadata, opcode,
+reference projection or Runtime Contract configuration is added.
+
+Main `489cc12a4` adds typed built-in constant evaluation and RAV0374 overflow
+rejection before emission. The constant default is checked, explicit unchecked
+integer operations wrap and const locals/fields retain evaluated dependencies.
+This is compiler-owned behavior, shared with the .NET target. Runtime-dependent
+operations keep the existing terminal ArithmeticOverflow policy on NeoCLR.
+
+The evaluator covers fixed-width addition, subtraction, multiplication, negation
+and numeric casts. Parameter defaults, division/remainder, bitwise/shift composition,
+native-width and enum constant arithmetic remain gaps. User code is never executed
+to evaluate constants. Out-of-range unchecked floating conversions are not folded.
+Broader structural work remains parked. See [qualification and exact tool hashes](validation/compound-operators/README.md#checked-blocks-and-constant-evaluation).
+
+Native class constant declarations remain an emitter gap: shared binding and .NET
+field evaluation work, while the native executable consumer uses const locals.
+
+The constant evaluator's validated native carry is `9ea79f0e2`: 175 focused tests
+pass on each compiler line, the local-constant consumer returns 42 on .NET and
+interpreter/JIT/AOT, and both targets reject the four overflow cases before emission.

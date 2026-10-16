@@ -110,5 +110,25 @@ path reuses checked arithmetic and conversion instructions, with ordinary calls 
 selected overloads. This adds no metadata encoding or recoverable API.
 
 See [checked mutation qualification](../validation/compound-operators/README.md#checked-mutation).
-Nullable/pointer checked mutation, block contexts and compile-time overflow
-remain compiler gaps, not deliberate platform divergences.
+Nullable/pointer checked mutation remains a compiler gap, not a deliberate divergence.
+
+## Lexical blocks and compile-time overflow
+
+Raven supports `checked { ... }` and `unchecked { ... }` with ordinary block scope
+and control flow. The nearest block or expression context wins; nested functions
+start a fresh context. Built-in fixed-width constant addition, subtraction,
+multiplication, negation and numeric casts use a checked default, matching .NET's
+constant-overflow policy. RAV0374 rejects overflow before emitting an assembly;
+explicit unchecked integer constants wrap. Const locals and fields retain typed
+values and can refer to other constants. User-defined operators are not executed
+by the compiler. Decimal overflow does not wrap.
+
+This is a bounded evaluator, not full .NET constant-expression coverage: parameter
+defaults, division/remainder, bitwise/shift composition, native-width and enum
+constant arithmetic are not widened. Out-of-range unchecked floating conversions
+remain backend-dependent and are not folded. These are gaps, not new semantics.
+See [executable evidence](../validation/compound-operators/README.md#checked-blocks-and-constant-evaluation).
+No runtime instruction, metadata or Runtime Contract change is needed.
+
+Native class constant declarations remain an emitter gap: shared binding and .NET
+field evaluation work, while the native executable consumer uses const locals.

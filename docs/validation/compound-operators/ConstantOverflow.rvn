@@ -1,0 +1,8 @@
+class Constants {
+    static func Add() -> int => 2147483647 + 1
+    static func Narrow() -> byte => (byte)256
+    static func Multiply() -> long => 9223372036854775807L * 2L
+    static func Negate() -> int => -(-2147483648)
+}
+
+func Main() -> int => 42

@@ -1,0 +1,16 @@
+func Main() -> int {
+    const basis = 40
+    const answer = basis + 2
+    const wrappedConstant = unchecked(2147483647 + 1)
+    const small = (byte)(20 * 2 + 2)
+    if small != (byte)42 || wrappedConstant != -2147483648 {
+        return 1
+    }
+    unchecked {
+        const wrapped = 2147483647 + 1
+        if wrapped != -2147483648 {
+            return 2
+        }
+    }
+    return answer
+}

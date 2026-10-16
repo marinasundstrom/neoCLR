@@ -171,11 +171,10 @@ Reproduce using the earlier native/.NET commands with the additional argument:
 Use a fresh output directory. The native bundle remains
 `target/function-reflection-library-validated-20261016`.
 
-Remaining checked work: expression/block contexts; checked overload selection and
-ordinary fallback; constant evaluation; built-in overflow checks and conversions
-across interpreter/JIT/AOT. A checked declaration does not itself change arithmetic
-inside its body. Broader interface/virtual/extension compound declarations and
-System.Numerics capability implementation remain separate. Structural work stays parked.
+Checked contexts, overload selection, conversions and bounded constant evaluation
+are qualified below. A checked declaration does not itself change arithmetic inside
+its body. Broader interface/virtual/extension compound declarations remain separate.
+Structural work stays parked.
 
 ## Checked expression follow-up
 
@@ -217,10 +216,10 @@ is built against the current metadata SDK. .NET uses OverflowException; native
 execution uses a terminal ArithmeticOverflow fault. This is the existing platform
 fault contract, not a new checked-context exception model.
 
-Remaining work: checked blocks, constant arithmetic evaluation, explicit
-conversions, unary negation, compound/increment mutations, lifted/pointer arithmetic
-and expression trees. RAV0373 diagnoses unimplemented checked conversions,
-unary/mutation and lifted/pointer operations instead of silently ignoring context.
+Remaining work includes lifted/pointer arithmetic and checked binary expression
+trees. RAV0373 diagnoses unimplemented checked operations instead of silently
+ignoring context. Later sections qualify conversions, unary/mutation operations,
+blocks and bounded constant evaluation.
 The current native primitive admission profile is unchanged. Structural work stays
 parked. Imported operator selection is covered in compiler tests; this fixture
 does not add native separate-provider qualification.
@@ -242,8 +241,8 @@ Both cases fault on all three native backends; JIT/AOT preserve the result slot.
 Runtime/SDK baseline `1f1e99af3` and bundle
 `target/function-reflection-library-validated-20261016` are unchanged. No runtime
 opcode or Runtime Contract switch is added. Unary negation is no longer a compiler
-gap; checked binary expression trees, conversions, mutation, blocks and constant
-arithmetic remain follow-up work.
+gap; checked binary expression trees and broader constant-expression coverage
+remain follow-up work.
 
 Native faults are terminal, not recoverable exceptions. See the separate
 [recoverable arithmetic proposal](../../design/checked-arithmetic.md).
@@ -265,8 +264,8 @@ explicit declarations with checked declarations before selecting the best candid
 unpaired ordinary and implicit conversions still participate. .NET uses conv.ovf
 instructions; the native adapter maps the same intent to existing SDK instructions.
 No metadata format or Runtime Contract switch changes. Nullable/pointer checked
-casts and checked user-defined expression trees remain diagnosed; blocks and
-compile-time overflow evaluation remain separate work.
+casts and checked user-defined expression trees remain diagnosed. Block and
+compile-time overflow qualification follows below.
 
 
 Validation records: [ordinary .NET](checked-conversions-dotnet-results.json),
@@ -303,8 +302,8 @@ Raven main `9dd7ea722` passes 159 focused mutation/conversion/operator tests and
 421-test overload-resolution suite. The native carry passes the same 159 focused
 tests. NeoCLR overflow remains terminal ArithmeticOverflow, while .NET uses
 OverflowException. Built-in overflow prevents write-back; checked lookup does not
-make user-defined bodies transactional. Nullable/pointer checked mutations, block
-contexts, constant evaluation and mutation expression trees remain explicit gaps.
+make user-defined bodies transactional. Nullable/pointer checked mutations and
+mutation expression trees remain explicit gaps.
 
 Reproduce the positive consumer with `run-dotnet.py` or `run.py`, selecting
 `--source docs/validation/compound-operators/CheckedMutation.rvn`. Run native fault
@@ -318,3 +317,49 @@ all backends. Exact tool/source/bundle hashes and command results are retained i
 [.NET results](checked-mutation-dotnet-results.json),
 [native results](checked-mutation-native-results.json) and
 [overflow results](checked-mutation-overflow-results.json).
+
+## Checked blocks and constant evaluation
+
+Raven main `3fa828516` and native carry `48b0b6f75` add checked/unchecked statement
+blocks. They reuse lexical context, ordinary block scope and control flow; nested
+functions and member bodies start fresh. Both generator builds and 71 focused
+block/expression/mutation tests pass. `CheckedBlocks.rvn` returns 42 on .NET 11,
+interpreter, managed JIT and sanitized AOT. `CheckedBlockOverflow.rvn` faults with
+ArithmeticOverflow on all native backends and preserves native result slots.
+
+[.NET block results](checked-block-dotnet-results.json),
+[native block results](checked-block-native-results.json), and
+[block overflow results](checked-block-overflow-results.json) retain tool/source hashes.
+Reproduce with `run-dotnet.py` or `run.py --source <source>`; use `--overflow` with
+the native overflow source. The native bundle is `numerics-public-libraries-20261016`.
+
+Raven main `489cc12a4` evaluates resolved built-in constant fixed-width addition,
+subtraction, multiplication, negation and numeric casts. Default constant context
+is checked; explicit unchecked integer constants wrap. Const locals/fields retain
+typed values and dependencies. User-defined operators are never executed by the
+compiler. Decimal overflow does not wrap. These rules mirror .NET; no runtime
+metadata, opcode or Runtime Contract configuration changes are needed.
+
+Parameter-default evaluation, division/remainder, bitwise/shift composition,
+native-width and enum constant arithmetic are not expanded. Out-of-range unchecked
+floating conversions remain backend-dependent and are not folded. Checked binary
+expression trees and existing nullable/pointer gaps remain separate.
+
+`ConstantArithmetic.rvn` checks local dependencies, narrowing and wrapping.
+Class constant declarations remain unsupported by native emission; field evaluation
+is covered by the .NET compiler tests, not the native consumer.
+`ConstantOverflow.rvn` checks addition, narrowing, multiplication and negation
+rejection. `run-constant-diagnostics.py` requires four RAV0374 diagnostics and no
+emitted assembly on either target. Pass `--dotnet-compiler`, `--native-compiler`,
+`--core`, `--bundle` and a fresh `--output` directory. Positive consumers use the
+existing .NET/native runners with `--source ConstantArithmetic.rvn`.
+
+Validated native carry: `9ea79f0e2`. Both compiler lines pass 175 focused tests;
+main also passes the 421-test overload-resolution suite. Both generator builds pass.
+The shared local-constant consumer returns 42 on .NET 11, interpreter, managed JIT
+and sanitized AOT; both compilers reject all four overflow cases without an assembly.
+[.NET constant results](constant-arithmetic-dotnet-results.json),
+[native constant results](constant-arithmetic-native-results.json), and
+[compile-time rejection results](constant-diagnostics-results.json) retain exact
+commands and source/tool/bundle fingerprints. Class-constant emission remains a
+native gap; the initial field-based consumer was rejected with NEOMETA001.

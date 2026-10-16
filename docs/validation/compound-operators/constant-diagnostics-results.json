@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "target": "dotnet",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/ConstantOverflow.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/constant-diagnostics-20261016/Rejected.dll"
+      ],
+      "exitCode": 1,
+      "output": "docs/validation/compound-operators/ConstantOverflow.rvn(2,33): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n\ndocs/validation/compound-operators/ConstantOverflow.rvn(3,37): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n\ndocs/validation/compound-operators/ConstantOverflow.rvn(4,39): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n\ndocs/validation/compound-operators/ConstantOverflow.rvn(5,36): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n\nBuild failed with 4 error(s)\n",
+      "assemblyExists": false
+    },
+    {
+      "target": "native",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/constant-diagnostics-20261016/native/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/constant-diagnostics-20261016/native/Main.rvn(2,33): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n/Users/robert/Projects/neoclr/target/constant-diagnostics-20261016/native/Main.rvn(3,37): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n/Users/robert/Projects/neoclr/target/constant-diagnostics-20261016/native/Main.rvn(4,39): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n/Users/robert/Projects/neoclr/target/constant-diagnostics-20261016/native/Main.rvn(5,36): error RAV0374: The constant operation overflows its result type. Use an explicit unchecked context if wrapping is intended.\n",
+      "assemblyExists": false
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/ConstantOverflow.rvn": "d8c04819904ce57dbcf7f74adc9a5886504e7f3e428866f3380250428ebf5479",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-constant-diagnostics.py": "abdc05be2799c721bd5838aa61deb1c5c62bd1a43f697f2d13576155021485ac",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "ed592a234c8c7dc39479d1c11a94d359f0348322cbd158016b782745eaeb65ae",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "1c6501e30e0f7157e27eef96485905624db4de429bb4607405fc153138e3766c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "c222b839b363d74509f8b887ce570b5a10144132b41acf6b6625c86209c84241",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "7653e5163b7c7cddc6cec3665fa82a8fc11268823e399c43175d12227c53fafa",
+    "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/bundle.json": "1c6d173bed8b9c6b74ff7c6f496a4231d560a20485e0018e81763ac4f69154f9"
+  }
+}

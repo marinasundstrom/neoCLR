@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedBlocks.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/checked-block-dotnet-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "6f79785065ee3f5752dc2a4a948c3a65d449279bc6040b4d9884dfdde39ef32e"
+    },
+    {
+      "label": "execute",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/checked-block-dotnet-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedBlocks.rvn": "b34e48486694b9c0e11b90eb101045ef3a3f2c88a8a579361a33b34a418ab703",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-dotnet.py": "9a26b57b6262443bfbbcb040ba2006e5f3027f097d9eb0690f0b38ae3908650c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "ed592a234c8c7dc39479d1c11a94d359f0348322cbd158016b782745eaeb65ae",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "c222b839b363d74509f8b887ce570b5a10144132b41acf6b6625c86209c84241",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll": "78c99406b5d3168d026e7a39ac550116940f6d1769f4f348124eed865ccef1e7",
+    "/Users/robert/Projects/neoclr/target/checked-block-dotnet-20261016/OperatorMatrix.dll": "ef68cc93445c24c08bf38b19e5eba5ff3db6b96eeed37e1092947275154cad29"
+  }
+}

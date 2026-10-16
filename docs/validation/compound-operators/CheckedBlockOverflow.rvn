@@ -1,0 +1,11 @@
+class BlockArithmetic {
+    static func Add(a: int, b: int) -> int {
+        checked {
+            var value = a
+            value += b
+            return value
+        }
+    }
+}
+
+func Main() -> int => BlockArithmetic.Add(2147483647, 1)

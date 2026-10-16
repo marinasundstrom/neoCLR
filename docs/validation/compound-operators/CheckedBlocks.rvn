@@ -1,0 +1,23 @@
+class BlockArithmetic {
+    static func Add(a: int, b: int) -> int {
+        checked {
+            var value = a
+            value += b
+            return value
+        }
+    }
+    static func Wrap(a: int, b: int) -> int {
+        checked {
+            unchecked {
+                return a + b
+            }
+        }
+    }
+}
+
+func Main() -> int {
+    if BlockArithmetic.Wrap(2147483647, 1) != -2147483648 {
+        return 1
+    }
+    return BlockArithmetic.Add(40, 2)
+}

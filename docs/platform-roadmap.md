@@ -5056,8 +5056,8 @@ called methods. Checked binary candidates are resolved first, with ordinary
 fallback only if none applies; ambiguity remains an error. The compiler owns this
 lookup; the SDK/runtime own checked instruction validation and execution.
 
-Checked blocks, constant arithmetic evaluation, nullable/pointer
-conversions and mutations, lifted arithmetic and checked binary expression trees remain gaps.
+Broader constant-expression coverage, nullable/pointer conversions and mutations,
+lifted arithmetic and checked binary expression trees remain gaps.
 Unsupported checked operations receive RAV0373 rather than silently executing
 unchecked. Numeric casts and signed unary negation are supported. Existing native
 primitive admission limits are unchanged.
@@ -5082,8 +5082,8 @@ operations. The .NET compiler also maps checked unary expression trees to
 
 The [operator qualification](validation/compound-operators/README.md#checked-unary-follow-up)
 records the matching builds, tests, standalone consumer and minimum-value overflow
-checks. Unary negation, numeric conversions and checked mutations are supported; blocks,
-constant evaluation and checked binary expression trees remain gaps.
+checks. Unary negation, numeric conversions, checked mutations and blocks are supported;
+checked binary expression trees and broader constant-expression coverage remain gaps.
 Broader structural work stays parked.
 
 The native unary carry is `371363a67`; all positive and unary-overflow backend
@@ -5129,5 +5129,24 @@ small-integer write-back and single evaluation of mutation locations. The native
 carry `a72b1b24c` passes interpreter/JIT/AOT success and overflow probes using
 existing checked instructions and terminal faults. See
 [qualification](validation/compound-operators/README.md#checked-mutation).
-The next compiler gaps are checked block contexts and constant evaluation; broader
+Checked blocks and bounded numeric constant evaluation are now qualified below; broader
 structural work remains parked. This bounded task does not reprioritize the roadmap.
+
+
+**Checked blocks and constant evaluation (2026-10-16):** Raven main `3fa828516`
+and native `48b0b6f75` add lexical checked/unchecked blocks. Main `489cc12a4`
+adds compile-time overflow diagnostics for built-in fixed-width addition,
+subtraction, multiplication, negation and numeric casts, plus typed const local/field
+dependencies. Explicit unchecked integer constants wrap. No runtime API, metadata
+or instruction change is required. Broader constant-expression coverage (including
+parameter defaults, division/remainder, bitwise/shift composition and native-width/
+enum arithmetic) remains open. Existing nullable/pointer and checked binary
+expression-tree gaps remain; structural work stays parked. This author-directed
+compiler task does not change milestone priorities. See [qualification](validation/compound-operators/README.md#checked-blocks-and-constant-evaluation).
+
+Native class constant declarations remain an emitter gap: shared binding and .NET
+field evaluation work, while the native executable consumer uses const locals.
+
+The constant evaluator's validated native carry is `9ea79f0e2`: 175 focused tests
+pass on each compiler line, the local-constant consumer returns 42 on .NET and
+interpreter/JIT/AOT, and both targets reject the four overflow cases before emission.
