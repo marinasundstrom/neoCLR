@@ -1,0 +1,48 @@
+.module SpecialConstraints
+.entry Main
+.type class Payload
+.field Number Int32
+.method instance .ctor() -> noresult
+ldarg 0
+ldc.i4 40
+stfld Payload::Number
+ret
+.end
+.end
+.type class ReferenceBox<T>
+.constraint T reference new
+.field Value T
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg 1
+stfld ReferenceBox<T>::Value
+ret
+.end
+.end
+.type class Derived<Unused,T>
+.constraint T reference new
+.extends ReferenceBox<T>
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg 1
+call instance ReferenceBox<T>::.ctor(T)
+ret
+.end
+.end
+.type ValueBox<T>
+.constraint T value new
+.field Value T
+.end
+.function Main() -> Int32
+newobj instance Payload::.ctor()
+newobj instance Derived<Boolean,Payload>::.ctor(Payload)
+ldfld ReferenceBox<Payload>::Value
+ldfld Payload::Number
+ldc.i4 2
+newobj ValueBox<Int32>
+newobj ValueBox<ValueBox<Int32>>
+ldfld ValueBox<ValueBox<Int32>>::Value
+ldfld ValueBox<Int32>::Value
+add
+ret
+.end

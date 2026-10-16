@@ -223,7 +223,14 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
-        if !definition.generic_constraints.is_empty()
+        if definition.generic_constraints.iter().any(|constraint| {
+            !matches!(
+                constraint.kind,
+                neoclr::metadata::ConstraintKind::ReferenceType
+                    | neoclr::metadata::ConstraintKind::ValueType
+                    | neoclr::metadata::ConstraintKind::DefaultConstructor
+            )
+        })
             || definition.generic_parameters.len() != arguments.len()
         {
             return Err(format!("unsupported generic type category, arity or constraints: {name}; reference={}, arity={}/{}, constraints={:?}", definition.is_reference_type, arguments.len(), definition.generic_parameters.len(), definition.generic_constraints).into());
@@ -232,6 +239,13 @@ impl Specializer<'_> {
         // Bound argument nesting independently of recursive local record layout checks.
         for arg in &arguments {
             validate_argument(arg, 0)?;
+        }
+        if !definition.generic_constraints.is_empty() {
+            // Check the original closed construction before discarding parameters
+            // from its executable shape. This also validates nested/base arguments.
+            self.source
+                .instantiated_fields(ty)
+                .map_err(|error| error.to_string())?;
         }
         if let Some(existing) = self
             .shapes
@@ -1111,6 +1125,7 @@ pub fn expand_with_host_roots(
             .map_err(|e| e.to_string())?;
         t.generic_parameters.clear();
         t.generic_variance.clear();
+        t.generic_constraints.clear();
         for field in &mut t.fields {
             field.ty = context.close(&field.ty, &shape.arguments)?;
         }
@@ -1278,7 +1293,7 @@ pub fn expand_with_host_roots(
         })
         .map(|shape| shape.row)
         .collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; no constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new type constraints; no method or nominal constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -1326,6 +1341,33 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn special_type_constraints_are_checked_before_specialization() {
+        let source = neoclr::assemble(include_str!("../../../docs/validation/special-type-constraints/Main.neoil")).unwrap();
+        let original = serde_json::to_value(&source).unwrap();
+        neoclr::verify(&source).unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(serde_json::to_value(&source).unwrap(), original);
+        assert!(selected.types.iter().all(|t| t.generic_constraints.is_empty()));
+        // The value box must not satisfy reference requirements, and a reference
+        // argument must not satisfy value requirements. Constructor visibility
+        // and abstractness are checked against the original declaration.
+        for case in 0..4 {
+            let mut invalid = source.clone();
+            match case {
+                0 => invalid.types.iter_mut().find(|t| t.name == "ValueBox").unwrap().generic_constraints[0].kind = neoclr::metadata::ConstraintKind::ReferenceType,
+                1 => invalid.types.iter_mut().find(|t| t.name == "ReferenceBox").unwrap().generic_constraints[0].kind = neoclr::metadata::ConstraintKind::ValueType,
+                2 => invalid.functions.iter_mut().find(|f| f.name.ends_with("..ctor")).unwrap().visibility = neoclr::metadata::Visibility::Private,
+                _ => invalid.types.iter_mut().find(|t| t.name == "Payload").unwrap().is_abstract = true,
+            }
+            assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("violates"));
+        }
+    }
+
     #[test]
     fn generic_class_override_without_base_call_retains_closed_slot() {
         let source = neoclr::assemble(r#"

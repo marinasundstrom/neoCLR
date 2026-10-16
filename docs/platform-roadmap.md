@@ -4883,3 +4883,10 @@ Structural work remains parked.
 **Abstract generic bases (2026-10-16):** SDK authoring and native execution now pass
 CLR/interpreter/AOT/JIT, including inherited abstract slots and rejection checks.
 See [qualification](validation/generic-class-virtual/README.md). Raven local/imported abstract contracts now pass the [native consumers](validation/generic-class-virtual/raven/README.md), with capability/CLR tests and exact generic arguments. Broader constrained dependency contracts remain open; structural work stays parked.
+
+**Constrained specialization prerequisite (2026-10-16):** native AOT/JIT now
+validate reference/value/default-constructor requirements before specializing closed
+record/class constructions. The [retained consumer](validation/special-type-constraints/README.md)
+covers inherited and nested constructions; negative tests cover invalid arguments.
+Nominal bounds, constrained methods and Raven dependency constraint import remain
+open. This does not resume structural types or broaden the variance scope.
