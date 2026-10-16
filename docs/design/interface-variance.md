@@ -443,3 +443,16 @@ Retrying the original consumer now passes the unbound native query and reaches
 `static owners cannot be used as values or instance receivers`: a discovered static
 type's ordinary token is incorrectly checked as value storage. This is the next
 native qualification blocker; the full consumer is not yet AOT/JIT qualified.
+
+### Static-owner token validation (2026-10-16)
+
+Native `ldtoken` now accepts a supported static owner as type identity, separately
+from value storage. This matches .NET's ability to reflect a static type without
+constructing an instance. It uses the ordinary token inventory, so discovery and
+explicit tokens agree; it does not introduce a second descriptor identity.
+Static-owner locals and instance values remain rejected. Open or unsupported types
+still pass through the existing token checks rather than receiving a blanket bypass.
+
+The focused static-token regression passes interpreter and macOS ARM64 native
+execution and AOT emission, with a negative static-local-storage check. Raven
+lowering and Runtime Contract configuration are unchanged.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Permit ordinary native type tokens for supported static owners without admitting static values or instance receivers. A focused regression verifies token identity in interpreter/JIT and AOT emission while rejecting static local storage; this clears a token-validation blocker exposed by assembly discovery.
+
 - Bind native TypeDisplayName queries for display names and namespaces using original source identities for open definitions, generic parameters and closed types. Preserve selector faults and exact InternalCall signatures; eleven focused metadata tests pass, including interpreter/JIT execution and AOT emission.
 
 - Bind native assembly/module type discovery through explicit schema-6 typeCatalogs retention. Preserve ordinary token identity for closed types and descriptive identity for open definitions/parameters; validate exact query contracts and unretained/foreign scope faults. Preserve the source TypeInfo recipe contract rather than the legacy System.Type contract. Ten focused catalog checks pass; the original Raven consumer advances to a later unsupported native member contract, so complete qualification remains pending.

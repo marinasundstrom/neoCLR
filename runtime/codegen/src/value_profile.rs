@@ -1817,8 +1817,13 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::TypeToken);
                 }
                 Op::LoadTypeToken(t) => {
-                    // A token cannot introduce open or unsupported type shapes.
-                    self.ty(t)?;
+                    // A static owner has a type identity even though it has no
+                    // instance storage. Keep ordinary value checks for every other shape.
+                    let static_owner = matches!(t, Type::Named(name) if self.input.types.iter()
+                        .any(|definition| definition.name == *name && crate::selection::static_owner(definition)));
+                    if !static_owner {
+                        self.ty(t)?;
+                    }
                     stack.push(Ty::TypeToken);
                 }
                 Op::PackValue(t) => {
@@ -2369,5 +2374,42 @@ mod object_assignment_tests {
         assert!(profile.reference_assignable(&view, &Ty::Reference(root)));
         assert!(!profile.reference_assignable(&view, &Ty::Reference(index("Other"))));
         assert!(!make(None).reference_assignable(&view, &Ty::Reference(root)));
+    }
+}
+
+#[cfg(test)]
+mod static_token_tests {
+    use super::*;
+
+    #[test]
+    fn static_type_tokens_are_valid_without_admitting_static_values() {
+        let mut input = neoclr::assemble(".module StaticTokens\n.entry Main\n.type class StaticOwner\n.end\n.function Main() -> Int32\nldtoken StaticOwner\nldtoken StaticOwner\nceq\nbrfalse Failed\nldc.i4 42\nret\nFailed:\nldc.i4 1\nret\n.end\n").unwrap();
+        input.types[0].is_abstract = true;
+        input.types[0].is_sealed = true;
+        assert!(crate::selection::static_owner(&input.types[0]));
+        let program = neoclr::LoadedProgram::new(&input).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        let (selected, _) = crate::selection::prepare(&input, "Main").unwrap();
+        assert!(
+            !crate::compiler::compile(&selected, "Main", false, None)
+                .unwrap()
+                .is_empty()
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        crate::linking::descriptor_token_tests::assert_native_result(&selected, 42);
+        let mut value = selected.clone();
+        value.functions[0]
+            .locals
+            .push(Type::Named("StaticOwner".into()));
+        assert!(
+            crate::compiler::compile(&value, "Main", false, None)
+                .unwrap_err()
+                .to_string()
+                .contains("static owners cannot be used as values")
+        );
     }
 }

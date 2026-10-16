@@ -11220,3 +11220,7 @@ TypeDisplayName now binds source display names and namespaces for open and close
 descriptors. Eleven focused metadata tests pass. The original consumer advances
 past the unbound query to static-owner token validation; full native discovery
 qualification remains pending. Raven emission and Runtime Contract are unchanged.
+
+Static-owner ordinary tokens are now accepted as metadata identity without allowing
+static types in value storage. The focused token test passes interpreter/JIT and AOT
+emission and rejects a static local. Full consumer qualification is still pending.
