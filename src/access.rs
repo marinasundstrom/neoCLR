@@ -9,6 +9,11 @@ pub(crate) fn check_call(
     caller: Option<&Function>,
     callee: &Function,
 ) -> Result<(), Fault> {
+    if crate::type_initialization::is_initializer(callee) {
+        return Err(Fault::new(
+            "type initializers cannot be called or bound directly",
+        ));
+    }
     if let Some(owner) = &callee.owner {
         check_owner(module, caller.and_then(scope), owner)?;
     }
@@ -56,6 +61,9 @@ pub(crate) fn check_call(
 }
 
 pub(crate) fn check_entry(module: &Module, entry: &Function) -> Result<(), Fault> {
+    if crate::type_initialization::is_initializer(entry) {
+        return Err(Fault::new("type initializer cannot be an entry point"));
+    }
     // Explicit entry selection is an execution root, not arbitrary host member invocation.
     if entry
         .definition
@@ -473,8 +481,14 @@ pub(crate) fn static_field(
     if !allowed {
         return Err(Fault::new("static field access denied"));
     }
-    // Initializer writes will be admitted together with once-only type initialization.
-    if write && field.readonly {
+    let initializer = crate::type_initialization::is_initializer(caller)
+        && caller.owner.as_ref().is_some_and(|ty| {
+            module
+                .type_definition(ty)
+                .is_some_and(|d| std::ptr::eq(d, definition))
+                && ty.generic_arguments() == owner.generic_arguments()
+        });
+    if write && field.readonly && !initializer {
         return Err(Fault::new(
             "readonly static field cannot be assigned outside type initialization",
         ));

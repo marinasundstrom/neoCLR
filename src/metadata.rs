@@ -276,6 +276,9 @@ pub enum Variance {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    /// Relaxed initialization: first static-field access is the chosen trigger.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub before_field_init: bool,
     // Trusted, in-memory native compiler proof; never accepted from serialized metadata.
     #[serde(skip)]
     pub(crate) native_interface: Option<crate::variance::NativeInterface>,

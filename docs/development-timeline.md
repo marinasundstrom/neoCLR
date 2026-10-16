@@ -18602,3 +18602,15 @@ Native static initialization remains explicitly rejected. The assistant recorded
 [type-initialization implementation requirements](design/readonly-fields.md), including
 per-closed-type state, ordering, reentrancy, publication and terminal-fault retention.
 This is preparation for implementation, not a claim that native static readonly is complete.
+
+
+## 2026-10-16: Native readonly initialization execution
+
+The author directed: “Continue with native static readonly fields and proper type
+initialization. Follow .NET semantics where applicable, validate interpreter, JIT
+and AOT, keep structural types parked, and commit each validated slice.” The assistant
+identified existing storage without initialization state, compared CLR recursive
+initialization and failure retention, and implemented the interpreter protocol in
+[the readonly design](design/readonly-fields.md). Native codegen and compiler production
+remain open in this slice; native admission explicitly rejects these modules instead
+of executing with missing guards. This direction does not unpark structural types.

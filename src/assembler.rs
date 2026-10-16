@@ -841,6 +841,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        before_field_init: false,
                         native_interface: None,
                         native_object_root: false,
                         native_array_element: None,
@@ -1391,7 +1392,7 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
     };
     let (owner, name, generic_arguments) = if let Some((owner, member)) = name.split_once("::") {
         let (member, generic_arguments) = parse_method_name(member.trim())?;
-        if member.trim().contains('.') && member.trim() != ".ctor" {
+        if member.trim().contains('.') && !matches!(member.trim(), ".ctor" | ".cctor") {
             return Err(Fault::new("expected an unqualified member name"));
         }
         let owner = parse_type(owner)?;

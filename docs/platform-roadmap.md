@@ -5168,3 +5168,9 @@ implementation](design/readonly-fields.md). This is a .NET parity gap; constants
 do not substitute for readonly storage. Wider native literal payloads, native-width/
 enum constant expression coverage and guest field reflection remain open. Structural
 work stays parked, and these author-directed slices do not reorder other milestones.
+
+
+Author-directed readonly prerequisite (2026-10-16): the interpreter now executes
+verified per-closed-type initializers with readonly write authority and retained
+faults. [Native guards and Raven/SDK production](design/readonly-fields.md) remain
+open; this does not change the milestone order or unpark structural work.

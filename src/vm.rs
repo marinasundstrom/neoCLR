@@ -347,6 +347,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
 }
 
 fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
+    crate::type_initialization::validate(module)?;
     crate::compositions::validate_surface(module)?;
     crate::metadata_origin::validate(module)?;
     crate::object_root::validate(module)?;
@@ -853,7 +854,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 .ok_or_else(|| Fault::new("method name does not match its declaring type"))?;
             if member.is_empty()
                 || (member.contains('.')
-                    && member != ".ctor"
+                    && !matches!(member, ".ctor" | ".cctor")
                     && function.interface_implementations.is_empty())
             {
                 return Err(Fault::new("invalid member name"));
@@ -1702,6 +1703,7 @@ fn variant_reference_view(
 }
 
 struct Frame {
+    initializing_type: Option<Type>,
     // Caller-visible reference result for variant interface dispatch.
     return_view: Option<Type>,
     queue_callback: bool,
@@ -1775,6 +1777,7 @@ impl Frame {
             .map(|ty| crate::slots::Slot::cell(ty.clone(), None))
             .collect();
         Ok(Self {
+            initializing_type: None,
             return_view: None,
             function: std::rc::Rc::new(function),
             pc: 0,
@@ -2231,6 +2234,15 @@ fn drive_instructions(
                 Err(fault) => break Err(fault),
             }
         };
+        if let Err(fault) = &result {
+            state
+                .invocation
+                .statics
+                .lock()
+                .unwrap()
+                .initialization
+                .fail_owner(&state.dispatch_identity, fault);
+        }
         let output_result = transfer_task_output(state, output, console_bytes);
         result.and_then(|value| output_result.map(|_| value))
     })
@@ -2654,7 +2666,7 @@ fn interpret_instructions_with_dispatch(
     } = dispatch;
     let mut executed = 0;
     reap_async(heap, parked_activations, async_operations);
-    loop {
+    'execution: loop {
         // Admit new frames before they execute or become a parked continuation.
         // Existing permits remain charged across host waits and instruction pauses.
         for frame in frames.iter_mut().rev() {
@@ -3054,6 +3066,58 @@ fn interpret_instructions_with_dispatch(
             instruction: Some(pc),
             stack_trace: None,
         })?;
+        // Do not consume operands or advance the triggering instruction until the
+        // initializer returns. Its frame participates in ordinary budgets and GC roots.
+        let entry_owner = if pc == 0 {
+            crate::type_initialization::entry_owner(module, &function).cloned()
+        } else {
+            None
+        };
+        let field_owner = match op {
+            Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => Some(owner.clone()),
+            _ => None,
+        };
+        // Native/PInvoke bodies do not push an interpreter frame, but their strict
+        // declaring type still has to initialize before the call executes.
+        let call_owner = match op {
+            Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                let callee = resolve(module, target)?;
+                crate::type_initialization::entry_owner(module, &callee).cloned()
+            }
+            _ => None,
+        };
+        for owner in entry_owner.into_iter().chain(field_owner).chain(call_owner) {
+            if let Some(initializer) = crate::type_initialization::initializer(module, &owner)? {
+                let begin = invocation.statics.lock().unwrap().begin_initialization(
+                    module,
+                    &owner,
+                    dispatch_identity,
+                    heap,
+                    &limits,
+                )?;
+                match begin {
+                    crate::type_initialization::Begin::Run => {
+                        let mut initializer = Frame::new(initializer, vec![])?;
+                        initializer.initializing_type = Some(owner);
+                        frames.push(initializer);
+                        continue 'execution;
+                    }
+                    crate::type_initialization::Begin::Wait => {
+                        heap.publish(execution_roots(
+                            frames,
+                            parked_activations,
+                            async_operations,
+                            scheduler,
+                            default_task_queue.as_ref(),
+                            invocation_result.as_ref(),
+                        ))?;
+                        return Ok(InstructionProgress::Waiting);
+                    }
+                    crate::type_initialization::Begin::Ready
+                    | crate::type_initialization::Begin::Recursive => {}
+                }
+            }
+        }
         let access_alignment = match pc.checked_sub(1).and_then(|i| function.body.get(i)) {
             Some(Op::Unaligned(alignment)) => Some(*alignment as usize),
             _ => None,
@@ -5230,6 +5294,15 @@ fn interpret_instructions_with_dispatch(
                         if frame.async_owner.is_some() {
                             async_operations.abandon(operation);
                         }
+                    }
+                    if let Some(owner) = &frame.initializing_type {
+                        let key = crate::type_identity::resolve(module, owner)?;
+                        invocation
+                            .statics
+                            .lock()
+                            .unwrap()
+                            .initialization
+                            .complete(&key, dispatch_identity)?;
                     }
                     frames.pop();
                     if runtime_callback {

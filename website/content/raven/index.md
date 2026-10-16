@@ -165,3 +165,8 @@ same-type capabilities; generic algorithms can ask for only the operation they n
 Constrained calls work in source code and across library boundaries on the
 interpreter, JIT and AOT. A Complex demo exercises arithmetic without imposing
 ordering. Mixed-type contracts and production Complex edge semantics remain future work.
+
+
+Native static readonly field initialization is still in development. The interpreter
+has per-type initializer execution and readonly write checks; Raven emission and
+JIT/AOT execution are not yet enabled for this feature.

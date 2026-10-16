@@ -6,6 +6,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub(crate) struct Storage {
     entries: HashMap<TypeIdentity, Vec<Value>>,
+    pub(crate) initialization: crate::type_initialization::Registry<TypeIdentity>,
     roots: Option<crate::shared_heap::RootSet>,
     heap: Option<crate::shared_heap::Identity>,
 }
@@ -77,6 +78,17 @@ impl Storage {
             self.entries.insert(key.clone(), fields);
         }
         Ok(key)
+    }
+    pub(crate) fn begin_initialization(
+        &mut self,
+        module: &Module,
+        owner: &Type,
+        execution: &std::sync::Arc<()>,
+        heap: &mut crate::shared_heap::Access<'_>,
+        limits: &crate::Limits,
+    ) -> Result<crate::type_initialization::Begin, Fault> {
+        let key = self.key(module, owner, heap, limits)?;
+        self.initialization.begin(&key, execution)
     }
     pub(crate) fn read(
         &mut self,

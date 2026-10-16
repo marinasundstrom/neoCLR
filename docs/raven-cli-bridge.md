@@ -12402,3 +12402,15 @@ implementation](design/readonly-fields.md). This is a .NET parity gap; constants
 do not substitute for readonly storage. Wider native literal payloads, native-width/
 enum constant expression coverage and guest field reflection remain open. Structural
 work stays parked, and these author-directed slices do not reorder other milestones.
+
+
+### Type-initialization runtime prerequisite (2026-10-16)
+
+The interpreter now supports verified native `.cctor` methods and the optional
+`before_field_init` TypeDef fact, with runtime-only invocation and exact-owner
+readonly writes. See [the execution contract](design/readonly-fields.md). This is a
+native metadata capability, not temporary CLI substitution. Matching runtimes are
+required for the new fact. No Runtime Contract switch changes. SDK `.cctor` authoring
+and Raven initializer-body emission remain unsupported, and shared JIT/AOT admission
+rejects initializer-bearing modules until native guards are available. Existing
+readonly instance and class-constant consumer evidence is unaffected.

@@ -72,6 +72,7 @@ mod scope;
 mod services;
 mod stack_trace;
 mod static_storage;
+mod type_initialization;
 mod string_interning;
 mod string_value;
 pub use services::{MissingService, RuntimeService, ServiceUse};
