@@ -1,0 +1,62 @@
+struct Counter {
+    public var Value: int = 0
+    func +=(value: int) {
+        Value = 1
+    }
+    func checked +=(value: int) {
+        Value = 42
+    }
+    func ++() {
+        Value = 1
+    }
+    func checked ++() {
+        Value = 42
+    }
+}
+
+class Runner {
+    private var Calls: int = 0
+    func GetItems(items: int[]) -> int[] {
+        Calls = Calls + 1
+        return items
+    }
+    func GetIndex() -> int {
+        Calls = Calls + 1
+        return 0
+    }
+    func CheckArray() -> bool {
+        let items: int[] = [40]
+        checked(GetItems(items)[GetIndex()] += 2)
+        return items[0] == 42 && Calls == 2
+    }
+}
+
+func Main() -> int {
+    var counter = Counter()
+    checked(counter += 1)
+    if counter.Value != 42 {
+        return 1
+    }
+    unchecked(counter += 1)
+    if counter.Value != 1 {
+        return 2
+    }
+    let prefix = checked(++counter)
+    if prefix.Value != 42 {
+        return 3
+    }
+    checked(counter++)
+    if counter.Value != 42 {
+        return 4
+    }
+    var number: byte = (byte)40
+    checked(number += (byte)1)
+    let old = checked(number++)
+    if old != (byte)41 || number != (byte)42 {
+        return 5
+    }
+    if !Runner().CheckArray() {
+        return 6
+    }
+    return counter.Value
+}

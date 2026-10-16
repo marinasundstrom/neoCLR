@@ -265,8 +265,8 @@ explicit declarations with checked declarations before selecting the best candid
 unpaired ordinary and implicit conversions still participate. .NET uses conv.ovf
 instructions; the native adapter maps the same intent to existing SDK instructions.
 No metadata format or Runtime Contract switch changes. Nullable/pointer checked
-casts and checked user-defined expression trees remain diagnosed; checked mutation,
-blocks and compile-time overflow evaluation remain separate work.
+casts and checked user-defined expression trees remain diagnosed; blocks and
+compile-time overflow evaluation remain separate work.
 
 
 Validation records: [ordinary .NET](checked-conversions-dotnet-results.json),
@@ -287,3 +287,34 @@ run-checked-overflow.py --conversions with the same compiler and bundle.
 
 The completed native compiler carry is `c290f2536`. All three fault cases pass on
 interpreter/JIT/AOT; ordinary .NET and both positive native consumers return 42.
+
+## Checked mutation
+
+`CheckedMutation.rvn` is shared by .NET and native runs. It exercises ordinary and
+checked instance compound operators, prefix results, discarded postfix, byte
+write-back and an array receiver/index with observable side effects. The array is
+initialized inside the method because native static nonconstant initializers remain
+unsupported. The compiler fix captures locations before read/modify/write and keeps
+checked operator/conversion intent through both emitters. Native statement lowering
+also unwraps checked expressions before dispatching assignments and discarded blocks.
+No runtime opcode, metadata format or Runtime Contract switch changes.
+
+Raven main `9dd7ea722` passes 159 focused mutation/conversion/operator tests and the
+421-test overload-resolution suite. The native carry passes the same 159 focused
+tests. NeoCLR overflow remains terminal ArithmeticOverflow, while .NET uses
+OverflowException. Built-in overflow prevents write-back; checked lookup does not
+make user-defined bodies transactional. Nullable/pointer checked mutations, block
+contexts, constant evaluation and mutation expression trees remain explicit gaps.
+
+Reproduce the positive consumer with `run-dotnet.py` or `run.py`, selecting
+`--source docs/validation/compound-operators/CheckedMutation.rvn`. Run native fault
+checks with `run-checked-overflow.py --mutations`; it covers int compound-add
+and byte increment overflow, including untouched native result slots.
+Use the matched `target/numerics-public-libraries-20261016` bundle.
+
+Completed native carry: `a72b1b24c`. The shared consumer returns 42 on .NET 11,
+interpreter, managed JIT and sanitized AOT. Both native overflow probes pass on
+all backends. Exact tool/source/bundle hashes and command results are retained in
+[.NET results](checked-mutation-dotnet-results.json),
+[native results](checked-mutation-native-results.json) and
+[overflow results](checked-mutation-overflow-results.json).

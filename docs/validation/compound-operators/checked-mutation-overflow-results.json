@@ -1,0 +1,405 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "compound-int",
+      "source": "class Program {\n    static func Overflow(a: int) {\n        var value = a\n        checked(value+= 1)\n    }\n    static func Main() -> int {\n        Overflow(2147483647)\n        return 42\n    }\n}\n",
+      "result": {
+        "passed": true,
+        "commands": [
+          {
+            "label": "compile",
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/project/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "logSha256": "4842b9a301432c47d7f8b53c4d873d0ed158bd8d64d6c1037d3b14c7c6ba1026",
+            "output": "Native build output: /Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/project/bin/neoclr/CompoundOperatorsRaven.dll\n"
+          },
+          {
+            "label": "interpreter",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "--execution",
+              "interpreter",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Web.dll"
+            ],
+            "exitCode": 1,
+            "logSha256": "cb41e7e4eed4b617765e41b358619e283440222d646c9043b5c82cede74d75a7",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4F766572666C6F77 [instruction 4]\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4D61696E [instruction 1]\n"
+          },
+          {
+            "label": "aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "a4572c79aebf4d9203c54a7a3f88f43504f7d139e16d77fd6208ab6e39addaf0",
+            "output": "(selection manifest in local aot.log)"
+          },
+          {
+            "label": "link-aot",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-fsanitize=undefined,bounds",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/app.o",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/app"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "execute-aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/app"
+            ],
+            "exitCode": 2,
+            "logSha256": "821062dfc9647181d25ff00df241d5bbcb7794a42328438a90c189a9f1169a8d",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 4]\n   at Program.Main [instruction 1]\nstatus=2 fault=2 result=-1\n"
+          },
+          {
+            "label": "link-jit",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-DJIT_HOST",
+              "-dynamiclib",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/host.dylib"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "jit",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--jit-managed",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/host.dylib",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "e6fb763d941025e68358aee1b67f1fd288f5bbe79f18ec63fd5a4c7283fe3698",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 4]\n   at Program.Main [instruction 1]\nstatus=2 fault=2 result=-1\nJIT_RESULT {\"compileAndFinalizeSeconds\":1.3093821669999999,\"guestExitCode\":2,\"invocationSeconds\":0.00006325,\"metadataLoadSeconds\":0.72122025,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":17.698026958}\n"
+          }
+        ],
+        "jit": {
+          "compileAndFinalizeSeconds": 1.3093821669999999,
+          "guestExitCode": 2,
+          "invocationSeconds": 6.325e-05,
+          "metadataLoadSeconds": 0.72122025,
+          "profile": "macos-arm64-jit-managed-v1",
+          "selectionAndVerificationSeconds": 17.698026958
+        },
+        "files": {
+          "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int.rvn": "4926810fcca2b66db437ec48b9f44a175a1ddc053a138ece016db612fc0536de",
+          "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run.py": "f5e4d1396ae1b6326e8e1e2c6b7c0e8ecf4585046757c0f5046a07246aaa9147",
+          "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "e76abc939caa12a8b9329c0f9d27468e5807e9e7949b7124f84b637d688539cc",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ae427abc32f5cdd6a796e025da84ae51020c7cc8128817e4e68edd080ed3c18b",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "5a95e47f6a5a8b841b55788afd191c66ba8229a2c09077010be49e10888627f0",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "cda09ad78b072d7924a669106b5d58d2c88024d9e72f23cd1d5666c175c581f8",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "66283b4f4c7b6c5a47a82c783c1c32c6a8fa3209a3d5b01bd84373906232fdfb",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr": "916259e50faa34b833939602261c098426e2d1fd14f0116faccc8e727e65924c",
+          "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/compound-int/project/bin/neoclr/CompoundOperatorsRaven.dll": "8d84fbc5557579c3ed486e0ef65aa78643bcfb5a3e27bdaf96bba7186e16ea01",
+          "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/bundle.json": "1c6d173bed8b9c6b74ff7c6f496a4231d560a20485e0018e81763ac4f69154f9"
+        }
+      }
+    },
+    {
+      "name": "increment-byte",
+      "source": "class Program {\n    static func Overflow(a: byte) {\n        var value = a\n        checked(value++)\n    }\n    static func Main() -> int {\n        Overflow((byte)255)\n        return 42\n    }\n}\n",
+      "result": {
+        "passed": true,
+        "commands": [
+          {
+            "label": "compile",
+            "command": [
+              "dotnet",
+              "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+              "neoclr",
+              "--project",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/project/App.rvnproj"
+            ],
+            "exitCode": 0,
+            "logSha256": "ad85ed66de172234ea6820fc9f02e7313461566c5c8a18147414935a4ab500eb",
+            "output": "Native build output: /Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/project/bin/neoclr/CompoundOperatorsRaven.dll\n"
+          },
+          {
+            "label": "interpreter",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr",
+              "run",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "--execution",
+              "interpreter",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Web.dll"
+            ],
+            "exitCode": 1,
+            "logSha256": "495e4faa8e6d3a497964b8ddaffb41298000fd0dfa63ccb80f6282c3cee3b73b",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4F766572666C6F77 [instruction 10]\n   at NeoMetadata_38BDB3E8597E7E16D88533DF565D429890BAA51974E3445447DF34A379FEFF08.T__50726F6772616D.M_4D61696E [instruction 2]\n"
+          },
+          {
+            "label": "aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/app.o",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "000d915acad4e8a7b8dea682a798e52410f8c850c2a7c5590e21b616a3e4d254",
+            "output": "(selection manifest in local aot.log)"
+          },
+          {
+            "label": "link-aot",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-fsanitize=undefined,bounds",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/app.o",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/app"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "execute-aot",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/app"
+            ],
+            "exitCode": 2,
+            "logSha256": "68d97c841258c1ca4ef8ab213dd1aacf023bb9ebf24d5ca2c550e5534f7a2669",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 10]\n   at Program.Main [instruction 2]\nstatus=2 fault=2 result=-1\n"
+          },
+          {
+            "label": "link-jit",
+            "command": [
+              "clang",
+              "-isysroot",
+              "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+              "-arch",
+              "arm64",
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-I",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+              "-DNEOCLR_NATIVE_GC",
+              "-DJIT_HOST",
+              "-dynamiclib",
+              "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+              "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+              "-o",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/host.dylib"
+            ],
+            "exitCode": 0,
+            "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "output": ""
+          },
+          {
+            "label": "jit",
+            "command": [
+              "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+              "--jit-managed",
+              "--closed-world",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/project/bin/neoclr/CompoundOperatorsRaven.dll",
+              "@entry",
+              "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/host.dylib",
+              "--system",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.runtime.neox",
+              "--object-root",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Runtime.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Data.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Networking.dll",
+              "--module",
+              "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/System.Web.dll",
+              "--compile-system",
+              "--reference-arena",
+              "--bind-user-fault",
+              "--native-gc",
+              "--native-stack-budget"
+            ],
+            "exitCode": 0,
+            "logSha256": "b3436993c08598d00bde10b31230942380c0c251e477b2af5c4c09449f4a7d57",
+            "output": "ArithmeticOverflow: Arithmetic overflow\n   at Program.Overflow [instruction 10]\n   at Program.Main [instruction 2]\nstatus=2 fault=2 result=-1\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.370310083,\"guestExitCode\":2,\"invocationSeconds\":0.000054917,\"metadataLoadSeconds\":0.630947042,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":15.627965209}\n"
+          }
+        ],
+        "jit": {
+          "compileAndFinalizeSeconds": 0.370310083,
+          "guestExitCode": 2,
+          "invocationSeconds": 5.4917e-05,
+          "metadataLoadSeconds": 0.630947042,
+          "profile": "macos-arm64-jit-managed-v1",
+          "selectionAndVerificationSeconds": 15.627965209
+        },
+        "files": {
+          "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte.rvn": "7cd696eb1ac719f1909e75fb1d720e281f12c73a2468bab21843df35d60c80d9",
+          "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run.py": "f5e4d1396ae1b6326e8e1e2c6b7c0e8ecf4585046757c0f5046a07246aaa9147",
+          "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "e76abc939caa12a8b9329c0f9d27468e5807e9e7949b7124f84b637d688539cc",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ae427abc32f5cdd6a796e025da84ae51020c7cc8128817e4e68edd080ed3c18b",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "5a95e47f6a5a8b841b55788afd191c66ba8229a2c09077010be49e10888627f0",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "cda09ad78b072d7924a669106b5d58d2c88024d9e72f23cd1d5666c175c581f8",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "66283b4f4c7b6c5a47a82c783c1c32c6a8fa3209a3d5b01bd84373906232fdfb",
+          "/Users/robert/Projects/neoclr/target/debug/neoclr": "916259e50faa34b833939602261c098426e2d1fd14f0116faccc8e727e65924c",
+          "/Users/robert/Projects/neoclr/target/checked-mutation-overflows-final-20261016/increment-byte/project/bin/neoclr/CompoundOperatorsRaven.dll": "8f60a5cb83b65cd15b9acce28292b6c4977f852a6b9e4f4d544b15ec5bd0aebd",
+          "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/bundle.json": "1c6d173bed8b9c6b74ff7c6f496a4231d560a20485e0018e81763ac4f69154f9"
+        }
+      }
+    }
+  ]
+}

@@ -12,6 +12,7 @@ parser.add_argument('--output', type=Path, required=True)
 mode = parser.add_mutually_exclusive_group()
 mode.add_argument('--unary', action='store_true', help='Qualify signed int/long unary negation instead of the binary matrix')
 mode.add_argument('--conversions', action='store_true', help='Qualify narrowing, unsigned-source and floating conversions')
+mode.add_argument('--mutations', action='store_true', help='Qualify compound arithmetic and increment narrowing overflow')
 args = parser.parse_args()
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=False)
@@ -31,6 +32,9 @@ if args.conversions:
     cases = [('narrow-byte', 'int', 'byte', '256', None),
              ('unsigned-to-signed', 'uint', 'int', '(uint)4294967295L', None),
              ('floating-to-int', 'double', 'int', '2147483648.0', None)]
+if args.mutations:
+    cases = [('compound-int', 'int', '+= 1', '2147483647', None),
+             ('increment-byte', 'byte', '++', '(byte)255', None)]
 reports = []
 for name, kind, operator, left, right in cases:
     source = output / (name + '.rvn')
@@ -40,14 +44,27 @@ for name, kind, operator, left, right in cases:
     if args.conversions:
         expression = f'({result_type})a'
     arguments = f'{left}, {right}' if right is not None else left
-    source.write_text(f'''class Program {{
+    source_text = f'''class Program {{
     static func Overflow({parameters}) -> {result_type} => checked({expression})
     static func Main() -> int {{
         let result = Overflow({arguments})
         return 42
     }}
 }}
-''')
+'''
+    if args.mutations:
+        source_text = f'''class Program {{
+    static func Overflow(a: {kind}) {{
+        var value = a
+        checked(value{operator})
+    }}
+    static func Main() -> int {{
+        Overflow({left})
+        return 42
+    }}
+}}
+'''
+    source.write_text(source_text)
     subprocess.run(['python3', str(runner), '--compiler', str(args.compiler),
                     '--bundle', str(args.bundle), '--output', str(output / name),
                     '--source', str(source), '--overflow'], check=True)

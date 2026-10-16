@@ -54,7 +54,7 @@ consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-on
 Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
 zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
 postfix mutation; consumed postfix uses the static overload. Checked mutation
-operators and extension/interface forms remain follow-up work. Paired `true`/`false` overloads
+selects the corresponding checked overload; extension/interface forms remain follow-up work. Paired `true`/`false` overloads
 support conditions and short-circuit logical operations through `&`/`|`, following
 .NET conventions. Direct `&&`/`||` overload declarations are not supported.
 The shared operator sample also checks arithmetic, bitwise, shifts, comparisons,
@@ -64,16 +64,17 @@ provides nominal arithmetic capabilities for constrained generic algorithms.
 Checked operator declarations (`func checked`) export distinct standard method
 names and require a matching ordinary declaration. Development checked expressions
 use `checked(...)` / `unchecked(...)` for integer binary addition, subtraction
-and multiplication, signed unary negation, and numeric casts. Checked unary/binary
+and multiplication, signed unary negation, numeric casts, compound assignments
+and increment/decrement. Checked unary/binary
 operators and explicit conversions follow .NET overload-selection conventions.
 The nearest context wins; a method's body is not implicitly checked merely because
 it declares a checked operator.
 
 The same consumer is qualified on .NET 11 and native interpreter/JIT/AOT. Native
 arithmetic overflow is a terminal fault; .NET uses OverflowException. Checked
-blocks, nullable/pointer conversions, mutation operators and lifted arithmetic
+blocks, nullable/pointer conversions and mutations, and lifted arithmetic
 remain compiler gaps, with explicit diagnostics for unimplemented checked operations. See the
-[qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-conversions).
+[qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-mutation).
 
 <a id="targets"></a>
 

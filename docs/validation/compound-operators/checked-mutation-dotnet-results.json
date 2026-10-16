@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedMutation.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/checked-mutation-dotnet-consumer-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "10c4c55dfd9ccc48f2f8adbae12c0bea3fb5d68cab0553d5ae239ba839860ee0"
+    },
+    {
+      "label": "execute",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/checked-mutation-dotnet-consumer-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedMutation.rvn": "1f72fd4ecf404b2dc9f481db061a620b8199a8d2dc43bfca063900e4b757e880",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-dotnet.py": "9a26b57b6262443bfbbcb040ba2006e5f3027f097d9eb0690f0b38ae3908650c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "a33a46ae983e7475228b027ded803c9dce3e7f68887bd148d5b608fed542387c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "e51801d10cfd6b49b9e9447f05c62ed3fd458864b2580ae693a34dbdc22cd0ff",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll": "cca6f73a30d293f5c50660a710752333507a72a6b33a1054961171c38374dca1",
+    "/Users/robert/Projects/neoclr/target/checked-mutation-dotnet-consumer-20261016/OperatorMatrix.dll": "290be4002d1ac47eb3bc9ee5b87a94bbf0d5a97323c41a5a5d24f30421cdd8f0"
+  }
+}

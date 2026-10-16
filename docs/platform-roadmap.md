@@ -5056,8 +5056,8 @@ called methods. Checked binary candidates are resolved first, with ordinary
 fallback only if none applies; ambiguity remains an error. The compiler owns this
 lookup; the SDK/runtime own checked instruction validation and execution.
 
-Checked blocks, constant arithmetic evaluation, mutation operators, nullable/pointer
-conversions, lifted arithmetic and checked binary expression trees remain gaps.
+Checked blocks, constant arithmetic evaluation, nullable/pointer
+conversions and mutations, lifted arithmetic and checked binary expression trees remain gaps.
 Unsupported checked operations receive RAV0373 rather than silently executing
 unchecked. Numeric casts and signed unary negation are supported. Existing native
 primitive admission limits are unchanged.
@@ -5065,8 +5065,8 @@ Broader structural work remains parked.
 
 See [the reproducible compiler qualification](validation/compound-operators/README.md#checked-expression-follow-up)
 for matched compiler revisions, bundle, source and backend evidence. The next
-bounded compiler slice is checked mutation, followed by block contexts and
-compile-time overflow evaluation.
+bounded compiler slice is block contexts, followed by compile-time overflow
+evaluation. Checked mutation qualification is recorded below.
 
 
 ### Checked unary negation follow-up (2026-10-16)
@@ -5082,7 +5082,7 @@ operations. The .NET compiler also maps checked unary expression trees to
 
 The [operator qualification](validation/compound-operators/README.md#checked-unary-follow-up)
 records the matching builds, tests, standalone consumer and minimum-value overflow
-checks. Unary negation and numeric conversions are supported; mutations, blocks,
+checks. Unary negation, numeric conversions and checked mutations are supported; blocks,
 constant evaluation and checked binary expression trees remain gaps.
 Broader structural work stays parked.
 
@@ -5121,3 +5121,13 @@ existing checked instructions, and imported checked conversion symbols retain
 conversion classification. [Evidence](validation/compound-operators/README.md#checked-conversions)
 covers .NET, interpreter/JIT/AOT, separate-provider selection and narrowing,
 unsigned-source and floating overflow faults. Recoverable arithmetic remains separate.
+
+
+**Checked mutation compiler slice (2026-10-16):** Raven main `9dd7ea722` implements
+checked compound assignments and increment/decrement, checked overload selection,
+small-integer write-back and single evaluation of mutation locations. The native
+carry `a72b1b24c` passes interpreter/JIT/AOT success and overflow probes using
+existing checked instructions and terminal faults. See
+[qualification](validation/compound-operators/README.md#checked-mutation).
+The next compiler gaps are checked block contexts and constant evaluation; broader
+structural work remains parked. This bounded task does not reprioritize the roadmap.

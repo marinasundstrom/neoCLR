@@ -98,3 +98,17 @@ conversion result types compete. .NET emits standard conversion operations;
 NeoCLR maps the same intent to existing terminal-fault instructions. Safe arithmetic
 methods and their Result contracts remain independent. See the
 [qualification](../validation/compound-operators/README.md#checked-conversions).
+
+## Checked mutation
+
+Raven carries checked context through compound assignment and increment/decrement.
+As on .NET, built-in overflow prevents the store; native execution reports terminal
+ArithmeticOverflow. User-defined bodies retain their own semantics and are not
+made transactional by checked lookup. Reference receivers and indices are captured
+before read/modify/write; value storage is retained rather than copied. The native
+path reuses checked arithmetic and conversion instructions, with ordinary calls for
+selected overloads. This adds no metadata encoding or recoverable API.
+
+See [checked mutation qualification](../validation/compound-operators/README.md#checked-mutation).
+Nullable/pointer checked mutation, block contexts and compile-time overflow
+remain compiler gaps, not deliberate platform divergences.
