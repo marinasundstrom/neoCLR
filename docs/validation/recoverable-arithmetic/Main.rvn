@@ -1,0 +1,86 @@
+import System.*
+import System.Result.*
+
+// Source-local prototype; not a new System API.
+union ArithmeticError {
+    case Overflow
+}
+
+class SafeArithmetic {
+    static func Add(left: int, right: int) -> Result<int, ArithmeticError> {
+        if right > 0 && left > 2147483647 - right {
+            return Error(ArithmeticError.Overflow())
+        }
+        if right < 0 && left < -2147483648 - right {
+            return Error(ArithmeticError.Overflow())
+        }
+        return Ok(left + right)
+    }
+}
+
+class Probe {
+    private var calls = 0
+    val Calls: int => calls
+
+    func Next(value: int) -> int {
+        calls += 1
+        return value
+    }
+}
+
+class Program {
+    static func Check(left: int, right: int) -> bool {
+        // Independent widened oracle: every sum of two int values fits in long.
+        let expected = (long)left + (long)right
+        let result = SafeArithmetic.Add(left, right)
+        if expected < -2147483648L || expected > 2147483647L {
+            if result is Error(let error) {
+                return error is ArithmeticError.Overflow
+            }
+            return false
+        }
+        if result is Ok(let value) {
+            return (long)value == expected
+        }
+        return false
+    }
+
+    static func Main() -> int {
+        let values: int[] = [-2147483648, -2147483647, -1073741824, -1, 0, 1, 1073741824, 2147483646, 2147483647]
+        var i = 0
+        while i < values.Length {
+            var j = 0
+            while j < values.Length {
+                if !Check(values[i], values[j]) {
+                    return 1
+                }
+                j += 1
+            }
+            i += 1
+        }
+        let probe = Probe()
+        let failed = SafeArithmetic.Add(probe.Next(2147483647), probe.Next(1))
+        if failed is not Error(_) || probe.Calls != 2 {
+            return 2
+        }
+        // Failure is an ordinary value: execution continues and a later call succeeds.
+        if SafeArithmetic.Add(probe.Next(40), probe.Next(2)) is Ok(let value) {
+            if value != 42 || probe.Calls != 4 {
+                return 3
+            }
+        } else {
+            return 4
+        }
+        // Existing public API demonstrates the same contract for division.
+        if Int32.Divide(1, 0) is not Error(IntegerDivisionError.DivisionByZero) {
+            return 5
+        }
+        if Int32.Divide(-2147483648, -1) is not Error(IntegerDivisionError.Overflow) {
+            return 6
+        }
+        if Int32.Divide(84, 2) is Ok(let value) {
+            return value
+        }
+        return 7
+    }
+}

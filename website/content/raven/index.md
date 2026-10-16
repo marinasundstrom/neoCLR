@@ -146,3 +146,7 @@ unfinished.
 Recoverable arithmetic methods are being considered separately from terminal
 native checked faults. Option/Result API shapes remain design work; the current
 checked expression support does not provide recoverable errors.
+
+A source-local integer addition experiment now exercises recoverable overflow
+through nominal Result values. This is an API-design prototype, not a new System
+arithmetic API; existing Int32.Divide already provides recoverable division errors.

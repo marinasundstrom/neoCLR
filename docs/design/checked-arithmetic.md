@@ -1,6 +1,6 @@
 # Recoverable arithmetic and checked contexts
 
-Status: research and assistant recommendation, 2026-10-16. Public API names,
+Status: research and source-local prototype, 2026-10-16. Public API names,
 error shape and capability interfaces are not decided or implemented.
 
 ## Current behavior and .NET comparison
@@ -59,3 +59,28 @@ Conversion work also needs NaN, infinity and truncation rules. Compare performan
 of successful and failed recoverable operations against explicit prechecks and
 existing faulting operations; do not benchmark terminal failures as recovery.
 Use ordinary nominal library unions; broader structural work stays parked.
+
+## Author clarification and first prototype
+
+The author confirmed the analogy with indexing: a direct indexer may fault, while
+an explicit safe method returns a recoverable result. This establishes the policy
+separation, without deciding every arithmetic method name or error type.
+
+Existing `System.Int32.Divide` already returns Result<int, IntegerDivisionError>,
+checking zero and minimum/-1 before division. Reuse that precedent when reviewing
+a permanent arithmetic family rather than adding a competing division API.
+
+The [source-local addition prototype](../validation/recoverable-arithmetic/README.md)
+uses nominal Result<int, ArithmeticError> and two sign-dependent bounds checks.
+For positive right operands, MAX-right is representable; for negative right
+operands, MIN-right is representable. Only a proven in-range sum reaches addition.
+This avoids wider production arithmetic and terminal overflow operations, and
+would generalize to signed widths without needing a wider primitive type.
+The test oracle deliberately uses widened arithmetic independently.
+
+No public System type or method is added. Naming, harmonizing IntegerDivisionError,
+unsigned operations, other widths/operators and optimized nonfaulting intrinsics
+remain follow-ups. Before adoption, measure result construction and branch costs;
+the disassembly contains nominal constructors and is not evidence of zero heap
+allocation or optimized machine-overflow-flag use. No .NET compiler semantics or
+Runtime Contract configuration changes are needed for this experiment.

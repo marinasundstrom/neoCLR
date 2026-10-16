@@ -18515,3 +18515,16 @@ remain open. This is implementation of the earlier platform convention direction
   Recorded [research and proposed validation](design/checked-arithmetic.md).
   Recoverable arithmetic methods have not been implemented; no author acceptance
   of a specific API is inferred. Structural work remains parked.
+
+
+### Follow-up — indexing analogy and executable arithmetic prototype
+
+- Author: “Exactly, we have the same distinction with indexing with indexer vs method”.
+  This confirms faulting direct operations versus explicit recoverable methods;
+  it does not finalize arithmetic names or generic capability interfaces.
+- Assistant action: found the existing Result-returning Int32.Divide precedent,
+  implemented a source-local signed Int32 addition prototype using bounds checks,
+  and added boundary, single-evaluation and post-failure continuation checks.
+  [Validation and remaining scope](validation/recoverable-arithmetic/README.md)
+  distinguish the prototype from a public class-library API. Broader structural
+  work remains parked.

@@ -5092,3 +5092,11 @@ checks pass. The author's exception-free recovery question is recorded in the
 [recoverable arithmetic proposal](design/checked-arithmetic.md). This is design
 work alongside compiler completion, not an implemented API or a permanent roadmap
 reprioritization.
+
+
+Recoverable arithmetic follow-up (2026-10-16): the author confirmed the same
+safe-method/faulting-operation distinction used by slicing and indexing. A
+[source-local addition prototype](validation/recoverable-arithmetic/README.md)
+checks this policy using existing nominal Result and the existing safe Int32.Divide
+API. Public numeric API adoption and performance qualification remain pending;
+this does not unblock or reprioritize broader structural work.
