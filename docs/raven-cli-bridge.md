@@ -11224,3 +11224,16 @@ qualification remains pending. Raven emission and Runtime Contract are unchanged
 Static-owner ordinary tokens are now accepted as metadata identity without allowing
 static types in value storage. The focused token test passes interpreter/JIT and AOT
 emission and rejects a static local. Full consumer qualification is still pending.
+
+### Qualified native generic discovery (2026-10-16)
+
+The original Raven consumer now passes interpreter/AOT/managed-JIT execution,
+including assembly/module definition identity, namespace filtering, all three
+variance states and indexed/sequence generic argument parity. See the
+[runner and evidence](validation/interface-variance/introspection/README.md), using
+bundle `variance-argument-sequence-20261016` built with Raven `eef1ed456`. This
+supersedes the native discovery gaps recorded above. Schema-6 typeCatalogs retention
+is required; module names require moduleCatalogs. Native host fault/root/collection
+checks and AOT UBSan/bounds checks pass. No Raven lowering, source metadata, bridge
+encoding or Runtime Contract change is involved. Open member/relationship queries,
+method generic-definition discovery and intrinsic String variance remain gaps.

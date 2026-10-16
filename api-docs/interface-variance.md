@@ -26,6 +26,6 @@ remain invariant. A class may still expose a wider read-only interface through i
 explicit implementations.
 
 Inspect a declaration through [GenericParameterTypeInfo.Variance](reflection.md#generic-parameter-variance-development).
-Native intrinsic String materialization and native open-definition reflection
-remain documented implementation gaps. The annotations do not imply support for
-those missing operations.
+Native open-definition discovery supports explicitly retained type catalogs; open
+member/relationship queries and intrinsic String variance materialization remain
+implementation gaps. Annotations do not imply support for those missing operations.

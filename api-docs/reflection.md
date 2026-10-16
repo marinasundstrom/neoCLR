@@ -168,10 +168,15 @@ output-argument convention and does not mean covariance.
 
 This follows .NET's placement of variance on generic parameter metadata, with a
 specialized descriptor and enum instead of the combined GenericParameterAttributes
-flags. It does not add method generic-definition discovery. Open definition
-inventory is currently an interpreter reflection capability; the native closed-world
-reflection profile still requires closed types. Native interface variance execution
-is supported independently of that existing reflection restriction.
+flags. It does not add method generic-definition discovery. Development native
+assembly/module discovery supports open definitions with explicit reflection-root
+schema 6 retention: `typeCatalogs` lists exact assembly identities; the `types`,
+`moduleCatalogs` and `moduleFunctions` arrays remain required. Retain module names
+separately through `moduleCatalogs` when using GetModules. Type-catalog retention
+does not grant construction or member invocation. Unretained assemblies and foreign
+module scopes fault. Empty declared modules return empty arrays. Ordinary discovered
+types still need supported native shapes; open member and relationship queries
+remain unsupported. No Raven Runtime Contract change is required.
 
 ### Generic argument sequences (development)
 
@@ -187,5 +192,6 @@ The class-library implementation reserves one result array and fills it through
 binding for this operation. Closed nominal constructions are qualified in
 interpreter, AOT and managed JIT by the
 [consumer](https://github.com/marinasundstrom/neoclr/blob/main/docs/validation/interface-variance/introspection/closed/Main.rvn).
-Open-definition discovery remains interpreter-only. This change does not grant
-additional discovery, construction or reflective invocation rights.
+The sibling open-definition consumer qualifies declaration parameters and variance
+in interpreter, AOT and managed JIT through explicit type-catalog retention. This
+does not grant construction or reflective invocation rights.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Qualify Raven open generic discovery across interpreter, AOT and managed JIT with explicit assembly/module catalogs: all variance states, parameter identity, indexed/sequence parity, namespace filtering, closed arguments and module/assembly identity pass. Retain a reproducible runner and artifact evidence, verify native fault/GC cleanup and AOT sanitizer checks, and update website/API support guidance. Open member/relationship queries and intrinsic String variance remain gaps.
+
 - Permit ordinary native type tokens for supported static owners without admitting static values or instance receivers. A focused regression verifies token identity in interpreter/JIT and AOT emission while rejecting static local storage; this clears a token-validation blocker exposed by assembly discovery.
 
 - Bind native TypeDisplayName queries for display names and namespaces using original source identities for open definitions, generic parameters and closed types. Preserve selector faults and exact InternalCall signatures; eleven focused metadata tests pass, including interpreter/JIT execution and AOT emission.

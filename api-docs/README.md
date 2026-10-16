@@ -2191,3 +2191,15 @@ Closed sequence/indexed parity passes interpreter/AOT/JIT, open parameter varian
 passes the interpreter, and four native snapshot checks pass. Native open-definition
 discovery remains a separate implementation gap. See the
 [reference contract](reflection.md#generic-argument-sequences-development).
+
+### Native open-definition discovery qualification (2026-10-16)
+
+The retained Raven consumer now validates assembly/module open-definition discovery
+and variance in interpreter/AOT/managed JIT with schema-6 typeCatalogs retention.
+This supersedes the discovery limitations above; open member/relationship queries
+remain unsupported. Update the reflection/variance manual references and on-site
+introspection feature/namespace content. No public signature, type selection, XML
+summary or class-library input changed, so the matching reference assemblies and
+native signature snapshot remain valid. Reference fingerprint validation and all
+four native snapshot checks pass. See the
+[qualification evidence](../docs/validation/interface-variance/introspection/README.md).

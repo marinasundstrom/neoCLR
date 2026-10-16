@@ -456,3 +456,19 @@ still pass through the existing token checks rather than receiving a blanket byp
 The focused static-token regression passes interpreter and macOS ARM64 native
 execution and AOT emission, with a negative static-local-storage check. Raven
 lowering and Runtime Contract configuration are unchanged.
+
+### Native Raven discovery qualification (2026-10-16)
+
+The [open-definition consumer](../validation/interface-variance/introspection/README.md)
+now passes interpreter, AOT and managed JIT against the matching
+`variance-argument-sequence-20261016` bundle (Raven compiler `eef1ed456`). It checks
+all three variance states, parameter sequence/indexed identity, namespace filtering,
+concrete closed arguments and module/assembly definition identity. Native hosts
+verify absence of faults and GC/root cleanup; AOT uses UBSan/bounds checks. The
+runner retains commands and artifact hashes in `native-results.json`.
+
+This supersedes the discovery blockers above. Runtime support comes from native
+binding and token validation; there is no compiler workaround or new source/CLI
+encoding. Explicit type-catalog retention remains required. Open member and
+relationship operations, method generic-definition discovery and intrinsic String
+variance materialization remain gaps. Structural types remain parked.

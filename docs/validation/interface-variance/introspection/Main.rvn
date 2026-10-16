@@ -18,7 +18,9 @@ func Main() -> int {
     var invariant = 0
     var covariant = 0
     var contravariant = 0
-    for type in RuntimeContext.Current.ExecutingAssembly.GetTypes() {
+    let assembly = RuntimeContext.Current.ExecutingAssembly
+    let types = assembly.GetTypes()
+    for type in types {
         if type is NominalTypeInfo nominal && nominal.Namespace == "VarianceIntrospection" && type.GenericArgumentCount == 1 {
             let parameter = type.GetGenericArguments()[0]
             if parameter is GenericParameterTypeInfo info {
@@ -42,6 +44,28 @@ func Main() -> int {
     }
     if typeof(Fixed<int>).GetGenericArgument(0) is GenericParameterTypeInfo {
         return 4
+    }
+    var moduleTypes = 0
+    for scope in assembly.GetModules() {
+        if scope.Name == "VarianceIntrospection" {
+            for type in scope.GetTypes() {
+                if type.GenericArgumentCount == 1 {
+                    var found = false
+                    for candidate in types {
+                        if type.Equals(candidate) {
+                            found = true
+                        }
+                    }
+                    if !found {
+                        return 5
+                    }
+                    moduleTypes += 1
+                }
+            }
+        }
+    }
+    if moduleTypes != 3 {
+        return 6
     }
     return 42
 }

@@ -14,10 +14,24 @@ Build a native Raven project containing Main.rvn and importing the fresh bundle'
 artifact hashes. The runtime unit test `generic_parameter_variance_follows_declaration_identity`
 also checks the raw query contract; codegen reflection tests check closed shape queries.
 
-Native open-definition discovery is an existing reflection gap. AOT/JIT interface
-variance calls are independently qualified in the parent directory. Reified generic
-metadata remains required, matching .NET; build-time catalogues alone do not prove
-complete runtime reflection support.
+Development native discovery is qualified with explicit assembly/module retention.
+The consumer also enumerates its logical module and compares its generic definition
+identities with assembly discovery. Run on macOS ARM64:
+
+```sh
+python3 docs/validation/interface-variance/introspection/native-run.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --bundle /absolute/path/to/native-bundle \
+  --output target/open-generic-introspection
+```
+
+The runner compiles once, then executes that image in the interpreter, AOT and
+managed JIT. It writes schema-6 reflection roots retaining the exact assembly's
+type catalog and module names. The host checks faults, root cleanup and collection;
+AOT also uses undefined-behavior and bounds sanitizers. `native-results.json` records
+the matching artifact hashes and outcomes. Reified generic metadata remains
+required, matching .NET. Open generic member/relationship queries, method generic
+definition discovery and intrinsic String variance remain separate gaps.
 
 The [closed-construction consumer](closed/README.md) separately qualifies indexed
 argument queries and identity across interpreter, AOT and managed JIT.

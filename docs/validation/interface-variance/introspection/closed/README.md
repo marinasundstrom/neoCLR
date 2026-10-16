@@ -20,7 +20,6 @@ The runner compiles once and runs that image in the interpreter, AOT and managed
 JIT. The native host checks guest faults and GC/root cleanup; AOT uses undefined
 behavior and bounds sanitizers. `results.json` records artifact hashes and outcomes.
 
-The sibling open-definition consumer remains blocked in native preparation at
-`neoCLR.Runtime.AssemblyTypes: unsupported value member contract`. This narrower
-qualification must not be read as complete generic introspection support. No
-structural-type work is involved.
+The [sibling open-definition consumer](../README.md) separately qualifies explicit
+assembly/module catalog discovery. Neither consumer establishes unrestricted
+member reflection or open generic invocation. Structural work remains parked.

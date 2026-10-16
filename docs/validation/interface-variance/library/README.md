@@ -33,6 +33,6 @@ This uncovered and fixed private nominal rewrites dropping native variance proof
 tests pass on both Raven branches. The native rewrite regression passes.
 
 Reference views do not allocate adapters or convert Result payloads. Native intrinsic
-String widening remains a materialization gap, and open-definition native reflection
+String widening remains a materialization gap, and open generic member reflection
 remains a separate coverage gap. Neither changes the requirement to retain generic
 metadata or resumes structural work.

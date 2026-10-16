@@ -15,5 +15,7 @@ Development generic type parameters expose `GenericParameterTypeInfo.Variance`:
 `Invariant`, `Covariant` (`out`) or `Contravariant` (`in`). Obtain parameters from
 an open definition's generic arguments. Closed constructions expose actual argument
 types. Method `ParameterInfo.IsOut` continues to describe an output argument.
-Open-definition discovery currently uses interpreter reflection; native reflection
-continues to require closed types. See the [reflection reference](/docs/reflection.html).
+Development native discovery supports retained assembly/module type catalogs,
+including open definitions and their variance annotations. AOT/JIT require explicit
+`typeCatalogs` retention; open member/relationship queries remain unsupported.
+See the [reflection reference](/docs/reflection.html).
