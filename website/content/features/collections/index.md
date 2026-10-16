@@ -183,7 +183,8 @@ native interpreter/AOT/JIT checks, including inherited storage. Constructed gene
 bases now pass SDK CLR/interpreter/AOT/JIT checks with transitive storage and
 inherited interface dispatch. Raven now emits these owned constructed bases,
 including reordered parameters and source declarations before their bases.
-Recursive base arguments and imported constructed hierarchies remain open.
+Separate native consumers import these constructed hierarchies with complete
+inherited field offsets. Recursive source base arguments remain open.
 Raven emits generic classes over local nongeneric
 bases and imports these owners from separately compiled native libraries, retaining
 value/reference payloads and inherited storage. Generic external-base authoring

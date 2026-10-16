@@ -6,5 +6,9 @@ func Main() -> int {
     if !System.Object.ReferenceEquals(references.Get(), parent) {
         return 1
     }
-    return references.Get().Get() + view.Echo(leaf.Count)
+    leaf.Count = 3
+    if parent.Get() != 40 {
+        return 2
+    }
+    return references.Get().Get() + view.Echo(leaf.Count) - 1
 }

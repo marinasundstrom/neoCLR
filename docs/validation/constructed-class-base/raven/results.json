@@ -8,11 +8,11 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/rejected/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/rejected/App.rvnproj"
       ],
       "exitCode": 1,
-      "logSha256": "8478ca83e0aa15983d81a97e54c60310d388c9cfe19bc26612f8477537cded66",
-      "output": "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/rejected/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/rejected/Main.rvn(27,43): error RAV1503: Cannot convert from 'Base<int>' to 'Leaf'\n/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/rejected/Main.rvn(28,51): error RAV1503: Cannot convert from 'Base<int>' to 'Base<bool>'\n/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/rejected/Main.rvn(29,67): error RAV1503: Cannot convert from 'Derived<bool, int>' to 'Derived<int, int>'\n"
+      "logSha256": "54e2c6bfd6c131fbc0221cbe021801831d8aa51999ea3a6c604f8b8d6d2065aa",
+      "output": "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/rejected/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/rejected/Main.rvn(27,43): error RAV1503: Cannot convert from 'Base<int>' to 'Leaf'\n/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/rejected/Main.rvn(28,51): error RAV1503: Cannot convert from 'Base<int>' to 'Base<bool>'\n/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/rejected/Main.rvn(29,67): error RAV1503: Cannot convert from 'Derived<bool, int>' to 'Derived<int, int>'\n"
     },
     {
       "label": "recursive-base-gap",
@@ -21,11 +21,11 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/recursive/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/recursive/App.rvnproj"
       ],
       "exitCode": 1,
-      "logSha256": "4c1e818cb8d85cde6eadc56414db3c4f645308b74dcbe549fac584a2fde56e43",
-      "output": "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/RuntimeGenerator.rvn(93,5): error NEOMETA001: Native emission does not support recursive constructed base arguments require deferred base binding.\n"
+      "logSha256": "e05622cfbc8f30ed43125ea85c3c53fee5acabe41b80baa09a89ec6d30a47a26",
+      "output": "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/RuntimeAwait.rvn(98,5): error NEOMETA001: Native emission does not support recursive constructed base arguments require deferred base binding.\n"
     },
     {
       "label": "compile",
@@ -34,18 +34,18 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/App.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "6d1c0228243988792e3d0afead6dd0647dcdc372a5cdb0601e40f1bd89c249ed",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll\n/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+      "logSha256": "7a40f47184ec23a961021f3c644d4da5613cd485f534fb5680b1178a65256234",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll\n/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
         "--execution",
         "interpreter",
         "--system",
@@ -70,9 +70,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -113,14 +113,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/app"
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -129,7 +129,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/app"
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -160,7 +160,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -172,9 +172,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -194,32 +194,32 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "76538a9cef18785b4fe2b9e651c48a98f3bb1e8fac4aafead6f81253a24893db",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.487699,\"guestExitCode\":42,\"invocationSeconds\":0.000045375,\"metadataLoadSeconds\":0.598909583,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.612171541}\n"
+      "logSha256": "a9aa8c3d3c922611790714dc07d223d8883e23cd60df2f7469f4c90f38b24417",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.49311,\"guestExitCode\":42,\"invocationSeconds\":0.000058458,\"metadataLoadSeconds\":0.607506416,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.576312209}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.487699,
+    "compileAndFinalizeSeconds": 0.49311,
     "guestExitCode": 42,
-    "invocationSeconds": 4.5375e-05,
-    "metadataLoadSeconds": 0.598909583,
+    "invocationSeconds": 5.8458e-05,
+    "metadataLoadSeconds": 0.607506416,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 14.612171541
+    "selectionAndVerificationSeconds": 14.576312209
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Main.rvn": "27e76454b39ac444ef4086ef34efafd7933232579d1f0f41b9d08a8b14588df5",
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Main.rvn": "8c18a08ee482bd092ccbb4cbee81efd8e986b22be016ee6d4f47c464e31d524b",
     "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Library.rvn": "6951002c1ed26f8f4842635bb413e08bade07dfec317b022898bd40d2879b952",
     "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Rejected.rvn": "fb67673dcf51e6a9c19915dfc16adb0785210feb63e11d176d02e2338159fcbd",
     "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Recursive.rvn": "f56635306eb4aedb548587d8ed506859f20ad53a7593bff1ae579936c873190d",
     "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/run.py": "da479301a776ee7e701eca72352208c7e6a3a3ba48498c084294f5f28edb3d63",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f71f722993ca55fc801b7081818c20174ea0df7e1339599d32cde1a296dd5840",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ec7f6e2c2c53026ccf215ec0dd2b5044221022ebfcb53c3b185a23670ac5e5ca",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "fffb7f965430f2cb9cc8b120b9d324affe4c33f4a701738233324ea56ec7402b",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "9eb6834b5a908a89248d63d0d31d792daf0a6cfe6cbccebb7d9feb09b560e827",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "fcd5d638db5c9f1843ab55813e03cf3518a3287e1661565c045144ea697662e4",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "341a01f68337405de8a14f5dbb6d24b8bf3e19c0882ebc0415b9a6191c7bd5bf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "4879cffdf047435e046945566f0b4f40edcf1caee9ba5f3af0c40cf84bcddef0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "5183c2608a5507edfb8bc01ae9f7d1390b496daf44951734727f56eaed882e97",
     "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "81c91ad3fafff14430f1d95e1c1d7a22789461b0d0f5b3ca24919e3429de9f51",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
-    "/Users/robert/Projects/neoclr/target/raven-constructed-base-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll": "613ad64c6aef417c871c5a5560dad5e711394366aa0ab519e19172f99b903992",
+    "/Users/robert/Projects/neoclr/target/raven-constructed-local-final-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll": "ff1d019c61f1fd619f1c7eb1050d3615b140445360b0479ac9875f7ef7a24dc9",
     "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
   }
 }

@@ -1,0 +1,245 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile-library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/Library.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "2e4a5a39311b03bb22eecf2dc5c02d103c66678901038448ea0292b4a951d53d",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/bin/neoclr/ConstructedBaseLibrary.dll\n/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/Main.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "cbcaee08e088238e5a9875362ed5f94096a76c286378c609b73e69010620dc2c",
+      "output": "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/rejected/Main.rvn(1,43): error RAV1503: Cannot convert from 'Base<int>' to 'Leaf'\n/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/rejected/Main.rvn(2,51): error RAV1503: Cannot convert from 'Base<int>' to 'Base<bool>'\n/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/rejected/Main.rvn(3,67): error RAV1503: Cannot convert from 'Derived<bool, int>' to 'Derived<int, int>'\n"
+    },
+    {
+      "label": "recursive-base-gap",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/recursive/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "e05622cfbc8f30ed43125ea85c3c53fee5acabe41b80baa09a89ec6d30a47a26",
+      "output": "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/RuntimeAwait.rvn(98,5): error NEOMETA001: Native emission does not support recursive constructed base arguments require deferred base binding.\n"
+    },
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "550747cee551ded40052474a8274defccb4819ac50a4df7827a06ebc1f2dfecb",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/bin/neoclr/ConstructedBaseLibrary.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/bin/neoclr/ConstructedBaseLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "8c2a4f469fa246dbe2d49a88f2d7a51454c13f8d7e328c35914ddf540d20ef41",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/bin/neoclr/ConstructedBaseLibrary.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "80637dcb9485f5ea0e0e938ea60b15c9504b975b866cd36b61717f3bb008afd7",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.530566833,\"guestExitCode\":42,\"invocationSeconds\":0.000050083,\"metadataLoadSeconds\":0.650728458,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.420280542}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.530566833,
+    "guestExitCode": 42,
+    "invocationSeconds": 5.0083e-05,
+    "metadataLoadSeconds": 0.650728458,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 14.420280542
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Main.rvn": "8c18a08ee482bd092ccbb4cbee81efd8e986b22be016ee6d4f47c464e31d524b",
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Library.rvn": "6951002c1ed26f8f4842635bb413e08bade07dfec317b022898bd40d2879b952",
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Rejected.rvn": "fb67673dcf51e6a9c19915dfc16adb0785210feb63e11d176d02e2338159fcbd",
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/Recursive.rvn": "f56635306eb4aedb548587d8ed506859f20ad53a7593bff1ae579936c873190d",
+    "/Users/robert/Projects/neoclr/docs/validation/constructed-class-base/raven/run.py": "da479301a776ee7e701eca72352208c7e6a3a3ba48498c084294f5f28edb3d63",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "fcd5d638db5c9f1843ab55813e03cf3518a3287e1661565c045144ea697662e4",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "341a01f68337405de8a14f5dbb6d24b8bf3e19c0882ebc0415b9a6191c7bd5bf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "4879cffdf047435e046945566f0b4f40edcf1caee9ba5f3af0c40cf84bcddef0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "5183c2608a5507edfb8bc01ae9f7d1390b496daf44951734727f56eaed882e97",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "81c91ad3fafff14430f1d95e1c1d7a22789461b0d0f5b3ca24919e3429de9f51",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
+    "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/project/bin/neoclr/ConstructedClassBaseRaven.dll": "7c59c4b5016e8ad931314e92c00dde5eba9ac91de01104a386f6059addcbffd6",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a",
+    "/Users/robert/Projects/neoclr/target/raven-constructed-import-20261016/library/bin/neoclr/ConstructedBaseLibrary.dll": "1a6922504e646ea8c7be5fb10e35eb00476609d6abb2c7c1efbca393d92ce824"
+  }
+}

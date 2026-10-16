@@ -9460,4 +9460,6 @@ limits remain in force.
 The executable fixture in `docs/validation/constructed-class-base` covers reordered
 parameters, a closed leaf over a generic intermediate base, integer/reference
 storage, nominal upcasts, inherited generic interfaces and rejection boundaries.
-Raven emission of constructed bases remains the next integration step.
+Raven's neoCLR adapter now emits owned constructed bases and imports those
+hierarchies from native dependencies. External constructed base authoring,
+recursive source base binding and generic class virtual slots remain gaps.
