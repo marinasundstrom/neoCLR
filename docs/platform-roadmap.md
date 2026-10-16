@@ -4859,3 +4859,8 @@ reference-only interface variance. The author explicitly postponed both Sliceabl
 and Result variance on 2026-10-16; neither is an acceptance gate for this bounded
 feature. Result-value widening and Sliceable adapters are deferred. Read-only producer/comparison interfaces opt into variance; mutable contracts, Result and Sliceable remain invariant. This does not resume
 structural-type work or change unrelated milestone priorities.
+
+**Recursive generic base authoring (2026-10-16):** SDK deferred base binding now
+passes CLR/interpreter/AOT/JIT self-reference storage checks and rejects actual
+inheritance cycles. See [retained evidence](validation/constructed-class-base/README.md).
+Raven integration and external constructed base authoring remain next steps.

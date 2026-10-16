@@ -190,3 +190,7 @@ bases and imports these owners from separately compiled native libraries, retain
 value/reference payloads and inherited storage. Generic external-base authoring
 remains open. Native base-constructor expressions support scalar constants and
 arithmetic; helper calls and control flow remain backend gaps.
+
+Development SDK authoring also supports recursive nominal base arguments such as
+`Node : Base<Node>` through deferred base binding. Actual inheritance cycles remain
+invalid. CLR/interpreter/AOT/JIT storage checks pass; Raven wiring is a separate step.

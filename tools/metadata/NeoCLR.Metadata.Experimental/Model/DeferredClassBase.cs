@@ -1,0 +1,26 @@
+namespace NeoCLR.Metadata.Experimental.Model;
+
+public sealed partial class TypeBuilder
+{
+    /// <summary>Binds an owned constructed base after declaring this class identity, before authoring its members.</summary>
+    /// <param name="baseType">A nonsealed top-level class construction in this assembly, with arguments scoped to this declaration.</param>
+    /// <remarks>Allows recursive arguments such as Node : Base&lt;Node&gt;. The direct inheritance chain must remain acyclic.
+    /// Only an ordinary top-level root class can be bound, once; an existing explicit base cannot be replaced.</remarks>
+    /// <exception cref="ArgumentException">Foreign, sealed, nonclass, cyclic or incorrectly scoped base.</exception>
+    /// <exception cref="InvalidOperationException">This owner is unsupported, already has an explicit base, or has members.</exception>
+    public void SetBaseType(GenericTypeInstance baseType)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (IsStatic || IsInterface || IsValueType || IsNativeObjectRoot || NativePrimitive is not null || NativeGrapheme ||
+            Definition.DeclaringType is not null || IsClosedHierarchy || HasExplicitClassBase ||
+            Methods.Count != 0 || Fields.Count != 0 || StaticFields.Count != 0)
+            throw new InvalidOperationException("deferred base binding requires a top-level root class before its members");
+        var parent = baseType.Definition;
+        if (!ReferenceEquals(parent.Assembly, Assembly) || parent.IsStatic || parent.IsInterface || parent.IsValueType ||
+            parent.NativePrimitive is not null || parent.NativeGrapheme || parent.Definition.DeclaringType is not null ||
+            (parent.Definition.Attributes & 0x100) != 0 || ReferenceEquals(parent, this) || parent.DerivesFrom(this))
+            throw new ArgumentException("constructed base requires an owned nonsealed class and an acyclic inheritance chain", nameof(baseType));
+        ((SignatureType)baseType).ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
+        Definition.BindConstructedBase(baseType);
+    }
+}

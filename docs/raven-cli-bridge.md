@@ -11559,3 +11559,21 @@ Both consumers return 42 in interpreter, AOT and managed JIT against
 `variance-argument-sequence-20261016`; native cleanup, AOT sanitizers, conversion
 rejections and recursive-base diagnostics pass. The retained local/imported
 reports include compiler, adapter, SDK, dependency and runtime hashes.
+
+### Deferred constructed base binding (2026-10-16)
+
+`TypeBuilder.SetBaseType(GenericTypeInstance baseType)` binds an owned constructed
+base after a root class identity is declared and before its fields or methods.
+This supports `Node : Base<Node>` without erasing or replacing generic arguments.
+The owner must be an ordinary top-level root class; binding an explicit base twice
+or binding after members throws `InvalidOperationException`. Foreign, sealed,
+nonclass, out-of-scope and cyclic base-definition edges throw `ArgumentException`
+before mutation. Type-argument recursion is allowed; inheritance cycles are not.
+
+The SDK fixture in `docs/validation/constructed-class-base` executes an inherited
+self-reference field and derived field through a recursive base, alongside the
+existing reordered generic hierarchy. CLR, interpreter, AOT and managed JIT return
+42; native cleanup/sanitizers and all 178 SDK contracts pass. This follows the CLR
+model of recursive nominal generic signatures. Encoding, Runtime Contracts and
+ABI are unchanged; no structural features are enabled. Raven integration and
+external constructed base authoring are separate next slices.

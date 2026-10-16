@@ -119,7 +119,12 @@ public sealed partial class TypeDefinition
     public bool IsClosedHierarchy => Producer is null && Module is not null && !Module.Assembly.IsNative
         ? throw new NotSupportedException("CLI closed-family attributes are not materialized") : closedHierarchy;
     private TypeReference? authoredBaseType;
-    internal SignatureType? AuthoredBaseSignature { get; init; }
+    internal SignatureType? AuthoredBaseSignature { get; set; }
+    internal void BindConstructedBase(GenericTypeInstance baseType)
+    {
+        authoredBaseType = baseType.Definition.Definition.ToReference();
+        AuthoredBaseSignature = baseType;
+    }
     /// <summary>Gets the nominal base signature, preserving native generic arguments in declaration scope.</summary>
     /// <remarks>Native local and explicitly bound external constructed bases retain exact signature identity.
     /// CLI bases are not yet materialized. Null means no recorded native/authored base.</remarks>
