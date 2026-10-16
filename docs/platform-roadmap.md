@@ -4979,3 +4979,7 @@ pass. See the linked qualification record. The author clarified that NeoCLR
 operator work is intended to support the System.Numerics interfaces; nominal
 capability contracts and their generic dispatch remain the next layer, not an
 implicit consequence of supporting an operator spelling.
+
+Instance increment slice: Raven main `94f133cab`, native `a28fe52ed`, with 231/233
+focused tests and native interpreter/JIT/AOT success. Prefix and postfix selection
+follow .NET conventions; checked and declaration-modifier support remain open.

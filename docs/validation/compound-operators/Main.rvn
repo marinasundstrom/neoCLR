@@ -10,6 +10,14 @@ class Counter {
     func >>=(count: int) { Value = Value >> count }
     func >>>=(count: int) { Value = Value >>> count }
 
+    func ++() { Value = Value + 1 }
+    func --() { Value = Value - 1 }
+    static func ++(value: Counter) -> Counter {
+        let result = Counter()
+        result.Value = value.Value + 2
+        return result
+    }
+
     static func +(left: Counter, right: int) -> Counter => Counter()
 }
 
@@ -19,6 +27,9 @@ struct ValueCounter {
     func +=(amount: int) {
         Value = Value + amount
     }
+
+    func ++() { Value = Value + 1 }
+    func --() { Value = Value - 1 }
 }
 
 class IndexCounter {
@@ -78,6 +89,22 @@ class Program {
         if wide != 11 {
             return 6
         }
+
+        var increment = Counter()
+        increment++
+        let prefixed = ++increment
+        if prefixed.Value != 2 || increment.Value != 2 { return 7 }
+        let old = increment++
+        if old.Value != 2 || increment.Value != 4 { return 8 }
+        increment--
+        if increment.Value != 3 { return 9 }
+
+        var number = ValueCounter()
+        number++
+        let updated = ++number
+        if updated.Value != 2 || number.Value != 2 { return 10 }
+        number--
+        if number.Value != 1 { return 11 }
 
         return alias.Value + value.Value + values[0].Value
     }

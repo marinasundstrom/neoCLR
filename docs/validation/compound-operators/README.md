@@ -54,7 +54,7 @@ install or publish a bundle.
 ## Remaining boundaries
 
 Checked forms, compound extension/interface/virtual declarations, instance
-increment/decrement are follow-up work. Native imported-library compound calls and other architectures are not
+declaration modifiers are follow-up work. Native imported-library compound calls and other architectures are not
 claimed by this fixture. The SDK is a host API documented in the
 [manual reference](../../../api-docs/experimental-metadata.md#managed-array-element-addresses-development-2026-10-16);
 no Raven class-library API or reference snapshot changed.
@@ -74,3 +74,17 @@ The .NET target follows .NET metadata conventions. NeoCLR uses those names for
 this slice too; purposeful nominal capability contracts remain separate. The
 author intends this operator work to support System.Numerics interfaces on
 NeoCLR next. Implementing a plus operator alone does not make a type numeric.
+
+## Instance increment follow-up
+
+Raven main `94f133cab`, native carry `a28fe52ed`: parameterless `func ++()` /
+`func --()` mutate writable variables. Prefix returns the updated value; discarded
+postfix prefers the instance method, while consumed postfix uses the static
+overload. Property/indexer access remains static-plus-setter. Standard CLI names
+are `op_IncrementAssignment` and `op_DecrementAssignment`; native dispatch uses
+ordinary calls. No Runtime Contract switch or runtime opcode is added.
+
+231 focused main tests and 233 native-line tests pass. `increment-results.json`
+records interpreter/JIT/AOT return 42 with class/struct prefix values, discarded
+postfix mutation and consumed-postfix fallback. Existing array-allocation limits
+remain unchanged.

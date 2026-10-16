@@ -52,7 +52,8 @@ Development Raven also supports explicit in-place compound operators such as
 mutate value storage. The current native class, struct-local and reference-array
 consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-only.
 Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
-zero-filling `>>>` are also qualified on those backends. Checked and
+zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
+postfix mutation; consumed postfix uses the static overload. Checked and
 extension/interface forms remain follow-up work. Nominal System.Numerics
 capabilities are a future layer over this operator support.
 

@@ -12171,3 +12171,10 @@ Contract setting or runtime opcode is introduced. Raven owns parsing/binding
 and lowering; existing runtime backends execute the operations. The expanded
 [consumer](validation/compound-operators/README.md#remaindershift-follow-up) passes
 interpreter, macOS ARM64 JIT and AOT; exact hashes are in `shift-results.json`.
+
+Instance increment follow-up: Raven main `94f133cab`, native `a28fe52ed`, qualifies
+`op_IncrementAssignment` and `op_DecrementAssignment` ordinary instance calls.
+Prefix capture/writeback and postfix result selection belong to Raven; there is
+no new temporary encoding, Runtime Contract flag or runtime instruction.
+The [consumer record](validation/compound-operators/README.md#instance-increment-follow-up)
+includes interpreter/JIT/AOT evidence and existing boundaries.
