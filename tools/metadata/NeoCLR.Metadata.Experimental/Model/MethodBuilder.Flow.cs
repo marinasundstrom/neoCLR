@@ -103,7 +103,7 @@ public sealed partial class MethodBuilder
                     (type.GenericInstance is not null || type.ImportedType?.TypeArguments.Count > 0) && stack[^1].ReferenceSignature is { } actualReference &&
                     type.ReferenceSignature is { } targetReference && Assembly.HasVariantReferenceConversion(actualReference, targetReference);
                 var constructedConformance = stack.Count > 0 && stack[^1].GenericInstance is { } instance &&
-                    (type.Class is { IsNativeObjectRoot: true } root && instance.Definition.DerivesFrom(root) ||
+                    (type.Class is { IsInterface: false, IsValueType: false } root && instance.Definition.DerivesFrom(root) ||
                      type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
                      type.GenericInstance is { Definition.IsInterface: true } interfaceInstance && instance.ConformsTo(interfaceInstance) ||
                      type.ImportedType is { } externalInterface && instance.ConformsTo(externalInterface));

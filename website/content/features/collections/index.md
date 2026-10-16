@@ -177,3 +177,8 @@ Generic dependency ancestry substitution is implemented in the metadata SDK and
 validated against CLR behavior. Local native generic base signatures and host introspection are now preserved;
 external constructed bases are supported by host introspection too. Layout
 authoring and Raven execution still need completion; this is not yet an end-to-end supported feature.
+
+SDK-authored generic classes over ordinary nongeneric bases now pass CLR and
+native interpreter/AOT/JIT checks, including inherited storage. Constructed generic
+bases and Raven hierarchy emission still need completion; computed native base
+constructor arguments remain a backend gap.

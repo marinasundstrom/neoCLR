@@ -714,3 +714,23 @@ rejection. Variance/introspection regressions also pass. Native class layout
 authoring and Raven eligibility/emission/executable qualification remain open;
 host metadata support does not close guest reflection gaps. Sliceable/Result
 variance and structural work remain deferred.
+
+### Generic derived class authoring over a nongeneric base (2026-10-16)
+
+The SDK now authors a top-level generic class over an owned ordinary nongeneric
+base, removing the previous Object-root-only restriction. Constructor validation
+still requires one direct base initialization before receiver use. Generic
+instances use their nominal ancestry for ordinary upcasts and reference variance.
+This is the first authoring step; constructed generic bases remain unimplemented.
+
+The executable CLR test exposed a generic field emission bug: bare FieldDef access
+left the derived field zero when inherited storage preceded it. CLI emission now
+uses the open constructed owner for generic field references. Integer and reference
+payloads preserve their storage and base upcast identity; existing generic and
+native Object-root checks pass. The native consumer is retained in
+[generic-class-base](../validation/generic-class-base/README.md).
+
+AOT also exposed its existing restriction to leading forwarded base-constructor
+arguments. The qualified native sample uses that path; constant/computed base
+arguments remain an explicit backend gap to fix. Raven generic hierarchy emission,
+constructed base authoring and guest reflection qualification remain open.

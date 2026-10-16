@@ -75,7 +75,8 @@ internal static class GenericObjectRootChecks
     {
         var restricted = new AssemblyBuilder(new("UnsupportedGenericBases", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var ordinary = restricted.AddClass("Example", "Base");
-        try { restricted.AddGenericClass("Example", "Bad", ["T"], ordinary); throw new Exception("ordinary generic base admitted"); }
+        var genericBase = restricted.AddGenericClass("Example", "GenericBase", ["T"]);
+        try { restricted.AddGenericClass("Example", "Bad", ["T"], genericBase); throw new Exception("unbound generic base admitted"); }
         catch (ArgumentException) { }
         var missing = Create();
         var constructor = missing.Types.Last().Methods.Single(m => m.IsConstructor);

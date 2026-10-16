@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Allow SDK generic classes over owned nonsealed nongeneric class bases, preserving constructor initialization checks, inherited storage and nominal upcasts/variance. Fix CLI field access on generic owners to retain their construction, preventing lost derived-field values with inherited storage. SDK/CLR regression checks and the retained interpreter/AOT/JIT consumer pass, including native cleanup/sanitizers; constructed base authoring and Raven emission remain open. AOT constant/computed base-constructor arguments remain an explicit backend gap.
+
 - Preserve external constructed class bases through arity-matched native bindings. Host metadata introspection substitutes open/closed arguments and inherits generic interfaces across exact dependency identities; local/external reader and variance regressions pass. Missing/invalid bindings and argument scope reject. Native encoding is unchanged; generic layout authoring and Raven execution remain open.
 
 - Preserve local native constructed class bases in TypeDefinition.BaseTypeSignature. Resolve open and closed BaseType views with canonical generic argument identity, and enumerate interfaces inherited through native class ancestors. Reject malformed/unsafe bases and unsupported CLI inspection/projection; SDK reader, metadata-context and constructed-interface checks pass. External generic bases, layout authoring and Raven/native execution remain open.

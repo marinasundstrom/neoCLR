@@ -9396,3 +9396,27 @@ Focused reader checks exercise open/closed identity, inherited generic interface
 round trips and invalid bindings, alongside existing local/nongeneric external
 base and metadata-introspection regressions. This is host metadata support, not a
 new guest reflection or Raven/native execution claim.
+
+## Generic class authoring over ordinary bases (development, 2026-10-16)
+
+`AssemblyBuilder.AddGenericClass(namespace, name, parameterNames, TypeBuilder
+baseType, visibility)` now accepts an owned, nonsealed, nongeneric top-level
+reference class, including the native Object root. The equivalent manually
+attached TypeDefinition is accepted. Foreign, static, value, interface, sealed
+or unbound generic bases reject. This does not yet author constructed generic
+bases or nested derived classes over ordinary bases.
+
+Derived constructors must explicitly initialize their direct base exactly once
+before field access or return. Inherited storage precedes the derived class's
+own fields. Closed instances can upcast to that base, including in covariant
+interface argument positions; class constructions themselves remain invariant.
+CLI field accesses on generic owners now encode the owner construction rather
+than using a bare FieldDef token, preserving correct field offsets with inherited
+storage. Native signatures retain the existing named base edge.
+
+SDK/CLR tests cover integer/reference storage, base initialization, upcast identity
+and existing generic-class/Object-root behavior. See the retained native consumer
+under docs/validation/generic-class-base. Generic base construction authoring and
+Raven emitter eligibility remain open. Native AOT constructor lowering currently
+requires leading forwarded base arguments; computed/constant base arguments are
+a backend gap, not an alternative to .NET semantics.

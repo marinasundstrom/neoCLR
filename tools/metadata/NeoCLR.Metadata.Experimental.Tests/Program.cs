@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--generic-class-bases"]) { GenericClassBaseChecks.Run(); GenericObjectRootChecks.Run(); GenericClassChecks.Run(); return 0; }
+
 if (args is ["--interface-variance"])
 {
     InterfaceVarianceChecks.Run();
@@ -603,6 +605,7 @@ var tests = new (string Name, Action Body)[]
     ("Native integer signatures and conversions", NativeIntegerChecks.Run),
     ("Pointer signature round trips and introspection", PointerSignatureChecks.Run),
     ("Generic class with source Object root", GenericObjectRootChecks.Run),
+    ("Generic class with ordinary base", GenericClassBaseChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
     ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),

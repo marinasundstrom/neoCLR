@@ -104,8 +104,8 @@ public sealed partial class AssemblyBuilder
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
-                if (type.LocalBase is { } parent && (!(IsOrdinaryBase(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
-                    throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
+                if (type.LocalBase is { } parent && (!(IsOrdinaryDerived(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
+                    throw new InvalidDataException("derived classes require ordinary reference owners and nongeneric bases");
             }
             ValidateValueLayouts();
             foreach (var type in types)
@@ -321,11 +321,11 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid names, visibility, duplicate type or exceeded limits.</exception>
     public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
         => AddGenericTypeCore(@namespace, name, genericParameterNames, visibility, false);
-    /// <summary>Adds a generic reference class deriving from this output's explicit native Object root.</summary>
+    /// <summary>Adds a generic reference class deriving from an owned nongeneric reference class.</summary>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Simple name without CLI arity.</param>
     /// <param name="genericParameterNames">One through 32 unique names.</param>
-    /// <param name="baseType">The attached native Object root in this output.</param>
+    /// <param name="baseType">The attached nongeneric reference base in this output.</param>
     /// <param name="visibility">Public or Internal.</param>
     /// <returns>An attached generic class; constructors must explicitly initialize the base.</returns>
     /// <exception cref="ArgumentException">Invalid owner, visibility, names or duplicate declaration.</exception>
@@ -333,8 +333,8 @@ public sealed partial class AssemblyBuilder
     public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)
     {
         ArgumentNullException.ThrowIfNull(baseType);
-        if (!ReferenceEquals(baseType.Assembly, this) || !baseType.IsNativeObjectRoot || !Enum.IsDefined(visibility))
-            throw new ArgumentException("generic local bases require this output's native Object root");
+        if (!ReferenceEquals(baseType.Assembly, this) || !IsOrdinaryBase(baseType) || (baseType.Definition.Attributes & 0x100) != 0 || !Enum.IsDefined(visibility))
+            throw new ArgumentException("generic derived classes require an owned nonsealed nongeneric reference base");
         var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u, baseType.Definition.ToReference(), genericParameterNames);
         Definition.MainModule.Types.Add(definition);
         return definition.Producer!;
@@ -817,7 +817,10 @@ public sealed partial class AssemblyBuilder
                     case "field.load":
                     case "field.store":
                         code.WriteByte(instruction.Field!.IsStatic ? (instruction.Op == "field.load" ? (byte)0x7e : (byte)0x80) : instruction.Op == "field.address" ? (byte)0x7c : instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
-                        code.WriteInt32(instruction.ConstructedField is { } fieldReference ? ConstructedFieldToken(fieldReference) : MetadataTokens.GetToken(fieldHandles[instruction.Field!])); break;
+                        code.WriteInt32(instruction.ConstructedField is { } fieldReference ? ConstructedFieldToken(fieldReference)
+                            : instruction.Field!.DeclaringType.GenericParameterNames.Count > 0
+                                ? ConstructedFieldToken(instruction.Field.MakeConstructedReference(Enumerable.Range(0, instruction.Field.DeclaringType.GenericParameterNames.Count).Select(SignatureType.TypeParameter).ToArray()))
+                                : MetadataTokens.GetToken(fieldHandles[instruction.Field])); break;
                     case "negate": code.WriteByte(0x65); break;
                     case "complement": code.WriteByte(0x66); break;
                     case "pop": code.WriteByte(0x26); break;

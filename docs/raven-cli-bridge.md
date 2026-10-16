@@ -11416,3 +11416,18 @@ Generic class-layout authoring and Raven owner eligibility/emission remain open.
 CLI inheritance projection continues to reject unsupported hierarchies rather
 than erasing arguments. This metadata slice is not Raven/native executable or
 guest reflection qualification. Sliceable/Result variance remains postponed.
+
+### Generic class authoring over ordinary bases (2026-10-16)
+
+The SDK AddGenericClass overload taking TypeBuilder now admits an owned nonsealed
+nongeneric class base, not only the native Object root. Native encoding retains
+its named base edge; Runtime Contracts are unchanged. Closed instances support
+base upcasts and interface variance through nominal ancestry. CLI field emission
+uses a constructed generic owner, fixing incorrect derived field access with
+inherited storage. Constructor validation requires explicit base initialization.
+
+SDK/CLR tests cover integer/reference fields and identity. The retained native
+consumer uses forwarded base arguments, which the AOT constructor lowerer currently
+requires. Constant/computed base arguments remain a backend gap. Raven owner
+eligibility/emission and authoring constructed generic bases still require work;
+this does not yet establish Raven source support for the hierarchy.

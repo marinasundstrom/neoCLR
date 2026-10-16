@@ -8,6 +8,7 @@ public sealed partial class AssemblyBuilder
     {
         if (source == target) return true;
         if (depth >= 64 || !Reference(source) || !Reference(target)) return false;
+        if (source.GenericInstance is { } constructed && target.ClassType is { } parent && constructed.Definition.DerivesFrom(parent)) return true;
         if (source.ClassType is { } derived && target.ClassType is { } ancestor && derived.DerivesFrom(ancestor)) return true;
         // Local subclasses retain an explicit dependency base contract. Reuse the
         // ordinary reference-conversion proof, including transitive local ancestry.
