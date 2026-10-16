@@ -13,6 +13,7 @@ parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--source', type=Path, help='Alternate focused operator consumer')
+parser.add_argument('--overflow', action='store_true', help='Expect checked arithmetic overflow and an untouched result slot on native backends')
 parser.add_argument('--value-arrays', action='store_true', help='Qualify interpreter support and the current AOT rejection for nominal value arrays')
 
 
@@ -22,7 +23,7 @@ compiler, bundle, output = (p.resolve() for p in (args.compiler, args.bundle, ar
 project = output / 'project'
 project.mkdir(parents=True, exist_ok=True)
 name = 'CompoundOperatorsRaven'
-expected = 42
+expected = 2 if args.overflow else 42
 source = args.source.resolve() if args.source else SOURCE / ('ValueArrays.rvn' if args.value_arrays else 'Main.rvn')
 host = SOURCE.parent / 'interface-variance/native-host.c'
 (project / 'Main.rvn').write_text(source.read_text())
@@ -45,7 +46,7 @@ def run(label, command, expected=0):
         output=(result.stdout + result.stderr)[:3000] if label != 'aot' else '(selection manifest in local aot.log)'))
     (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
     print(label, result.returncode, flush=True)
-    if result.returncode != expected:
+    if expected is not None and result.returncode != expected:
         raise RuntimeError(result.stdout[-3000:] + result.stderr[-3000:])
     return result
 
@@ -55,7 +56,9 @@ references = ['--system', bundle / 'System.runtime.neox', '--object-root', bundl
 for library in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
     references += ['--module', bundle / (library + '.dll')]
 interpreter = [ROOT / 'target/debug/neoclr', 'run', image, '--execution', 'interpreter', *references]
-interpreted = run('interpreter', interpreter, 42)
+interpreted = run('interpreter', interpreter, None if args.overflow else 42)
+if args.overflow:
+    assert interpreted.returncode != 0 and 'ArithmeticOverflow:' in interpreted.stdout + interpreted.stderr
 codegen = ROOT / 'target/debug/neoclr-codegen'
 obj = output / 'app.o'
 obj.unlink(missing_ok=True)
@@ -76,10 +79,14 @@ support = [console / f for f in ('native-gc.c', 'root-probe.c', 'text-arena.c', 
 support += [ROOT / 'docs/experiments/aot-fault-details/render.c']
 run('link-aot', [*link, '-fsanitize=undefined,bounds', host, obj, *support, '-o', output / 'app'])
 executed = run('execute-aot', [output / 'app'], expected)
+if args.overflow:
+    assert 'status=2 fault=2 result=-1' in executed.stderr
 run('link-jit', [*link, '-DJIT_HOST', '-dynamiclib', host, *support, '-o', output / 'host.dylib'])
 result = run('jit', [codegen, '--jit-managed', '--closed-world', image, '@entry', output / 'host.dylib', *options])
 report['jit'] = json.loads(result.stderr.split('JIT_RESULT ', 1)[1])
 assert report['jit']['guestExitCode'] == expected
+if args.overflow:
+    assert 'status=2 fault=2 result=-1' in result.stderr
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in
     (source, SOURCE / 'run.py', host, compiler, compiler.parent / 'NeoCLR.Metadata.Experimental.dll', compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll', codegen, ROOT / 'target/debug/neoclr', image, bundle / 'bundle.json')}
 report['passed'] = True

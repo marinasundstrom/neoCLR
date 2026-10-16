@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedExpressions.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/raven-ranges/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/checked-expressions-dotnet-20261016-final/OperatorMatrix.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "7e0e1cd9c14956c9382099ac690e27102b03df76c9e7b33de013fc2e103011c4"
+    },
+    {
+      "label": "execute",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/checked-expressions-dotnet-20261016-final/OperatorMatrix.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/CheckedExpressions.rvn": "af54a635b4dc9bed7fc6d5873463c279072eaf397ca02926d5bedc6c6a21c69c",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-dotnet.py": "9a26b57b6262443bfbbcb040ba2006e5f3027f097d9eb0690f0b38ae3908650c",
+    "/Users/robert/Projects/raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "8ef0098c7b96f0367b5dec001c8f74d0c81794d9c8ba3ae7c58017be8acde775",
+    "/Users/robert/Projects/raven-ranges/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "d7ec85221a071bbef743958fdb1406faeea9d1c25bc1b9d19d315bc17c712c46",
+    "/Users/robert/Projects/raven-ranges/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll": "d971d624c694a7d44d7f150bcd61eb5ca69fef257e25e8ad5aac69911d0fab4b",
+    "/Users/robert/Projects/neoclr/target/checked-expressions-dotnet-20261016-final/OperatorMatrix.dll": "9255849f63c71a098ce33a7c1f64d0ddae78fd330b9cf7577c8b2eedf23d7df0"
+  }
+}

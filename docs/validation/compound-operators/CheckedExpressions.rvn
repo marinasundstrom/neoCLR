@@ -1,0 +1,37 @@
+class Number {
+    static func +(left: Number, right: Number) -> int => 1
+    static func checked +(left: Number, right: Number) -> int => 42
+    static func -(left: Number, right: Number) -> int => 1
+    static func checked -(left: Number, right: Number) -> int => 42
+    static func *(left: Number, right: Number) -> int => 1
+    static func checked *(left: Number, right: Number) -> int => 42
+    static func /(left: Number, right: Number) -> int => 1
+    static func checked /(left: Number, right: Number) -> int => 42
+    static func +(left: Number, right: int) -> int => right
+}
+
+class Program {
+    static func Add(left: int, right: int) -> int => checked(left + right)
+    static func Subtract(left: long, right: long) -> long => checked(left - right)
+    static func Multiply(left: uint, right: uint) -> uint => checked(left * right)
+    static func UnsignedAdd(left: ulong, right: ulong) -> ulong => checked(left + right)
+    static func Wrap(left: int, right: int) -> int => checked(unchecked(left + right))
+
+    static func Main() -> int {
+        let left = Number()
+        let right = Number()
+        if checked(left + right) != 42 { return 1 }
+        if checked(left - right) != 42 { return 2 }
+        if checked(left * right) != 42 { return 3 }
+        if checked(left / right) != 42 { return 4 }
+        if unchecked(left + right) != 1 { return 5 }
+        if checked(unchecked(left + right)) != 1 { return 6 }
+        if checked(left + 42) != 42 { return 7 }
+        if Add(40, 2) != 42 { return 8 }
+        if Subtract(84, 42) != 42 { return 9 }
+        if Multiply((uint)21, (uint)2) != (uint)42 { return 10 }
+        if UnsignedAdd((ulong)40, (ulong)2) != (ulong)42 { return 11 }
+        if Wrap(2147483647, 1) != -2147483648 { return 12 }
+        return 42
+    }
+}

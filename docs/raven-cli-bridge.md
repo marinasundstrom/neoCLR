@@ -12234,6 +12234,35 @@ qualifies macOS ARM64; Windows profile restrictions are unchanged. This supersed
 the backend rejection noted above. Raven checked contexts and operator selection
 remain the next compiler step; no Runtime Contract, encoding or library change.
 
+
+## Checked expression qualification (2026-10-16)
+
+Raven main `935ab4af7` introduces checked/unchecked parenthesized expressions and
+checked binary operator lookup. Its deliberate native carry `57fec6ec7` maps integer binary
+`+`, `-`, `*` to existing signed/unsigned overflow instructions. Native checked
+operator overloads are ordinary method calls. No Runtime Contract setting,
+container version, temporary carrier or runtime-library API is added. The normal
+.NET target emits standard checked IL; native overflow remains a terminal
+ArithmeticOverflow fault rather than a catchable .NET OverflowException.
+
+The nearest context wins, and contexts do not flow into nested function bodies or
+called methods. Checked binary candidates are resolved first, with ordinary
+fallback only if none applies; ambiguity remains an error. The compiler owns this
+lookup; the SDK/runtime own checked instruction validation and execution.
+
+Checked blocks, constant arithmetic evaluation, explicit conversions, unary minus,
+mutation operators, lifted/pointer arithmetic and expression trees remain gaps.
+Unimplemented checked conversions/unary/mutation/lifted/pointer operations receive
+RAV0373 rather than silently executing unchecked. SDK conversion support remains
+available independently. Existing native primitive admission limits are unchanged.
+Broader structural work remains parked.
+
+See [the reproducible compiler qualification](validation/compound-operators/README.md#checked-expression-follow-up)
+for matched compiler revisions, bundle, source and backend evidence. This supersedes
+the earlier statement that all Raven checked contexts are still pending. The next
+bounded compiler slice is checked conversions/unary operations and their overload
+selection, followed by mutation forms and block contexts.
+
 ## Mutable collection helpers — 2026-10-16
 
 `MutableMap.Entry` and `MutableSet.GetOrInsert` are library extensions. MapEntry is

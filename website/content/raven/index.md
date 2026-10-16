@@ -53,25 +53,27 @@ mutate value storage. The current native class, struct-local and reference-array
 consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-only.
 Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
 zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
-postfix mutation; consumed postfix uses the static overload. Checked expression
-contexts and extension/interface forms remain follow-up work. Paired `true`/`false` overloads
+postfix mutation; consumed postfix uses the static overload. Checked mutation
+operators and extension/interface forms remain follow-up work. Paired `true`/`false` overloads
 support conditions and short-circuit logical operations through `&`/`|`; direct
 `&&`/`||` overload declarations must migrate to that .NET-compatible convention.
 The shared operator sample also checks arithmetic, bitwise, shifts, comparisons,
 unary operations and conversions on .NET 11 and native interpreter/JIT/AOT. Nominal System.Numerics
 capabilities are a future layer over this operator support.
 
-Checked operator declarations (`func checked`) now export distinct standard method
-names and require a matching ordinary declaration. This is a development metadata
-foundation qualified by explicit calls on .NET and interpreter/JIT/AOT. Raven
-expressions still select ordinary overloads, and checked bodies
-do not automatically enable overflow checks. Checked contexts and primitive overflow
-behavior remain separate implementation work.
-The metadata SDK now provides checked integer addition, subtraction and multiplication;
-native JIT/AOT preserve 32-bit, 64-bit and pointer-sized overflow semantics.
-This backend prerequisite does not yet enable Raven checked contexts.
-The SDK also emits checked numeric conversions, qualified on .NET and native
-interpreter/JIT/AOT. Raven checked-context selection remains the compiler step.
+Checked operator declarations (`func checked`) export distinct standard method
+names and require a matching ordinary declaration. Development checked expressions
+now use `checked(...)` / `unchecked(...)` for integer binary addition, subtraction
+and multiplication and checked binary overload selection with ordinary fallback.
+The nearest context wins; a method's body is not implicitly checked merely because
+it declares a checked operator.
+
+The same consumer is qualified on .NET 11 and native interpreter/JIT/AOT. Native
+arithmetic overflow is a terminal fault; .NET uses OverflowException. Checked
+blocks, conversions, unary negation, mutation operators and lifted arithmetic remain
+compiler gaps, with explicit diagnostics for unimplemented checked operations.
+The SDK/runtime also support checked numeric conversions independently. See the
+[qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-expression-follow-up).
 
 <a id="targets"></a>
 

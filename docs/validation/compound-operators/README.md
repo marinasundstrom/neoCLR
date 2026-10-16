@@ -176,3 +176,51 @@ ordinary fallback; constant evaluation; built-in overflow checks and conversions
 across interpreter/JIT/AOT. A checked declaration does not itself change arithmetic
 inside its body. Broader interface/virtual/extension compound declarations and
 System.Numerics capability implementation remain separate. Structural work stays parked.
+
+## Checked expression follow-up
+
+Raven main `935ab4af7` adds `checked(...)` / `unchecked(...)`, lexical context
+precedence, integer binary overflow checking and checked binary `+ - * /` lookup.
+The deliberate native carry `57fec6ec7` uses the six existing signed/unsigned arithmetic
+instructions from SDK `1876fb72b` or later. No Runtime Contract setting, native
+container change or new class-library API is involved. Ordinary expressions keep
+their behavior. A checked method declaration does not implicitly check its body.
+
+Both compiler lines pass 73 focused tests, covering runtime overflow, nested
+contexts, nested-function boundaries, source/imported operator selection,
+inapplicable-candidate fallback, ambiguity preservation, diagnostics and ordinary
+operator/parser/operation regressions. Required syntax-generator builds pass.
+
+`CheckedExpressions.rvn` exercises checked operator preference and fallback,
+unchecked nesting, successful signed/unsigned primitive arithmetic and wrapping.
+It returns 42 on .NET 11 and native interpreter/macOS ARM64 managed JIT/AOT.
+`checked-expressions-dotnet-results.json` and `checked-expressions-native-results.json`
+retain commands and artifact hashes. Use the existing .NET/native commands with
+`--source docs/validation/compound-operators/CheckedExpressions.rvn` to reproduce.
+
+`run-checked-overflow.py` generates six small Raven consumers for signed/unsigned
+addition, subtraction and multiplication. Each faults in the interpreter, JIT and
+AOT; native hosts check ArithmeticOverflow status/code 2 and an untouched result
+slot. AOT uses the existing undefined-behavior/bounds sanitizer host. Exact source,
+commands and fingerprints are in `checked-expressions-overflow-results.json`.
+
+```sh
+python3 docs/validation/compound-operators/run-checked-overflow.py \
+  --compiler ../Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll \
+  --bundle target/function-reflection-library-validated-20261016 \
+  --output target/checked-expression-overflow-check
+```
+
+Use a fresh output directory. Runtime/SDK baseline is neoCLR `1f1e99af3`.
+The bundle remains unchanged; the updated compiler
+is built against the current metadata SDK. .NET uses OverflowException; native
+execution uses a terminal ArithmeticOverflow fault. This is the existing platform
+fault contract, not a new checked-context exception model.
+
+Remaining work: checked blocks, constant arithmetic evaluation, explicit
+conversions, unary negation, compound/increment mutations, lifted/pointer arithmetic
+and expression trees. RAV0373 diagnoses unimplemented checked conversions,
+unary/mutation and lifted/pointer operations instead of silently ignoring context.
+The current native primitive admission profile is unchanged. Structural work stays
+parked. Imported operator selection is covered in compiler tests; this fixture
+does not add native separate-provider qualification.
