@@ -9550,3 +9550,18 @@ base; all 14 specialization tests pass. Native cleanup and AOT sanitizers pass.
 This is macOS ARM64 development qualification. Generic methods, abstract generic
 class authoring, generic Object override qualification and Raven emission/import
 of these virtual slots remain separate work; structural types remain parked.
+
+### Imported concrete generic virtual slots (2026-10-16)
+
+`CreateMethodReference` accepts nongeneric virtual methods on generic reference
+class definitions. Construct the reference with exact owner arguments before
+calling. `CallVirtual` dispatches to the closed override; `Call` invokes a public
+concrete body directly, including an explicit base call. Abstract direct calls
+and abstract generic class-slot authoring remain rejected. This matches the
+existing nongeneric reference contract and CLR dispatch semantics.
+
+The external constructed-base fixture now exercises reordered child arguments,
+virtual `Get` and `Echo` overrides, direct imported base calls, integer/reference
+payloads and inherited interface dispatch. CLR, interpreter, AOT and managed JIT
+return 42, including native cleanup and AOT sanitizers. No encoding, ABI or
+Runtime Contract change. Raven emission/import remains the next integration step.

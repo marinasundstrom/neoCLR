@@ -193,11 +193,13 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(operand);
         var baseConstructor = operand.Definition.IsConstructor && opCode == OpCode.Call && bodyBuilder.IsConstructor &&
             DeclaringType?.IsDirectBaseConstructor(operand.Definition.Target, operand.DeclaringType) == true;
-        if (!ReferenceEquals(operand.Definition.Owner, Assembly) || !baseConstructor && opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call))
+        var baseMethod = opCode == OpCode.Call && !operand.Definition.IsConstructor && !operand.Definition.IsStatic &&
+            operand.Definition.RequiresVirtualDispatch && !operand.Definition.Target.IsAbstract && operand.Definition.Target.Visibility == MethodVisibility.Public;
+        if (!ReferenceEquals(operand.Definition.Owner, Assembly) || !baseConstructor && !baseMethod && opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call))
             throw new ArgumentException("incorrect imported owner or dispatch opcode");
         foreach (var type in operand.DeclaringType.TypeArguments.Concat(operand.MethodArguments))
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new(baseConstructor ? "call.constructed" : operand.Definition.IsConstructor ? "new.constructed" : operand.Definition.RequiresVirtualDispatch ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition.Target,
+        Append(new(baseConstructor || baseMethod ? "call.constructed" : operand.Definition.IsConstructor ? "new.constructed" : operand.Definition.RequiresVirtualDispatch ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition.Target,
             ConstructedTarget: operand.Target, Type: operand.Definition.IsStatic ? null : (SignatureType)operand.DeclaringType));
     }
 

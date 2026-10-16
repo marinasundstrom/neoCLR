@@ -21,7 +21,7 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/App.dll",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/App.dll",
         "--execution",
         "interpreter",
         "--system",
@@ -31,7 +31,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/Library.dll"
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/Library.dll"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -42,9 +42,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/App.dll",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/App.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/app.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -52,7 +52,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/Library.dll",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/Library.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -60,7 +60,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "3f132ec0ca000ab18cc975c56ad77102f55a881593dd43ca370294bf46f3eac9",
+      "logSha256": "2a4c2c702fca596b163c2a14f67c4e4e8d0f83ebdf7a455507209f8d675b67fd",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -81,14 +81,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/app.o",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/app"
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -97,7 +97,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/app"
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -128,7 +128,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/host.dylib"
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -140,9 +140,9 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/App.dll",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/App.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/host.dylib",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
@@ -150,7 +150,7 @@
         "--module",
         "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/Library.dll",
+        "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/Library.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -158,26 +158,26 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "2e48b71f19fb7785c81032ed94e86ef374bc347d48e300ada272038617a03db8",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.354001375,\"guestExitCode\":42,\"invocationSeconds\":0.000048708,\"metadataLoadSeconds\":0.317784958,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":6.985373334}\n"
+      "logSha256": "0164414d35e13f1886f7395b8033d25ee1cb437bbe47fbcecace0fbb6c3868bd",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.530992167,\"guestExitCode\":42,\"invocationSeconds\":0.000046708,\"metadataLoadSeconds\":0.315880208,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":5.818876583}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.354001375,
+    "compileAndFinalizeSeconds": 0.530992167,
     "guestExitCode": 42,
-    "invocationSeconds": 4.8708e-05,
-    "metadataLoadSeconds": 0.317784958,
+    "invocationSeconds": 4.6708e-05,
+    "metadataLoadSeconds": 0.315880208,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 6.985373334
+    "selectionAndVerificationSeconds": 5.818876583
   },
   "files": {
-    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ExternalConstructedBaseChecks.cs": "6f8b9d2669475bcdb204938cd988f98e89a07a08b69392a1780facb62d15cac9",
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ExternalConstructedBaseChecks.cs": "8d59fe4ed19184323aa3c7e7fcc9f5c626cc5dbf2103c0ea6d1b0356830f021f",
     "/Users/robert/Projects/neoclr/docs/validation/external-constructed-class-base/run.py": "ea38305c70c2c522f01292a4b8990fe7dc4bca3af8532301b8157084b051a5f9",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
-    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "81c91ad3fafff14430f1d95e1c1d7a22789461b0d0f5b3ca24919e3429de9f51",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "d2fbad055207db09743cbf083a90e0156e2ab1b831d25b414af0ca5988ac9b5b",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "f925bf883c26caf11ec17187b67754c4f7164574d6320cedc1e488883e55f9d4",
-    "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/App.dll": "b0aa1ee48a8ac55c3b799ca220c4873cfbd79a3cf1249cf8476a0650e1f0ee3c",
-    "/Users/robert/Projects/neoclr/target/external-constructed-sdk-20261016/Library.dll": "f3cefcf98266add6550063dab2c0a0fa1f9ee80ad4823292cfd34080d59d846e",
+    "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/App.dll": "b5b97ad9531da1a149c2c7cc145130a329679b0beca5b3505af6d89647f8000f",
+    "/Users/robert/Projects/neoclr/target/external-generic-virtual-20261016/Library.dll": "3829ec5ff653b0d2a7ec9da40e9a5b56db069e0ebf9d08d3a2111af1875c8085",
     "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
   }
 }

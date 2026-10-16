@@ -184,7 +184,7 @@ public storage, field mutation, value/reference arguments and inherited generic
 interface dispatch. SDK CLR checks and Raven interpreter/AOT/JIT checks pass on
 macOS ARM64. Actual inheritance cycles and reverse/invariant conversions reject.
 Development SDK virtual slots on concrete generic reference classes now pass
-CLR/interpreter/AOT/JIT dispatch checks. Raven emission/import and abstract generic
+CLR/interpreter/AOT/JIT dispatch checks, including imported slots and direct base calls against a separate provider. Raven emission/import and abstract generic
 class authoring for this feature remain open. Base-constructor
 expressions support scalar constants and arithmetic; helper calls and control
 flow remain backend gaps. Structural work and Sliceable/Result variance are parked.

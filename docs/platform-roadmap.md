@@ -4877,6 +4877,6 @@ remain open; structural work stays parked.
 **Generic virtual slots (2026-10-16):** concrete generic reference-class SDK
 slots/overrides and native closed dispatch are qualified in CLR/interpreter/AOT/JIT,
 including reordered generic base parameters and direct base calls. See
-[retained evidence](validation/generic-class-virtual/README.md). Raven emission/import,
+[retained evidence](validation/generic-class-virtual/README.md). Imported generic virtual contracts and direct base calls also pass the separate-provider [fixture](validation/external-constructed-class-base/README.md). Raven emission/import,
 abstract generic classes and broader constrained dependency contracts remain open.
 Structural work remains parked.
