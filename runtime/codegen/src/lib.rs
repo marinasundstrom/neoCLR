@@ -10,6 +10,7 @@ mod jit;
 mod limits;
 mod linking;
 mod reflection_arrays;
+mod function_invocation;
 mod reflection_collections;
 mod reflection_construction;
 mod reflection_metadata;

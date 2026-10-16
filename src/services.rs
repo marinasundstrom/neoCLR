@@ -156,7 +156,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::ReflectionArray(_) | crate::native::Binding::StringSnapshot => {
                 RuntimeService::ManagedArrays
             }
-            crate::native::Binding::ReflectionConstruct
+            crate::native::Binding::InvokeFunction
+            | crate::native::Binding::ReflectionConstruct
             | crate::native::Binding::ReflectionCollection(_)
             | crate::native::Binding::ReflectionMember(_)
             | crate::native::Binding::ReflectionProperty(_) => RuntimeService::ReflectionExecution,
@@ -242,7 +243,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
         }];
         if matches!(
             &binding,
-            crate::native::Binding::ReflectionConstruct
+            crate::native::Binding::InvokeFunction
+                | crate::native::Binding::ReflectionConstruct
                 | crate::native::Binding::ReflectionCollection(_)
                 | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionProperty(_)

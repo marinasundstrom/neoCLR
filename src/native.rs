@@ -34,6 +34,7 @@ pub(crate) enum Binding {
     Reflection(crate::reflection::Query),
     ReflectionConstructionCheck,
     ReflectionConstruct,
+    InvokeFunction,
     ReflectionMember(u8),
     ReflectionMemberCheck(u8),
     ReflectionAssignable,
@@ -342,6 +343,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("reflection collection signature mismatch"));
         }
         return Ok(Binding::ReflectionCollection(kind as u8));
+    }
+    if function.name == "neoCLR.Runtime.InvokeFunction" {
+        let object = Type::from_name("System.Object");
+        if function.parameters != [object.clone(), Type::ArrayRef(Box::new(object.clone()))]
+            || function.returns != object || function.no_result {
+            return Err(Fault::new("dynamic function invocation signature mismatch"));
+        }
+        return Ok(Binding::InvokeFunction);
     }
     for (kind, name) in ["Length", "Get", "Create"].iter().enumerate() {
         if function.name != format!("neoCLR.Runtime.ReflectionArray{name}") {

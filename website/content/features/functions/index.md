@@ -87,5 +87,16 @@ mapping is unchanged, and the .NET target rejects `func` constraints. A separate
 compiled provider and consumer forward a callback through a constrained generic
 function and return 42 in interpreter/AOT/JIT. Signature bounds such as
 `where T: () -> T2` remain a gap.
-Function-list/observer APIs and dynamic invocation remain deferred. This is feature
+Function-list/observer APIs remain deferred; provisional dynamic invocation is described below. This is feature
 branch development, not a published capability.
+
+### Provisional dynamic invocation (feature branch)
+
+A native primitive now accepts a function reference and an Object argument array,
+validates/converts the arguments and invokes its existing bound target. A Raven
+sample-local facade demonstrates interpreter/JIT/AOT execution. Scalar results are
+boxed, reference identity is retained, and no-result calls return null. Count/type
+mismatches reject before invocation; target faults propagate. Exact boxed scalar
+and supported reference signatures are the initial profile; ref/out, coercion and
+arbitrary value marshalling remain gaps. The facade is provisional, not a permanent
+class-library member. Function-list/event policy remains separate.

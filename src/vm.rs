@@ -4824,7 +4824,8 @@ fn interpret_instructions_with_dispatch(
                         }
                         if matches!(
                             binding,
-                            crate::native::Binding::ReflectionConstruct
+                            crate::native::Binding::InvokeFunction
+                                | crate::native::Binding::ReflectionConstruct
                                 | crate::native::Binding::ReflectionArray(_)
                                 | crate::native::Binding::ReflectionCollection(_)
                                 | crate::native::Binding::ReflectionMember(_)
@@ -4858,6 +4859,12 @@ fn interpret_instructions_with_dispatch(
                                     crate::reflection_members::adapter(
                                         module, &callee, &args, kind,
                                     )?
+                                } else if matches!(binding, crate::native::Binding::InvokeFunction) {
+                                    let shapes = match &args[0] {
+                                        Value::Function(function) => vec![function.ty.clone()],
+                                        _ => vec![],
+                                    };
+                                    crate::function_invocation::lower(module, &callee, &shapes)?
                                 } else {
                                     crate::reflection_execution::adapter(module, &callee, &args[0])?
                                 };

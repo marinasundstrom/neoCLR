@@ -235,6 +235,7 @@ impl Options {
                                 | "type-argument-closed-v1"
                                 | "type-shape-closed-v1"
                                 | "reflection-construction-retained-v1"
+                                | "dynamic-function-closed-v1"
                                 | "reflection-array-closed-v1"
                                 | "reflection-property-retained-v1"
                                 | "reflection-snapshot-retained-v1"

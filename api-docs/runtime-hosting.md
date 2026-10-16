@@ -153,3 +153,23 @@ does not bypass method constraint checks. Default builds reject structural bound
 The metadata preserves the structural bound, not multiple conjunctive nominal rows.
 No new guest constraint reflection API is introduced. See
 [validation and limits](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/composition-constraints/README.md).
+
+## Provisional dynamic Function lowering (2026-10-16)
+
+```rust
+pub fn function_invocation::lower(
+    module: &Module,
+    service: &metadata::Function,
+    shapes: &[metadata::Type],
+) -> Result<metadata::Function, Fault>;
+```
+
+Experimental runtime/compiler helper, not a stable native hosting ABI. It validates
+an `InvokeFunction` InternalCall contract and returns an ordinary checked IL adapter
+for the supplied closed structural function shapes. The caller must supply the
+reachable binding inventory and use the matching linked module. Duplicate shapes
+are deduplicated. Invalid service/shape metadata returns Fault; unsupported runtime
+inputs and signatures fault when the adapter executes. It neither executes code nor
+changes its inputs. It preserves the service identity and signature, clears the
+InternalCall flag and supplies the adapter body and initialized result local.
+See [the primitive contract and validation](../docs/validation/dynamic-function-invocation/README.md).

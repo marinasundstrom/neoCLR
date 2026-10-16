@@ -4900,3 +4900,11 @@ generic classes, including separate-provider import. See the [consumer evidence]
 The host SDK now retains method FunctionType constraints through authoring, snapshots, introspection and imports, with argument/proof validation and fail-closed CLI export. Native AOT/JIT method specialization now validates function-kind requirements, preserving source declarations. Raven method emission/import and separate-provider forwarding now return 42 in interpreter/AOT/JIT; signature bounds remain open. Invocation decisions are explicitly
 postponed. This is not a resumption of the broader structural roadmap. See
 [direction](proposals/structural-types.md#20-generic-constraints-on-function-types).
+
+
+**Author-directed provisional invocation primitive (2026-10-16, feature branch):**
+Following function-category constraints, the author requested usable dynamic
+function invocation without freezing the API. The runtime primitive and sample-local
+Raven facade use checked boxed arguments and existing typed calls, qualified in
+interpreter/JIT/AOT. See [evidence and .NET comparison](validation/dynamic-function-invocation/README.md).
+This bounded work does not resume general structural types or add event policy.

@@ -157,3 +157,14 @@ evolve and is not an equality key. Imported source
 names are retained independently of lowered implementation names. Null member access
 raises NullReference. This Object inheritance contract applies to Functions;
 structural identity alone does not imply the same behavior for other type families.
+
+## Provisional dynamic invocation primitive
+
+On `codex/function-kind-constraint`, an existing function reference can be invoked
+through `neoCLR.Runtime.InvokeFunction(function, arguments)` with a non-null Object
+argument array. Exact scalar boxes are unboxed; references use checked casts. Results
+are boxed/reference-preserving, with null for no-result calls. This is a native
+primitive and sample-local Raven facade, not a permanent class-library API.
+Interpreter/JIT/AOT qualification and restrictions are recorded in the
+[dynamic invocation fixture](../docs/validation/dynamic-function-invocation/README.md).
+This does not turn a MethodInfo descriptor into a bound function or add multicast policy.

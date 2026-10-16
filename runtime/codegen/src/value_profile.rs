@@ -991,6 +991,7 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
+            Ty::Callable(_) => vec![], // Descriptor identity is checked separately from nominal tags.
             Ty::MixedUnion(parts) | Ty::ValueUnion(parts) => {
                 self.cast_targets(&Ty::ReferenceUnion(parts.clone()))
             }
@@ -1939,6 +1940,7 @@ impl<'a> Profile<'a> {
                             | Ty::Interface(_)
                             | Ty::Intersection(_)
                             | Ty::ReferenceUnion(_)
+                            | Ty::Callable(_)
                     ) && !(source == Ty::Literal && self.references)
                         && self.backing_for_array(&source).is_none()
                     {

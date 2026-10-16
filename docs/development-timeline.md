@@ -18348,3 +18348,14 @@ broader bound profiles remain recorded gaps. Validation evidence is retained in
   42 in interpreter/AOT/JIT; host metadata introspection preserves the method flag.
   Guest reflection follow-up is pending. See the
   [retained consumer](validation/function-kind-constraint/README.md).
+
+
+- **Dynamic invocation clarification (2026-10-16):** the author clarified that the
+  API need not be permanent, but usable primitives should exist now, and explicitly
+  requested reflection/dynamic invocation with interpreter, JIT and AOT validation
+  and separately committed slices. **Assistant response/action:** implemented a
+  provisional native InvokeFunction service and shared checked-IL adapter, with a
+  sample-local Raven facade. Bound receiver/no-result calls and invalid arguments
+  are qualified across backends. The .NET comparison and current restrictions are
+  recorded in the [fixture](validation/dynamic-function-invocation/README.md).
+  Function signature constraints and event policy remain separate work.

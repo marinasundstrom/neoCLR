@@ -22,6 +22,7 @@ mod time_zones;
 pub use console::{Console, StdioConsole};
 pub mod frontend;
 mod function_objects;
+pub mod function_invocation;
 mod gc;
 mod shared_heap;
 // Internal native submission is tested before connecting guest VM safepoints.

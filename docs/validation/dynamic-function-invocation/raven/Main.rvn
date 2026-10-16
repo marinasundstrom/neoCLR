@@ -1,0 +1,29 @@
+import System.*
+
+class Counter {
+    private val value: int
+
+    init(value: int) {
+        self.value = value
+    }
+
+    func Add(increment: int) -> int => value + increment
+}
+
+// This facade is deliberately sample-local while its API evolves.
+static class FunctionReflection {
+    static func Invoke(function: Object, arguments: Object?[]) -> Object? {
+        return neoCLR.Runtime.InvokeFunction(function, arguments)
+    }
+}
+
+func Main() -> int {
+    let counter = Counter(40)
+    let callback: (int) -> int = counter.Add
+    let arguments: Object?[] = [2]
+    let result = FunctionReflection.Invoke(callback, arguments)
+    return result match {
+        int value => value
+        _ => 0
+    }
+}

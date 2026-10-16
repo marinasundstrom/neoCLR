@@ -1,0 +1,182 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "assemble",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/Main.neoil",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/DynamicFunction.neox",
+        "--format",
+        "neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "92b8fefdb21ea422fb09e2816e86f247702903c0a27bacd7d6b7d2f265d06934",
+      "output": "Assembled DynamicFunction -> /Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/DynamicFunction.neox\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/DynamicFunction.neox",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "16e242f6040959c1a7a1f42b8f00a4b22ff4cd02893d7886349e064256e2dcd3",
+      "output": "UserFault: dynamic target entered\n   at Counter.Add [instruction 2]\n   at neoCLR.Runtime.InvokeFunction [instruction 21]\n   at Main [instruction 25]\n"
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/DynamicFunction.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "3b175b86a702d3a25ff8b3feaa1d993e53c4906f3eb57a541147509d77fee83c",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/app"
+      ],
+      "exitCode": 2,
+      "logSha256": "9ea2fff7373bc1884ca1d6b50532b9c32047dc7fb7a69d77face3fbeb5413444",
+      "output": "UserFault: dynamic target entered\n   at Counter.Add [instruction 2]\n   at neoCLR.Runtime.InvokeFunction [instruction 39]\n   at Main [instruction 25]\nstatus=4 fault=4 result=-1\n"
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/DynamicFunction.neox",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "d6a7872f164898a8e509b171b37f0b36310d04e04e3a1f3eeee9fa5935c9c7b7",
+      "output": "UserFault: dynamic target entered\n   at Counter.Add [instruction 2]\n   at neoCLR.Runtime.InvokeFunction [instruction 39]\n   at Main [instruction 25]\nstatus=4 fault=4 result=-1\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.479526167,\"guestExitCode\":2,\"invocationSeconds\":0.000082917,\"metadataLoadSeconds\":0.36050975,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":6.5974705}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.479526167,
+    "guestExitCode": 2,
+    "invocationSeconds": 8.2917e-05,
+    "metadataLoadSeconds": 0.36050975,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 6.5974705
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/dynamic-function-invocation/Main.neoil": "f348ecd1080a8a09d674adf07c92e8ce1ca57fc2d90db200105d12b520ecb2fb",
+    "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/Main.neoil": "3cc9f0b458246af5d390bff11a19b72123453d26052a74a3e5b7758137fd9b95",
+    "/Users/robert/Projects/neoclr/docs/validation/dynamic-function-invocation/run.py": "286cee7599fc984bdd1eb925a39439ec8686229e66e50ba6124086942e70ce53",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "a0ad7c0233d6b7849a7300daa69f85e9395cafeae741c62aced27e6c183fd418",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "b6ddaf93c1cec48948054cb804432dae5929206bad780e9f51b5143b3f4cea7d",
+    "/Users/robert/Projects/neoclr/target/dynamic-function-target-fault-20261016/DynamicFunction.neox": "1534baa5d5386d01276af4aaa94e5ecab3fdfdd556e350c8fbcf8ba11f0001a2",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
+  }
+}

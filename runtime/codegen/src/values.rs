@@ -3047,6 +3047,27 @@ pub(crate) fn compile_into(
                             } else {
                                 let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
                                 let mut matches = b.ins().iconst(types::I8, 0);
+                                let callable = b.ins().icmp_imm(IntCC::Equal, tag, u32::MAX as i64);
+                                if p.is_object_base(&target_ty) {
+                                    matches = callable;
+                                }
+                                if let Ty::Callable(shape) = &target_ty {
+                                    // Check the descriptor header before reading its target slot:
+                                    // an ordinary empty Object need not have payload storage.
+                                    let function = b.create_block();
+                                    let done = b.create_block();
+                                    b.append_block_param(done, types::I8);
+                                    b.ins().brif(callable, function, &[], done, &[matches.into()]);
+                                    b.switch_to_block(function);
+                                    let identity = b.ins().load(types::I64, MemFlags::new(), value, 8);
+                                    for index in p.callable_targets(shape)? {
+                                        let equal = b.ins().icmp_imm(IntCC::Equal, identity, (index + 1) as i64);
+                                        matches = b.ins().bor(matches, equal);
+                                    }
+                                    b.ins().jump(done, &[matches.into()]);
+                                    b.switch_to_block(done);
+                                    matches = b.block_params(done)[0];
+                                }
                                 for index in p.cast_targets(&target_ty) {
                                     let matched = matches_type(&mut b, &p, tag, index);
                                     matches = b.ins().bor(matches, matched);
@@ -3068,7 +3089,8 @@ pub(crate) fn compile_into(
                             let invalid = b.ins().band(absent, present);
                             let code = if matches!(
                                 target_ty,
-                                Ty::Intersection(_)
+                                Ty::Callable(_)
+                                    | Ty::Intersection(_)
                                     | Ty::ReferenceUnion(_)
                                     | Ty::MixedUnion(_)
                                     | Ty::ValueUnion(_)

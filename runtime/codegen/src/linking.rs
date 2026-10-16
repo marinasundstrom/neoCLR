@@ -1228,6 +1228,7 @@ pub fn prepare(
         "policy":"verified sealed owner or inherited Object override with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
     if reference_arena {
         super::reflection_arrays::bind(&mut selected, &mut report)?;
+        super::function_invocation::bind(&mut selected, &mut report)?;
     }
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_scalar_queries(&mut selected, &mut report)?;

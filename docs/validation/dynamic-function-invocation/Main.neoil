@@ -1,0 +1,63 @@
+.module DynamicFunction
+.entry Main
+.function neoCLR.Runtime.InvokeFunction(System.Object function, arrayref<System.Object> arguments) -> System.Object
+.methodimpl InternalCall
+.end
+.type class Counter
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg 0
+ldarg 1
+stfld Counter::Value
+ret
+.end
+.method instance Set() -> noresult
+ldarg 0
+ldc.i4 40
+stfld Counter::Value
+ret
+.end
+.method instance Add(Int32 value) -> Int32
+ldarg 0
+ldfld Counter::Value
+ldarg 1
+add
+ret
+.end
+.end
+.function Main() -> Int32
+.local System.Object callback
+.local Counter counter
+.local arrayref<System.Object> arguments
+ldc.i4 1
+newobj instance Counter::.ctor(Int32)
+stloc counter
+ldloc counter
+function.bind fn<noresult Void> = instance Counter::Set()
+castclass System.Object
+ldc.i4 0
+array.reserve System.Object
+call neoCLR.Runtime.InvokeFunction(System.Object,arrayref<System.Object>)
+ref.isnull
+brfalse Invalid
+ldloc counter
+function.bind fn<Int32,Int32> = instance Counter::Add(Int32)
+castclass System.Object
+stloc callback
+ldc.i4 1
+array.reserve System.Object
+stloc arguments
+ldloc arguments
+ldc.i4 0
+ldc.i4 2
+box Int32
+stelem System.Object
+ldloc callback
+ldloc arguments
+call neoCLR.Runtime.InvokeFunction(System.Object,arrayref<System.Object>)
+unbox.any Int32
+ret
+Invalid:
+ldc.i4 0
+ret
+.end
