@@ -172,3 +172,7 @@ and limitations.
 Variance also follows nominal interfaces inherited through imported class bases.
 The metadata writer uses explicit dependency ancestry; it does not infer
 conformance from matching members. Result and Sliceable remain invariant.
+
+Generic dependency ancestry substitution is implemented in the metadata SDK and
+validated against CLR behavior. Native generic base metadata and Raven support
+still need completion; this is not yet an end-to-end supported feature.

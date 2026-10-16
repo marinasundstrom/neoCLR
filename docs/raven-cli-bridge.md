@@ -11372,3 +11372,19 @@ SDK contract. Sliceable/Result variance and structural work stay deferred.
 The [retained consumer](validation/interface-variance/inherited-interface/README.md)
 checks actual calls, identity, inherited-field mutation and three invalid source
 conversions against the existing `variance-argument-sequence-20261016` bundle.
+
+### Generic dependency base contracts (2026-10-16)
+
+DeclareClassBase now records an imported generic definition's scoped base signature
+and substitutes arguments when checking closed ancestry and interface variance.
+For example, Leaf<int> through Middle<int> can widen to Base<int[]> when those
+nominal base templates are explicitly registered. Generic classes remain invariant.
+This follows .NET substitution semantics; no Runtime Contract setting or native/CLI
+encoding changes. The SDK owns validation and substitution; loaded dependency
+metadata remains authoritative.
+
+Focused SDK and emitted CLR checks pass. This slice does not claim a complete Raven
+native consumer: the native reader's generic base-signature materialization and
+SDK generic layout authoring still require implementation. Raven's existing host
+registration path can use scoped generic templates once those metadata layers
+preserve them. These are temporary coverage gaps, not permanent platform rules.

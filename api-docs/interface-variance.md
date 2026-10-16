@@ -33,7 +33,7 @@ member/relationship queries remain implementation gaps. Annotations do not imply
 Variance also follows explicitly declared local-to-imported class ancestry. The
 separately compiled Raven consumer validates producer/consumer and nested views in
 interpreter/AOT/JIT, preserving receiver/payload identity and inherited-field writes.
-Reverse and unrelated-class conversions reject; this does not enable generic class bases.
+Reverse and unrelated-class conversions reject; native generic class-base materialization and layout authoring remain gaps.
 
 Interface-valued reference arguments may widen to Object in the declared variance
 direction. Native lowering preserves the verified Object-root role through private
@@ -59,3 +59,7 @@ conversions reject. See the retained String consumer for source and validation.
 Imported class arguments may also widen to interfaces inherited through explicitly
 registered class ancestors. Producer and consumer conversions preserve nominal
 conformance; the SDK requires the complete dependency ancestry contract.
+
+The metadata SDK can now register generic dependency base templates and substitute
+arguments for variance checks. This is validated at the SDK/CLR level; complete
+Raven/native generic base support is not yet qualified.

@@ -7187,14 +7187,24 @@ transport retains Abstract in its nonexecutable CLI projection and closure in th
 authoritative native payload; there is currently no projected closed-family attribute.
 Generic/nested closed roots and class virtual/abstract methods remain unsupported.
 
-DeclareClassBase records host-provided signature conversion facts for two output-owned
-nongeneric top-level class references in the same exact dependency assembly. It emits
-no new dependency declaration and opens no metadata reader. Repeating the same edge is
-idempotent; foreign/value/interface/generic/nested/cross-assembly, cyclic or conflicting
-edges throw ArgumentException. Null inputs throw ArgumentNullException; over 4096 edges
-throw InvalidDataException. Runtime verification still checks the actual dependency
-definitions; hosts must supply truthful symbol facts. It does not enable authoring a
-new class that derives from a dependency.
+DeclareClassBase records host-provided signature conversion facts for output-owned
+top-level class definitions in explicitly registered dependencies. The source is
+an unconstructed definition; the base is a complete nominal signature whose type
+parameters are scoped to that source. For example, registering `Middle<T>` with
+`Base<T[]>` and `Leaf<T>` with `Middle<T>` permits `Leaf<int>` to `Base<int[]>`.
+Substitution follows each edge and also applies when finding inherited interface
+views for variance. Constructed classes themselves remain invariant.
+
+The method emits no dependency declaration and opens no metadata reader. Repeating
+the same edge is idempotent. Foreign/value/interface/nested owners, unbound bases,
+method or out-of-scope type parameters, definition cycles (including expanding
+constructions), and conflicting edges throw ArgumentException. Null inputs throw
+ArgumentNullException; over 4096 edges throw InvalidDataException. Supported base
+arguments are primitive, nominal, array and owner-parameter signatures. Unsupported
+signature categories remain implementation gaps. Runtime verification checks the
+actual dependency definitions; hosts must supply truthful symbol facts. This does
+not yet enable authoring generic class layouts or materializing generic base
+signatures through the native TypeDefinition reader.
 
 See [the executable compiler gate](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/closed-family-2026-10-04.md).
 

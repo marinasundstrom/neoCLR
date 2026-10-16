@@ -11,6 +11,7 @@ internal static class InterfaceVarianceChecks
         CheckReferenceConversions();
         CheckExternalBaseConversions();
         CheckInheritedClassInterfaceConversions();
+        CheckGenericClassBaseConversions();
         CheckStringConversions();
         var core = new AssemblyIdentity("Core", new(1, 0, 0, 0));
         var graph = new AssemblyBuilder(new("VarianceSnapshot", new(1, 0, 0, 0)), core);
@@ -169,6 +170,59 @@ internal static class InterfaceVarianceChecks
         Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
     }
 
+    private static void CheckGenericClassBaseConversions()
+    {
+        var host = typeof(object).Assembly.GetName();
+        var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
+        var dependencyName = typeof(VarianceGenericBase<>).Assembly.GetName();
+        var dependency = new AssemblyIdentity(dependencyName.Name!, dependencyName.Version!);
+        var graph = new AssemblyBuilder(new("GenericBaseVariance", new(1, 0, 0, 0)), core);
+        ImportedTypeReference Import(string name) => graph.CreateTypeReference(dependency, core, new string('a', 64), "", name, 1);
+        var parent = Import("VarianceGenericBase`1");
+        var middle = Import("VarianceGenericMiddle`1");
+        var leaf = Import("VarianceGenericLeaf`1");
+        var view = graph.CreateInterfaceReference(dependency, core, new string('a', 64), "", "VarianceGenericView`1", 1);
+        graph.CompleteInterfaceReference(view);
+        var parameter = SignatureType.TypeParameter(0);
+        graph.AddInterfaceConversion(parent, view.MakeGenericInstance(parameter));
+        graph.DeclareClassBase(middle, parent.MakeGenericInstance(SignatureType.ArrayOf(parameter)));
+        graph.DeclareClassBase(leaf, middle.MakeGenericInstance(parameter));
+        graph.DeclareClassBase(leaf, middle.MakeGenericInstance(parameter));
+        Reject<ArgumentException>(() => graph.DeclareClassBase(parent, leaf.MakeGenericInstance(parameter)));
+        Reject<ArgumentException>(() => graph.DeclareClassBase(leaf, parent.MakeGenericInstance(parameter)));
+        Reject<ArgumentException>(() => graph.DeclareClassBase(Import("Bad`1"), parent));
+        Reject<ArgumentException>(() => graph.DeclareClassBase(Import("Scope`1"), parent.MakeGenericInstance(SignatureType.TypeParameter(1))));
+        var producer = graph.AddGenericInterface("Example", "Producer", ["T"]);
+        producer.SetVariance(0, GenericVariance.Covariant);
+        producer.AddInterfaceMethod("Get", new(parameter, []));
+        var consumer = graph.AddGenericInterface("Example", "Consumer", ["T"]);
+        consumer.SetVariance(0, GenericVariance.Contravariant);
+        consumer.AddInterfaceMethod("Accept", new(PrimitiveType.Void, [parameter]));
+        var from = leaf.MakeGenericInstance(PrimitiveType.Int32);
+        var to = parent.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32));
+        void Conversion(string name, SignatureType source, SignatureType target)
+        {
+            var method = graph.AddFunction(name, new(target, [source]));
+            method.LoadArgument(0); method.Return();
+        }
+        var inheritedView = view.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32));
+        Conversion("ViewProducer", producer.MakeGenericInstance(from), producer.MakeGenericInstance(inheritedView));
+        Conversion("ViewConsumer", consumer.MakeGenericInstance(inheritedView), consumer.MakeGenericInstance(from));
+        Conversion("Upcast", from, to);
+        Conversion("Produce", producer.MakeGenericInstance(from), producer.MakeGenericInstance(to));
+        Conversion("Consume", consumer.MakeGenericInstance(to), consumer.MakeGenericInstance(from));
+        _ = graph.WriteNativeAssembly();
+        var loaded = System.Reflection.Assembly.Load(graph.Write());
+        var value = new VarianceGenericLeaf<int>();
+        Check(ReferenceEquals(loaded.ManifestModule.GetMethods().Single(m => m.Name == "Upcast").Invoke(null, [value]), value),
+            "CLR generic base substitution preserves identity");
+        foreach (var name in new[] { "Produce", "Consume", "ViewProducer", "ViewConsumer" })
+            Check(loaded.ManifestModule.GetMethods().Single(m => m.Name == name).Invoke(null, [null]) is null,
+                "CLR generic base variance " + name);
+        Conversion("WrongArguments", from, parent.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int64)));
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+    }
+
     private static void CheckStringConversions()
     {
         var graph = new AssemblyBuilder(new("StringVariance", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
@@ -272,3 +326,8 @@ internal static class InterfaceVarianceChecks
         throw new Exception("Expected " + typeof(T).Name);
     }
 }
+
+public interface VarianceGenericView<T> { }
+public class VarianceGenericBase<T> : VarianceGenericView<T> { }
+public class VarianceGenericMiddle<T> : VarianceGenericBase<T[]> { }
+public class VarianceGenericLeaf<T> : VarianceGenericMiddle<T> { }

@@ -18270,3 +18270,18 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   separate gap. Structural work remains parked.
 - **Validation:** all 11 focused `interface_variance` runtime tests pass. No
   production behavior changed; existing native consumer evidence is reused.
+
+## 2026-10-16 — Fill type-system gaps against the .NET model
+
+- **Author:** directed filling the remaining type-system gaps, then clarified,
+  “.NET is our model, where we don’t diverge”. Sliceable/Result variance remains
+  postponed and structural work remains parked.
+- **Assistant:** selected generic base ancestry first, treating existing
+  restrictions as implementation gaps. Used .NET's constructed-class substitution
+  rules as the baseline and implemented scoped generic dependency base contracts
+  in the metadata SDK, including transitive substitution and cycle checks.
+- **Validation:** focused SDK tests and emitted CLR calls pass, including non-null
+  identity preservation, nested array arguments and inherited interface variance.
+- **Still open:** native generic base materialization/layout authoring and a Raven
+  native consumer, plus open generic relationship/member reflection. This SDK
+  slice does not claim to close those layers or introduce different semantics.

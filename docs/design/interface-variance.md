@@ -658,3 +658,26 @@ both producer and consumer conversions through a complete transitive chain, and
 rejects reverse widening. Emitted CLI conversion methods also load and execute.
 See the [Raven consumer](../validation/interface-variance/inherited-interface/README.md)
 for separately compiled dependency and native qualification.
+
+### Generic dependency ancestry substitution (2026-10-16)
+
+The author reaffirmed that .NET is the model wherever neoCLR does not deliberately
+diverge. Generic base substitution follows the
+[C# class specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#1533-members-of-constructed-types):
+apply the derived construction's arguments to its immediate base signature, then
+repeat for ancestors. This is a compatibility correction, not a new variance rule.
+
+The SDK's DeclareClassBase now accepts generic definitions with scoped base
+signatures. Its shared ancestry lookup substitutes nested nominal/array arguments;
+reference conversions and interface variance use that lookup. Definitions are
+checked for cycles before registration, including cycles whose arguments expand.
+Generic class arguments remain invariant. Focused SDK checks cover transitive
+array substitution, inherited interface producer/consumer views, wrong arguments,
+missing scope, unbound bases, duplicate/conflicting edges and cycles. Emitted CLR
+conversion methods execute, including a non-null identity-preserving base upcast.
+
+This closes dependency-contract validation only. Native TypeDefinition generic
+base materialization, generic class layout authoring and Raven source/native
+qualification remain gaps to close, not intended .NET divergences. Open generic
+relationship reflection remains separate. Sliceable/Result variance and structural
+work stay deferred.

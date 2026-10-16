@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Support scoped generic dependency base contracts in DeclareClassBase, substituting arguments through transitive reference and interface-variance checks in line with .NET. Reject unbound/out-of-scope bases, conflicting edges and definition cycles; generic classes remain invariant. SDK and emitted CLR checks pass. Native generic base materialization, layout authoring and Raven/native qualification remain open.
+
 - Fix SDK reference-only variance through interfaces inherited by imported classes: traverse explicitly registered dependency class bases, rejecting absent/incomplete ancestry and reverse conversions. Focused SDK/CLR checks and a separately compiled Raven interpreter/AOT/JIT consumer pass, including inherited interface calls, identity, mutation and native cleanup/sanitizers. No Runtime Contract, encoding or ABI change; Sliceable/Result variance remains deferred.
 
 - Record the author-directed deferral of Sliceable and Result variance, separating the original proposal from qualified reference-only interface variance. Add rejection coverage for invariant interfaces and nominal value wrappers nested in variant contracts, with valid exact-signature controls. Correct historical baseline and String qualification descriptions; no runtime ABI or compiler contract change.

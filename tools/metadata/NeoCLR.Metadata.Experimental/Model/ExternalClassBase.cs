@@ -38,7 +38,7 @@ public sealed partial class AssemblyBuilder
     internal int ExternalClassFieldCount(ImportedTypeReference type)
     {
         int count = 0;
-        for (ImportedTypeReference? current = type; current is not null; current = declaredClassBases.GetValueOrDefault(current))
+        for (ImportedTypeReference? current = type; current is not null; current = DeclaredClassBase(current))
         {
             if (!HasClassBaseContract(current)) throw new InvalidDataException("external ancestor requires a complete layout contract");
             count = checked(count + externalClassFieldCounts.GetValueOrDefault(current));
@@ -48,14 +48,14 @@ public sealed partial class AssemblyBuilder
 
     internal IEnumerable<MethodBuilder> ExternalClassMethods(ImportedTypeReference type)
     {
-        for (ImportedTypeReference? current = type; current is not null; current = declaredClassBases.GetValueOrDefault(current))
+        for (ImportedTypeReference? current = type; current is not null; current = DeclaredClassBase(current))
             if (externalClassContracts.TryGetValue(current, out var methods))
                 foreach (var method in methods) yield return method.Target;
     }
 
     internal IEnumerable<SignatureType> ExternalClassInterfaces(ImportedTypeReference type)
     {
-        for (ImportedTypeReference? current = type; current is not null; current = declaredClassBases.GetValueOrDefault(current))
+        for (ImportedTypeReference? current = type; current is not null; current = DeclaredClassBase(current))
             if (authoredInterfaceBases.TryGetValue(current, out var interfaces))
                 foreach (var contract in interfaces) yield return contract;
     }

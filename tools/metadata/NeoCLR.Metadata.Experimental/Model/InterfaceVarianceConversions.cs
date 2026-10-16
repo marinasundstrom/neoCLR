@@ -86,7 +86,7 @@ public sealed partial class AssemblyBuilder
                     foreach (var parent in owner.InheritedContracts()) pending.Push(Substitute(parent));
                 // A class inherits its base's nominal interface views. Traverse
                 // only registered dependency ancestry; do not infer it from names.
-                if (current.ImportedType is { } externalClass && declaredClassBases.TryGetValue(externalClass, out var baseClass))
+                if (current.ImportedType is { } externalClass && DeclaredClassBase(externalClass) is { } baseClass)
                     pending.Push(baseClass);
                 if (current.ImportedType is { } authoredOwner && authoredInterfaceBases.TryGetValue(InterfaceDefinition(authoredOwner), out var edges))
                     foreach (var parent in edges) pending.Push(parent.Substitute(Substitute));
