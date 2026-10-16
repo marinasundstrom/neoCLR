@@ -1,0 +1,29 @@
+public open class Base {
+    public field Number: int
+
+    public init(number: int) {
+        Number = number
+    }
+}
+
+public class Box<T> : Base {
+    private var value: T
+
+    public init(number: int, value: T) : base(number + 1) {
+        self.value = value
+    }
+
+    public func Get() -> T => value
+}
+
+func Main() -> int {
+    let box = Box<int>(1, 40)
+    let parent: Base = box
+    parent.Number = parent.Number + 1
+    if box.Get() != 40 { return 1 }
+    let references = Box<Base>(9, parent)
+    if !System.Object.ReferenceEquals(references.Get(), parent) { return 2 }
+    if references.Number != 10 { return 3 }
+    references.Get().Number = 2
+    return parent.Number + box.Get()
+}

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Retain the Raven native consumer for generic classes over local nongeneric bases, covering computed base initialization, generic payload storage, upcasts and inherited-field mutation. The compiler capability is enabled on Raven `codex/neoclr`; constructed/external generic base authoring remains open.
+
 - Admit native constant and scalar arithmetic/conversion arguments before the unconditional direct-base constructor call. Protect the uninitialized receiver from prefix operations and reject branches back into initialization. Focused profile checks and the updated CLR/interpreter/AOT/JIT consumer pass, including native cleanup and sanitizers; helper calls, stores and control flow in base expressions remain unsupported. Runtime Contracts and metadata encoding are unchanged.
 
 - Allow SDK generic classes over owned nonsealed nongeneric class bases, preserving constructor initialization checks, inherited storage and nominal upcasts/variance. Fix CLI field access on generic owners to retain their construction, preventing lost derived-field values with inherited storage. SDK/CLR regression checks and the retained interpreter/AOT/JIT consumer pass, including native cleanup/sanitizers; constructed base authoring and Raven emission remain open. AOT constant/computed base-constructor arguments remain an explicit backend gap.

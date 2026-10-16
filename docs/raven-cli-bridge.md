@@ -11451,3 +11451,20 @@ JIT against bundle variance-argument-sequence-20261016, including native cleanup
 and AOT sanitizer checks. The pre-fix AOT run reproduced the forwarded-arguments
 diagnostic. Sources, commands and current backend hashes are retained with the
 consumer evidence.
+
+### Raven generic local derived classes (2026-10-16)
+
+Raven's `codex/neoclr` adapter now enables generic classes over local nongeneric
+bases. `Box<T> : Base` retains native generic identity and explicit base
+initialization; the existing SDK encoding carries the relationship and generic
+members. There is no new Runtime Contract configuration or CLI encoding.
+Ordinary .NET behavior remains unchanged. See the retained
+[consumer](validation/generic-class-base/raven/README.md) for qualification.
+Constructed bases, generic derivation from external bases and imported generic
+derived-owner admission remain open; backend helper/control-flow initializer
+limits also remain. Structural types and Sliceable/Result variance stay deferred.
+
+Validation: the retained consumer returns 42 in interpreter, AOT and managed JIT
+against `variance-argument-sequence-20261016`, with native cleanup and AOT
+sanitizers passing. Both focused Raven inheritance tests pass, including CLR
+execution; the report records matching compiler, SDK and runtime hashes.

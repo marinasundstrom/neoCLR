@@ -180,5 +180,6 @@ authoring and Raven execution still need completion; this is not yet an end-to-e
 
 SDK-authored generic classes over ordinary nongeneric bases now pass CLR and
 native interpreter/AOT/JIT checks, including inherited storage. Constructed generic
-bases and Raven hierarchy emission still need completion; native base-constructor expressions support scalar constants/arithmetic;
+bases still need completion. Raven now emits generic classes over local nongeneric bases;
+external-base authoring and imported generic derived owners remain open; native base-constructor expressions support scalar constants/arithmetic;
 helper calls and control flow in those expressions remain backend gaps.
