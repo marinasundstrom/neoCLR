@@ -1,0 +1,12 @@
+public class Constants {
+    public const Base = 40
+    public const Answer = Base + 2
+    public const Minimum = unchecked(2147483647 + 1)
+}
+
+func Main() -> int {
+    if Constants.Minimum != -2147483648 {
+        return 1
+    }
+    return Constants.Answer
+}

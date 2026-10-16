@@ -73,10 +73,13 @@ it declares a checked operator.
 
 The same consumer is qualified on .NET 11 and native interpreter/JIT/AOT. Native
 arithmetic overflow is a terminal fault; .NET uses OverflowException. Built-in
-fixed-width constant addition, subtraction, multiplication, negation and numeric
-casts diagnose overflow at compile time by default; explicit unchecked integer
-constants wrap. Const locals retain typed values and dependencies on both targets; .NET also
-supports evaluated const fields, whose native emission remains a gap.
+fixed-width constant arithmetic and numeric casts diagnose overflow at compile time
+by default; integer/decimal constant zero divisors are diagnosed; explicit unchecked integer
+constants wrap. Const locals retain typed values and dependencies. The .NET target also supports
+arithmetic parameter defaults; native optional declarations remain unsupported.
+Development native emission also preserves Int32 class constants for source and
+imported consumers without allocating static storage; other constant field types
+and guest field-reflection support remain gaps.
 Broader constant-expression coverage, nullable/pointer conversions and mutations, and lifted arithmetic
 remain compiler gaps, with explicit diagnostics for unimplemented checked operations. See the
 [qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-blocks-and-constant-evaluation).

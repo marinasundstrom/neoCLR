@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "/Users/robert/Projects/neoclr/docs/validation/compound-operators/ConstantDefaults.rvn",
+        "--framework",
+        "net11.0",
+        "--raven-core",
+        "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/constantdefaults-dotnet-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "3612dd831f39810b3daaf959939ecd1e7dd24e258442a9475694da63e3a3768c"
+    },
+    {
+      "label": "execute",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/constantdefaults-dotnet-20261016/OperatorMatrix.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/ConstantDefaults.rvn": "1f0ea265293a99532e8998f2a8b47faef55bf00a3a61e819e990d1dd8aa10a79",
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-dotnet.py": "9a26b57b6262443bfbbcb040ba2006e5f3027f097d9eb0690f0b38ae3908650c",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "ddf612db265a7e8aa81fda0b246fa47af43bba6d3461474cecc80f78fb761e13",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "b16481e9edd7cbe640abb91ecde62c69ca148c654c6cfc94afc10639094f3706",
+    "/Users/robert/Projects/Raven-checked-conversions/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll": "e1a4f6cee9116b967fadc466b7a14b6d4df472521ce596806c5d83149a257c2f",
+    "/Users/robert/Projects/neoclr/target/constantdefaults-dotnet-20261016/OperatorMatrix.dll": "7e5255747a220f96aa1b66c139ab305dffa7a72cd2451332af8ce49b164eca8b"
+  }
+}

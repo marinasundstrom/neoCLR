@@ -1,0 +1,21 @@
+class InstanceState {
+    private val value: int
+
+    init(value: int) {
+        self.value = value
+    }
+
+    val Value: int => value
+}
+
+class StaticState {
+    static readonly field Value: int = 42
+}
+
+func Main() -> int {
+    let state = InstanceState(42)
+    if state.Value != StaticState.Value {
+        return 1
+    }
+    return state.Value
+}

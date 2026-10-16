@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "source": "/Users/robert/Projects/neoclr/docs/validation/compound-operators/ConstantDefaults.rvn",
+      "sourceSha256": "1f0ea265293a99532e8998f2a8b47faef55bf00a3a61e819e990d1dd8aa10a79",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/constant-admission-final-20261016/ConstantDefaults/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/constant-admission-final-20261016/ConstantDefaults/Main.rvn(2,5): error NEOMETA001: Native emission does not support callable declaration: static func Answer(value: int = 42) -> int.\n"
+    },
+    {
+      "source": "/Users/robert/Projects/neoclr/docs/validation/compound-operators/ReadonlyFields.rvn",
+      "sourceSha256": "a76222d29e86c9b212149b7943f9f935bc848785260d6f9c8a301a1e8aaf046d",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/constant-admission-final-20261016/ReadonlyFields/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/target/constant-admission-final-20261016/ReadonlyFields/Main.rvn(12,27): error NEOMETA001: Native emission does not support static field initializers require runtime type initialization.\n"
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/compound-operators/run-constant-admission.py": "824e5413e40d48d3a789d3a826ba1014c0cb7b992d0371c53f5a0cbe501009c8",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "6ae5faadc7b2fb0dc3f2731549fa4f42a8900b9707c6267921300ba27b05c3c6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "9c36acf4422b337a4d05fc9ff85ac0fd6877b0b237da99f98f89e594744f66eb",
+    "/Users/robert/Projects/neoclr/target/numerics-public-libraries-20261016/bundle.json": "1c6d173bed8b9c6b74ff7c6f496a4231d560a20485e0018e81763ac4f69154f9"
+  },
+  "compilerSha256": "953fa6b522e1c2e011eff43b605a98fafbb0076f6117ae39a905c2cce2da7456",
+  "codeAnalysisSha256": "47c3133e05e8a6a171c4594e6aeaa106980d994968b9d28a4f594fa96d7e8cf6"
+}

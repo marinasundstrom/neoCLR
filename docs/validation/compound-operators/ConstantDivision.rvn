@@ -1,0 +1,8 @@
+func Main() -> int {
+    let wrapped = unchecked(-2147483648 / -1)
+    let remainder = -2147483648 % -1
+    if wrapped != -2147483648 || remainder != 0 {
+        return 1
+    }
+    return 42
+}

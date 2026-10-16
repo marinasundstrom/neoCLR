@@ -1,0 +1,11 @@
+func Main() -> int {
+    const answer = (84 / 2) | 0
+    const remainder = -85 % 43
+    const masked = checked(1 << 32)
+    const shifted = -1 >>> 31
+    const complement = ~(-43)
+    if remainder != -42 || masked != 1 || shifted != 1 || complement != answer {
+        return 1
+    }
+    return answer
+}

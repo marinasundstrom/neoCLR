@@ -1,0 +1,5 @@
+class Calculator {
+    static func Answer(value: int = (84 / 2) | 0) -> int => value
+}
+
+func Main() -> int => Calculator.Answer()

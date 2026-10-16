@@ -5139,14 +5139,32 @@ adds compile-time overflow diagnostics for built-in fixed-width addition,
 subtraction, multiplication, negation and numeric casts, plus typed const local/field
 dependencies. Explicit unchecked integer constants wrap. No runtime API, metadata
 or instruction change is required. Broader constant-expression coverage (including
-parameter defaults, division/remainder, bitwise/shift composition and native-width/
-enum arithmetic) remains open. Existing nullable/pointer and checked binary
+native-width/enum arithmetic) remains open. Existing nullable/pointer and checked binary
 expression-tree gaps remain; structural work stays parked. This author-directed
 compiler task does not change milestone priorities. See [qualification](validation/compound-operators/README.md#checked-blocks-and-constant-evaluation).
 
-Native class constant declarations remain an emitter gap: shared binding and .NET
-field evaluation work, while the native executable consumer uses const locals.
+Native Int32 class constants now emit storage-free metadata and support imported
+reads; wider payload types remain a gap. Native optional parameters remain rejected.
 
 The constant evaluator's validated native carry is `9ea79f0e2`: 175 focused tests
 pass on each compiler line, the local-constant consumer returns 42 on .NET and
 interpreter/JIT/AOT, and both targets reject the four overflow cases before emission.
+
+### Constant and readonly qualification (2026-10-16)
+
+General Raven constant operator/default/lowering slices are committed on main and
+carried deliberately to codex/neoclr. Native Int32 class literal metadata uses
+neoCLR `e453a7bbf` and Raven `1b00893b3`; source and separate-provider consumers pass
+interpreter/JIT/AOT. Numeric constant materialization is main `e44a7ca96` / native
+`d194b4bda`, with 150 focused tests on each compiler line and native execution.
+The [qualification record](validation/compound-operators/README.md#additional-constant-operators-and-native-class-constants)
+retains revisions, commands and hashes. Parameter-default arithmetic works on .NET;
+native optional declarations remain explicitly rejected until metadata/import support.
+
+The author additionally requests both instance and static readonly fields. Instance
+constructor initialization passes all native backends; both forms pass on .NET.
+Native static initializers remain unsupported and need the [type-initialization
+implementation](design/readonly-fields.md). This is a .NET parity gap; constants
+do not substitute for readonly storage. Wider native literal payloads, native-width/
+enum constant expression coverage and guest field reflection remain open. Structural
+work stays parked, and these author-directed slices do not reorder other milestones.

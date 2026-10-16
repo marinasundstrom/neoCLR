@@ -18578,3 +18578,27 @@ remain open. This is implementation of the earlier platform convention direction
   behavior, with a compact qualification index. Raw regression evidence, published
   release notes, changelog and this conversation record remain separate from the
   feature narrative. No runtime or public API behavior changed.
+
+## 2026-10-16 — Constants and readonly field storage
+
+The author asked to continue native class-constant emission and the remaining
+constant-expression gaps, with general fixes on Raven main carried deliberately
+to codex/neoclr, validated slice commits and structural work parked. During that
+work the author added: “We need to support readonly fields too... both instance
+and static”. The assistant distinguished storage-free constants from readonly
+storage and proposed checking initialization contexts and write enforcement.
+
+The current investigation finds constructor/init-accessor enforcement for instance
+readonly fields, but native static readonly writes and type initializers are not
+admitted. This is a gap relative to .NET, not a deliberate readonly semantic change.
+Class constants and readonly fields must remain separate contracts. Constant work
+and qualification are recorded in the compiler changelogs and
+[operator qualification](validation/compound-operators/README.md); static initialization
+and full readonly qualification remain open at this point in the investigation.
+
+Qualification outcome: instance constructor-initialized readonly storage returns 42
+on interpreter/JIT/AOT; the combined instance/static sample returns 42 on .NET.
+Native static initialization remains explicitly rejected. The assistant recorded
+[type-initialization implementation requirements](design/readonly-fields.md), including
+per-closed-type state, ordering, reentrancy, publication and terminal-fault retention.
+This is preparation for implementation, not a claim that native static readonly is complete.

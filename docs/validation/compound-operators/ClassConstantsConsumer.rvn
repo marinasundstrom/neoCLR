@@ -1,0 +1,6 @@
+func Main() -> int {
+    if Constants.Minimum != -2147483648 {
+        return 1
+    }
+    return Constants.Answer
+}

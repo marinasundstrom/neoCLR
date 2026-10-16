@@ -1,0 +1,17 @@
+class InstanceState {
+    private val value: int
+
+    init(value: int) {
+        self.value = value
+    }
+
+    val Value: int => value
+}
+
+func Main() -> int {
+    let state = InstanceState(42)
+    if state.Value != 42 {
+        return 1
+    }
+    return state.Value
+}

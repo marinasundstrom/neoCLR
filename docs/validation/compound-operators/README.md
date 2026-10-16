@@ -340,14 +340,13 @@ typed values and dependencies. User-defined operators are never executed by the
 compiler. Decimal overflow does not wrap. These rules mirror .NET; no runtime
 metadata, opcode or Runtime Contract configuration changes are needed.
 
-Parameter-default evaluation, division/remainder, bitwise/shift composition,
-native-width and enum constant arithmetic are not expanded. Out-of-range unchecked
+Native-width and enum constant arithmetic are not expanded. Out-of-range unchecked
 floating conversions remain backend-dependent and are not folded. Checked binary
 expression trees and existing nullable/pointer gaps remain separate.
 
 `ConstantArithmetic.rvn` checks local dependencies, narrowing and wrapping.
-Class constant declarations remain unsupported by native emission; field evaluation
-is covered by the .NET compiler tests, not the native consumer.
+Int32 native class constants are qualified in the following section; this fixture
+retains its local-constant coverage.
 `ConstantOverflow.rvn` checks addition, narrowing, multiplication and negation
 rejection. `run-constant-diagnostics.py` requires four RAV0374 diagnostics and no
 emitted assembly on either target. Pass `--dotnet-compiler`, `--native-compiler`,
@@ -361,5 +360,60 @@ and sanitized AOT; both compilers reject all four overflow cases without an asse
 [.NET constant results](constant-arithmetic-dotnet-results.json),
 [native constant results](constant-arithmetic-native-results.json), and
 [compile-time rejection results](constant-diagnostics-results.json) retain exact
-commands and source/tool/bundle fingerprints. Class-constant emission remains a
-native gap; the initial field-based consumer was rejected with NEOMETA001.
+commands and source/tool/bundle fingerprints. Wider class-constant payloads remain a native gap; Int32 support is qualified below.
+
+
+## Additional constant operators and native class constants
+
+Raven main `84bdf63bf` / native `c59392f96` add division/remainder, bitwise operations,
+complement and masked shifts to typed constant evaluation. Both lines pass 80 focused
+tests. Main `49ca35b30` / native shared-binder carry `5f9a9c4f3` extend arithmetic
+parameter defaults (77 focused tests per line, plus 421 overload tests on main).
+Native callable admission still rejects optional declarations, so this is .NET
+support, not native default-parameter metadata support.
+
+Main `e44a7ca96` / native `d194b4bda` materialize numeric binary constant results
+at lowering time. ConstantDivision.rvn verifies unchecked minimum/-1 division and
+minimum%-1 remainder without runtime faults. Both lines pass 150 focused tests;
+the native consumer returns 42 on interpreter/JIT/AOT.
+
+NeoCLR `e453a7bbf` adds storage-free Int32 literal-field metadata and SDK roundtrip/
+reference projection. Raven native `1b00893b3` admits declarations and source/imported
+reads. ClassConstants.rvn and ClassConstantsConsumer.rvn both return 42 on
+interpreter/JIT/AOT. Emit a Library project named ClassConstantsProvider containing
+the Constants declaration, then pass its DLL to `run.py --reference` for the consumer.
+Rebuild both hosts with `cargo build -p neoclr -p neoclr-codegen`; an older host
+rejects literal_fields. The numerics-public-libraries-20261016 bundle remains unchanged.
+Other class constant payload types and guest field-reflection enumeration remain gaps.
+
+Evidence: [operators](constant-operators-native-results.json),
+[constant division](constant-division-native-results.json),
+[source class constants](class-constants-native-results.json), and
+[imported class constants](class-constants-import-results.json).
+The SDK `--class-constants` checks CLI/native/reference roundtrips, metadata values,
+visibility and storage exclusion; runtime `literal_field_tests` checks persistence
+and malformed duplicate rejection. API snapshot fingerprints pass unchanged.
+
+## Readonly field qualification and remaining admission limits
+
+ReadonlyFields.rvn returns 42 on .NET with both instance and static readonly storage.
+ReadonlyInstance.rvn returns 42 on native interpreter/JIT/AOT with constructor-initialized
+private val storage and a public getter. Native static field initializers remain
+rejected. They require type initialization, distinct from literal metadata support.
+See [the implementation requirements](../../design/readonly-fields.md).
+
+`run-constant-admission.py --compiler <native rvnc> --bundle <bundle> --output <fresh directory>`
+checks that arithmetic optional parameters and static readonly initializers are
+rejected explicitly with NEOMETA001 and no emitted assembly. These are recorded
+limitations, not successful feature execution. [Admission results](constant-admission-results.json),
+[.NET readonly results](readonly-fields-dotnet-results.json), and
+[native instance-readonly results](readonly-instance-native-results.json).
+
+Remaining constant work includes native-width/enum expression coverage, wider native
+class-literal payload types and native optional-parameter metadata/import. Structural
+work remains parked. Static readonly initialization is the next author-directed
+runtime/compiler feature, with once-only execution, ordering, reentrancy, failure,
+closed-generic storage and publication semantics still to implement.
+
+Ordinary .NET evidence also includes [arithmetic defaults](constant-defaults-dotnet-results.json)
+and [materialized division](constant-division-dotnet-results.json), each returning 42.

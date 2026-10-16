@@ -123,12 +123,11 @@ explicit unchecked integer constants wrap. Const locals and fields retain typed
 values and can refer to other constants. User-defined operators are not executed
 by the compiler. Decimal overflow does not wrap.
 
-This is a bounded evaluator, not full .NET constant-expression coverage: parameter
-defaults, division/remainder, bitwise/shift composition, native-width and enum
+This is a bounded evaluator, not full .NET constant-expression coverage: native-width and enum
 constant arithmetic are not widened. Out-of-range unchecked floating conversions
 remain backend-dependent and are not folded. These are gaps, not new semantics.
 See [executable evidence](../validation/compound-operators/README.md#checked-blocks-and-constant-evaluation).
 No runtime instruction, metadata or Runtime Contract change is needed.
 
-Native class constant declarations remain an emitter gap: shared binding and .NET
-field evaluation work, while the native executable consumer uses const locals.
+Native Int32 class constants now emit storage-free metadata and support imported
+reads; wider payload types remain a gap. Native optional parameters remain rejected.
