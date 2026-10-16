@@ -86,6 +86,7 @@ pub(super) fn compile_for_target(
                 })
                 || f.body.iter().any(|op| {
                     matches!(op, Op::New(Type::Tuple(_)) | Op::CastClass(Type::Union(_)) | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::LoadMetadataToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                        || crate::checked_conversion::spec(op).is_some()
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
         })
@@ -580,7 +581,7 @@ fn return_if(builder: &mut FunctionBuilder<'_>, failed: ir::Value, status: ir::V
     return_if_detailed(builder, failed, status, None);
 }
 
-fn return_if_detailed(
+pub(super) fn return_if_detailed(
     builder: &mut FunctionBuilder<'_>,
     failed: ir::Value,
     status: ir::Value,

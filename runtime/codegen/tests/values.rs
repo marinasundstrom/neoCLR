@@ -1051,7 +1051,7 @@ ret
 fn byte_profile_rejects_invalid_conversions_and_distinct_borrows() {
     for body in [
         "ldc.bool true\nconv.u1\nret",
-        "ldc.i4 256\nconv.ovf.u1\nret",
+        "ldc.bool true\nconv.ovf.u1\nret",
         ".local Byte value\nldloca value\ninitobj Int32\nldc.i4 0\nret",
     ] {
         let source = format!(
@@ -3508,5 +3508,52 @@ fn checked_wide_and_native_arithmetic_matches_interpreter_and_preserves_fault_re
                 );
             }
         }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn checked_conversions_route_numeric_functions_and_preserve_fault_results() {
+    for (source, literal, opcode, overflow) in [
+        ("Int32", "ldc.i4 42", "conv.ovf.u1", false),
+        ("Int32", "ldc.i4 256", "conv.ovf.u1", true),
+        ("Int32", "ldc.i4 -1", "conv.ovf.i4.un", true),
+        ("Int64", "ldc.i8 -1", "conv.ovf.u8", true),
+        ("Int64", "ldc.i8 42", "conv.ovf.i1", false),
+        ("Int64", "ldc.i8 9223372036854775807", "conv.ovf.i4", true),
+    ] {
+        // No nominal type declaration: selection must route checked conversions
+        // through the numeric value profile even for an otherwise scalar method.
+        let source = format!(
+            ".module CheckedConversion
+.entry Main
+             .function Convert({source} value) -> Int32
+ldarg value
+{opcode}
+conv.i4
+ret
+.end
+             .function Main() -> Int32
+{literal}
+call Convert({source})
+ret
+.end
+"
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        let interpreted = neoclr::run(&m, neoclr::Limits::default());
+        if overflow {
+            assert_eq!(
+                interpreted.unwrap_err().code,
+                neoclr::FaultCode::ArithmeticOverflow
+            );
+        } else {
+            assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(42));
+        }
+        native(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            if overflow { 2 } else { 0 },
+            if overflow { 12345 } else { 42 },
+        );
     }
 }

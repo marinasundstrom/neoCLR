@@ -3189,6 +3189,10 @@ pub(crate) fn compile_into(
                         let equal = b.ins().icmp(IntCC::Equal, left, right);
                         stack.push(b.ins().uextend(types::I32, equal));
                     }
+                    _ if crate::checked_conversion::spec(op).is_some() => {
+                        let value = pop(&mut stack);
+                        stack.push(crate::checked_conversion::emit(&mut b, op, value, site.as_ref()));
+                    }
                     Op::ConvertInt32 | Op::ConvertUInt32 => {
                         if matches!(top(), Ty::Size | Ty::Wide) {
                             let value = pop(&mut stack);

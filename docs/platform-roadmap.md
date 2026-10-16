@@ -5021,3 +5021,11 @@ covers boundary values and floating-point truncation/overflow. JIT/AOT still rej
 these operations; native lowering is the next prerequisite before Raven checked
 contexts and narrowing can be qualified. No Runtime Contract configuration, native
 encoding version or compiler behavior changes in this SDK slice.
+
+
+Native checked conversion follow-up (2026-10-16): all 20 conversions now use shared
+JIT/AOT lowering with exact integer range checks, floating truncation and ordered
+bounds checks, and existing ArithmeticOverflow fault propagation. The [native matrix](validation/checked-conversions/README.md#native-jitaot-lowering-follow-up)
+qualifies macOS ARM64; Windows profile restrictions are unchanged. This supersedes
+the backend rejection noted above. Raven checked contexts and operator selection
+remain the next compiler step; no Runtime Contract, encoding or library change.

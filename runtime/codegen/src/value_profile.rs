@@ -1268,6 +1268,7 @@ impl<'a> Profile<'a> {
                     n.checked_sub(offset)
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
+                _ if crate::checked_conversion::spec(op).is_some() => (),
                 Op::ConvertFloat32
                 | Op::ConvertFloat64
                 | Op::ConvertFloatUnsigned
@@ -1473,6 +1474,7 @@ impl<'a> Profile<'a> {
                     }
                 }
                 Op::Load(n) | Op::Store(n) | Op::LocalAddress(n) if *n < self.locals[i].len() => (),
+                _ if crate::checked_conversion::spec(op).is_some() => (),
                 Op::Int(_)
                 | Op::Int64(_)
                 | Op::Float64 { .. }
@@ -1757,6 +1759,18 @@ impl<'a> Profile<'a> {
                 Op::Int64(_) => stack.push(Ty::Wide),
                 Op::Float64 { .. } => stack.push(Ty::Double),
                 Op::Float32 { .. } => stack.push(Ty::Single),
+                _ if crate::checked_conversion::spec(op).is_some() => {
+                    let source = pop(&mut stack)?;
+                    if !matches!(source, Ty::Int | Ty::Wide | Ty::Size | Ty::Single | Ty::Double) {
+                        return Err(fail(pc, "checked conversion requires a numeric operand"));
+                    }
+                    stack.push(match op {
+                        Op::CheckedNativeInt | Op::CheckedNativeUInt
+                        | Op::CheckedNativeIntUnsigned | Op::CheckedNativeUIntUnsigned => Ty::Size,
+                        _ if crate::checked_conversion::spec(op).unwrap().0 == 64 => Ty::Wide,
+                        _ => Ty::Int,
+                    });
+                }
                 Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned => {
                     let source = pop(&mut stack)?;
                     if !matches!(

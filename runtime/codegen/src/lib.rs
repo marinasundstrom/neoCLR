@@ -4,6 +4,7 @@ mod bindings;
 mod boxing;
 mod class_dispatch;
 mod compiler;
+mod checked_conversion;
 mod fault_details;
 mod inspection;
 mod jit;

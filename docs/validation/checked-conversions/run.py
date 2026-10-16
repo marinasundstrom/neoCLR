@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Qualify SDK checked conversions in the interpreter and retain AOT rejection evidence."""
+"""Qualify SDK checked conversions in the interpreter and optionally retain historical AOT rejection evidence."""
 from concurrent.futures import ThreadPoolExecutor
 import argparse
 import hashlib
@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[3]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--images', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--expect-aot-rejection', action='store_true', help='Only for the pre-lowering backend at fd355a771')
 args = parser.parse_args()
 images, output = args.images.resolve(), args.output.resolve()
 output.mkdir(parents=True, exist_ok=False)
@@ -48,7 +49,7 @@ with ThreadPoolExecutor(max_workers=8) as workers:
 for case in cases:
     name = case['name']
     opcode = name.split('-')[0]
-    if opcode not in tested:
+    if args.expect_aot_rejection and opcode not in tested:
         image = images / (name + '.dll')
         obj = output / (opcode + '.o')
         result, log = run(opcode + '-aot-rejection', [codegen, '--closed-world', image, '@entry', obj])
@@ -61,4 +62,6 @@ report['files'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexd
                    for p in [runtime, codegen, Path(__file__).resolve(), images / 'cases.json',
                              ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll']}
 (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
-print(len(cases), 'interpreter cases PASS;', len(tested), 'AOT opcodes reject explicitly')
+print(len(cases), 'interpreter cases PASS')
+if args.expect_aot_rejection:
+    print(len(tested), 'AOT opcodes reject explicitly')

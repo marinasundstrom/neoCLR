@@ -9779,7 +9779,7 @@ This closes an SDK authoring gap relative to [.NET checked addition](https://lea
 and its unsigned form. Enum members are appended, preserving previous numeric
 values. There is no new convenience method or automatic checked context. Raven
 must still choose these operations during checked-expression lowering. Checked
-numeric conversion authoring is described below; native JIT/AOT lowering remains a gap.
+numeric conversion authoring and native lowering are described below.
 
 See [checked arithmetic validation](../docs/validation/checked-arithmetic/README.md)
 for the compiled SDK consumer, rejection cases and execution-mode evidence.
@@ -9818,8 +9818,9 @@ No array-length marker, reference, Boolean or managed pointer conversion is impl
 
 CLI uses standard conv.ovf.*[.un] instructions and OverflowException. Native
 emission uses the existing identically named operations and ArithmeticOverflow.
-The interpreter implements them; native JIT/AOT lowering remains unsupported and
-rejects explicitly. SDK authoring is not a backend capability guarantee.
+The interpreter and shared native JIT/AOT lowering implement them. Native faults
+preserve the caller result slot and use the existing fault-state contract. Native
+qualification covers macOS ARM64; existing Windows profile restrictions remain.
 
 For a method with an Int64 argument and Int32 result, for example:
 

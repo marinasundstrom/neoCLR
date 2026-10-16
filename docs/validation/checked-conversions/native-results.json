@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-16",
+  "platform": "macOS ARM64",
+  "passed": true,
+  "aotCases": 852,
+  "aotSuccesses": 442,
+  "aotOverflows": 410,
+  "jitCases": [
+    {
+      "name": "Conv_Ovf_I1-Int32-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I1_Un-Int64-2",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U1-IntPtr-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U1_Un-UIntPtr-2",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I2-Single-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I2_Un-Double-3",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U2-Int32-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U2_Un-Int64-2",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I4-IntPtr-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I4_Un-UIntPtr-2",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U4-Single-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U4_Un-Double-2",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I8-Int32-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I8_Un-Int64-2",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U8-IntPtr-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U8_Un-UIntPtr-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I-Single-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I_Un-Double-3",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U-Int32-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U_Un-Int64-0",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I8-Double-3",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U8-Double-4",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I4-Single-5",
+      "overflow": true,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U1-Double-1",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_I8-Double-6",
+      "overflow": false,
+      "passed": true
+    },
+    {
+      "name": "Conv_Ovf_U8-Double-7",
+      "overflow": true,
+      "passed": true
+    }
+  ],
+  "priorOracle": "results.json (.NET/interpreter qualification at fd355a771)",
+  "focusedRoutingCases": 6,
+  "invalidProfileTestPassed": true,
+  "apiSnapshotTests": 4,
+  "fullReport": "target/checked-conversions-aot-jit-20261016-final/results.json",
+  "fullReportSha256": "292cf6e07e663c6956999261c53ede4b6272ab67dbb938acbe6dae91c7549145",
+  "files": {
+    "docs/validation/checked-arithmetic/host.c": "09925bd1735890dbc062f3f54b7276fcb9ee0afa6f890c132281b334d528608a",
+    "docs/validation/checked-conversions/run-native.py": "1cb95bcd79b4aefbcfe4918e14360d912836f63adf2ee006194afa48d09b96ee",
+    "target/checked-conversions-sdk-20261016-v3/cases.json": "563387a9035dd32cd90787b45d099c140f63251eea943b67cd9f732834e774da",
+    "target/debug/neoclr": "916259e50faa34b833939602261c098426e2d1fd14f0116faccc8e727e65924c",
+    "target/debug/neoclr-codegen": "7feb8699b64d78a94db69691d6a3d972e4ad060df6a648995a582c16e012a8ac",
+    "target/function-reflection-library-validated-20261016/bundle.json": "dc92e3f835797fb7ab7f1bfbcda4fffec81901f7096a031978844f56bb4b4418",
+    "tools/metadata/NeoCLR.Metadata.Experimental/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "58f946d6521e05825d7825c11a4a0dce415f9b584a9184e835343b6d2f109c3b"
+  },
+  "logs": {
+    "/tmp/checked-conversion-routing.log": "314ece6c6e79c463bf907722edc865247239fdd7523932470664f92ec608e1cc",
+    "/tmp/checked-conversion-invalid-final.log": "ab328f3c2eaa1a438a433348c34783934ef8818485187c534ac954bb2efc273e",
+    "/tmp/checked-conversion-native-snapshot.log": "24759018e26ca4869a717d1cfca1705830d88f6e5a7f92214b9e6d23bea30216",
+    "/tmp/checked-conversions-aot-jit-final.log": "8d9277ba03a562553aaec5980f2c10283fc7b91dc89c89cd6ef355d05f478b9d"
+  }
+}

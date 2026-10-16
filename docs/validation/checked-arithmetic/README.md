@@ -78,5 +78,5 @@ Raven checked expression/block contexts, overload selection/fallback and checked
 narrowing are still follow-up work. Structural type work remains parked.
 
 Subsequent SDK slice: [checked conversion authoring](../checked-conversions/README.md)
-is now qualified on .NET and the interpreter. Shared JIT/AOT conversion lowering
-remains open. The arithmetic evidence above is unchanged.
+is now qualified on .NET and the interpreter, with a subsequent shared JIT/AOT
+lowering qualification in that record. The arithmetic evidence above is unchanged.

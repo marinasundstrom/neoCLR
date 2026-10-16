@@ -70,8 +70,8 @@ behavior remain separate implementation work.
 The metadata SDK now provides checked integer addition, subtraction and multiplication;
 native JIT/AOT preserve 32-bit, 64-bit and pointer-sized overflow semantics.
 This backend prerequisite does not yet enable Raven checked contexts.
-The SDK also emits checked numeric conversions for .NET and the native interpreter;
-JIT/AOT support for those conversions remains a prerequisite.
+The SDK also emits checked numeric conversions, qualified on .NET and native
+interpreter/JIT/AOT. Raven checked-context selection remains the compiler step.
 
 <a id="targets"></a>
 

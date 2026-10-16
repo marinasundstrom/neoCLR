@@ -1,9 +1,11 @@
 # Checked numeric conversions
 
-The interpreter supports conv.ovf.i1/u1/i2/u2/i4/u4/i8/u8/i/u and the .un variant of
-each instruction. These are the familiar CLI checked integer conversion forms. The
-intentional neoCLR difference is failure handling: overflow terminates with a Fault
-and instruction location rather than raising a catchable exception.
+The interpreter and shared JIT/AOT lowering support conv.ovf.i1/u1/i2/u2/i4/u4/i8/u8/i/u
+and the .un variant of each instruction. Native qualification covers macOS ARM64. These are the familiar CLI checked integer conversion forms. The
+intentional neoCLR difference is failure handling: overflow terminates the invocation
+rather than raising a catchable exception. The interpreter reports ArithmeticOverflow
+with an instruction location; native code returns status 2 and records fault details
+when using the corresponding context ABI. The host result slot remains unchanged.
 
 ## Source interpretation and destination range
 
@@ -56,3 +58,17 @@ numeric range. These instructions neither validate pointer lifetime nor change o
 
 See the [sample](../examples/checked-conversions.neoil),
 [integer storage rules](integer-types.md), and [floating-point rules](floating-point.md).
+
+## Native implementation and qualification
+
+Integer lowering checks bounds before reducing the evaluation width. Floating
+lowering truncates, checks ordered lower/exclusive-upper bounds, then uses a
+nontrapping conversion. This preserves the same observable faults without exposing
+hardware traps through the native ABI. Native-width conversions use 64 bits on
+current codegen targets; Windows profile restrictions remain unchanged.
+
+The [SDK differential matrix](validation/checked-conversions/README.md) compares
+852 cases with .NET and the interpreter, executes them in AOT, and checks selected
+managed JIT cases including cleanup and fault state. Raven checked-context syntax
+and operator selection remain compiler work; native instruction support alone does
+not enable those language semantics. No metadata or Runtime Contract change is required.
