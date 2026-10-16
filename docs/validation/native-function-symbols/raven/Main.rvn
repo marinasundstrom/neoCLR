@@ -1,0 +1,9 @@
+func Apply<T>(callback: (T) -> T, value: T) -> T => callback(value)
+
+func Increment(value: int) -> int => value + 2
+
+func Main() -> int {
+    let callback: (int) -> int = Increment
+    let box = FunctionBox<int>(callback)
+    return Apply(box.Get(), 40)
+}

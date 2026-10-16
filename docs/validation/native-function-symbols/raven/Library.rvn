@@ -1,0 +1,9 @@
+public class FunctionBox<T> {
+    private val callback: (T) -> T
+
+    init(callback: (T) -> T) {
+        self.callback = callback
+    }
+
+    func Get() -> (T) -> T => callback
+}

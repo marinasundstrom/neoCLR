@@ -78,6 +78,9 @@ Null member access raises NullReference.
 Native `FunctionType` constraint groundwork on `codex/function-kind-constraint`
 restricts a generic argument to a structural function signature. Nominal delegates
 and objects with an `Invoke` member do not qualify. The intended Raven spelling is
-`where T: func`; compiler support is still pending. Function-list/event-like APIs
+`where T: func`; constraint syntax is still pending. Raven now distinguishes native
+function-signature symbols from nominal delegate types, including generic
+substitution and imported callback signatures. Ordinary Raven/.NET mappings are
+unchanged. Function-list/event-like APIs
 would be ordinary library types, but invocation and multicast decisions are
 postponed. This is development work, not a published capability.
