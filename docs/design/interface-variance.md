@@ -534,3 +534,20 @@ Receiver/payload identity, native cleanup and AOT sanitizer checks pass; the thr
 existing unsafe source conversions still reject. Updated artifact hashes and
 commands are retained with the sample. Two native proof tests and the existing
 runtime reference-conversion regression also pass. Structural types remain parked.
+
+### Array arguments in interface variance (2026-10-16)
+
+The imported-base Raven consumer additionally exercises `Producer<int[]>` to
+`Producer<Object>` and `Consumer<Object>` to `Consumer<int[]>`. The array is a
+reference argument even though its elements are values. Both calls preserve the
+original array identity; mutation remains visible through its original producer.
+The same emitted image returns 42 in interpreter, AOT and managed JIT, including
+native fault/root/collection and AOT undefined-behavior/bounds sanitizer checks.
+The existing three reverse/unrelated source conversions still reject.
+
+This qualifies existing reference conversion behavior without new adapters,
+element boxing, metadata encodings or Runtime Contract options. Mutable array
+element types remain invariant; this does not permit `int[]` to `Object[]`.
+The unchanged bundle is `variance-argument-sequence-20261016`, using the compiler
+rebuilt against SDK `2c98cbd1b` and the backend Object-root fix `81701e5aa`.
+Evidence is retained in `docs/validation/interface-variance/imported-base/results.json`.

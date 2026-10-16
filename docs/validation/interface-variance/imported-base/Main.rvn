@@ -36,6 +36,16 @@ class NestedSource : Producer<Consumer<Base>> {
     func Get() -> Consumer<Base> => value
 }
 
+class ArraySource : Producer<int[]> {
+    private val value: int[]
+
+    init(value: int[]) {
+        self.value = value
+    }
+
+    func Get() -> int[] => value
+}
+
 class ObjectSink : Consumer<Object> {
     private val expected: Object
 
@@ -56,6 +66,9 @@ func Narrow(value: Consumer<Base>) -> Consumer<Leaf> => value
 func NarrowObject(value: Consumer<Object>) -> Consumer<Consumer<Base>> => value
 func WidenObject(value: Producer<Consumer<Base>>) -> Producer<Object> => value
 func Nest(value: Producer<Consumer<Base>>) -> Producer<Consumer<Leaf>> => value
+
+func WidenArray(value: Producer<int[]>) -> Producer<Object> => value
+func NarrowArray(value: Consumer<Object>) -> Consumer<int[]> => value
 
 func Main() -> int {
     let leaf = Leaf(40)
@@ -86,6 +99,20 @@ func Main() -> int {
     }
     if nestedConsumer.Accept(leaf) != 42 || leaf.Number != 42 {
         return 4
+    }
+    let numbers: int[] = [40, 2]
+    let arraySource = ArraySource(numbers)
+    let arrayProducer = WidenArray(arraySource)
+    if !Object.ReferenceEquals(arrayProducer.Get(), numbers) {
+        return 7
+    }
+    let arrayConsumer = NarrowArray(ObjectSink(numbers))
+    if arrayConsumer.Accept(numbers) != 42 {
+        return 8
+    }
+    numbers[0] = 42
+    if arraySource.Get()[0] != 42 {
+        return 9
     }
     return 42
 }

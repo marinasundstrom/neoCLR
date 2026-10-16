@@ -40,3 +40,9 @@ The consumer additionally checks interface-valued arguments widening to Object i
 both producer and consumer variance positions. These checks exposed loss of the
 native Object-root role during private renaming; the native fix retains that fact
 without changing nominal identity or adding a conversion wrapper.
+
+Array-valued arguments also pass in both directions: Producer<int[]> widens to
+Producer<Object>, and Consumer<Object> narrows to Consumer<int[]>. Calls preserve
+array identity, and a mutation is visible through the original producer. Array
+element storage remains invariant. This extends the retained three-backend evidence
+without a runtime or compiler code change.

@@ -39,3 +39,8 @@ Interface-valued reference arguments may widen to Object in the declared varianc
 direction. Native lowering preserves the verified Object-root role through private
 renaming; producer and consumer paths are qualified with actual identity checks in
 interpreter/AOT/JIT. This does not admit value boxing or intrinsic String widening.
+
+Array references are also supported as variant arguments: Producer<int[]> can
+widen to Producer<Object>, and Consumer<Object> can narrow to Consumer<int[]>.
+The calls retain the same array; element storage remains invariant. Both directions
+are qualified in Raven interpreter, AOT and managed JIT.

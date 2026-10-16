@@ -152,3 +152,8 @@ remain rejected. See the [variance reference](/docs/interface-variance.html).
 
 Interface-valued arguments can also widen to Object in the declared variance
 direction; native producer and consumer paths preserve reference identity.
+
+Array references are also supported as variant arguments: Producer<int[]> can
+widen to Producer<Object>, and Consumer<Object> can narrow to Consumer<int[]>.
+The calls retain the same array; element storage remains invariant. Both directions
+are qualified in Raven interpreter, AOT and managed JIT.

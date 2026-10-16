@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Qualify array-valued interface variance through imported Raven contracts: Producer<int[]> widens to Producer<Object> and Consumer<Object> narrows to Consumer<int[]> with array identity preserved. Interpreter/AOT/JIT and native cleanup/sanitizer checks pass; array storage remains invariant. No compiler/runtime behavior change.
+
 - Preserve the verified Object-root role through private native renaming so interface-valued variant arguments can widen to Object. Fix an AOT fault in an otherwise valid Raven conversion; reject forged compiler facts and retain reverse/value-boxing exclusions. Extended producer/consumer calls pass interpreter/AOT/JIT with identity, native cleanup and sanitizer checks.
 
 - Qualify imported-base interface variance through a separately compiled Raven library and consumer. Covariant, contravariant and nested calls preserve receiver/payload identity and inherited-field mutation in interpreter/AOT/JIT; three reverse/unrelated source conversions reject. Retain the runner, binary hashes and native fault/GC/sanitizer checks, closing the SDK fix’s source/native qualification gap.
