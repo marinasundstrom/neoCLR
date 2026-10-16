@@ -28,6 +28,26 @@ pub fn properties(module: &Module, owner: &Type) -> Result<Value, Fault> {
     )
 }
 
+/// Return all field or constructor descriptors, without executing initialization.
+pub fn members(module: &Module, owner: &Type, constructors: bool) -> Result<Value, Fault> {
+    let query = if constructors {
+        crate::reflection::Query::Constructors
+    } else {
+        crate::reflection::Query::Fields
+    };
+    query.invoke_profile(
+        module,
+        &[
+            Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(
+                module, owner,
+            )?)),
+            Value::Int32(60),
+        ],
+        &Limits::default(),
+        true,
+    )
+}
+
 /// Return the optional logical element descriptor recipe.
 pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::ElementType.invoke_profile(
@@ -506,8 +526,78 @@ fault "test body must not execute"
         // Attributes remain available even when signature materialization is unsupported.
         assert!(module_function_attributes(&module, "Package", "Example.Tests", &id).is_ok());
     }
+    #[test]
+    fn fields_and_initializer_are_descriptive_and_keep_distinct_tokens() {
+        let mut source = fixture();
+        let owner = Type::from_name("Marker");
+        let d = source
+            .types
+            .iter_mut()
+            .find(|d| d.name == "Marker")
+            .unwrap();
+        d.static_fields = serde_json::from_value(serde_json::json!([
+            {"name":"Answer", "ty":"Int32", "readonly":true}
+        ]))
+        .unwrap();
+        d.literal_fields = serde_json::from_value(serde_json::json!([
+            {"name":"Literal", "value":42, "visibility":"public"}
+        ]))
+        .unwrap();
+        let mut initializer = source
+            .functions
+            .iter()
+            .find(|f| f.owner.as_ref() == Some(&owner))
+            .unwrap()
+            .clone();
+        initializer.name = "Marker..cctor".into();
+        initializer.instance = false;
+        initializer.visibility = crate::metadata::Visibility::Private;
+        initializer.parameters.clear();
+        initializer.definition.as_mut().unwrap().index += 100;
+        source.functions.push(initializer);
+        let Value::Array { elements, .. } = members(&source, &owner, false).unwrap() else {
+            panic!()
+        };
+        assert_eq!(elements.len(), 3);
+        let tokens: Vec<_> = elements.iter().map(|f| fields(f)[2].clone()).collect();
+        assert_ne!(tokens[0], tokens[1]);
+        assert_ne!(tokens[1], tokens[2]);
+        let readonly = fields(&elements[1]);
+        assert_eq!(readonly[8], Value::Boolean(true));
+        assert_eq!(readonly[10], Value::Boolean(true));
+        let literal = fields(&elements[2]);
+        assert_eq!(literal[11], Value::Boolean(true));
+        assert_eq!(literal[12], Value::Erased(Box::new(Value::Int32(42))));
+        let Value::Array { elements, .. } = members(&source, &owner, true).unwrap() else {
+            panic!()
+        };
+        assert_eq!(elements.len(), 2);
+        let Value::Object { ty, .. } = &elements[1] else {
+            panic!()
+        };
+        assert_eq!(*ty, Type::from_name("System.Introspection.ConstructorInfo"));
+        let methods = crate::reflection::Query::Methods
+            .invoke_profile(
+                &source,
+                &[
+                    Value::RuntimeTypeHandle(Box::new(
+                        crate::type_identity::describe_loaded(&source, &owner).unwrap(),
+                    )),
+                    Value::Int32(60),
+                ],
+                &Limits::default(),
+                true,
+            )
+            .unwrap();
+        let Value::Array { elements, .. } = methods else {
+            panic!()
+        };
+        assert!(
+            elements.is_empty(),
+            "instance and static constructors must not become methods"
+        );
+    }
 }
-
 
 /// Retain a verified interface's source identity in a private native compiler shape.
 /// These facts are in-memory compiler IR, not serialized metadata or new inheritance.

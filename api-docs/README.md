@@ -2289,3 +2289,9 @@ Development Int32 class constants extend the host FieldDefinition constructor's
 accepted contract without adding guest APIs. The manual [metadata SDK reference](experimental-metadata.md#int32-class-constants-development)
 documents flags, metadata preservation and storage exclusion. Host C# SDK types
 retain their existing RavenDoc exclusion; guest reference/snapshot inputs are unchanged.
+
+Field/initializer development coverage (2026-10-16): FieldInfo IsInitOnly/IsLiteral/
+ConstantValue and TypeInfo IsBeforeFieldInit/TypeInitializer are in the matching
+CoreProbe reference, XML summaries and manual introspection/reflection guide. No new
+public type exclusion is needed. The native execution scope remains bounded as documented;
+general closed-generic reflection and arbitrary boxed value payloads are not claimed.

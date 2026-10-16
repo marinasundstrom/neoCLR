@@ -18632,6 +18632,30 @@ integration work; native contexts retain their existing thread-affine lifetime.
   already have guest surfaces; their documented execution/signature limits remain.
 - The concurrent SDK slice adds initializer authoring/native reads/reference
   projection, not guest reflection parity. Requirements are recorded in
-  [readonly initialization](design/readonly-fields.md#guest-introspection-and-reflection-follow-through).
+  [readonly initialization](design/readonly-fields.md#guest-introspection-and-reflection).
   No new reflection API or broader structural restart was authorized or implemented
   by this question; Raven source emission and reflection qualification remain open.
+
+
+### 2026-10-16 — Closing field and initializer reflection
+
+- Author directed Raven static readonly emission, closure of field/type-initializer
+  introspection and reflection gaps, validation on interpreter/JIT/AOT and a commit
+  for each validated slice. Follow-up: “Continue until you have closed the introspection
+  and reflection gap.” Structural work remains parked.
+- Assistant completed native Raven initializer production and source/imported generic
+  consumers, then added field storage/literal facts and initializer/timing descriptions.
+  Inspection remains descriptive. Public static field operations use ordinary runtime
+  guards; rejected writes do not initialize the owner, and initializer faults remain terminal.
+- The consumer exposed capture of a type-name receiver during qualified static compound
+  mutation. Assistant fixed this on Raven main `289019055`, validated 29 focused tests,
+  and carried it deliberately to `codex/neoclr` as `97f5252c9`.
+- Assistant preserved native static/literal field tokens (`5d3f6d6cf`) and corrected
+  the combined origin-table limit (`40d40c854`). Added explicit schema-7 native retention
+  for field execution and descriptive constructors, corrected native snapshot/query
+  dispatch, and kept function/array initializers absent without nominal metadata roots.
+- [Recorded consumers](validation/field-reflection/README.md) pass interpreter, managed
+  JIT and sanitized AOT on macOS ARM64, including terminal initializer overflow and
+  reflective construction. API reference artifacts and feature/integration documentation
+  are refreshed. General closed-generic reflection execution and arbitrary boxed value
+  payloads remain separately documented limits, not erased metadata or completed work.

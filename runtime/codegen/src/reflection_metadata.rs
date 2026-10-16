@@ -261,17 +261,17 @@ fn signature_name(ty: &Type) -> Result<String, Error> {
     })
 }
 
-fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 20], Error> {
+fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 21], Error> {
     use neoclr::metadata::Representation;
     let Some(d) = source.type_definition(ty) else {
         if matches!(ty, Type::Function(_)) {
-            let mut result = [false; 20];
+            let mut result = [false; 21];
             result[11] = visible(source, ty);
             result[13] = true;
             return Ok(result);
         }
         if matches!(ty, Type::ArrayRef(_)) {
-            let mut result = [false; 20];
+            let mut result = [false; 21];
             result[0] = true;
             result[11] = visible(source, ty);
             return Ok(result);
@@ -279,7 +279,7 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 20], Error> {
         return Err("native shape queries require source declaration".into());
     };
     let interface = d.representation == Representation::Interface;
-    let mut result = [false; 20];
+    let mut result = [false; 21];
     result[0] = matches!(ty, Type::ArrayRef(_));
     result[3] = interface;
     result[5] = d.is_abstract || interface;
@@ -304,6 +304,7 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 20], Error> {
             }) == Some("System.Runtime.CompilerServices.UnionAttribute")
     });
     result[11] = visible(source, ty);
+    result[20] = !matches!(ty, Type::ArrayRef(_)) && d.before_field_init;
     result[12] = !matches!(ty, Type::ArrayRef(_));
     Ok(result)
 }
@@ -491,7 +492,7 @@ pub fn bind_queries(
         {
             shape(source, &semantic_type)?
         } else {
-            [false; 20]
+            [false; 21]
         };
         let metadata_token = if queries
             .iter()
@@ -586,7 +587,7 @@ pub fn bind_queries(
                 Op::BranchFalse(5),
                 Op::Fault("unknown type shape query".into()),
                 Op::Arg(1),
-                Op::Int(20),
+                Op::Int(21),
                 Op::Less,
                 Op::BranchTrue(10),
                 Op::Fault("unknown type shape query".into()),
@@ -1112,7 +1113,10 @@ mod object_tests {
             "nativeBindings":[], "functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.ObjectTypeHandle"}],
             "sourceMetadata":{"types":[]}});
         bind_object_type(&mut source, &mut report).unwrap();
-        assert_eq!(report["nativeBindings"][0]["functionTokens"], json!([shape.clone()]));
+        assert_eq!(
+            report["nativeBindings"][0]["functionTokens"],
+            json!([shape.clone()])
+        );
         assert_eq!(report["nativeBindings"][0]["targets"], json!([]));
         assert!(source.functions[0].body.iter().any(|op| matches!(op,
             neoclr::metadata::Instruction::LoadTypeToken(t) if t == &shape)));
@@ -1171,7 +1175,7 @@ fn open_query_prefix(
             Op::BranchFalse(5),
             Op::Fault("unknown type shape query".into()),
             Op::Arg(1),
-            Op::Int(20),
+            Op::Int(21),
             Op::Less,
             Op::BranchTrue(10),
             Op::Fault("unknown type shape query".into()),
@@ -1268,7 +1272,7 @@ fn open_query_prefix(
                 body.push(Op::Fault("generic argument index out of range".into()));
             }
             "neoCLR.Runtime.TypeShape" => {
-                for selector in 0..20 {
+                for selector in 0..21 {
                     let fact =
                         neoclr::native_metadata::descriptor_shape(source, &descriptor, selector)
                             .map_err(|e| e.to_string())?;
@@ -1512,7 +1516,7 @@ mod open_query_tests {
     #[test]
     fn open_queries_preserve_invalid_selector_and_argument_faults() {
         for (name, selector, expected) in [
-            ("TypeShape", 20, "unknown type shape query"),
+            ("TypeShape", 21, "unknown type shape query"),
             ("TypeDisplayName", -1, "unknown type name query"),
             ("TypeDisplayName", 2, "unknown type name query"),
             ("TypeArgument", -1, "generic argument index out of range"),

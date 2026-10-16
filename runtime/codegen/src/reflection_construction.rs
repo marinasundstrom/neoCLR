@@ -20,7 +20,7 @@ pub fn bind(
         .and_then(Value::as_u64)
         .unwrap_or(0);
     if config.len()
-        != if version == 6 {
+        != if version >= 6 {
             5
         } else if version == 5 {
             4
@@ -29,9 +29,9 @@ pub fn bind(
         } else {
             2
         }
-        || !matches!(version, 1 | 2 | 3 | 4 | 5 | 6)
+        || !matches!(version, 1 | 2 | 3 | 4 | 5 | 6 | 7)
     {
-        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, 5 with moduleCatalogs and moduleFunctions, or 6 additionally with typeCatalogs".into());
+        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, 5 with moduleCatalogs and moduleFunctions, 6 additionally with typeCatalogs, or 7 with field and constructor retention".into());
     }
     let roots = config
         .get("types")
@@ -132,6 +132,7 @@ pub fn bind(
         let field_count = match version {
             1 => 2,
             2 => 5,
+            7 => 10,
             _ => 6,
         };
         if fields.len() != field_count
@@ -167,6 +168,20 @@ pub fn bind(
             }
             if !property_policy[0] && (property_policy[1] || property_policy[2]) {
                 return Err("reflection accessor roots require property metadata".into());
+            }
+        }
+        let mut field_policy = [false; 4];
+        if version >= 7 {
+            for (i, key) in ["fields", "fieldGetters", "fieldSetters", "constructors"]
+                .iter()
+                .enumerate()
+            {
+                field_policy[i] = root[*key]
+                    .as_bool()
+                    .ok_or("field/constructor retention requires Boolean policies")?;
+            }
+            if !field_policy[0] && (field_policy[1] || field_policy[2]) {
+                return Err("field access requires field metadata".into());
             }
         }
         let index = definitions
@@ -240,6 +255,7 @@ pub fn bind(
             }
         }
         rows.push(json!({"definition":definition,"sourceName":ty.name,"construct":construct,
+            "fields":field_policy[0],"fieldGetters":field_policy[1],"fieldSetters":field_policy[2],"constructors":field_policy[3],
             "customAttributes":custom_attributes,"properties":property_policy[0],"getters":property_policy[1],"setters":property_policy[2],
             "checkStatus":status,"constructor":target.as_ref().and_then(|_| candidates.first()).map(|i| &methods[*i]),
             "policy":"explicit source identity; metadata check does not retain constructor body unless invocation is requested"}));
@@ -336,6 +352,46 @@ pub fn bind(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn field_retention_requires_explicit_metadata_and_boolean_policies() {
+        let source = neoclr::assemble(".module Fields\n.type Item\n.end\n").unwrap();
+        let definition = TypeDefId {
+            module: "Fields".into(),
+            revision: None,
+            index: 0,
+        };
+        let valid = json!({"schemaVersion":7,"types":[{
+            "definition":definition,"construct":false,"properties":false,"getters":false,"setters":false,
+            "customAttributes":false,"fields":true,"fieldGetters":true,"fieldSetters":false,"constructors":true
+        }],"moduleCatalogs":[],"moduleFunctions":[],"typeCatalogs":[]});
+        let result = bind(
+            &mut source.clone(),
+            &source,
+            &[definition.clone()],
+            &[],
+            &valid,
+        )
+        .unwrap();
+        assert_eq!(result["types"][0]["fields"], true);
+        for key in ["fields", "fieldGetters", "fieldSetters", "constructors"] {
+            let mut invalid = valid.clone();
+            invalid["types"][0][key] = json!("true");
+            assert!(
+                bind(
+                    &mut source.clone(),
+                    &source,
+                    &[definition.clone()],
+                    &[],
+                    &invalid
+                )
+                .is_err()
+            );
+        }
+        let mut invalid = valid;
+        invalid["types"][0]["fields"] = json!(false);
+        assert!(bind(&mut source.clone(), &source, &[definition], &[], &invalid).is_err());
+    }
 
     #[test]
     fn type_catalog_retention_is_explicit_and_does_not_select_layouts() {

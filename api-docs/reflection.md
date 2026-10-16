@@ -41,7 +41,7 @@ remain terminal runtime Faults, including allocation and execution limits. Sette
 have side effects before a fault; operations are not transactional.
 
 Only the current loaded program is supported. Dynamic loading, separate execution
-contexts, generic-class invocation and static-field access remain future work. These
+contexts, generic-class invocation remain future work. These
 extensions do not make every introspection descriptor executable.
 
 Development FunctionTypeInfo.InvokeMethod and TypeInfo.GetMethods expose a synthesized
@@ -82,8 +82,8 @@ Void-returning methods produce a successful null. Virtual calls dispatch normall
 
 [FieldReflectionExtensions](xref:System.Runtime.Reflection.FieldReflectionExtensions)
 adds `GetValue(Object?) -> Result<Object?, ReflectionError>` and
-`SetValue(Object?, Object?) -> Result<(), ReflectionError>`. Fields must be public
-instance fields; source read-only fields cannot be assigned. Private helper visibility
+`SetValue(Object?, Object?) -> Result<(), ReflectionError>`. Fields must be public instance or static fields (including readable literals);
+source read-only and literal fields cannot be assigned. Private helper visibility
 does not grant permission. New origins retain field_access and field_readonly arrays;
 old imported fields without those admission flags cannot execute through reflection.
 
@@ -207,3 +207,36 @@ See [function invocation](functions.md#functionreflectioninvoke-provisional-deve
 for supported signatures, null/no-result behavior and limits. Generic overloads are
 future work. This differs from .NET Delegate.DynamicInvoke's exception contract and
 uses the existing neoCLR reflection error convention.
+
+## Fields and type initializers (development)
+
+`FieldInfo.IsInitOnly`, `IsLiteral` and `ConstantValue: Option<Object>` distinguish
+readonly storage from storage-free Int32 literals. `GetFields` applies Public/NonPublic
+and Instance/Static flags to all three categories; its default includes public instance
+and static fields. Metadata inspection and literal reads never initialize the owner.
+`TypeInfo.IsBeforeFieldInit` exposes relaxed initialization timing, while
+`TypeInfo.TypeInitializer: Option<ConstructorInfo>` describes the private static `.cctor`.
+It is excluded from ordinary methods and public instance constructor enumeration.
+This descriptor does not grant direct invocation of a runtime-owned initializer.
+
+Field `GetValue`/`SetValue` support public instance fields of nongeneric reference
+classes and public static fields of nongeneric nominal records. Static operations
+ignore the receiver, like .NET FieldInfo. Values remain exact boxed built-in scalars
+or compatible references/null. Readonly and literal writes return AccessDenied;
+wrong values return InvalidValue. Successful storage access runs normal type
+initialization, once per closed owner in the invocation; initializer faults remain
+terminal and are never converted to successful reflection results.
+
+Interpreter execution and retained JIT/AOT access use ordinary verified field
+operations. Native compilation requires reflection-roots schema 7: each type row
+adds Boolean `fields`, `fieldGetters`, `fieldSetters`, and `constructors` to the
+schema-6 policies. Getters/setters require field metadata; constructor retention
+is descriptive and does not make private constructors callable. Existing generic
+reflection execution, custom boxed value payload and boxed instance-struct field
+limitations remain; these are execution gaps rather than erased type information.
+See `docs/validation/field-reflection` for the executable contract and fault checks.
+
+These descriptor additions require a matching runtime and System.Runtime bundle;
+old RuntimeFieldInfo provider layouts must be rebuilt. Legacy source-origin token tables
+remain readable, with absent tokens reported as None. No change to ordinary Raven/.NET
+reflection or compiler Runtime Contract selection is implied.

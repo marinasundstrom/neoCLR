@@ -1,0 +1,18 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+
+public class Counter { public static field Count: int }
+public class State {
+    public static readonly field Value: int
+    static init() {
+        let value = 2147483647
+        Value = checked(value + 1)
+    }
+}
+func Main() -> int {
+    for member in typeof(State).GetFields() {
+        let _ = member.GetValue(null)
+    }
+    return 42
+}

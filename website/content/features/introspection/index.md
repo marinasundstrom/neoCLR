@@ -117,3 +117,11 @@ Development native discovery supports retained assembly/module type catalogs,
 including open definitions and their variance annotations. AOT/JIT require explicit
 `typeCatalogs` retention; open member/relationship queries remain unsupported.
 See the [reflection reference](/docs/reflection.html).
+
+## Development: field and initializer facts
+
+FieldInfo now distinguishes readonly storage and Int32 literals through `IsInitOnly`,
+`IsLiteral` and `ConstantValue`. TypeInfo exposes `IsBeforeFieldInit` and an optional
+`TypeInitializer` constructor descriptor. Inspection never runs the initializer.
+See the [introspection reference](/docs/introspection.html) and
+[reflection execution limits](/docs/reflection.html#fields-and-type-initializers-development).

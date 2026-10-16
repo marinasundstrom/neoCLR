@@ -28,7 +28,7 @@ is not a MethodInfo. Default enumeration returns declared public instance
 constructors; flags can inspect nonpublic constructors. Constructors are not
 inherited and remain excluded from GetMethods. Metadata tokens and parameter
 identity follow the existing module-scoped contracts. Enumeration does not run code.
-The target currently has no static initializer import/execution model.
+Static initializers are described by TypeInitializer and selected by Static | NonPublic flags; they remain runtime-owned and cannot be called directly.
 
 ## Bounded execution policy
 
@@ -38,7 +38,7 @@ fields require a compatible non-null receiver; static methods require null.
 Public IL methods are supported, including ordinary virtual dispatch. Native,
 open-generic, byref/out and custom-value signatures remain outside this slice.
 Abstract/interface method descriptors are not independently invocable in this slice.
-Fields are instance fields; static storage is not currently part of this model.
+Fields include public instance storage, static storage and readable Int32 literals. Static field access ignores the receiver and uses normal initialization guards; readonly/literal writes are denied. See the [field and initializer contract](../api-docs/reflection.md#fields-and-type-initializers-development).
 
 Values support references/null and the same exact boxed built-in scalar types as
 property execution. No numeric widening, string conversion, optional-argument

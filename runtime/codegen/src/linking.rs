@@ -250,13 +250,18 @@ pub fn prepare(
             &methods,
             retention,
         )?);
+        super::reflection_fields::bind(&mut joined, &source_metadata, &types, retention)?;
         super::reflection_collections::bind(&mut joined, &source_metadata, &types, retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, retention)?;
     } else if super::runtime_context::has_queries(&joined, &source_metadata)
         || joined.functions.iter().any(|f| {
             matches!(
                 f.name.as_str(),
-                "neoCLR.Runtime.ReflectionPropertyGet"
+                "neoCLR.Runtime.ReflectionFieldGet"
+                    | "neoCLR.Runtime.ReflectionFieldGetCheck"
+                    | "neoCLR.Runtime.ReflectionFieldSet"
+                    | "neoCLR.Runtime.ReflectionFieldSetCheck"
+                    | "neoCLR.Runtime.ReflectionPropertyGet"
                     | "neoCLR.Runtime.ReflectionPropertyGetCheck"
                     | "neoCLR.Runtime.ReflectionPropertySet"
                     | "neoCLR.Runtime.ReflectionPropertySetCheck"
@@ -279,6 +284,7 @@ pub fn prepare(
             &methods,
             &mut retention,
         )?);
+        super::reflection_fields::bind(&mut joined, &source_metadata, &types, &retention)?;
         super::reflection_collections::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         reflection_retention = Some(retention);

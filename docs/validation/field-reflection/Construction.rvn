@@ -1,0 +1,39 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Result.*
+
+public class Counter {
+    public static field Count: int
+}
+
+public class State {
+    public static readonly field Answer: int
+
+    static init() {
+        Counter.Count += 1
+        Answer = 42
+    }
+}
+
+func Main() -> int {
+    let info = typeof(State)
+    if info.IsBeforeFieldInit || Counter.Count != 0 {
+        return 1
+    }
+    let instance = match info.CreateInstance() {
+        Ok(let value) => value
+        Error(_) => return 2
+    }
+    if Counter.Count != 1 || State.Answer != 42 {
+        return 3
+    }
+    let second = match info.CreateInstance() {
+        Ok(let value) => value
+        Error(_) => return 4
+    }
+    if Counter.Count != 1 {
+        return 5
+    }
+    return 42
+}

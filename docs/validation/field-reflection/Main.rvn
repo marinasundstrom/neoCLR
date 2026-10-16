@@ -1,0 +1,121 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Result.*
+import System.Option.*
+
+public class Counter {
+    public static field Count: int
+}
+
+public class State {
+    public static readonly field Answer: int = 40
+    public static field Mutable: int
+    private static field Hidden: int
+    public const Literal = 42
+    public readonly field Instance: int = 3
+
+    static init() {
+        Counter.Count += 1
+        Answer += 2
+    }
+}
+
+func Main() -> int {
+    if let Some(_) = typeof(() -> int).TypeInitializer { return 32 }
+    if let Some(_) = typeof(int[]).TypeInitializer { return 33 }
+    if typeof(() -> int).IsBeforeFieldInit || typeof(int[]).IsBeforeFieldInit { return 34 }
+    let info = typeof(State)
+    if info.IsBeforeFieldInit || !typeof(Counter).IsBeforeFieldInit { return 1 }
+    if let Some(initializer) = info.TypeInitializer {
+        if !initializer.IsStatic || !initializer.IsPrivate { return 2 }
+        if initializer.Name != ".cctor" || initializer.GetParameters().Count != 0 { return 35 }
+    } else { return 3 }
+    if Counter.Count != 0 { return 4 }
+    if info.GetConstructors().Count != 1 { return 24 }
+    let fields = info.GetFields(BindingFlags.Public | BindingFlags.Static)
+    if fields.Count != 3 { return 5 }
+    for member in fields {
+        if !member.IsStatic { return 6 }
+        if let Some(token) = member.MetadataToken {
+            if token == 0 { return 22 }
+        } else { return 23 }
+        if member.Name == "Answer" {
+            match member.SetValue(null, 9) {
+                Error(ReflectionError.AccessDenied) => ()
+                _ => return 25
+            }
+        }
+        if member.Name == "Literal" {
+            match member.GetValue(null) {
+                Ok(int number) => {
+                    if number != 42 { return 26 }
+                }
+                _ => return 27
+            }
+            match member.SetValue(null, 9) {
+                Error(ReflectionError.AccessDenied) => ()
+                _ => return 28
+            }
+            if !member.IsLiteral || member.IsInitOnly { return 7 }
+            if let Some(value) = member.ConstantValue {
+                if (int)value != 42 { return 8 }
+            } else { return 9 }
+        }
+    }
+    for member in info.GetFields(BindingFlags.NonPublic | BindingFlags.Static) {
+        match member.GetValue(null) {
+            Error(ReflectionError.AccessDenied) => ()
+            _ => return 29
+        }
+    }
+    if Counter.Count != 0 { return 10 }
+    for member in fields {
+        if member.Name == "Answer" {
+            if !member.IsInitOnly || member.IsLiteral { return 11 }
+            let value = match member.GetValue("ignored static receiver") {
+                Ok(let value) => value
+                Error(_) => return 12
+            }
+            if value is int number {
+                if number != 42 || Counter.Count != 1 { return 13 }
+            } else { return 13 }
+            match member.SetValue(null, 9) {
+                Error(ReflectionError.AccessDenied) => ()
+                _ => return 14
+            }
+        }
+        if member.Name == "Mutable" {
+            match member.SetValue("ignored static receiver", 7) {
+                Ok(_) => ()
+                Error(_) => return 15
+            }
+            match member.SetValue(null, "wrong") {
+                Error(ReflectionError.InvalidValue) => ()
+                _ => return 16
+            }
+            if State.Mutable != 7 { return 17 }
+        }
+    }
+    let instance = State()
+    for member in info.GetFields(BindingFlags.Public | BindingFlags.Instance) {
+        if !member.IsInitOnly { return 18 }
+        match member.SetValue(instance, 4) {
+            Error(ReflectionError.AccessDenied) => ()
+            _ => return 30
+        }
+        match member.GetValue(null) {
+            Error(ReflectionError.InvalidReceiver) => ()
+            _ => return 31
+        }
+        let value = match member.GetValue(instance) {
+            Ok(let value) => value
+            Error(_) => return 19
+        }
+        if value is int number {
+            if number != 3 { return 20 }
+        } else { return 20 }
+    }
+    if Counter.Count != 1 { return 21 }
+    return 42
+}

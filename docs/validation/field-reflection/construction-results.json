@@ -1,0 +1,213 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "e9e3f4e32c7b3f9af96758c3549d3f97211f4314648093702546a1a0672f2b1d",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll\n/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/Main.rvn(7,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/Main.rvn(11,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "label": "metadata",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/metadata.neoil"
+      ],
+      "exitCode": 0,
+      "logSha256": "a754f27ba1f3a16fad61363aa9e11d3d602524c2994c7b248475bf01c120d4f1",
+      "output": "Disassembled /Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll -> /Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/metadata.neoil\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/app.o",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/roots.json",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "50afa08bb5958ad3a9c5b81f459e6a2469630c54dcfdc805bd4e5c2631599aaa",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/host.dylib",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/roots.json",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "f2ceb2fc8fc387a222a731d93e4f3e5615ce8e49888427dc4aee4077e635375c",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":1.013896292,\"guestExitCode\":42,\"invocationSeconds\":0.00011225,\"metadataLoadSeconds\":0.662717375,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":15.24669125}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 1.013896292,
+    "guestExitCode": 42,
+    "invocationSeconds": 0.00011225,
+    "metadataLoadSeconds": 0.662717375,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 15.24669125
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/roots.json": "255719cad8952b6e2e93e29d792deeb7ef80d383e9bef793e43bc439097ed495",
+    "/Users/robert/Projects/neoclr/docs/validation/field-reflection/Construction.rvn": "19d3ef6618e80e97e7c3d926e4821b20d654d519f28749d33d20932d050b26eb",
+    "/Users/robert/Projects/neoclr/docs/validation/field-reflection/run.py": "e96a310fe6579a339216a18cbacf086440485076eb452d5863fa7fbba9b4ef46",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "9fc02b56e1fbcc411b9b0700a90ddfdfeb796e817a9d98400e956d8e0504411d",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "11f4471ed84b992e3d4f75be40eaee051e649bd6a6ba26be569de69cb69f27c4",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "0fb339aca076c1d82ddf8ccf9a5783bf525fe76d8b6d89069bbcc9a63176e97f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "156dc4b817d4b418b530e6519e9116ab7998d628922d60d413ca2d45262aa9ff",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "8c181dccd29206d5e52d0ba649b653691088a8cb3729de5448e35e00b1ae6730",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "11814d90c8726409f4bb20c98faaa59d4d6acbbc5d024762665f6c883d71c7c1",
+    "/Users/robert/Projects/neoclr/target/field-reflection-construction-20261016b/project/bin/neoclr/FieldReflectionRaven.dll": "925c5cb2af157b8daeb8dab67ddd6a43c281006ec81875ccd05274c22c97ec41",
+    "/Users/robert/Projects/neoclr/target/field-reflection-libraries-20261016f/bundle.json": "ff50fd598922b5ab0d82228c2ccde1a3e6fa5d43725d7c3b4780b867e78454a5"
+  }
+}

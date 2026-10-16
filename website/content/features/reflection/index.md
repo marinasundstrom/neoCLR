@@ -58,8 +58,7 @@ rolled back.
 The current scope is public IL methods and instance fields/properties on nongeneric
 reference classes, with references and built-in scalar values. Constructor selection
 requires exact scalar types or assignable references; it does not rank multiple matches.
-There is no binder coercion, optional-argument completion, byref/out support, static field
-storage or arbitrary value-type execution. Generic classes and independent execution
+There is no binder coercion, optional-argument completion, byref/out support or arbitrary value-type execution. Generic classes and independent execution
 contexts remain future work.
 
 [Read the API guide](../../docs/reflection.html) ·
@@ -97,3 +96,14 @@ See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflection
 for signatures and limitations.
 
 Development branch update (2026-10-15): structural unions report `IsValueType` even when all alternatives are references; this classification adds no nominal base type.
+
+## Development: fields and type initialization
+
+Field descriptions include instance/static storage and Int32 constants, with
+`IsInitOnly`, `IsLiteral` and `ConstantValue`. `TypeInfo.TypeInitializer` and
+`IsBeforeFieldInit` describe initialization without running it. Public static field
+reflection uses normal initialization guards; readonly writes return AccessDenied.
+JIT/AOT use explicitly retained metadata and operations (reflection-roots schema 7).
+See the [API contract](/docs/reflection.html#fields-and-type-initializers-development)
+for exact value/owner restrictions and the distinction between Result errors and
+terminal initializer faults. These additions are development capabilities.

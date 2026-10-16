@@ -14,6 +14,12 @@ public sealed interface MemberInfo {
 }
 
 public sealed interface FieldInfo : MemberInfo {
+    /// True for storage assignable only during its owning initialization.
+    val IsInitOnly: bool { get }
+    /// True for a storage-free constant declaration.
+    val IsLiteral: bool { get }
+    /// The declared constant, without executing initialization; None for storage fields.
+    val ConstantValue: Option<Object> { get }
     val FieldType: TypeInfo { get }
     val IsPublic: bool { get }
     val IsPrivate: bool { get }
@@ -113,18 +119,32 @@ internal sealed class RuntimeMemberInfo {
 }
 
 internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
+    val IsInitOnly: bool => StoredIsInitOnly
+    val IsLiteral: bool => StoredIsLiteral
+    val ConstantValue: Option<Object> {
+        get {
+            if StoredConstantValue is Object value { return Some(value) }
+            return None
+        }
+    }
     private field StoredFieldType: TypeInfo
     private field StoredIsPublic: bool
     private field StoredIsPrivate: bool
     private field StoredIsAssembly: bool
     private field StoredIsStatic: bool
     private field StoredDefinitionIndex: int
+    private val StoredIsInitOnly: bool
+    private val StoredIsLiteral: bool
+    private val StoredConstantValue: Object?
 
     private init(
         name: string, declaringType: TypeInfo, metadataToken: int,
         fieldType: TypeInfo, isPublic: bool,
         isPrivate: bool, isAssembly: bool,
-        isStatic: bool, definitionIndex: int): base(name, declaringType, metadataToken) {
+        isStatic: bool, definitionIndex: int, isInitOnly: bool, isLiteral: bool, constantValue: Object?): base(name, declaringType, metadataToken) {
+        StoredIsInitOnly = isInitOnly
+        StoredIsLiteral = isLiteral
+        StoredConstantValue = constantValue
         StoredFieldType = fieldType
         StoredIsPublic = isPublic
         StoredIsPrivate = isPrivate
@@ -443,6 +463,10 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     val IsEnum: bool { get }
     val IsValueType: bool { get }
     val IsVisible: bool { get }
+    /// Whether initialization uses relaxed first-static-field-access timing.
+    val IsBeforeFieldInit: bool { get }
+    /// Describes the runtime-owned initializer without executing it.
+    val TypeInitializer: Option<ConstructorInfo> { get }
     func GetGenericArguments() -> Sequence<TypeInfo>
     func GetElementType() -> Option<TypeInfo>
 
@@ -620,6 +644,18 @@ internal open class RuntimeTypeInfo : TypeInfo {
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
     val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
+    val IsBeforeFieldInit: bool => RuntimeServices.TypeShape(Handle, 20)
+    val TypeInitializer: Option<ConstructorInfo> {
+        get {
+            if !IsNominalType {
+                return None
+            }
+            for constructor in GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) {
+                if constructor.IsStatic { return Some(constructor) }
+            }
+            return None
+        }
+    }
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {
@@ -772,6 +808,18 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
     val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
+    val IsBeforeFieldInit: bool => RuntimeServices.TypeShape(Handle, 20)
+    val TypeInitializer: Option<ConstructorInfo> {
+        get {
+            if !IsNominalType {
+                return None
+            }
+            for constructor in GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) {
+                if constructor.IsStatic { return Some(constructor) }
+            }
+            return None
+        }
+    }
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {
@@ -1057,6 +1105,18 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
     val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
+    val IsBeforeFieldInit: bool => RuntimeServices.TypeShape(Handle, 20)
+    val TypeInitializer: Option<ConstructorInfo> {
+        get {
+            if !IsNominalType {
+                return None
+            }
+            for constructor in GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) {
+                if constructor.IsStatic { return Some(constructor) }
+            }
+            return None
+        }
+    }
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {

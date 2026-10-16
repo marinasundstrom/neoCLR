@@ -5161,21 +5161,13 @@ The [qualification record](validation/compound-operators/README.md#additional-co
 retains revisions, commands and hashes. Parameter-default arithmetic works on .NET;
 native optional declarations remain explicitly rejected until metadata/import support.
 
-The author additionally requests both instance and static readonly fields. Instance
-constructor initialization passes all native backends; both forms pass on .NET.
-Native static initializers remain unsupported and need the [type-initialization
-implementation](design/readonly-fields.md). This is a .NET parity gap; constants
-do not substitute for readonly storage. Wider native literal payloads, native-width/
-enum constant expression coverage and guest field reflection remain open. Structural
-work stays parked, and these author-directed slices do not reorder other milestones.
-
-
-Author-directed readonly prerequisite (2026-10-16): the interpreter and shared JIT/AOT now execute
-verified per-closed-type initializers with readonly write authority and retained
-faults. [Raven production and remaining admission gaps](design/readonly-fields.md) remain
-open; this does not change the milestone order or unpark structural work.
-
-The metadata SDK now authors/imports initializers and preserves timing in native and CLI
-reference metadata; focused CLR execution and metadata rejection checks pass. Raven
-source-body integration remains pending. This author-directed prerequisite does not
-change the milestone order.
+The author-directed readonly work now includes Raven native source emission and
+separate-provider consumers, qualified on interpreter/JIT/sanitized AOT. Canonical
+`.cctor` bodies, strict/relaxed timing and per-closed-type initialization use the
+[implemented runtime protocol](design/readonly-fields.md); constants do not substitute
+for readonly storage. Guest field/initializer introspection and public static-field
+reflection are covered by [the focused consumer suite](validation/field-reflection/README.md).
+Native roots distinguish descriptive field/constructor metadata from field execution.
+Wider literal payloads, native-width/enum constant expression coverage and general
+closed-generic reflection execution remain separate gaps. Structural work stays parked;
+these author-directed slices do not reorder the platform milestones.

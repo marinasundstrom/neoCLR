@@ -219,6 +219,10 @@ impl Query {
                 crate::assembly_info::type_module_value(module, d)
             }
             Self::Shape => Ok(Value::Boolean(match argument {
+                20 => {
+                    matches!(handle.identity, TypeIdentity::Definition { .. })
+                        && definition.is_some_and(|d| d.before_field_init)
+                }
                 17 => matches!(handle.identity, TypeIdentity::GenericParameter { .. }),
                 18 | 19 => match &handle.identity {
                     TypeIdentity::GenericParameter { definition, index } => {
@@ -472,64 +476,95 @@ impl Query {
             }
             Self::Fields => {
                 validate_flags(argument)?;
-                array(
-                    "System.Introspection.FieldInfo",
-                    definition
-                        .into_iter()
-                        .flat_map(|d| d.fields.iter().enumerate())
-                        .filter(|(index, _)| {
-                            selected(
-                                argument,
-                                if crate::metadata_origin::field_access(definition.unwrap(), *index)
-                                    == SourceAccess::Public
-                                {
-                                    Visibility::Public
-                                } else {
-                                    Visibility::Private
-                                },
+                let mut fields = vec![];
+                if let Some(d) = definition {
+                    let declarations = d
+                        .fields
+                        .iter()
+                        .enumerate()
+                        .map(|(i, f)| {
+                            (
+                                f.name.as_str(),
+                                f.ty.clone(),
+                                crate::metadata_origin::field_access(d, i),
                                 false,
+                                d.origin
+                                    .as_ref()
+                                    .is_some_and(|o| o.field_readonly.get(i) == Some(&true)),
+                                None,
                             )
                         })
-                        .map(|(index, f)| {
-                            member_record(
-                                module,
-                                crate::metadata_tokens::member(
-                                    module,
-                                    definition.unwrap(),
-                                    index,
-                                    false,
-                                )?,
-                                "System.Introspection.FieldInfo",
-                                vec![
-                                    Value::String(f.name.clone().into()),
-                                    snapshot_type(module, (**handle).clone()),
-                                    type_value(
-                                        module,
-                                        &f.ty.substitute_type_parameters(arguments)?,
-                                    )?,
-                                    Value::Boolean(
-                                        crate::metadata_origin::field_access(
-                                            definition.unwrap(),
-                                            index,
-                                        ) == SourceAccess::Public,
-                                    ),
-                                    Value::Boolean(
-                                        crate::metadata_origin::field_access(
-                                            definition.unwrap(),
-                                            index,
-                                        ) == SourceAccess::Private,
-                                    ),
-                                    Value::Boolean(
-                                        crate::metadata_origin::field_access(
-                                            definition.unwrap(),
-                                            index,
-                                        ) == SourceAccess::Assembly,
-                                    ),
-                                    Value::Boolean(false),
-                                    index_value(index)?,
-                                ],
+                        .chain(d.static_fields.iter().map(|f| {
+                            (
+                                f.name.as_str(),
+                                f.ty.clone(),
+                                match f.visibility {
+                                    Visibility::Public => SourceAccess::Public,
+                                    Visibility::Internal => SourceAccess::Assembly,
+                                    Visibility::Private => SourceAccess::Private,
+                                    Visibility::Protected => SourceAccess::Family,
+                                },
+                                true,
+                                f.readonly,
+                                None,
                             )
-                        }),
+                        }))
+                        .chain(d.literal_fields.iter().map(|f| {
+                            (
+                                f.name.as_str(),
+                                Type::Int32,
+                                match f.visibility {
+                                    Visibility::Public => SourceAccess::Public,
+                                    Visibility::Internal => SourceAccess::Assembly,
+                                    Visibility::Private => SourceAccess::Private,
+                                    Visibility::Protected => SourceAccess::Family,
+                                },
+                                true,
+                                false,
+                                Some(f.value),
+                            )
+                        }));
+                    for (index, (name, ty, access, is_static, readonly, constant)) in
+                        declarations.enumerate()
+                    {
+                        if !selected(
+                            argument,
+                            if access == SourceAccess::Public {
+                                Visibility::Public
+                            } else {
+                                Visibility::Private
+                            },
+                            is_static,
+                        ) {
+                            continue;
+                        }
+                        fields.push(member_record(
+                            module,
+                            crate::metadata_tokens::member(module, d, index, false)?,
+                            "System.Introspection.FieldInfo",
+                            vec![
+                                Value::String(name.into()),
+                                snapshot_type(module, (**handle).clone()),
+                                type_value(module, &ty.substitute_type_parameters(arguments)?)?,
+                                Value::Boolean(access == SourceAccess::Public),
+                                Value::Boolean(access == SourceAccess::Private),
+                                Value::Boolean(access == SourceAccess::Assembly),
+                                Value::Boolean(is_static),
+                                index_value(index)?,
+                                Value::Boolean(readonly),
+                                Value::Boolean(constant.is_some()),
+                                constant
+                                    .map(|n| Value::Erased(Box::new(Value::Int32(n))))
+                                    .unwrap_or_else(|| {
+                                        Value::NullObjectReference(Type::from_name("System.Object"))
+                                    }),
+                            ],
+                        )?);
+                    }
+                }
+                array(
+                    "System.Introspection.FieldInfo",
+                    fields.into_iter().map(Ok),
                     limits,
                 )
             }
@@ -566,7 +601,9 @@ impl Query {
                         .filter(|f| {
                             owner.is_some()
                                 && f.owner == owner
-                                && f.name.ends_with("..ctor") == constructors
+                                && (f.name.ends_with("..ctor")
+                                    || crate::type_initialization::is_initializer(f))
+                                    == constructors
                                 && selected(
                                     argument,
                                     if member_access(f) == SourceAccess::Public {
@@ -894,6 +931,10 @@ fn member_record(
     if type_contract(module) == "System.Introspection.TypeInfo" {
         fields.insert(2, Value::Int32(token));
         fields.insert(3, option(module, "System.Introspection.ModuleInfo", None)?);
+    } else if name == "System.Introspection.FieldInfo" {
+        // The legacy System.Type profile has an eight-field descriptor layout.
+        // The appended facts belong to the source-owned TypeInfo provider API.
+        fields.truncate(8);
     }
     Ok(record(name, fields))
 }
@@ -1123,7 +1164,7 @@ fn method(
         } else {
             0
         },
-        if f.name.ends_with("..ctor") {
+        if f.name.ends_with("..ctor") || crate::type_initialization::is_initializer(f) {
             "System.Introspection.ConstructorInfo"
         } else {
             "System.Introspection.MethodInfo"
@@ -1191,7 +1232,10 @@ fn method(
             Value::Boolean(crate::interfaces::is_bodyless(module, f)),
         ],
     )?;
-    if type_contract(module) == "System.Introspection.TypeInfo" && !f.name.ends_with("..ctor") {
+    if type_contract(module) == "System.Introspection.TypeInfo"
+        && !f.name.ends_with("..ctor")
+        && !crate::type_initialization::is_initializer(f)
+    {
         if let Value::Object { fields, .. } = &mut result {
             fields.push(Value::String(
                 format!(

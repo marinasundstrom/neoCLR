@@ -167,7 +167,9 @@ interpreter, JIT and AOT. A Complex demo exercises arithmetic without imposing
 ordering. Mixed-type contracts and production Complex edge semantics remain future work.
 
 
-Native static readonly field initialization is still in development. Interpreter, JIT and AOT
-have per-type initializer execution and readonly write checks, including generic
-owners and GC-safe calls. The metadata SDK can author and inspect initializers with
-strict or relaxed timing. Raven source emission is not yet enabled.
+Native static readonly initialization is available in development builds. Raven emits
+field initializers and explicit static constructors, preserving strict or relaxed timing.
+Source and imported consumers run in interpreter, JIT and AOT, including closed generic
+owners. The [reflection APIs](/features/reflection/) describe readonly/literal fields and
+type initializers, and execute public static field access through the same initialization
+guards. Ordinary Raven/.NET behavior remains unchanged.

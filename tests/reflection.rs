@@ -101,6 +101,10 @@ fn fields_preserve_closed_reference_types_and_filter_visibility() {
                 .map(|s| Value::String(s.into()))
                 .collect::<Vec<_>>()
         );
+        assert!(
+            entries.iter().all(|entry| fields(entry).len() == 8),
+            "legacy FieldInfo layout must remain stable"
+        );
         if flags.is_none() {
             assert_eq!(type_name(&fields(&entries[0])[2]), "System.Int32&");
             assert_eq!(fields(&entries[0])[7], Value::Int32(0));

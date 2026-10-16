@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 7,
+  "types": [
+    {
+      "definition": {
+        "module": "NeoMetadata_C028086AEA1B62B7710E9E40F8751FB8CDBDA17FC26D79D218F5116127CA11D3",
+        "revision": "1.0.0.0",
+        "index": 7
+      },
+      "construct": true,
+      "properties": false,
+      "getters": false,
+      "setters": false,
+      "customAttributes": false,
+      "fields": true,
+      "fieldGetters": true,
+      "fieldSetters": true,
+      "constructors": true
+    }
+  ],
+  "moduleCatalogs": [],
+  "moduleFunctions": [],
+  "typeCatalogs": []
+}

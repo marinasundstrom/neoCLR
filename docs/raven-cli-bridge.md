@@ -12397,10 +12397,10 @@ native optional declarations remain explicitly rejected until metadata/import su
 
 The author additionally requests both instance and static readonly fields. Instance
 constructor initialization passes all native backends; both forms pass on .NET.
-Native static initializers remain unsupported and need the [type-initialization
-implementation](design/readonly-fields.md). This is a .NET parity gap; constants
-do not substitute for readonly storage. Wider native literal payloads, native-width/
-enum constant expression coverage and guest field reflection remain open. Structural
+Native static initializers use the [type-initialization
+implementation](design/readonly-fields.md); constants do not substitute for readonly
+storage. Wider native literal payloads and native-width/enum constant expression
+coverage remain separate gaps. Field/initializer reflection is qualified below. Structural
 work stays parked, and these author-directed slices do not reorder other milestones.
 
 
@@ -12412,7 +12412,7 @@ readonly writes. See [the execution contract](design/readonly-fields.md). This i
 native metadata capability, not temporary CLI substitution. Matching runtimes are
 required for the new fact. No Runtime Contract switch changes. SDK `.cctor` authoring and declaration reads now preserve canonical native identity,
 readonly write authority and strict/relaxed timing, including CLI reference projection.
-Raven initializer-body emission remains unsupported. Shared JIT/AOT now retain
+Raven initializer-body emission now uses this native contract. Shared JIT/AOT now retain
 and guard native initializers, including closed generic owners and GC-safe implicit
 calls; raw-metadata consumers qualify the runtime in all three execution modes. Existing
 readonly instance and class-constant consumer evidence is unaffected.
@@ -12430,8 +12430,8 @@ Matching neoCLR main runtime/SDK support is required. Native readonly stores rem
 restricted to the exact owning initializer. Interpreter, JIT and sanitized AOT qualify
 source readonly, explicit/generic and separate-provider consumers in neoCLR's
 `docs/validation/compound-operators/StaticInitialization*.rvn`. Runtime storage remains
-invocation-owned, with terminal Faults; intrinsic initializer admission and guest
-reflection integration are separate runtime responsibilities.
+invocation-owned, with terminal Faults; intrinsic initializer admission remains a
+separate runtime gap. Guest field/initializer reflection follows the contract below.
 
 ### Native field source identities (2026-10-16)
 
@@ -12442,3 +12442,23 @@ tokens reported as None. Instance access/readonly origin arrays remain instance-
 The CLI reference projection retains standard FieldDef identity; no new Raven Runtime
 Contract switch or ordinary .NET emission change is required. SDK static-field and
 class-constant roundtrips and the native interpreter consumer validate this contract.
+
+### Guest field and initializer reflection (2026-10-16)
+
+A matching System.Runtime bundle adds FieldInfo IsInitOnly/IsLiteral/ConstantValue
+and TypeInfo IsBeforeFieldInit/TypeInitializer. Native field snapshots include static
+storage and literals with binding filters; initializer discovery is descriptive and
+ordinary method enumeration excludes `.cctor`. Function/array descriptors have no
+nominal initializer. Public static reflection uses normal verified storage operations,
+so initialization and terminal faults follow the same interpreter/JIT/AOT contract.
+Readonly/literal writes and private access return AccessDenied before user code.
+
+Native compilation retains field and constructor descriptions explicitly through
+reflection-roots schema 7; field getter/setter policies are separate. This is native
+metadata/backend execution, not a CLI field carrier or new Runtime Contract setting.
+The compiler uses main 289019055 / native 97f5252c9 for qualified static compound
+mutation. The SDK/runtime own source tokens and initialization guards; Raven owns
+source binding/emission and the guest descriptor/extension facade. Rebuild old
+RuntimeFieldInfo provider layouts with the matching bundle. General closed-generic
+reflection execution and arbitrary boxed value payloads remain documented limits.
+See [the executable consumer and exact revisions/hashes](validation/field-reflection/README.md).

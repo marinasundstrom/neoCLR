@@ -258,6 +258,7 @@ impl Factory<'_> {
                     }
                     let (skip_module, identity) = match logical {
                         "System.Introspection.PropertyInfo"
+                        | "System.Introspection.FieldInfo"
                         | "System.Introspection.ConstructorInfo" => (true, None),
                         "System.Introspection.CustomAttributeData"
                         | "System.Introspection.CustomAttributeNamedArgument"
@@ -384,7 +385,9 @@ pub fn bind(
         .filter(|(_, f)| {
             matches!(
                 f.name.as_str(),
-                "neoCLR.Runtime.TypeProperties"
+                "neoCLR.Runtime.TypeFields"
+                    | "neoCLR.Runtime.TypeConstructors"
+                    | "neoCLR.Runtime.TypeProperties"
                     | "neoCLR.Runtime.TypeModule"
                     | "neoCLR.Runtime.TypeDeclaringType"
                     | "neoCLR.Runtime.ModuleAssembly"
@@ -492,6 +495,9 @@ pub fn bind(
         let assembly_types = f.name == "neoCLR.Runtime.AssemblyTypes";
         let module_types = f.name == "neoCLR.Runtime.ModuleTypes";
         let properties = f.name.ends_with("Properties");
+        let fields = f.name.ends_with("TypeFields");
+        let constructors = f.name.ends_with("TypeConstructors");
+        let members = fields || constructors;
         let attributes = f.name == "neoCLR.Runtime.MemberCustomAttributes";
         let module_attributes = f.name == "neoCLR.Runtime.ModuleMemberCustomAttributes";
         let module_functions = f.name == "neoCLR.Runtime.ModuleFunctions";
@@ -510,7 +516,7 @@ pub fn bind(
                         vec![Type::String, Type::String]
                     } else if assembly_name || assembly_modules || assembly_types {
                         vec![Type::String]
-                    } else if properties {
+                    } else if properties || members {
                         vec![Type::RuntimeTypeHandle, Type::Int32]
                     } else {
                         vec![Type::RuntimeTypeHandle]
@@ -857,11 +863,19 @@ pub fn bind(
             factory.body.push(Op::Fault(
                 "native logical module metadata was not retained".into(),
             ));
-        } else if properties {
+        } else if properties || members {
             let Type::ArrayRef(element) = &expected else {
                 return Err("TypeProperties requires PropertyInfo vector".into());
             };
-            if name(source, element) != Some("System.Introspection.PropertyInfo") {
+            if name(source, element)
+                != Some(if fields {
+                    "System.Introspection.FieldInfo"
+                } else if constructors {
+                    "System.Introspection.ConstructorInfo"
+                } else {
+                    "System.Introspection.PropertyInfo"
+                })
+            {
                 return Err("TypeProperties requires scoped PropertyInfo".into());
             }
             factory.body.extend([
@@ -874,7 +888,14 @@ pub fn bind(
                 Op::Fault("unsupported BindingFlags bits".into()),
             ]);
             for row in retention["types"].as_array().unwrap() {
-                if row["properties"] != true {
+                if row[if fields {
+                    "fields"
+                } else if constructors {
+                    "constructors"
+                } else {
+                    "properties"
+                }] != true
+                {
                     continue;
                 }
                 let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
@@ -883,8 +904,12 @@ pub fn bind(
                     .position(|d| *d == id)
                     .ok_or("missing snapshot root")?;
                 let owner = Type::Named(source.types[ti].name.clone());
-                let V::Array { elements, .. } = neoclr::native_metadata::properties(source, &owner)
-                    .map_err(|e| e.to_string())?
+                let V::Array { elements, .. } = (if members {
+                    neoclr::native_metadata::members(source, &owner, constructors)
+                } else {
+                    neoclr::native_metadata::properties(source, &owner)
+                })
+                .map_err(|e| e.to_string())?
                 else {
                     return Err("invalid property recipe".into());
                 };
@@ -899,30 +924,101 @@ pub fn bind(
                 let count = factory.local(Type::Int32);
                 factory.body.extend([Op::Int(0), Op::Store(count)]);
                 let mut masks = vec![];
-                for p in &source.types[ti].properties {
-                    let public = p.getter.iter().chain(&p.setter).any(|r| {
+                if fields {
+                    let d = &source.types[ti];
+                    masks.extend(d.fields.iter().enumerate().map(|(i, _)| {
+                        (
+                            4,
+                            if d.origin.as_ref().map_or(
+                                d.fields[i].visibility == Visibility::Public,
+                                |o| {
+                                    o.field_access.get(i)
+                                        == Some(&neoclr::metadata_origin::SourceAccess::Public)
+                                },
+                            ) {
+                                16
+                            } else {
+                                32
+                            },
+                        )
+                    }));
+                    masks.extend(d.static_fields.iter().map(|f| {
+                        (
+                            8,
+                            if f.visibility == Visibility::Public {
+                                16
+                            } else {
+                                32
+                            },
+                        )
+                    }));
+                    masks.extend(d.literal_fields.iter().map(|f| {
+                        (
+                            8,
+                            if f.visibility == Visibility::Public {
+                                16
+                            } else {
+                                32
+                            },
+                        )
+                    }));
+                } else if constructors {
+                    masks.extend(
                         source
                             .functions
                             .iter()
-                            .find(|f| {
-                                if r.definition.is_some() {
-                                    f.definition == r.definition
-                                } else {
-                                    f.name == r.name
-                                        && f.owner == r.owner
-                                        && f.parameters == r.parameters
-                                }
+                            .filter(|f| {
+                                f.owner.as_ref().and_then(Type::definition_name)
+                                    == Some(source.types[ti].name.as_str())
+                                    && (f.name.ends_with("..ctor") || f.name.ends_with("..cctor"))
                             })
-                            .is_some_and(|f| {
-                                f.origin
-                                    .as_ref()
-                                    .map_or(f.visibility == Visibility::Public, |o| {
-                                        o.member_access
-                                            == Some(neoclr::metadata_origin::SourceAccess::Public)
+                            .map(|f| {
+                                (
+                                    if f.instance { 4 } else { 8 },
+                                    if f.origin.as_ref().map_or(
+                                        f.visibility == Visibility::Public,
+                                        |o| {
+                                            o.member_access
+                                                == Some(
+                                                    neoclr::metadata_origin::SourceAccess::Public,
+                                                )
+                                        },
+                                    ) {
+                                        16
+                                    } else {
+                                        32
+                                    },
+                                )
+                            }),
+                    );
+                } else {
+                    for p in &source.types[ti].properties {
+                        let public =
+                            p.getter.iter().chain(&p.setter).any(|r| {
+                                source
+                                    .functions
+                                    .iter()
+                                    .find(|f| {
+                                        if r.definition.is_some() {
+                                            f.definition == r.definition
+                                        } else {
+                                            f.name == r.name
+                                                && f.owner == r.owner
+                                                && f.parameters == r.parameters
+                                        }
                                     })
-                            })
-                    });
-                    masks.push((if p.instance { 4 } else { 8 }, if public { 16 } else { 32 }));
+                                    .is_some_and(|f| {
+                                        f.origin.as_ref().map_or(
+                                            f.visibility == Visibility::Public,
+                                            |o| {
+                                                o.member_access
+                                            == Some(neoclr::metadata_origin::SourceAccess::Public)
+                                            },
+                                        )
+                                    })
+                            });
+                        masks.push((if p.instance { 4 } else { 8 }, if public { 16 } else { 32 }));
+                    }
                 }
                 if masks.len() != elements.len() {
                     return Err("property recipe inventory mismatch".into());

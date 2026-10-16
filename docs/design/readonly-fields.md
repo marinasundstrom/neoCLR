@@ -1,7 +1,7 @@
 # Readonly fields and type initialization
 
-Status: interpreter and shared JIT/AOT type initialization implemented; compiler
-producer integration remains an implementation gap. Author direction: support both instance and static
+Status: native runtime, Raven producer/import and guest field/initializer descriptions
+are implemented; backend qualification is recorded below. Author direction: support both instance and static
 readonly fields, keeping .NET semantics as the default model.
 
 ## Contract
@@ -21,13 +21,14 @@ runs at most once for a type, with runtime synchronization and a retained failed
 state. Field initializers execute in declaration order. These semantics require
 more than admitting a readonly modifier in metadata.
 
-## Current layers and next implementation slices
+## Implemented layers
 
 Raven/.NET already emits both forms; the shared ReadonlyFields consumer returns 42.
 Native metadata carries instance readonly and static readonly flags, and access
 validation restricts instance writes to constructors/init accessors. The interpreter admits stores from a verified owning `.cctor`; ordinary writes
-still reject. The metadata SDK authors and imports `.cctor`, preserving initialization timing; Raven still rejects static
-field initializers. Shared JIT/AOT lowering executes retained initializers through private guards. This is not yet end-to-end Raven support.
+still reject. The metadata SDK authors and imports `.cctor`, preserving initialization timing; Raven emits static field initializers and explicit static constructors. Shared JIT/AOT lowering executes retained initializers through private guards. Raven source and imported consumers now qualify this protocol.
+
+The implementation sequence was:
 
 1. Qualify instance constructor initialization, declaration initialization,
    imported reads, defensive copies of mutable value fields, and rejected writes.
@@ -44,7 +45,7 @@ The native exception-free failure policy must be explicit: it cannot manufacture
 retry and ordinary access after failure. Recursive initialization may observe default
 or partially assigned fields as specified below. Generic types require independent storage/initialization per closed
 type. No eager-entry-point initialization or constant substitution establishes the
-full readonly contract. These are implementation requirements, not shipped features.
+full readonly contract. These are development capabilities, not a new published release.
 
 Broader structural work remains parked. This author-directed work does not reorder
 the platform roadmap's other milestones.
@@ -145,28 +146,31 @@ are covered by the [manual metadata reference](../../api-docs/experimental-metad
 `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --type-initialization`
 checks executable CLR behavior, CLI/native/reference declarations and invalid stores,
 methods and entry points. Runtime backend qualification above is unchanged. Raven
-source emission and imported-consumer qualification remain the next integration step.
+source emission and imported-consumer qualification are recorded in
+[the compiler consumer suite](../validation/compound-operators/README.md).
 
-## Guest introspection and reflection follow-through
+## Guest introspection and reflection
 
-The host SDK's declaration support is not guest API parity. A source audit on
-2026-10-16 found these remaining integration requirements:
+`GetFields` describes instance storage, static storage and Int32 literals, with binding
+filters and distinct declaration ordinals. `IsInitOnly`, `IsLiteral` and
+`ConstantValue: Option<Object>` preserve the readonly/literal distinction. Source
+FieldDef tokens include static/literal rows; legacy missing tokens remain absent.
 
-- `src/reflection.rs` enumerates only `TypeDef.fields`; static storage and literal
-  declarations need distinct descriptor identities/ordinals and binding filters.
-- Guest `System.Introspection.FieldInfo` exposes type/access/static facts, but no
-  `IsInitOnly`, `IsLiteral` or raw-constant accessor. Follow the corresponding .NET
-  FieldInfo concepts while retaining Result for fallible execution.
-- Guest constructor discovery recognizes only `..ctor`. Exclude `..cctor` from
-  ordinary method discovery and expose a dedicated type-initializer description,
-  plus initialization timing. Description must not execute initialization or grant
-  ordinary invocation authority.
-- `src/reflection_members.rs` executes public instance-field access only. Static
-  reads/writes need the same runtime initialization guards as ordinary code; readonly
-  writes must remain rejected. Qualify reflective method calls and construction
-  against strict initialization in interpreter, JIT and AOT, including failures.
+`TypeInitializer: Option<ConstructorInfo>` describes `.cctor`; `IsBeforeFieldInit`
+preserves timing. Constructor discovery requires static/nonpublic flags to select it,
+and ordinary methods exclude it. Inspection and constant reads never execute user
+initialization or authorize direct initializer calls.
 
-These are tracked gaps, not implemented guest APIs. .NET's load-context lifetime and
-exception wrapping remain distinct from neoCLR's current invocation-owned state and
-terminal Fault contract. The existing SDK/runtime tests do not establish reflection
-execution support for these additions.
+Reflection static reads/writes use the same verified operations and initialization
+guards as ordinary code. Readonly/literal writes return AccessDenied. Native schema-7
+retention distinguishes field metadata, getter/setter execution and descriptive
+constructors; it does not grant private execution. See the [guest qualification](../validation/field-reflection/README.md)
+and [public API contract](../../api-docs/reflection.md#fields-and-type-initializers-development).
+
+The bounded execution contract remains narrower than .NET: nongeneric nominal static
+owners, reference-class instance fields, exact boxed built-in scalar/reference values,
+and no private writes. Generic signatures are preserved by introspection; general
+closed-generic reflection execution and arbitrary boxed value storage remain separate
+gaps. Initialization state is invocation-owned and faults are terminal, rather than
+.NET's load-context lifetime and TypeInitializationException wrapping. Broader structural
+work remains parked.

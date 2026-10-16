@@ -94,7 +94,7 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
     let owner =
         crate::reflection_execution::bound_type(module, &args[0]).map_err(|_| Error::Unbound)?;
     let d = module.type_definition(&owner).ok_or(Error::Unsupported)?;
-    if (!d.is_reference_type && kind != 4)
+    if (!d.is_reference_type && kind != 4 && !matches!(kind, 2 | 3))
         || d.representation != Representation::Record
         || !d.generic_parameters.is_empty()
     {
@@ -113,6 +113,57 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
     let mut body = vec![Op::LocalAddress(0), Op::InitializeObject(object())];
     if kind == 2 || kind == 3 {
         let index = usize::try_from(index).map_err(|_| Error::Missing)?;
+        if index >= d.fields.len() {
+            if arguments.len() != if kind == 3 { 1 } else { 0 } {
+                return Err(Error::Arguments);
+            }
+            if d.visibility != Visibility::Public {
+                return Err(Error::Access);
+            }
+            let slot = index - d.fields.len();
+            if let Some(field) = d.static_fields.get(slot) {
+                if field.visibility != Visibility::Public || kind == 3 && field.readonly {
+                    return Err(Error::Access);
+                }
+                if !supported_value(module, &field.ty) {
+                    return Err(Error::Unsupported);
+                }
+                if kind == 3 {
+                    if !value_matches(module, &arguments[0], &field.ty) {
+                        return Err(Error::Value);
+                    }
+                    body.extend([
+                        Op::Arg(3),
+                        Op::Int(0),
+                        Op::ArrayElement(object()),
+                        convert(module, &field.ty),
+                        Op::SetStaticField { owner, index: slot },
+                        Op::Load(0),
+                    ]);
+                } else {
+                    body.push(Op::StaticField { owner, index: slot });
+                    body.push(if module.is_object_reference_type(&field.ty) {
+                        Op::CastClass(object())
+                    } else {
+                        Op::BoxValue(field.ty.clone())
+                    });
+                }
+            } else {
+                let literal = d
+                    .literal_fields
+                    .get(slot - d.static_fields.len())
+                    .ok_or(Error::Missing)?;
+                if literal.visibility != Visibility::Public || kind == 3 {
+                    return Err(Error::Access);
+                }
+                body.extend([Op::Int(literal.value), Op::BoxValue(Type::Int32)]);
+            }
+            body.push(Op::Return);
+            return Ok(Plan { body });
+        }
+        if !d.is_reference_type {
+            return Err(Error::Unsupported);
+        }
         let field = d.fields.get(index).ok_or(Error::Missing)?;
         if !supported_value(module, &field.ty) {
             return Err(Error::Unsupported);

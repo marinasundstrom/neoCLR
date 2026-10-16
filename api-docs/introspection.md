@@ -480,3 +480,17 @@ open generics and JIT/AOT composition execution remain outside this POC.
 Member, hierarchy and custom-attribute queries on direct compositions fault
 explicitly until their semantics are implemented. No fabricated nominal member set
 is returned. The obsolete CLI bootstrap remains unqualified for these providers.
+
+## Field storage and initialization (development)
+
+FieldInfo exposes IsInitOnly, IsLiteral and ConstantValue (Option<Object>, currently
+boxed Int32 literals). GetFields includes static storage and constants according to
+BindingFlags; DefinitionIndex is a descriptor ordinal, not a storage opcode slot.
+MetadataToken retains the defining module's field token; older producers that omitted
+static tokens report None instead of inventing one. Names and generic field signatures
+remain descriptive even where reflection execution is unsupported.
+
+TypeInfo exposes IsBeforeFieldInit and TypeInitializer (Option<ConstructorInfo>).
+The latter is a private static constructor description, separate from ordinary methods.
+Neither property executes initialization. Native JIT/AOT constructor descriptions
+require explicit constructor metadata retention in reflection-roots schema 7.
