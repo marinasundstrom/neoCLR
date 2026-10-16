@@ -73,14 +73,17 @@ Typed invocation and property access use the Function object's bound target.
 Null member access raises NullReference.
 
 
-### Function-kind constraint groundwork (feature branch)
+### Function-kind constraints (feature branch)
 
-Native `FunctionType` constraint groundwork on `codex/function-kind-constraint`
-restricts a generic argument to a structural function signature. Nominal delegates
-and objects with an `Invoke` member do not qualify. The intended Raven spelling is
-`where T: func`; constraint syntax is still pending. Raven now distinguishes native
-function-signature symbols from nominal delegate types, including generic
-substitution and imported callback signatures. Ordinary Raven/.NET mappings are
-unchanged. Function-list/event-like APIs
-would be ordinary library types, but invocation and multicast decisions are
-postponed. This is development work, not a published capability.
+On `codex/function-kind-constraint`, Raven supports `where T: func` for native
+generic classes. It restricts a generic argument to a structural function signature;
+nominal delegates and objects with `Invoke` do not qualify. The constraint does not
+supply an invocation signature to the generic body. A tested function slot stores
+and returns a function that the consumer invokes after its signature is concrete.
+
+Raven distinguishes native function signatures from nominal delegate symbols,
+including generic substitution and imported callback signatures. Normal Raven/.NET
+mapping is unchanged, and the .NET target rejects `func` constraints. Native method
+constraint emission and signature bounds such as `where T: () -> T2` remain gaps.
+Function-list/observer APIs and dynamic invocation remain deferred. This is feature
+branch development, not a published capability.

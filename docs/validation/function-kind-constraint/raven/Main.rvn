@@ -1,0 +1,17 @@
+class Incrementer {
+    private val step: int
+
+    init(step: int) {
+        self.step = step
+    }
+
+    func Apply(value: int) -> int => value + step
+}
+
+func Main() -> int {
+    let incrementer = Incrementer(2)
+    let callback: (int) -> int = incrementer.Apply
+    let slot = FunctionSlot<(int) -> int>(callback)
+    let function = slot.Get()
+    return function(40)
+}

@@ -4894,7 +4894,9 @@ Nongeneric nominal class bounds now also validate before specialization. Raven d
 **Author-directed function-kind groundwork (2026-10-16, feature branch only):**
 `func` is intended to constrain structural function types for ordinary library
 function lists/signals, without event metadata. Native runtime/host SDK groundwork
-is isolated on `codex/function-kind-constraint`; Raven syntax awaits distinct
-structural function symbols across the bridge. Invocation decisions are explicitly
+is isolated on `codex/function-kind-constraint`. Raven now separates structural
+function symbols from nominal delegates and emits `where T: func` for native
+generic classes, including separate-provider import. See the [consumer evidence](validation/function-kind-constraint/README.md).
+Method-level native constraint emission and signature bounds remain open. Invocation decisions are explicitly
 postponed. This is not a resumption of the broader structural roadmap. See
 [direction](proposals/structural-types.md#20-generic-constraints-on-function-types).

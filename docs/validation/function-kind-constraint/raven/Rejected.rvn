@@ -1,0 +1,1 @@
+func Invalid(value: FunctionSlot<int>) -> int => 0

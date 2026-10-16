@@ -37,3 +37,16 @@ RuntimeAwait/RuntimeGenerator binding and was not integrated. The intended spell
 is `where T: func`, only for structural functions in neoCLR. Invocation APIs are
 postponed; the subsequently proposed `Reflection.InvokeFunction(functionObj, args)`
 is a candidate only. See [direction](../../proposals/structural-types.md#20-generic-constraints-on-function-types).
+
+
+## Raven source and separate provider
+
+`raven/Library.rvn` defines `FunctionSlot<T> where T: func`. The consumer stores a
+bound `Incrementer.Apply` function, retrieves it as `(int) -> int` and invokes it,
+returning 42. The receiver's state supplies the increment. `Rejected.rvn` verifies
+that an integer cannot be substituted for the constrained parameter.
+
+Run `python3 raven/run.py --compiler /path/to/rvnc.dll --bundle /path/to/bundle
+--output /path/to/output --imported` as one command. The retained bundle is
+`target/variance-argument-sequence-20261016`. This is a test holder, not an observer
+or event API. Native method constraints and signature bounds remain separate gaps.

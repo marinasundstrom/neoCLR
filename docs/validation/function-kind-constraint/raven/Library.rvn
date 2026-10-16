@@ -1,0 +1,9 @@
+public class FunctionSlot<T> where T: func {
+    private val callback: T
+
+    init(callback: T) {
+        self.callback = callback
+    }
+
+    func Get() -> T => callback
+}

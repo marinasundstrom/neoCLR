@@ -739,7 +739,7 @@ for statically known callable contracts.
 
 neoCLR needs a way to constrain a generic type parameter to function types.
 
-A possible Raven syntax is:
+The feature branch supports the Raven category syntax:
 
 ```raven
 where F : func
@@ -778,9 +778,13 @@ approved or implemented by this clarification. Typed visitor dispatch was an
 assistant suggestion, not an adopted API.
 
 Native runtime/host SDK groundwork is isolated on `codex/function-kind-constraint`;
-Raven syntax/import integration remains pending a reliable distinction between
-structural function symbols and nominal delegate transport. Broader structural
-work remains parked.
+Raven now separates structural function symbols from nominal delegate transport
+and emits/imports the category constraint on native generic classes. The
+[retained consumer](../validation/function-kind-constraint/README.md) qualifies
+a stored bound method across a separate provider. Native method-level constraint
+emission and signature bounds (`where T: () -> T2`) remain open. The author also
+clarified an observer-type direction using ordinary properties; no subscription
+or dynamic invocation contract has been selected. Broader structural work remains parked.
 
 ---
 
