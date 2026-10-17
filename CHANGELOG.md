@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Measure the refreshed `.20261017.4` package: 45 CPU/JSON and ten longer native CPU processes pass correctness/input checks across interpreter/JIT/AOT. Interpreter CPU median is 6.39 operations/s, consistent with the earlier range-guard recovery. Retain samples, startup/batch separation, artifact provenance and active macOS-indexing limitations; HTTP and Windows measurements remain separate.
+
 - Complete the repaired macOS extracted-source smoke gate at `80c381a41`: archive membership/notices, optimized build, pinned historical seed and all 25 source/artifact programs pass. Reuse the prior full-run results with focused repairs rather than claiming a new full-suite pass. Start Windows qualification on isolated candidate branches at workflow revision `504d1227`; publication remains separate.
 
 - Pin Windows native-toolchain qualification to the validated Raven `40fcae6d0` compiler and the `.20261017.4` local candidate version. Require two independent ten-cycle packaged-editor configuration-recovery runs in addition to main/inlay acceptance, retaining separate reports. This prepares Windows qualification; it does not claim a Windows pass or publish a release.
