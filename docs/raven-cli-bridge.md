@@ -12841,3 +12841,16 @@ observable boundary semantics remain the comparison baseline. See the paired
 Raven `docs/compiler/neoclr-cli-bridge.md` and [native qualification](validation/range-iteration/README.md#exclusive-unit-step-optimization--2026-10-17).
 The isolated compiler replacement passes interpreter/JIT/AOT; release packaging
 and Windows qualification remain separate. Structural expansion stays parked.
+
+## Callback result inference in editor queries (2026-10-17)
+
+Raven main `752d240b4` and native `40fcae6d0` retain unresolved generic
+overloads in available return-type queries. These shortcuts decline an answer
+until authoritative binding can resolve the callback, rather than incorrectly
+selecting a concrete unit-returning overload. Cold native metadata queries for
+`Task.Run(() => 41)` now yield `Task<int>`; awaiting it yields `int`.
+This is a shared semantic-query correction, with no Runtime Contract option,
+metadata encoding, emission, ABI or public API change. The native probe and
+[development editor evidence](validation/release-candidate-20261017/callback-inlays-development.json)
+pass. A rebuilt release SDK/VSIX still needs qualification; structural expansion
+remains parked.

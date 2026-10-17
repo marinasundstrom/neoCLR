@@ -262,3 +262,25 @@ This is local qualification, not a published release or an update to the user's
 normal SDK/profile. Windows qualification, canonical source gates, remote candidate
 pins and runtime measurements remain release requirements. CPU/JSON preparation
 against this extracted archive passes; timed results are recorded separately.
+
+## Callback result inlay correction
+
+An author screenshot exposed `Task<Void>` for `Task.Run(() => 41)`, a case not
+asserted by earlier editor checks. Shared Raven `752d240b4` and native `40fcae6d0`
+fix the available-type shortcuts that discarded unresolved generic overloads.
+Main passes 60 focused checks; the native line passes 66. The
+[native metadata probe](callback-native-probe.txt) reports `Task<int>` and awaited
+`int`, and the [real-editor check](callback-inlays-development.json) asserts the
+exact hint, plus strict comment-edit and concurrent-range checks.
+
+This [development configuration](callback-inference-identity.json) uses the .3
+packaged server with its analysis assembly replaced by the fixed Release/net11.0
+build through an explicit server path. It does not qualify the archived SDK/VSIX.
+The inlay harness startup budget now matches the 90-second package acceptance
+budget; post-edit assertions are unchanged. A prior Debug override exhausted the
+old 15-second startup budget before providers registered. The original .3 package
+also had a [disappearing-hint failure](range-package-inlays-failed.json); keep that
+evidence instead of claiming all earlier package checks passed.
+
+An independent [second real-editor run](callback-inlays-development-repeat.json)
+also passes the exact task hint, comment edits and concurrent ranges.

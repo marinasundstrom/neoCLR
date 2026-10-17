@@ -1,0 +1,246 @@
+{
+  "passed": false,
+  "samples": [
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 13,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 0,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 8,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 0,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 0,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 0,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 206,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-0-100ms",
+      "version": 3,
+      "elapsedMs": 6,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-0-350ms",
+      "version": 3,
+      "elapsedMs": 24,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-0-900ms",
+      "version": 3,
+      "elapsedMs": 18,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-1-100ms",
+      "version": 4,
+      "elapsedMs": 8,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-1-350ms",
+      "version": 4,
+      "elapsedMs": 28,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-1-900ms",
+      "version": 4,
+      "elapsedMs": 10,
+      "hints": []
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: Number hint disappeared after a comment edit\n\tat exports.run (/Users/robert/Projects/neoclr/scripts/native-vscode-inlay-acceptance.cjs:51:9)"
+}

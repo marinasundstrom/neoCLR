@@ -36,7 +36,8 @@ exports.run = async function () {
       Array.from({length: 100}, (_, i) => `// padding ${i}\n`).join('');
     await replace(source);
     let baseline;
-    for (let i = 0; i < 30; i++) {
+    // Match the package acceptance startup budget; edit checks remain strict.
+    for (let i = 0; i < 180; i++) {
       baseline = await sample('warmup', fullRange());
       if (baseline.some(h => h.label.includes(': int')) && baseline.some(h => h.label.includes(': string'))) break;
       await delay(500);
@@ -59,6 +60,25 @@ exports.run = async function () {
       assert(results[0].some(h => h.label.includes(': int')), 'Concurrent number range lost hints');
       assert(results[1].some(h => h.label.includes(': string')), 'Concurrent text range lost hints');
     }
+    // Native Task.Run must retain the callback result in the inferred local type.
+    const asyncRoot = vscode.workspace.workspaceFolders.find(f => f.name === 'Async').uri.fsPath;
+    const asyncUri = vscode.Uri.file(path.join(asyncRoot, 'Main.rvn'));
+    const asyncDocument = await vscode.workspace.openTextDocument(asyncUri);
+    await vscode.window.showTextDocument(asyncDocument);
+    const operationPosition = asyncDocument.positionAt(asyncDocument.getText().indexOf('let operation') + 'let operation'.length);
+    let operationHint;
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const result = await vscode.commands.executeCommand('vscode.executeInlayHintProvider', asyncUri,
+        new vscode.Range(asyncDocument.positionAt(0), asyncDocument.positionAt(asyncDocument.getText().length)));
+      const hints = (result || []).map(h => ({ line: h.position.line, character: h.position.character,
+        label: typeof h.label === 'string' ? h.label : h.label.map(p => p.value).join('') }));
+      report.samples.push({ label: 'native-task-result', hints });
+      operationHint = hints.find(h => h.line === operationPosition.line && h.character === operationPosition.character);
+      if (operationHint) break;
+      await delay(500);
+    }
+    assert(operationHint, 'No inferred Task.Run result hint');
+    assert.strictEqual(operationHint.label, ': Task<int>', 'Task.Run result hint must preserve the callback result');
     report.passed = true;
   } catch (error) {
     report.error = String(error.stack || error);

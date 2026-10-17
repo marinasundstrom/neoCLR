@@ -1,0 +1,3 @@
+operation: class Task<int>
+value: struct int
+PASS native function inference

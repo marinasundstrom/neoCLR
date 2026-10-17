@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Correct release qualification for callback-result inlays: Raven main `752d240b4` / native `40fcae6d0` preserve unresolved generic overload candidates, yielding `Task<int>` for `Task.Run(() => 41)`. Record 60 main and 66 native focused checks, a native metadata probe and two passing real-editor development checks. Add an exact task-type assertion and align startup waiting with package acceptance; retain earlier failed inlay evidence. A refreshed SDK/VSIX and Windows qualification remain pending.
+
 - Qualify Raven 368e5ca39 exclusive unit-step range guard removal: 23 compiler checks and an expanded signed-boundary consumer pass interpreter/JIT/AOT. Retain a repeatable bundle validator and compiler-only CPU comparison; interpreter median rises from 4.27 to 6.31 operations/s, largely recovering the candidate regression without weakening inclusive/general-step overflow safety. Runtime/libraries are unchanged; a complete optimized SDK/library refresh and Windows/HTTP release gates remain pending.
 
 - Record five-round local CPU/JSON measurements for the fixed macOS candidate and published-digest Preview 15: 45 successful processes per cohort, separate startup/batch timings and retained input hashes. Adapt only the baseline CPU range spelling to its historical half-open syntax; retain the failed unadapted checksum run. CPU interpreter throughput is about 35% lower in the candidate; document extra range overflow checks as an investigation lead, not a completed optimization. HTTP/Windows and full release gates remain open.

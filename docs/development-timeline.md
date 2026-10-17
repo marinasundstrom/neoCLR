@@ -18767,3 +18767,17 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   unpublished release-note draft, and distinguished 104 redirect routes from 19
   hierarchical reference gaps. Both platforms require optimized package acceptance
   and fresh runtime measurements; no benchmark or remote qualification is claimed.
+
+### 2026-10-17 — Correct the inferred native task inlay
+
+- Author supplied a VS Code screenshot of `Task.Run(() => 41)` displayed as
+  `Task<Void>` and said “This is not right. The inlay is wrong”.
+- Assistant reproduced the error through a cold compiler local-symbol query,
+  including a probe loading the real native references. Available return-type
+  queries discarded unresolved generic candidates and selected a concrete unit
+  overload prematurely; the problem was not an ABI or display-name convention.
+- Shared Raven fix `752d240b4` passed 60 focused checks on main. Native carry
+  `40fcae6d0` passed 66 focused checks, the native metadata probe and a real-editor
+  development check with an exact `Task<int>` assertion.
+  Earlier editor evidence did not cover this inferred-task type; refreshed package
+  qualification remains required. Broader structural work stays parked.

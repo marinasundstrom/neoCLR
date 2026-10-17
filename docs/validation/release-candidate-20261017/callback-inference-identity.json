@@ -1,0 +1,10 @@
+{
+  "ravenMain": "752d240b4",
+  "ravenNative": "40fcae6d0",
+  "mainFocusedTests": 60,
+  "nativeFocusedTests": 66,
+  "serverBase": "0.0.0-native-candidate.20261017.3",
+  "override": "Raven.CodeAnalysis.dll Release/net11.0 from native source",
+  "analysisSha256": "013fd31c4a2d026c540fbbbd18f55bfaf70a6730e78d41939dd3d614ce6950ea",
+  "packagedQualification": false
+}
