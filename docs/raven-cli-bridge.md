@@ -12477,3 +12477,8 @@ as the native core fails with missing dependency NeoCLR.CoreProbe. Production co
 construction and runtime services must be migrated before changing the SDK defaults.
 The existing native-only core is a reduced fixture, not a substitute for production
 Object/primitive implementations. Ordinary .NET compilation remains unchanged.
+
+The next validated Raven slice derives native project core identity from the
+selected artifact when no explicit metadata-name override is supplied. Native
+project compilation/emission passes without inheriting NeoCLR.CoreProbe identity;
+explicit mismatches and retained CLI core checks still reject as before.

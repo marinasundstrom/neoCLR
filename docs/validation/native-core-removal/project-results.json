@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "log": "/tmp/native-core-baseline.log",
+      "output": "PASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard\n",
+      "sha256": "78ea73d945fc36f80ed1858259c2562714dc1956b12da9a0877c65085ccd3253"
+    },
+    {
+      "log": "/tmp/native-project-contract-final-test.log",
+      "output": "PASS native-only references, compilation/emission, System completion, explicit typeof retention/clearing/rejection, execution paths and nine rejected configurations\n",
+      "sha256": "f38d17bf7e7484246d053587e367886c8265d5885060c854935f3f27fb749bcd"
+    },
+    {
+      "log": "/tmp/native-core-inference-test.log",
+      "output": "PASS native-only references, compilation/emission, System completion, explicit typeof retention/clearing/rejection, execution paths and nine rejected configurations\n",
+      "sha256": "f38d17bf7e7484246d053587e367886c8265d5885060c854935f3f27fb749bcd"
+    }
+  ]
+}
