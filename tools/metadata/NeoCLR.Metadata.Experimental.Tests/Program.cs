@@ -183,6 +183,10 @@ if (args.Length == 2 && args[0] == "--inherited-interface-image")
 {
     File.WriteAllBytes(args[1], NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(InheritedInterfaceChecks.Create())); return 0;
 }
+if (args is ["--native-owned-parameter-arrays"])
+{
+    ParameterArrayChecks.RunNativeOwned(); return 0;
+}
 if (args.Length == 3 && args[0] == "--parameter-arrays")
 {
     ParameterArrayChecks.RunNative(args[1], args[2]); return 0;

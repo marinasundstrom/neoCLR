@@ -946,7 +946,17 @@ public sealed partial class NativeAssemblyDefinition
                             Require(parameter >= 0 && tokens[parameter].GetUInt32() != 0, "attribute target does not belong to parameter");
                             if (!parameterAttributes.TryGetValue(parameter, out var values)) parameterAttributes.Add(parameter, values = []);
                             Require(values.Count < 256, "too many parameter attributes");
-                            values.Add(ReadAttribute(attribute));
+                            var decodedAttribute = ReadAttribute(attribute);
+                            if (decodedAttribute.Owner.ClassType is { Namespace: "System", Name: "ParamArrayAttribute" } ||
+                                decodedAttribute.Owner.ImportedType is { Namespace: "System", Name: "ParamArrayAttribute", DeclaringType: null })
+                            {
+                                Require(parameterArray is null && decodedAttribute.Arguments.Length == 0 && decodedAttribute.Named.Length == 0,
+                                    "invalid or duplicate native parameter-array marker");
+                                Require(parameter == parameterTypes.Length - 1 && parameterTypes[parameter].ArrayElement is not null,
+                                    "parameter-array marker requires the final by-value vector parameter token");
+                                parameterArray = parameter;
+                            }
+                            values.Add(decodedAttribute);
                             continue;
                         }
                         Require(parameterArray is null, "duplicate parameter-array marker");

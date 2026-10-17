@@ -389,5 +389,8 @@ public sealed partial class AssemblyBuilder
 {
     private bool HasParameterArrayAttribute(MethodBuilder method, int position) => method.Definition.GetParameterCustomAttributes(position)
         .Any(attribute => attribute.AttributeType.Namespace == "System" && attribute.AttributeType.Name == "ParamArrayAttribute" &&
-            (attribute.AttributeType.ExplicitScope ?? attribute.AttributeType.Module.Assembly.Identity).Equals(CoreLibrary));
+            ((attribute.AttributeType.ExplicitScope ?? attribute.AttributeType.Module.Assembly.Identity).Equals(CoreLibrary) ||
+             (attribute.AttributeType.ExplicitScope ?? attribute.AttributeType.Module.Assembly.Identity).Equals(Identity) ||
+             nativeImportedDefinitions.Keys.Any(t => t.Namespace == "System" && t.Name == "ParamArrayAttribute" &&
+                 t.AssemblyIdentity.Equals(attribute.AttributeType.ExplicitScope))));
 }

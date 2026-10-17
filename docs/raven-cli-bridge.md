@@ -12482,3 +12482,19 @@ The next validated Raven slice derives native project core identity from the
 selected artifact when no explicit metadata-name override is supplied. Native
 project compilation/emission passes without inheriting NeoCLR.CoreProbe identity;
 explicit mismatches and retained CLI core checks still reject as before.
+
+### Native parameter-array marker ownership (2026-10-17)
+
+The metadata SDK can now synthesize parameter-array metadata from a local public
+nongeneric `System.ParamArrayAttribute` with a public parameterless constructor,
+or an explicitly imported native declaration of that type. Multiple selected owners
+are rejected. The native reader and introspection preserve the marker on the final
+by-value array parameter without loading CLI metadata or running its constructor.
+The .NET-compatible expansion contract and physical array signature do not change.
+No new Runtime Contract property or public API is introduced.
+
+`NeoCLR.Metadata.Experimental.Tests --native-owned-parameter-arrays` validates local
+and separate-provider native roundtrips, exact reference ownership, introspection,
+invalid targets and missing constructors. The legacy `--parameter-arrays` probe
+still passes. Compiler marker selection and production source ownership are not
+completed by this SDK slice; see the [migration audit](validation/native-core-removal/production-audit.md).

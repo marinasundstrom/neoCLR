@@ -8,7 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
-- Record the production bootstrap-removal audit, native artifact dependencies and retained direct-call inventory. Clarify that Raven neoCLR compilation and editor symbols must use native metadata references, including the core library. Separate confirmed migration blockers from pending use-site analysis and unvalidated prototypes; no production bundle or installed SDK is replaced.
+- Support native-owned and explicitly imported native ParamArrayAttribute markers in metadata emission and import, preserving exact dependency ownership and parameter introspection. Reject ambiguous owners or missing marker constructors; retain the legacy marker binding. Production library ownership and compiler marker selection remain separate migration steps.
+
+- Record the production bootstrap-removal audit, native artifact dependencies and retained direct-call inventory. Clarify that Raven neoCLR compilation and editor symbols must use native metadata references, including the core library. Complete compiler/helper use-site analysis and separate confirmed migration blockers from unvalidated prototypes; no production bundle or installed SDK is replaced.
 
 - Qualify native-only Raven project contract handling and System namespace completion without CLI delegate transport symbols. Qualify artifact-derived native core identity without an inherited CLI preset and retain explicit mismatch rejection. Clarify the website’s bootstrap status. Record the production System.Runtime dependency on NeoCLR.CoreProbe as a remaining bootstrap-removal blocker; do not switch the installed SDK to the reduced fixture core.
 

@@ -60,9 +60,47 @@ internal static class ParameterArrayChecks
         Reject(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(root.ToJsonString()), core.Identity)));
     }
 
-    private static AssemblyBuilder Create(AssemblyIdentity core)
+    internal static void RunNativeOwned()
     {
-        var graph = new AssemblyBuilder(new("ParameterArrays", new(1, 0, 0, 0)), core);
+        var core = new AssemblyIdentity("NativeParameterCore", new(1, 0, 0, 0));
+        var graph = Create(core);
+        var marker = graph.AddClass("System", "ParamArrayAttribute");
+        var constructor = marker.AddConstructor(new MethodSignature(PrimitiveType.Void, []));
+        constructor.GetILGenerator().Fail("metadata must not construct the marker");
+        graph.Definition.MainModule.Types.Single(t => t.Name == "Operations").Methods[0]
+            .GetParameterCustomAttributes(0).Add(new CustomAttributeDefinition(constructor.Definition, []));
+        var image = graph.WriteNativeAssembly();
+        var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(image, core));
+        Check(loaded.MainModule.AssemblyReferences.Count == 0, "native marker acquired an external core dependency");
+        var methods = loaded.MainModule.Types.Single(t => t.Name == "Operations").Methods;
+        Check(methods.Count == 2 && methods.All(m => m.ParameterArrayIndex == 0), "native-owned parameter arrays lost");
+        var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([loaded]);
+        Check(context.Resolve(loaded.Identity).GetTypes().Single(t => t.Name == "Operations").GetMethods()
+            .All(m => m.GetParameters().Single().IsParameterArray), "native-owned introspection lost parameter arrays");
+        var invalid = System.Text.Json.Nodes.JsonNode.Parse(image)!;
+        var function = invalid["functions"]!.AsArray().First(f => f!["custom_attributes"] is not null)!;
+        function["custom_attributes"]![0]!["target_token"] = 0;
+        Reject(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(invalid.ToJsonString()), core)));
+        var consumer = Create(core, "ParameterConsumer");
+        consumer.ImportReference(loaded.MainModule.Types.Single(t => t.Name == "ParamArrayAttribute"), core);
+        var importedImage = consumer.WriteNativeAssembly();
+        var imported = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(importedImage, core));
+        Check(imported.MainModule.AssemblyReferences.Count == 1 && imported.MainModule.AssemblyReferences[0].Identity.Equals(loaded.Identity),
+            "imported marker did not retain its exact native owner");
+        Check(imported.MainModule.Types.Single(t => t.Name == "Operations").Methods.All(m => m.ParameterArrayIndex == 0),
+            "imported native parameter arrays lost");
+        var importedContext = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([loaded, imported]);
+        Check(importedContext.Resolve(imported.Identity).GetTypes().Single(t => t.Name == "Operations").GetMethods()
+            .All(m => m.GetParameters().Single().IsParameterArray), "imported native introspection lost parameter arrays");
+        var missingConstructor = Create(core);
+        missingConstructor.AddClass("System", "ParamArrayAttribute");
+        Reject(() => missingConstructor.WriteNativeAssembly());
+        Console.WriteLine("PASS local/imported native parameter arrays, exact dependency ownership, introspection and malformed marker rejection");
+    }
+
+    private static AssemblyBuilder Create(AssemblyIdentity core, string name = "ParameterArrays")
+    {
+        var graph = new AssemblyBuilder(new(name, new(1, 0, 0, 0)), core);
         var owner = graph.AddClass("Example", "Operations");
         foreach (bool manual in new[] { false, true })
         {

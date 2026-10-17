@@ -41,13 +41,45 @@ public sealed partial class AssemblyBuilder
         var parameterAttributes = new Dictionary<MethodBuilder, CustomAttributeDefinition>();
         if (methods.Any(m => m.Definition.ParameterArrayIndex is not null))
         {
-            (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native parameter arrays require an explicit core marker binding")).ValidateParameterArrayMarker();
-            var marker = ImportTypeIdentity(CoreLibrary, "System", "ParamArrayAttribute", 0);
+            var localMarker = types.SingleOrDefault(t => t.Namespace == "System" && t.Name == "ParamArrayAttribute" && t.Definition.DeclaringType is null);
+            var importedMarkers = nativeImportedDefinitions.Where(p => p.Key.Namespace == "System" &&
+                p.Key.Name == "ParamArrayAttribute" && p.Key.DeclaringType is null).ToArray();
+            if (importedMarkers.Length > 1 || localMarker is not null && importedMarkers.Length != 0)
+                throw new InvalidDataException("ambiguous native parameter-array marker owner");
+            CustomAttributeDefinition markerAttribute;
+            SignatureType marker;
+            if (localMarker is not null)
+            {
+                var constructor = localMarker.Methods.SingleOrDefault(m => m.IsConstructor &&
+                    m.Visibility == MethodVisibility.Public && m.ParameterCount == 0);
+                if (localMarker.IsValueType || localMarker.IsStatic || localMarker.GenericParameterNames.Count != 0 ||
+                    (localMarker.Definition.Attributes & 7) != 1 || constructor is null)
+                    throw new InvalidDataException("native parameter arrays require a public nongeneric marker with a public parameterless constructor");
+                marker = localMarker;
+                markerAttribute = new CustomAttributeDefinition(constructor.Definition, []);
+            }
+            else if (importedMarkers.Length == 1)
+            {
+                var definition = importedMarkers[0].Value;
+                var constructor = definition.Methods.SingleOrDefault(m => m.Name == ".ctor" && !m.IsStatic &&
+                    (m.Attributes & 7) == 6 && m.TryGetSignature(out var signature) &&
+                    signature!.ParameterTypes.Count == 0 && signature.ReturnType == PrimitiveType.Void);
+                if (definition.IsValueType || definition.GenericArity != 0 || constructor is null)
+                    throw new InvalidDataException("native parameter arrays require a public nongeneric marker with a public parameterless constructor");
+                marker = importedMarkers[0].Key;
+                markerAttribute = new CustomAttributeDefinition(ImportReference(constructor, CoreLibrary), []);
+            }
+            else
+            {
+                (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native parameter arrays require an explicit marker owner")).ValidateParameterArrayMarker();
+                marker = ImportTypeIdentity(CoreLibrary, "System", "ParamArrayAttribute", 0);
+                markerAttribute = new CustomAttributeDefinition(Definition.MainModule.ImportReference(CoreLibrary, "System", "ParamArrayAttribute"), []);
+            }
             foreach (var method in methods.Where(m => m.Definition.ParameterArrayIndex is not null))
             {
                 if (HasParameterArrayAttribute(method, method.Definition.ParameterArrayIndex!.Value)) continue;
-                var attribute = new CustomAttributeDefinition(Definition.MainModule.ImportReference(CoreLibrary, "System", "ParamArrayAttribute"), []);
-                attributeOwners.Add(attribute, marker); parameterAttributes.Add(method, attribute);
+                var attribute = markerAttribute;
+                attributeOwners.TryAdd(attribute, marker); parameterAttributes.Add(method, attribute);
             }
         }
         foreach (var type in types)

@@ -79,11 +79,38 @@ list is a candidate set, **not** a list of required new public APIs.
   markers require a use-site audit. Their presence in the CLI core alone does not
   establish a native need. Tuple expansion remains parked.
 
+## Completed use-site audit
+
+The native emitter consumes MethodImplAttribute for `neoCLR.Runtime` internal calls,
+FlagsAttribute for enum flags, and explicit source custom attributes. No direct native
+emitter use was found for CompilerGenerated, IsExternalInit, Nullable/NullableContext,
+RefSafetyRules, ReferenceAssembly, TopLevel or TupleElementNames transport markers.
+Their CLI availability is not a requirement to port them. Nullable annotations and
+native namespace functions already have native metadata representations. Shared binder
+requirements remain subject to the production compilation gate rather than an assumption
+that every CLI type must exist.
+
+`RuntimeAwait.rvn` uses native Task/Promise/TaskOutcome and function types, plus internal
+calls authorized by MethodImpl/InternalCall: operation creation, managed start, owner
+retention, completion, await, release, status and scheduler submission.
+`RuntimeGenerator.rvn` builds on that provider and native async iterator contracts; it
+has no additional direct CLI service dependency. These are source adapters, not CLI
+metadata references, and need the native service-owner and project-helper contracts.
+
+The entry-point emitter also resolves RuntimeServices to drain pending tasks. Migrate
+that lookup alongside TypeHandle and CheckedStorage, not only the source-facing facade.
+The retained direct-call evidence confirms the production service categories; changing
+a call's ownership requires validating its resolved signature and runtime implementation.
+No declaration-only stub or dependency stripping is sufficient.
+
+The inventory is sufficient to start bounded migration. Production compilation and
+consumer/editor gates may expose additional shared binder assumptions; those are
+validation discoveries, not evidence that the reference migration is complete.
+
 ## Proposed order and validation gates
 
-1. Finish the source/use-site inventory, including retained runtime services,
-   marker use sites and the generated async helper requirements. The Networking
-   retained-call dependency is established; exhaustive call coverage remains open.
+1. Artifact and compiler/helper use-site inventory completed above; retain it as
+   the baseline for migration and update it when production validation exposes gaps.
 2. Port required attributes and implement native local **and imported** metadata
    handling. Validate rejection paths, parameter expansion and introspection.
 3. Replace runtime-service and intrinsic authorization with explicit native owners;
@@ -108,6 +135,7 @@ parameter-array probe still passed. Production source/seed changes were attempte
 but the rebuild stopped at duplicate ownership: ParamArrayAttribute remains in the
 CLI core as well as the new source declaration. Imported-native marker handling,
 production compilation, runtime consumers and API snapshot refresh are unfinished.
-These implementation changes are uncommitted and are **not** validated production
-support. Keep them separate from this audit commit and reconsider them against the
-complete migration sequence.
+The SDK local/imported marker support has since passed its focused roundtrip and
+legacy probes and is committed as a separate migration slice. Production source/seed
+changes remain uncommitted and are **not** validated production support. Compiler
+selection and library ownership must be completed before replacing the bundle.
