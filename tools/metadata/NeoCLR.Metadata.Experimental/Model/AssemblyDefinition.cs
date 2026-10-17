@@ -151,6 +151,12 @@ public sealed partial class AssemblyDefinition
                 bool valueType = !type.BaseType.IsNil && (type.BaseType.Kind == HandleKind.TypeReference
                     ? reader.GetString(baseReference.Namespace) == "System" && reader.GetString(baseReference.Name) is "ValueType" or "Enum"
                     : type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Namespace) == "System" && reader.GetString(baseDefinition.Name) is "ValueType" or "Enum");
+                // The core Enum base is an abstract reference class even though
+                // it directly extends the core's ValueType declaration.
+                if (valueType && declaring.IsNil && reader.GetString(type.Namespace) == "System" &&
+                    reader.GetString(type.Name) == "Enum" && type.BaseType.Kind == HandleKind.TypeDefinition &&
+                    reader.GetString(baseDefinition.Name) == "ValueType")
+                    valueType = false;
                 bool unsupportedParameters = type.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || (p.Attributes & ~System.Reflection.GenericParameterAttributes.VarianceMask) != 0 || (p.Attributes & System.Reflection.GenericParameterAttributes.VarianceMask) == System.Reflection.GenericParameterAttributes.VarianceMask || (type.Attributes & System.Reflection.TypeAttributes.Interface) == 0 && p.Attributes != 0 || p.GetConstraints().Count != 0).Any();
                 rows.Add(new((uint)MetadataTokens.GetToken(handle), ReadName(type.Namespace), ReadName(type.Name),
                     type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType, valueType && type.BaseType.Kind == HandleKind.TypeReference && reader.GetString(baseReference.Name) is "ValueType" or "Enum" ? references.FirstOrDefault(r => r.Token == (uint)MetadataTokens.GetToken(baseReference.ResolutionScope))?.Identity : valueType && type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Name) is "ValueType" or "Enum" ? identity : null, IsEnum: valueType && (type.BaseType.Kind == HandleKind.TypeReference ? reader.GetString(baseReference.Name) : reader.GetString(baseDefinition.Name)) == "Enum", NativeVariance: type.GetGenericParameters().Select(reader.GetGenericParameter).Select(p => (GenericVariance)(p.Attributes & System.Reflection.GenericParameterAttributes.VarianceMask)).ToArray()));
@@ -583,8 +589,8 @@ public sealed partial class TypeDefinition
         Name = row.Name; IsNativePrimitiveReference = row.PrimitiveReference; NativePrimitive = row.NativePrimitive; NativeGrapheme = row.NativeGrapheme; IsValueType = row.IsValueType; IsEnum = row.IsEnum; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
     /// <summary>Gets the intrinsic native value category, or whether a CLI declaration directly extends System.ValueType or System.Enum.</summary>
-    /// <remarks>This is a metadata classification, not runtime type loading or base-identity validation.</remarks>
-    public bool IsValueType { get; }
+    /// <remarks>The core System.Enum base remains a reference class. This is a metadata classification, not runtime type loading or base-identity validation.</remarks>
+    public bool IsValueType { get; private set; }
     /// <summary>Gets whether this declaration directly extends System.Enum.</summary>
     public bool IsEnum { get; }
     internal bool CanImportReference { get; }

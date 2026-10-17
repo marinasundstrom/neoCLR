@@ -52,6 +52,15 @@ public sealed partial class TypeReference
 public sealed partial class TypeDefinition
 {
     internal TypeBuilder? Producer { get; set; }
+    internal void ClassifyCoreEnumBase(AssemblyBuilder owner)
+    {
+        if (owner.Identity.Equals(owner.CoreLibrary) && DeclaringType is null &&
+            Namespace == "System" && Name == "Enum" &&
+            BaseType is { ExplicitScope: null, Namespace: "System", Name: "ValueType" } parent &&
+            ReferenceEquals(parent.Module, owner.Definition.MainModule))
+            IsValueType = false;
+    }
+
     private readonly IList<FieldDefinition>? authoredFields;
     private readonly IList<MethodDefinition>? authoredMethods;
     private readonly IList<PropertyDefinition>? authoredProperties;
@@ -182,6 +191,7 @@ public sealed partial class AssemblyBuilder
     private static bool IsOrdinaryBase(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null;
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
+        definition.ClassifyCoreEnumBase(this);
         if (definition.IsNativeObjectRoot)
         {
             if (ExternalObjectRoot is not null) throw new InvalidOperationException("conflicting native Object ownership");

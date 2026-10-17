@@ -12736,3 +12736,8 @@ receiver inference was developed on Raven main (81daa7e11) and carried separatel
 (fd229a08d). Production core source binding now reaches emission, where qualified
 case-pattern handling is the next observed blocker. This is not a published
 native-only production bundle. Broader structural work remains parked.
+
+Source-core metadata authoring preserves `System.Enum : System.ValueType` as an
+abstract reference class, matching .NET. Ordinary enum and struct declarations
+retain value identity through native and documentation projection roundtrips.
+See the [metadata API contract](../api-docs/experimental-metadata.md#core-enum-base-classification-development).

@@ -9975,3 +9975,20 @@ The native queue-service probe exercises definition and symbol-authored referenc
 against production TaskQueue, replacing the two corresponding legacy seed declarations
 in the test dependency to avoid duplicate implementations. It does not replace the
 production service bundle or establish complete native core production.
+
+### Core Enum base classification (development)
+
+`Model.TypeDefinition.IsValueType` and `Model.TypeBuilder.IsValueType` exclude
+the source-owned core `System.Enum` base class. With matching output and core
+identities, a top-level `System.Enum` derived from the output's `System.ValueType`
+remains an ordinary abstract reference class, so `SetAbstractClass()` is valid.
+A same-named declaration in a different output does not receive this authoring
+exception. Ordinary enum declarations extending core `System.Enum` and structs
+extending `System.ValueType` remain value types.
+
+The CLI projection reader also recognizes the local `System.Enum` base as a
+reference class; classification is not a replacement for runtime identity
+validation. Native metadata retains the explicit category. This matches the
+[.NET Enum hierarchy](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-10.0).
+The focused `--core-base-types` metadata test covers authoring and both native and
+CLI projection roundtrips. No guest runtime API is added by this correction.
