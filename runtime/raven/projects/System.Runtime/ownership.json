@@ -171,7 +171,6 @@
         "runtime/raven/native/RuntimeMathCalls.rvn",
         "runtime/raven/native/RuntimeNativeAllocationCalls.rvn",
         "runtime/raven/native/RuntimeNativeIntegerCalls.rvn",
-        "runtime/raven/native/RuntimeNativeIntegerServices.rvn",
         "runtime/raven/native/RuntimeObjectCalls.rvn",
         "runtime/raven/native/RuntimeObjectServices.rvn",
         "runtime/raven/native/RuntimeStorageCalls.rvn",
@@ -309,7 +308,9 @@
         "System.Collections.AsyncIterable`1",
         "System.Collections.AsyncIterator`1",
         "System.Diagnostics.StackTrace",
-        "System.ParamArrayAttribute"
+        "System.ParamArrayAttribute",
+        "System.IntPtr",
+        "System.UIntPtr"
       ]
     }
   ],
@@ -356,7 +357,9 @@
     "System.Char": "System.Runtime",
     "System.Boolean": "System.Runtime",
     "System.RuntimeTypeHandle": "System.Runtime",
-    "System.Value": "System.Runtime"
+    "System.Value": "System.Runtime",
+    "System.IntPtr": "System.Runtime",
+    "System.UIntPtr": "System.Runtime"
   },
   "failure": {
     "assemblyName": "System.Runtime",

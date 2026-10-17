@@ -1,0 +1,8 @@
+func Main() -> int {
+    let signed = default(nint)
+    let unsigned = default(nuint)
+    if signed.CompareTo(default(nint)) != 0 || unsigned.CompareTo(default(nuint)) != 0 {
+        return 1
+    }
+    return 42
+}

@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "command": [
+    "/Users/robert/Projects/neoclr/target/debug/neoclr",
+    "run",
+    "/Users/robert/Projects/neoclr/target/native-integer-owner-consumer/bin/neoclr/App.dll",
+    "--execution",
+    "interpreter",
+    "--system",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.runtime.neox",
+    "--object-root",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.Data.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.Networking.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.Web.dll"
+  ],
+  "exitCode": 42,
+  "stdout": "",
+  "stderr": "",
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-integer-owner-consumer/bin/neoclr/App.dll": "73b7abf0562aa7589493840cd7c7dbda3349800ced706a0c6e48ddc108851511",
+    "/Users/robert/Projects/neoclr/target/native-integer-library/System.Runtime.dll": "a49667c8274540c1231f8de7d504b6ff5738950f23619f75bc46bdcbe37a2034"
+  }
+}

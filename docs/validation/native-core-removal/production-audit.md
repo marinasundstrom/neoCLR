@@ -158,3 +158,8 @@ stripping are accepted substitutes for the above gates.
   Interpreter/JIT/sanitized AOT pass and negative reservation faults. The existing
   native operations suffice; new compiler interception is unnecessary for that path.
   Production ownership still needs to move when constructing its native core.
+
+- IntPtr/UIntPtr member ownership is fixed by declaring both source types and native
+  primitive owners in the production manifest. Their forwards are removed; a fresh
+  five-library build, imported comparisons and LSP completion pass. Integral numeric
+  casts remain a distinct Raven language/backend gap, not a reason to keep the facade.

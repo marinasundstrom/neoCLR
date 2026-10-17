@@ -93,3 +93,25 @@ An attempted native-integer consumer could not bind Int32-to-IntPtr/UIntPtr cast
 or imported CompareTo through the current project configuration. Those two adapters
 remain unchanged and the gap must be isolated before migrating them. Other wrappers,
 intrinsic ownership and production native-core construction remain open.
+
+## Native integer ownership
+
+The native-integer member gap was caused by missing IntPtr/UIntPtr entries in both
+`libraries[].types` and `nativePrimitives` in the production ownership manifest.
+Both now select System.Runtime, preserving native-width primitive storage while
+exposing the source nominal contracts. Their two forwarding adapters are removed;
+source methods and Console call the existing native services directly.
+
+Raven `04632d5e2` builds `target/native-integer-library` with all five libraries.
+The [consumer](NativeIntegerOwnerConsumer.rvn) invokes both imported comparisons;
+[interpreter execution](native-integer-owner-results.json) returns 42, and
+[LSP completion](native-integer-owner-completion.json) exposes CompareTo on nint.
+The matching API audit renders IntPtr/UIntPtr under System.Runtime and the native
+snapshot/source fingerprints are refreshed. Local file browser preview was blocked
+by URL policy; the renderer checks and generated HTML ownership/member links were
+inspected instead. No website publication or SDK installation occurred.
+
+This resolves member ownership, not the separate general Raven integral conversion
+rules, which still exclude native integers at this compiler revision. It adds no
+unchecked allocation or synthetic runtime implementations. Other bootstrap services
+and native production core construction remain open.

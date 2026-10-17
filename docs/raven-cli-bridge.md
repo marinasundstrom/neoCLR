@@ -12540,3 +12540,10 @@ imports/calls these through ordinary native symbols without BootstrapReference o
 compiler switches; interpreter/JIT/AOT preserve execution. Legacy bootstrap intrinsic
 recognition remains only for existing CLI production inputs until their core ownership
 moves. This does not authorize name-only intrinsic recognition from arbitrary libraries.
+
+IntPtr and UIntPtr now explicitly select System.Runtime in the source declaration
+and primitive-owner manifest. Consumer symbols retain native-width identity and
+expose the library's ComparableTo implementation; library/Console native-integer
+calls no longer use extension forwarding adapters. No Runtime Contract default or
+runtime numeric behavior changes. See the [ownership gate](validation/native-core-removal/README.md#native-integer-ownership).
+General native-integral conversion classification is separate from this owner fix.

@@ -83,11 +83,11 @@ public static class Console {
     }
 
     static func WriteLine(value: nint) {
-        WriteLine(RuntimeServices.Int64ToString(RuntimeServices.IntPtrToInt64(value)))
+        WriteLine(RuntimeServices.Int64ToString(neoCLR.Runtime.IntPtrToInt64(value)))
     }
 
     static func WriteLine(value: nuint) {
-        WriteLine(RuntimeServices.UInt64ToString(RuntimeServices.UIntPtrToUInt64(value)))
+        WriteLine(RuntimeServices.UInt64ToString(neoCLR.Runtime.UIntPtrToUInt64(value)))
     }
 
     // Fresh non-owning wrappers share the host's channels; closing one closes only it.

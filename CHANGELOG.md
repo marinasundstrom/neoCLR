@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Select System.Runtime as the native IntPtr/UIntPtr declaration and primitive owner, restoring imported CompareTo and editor member lookup. Remove their two runtime-service forwards and call native conversions directly from the library and Console. Validate a fresh five-library bundle, interpreter consumer, completion and matching API snapshots. Integral cast support is a separate compiler gap.
+
 - Qualify native metadata-owned CheckedStorage.Reserve<T> and RuntimeServices.TypeHandle<T> bodies without a CLI reference or BootstrapReference. Generic value/reference reservations and type-token calls compile and return 42 in interpreter/JIT/sanitized AOT; negative reservation faults in the interpreter. Extend the reduced native-core probe and editor checks. This establishes the intrinsic ownership path; production native-core construction remains unfinished.
 
 - Remove 18 math/environment forwarding adapters from native System.Runtime and bind callers directly to the existing native service declarations. Preserve public contracts and runtime implementations; validate a fresh four-library build, executable consumer, Math editor completion and API source fingerprints. Native-integer adapters remain pending a separate consumer binding gap.
