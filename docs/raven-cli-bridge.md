@@ -12652,3 +12652,15 @@ function invocation interpreter consumers plus TypeInfo completion. See the
 [gate](validation/native-core-removal/README.md#direct-native-introspection-calls--2026-10-17).
 Remaining primitive/core service and compiler dependencies still require native
 metadata migration. The installed SDK and structural work remain unchanged.
+
+### Source-owned type-handle primitives (2026-10-17)
+
+System.Runtime owns seven native type-handle InternalCalls: names/display names,
+shape, metadata token, equality and generic argument count/access. Descriptor
+callers bind directly, and prepared CLI/retained seed inputs no longer define these
+services or their facades. Runtime behavior and public APIs are unchanged; no
+Runtime Contract switch or ordinary .NET compiler change is required. Raven
+3d233b07c builds all five libraries against native-handle-bootstrap. The generic
+type consumer, native ownership inspection, editor completion and API fingerprints
+qualify the [slice](validation/native-core-removal/README.md#native-type-handle-ownership--2026-10-17).
+Remaining core services/compiler bootstrap contracts still need migration.

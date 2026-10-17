@@ -1,0 +1,44 @@
+import System.*
+import System.Introspection.*
+import System.Option.*
+
+public class Box<T> { }
+
+func CheckArgument<T>() -> bool {
+    let info = typeof(Box<T>)
+    return info.GenericArgumentCount == 1 && info.GetGenericArgument(0).Equals(typeof(T))
+}
+
+func Main() -> int {
+    if !CheckArgument<int>() || !CheckArgument<string>() || !CheckArgument<Box<int>>() {
+        return 1
+    }
+    let info = typeof(Box<int>)
+    if !info.IsNominalType || info.IsArray || info.IsValueType || info.IsInterface {
+        return 2
+    }
+    if !info.Equals(typeof(Box<int>)) || info.Equals(typeof(Box<string>)) {
+        return 3
+    }
+    let arguments = info.GetGenericArguments()
+    if arguments.Count != 1 || !arguments[0].Equals(typeof(int)) {
+        return 4
+    }
+    if info.DisplayName == "" || !typeof(int).IsValueType || !typeof(int[]).IsArray {
+        return 5
+    }
+    if info is NominalTypeInfo nominal {
+        if nominal.Name == "" || nominal.FullName != info.DisplayName {
+            return 6
+        }
+        let Some(token) = nominal.MetadataToken else {
+            return 7
+        }
+        if token == 0 {
+            return 8
+        }
+    } else {
+        return 9
+    }
+    return 42
+}

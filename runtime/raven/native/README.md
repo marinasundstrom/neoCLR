@@ -4,12 +4,14 @@ These Raven sources are inputs to the native class-library build, alongside thei
 source-owned callers. They are not CLI bridge implementations and are not included
 in the legacy .NET bridge source glob.
 
-`RuntimeHandleServices.rvn` declares two internal runtime services using the selected
+`RuntimeHandleServices.rvn` declares ObjectTypeHandle and seven type-handle primitives
+using the selected
 primitive core's `MethodImpl(InternalCall)` marker. The native emitter consumes that
 marker into the existing implementation flag; no attribute object or placeholder
 method executes. Object and RuntimeTypeHandle use the explicitly selected owners,
 including source owners during full bootstrap. The service implementations already
-exist in the runtime. `NativeObject.GetTypeHandle` is a distinct internal facade for
+exist in the runtime. Type-handle callers bind native declarations directly;
+bootstrap preparation removes their CLI facade and retained seed definitions. `NativeObject.GetTypeHandle` is a distinct internal facade for
 source Object.GetType: an extension cannot override the existing bootstrap static
 RuntimeServices member. The legacy ObjectIntrospection extension retains its prior
 bootstrap path. See the [source-owner gate](../../../docs/experiments/extended-cli-metadata/object-handles-2026-10-07.md).

@@ -9,3 +9,21 @@ internal extern func TypeArgumentCount(handle: System.RuntimeTypeHandle) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ObjectTypeHandle(value: object) -> System.RuntimeTypeHandle;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeMetadataToken(handle: System.RuntimeTypeHandle) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeDisplayName(handle: System.RuntimeTypeHandle, kind: int) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeShape(handle: System.RuntimeTypeHandle, kind: int) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeArgument(handle: System.RuntimeTypeHandle, index: int) -> System.RuntimeTypeHandle;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeEquals(left: System.RuntimeTypeHandle, right: System.RuntimeTypeHandle) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeName(handle: System.RuntimeTypeHandle) -> string;

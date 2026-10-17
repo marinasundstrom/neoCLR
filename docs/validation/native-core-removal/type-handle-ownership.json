@@ -1,0 +1,147 @@
+{
+  "passed": true,
+  "methods": [
+    {
+      "name": "neoCLR.Runtime.TypeArgumentCount",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeArgumentCount",
+        "parameter_tokens": [
+          134217838
+        ],
+        "token": 100663381
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.TypeMetadataToken",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeMetadataToken",
+        "parameter_tokens": [
+          134217840
+        ],
+        "token": 100663383
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.TypeDisplayName",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeDisplayName",
+        "parameter_tokens": [
+          134217841,
+          134217842
+        ],
+        "token": 100663384
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle",
+        "Int32"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.TypeShape",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeShape",
+        "parameter_tokens": [
+          134217843,
+          134217844
+        ],
+        "token": 100663385
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle",
+        "Int32"
+      ],
+      "returns": "Boolean"
+    },
+    {
+      "name": "neoCLR.Runtime.TypeArgument",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeArgument",
+        "parameter_tokens": [
+          134217845,
+          134217846
+        ],
+        "token": 100663386
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle",
+        "Int32"
+      ],
+      "returns": "RuntimeTypeHandle"
+    },
+    {
+      "name": "neoCLR.Runtime.TypeEquals",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeEquals",
+        "parameter_tokens": [
+          134217847,
+          134217848
+        ],
+        "token": 100663387
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle",
+        "RuntimeTypeHandle"
+      ],
+      "returns": "Boolean"
+    },
+    {
+      "name": "neoCLR.Runtime.TypeName",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "TypeName",
+        "parameter_tokens": [
+          134217849
+        ],
+        "token": 100663388
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "RuntimeTypeHandle"
+      ],
+      "returns": "String"
+    }
+  ],
+  "retainedDefinitions": 0,
+  "sha256": {
+    "target/native-handle-direct-library/System.Runtime.dll": "30ad22d24e04e48e9f5b857cd5f77f855137c9481219b5e78ec68d3b893eba73",
+    "target/native-handle-bootstrap/Core.dll": "4f8edbee05e88c92179bb186afbe6fe75bfde88981a1d628a44041891ca1c137",
+    "target/native-handle-bootstrap/System.retained.json": "d78064b4a79569c2ca6072c37fc69696947e92b3033695027f01a25b35dd1b06",
+    "target/native-handle-bootstrap/preparation-evidence.json": "4854071d11538f5cd25de52a891eb83b649e7b898351dacc10acbe92c7c6cf28",
+    "target/native-handle-direct-library/build-evidence.json": "0c0ea88368676e9e7c0070ebd1200baca9f589bb0b737d7ee0d4bf463a547460"
+  }
+}

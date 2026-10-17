@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 import shutil
+import re
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -20,6 +21,14 @@ def retained_model(model):
         raise ValueError('Expected exactly one bootstrap Object declaration')
     model['types'] = [t for t in model['types'] if t['name'] != 'System.Object']
     model['functions'] = [f for f in model['functions'] if f.get('owner') != {'Named': 'System.Object'}]
+
+    handle_services = {'neoCLR.Runtime.' + name for name in
+                       ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
+                        'TypeArgumentCount', 'TypeEquals', 'TypeName')}
+    for name in handle_services:
+        if sum(f['name'] == name for f in model['functions']) != 1:
+            raise ValueError('Expected exactly one retained handle service: ' + name)
+    model['functions'] = [f for f in model['functions'] if f['name'] not in handle_services]
 
     def clear_ids(value):
         if isinstance(value, dict):
@@ -82,6 +91,15 @@ def main():
         if seed_text.count(declaration) != 1:
             raise ValueError('Expected exactly one retained payload helper: ' + name)
         seed_text = seed_text.replace(declaration, '')
+    # Native System.Runtime owns these handle primitives. Remove the old facade;
+    # seed service declarations remain available to assemble the temporary Object
+    # body and are removed from the retained model after that body is discarded.
+    for name in ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
+                 'TypeArgumentCount', 'TypeEquals', 'TypeName'):
+        pattern = r'(?m)^\.method static ' + name + r'\([^\n]*\n.*?^\.end\n'
+        seed_text, count = re.subn(pattern, '', seed_text, flags=re.DOTALL)
+        if count != 1:
+            raise ValueError('Expected exactly one retained handle facade: ' + name)
     for path in (args.probe or args.core_reference, args.runtime, args.translator):
         if not path.is_file():
             raise FileNotFoundError(path)

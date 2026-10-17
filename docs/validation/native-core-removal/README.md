@@ -356,3 +356,34 @@ are unchanged; their earlier JIT/AOT qualification is reused, not rerun here.
 Type-handle primitives, strings/parsing, scheduling and other retained core services
 still require native ownership and compiler/bootstrap migration. This does not
 replace the installed SDK or establish native-only production core construction.
+
+## Native type-handle ownership — 2026-10-17
+
+System.Runtime now owns seven internal native declarations: TypeName,
+TypeDisplayName, TypeShape, TypeMetadataToken, TypeEquals, TypeArgumentCount and
+TypeArgument. The existing TypeArgumentCount declaration is reused and the other
+six are added to RuntimeHandleServices.rvn. Descriptor callers select these native
+functions directly. The runtime implementations and .NET-style type identity,
+generic argument retention and introspection semantics are unchanged.
+
+Bootstrap preparation removes the seven CLI facade methods and seed facade bodies.
+The seed's native service declarations remain only during assembly of its temporary
+Object body; preparation removes them from the retained model together with that
+Object. Exact-count checks reject missing/duplicate seed declarations. No native
+handle implementation is retained as a fallback. Original legacy seed sources stay
+available for older probes; production preparation is the migration boundary.
+
+Raven `3d233b07c` builds all five libraries in `target/native-handle-direct-library`
+against freshly prepared `target/native-handle-bootstrap`. No Runtime Contract
+switch or compiler/.NET change is required. The [consumer](TypeHandleConsumer.rvn)
+checks generic int/string/nested arguments, identity, nominal/value/array flags,
+names and metadata tokens. [Interpreter evidence](type-handle-results.json),
+[native ownership evidence](type-handle-ownership.json) and
+[editor completion](type-handle-completion.json) qualify this slice. The API source
+fingerprint check passes; public signatures are unchanged. Existing JIT/AOT provider
+implementations are reused without a new backend matrix in this slice.
+
+Strings/parsing, scheduling and other retained services plus compiler bootstrap
+contracts still require migration before production native-only core construction.
+The installed SDK is unchanged. Existing structural descriptor behavior is preserved;
+broader structural work remains parked.

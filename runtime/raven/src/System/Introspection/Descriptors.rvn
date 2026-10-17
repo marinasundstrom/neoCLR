@@ -495,33 +495,33 @@ internal open class RuntimeTypeInfo : TypeInfo {
     }
 
     internal static func GenericArgumentsFromHandle(handle: RuntimeTypeHandle) -> Sequence<TypeInfo> {
-        let count = RuntimeServices.TypeArgumentCount(handle)
+        let count = neoCLR.Runtime.TypeArgumentCount(handle)
         let result = CheckedStorage.Reserve<TypeInfo>(count)
         var index = 0
         while index < count {
-            result[index] = FromHandle(RuntimeServices.TypeArgument(handle, index))
+            result[index] = FromHandle(neoCLR.Runtime.TypeArgument(handle, index))
             index += 1
         }
         return result
     }
 
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
-        if RuntimeServices.TypeShape(handle, 17) {
+        if neoCLR.Runtime.TypeShape(handle, 17) {
             return RuntimeGenericParameterTypeInfo.Create(handle)
         }
-        if RuntimeServices.TypeShape(handle, 12) {
+        if neoCLR.Runtime.TypeShape(handle, 12) {
             return RuntimeNominalTypeInfo.FromHandle(handle)
         }
-        if RuntimeServices.TypeShape(handle, 13) {
+        if neoCLR.Runtime.TypeShape(handle, 13) {
             return RuntimeFunctionTypeInfo.FromHandle(handle)
         }
-        if RuntimeServices.TypeShape(handle, 14) {
+        if neoCLR.Runtime.TypeShape(handle, 14) {
             return RuntimeUnionTypeInfo.Create(handle)
         }
-        if RuntimeServices.TypeShape(handle, 15) {
+        if neoCLR.Runtime.TypeShape(handle, 15) {
             return RuntimeIntersectionTypeInfo.Create(handle)
         }
-        if RuntimeServices.TypeShape(handle, 16) {
+        if neoCLR.Runtime.TypeShape(handle, 16) {
             return RuntimeTupleTypeInfo.Create(handle)
         }
         return RuntimeTypeInfo(handle)
@@ -595,24 +595,24 @@ internal open class RuntimeTypeInfo : TypeInfo {
     func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo> {
         return neoCLR.Runtime.TypeProperties(Handle, (int)flags)
     }
-    val DisplayName: string => RuntimeServices.TypeDisplayName(Handle, 0)
-    val IsNominalType: bool => RuntimeServices.TypeShape(Handle, 12)
-    val IsFunctionType: bool => RuntimeServices.TypeShape(Handle, 13)
-    val GenericArgumentCount: int => RuntimeServices.TypeArgumentCount(Handle)
+    val DisplayName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
+    val IsNominalType: bool => neoCLR.Runtime.TypeShape(Handle, 12)
+    val IsFunctionType: bool => neoCLR.Runtime.TypeShape(Handle, 13)
+    val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
-        return RuntimeTypeInfo.FromHandle(RuntimeServices.TypeArgument(Handle, index))
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeArgument(Handle, index))
     }
 
     func Equals(other: TypeInfo) -> bool {
         if other is RuntimeTypeInfo implementation {
-            return RuntimeServices.TypeEquals(Handle, implementation.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, implementation.ExecutionHandle)
         }
         if other is RuntimeNominalTypeInfo nominal {
-            return RuntimeServices.TypeEquals(Handle, nominal.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, nominal.ExecutionHandle)
         }
         if other is RuntimeFunctionTypeInfo functionType {
-            return RuntimeServices.TypeEquals(Handle, functionType.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, functionType.ExecutionHandle)
         }
         return false
     }
@@ -632,19 +632,19 @@ internal open class RuntimeTypeInfo : TypeInfo {
 
     override func ToString() -> string => DisplayName
 
-    val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
-    val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)
-    val IsPointer: bool => RuntimeServices.TypeShape(Handle, 2)
-    val IsInterface: bool => RuntimeServices.TypeShape(Handle, 3)
-    val IsReadOnly: bool => RuntimeServices.TypeShape(Handle, 4)
-    val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
-    val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
-    val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
-    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 14)
-    val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
-    val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
-    val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
-    val IsBeforeFieldInit: bool => RuntimeServices.TypeShape(Handle, 20)
+    val IsArray: bool => neoCLR.Runtime.TypeShape(Handle, 0)
+    val IsByRef: bool => neoCLR.Runtime.TypeShape(Handle, 1)
+    val IsPointer: bool => neoCLR.Runtime.TypeShape(Handle, 2)
+    val IsInterface: bool => neoCLR.Runtime.TypeShape(Handle, 3)
+    val IsReadOnly: bool => neoCLR.Runtime.TypeShape(Handle, 4)
+    val IsAbstract: bool => neoCLR.Runtime.TypeShape(Handle, 5)
+    val IsOpen: bool => neoCLR.Runtime.TypeShape(Handle, 8)
+    val IsClosedHierarchy: bool => neoCLR.Runtime.TypeShape(Handle, 9)
+    val IsUnion: bool => neoCLR.Runtime.TypeShape(Handle, 14)
+    val IsEnum: bool => neoCLR.Runtime.TypeShape(Handle, 6)
+    val IsValueType: bool => neoCLR.Runtime.TypeShape(Handle, 7)
+    val IsVisible: bool => neoCLR.Runtime.TypeShape(Handle, 11)
+    val IsBeforeFieldInit: bool => neoCLR.Runtime.TypeShape(Handle, 20)
     val TypeInitializer: Option<ConstructorInfo> {
         get {
             if !IsNominalType {
@@ -669,7 +669,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
 
 internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
-        return neoCLR.Runtime.MemberCustomAttributes(self, RuntimeServices.TypeMetadataToken(Handle))
+        return neoCLR.Runtime.MemberCustomAttributes(self, neoCLR.Runtime.TypeMetadataToken(Handle))
     }
 
     private field Handle: RuntimeTypeHandle
@@ -753,29 +753,29 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
         return neoCLR.Runtime.TypeProperties(Handle, (int)flags)
     }
     val DeclaringType: Option<TypeInfo> => neoCLR.Runtime.TypeDeclaringType(Handle)
-    val MetadataToken: Option<int> => Some(RuntimeServices.TypeMetadataToken(Handle))
+    val MetadataToken: Option<int> => Some(neoCLR.Runtime.TypeMetadataToken(Handle))
     val Module: Option<ModuleInfo> => Some(neoCLR.Runtime.TypeModule(Handle))
-    val Name: string => RuntimeServices.TypeName(Handle)
-    val FullName: string => RuntimeServices.TypeDisplayName(Handle, 0)
-    val Namespace: string => RuntimeServices.TypeDisplayName(Handle, 1)
-    val DisplayName: string => RuntimeServices.TypeDisplayName(Handle, 0)
-    val IsNominalType: bool => RuntimeServices.TypeShape(Handle, 12)
-    val IsFunctionType: bool => RuntimeServices.TypeShape(Handle, 13)
-    val GenericArgumentCount: int => RuntimeServices.TypeArgumentCount(Handle)
+    val Name: string => neoCLR.Runtime.TypeName(Handle)
+    val FullName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
+    val Namespace: string => neoCLR.Runtime.TypeDisplayName(Handle, 1)
+    val DisplayName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
+    val IsNominalType: bool => neoCLR.Runtime.TypeShape(Handle, 12)
+    val IsFunctionType: bool => neoCLR.Runtime.TypeShape(Handle, 13)
+    val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
-        return RuntimeTypeInfo.FromHandle(RuntimeServices.TypeArgument(Handle, index))
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeArgument(Handle, index))
     }
 
     func Equals(other: TypeInfo) -> bool {
         if other is RuntimeTypeInfo implementation {
-            return RuntimeServices.TypeEquals(Handle, implementation.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, implementation.ExecutionHandle)
         }
         if other is RuntimeNominalTypeInfo nominal {
-            return RuntimeServices.TypeEquals(Handle, nominal.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, nominal.ExecutionHandle)
         }
         if other is RuntimeFunctionTypeInfo functionType {
-            return RuntimeServices.TypeEquals(Handle, functionType.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, functionType.ExecutionHandle)
         }
         return false
     }
@@ -795,20 +795,20 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
 
     override func ToString() -> string => DisplayName
 
-    val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
-    val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)
-    val IsPointer: bool => RuntimeServices.TypeShape(Handle, 2)
-    val IsInterface: bool => RuntimeServices.TypeShape(Handle, 3)
-    val IsReadOnly: bool => RuntimeServices.TypeShape(Handle, 4)
-    val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
-    val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
-    val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
-    val IsUnionDeclaration: bool => RuntimeServices.TypeShape(Handle, 10)
-    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 14)
-    val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
-    val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
-    val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
-    val IsBeforeFieldInit: bool => RuntimeServices.TypeShape(Handle, 20)
+    val IsArray: bool => neoCLR.Runtime.TypeShape(Handle, 0)
+    val IsByRef: bool => neoCLR.Runtime.TypeShape(Handle, 1)
+    val IsPointer: bool => neoCLR.Runtime.TypeShape(Handle, 2)
+    val IsInterface: bool => neoCLR.Runtime.TypeShape(Handle, 3)
+    val IsReadOnly: bool => neoCLR.Runtime.TypeShape(Handle, 4)
+    val IsAbstract: bool => neoCLR.Runtime.TypeShape(Handle, 5)
+    val IsOpen: bool => neoCLR.Runtime.TypeShape(Handle, 8)
+    val IsClosedHierarchy: bool => neoCLR.Runtime.TypeShape(Handle, 9)
+    val IsUnionDeclaration: bool => neoCLR.Runtime.TypeShape(Handle, 10)
+    val IsUnion: bool => neoCLR.Runtime.TypeShape(Handle, 14)
+    val IsEnum: bool => neoCLR.Runtime.TypeShape(Handle, 6)
+    val IsValueType: bool => neoCLR.Runtime.TypeShape(Handle, 7)
+    val IsVisible: bool => neoCLR.Runtime.TypeShape(Handle, 11)
+    val IsBeforeFieldInit: bool => neoCLR.Runtime.TypeShape(Handle, 20)
     val TypeInitializer: Option<ConstructorInfo> {
         get {
             if !IsNominalType {
@@ -1056,24 +1056,24 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
     func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo> {
         return neoCLR.Runtime.TypeProperties(Handle, (int)flags)
     }
-    val DisplayName: string => RuntimeServices.TypeDisplayName(Handle, 0)
-    val IsNominalType: bool => RuntimeServices.TypeShape(Handle, 12)
-    val IsFunctionType: bool => RuntimeServices.TypeShape(Handle, 13)
-    val GenericArgumentCount: int => RuntimeServices.TypeArgumentCount(Handle)
+    val DisplayName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
+    val IsNominalType: bool => neoCLR.Runtime.TypeShape(Handle, 12)
+    val IsFunctionType: bool => neoCLR.Runtime.TypeShape(Handle, 13)
+    val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
-        return RuntimeTypeInfo.FromHandle(RuntimeServices.TypeArgument(Handle, index))
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeArgument(Handle, index))
     }
 
     func Equals(other: TypeInfo) -> bool {
         if other is RuntimeTypeInfo implementation {
-            return RuntimeServices.TypeEquals(Handle, implementation.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, implementation.ExecutionHandle)
         }
         if other is RuntimeNominalTypeInfo nominal {
-            return RuntimeServices.TypeEquals(Handle, nominal.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, nominal.ExecutionHandle)
         }
         if other is RuntimeFunctionTypeInfo functionType {
-            return RuntimeServices.TypeEquals(Handle, functionType.ExecutionHandle)
+            return neoCLR.Runtime.TypeEquals(Handle, functionType.ExecutionHandle)
         }
         return false
     }
@@ -1093,19 +1093,19 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
 
     override func ToString() -> string => DisplayName
 
-    val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
-    val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)
-    val IsPointer: bool => RuntimeServices.TypeShape(Handle, 2)
-    val IsInterface: bool => RuntimeServices.TypeShape(Handle, 3)
-    val IsReadOnly: bool => RuntimeServices.TypeShape(Handle, 4)
-    val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
-    val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
-    val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
-    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 14)
-    val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
-    val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
-    val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
-    val IsBeforeFieldInit: bool => RuntimeServices.TypeShape(Handle, 20)
+    val IsArray: bool => neoCLR.Runtime.TypeShape(Handle, 0)
+    val IsByRef: bool => neoCLR.Runtime.TypeShape(Handle, 1)
+    val IsPointer: bool => neoCLR.Runtime.TypeShape(Handle, 2)
+    val IsInterface: bool => neoCLR.Runtime.TypeShape(Handle, 3)
+    val IsReadOnly: bool => neoCLR.Runtime.TypeShape(Handle, 4)
+    val IsAbstract: bool => neoCLR.Runtime.TypeShape(Handle, 5)
+    val IsOpen: bool => neoCLR.Runtime.TypeShape(Handle, 8)
+    val IsClosedHierarchy: bool => neoCLR.Runtime.TypeShape(Handle, 9)
+    val IsUnion: bool => neoCLR.Runtime.TypeShape(Handle, 14)
+    val IsEnum: bool => neoCLR.Runtime.TypeShape(Handle, 6)
+    val IsValueType: bool => neoCLR.Runtime.TypeShape(Handle, 7)
+    val IsVisible: bool => neoCLR.Runtime.TypeShape(Handle, 11)
+    val IsBeforeFieldInit: bool => neoCLR.Runtime.TypeShape(Handle, 20)
     val TypeInitializer: Option<ConstructorInfo> {
         get {
             if !IsNominalType {
@@ -1172,10 +1172,10 @@ internal class RuntimeGenericParameterTypeInfo : RuntimeTypeInfo, GenericParamet
 
     val Variance: GenericVariance {
         get {
-            if RuntimeServices.TypeShape(ExecutionHandle, 18) {
+            if neoCLR.Runtime.TypeShape(ExecutionHandle, 18) {
                 return GenericVariance.Covariant
             }
-            if RuntimeServices.TypeShape(ExecutionHandle, 19) {
+            if neoCLR.Runtime.TypeShape(ExecutionHandle, 19) {
                 return GenericVariance.Contravariant
             }
             return GenericVariance.Invariant

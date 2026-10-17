@@ -213,3 +213,9 @@ stripping are accepted substitutes for the above gates.
   field/construction/function interpreter regressions and TypeInfo completion pass.
   Retained type-handle primitives and other core services still need migration;
   removing these forwards does not remove all bootstrap dependencies.
+
+- Seven type-handle primitives are now owned by native System.Runtime declarations.
+  Preparation removes their CLI methods and both facade/native seed definitions;
+  a fresh five-library build, generic type consumer, metadata ownership inspection
+  and TypeInfo completion qualify this ownership migration. Remaining string,
+  parsing, scheduling and compiler bootstrap work remains open.

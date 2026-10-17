@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "compilerRevision": "3d233b07c",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-handle-direct-consumer/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-handle-direct-consumer/bin/neoclr/App.dll": "92a2994749d789209cbae9e83595d06a4f274614a300931b6e65b254d5285ebd",
+    "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.Runtime.dll": "30ad22d24e04e48e9f5b857cd5f77f855137c9481219b5e78ec68d3b893eba73",
+    "/Users/robert/Projects/neoclr/target/native-handle-direct-library/build-evidence.json": "0c0ea88368676e9e7c0070ebd1200baca9f589bb0b737d7ee0d4bf463a547460",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64",
+    "/Users/robert/Projects/neoclr/docs/validation/native-core-removal/TypeHandleConsumer.rvn": "962257c1bc3900bf3371c646e516f9ccc2e84eb8f27ae2af24231fe75d481204",
+    "/Users/robert/Projects/neoclr/target/native-handle-direct-library/System.runtime.neox": "ee9f350bcd6937c043a0f13f4c7479a2aa617c267a41e979eacb475d5745979e",
+    "/Users/robert/Projects/neoclr/target/native-handle-bootstrap/Core.dll": "4f8edbee05e88c92179bb186afbe6fe75bfde88981a1d628a44041891ca1c137"
+  }
+}

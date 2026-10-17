@@ -19,7 +19,9 @@ if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
         foreach (var type in module.Types.Where(t => removedNames.Contains(t.FullName)).ToArray())
             module.Types.Remove(type);
         // These runtime functions are now declared by the native System.Runtime sources.
-        var sourceServices = new HashSet<string> { "GetDefaultTaskQueue", "GetCurrentTaskQueue", "RegisterTaskQueue", "IsValue", "UnpackValue" };
+        var sourceServices = new HashSet<string> { "GetDefaultTaskQueue", "GetCurrentTaskQueue", "RegisterTaskQueue", "IsValue", "UnpackValue",
+            "TypeMetadataToken", "TypeDisplayName", "TypeShape", "TypeArgument",
+            "TypeArgumentCount", "TypeEquals", "TypeName" };
         var services = module.GetType("System.Runtime.CompilerServices.RuntimeServices");
         if (services is not null)
             foreach (var method in services.Methods.Where(m => sourceServices.Contains(m.Name)).ToArray())
