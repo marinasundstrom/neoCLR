@@ -7,7 +7,6 @@
         "runtime/raven/native/ObjectIntrospection.rvn",
         "runtime/raven/native/ParameterSnapshot.rvn",
         "runtime/raven/native/RuntimeIntrospectionCalls.rvn",
-        "runtime/raven/native/RuntimeIntrospectionServices.rvn",
         "runtime/raven/src/System/Array.rvn",
         "runtime/raven/src/System/Boolean.rvn",
         "runtime/raven/src/System/BooleanParseError.rvn",

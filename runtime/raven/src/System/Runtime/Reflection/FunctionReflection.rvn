@@ -16,9 +16,9 @@ public static class FunctionReflection {
     /// InvalidReceiver indicates null or a non-function; InvalidArguments indicates an
     /// incorrect count or type; UnsupportedType indicates an unsupported signature.</returns>
     static func Invoke(function: Object?, arguments: Object?[]) -> Result<Object?, ReflectionError> {
-        let status = RuntimeServices.InvokeFunctionCheck(function, arguments)
+        let status = neoCLR.Runtime.InvokeFunctionCheck(function, arguments)
         if status == 0 {
-            return Ok(RuntimeServices.InvokeFunction(function, arguments))
+            return Ok(neoCLR.Runtime.InvokeFunction(function, arguments))
         }
         if status == 6 {
             return Error(ReflectionError.InvalidReceiver)

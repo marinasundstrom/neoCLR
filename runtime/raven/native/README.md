@@ -14,13 +14,16 @@ source Object.GetType: an extension cannot override the existing bootstrap stati
 RuntimeServices member. The legacy ObjectIntrospection extension retains its prior
 bootstrap path. See the [source-owner gate](../../../docs/experiments/extended-cli-metadata/object-handles-2026-10-07.md).
 
-Production introspection/JSON sources now compile and execute with the associated
-`RuntimeIntrospection*` adapters; see the recorded native JSON integration gates.
+Production introspection/reflection sources call `RuntimeIntrospectionCalls.rvn`
+declarations directly. RuntimeContext uses the source-owned RuntimeTypeInfo factory;
+there is no RuntimeServices introspection forwarding extension. Native metadata
+providers and checked invocation contracts are unchanged. See the
+[direct-call gate](../../../docs/validation/native-core-removal/README.md).
 
 The storage adapters are also explicit native inputs:
-`RuntimeStorageCalls.rvn` declares the internal ABI; `RuntimeStorageServices.rvn`
-and `RuntimeFileTextServices.rvn` expose it in the namespaces used by the unchanged
-production sources. They perform real runtime calls, not CLI projections or stubs.
+`RuntimeStorageCalls.rvn` declares the internal ABI and production callers bind
+native storage/file-text declarations directly. They perform real runtime calls,
+not CLI projections or stubs.
 `StorageNames(Value)` materializes a native string snapshot as a managed `Array<String>`;
 its array storage is independently owned and subject to array/heap limits. Runtime
 service analysis marks this conversion as ManagedArrays, while StorageList owns the

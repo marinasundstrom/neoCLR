@@ -18,7 +18,7 @@ SOURCES = [
      'System/Runtime/RuntimeContext.rvn', 'System/HashCode.rvn', 'System/Boolean.rvn', 'System/BooleanParseError.rvn']
 SOURCES = [ROOT / 'runtime/raven/src' / name for name in SOURCES] + [
     ROOT / 'runtime/raven/native' / (name + '.rvn') for name in
-    ('RuntimeIntrospectionServices', 'RuntimeIntrospectionCalls', 'ParameterSnapshot', 'ObjectIntrospection')]
+    ('RuntimeIntrospectionCalls', 'ParameterSnapshot', 'ObjectIntrospection')]
 
 
 def main():

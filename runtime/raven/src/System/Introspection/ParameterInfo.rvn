@@ -50,7 +50,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
         if StoredDeclaringType.IsNominalType {
-            return RuntimeServices.MemberCustomAttributes(StoredDeclaringType, StoredMetadataToken)
+            return neoCLR.Runtime.MemberCustomAttributes(StoredDeclaringType, StoredMetadataToken)
         }
         return CheckedStorage.Reserve<CustomAttributeData>(0)
     }

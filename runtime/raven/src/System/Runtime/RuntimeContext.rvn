@@ -12,10 +12,10 @@ public class RuntimeContext {
     }
 
     val ExecutingAssembly: AssemblyInfo {
-        get => RuntimeServices.ExecutingAssembly()
+        get => neoCLR.Runtime.ExecutingAssembly()
     }
 
     func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
-        return RuntimeServices.TypeInfo(handle)
+        return System.Introspection.RuntimeTypeInfo.FromHandle(handle)
     }
 }

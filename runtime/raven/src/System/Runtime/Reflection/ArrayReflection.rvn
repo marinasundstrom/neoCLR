@@ -10,7 +10,7 @@ public static class ArrayReflection {
     /// <summary>Returns the number of elements in a supported managed vector.</summary>
     /// <param name="array">A non-null managed vector.</param>
     static func GetLength(array: Object) -> int {
-        return RuntimeServices.ReflectionArrayLength(array)
+        return neoCLR.Runtime.ReflectionArrayLength(array)
     }
 
     /// <summary>Reads an element, boxing scalar values and preserving reference identity.</summary>
@@ -18,7 +18,7 @@ public static class ArrayReflection {
     /// <param name="index">A zero-based index within the array.</param>
     /// <returns>The boxed value, original reference or null.</returns>
     static func GetValue(array: Object, index: int) -> Object? {
-        return RuntimeServices.ReflectionArrayGet(array, index)
+        return neoCLR.Runtime.ReflectionArrayGet(array, index)
     }
 
     /// <summary>Creates a managed vector of the runtime-backed array type and copies the supplied elements.</summary>
@@ -26,6 +26,6 @@ public static class ArrayReflection {
     /// <param name="values">Elements with exact boxed scalar types or compatible references.</param>
     /// <returns>A new array; reference elements retain their identity.</returns>
     static func Create(arrayType: TypeInfo, values: Object?[]) -> Object {
-        return RuntimeServices.ReflectionArrayCreate(arrayType, values)
+        return neoCLR.Runtime.ReflectionArrayCreate(arrayType, values)
     }
 }

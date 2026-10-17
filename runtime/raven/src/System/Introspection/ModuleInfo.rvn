@@ -24,14 +24,14 @@ internal class RuntimeModuleInfo : ModuleInfo {
 
     val Name: string => StoredName
 
-    val Assembly: AssemblyInfo => RuntimeServices.ModuleAssembly(StoredIdentity, StoredName)
+    val Assembly: AssemblyInfo => neoCLR.Runtime.ModuleAssembly(StoredIdentity, StoredName)
 
     func GetTypes() -> Sequence<TypeInfo> {
-        return RuntimeServices.ModuleTypes(StoredIdentity, StoredName)
+        return neoCLR.Runtime.ModuleTypes(StoredIdentity, StoredName)
     }
 
     func GetFunctions() -> Sequence<MethodInfo> {
-        return RuntimeServices.ModuleFunctions(StoredIdentity, StoredName)
+        return neoCLR.Runtime.ModuleFunctions(StoredIdentity, StoredName)
     }
 
     override func Equals(other: Object?) -> bool {

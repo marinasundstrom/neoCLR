@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "compilerRevision": "589c353e7",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/Main.rvn(8,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/Main.rvn(12,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/Main.rvn(13,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/Main.rvn(15,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/Main.rvn(16,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-introspection-fields-consumer/bin/neoclr/App.dll": "7d0d5327ac8d25be9bced9d6ac40c332711cd0bee285d93acfc95ce6184c86d8",
+    "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.Runtime.dll": "67b0ab5b218a4bd4e8086f1bdeeda144fd962d5a2e00c87d4d82d568e1770194",
+    "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/build-evidence.json": "916b53ede31e7bb39617e75b544a40e924a52c85a6b43f3f97e8cf313dec0a55",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64",
+    "/Users/robert/Projects/neoclr/docs/validation/field-reflection/Main.rvn": "753770465912e3bea36757e2b6dd1797df5974664819eb6ffc640a83cf9431c9",
+    "/Users/robert/Projects/neoclr/target/native-introspection-direct-library/System.runtime.neox": "2d9ad0f7f9a1cced968cde5f40a6280a97c0808eda020b2c50c643af17f0a07b",
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeIntrospectionCalls.rvn": "ecab06c08021f54819999e05f37cfb8c6bf3e0dd62f16cbd61e3c7078739c960"
+  }
+}

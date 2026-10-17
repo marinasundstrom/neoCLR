@@ -12640,3 +12640,15 @@ Raven eeb6ef0d1 builds all five libraries with the prepared payload bootstrap.
 See the [networking gate](validation/native-core-removal/README.md#direct-native-networking-calls--2026-10-17)
 for loopback/cancellation execution and completion evidence. Remaining bootstrap
 services still prevent declaring production core construction native-only.
+
+### Direct introspection services (2026-10-17)
+
+The 49-method RuntimeServices introspection extension is removed. System.Runtime
+callers use 48 existing native InternalCalls and RuntimeTypeInfo.FromHandle directly.
+Ownership, public contracts, checked reflection error mapping and backend bindings
+are unchanged; no Runtime Contract switch or .NET compiler change is required.
+Raven 589c353e7 qualifies a fresh five-library bundle with field, construction and
+function invocation interpreter consumers plus TypeInfo completion. See the
+[gate](validation/native-core-removal/README.md#direct-native-introspection-calls--2026-10-17).
+Remaining primitive/core service and compiler dependencies still require native
+metadata migration. The installed SDK and structural work remain unchanged.

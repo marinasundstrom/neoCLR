@@ -20,20 +20,20 @@ internal class RuntimeAssemblyInfo : AssemblyInfo {
         StoredIdentity = identity
     }
 
-    val Name: string => RuntimeServices.AssemblyName(StoredIdentity)
+    val Name: string => neoCLR.Runtime.AssemblyName(StoredIdentity)
 
     val FullName: string => StoredIdentity
 
-    val MetadataToken: int => RuntimeServices.AssemblyMetadataToken(StoredIdentity)
+    val MetadataToken: int => neoCLR.Runtime.AssemblyMetadataToken(StoredIdentity)
 
-    val ReferencedAssemblies: Sequence<AssemblyInfo> => RuntimeServices.AssemblyReferences(StoredIdentity)
+    val ReferencedAssemblies: Sequence<AssemblyInfo> => neoCLR.Runtime.AssemblyReferences(StoredIdentity)
 
     func GetModules() -> Sequence<ModuleInfo> {
-        return RuntimeServices.AssemblyModules(StoredIdentity)
+        return neoCLR.Runtime.AssemblyModules(StoredIdentity)
     }
 
     func GetTypes() -> Sequence<TypeInfo> {
-        return RuntimeServices.AssemblyTypes(StoredIdentity)
+        return neoCLR.Runtime.AssemblyTypes(StoredIdentity)
     }
 
     override func Equals(other: Object?) -> bool {

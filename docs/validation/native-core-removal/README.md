@@ -325,3 +325,34 @@ See [deadline/listener consumer](NetworkDirectConsumer.rvn),
 [editor evidence](network-direct-completion.json). Full native core construction,
 remaining introspection adapters and compiler bootstrap dependencies remain open.
 The installed SDK is unchanged; broader structural work remains parked.
+
+## Direct native introspection calls — 2026-10-17
+
+Remove the 49-method RuntimeServices introspection extension. Its callers now use
+48 existing native InternalCall declarations and the source-owned
+RuntimeTypeInfo.FromHandle factory directly. Production and POC ownership source
+lists and the JSON mapping harness no longer include the removed file.
+System.Runtime continues to own these declarations. Public introspection and
+checked reflection APIs, native providers, callback signatures and error mapping
+are unchanged; no Runtime Contract setting or ordinary Raven/.NET behavior changes.
+This preserves the existing .NET-style metadata inspection/reflective invocation
+model and neoCLR's Result-based preflight errors; it adds no new divergence.
+Existing structural descriptor calls are only retargeted; structural work is parked.
+
+Raven `589c353e7` builds all five libraries in
+`target/native-introspection-direct-library` using `target/native-payload-bootstrap`.
+The existing field-reflection, constructor/type-initializer and dynamic-function
+invocation consumers are compiled against this fresh bundle and return 42 in the
+interpreter. They cover readonly/literal rejection, invalid receiver/value errors,
+initialization timing, function argument/receiver rejection and successful calls.
+Editor completion resolves GetFields and TypeInitializer on typeof(int).
+API source fingerprints are refreshed without changing public signatures.
+
+Evidence: [field consumer](introspection-fields-results.json),
+[construction consumer](introspection-construction-results.json),
+[function consumer](introspection-function-results.json) and
+[completion](introspection-direct-completion.json). Native backend implementations
+are unchanged; their earlier JIT/AOT qualification is reused, not rerun here.
+Type-handle primitives, strings/parsing, scheduling and other retained core services
+still require native ownership and compiler/bootstrap migration. This does not
+replace the installed SDK or establish native-only production core construction.

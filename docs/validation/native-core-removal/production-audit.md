@@ -207,3 +207,9 @@ stripping are accepted substitutes for the above gates.
   interpreter loopback/deadline and cancellation consumers, Socket completion and
   API fingerprints qualify this slice. Remaining introspection and source-core
   bootstrap work stays open.
+
+- Remove the 49-method introspection facade: callers select 48 native declarations
+  and the source-owned RuntimeTypeInfo factory directly. Fresh five-library build,
+  field/construction/function interpreter regressions and TypeInfo completion pass.
+  Retained type-handle primitives and other core services still need migration;
+  removing these forwards does not remove all bootstrap dependencies.

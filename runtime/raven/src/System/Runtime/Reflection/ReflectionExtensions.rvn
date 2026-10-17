@@ -10,9 +10,9 @@ public extension TypeReflectionExtensions for TypeInfo {
     func CreateInstance(params arguments: Object?[]) -> Result<Object, ReflectionError> {
         if self is RuntimeNominalTypeInfo implementation {
             let handle = implementation.ExecutionHandle
-            let status = RuntimeServices.ReflectionConstructArgsCheck(handle, 0, null, arguments)
+            let status = neoCLR.Runtime.ReflectionConstructArgsCheck(handle, 0, null, arguments)
             if status == 0 {
-                return Ok(RuntimeServices.ReflectionConstructArgs(handle, 0, null, arguments))
+                return Ok(neoCLR.Runtime.ReflectionConstructArgs(handle, 0, null, arguments))
             }
                     if status == 1 {
                         return Error(ReflectionError.UnboundMetadata)
@@ -82,9 +82,9 @@ public extension PropertyReflectionExtensions for PropertyInfo {
             if let Some(owner) = implementation.DeclaringType {
                 if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionPropertyGetCheck(handle, implementation.DefinitionIndex, receiver)
+                    let status = neoCLR.Runtime.ReflectionPropertyGetCheck(handle, implementation.DefinitionIndex, receiver)
                     if status == 0 {
-                        let value: Object? = RuntimeServices.ReflectionPropertyGet(handle, implementation.DefinitionIndex, receiver)
+                        let value: Object? = neoCLR.Runtime.ReflectionPropertyGet(handle, implementation.DefinitionIndex, receiver)
                         return Ok(value)
                     }
                     if status == 1 {
@@ -111,9 +111,9 @@ public extension PropertyReflectionExtensions for PropertyInfo {
             if let Some(owner) = implementation.DeclaringType {
                 if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionPropertySetCheck(handle, implementation.DefinitionIndex, receiver, value)
+                    let status = neoCLR.Runtime.ReflectionPropertySetCheck(handle, implementation.DefinitionIndex, receiver, value)
                     if status == 0 {
-                        RuntimeServices.ReflectionPropertySet(handle, implementation.DefinitionIndex, receiver, value)
+                        neoCLR.Runtime.ReflectionPropertySet(handle, implementation.DefinitionIndex, receiver, value)
                         return Ok(())
                     }
                     if status == 1 {
@@ -145,9 +145,9 @@ public extension MethodReflectionExtensions for MethodInfo {
             if let Some(owner) = implementation.DeclaringType {
                 if owner is RuntimeNominalTypeInfo runtimeOwner && implementation.DefinitionIndex is Some(let index) {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionInvokeCheck(handle, index, receiver, arguments)
+                    let status = neoCLR.Runtime.ReflectionInvokeCheck(handle, index, receiver, arguments)
                     if status == 0 {
-                        let value: Object? = RuntimeServices.ReflectionInvoke(handle, index, receiver, arguments)
+                        let value: Object? = neoCLR.Runtime.ReflectionInvoke(handle, index, receiver, arguments)
                         return Ok(value)
                     }
                     if status == 1 {
@@ -187,9 +187,9 @@ public extension FieldReflectionExtensions for FieldInfo {
             if let Some(owner) = implementation.DeclaringType {
                 if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionFieldGetCheck(handle, implementation.DefinitionIndex, receiver, [])
+                    let status = neoCLR.Runtime.ReflectionFieldGetCheck(handle, implementation.DefinitionIndex, receiver, [])
                     if status == 0 {
-                        let value: Object? = RuntimeServices.ReflectionFieldGet(handle, implementation.DefinitionIndex, receiver, [])
+                        let value: Object? = neoCLR.Runtime.ReflectionFieldGet(handle, implementation.DefinitionIndex, receiver, [])
                         return Ok(value)
                     }
                     if status == 1 {
@@ -226,9 +226,9 @@ public extension FieldReflectionExtensions for FieldInfo {
             if let Some(owner) = implementation.DeclaringType {
                 if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionFieldSetCheck(handle, implementation.DefinitionIndex, receiver, [value])
+                    let status = neoCLR.Runtime.ReflectionFieldSetCheck(handle, implementation.DefinitionIndex, receiver, [value])
                     if status == 0 {
-                        let _ = RuntimeServices.ReflectionFieldSet(handle, implementation.DefinitionIndex, receiver, [value])
+                        let _ = neoCLR.Runtime.ReflectionFieldSet(handle, implementation.DefinitionIndex, receiver, [value])
                         return Ok(())
                     }
                     if status == 1 {
@@ -276,9 +276,9 @@ public extension ConstructorReflectionExtensions for ConstructorInfo {
             if let Some(owner) = implementation.DeclaringType {
                 if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionConstructorInvokeCheck(handle, implementation.DefinitionIndex, null, arguments)
+                    let status = neoCLR.Runtime.ReflectionConstructorInvokeCheck(handle, implementation.DefinitionIndex, null, arguments)
                     if status == 0 {
-                        return Ok(RuntimeServices.ReflectionConstructorInvoke(handle, implementation.DefinitionIndex, null, arguments))
+                        return Ok(neoCLR.Runtime.ReflectionConstructorInvoke(handle, implementation.DefinitionIndex, null, arguments))
                     }
                     if status == 1 {
                         return Error(ReflectionError.UnboundMetadata)
