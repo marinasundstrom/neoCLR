@@ -2340,6 +2340,11 @@ unpublished local website routes. Collection-helper and variance guides are incl
 in navigation. Published release notes and benchmark history remain separate.
 
 Validation: all five native libraries rebuilt; four native snapshot tests and 22
-website tests pass. The integrated site checks 4,441 pages. Its 123 retained legacy
-API pages remain coverage gaps, with a current reference-limitation notice; this
-refresh does not qualify their native behavior or erase the coverage backlog.
+website tests pass. The integrated site checks 4,441 pages. The 123 retained legacy routes are not 123 missing native APIs. The release
+[audit](../docs/validation/release-candidate-20261017/api-route-audit.json) identifies
+104 compatibility redirects with existing local targets and 19 hierarchical legacy
+pages: two Enum helper pages absent from the native Enum declaration, two namespace
+containers and 15 CLI-only compiler/exception scaffold pages. The latter retain
+reference-limitation notices and do not advertise native support. Native navigation
+comes from the native snapshot; retained URLs preserve older links. This route
+classification does not qualify the legacy signatures or add those APIs to NeoCLR.

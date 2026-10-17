@@ -1,0 +1,501 @@
+{
+  "nativeSnapshotSha256": "19e0626669b8016876896c2794f3d387f63169c31ab3eca893a2c9ab083b71b0",
+  "compatibilityRedirects": 104,
+  "hierarchicalLegacyPages": 19,
+  "redirectLocalTargetsExist": true,
+  "rows": [
+    {
+      "path": "System/Enum/method_GetNames.html",
+      "classification": "legacy Enum helpers absent from native Enum declaration"
+    },
+    {
+      "path": "System/Enum/method_GetValues.html",
+      "classification": "legacy Enum helpers absent from native Enum declaration"
+    },
+    {
+      "path": "System/Math/NamespaceMembers/index.html",
+      "classification": "legacy namespace container"
+    },
+    {
+      "path": "System/NamespaceMembers/index.html",
+      "classification": "legacy namespace container"
+    },
+    {
+      "path": "System/NotImplementedException/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/NotImplementedException/method__ctor.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/CompilerGeneratedAttribute/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/CompilerGeneratedAttribute/method__ctor.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/ExtensionAttribute/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/ExtensionAttribute/method__ctor.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/IsExternalInit/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/RefSafetyRulesAttribute/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/RefSafetyRulesAttribute/method__ctor.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/ReferenceAssemblyAttribute/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/ReferenceAssemblyAttribute/method__ctor.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/TopLevelAttribute/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/TopLevelAttribute/method__ctor.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/UnionValue/index.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System/Runtime/CompilerServices/UnionValue/property_Value.html",
+      "classification": "CLI-only compiler or exception scaffold absent from native reference"
+    },
+    {
+      "path": "System.Concurrency.Thread.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Concurrency.ThreadPool.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Concurrency.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Console.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.ConsoleReadError.ReadFailed.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.ConsoleReadError.Unavailable.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.ConsoleReadError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Equatable-1.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.HashCode.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.FileInputStream.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.FileOutputStream.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.InputStream.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.OutputStream.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.SeekableStream.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.AccessDenied.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.AlreadyExists.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.Closed.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.InvalidPath.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.InvalidRange.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.IoFailure.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.LimitExceeded.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.NotFound.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.WrongAccess.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.WrongKind.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamReader.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.StreamWriter.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.AccessDenied.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.AlreadyExists.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.Closed.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.InvalidPath.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.InvalidRange.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.InvalidUtf8.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.IoFailure.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.LimitExceeded.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.NotFound.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.WrongAccess.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.WrongKind.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReadError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextReader.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.TextWriter.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.IO.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.AssemblyInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.BindingFlags.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.FieldInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.MemberInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.MethodInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.ModuleInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.ParameterInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.PropertyInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.TypeInfo.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Introspection.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Object.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Runtime.CompilerServices.AsyncTaskMethodBuilder-1.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Runtime.CompilerServices.IAsyncStateMachine.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Runtime.CompilerServices.ITaskAwaiter.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Runtime.CompilerServices.IsExternalInit.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Runtime.CompilerServices.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Runtime.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.Directory.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.EntryKind.Directory.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.EntryKind.File.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.EntryKind.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.File.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.AccessDenied.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.InvalidLimit.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.InvalidPath.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.InvalidUtf8.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.NotFound.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.NotRegularFile.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.ReadFailed.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.TooLarge.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileReadError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileSystem.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileText.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.AccessDenied.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.InvalidLimit.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.InvalidPath.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.NotFound.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.NotRegularFile.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.TooLarge.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.WriteFailed.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.FileWriteError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.InvalidPathError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.Metadata.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.Path.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageItem.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.AccessDenied.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.InvalidPath.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.InvalidRange.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.IoFailure.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.LimitExceeded.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.NotFound.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.WrongKind.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageLookupError.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.StorageProvider.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Storage.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Tasks.Promise-1.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Tasks.Task-1.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Tasks.TaskQueue.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Tasks.TaskState.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Tasks.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.Value.html",
+      "classification": "compatibility redirect"
+    },
+    {
+      "path": "System.html",
+      "classification": "compatibility redirect"
+    }
+  ],
+  "scope": "Audit of retained routes in the existing site; no claim that legacy signatures are supported native APIs. Pages retain reference limitation notices; publication unchanged."
+}
