@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "compilerRevision": "d83ea51e7",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/PayloadConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/NativeCore.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/NativeCore.dll"
+      ],
+      "stdin": "*",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/InvalidPayload.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/NativeCore.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-payload-core-v3/NativeCore.dll"
+      ],
+      "stdin": "*",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D655365727669636573.M_556E7061636B56616C7565 [instruction 1]\n   at NeoMetadata_399B046ACB87C61378C53BD2CFEF12DE809D3964A72D5F03677753A0FB21EA47.F_4D61696E [instruction 13]\n"
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-payload-core-v3/NativeCore.dll": "da1b4780fcb8d0cb07c1701b3ad09c52b2be940642ea3034541276248b1a4295",
+    "/Users/robert/Projects/neoclr/target/native-payload-core-v3/PayloadConsumer.dll": "6539de6207ea86c605e0ccbaa8b954f17cae6a2c2dfea95870fb95512589a42a",
+    "/Users/robert/Projects/neoclr/target/native-payload-core-v3/InvalidPayload.dll": "d2d8c7aa4e98ff1417b3859110602c69d85cc7f88a2fb141d7596a143cde2156",
+    "/Users/robert/Projects/neoclr/target/native-payload-core-v3/System.neox": "ffeb28eefd8e74baeede19208a692cacb7780deff7086cbe978a46c603db606a",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64"
+  },
+  "buildCommand": [
+    "dotnet",
+    "run",
+    "--project",
+    "docs/experiments/native-core-bootstrap/Probe.csproj",
+    "-p:RavenRoot=/Users/robert/Projects/Raven",
+    "-p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj",
+    "-p:WarningLevel=0",
+    "--",
+    "target/native-payload-core-v3",
+    "--intrinsics"
+  ],
+  "buildOutput": "PASS native intrinsic method import, generic value/reference calls and completion without BootstrapReference\nPASS native payload helpers compile and complete without BootstrapReference\nPASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard\n"
+}

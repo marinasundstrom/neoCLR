@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify native-owned IsValue<T>/UnpackValue<T> SDK bodies with explicitly owned System.Value signatures and no CLI reference. Byte/int membership, byte extraction, EOF unit checks and wrong-type extraction rejection pass in the interpreter; native-only editor completion exposes both helpers. Production owner migration and JIT/AOT payload qualification remain open.
+
 - Remove four object-identity and string-join forwarding adapters; source callers select existing native functions. Validate five-library compilation, interpreter identity/null/hash/UTF-8 join behavior, String.Join completion and API fingerprints. Native core construction and payload migration remain open.
 
 - Remove 12 console, file-text and storage RuntimeServices forwards; callers bind existing native namespace declarations. Validate a fresh five-library bundle, interpreter consumer with piped input/exact output and isolated file operations, Console/FileText completion and API fingerprints. Public contracts and runtime bindings are unchanged; payload helpers and production native-core construction remain open.

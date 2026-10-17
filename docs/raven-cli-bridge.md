@@ -12592,3 +12592,14 @@ are removed. Public contracts, native binding validation and Runtime Contract
 configuration are unchanged. Remaining payload helpers, introspection/network
 forwards and production native-core construction remain separate migration work.
 See the [qualification record](validation/native-core-removal/README.md#direct-object-and-string-join-services).
+
+### Native payload helper ownership (2026-10-17)
+
+The reduced native-core probe qualifies native IsValue<T>/UnpackValue<T> bodies
+through existing SDK ValueIs/ValueUnpack operations and ordinary Raven native symbol
+import/emission. No BootstrapReference or CLI input is needed. Explicitly owned
+System.Value signatures preserve the runtime payload contract. Byte/Int32 membership,
+byte extraction and unit EOF checks pass in the interpreter; incompatible extraction
+faults. Native-only completion exposes both methods. See the
+[payload gate](validation/native-core-removal/README.md#native-payload-helper-qualification).
+Production ownership and JIT/AOT payload qualification remain open.

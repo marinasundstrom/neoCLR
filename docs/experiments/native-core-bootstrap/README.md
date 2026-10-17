@@ -573,3 +573,11 @@ instead of porting legacy bootstrap identity checks into a new special-case comp
 path. Production must still author these contracts under its eventual native core
 identity and remove the corresponding CLI owners. No public runtime API is added by
 this qualification fixture.
+
+### Native payload helper bodies (2026-10-17)
+
+`--intrinsics` also emits native-owned IsValue<T>/UnpackValue<T> methods using
+ValueIs/ValueUnpack and a ConsoleReadByte service declaration. PayloadConsumer.dll
+checks byte/int membership, byte extraction and EOF unit membership; InvalidPayload.dll
+attempts incompatible extraction. See the [qualification record](../../validation/native-core-removal/README.md#native-payload-helper-qualification).
+These are test-only fixture additions, not production core replacement.

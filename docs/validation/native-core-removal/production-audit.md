@@ -182,3 +182,8 @@ stripping are accepted substitutes for the above gates.
 - Object identity/equality/hash and string joining now call native declarations
   directly. Four adapters are removed; fresh five-library compilation, interpreter
   consumer and String.Join completion pass. No public contract changes.
+
+- Native-only IsValue<T>/UnpackValue<T> ownership now passes compilation, interpreter
+  membership/extraction/EOF and wrong-type rejection, and LSP completion. No compiler
+  intrinsic interception is needed for these imported bodies. Production owner
+  migration and native backend payload qualification remain open.

@@ -208,3 +208,26 @@ Public signatures, Runtime Contract settings and runtime implementations are
 unchanged. This forwarding-only slice does not repeat JIT/AOT implementation checks.
 Production CLI core input and payload dependencies remain; structural work stays
 parked and the installed SDK is unchanged.
+
+## Native payload helper qualification
+
+The `--intrinsics` native-core probe now authors IsValue<T> and UnpackValue<T>
+with SDK ValueIs/ValueUnpack bodies, plus an exact native ConsoleReadByte declaration.
+System.Value has an explicitly owned native primitive declaration/signature; the
+SDK deliberately disallows bare PrimitiveType.Value signatures. No compiler
+bootstrap interception or new Runtime Contract setting is used.
+
+The [probe](../../experiments/native-core-bootstrap/PayloadConsumer.cs) compiles
+against native-only references. With input `*` then EOF it checks byte membership,
+rejects Int32 membership, extracts byte 42 and recognizes the unit end-of-input
+payload. Wrong-type extraction faults inside UnpackValue. [Execution evidence](payload-results.json)
+records build/run commands and hashes. [Native-only LSP completion](payload-completion.json)
+exposes both generic helpers. Prepare the empty System seed as for the existing
+intrinsic probe; the interpreter is the qualified execution mode for this slice.
+
+This establishes native metadata ownership and interpreter behavior, not general
+payload/JIT/AOT coverage or production core replacement. The fixture's Object slots
+remain test-only. Production System.Value/RuntimeServices ownership must move as
+part of coherent native-core construction; existing payload callers remain unchanged.
+The .NET analogue is runtime-owned representation/intrinsic helpers behind CoreLib,
+not a new public .NET API. Structural work remains parked.

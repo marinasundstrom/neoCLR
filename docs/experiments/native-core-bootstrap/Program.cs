@@ -162,6 +162,17 @@ if (args.Length == 2 && args[1] == "--intrinsics")
     var handle = services.AddMethod("TypeHandle", new(PrimitiveType.RuntimeTypeHandle, [], ["T"]));
     handle.GetILGenerator().LoadTypeToken(element);
     handle.Return();
+    var payloadType = core.AddValueType("System", "Value");
+    payloadType.SetNativePrimitive(PrimitiveType.Value);
+    var read = core.AddFunction("neoCLR.Runtime", "ConsoleReadByte", new(payloadType, []));
+    read.SetInternalCall();
+    foreach (var name in new[] { "IsValue", "UnpackValue" })
+    {
+        var helper = services.AddMethod(name, new(name == "IsValue" ? PrimitiveType.Boolean : element, [payloadType], ["T"]));
+        helper.LoadArgument(0);
+        helper.GetILGenerator().Emit(name == "IsValue" ? OpCode.ValueIs : OpCode.ValueUnpack, element);
+        helper.Return();
+    }
 }
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
 File.WriteAllBytes(Path.Combine(output, "NativeCore.dll"), bytes);
@@ -219,7 +230,10 @@ var emitted = compilation.Emit(image, null, new EmitOptions().WithBackend(new Ne
 if (!emitted.Success) throw new Exception(string.Join("\n", emitted.Diagnostics));
 File.WriteAllBytes(Path.Combine(output, "Consumer.dll"), image.ToArray());
 if (args.Length == 2 && args[1] == "--intrinsics")
+{
     IntrinsicConsumer.Build(output, catalog, options);
+    PayloadConsumer.Build(output, catalog, options);
+}
 Console.WriteLine("PASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard");
 
 return 0;
