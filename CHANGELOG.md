@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Rebuild the macOS SDK, VSIX and five native libraries with Raven `40fcae6d0`. Extracted-package acceptance, 26 installed-editor checks, two ten-cycle two-project recovery runs and exact `Task<int>` inlays pass without overrides; signed-range consumers pass interpreter/JIT/AOT. Preserve archive and server hashes. Runtime/backend binaries are unchanged; Windows, source-test failures, minimum-Rust and fresh timed measurements remain release gates.
+
 - Apply canonical Rust formatting and simplify two no-op unit match arms and an equivalent short-circuit dispatch condition identified by release Clippy checks; simplify equivalent single-case test control flow. These are source-maintenance changes; nominal interface conformance, structural semantics and runtime ABI remain unchanged. All-target Clippy passes with warnings denied. Retain the optimized extracted-source audit’s six failing tests as open release blockers, distinct from native package acceptance.
 
 - Correct release qualification for callback-result inlays: Raven main `752d240b4` / native `40fcae6d0` preserve unresolved generic overload candidates, yielding `Task<int>` for `Task.Run(() => 41)`. Record 60 main and 66 native focused checks, a native metadata probe and two passing real-editor development checks. Add an exact task-type assertion and align startup waiting with package acceptance; retain earlier failed inlay evidence. A refreshed SDK/VSIX and Windows qualification remain pending.

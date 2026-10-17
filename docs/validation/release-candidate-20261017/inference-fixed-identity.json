@@ -1,0 +1,44 @@
+{
+  "version": "0.0.0-native-candidate.20261017.4",
+  "ravenRevision": "40fcae6d01fe308fef52e1ecc898ed61cf45cd4e",
+  "runtimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+  "matchedServerFiles": {
+    "Raven.LanguageServer.dll": "584e39a9febb7c4df183d0cc5f1e79c47751ff5847c5ccfd7bdae0f52d949dee",
+    "Raven.CodeAnalysis.dll": "8595a0844e288498218d54e46ca60da0aa93c856173d6e49e942e47b21f8a445",
+    "Raven.CodeAnalysis.NeoClr.dll": "c470717a0318e4d443bf5fc1290605511003c5ea94f15ff4555f77ee13af187a",
+    "NeoCLR.Metadata.Experimental.dll": "f82038ae1a1c1c9a8dbfe7b58363020aa867a7ec4e84a8fa5572dba649716a94"
+  },
+  "neoclr-native-candidate-osx-arm64.tar.gz": "cccaf0f8fb2445f11f62981261cd3f16ec8d42aa1e60114ffb469ef96db1e3ed",
+  "raven-vscode.vsix": "538f0120e3cde9c6b20d5c861f7cd4f1e370ad5bbccfe5cb02cc92ef1551a3ad",
+  "neoclr": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+  "neoclr-codegen": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+  "runtimeReusedUnchanged": true,
+  "sdkBuildLogSha256": "876bf277cdba744dd89d4f2301be458fd099b3b5d2a702f8db0689aecada1ae1",
+  "installedServerSelections": [
+    {
+      "log": "target/release-inference-fixed-20261017/vscode-profile/logs/20261017T231700/window1/exthost/output_logging_20261017T231702/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-inference-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.4/server/Raven.LanguageServer.dll"
+      ]
+    },
+    {
+      "log": "target/release-inference-fixed-20261017/vscode-profile/logs/20261017T231834/window1/exthost/output_logging_20261017T231836/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-inference-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.4/server/Raven.LanguageServer.dll"
+      ]
+    },
+    {
+      "log": "target/release-inference-fixed-20261017/vscode-profile/logs/20261017T231941/window1/exthost/output_logging_20261017T231943/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-inference-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.4/server/Raven.LanguageServer.dll"
+      ]
+    },
+    {
+      "log": "target/release-inference-fixed-20261017/vscode-profile/logs/20261017T232042/window1/exthost/output_logging_20261017T232044/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-inference-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.4/server/Raven.LanguageServer.dll"
+      ]
+    }
+  ],
+  "launchInterruption": "Initial editor launch terminated before Raven activation; retry was held by macOS stale-window recovery dialog. Dismissing Don\u2019t Reopen allowed the unchanged package to run."
+}

@@ -299,3 +299,32 @@ The legacy `RuntimeFieldInfo` fixture has six declared fields beyond its base;
 the current runtime snapshot also supplies readonly, literal and constant-value
 data. Repair and focused revalidation remain open, as does investigation of the
 array-interface assertion. Windows and minimum-Rust checks remain separate.
+
+## Inference-fixed packaged editor qualification
+
+Local candidate `0.0.0-native-candidate.20261017.4` carries Raven `40fcae6d0`,
+including both callback inference and exclusive unit-step optimization. The SDK,
+language server, VSIX and five native libraries were rebuilt together; the optimized
+runtime/backend remain byte-identical to the qualified `a9b01a0e14` binaries.
+[Identity](inference-fixed-identity.json) verifies the SDK/VSIX assemblies and all
+four installed-server selections. [Build evidence](inference-fixed-cohort-build.json)
+and [extracted acceptance](inference-fixed-acceptance.json) record the actual archive.
+
+- [Main editor suite](inference-fixed-editor-main.json): all 26 checks pass.
+- [First recovery run](inference-fixed-editor-configuration-1.json) and
+  [second recovery run](inference-fixed-editor-configuration-2.json): ten cycles
+  each, requiring both native projects to invalidate and recover.
+- [Inlays](inference-fixed-editor-inlays.json): exact `Task<int>` result, comment
+  edits and concurrent ranges pass, without a development-server override.
+- [Range consumer](inference-fixed-ranges.json): interpreter/JIT/AOT pass.
+  CPU/JSON preparation also passes; no new timed measurement is claimed.
+
+The first editor launch ended before Raven activation; a retry was blocked by a
+macOS window-recovery dialog. After dismissing that prompt, all four checks ran
+against the unchanged installed package. This launch interruption is separate
+from the previously retained disappearing-inlay failure.
+
+Archive: `target/release-inference-fixed-20261017/neoclr-native-candidate-osx-arm64.tar.gz`.
+The VSIX is installed only in the isolated test profile. The normal user SDK/profile
+and published downloads are unchanged. Windows, six source-test failures, minimum
+Rust qualification, remote candidate pins and runtime measurements remain open.
