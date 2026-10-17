@@ -1,0 +1,136 @@
+{
+  "ravenRevision": "7bfbce21f0750b1ec54a045539f959036e9fb52b",
+  "runtimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "scripts/build-native-class-library.py",
+        "--compiler",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/sdk/raven-sdk-0.0.0-native-candidate.20261017.2-osx-arm64/tools/rvnc/rvnc.dll",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/libraries",
+        "--compiler-revision",
+        "7bfbce21f0750b1ec54a045539f959036e9fb52b",
+        "--with-postgresql"
+      ],
+      "exitCode": 0,
+      "stdout": "Built native System.Runtime/System.Data/System.Networking/System.Web/System.Data.PostgreSql bundle: /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/libraries\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "package:extension"
+      ],
+      "exitCode": 0,
+      "stdout": "\n> raven-vscode@0.1.13 package:extension\n> npm run check-types && node esbuild.js --production\n\n\n> raven-vscode@0.1.13 check-types\n> tsc -p ./tsconfig.json --noEmit\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "npx",
+        "--no-install",
+        "vsce",
+        "package",
+        "0.0.0-native-candidate.20261017.2",
+        "--no-update-package-json",
+        "--no-dependencies",
+        "--out",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/raven-vscode.vsix"
+      ],
+      "exitCode": 0,
+      "stdout": " INFO  Files included in the VSIX:\nraven-vscode.vsix\n\u251c\u2500 [Content_Types].xml \n\u251c\u2500 extension.vsixmanifest \n\u2514\u2500 extension/\n   \u251c\u2500 LICENSE.txt [1.05 KB]\n   \u251c\u2500 language-configuration.json [0.51 KB]\n   \u251c\u2500 package.json [16.08 KB]\n   \u251c\u2500 readme.md [6.97 KB]\n   \u251c\u2500 dist/ (1 file) [392.12 KB]\n   \u251c\u2500 server/ (87 files) [29.64 MB]\n   \u2514\u2500 syntaxes/ (1 file) [38.01 KB]\n\n=> Run vsce ls --tree to see all included files.\n\n DONE  Packaged: /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/raven-vscode.vsix (95 files, 10.34 MB)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/package-native-poc.py",
+        "--sdk",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/sdk/raven-sdk-0.0.0-native-candidate.20261017.2-osx-arm64",
+        "--vsix",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/raven-vscode.vsix",
+        "--libraries",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/libraries",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "--runtime-revision",
+        "a9b01a0e14c53ecbffa764d57897032806313f2b",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/base"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/base/neoclr-native-poc.tar.gz\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/prepare-jit-bundle.py",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/base/neoclr-native-poc",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/extracted/neoclr-native-poc/bin/neoclr-codegen",
+        "--host-recipe",
+        "docs/experiments/runtime-async/native-validation.json",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/jit"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/jit/bundle\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/extracted/neoclr-native-poc/tools/verify-native-bundle.py",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/extracted/neoclr-native-poc",
+        "--report",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/acceptance.json"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/acceptance.json\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/prepare-native-editor.py",
+        "--sdk",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/extracted/neoclr-native-poc/sdk",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/libraries",
+        "--installed-editor",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/editor-native-core"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/editor-native-core-library/One/bin/neoclr/EditorLibrary.dll\nNative build output: /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/editor-native-core-library/Two/bin/neoclr/EditorLibrary.dll\n/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/editor-native-core\n/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/editor-native-core.code-workspace\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
+        "--user-data-dir",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/vscode-profile",
+        "--extensions-dir",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/vscode-extensions",
+        "--install-extension",
+        "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/raven-vscode.vsix",
+        "--force"
+      ],
+      "exitCode": 0,
+      "stdout": "Installing extensions...\nExtension 'raven-vscode.vsix' was successfully installed.\n",
+      "stderr": "(node:53242) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `Code --trace-deprecation ...` to show where the warning was created)\n"
+    }
+  ],
+  "archiveSha256": "4638c36adcbd3ebcce70d701b1cc36661b226f55638d8d4eb51b0992fb397ded"
+}

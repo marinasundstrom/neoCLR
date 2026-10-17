@@ -1,0 +1,36 @@
+{
+  "version": "0.0.0-native-candidate.20261017.2",
+  "ravenRevision": "7bfbce21f",
+  "runtimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+  "matchedServerFiles": {
+    "Raven.LanguageServer.dll": "5cd6036109268fb14802f965112c62c1e1307bb0b6a2ccff04c7ffc30f63bffe",
+    "Raven.CodeAnalysis.dll": "7ae0934d0e71ab435cc1f2d914eb6cda72716bf1a0d142efb5d5cf027b082931",
+    "Raven.CodeAnalysis.NeoClr.dll": "e5c3a7ffa376cdfe8c8d3b17ad7478322650b5406d8b13744d8399127fc1379a",
+    "NeoCLR.Metadata.Experimental.dll": "210e32d6d01930ff86f98a8bec6c7ed607802f4b3aa9bac9e8726c74eb81632a"
+  },
+  "neoclr-native-candidate-osx-arm64.tar.gz": "4638c36adcbd3ebcce70d701b1cc36661b226f55638d8d4eb51b0992fb397ded",
+  "raven-vscode.vsix": "e9654ab7fc1d04e69bfb7b223f0e6b07bb7befb47d82c14636b04a909f7e2d39",
+  "runtimeReusedUnchanged": true,
+  "neoclr": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+  "neoclr-codegen": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+  "installedEditorSelections": [
+    "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.2/server/Raven.LanguageServer.dll",
+    "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.2/server/Raven.LanguageServer.dll",
+    "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.2/server/Raven.LanguageServer.dll",
+    "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/vscode-extensions/raven.raven-vscode-0.0.0-native-candidate.20261017.2/server/Raven.LanguageServer.dll"
+  ],
+  "sdkBuild": {
+    "command": [
+      "scripts/package-sdk.sh",
+      "osx-arm64",
+      "0.0.0-native-candidate.20261017.2"
+    ],
+    "environment": {
+      "RAVEN_NEOCLR_METADATA_PROJECT": "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj",
+      "RAVEN_PACKAGE_OUTPUT": "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/sdk"
+    },
+    "exitCode": 0,
+    "logSha256": "01b05cdba2baaf7df93b78e0dc8ec3804dd9d6f9d47bf635392532b0f73d6602"
+  },
+  "configurationHarnessSha256": "ecd898ef7cc807f96d59dc317e2b7fb7c79ff6a957e1e1b289dcdd5531c76ebd"
+}

@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
-- Validate workspace-relative watching and native metadata dependency snapshots in Raven: six shared watcher checks and five native recovery checks pass. Strengthen the real-editor check to require both native projects to invalidate and recover; ten cycles pass with the fixed development server. Fresh no-override packaged qualification remains pending; runtime semantics and archived packages are unchanged.
+- Validate workspace-relative watching and native metadata dependency snapshots in Raven: six shared watcher checks and five native recovery checks pass. Strengthen the real-editor check to require both native projects to invalidate and recover; ten cycles pass with the fixed development server. A fresh SDK/VSIX and matching five-library candidate passes extracted-package acceptance, all 26 installed-editor checks, inlays and two ten-cycle runs requiring both native projects to recover. Close the macOS stale-project-diagnostic blocker; optimized runtime/codegen binaries are unchanged. Windows/source/performance gates and publication remain separate.
 
 - Strengthen the repeated editor configuration check to ten cycles with timed project diagnostics; retain both intermittent passing and failing evidence. Record Raven workspace recovery fix 24898a8d5 / e7ce2f8ee, validated on both compiler lines, preserving unsaved buffers through failed then successful reloads. The separate configuration-diagnostic failure remains a release blocker; the archived SDK/VSIX is unchanged.
 

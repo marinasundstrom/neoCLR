@@ -237,3 +237,28 @@ Debug/net10.0 with the explicit server override. Fresh SDK/VSIX packaging and a
 no-override installed-server run are the next qualification step. The older
 archive remains unchanged. Runtime contracts, emission and ABI are unaffected;
 structural expansion remains parked.
+
+## Fixed packaged editor qualification
+
+Local candidate `0.0.0-native-candidate.20261017.2` contains Raven `7bfbce21f`,
+fresh SDK/server/VSIX and five libraries built by that exact compiler.
+The optimized runtime and codegen binaries are unchanged from the prior qualified
+candidate. [Identity](editor-fixed-package-identity.json) checks SDK/VSIX server,
+analysis and metadata-adapter hashes, runtime reuse and all four installed-server
+selections. [Build commands](editor-fixed-package-build.json) and
+[extracted acceptance](editor-fixed-package-acceptance.json) identify the archive
+and passing collections/tasks/JSON/HTTP execution without overrides.
+
+The [main installed-editor suite](editor-fixed-main.json) passes all 26 checks,
+and [inlays](editor-fixed-inlays.json) pass. Two independent runs of the stronger
+configuration test pass [ten cycles](editor-fixed-configuration-1.json) and
+[ten more](editor-fixed-configuration-2.json): both native projects must report
+the missing core and both must clear their errors after restoration in every
+cycle. No server or SDK override is configured. This closes the repeated stale
+project-diagnostic blocker for this macOS candidate.
+
+Archive: `target/release-editor-fixed-20261017/neoclr-native-candidate-osx-arm64.tar.gz`.
+This is local qualification, not a published release or an update to the user's
+normal SDK/profile. Windows qualification, canonical source gates, remote candidate
+pins and runtime measurements remain release requirements. CPU/JSON preparation
+against this extracted archive passes; timed results are recorded separately.
