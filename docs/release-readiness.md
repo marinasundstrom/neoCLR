@@ -51,11 +51,12 @@ analysis. Twenty-one focused native/.NET diagnostic and semantic-model checks pa
 the unchanged HTTP server compiles using an isolated compiler update. The subsequent
 metadata-library repair admits its missing authored-method union signature path;
 the unchanged HTTP client compiles and the interpreter client/server pair passes.
-JIT server requests pass, but the client fails because generic argument metadata
-for the union was not retained. This backend retention gap is the next blocker.
+The backend repair now preserves union generic-argument metadata recursively.
+Unchanged HTTP server requests and client/server execution pass in JIT and AOT;
+seven backend tests and one interpreter visibility test pass.
 See [qualification](validation/release-candidate-20261017/README.md#authored-method-union-signatures).
 The installed SDK and archive are unchanged; rebuild a coherent compiler/server/
-library package after the remaining runtime failure is resolved.
+library package for complete package/editor acceptance.
 
 CPU/JSON benchmark preparation now compiles and links successfully against this
 extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)

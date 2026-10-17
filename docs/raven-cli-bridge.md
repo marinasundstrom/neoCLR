@@ -12797,3 +12797,13 @@ constructed the correct signature; no ABI, CLI carrier or Runtime Contract chang
 was needed. Ownership, supported-constituent and generic-scope checks remain enforced.
 See [release qualification](validation/release-candidate-20261017/README.md#native-union-coverage-in-raven).
 Full packaged editor and cross-platform acceptance remain separate gates.
+
+### Union generic-argument retention (2026-10-17)
+
+The native backend preserves union generic arguments through source/native token
+mapping and descriptor name/shape queries. The native signature remains structural;
+no CLI representation, Runtime Contract setting or ABI changes. Missing constituent
+metadata and open arguments still reject. The unchanged HTTP client/server workflow
+passes interpreter/JIT/AOT with the corrected metadata library/backend. See
+[focused qualification](validation/release-candidate-20261017/README.md#union-generic-argument-metadata-retention).
+This qualifies the existing workload, not broader parked structural work or a new SDK.

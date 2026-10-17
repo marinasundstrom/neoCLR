@@ -1,0 +1,102 @@
+{
+  "execution": "default",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-runner": "378d722d76438723dd1d00e2b7c191a7c4e5ef703659dc11b7a54a4b1dc0bf97",
+    "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-server/app.dll": "396d63117be59ce9f5f922ef3bde92e40617c2920981fdfd9f1a7497665e0e3c",
+    "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-client-fixed-input/app.dll": "00285ad4a06cb7fdd4abfa697aa34634c96ca5efaaa95bcf6011484c9c368e29",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll": "3bdde43a3f0124ea9fda4feb6572edc2d4ab149d13915b573ec60185519dabac",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll": "d74ee612abfe105b29c72cb1e60f1dc71851e7104721b502248c358705fc4689",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll": "b0968e836e15c54fc8f47f2e86b0359eb2014fcaa5fe7caedc7bf8b6f82ced9a",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll": "9e1d05a84b73121ba647045e4b3695ccb7ec3ca64db63b533f6f8b2d23094512",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll": "4df971c2b8ecbcb7658d4171ae8a14277c7b379233f5ce021e8b29efcf2bc094",
+    "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-server/app.reflection.json": "7b5f0fa6496763b241e15867e8db86e6e850dbda005ad528cd709ae75248329b",
+    "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-client-fixed-input/app.reflection.json": "faa451155938d04a6eb3c432b0b5be5463351950d5e2db4ca88fa9bc2d3b2177"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-runner",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-server/app.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-server/app.reflection.json",
+        "--",
+        "4"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/report",
+          "status": 200,
+          "body": {
+            "station": "Caf\u00e9"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 201,
+          "body": {
+            "accepted": true
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 400,
+          "body": {
+            "error": "Invalid report"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/missing",
+          "status": 404,
+          "body": {
+            "error": "Not found"
+          }
+        }
+      ],
+      "port": "56950",
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    },
+    {
+      "serverCommand": [
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-runner",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-server/app.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-server/app.reflection.json",
+        "--",
+        "2"
+      ],
+      "requests": [],
+      "port": "56955",
+      "clientCommand": [
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-runner",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-client-fixed-input/app.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-union-metadata/aot-client-fixed-input/app.reflection.json",
+        "--",
+        "http://127.0.0.1:56955/"
+      ],
+      "client": {
+        "exitCode": 0,
+        "stdout": "{\"accepted\":true}\n",
+        "stderr": ""
+      },
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true
+}

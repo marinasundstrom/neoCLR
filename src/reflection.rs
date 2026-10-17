@@ -1690,6 +1690,7 @@ pub(crate) fn materialize(
 // also expose only visible element/argument types; visibility grants no execution.
 fn publicly_visible(module: &Module, ty: &Type) -> bool {
     match ty {
+        Type::Union(parts) => parts.iter().all(|t| publicly_visible(module, t)),
         Type::Function(shape) => shape
             .parameters
             .iter()
@@ -1719,6 +1720,16 @@ fn publicly_visible(module: &Module, ty: &Type) -> bool {
 #[cfg(test)]
 mod visibility_tests {
     use super::*;
+
+    #[test]
+    fn union_visibility_requires_visible_constituents() {
+        let mut module = crate::assemble(".module Visibility\n.type Item\n.end\n").unwrap();
+        let union = Type::Union(vec![Type::Named("Item".into()), Type::Int32]);
+        module.types[0].visibility = crate::metadata::Visibility::Public;
+        assert!(publicly_visible(&module, &union));
+        module.types[0].visibility = crate::metadata::Visibility::Private;
+        assert!(!publicly_visible(&module, &union));
+    }
 
     #[test]
     fn generic_parameter_variance_follows_declaration_identity() {

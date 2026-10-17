@@ -122,3 +122,26 @@ That backend retention failure remains a release blocker. The waiting server's
 orphan backend was terminated after the client failed so the harness could finish
 recording its report; the recorded killed-server status is cleanup, not the cause.
 AOT and fresh coherent package/editor qualification remain pending.
+
+## Union generic-argument metadata retention
+
+The backend maps native union tokens recursively between source identities and
+specialized constituent identities, just as it does for function signatures.
+Union display names and shape queries retain structural/value-type identity; no
+nominal declaration or ABI change is introduced. Missing constituent metadata and
+open arguments still reject. Both interpreter and backend visibility now require
+all union constituents to be public.
+
+[Focused evidence](union-metadata.json) records seven backend metadata tests and
+one interpreter visibility test, optimized backend/compiler hashes, runner adapters
+and AOT build commands. The unchanged HTTP server request checks and Raven
+client/server pair pass in [JIT](http-union-metadata-jit.json) and
+[AOT](http-union-metadata-aot.json). Interpreter execution passed in the preceding
+slice; its executable behavior is unchanged by this metadata-retention fix.
+AOT outputs are built from fresh assemblies with matching reflection roots.
+
+The previous failure reports remain available. The corrected backend is explicitly
+overridden for JIT; the archived package and installed SDK are not modified.
+Review of the introspection website found no new API or signature to document;
+this repairs the existing generic-argument/retention contract. Full coherent
+package/editor acceptance, Windows validation and runtime measurements remain open.

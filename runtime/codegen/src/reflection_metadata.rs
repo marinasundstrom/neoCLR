@@ -133,6 +133,7 @@ pub fn catalogue(
 // metadata, never projected native layout, determines these language-visible facts.
 fn visible(source: &neoclr::Module, ty: &Type) -> bool {
     match ty {
+        Type::Union(parts) => parts.iter().all(|t| visible(source, t)),
         Type::Function(function) => function
             .parameters
             .iter()
@@ -166,6 +167,14 @@ pub(super) fn semantic_token(
 ) -> Result<Type, Error> {
     if token.is_primitive() {
         return Ok(token.clone());
+    }
+    if let Type::Union(parts) = token {
+        return Ok(Type::Union(
+            parts
+                .iter()
+                .map(|part| semantic_token(input, report, part))
+                .collect::<Result<_, _>>()?,
+        ));
     }
     if let Type::Function(function) = token {
         let mut function = function.clone();
@@ -214,6 +223,14 @@ pub(super) fn semantic_token(
 fn native_token(input: &neoclr::Module, report: &Value, semantic: &Type) -> Result<Type, Error> {
     if semantic.is_primitive() {
         return Ok(semantic.clone());
+    }
+    if let Type::Union(parts) = semantic {
+        return Ok(Type::Union(
+            parts
+                .iter()
+                .map(|part| native_token(input, report, part))
+                .collect::<Result<_, _>>()?,
+        ));
     }
     if let Type::Function(function) = semantic {
         let mut function = function.clone();
@@ -264,6 +281,13 @@ fn signature_name(ty: &Type) -> Result<String, Error> {
 fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 21], Error> {
     use neoclr::metadata::Representation;
     let Some(d) = source.type_definition(ty) else {
+        if matches!(ty, Type::Union(_)) {
+            let mut result = [false; 21];
+            result[7] = true;
+            result[11] = visible(source, ty);
+            result[14] = true;
+            return Ok(result);
+        }
         if matches!(ty, Type::Function(_)) {
             let mut result = [false; 21];
             result[11] = visible(source, ty);
@@ -465,13 +489,13 @@ pub fn bind_queries(
                 }
             };
             (name.to_owned(), arguments.len(), semantic)
-        } else if matches!(token, Type::Function(_)) {
+        } else if matches!(token, Type::Function(_) | Type::Union(_)) {
             let semantic = semantic_token(input, report, token)?;
             let neoclr::Value::String(name) =
                 neoclr::native_metadata::display_name(source, &semantic)
                     .map_err(|e| e.to_string())?
             else {
-                return Err("function display name was not a string".into());
+                return Err("structural display name was not a string".into());
             };
             (name.to_string(), 0, semantic)
         } else if matches!(token, Type::ArrayRef(_)) {
@@ -813,6 +837,25 @@ mod tests {
                     .any(|op| matches!(op, Op::Bool(false)))
             );
         }
+    }
+
+    #[test]
+    fn union_generic_arguments_preserve_closed_identity_and_visibility() {
+        let (mut input, report) = query();
+        let semantic = Type::Union(vec![Type::Named("Original".into()), Type::Int32]);
+        let native = native_token(&input, &report, &semantic).unwrap();
+        assert_ne!(native, semantic);
+        assert_eq!(semantic_token(&input, &report, &native).unwrap(), semantic);
+        let facts = shape(&input, &native).unwrap();
+        assert!(facts[7]);
+        assert!(facts[14]);
+        assert!(!facts[12]);
+        input.types[0].visibility = neoclr::metadata::Visibility::Private;
+        assert!(!shape(&input, &native).unwrap()[11]);
+        let open = Type::Union(vec![Type::MethodTypeParameter(0), Type::Int32]);
+        assert!(native_token(&input, &report, &open).is_err());
+        let missing = Type::Union(vec![Type::Named("Missing".into()), Type::Int32]);
+        assert!(native_token(&input, &report, &missing).is_err());
     }
 
     #[test]
