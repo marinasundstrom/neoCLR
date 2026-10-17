@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Measure plain and typed-JSON HTTP on the refreshed macOS candidate across interpreter/JIT/AOT: 36 processes validate 1,152 responses with zero errors. Retain five-round samples, separate startup, input hashes and host-load limitations. Windows measurements and matched baseline HTTP comparisons remain open release gates.
+
 - Classify the API-reference route backlog: 104 compatibility redirects have existing local targets; 19 hierarchical legacy pages represent old Enum helpers, namespace containers or CLI compiler/exception scaffolds. Correct the maintenance inventory so these are not described as 123 missing native APIs. Retain legacy-route limitation notices and current native navigation; no public API or publication change.
 
 - Measure the refreshed `.20261017.4` package: 45 CPU/JSON and ten longer native CPU processes pass correctness/input checks across interpreter/JIT/AOT. Interpreter CPU median is 6.39 operations/s, consistent with the earlier range-guard recovery. Retain samples, startup/batch separation, artifact provenance and active macOS-indexing limitations; HTTP and Windows measurements remain separate.
