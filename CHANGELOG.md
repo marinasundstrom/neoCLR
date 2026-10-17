@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Correct generated bundle README notices for native source-core libraries: production compilation has no CLI primitive-core/CoreProbe dependency, while the retained seed supplies execution support. Historical profiles retain their distinct notice. Validate both rendered notice branches; release archive documentation repacking remains separately recorded.
+
 - Fix typed-JSON HTTP benchmark preparation to resolve reflection roots from the final compiled assembly and reuse them in JIT/AOT. A preliminary compile had selected Person index 6 while the final assembly used index 0; retain the failure diagnosis. The repaired five-round final-package run validates 576 responses with zero errors. Include worker diagnostics for incomplete responses and retain error text in failed reports.
 
 - Complete final macOS SDK runtime-await qualification: all 24 language, cleanup, fault, HTTP server/client, empty/whitespace state-machine and generator checks pass across interpreter/JIT/AOT. Final-package measurements are running; Windows remains separate.

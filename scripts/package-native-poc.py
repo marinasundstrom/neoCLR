@@ -149,6 +149,14 @@ def main():
                 '${workspaceFolder}/../../sdk/tools/rvnc/rvnc.dll', 'neoclr', '--project', '${workspaceFolder}/App.rvnproj',
                 '--run', '${workspaceFolder}/../../bin/' + executable], problemMatcher=[])]}, indent=2) + '\n')
     configure_editor_tasks(staged, samples)
+    core_description = (
+        'The libraries are built from native metadata and explicit runtime-service contracts.\n'
+        'Production compilation has no CLI primitive-core or CoreProbe dependency. The\n'
+        'retained runtime seed supplies execution support, not semantic CLI references.\n'
+        if split and catalog.get('kind') == 'native-source-core-class-library' else
+        'This historical profile retains an explicit CLI primitive core and runtime seed.\n'
+        'It does not represent native source-core construction.\n'
+    )
     (staged / 'README.md').write_text('''# Native neoCLR POC bundle
 
 This is an experimental native-metadata POC bundle. The host needs the
@@ -166,8 +174,7 @@ Use the `neoCLR: Run` task. Project references and task paths are relative to th
 bundle. The compiler and runtime execute native metadata libraries; their source
 files are deliberately absent from these consumer projects.
 
-The CLI primitive core and retained runtime seed in lib/ are explicit temporary
-bootstrap dependencies, not a complete native System bootstrap. The manifest identifies the shipped assemblies and their runtime seed. Documentation
+''' + core_description + '''The manifest identifies the shipped assemblies and their runtime seed. Documentation
 sidecars do not imply full API-help coverage. No library translation bridge is run.
 The original library build evidence and declared revisions are in provenance.json.
 ''')
