@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "labels": [
+    "Object",
+    "ValueType",
+    "Attribute",
+    "Byte",
+    "Int32",
+    "Int64",
+    "Double",
+    "Boolean",
+    "Void",
+    "String",
+    "Runtime"
+  ],
+  "serverSha256": "3f6685034eb341db20bd4bbb3fcf2c191fcafb3f88a1a01fcb64bf13c7c1f1df",
+  "project": "/Users/robert/Projects/neoclr/target/native-core-contract-project"
+}

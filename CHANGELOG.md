@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify native-only Raven project contract handling and System namespace completion without CLI delegate transport symbols. Record the production System.Runtime dependency on NeoCLR.CoreProbe as a remaining bootstrap-removal blocker; do not switch the installed SDK to the reduced fixture core.
+
 - Prepare a local macOS ARM64 Raven SDK and VS Code reflection preview with matching native libraries and isolated editor state. Include an editable field/type-initializer consumer and a task that validates interpreter, JIT and sanitized AOT execution; record installed artifact hashes and editor validation. This is a local development installation, not a release or website publication.
 
 ### 2026-10-16

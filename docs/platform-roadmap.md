@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Native bootstrap removal (author direction, 2026-10-17):** replace the remaining CLI semantic bootstrap with native symbols and explicit contracts. Native-only project contract/completion validation is the first bounded slice; production System.Runtime still depends on NeoCLR.CoreProbe. See [evidence and remaining work](validation/native-core-removal/README.md). Keep structural work parked. This does not declare the production SDK bridge-free.
+
 **Mutable collection helper slice (author direction, 2026-10-16):** implemented
 `MutableMap<K,V>.Entry(key)` and `MutableSet<T>.GetOrInsert(value)` as extensions,
 with live key locators, explicit synchronous callback semantics and canonical set

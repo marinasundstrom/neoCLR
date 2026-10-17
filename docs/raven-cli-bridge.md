@@ -12462,3 +12462,18 @@ source binding/emission and the guest descriptor/extension facade. Rebuild old
 RuntimeFieldInfo provider layouts with the matching bundle. General closed-generic
 reflection execution and arbitrary boxed value payloads remain documented limits.
 See [the executable consumer and exact revisions/hashes](validation/field-reflection/README.md).
+
+## Native-only project contracts — 2026-10-17
+
+Author direction: remove the remaining CLI semantic bootstrap and replace it with
+native symbols/contracts; keep structural work parked. The first bounded Raven
+slice preserves explicit typeof project mappings in native-only mode. It validates
+compilation/emission, explicit clearing and missing-contract diagnostics. A real LSP
+completion request on the native-only fixture lists native System types and no
+Action/Func transport types; see [validation](validation/native-core-removal/README.md).
+
+The installed production bundle is not yet bridge-free. Selecting its System.Runtime
+as the native core fails with missing dependency NeoCLR.CoreProbe. Production core
+construction and runtime services must be migrated before changing the SDK defaults.
+The existing native-only core is a reduced fixture, not a substitute for production
+Object/primitive implementations. Ordinary .NET compilation remains unchanged.

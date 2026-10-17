@@ -18659,3 +18659,20 @@ integration work; native contexts retain their existing thread-affine lifetime.
   reflective construction. API reference artifacts and feature/integration documentation
   are refreshed. General closed-generic reflection execution and arbitrary boxed value
   payloads remain separately documented limits, not erased metadata or completed work.
+
+## 2026-10-17 — Remaining bootstrap exposed in editor completion
+
+The author showed a screenshot of System completion containing Action and asked,
+“I thought we were going to remove the bridge used?” The assistant acknowledged
+that native output/execution had been delivered while CLI Core.dll semantic input
+and delegate transport symbols remained, and that the delivery description should
+have made that distinction clear. The author directed removal through native type
+symbols/contracts, compilation and editor validation, separate validated commits,
+and continued parking of structural work.
+
+The assistant found an existing reduced native-only path, verified its compilation
+and completion without host delegates, and fixed its unconditional removal of
+explicit typeof contracts. A production System.Runtime probe rejected its retained
+NeoCLR.CoreProbe dependency. Full production bootstrap removal remains open; no
+completion-only filter or unqualified SDK switch was made. See the
+[validation record](validation/native-core-removal/README.md).
