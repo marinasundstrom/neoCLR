@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Audit upcoming macOS ARM64 and Windows x64 release readiness: record candidate pin/package gaps, distinguish legacy API redirects from unverified pages, and establish correctness-first runtime benchmark gates on both platforms. Replace the stale unpublished release-note draft; measurements and release qualification remain pending.
+
 - Refresh release-facing website and API guides around current native metadata, async, operators, range endpoints, variance and reflection contracts. Remove dated progress headings and obsolete migration narratives while preserving incoming anchors, experimental limitations, published release/download history and benchmark evidence. Add missing collection-helper and variance guide navigation, repair source-evidence links and generic-name Markdown, and refresh the native API snapshot from five rebuilt libraries. Correct the Array source summary that rendered as malformed HTML; API signatures are unchanged.
 
 - Install an isolated native-core VS Code preview with Raven 57dbabb17 project fixes: deduplicated execution-core inputs and native Console ownership. The installed parsing/await consumer prints 42 and exits zero; native editor completion excludes host Action/Func types. Record exact artifacts; global defaults and published packages remain unchanged.

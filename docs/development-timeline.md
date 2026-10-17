@@ -18753,3 +18753,17 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   snapshot tests pass. The complete site validates 4,441 pages, including HTML and
   local links. Existing 123 legacy API coverage gaps remain explicitly identified;
   this content refresh does not claim those missing native references are complete.
+
+### 2026-10-17 — Audit the next release and rerun runtime benchmarks
+
+- Author clarified that compilation and execution are separate, directed investigation
+  of remaining release requirements, and requested runtime benchmarks as part of
+  release work. Author explicitly required both macOS and Windows releases.
+- Assistant audited local release procedures, candidate revisions, package evidence,
+  API coverage and benchmark harnesses. The local preview uses debug runtime binaries;
+  CI compiler pins predate the latest project execution fixes. The CPU preparation
+  selects a macOS profile and HTTP benchmark rejects non-macOS hosts.
+- Assistant recorded a [release work order](release-readiness.md), replaced the stale
+  unpublished release-note draft, and distinguished 104 redirect routes from 19
+  hierarchical reference gaps. Both platforms require optimized package acceptance
+  and fresh runtime measurements; no benchmark or remote qualification is claimed.

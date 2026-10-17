@@ -5,6 +5,15 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Active release preparation — 2026-10-17
+
+The [release readiness work order](../release-readiness.md) owns the next candidate's
+remaining gates and runtime benchmark sequence. Both macOS ARM64 and Windows x64
+are required. Native bootstrap closure and a local debug SDK/editor preview are
+validated, but optimized packages, fresh candidate qualification and runtime benchmark
+results remain open. Compiler measurements are separate from execution measurements.
+The older dated entries below retain their original evidence, not current approval.
+
 ## Fixed for next release: ad-hoc union hover — 2026-10-14
 
 Author-reported editor issue, deliberately deferred beyond Preview 15: hovering

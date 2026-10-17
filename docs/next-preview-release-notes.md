@@ -1,56 +1,44 @@
-# Next preview: a unified runtime
+# Next preview — draft release scope
 
-This preview brings the components developed as separate experiments into one
-integrated neoCLR runtime. It is the central change in this release, alongside
-improvements to HTTP processing, memory management and development tools.
+Unpublished draft. Release version and date are not selected. Intended binary
+targets are macOS ARM64 and Windows x64; both require candidate qualification.
+See the [release readiness work order](release-readiness.md) for remaining gates.
 
-## One runtime, modular components
+## Native compiler and library contracts
 
-Execution through the interpreter and JIT, garbage collection, and scheduling
-with suspension and resumption now form a shared runtime foundation. Native AOT
-is the publishing target, using that foundation in compiled applications.
+System.Runtime and dependent libraries are built from Raven source using native
+metadata and explicit runtime-service contracts. Production construction no longer
+requires the NeoCLR.CoreProbe/CLI semantic bootstrap. The compiler and editor import
+native library types; the Raven tooling itself still runs on .NET.
 
-The components keep their own responsibilities and boundaries. Integration lets
-us develop, validate and optimize them together, and gives profiling and debugging
-tools a common runtime to observe. JIT is the default for development; AOT builds
-native applications. Interpreter execution remains supported.
+## Language and runtime support
 
-## Runtime await
+The candidate includes checked operators and contexts, consistent exclusive/inclusive
+range endpoints, overflow-safe signed integer iteration, and reference-only nominal
+interface variance. Static readonly fields and type initializers retain their native
+metadata and execution contracts. Introspection describes fields, initializers and
+generic variance; reflection performs supported operations under runtime guards.
+Native Function types support typed patterns and provisional dynamic invocation.
 
-Raven's native target uses runtime-owned suspension and resumption for `await`,
-including async `Main`. The same programming model works across interpreter, JIT
-and AOT. Windows x64 uses fibers to preserve suspended execution.
+These are bounded capabilities, not full .NET API parity. Further structural type
+work remains parked; published documentation must retain the exact supported forms
+and backend limits. The release will use matching compiler, libraries and runtime
+artifacts; applications need to be rebuilt with that cohort.
 
-## HTTP and memory management
+## Tools and documentation
 
-HTTP parsing scans URI components and known header names as bytes, reducing
-intermediate strings. Common header names share lazily initialized values.
+Native editor completion and source-local declarations share the compiler's native
+metadata references. Hover improvements display union alternatives without expanding
+unrelated nominal cases. Website guides describe current contracts and the native API
+snapshot includes the source-owned core types.
 
-The collector reduces repeated heap inspection and tracing work for strings and
-byte buffers. Allocation helpers preserve live inputs when collection occurs.
+## Performance and qualification
 
-## Libraries and tools
+Runtime benchmarks must be rerun on the optimized macOS and Windows packages after
+correctness acceptance. Compilation is outside execution measurements; startup and
+steady-state results are reported separately. No performance improvement is claimed
+until those measurements and regression investigations are recorded.
 
-JSON values can produce compact or indented JSON through `ToJsonString` and
-`JsonSerializerOptions.WriteIndented`. String and stream serializers share the
-same formatting options.
-
-HTTP JSON helpers preserve `HttpError | JsonError`, and object-mapping examples
-retain the original error. The API reference includes links to declaration files
-on GitHub, including PostgreSQL APIs.
-
-## Updating
-
-Use the matching SDK, extension, runtime and libraries, and rebuild applications.
-Native hosts also require a rebuild for the updated runtime context. The native
-compiler tool is now named `neoclr-codegen`.
-
-Task APIs live in `System.Concurrency.Tasks`. Stream operations return tasks;
-use `await` to consume them.
-
-## Scope
-
-neoCLR is experimental: APIs and metadata may change. The release targets macOS
-ARM64 and Windows x64. HTTP supports HTTP/1.1; HTTP/2/3 and connection pooling
-are not available. PostgreSQL is a local development provider with loopback/trust
-authentication, not a general production database connection.
+Final release notes must link exact package hashes, platform qualification and
+benchmark results, document remaining API-reference gaps and state the actual
+optional-provider contents. Prior release results do not certify this candidate.
