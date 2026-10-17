@@ -1,0 +1,36 @@
+{
+  "passed": false,
+  "scope": "Retained failed final-package HTTP JSON warmup, diagnosed separately",
+  "oldRoot": {
+    "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+    "revision": "1.0.0.0",
+    "index": 6
+  },
+  "actualPerson": {
+    "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+    "index": 0,
+    "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.T__506572736F6E"
+  },
+  "assemblySha256": "1f2d9c469b7d78f350fb5423a91417d6ee149279ceebb803fe1187cbbc8efebf",
+  "jit": {
+    "responses": [
+      {
+        "request": 0,
+        "response": ""
+      }
+    ],
+    "stderr": "RuntimeError: native reflection property metadata was not retained; configure --reflection-roots\n   at System.Introspection.RuntimeNominalTypeInfo.GetProperties [instruction 3]\n   at System.Data.Json.ObjectMapper.WriteValue [instruction 508]\n   at System.Data.Json.ObjectMapper.Write [instruction 4]\n   at System.Data.Json.JsonSerializer.Serialize [instruction 15]\n   at RespondWithPerson [instruction 2]\n   at Respond [instruction 26]\n   at System.Web.Http.HttpServeOperation.OnAccepted [instruction 102]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n   at System.Concurrency.Tasks.TaskQueue.Drain [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n   at Raven.Generated.<AsyncEntry> [instruction 1]\n",
+    "exit": null
+  },
+  "aot": {
+    "responses": [
+      {
+        "request": 0,
+        "response": ""
+      }
+    ],
+    "stderr": "RuntimeError: native reflection property metadata was not retained; configure --reflection-roots\n   at System.Introspection.RuntimeNominalTypeInfo.GetProperties [instruction 3]\n   at System.Data.Json.ObjectMapper.WriteValue [instruction 508]\n   at System.Data.Json.ObjectMapper.Write [instruction 4]\n   at System.Data.Json.JsonSerializer.Serialize [instruction 15]\n   at RespondWithPerson [instruction 2]\n   at Respond [instruction 26]\n   at System.Web.Http.HttpServeOperation.OnAccepted [instruction 102]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n   at System.Concurrency.Tasks.TaskQueue.Drain [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n   at Raven.Generated.<AsyncEntry> [instruction 1]\n",
+    "exit": null
+  },
+  "repair": "Use build-native-project --reflection-type Person, then use its app.reflection.json for JIT; AOT consumes the same final-artifact roots."
+}

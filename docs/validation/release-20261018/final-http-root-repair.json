@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "rounds": 5,
+  "workload": "json",
+  "summary": {
+    "interpreter": {
+      "requestsPerSecond": {
+        "median": 1.1654164088496874,
+        "min": 1.1556254095077234,
+        "max": 1.1801573964708172
+      },
+      "startupSecondsMedian": 2.782299834,
+      "latencySeconds": {
+        "p50": 0.8555975840000087,
+        "p95": 0.8825793329999954,
+        "p99": 0.9118486659999974
+      },
+      "validatedRequests": 192,
+      "measuredRequests": 120,
+      "errors": 0
+    },
+    "jit": {
+      "requestsPerSecond": {
+        "median": 79.87406548966004,
+        "min": 79.55147341293677,
+        "max": 81.47911730454737
+      },
+      "startupSecondsMedian": 8.431557916000003,
+      "latencySeconds": {
+        "p50": 0.012501708000002054,
+        "p95": 0.012647499999999923,
+        "p99": 0.012956625000001054
+      },
+      "validatedRequests": 192,
+      "measuredRequests": 120,
+      "errors": 0
+    },
+    "aot": {
+      "requestsPerSecond": {
+        "median": 83.17992211912761,
+        "min": 78.1714186056812,
+        "max": 83.38738080629017
+      },
+      "startupSecondsMedian": 0.00527737499999148,
+      "latencySeconds": {
+        "p50": 0.012031708999998614,
+        "p95": 0.012820541999985835,
+        "p99": 0.01290845799999829
+      },
+      "validatedRequests": 192,
+      "measuredRequests": 120,
+      "errors": 0
+    }
+  },
+  "inputHashes": {
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/http-json-final-roots/project/Main.rvn": "c9373fa6cf7505e4a668fe2fc50a52b077871e2c7e8608fe1339ae74439c03dd",
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/http-json-final-roots/project/Model.rvn": "da25ee543a6ad576b0861d494e4dbd9e71416af671266a96798196575399c7c7",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/benchmark.py": "196a37ecc7d32ac84ae706cb6148076f4122b4da5336a85fc055a4cc5b49835b",
+    "/Users/robert/Projects/neoclr/benchmarks/jit-http/benchmark.py": "e1577e9daa7f5793a76eda71cef4e0780a274907bf2526e31bab99e6218063c7",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/process.py": "8f431f98dedaa45bcb86091feea953097f6b94a6e3c6f948c18fec03da17d80c",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/host.py": "d953141f0632918bf5dee22f6dcd929902d81a6951636839f8cafeab0b8d45ee",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/JsonServer.rvn": "c9373fa6cf7505e4a668fe2fc50a52b077871e2c7e8608fe1339ae74439c03dd",
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/manifest.json": "568cb7c0854ae3383afd882b5c62e7df6323b9279bf954ad8ecdc52dc5f2363a"
+  },
+  "buildCommand": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+    "--profile",
+    "http",
+    "--project",
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/http-json-final-roots/project/App.rvnproj",
+    "--bundle",
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc",
+    "--aot",
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr-codegen",
+    "--output",
+    "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/http-json-final-roots/native",
+    "--http-heap-bytes",
+    "33554432",
+    "--byte-array-limit",
+    "4194304",
+    "--command-timeout",
+    "600",
+    "--reflection-type",
+    "Person"
+  ]
+}

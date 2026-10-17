@@ -166,3 +166,17 @@ validation and timing boundaries are shared. Windows reports an unavailable load
 average as null and records `tasklist` output instead of a POSIX CPU process listing.
 The optional database workload still requires macOS: its shared-host linker has not
 been ported. Host-selection tests alone do not qualify Windows execution.
+
+
+## Reflection roots belong to the final assembly
+
+Typed JSON preparation uses `build-native-project.py --reflection-type Person`.
+The build tool resolves that name after compiling the final `app.dll`; AOT and JIT
+consume its `app.reflection.json`. Do not generate roots from a preliminary compile
+and then compile again: definition indices can change even when the source and
+module identity match. The database path compiles once and copies that exact
+assembly before using its roots.
+
+`--server-source PATH` selects and hashes an explicit historical syntax fixture;
+it does not change response validation. Incomplete HTTP responses report the
+request index and worker error, and failed reports retain an error description.

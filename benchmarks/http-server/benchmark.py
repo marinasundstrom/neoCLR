@@ -41,6 +41,9 @@ def server_sample(command, workload):
                     data += chunk
                     if len(data) > 8192:
                         raise ValueError('Oversized response')
+                if b'\r\n\r\n' not in data:
+                    raise RuntimeError(f'Incomplete HTTP response at request {index}: {len(data)} bytes; '
+                                       f'worker exit={guest.process.poll()}; stderr={guest.errors().decode(errors="replace")}')
                 headers, body = data.split(b'\r\n\r\n', 1)
                 lines = headers.split(b'\r\n')
                 fields = dict(line.lower().split(b': ', 1) for line in lines[1:])
@@ -123,7 +126,7 @@ def main():
     try:
         native=out/'native'
         roots=[]
-        if args.workload != 'plain':
+        if args.workload == 'database':
             def run(command):
                 return subprocess.run(list(map(str,command)),check=True,capture_output=True,text=True)
             run(['dotnet',bundle/'sdk/tools/rvnc/rvnc.dll','neoclr','--project',project/'App.rvnproj'])
@@ -140,7 +143,7 @@ def main():
         build=[sys.executable,str(ROOT/'scripts/build-native-project.py'),'--profile',host_target['http'],'--project',str(project/'App.rvnproj'),
                '--bundle',str(bundle),'--aot',str(bundle/manifest['jit']['compiler']),'--output',str(native),
                '--http-heap-bytes',str(manifest['jit']['heapBytes']),'--byte-array-limit',str(manifest['jit']['byteArrayLimit']),
-               '--command-timeout','600',*roots]
+               '--command-timeout','600',*(['--reflection-type','Person'] if args.workload == 'json' else roots)]
         if args.workload == 'database':
             # PostgreSQL's released managed library requires runtime-async bindings.
             # Reuse the qualified shared host, as in sql-postgresql/validate.py.
@@ -174,6 +177,11 @@ def main():
                 subprocess.run(build,stdout=log,stderr=subprocess.STDOUT,check=True)
             report['buildCommand']=build
             report['build']=json.loads((native/'build.json').read_text())
+            if args.workload == 'json':
+                root_path = native/'app.reflection.json'
+                if report['build']['inputs'].get(str(root_path)) != sha(root_path):
+                    raise ValueError('Reflection roots must belong to the final native build')
+                roots = ['--reflection-roots', str(root_path)]
         assembly=native/'app.dll'
         runtime=str(bundle/manifest['runtime'])
         context=['--system',str(bundle/manifest['runtimeSeed']),'--object-root',str(bundle/manifest['objectRoot'])]
@@ -213,6 +221,9 @@ def main():
             if sha(bundle/name)!=digest:
                 raise ValueError('Bundle changed during measurement: '+name)
         report['passed']=True
+    except Exception as error:
+        report['error']=str(error)
+        raise
     finally:
         (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')
 
