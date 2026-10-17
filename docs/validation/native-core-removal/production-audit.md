@@ -163,3 +163,8 @@ stripping are accepted substitutes for the above gates.
   primitive owners in the production manifest. Their forwards are removed; a fresh
   five-library build, imported comparisons and LSP completion pass. Integral numeric
   casts remain a distinct Raven language/backend gap, not a reason to keep the facade.
+
+- The integral native-integer cast gap is now addressed by a main-first Raven fix
+  and explicit neoCLR lowering. Native comparisons and high-bit conversions pass
+  interpreter/JIT/AOT; LSP member completion passes. Target-typed native literals
+  and full float/decimal conversions remain open. See the conversion gate in README.

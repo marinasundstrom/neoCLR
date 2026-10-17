@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "expression": "((nint)42).",
+  "labels": [
+    "CompareTo",
+    "ToString",
+    "Equals",
+    "GetHashCode",
+    "GetType"
+  ],
+  "serverSha256": "a7deae32642f1a58f7ee188ec0d39e2b105e3995f142f03b0384e70a93f62f92",
+  "project": "/Users/robert/Projects/neoclr/target/native-integer-conversions"
+}

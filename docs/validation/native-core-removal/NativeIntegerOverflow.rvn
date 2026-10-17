@@ -1,0 +1,6 @@
+func Convert(value: int) -> nuint => checked((nuint)value)
+
+func Main() -> int {
+    let value = Convert(-1)
+    return (int)value
+}

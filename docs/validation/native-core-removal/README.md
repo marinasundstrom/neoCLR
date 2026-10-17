@@ -115,3 +115,29 @@ This resolves member ownership, not the separate general Raven integral conversi
 rules, which still exclude native integers at this compiler revision. It adds no
 unchecked allocation or synthetic runtime implementations. Other bootstrap services
 and native production core construction remain open.
+
+## Native integral conversions
+
+Raven main `babd5fad0` implements built-in integral conversions involving nint/nuint;
+its focused conversion suite passes 104 tests. The neoCLR carry emits native-width
+conversion instructions, preserves high UInt32 bits and signed widening, and selects
+checked conversion signedness from the source. No new Runtime Contract switch is
+needed. IntPtr/UIntPtr instance methods use the same verified borrowed-receiver
+projection as the previously supported primitive owners in JIT/AOT.
+
+The [consumer](NativeIntegerConsumer.rvn) compiles against the five-library
+`target/native-integer-library` bundle from the ownership slice. It returns 42 in
+interpreter, managed JIT and sanitized AOT. [Editor completion](native-integer-cast-completion.json)
+resolves CompareTo on `((nint)42).`. This is production native library import with
+CLI core input, not proof of complete bootstrap removal. Execution is qualified on
+macOS ARM64; 32-bit runtime execution remains unverified.
+
+Target-typed native integer literal assignment and full floating-point/decimal
+conversion support remain open; samples use explicit integral casts. Other service
+wrappers and production native core construction remain open. Structural work is
+parked and the installed SDK is unchanged.
+
+Raven neoCLR `d83ea51e7` is the validated compiler carry. The
+[overflow consumer](NativeIntegerOverflow.rvn) reports ArithmeticOverflow in interpreter,
+managed JIT and sanitized AOT. [Execution evidence](native-integer-conversion-results.json)
+records commands, result codes and binary hashes for both consumers.

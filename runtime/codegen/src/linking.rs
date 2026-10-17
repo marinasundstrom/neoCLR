@@ -892,6 +892,8 @@ pub fn prepare(
                         | neoclr::metadata::Type::Boolean
                         | neoclr::metadata::Type::Int64
                         | neoclr::metadata::Type::UInt64
+                        | neoclr::metadata::Type::IntPtr
+                        | neoclr::metadata::Type::UIntPtr
                         | neoclr::metadata::Type::Char
                 )
             ) && f.instance

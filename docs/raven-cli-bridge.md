@@ -12547,3 +12547,16 @@ expose the library's ComparableTo implementation; library/Console native-integer
 calls no longer use extension forwarding adapters. No Runtime Contract default or
 runtime numeric behavior changes. See the [ownership gate](validation/native-core-removal/README.md#native-integer-ownership).
 General native-integral conversion classification is separate from this owner fix.
+
+### Native integer conversion qualification (2026-10-17)
+
+Raven main `babd5fad0`, carried deliberately as neoCLR `d83ea51e7`, recognizes native
+integral casts and widening without CLI nominal conversion operators. Native lowering
+preserves signedness and native storage category; checked failure is ArithmeticOverflow,
+not a .NET exception. No Runtime Contract setting changes. The runtime admits native
+integer instance methods under its existing verified primitive receiver projection.
+The [consumer and completion gate](validation/native-core-removal/README.md#native-integral-conversions)
+passes interpreter/JIT/sanitized AOT against the fresh production library bundle.
+Target-typed native literals and complete float/decimal conversions remain gaps.
+Production core input still includes the CLI bridge; native-only core construction
+and other runtime-service wrappers remain open. Structural work stays parked.

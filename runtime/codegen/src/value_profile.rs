@@ -389,7 +389,13 @@ impl<'a> Profile<'a> {
                     let projected_receiver = index == 0
                         && matches!(
                             **target,
-                            Type::Int32 | Type::Boolean | Type::Int64 | Type::UInt64 | Type::Char
+                            Type::Int32
+                                | Type::Boolean
+                                | Type::Int64
+                                | Type::UInt64
+                                | Type::IntPtr
+                                | Type::UIntPtr
+                                | Type::Char
                         )
                         && primitive_receivers.is_some_and(|indices| indices.contains(&i));
                     if !f.out_parameters.contains(&index) && !projected_receiver {

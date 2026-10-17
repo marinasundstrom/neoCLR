@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify native integral conversions with Raven main babd5fad0 carried to codex/neoclr d83ea51e7. Admit IntPtr/UIntPtr under the existing verified primitive receiver projection for JIT/AOT. Fresh native-library consumers preserve signed widening and high UInt32 bits, expose cast member completion, and report checked ArithmeticOverflow in interpreter/JIT/sanitized AOT. Target-typed native literals, full float/decimal conversions and production native-core construction remain open.
+
 - Select System.Runtime as the native IntPtr/UIntPtr declaration and primitive owner, restoring imported CompareTo and editor member lookup. Remove their two runtime-service forwards and call native conversions directly from the library and Console. Validate a fresh five-library bundle, interpreter consumer, completion and matching API snapshots. Integral cast support is a separate compiler gap.
 
 - Qualify native metadata-owned CheckedStorage.Reserve<T> and RuntimeServices.TypeHandle<T> bodies without a CLI reference or BootstrapReference. Generic value/reference reservations and type-token calls compile and return 42 in interpreter/JIT/sanitized AOT; negative reservation faults in the interpreter. Extend the reduced native-core probe and editor checks. This establishes the intrinsic ownership path; production native-core construction remains unfinished.

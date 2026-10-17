@@ -1,0 +1,16 @@
+func Signed(value: int) -> ulong => unchecked((ulong)(nint)value)
+func Unsigned(value: uint) -> long => (long)(nint)value
+func Wrapped(value: int) -> ulong => (ulong)unchecked((nuint)value)
+func Checked(value: int) -> nuint => checked((nuint)value)
+
+func Main() -> int {
+    let signed = (nint)42
+    let unsigned = (nuint)42
+    if signed.CompareTo((nint)41) != 1 || unsigned.CompareTo((nuint)43) != -1 {
+        return 1
+    }
+    if Signed(-1) != unchecked((ulong)-1L) || Wrapped(-1) != unchecked((ulong)-1L) || Unsigned((uint)4294967295L) != 4294967295L {
+        return 2
+    }
+    return (int)Checked(42)
+}
