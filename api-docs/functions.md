@@ -113,7 +113,9 @@ not generally inheritable; permitted kinds need explicit rules. This proposal do
 not make Array, Tuple, Union or Intersection inheritable. Conversion/rebinding rules
 remain future design work.
 
-## Bound target property (development)
+<a id="bound-target-property-development"></a>
+
+## Bound target property
 
 Every Function signature synthesizes a read-only public instance property
 `Function: MethodInfo`. Read it on a Function object to inspect the actual bound
@@ -140,7 +142,9 @@ of when the bindings were created. Different targets, generic instantiations or
 receivers differ. Equal computed results do not imply equal Function objects.
 A future common FunctionInfo interface is deferred; Function returns MethodInfo now.
 
-## Object members (development)
+<a id="object-members-development"></a>
+
+## Object members
 
 Function types have Object as their BaseType while IsNominalType remains false.
 They synthesize virtual overrides of ToString(), Equals(Object?) and GetHashCode(),
@@ -158,7 +162,9 @@ names are retained independently of lowered implementation names. Null member ac
 raises NullReference. This Object inheritance contract applies to Functions;
 structural identity alone does not imply the same behavior for other type families.
 
-## FunctionReflection.Invoke (provisional development API)
+<a id="functionreflectioninvoke-provisional-development-api"></a>
+
+## FunctionReflection.Invoke (provisional API)
 
 Integrated on neoCLR `main` with Raven `codex/neoclr` on 2026-10-16. Integration does
 not freeze this API or imply a published release.
@@ -192,7 +198,7 @@ work; this provisional API does not infer a return type from an Object reference
 The library uses `neoCLR.Runtime.InvokeFunctionCheck` followed by the checked
 `InvokeFunction` primitive. The check returns a status without calling the function;
 the invocation primitive retains its runtime checks. Interpreter/JIT/AOT validation
-and restrictions are recorded in the [fixture](../docs/validation/dynamic-function-invocation/README.md).
+and restrictions are recorded in the [fixture](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/dynamic-function-invocation/README.md).
 This does not turn a MethodInfo into a bound function or add multicast policy.
 
 

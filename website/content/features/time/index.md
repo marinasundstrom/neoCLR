@@ -71,14 +71,14 @@ second-level historical offsets. Precision is 100 ns; leap seconds are unsupport
 interop needs validation. .NET TimeZoneInfo already handles rule conversions; this API
 makes the zero/one/two mapping explicit, following the distinction also used by Noda Time.
 
-Development parsing now covers Date, TimeOfDay and LocalDateTime numeric culture
+Parsing covers Date, TimeOfDay and LocalDateTime numeric culture
 formats, Duration's invariant day/clock form, and TimeOffset's signed numeric form
 or Z. Instant.Parse accepts an invariant numeric timestamp with an explicit offset
 or Z, without consulting the host timezone. Parsers return typed Result errors and
 preserve 100 ns precision where relevant. ZonedDateTime.Parse takes the timestamp
 and an explicitly resolved zone, validating the stated offset and rejecting gaps or
-mismatches. Matching offsets select either DST-overlap candidate. Native development
-now supports pinned-zone lookup, offset queries and database version; native MapLocal
+mismatches. Matching offsets select either DST-overlap candidate. The native runtime
+supports pinned-zone lookup, offset queries and database version; native MapLocal
 and system-zone discovery remain gaps. Inline zone identifiers, serialization,
 richer resolvers, custom rule providers,
 broader zone ranges and scheduling remain future work. Resource localization remains separate from culture.

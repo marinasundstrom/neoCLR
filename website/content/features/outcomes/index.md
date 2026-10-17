@@ -81,23 +81,18 @@ preferable for many public APIs: they give errors a domain name and meaningful
 cases, and keep the contract independent of lower-level implementation choices.
 Use a converter when it performs that intentional domain mapping.
 
-Existing APIs are candidates too. Review wrappers that only combine unchanged
-errors: an ad-hoc union may make them simpler and their alternatives easier to
-discover. Changing an existing public signature still needs a compatibility review,
-and named cases may carry domain meaning worth preserving. The development
-HTTP JSON client helpers now use `HttpError | JsonError`: they compose transport
-and serialization errors directly. This replaces their HttpJsonError return type;
-rebuild consumers and update wrapper patterns. HttpError and JsonError keep their
-meaningful nominal cases. See [HTTP JSON APIs](../../docs/json.html).
+HTTP JSON client helpers return `HttpError | JsonError`, composing transport and
+serialization errors directly. Match the typed alternatives after extracting Error;
+HttpError and JsonError retain their nominal cases. See [HTTP JSON APIs](../../docs/json.html).
 
-Development neoCLR removes the nominal `System.Union` runtime carriers and emits union
-signatures and support interpreter execution, including value and reference
-alternatives. These are different representations and require matching compiler
-and library artifacts. Bounded native AOT checks now cover reference-only unions
-and tagged Int32/Int64/Boolean unions without carrier allocation. Mixed payloads
-and complete AOT/JIT qualification remain open.
+Native structural unions support value and reference alternatives. Supported
+native layouts retain references and store scalar payloads inline without a nominal
+carrier. Exact alternative identity matters: equal enum bits do not make different
+enum types interchangeable. Further structural work is parked; open-generic
+compositions and wider backend coverage remain incomplete. Consult the detailed
+contract for supported combinations.
 
-[Union API and bridge limits](../../docs/unions.html) ·
+[Union API and limits](../../docs/unions.html) ·
 [Tested configuration loader and validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/adhoc-error-unions)
 
 <a id="operator-list"></a>
@@ -162,24 +157,3 @@ Capture is bounded to 64 frames and 64 KiB with explicit truncation. Source line
 structured frame access and suspended async caller history remain incomplete.
 Faults remain terminal; capturing a stack does not introduce recovery.
 [StackTrace API and example](../../docs/stack-trace.html).
-
-On the structural feature branches, intrinsic `string` alternatives now have
-native metadata and collector checks alongside integer alternatives. String
-owners remain traced references inside a structural union value. This remains
-development work; see the [union API and limits](../../docs/unions.html).
-
-Development native unions also admit Single/Double payloads with exact alternative
-identity and inline numeric storage; focused interpreter/AOT checks cover calls,
-widening and incorrect extraction without carrier allocation.
-
-A fresh Raven float/double/int consumer also passes interpreter, AOT and managed
-JIT checks on macOS ARM64 with zero arena allocation. This remains feature-branch
-qualification, not a published platform-wide capability.
-
-Int32-backed nominal enum alternatives also have focused native union checks.
-Equal underlying bits do not erase distinct enum identities; other enum widths
-remain subject to the existing native backend limits.
-
-Structural runtime admission no longer requires the experimental Cargo features,
-including in reduced builds. Compiler/metadata switches and nominal Union/Tuple
-carriers are removed on the integrated development line; publication remains separate.

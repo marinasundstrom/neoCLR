@@ -95,7 +95,7 @@ heaps. The [GC benchmark report](/benchmarks/gc/#dense-object-graphs-2026-10-13)
 records general object-graph gains, small/sparse controls and memory costs. This
 changes lookup work, not managed lifetime semantics or collection frequency.
 
-Native allocation now combines full heap validation with free-space selection in
+Native allocation combines full heap validation with free-space selection in
 one walk. Audited concat/join and UTF-8 slicing helpers can retain their inputs while collecting and
 retrying an output allocation. Integer formatting can also retry its sole output
 allocation after formatting into native stack storage. Byte and scalar array
@@ -116,7 +116,7 @@ arguments and receivers at collecting allocation boundaries and initializes payl
 before publication. This does not change the public
 API or enable general collection pacing.
 
-Native scheduler acquisition now collects before returning idle or pending, retaining
+Native scheduler acquisition collects before returning idle or pending, retaining
 waiting operations and reclaiming abandoned owners. Development host builds can
 opt into bounded collection pacing; installed JIT/AOT hosts retain stress collection
 as the default while managed-workload qualification continues. Short local

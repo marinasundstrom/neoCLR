@@ -82,8 +82,8 @@ def main():
             gaps.append(str(relative))
             content = page.read_text()
             content = re.sub(r'<aside data-native-preview="true">.*?</aside>', '', content, flags=re.S)
-            notice = ('<aside data-native-preview="true"><p><strong>Migration gap:</strong> '
-                      'This page still uses the previous reference snapshot. Native documentation coverage is pending.</p></aside>')
+            notice = ('<aside data-native-preview="true"><p><strong>Reference limitation:</strong> '
+                      'This page uses a CLI documentation projection. Its native API coverage is not verified.</p></aside>')
             content = re.sub(r'(<main\b[^>]*>)', lambda match: match[1] + notice, content, count=1)
             page.write_text(content)
         # Preserve URLs shared during the earlier preview with redirects.

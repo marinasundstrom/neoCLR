@@ -66,20 +66,19 @@ example above deliberately demonstrates that the names can differ.
 
 Native metadata has a versioned module table, preserving empty modules and their
 assembly owner. Reader/writer APIs support module discovery and scoped declaration
-authoring. Existing namespace syntax remains accepted during migration. The Raven language
+authoring. Namespace syntax is also accepted. The Raven language
 server presents neoCLR scopes as modules in hover, completion descriptions and
 document/workspace symbols. For .NET
 output, Raven projects modules onto namespaces; explicit module identity and empty
 module declarations do not survive that projection.
 
-Older neoCLR metadata exposes an identified namespace projection. Development host
-and guest `ModuleInfo` now describe logical modules. Interpreter traversal through
+Host and guest `ModuleInfo` describe logical modules. Interpreter traversal through
 `RuntimeContext.Current.ExecutingAssembly.GetModules()` includes declared empty
 modules. Native compilation supports explicitly retained type-to-module ownership
 and `Module.Assembly` with assembly `Name`/`FullName`. Explicit module-catalog retention
 also enables native `AssemblyInfo.GetModules()`, preserving declared empty modules;
-a missing catalog faults instead of returning an incomplete list. Native RuntimeContext.ExecutingAssembly now preserves the calling assembly, including
-library helpers and callbacks; type enumeration remains open. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
+a missing catalog faults instead of returning an incomplete list. Native RuntimeContext.ExecutingAssembly preserves the calling assembly, including
+library helpers and callbacks. Type enumeration requires explicit native type-catalog retention. See the [API scope](/docs/introspection.html#logical-modules-development-2026-10-10).
 Module-private visibility, re-exports, guest module-function discovery and independently
 loadable modules remain outside this foundation. A module does not create its own heap,
 scheduler, native ABI or artifact file.

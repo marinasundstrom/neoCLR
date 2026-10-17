@@ -65,7 +65,9 @@ API and Raven emitter do not yet author this instruction; public AOT exports and
 sidecar generation remain [design work](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/native-import-export-contract.md).
 
 
-## Callable ABI metadata (development)
+<a id="callable-abi-metadata-development"></a>
+
+## Callable ABI metadata
 
 Both Rust `metadata::NativeImport` and `metadata::NativeAbi` additionally expose:
 

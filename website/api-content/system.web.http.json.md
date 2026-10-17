@@ -4,18 +4,17 @@ uid: N:System.Web.Http.Json
 ## JSON over HTTP
 
 JsonContent and HttpClientJsonExtensions connect HTTP content and client operations
-to System.Data.Json. Development client helpers return `HttpError | JsonError`,
+to System.Data.Json. Client helpers return `HttpError | JsonError`,
 exposing the original alternatives without an aggregation wrapper. GET rejects
 unsuccessful status as HttpError.UnsuccessfulStatus before JSON decoding.
-This changes the previous HttpJsonError return signatures; rebuild consumers and
-match the typed alternatives after extracting Error. Nominal error contracts
+Match the typed alternatives after extracting Error. Nominal error contracts
 remain useful where their cases add domain meaning.
 
 See [Web](/features/web/) and [JSON](/docs/json.html). These helpers retain the
 underlying HTTP and JSON bounds and supported mapping shapes; they do not add a
 separate transport or unrestricted object serializer.
 
-Development content reads are available directly through HttpContentJsonExtensions:
+Content reads are available directly through HttpContentJsonExtensions:
 `ReadFromJson<T>`, `ReadFromJson(TypeInfo)` and `ReadJsonNode`, each with a cancellation
 overload. They return tasks containing Result values, preserve JsonError and do not
 consume buffered content. Pre-cancellation skips conversion. Conversion remains

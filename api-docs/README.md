@@ -2324,3 +2324,22 @@ reentrancy and callback failures fault. All new public declarations have source 
 and native rendered type/member entries. Self denotes a native signature marker.
 The legacy aggregate reference is regenerated for the added drain helper and kept
 only for documentation compatibility; it is no longer a production compiler input.
+
+### Release website refresh (2026-10-17)
+
+The native snapshot is rebuilt from `target/release-website-native-libraries` with
+Raven `57dbabb17` and rendered into `target/release-website-native-api`. The source
+Array summary uses prose instead of unescaped generic syntax, avoiding malformed
+HTML in its native type and constructor pages. Namespace introductions match the
+current website content. No API signatures change. Legacy coverage notices now
+state the reference limitation without narrating migration history.
+
+Product and API-guide headings preserve their former anchors while dropping dated
+progress labels. Source-only validation links point to the repository rather than
+unpublished local website routes. Collection-helper and variance guides are included
+in navigation. Published release notes and benchmark history remain separate.
+
+Validation: all five native libraries rebuilt; four native snapshot tests and 22
+website tests pass. The integrated site checks 4,441 pages. Its 123 retained legacy
+API pages remain coverage gaps, with a current reference-limitation notice; this
+refresh does not qualify their native behavior or erase the coverage backlog.

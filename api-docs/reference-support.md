@@ -16,23 +16,19 @@ the [collections](/features/collections/), [outcomes](/features/outcomes/) and
 names and values, with TypeInfo and constrained generic overloads. Its class remains
 non-constructible; its presence does not imply every .NET Enum method is supported.
 
-## Metadata scaffolds
+<a id="metadata-scaffolds"></a>
 
-Public visibility in a compiler reference does not mean that every CLR support type
-is an executable neoCLR service. ValueType, Delegate, MulticastDelegate,
-attribute metadata and NotImplementedException support compilation or
-reference-body scaffolding. Delegate and MulticastDelegate are excluded transport
-scaffolds; the Function family page documents the runtime contract. Other scaffold
-pages identify their role. In particular,
-MulticastDelegate does not promise multicast callbacks, and the placeholder exception
-does not add exception construction or throwing to applications.
+## Native metadata and documentation inputs
 
-The non-generic Array, Option, Result and TaskOutcome metadata scaffolds are
-intentionally excluded from generated pages and navigation to avoid duplicate
-application types. Use `Array<T>`, `Option<T>`, `Result<T, E>` and
-`TaskOutcome<T>`. CLR case-carrier types nested in the non-generic containers are
-excluded as well. Exact exclusions and reasons
-are recorded in `exclusions.json`; the complete metadata inventory is retained.
+Production libraries are built from Raven source and imported through native
+metadata. The compiler and language server use these native definitions; host CLR
+support types do not become application APIs.
+
+The website renders the committed native API snapshot. A separate legacy CLI
+reference remains for documentation tooling and fixture compatibility. Delegate,
+MulticastDelegate, placeholder exceptions and CLI case carriers in that projection
+do not describe additional executable neoCLR capabilities. Exact exclusions and
+manual rendering exceptions remain recorded in the reference inventory.
 
 ## Manual entries for renderer limitations
 
@@ -50,17 +46,20 @@ types, except the explicitly excluded scaffolds above, have generated reference
 pages. The existing String and ThreadPool scaffold
 constructor exclusions remain explicit; they are not supported application constructors.
 
-## CLI union carrier details
+<a id="cli-union-carrier-details"></a>
 
-The CLI reference assembly used by this website represents unions through generated
-carriers. Its UnionValue contract exposes the boxed active case; default carriers are
-inactive. These are details of the documentation/CLI representation, not an additional
-interface requirement for native NeoCLR unions. Ordinary source should use named cases,
-patterns and propagation, including explicit None construction for absence.
+## Union representations
 
-## Source attribute base (development)
+Native structural unions use signature metadata. Declared Raven unions remain
+nominal. Ordinary source uses named cases, patterns and propagation, including
+explicit None construction for absence. Generated carriers in the isolated CLI
+reference are tooling details, not a native interface requirement.
 
-`System.Attribute` now has a source-built abstract declaration with a protected
+<a id="source-attribute-base-development"></a>
+
+## Source attribute base
+
+`System.Attribute` has a source-built abstract declaration with a protected
 constructor, following the basic .NET nominal attribute inheritance shape.
 `System.Runtime.CompilerServices.UnionAttribute` derives from it; source-owned union
 markers retain that base relationship in native metadata. The reference assembly

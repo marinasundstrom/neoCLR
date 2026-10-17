@@ -55,18 +55,18 @@ An invoked method returning no value succeeds with a null object result; field w
 return unit. Faults raised by application code remain terminal, and mutations are not
 rolled back.
 
-The current scope is public IL methods and instance fields/properties on nongeneric
+Method and instance-member execution supports public IL methods and fields/properties on nongeneric
 reference classes, with references and built-in scalar values. Constructor selection
 requires exact scalar types or assignable references; it does not rank multiple matches.
-There is no binder coercion, optional-argument completion, byref/out support or arbitrary value-type execution. Generic classes and independent execution
-contexts remain future work.
+There is no binder coercion, optional-argument completion, byref/out support or arbitrary value-type execution. Generic method/instance-member execution and independent execution contexts remain
+future work. Static fields have the separate owner restrictions described below.
 
 [Read the API guide](../../docs/reflection.html) ·
 [Type extensions](xref:System.Runtime.Reflection.TypeReflectionExtensions) ·
 [Method extensions](xref:System.Runtime.Reflection.MethodReflectionExtensions) ·
 [Field extensions](xref:System.Runtime.Reflection.FieldReflectionExtensions)
 
-Development attribute inspection belongs to [Introspection](../introspection/#development-case-inspecting-route-declarations-at-startup):
+Attribute inspection belongs to [Introspection](../introspection/#development-case-inspecting-route-declarations-at-startup):
 MemberInfo and ParameterInfo expose constructor data without executing attribute
 constructors. Read it once during startup and cache the validated mapping.
 
@@ -95,9 +95,9 @@ combines this execution support with startup schema validation and cached route 
 See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflectionExtensions)
 for signatures and limitations.
 
-Development branch update (2026-10-15): structural unions report `IsValueType` even when all alternatives are references; this classification adds no nominal base type.
+<a id="development-fields-and-type-initialization"></a>
 
-## Development: fields and type initialization
+## Fields and type initialization
 
 Field descriptions include instance/static storage and Int32 constants, with
 `IsInitOnly`, `IsLiteral` and `ConstantValue`. `TypeInfo.TypeInitializer` and
@@ -106,4 +106,4 @@ reflection uses normal initialization guards; readonly writes return AccessDenie
 JIT/AOT use explicitly retained metadata and operations (reflection-roots schema 7).
 See the [API contract](/docs/reflection.html#fields-and-type-initializers-development)
 for exact value/owner restrictions and the distinction between Result errors and
-terminal initializer faults. These additions are development capabilities.
+terminal initializer faults.

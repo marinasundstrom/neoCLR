@@ -1,4 +1,6 @@
-# Mutable collection helpers (development)
+# Mutable collection helpers
+
+<a id="mutable-collection-helpers-development"></a>
 
 Import `System.Collections.*` for extensions on `MutableMap<K,V>` and
 `MutableSet<T>`. HashMap and HashSet implement those contracts. Existing indexers,
@@ -10,8 +12,8 @@ let value = entry.AndModify(value => value + 1).OrInsert(2)
 let stored = set.GetOrInsert(candidate)
 ```
 
-The complete [validated consumer](../docs/validation/map-entry/raven/Main.rvn)
-exercises these operations. See the [design contract](../docs/collection-entry-design.md)
+The complete [validated consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/map-entry/raven/Main.rvn)
+exercises these operations. See the [design contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/collection-entry-design.md)
 for comparison with .NET and Rust.
 
 | Member | Contract |

@@ -84,19 +84,17 @@ metadata/IL and links runtime support into a standalone executable. Checked case
 include routing and bounded HTTP serving; general interpreter/native parity is open.
 A native executable still needs implementations of memory management, scheduling, text, I/O and faults.
 
-**Development:** JIT bundles default to native JIT execution on macOS ARM64 and
+JIT bundles default to native JIT execution on macOS ARM64 and
 Windows x64. Interpreter execution remains available explicitly and is the default
 on other hosts. JIT currently compiles eagerly through a separate backend process.
 Broader native parity, native hot reload and trimming remain future work.
 [Setup](../try/) describes the available toolchain, and
 [native compilation](../features/native-compilation/) lists its execution limits.
 
-**Development:** rebuilt SDKs select runtime-await for neoCLR applications, with
-native carriers for macOS ARM64 and Windows x64. Matching runtime and JIT helpers
-are required; this does not update already installed SDKs. Compiler state machines
-remain an explicit fallback, and existing library bootstrap lowering is retained.
-See the [integration qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
-This is independent of GC pacing.
+Runtime-await retains locals and cleanup across suspension on macOS ARM64 and
+Windows x64. Compiler state machines remain an explicit fallback. Matching compiler,
+library and runtime contracts are required; see [Tasks and async](../features/tasks/).
+
 Memory-management boundaries also leave room for future specialized distributions;
 swappable collectors or general non-GC managed execution are not current features.
 

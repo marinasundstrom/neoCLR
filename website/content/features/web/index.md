@@ -85,7 +85,9 @@ The full case includes the nested station model.
 The walkthrough includes the shared models, routing, client connection setup,
 complete projects, run instructions and expected responses.
 
-## Streaming bodies — development
+<a id="streaming-bodies--development"></a>
+
+## Streaming bodies
 
 `Send(request, HttpCompletionOption.ResponseHeadersRead)` returns after final
 response headers. `HttpServer.AcceptHeaders()` does the same for incoming requests.
@@ -132,8 +134,9 @@ cannot be forcibly interrupted. Transport phases have their own bounds.
 ## HTTPS and current limits
 
 Development HTTPS uses explicit certificate credentials and trust through managed
-`SslStream`. Preview 14 passes shared HTTPS/JSON and failure checks
-on macOS ARM64 and Windows x64 in interpreter, JIT and AOT modes. See the
+`SslStream`. Supported HTTPS/JSON workloads include certificate rejection,
+deadlines and cancellation on macOS ARM64 and Windows x64. Backend coverage
+depends on the matching build kit. See the
 [TLS guide](/docs/ssl-streams.html) for setup and
 [release availability](/try/#development) for matching tools.
 SQL transport has separate limitations; HTTP TLS support does not imply SQL TLS.

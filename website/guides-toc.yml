@@ -60,7 +60,7 @@
       href: features/reflection/index.md
     - name: "Garbage collection"
       href: features/gc/index.md
-- name: Development walkthroughs
+- name: Walkthroughs
   items:
     - name: "Storage providers"
       href: docs/storage-experiment.md
@@ -76,6 +76,10 @@
   items:
     - name: "Public reference coverage"
       href: docs/reference-support.md
+    - name: "Mutable collection helpers"
+      href: docs/collection-entries.md
+    - name: "Interface variance"
+      href: docs/interface-variance.md
     - name: "JSON serialization"
       href: docs/json.md
     - name: "Streams"
@@ -88,7 +92,7 @@
       href: docs/async-builders.md
     - name: "Task callback methods"
       href: docs/callbacks.md
-    - name: "Cloning with Self (development)"
+    - name: "Cloning with Self"
       href: docs/cloning.md
     - name: "Console and standard streams"
       href: docs/console.md
@@ -118,15 +122,15 @@
       href: docs/storage-poc.md
     - name: "Storage providers"
       href: docs/storage-provider.md
-    - name: "Casing and decimal reporting (development)"
+    - name: "Casing and decimal reporting"
       href: docs/text-numbers.md
     - name: "Local time mapping payloads"
       href: docs/time-zone-mappings.md
-    - name: "Native interop contracts (development)"
+    - name: "Native interop contracts"
       href: docs/native-interop.md
-    - name: "Cryptography (development)"
+    - name: "Cryptography"
       href: docs/cryptography.md
-    - name: "SQL data access (development)"
+    - name: "SQL data access"
       href: docs/sql.md
     - name: "Benchmarking"
       href: docs/benchmarking.md
@@ -136,11 +140,11 @@
       href: docs/stack-trace.md
     - name: "Sequence access"
       href: docs/sequence-access.md
-    - name: HTTP body streams (development)
+    - name: HTTP body streams
       href: docs/http-body-streams.md
     - name: HTTP server lifetime and concurrency
       href: docs/http-server.md
-    - name: TLS streams (development)
+    - name: TLS streams
       href: docs/ssl-streams.md
 - name: Platform foundations
   items:

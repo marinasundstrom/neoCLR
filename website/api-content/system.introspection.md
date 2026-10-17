@@ -11,11 +11,11 @@ See [introspection](/docs/introspection.html) for descriptor identity and metada
 availability. These descriptors do not dynamically load assemblies; invocation and
 member-access operations are provided separately by System.Runtime.Reflection.
 
-Development generic type parameters expose `GenericParameterTypeInfo.Variance`:
+Generic type parameters expose `GenericParameterTypeInfo.Variance`:
 `Invariant`, `Covariant` (`out`) or `Contravariant` (`in`). Obtain parameters from
 an open definition's generic arguments. Closed constructions expose actual argument
 types. Method `ParameterInfo.IsOut` continues to describe an output argument.
-Development native discovery supports retained assembly/module type catalogs,
+Native discovery supports retained assembly/module type catalogs,
 including open definitions and their variance annotations. AOT/JIT require explicit
 `typeCatalogs` retention; open member/relationship queries remain unsupported.
 See the [reflection reference](/docs/reflection.html).

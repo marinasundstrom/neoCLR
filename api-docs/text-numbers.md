@@ -1,4 +1,6 @@
-# Casing and decimal reporting (development)
+# Casing and decimal reporting
+
+<a id="casing-and-decimal-reporting-development"></a>
 
 The native **text model is Unicode text**; **UTF-8 is the native storage representation**.
 String exposes grapheme and scalar views. Char represents one grapheme cluster, potentially
@@ -42,7 +44,9 @@ The executable report consumer is maintained in
 `docs/experiments/casing-integer/Main.rvn` in the repository.
 
 
-## Number and concrete Parse (development)
+<a id="number-and-concrete-parse-development"></a>
+
+## Number and concrete Parse
 
 [Number](xref:System.Number) supplies static `Zero`, `One`, the binary
 `+`, `-`, `*`, `/` operators, and inherited `CompareTo`. Implementers are SByte,
@@ -97,7 +101,9 @@ Number emission on that newer path; the older bridge's closed specialization evi
 above remains distinct.
 
 
-## Ordinal replacement (development)
+<a id="ordinal-replacement-development"></a>
+
+## Ordinal replacement
 
 [String.Replace(oldValue, newValue)](xref:System.String) returns immutable text after
 replacing exact, non-overlapping matches. Empty replacement deletes; unchanged text
@@ -108,7 +114,9 @@ deletion. The shared service has interpreter and experimental ARM64 coverage; fu
 native core bootstrap remains work in progress.
 
 
-## Minimal arithmetic capabilities (development)
+<a id="minimal-arithmetic-capabilities-development"></a>
+
+## Minimal arithmetic capabilities
 
 System.Numerics provides four public nominal interfaces in System.Runtime:
 AdditionOperators (`+`), SubtractionOperators (`-`), MultiplyOperators (`*`) and
@@ -118,7 +126,7 @@ and the result have that type. Implementations must explicitly declare conforman
 and supply the exact operator. Supporting an operator alone does not establish
 interface membership. These contracts do not provide ordering, parsing or conversions.
 
-Number inherits all four and retains ComparableTo<Self>, Zero, One and its existing
+Number inherits all four and retains `ComparableTo<Self>`, Zero, One and its existing
 operator declarations. The eight fixed-width integer types, Single and Double gain
 these capabilities through Number; their arithmetic behavior is unchanged. Integer
 addition/subtraction/multiplication wrap and invalid integer division faults. Floating
@@ -131,7 +139,7 @@ For example, the validated native consumer uses:
 static func Add<T>(left: T, right: T) -> T where T: AdditionOperators => left + right
 ```
 
-The [consumer](../docs/validation/numerics-interfaces/LibraryConsumer.rvn) also forwards
+The [consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/numerics-interfaces/LibraryConsumer.rvn) also forwards
 Number-constrained parameters to Add and implements the capabilities on a Complex
 demo without imposing ordering. Native interpreter/JIT/AOT support closed nongeneric
 interface bounds and static Self dispatch, including imported top-level functions and static class methods.

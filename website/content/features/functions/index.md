@@ -73,54 +73,42 @@ Typed invocation and property access use the Function object's bound target.
 Null member access raises NullReference.
 
 
-### Function-kind constraints (development)
+<a id="function-kind-constraints-development"></a>
 
-On Raven `codex/neoclr` with neoCLR `main`, Raven supports `where T: func` for native
-generic classes and functions/methods. It restricts a generic argument to a structural function signature;
-nominal delegates and objects with `Invoke` do not qualify. The constraint does not
-supply an invocation signature to the generic body. A tested function slot stores
-and returns a function that the consumer invokes after its signature is concrete.
+### Function-kind constraints
 
-Raven distinguishes native function signatures from nominal delegate symbols,
-including generic substitution and imported callback signatures. Normal Raven/.NET
-mapping is unchanged, and the .NET target rejects `func` constraints. A separately
-compiled provider and consumer forward a callback through a constrained generic
-function and return 42 in interpreter/AOT/JIT. Signature bounds such as
-`where T: () -> T2` remain a gap.
-Function-list/observer APIs remain deferred; provisional dynamic invocation is described below. This is integrated development work, not a published release capability.
+Raven supports `where T: func` for native generic classes and functions/methods.
+Only structural function signatures satisfy the constraint; nominal delegates and
+objects with an Invoke member do not. A function-kind constraint allows storage and
+forwarding but does not supply a callable signature to the generic body.
+Signature bounds such as `where T: () -> T2` remain unsupported.
 
-### Provisional dynamic invocation (development)
+Native signature substitution and imported callbacks retain their function types.
+The .NET target keeps its standard delegate representation and rejects `func`
+constraints. Function-list, event and multicast policies remain undecided.
 
-A native primitive now accepts a function reference and an Object argument array,
-validates/converts the arguments and invokes its existing bound target. The public Raven
-FunctionReflection consumer demonstrates interpreter/JIT/AOT execution. Scalar results are
-boxed, reference identity is retained, and no-result calls return null. Count/type
-mismatches reject before invocation; target faults propagate. Exact boxed scalar
-and supported reference signatures are the initial profile; ref/out, coercion and
-arbitrary value marshalling remain gaps. The provisional class-library `System.Runtime.Reflection.FunctionReflection.Invoke`
-now returns `Result<Object?, ReflectionError>` for input validation. Target faults
-still propagate; generic overloads remain future work. Function-list/event policy remains separate.
+<a id="provisional-dynamic-invocation-development"></a>
 
-The same source sample checks Object.GetType against the exact structural function
-type and dynamically passes a function through another function as an argument and
-result. Native `typeof` tokens preserve function signatures. This qualifies runtime
-type identity; it does not imply every reflective member query is supported by AOT.
+### Provisional dynamic invocation
 
+`System.Runtime.Reflection.FunctionReflection.Invoke` accepts a function reference
+and an Object argument array. It returns `Result<Object?, ReflectionError>` after
+checking the receiver, argument count and supported argument types. Invalid input
+is rejected before execution. Target faults remain terminal.
 
-On the neoCLR compiler line, Raven type patterns support function signatures:
-`if obj is () -> T { }` tests a signature using an in-scope generic parameter, while
-`() -> T callback => callback()` captures and invokes it in a match arm. The native
-sample validates these forms in interpreter/JIT/AOT. The shared Raven parser also
-supports the .NET target, using its standard delegate representation.
+Scalar results are boxed, reference results retain identity, and no-result calls
+return null. Exact boxed scalar and supported reference signatures work in the
+interpreter, JIT and AOT. Ref/out, coercion, arbitrary value marshalling and generic
+helper overloads remain unsupported. The API is provisional.
 
+### Function type patterns
 
-The retained native sample also checks that `TypeInfo.IsInstanceOfType` agrees with
-function-type `is` patterns, including closed generic signatures, null, nominal
-objects and mismatched signatures. Reflection uses the existing exact native
-function signature relationship.
+`if obj is () -> T { }` tests a signature using an in-scope generic parameter.
+A match arm `() -> T callback => callback()` captures and invokes the function.
+Native `typeof` and `TypeInfo.IsInstanceOfType` use the same exact signature
+relationship, including closed generic arguments. Null and mismatched signatures
+do not match. The shared Raven syntax also works on .NET using standard delegates.
 
-
-The public function invocation consumer imports the fresh class-library API and
-checks wrong argument counts/types, null and non-function receivers, plus successful
-null reference results. Validation errors are ordinary Result values; no event or
-multicast policy is implied.
+Functions can be arguments and results of other functions. Reflective invocation
+preserves their signature identity; native metadata retention still determines
+which reflective member queries are available.

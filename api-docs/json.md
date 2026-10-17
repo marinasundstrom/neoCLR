@@ -64,7 +64,9 @@ constructor. The serializer invokes real constructors/getters/setters through
 JsonValue inputs to the Object overload still use the DOM codec, including when
 held as Object. Prefer SerializeNode when explicitly working with nodes.
 
-## Dynamic JSON content inside typed models (development)
+<a id="dynamic-json-content-inside-typed-models-development"></a>
+
+## Dynamic JSON content inside typed models
 
 Declare a property or array element as `JsonValue` to retain any JSON kind inside
 an otherwise typed model. `JsonObject`, `JsonArray`, `JsonString`, `JsonNumber`,
@@ -109,7 +111,9 @@ unsupported shapes through diagnostic text; ordinary syntax, missing-field,
 type-mismatch, number and stream causes retain their existing JsonError cases.
 Terminal Faults from user accessors/constructors are not wrapped.
 
-## Typed arrays — development
+<a id="typed-arrays--development"></a>
+
+## Typed arrays
 
 Use `Deserialize<int[]>("[21,22]")` or `Deserialize<ReportPayload[]>(text)` for
 root arrays. Array-valued model properties use the same mapper; strings, Int32,
@@ -126,7 +130,9 @@ this slice; supported collection elements use the rules below. Shared model elem
 serialize repeatedly and deserialize independently. The complete input tree,
 including later elements, is validated before any model constructor/setter runs.
 
-## Lists, sequences and string-keyed maps — development
+<a id="lists-sequences-and-string-keyed-maps--development"></a>
+
+## Lists, sequences and string-keyed maps
 
 | Declared type | JSON shape | Deserialized implementation |
 | --- | --- | --- |
@@ -225,7 +231,9 @@ acknowledgement from the response. The application explicitly adapts the two cli
 AppError union; single-cause operations retain application-owned converters. The response's Request
 property identifies the effective POST, including client default headers.
 
-## DOM collection views (development)
+<a id="dom-collection-views-development"></a>
+
+## DOM collection views
 
 JsonObject implements `Map<string, JsonValue>`; JsonArray implements
 `Sequence<JsonValue>`. Object indexing uses exact field names and array indexing

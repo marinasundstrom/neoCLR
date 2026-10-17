@@ -18736,3 +18736,20 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
 - Installed SDK replacement and release publication are separate actions; neither
   is claimed here. Legacy fixture/documentation bridge tooling remains isolated
   from the production native build.
+
+### 2026-10-17 — Release website preparation
+
+- Author asked to prepare a new release, update the website to reflect completed
+  work, and remove historical change information from its content.
+- Assistant revised product and API-guide prose around current contracts, preserving
+  published release notes, changelog and benchmark methodology/history separately.
+  Native metadata loading, runtime-await, operators, ranges, variance, static fields
+  and reflection are described without dated progress narratives. Further structural
+  work stays parked and its unsupported forms remain visible.
+- The published download links remain tied to the existing release; no new version
+  or publication is inferred. The locally installed native-core SDK is separately
+  recorded in [preview evidence](validation/native-core-removal/installed-preview.json).
+- Validation: all five native libraries rebuilt; 22 website tests and four native
+  snapshot tests pass. The complete site validates 4,441 pages, including HTML and
+  local links. Existing 123 legacy API coverage gaps remain explicitly identified;
+  this content refresh does not claim those missing native references are complete.

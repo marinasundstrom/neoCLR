@@ -102,7 +102,9 @@ memory-stream, encoding-streams, encoding-boundaries and json-streams suites und
 `runtime/raven/tests`. Native library support does not imply that the historical
 synchronous CLI execution bridge supports these new signatures.
 
-## Gzip composition (development)
+<a id="gzip-composition-development"></a>
+
+## Gzip composition
 
 [GZipStream](compression.md) wraps these capabilities. Compression writes incrementally
 and requires awaited Finish before Close. The initial decoder reads to EOF with

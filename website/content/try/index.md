@@ -70,12 +70,13 @@ On Windows, use `python` in place of `python3`. It compiles and runs the bundled
 collections, Tasks, JSON and HTTP examples.
 
 [Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.15)
-include the exact supported toolchain and limitations. Older installation instructions
-belong to their [matching release](https://github.com/marinasundstrom/neoCLR/releases).
+include the exact supported toolchain and limitations.
 
 <a id="development"></a>
 
-## Preview 15 capabilities
+<a id="preview-15-capabilities"></a>
+
+## Published bundle capabilities
 
 HTTP client/server, typed JSON and HTTPS checks pass in interpreter, JIT and AOT
 modes on macOS ARM64 and Windows x64. Runtime-owned suspension and resumption

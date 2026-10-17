@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Refresh release-facing website and API guides around current native metadata, async, operators, range endpoints, variance and reflection contracts. Remove dated progress headings and obsolete migration narratives while preserving incoming anchors, experimental limitations, published release/download history and benchmark evidence. Add missing collection-helper and variance guide navigation, repair source-evidence links and generic-name Markdown, and refresh the native API snapshot from five rebuilt libraries. Correct the Array source summary that rendered as malformed HTML; API signatures are unchanged.
+
 - Install an isolated native-core VS Code preview with Raven 57dbabb17 project fixes: deduplicated execution-core inputs and native Console ownership. The installed parsing/await consumer prints 42 and exits zero; native editor completion excludes host Action/Func types. Record exact artifacts; global defaults and published packages remain unchanged.
 
 - Complete production native compiler bootstrap construction with Raven 51dd22f5a: System.Runtime owns core bases, compiler markers, checked array reservation and async entry draining; dependent libraries use native metadata and explicit runtime contracts. Remove CoreProbe/CLI core and retained-seed translation from the production build and update packaging/sample tooling. Five-library compilation, parsing/async consumers, native project and language-server completion, interpreter/JIT/sanitized AOT, and refreshed native API snapshots pass. The installed SDK is unchanged; legacy fixture/documentation bridges remain isolated and broader structural work stays parked.

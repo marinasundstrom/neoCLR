@@ -59,7 +59,7 @@ A byte array is a useful I/O buffer, but being managed does not make it safe for
 
 The API includes Length, Count, indexed access, iteration, Empty and ForEach, with the runtime’s supported element types. The generic shape is not a promise that every possible element signature or .NET Array helper is admitted. Direct array loops use indexed access; Iterable consumers use the declared interface contract.
 
-Development slicing API: `Array<T>` explicitly implements `Sliceable<T[]>`.
+Slicing contract: `Array<T>` explicitly implements `Sliceable<T[]>`.
 `Slice(range)` returns `Result<T[], InvalidRangeError>`; the range indexer returns a
 shallow copy and faults on invalid bounds. Both use the same Range validator.
 Valid empty ranges succeed, from-end boundaries resolve against Length, and bounds
@@ -68,7 +68,8 @@ Array size and allocation remain constrained by runtime budgets; the Result hand
 invalid slice bounds, not every possible runtime fault.
 See the [slicing API contract](../../docs/arrays.html).
 
-Span/Memory APIs, general interface variance and immutable or frozen array families are not introduced by this implementation.
+Span/Memory APIs and immutable or frozen array families remain future work.
+Read-only interface views support [reference variance](../collections/#interface-variance); mutable array storage remains invariant.
 
 <a id="direction"></a>
 
@@ -89,7 +90,9 @@ Include the required access and lifetime when reporting an array issue. This dis
 Questions, sample programs and documentation corrections are welcome. See [how to contribute](../../#feedback) for ways to participate.
 
 
-## Development: Index and Range
+<a id="development-index-and-range"></a>
+
+## Index and Range
 
 The matching development compiler and native libraries support `values[^1]`,
 from-end assignment and half-open slices such as `values[1..^1]` and `values[..]`.
@@ -101,27 +104,16 @@ callers must establish valid input. `values.Get(index)` returns an `Option<T>` f
 an integer or Index. `values.Slice(range)` returns `Result<T[], InvalidRangeError>`.
 Index and Range describe positions and boundaries; applying them determines validity.
 
-The development Raven compiler now uses `..` for an exclusive end and `..=` for an
-inclusive end. Existing half-open slices retain `..`; the former `..<` spelling is
-removed. Native inclusive Range values now use checked Index conversion, rejecting
-unrepresentable ends before arithmetic while retaining the half-open Range library
-contract. The native compiler work is qualified on macOS ARM64.
+Raven uses `..` for an exclusive end and `..=` for an inclusive end in slices,
+range patterns and integer iteration. Inclusive Range construction checks endpoint
+conversion before arithmetic; the library Range contract remains half-open.
+String slices use grapheme boundaries. [Sequences and lists](../collections/) also
+support indexing and slicing. Borrowed views remain future work.
 
-The array contract is tested in interpreter and macOS native AOT; the Windows JIT
-framework checks also cover array and string Index/Range operations. String range support is available in the matching development libraries, using
-grapheme boundaries. [Sequences and lists](../collections/) also support indexing
-and slicing. Borrowed views remain future work.
+Signed int/long range patterns follow the same endpoints. A long subject currently
+requires long literal bounds, such as `1L..=3L`. Signed int/long loops and
+comprehensions stop before advancing would overflow, including an inclusive maximum
+endpoint. Other numeric stepping domains are not covered by this guarantee.
+Explicit Interval progressions remain design work.
 
 [Array API reference →](../../docs/api/System/Array%601/index.html)
-
-
-Development compiler note: signed int/long range patterns in conditions and match
-arms now use the same exclusive `..` and inclusive `..=` endpoints on the native
-target. Checked inclusive Range construction is also supported. Bounds for a long subject currently require long literals, such as
-`1L..=3L`.
-
-
-Development signed int/long range loops and comprehensions now stop before
-advancement would overflow, including an inclusive maximum endpoint. Other numeric
-stepping domains retain their existing behavior. Nominal safe-slicing capabilities
-and explicit Interval progressions remain design work, not published APIs.

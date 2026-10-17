@@ -93,34 +93,34 @@ The tour covers type identity, modules, metadata tokens and member classificatio
 
 <a id="development-case-inspecting-route-declarations-at-startup"></a>
 
-### Development: union classification
+<a id="development-union-classification"></a>
 
-On the structural-type experimental branch, `TypeInfo.IsUnion` is reserved for
-structural unions. Use `NominalTypeInfo.IsUnionDeclaration` to detect nominal Raven
-union declarations. Experimental UnionTypeInfo and IntersectionTypeInfo expose direct constituent
-snapshots in the interpreter. The composition is structural; its interface
-constituents remain nominal and require explicit implementation. This does not
-introduce implicit member-shape conformance or Rust-style traits. The companion experimental Raven contract now emits
-source union/intersection type tokens and signatures, including closed generic
-arguments. Experimental native generic constraints now retain union/intersection
-bounds. The paired Raven branch emits and imports closed structural method bounds,
-including generic-body trait calls. Host tools expose their complete signatures;
-guest constraint reflection remains pending. Member/hierarchy queries and JIT/AOT
-remain under development. This is not part of the published
-release; see the [descriptor contract](/docs/introspection.html#structural-composition-descriptors-experimental-2026-10-14).
+### Union classification
 
-Development generic type parameters expose `GenericParameterTypeInfo.Variance`:
+`TypeInfo.IsUnion` describes structural unions. Use
+`NominalTypeInfo.IsUnionDeclaration` for nominal Raven union declarations.
+UnionTypeInfo and IntersectionTypeInfo expose direct constituent snapshots.
+Interface constituents remain nominal and require explicit implementation.
+Member/hierarchy queries, open-generic compositions and backend coverage remain
+limited; further structural work is parked. See the
+[descriptor contract](/docs/introspection.html#structural-composition-descriptors-experimental-2026-10-14).
+
+## Generic parameter information
+
+Generic type parameters expose `GenericParameterTypeInfo.Variance`:
 `Invariant`, `Covariant` (`out`) or `Contravariant` (`in`). Obtain parameters from
 an open definition's generic arguments. Closed constructions expose actual argument
 types. Method `ParameterInfo.IsOut` continues to describe an output argument.
-Development native discovery supports retained assembly/module type catalogs,
+Native discovery supports retained assembly/module type catalogs,
 including open definitions and their variance annotations. AOT/JIT require explicit
 `typeCatalogs` retention; open member/relationship queries remain unsupported.
 See the [reflection reference](/docs/reflection.html).
 
-## Development: field and initializer facts
+<a id="development-field-and-initializer-facts"></a>
 
-FieldInfo now distinguishes readonly storage and Int32 literals through `IsInitOnly`,
+## Field and initializer facts
+
+FieldInfo distinguishes readonly storage and Int32 literals through `IsInitOnly`,
 `IsLiteral` and `ConstantValue`. TypeInfo exposes `IsBeforeFieldInit` and an optional
 `TypeInitializer` constructor descriptor. Inspection never runs the initializer.
 See the [introspection reference](/docs/introspection.html) and

@@ -11,7 +11,7 @@ See [JSON](/docs/json.html) for supported shapes and limits, and
 [error payloads](/docs/json-error-payloads.html) for inspecting failures.
 System.Web.Http.Json adds HTTP integration on top of these contracts.
 
-Development `JsonObject` implements `Map<string, JsonValue>`. Use `value["name"]`
+`JsonObject` implements `Map<string, JsonValue>`. Use `value["name"]`
 for an existing field; a missing field causes a terminal Fault. Prefer `Find`
 (`Some`/`None`) or `Field` (typed JSON error) when absence is expected. A present
 `JsonNull` remains a node, distinct from absence. Keys and pair iteration are shallow,
@@ -19,7 +19,7 @@ insertion-ordered snapshots retaining original node references. Mutation still u
 `Add`, which rejects duplicates and reports the container quota through Result;
 `JsonObject` does not implement `MutableMap` yet.
 
-Development `JsonArray` implements `Sequence<JsonValue>`. Use `array[index]` for
+`JsonArray` implements `Sequence<JsonValue>`. Use `array[index]` for
 known valid indices, or `Item(index)` for a recoverable `InvalidIndex` result.
 Negative and past-end indexer accesses cause a terminal Fault. `for` iteration
 captures a shallow ordered snapshot: later additions are excluded, while child

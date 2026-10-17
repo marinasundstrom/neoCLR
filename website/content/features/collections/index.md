@@ -27,7 +27,9 @@ iterables for initialization or copying where the contract provides that overloa
 The complete sample reads arrays and lists, replaces elements through MutableSequence
 and grows a List. [Download it](/samples/library-collection-capabilities.rvn).
 
-## Fluent mutable access (development)
+<a id="fluent-mutable-access-development"></a>
+
+## Fluent mutable access
 
 `map.Entry(key).AndModify(value => value + 1).OrInsert(2)` modifies an existing
 value or inserts the fallback. `OrInsertWith` evaluates its factory only when absent.
@@ -38,7 +40,9 @@ MutableMap and MutableSet; they add no synchronization or atomicity.
 
 See [member contracts and callback rules](/docs/collection-entries.html).
 
-## Recoverable slicing (development)
+<a id="recoverable-slicing-development"></a>
+
+## Recoverable slicing
 
 Array and ArrayList explicitly implement `Sliceable<T[]>`: `Slice(range)` returns
 `Result<T[], InvalidRangeError>`, while their range indexers fault for invalid
@@ -110,40 +114,24 @@ and hashing. Avoid changing a key in ways that affect equality while it is store
 
 ## Structural data composition
 
-Use structural types when data needs a shape but not a new nominal declaration.
 Tuples combine values, unions represent alternatives, and intersections describe
-simultaneous nominal contracts. They remain real types with native metadata and
-introspection; interface implementation stays explicit.
+simultaneous nominal contracts. These are runtime types with native signatures and
+introspection, not implicit interface conformance. Tuple element names are retained,
+while compatibility remains positional. Arrays have a structural runtime shape and
+a nominal `Array<T>` representation of the same storage.
 
-The structural feature branches support native Raven tuples with ordered elements,
-value copies and local mutation. Element names are stored in the signature and
-preserved by reflection, while identity and compatibility remain positional.
-Native binding requires no nominal tuple carrier. Development runtime libraries
-now remove `System.Tuple` and `System.Union`; rebuild consumers with the matching
-compiler. `Range` returns a named structural offset/length pair.
-
-Structural unions support both value and reference alternatives, including scoped
-nominal constituents such as `Response<T> | HttpError | JsonError`. Tested task
-consumers deliver all alternatives with `Response` and `Response<int>`; a generic
-method with `Response<T>` also executes. Copying a reference payload preserves its
-object identity. Arrays retain their structural runtime shape and nominal
-`Array<T>` representation.
-
-This work requires matching feature-branch artifacts. Interpreter execution is
-validated, and bounded tuple storage also runs through macOS ARM64 AOT using inline
-slots without a heap carrier. Bounded intersection views also have AOT checks and
-retain one object reference. Native reference-alternative unions likewise copy a
-payload reference without a carrier while remaining structural value types. Native
-value alternatives and broader AOT/JIT support are still being developed;
-the temporary boxed union storage is not the intended final performance model.
-Bare generic-parameter union alternatives and unrestricted combinations remain
-incomplete.
+The integrated implementation covers bounded native forms; further structural work
+is parked. Open-generic combinations and broader backend coverage remain incomplete.
+Use the individual contracts to check supported storage, calls and reflection before
+relying on a composition. Function types have their own [supported API](../functions/).
 
 [Structural families](../../docs/structural-types.html) ·
 [Tuple contract](../../docs/tuples.html) · [Union contract](../../docs/unions.html) ·
 [Intersection contract](../../docs/intersections.html)
 
-## Interface variance (development)
+<a id="interface-variance-development"></a>
+
+## Interface variance
 
 `Iterable<out T>`, `Iterator<out T>`, `Collection<out T>` and `Sequence<out T>`
 permit compatible reference views. AsyncIterable and AsyncIterator also declare
@@ -156,45 +144,31 @@ nominal conformance explicit; variance does not box elements or widen Result val
 Sliceable, mutable collections and array storage remain invariant. Generic metadata
 must remain available independently of native executable specialization.
 
-Development validation also covers local classes inheriting an imported base:
-producer, consumer and nested variance calls preserve object identity and inherited
-storage in interpreter, AOT and managed JIT. Reverse and unrelated-class conversions
-remain rejected. See the [variance reference](/docs/interface-variance.html).
+Variance follows explicit nominal interfaces, including those inherited through
+imported class bases. Compatible producer and consumer views preserve reference
+identity for classes, interfaces, arrays and strings. For example, an array can
+widen to its declared Iterable contract without changing its invariant element
+storage. Strings can expose Object or `Iterable<char>` views without copying UTF-8
+bytes. Reverse and unrelated conversions are rejected.
 
-Interface-valued arguments can also widen to Object in the declared variance
-direction; native producer and consumer paths preserve reference identity.
+See the [variance reference](/docs/interface-variance.html) for conversion rules,
+costs and backend limits.
 
-Array references are also supported as variant arguments: Producer<int[]> can
-widen to Producer<Object>, and Consumer<Object> can narrow to Consumer<int[]>.
-The calls retain the same array; element storage remains invariant. Both directions
-are qualified in Raven interpreter, AOT and managed JIT.
-
-Array arguments may also widen to their declared Iterable<int> contract: producer
-and consumer conversions between int[] and Iterable<int> preserve array identity
-and support iteration in interpreter/AOT/JIT. Result and Sliceable remain invariant.
-
-String arguments support the same reference variance: producer views can expose
-Object or String's nominal Iterable<char> contract, while consumer views accept
-String. Text identity is preserved. Native conversions use the existing tagged
-pointer; interpreter conversions use ordinary String view handles without copying
-UTF-8 bytes. See the [variance reference](/docs/interface-variance.html) for costs
-and limitations.
-
-Variance also follows nominal interfaces inherited through imported class bases.
-The metadata writer uses explicit dependency ancestry; it does not infer
-conformance from matching members. Result and Sliceable remain invariant.
+## Generic inheritance and constraints
 
 Generic base signatures preserve their arguments through native metadata and host
-introspection. Raven's neoCLR target now supports local and external constructed
+introspection. Raven's neoCLR target supports local and external constructed
 bases, including reordered parameters, recursive arguments such as
 `Node<T> : Base<Node<T>>`, and separately compiled dependencies. Classes remain
 invariant; inherited interface conformance comes from explicit nominal contracts.
 
-Development consumers cover protected base initialization, inherited private and
-public storage, field mutation, value/reference arguments and inherited generic
-interface dispatch. SDK CLR checks and Raven interpreter/AOT/JIT checks pass on
-macOS ARM64. Actual inheritance cycles and reverse/invariant conversions reject.
-Development SDK virtual slots on concrete generic reference classes now pass
-CLR/interpreter/AOT/JIT dispatch checks, including imported slots and direct base calls against a separate provider. Raven native emission/import passes local and separate-provider consumers with value/reference payloads. Abstract generic bases now pass SDK CLR and Raven local/imported interpreter/AOT/JIT consumers, including abstract slots and concrete base calls. Base-constructor
-expressions support scalar constants and arithmetic; helper calls and control
-flow remain backend gaps. Native AOT/JIT now qualify reference/value/default-constructor requirements on closed generic record/class shapes. Source constraint metadata is retained. Native Raven dependency imports now preserve reference/value/default-constructor requirements and nongeneric nominal class bounds, with separate-provider interpreter/AOT/JIT qualification. Constrained methods, constructed/interface bounds and external source-bound authoring remain gaps. Structural work and Sliceable/Result variance are parked.
+Inherited storage and generic interface dispatch support value and reference
+arguments. Concrete and abstract generic bases support local and imported virtual
+slots and direct base calls. Generic virtual methods remain unsupported.
+Base-constructor expressions support scalar constants and arithmetic; helper calls
+and control flow remain backend gaps.
+
+Native dependency imports preserve reference/value/default-constructor requirements
+and nongeneric nominal class bounds. Constrained methods, constructed/interface
+bounds and external source-bound authoring have remaining gaps. Result and Sliceable
+variance remain postponed.

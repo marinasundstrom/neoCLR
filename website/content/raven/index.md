@@ -43,52 +43,47 @@ Patterns expose a case and bind its payload. There is no need for a special meth
 {{FUNC_SAMPLE}}
 ```
 
-`var` marks a mutable binding. These callbacks capture the same variable: writing 42 changes what the reader observes. On neoCLR, System.Void can be a generic result type, so one Func family also describes callbacks with no payload. The Raven spelling `unit` and its value `()` map to System.Void in this target.
+`var` marks a mutable binding. These callbacks capture the same variable: writing 42 changes what the reader observes. Native function signatures describe both value-producing and no-result callbacks; see [Function types](../features/functions/) for their runtime identity and invocation contracts.
 
 For properties, `val` expresses read-only access. Explicit mutability helps readers distinguish a stable local binding from state that may change.
 
-Development Raven also supports explicit in-place compound operators such as
-`func +=(amount: int)` on classes and structs. These preserve reference identity and
-mutate value storage. The current native class, struct-local and reference-array
-consumer passes interpreter/JIT/AOT; nominal struct arrays remain interpreter-only.
-Remainder and shift compound overloads (`%=`, `<<=`, `>>=`, `>>>=`) and binary
-zero-filling `>>>` are also qualified on those backends. Parameterless instance `++`/`--` also support prefix results and discarded
-postfix mutation; consumed postfix uses the static overload. Checked mutation
-selects the corresponding checked overload; extension/interface forms remain follow-up work. Paired `true`/`false` overloads
-support conditions and short-circuit logical operations through `&`/`|`, following
-.NET conventions. Direct `&&`/`||` overload declarations are not supported.
-The shared operator sample also checks arithmetic, bitwise, shifts, comparisons,
-unary operations and conversions on .NET 11 and native interpreter/JIT/AOT. System.Numerics
-provides nominal arithmetic capabilities for constrained generic algorithms.
+## Operators and checked arithmetic
 
-Checked operator declarations (`func checked`) export distinct standard method
-names and require a matching ordinary declaration. Development checked expressions
-use `checked(...)` / `unchecked(...)` and `checked { ... }` / `unchecked { ... }`
-for integer binary addition, subtraction
-and multiplication, signed unary negation, numeric casts, compound assignments
-and increment/decrement. Checked unary/binary
-operators and explicit conversions follow .NET overload-selection conventions.
-The nearest context wins; a method's body is not implicitly checked merely because
-it declares a checked operator.
+Raven supports arithmetic, bitwise, shift, comparison, unary and conversion
+operators, including in-place compound operators such as `func +=(amount: int)`.
+In-place operators preserve reference identity and mutate value storage. Nominal
+struct arrays remain interpreter-only. Parameterless instance `++`/`--` support
+prefix results and discarded postfix mutation; consumed postfix uses a static overload.
+Paired `true`/`false` operators support conditions and short-circuit operations
+through `&`/`|`; direct `&&`/`||` declarations are not supported.
 
-The same consumer is qualified on .NET 11 and native interpreter/JIT/AOT. Native
-arithmetic overflow is a terminal fault; .NET uses OverflowException. Built-in
-fixed-width constant arithmetic and numeric casts diagnose overflow at compile time
-by default; integer/decimal constant zero divisors are diagnosed; explicit unchecked integer
-constants wrap. Const locals retain typed values and dependencies. The .NET target also supports
-arithmetic parameter defaults; native optional declarations remain unsupported.
-Development native emission also preserves Int32 class constants for source and
-imported consumers without allocating static storage; other constant field types
-and guest field-reflection support remain gaps.
-Broader constant-expression coverage, nullable/pointer conversions and mutations, and lifted arithmetic
-remain compiler gaps, with explicit diagnostics for unimplemented checked operations. See the
-[qualification and remaining limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-blocks-and-constant-evaluation).
+Use `checked(...)` or `checked { ... }` for overflow checking, and `unchecked` for
+wrapping integer operations. The nearest context wins. Checked overloads require
+matching ordinary declarations and follow .NET selection conventions. Native
+arithmetic overflow causes a terminal Fault; .NET uses OverflowException.
+Compile-time fixed-width arithmetic and casts diagnose overflow by default;
+explicit unchecked integer constants wrap. Constant zero divisors are diagnosed.
+
+Native emission supports Int32 class constants without static storage. Broader
+constant-expression coverage, optional parameter declarations, lifted arithmetic,
+nullable/pointer conversions and extension/interface mutation operators remain gaps.
+[Operator contracts and supported forms](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-blocks-and-constant-evaluation)
+provide implementation details.
 
 <a id="targets"></a>
 
 ## The .NET and neoCLR targets
 
-Raven normally targets .NET and can use its libraries. The Raven compiler and Raven Language Server run on .NET; the VS Code extension uses that server for editor features. neoCLR itself and programs running on it do not depend on .NET. The native target emits PE assemblies directly and imports native library metadata into Raven symbols. The development production build constructs System.Runtime directly from Raven source and imports native metadata for every library, with explicit runtime contracts. Five-library compilation, an async/parsing consumer and native editor completion are validated without a CLI semantic core. The reserved System execution module is empty. Installed and published SDKs must be rebuilt from these matching compiler/runtime revisions to acquire this behavior.
+Raven normally targets .NET and can use its libraries. The compiler and Language
+Server run on .NET; the VS Code extension uses that server for editor features.
+neoCLR and its applications do not require .NET at runtime.
+
+The neoCLR target emits native PE metadata and instructions directly. Both compiler
+and editor import native library metadata, so completion reflects neoCLR's types
+and members. System.Runtime is built from Raven source using explicit runtime
+contracts; production library construction requires no CLI semantic core or
+CoreProbe bridge. Compiler tooling running on .NET does not make host .NET types
+available to a neoCLR program.
 
 This gives us a source language for applications and for the Raven-authored System.Runtime library. It also makes language and runtime gaps visible through real programs. It is not a promise that arbitrary .NET libraries or every Raven feature already run on neoCLR.
 
@@ -139,35 +134,27 @@ and compiler. Library XML and Markdown sidecars supply API descriptions where av
 `neoclr disassemble` inspects metadata and instructions without executing the assembly
 or loading its dependencies. Its output is a diagnostic listing, not reassemblable neoIL.
 
-The native target does not support every Raven or .NET feature. Local and imported concrete generic class
-virtual slots and overrides now pass development interpreter/JIT/AOT consumers.
-Abstract generic bases are also qualified with local and imported slots. Generic virtual methods remain unsupported. An explicit development compiler option now exercises ordinary
-async methods through retained runtime frames. The POC now qualifies interpreter
-execution and macOS ARM64 JIT/AOT HTTP application bodies, with cleanup and GC checks.
-[Runtime-async POC details](../features/tasks/#direction) describe the temporary native
-stack carrier and remaining limits; this is not the default mode. General green threads remain
-unfinished.
+## Generics and numeric capabilities
 
-[Install and run →](../try/) · [HTTP application case →](../cases/http-server/) ·
-[API reference →](../docs/)
+Local and imported constructed generic classes support inherited storage, virtual
+slots, abstract bases and concrete overrides. Generic virtual methods remain
+unsupported. [Collection interfaces](../features/collections/#interface-variance)
+provide reference-only variance through explicit nominal contracts.
 
-Recoverable arithmetic methods are being considered separately from terminal
-native checked faults. Option/Result API shapes remain design work; the current
-checked expression support does not provide recoverable errors.
+System.Numerics provides AdditionOperators, SubtractionOperators, MultiplyOperators
+and DivisionOperators using native Self. Number inherits these same-type
+capabilities; generic algorithms can request only the operation they need.
+Constrained calls work across library boundaries. A Complex demonstration exercises
+arithmetic without imposing ordering; mixed-type contracts and production Complex
+edge semantics remain future work.
 
-A source-local integer addition experiment now exercises recoverable overflow
-through nominal Result values. This is an API-design prototype, not a new System
-arithmetic API; existing Int32.Divide already provides recoverable division errors.
+Checked expressions fault on native overflow. Recoverable numeric APIs are separate
+contracts: Int32.Divide returns an expected division error, while the source-local
+Result-based addition example remains an API experiment.
 
-In the development class library, System.Numerics provides AdditionOperators,
-SubtractionOperators, MultiplyOperators and DivisionOperators using native Self. Number inherits these
-same-type capabilities; generic algorithms can ask for only the operation they need.
-Constrained calls work in source code and across library boundaries on the
-interpreter, JIT and AOT. A Complex demo exercises arithmetic without imposing
-ordering. Mixed-type contracts and production Complex edge semantics remain future work.
+## Fields and initialization
 
-
-Native static readonly initialization is available in development builds. Raven emits
+Native static readonly initialization is supported. Raven emits
 field initializers and explicit static constructors, preserving strict or relaxed timing.
 Source and imported consumers run in interpreter, JIT and AOT, including closed generic
 owners. The [reflection APIs](/features/reflection/) describe readonly/literal fields and

@@ -38,7 +38,9 @@ cancellation. `GetResult()` faults for a cancelled or pending task. Application 
 normally uses `await` or outcome patterns; this method also serves the compiler's
 await protocol.
 
-## Task.Run (development)
+<a id="taskrun-development"></a>
+
+## Task.Run
 
 `Task.Run(callback)` submits work with shared lexical captures. Its overloads accept
 `Func<unit>`, `Func<T>` and `Func<Task<T>>`, returning `Task<unit>` or `Task<T>`.

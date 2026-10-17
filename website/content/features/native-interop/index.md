@@ -61,7 +61,7 @@ Runtime-owned internal calls remain separate from foreign imports. Both use `ext
 while `MethodImpl(InternalCall)` identifies a runtime service and `NativeImport`
 identifies a library/export. Metadata inspection preserves both distinctions.
 
-Main includes development support for binding a native
+The runtime supports binding a native
 address to a structural Function signature in the interpreter. It also accepts
 managed Functions as call-scoped native callbacks and wraps returned native callable
 pointers as Functions. Each callable has its own convention and conversion metadata;
@@ -71,8 +71,3 @@ registration/unregistration lifetime contract. Raven mapping syntax and JIT/AOT 
 remain next. The longer-term goal is an AOT library plus versioned public-interface
 metadata for runtime and native consumers. Export stubs and that sidecar format are
 not implemented yet.
-
-
-This bounded interpreter feature was integrated at the author's direction on
-2026-10-12. Source annotations, richer marshalling/lifetime support and native
-backend/export integration may expand it later; they are not implemented by this merge.

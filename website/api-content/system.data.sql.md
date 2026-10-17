@@ -3,7 +3,7 @@ uid: N:System.Data.Sql
 ---
 ## SQL connections and mapping
 
-Development SQL-domain contracts: configured databases open connections, statements bind
+SQL-domain contracts: configured databases open connections, statements bind
 positional values, and execution returns owned buffered rows. SqlMapper maps rows to
 scalar properties or through explicit callbacks. Transactions have explicit completion
 and lifetime. This is not ADO.NET or Dapper API compatibility.

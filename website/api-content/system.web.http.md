@@ -12,7 +12,7 @@ See [Web](/features/web/) for the current cleartext scope, limits and tested sam
 This preview is not a general production web stack. System.Web.Http.Json supplies
 JSON content and client helpers.
 
-Development HttpClient.Timeout is an `Option<Duration>`, defaulting to Some(100 seconds).
+HttpClient.Timeout is an `Option<Duration>`, defaulting to Some(100 seconds).
 None disables the client countdown. Configure it before sending. Expiry requests
 cancellation and waits for handler cleanup before returning HttpError.TimedOut; caller
 or disposal cancellation remains task cancellation. Independent transport phase bounds
@@ -23,7 +23,7 @@ Parse. HttpRequest.Method returns HttpMethod; Create accepts it with URL/Uri and
 content. Exact spelling is available through Method.Method; value equality ignores
 ASCII case. CONNECT is representable but the socket transport does not implement tunnelling.
 
-Development HTTP/1.1 admits 1 MiB buffered bodies and known-length uploads, 32 KiB
+HTTP/1.1 admits 1 MiB buffered bodies and known-length uploads, 32 KiB
 headers and 100 fields, subject to independent host allocation budgets. Incoming
 requests support bounded chunked coding; client responses support up to 16 interim
 replies before the final response. Chunk extensions/trailers and status-101 upgrades

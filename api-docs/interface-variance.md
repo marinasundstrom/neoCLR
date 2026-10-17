@@ -1,4 +1,6 @@
-# Interface variance (development)
+# Interface variance
+
+<a id="interface-variance-development"></a>
 
 These are the class library's annotated declarations. RavenDoc preserves `in`/`out`
 in generated signatures from native metadata. This reference collects the eleven
@@ -40,18 +42,18 @@ direction. Native lowering preserves the verified Object-root role through priva
 renaming; producer and consumer paths are qualified with actual identity checks in
 interpreter/AOT/JIT. This does not admit value boxing.
 
-Array references are also supported as variant arguments: Producer<int[]> can
-widen to Producer<Object>, and Consumer<Object> can narrow to Consumer<int[]>.
+Array references are also supported as variant arguments: `Producer<int[]>` can
+widen to `Producer<Object>`, and `Consumer<Object>` can narrow to `Consumer<int[]>`.
 The calls retain the same array; element storage remains invariant. Both directions
 are qualified in Raven interpreter, AOT and managed JIT.
 
-Array arguments may also widen to their declared Iterable<int> contract: producer
-and consumer conversions between int[] and Iterable<int> preserve array identity
+Array arguments may also widen to their declared `Iterable<int>` contract: producer
+and consumer conversions between int[] and `Iterable<int>` preserve array identity
 and support iteration in interpreter/AOT/JIT. Result and Sliceable remain invariant.
 
-String is also a reference argument. Producer<string> can widen to Producer<Object>
-or Producer<Iterable<char>>, and the corresponding consumers narrow to
-Consumer<string>. The interpreter allocates an ordinary view handle while sharing
+String is also a reference argument. `Producer<string>` can widen to `Producer<Object>`
+or Producer<`Iterable<char>`>, and the corresponding consumers narrow to
+`Consumer<string>`. The interpreter allocates an ordinary view handle while sharing
 the UTF-8 owner; native dispatch adapts its pointer tag without allocating a wrapper
 or copying text. Nominal conformance remains explicit, and reverse/value-boxing
 conversions reject. See the retained String consumer for source and validation.

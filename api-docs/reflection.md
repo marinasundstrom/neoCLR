@@ -1,6 +1,6 @@
-<a id="runtime-reflection-development"></a>
-
 # Runtime reflection
+
+<a id="runtime-reflection-development"></a>
 
 Import `System.Runtime.Reflection.*` to execute a small set of operations on
 runtime-backed `System.Introspection` descriptors. Introspection itself remains
@@ -63,7 +63,9 @@ Rust callers constructing MetadataOrigin literals must supply the new optional f
 Newly imported artifacts need the matching runtime. These host/artifact contracts
 are not additional guest APIs or permissions to bypass normal runtime access checks.
 
-## Constructor arguments, methods and fields (development)
+<a id="constructor-arguments-methods-and-fields-development"></a>
+
+## Constructor arguments, methods and fields
 
 [ConstructorInfo](xref:System.Introspection.ConstructorInfo) describes a constructor
 through MemberInfo identity, accessibility and GetParameters; GetConstructors defaults
@@ -72,7 +74,7 @@ Adding ConstructorInfo extends the closed MemberInfo family: update exhaustive m
 
 [TypeReflectionExtensions](xref:System.Runtime.Reflection.TypeReflectionExtensions)
 adds `CreateInstance(params Object?[])` and `CreateInstance<T>(params Object?[])` returning
-Result<Object, ReflectionError> and Result<T, ReflectionError>. The described type is
+`Result<Object, ReflectionError>` and `Result<T, ReflectionError>`. The described type is
 constructed; T is a checked result view, validated before invoking user code.
 
 [MethodReflectionExtensions](xref:System.Runtime.Reflection.MethodReflectionExtensions)
@@ -94,7 +96,9 @@ return AmbiguousConstructor; none returns MissingConstructor. Invalid method arg
 return InvalidArguments. Incompatible T returns InvalidResultType. UnsupportedMethod
 and UnsupportedField distinguish unsupported metadata shapes. User Faults stay terminal.
 
-## Retained constructor invocation (development)
+<a id="retained-constructor-invocation-development"></a>
+
+## Retained constructor invocation
 
 `ConstructorReflectionExtensions.Invoke(self: ConstructorInfo, params arguments: Object?[])
 -> Result<Object, ReflectionError>` invokes the selected constructor directly.
@@ -124,7 +128,9 @@ supports cached route bindings without exposing private array-allocation service
 The caller controls collection mutation while it is copied. It adds no overload
 selection or coercion, and provider/constructor Faults remain terminal.
 
-## Dynamic managed arrays (development, 2026-10-07)
+<a id="dynamic-managed-arrays-development-2026-10-07"></a>
+
+## Dynamic managed arrays
 
 [ArrayReflection](xref:System.Runtime.Reflection.ArrayReflection) supplies three bounded
 operations used by independently compiled JSON mapping:
@@ -150,7 +156,9 @@ initialized value storage. The cost is a copy and a narrower API; this is not a 
 of better performance. A future checked Result API remains possible without exposing
 the internal RuntimeServices surface. Introspection descriptors alone stay non-executable.
 
-## Generic parameter variance (development)
+<a id="generic-parameter-variance-development"></a>
+
+## Generic parameter variance
 
 `System.Introspection.GenericParameterTypeInfo : TypeInfo` represents an unbound
 type parameter returned by an open definition's `GetGenericArguments()` or
@@ -178,7 +186,9 @@ module scopes fault. Empty declared modules return empty arrays. Ordinary discov
 types still need supported native shapes; open member and relationship queries
 remain unsupported. No Raven Runtime Contract change is required.
 
-### Generic argument sequences (development)
+<a id="generic-argument-sequences-development"></a>
+
+### Generic argument sequences
 
 `TypeInfo.GetGenericArguments()` returns a freshly populated sequence in declaration
 order, using the same count and indexed handle queries as `GenericArgumentCount`
@@ -208,7 +218,9 @@ for supported signatures, null/no-result behavior and limits. Generic overloads 
 future work. This differs from .NET Delegate.DynamicInvoke's exception contract and
 uses the existing neoCLR reflection error convention.
 
-## Fields and type initializers (development)
+<a id="fields-and-type-initializers-development"></a>
+
+## Fields and type initializers
 
 `FieldInfo.IsInitOnly`, `IsLiteral` and `ConstantValue: Option<Object>` distinguish
 readonly storage from storage-free Int32 literals. `GetFields` applies Public/NonPublic

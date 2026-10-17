@@ -4,7 +4,7 @@ An array shape `T[]` has an element type and fixed length. Array values can be
 passed as Object. Its shape has no nominal declaration name; the library's
 [Array&lt;T&gt; member contract](xref:System.Array`1) supplies the operations below.
 The named library contract and an individual array shape are distinct descriptors.
-`T[]` and `Array<T>` represent the same intrinsic array contract: the nominal
+`T[]` and ``Array<T>`` represent the same intrinsic array contract: the nominal
 spelling does not add a wrapper or copy. Arrays therefore combine runtime structural
 shape with a nominal API representation.
 
@@ -29,7 +29,9 @@ storage, mutation and Object conversion limits.
 
 [All structural families](structural-types.md)
 
-## Nominal slicing (development)
+<a id="nominal-slicing-development"></a>
+
+## Nominal slicing
 
 Array and ArrayList explicitly implement [Sliceable&lt;TSlice&gt;](xref:System.Sliceable`1)
 with `TSlice = T[]`. The safe method accepts empty ranges at valid boundaries,

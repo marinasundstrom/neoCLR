@@ -13,7 +13,9 @@ and [local-time mappings](/docs/time-zone-mappings.html). Local time can be ambi
 or skipped at a zone transition; inspect the mapping result rather than assuming
 there is always one instant.
 
-## Development: civil parsing
+<a id="development-civil-parsing"></a>
+
+## Civil parsing
 
 Date, TimeOfDay and LocalDateTime now provide `Parse(value)` and
 `Parse(value, culture)`, returning `Result<T, DateTimeParseError>`. Use
@@ -28,7 +30,9 @@ No whitespace trimming, timezone suffixes, extra fractional precision, general
 format patterns or Hebrew-calendar parsing are supported in this slice.
 
 
-## Development: duration and offset parsing
+<a id="development-duration-and-offset-parsing"></a>
+
+## Duration and offset parsing
 
 `Duration.Parse(value)` returns `Result<Duration, DateTimeParseError>` for invariant
 `[-][d.]hh:mm:ss[.fraction]`, with 1–8 day digits and 1–7 fractional digits.
@@ -41,7 +45,9 @@ Unsupported syntax returns InvalidFormat. General parsing patterns and inline zo
 and [offset reference](/docs/api/System/Time/TimeOffset/method_Parse.html).
 
 
-## Development: explicit-offset instant parsing
+<a id="development-explicit-offset-instant-parsing"></a>
+
+## Explicit-offset instant parsing
 
 `Instant.Parse(value)` returns `Result<Instant, DateTimeParseError>` for
 `yyyy-MM-ddTHH:mm:ss[.fraction]` followed by `Z` or `±HH:mm[:ss]`. It preserves
@@ -53,7 +59,9 @@ Unsupported syntax returns InvalidFormat; invalid fields/ranges return OutOfRang
 [Instant.Parse reference](/docs/api/System/Time/Instant/method_Parse.html).
 
 
-## Development: zoned parsing with an explicit zone
+<a id="development-zoned-parsing-with-an-explicit-zone"></a>
+
+## Zoned parsing with an explicit zone
 
 `ZonedDateTime.Parse(value, zone)` returns `Result<ZonedDateTime, DateTimeParseError>`.
 The input uses Instant.Parse's explicit-offset grammar; resolve a named zone with

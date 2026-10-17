@@ -82,7 +82,9 @@ The matching revision and artifact-loading cases execute in
 snapshot/execution lifetime and resource limits. This API does not authorize native
 P/Invoke; existing safe/unsafe execution boundaries remain unchanged.
 
-## Structural composition identity keys (development, 2026-10-14)
+<a id="structural-composition-identity-keys-development-2026-10-14"></a>
+
+## Structural composition identity keys
 
 On `codex/structural-union-intersection`, the Rust `TypeIdentity` enum adds:
 
@@ -114,7 +116,9 @@ interpreter, including nested descriptors inside admitted generic wrappers. See 
 Member and hierarchy queries remain unsupported for direct compositions. These host Rust APIs are
 excluded from the guest RavenDoc selection and documented here.
 
-### Host composition descriptors (development, 2026-10-14)
+<a id="host-composition-descriptors-development-2026-10-14"></a>
+
+### Host composition descriptors
 
 `LoadedProgram::describe_type(&Type) -> Result<TypeDescriptor, Fault>` now supports
 admitted closed compositions in the standard runtime. `TypeDescriptor`
@@ -172,7 +176,7 @@ are deduplicated. Invalid service/shape metadata returns Fault; unsupported runt
 inputs and signatures fault when the adapter executes. It neither executes code nor
 changes its inputs. It preserves the service identity and signature, clears the
 InternalCall flag and supplies the adapter body and initialized result local.
-See [the primitive contract and validation](../docs/validation/dynamic-function-invocation/README.md).
+See [the primitive contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/dynamic-function-invocation/README.md).
 
 
 The provisional `function_invocation::lower` adapter also accepts the reserved

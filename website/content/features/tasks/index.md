@@ -59,11 +59,10 @@ progress other contexts during a blocked host call, but it does not promise para
 execution of arbitrary guest CPU code. Entry completion drains pending work.
 
 The native compiler supports await in functions, class methods and ordinary for
-loops, with locals and cleanup retained across suspension. Rebuilt development SDKs
-select runtime-await and supply the private providers for async functions and
-generators. Native suspension supports macOS ARM64 and Windows x64 with matching
-runtime/JIT helpers; existing published bundles are unchanged. Compiler state
-machines remain an explicit project option. See [integration and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
+loops, with locals and cleanup retained across suspension. The SDK selects
+runtime-await and supplies private providers for async functions and generators.
+Native suspension supports macOS ARM64 and Windows x64 with matching runtime/JIT
+helpers. Compiler state machines remain an explicit project option.
 This does not promise parallel guest execution or unrestricted portable green threads.
 
 ## Read further

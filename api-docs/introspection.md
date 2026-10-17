@@ -58,7 +58,9 @@ The executable integration fixture also checks constructed generic types, arrays
 wrong types, null at the Object boundary, HashMap callbacks and retention through GC.
 There is no general default comparer or cross-program descriptor identity contract.
 
-## Type relationships (development)
+<a id="type-relationships-development"></a>
+
+## Type relationships
 
 Use `source.AssignableTo(target)` or `target.AssignableFrom(source)` when you need
 to know whether a value can be used as another type. Both require non-null
@@ -84,7 +86,9 @@ are not supported yet.
 These queries inspect types available in the loaded program; they do not load types
 or authorize reflective construction or invocation.
 
-## Logical modules (development, 2026-10-10)
+<a id="logical-modules-development-2026-10-10"></a>
+
+## Logical modules
 
 `RuntimeContext.Current.ExecutingAssembly.GetModules()` now returns flat logical
 modules in ordinal name order, including explicitly declared empty modules. A module
@@ -281,7 +285,9 @@ expose parameters and visibility, without a method return type. See the
 [Reflection API guide](reflection.md) for execution limits.
 
 
-### Interface method flags (development)
+<a id="interface-method-flags-development"></a>
+
+### Interface method flags
 
 For admitted application interfaces, public instance defaults are virtual and have
 bodies (`IsAbstract` is false). Ordinary static helpers report `IsStatic` true and
@@ -381,7 +387,9 @@ named snapshot. Older libraries retain fixed-only inspection and explicitly reje
 named data. See the [tested consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-attributes/README.md).
 
 
-### Module function selection bridge (development)
+<a id="module-function-selection-bridge-development"></a>
+
+### Module function selection bridge
 
 `native_metadata::module_function_definitions(&Module, identity: &str, name: &str)
 -> Result<Vec<metadata::MemberId>, Fault>` is an unstable Rust backend helper, not
@@ -420,7 +428,9 @@ must pass the existing provider/materialization checks before becoming guest val
 these helpers alone do not change native retention. Guest enumeration is described below.
 
 
-### Guest module functions (development)
+<a id="guest-module-functions-development"></a>
+
+### Guest module functions
 
 `ModuleInfo.GetFunctions() -> Sequence<MethodInfo>` enumerates directly declared
 free functions in the module's assembly and exact namespace, in loaded metadata
@@ -481,16 +491,18 @@ Member, hierarchy and custom-attribute queries on direct compositions fault
 explicitly until their semantics are implemented. No fabricated nominal member set
 is returned. The obsolete CLI bootstrap remains unqualified for these providers.
 
-## Field storage and initialization (development)
+<a id="field-storage-and-initialization-development"></a>
 
-FieldInfo exposes IsInitOnly, IsLiteral and ConstantValue (Option<Object>, currently
+## Field storage and initialization
+
+FieldInfo exposes IsInitOnly, IsLiteral and ConstantValue (`Option<Object>`, currently
 boxed Int32 literals). GetFields includes static storage and constants according to
 BindingFlags; DefinitionIndex is a descriptor ordinal, not a storage opcode slot.
 MetadataToken retains the defining module's field token; older producers that omitted
 static tokens report None instead of inventing one. Names and generic field signatures
 remain descriptive even where reflection execution is unsupported.
 
-TypeInfo exposes IsBeforeFieldInit and TypeInitializer (Option<ConstructorInfo>).
+TypeInfo exposes IsBeforeFieldInit and TypeInitializer (`Option<ConstructorInfo>`).
 The latter is a private static constructor description, separate from ordinary methods.
 Neither property executes initialization. Native JIT/AOT constructor descriptions
 require explicit constructor metadata retention in reflection-roots schema 7.
