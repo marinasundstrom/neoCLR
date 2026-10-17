@@ -19,10 +19,10 @@ public struct Double : Number {
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<double, NumberParseError> {
         let payload = RuntimeServices.ParseDouble(value)
-        if RuntimeServices.IsValue<double>(payload) {
-            return Ok(RuntimeServices.UnpackValue<double>(payload))
+        if neoCLR.Runtime.IsValue<double>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<double>(payload))
         }
-        let status = RuntimeServices.UnpackValue<int>(payload)
+        let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
             return Error(NumberParseError.InvalidFormat())
         }

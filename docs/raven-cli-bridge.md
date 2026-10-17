@@ -12614,3 +12614,19 @@ Production System.Value is native-owned; RuntimeServices helper declarations and
 bodies remain CLI/seed-owned until the production construction stage supplies native
 managed bodies. These are not new runtime InternalCalls. No Runtime Contract switch,
 .NET semantics or installed SDK changes. Wider payload-shape coverage remains open.
+
+### Production payload ownership migration (2026-10-17)
+
+The managed-body construction gap above is closed for IsValue/UnpackValue with Raven
+`eef6c6e3c`. The explicit System.Value primitive implementation owner may declare
+the two exact internal extern native functions; the backend emits managed ValueIs/
+ValueUnpack bodies, not InternalCalls. Staged preparation removes the old CLI/seed
+counterparts, and all production payload callers use the new native definitions.
+A documented System.Networking friend grant permits its private DNS/socket payload
+decoding without exposing public implementation helpers. No new Runtime Contract
+switch or .NET behavior change is introduced.
+
+The [production gate](validation/native-core-removal/README.md#production-source-owned-payload-helpers)
+passes five-library compilation, interpreter/JIT/sanitized AOT consumption and editor
+completion. Broader source-core construction remains unfinished; this does not
+replace the installed SDK or remove unrelated RuntimeServices dependencies.

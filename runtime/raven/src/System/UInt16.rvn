@@ -19,10 +19,10 @@ public struct UInt16 : Number {
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<ushort, NumberParseError> {
         let payload = RuntimeServices.ParseUInt16(value)
-        if RuntimeServices.IsValue<ushort>(payload) {
-            return Ok(RuntimeServices.UnpackValue<ushort>(payload))
+        if neoCLR.Runtime.IsValue<ushort>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<ushort>(payload))
         }
-        let status = RuntimeServices.UnpackValue<int>(payload)
+        let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
             return Error(NumberParseError.InvalidFormat())
         }

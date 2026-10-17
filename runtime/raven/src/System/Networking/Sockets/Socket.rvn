@@ -144,10 +144,10 @@ public class Socket {
 
     static func Listen(address: string, port: int, backlog: int) -> Result<Socket, SocketError> {
         let payload = RuntimeServices.SocketListen(address, port, backlog)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(Socket(RuntimeServices.UnpackValue<long>(payload)))
+        return Ok(Socket(neoCLR.Runtime.UnpackValue<long>(payload)))
     }
 
     func Accept() -> Task<Result<Socket, SocketError>> {
@@ -164,10 +164,10 @@ public class Socket {
 
     func GetLocalPort() -> Result<int, SocketError> {
         let payload = RuntimeServices.SocketLocalPort(handle)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(RuntimeServices.UnpackValue<int>(payload))
+        return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
     func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
@@ -303,10 +303,10 @@ internal class SocketConnectCompletion {
         }
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketConnect(address, port, self.Complete)
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            operation = RuntimeServices.UnpackValue<long>(payload)
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
                 registration = token.Register(self.RequestCancellation)
             }
@@ -343,10 +343,10 @@ internal class SocketConnectCompletion {
         } else {
             RuntimeServices.SocketConnectAddressesUntil(snapshot, port, deadline, self.Complete)
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            operation = RuntimeServices.UnpackValue<long>(payload)
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
                 registration = token.Register(self.RequestCancellation)
             }
@@ -360,10 +360,10 @@ internal class SocketConnectCompletion {
         }
         _ = TaskQueue.Default
         let payload = RuntimeServices.SocketAccept(handle, self.Complete)
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            operation = RuntimeServices.UnpackValue<long>(payload)
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
                 registration = token.Register(self.RequestCancellation)
             }
@@ -386,10 +386,10 @@ internal class SocketConnectCompletion {
             _ = source.Cancel()
             return
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            _ = source.Complete(Ok(Socket(RuntimeServices.UnpackValue<long>(payload))))
+            _ = source.Complete(Ok(Socket(neoCLR.Runtime.UnpackValue<long>(payload))))
         }
     }
 }
@@ -424,10 +424,10 @@ internal class SocketTransferCompletion {
         } else {
             RuntimeServices.SocketReceiveUntil(handle, buffer, offset, count, deadline, self.Complete)
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            operation = RuntimeServices.UnpackValue<long>(payload)
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
                 registration = token.Register(self.RequestCancellation)
             }
@@ -449,10 +449,10 @@ internal class SocketTransferCompletion {
         } else {
             RuntimeServices.SocketSendUntil(handle, buffer, offset, count, deadline, self.Complete)
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            operation = RuntimeServices.UnpackValue<long>(payload)
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
                 registration = token.Register(self.RequestCancellation)
             }
@@ -475,10 +475,10 @@ internal class SocketTransferCompletion {
             _ = source.Cancel()
             return
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            _ = source.Complete(Ok(RuntimeServices.UnpackValue<int>(payload)))
+            _ = source.Complete(Ok(neoCLR.Runtime.UnpackValue<int>(payload)))
         }
     }
 }

@@ -120,8 +120,8 @@ internal class ConsoleOutputStream : OutputStream {
             return Error(StreamError.Closed())
         }
         let payload = neoCLR.Runtime.ConsoleWriteBytes(error, buffer, offset, count)
-        if RuntimeServices.IsValue<byte>(payload) {
-            let status = RuntimeServices.UnpackValue<byte>(payload)
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            let status = neoCLR.Runtime.UnpackValue<byte>(payload)
             if status == 7 {
                 return Error(StreamError.InvalidRange())
             }
@@ -130,7 +130,7 @@ internal class ConsoleOutputStream : OutputStream {
             }
             return Error(StreamError.IoFailure())
         }
-        return Ok(RuntimeServices.UnpackValue<int>(payload))
+        return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
     private func FlushCore() -> Result<unit, StreamError> {
@@ -138,7 +138,7 @@ internal class ConsoleOutputStream : OutputStream {
             return Error(StreamError.Closed())
         }
         let payload = neoCLR.Runtime.ConsoleFlush(error)
-        if RuntimeServices.IsValue<byte>(payload) {
+        if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(StreamError.IoFailure())
         }
         return Ok(())

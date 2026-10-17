@@ -163,6 +163,7 @@
         "runtime/raven/native/RuntimeFailureCalls.rvn",
         "runtime/raven/native/RuntimeHandleServices.rvn",
         "runtime/raven/native/RuntimeHeapCalls.rvn",
+        "runtime/raven/native/RuntimePayload.rvn",
         "runtime/raven/native/RuntimeIntrospectionCalls.rvn",
         "runtime/raven/native/RuntimeIntrospectionServices.rvn",
         "runtime/raven/native/RuntimeMathCalls.rvn",

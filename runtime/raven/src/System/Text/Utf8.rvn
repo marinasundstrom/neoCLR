@@ -19,8 +19,8 @@ internal static class Utf8 {
             index += 1
         }
         let payload = RuntimeServices.Utf8Decode(snapshot)
-        if RuntimeServices.IsValue<string>(payload) {
-            return Ok(RuntimeServices.UnpackValue<string>(payload))
+        if neoCLR.Runtime.IsValue<string>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
         }
         return Result<string, InvalidUtf8Error>.Error(InvalidUtf8Error())
     }

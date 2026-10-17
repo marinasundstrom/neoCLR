@@ -13,10 +13,10 @@ public struct Int64 : Number {
 
     static func Parse(value: string) -> Result<long, NumberParseError> {
         let payload = RuntimeServices.ParseInt64(value)
-        if RuntimeServices.IsValue<long>(payload) {
-            return Ok(RuntimeServices.UnpackValue<long>(payload))
+        if neoCLR.Runtime.IsValue<long>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<long>(payload))
         }
-        let status = RuntimeServices.UnpackValue<byte>(payload)
+        let status = neoCLR.Runtime.UnpackValue<byte>(payload)
         if status == 1 {
             return Error(NumberParseError.InvalidFormat())
         }

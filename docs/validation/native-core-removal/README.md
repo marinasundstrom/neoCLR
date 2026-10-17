@@ -260,3 +260,42 @@ The SDK already authors those bodies and Raven already imports/calls them; the
 remaining work is production construction/ownership, not an interpreter or scalar
 JIT/AOT payload implementation. Do not use the reduced fixture Object as the
 production core. No production bundle or installed SDK was replaced here.
+
+## Production source-owned payload helpers
+
+Raven `eef6c6e3c` closes the preceding managed-body construction gap. The existing
+explicit native System.Value ownership contract authorizes only internal extern
+`neoCLR.Runtime.IsValue<T>(System.Value) -> bool` and
+`neoCLR.Runtime.UnpackValue<T>(System.Value) -> T` declarations, with one
+unconstrained invariant type parameter, one by-value argument and no attributes or
+source body. The backend supplies managed ValueIs/ValueUnpack bodies. Other externs
+remain subject to import/InternalCall rules; .NET behavior is unchanged. Missing
+ownership, wrong result signatures and constrained declarations are rejected.
+
+System.Runtime owns both definitions and System.Value. Production callers, including
+Networking, now use native namespace functions. Staged preparation removes both
+CLI helper declarations and retained-seed methods. This requires the matching Raven
+compiler: an older compiler rejects the new declarations rather than silently
+falling back. The [ownership evidence](payload-production-ownership.json) records
+internal visibility, zero InternalCall flags, native bodies and admission checks.
+
+A narrowly scoped InternalsVisibleTo grant to System.Networking is necessary for
+its DNS/socket implementations to decode private service payloads. Public APIs expose
+typed Results and offer no replacement for decoding this internal ABI. The helpers
+remain internal; no friend grant is added for applications or unrelated libraries.
+Revisit the grant if Networking can use a suitable typed runtime service contract.
+
+The fresh five-library `target/native-payload-production-v2` bundle builds with
+the newly prepared `target/native-payload-bootstrap` inputs. The
+[public consumer](PayloadProductionConsumer.rvn) checks byte and unit console payloads,
+valid/invalid integer parsing and string slicing, returning 42 in interpreter,
+managed JIT and sanitized AOT. [Commands and hashes](payload-production-results.json)
+record the tested compiler/runtime/bundle; input is `*` followed by EOF.
+[Production completion](payload-production-completion.json) resolves Console.ReadByte.
+API source fingerprints pass; public signatures are unchanged. Wrong-type fault
+coverage from the native-only helper matrix remains applicable to the same opcode
+bodies. No general payload-cast language syntax is added.
+
+Other RuntimeServices members, native core construction and broader payload storage
+shapes remain open. This removes production payload-helper bootstrap ownership,
+not every CLI dependency. The installed SDK is unchanged and structural work is parked.

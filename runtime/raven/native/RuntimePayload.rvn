@@ -1,0 +1,11 @@
+import System.Runtime.CompilerServices.*
+
+// Networking must decode private native DNS/socket payloads using this shared ABI.
+// Keep these implementation helpers internal rather than exposing a public API.
+[assembly: InternalsVisibleTo("System.Networking")]
+
+module neoCLR.Runtime
+
+// The explicit System.Value owner supplies managed value.is/value.unpack bodies.
+internal extern func IsValue<T>(value: System.Value) -> bool;
+internal extern func UnpackValue<T>(value: System.Value) -> T;

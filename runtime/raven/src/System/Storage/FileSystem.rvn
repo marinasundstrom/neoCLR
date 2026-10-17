@@ -161,8 +161,8 @@ internal class LocalDirectory : Directory {
 
     func GetItems(maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
         let payload = neoCLR.Runtime.StorageList(nativePath, maxItems)
-        if RuntimeServices.IsValue<byte>(payload) {
-            let status = RuntimeServices.UnpackValue<byte>(payload)
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            let status = neoCLR.Runtime.UnpackValue<byte>(payload)
             if status == 1 {
                 return Error(StorageLookupError.InvalidPath())
             }

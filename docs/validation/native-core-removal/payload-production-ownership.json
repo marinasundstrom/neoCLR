@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "methods": [
+    {
+      "name": "IsValue",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "IsValue",
+        "parameter_tokens": [
+          134217794
+        ],
+        "token": 100663360
+      },
+      "implFlags": 0,
+      "body": "I_0000: ldarg 0\n  I_0001: value.is {\"MethodTypeParameter\":0}\n  I_0002: ret"
+    },
+    {
+      "name": "UnpackValue",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "UnpackValue",
+        "parameter_tokens": [
+          134217795
+        ],
+        "token": 100663361
+      },
+      "implFlags": 0,
+      "body": "I_0000: ldarg 0\n  I_0001: value.unpack {\"MethodTypeParameter\":0}\n  I_0002: ret"
+    }
+  ],
+  "retainedSeedPayloadHelpers": 0,
+  "sourceAdmissionBuild": "PASS native intrinsic method import, generic value/reference calls and completion without BootstrapReference\nPASS native payload helpers compile and complete without BootstrapReference\nPASS source payload ownership, missing-owner, signature and constraint admission checks\nPASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard\n",
+  "rejections": {
+    "unowned": "error NEOMETA001: Native emission does not support extern requires a supported NativeImport attribute or an internal neoCLR.Runtime MethodImpl(InternalCall) service.",
+    "wrong-result": "error NEOMETA001: Native emission does not support extern requires a supported NativeImport attribute or an internal neoCLR.Runtime MethodImpl(InternalCall) service.",
+    "constrained": "error NEOMETA001: Native emission does not support extern requires a supported NativeImport attribute or an internal neoCLR.Runtime MethodImpl(InternalCall) service."
+  }
+}

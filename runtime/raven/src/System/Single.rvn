@@ -19,10 +19,10 @@ public struct Single : Number {
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<float, NumberParseError> {
         let payload = RuntimeServices.ParseSingle(value)
-        if RuntimeServices.IsValue<float>(payload) {
-            return Ok(RuntimeServices.UnpackValue<float>(payload))
+        if neoCLR.Runtime.IsValue<float>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<float>(payload))
         }
-        let status = RuntimeServices.UnpackValue<int>(payload)
+        let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
             return Error(NumberParseError.InvalidFormat())
         }

@@ -3,13 +3,12 @@ module System.Storage.Metadata
 import System.*
 import System.Storage.*
 import System.Result.*
-import System.Runtime.CompilerServices.RuntimeServices
 
 // Synchronous host-path lookup; no file contents or open resource are retained.
 public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
     let payload = neoCLR.Runtime.StorageKind(path)
-    if RuntimeServices.IsValue<byte>(payload) {
-        let status = RuntimeServices.UnpackValue<byte>(payload)
+    if neoCLR.Runtime.IsValue<byte>(payload) {
+        let status = neoCLR.Runtime.UnpackValue<byte>(payload)
         if status == 1 {
             return Error(StorageLookupError.InvalidPath())
         }
@@ -27,7 +26,7 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
         }
         System.Fail("Unexpected metadata error status")
     }
-    let kind = RuntimeServices.UnpackValue<int>(payload)
+    let kind = neoCLR.Runtime.UnpackValue<int>(payload)
     if kind == 1 {
         return Ok(EntryKind.File)
     }

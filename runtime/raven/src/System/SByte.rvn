@@ -19,10 +19,10 @@ public struct SByte : Number {
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<sbyte, NumberParseError> {
         let payload = RuntimeServices.ParseSByte(value)
-        if RuntimeServices.IsValue<sbyte>(payload) {
-            return Ok(RuntimeServices.UnpackValue<sbyte>(payload))
+        if neoCLR.Runtime.IsValue<sbyte>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<sbyte>(payload))
         }
-        let status = RuntimeServices.UnpackValue<int>(payload)
+        let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
             return Error(NumberParseError.InvalidFormat())
         }

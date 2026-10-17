@@ -16,10 +16,10 @@ public class FileInputStream : InputStream, SeekableStream {
 
     static func Open(path: string) -> Result<FileInputStream, StreamError> {
         let payload = RuntimeServices.FileOpenRead(path)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(FileInputStream(RuntimeServices.UnpackValue<int>(payload)))
+        return Ok(FileInputStream(neoCLR.Runtime.UnpackValue<int>(payload)))
     }
 
     func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
@@ -41,10 +41,10 @@ public class FileInputStream : InputStream, SeekableStream {
             return Error(StreamError.Closed())
         }
         let payload = RuntimeServices.FileReadInto(handle, buffer, offset, count)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(RuntimeServices.UnpackValue<int>(payload))
+        return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
     func GetPosition() -> Result<long, StreamError> {
@@ -52,10 +52,10 @@ public class FileInputStream : InputStream, SeekableStream {
             return Error(StreamError.Closed())
         }
         let payload = RuntimeServices.FilePosition(handle)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(RuntimeServices.UnpackValue<long>(payload))
+        return Ok(neoCLR.Runtime.UnpackValue<long>(payload))
     }
 
     func Seek(position: long) -> Result<long, StreamError> {
@@ -63,10 +63,10 @@ public class FileInputStream : InputStream, SeekableStream {
             return Error(StreamError.Closed())
         }
         let payload = RuntimeServices.FileSeek(handle, position)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(RuntimeServices.UnpackValue<long>(payload))
+        return Ok(neoCLR.Runtime.UnpackValue<long>(payload))
     }
 
     func Close() {

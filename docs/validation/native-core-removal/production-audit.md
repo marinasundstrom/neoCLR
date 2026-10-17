@@ -194,3 +194,10 @@ stripping are accepted substitutes for the above gates.
   System.Value exists, but RuntimeServices helper declarations/implementations remain
   CLI/seed-owned. Their managed opcode bodies cannot simply become InternalCalls.
   See the explicit ownership boundary in README; no production migration is claimed.
+
+- Production payload helper ownership is now migrated: Raven eef6c6e3c emits the
+  exact source-owned managed bodies under the explicit System.Value implementation
+  contract; staged preparation removes CLI/seed duplicates. Networking has a narrow
+  documented friend grant. Five-library compilation, interpreter/JIT/AOT consumption
+  and public member completion pass. This supersedes the construction blocker above
+  for these two methods only; other core/bootstrap work remains open.

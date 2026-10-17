@@ -16,10 +16,10 @@ public class FileOutputStream : OutputStream {
 
     static func CreateNew(path: string) -> Result<FileOutputStream, StreamError> {
         let payload = RuntimeServices.FileCreateNew(path)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(FileOutputStream(RuntimeServices.UnpackValue<int>(payload)))
+        return Ok(FileOutputStream(neoCLR.Runtime.UnpackValue<int>(payload)))
     }
 
     func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
@@ -69,10 +69,10 @@ public class FileOutputStream : OutputStream {
             return Error(StreamError.Closed())
         }
         let payload = RuntimeServices.FileWriteChunk(handle, buffer, offset, count)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
-        return Ok(RuntimeServices.UnpackValue<int>(payload))
+        return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
     private func FlushCore() -> Result<unit, StreamError> {
@@ -80,8 +80,8 @@ public class FileOutputStream : OutputStream {
             return Error(StreamError.Closed())
         }
         let payload = RuntimeServices.FileFlush(handle)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Error(DecodeError(RuntimeServices.UnpackValue<byte>(payload)))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(())
     }

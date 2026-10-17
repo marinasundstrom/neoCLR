@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Move production IsValue/UnpackValue ownership to native System.Runtime managed bodies using Raven eef6c6e3c and the existing explicit System.Value implementation contract. Retarget production callers, remove CLI/seed duplicates during staging, and grant System.Networking internal access solely for private DNS/socket payload decoding. Five-library compilation, interpreter/JIT/sanitized AOT payload consumption, admission rejection tests, metadata ownership inspection, editor completion and API fingerprints pass. Other core/bootstrap services and the installed SDK remain unmigrated.
+
 - Qualify native-owned scalar/unit payload helpers in managed JIT and sanitized AOT, including wrong-type RuntimeError propagation and root cleanup. Add a reusable native execution runner; native-only project compilation and editor completion pass. Record the production ownership blocker: System.Value is native-owned, but RuntimeServices helper definitions still require native managed-body construction before CLI/seed removal. No production ownership switch is claimed.
 
 - Qualify native-owned IsValue<T>/UnpackValue<T> SDK bodies with explicitly owned System.Value signatures and no CLI reference. Byte/int membership, byte extraction, EOF unit checks and wrong-type extraction rejection pass in the interpreter; native-only editor completion exposes both helpers. Production owner migration and JIT/AOT payload qualification remain open.

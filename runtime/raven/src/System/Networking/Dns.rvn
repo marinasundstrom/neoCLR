@@ -95,10 +95,10 @@ internal class DnsCompletion {
         } else {
             RuntimeServices.DnsLookupUntil(hostName, deadline, self.Complete)
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            operation = RuntimeServices.UnpackValue<long>(payload)
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
                 registration = token.Register(self.RequestCancellation)
             }
@@ -121,8 +121,8 @@ internal class DnsCompletion {
             _ = source.Cancel()
             return
         }
-        if RuntimeServices.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Dns.DecodeError(RuntimeServices.UnpackValue<byte>(payload))))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Error(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             let addresses: Sequence<string> = RuntimeServices.DnsAddresses(payload)
             let values = ArrayList<IPAddress>()

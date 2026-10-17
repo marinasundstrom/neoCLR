@@ -3,7 +3,6 @@ module System.Storage.FileText
 import System.Storage.FileReadError
 import System.Storage.FileWriteError
 import System.Result.*
-import System.Runtime.CompilerServices.RuntimeServices
 
 public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Result<System.Void, FileWriteError> {
     let status = neoCLR.Runtime.WriteAllText(path, text, maxBytes)
@@ -37,10 +36,10 @@ public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Re
 
 public func ReadAllText(path: string, maxBytes: int) -> System.Result<string, FileReadError> {
     let payload = neoCLR.Runtime.ReadAllText(path, maxBytes)
-    if !RuntimeServices.IsValue<byte>(payload) {
-        return Ok(RuntimeServices.UnpackValue<string>(payload))
+    if !neoCLR.Runtime.IsValue<byte>(payload) {
+        return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
     }
-    let status = RuntimeServices.UnpackValue<byte>(payload)
+    let status = neoCLR.Runtime.UnpackValue<byte>(payload)
     if status == 1 {
         return Error(FileReadError.InvalidLimit())
     }

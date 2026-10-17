@@ -581,3 +581,8 @@ ValueIs/ValueUnpack and a ConsoleReadByte service declaration. PayloadConsumer.d
 checks byte/int membership, byte extraction and EOF unit membership; InvalidPayload.dll
 attempts incompatible extraction. See the [qualification record](../../validation/native-core-removal/README.md#native-payload-helper-qualification).
 These are test-only fixture additions, not production core replacement.
+
+The --intrinsics probe also checks source-declared helper construction with explicit
+Value ownership, rejecting unowned declarations, wrong results and generic constraints.
+Production migration and its narrow Networking friend grant are recorded in the
+[production payload gate](../../validation/native-core-removal/README.md#production-source-owned-payload-helpers).

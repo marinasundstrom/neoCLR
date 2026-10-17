@@ -76,6 +76,12 @@ def main():
             if seed_text.count(declaration) != 1:
                 raise ValueError('Expected exactly one retained queue declaration: ' + name)
             seed_text = seed_text.replace(declaration, '')
+    # Native Value ownership supplies these managed bodies, not InternalCalls.
+    for name, result, opcode in (('IsValue', 'Boolean', 'value.is'), ('UnpackValue', 'T', 'value.unpack')):
+        declaration = f'.method static {name}<T>(Value value) -> {result}\nldarg value\n{opcode} T\nret\n.end\n'
+        if seed_text.count(declaration) != 1:
+            raise ValueError('Expected exactly one retained payload helper: ' + name)
+        seed_text = seed_text.replace(declaration, '')
     for path in (args.probe or args.core_reference, args.runtime, args.translator):
         if not path.is_file():
             raise FileNotFoundError(path)

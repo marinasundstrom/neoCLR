@@ -19,10 +19,10 @@ public struct Byte : Number {
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<byte, NumberParseError> {
         let payload = RuntimeServices.ParseByte(value)
-        if RuntimeServices.IsValue<byte>(payload) {
-            return Ok(RuntimeServices.UnpackValue<byte>(payload))
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<byte>(payload))
         }
-        let status = RuntimeServices.UnpackValue<int>(payload)
+        let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
             return Error(NumberParseError.InvalidFormat())
         }

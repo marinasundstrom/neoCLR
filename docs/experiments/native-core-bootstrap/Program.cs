@@ -233,6 +233,7 @@ if (args.Length == 2 && args[1] == "--intrinsics")
 {
     IntrinsicConsumer.Build(output, catalog, options);
     PayloadConsumer.Build(output, catalog, options);
+    PayloadSourceConsumer.Build(output, catalog, options);
 }
 Console.WriteLine("PASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard");
 
