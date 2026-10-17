@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "compilerRevision": "c0854cdda4115c9ec3153a26e73375db14011bd8",
+  "commands": [
+    {
+      "label": "https-build",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\https-server\\Native.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\qualified\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\target\\qualified\\neoclr-native-poc\\bin\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-https-project-validation\\https",
+        "--https-server"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "cleartext-build",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\https-server\\Native.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\qualified\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\target\\qualified\\neoclr-native-poc\\bin\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-https-project-validation\\cleartext"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "https-validation",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\https-server\\validate.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\qualified\\neoclr-native-poc",
+        "--project-build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-https-project-validation\\https",
+        "--cleartext-build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-https-project-validation\\cleartext",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-https-project-validation\\validation",
+        "--windows-jit"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "783e0ff9cc2ee3c92328c6a4825bf83a5af17074",
+  "bundleManifestSha256": "faefccac240e56e316026c8e67faf1fd769675d76098be30b3372c845f8f35d7",
+  "backendSha256": "d06e42154d756bb5d3f09dd22f0697a4d6ad11b81e9233f27c42739ab9b2966d"
+}

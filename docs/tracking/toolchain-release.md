@@ -5,14 +5,16 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
-## Active release preparation — 2026-10-17
+## Preview 16 release preparation — 2026-10-18
 
-The [release readiness work order](../release-readiness.md) owns the next candidate's
-remaining gates and runtime benchmark sequence. Both macOS ARM64 and Windows x64
-are required. Native bootstrap closure and a local debug SDK/editor preview are
-validated, but optimized packages, fresh candidate qualification and runtime benchmark
-results remain open. Compiler measurements are separate from execution measurements.
-The older dated entries below retain their original evidence, not current approval.
+The [release readiness work order](../release-readiness.md) and
+[qualification record](../validation/release-20261018/README.md) identify the exact
+macOS ARM64 and Windows x64 packages. Both optimized packages and installed editors
+pass, including twenty recovery cycles per platform and exact Task<int> inlays.
+The canonical source suite passes. Matching-package HTTPS checks pass. Final Windows benchmarks pass as well.
+All execution gates are closed; asset publication and website deployment follow.
+Compiler measurements remain separate from runtime measurements. Older dated entries
+below retain their original evidence and published release scope.
 
 ## Fixed for next release: ad-hoc union hover — 2026-10-14
 

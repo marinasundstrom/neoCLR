@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Close final Windows execution gates: matching-package HTTPS passes 27 JIT/AOT security/recovery cases; CPU/JSON benchmarks pass 55 processes and plain/typed-JSON HTTP validates 1,152 responses. Retain complete compressed reports, archive identity, ranges and startup, and update website benchmark tables for both platforms without cross-host speed claims.
+
 - Retain the refreshed canonical source pass at efa1687c8 (full suite, 25 smokes, host/MSRV/Clippy checks) and verify its qualified-source archive checksum. Matching-package macOS HTTPS passes all 15 AOT security/recovery/cleartext cases; keep low-level three-mode security coverage separate.
 
 - Retain final Windows package/editor qualification: extracted samples, HTTP, JSON, GC, headers, 24 await cases, exact inlays and twenty diagnostic-recovery cycles pass. Verify matching SDK/VSIX servers and both publication archive manifests; only README notices change, with executable/library bytes preserved. Repacked macOS acceptance passes.

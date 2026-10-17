@@ -1,155 +1,43 @@
-# Upcoming release readiness
+# Preview 16 release readiness
 
-Audit: 2026-10-17. Required release targets: **macOS ARM64 and Windows x64**.
-No new release number, tag, publication date or published artifact is selected.
-This is the active release work order, supporting the platform roadmap and
-[toolchain tracker](tracking/toolchain-release.md). Published release records remain frozen.
+Release targets: **macOS ARM64 and Windows x64**. SDK/extension version
+`0.1.16-neoclr.20261017.1`, Raven `c0854cdda`. The
+[qualification record](validation/release-20261018/README.md) owns exact revisions,
+archive hashes, raw reports and the remaining publication status.
 
-## Current assessment
+| Gate | Evidence and status |
+| --- | --- |
+| Source | Canonical extracted-source full suite and 25 smoke programs pass at `efa1687c8`, with strict Clippy/formatting, release-host checks and minimum-Rust checks on Windows/macOS/Linux. The qualified-source archive is that exact snapshot. |
+| Optimized packages | Both extracted platform packages pass. README-only publication repacking preserves every executable/library byte and verifies every manifest hash. |
+| Native metadata | Production System.Runtime and dependent libraries are built from native metadata and explicit runtime-service contracts, without CoreProbe semantic references. The retained seed supplies execution support. |
+| Runtime/library | Packaged collections, JSON/reflection, HTTP, GC and 24 await cases pass their supported interpreter/JIT/AOT matrices. Unchanged earlier focused type, checked-arithmetic and field/initializer evidence remains linked from the candidate record. |
+| Editor | Both platforms pass installed-server completion/hover/navigation checks, exact Task<int> inlays and two ten-cycle two-project diagnostic-recovery runs. SDK/VSIX server files match. |
+| HTTPS | Hosted security-provider checks pass on both platforms. Matching-package macOS HTTPS passes 15 AOT security/recovery/cleartext cases. Matching-package Windows JIT/AOT project qualification also passes. |
+| Runtime performance | Final macOS CPU/JSON and plain/typed-JSON HTTP measurements pass correctness checks; final Windows measurements also pass against the exact qualified archive. Compilation is excluded from steady-state measurements. |
+| API coverage | Native snapshot and website contract tests verify the reference and navigation. The route audit classifies 19 legacy-only hierarchical pages and validates 104 compatibility redirects; documented coverage limitations remain explicit. |
+| Publication | Final release notes, asset hashes and website links are being prepared. No published Preview 15 artifact or notes are modified. |
 
-Native compiler bootstrap construction is complete for the qualified repository
-build. That is not yet a qualified release package. At audit time neoCLR is
-`677279b35` and Raven `codex/neoclr` is `57dbabb175f8d934745c22f990657b2b8d1bd5c6`.
-There are 279 neoCLR commits after Preview 15, so the old release's delta-only
-qualification cannot certify this candidate.
+The [earlier candidate record](validation/release-candidate-20261017/README.md)
+retains the six repaired source-test failures, UTF-8/array and JSON codegen fixes,
+callback inference and repeated stale-project-diagnostic repairs. Failed candidate
+runs are not relabeled as release qualification.
 
-Evidence already available:
+## Scope and measurement limits
 
-- Five native libraries build without a CLI semantic core. Native parsing/async
-  consumers pass interpreter/JIT/sanitized AOT and editor completion; see
-  [native-core qualification](validation/native-core-removal/README.md).
-- The isolated macOS SDK/editor sample compiles, prints 42 and exits zero. Its
-  runtime binaries are debug builds, not optimized release artifacts; see
-  [installation evidence](validation/native-core-removal/installed-preview.json).
-- Website HTML and local links pass for 4,441 pages, alongside 22 website and four
-  native snapshot tests. Published download links still identify Preview 15.
+The release keeps broader structural work parked. Supported structural types,
+nominal interface variance, Function reflection, ranges, checked operations and
+field/type initialization retain their documented bounded contracts. Raven/.NET
+and Raven/neoCLR remain separate compiler lines.
 
-## Candidate validation checkpoint (2026-10-17)
+CPU/JSON and HTTP measurements use fresh processes, five rounds and explicit
+warmups. Native CPU batches contain 10,000 operations; smaller pilot batches are
+not used for native CPU conclusions. Startup is separate from throughput. Preserve
+raw data, correctness checks, host/toolchain details and artifact/input hashes.
+Interactive macOS and hosted Windows measurements are separate series, not a
+cross-platform ranking or a production capacity guarantee. The syntax-adapted
+Preview 15 comparison documents the historical endpoint spelling; it does not
+justify precise speedup claims under different host load. PostgreSQL, allocation
+rates, sustained concurrency and HTTPS throughput are not newly measured.
 
-An optimized macOS runtime/backend and extracted native-core bundle were built
-locally. Archive acceptance and untimed CPU/JSON preparation exposed two native
-codegen gaps before measurements began:
-
-- Native UTF-8 byte arrays and grapheme arrays needed exact InternalCall result
-  admission. UTF-8 results also needed an ordinary managed-array tag and inclusion
-  in nominal interface dispatch. The focused fix and executable evidence are in
-  [text-vector validation](validation/release-candidate-20261017/README.md).
-- The packaged JSON consumer's identity test on a value-only union now has bounded
-  native lowering, with exact-shape admission and preserved default/null semantics.
-  Its unchanged async/error/reflection workload passes interpreter/JIT/AOT against
-  the corrected backend; see [JSON evidence](validation/release-candidate-20261017/json-patterns.json).
-  Fresh archive acceptance is recorded below.
-
-A second macOS archive with the corrected backend was staged, extracted and
-validated without overrides. Collections, tasks and JSON pass. Its original
-acceptance stopped at Raven's `RAV2100` diagnostic on the HTTP JSON server's
-`HttpError | JsonError` match. [Archive acceptance](validation/release-candidate-20261017/package-acceptance.json)
-retains that failure and archive hash.
-
-Raven `743e229a6` on `codex/neoclr` fixes the missing structural-union coverage
-analysis. Twenty-one focused native/.NET diagnostic and semantic-model checks pass;
-the unchanged HTTP server compiles using an isolated compiler update. The subsequent
-metadata-library repair admits its missing authored-method union signature path;
-the unchanged HTTP client compiles and the interpreter client/server pair passes.
-The backend repair now preserves union generic-argument metadata recursively.
-Unchanged HTTP server requests and client/server execution pass in JIT and AOT;
-seven backend tests and one interpreter visibility test pass.
-See [qualification](validation/release-candidate-20261017/README.md#authored-method-union-signatures).
-A new coherent macOS candidate now passes extracted-package acceptance with fresh
-SDK/server/VSIX and five native libraries. Its main installed-editor suite passes
-26 checks and inlay checks pass. The subsequent fixed candidate uses Raven
-`7bfbce21f`: workspace-relative watching and metadata dependency snapshots close
-the repeated stale-project-diagnostic blocker. Its fresh installed SDK/VSIX passes
-26 main checks, inlays and two ten-cycle runs requiring both native projects to
-invalidate and recover. See [fixed candidate evidence](validation/release-candidate-20261017/README.md#fixed-packaged-editor-qualification).
-The existing user SDK/profile and published archives are unchanged.
-
-CPU/JSON benchmark preparation now compiles and links successfully against this
-extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)
-identifies the workloads and artifacts; it is not an execution or timing result.
-
-Local CPU/JSON measurements now pass 45 candidate and 45 syntax-adapted Preview 15
-processes. The initial CPU interpreter result was about 35% lower. Raven 368e5ca39
-removes a redundant guard only for provably safe exclusive unit-step ranges;
-23 compiler tests and interpreter/JIT/AOT boundary consumers pass. A compiler-only
-repeat improves median throughput from 4.27 to 6.31 operations/s, close to the
-previous Preview 15 result of 6.45. See [isolated evidence and limitations](../benchmarks/execution/unit-step-20261017/README.md).
-The `.20261017.4` SDK/library refresh carries that fix and callback inference, passes extracted acceptance, range interpreter/JIT/AOT, 26 editor checks, twenty two-project recovery cycles and exact `Task<int>` inlays; see [package evidence](validation/release-candidate-20261017/README.md#inference-fixed-packaged-editor-qualification). Windows execution/editor qualification remains pending. The pinned Raven revision
-is available on the isolated remote candidate branch. Fresh macOS HTTP results
-are linked below; Windows measurements consume the matching qualification archive.
-
-## Required before release
-
-| Gate | Observed gap | Required outcome |
-| --- | --- | --- |
-| Candidate identity | The refreshed workflow pins Raven `c0854cdda` and package `0.1.16-neoclr.20261017.1`; Windows run `39073227105` is in progress. The earlier run `39071070147` passed extracted samples but failed explicit state-machine configuration clearing; the compiler repair passes nine local checks. | Select exact available Raven/runtime revisions and a distinct candidate package version. Record hashes for compiler, server, extension, libraries, runtime, codegen and native hosts. |
-| Source qualification | The [canonical extracted-source run at `25828f59e`](validation/release-candidate-20261017/canonical-source-passed.json) passes the full suite and all 25 smoke programs, closing the six original failures; Rust 1.85 all-target checking passes locally and in CI on Windows/macOS/Linux; see the [source report](validation/release-candidate-20261017/source-audit-report.json). The native source validator still checks the legacy seed fixture. Its pinned hash was reproduced successfully, but that is not production-core acceptance. | Run canonical extracted-source full tests once, formatting/Clippy and minimum-Rust checks on all release targets; retain focused macOS/Windows host/ABI checks. Keep legacy fixture evidence distinct from the native library/package gate. |
-| Optimized packages | A fresh optimized macOS candidate passes extracted-package acceptance; no fresh Windows native-core package acceptance is recorded. | Build optimized macOS ARM64 and Windows x64 runtime/backend/host packages from the same selected revisions. Extract and validate each actual archive, not a working checkout. |
-| Runtime/library correctness | Narrow bootstrap consumers do not qualify all production wrappers or all newly integrated type-system behavior. | On both targets exercise packaged collections, parsing/text, checked arithmetic, readonly/type initialization, variance/imported generics, Function invocation, reflection/JSON, async, HTTP/TLS and GC. Use interpreter/JIT/AOT for supported workloads. Reuse unchanged focused evidence only with explicit dependency justification. |
-| Editor | Earlier macOS package passed 26 main checks and twenty two-project recovery cycles. The refreshed `.20261017.4` package additionally passes exact `Task<int>` inference and repeats all recovery checks. Windows qualification is pending. | Validate native-only completion, hover, navigation, inlays, configuration recovery and build/run tasks with the exact shipped SDK/VSIX on both platforms. Test stale-output rejection and HTTP task inputs. |
-| API coverage | [Route audit](validation/release-candidate-20261017/api-route-audit.json) verifies existing local targets for 104 compatibility redirects and classifies 19 legacy-only hierarchical pages. Reference-limitation notices remain; native navigation uses the native snapshot. | Verify redirect destinations; classify the 19 pages against native metadata. Preserve documented current APIs, remove obsolete scaffolds from current navigation, and retain honest notices/manual references for real coverage gaps. |
-| Documentation and packaging | The previous next-preview draft described the already released unified runtime. Native-core migration changes the compiler/library cohort. | Finalize current release notes, supported-feature limits, notices, package prerequisites and checksums. Change published download URLs only when actual new assets exist. |
-| Runtime performance | Local candidate/Preview 15 CPU/JSON measurements are recorded; the isolated unit-step guard fix largely recovers the CPU interpreter regression. Fresh complete-package CPU/JSON measurements now pass (55 processes); [results and host limitations](../benchmarks/execution/candidate-refreshed-20261017/README.md) are retained. Fresh [plain/typed-JSON HTTP measurements](../benchmarks/http-server/candidate-refreshed-20261017/README.md) also pass: 1,152 responses, zero errors. The [Preview 15 HTTP comparison](../benchmarks/http-server/preview15-comparison-20261017/README.md) also passes with an explicit historical range spelling. Windows measurements remain incomplete. | Complete the benchmark preparation below, then retain and review runtime measurements on both release targets before publication. |
-
-The 19 hierarchical API pages comprise two Enum helper pages, two namespace
-containers and 15 exception/compiler-scaffold pages. This is a route inventory,
-not a conclusion that any particular API can be deleted. Inspect native definitions
-and supported contracts before removing or redirecting their pages.
-
-## Runtime benchmark work order
-
-Compiler performance is outside this gate. Build source programs and AOT outputs
-before timed execution. Report process startup separately: it can include loading,
-verification and JIT preparation, but must not be mixed into steady-state throughput.
-
-1. Host selection is implemented for CPU/JSON and plain/JSON HTTP preparation:
-   macOS ARM64 uses `console`/`http` and `app`; Windows x64 uses
-   `windows-console`/`windows-http` and `app.exe`. Thirteen framework tests pass.
-   Actual Windows execution remains unqualified. Windows database preparation
-   explicitly remains unsupported.
-2. Run untimed correctness/preparation checks against each fresh extracted release
-   bundle. Do not time builds concurrently with a benchmark or publish failed runs.
-3. Rerun CPU summation, JSON DOM serialization/deserialization, and HTTP plain/typed
-   JSON in interpreter, JIT and AOT on macOS ARM64 and Windows x64. Preserve each
-   result checksum and validate every HTTP response. PostgreSQL remains a separately
-   identified optional workload with a pinned disposable database; its absence must
-   not be reported as a successful measurement.
-4. Use at least five fresh-process rounds with rotating mode order and recorded
-   warmups. Preserve the existing larger native CPU batches (10,000 operations,
-   20 warmups) rather than reverting to sub-millisecond samples. Keep interpreter
-   and JSON batch settings explicit. Retain raw samples, median, range, errors,
-   hardware/OS/toolchain, power/load conditions, exact artifact and harness hashes.
-5. Record allocation/GC diagnostics separately where supported by existing profiling
-   harnesses. Do not describe RSS as managed allocation rate or infer allocation
-   savings from timing alone. Profile suspicious regressions before changing code.
-6. Compare the new candidate with Preview 15 on the same host using the same workload
-   and harness where compatible. Keep Preview 14 published numbers as historical
-   evidence, not a controlled before/after comparison. If an old bundle cannot run
-   the workload unchanged, document the incompatibility rather than invent a ratio.
-7. Review regressions and repeat material or noisy differences under matched
-   conditions. These fixed-count exploratory harnesses have no established universal
-   regression threshold; do not manufacture one. Record unresolved performance
-   risks explicitly before declaring release readiness.
-8. Update benchmark pages from the accepted raw evidence. Keep macOS and Windows
-   results separate; different hardware does not establish a platform speed ranking.
-
-Existing procedures: [execution](../benchmarks/execution/README.md),
-[HTTP](../benchmarks/http-server/README.md),
-[framework](../benchmarks/framework/README.md),
-[source gates](next-preview-validation.md).
-
-## Order and completion rule
-
-First reconcile candidate pins and API inventory, then prepare and qualify both
-optimized packages. Port/check benchmark preparation while those gates are being
-established. Measure the frozen packages after correctness passes, investigate
-regressions, and complete release metadata and artifact review. A later code fix
-invalidates affected measurements and checks; a prose-only correction does not
-require rerunning runtime workloads.
-
-Both target packages and their benchmark records are required by the author.
-Fresh local CPU/JSON measurements and the subsequent isolated compiler fix
-are recorded above. This audit does not claim remote CI status, Windows execution
-or publication. Structural expansion remains
-parked; known bounded limitations do not imply a requirement to implement every
-unsupported feature before this release.
+All execution gates pass. Publication still requires verified uploaded asset
+checksums and the separate manual website deployment.

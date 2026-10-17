@@ -1,0 +1,325 @@
+{
+  "execution": {
+    "passed": true,
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "rawSha256": "cd460e9274906deed520b10d2e33d1e2f4757e56956847b7f5001541e011b3ff",
+    "gzipSha256": "f056271205cc4ff465c4ac38c8d8e3461467d47c9bb70d02a7f936e13589f6ff",
+    "summary": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.8571066000000656,
+            "minimum": 3.753689100000088,
+            "maximum": 4.058305099999984
+          },
+          "batchSeconds": {
+            "median": 2.9948825999999826,
+            "minimum": 2.920377999999914,
+            "maximum": 3.0495752000000493
+          },
+          "operationsPerSecond": {
+            "median": 5.342446478536452,
+            "minimum": 5.246632383421711,
+            "maximum": 5.478742820278906
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.20922209999992,
+            "minimum": 3.121218499999941,
+            "maximum": 3.681575099999918
+          },
+          "batchSeconds": {
+            "median": 0.00018020000004526082,
+            "minimum": 0.00014310000005934853,
+            "maximum": 0.00026109999998880085
+          },
+          "operationsPerSecond": {
+            "median": 88790.23305206039,
+            "minimum": 61279.203372984586,
+            "maximum": 111809.9230843064
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.010208299999931114,
+            "minimum": 0.009228600000028564,
+            "maximum": 0.012122200000021621
+          },
+          "batchSeconds": {
+            "median": 0.00021770000000742584,
+            "minimum": 0.00017289999993863603,
+            "maximum": 0.00026430000002619636
+          },
+          "operationsPerSecond": {
+            "median": 73495.63619409385,
+            "minimum": 60537.268249769746,
+            "maximum": 92539.039940304
+          }
+        }
+      },
+      "json.serialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.830592499999966,
+            "minimum": 3.6806417000000238,
+            "maximum": 4.321019699999965
+          },
+          "batchSeconds": {
+            "median": 3.739091399999893,
+            "minimum": 3.546581099999912,
+            "maximum": 4.29217970000002
+          },
+          "operationsPerSecond": {
+            "median": 4.279114439406444,
+            "minimum": 3.727709722871092,
+            "maximum": 4.511387036941125
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.220305099999905,
+            "minimum": 3.1515521000000035,
+            "maximum": 3.469452199999978
+          },
+          "batchSeconds": {
+            "median": 0.04216900000005808,
+            "minimum": 0.04141920000006394,
+            "maximum": 0.04620959999999741
+          },
+          "operationsPerSecond": {
+            "median": 379.4256444302204,
+            "minimum": 346.2483986011759,
+            "maximum": 386.294278981132
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.009805199999959768,
+            "minimum": 0.009465399999953661,
+            "maximum": 0.011955999999941014
+          },
+          "batchSeconds": {
+            "median": 0.04247269999996206,
+            "minimum": 0.041230299999938325,
+            "maximum": 0.04447579999998652
+          },
+          "operationsPerSecond": {
+            "median": 376.71257066337415,
+            "minimum": 359.74619905667464,
+            "maximum": 388.0641178944595
+          }
+        }
+      },
+      "json.deserialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.9947579000000815,
+            "minimum": 3.775981300000012,
+            "maximum": 4.078181100000052
+          },
+          "batchSeconds": {
+            "median": 3.738639400000011,
+            "minimum": 3.6427625000000035,
+            "maximum": 3.879301899999973
+          },
+          "operationsPerSecond": {
+            "median": 4.279631782621227,
+            "minimum": 4.124453422921302,
+            "maximum": 4.392270975667501
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.3282409999999345,
+            "minimum": 3.0994759999999815,
+            "maximum": 3.540273700000057
+          },
+          "batchSeconds": {
+            "median": 0.056286599999907594,
+            "minimum": 0.05522229999996853,
+            "maximum": 0.057453099999975166
+          },
+          "operationsPerSecond": {
+            "median": 284.2594862725101,
+            "minimum": 278.4880189233813,
+            "maximum": 289.73802250194433
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.010026799999991454,
+            "minimum": 0.009542599999917911,
+            "maximum": 0.012569199999916236
+          },
+          "batchSeconds": {
+            "median": 0.056867500000066684,
+            "minimum": 0.05597950000003493,
+            "maximum": 0.0597171999999091
+          },
+          "operationsPerSecond": {
+            "median": 281.35578317986966,
+            "minimum": 267.92950774691974,
+            "maximum": 285.8189158529465
+          }
+        }
+      }
+    }
+  },
+  "cpu-native-longer": {
+    "passed": true,
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "rawSha256": "0a2ba6fc611fd24ae95e4b50645807a6614b0e3f0e3c18276ff9f5c0979626ab",
+    "gzipSha256": "f3bf58ffcd2dbc7619032575460ff191d0cfb7658bd4798861a385846aaf4a93",
+    "summary": {
+      "cpu.sum": {
+        "jit": {
+          "startupSeconds": {
+            "median": 3.3453431000000364,
+            "minimum": 3.2961288000000195,
+            "maximum": 3.448405800000046
+          },
+          "batchSeconds": {
+            "median": 0.13962290000006305,
+            "minimum": 0.1374451000000363,
+            "maximum": 0.14401299999997264
+          },
+          "operationsPerSecond": {
+            "median": 71621.48902504878,
+            "minimum": 69438.17572026067,
+            "maximum": 72756.32234250155
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.009648399999946378,
+            "minimum": 0.009448199999951612,
+            "maximum": 0.010277100000052997
+          },
+          "batchSeconds": {
+            "median": 0.12531460000002426,
+            "minimum": 0.11722880000002078,
+            "maximum": 0.13280710000003637
+          },
+          "operationsPerSecond": {
+            "median": 79799.16147039582,
+            "minimum": 75297.1791417572,
+            "maximum": 85303.27018615074
+          }
+        }
+      }
+    }
+  },
+  "http-plain": {
+    "passed": true,
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "rawSha256": "b8c3eb554ae4bf38ff4f6390eeff0a74ebe1ea94084577a530b40d608cee68f3",
+    "gzipSha256": "983261ab1622bd5dd2c18170abc60c095e768e527c62e85b98b983b6faec8361",
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 2.0828194265679265,
+          "min": 1.8999946372650627,
+          "max": 2.2079802588901165
+        },
+        "startupSecondsMedian": 3.388703699999951,
+        "latencySeconds": {
+          "p50": 0.4719515000000456,
+          "p95": 0.5632875000000013,
+          "p99": 0.635867200000007
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 62.34848020387841,
+          "min": 45.594134314624604,
+          "max": 69.80289117766596
+        },
+        "startupSecondsMedian": 6.352502699999945,
+        "latencySeconds": {
+          "p50": 0.00830380000002151,
+          "p95": 0.046530100000040875,
+          "p99": 0.048478599999953076
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 57.89545672638701,
+          "min": 51.111167428072726,
+          "max": 64.94727769420412
+        },
+        "startupSecondsMedian": 0.006903099999931328,
+        "latencySeconds": {
+          "p50": 0.00831289999996443,
+          "p95": 0.04072550000000774,
+          "p99": 0.04668360000005123
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    }
+  },
+  "http-json": {
+    "passed": true,
+    "platform": "Windows-2025Server-10.0.26100-SP0",
+    "rawSha256": "474c3427656622ae5c99477c616bef61a58ea07eee7f4d43c9d604dd2017e80b",
+    "gzipSha256": "99b3e46e8209a68d681a4a9a877ce827be93cef9fa575ef0686d40b4c75c97e7",
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 1.208174417495766,
+          "min": 1.1622117540518333,
+          "max": 1.2405251724034072
+        },
+        "startupSecondsMedian": 3.434404000000086,
+        "latencySeconds": {
+          "p50": 0.8185292999999092,
+          "p95": 0.8854212999999618,
+          "p99": 0.9403850999999577
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 44.891614807478746,
+          "min": 42.934993200168094,
+          "max": 53.99615412389801
+        },
+        "startupSecondsMedian": 8.808498999999983,
+        "latencySeconds": {
+          "p50": 0.01467200000001867,
+          "p95": 0.039219399999865345,
+          "p99": 0.051145200000064506
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 45.67380567280513,
+          "min": 36.612512692340566,
+          "max": 50.92901958879483
+        },
+        "startupSecondsMedian": 0.006951900000103706,
+        "latencySeconds": {
+          "p50": 0.016030700000101206,
+          "p95": 0.047480499999892345,
+          "p99": 0.05224760000010065
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
-# Preview 16 qualification — in progress
+# Preview 16 qualification
 
 Package version `0.1.16-neoclr.20261017.1`, Raven `c0854cdda`. Publication remains
-pending final Windows measurements and matching-package HTTPS qualification.
+pending final asset publication and website deployment.
 
 The macOS archive passes [extracted sample acceptance](macos-acceptance.json) and
 [HTTP client/server acceptance](macos-acceptance-http.json). The installed extension
@@ -69,3 +69,17 @@ connections, timeout/cancellation, recovery, credential failures and cleartext
 isolation. It uses the packaged compiler/backend and library hashes. Low-level
 security-provider interpreter/JIT/AOT coverage remains separately recorded in the
 [hosted contracts](../release-candidate-20261017/hosted-native-contracts.json).
+
+The [Windows HTTPS project](windows-https-project.json) passes 27 cases with the
+same scenarios in JIT/AOT plus credential and cleartext checks. Its
+[build identity](windows-https-build.json) records the qualified package compiler,
+manifest and backend; [hosted run](https://github.com/marinasundstrom/neoCLR/actions/runs/39076063898)
+passes without the legacy SDK bootstrap.
+
+## Final Windows measurements
+
+[Windows CPU/JSON and HTTP results](../../../benchmarks/release-20261018/windows/README.md)
+pass 55 processes and 1,152 responses against the exact qualified archive. Reports
+retain five-round ranges, startup, correctness checks, raw/gzip hashes and host
+limitations. Together with macOS, this closes the two-platform measurement gate;
+no cross-platform performance ranking or unmeasured PostgreSQL result is implied.
