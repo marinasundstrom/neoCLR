@@ -2295,3 +2295,13 @@ ConstantValue and TypeInfo IsBeforeFieldInit/TypeInitializer are in the matching
 CoreProbe reference, XML summaries and manual introspection/reflection guide. No new
 public type exclusion is needed. The native execution scope remains bounded as documented;
 general closed-generic reflection and arbitrary boxed value payloads are not claimed.
+
+### Native parameter-array marker ownership (2026-10-17)
+
+ParamArrayAttribute is now emitted by native System.Runtime, with a public constructor
+and parameter-only usage metadata. It remains in the RavenDoc selection. The matching
+native reference and compiler-reference fingerprints were refreshed; inspection does
+not construct attributes. Compiler-reference projection remains documentation tooling,
+not the desired target semantic reference. The themed audit includes the optional
+PostgreSql provider required by the current API content; its omission correctly fails
+content-ID validation. Native service bootstrap removal is still in progress.

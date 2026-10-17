@@ -1,0 +1,83 @@
+{
+  "scope": "Native-owned ParamArrayAttribute migration; production build still uses CLI core and retained runtime services.",
+  "compilerRevision": "a6006e458",
+  "metadataRevision": "609fff182",
+  "artifacts": {
+    "System.Runtime": {
+      "sha256": "f828932821fa3167bbc8839cdebafd443c2f4dc3ac7b9a499c307503fd6c5579",
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "NeoCLR.CoreProbe"
+        }
+      ],
+      "bootstrapTypeRefs": []
+    },
+    "System.Data": {
+      "sha256": "ff9e9342eed75593d7305dc29a921ddf03a6e4d1440c7b43562b70eb7583b37b",
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        }
+      ],
+      "bootstrapTypeRefs": []
+    },
+    "System.Networking": {
+      "sha256": "51f2a335748d27bebdb9437a4ae02cb0b4171ac907e6c96d8c544a656bad03b9",
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        },
+        {
+          "MetadataToken": 587202562,
+          "Name": "NeoCLR.CoreProbe"
+        }
+      ],
+      "bootstrapTypeRefs": []
+    },
+    "System.Web": {
+      "sha256": "f56834b280d34edbed270ca8ec8e409afcc2217fb3caad253144009552349627",
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        },
+        {
+          "MetadataToken": 587202562,
+          "Name": "System.Networking"
+        },
+        {
+          "MetadataToken": 587202563,
+          "Name": "System.Data"
+        }
+      ],
+      "bootstrapTypeRefs": []
+    },
+    "System.Data.PostgreSql": {
+      "sha256": "db1159d8c6d010a0ba06ce5724d70280fc6233708443949a10604ab0f6b80552",
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        },
+        {
+          "MetadataToken": 587202562,
+          "Name": "System.Data"
+        },
+        {
+          "MetadataToken": 587202563,
+          "Name": "System.Networking"
+        }
+      ],
+      "bootstrapTypeRefs": []
+    }
+  },
+  "consumer": {
+    "result": 42,
+    "execution": "interpreter",
+    "sha256": "dece39c5d4dfe7a814ba0ba656e04c8b149fd7c9b134a2ad4f43d0ab28998929",
+    "bundle": "native-param-marker-libraries-v2 (four libraries); v3 adds PostgreSql for documentation coverage"
+  }
+}

@@ -57,6 +57,11 @@ def main():
         if seed_text.count(declaration) != 1:
             raise ValueError('Expected exactly one retained declaration: ' + name)
         seed_text = seed_text.replace(declaration, '')
+    marker = '.type class System.ParamArrayAttribute\n.method instance .ctor() -> noresult\nret\n.end\n.end\n'
+    if 'System.ParamArrayAttribute' in ownership['libraries'][0]['types']:
+        if seed_text.count(marker) != 1:
+            raise ValueError('Expected exactly one retained parameter-array marker')
+        seed_text = seed_text.replace(marker, '')
     for path in (args.probe or args.core_reference, args.runtime, args.translator):
         if not path.is_file():
             raise FileNotFoundError(path)

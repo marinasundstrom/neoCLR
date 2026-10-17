@@ -127,15 +127,15 @@ The sequence may change when the unresolved inventory produces evidence. No blan
 port of every CLI type, no completion-only filtering, and no metadata dependency
 stripping are accepted substitutes for the above gates.
 
-## Uncommitted prototype status
+## Validated migration progress
 
-Before the audit request, a native-owned ParamArray marker writer/reader prototype
-passed a focused SDK roundtrip/introspection/invalid-target test, and the legacy
-parameter-array probe still passed. Production source/seed changes were attempted,
-but the rebuild stopped at duplicate ownership: ParamArrayAttribute remains in the
-CLI core as well as the new source declaration. Imported-native marker handling,
-production compilation, runtime consumers and API snapshot refresh are unfinished.
-The SDK local/imported marker support has since passed its focused roundtrip and
-legacy probes and is committed as a separate migration slice. Production source/seed
-changes remain uncommitted and are **not** validated production support. Compiler
-selection and library ownership must be completed before replacing the bundle.
+- SDK local/imported and symbol-authored parameter-array markers are validated in
+  `99eabe63f`/`609fff182`; Raven symbol selection is validated in `a6006e458`.
+- Native System.Runtime now owns ParamArrayAttribute. Staged preparation removes its
+  CLI and retained-seed duplicates. A fresh five-library documentation bundle builds;
+  an expanded-call consumer returns 42 using the fresh four-library bundle.
+- Native-only LSP completion includes the marker without CLI delegate leakage. See
+  [qualification details](README.md#native-parameter-array-migration).
+- The initial duplicate-ownership failure is resolved. Retained runtime-service
+  references, intrinsic ownership and source-core production remain open. Neither
+  the installed SDK nor production editor configuration has been replaced.

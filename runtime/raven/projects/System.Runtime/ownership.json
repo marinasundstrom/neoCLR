@@ -184,7 +184,8 @@
         "runtime/raven/src/System/Collections/AsyncIterable.rvn",
         "runtime/raven/src/System/Collections/AsyncIterator.rvn",
         "runtime/raven/src/System/Diagnostics/StackTrace.rvn",
-        "runtime/raven/native/RuntimeDiagnosticsCalls.rvn"
+        "runtime/raven/native/RuntimeDiagnosticsCalls.rvn",
+        "runtime/raven/src/System/ParamArrayAttribute.rvn"
       ],
       "types": [
         "System.AttributeTargets",
@@ -309,7 +310,8 @@
         "System.AsyncDisposable",
         "System.Collections.AsyncIterable`1",
         "System.Collections.AsyncIterator`1",
-        "System.Diagnostics.StackTrace"
+        "System.Diagnostics.StackTrace",
+        "System.ParamArrayAttribute"
       ]
     }
   ],

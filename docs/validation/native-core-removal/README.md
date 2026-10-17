@@ -36,3 +36,19 @@ The project probe compiles/emits both explicit and inferred configurations, keep
 explicit mismatches rejected and leaves the legacy CLI configuration checks intact.
 The website now explicitly distinguishes the production CLI semantic dependency
 from native metadata output and the reduced native-only qualification.
+
+## Native parameter-array migration
+
+SDK `99eabe63f`/`609fff182` and Raven `a6006e458` close the local/imported and
+symbol-authored parameter-marker gap. `System.Runtime` now declares ParamArrayAttribute;
+bootstrap preparation removes its duplicate CLI and seed declarations. This is a
+staged migration, not a bridge-free bundle. [Fresh artifact evidence](native-parameter-production.json)
+shows no bootstrap TypeRefs in Runtime/Data/Networking/Web/PostgreSql; retained service
+AssemblyRefs still remain. A fresh production consumer compiles expanded arguments and
+returns 42 in the interpreter. The parameter-array physical calling convention is unchanged.
+
+[Language-server completion](native-parameter-completion.json) against native-only core
+and marker references includes ParamArrayAttribute and Int32 without CLI delegates.
+This reduced editor fixture establishes native metadata loading, not complete production
+editor migration. The production reference snapshot is refreshed from the matching native
+bundle and documents the marker under System.Runtime. The installed SDK is unchanged.

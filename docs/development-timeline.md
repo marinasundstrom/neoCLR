@@ -30,6 +30,9 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Author:** directs porting needed types and attributes into neoCLR, then asks to
   identify the issues before fixing them in a sweep. Clarifies: “the goal is that
   the compiler should load native metadata references for neoCLR”.
+- **Author follow-up:** directs finishing the audit, then working through the migration
+  with compilation/editor validation and separate commits. Explicitly includes filling
+  gaps between Raven and the metadata library in that scope.
 - **Assistant response/action:** pauses implementation and inventories the existing
   production bundle, compiler contracts and retained runtime-service calls. Defines
   native core and dependency metadata as the end state for compilation and editor

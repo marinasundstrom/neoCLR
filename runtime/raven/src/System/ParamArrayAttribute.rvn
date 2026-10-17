@@ -1,0 +1,8 @@
+module System
+
+/// Marks the final array parameter as accepting a variable number of arguments.
+[AttributeUsage(AttributeTargets.Parameter)]
+public class ParamArrayAttribute : Attribute {
+    /// Initializes the parameter-array marker.
+    init() { }
+}

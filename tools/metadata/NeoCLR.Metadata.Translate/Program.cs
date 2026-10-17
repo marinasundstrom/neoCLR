@@ -11,7 +11,7 @@ if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
             throw new InvalidDataException("input and output paths must differ");
         using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(args[1]);
         var module = image.MainModule;
-        var removedNames = new HashSet<string> { "System.AttributeTargets", "System.AttributeUsageAttribute" };
+        var removedNames = new HashSet<string> { "System.AttributeTargets", "System.AttributeUsageAttribute", "System.ParamArrayAttribute" };
         foreach (var type in module.GetTypes())
             foreach (var attribute in type.CustomAttributes.ToArray())
                 if (removedNames.Contains(attribute.AttributeType.FullName))

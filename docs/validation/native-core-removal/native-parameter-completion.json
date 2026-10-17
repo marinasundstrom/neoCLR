@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "labels": [
+    "ParamArrayAttribute",
+    "Object",
+    "ValueType",
+    "Attribute",
+    "Byte",
+    "Int32",
+    "Int64",
+    "Double",
+    "Boolean",
+    "Void",
+    "String",
+    "Runtime"
+  ],
+  "serverSha256": "5d4d5d70cbbbd29ae92c8afe0bf6693a55c78aa939cddbe75a2e2971000c621c",
+  "project": "/Users/robert/Projects/neoclr/target/native-params-editor"
+}
