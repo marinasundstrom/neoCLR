@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Recognize the native RuntimeContext.ExecutingAssembly getter calling its reserved InternalCall directly during JIT/AOT preparation. Preserve lexical caller identity and legacy facade validation; four focused tests pass, including malformed-target rejection.
+
 - Admit no-result native DrainEntryTasks declarations without introducing an inhabited unit result. Interpreter queue resumption preserves the caller stack; codegen stand-ins retain the exact result shape. Six entry-result tests and the focused native binding test pass.
 
 - Qualify source-owned native Self interface signatures and concrete primitive implementations in Raven source-core construction: static Int32.Zero consumption passes compilation/completion and interpreter/JIT/sanitized AOT, with native reflection retaining Self on the interface and Int32 on its implementation.

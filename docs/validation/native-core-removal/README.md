@@ -511,6 +511,15 @@ result. The interpreter remembers that shape while running queued callbacks and
 does not push a synthetic unit on return. The JIT/AOT binding stand-in emits a
 bare return for that signature. The existing inhabited-unit contract is retained
 for explicit legacy fixtures. Six `entry_results` integration tests and the
-`task_queue_intrinsics_require_exact_contracts` codegen test pass; production
+task-queue codegen binding test pass; production
 backend qualification is recorded separately below. This is startup plumbing,
 not a change to task scheduling or broader structural features.
+
+## Native executing-assembly getter
+
+JIT/AOT preparation now validates the source getter's direct reserved InternalCall
+as well as the explicit historical two-step facade. Caller-specific assembly
+recipes and receiver checks remain unchanged. Four `runtime_context` codegen
+tests pass, including native direct calls and malformed/indirect rejection.
+This closes a preparation dependency on the removed IntrospectionRuntimeServices
+wrapper; it does not relax native service admission.

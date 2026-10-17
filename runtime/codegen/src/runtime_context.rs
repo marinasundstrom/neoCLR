@@ -108,30 +108,36 @@ pub fn prepare(input: &mut Module, source: &Module) -> Result<Vec<Query>, Error>
         {
             continue; // A similarly named user type is not the runtime contract.
         }
-        let wrapper = forwarding_target(input, &original)?;
-        let wrapper_owner = wrapper
-            .owner
-            .as_ref()
-            .and_then(|ty| source.type_definition(ty))
-            .and_then(|ty| ty.origin.as_ref())
-            .ok_or("missing ExecutingAssembly service owner")?;
         if !original.instance
             || !original.origin.as_ref().is_some_and(|origin| {
                 origin.assembly == scope.assembly && origin.module == scope.module
             })
-            || wrapper.instance
-            || wrapper_owner.name != "System.Runtime.CompilerServices.IntrospectionRuntimeServices"
-            || wrapper_owner.assembly != scope.assembly
-            || wrapper_owner.module != scope.module
-            || !wrapper.origin.as_ref().is_some_and(|origin| {
-                origin.name == "ExecutingAssembly"
-                    && origin.assembly == scope.assembly
-                    && origin.module == scope.module
-            })
         {
-            return Err("ExecutingAssembly requires its scoped runtime service facade".into());
+            return Err("ExecutingAssembly requires its scoped runtime getter".into());
         }
-        let service = forwarding_target(input, wrapper)?;
+        let target = forwarding_target(input, &original)?;
+        let service = if target.owner.is_none() {
+            // Native source libraries call the reserved service directly.
+            target
+        } else {
+            // Explicit legacy bridge fixtures retain one extra managed facade.
+            let wrapper_owner = target.owner.as_ref()
+                .and_then(|ty| source.type_definition(ty))
+                .and_then(|ty| ty.origin.as_ref())
+                .ok_or("missing ExecutingAssembly service owner")?;
+            if target.instance
+                || wrapper_owner.name != "System.Runtime.CompilerServices.IntrospectionRuntimeServices"
+                || wrapper_owner.assembly != scope.assembly
+                || wrapper_owner.module != scope.module
+                || !target.origin.as_ref().is_some_and(|origin| {
+                    origin.name == "ExecutingAssembly"
+                        && origin.assembly == scope.assembly && origin.module == scope.module
+                })
+            {
+                return Err("ExecutingAssembly requires its scoped runtime service facade".into());
+            }
+            forwarding_target(input, target)?
+        };
         if service.name != "neoCLR.Runtime.ExecutingAssembly"
             || service.owner.is_some()
             || service.instance
@@ -348,6 +354,19 @@ mod tests {
             matches!(&input.functions[4].body[1], Op::String(identity) if identity == "Dependency")
         );
         assert!(source.functions[0].parameters.is_empty());
+    }
+
+    #[test]
+    fn native_direct_service_preserves_callers_and_rejects_non_intrinsics() {
+        let mut source = fixture();
+        source.functions[0].body = source.functions[1].body.clone();
+        let mut input = source.clone();
+        let queries = prepare(&mut input, &source).unwrap();
+        assert_eq!(queries[0].assemblies.len(), 2);
+        assert!(matches!(&input.functions[3].body[3], Op::String(name) if name == "Application"));
+        let mut invalid = source.clone();
+        invalid.functions[2].impl_flags = 0;
+        assert!(prepare(&mut invalid, &source).is_err());
     }
 
     #[test]
