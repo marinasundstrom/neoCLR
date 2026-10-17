@@ -1,0 +1,101 @@
+{
+  "passed": false,
+  "root": "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/collections/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/collections/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/collections/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Suspended\n42\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Main.rvn(65,33): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Main.rvn(80,39): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-eawk0wm0/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-eawk0wm0/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(64,29): error RAV2100: Missing match case: '_'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    }
+  ],
+  "verifiedFiles": 1602,
+  "execution": "default",
+  "error": "Bundle command failed: {\"command\": [\"dotnet\", \"/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll\", \"neoclr\", \"--project\", \"/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/App.rvnproj\"], \"exitCode\": 1, \"stdout\": \"\", \"stderr\": \"/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(64,29): error RAV2100: Missing match case: '_'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\\n\"}",
+  "archiveSha256": "3476891c6a853cd52b010ef3ab9cd7d66032dec212d1fb3e228a0e9de899fd4b"
+}

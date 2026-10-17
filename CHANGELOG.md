@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Record fresh optimized macOS archive acceptance: collections, tasks and JSON pass with the bundled backend; HTTP JSON source compilation exposes a native union-exhaustiveness diagnostic that remains a release blocker. CPU/JSON benchmark workers now build against the extracted archive; no performance measurements or Windows qualification are claimed.
+
 - Lower identity patterns on native value-only unions without boxing: same-shape tests inspect the initialized tag and identity unboxing preserves payload/default values. Different shapes and escaping test results remain rejected; 13 related union tests pass. The packaged async JSON/reflection/error-alternative consumer passes interpreter/JIT/AOT with the corrected backend; whole-package and Windows qualification remain separate gates.
 
 - Correct native UTF-8/grapheme array results in JIT/AOT: retain exact InternalCall contracts, publish fresh UTF-8 results as managed byte arrays, and include returned byte-array backings in nominal interface dispatch. The native text consumer passes interpreter/JIT/AOT; binding rejection and five existing UTF-8 tests pass. Release benchmarks and Windows qualification remain pending.

@@ -70,6 +70,14 @@ checks remain in the same suite.
 
 ## Package status
 
-Focused JSON validation uses a backend override; the old archive remains unqualified.
-Rebuild and extract the candidate before rerunning whole-package acceptance.
-Windows validation and benchmarks remain pending. See [release readiness](../../release-readiness.md).
+A new archive embeds the corrected backend. Its extracted-package checks, without
+an override, pass collections, tasks and JSON. [Acceptance](package-acceptance.json)
+records the archive hash and the next failure: Raven rejects the HTTP JSON server's
+`HttpError | JsonError` match in `AdaptClientResult<T>` as non-exhaustive (RAV2100).
+The sample is unchanged; no catch-all bypass was added.
+
+[CPU/JSON preparation](benchmark-preparation.json) now compiles and links the worker
+against that extracted bundle. This establishes build readiness only, not workload
+correctness or performance. No measurements have been taken. Windows validation,
+full package acceptance and final SDK/editor qualification remain pending.
+See [release readiness](../../release-readiness.md).

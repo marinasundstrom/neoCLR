@@ -38,10 +38,20 @@ codegen gaps before measurements began:
   native lowering, with exact-shape admission and preserved default/null semantics.
   Its unchanged async/error/reflection workload passes interpreter/JIT/AOT against
   the corrected backend; see [JSON evidence](validation/release-candidate-20261017/json-patterns.json).
-  Whole-package acceptance still requires a freshly staged archive.
+  Fresh archive acceptance is recorded below.
 
-The original archive retains the pre-fix backend and is not qualified. Rebuild it
-from a validated revision after the remaining correctness failures are closed.
+A second macOS archive with the corrected backend was staged, extracted and
+validated without overrides. Collections, tasks and JSON pass. Acceptance now stops
+while compiling the HTTP JSON server: Raven reports `RAV2100: Missing match case:
+'_'` for the `HttpError | JsonError` match in `AdaptClientResult<T>`. Preserve the
+exhaustive sample and investigate the compiler/import contract; adding a catch-all
+would hide the blocker. [Archive acceptance](validation/release-candidate-20261017/package-acceptance.json)
+records the archive hash and exact commands/failure.
+
+CPU/JSON benchmark preparation now compiles and links successfully against this
+extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)
+identifies the workloads and artifacts; it is not an execution or timing result.
+
 Windows execution, editor package qualification and runtime measurements remain
 pending. The local Raven revision is ahead of the remote branch; candidate pinning
 must establish a remotely available, matching compiler/server/extension cohort.

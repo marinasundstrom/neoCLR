@@ -1,0 +1,62 @@
+{
+  "prepared": true,
+  "measured": false,
+  "command": [
+    "python3",
+    "benchmarks/execution/prepare.py",
+    "--bundle",
+    "target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc",
+    "--output",
+    "target/release-candidate-json-fixed-execution"
+  ],
+  "exitCode": 0,
+  "manifest": "target/release-candidate-json-fixed-execution/manifest.json",
+  "manifestSha256": "0825ec508c5c8c0c525512937e891ac141862f5a504eb6b31f8eb8a255147bde",
+  "cases": [
+    "cpu.sum",
+    "json.serialize",
+    "json.deserialize"
+  ],
+  "host": {
+    "console": "console",
+    "http": "http",
+    "executable": "app"
+  },
+  "commands": {
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-execution/native/app.dll",
+      "--execution",
+      "interpreter",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+      "--instructions",
+      "100000000",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-execution/native/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-execution/native/app"
+    ]
+  },
+  "artifacts": {
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-execution/native/app.dll": "090e62f48fef4aae1f4ea774029f92c2f5526a4204833f70743c81493e6d18d6",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-execution/native/app": "6f859a0c820846ba574cebc74f7530c00e13c687d4259e63e4fa754fa06474bd"
+  }
+}
