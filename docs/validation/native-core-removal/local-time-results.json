@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "environment": {
+    "TZ": "UTC"
+  },
+  "compilerRevision": "85660156b",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-local-time-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-local-time-consumer/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-local-time-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-local-time-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-local-time-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-local-time-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-local-time-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-local-time-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-local-time-library/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-local-time-consumer/bin/neoclr/App.dll": "e98189e6fdeb228e773f33160e2c2aac965c85ff70208029e897a12919633889",
+    "/Users/robert/Projects/neoclr/target/native-local-time-library/System.Runtime.dll": "5ff12be564d33e1af77ab39b27b46e20186665f7da69b33547637c2eb7cc4309",
+    "/Users/robert/Projects/neoclr/target/native-local-time-library/build-evidence.json": "cc0a2fffdd9caf8aaa9f525ccd221fd78a86dcb992f32cfdb4443d2d66cc0e08",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "68c91bf00c596d381346c069ccf11d5cca351444d7953dd55c5508c416d27fdf"
+  },
+  "focusedTest": "\nrunning 1 test\n.\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 312 filtered out; finished in 0.01s\n\n"
+}

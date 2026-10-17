@@ -1,6 +1,5 @@
 module System
 
-import System.Runtime.CompilerServices.RuntimeServices
 
 public struct Char : ComparableTo<char> {
     // Immutable grapheme storage is supplied by the runtime.

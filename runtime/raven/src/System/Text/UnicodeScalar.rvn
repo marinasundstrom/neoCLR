@@ -1,6 +1,5 @@
 module System.Text
 
-import System.Runtime.CompilerServices.RuntimeServices
 
 public static class UnicodeScalar {
     static func IsDigit(value: uint) -> bool {

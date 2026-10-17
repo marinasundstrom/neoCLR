@@ -43,3 +43,6 @@ internal extern func JoinWorker(arg0: int) -> string;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ScheduleTask(arg0: () -> System.Void) -> System.Void;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func UnixTimeToLocal(ticks: long) -> int[];

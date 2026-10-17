@@ -5135,7 +5135,8 @@ fn interpret_instructions_with_dispatch(
                         };
                         let value = if matches!(
                             binding,
-                            crate::native::Binding::EnvironmentArguments
+                            crate::native::Binding::UnixTimeToLocal
+                                | crate::native::Binding::EnvironmentArguments
                                 | crate::native::Binding::TimeZoneMapLocal
                                 | crate::native::Binding::StringGraphemes
                                 | crate::native::Binding::StringScalars

@@ -2,7 +2,6 @@ module System.Time
 
 import System.*
 
-import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 
 public struct LocalDateTime {
@@ -35,7 +34,7 @@ public struct LocalDateTime {
     }
 
     internal static func FromUnixTimeTicks(ticks: long) -> LocalDateTime {
-        let parts = RuntimeServices.UnixTimeToLocal(ticks)
+        let parts = neoCLR.Runtime.UnixTimeToLocal(ticks)
         let Ok(date) = System.Time.Date.Create(parts[0], parts[1], parts[2]) else {
             System.Fail("Invalid local date from runtime")
         }

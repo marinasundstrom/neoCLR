@@ -1,6 +1,5 @@
 module System
 
-import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 import System.Option.*
 import System.Text.Utf8SliceError

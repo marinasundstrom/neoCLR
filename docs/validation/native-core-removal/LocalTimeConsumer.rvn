@@ -1,0 +1,17 @@
+import System.*
+import System.Time.*
+
+func Main() -> int {
+    let epoch = Instant.FromUnixTimeTicks(0).ToLocalDateTime()
+    if epoch.Date.Year != 1970 || epoch.Date.Month != 1 || epoch.Date.Day != 1 {
+        return 1
+    }
+    if epoch.Time.Hour != 0 || epoch.Time.Minute != 0 || epoch.Time.Second != 0 {
+        return 2
+    }
+    let previous = Instant.FromUnixTimeTicks(-1).ToLocalDateTime()
+    if previous.Date.Year != 1969 || previous.Date.Month != 12 || previous.Date.Day != 31 || previous.Time.Second != 59 {
+        return 3
+    }
+    return 42
+}

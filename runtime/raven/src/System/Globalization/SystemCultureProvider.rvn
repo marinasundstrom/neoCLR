@@ -1,6 +1,5 @@
 module System.Globalization
 
-import System.Runtime.CompilerServices.RuntimeServices
 
 /// Captures the host's first preferred locale; no mutable process-wide culture.
 public class SystemCultureProvider : CultureProvider {

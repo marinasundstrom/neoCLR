@@ -235,3 +235,11 @@ stripping are accepted substitutes for the above gates.
   UnixTimeToLocal remains the final source facade call. A native-only production
   core probe still diagnoses missing NeoCLR.CoreProbe, so compiler contract closure
   remains separate from source forward removal.
+
+### Native local-time ownership (2026-10-17)
+
+UnixTimeToLocal is source-owned with native Int32 array results. Production library
+source no longer calls RuntimeServices. Fresh five-library compilation, UTC epoch/
+negative-timestamp interpreter checks, completion and API fingerprints pass.
+Compiler source-core construction and CoreProbe metadata dependencies remain open.
+See docs/validation/native-core-removal/local-time-results.json.

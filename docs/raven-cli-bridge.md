@@ -12698,3 +12698,11 @@ task/file consumer and stream completion. No Runtime Contract setting or .NET
 compiler behavior changes. See the
 [gate](validation/native-core-removal/README.md#native-filetimeworkertask-services--2026-10-17).
 Local-time array conversion and compiler source-core contracts remain open.
+
+### Native local-time ownership (2026-10-17)
+
+UnixTimeToLocal is source-owned with native Int32 array results. Production library
+source no longer calls RuntimeServices. Fresh five-library compilation, UTC epoch/
+negative-timestamp interpreter checks, completion and API fingerprints pass.
+Compiler source-core construction and CoreProbe metadata dependencies remain open.
+See docs/validation/native-core-removal/local-time-results.json.

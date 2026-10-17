@@ -2,7 +2,6 @@ module System.Time
 
 import System.*
 
-import System.Runtime.CompilerServices.RuntimeServices
 
 public open class SystemClock : Clock {
     public init() {}

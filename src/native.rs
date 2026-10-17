@@ -1196,7 +1196,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     };
     let array_reference_result = matches!(
         binding,
-        Binding::Utf8Encode | Binding::StringGraphemes | Binding::StringScalars
+        Binding::Utf8Encode
+            | Binding::StringGraphemes
+            | Binding::StringScalars
+            | Binding::UnixTimeToLocal
     ) && matches!((&returns, &function.returns), (Type::Array(expected), Type::ArrayRef(actual)) if expected == actual);
     if function.returns != returns && !array_reference_result {
         return Err(Fault::new(format!(
@@ -2035,5 +2038,32 @@ mod storage_snapshot_tests {
                 assert_eq!(super::bind(function).is_ok(), accepted, "{name}");
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod local_time_array_tests {
+    #[test]
+    fn local_time_managed_array_contract_and_execution() {
+        for (result, accepted) in [
+            ("Int32[]", true),
+            ("arrayref<Int32>", true),
+            ("arrayref<Int64>", false),
+        ] {
+            let source = format!(
+                ".module Test\n.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> {result}\n.methodimpl InternalCall\n.end\n"
+            );
+            let parsed = crate::assembler::parse_module(&source).unwrap();
+            let assembled = super::bind(&parsed.functions[0]);
+            assert_eq!(assembled.is_ok(), accepted, "{result}: {:?}", assembled.as_ref().err());
+        }
+        let module = crate::assembler::parse_module(".module Test\n.entry Main\n.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> arrayref<Int32>\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i8 0\ncall neoCLR.Runtime.UnixTimeToLocal(Int64)\nldlen\nconv.i4\nret\n.end\n").unwrap();
+        let library = crate::assemble(".module System\n").unwrap();
+        let program = crate::LoadedProgram::with_library(&module, &library).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(crate::Limits::default()).unwrap().value,
+            crate::Value::Int32(8)
+        );
     }
 }

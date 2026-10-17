@@ -1,6 +1,5 @@
 module System
 
-import System.Runtime.CompilerServices.RuntimeServices
 
 /// Consistent string equality, hashing and ordering under an explicit ordinal policy.
 public class StringComparer : Collections.EqualityComparer<string>, Collections.Comparer<string> {

@@ -453,3 +453,17 @@ UnixTimeToLocal is the last source RuntimeServices call. A separate native-only
 production consumer still reports missing NeoCLR.CoreProbe: compiler source-core
 construction and remaining metadata dependencies are not closed by these forwards.
 The installed SDK remains unchanged; structural work is parked.
+
+## Native local-time conversion — 2026-10-17
+
+UnixTimeToLocal now uses an internal native declaration and managed Int32 array
+results. Preparation removes its CLI/seed facade. Production Raven library source
+has no remaining RuntimeServices calls. Exact result-element admission and native
+managed-array materialization pass focused tests; legacy array results remain
+supported. Raven 85660156b builds five libraries in native-local-time-library with
+native-local-time-bootstrap. The [consumer](LocalTimeConsumer.rvn) checks epoch and
+negative timestamps under UTC; [execution](local-time-results.json) and
+[completion](local-time-completion.json) pass. API fingerprints are refreshed.
+This qualifies interpreter execution, not new JIT/AOT local-time support.
+Compiler source-core construction and the CoreProbe metadata dependency remain
+open; the installed SDK is unchanged and broader structural work stays parked.

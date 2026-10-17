@@ -31,7 +31,7 @@ SOURCE_CORE_SERVICES = (
     'FileCreateNew', 'FilePosition', 'FileSeek',
     'FileReadInto', 'FileWriteChunk', 'FileFlush',
     'FileClose', 'StartWorker', 'QueueWorker',
-    'JoinWorker', 'ScheduleTask',
+    'JoinWorker', 'ScheduleTask', 'UnixTimeToLocal',
 )
 
 def sha(path):

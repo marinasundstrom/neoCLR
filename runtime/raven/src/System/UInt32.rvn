@@ -1,7 +1,6 @@
 module System
 
 import System.Result.*
-import System.Runtime.CompilerServices.RuntimeServices
 
 public struct UInt32 : Number {
     // The runtime supplies intrinsic primitive storage.

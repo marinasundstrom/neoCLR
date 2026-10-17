@@ -38,7 +38,7 @@ if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
             "FileCreateNew", "FilePosition", "FileSeek",
             "FileReadInto", "FileWriteChunk", "FileFlush",
             "FileClose", "StartWorker", "QueueWorker",
-            "JoinWorker", "ScheduleTask" };
+            "JoinWorker", "ScheduleTask", "UnixTimeToLocal" };
         var services = module.GetType("System.Runtime.CompilerServices.RuntimeServices");
         if (services is not null)
             foreach (var method in services.Methods.Where(m => sourceServices.Contains(m.Name)).ToArray())
