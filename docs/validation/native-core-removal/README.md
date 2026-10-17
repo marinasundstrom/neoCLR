@@ -486,3 +486,20 @@ revisions and hashes. The test Object methods are fixture bodies, never producti
 implementations. Production core declarations and managed allocation/entry-drain
 contracts remain to migrate; installed artifacts and broader structural work are
 unchanged.
+
+## Source-core managed array reservation — 2026-10-17
+
+Raven 31da12d29 admits only the exact internal unannotated source-core
+`neoCLR.Runtime.ReserveArray<T>(count: int) -> T[]` declaration and emits a
+managed body using the existing checked reservation operation. No bootstrap
+reference matching or host callback is involved. Non-Int32 sizes and fixed-length
+result signatures are rejected before output.
+
+The source-core probe emits three consumers: initialized array/interface/extension
+use returns 42; uninitialized reads and negative lengths fault. All pass in the
+interpreter, JIT and sanitized AOT using an empty System seed and the source-built
+core. [Evidence](source-core-storage-results.json) and the
+[runner](validate-source-core-storage.py) preserve the checks. Final compiler
+validation produces byte-identical accepted artifacts. This retains checked
+uninitialized storage semantics, not .NET zero-filled array allocation. Public
+class-library forwarding and the remaining core declarations are still pending.

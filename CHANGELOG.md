@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify Raven 31da12d29 source-core managed array reservation in interpreter, JIT and sanitized AOT: initialized array/interface use succeeds, while uninitialized reads and negative lengths fault. Record exact signature rejection and byte-identical final artifacts; production class-library forwarding remains pending.
+
 - Record Raven 87698cd00 reference-free native source-core construction and exact metadata-arity fixes on Raven main/codex-neoclr. Native consumer compilation, array-interface/extension interpreter execution, completion and existing native-project checks pass. Production foundational declarations and managed compiler services still require migration; no SDK replacement is claimed.
 
 - Move local-time conversion to native source ownership and remove the last production RuntimeServices call/imports. Validate exact Int32 array admission/materialization, fresh five-library compilation, UTC epoch/negative timestamp interpreter consumption, completion and API fingerprints. Compiler source-core contracts remain open.

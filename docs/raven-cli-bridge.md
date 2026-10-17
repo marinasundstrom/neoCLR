@@ -12717,3 +12717,11 @@ provides completion and returns 42. Existing native-project checks still pass.
 See [validation](validation/native-core-removal/README.md#reference-free-native-source-core--2026-10-17).
 This compiler capability does not yet publish a migrated production core; source
 foundational declarations and managed compiler services remain the next boundary.
+
+### Managed source-core allocation (2026-10-17)
+
+Raven 31da12d29 constructs the exact internal generic ReserveArray helper as
+a managed native body using existing checked-uninitialized array storage.
+The compiler no longer needs a CLI method identity for this source-core helper.
+Interpreter/JIT/AOT success and rejection checks pass; no public API or production
+SDK switch is claimed. See [evidence](validation/native-core-removal/source-core-storage-results.json).
