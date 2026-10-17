@@ -1,9 +1,9 @@
-# Preview 16 release readiness
+# Preview 16 release closure
 
 Release targets: **macOS ARM64 and Windows x64**. SDK/extension version
 `0.1.16-neoclr.20261017.1`, Raven `c0854cdda`. The
 [qualification record](validation/release-20261018/README.md) owns exact revisions,
-archive hashes, raw reports and the remaining publication status.
+archive hashes, raw reports and publication verification.
 
 | Gate | Evidence and status |
 | --- | --- |
@@ -15,7 +15,7 @@ archive hashes, raw reports and the remaining publication status.
 | HTTPS | Hosted security-provider checks pass on both platforms. Matching-package macOS HTTPS passes 15 AOT security/recovery/cleartext cases. Matching-package Windows JIT/AOT project qualification also passes. |
 | Runtime performance | Final macOS CPU/JSON and plain/typed-JSON HTTP measurements pass correctness checks; final Windows measurements also pass against the exact qualified archive. Compilation is excluded from steady-state measurements. |
 | API coverage | Native snapshot and website contract tests verify the reference and navigation. The route audit classifies 19 legacy-only hierarchical pages and validates 104 compatibility redirects; documented coverage limitations remain explicit. |
-| Publication | Final release notes, asset hashes and website links are being prepared. No published Preview 15 artifact or notes are modified. |
+| Publication | Preview 16 and all eleven assets are public and verified. Manual website deployment and live download/benchmark/API checks pass. Published Preview 15 artifacts and notes remain unchanged. |
 
 The [earlier candidate record](validation/release-candidate-20261017/README.md)
 retains the six repaired source-test failures, UTF-8/array and JSON codegen fixes,
@@ -39,5 +39,6 @@ Preview 15 comparison documents the historical endpoint spelling; it does not
 justify precise speedup claims under different host load. PostgreSQL, allocation
 rates, sustained concurrency and HTTPS throughput are not newly measured.
 
-All execution gates pass. Publication still requires verified uploaded asset
-checksums and the separate manual website deployment.
+All execution and publication gates pass. [Preview 16](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16)
+is published; [verification](validation/release-20261018/publication.json) records the
+release commit and all asset identities.

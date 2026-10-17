@@ -1,7 +1,8 @@
 # Preview 16 qualification
 
-Package version `0.1.16-neoclr.20261017.1`, Raven `c0854cdda`. Publication remains
-pending final asset publication and website deployment.
+Package version `0.1.16-neoclr.20261017.1`, Raven `c0854cdda`. [Preview 16 is published](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16)
+at `f404ab0c4`; [public asset verification](publication.json) and
+[live website checks](website-live.json) pass.
 
 The macOS archive passes [extracted sample acceptance](macos-acceptance.json) and
 [HTTP client/server acceptance](macos-acceptance-http.json). The installed extension
@@ -83,3 +84,17 @@ pass 55 processes and 1,152 responses against the exact qualified archive. Repor
 retain five-round ranges, startup, correctness checks, raw/gzip hashes and host
 limitations. Together with macOS, this closes the two-platform measurement gate;
 no cross-platform performance ranking or unmeasured PostgreSQL result is implied.
+
+## Publication closure
+
+All eleven public download URLs return HTTP 200 and their GitHub SHA-256 digests
+match local files. The public checksum and validation files also match downloaded
+bytes. The [manual website deployment](website-deployment.json) passes; six live
+pages verify Preview 16 downloads, both platform benchmark tables and the API reference.
+Local validation passed 22 website contracts, four native snapshot tests and the
+4,441-page build/link check. Existing documented API-description gaps remain explicit.
+
+The tag/push triggered 36 redundant CI runs for already-qualified inputs; those were
+cancelled to avoid repeating the same execution gates. This does not replace or alter
+the successful run identities above. Published notes/assets are frozen. Unrelated
+uncommitted HTTP design work is excluded from the release and remains in the workspace.

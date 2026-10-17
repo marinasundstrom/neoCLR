@@ -1,0 +1,150 @@
+{
+  "conclusion": "success",
+  "headSha": "f404ab0c477a6d36f7b8be1a39620f04fed24c34",
+  "jobs": [
+    {
+      "completedAt": "2026-10-17T22:54:07Z",
+      "conclusion": "success",
+      "databaseId": 117525180896,
+      "name": "build",
+      "startedAt": "2026-10-17T22:51:36Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-17T22:51:39Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-17T22:51:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:51:42Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v6",
+          "number": 2,
+          "startedAt": "2026-10-17T22:51:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:51:42Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v6",
+          "number": 3,
+          "startedAt": "2026-10-17T22:51:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:51:51Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-dotnet@v5",
+          "number": 4,
+          "startedAt": "2026-10-17T22:51:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:52:17Z",
+          "conclusion": "success",
+          "name": "Check website contracts",
+          "number": 5,
+          "startedAt": "2026-10-17T22:51:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:02Z",
+          "conclusion": "success",
+          "name": "Build and check project site",
+          "number": 6,
+          "startedAt": "2026-10-17T22:52:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:04Z",
+          "conclusion": "success",
+          "name": "Upload site",
+          "number": 7,
+          "startedAt": "2026-10-17T22:54:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:04Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-dotnet@v5",
+          "number": 12,
+          "startedAt": "2026-10-17T22:54:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:04Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v6",
+          "number": 13,
+          "startedAt": "2026-10-17T22:54:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:04Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v6",
+          "number": 14,
+          "startedAt": "2026-10-17T22:54:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:04Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-10-17T22:54:04Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39076686217/job/117525180896"
+    },
+    {
+      "completedAt": "2026-10-17T22:54:22Z",
+      "conclusion": "success",
+      "databaseId": 117525855905,
+      "name": "deploy",
+      "startedAt": "2026-10-17T22:54:10Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-17T22:54:13Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-17T22:54:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:13Z",
+          "conclusion": "success",
+          "name": "Configure Pages",
+          "number": 2,
+          "startedAt": "2026-10-17T22:54:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:20Z",
+          "conclusion": "success",
+          "name": "Publish site",
+          "number": 3,
+          "startedAt": "2026-10-17T22:54:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-17T22:54:20Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 4,
+          "startedAt": "2026-10-17T22:54:20Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39076686217/job/117525855905"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39076686217"
+}

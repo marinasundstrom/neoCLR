@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16",
+  "publishedAt": "2026-10-17T22:50:31Z",
+  "releaseCommit": "f404ab0c477a6d36f7b8be1a39620f04fed24c34",
+  "tag": "v0.1.0-preview.16",
+  "assets": [
+    {
+      "name": "neoclr-preview16-osx-arm64.tar.gz",
+      "sha256": "1efbce28b78c962bf01d9459ef9dcfa51f6f477e6db064ce6c34512db570d644",
+      "publicStatus": 200,
+      "size": 55168280
+    },
+    {
+      "name": "neoclr-preview16-qualified-source.tar",
+      "sha256": "8f996473d619ab5edd8107eab546755efdb2bb5f9519b0135cd5e9c97e91da65",
+      "publicStatus": 200,
+      "size": 253777920
+    },
+    {
+      "name": "neoclr-preview16-win-x64.tar.gz",
+      "sha256": "08d3752b6e80bad5c5200a8f6179118f799955f640d59fca4284775a2a123df7",
+      "publicStatus": 200,
+      "size": 54790722
+    },
+    {
+      "name": "preview-16-validation.json",
+      "sha256": "9fa8e98005de797ba6c9c67aec6823a04dde70d837ced96e1a03fe6c3f43be72",
+      "publicStatus": 200,
+      "size": 12256
+    },
+    {
+      "name": "raven-0.1.16-neoclr.20261017.1-osx-arm64.vsix",
+      "sha256": "0908370f81c002ec9cff422d404a8b0220c4ffae86714227f502934221bdf95c",
+      "publicStatus": 200,
+      "size": 10844137
+    },
+    {
+      "name": "raven-0.1.16-neoclr.20261017.1-win-x64.vsix",
+      "sha256": "6a973fa053c1e9a9d9a514bcbc1edde787f87fecb772f027c373f86b8ea224c8",
+      "publicStatus": 200,
+      "size": 10868817
+    },
+    {
+      "name": "raven-sdk-0.1.16-neoclr.20261017.1-osx-arm64.tar.gz",
+      "sha256": "b355084eebff271b028ea99d95e44c82fc273f2c72e4ee6661efe2a3d8f19e48",
+      "publicStatus": 200,
+      "size": 33178500
+    },
+    {
+      "name": "raven-sdk-0.1.16-neoclr.20261017.1-win-x64.tar.gz",
+      "sha256": "5bc57f05b08b5cca295d295e114185da310b2155f5bb67a8c4a9a37f3ea027df",
+      "publicStatus": 200,
+      "size": 33085912
+    },
+    {
+      "name": "raven-tool-notices-osx-arm64.tar.gz",
+      "sha256": "0b4cdae939cdf0648d3864ad0c2022fc1a175f1628426cda62c2193c3d5cffe1",
+      "publicStatus": 200,
+      "size": 142053
+    },
+    {
+      "name": "raven-tool-notices-win-x64.tar.gz",
+      "sha256": "f08517a0d0e9b05dd944301b1e4a97c587280ba3af72e203ba72b6154df05ec4",
+      "publicStatus": 200,
+      "size": 141732
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "ccc4bcbd9b003652f9436a03594332caf4b214f02015aed39c7b242580aa5c8c",
+      "publicStatus": 200,
+      "size": 1053
+    }
+  ],
+  "verification": "All 11 unauthenticated public download URLs return HTTP 200 and GitHub SHA-256 digests match local files; downloaded checksum and validation files match byte for byte."
+}

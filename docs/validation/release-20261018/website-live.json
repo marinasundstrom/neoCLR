@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "deploymentRun": "https://github.com/marinasundstrom/neoCLR/actions/runs/39076686217",
+  "commit": "f404ab0c477a6d36f7b8be1a39620f04fed24c34",
+  "pages": [
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/",
+      "status": 200,
+      "sha256": "cdc0d9f159c31faab68855a8510f4684988190f3dd2f87eca2b4b8d1a108efc7",
+      "expected": [
+        "Preview 16",
+        "v0.1.0-preview.16"
+      ]
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/try/",
+      "status": 200,
+      "sha256": "e64838274ef843135fabcbbc7a7ed6fa1a8e89410f61effb9957e3ee65a29848",
+      "expected": [
+        "neoclr-preview16-osx-arm64.tar.gz",
+        "neoclr-preview16-win-x64.tar.gz"
+      ]
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/benchmarks/execution/",
+      "status": 200,
+      "sha256": "67db706deddfc3d21e420abeb422f674e007489b33a13894b5e071d00a10692f",
+      "expected": [
+        "Windows x64",
+        "5.34",
+        "6.26"
+      ]
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/benchmarks/http/",
+      "status": 200,
+      "sha256": "8988a796dbb78df9b40a7d096fee920b68840c69e9d863c0923d69acb655d587",
+      "expected": [
+        "62.35",
+        "142.79"
+      ]
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/docs/",
+      "status": 200,
+      "sha256": "e91f4a56ef9864faf93e1e54aab1ce96c0d611de1e1aad57bdbf25bdcd943896",
+      "expected": [
+        "API"
+      ]
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/docs/api/System/Networking/Security/SslStream/index.html",
+      "status": 200,
+      "sha256": "54fbec1fb1e813c0a6548557e90ad6b16540f07bdf02585f1fa512de07c116a3",
+      "expected": [
+        "SslStream"
+      ]
+    }
+  ]
+}

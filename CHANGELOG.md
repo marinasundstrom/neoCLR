@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-18
+
+- Publish Preview 16 and all eleven macOS/Windows runtime, Raven SDK/VSIX, qualified-source, notice and checksum assets. Verify public download availability and SHA-256 identities. Deploy the website manually and verify live Preview 16 links, two-platform benchmark tables and API pages; preserve published notes and unrelated working changes.
+
 ## 0.1.0-preview.16 — 2026-10-18
 
 ### 2026-10-18

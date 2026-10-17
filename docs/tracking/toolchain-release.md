@@ -5,14 +5,15 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
-## Preview 16 release preparation — 2026-10-18
+## Preview 16 publication — 2026-10-18
 
 The [release readiness work order](../release-readiness.md) and
 [qualification record](../validation/release-20261018/README.md) identify the exact
 macOS ARM64 and Windows x64 packages. Both optimized packages and installed editors
 pass, including twenty recovery cycles per platform and exact Task<int> inlays.
 The canonical source suite passes. Matching-package HTTPS checks pass. Final Windows benchmarks pass as well.
-All execution gates are closed; asset publication and website deployment follow.
+All execution gates are closed; Preview 16, its eleven verified assets and the
+updated website are published.
 Compiler measurements remain separate from runtime measurements. Older dated entries
 below retain their original evidence and published release scope.
 

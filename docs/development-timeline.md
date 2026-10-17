@@ -35,8 +35,12 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Observed outcome:** both platform packages pass; each benchmark series validates
   55 CPU/JSON processes and 1,152 HTTP responses. Eleven draft release assets match
   local SHA-256 digests. Raven `codex/neoclr` is pushed to `c0854cdda`; main is separate.
-- **Remaining action:** publish Preview 16 and deploy/verify the website. See the
-  [qualification record](validation/release-20261018/README.md). Unrelated HTTP design
+- **Publication outcome:** [Preview 16](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16)
+  is published at `f404ab0c4`; all eleven unauthenticated asset URLs return HTTP 200
+  and match recorded SHA-256 identities. Manual website deployment `39076686217`
+  passes; live download, benchmark and SslStream API pages are verified.
+- **Scope:** the [qualification record](validation/release-20261018/README.md)
+  preserves source/package provenance and bounded support. Unrelated HTTP design
   discussion is not part of these implementation or performance claims.
 
 ## 2026-10-17 — Complete and publish the next release
