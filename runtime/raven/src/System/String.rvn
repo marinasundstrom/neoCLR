@@ -101,7 +101,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
             size += bytes
             index += 1
         }
-        return RuntimeServices.StringJoinParts(values, count, separator, size)
+        return neoCLR.Runtime.StringJoinParts(values, count, separator, size)
     }
 
     /// Concatenates textual representations; null contributes an empty string.

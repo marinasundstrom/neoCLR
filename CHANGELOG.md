@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Remove four object-identity and string-join forwarding adapters; source callers select existing native functions. Validate five-library compilation, interpreter identity/null/hash/UTF-8 join behavior, String.Join completion and API fingerprints. Native core construction and payload migration remain open.
+
 - Remove 12 console, file-text and storage RuntimeServices forwards; callers bind existing native namespace declarations. Validate a fresh five-library bundle, interpreter consumer with piped input/exact output and isolated file operations, Console/FileText completion and API fingerprints. Public contracts and runtime bindings are unchanged; payload helpers and production native-core construction remain open.
 
 - Remove 13 time-zone and heap RuntimeServices forwards; bind public TimeZone and GC callers directly to existing native service declarations. Validate a fresh five-library bundle with Raven d83ea51e7, an interpreter consumer returning 42, TimeZone/GC editor completion and API source fingerprints. Public contracts and backend implementations are unchanged; remaining services and production native-core construction stay open.

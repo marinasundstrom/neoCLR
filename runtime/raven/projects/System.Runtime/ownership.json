@@ -169,7 +169,6 @@
         "runtime/raven/native/RuntimeNativeAllocationCalls.rvn",
         "runtime/raven/native/RuntimeNativeIntegerCalls.rvn",
         "runtime/raven/native/RuntimeObjectCalls.rvn",
-        "runtime/raven/native/RuntimeObjectServices.rvn",
         "runtime/raven/native/RuntimeStorageCalls.rvn",
         "runtime/raven/native/RuntimeTimeZoneCalls.rvn",
         "runtime/raven/src/System/AsyncDisposable.rvn",

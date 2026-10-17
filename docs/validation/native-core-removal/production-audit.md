@@ -178,3 +178,7 @@ stripping are accepted substitutes for the above gates.
   directly; 12 forwards are removed. Five-library compilation, interpreter input/
   output and filesystem consumer, plus Console/FileText completion pass. IsValue/
   UnpackValue and other retained core services remain explicit migration dependencies.
+
+- Object identity/equality/hash and string joining now call native declarations
+  directly. Four adapters are removed; fresh five-library compilation, interpreter
+  consumer and String.Join completion pass. No public contract changes.

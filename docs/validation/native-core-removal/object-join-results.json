@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "compilerRevision": "d83ea51e7",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-object-join-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-object-join-consumer/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-object-join-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-object-join-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-object-join-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-object-join-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-object-join-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-object-join-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-object-join-library/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-object-join-consumer/bin/neoclr/App.dll": "1d1048dba64fddef73033efc418558fe487c4331eac37ad152c147965923033b",
+    "/Users/robert/Projects/neoclr/target/native-object-join-library/System.Runtime.dll": "fb541e36ba965c3318d281b8f10d3d7556e63312d6fac06674bd35720d56c8c6",
+    "/Users/robert/Projects/neoclr/target/native-object-join-library/build-evidence.json": "3f4cded67827a70ffad3d2ebad686ba8b1cff1c3c97f1030ef92cf0e30fa17d9",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64"
+  }
+}

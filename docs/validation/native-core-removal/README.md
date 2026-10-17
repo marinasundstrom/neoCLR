@@ -194,3 +194,17 @@ Create an empty `files` directory beneath the recorded working directory before
 reproduction; supply the single input byte `A` followed by EOF. The harness also
 verifies `files/roundtrip.txt` remains `Hello, värld!` after the rejected oversized
 write.
+
+## Direct object and string-join services
+
+Four forwarding adapters are removed; Object identity/equality/hash and String/
+StringBuilder join callers bind existing native namespace declarations directly.
+Raven `d83ea51e7` builds all five libraries in `target/native-object-join-library`.
+The [consumer](ObjectJoinConsumer.rvn) returns 42 for reference identity, distinct
+objects, null equality, stable identity hashing, UTF-8 join and empty join.
+[Execution](object-join-results.json) records commands and hashes;
+[completion](object-join-completion.json) exposes String.Join. API fingerprints pass.
+Public signatures, Runtime Contract settings and runtime implementations are
+unchanged. This forwarding-only slice does not repeat JIT/AOT implementation checks.
+Production CLI core input and payload dependencies remain; structural work stays
+parked and the installed SDK is unchanged.

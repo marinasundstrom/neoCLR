@@ -1,7 +1,6 @@
 module System.Text
 
 import System.*
-import System.Runtime.CompilerServices.RuntimeServices
 
 /// Builds immutable UTF-8 strings within an explicit byte limit. Not thread-safe.
 public class StringBuilder {
@@ -89,7 +88,7 @@ public class StringBuilder {
     /// Returns a cached immutable snapshot, independent of subsequent mutations.
     override func ToString() -> string {
         if dirty {
-            let text = RuntimeServices.StringJoinParts(parts, count, "", size)
+            let text = neoCLR.Runtime.StringJoinParts(parts, count, "", size)
             let compact = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(1)
             compact[0] = text
             parts = compact

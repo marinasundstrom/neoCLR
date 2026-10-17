@@ -11,15 +11,15 @@ public abstract class Object {
     }
 
     static func ReferenceEquals(left: Object?, right: Object?) -> bool {
-        return RuntimeServices.ObjectReferenceEquals(left, right)
+        return neoCLR.Runtime.ObjectReferenceEquals(left, right)
     }
 
     virtual func Equals(other: Object?) -> bool {
-        return RuntimeServices.ObjectEquals(self, other)
+        return neoCLR.Runtime.ObjectEquals(self, other)
     }
 
     virtual func GetHashCode() -> int {
-        return RuntimeServices.ObjectIdentityHash(self)
+        return neoCLR.Runtime.ObjectIdentityHash(self)
     }
 
     func GetType() -> TypeInfo {

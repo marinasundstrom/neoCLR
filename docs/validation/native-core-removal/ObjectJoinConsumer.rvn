@@ -1,0 +1,26 @@
+import System.*
+
+class Item { }
+
+func Main() -> int {
+    let first = Item()
+    let second = Item()
+    if !object.ReferenceEquals(first, first) || object.ReferenceEquals(first, second) {
+        return 1
+    }
+    if !first.Equals(first) || first.Equals(second) || first.Equals(null) {
+        return 2
+    }
+    if first.GetHashCode() != first.GetHashCode() {
+        return 3
+    }
+    let parts: string[] = ["native", "värld"]
+    if string.Join("/", parts) != "native/värld" {
+        return 4
+    }
+    let empty: string[] = []
+    if string.Join("/", empty) != "" {
+        return 5
+    }
+    return 42
+}

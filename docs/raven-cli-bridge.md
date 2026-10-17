@@ -12583,3 +12583,12 @@ is native-only. Structural work stays parked.
 
 See the [console/storage gate](validation/native-core-removal/README.md#direct-console-and-storage-services)
 for the matching bundle, compiler revision and executable/editor evidence.
+
+### Direct object identity and string-join services (2026-10-17)
+
+Source Object identity/equality/hash and String/StringBuilder join operations now
+select existing native namespace declarations directly. Four forwarding adapters
+are removed. Public contracts, native binding validation and Runtime Contract
+configuration are unchanged. Remaining payload helpers, introspection/network
+forwards and production native-core construction remain separate migration work.
+See the [qualification record](validation/native-core-removal/README.md#direct-object-and-string-join-services).
