@@ -31,7 +31,23 @@ fn entry_dispatch_without_a_queue_resumes_and_preserves_stack_values() {
     );
 }
 
+#[test]
+fn no_result_entry_dispatch_preserves_the_caller_stack() {
+    let module = neoclr::assemble(".module App\n.entry Main\n.function Main() -> Int32\nldc.i4 42\ncall neoCLR.Runtime.DrainEntryTasks()\nret\n.end\n.function neoCLR.Runtime.DrainEntryTasks() -> noresult\n.methodimpl InternalCall\n.end\n").unwrap();
+    let program = neoclr::LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+}
+
 fn dispatch_program(drain: &str) -> neoclr::LoadedProgram {
+    dispatch_program_with_result(drain, false)
+}
+
+fn dispatch_program_with_result(drain: &str, no_result: bool) -> neoclr::LoadedProgram {
+    let drain_result = if no_result { "noresult" } else { "Void" };
     let system = neoclr::assemble(&format!(
         r#".module System
 .type class System.Concurrency.Tasks.TaskQueue
@@ -46,7 +62,7 @@ ret
 .function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> Void
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.DrainEntryTasks() -> Void
+.function neoCLR.Runtime.DrainEntryTasks() -> {drain_result}
 .methodimpl InternalCall
 .end
 "#
@@ -68,8 +84,14 @@ call neoCLR.Runtime.DrainEntryTasks()
 ret
 .end
 "#;
+    let source = if no_result {
+        source.replace("call Wait()\npop", "call Wait()")
+            .replace(".function Wait() -> Void", ".function Wait() -> noresult")
+    } else {
+        source.to_owned()
+    };
     let app =
-        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &system)
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &system)
             .unwrap()
             .remove(0);
     neoclr::LoadedProgram::with_library(&app, &system).unwrap()
@@ -77,11 +99,13 @@ ret
 
 #[test]
 fn entry_dispatch_resumes_after_queue_return() {
-    let program = dispatch_program("");
-    program.verify().unwrap();
-    let result = program.run(neoclr::Limits::default()).unwrap();
-    assert_eq!(result.value, neoclr::Value::Int32(42));
-    assert_eq!(result.heap.len(), 0);
+    for no_result in [false, true] {
+        let program = dispatch_program_with_result("", no_result);
+        program.verify().unwrap();
+        let result = program.run(neoclr::Limits::default()).unwrap();
+        assert_eq!(result.value, neoclr::Value::Int32(42));
+        assert_eq!(result.heap.len(), 0);
+    }
 }
 
 #[test]

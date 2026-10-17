@@ -2015,7 +2015,6 @@ pub fn task_queue(
             || f.receiver_readonly
             || !f.parameters.is_empty()
             || f.returns != Type::Void
-            || f.no_result
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
             || !f.body.is_empty()
@@ -2037,7 +2036,11 @@ pub fn task_queue(
             return Err("native entry drain binding requires exact DrainEntryTasks() -> Void InternalCall contract".into());
         }
         f.impl_flags = 0;
-        f.body = vec![Op::Void, Op::Return];
+        f.body = if f.no_result {
+            vec![Op::Return]
+        } else {
+            vec![Op::Void, Op::Return]
+        };
         rows.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
             "implementation":"entry-task-drain-v1","requiresHostIo":host_io}));
     }
@@ -2082,6 +2085,10 @@ mod task_queue_tests {
             json!({"functions":[{"name":"neoCLR.Runtime.DrainEntryTasks","compiledIndex":0}]});
         let (rows, _) = task_queue(&mut source.clone(), &inventory, &source).unwrap();
         assert_eq!(rows[0]["implementation"], "entry-task-drain-v1");
+        let mut no_result = source.clone();
+        no_result.functions[0].no_result = true;
+        task_queue(&mut no_result, &inventory, &source).unwrap();
+        assert!(matches!(no_result.functions[0].body.as_slice(), [Op::Return]));
         for change in 0..8 {
             let mut input = source.clone();
             match change {
@@ -2089,7 +2096,7 @@ mod task_queue_tests {
                 1 => input.functions[0].body = vec![Op::Void, Op::Return],
                 2 => input.functions[0].parameters.push(Type::Int32),
                 3 => input.functions[0].returns = Type::Int32,
-                4 => input.functions[0].no_result = true,
+                4 => input.functions[0].instance = true,
                 5 => input.functions[0].receiver_readonly = true,
                 6 => input.functions[0].generic_arguments.push(Type::Int32),
                 _ => input.functions[0].out_parameters.push(0),

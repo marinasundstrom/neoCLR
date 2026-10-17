@@ -1710,6 +1710,7 @@ struct Frame {
     runtime_callback: bool,
     // Travels with this frame when its activation is parked or restored.
     entry_drain_wait: bool,
+    entry_drain_no_result: bool,
     async_result: Option<i64>,
     async_owner: Option<Value>,
     permit: Option<crate::invocation_budget::FramePermit>,
@@ -1790,6 +1791,7 @@ impl Frame {
             queue_callback: false,
             runtime_callback: false,
             entry_drain_wait: false,
+            entry_drain_no_result: false,
             async_result: None,
             async_owner: None,
             constructing: false,
@@ -2985,13 +2987,13 @@ fn interpret_instructions_with_dispatch(
             }
             if *entry_drain_active && frames.last().is_some_and(|frame| frame.entry_drain_wait) {
                 *entry_drain_active = false;
-                frames.last_mut().unwrap().entry_drain_wait = false;
+                let startup = frames.last_mut().unwrap();
+                startup.entry_drain_wait = false;
+                if !startup.entry_drain_no_result {
+                    startup.stack.push(Value::Void);
+                }
+                startup.entry_drain_no_result = false;
                 *owner = std::sync::Weak::new();
-                frames
-                    .last_mut()
-                    .ok_or_else(|| Fault::new("missing startup frame"))?
-                    .stack
-                    .push(Value::Void);
                 *drain_required = true;
                 continue;
             }
@@ -4868,6 +4870,7 @@ fn interpret_instructions_with_dispatch(
                             }
                             *entry_drain_active = true;
                             frame.entry_drain_wait = true;
+                            frame.entry_drain_no_result = callee.no_result;
                             *drain_required = true;
                             return Ok(Some(Value::Void));
                         }

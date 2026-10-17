@@ -252,6 +252,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         && !matches!(
             function.name.as_str(),
             "neoCLR.Runtime.ScheduleTask"
+                | "neoCLR.Runtime.DrainEntryTasks"
                 | "neoCLR.Runtime.RuntimeAsyncYield"
                 | "neoCLR.Runtime.RuntimeAsyncAwaitUnit"
                 | "neoCLR.Runtime.ReflectionPropertySet"

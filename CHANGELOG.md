@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Admit no-result native DrainEntryTasks declarations without introducing an inhabited unit result. Interpreter queue resumption preserves the caller stack; codegen stand-ins retain the exact result shape. Six entry-result tests and the focused native binding test pass.
+
 - Qualify source-owned native Self interface signatures and concrete primitive implementations in Raven source-core construction: static Int32.Zero consumption passes compilation/completion and interpreter/JIT/sanitized AOT, with native reflection retaining Self on the interface and Int32 on its implementation.
 
 - Qualify Raven 85ebd0bec source-core array iteration through the native Array<T> member contract: consumer compilation/completion and interpreter/JIT/sanitized AOT execution pass, including allocation faults. Qualified generic case patterns are carried from main via f98f88c7d; production source-core migration remains in progress.

@@ -503,3 +503,14 @@ core. [Evidence](source-core-storage-results.json) and the
 validation produces byte-identical accepted artifacts. This retains checked
 uninitialized storage semantics, not .NET zero-filled array allocation. Public
 class-library forwarding and the remaining core declarations are still pending.
+
+## No-result entry draining
+
+Native source declarations can expose `neoCLR.Runtime.DrainEntryTasks` with no
+result. The interpreter remembers that shape while running queued callbacks and
+does not push a synthetic unit on return. The JIT/AOT binding stand-in emits a
+bare return for that signature. The existing inhabited-unit contract is retained
+for explicit legacy fixtures. Six `entry_results` integration tests and the
+`task_queue_intrinsics_require_exact_contracts` codegen test pass; production
+backend qualification is recorded separately below. This is startup plumbing,
+not a change to task scheduling or broader structural features.
