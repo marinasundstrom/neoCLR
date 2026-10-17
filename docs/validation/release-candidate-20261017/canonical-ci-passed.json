@@ -1,0 +1,32 @@
+{
+  "conclusion": "success",
+  "headSha": "25828f59e4d9c789ef4b16d1154d2fc1c6984e07",
+  "jobs": [
+    {
+      "name": "minimum-rust (macos-latest)",
+      "conclusion": "success"
+    },
+    {
+      "name": "canonical",
+      "conclusion": "success"
+    },
+    {
+      "name": "minimum-rust (ubuntu-latest)",
+      "conclusion": "success"
+    },
+    {
+      "name": "minimum-rust (windows-latest)",
+      "conclusion": "success"
+    },
+    {
+      "name": "host-boundaries (macos-latest)",
+      "conclusion": "success"
+    },
+    {
+      "name": "host-boundaries (windows-latest)",
+      "conclusion": "success"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39072006701"
+}

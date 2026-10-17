@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Close the source qualification gate: CI run `39072006701` at `25828f59e` passes the canonical extracted-source full suite and all 25 smoke programs, strict Clippy/formatting, release-host checks and all three minimum-Rust checks. Retain the report and job identities; native SDK/editor qualification remains separate.
+
 - Prepare Preview 16 draft notes covering native metadata construction, bounded type contracts, ranges/checked operations, introspection and editor fixes. Keep platform qualification and publication explicitly pending.
 
 ### 2026-10-17
