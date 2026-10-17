@@ -7,7 +7,7 @@ import System.Runtime.CompilerServices.*
 
 internal static class Utf8 {
     static func Encode(text: string) -> Sequence<byte> {
-        return RuntimeServices.Utf8Encode(text)
+        return neoCLR.Runtime.Utf8Encode(text)
     }
 
     static func Decode(bytes: Sequence<byte>) -> Result<string, InvalidUtf8Error> {

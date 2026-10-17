@@ -224,3 +224,7 @@ stripping are accepted substitutes for the above gates.
   the obsolete seed Console facade too, closing its internal formatting-call
   access failure. String equality and three managed-array text helper bodies
   remain for a separate slice; provider semantics are unchanged.
+
+- All remaining text helper facades are removed. Native managed-array results serve
+  graphemes/scalars/UTF-8 bytes; source null-safe ordinal equality replaces its
+  seed body. Fresh compilation, interpreter consumption and completion pass.

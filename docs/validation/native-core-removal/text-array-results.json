@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "compilerRevision": "304e8675a",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-text-array-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-text-array-consumer/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-text-array-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-text-array-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-text-array-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-text-array-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-text-array-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-text-array-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-text-array-library/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-text-array-consumer/bin/neoclr/App.dll": "351435edd39bc52584a9816a0307bede059942cfb92a9ee3bbfd4e2bd7e1de9d",
+    "/Users/robert/Projects/neoclr/target/native-text-array-library/System.Runtime.dll": "62c880f1c6c32aaa35f2811d7d533d147d25a48c6b1c99ba9858c5327b64e55e",
+    "/Users/robert/Projects/neoclr/target/native-text-array-library/build-evidence.json": "4e6e223fe14525c046558eee22790a3d4e211cec8fd45cc8a1774c2d198b632e",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64",
+    "/Users/robert/Projects/neoclr/docs/validation/native-core-removal/TextArrayConsumer.rvn": "87afbcf88f7aa41cc89dd4d8dafbc94b876379af1148fa70b3fe1cf8e9d2cb3e",
+    "/Users/robert/Projects/neoclr/target/native-text-array-library/System.runtime.neox": "944bb60290426fb88ce3b41a2d74b994cf7ed90aadb29a2c60c746c89e7926da",
+    "/Users/robert/Projects/neoclr/target/native-text-array-bootstrap/Core.dll": "d4ecea5dd013d1f4de7e7c00c205bb1a836da1d40c139905ca7a1d72e55bac99"
+  },
+  "retainedTextHelperDefinitions": 0
+}

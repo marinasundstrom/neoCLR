@@ -16,7 +16,7 @@ public struct Char : ComparableTo<char> {
     }
 
     func Equals(other: char) -> bool {
-        return RuntimeServices.StringEquals(neoCLR.Runtime.CharText(m_value), neoCLR.Runtime.CharText(other))
+        return neoCLR.Runtime.StringEquals(neoCLR.Runtime.CharText(m_value), neoCLR.Runtime.CharText(other))
     }
 
     func CompareTo(other: char) -> int {

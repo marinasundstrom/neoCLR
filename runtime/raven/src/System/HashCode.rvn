@@ -14,7 +14,7 @@ public struct HashCode {
     }
 
     func Add(value: string) {
-        let bytes = RuntimeServices.Utf8Encode(value)
+        let bytes = neoCLR.Runtime.Utf8Encode(value)
         var hash = -2128831035
         var index = 0
         while index < bytes.Length {

@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "expression": "\"text\".",
+  "labels": [
+    "Get",
+    "Slice",
+    "Equals",
+    "ToUpperInvariant",
+    "ToLowerInvariant",
+    "Replace",
+    "ContainsOrdinal",
+    "StartsWithOrdinal",
+    "EndsWithOrdinal",
+    "GetUtf8ByteCount",
+    "GetIterator",
+    "GetScalars",
+    "SliceUtf8",
+    "Length",
+    "IsEmpty",
+    "ToString",
+    "GetHashCode",
+    "GetType",
+    "Count"
+  ],
+  "serverSha256": "e0b7247dab96f7506e61a540e2fb7c9ba4fb777fc14d70f1b6a31d391082dae3",
+  "project": "/Users/robert/Projects/neoclr/target/native-text-array-consumer"
+}

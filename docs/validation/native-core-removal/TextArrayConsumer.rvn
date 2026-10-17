@@ -1,0 +1,45 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+func Same(left: string?, right: string?) -> bool => left == right
+
+func Main() -> int {
+    if !Same(null, null) || Same(null, "") || Same("", null) || !Same("hé", "hé") || Same("a", "b") {
+        return 1
+    }
+    let text = "hé🙂"
+    var count = 0
+    var rebuilt = ""
+    for character in text {
+        rebuilt = string.Concat(rebuilt, character.ToString())
+        count += 1
+    }
+    if count != 3 || rebuilt != text {
+        return 2
+    }
+    let scalars = text.GetScalars()
+    if scalars.Count != 3 || scalars[0] != (uint)104 || scalars[1] != (uint)233 || scalars[2] != (uint)128578 {
+        return 3
+    }
+    let Ok(bytes) = Encodings.Utf8.Encode(text) else {
+        return 4
+    }
+    if bytes.Count != 7 || bytes[0] != (byte)104 || bytes[1] != (byte)195 {
+        return 5
+    }
+    let Ok(decoded) = Encodings.Utf8.Decode(bytes) else {
+        return 6
+    }
+    if decoded != text {
+        return 7
+    }
+    let Ok(empty) = Encodings.Utf8.Encode("") else {
+        return 8
+    }
+    if empty.Count != 0 || "".GetScalars().Count != 0 {
+        return 9
+    }
+    return 42
+}

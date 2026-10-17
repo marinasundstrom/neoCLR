@@ -22,6 +22,7 @@ SOURCE_TEXT_SERVICES = (
     'ParseInt16', 'ParseUInt16', 'ParseInt32',
     'ParseUInt32', 'ParseInt64', 'ParseUInt64',
     'ParseSingle', 'ParseDouble', 'Utf8Decode',
+    'StringGraphemes', 'StringScalars', 'Utf8Encode',
 )
 
 
@@ -116,7 +117,7 @@ def main():
     # seed service declarations remain available to assemble the temporary Object
     # body and are removed from the retained model after that body is discarded.
     for name in ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
-                 'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES:
+                 'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES + ('StringEquals',):
         pattern = r'(?m)^\.method static ' + name + r'\([^\n]*\n.*?^\.end\n'
         seed_text, count = re.subn(pattern, '', seed_text, flags=re.DOTALL)
         if count != 1:

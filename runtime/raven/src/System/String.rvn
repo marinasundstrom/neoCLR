@@ -111,12 +111,12 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return neoCLR.Runtime.StringConcat(first, second)
     }
 
-    static func ==(left: string, right: string) -> bool => RuntimeServices.StringEquals(left, right)
+    static func ==(left: string, right: string) -> bool => neoCLR.Runtime.StringEquals(left, right)
 
-    static func !=(left: string, right: string) -> bool => !RuntimeServices.StringEquals(left, right)
+    static func !=(left: string, right: string) -> bool => !neoCLR.Runtime.StringEquals(left, right)
 
     func Equals(other: string) -> bool {
-        return RuntimeServices.StringEquals(m_value, other)
+        return neoCLR.Runtime.StringEquals(m_value, other)
     }
 
     /// Compares non-null strings using an explicit policy; unknown modes fault.
@@ -179,15 +179,15 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
 
 
     func GetIterator() -> Collections.Iterator<char> {
-        let elements = RuntimeServices.StringGraphemes(m_value)
+        let elements = neoCLR.Runtime.StringGraphemes(m_value)
         return elements.GetIterator()
     }
 
     func GetScalars() -> Collections.Sequence<uint> {
-        return RuntimeServices.StringScalars(m_value)
+        return neoCLR.Runtime.StringScalars(m_value)
     }
 
-    val IsEmpty: bool => RuntimeServices.StringEquals(m_value, "")
+    val IsEmpty: bool => neoCLR.Runtime.StringEquals(m_value, "")
 
     /// Legacy byte-oriented API; byte slicing belongs to explicit encoding and buffers.
     [Obsolete("Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.")]

@@ -70,3 +70,24 @@ internal extern func StringHashOrdinalIgnoreCase(arg0: string) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func Utf8Decode(arg0: byte[]) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringGraphemes(text: string) -> char[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringScalars(text: string) -> uint[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func Utf8Encode(text: string) -> byte[];
+
+// Preserve ordinal value equality, including nulls, without recursing through
+// the public String equality operators implemented using this helper.
+internal func StringEquals(left: string, right: string) -> bool {
+    if left is null {
+        return right is null
+    }
+    if right is null {
+        return false
+    }
+    return StringCompareOrdinal(left, right) == 0
+}

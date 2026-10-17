@@ -412,3 +412,20 @@ StringEquals still has a managed opcode body. StringGraphemes, StringScalars and
 Utf8Encode still materialize managed arrays through retained helper bodies. These
 are the next text migration boundary, followed by remaining services and compiler
 bootstrap contracts. The installed SDK is unchanged and structural work is parked.
+
+## Native text arrays and equality — 2026-10-17
+
+StringGraphemes, StringScalars and Utf8Encode now use existing native managed-array
+result support directly. StringEquals is source-owned code: explicit null checks
+followed by ordinal comparison, avoiding recursion through String's public operators.
+Preparation removes the four CLI facade methods, the three native seed definitions
+and all four managed seed bodies. No public signature, runtime provider or compiler
+contract changes. The fresh five-library native-text-array-library bundle uses
+native-text-array-bootstrap and Raven 304e8675a.
+
+[Consumer](TextArrayConsumer.rvn), [interpreter evidence](text-array-results.json)
+and [completion](text-array-completion.json) cover null/value equality, grapheme
+iteration, Unicode scalar snapshots, UTF-8 encode/decode and empty arrays. API
+fingerprints pass. Existing JIT/AOT provider support is reused without rerunning a
+backend matrix. No text helper remains on RuntimeServices; file/time/scheduling
+and compiler bootstrap contracts remain open. Structural work is parked.

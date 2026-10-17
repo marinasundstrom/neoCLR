@@ -12677,3 +12677,13 @@ ordinary .NET compiler change is required. See the
 [gate](validation/native-core-removal/README.md#native-direct-textparsing-ownership--2026-10-17).
 Managed string equality and text-array helpers remain, as do other core/compiler
 bootstrap contracts; broader structural work stays parked.
+
+### Native text arrays and equality (2026-10-17)
+
+The four remaining text helper facades are removed from prepared CLI/seed inputs.
+Three source InternalCalls select existing managed-array result support; native
+StringEquals source uses null checks and ordinal comparison. Raven 304e8675a builds
+all five libraries, and text-array/equality interpreter and completion checks pass.
+No Runtime Contract switch or ordinary .NET change is required. See the
+[gate](validation/native-core-removal/README.md#native-text-arrays-and-equality--2026-10-17).
+Other retained services and native compiler/core construction remain open.
