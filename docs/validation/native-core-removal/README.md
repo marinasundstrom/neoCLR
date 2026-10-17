@@ -52,3 +52,26 @@ and marker references includes ParamArrayAttribute and Int32 without CLI delegat
 This reduced editor fixture establishes native metadata loading, not complete production
 editor migration. The production reference snapshot is refreshed from the matching native
 bundle and documents the marker under System.Runtime. The installed SDK is unchanged.
+
+## Native queue-service migration
+
+Raven `ff4cff61b` and SDK `bdbe3298d` preserve generic native InternalCall identity.
+System.Runtime now declares all three generic queue services in native Raven source,
+and staged bootstrap preparation removes the old facade methods and seed functions.
+The four-library `target/native-queue-libraries-v3` bundle compiles against that staged
+input. The [consumer](QueueConsumer.rvn) exercises queue registration/default identity
+and async completion. [Execution evidence](queue-results.json) records 42 in the
+interpreter, managed JIT and sanitized AOT, with fresh runtime/backend binaries.
+Focused signature tests preserve rejection of malformed getters/registrations.
+
+Raven emits no-result registration, unlike the old seed's inhabited-unit result.
+Both registration forms are supported; getters still return their exact generic T,
+and the runtime retains nominal TaskQueue identity/layout validation. This does not
+relax arbitrary runtime-service declarations.
+
+[Production editor completion](queue-completion.json) resolves TaskQueue.Default
+against the same bundle. This production project still uses the CLI core; the check
+is member-import validation, not a claim of bridge-free System completion. The
+public API surface is unchanged and source fingerprints pass the API snapshot check.
+Remaining facade services, intrinsic owners and native source-core construction are
+still migration blockers; the installed SDK is unchanged.

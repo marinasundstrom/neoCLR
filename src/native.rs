@@ -222,7 +222,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         let register = function.name == "neoCLR.Runtime.RegisterTaskQueue";
         if function.generic_parameters.len() != 1
             || !function.generic_constraints.is_empty()
-            || function.no_result
+            || (function.no_result && !register)
             || function.parameters
                 != if register {
                     vec![parameter.clone()]
@@ -1893,7 +1893,9 @@ mod task_callback_tests {
             ("GetDefaultTaskQueue<T, U>() -> T", false),
             ("GetDefaultTaskQueue() -> Int32", false),
             ("RegisterTaskQueue<T>(Int32 queue) -> Void", false),
-            ("RegisterTaskQueue<T>(T queue) -> noresult", false),
+            ("RegisterTaskQueue<T>(T queue) -> noresult", true),
+            ("GetDefaultTaskQueue<T>() -> noresult", false),
+            ("RegisterTaskQueue<T>(T queue) -> Int32", false),
         ] {
             let module = crate::assemble(&format!(
                 ".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"

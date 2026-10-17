@@ -1947,7 +1947,7 @@ pub fn task_queue(
             || f.receiver_readonly
             || f.parameters != if register { vec![ty.clone()] } else { vec![] }
             || f.returns != if register { Type::Void } else { ty.clone() }
-            || f.no_result
+            || (f.no_result && !register)
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
             || !f.body.is_empty()
@@ -1968,7 +1968,9 @@ pub fn task_queue(
             );
         }
         f.impl_flags = 0;
-        f.body = if register {
+        f.body = if register && f.no_result {
+            vec![Op::Return]
+        } else if register {
             vec![Op::Void, Op::Return]
         } else {
             vec![Op::Branch(0)]
@@ -2145,7 +2147,11 @@ mod task_queue_tests {
                     4 => input.functions[1].no_result = true,
                     _ => input.functions[1].readonly_parameters = vec![0],
                 }
-                assert!(task_queue(&mut input, &inventory, &source).is_err());
+                if change == 4 && register {
+                    assert!(task_queue(&mut input, &inventory, &source).is_ok());
+                } else {
+                    assert!(task_queue(&mut input, &inventory, &source).is_err());
+                }
             }
             let mut missing_drain = source.clone();
             missing_drain.functions[0].name = "Different".into();

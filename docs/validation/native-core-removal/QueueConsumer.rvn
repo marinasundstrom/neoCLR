@@ -1,0 +1,10 @@
+import System.*
+import System.Concurrency.Tasks.*
+
+async func Main() -> Task<int> {
+    let queue = TaskQueue.Default
+    if !object.ReferenceEquals(queue, TaskQueue.Default) {
+        return 1
+    }
+    return await Task.FromResult(42)
+}

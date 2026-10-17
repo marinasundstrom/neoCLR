@@ -1,8 +1,8 @@
 # Production bootstrap removal audit — 2026-10-17
 
 The author asked to identify the issues before fixing them in a sweep, and authorized
-adding real neoCLR types/attributes needed by Raven and the samples. Implementation
-is paused for this inventory. This is a migration plan, not completed support.
+adding real neoCLR types/attributes needed by Raven and the samples. The initial inventory is complete and bounded migration slices are underway.
+This records remaining blockers, not completed native-only production support.
 Broader structural work remains parked; ordinary Raven/.NET remains separate.
 
 The author clarified the destination: **Raven targeting neoCLR must load native
@@ -140,3 +140,10 @@ stripping are accepted substitutes for the above gates.
 - The initial duplicate-ownership failure is resolved. Retained runtime-service
   references, intrinsic ownership and source-core production remain open. Neither
   the installed SDK nor production editor configuration has been replaced.
+
+- Generic InternalCall metadata authoring/import (`bdbe3298d`) and Raven native
+  symbols (`ff4cff61b`) preserve runtime service identity. Production TaskQueue and
+  workers now call native source-owned generic queue services, with their staged
+  CLI/seed declarations removed. Registration accepts Raven's no-result ABI; exact
+  nominal queue validation remains in place. Other services and native core
+  construction are still open.

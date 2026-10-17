@@ -18697,3 +18697,11 @@ explicit typeof contracts. A production System.Runtime probe rejected its retain
 NeoCLR.CoreProbe dependency. Full production bootstrap removal remains open; no
 completion-only filter or unqualified SDK switch was made. See the
 [validation record](validation/native-core-removal/README.md).
+
+The author further clarified that this work includes filling gaps between Raven and
+the metadata library. The assistant identified and implemented native parameter-array
+marker ownership and generic InternalCall authoring/import contracts in both layers,
+then began replacing production queue-service declarations. Execution exposed Raven's
+no-result registration signature; the runtime/backend binding was extended specifically
+for that signature, preserving nominal queue validation. Native-only production core
+construction and remaining service/intrinsic contracts are still open.

@@ -4,6 +4,7 @@ Usage: python3 scripts/check-native-editor.py SERVER_DLL PROJECT_DIR OUTPUT_JSON
 Run NeoClrMetadataProbe --native-core-project CORE LIBRARY PROJECT_DIR first.
 This checks semantic editor requests, not VS Code build/run or reference refresh.
 """
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -13,7 +14,14 @@ import sys
 import threading
 import time
 
-server, project, output = map(lambda p: Path(p).resolve(), sys.argv[1:])
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('server', type=Path)
+parser.add_argument('project', type=Path)
+parser.add_argument('output', type=Path)
+parser.add_argument('--expression', default='System.')
+parser.add_argument('--expect', action='append', default=[])
+args = parser.parse_args()
+server, project, output = (p.resolve() for p in (args.server, args.project, args.output))
 messages = queue.Queue()
 output.parent.mkdir(parents=True, exist_ok=True)
 log = output.with_suffix('.stderr.log').open('wb')
@@ -67,20 +75,22 @@ try:
         'workspaceFolders': [{'uri': project.as_uri(), 'name': 'native core'}]}, True))
     send('initialized', {})
     uri = (project / 'Main.rvn').as_uri()
-    source = 'func Main() -> int { System. }'
+    source = 'func Main() -> int { ' + args.expression + ' }'
     send('textDocument/didOpen', {'textDocument': {'uri': uri, 'version': 1, 'languageId': 'raven', 'text': source}})
     result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
-        'position': {'line': 0, 'character': source.index('System.') + len('System.')},
+        'position': {'line': 0, 'character': source.index(args.expression) + len(args.expression)},
         'context': {'triggerKind': 1}}, True))
     items = result if isinstance(result, list) else result['items']
     labels = [item['label'] for item in items]
-    assert 'Int32' in labels, labels
-    assert not any(label.startswith(('Action', 'Func<')) for label in labels), labels
+    for expected in args.expect or (['Int32'] if args.expression == 'System.' else []):
+        assert expected in labels, labels
+    if args.expression == 'System.':
+        assert not any(label.startswith(('Action', 'Func<')) for label in labels), labels
     receive(send('shutdown', None, True))
     send('exit', None)
     process.wait(timeout=10)
     assert process.returncode == 0
-    output.write_text(json.dumps({'passed': True, 'labels': labels,
+    output.write_text(json.dumps({'passed': True, 'expression': args.expression, 'labels': labels,
         'serverSha256': hashlib.sha256(server.read_bytes()).hexdigest(),
         'project': str(project)}, indent=2) + '\n')
     print('PASS native-only System completion without CLI delegate transport types')

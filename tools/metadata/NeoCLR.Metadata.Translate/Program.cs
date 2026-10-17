@@ -18,6 +18,12 @@ if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
                     type.CustomAttributes.Remove(attribute);
         foreach (var type in module.Types.Where(t => removedNames.Contains(t.FullName)).ToArray())
             module.Types.Remove(type);
+        // These runtime functions are now declared by the native System.Runtime sources.
+        var queueServices = new HashSet<string> { "GetDefaultTaskQueue", "GetCurrentTaskQueue", "RegisterTaskQueue" };
+        var services = module.GetType("System.Runtime.CompilerServices.RuntimeServices");
+        if (services is not null)
+            foreach (var method in services.Methods.Where(m => queueServices.Contains(m.Name)).ToArray())
+                services.Methods.Remove(method);
         // Retained declarations may not keep signatures referencing removed definitions.
         foreach (var type in module.GetTypes())
         {

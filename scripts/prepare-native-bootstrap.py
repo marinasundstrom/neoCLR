@@ -62,6 +62,20 @@ def main():
         if seed_text.count(marker) != 1:
             raise ValueError('Expected exactly one retained parameter-array marker')
         seed_text = seed_text.replace(marker, '')
+    # Source runtime declarations now own all three generic queue services. Remove
+    # both legacy facade methods and seed implementations, with exact shape checks.
+    for name in ('GetDefaultTaskQueue', 'GetCurrentTaskQueue', 'RegisterTaskQueue'):
+        register = name == 'RegisterTaskQueue'
+        parameters = 'T queue' if register else ''
+        result = 'noresult' if register else 'T'
+        body = ('ldarg queue\n' if register else '') + f'call neoCLR.Runtime.{name}<T>({"T" if register else ""})\n'
+        body += ('pop\n' if register else '') + 'ret\n'
+        facade = f'.method static {name}<T>({parameters}) -> {result}\n{body}.end\n'
+        service = f'.function neoCLR.Runtime.{name}<T>({parameters}) -> {"Void" if register else "T"}\n.methodimpl InternalCall\n.end\n'
+        for declaration in (facade, service):
+            if seed_text.count(declaration) != 1:
+                raise ValueError('Expected exactly one retained queue declaration: ' + name)
+            seed_text = seed_text.replace(declaration, '')
     for path in (args.probe or args.core_reference, args.runtime, args.translator):
         if not path.is_file():
             raise FileNotFoundError(path)

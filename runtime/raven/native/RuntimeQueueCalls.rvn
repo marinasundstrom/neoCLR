@@ -1,0 +1,14 @@
+import System.Runtime.CompilerServices.*
+
+module neoCLR.Runtime
+
+// The runtime validates the selected nominal TaskQueue layout and retains its exact type.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GetDefaultTaskQueue<T>() -> T;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func GetCurrentTaskQueue<T>() -> T;
+
+// Raven unit-returning declarations use the native no-result control signature.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func RegisterTaskQueue<T>(queue: T) -> ();

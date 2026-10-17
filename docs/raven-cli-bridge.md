@@ -12514,3 +12514,14 @@ signature and TaskQueue layout checks. This closes an API-boundary gap; the reta
 production service seed and core migration are still separate work. The model reuses
 the existing .NET-compatible implementation flag and generic method metadata rather
 than adding a new runtime operation. No Runtime Contract default changes.
+
+Production queue services are now native source declarations in
+`runtime/raven/native/RuntimeQueueCalls.rvn`; TaskQueue and workers call those exact
+functions. Staged preparation removes their three CLI facade methods and retained
+seed declarations, so a duplicate definition cannot silently supply execution.
+Raven unit returns lower to no-result control signatures. RegisterTaskQueue accepts
+that form as well as its legacy inhabited-unit signature; getters still require T.
+Interpreter and compiled bindings retain exact arity, parameters, InternalCall flags,
+nominal queue identity and layout checks. This is an ABI compatibility correction,
+not an exception-model or ordinary .NET change. Other services and source-core
+production remain bootstrap-dependent. See [queue validation](validation/native-core-removal/README.md#native-queue-service-migration).
