@@ -12752,3 +12752,11 @@ negative-length/uninitialized-read faults. See
 [evidence](validation/native-core-removal/source-core-loop-results.json).
 Raven f98f88c7d carries the qualified case-pattern fix from main and validates the
 .NET-shaped Enum base with SDK b68592c43. Production migration is still in progress.
+
+Source-core native Self mapping now handles the explicitly configured source
+marker before nominal storage mapping. Static numeric interface implementations
+match their Self signatures without a CLI marker reference. Native reflection
+retains Self on the interface and Int32 on Int32.Zero; a native consumer compiles,
+completes and returns 42 in interpreter, JIT and sanitized AOT.
+See [evidence](validation/native-core-removal/source-core-self-results.json).
+The compiler's marker identity remains an explicit configuration contract.
