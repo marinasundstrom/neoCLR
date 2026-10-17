@@ -1,0 +1,21 @@
+{
+  "headSha": "504d122733d7b14ddbec173dcd31147d3ec42f16",
+  "jobs": [
+    {
+      "name": "minimum-rust (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "minimum-rust (macos-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "minimum-rust (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39071070134"
+}

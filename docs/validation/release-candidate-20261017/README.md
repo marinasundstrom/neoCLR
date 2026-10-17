@@ -356,3 +356,7 @@ branches: neoCLR `504d1227`, Raven `40fcae6d0`.
 [Native toolchain run](https://github.com/marinasundstrom/neoCLR/actions/runs/39071070147)
 is in progress, not a Windows pass or a publication. The workflow additionally
 requires two ten-cycle installed-editor recovery runs.
+
+[Minimum-Rust CI](minimum-rust-platforms.json) passes all-target checking on Windows,
+macOS and Linux at candidate `504d1227`, complementing local Rust 1.85 evidence.
+This does not substitute for runtime execution or editor qualification.
