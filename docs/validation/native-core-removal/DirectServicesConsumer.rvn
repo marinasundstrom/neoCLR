@@ -1,0 +1,25 @@
+import System.*
+
+func Main() -> int {
+    if Math.Sqrt(9.0) != 3.0 || Math.Pow(2.0, 3.0) != 8.0 {
+        return 1
+    }
+    if Math.Round(2.5) != 2.0 || Math.Floor(-2.5) != -3.0 {
+        return 2
+    }
+    let arguments = Environment.GetCommandLineArgs()
+    if arguments.Length < 1 {
+        return 4
+    }
+    if Environment.GetCurrentDirectory() is .Ok(let directory) {
+        if directory.Length == 0 {
+            return 5
+        }
+    } else {
+        return 6
+    }
+    if Environment.GetEnvironmentVariable("invalid=name") is .Error(let error) {
+        return 42
+    }
+    return 7
+}

@@ -6,11 +6,11 @@ import System.Option.*
 import System.Runtime.CompilerServices.RuntimeServices
 
 public func GetCommandLineArgs() -> string[] {
-    return RuntimeServices.EnvironmentArguments()
+    return neoCLR.Runtime.EnvironmentArguments()
 }
 
 public func GetCurrentDirectory() -> System.Result<string, EnvironmentError> {
-    let payload = RuntimeServices.EnvironmentCurrentDirectory()
+    let payload = neoCLR.Runtime.EnvironmentCurrentDirectory()
     if RuntimeServices.IsValue<int>(payload) {
         return Error(default(EnvironmentError))
     }
@@ -18,7 +18,7 @@ public func GetCurrentDirectory() -> System.Result<string, EnvironmentError> {
 }
 
 public func GetEnvironmentVariable(name: string) -> System.Result<System.Option<string>, EnvironmentError> {
-    let payload = RuntimeServices.EnvironmentVariable(name)
+    let payload = neoCLR.Runtime.EnvironmentVariable(name)
     if RuntimeServices.IsValue<int>(payload) {
         return Error(default(EnvironmentError))
     }

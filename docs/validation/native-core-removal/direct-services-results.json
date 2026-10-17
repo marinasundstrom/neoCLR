@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "command": [
+    "/Users/robert/Projects/neoclr/target/debug/neoclr",
+    "run",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-consumer/bin/neoclr/App.dll",
+    "--execution",
+    "interpreter",
+    "--system",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.runtime.neox",
+    "--object-root",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.Data.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.Networking.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.Web.dll"
+  ],
+  "exitCode": 42,
+  "stdout": "",
+  "stderr": "",
+  "compilerRevision": "290de084b",
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-direct-services-consumer/bin/neoclr/App.dll": "114fe66712f5bc03738bc7da271bba47dfd06deb164543fadcff6b8491527f96",
+    "/Users/robert/Projects/neoclr/target/native-direct-services-v2/System.Runtime.dll": "d7f1efb323a034b4d6308db1408a1f47fcb471f745aa0c17462a5938e1fb26cd"
+  }
+}

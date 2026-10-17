@@ -93,7 +93,7 @@ try:
     output.write_text(json.dumps({'passed': True, 'expression': args.expression, 'labels': labels,
         'serverSha256': hashlib.sha256(server.read_bytes()).hexdigest(),
         'project': str(project)}, indent=2) + '\n')
-    print('PASS native-only System completion without CLI delegate transport types')
+    print('PASS completion for ' + args.expression)
 finally:
     if process.poll() is None:
         process.kill()

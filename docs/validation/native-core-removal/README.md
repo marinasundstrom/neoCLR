@@ -75,3 +75,21 @@ is member-import validation, not a claim of bridge-free System completion. The
 public API surface is unchanged and source fingerprints pass the API snapshot check.
 Remaining facade services, intrinsic owners and native source-core construction are
 still migration blockers; the installed SDK is unchanged.
+
+## Direct math and environment services
+
+Production callers now select native namespace functions directly, removing 18
+forwarding methods and their bootstrap RuntimeServices extension dependency.
+No public API or runtime implementation changed. Raven `290de084b` builds the fresh
+four-library `target/native-direct-services-v2` bundle. The
+[consumer](DirectServicesConsumer.rvn) checks math, command-line arguments, current
+directory and environment-query error behavior; [execution](direct-services-results.json)
+returns 42 in the interpreter. [LSP completion](direct-services-completion.json)
+resolves Math functions against that bundle. API source fingerprints are refreshed.
+This remains a production project with CLI core input, not native-only completion.
+Existing JIT/AOT implementation evidence is unaffected by these forwarding removals.
+
+An attempted native-integer consumer could not bind Int32-to-IntPtr/UIntPtr casts
+or imported CompareTo through the current project configuration. Those two adapters
+remain unchanged and the gap must be isolated before migrating them. Other wrappers,
+intrinsic ownership and production native-core construction remain open.

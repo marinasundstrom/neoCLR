@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "expression": "System.Math.",
+  "labels": [
+    "Pi",
+    "E",
+    "Tau",
+    "Abs",
+    "Min",
+    "Max",
+    "Sign",
+    "Clamp",
+    "Sqrt",
+    "Floor",
+    "Ceiling",
+    "Truncate",
+    "Round",
+    "Exp",
+    "Log",
+    "Log10",
+    "Sin",
+    "Cos",
+    "Tan",
+    "Pow"
+  ],
+  "serverSha256": "336a7f8f8e7e844eb461452182a0bec3c04863149096ed36991703be84bc714b",
+  "project": "/Users/robert/Projects/neoclr/target/native-direct-services-consumer"
+}

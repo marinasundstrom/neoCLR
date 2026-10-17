@@ -147,3 +147,8 @@ stripping are accepted substitutes for the above gates.
   CLI/seed declarations removed. Registration accepts Raven's no-result ABI; exact
   nominal queue validation remains in place. Other services and native core
   construction are still open.
+
+- Math/environment callers now use native declarations directly; 18 forwarding
+  methods are removed. Fresh production compilation, interpreter execution and Math
+  LSP completion pass. Native-integer migration is deferred after the consumer found
+  unresolved IntPtr/UIntPtr conversion/member binding; its existing adapters remain.

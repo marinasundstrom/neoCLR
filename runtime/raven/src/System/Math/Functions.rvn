@@ -1,7 +1,5 @@
 module System.Math
 
-import System.Runtime.CompilerServices.RuntimeServices
-
 import System.OverflowError
 import System.InvalidRangeError
 import System.Result.*
@@ -57,61 +55,61 @@ public func Clamp(value: int, min: int, max: int) -> System.Result<int, InvalidR
 }
 
 public func Abs(value: double) -> double {
-    return RuntimeServices.MathAbs(value)
+    return neoCLR.Runtime.MathAbs(value)
 }
 
 public func Sqrt(value: double) -> double {
-    return RuntimeServices.MathSqrt(value)
+    return neoCLR.Runtime.MathSqrt(value)
 }
 
 public func Floor(value: double) -> double {
-    return RuntimeServices.MathFloor(value)
+    return neoCLR.Runtime.MathFloor(value)
 }
 
 public func Ceiling(value: double) -> double {
-    return RuntimeServices.MathCeiling(value)
+    return neoCLR.Runtime.MathCeiling(value)
 }
 
 public func Truncate(value: double) -> double {
-    return RuntimeServices.MathTruncate(value)
+    return neoCLR.Runtime.MathTruncate(value)
 }
 
 public func Round(value: double) -> double {
-    return RuntimeServices.MathRound(value)
+    return neoCLR.Runtime.MathRound(value)
 }
 
 public func Exp(value: double) -> double {
-    return RuntimeServices.MathExp(value)
+    return neoCLR.Runtime.MathExp(value)
 }
 
 public func Log(value: double) -> double {
-    return RuntimeServices.MathLog(value)
+    return neoCLR.Runtime.MathLog(value)
 }
 
 public func Log10(value: double) -> double {
-    return RuntimeServices.MathLog10(value)
+    return neoCLR.Runtime.MathLog10(value)
 }
 
 public func Sin(value: double) -> double {
-    return RuntimeServices.MathSin(value)
+    return neoCLR.Runtime.MathSin(value)
 }
 
 public func Cos(value: double) -> double {
-    return RuntimeServices.MathCos(value)
+    return neoCLR.Runtime.MathCos(value)
 }
 
 public func Tan(value: double) -> double {
-    return RuntimeServices.MathTan(value)
+    return neoCLR.Runtime.MathTan(value)
 }
 
 public func Pow(left: double, right: double) -> double {
-    return RuntimeServices.MathPow(left, right)
+    return neoCLR.Runtime.MathPow(left, right)
 }
 
 public func Min(left: double, right: double) -> double {
-    return RuntimeServices.MathMin(left, right)
+    return neoCLR.Runtime.MathMin(left, right)
 }
 
 public func Max(left: double, right: double) -> double {
-    return RuntimeServices.MathMax(left, right)
+    return neoCLR.Runtime.MathMax(left, right)
 }

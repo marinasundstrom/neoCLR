@@ -12525,3 +12525,10 @@ Interpreter and compiled bindings retain exact arity, parameters, InternalCall f
 nominal queue identity and layout checks. This is an ABI compatibility correction,
 not an exception-model or ordinary .NET change. Other services and source-core
 production remain bootstrap-dependent. See [queue validation](validation/native-core-removal/README.md#native-queue-service-migration).
+
+Math/environment production callers now bind existing native namespace functions
+without RuntimeServices extension forwards. The compiler/runtime contracts and public
+APIs are unchanged; source ownership and the selected native function identity remain
+explicit. Compilation, interpreter and Math completion validation are recorded in the
+[native migration evidence](validation/native-core-removal/README.md#direct-math-and-environment-services).
+The native-integer adapters are retained pending their consumer binding gap.
