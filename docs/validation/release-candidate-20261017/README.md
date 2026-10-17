@@ -328,3 +328,17 @@ Archive: `target/release-inference-fixed-20261017/neoclr-native-candidate-osx-ar
 The VSIX is installed only in the isolated test profile. The normal user SDK/profile
 and published downloads are unchanged. Windows, six source-test failures, minimum
 Rust qualification, remote candidate pins and runtime measurements remain open.
+
+## Source-test repairs
+
+Array repair `a67562dfa` updates the stale incompatible-interface diagnostic
+expectation while preserving all three rejection/identity checks;
+[release tests](array-source-repair.txt) pass. The archived Raven profile now adds
+the three field-snapshot storage slots when adapting its old descriptor fixture.
+The guard requires the expected archived layout and fails if it changes. Generated
+bridge snapshots and production native libraries remain untouched.
+[All 26 reflection tests](reflection-source-repair.txt) pass, including the five
+previous failures. These focused results close the six failures; the unaffected
+results of the earlier full source run remain evidence, not a newly passing full run.
+[Rust 1.85 all-target checking](minimum-rust-macos.txt) also passes on macOS.
+Windows and source-validator stages skipped after the original failure remain open.

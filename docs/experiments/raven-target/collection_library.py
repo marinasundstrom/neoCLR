@@ -60,6 +60,19 @@ def build(path: Path) -> str:
     if path == ROOT / 'runtime/System/Collections/Iterable.neoil':
         return build(ROOT / 'runtime/raven/Iterable.neoil')
     text = path.read_text()
+    if path == ROOT / 'runtime/raven/generated/Descriptors.helpers.neoil':
+        # Archived CLI snapshots predate the native field-reflection payload.
+        # Adapt this test-only profile's storage without rewriting its generated
+        # artifacts or reintroducing the bridge into production library builds.
+        anchor = '.field private DefinitionIndex Int32\n.property instance FieldType()'
+        if text.count(anchor) != 1:
+            raise ValueError('Revisit archived RuntimeFieldInfo layout adaptation')
+        text = text.replace(anchor,
+            '.field private DefinitionIndex Int32\n'
+            '.field private StoredIsInitOnly Boolean\n'
+            '.field private StoredIsLiteral Boolean\n'
+            '.field private StoredConstantValue System.Object\n'
+            '.property instance FieldType()', 1)
     if path == ROOT / 'runtime/System/Collections/Iterator.neoil':
         return build(ROOT / 'runtime/raven/Iterator.neoil')
     if path.stem in COLLECTIONS | {'Disposable'}:

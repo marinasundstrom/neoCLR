@@ -1,0 +1,33 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Finished `release` profile [optimized] target(s) in 3.07s
+     Running tests/raven_reflection.rs (target/release/deps/raven_reflection-b1fb3f662f365195)
+
+running 26 tests
+test bound_function_parameters_keep_closed_module_method_identity ... ok
+test descriptor_parameter_sequences_do_not_expose_runtime_owned_storage ... ok
+test enum_snapshots_keep_unsigned_order_aliases_and_nominal_boxes ... ok
+test direct_native_type_result_preserves_public_interface_view ... ok
+test assembly_module_object_identity_preserves_catalog_scope ... ok
+test inheritance_classification_metadata_round_trips_and_checks_directives ... ok
+test executing_assembly_exposes_system_runtime_through_sequence ... ok
+test descriptor_private_accessor_requires_explicit_inclusion ... ok
+test executing_assembly_follows_source_caller_not_entry_or_runtime_facade ... ok
+test member_queries_currently_enumerate_declarations_only ... ok
+test discovery_limits_and_unloaded_references_fail_without_loading ... ok
+test member_object_identity_includes_kind_closed_owner_and_definition ... ok
+test handle_fields_must_be_assigned_by_class_constructors ... ok
+test module_inventory_contains_open_generic_definitions ... ok
+test object_get_type_rejects_null ... ok
+test object_get_type_reports_derived_allocation_through_base_and_interface ... ok
+test constructed_types_reuse_definition_tokens_and_arrays_are_not_members ... ok
+test type_has_no_metadata_query_exports ... ok
+test parameter_identity_uses_owner_kind_closed_type_definition_and_position ... ok
+test reflection_snapshots_implement_public_info_interfaces ... ok
+test returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit ... ok
+test type_classification_distinguishes_open_closed_leaf_and_nominal_union ... ok
+test property_tokens_are_definition_rows_scoped_to_the_declaring_module ... ok
+test object_get_type_preserves_concrete_type_through_reference_views ... ok
+test source_tokens_reach_type_member_and_parameter_interfaces ... ok
+test value_type_classification_uses_type_category_not_addressing_mode ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 62.18s

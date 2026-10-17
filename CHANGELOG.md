@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Adapt the archived Raven test profile’s RuntimeFieldInfo storage to the current readonly/literal/constant snapshot payload, without modifying generated bridge artifacts or production native libraries. All 26 reflection tests pass in release mode, closing the five reflection failures; the separate array repair closes the sixth source failure. Rust 1.85 all-target checking passes on macOS. The earlier full-run failure remains retained; Windows and subsequent source smoke stages remain separate.
+
 - Repair the array-interface source test’s stale diagnostic expectation after nominal-view dispatch changes. Preserve its incompatible-element and null-receiver checks, and print the actual fault on assertion failure. All three array-interface tests pass in release mode; runtime behavior is unchanged.
 
 - Rebuild the macOS SDK, VSIX and five native libraries with Raven `40fcae6d0`. Extracted-package acceptance, 26 installed-editor checks, two ten-cycle two-project recovery runs and exact `Task<int>` inlays pass without overrides; signed-range consumers pass interpreter/JIT/AOT. Preserve archive and server hashes. Runtime/backend binaries are unchanged; Windows, source-test failures, minimum-Rust and fresh timed measurements remain release gates.
