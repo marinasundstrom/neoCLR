@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Install an isolated native-core VS Code preview with Raven 57dbabb17 project fixes: deduplicated execution-core inputs and native Console ownership. The installed parsing/await consumer prints 42 and exits zero; native editor completion excludes host Action/Func types. Record exact artifacts; global defaults and published packages remain unchanged.
+
 - Complete production native compiler bootstrap construction with Raven 51dd22f5a: System.Runtime owns core bases, compiler markers, checked array reservation and async entry draining; dependent libraries use native metadata and explicit runtime contracts. Remove CoreProbe/CLI core and retained-seed translation from the production build and update packaging/sample tooling. Five-library compilation, parsing/async consumers, native project and language-server completion, interpreter/JIT/sanitized AOT, and refreshed native API snapshots pass. The installed SDK is unchanged; legacy fixture/documentation bridges remain isolated and broader structural work stays parked.
 
 - Recognize the native RuntimeContext.ExecutingAssembly getter calling its reserved InternalCall directly during JIT/AOT preparation. Preserve lexical caller identity and legacy facade validation; four focused tests pass, including malformed-target rejection.

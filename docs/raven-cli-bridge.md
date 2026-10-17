@@ -12770,3 +12770,14 @@ retains Self on the interface and Int32 on Int32.Zero; a native consumer compile
 completes and returns 42 in interpreter, JIT and sanitized AOT.
 See [evidence](validation/native-core-removal/source-core-self-results.json).
 The compiler's marker identity remains an explicit configuration contract.
+
+### Native project preview delivery (2026-10-17)
+
+Raven `57dbabb17` deduplicates the native core in execution inputs and disables
+the legacy Console lowering shortcut for native catalogs. Native Console calls
+resolve against their actual System.Runtime owner. The .NET target is unchanged.
+The installed SDK compiles and runs the parsing/await/Console consumer and its
+language server supplies native System completion. See the
+[installed preview evidence](validation/native-core-removal/installed-preview.json).
+Production construction uses native metadata; isolated CLI fixtures and legacy
+documentation projections are not application dependencies.

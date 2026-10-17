@@ -565,3 +565,18 @@ The production workflow and packaging no longer require bootstrap preparation.
 Publishing the paired Raven revision, remote CI and installing a rebuilt SDK remain
 separate delivery actions. API snapshots and four snapshot checks pass; no unrelated
 website build is required.
+
+## Installed native-core preview (2026-10-17)
+
+The isolated macOS ARM64 VS Code preview uses SDK
+`0.1.15-neoclr.20261017.2`, native libraries produced by Raven `51dd22f5a`
+and the project adapter from `57dbabb17`. The adapter coalesces execution-core
+paths and binds Console calls to the native declaration rather than the legacy
+CLI shortcut. The installed sample parses and awaits 42, prints it and exits zero.
+The installed language server completes System without host Action/Func leakage.
+[Installation evidence](installed-preview.json) records hashes and exact commands.
+
+The preview was installed in an isolated VS Code profile and opened locally;
+global SDK/extension defaults and published packages are unchanged. The native
+runtime binaries are qualified debug builds, not release artifacts. This local
+installation does not replace cross-platform release qualification.
