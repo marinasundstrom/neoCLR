@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify Raven 85ebd0bec source-core array iteration through the native Array<T> member contract: consumer compilation/completion and interpreter/JIT/sanitized AOT execution pass, including allocation faults. Qualified generic case patterns are carried from main via f98f88c7d; production source-core migration remains in progress.
+
 - Preserve source-core `System.Enum : System.ValueType` as an abstract reference class in metadata authoring and CLI projection reading, matching .NET. Native/projection roundtrips retain ordinary struct and enum value identities; a non-core declaration does not acquire the authoring exception.
 
 - Qualify Raven 7b2fee1fd source-core declaration ordering: primitive type shells precede function signatures, source attributes defer provisional binding, and alternate file orders preserve overloads and native-call markers. Carry main generic union receiver inference via fd229a08d. Native consumer compilation/completion passes; production core emission remains blocked by qualified case patterns and subsequent migration work.

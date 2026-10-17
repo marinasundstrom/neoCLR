@@ -12741,3 +12741,14 @@ Source-core metadata authoring preserves `System.Enum : System.ValueType` as an
 abstract reference class, matching .NET. Ordinary enum and struct declarations
 retain value identity through native and documentation projection roundtrips.
 See the [metadata API contract](../api-docs/experimental-metadata.md#core-enum-base-classification-development).
+
+### Source-core array-loop contract (2026-10-17)
+
+Raven 85ebd0bec resolves array-loop Length through the actual array symbol and
+its configured `Array<T>` view. The standalone source core no longer needs a
+placeholder Length property on its nongeneric Array base. Compilation/completion,
+interpreter, JIT and sanitized AOT pass, with initialized reads and the existing
+negative-length/uninitialized-read faults. See
+[evidence](validation/native-core-removal/source-core-loop-results.json).
+Raven f98f88c7d carries the qualified case-pattern fix from main and validates the
+.NET-shaped Enum base with SDK b68592c43. Production migration is still in progress.
