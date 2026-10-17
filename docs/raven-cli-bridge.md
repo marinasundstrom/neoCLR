@@ -12725,3 +12725,14 @@ a managed native body using existing checked-uninitialized array storage.
 The compiler no longer needs a CLI method identity for this source-core helper.
 Interpreter/JIT/AOT success and rejection checks pass; no public API or production
 SDK switch is claimed. See [evidence](validation/native-core-removal/source-core-storage-results.json).
+
+### Source-core declaration ordering (2026-10-17)
+
+Raven 7b2fee1fd declares source-core type shells before namespace function
+signatures and defers provisional attribute binding. The new overload regression
+fails on the prior compiler and passes with alternate file orders; source native
+markers and native consumer compilation/completion pass. General qualified union
+receiver inference was developed on Raven main (81daa7e11) and carried separately
+(fd229a08d). Production core source binding now reaches emission, where qualified
+case-pattern handling is the next observed blocker. This is not a published
+native-only production bundle. Broader structural work remains parked.

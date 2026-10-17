@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify Raven 7b2fee1fd source-core declaration ordering: primitive type shells precede function signatures, source attributes defer provisional binding, and alternate file orders preserve overloads and native-call markers. Carry main generic union receiver inference via fd229a08d. Native consumer compilation/completion passes; production core emission remains blocked by qualified case patterns and subsequent migration work.
+
 - Qualify Raven 31da12d29 source-core managed array reservation in interpreter, JIT and sanitized AOT: initialized array/interface use succeeds, while uninitialized reads and negative lengths fault. Record exact signature rejection and byte-identical final artifacts; production class-library forwarding remains pending.
 
 - Record Raven 87698cd00 reference-free native source-core construction and exact metadata-arity fixes on Raven main/codex-neoclr. Native consumer compilation, array-interface/extension interpreter execution, completion and existing native-project checks pass. Production foundational declarations and managed compiler services still require migration; no SDK replacement is claimed.
