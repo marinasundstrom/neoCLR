@@ -10,6 +10,8 @@ if (args is ["--type-initialization"]) { TypeInitializationChecks.Run(); return 
 
 if (args is ["--class-constants"]) { ClassConstantChecks.Run(); return 0; }
 
+if (args is ["--authored-composition-methods"]) { AuthoredCompositionMethodChecks.Run(); return 0; }
+
 if (args is ["--authored-method-bounds"]) { AuthoredMethodBoundChecks.Run(); return 0; }
 
 if (args is ["--external-constructed-bases"]) { ExternalConstructedBaseChecks.Run(); return 0; }
@@ -47,7 +49,7 @@ if (args is ["--open-constrained-calls"]) { OpenConstrainedCallChecks.Run(); ret
 
 if (args is ["--structural-method-constraints"]) { StructuralMethodConstraintChecks.Run(); GenericMethodConstraintChecks.Run(); return 0; }
 
-if (args is ["--authored-compositions"]) { AuthoredCompositionChecks.Run(); return 0; }
+if (args is ["--authored-compositions"]) { AuthoredCompositionChecks.Run(); AuthoredCompositionMethodChecks.Run(); return 0; }
 if (args is ["--reference-compositions"]) { ReferenceCompositionChecks.Run(); Console.WriteLine("PASS read-only reference compositions"); return 0; }
 
 if (args is ["--static-fields"]) { StaticFieldChecks.Run(); return 0; }

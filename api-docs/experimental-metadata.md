@@ -5183,7 +5183,12 @@ not its construction; use `MakeConstructedReference` on the returned member to b
 arguments. Static generic methods are supported; instance generic methods are not.
 
 Signatures admit primitive values, a Void result, scoped owner/method parameters,
-output-owned external reference-class constructions and vectors. `.ctor` requires an
+output-owned external reference-class constructions, vectors and native unions, including
+unions nested in generic arguments such as `Task<Result<T, HttpError | JsonError>>`.
+Union constituents are checked recursively against the same supported-signature rules;
+this does not admit arbitrary compositions or bypass ownership/generic-scope validation.
+Unsupported-signature errors include the owner, method, parameters and return type.
+`.ctor` requires an
 instance nongeneric Void signature. Later extensions documented below admit ref/out parameters, nested/value owners and bounded value overrides. General class virtual contracts remain unsupported. Authored interface dispatch is supported as
 described below. No members or access rules are resolved
 from the dependency: the caller asserts the semantic contract. This API does not imply

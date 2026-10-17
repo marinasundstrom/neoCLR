@@ -12791,6 +12791,9 @@ without a nominal carrier or new bridge encoding. Runtime Contract configuration
 native signatures, backend emission and ordinary .NET behavior are unchanged.
 The compiler owns this analysis; public semantic-model answers agree with binder
 diagnostics. Twenty-one focused checks pass and the packaged HTTP server compiles.
-The client still fails authored-method signature encoding in the metadata library.
+The subsequent metadata-library fix admits native unions recursively in authored
+method signatures, including `Task<Result<T, HttpError | JsonError>>`. Raven already
+constructed the correct signature; no ABI, CLI carrier or Runtime Contract change
+was needed. Ownership, supported-constituent and generic-scope checks remain enforced.
 See [release qualification](validation/release-candidate-20261017/README.md#native-union-coverage-in-raven).
 Full packaged editor and cross-platform acceptance remain separate gates.

@@ -1,0 +1,150 @@
+{
+  "execution": "interpreter",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr": "41ccb8242ff52a86156031011d1f8484f6d33b637647c260f656e646916ec7a0",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll": "9c1a9b4e0c6ccd21241cbd8124e8b4e3ccd92358f9b7ee497552adbe7c4244e6",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll": "c22404eb2b45102de750f6f04e9b73476d6f8abff518a6b69f617e84224c8b0a",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll": "3bdde43a3f0124ea9fda4feb6572edc2d4ab149d13915b573ec60185519dabac",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll": "d74ee612abfe105b29c72cb1e60f1dc71851e7104721b502248c358705fc4689",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll": "b0968e836e15c54fc8f47f2e86b0359eb2014fcaa5fe7caedc7bf8b6f82ced9a",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll": "9e1d05a84b73121ba647045e4b3695ccb7ec3ca64db63b533f6f8b2d23094512",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll": "4df971c2b8ecbcb7658d4171ae8a14277c7b379233f5ce021e8b29efcf2bc094",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.reflection.json": "70b58551becdceb3196042e9fef87e964b8bb35bd52e04f88b0f05a1102a3521",
+    "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.reflection.json": "39ff603186ee97b260c26f741b7363734ac8622c6451483b2f302858e2cf19d6"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--",
+        "4"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/report",
+          "status": 200,
+          "body": {
+            "station": "Caf\u00e9"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 201,
+          "body": {
+            "accepted": true
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 400,
+          "body": {
+            "error": "Invalid report"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/missing",
+          "status": 404,
+          "body": {
+            "error": "Not found"
+          }
+        }
+      ],
+      "port": "56823",
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    },
+    {
+      "serverCommand": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--",
+        "2"
+      ],
+      "requests": [],
+      "port": "56828",
+      "clientCommand": [
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--",
+        "http://127.0.0.1:56828/"
+      ],
+      "client": {
+        "exitCode": 0,
+        "stdout": "{\"accepted\":true}\n",
+        "stderr": ""
+      },
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true
+}

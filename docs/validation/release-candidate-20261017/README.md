@@ -100,3 +100,25 @@ union coverage, but native metadata emission fails with `NEOMETA003: unsupported
 authored method signature`. No sample catch-all or contract workaround was added.
 The isolated composition is qualification evidence, not a replacement release SDK.
 The installed SDK and previous archive are unchanged.
+
+## Authored method union signatures
+
+The metadata library now recursively admits native unions in authored method
+signatures. The failing import was `HttpClientJsonExtensions.GetFromJson<T>`
+returning `Task<Result<T, HttpError | JsonError>>`: Raven supplied the correct
+signature, but the authored-method validator lacked its union branch. This changes
+validation, not the native format or ABI. Intersections remain outside this repair.
+
+`--authored-compositions` passes native composition checks plus nested generic-union
+method interning, substitution, binary roundtrip and scope/ownership rejection.
+`--authored-method-bounds` passes. The unchanged HTTP client now compiles using the
+isolated Raven 743e229a6 compiler with the rebuilt metadata library; the installed
+SDK and archived compiler have not been replaced.
+
+[Interpreter](http-authored-union-interpreter.json) passes all HTTP requests and
+the client/server pair. [JIT](http-authored-union-default.json) passes server requests,
+but the client fails with `generic argument type metadata was not retained: Union`.
+That backend retention failure remains a release blocker. The waiting server's
+orphan backend was terminated after the client failed so the harness could finish
+recording its report; the recorded killed-server status is cleanup, not the cause.
+AOT and fresh coherent package/editor qualification remain pending.

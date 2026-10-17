@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Admit native unions recursively in authored method signatures, including imported `Task<Result<T, HttpError | JsonError>>` results, while preserving constituent, ownership and generic-scope validation. Improve rejection diagnostics with the exact method signature. Focused metadata roundtrip/bounds tests and unchanged HTTP client compilation/interpreter execution pass; JIT exposes a separate generic-union metadata-retention blocker. No ABI change or SDK replacement.
+
 - Qualify Raven `743e229a6` native structural-union exhaustiveness repair: 21 focused diagnostic/semantic-model checks pass and the unchanged packaged HTTP JSON server compiles with an isolated compiler update. The HTTP client now reaches a separate authored-method signature encoding failure. Installed SDK, archived candidate, runtime contracts and .NET behavior remain unchanged; record the remaining release blocker.
 
 - Record fresh optimized macOS archive acceptance: collections, tasks and JSON pass with the bundled backend; HTTP JSON source compilation identifies a native union-exhaustiveness regression. CPU/JSON benchmark workers now build against the extracted archive; no performance measurements or Windows qualification are claimed.

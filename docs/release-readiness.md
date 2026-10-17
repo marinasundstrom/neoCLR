@@ -48,12 +48,14 @@ retains that failure and archive hash.
 
 Raven `743e229a6` on `codex/neoclr` fixes the missing structural-union coverage
 analysis. Twenty-one focused native/.NET diagnostic and semantic-model checks pass;
-the unchanged HTTP server compiles using an isolated compiler update. The client
-gets past coverage analysis but fails with `NEOMETA003: unsupported authored method
-signature`. This is the next compiler/metadata-library blocker. See
-[qualification](validation/release-candidate-20261017/union-exhaustiveness.json).
+the unchanged HTTP server compiles using an isolated compiler update. The subsequent
+metadata-library repair admits its missing authored-method union signature path;
+the unchanged HTTP client compiles and the interpreter client/server pair passes.
+JIT server requests pass, but the client fails because generic argument metadata
+for the union was not retained. This backend retention gap is the next blocker.
+See [qualification](validation/release-candidate-20261017/README.md#authored-method-union-signatures).
 The installed SDK and archive are unchanged; rebuild a coherent compiler/server/
-library package after the remaining encoding failure is resolved.
+library package after the remaining runtime failure is resolved.
 
 CPU/JSON benchmark preparation now compiles and links successfully against this
 extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)

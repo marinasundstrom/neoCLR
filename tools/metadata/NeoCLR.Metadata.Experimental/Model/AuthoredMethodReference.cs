@@ -21,7 +21,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Authors a public member, class virtual slot, bounded value override or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
-    /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature; Self is admitted only for an interface contract.</param>
+    /// <param name="signature">Primitive, scoped parameter, external nominal construction, native union, vector or bounded function signature; Self is admitted only for an interface contract.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
     /// <param name="isOverride">Reuse an inherited class slot with isVirtual; value overrides support Object.ToString/GetHashCode/Equals.</param>
     /// <param name="nativePrimitive">Explicit canonical numeric or String owner representation, or null for an ordinary owner.</param>
@@ -90,7 +90,7 @@ public sealed partial class AssemblyBuilder
             !isStatic && signature.GenericParameterNames.Count != 0)
             throw new ArgumentException("unsupported method or constructor contract", nameof(name));
         if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null))
-            throw new InvalidDataException("unsupported authored method signature");
+            throw new InvalidDataException($"unsupported authored method signature: {declaringType}.{name}({string.Join(", ", signature.ParameterTypes)}) -> {signature.ReturnType}");
         signature.ValidateOwner(this, declaringType.GenericArity, allowSelf: isInterface);
         if (authoredCallableReferences.Any(m => Equals(m.DeclaringReference, declaringType) && m.Target.DeclaringType?.NativePrimitive != nativePrimitive))
             throw new InvalidDataException("conflicting primitive owner contract");
@@ -134,6 +134,7 @@ public sealed partial class AssemblyBuilder
 
         bool Supported(SignatureType type, bool result) => type.PointerElement is not null ? true :
             type.IsSelf ? isInterface :
+            type.Composition is { Kind: ReferenceCompositionKind.Union } union ? union.Constituents.All(t => Supported(t, false)) :
             type.Tuple is { } tuple ? tuple.ElementTypes.All(t => Supported(t, false)) :
             type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
