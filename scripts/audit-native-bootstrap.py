@@ -25,7 +25,7 @@ def main():
     baseline = original['libraries'][0]['sources']
     production = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/src/System').rglob('*.rvn'))
     network = [s for s in production if '/Networking/' in s or '/Web/' in s or s.endswith(('/Uri.rvn', '/UriError.rvn'))]
-    network += ['runtime/raven/native/' + n + '.rvn' for n in ('RuntimeNetworkCalls', 'RuntimeNetworkServices')]
+    network += ['runtime/raven/native/' + n + '.rvn' for n in ('RuntimeNetworkCalls',)]
     selected = set(baseline + network)
     omitted = sorted(set(production) - selected)
     groups = {
@@ -47,7 +47,7 @@ def main():
     if args.runtime or set(args.case or []) & {'full-owned-handle', 'runtime-owned'}:
         cases.append(('full-owned-handle', full_sources, False))
         runtime_sources = [s for s in full_sources if not any(part in s for part in ('/Data/', '/Networking/', '/Web/'))
-                           and Path(s).stem not in ('RuntimeNetworkCalls', 'RuntimeNetworkServices')]
+                           and Path(s).stem not in ('RuntimeNetworkCalls',)]
         cases.append(('runtime-owned', runtime_sources, False))
     if args.case:
         unknown = set(args.case) - {name for name, _, _ in cases}

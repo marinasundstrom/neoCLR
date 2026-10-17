@@ -29,7 +29,7 @@ def main():
     http = sorted((ROOT / 'runtime/raven/src/System/Networking').rglob('*.rvn'))
     http += sorted((ROOT / 'runtime/raven/src/System/Web').rglob('*.rvn'))
     http += [ROOT / 'runtime/raven/src/System' / n for n in ('Uri.rvn', 'UriError.rvn')]
-    http += [ROOT / 'runtime/raven/native' / n for n in ('RuntimeNetworkCalls.rvn', 'RuntimeNetworkServices.rvn')]
+    http += [ROOT / 'runtime/raven/native' / n for n in ('RuntimeNetworkCalls.rvn',)]
     inputs = [args.compiler.resolve(), args.core.resolve(), args.seed.resolve(), ownership_source, Path(__file__)]
     inputs += [args.compiler.resolve().parent / n for n in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()

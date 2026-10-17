@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "compilerRevision": "eeb6ef0d1",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(24,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(48,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(61,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(81,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(85,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(97,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(110,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(148,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(157,17): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/Main.rvn(184,13): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Network token cancellation checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-network-cancellation-consumer/bin/neoclr/App.dll": "b7b7f9e9787f03f09c667b5f40a1204bb954842ed097d01547cbe42a41ad6cef",
+    "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Runtime.dll": "86543be6d74bd49b0aa1928a03163bc736665551403cd45c8327d279b0444a96",
+    "/Users/robert/Projects/neoclr/target/native-network-direct-library/build-evidence.json": "fcaa0932d2b5b4420e59786a3d3d6d767e86e279816709d90a710d77e9000985",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64",
+    "/Users/robert/Projects/neoclr/docs/experiments/network-cancellation/Main.rvn": "5abde59376d542a1c45617529289f368877f436235361fe92466a4bea7e1a42a",
+    "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.Networking.dll": "e4d77dec2f1dfc24a6cfb51a60e57bb53cdb8cc3a6e84281c2a44737ab40b50f",
+    "/Users/robert/Projects/neoclr/target/native-network-direct-library/System.runtime.neox": "2d9ad0f7f9a1cced968cde5f40a6280a97c0808eda020b2c50c643af17f0a07b"
+  }
+}

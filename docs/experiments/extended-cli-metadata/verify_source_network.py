@@ -21,7 +21,7 @@ def main():
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     sources = sorted((ROOT / 'runtime/raven/src/System/Networking').rglob('*.rvn'))
     sources += [ROOT / 'runtime/raven/native' / name for name in
-                ('RuntimeNetworkCalls.rvn', 'RuntimeNetworkServices.rvn')]
+                ('RuntimeNetworkCalls.rvn',)]
     sample = ROOT / 'docs/experiments/network-cancellation/Main.rvn'
     network, app = output / 'Sockets.dll', output / 'NetworkCancellation.dll'
     commands = []

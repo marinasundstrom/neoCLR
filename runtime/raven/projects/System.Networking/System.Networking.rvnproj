@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../src/System/Networking/**/*.rvn" />
-    <Compile Include="../../native/RuntimeNetworkCalls.rvn;../../native/RuntimeNetworkServices.rvn" />
+    <Compile Include="../../native/RuntimeNetworkCalls.rvn" />
     <ProjectReference Include="../System.Runtime/System.Runtime.rvnproj" />
   </ItemGroup>
 </Project>

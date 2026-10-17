@@ -42,7 +42,7 @@ def main():
         sources = sorted((ROOT / 'runtime/raven/src/System' / group).rglob('*.rvn'))
         if group == 'Networking':
             sources += [ROOT / 'runtime/raven/native' / (name + '.rvn')
-                        for name in ('RuntimeNetworkCalls', 'RuntimeNetworkServices')]
+                        for name in ('RuntimeNetworkCalls',)]
         inputs += sources
         artifact = output / ('System.' + group + '.dll')
         artifacts[group] = artifact

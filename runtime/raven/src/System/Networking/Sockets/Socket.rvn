@@ -143,7 +143,7 @@ public class Socket {
     }
 
     static func Listen(address: string, port: int, backlog: int) -> Result<Socket, SocketError> {
-        let payload = RuntimeServices.SocketListen(address, port, backlog)
+        let payload = neoCLR.Runtime.SocketListen(address, port, backlog)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -163,7 +163,7 @@ public class Socket {
     }
 
     func GetLocalPort() -> Result<int, SocketError> {
-        let payload = RuntimeServices.SocketLocalPort(handle)
+        let payload = neoCLR.Runtime.SocketLocalPort(handle)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -233,7 +233,7 @@ public class Socket {
     }
 
     func Close() {
-        _ = RuntimeServices.SocketClose(handle)
+        _ = neoCLR.Runtime.SocketClose(handle)
     }
 
     internal static func DecodeError(code: byte) -> SocketError {
@@ -302,7 +302,7 @@ internal class SocketConnectCompletion {
             return
         }
         _ = TaskQueue.Default
-        let payload = RuntimeServices.SocketConnect(address, port, self.Complete)
+        let payload = neoCLR.Runtime.SocketConnect(address, port, self.Complete)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
@@ -339,9 +339,9 @@ internal class SocketConnectCompletion {
         }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
-            RuntimeServices.SocketConnectAddresses(snapshot, port, self.Complete)
+            neoCLR.Runtime.SocketConnectAddresses(snapshot, port, self.Complete)
         } else {
-            RuntimeServices.SocketConnectAddressesUntil(snapshot, port, deadline, self.Complete)
+            neoCLR.Runtime.SocketConnectAddressesUntil(snapshot, port, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
@@ -359,7 +359,7 @@ internal class SocketConnectCompletion {
             return
         }
         _ = TaskQueue.Default
-        let payload = RuntimeServices.SocketAccept(handle, self.Complete)
+        let payload = neoCLR.Runtime.SocketAccept(handle, self.Complete)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
@@ -371,7 +371,7 @@ internal class SocketConnectCompletion {
     }
 
     internal func RequestCancellation() {
-        cancellationWon = RuntimeServices.SocketCancel(operation)
+        cancellationWon = neoCLR.Runtime.SocketCancel(operation)
     }
 
     internal func Complete() {
@@ -380,7 +380,7 @@ internal class SocketConnectCompletion {
         if active is CancellationRegistration current {
             current.Dispose()
         }
-        let payload = RuntimeServices.SocketConnectResult(operation)
+        let payload = neoCLR.Runtime.SocketConnectResult(operation)
         operation = 0
         if cancellationWon {
             _ = source.Cancel()
@@ -420,9 +420,9 @@ internal class SocketTransferCompletion {
         }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
-            RuntimeServices.SocketReceive(handle, buffer, offset, count, self.Complete)
+            neoCLR.Runtime.SocketReceive(handle, buffer, offset, count, self.Complete)
         } else {
-            RuntimeServices.SocketReceiveUntil(handle, buffer, offset, count, deadline, self.Complete)
+            neoCLR.Runtime.SocketReceiveUntil(handle, buffer, offset, count, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
@@ -445,9 +445,9 @@ internal class SocketTransferCompletion {
         }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
-            RuntimeServices.SocketSend(handle, buffer, offset, count, self.Complete)
+            neoCLR.Runtime.SocketSend(handle, buffer, offset, count, self.Complete)
         } else {
-            RuntimeServices.SocketSendUntil(handle, buffer, offset, count, deadline, self.Complete)
+            neoCLR.Runtime.SocketSendUntil(handle, buffer, offset, count, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
@@ -460,7 +460,7 @@ internal class SocketTransferCompletion {
     }
 
     internal func RequestCancellation() {
-        cancellationWon = RuntimeServices.SocketCancel(operation)
+        cancellationWon = neoCLR.Runtime.SocketCancel(operation)
     }
 
     internal func Complete() {
@@ -469,7 +469,7 @@ internal class SocketTransferCompletion {
         if active is CancellationRegistration current {
             current.Dispose()
         }
-        let payload = RuntimeServices.SocketTransferResult(operation)
+        let payload = neoCLR.Runtime.SocketTransferResult(operation)
         operation = 0
         if cancellationWon {
             _ = source.Cancel()

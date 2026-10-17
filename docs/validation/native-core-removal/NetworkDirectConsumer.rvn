@@ -1,0 +1,26 @@
+import System.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Result.*
+
+func Main() -> int {
+    if !NetworkDeadline.Expired.IsExpired {
+        return 1
+    }
+    let deadline = NetworkDeadline.AfterMilliseconds(60000)
+    if deadline.IsExpired {
+        return 2
+    }
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
+        return 3
+    }
+    let Ok(port) = listener.GetLocalPort() else {
+        listener.Close()
+        return 4
+    }
+    listener.Close()
+    if port <= 0 {
+        return 5
+    }
+    return 42
+}

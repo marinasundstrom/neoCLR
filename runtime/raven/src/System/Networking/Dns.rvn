@@ -91,9 +91,9 @@ internal class DnsCompletion {
         }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
-            RuntimeServices.DnsLookup(hostName, self.Complete)
+            neoCLR.Runtime.DnsLookup(hostName, self.Complete)
         } else {
-            RuntimeServices.DnsLookupUntil(hostName, deadline, self.Complete)
+            neoCLR.Runtime.DnsLookupUntil(hostName, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
@@ -106,7 +106,7 @@ internal class DnsCompletion {
     }
 
     internal func RequestCancellation() {
-        cancellationWon = RuntimeServices.DnsCancel(operation)
+        cancellationWon = neoCLR.Runtime.DnsCancel(operation)
     }
 
     internal func Complete() {
@@ -115,7 +115,7 @@ internal class DnsCompletion {
         if active is CancellationRegistration current {
             current.Dispose()
         }
-        let payload = RuntimeServices.DnsResult(operation)
+        let payload = neoCLR.Runtime.DnsResult(operation)
         operation = 0
         if cancellationWon {
             _ = source.Cancel()
@@ -124,7 +124,7 @@ internal class DnsCompletion {
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
-            let addresses: Sequence<string> = RuntimeServices.DnsAddresses(payload)
+            let addresses: Sequence<string> = neoCLR.Runtime.DnsAddresses(payload)
             let values = ArrayList<IPAddress>()
             var index = 0
             while index < addresses.Count {

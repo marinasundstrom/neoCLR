@@ -201,3 +201,9 @@ stripping are accepted substitutes for the above gates.
   documented friend grant. Five-library compilation, interpreter/JIT/AOT consumption
   and public member completion pass. This supersedes the construction blocker above
   for these two methods only; other core/bootstrap work remains open.
+
+- Networking now calls all 21 native DNS/socket declarations directly; its
+  RuntimeServices forwarding extension is removed. Fresh five-library compilation,
+  interpreter loopback/deadline and cancellation consumers, Socket completion and
+  API fingerprints qualify this slice. Remaining introspection and source-core
+  bootstrap work stays open.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Remove 21 networking RuntimeServices forwards and bind DNS/socket callers directly to native declarations. Update production projects and source-list tooling. Fresh five-library compilation, interpreter loopback/deadline and cancellation consumers, Socket editor completion and API fingerprints pass. Native bindings and public contracts are unchanged; remaining bootstrap/core migration stays open.
+
 - Move production IsValue/UnpackValue ownership to native System.Runtime managed bodies using Raven eef6c6e3c and the existing explicit System.Value implementation contract. Retarget production callers, remove CLI/seed duplicates during staging, and grant System.Networking internal access solely for private DNS/socket payload decoding. Five-library compilation, interpreter/JIT/sanitized AOT payload consumption, admission rejection tests, metadata ownership inspection, editor completion and API fingerprints pass. Other core/bootstrap services and the installed SDK remain unmigrated.
 
 - Qualify native-owned scalar/unit payload helpers in managed JIT and sanitized AOT, including wrong-type RuntimeError propagation and root cleanup. Add a reusable native execution runner; native-only project compilation and editor completion pass. Record the production ownership blocker: System.Value is native-owned, but RuntimeServices helper definitions still require native managed-body construction before CLI/seed removal. No production ownership switch is claimed.

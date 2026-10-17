@@ -31,9 +31,10 @@ builds the production library and executes consumers with only native artifact r
 Seeds and ownership manifests remain explicit; source declarations must not compete
 with retained runtime definitions.
 
-`RuntimeNetworkCalls.rvn` and `RuntimeNetworkServices.rvn` expose the existing native
+`RuntimeNetworkCalls.rvn` exposes the existing native
 DNS/socket services, including callback functions, managed buffers, cancellation and
-deadlines. DnsAddresses uses the same managed string-snapshot materialization as
+deadlines. Library callers bind these declarations directly; there is no
+RuntimeServices forwarding extension. DnsAddresses uses the same managed string-snapshot materialization as
 StorageNames. Callbacks retain existing native function signatures, with no nominal
 delegate ABI or structural Function experiment dependency. The unchanged network
 cancellation fixture runs over localhost and an ephemeral loopback listener through

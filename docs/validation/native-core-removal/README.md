@@ -299,3 +299,29 @@ bodies. No general payload-cast language syntax is added.
 Other RuntimeServices members, native core construction and broader payload storage
 shapes remain open. This removes production payload-helper bootstrap ownership,
 not every CLI dependency. The installed SDK is unchanged and structural work is parked.
+
+## Direct native networking calls — 2026-10-17
+
+System.Networking now calls the 21 existing DNS/socket declarations in
+`RuntimeNetworkCalls.rvn` directly. The RuntimeServices forwarding extension is
+removed from production projects and source-list tooling. Native InternalCall
+ownership remains System.Networking; callbacks, buffers, cancellation, deadlines
+and payload decoding retain their existing contracts. This changes neither the
+.NET-style public asynchronous API nor the native provider implementation.
+No Runtime Contract setting or Raven/.NET compiler behavior changes.
+
+Raven `eeb6ef0d1` builds the fresh five-library bundle at
+`target/native-network-direct-library`, using `target/native-payload-bootstrap`.
+The loopback/deadline consumer and the existing callback cancellation regression
+validate the interpreter path; Socket.Listen/Connect editor completion and API
+source fingerprints are checked against the fresh sources. The callback regression
+intentionally retains OnCompleted to observe cancellation/completion ordering.
+Backend bindings are unchanged; the earlier JIT/AOT payload evidence remains
+applicable, and no new network JIT/AOT qualification is claimed.
+
+See [deadline/listener consumer](NetworkDirectConsumer.rvn),
+[execution evidence](network-direct-results.json),
+[cancellation evidence](network-cancellation-results.json) and
+[editor evidence](network-direct-completion.json). Full native core construction,
+remaining introspection adapters and compiler bootstrap dependencies remain open.
+The installed SDK is unchanged; broader structural work remains parked.

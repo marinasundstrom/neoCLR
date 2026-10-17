@@ -12630,3 +12630,13 @@ The [production gate](validation/native-core-removal/README.md#production-source
 passes five-library compilation, interpreter/JIT/sanitized AOT consumption and editor
 completion. Broader source-core construction remains unfinished; this does not
 replace the installed SDK or remove unrelated RuntimeServices dependencies.
+
+### Direct networking services (2026-10-17)
+
+System.Networking calls its existing native InternalCall declarations directly,
+removing 21 RuntimeServices forwards. Public signatures, native callback/buffer
+contracts and backend bindings are unchanged; no Runtime Contract switch changes.
+Raven eeb6ef0d1 builds all five libraries with the prepared payload bootstrap.
+See the [networking gate](validation/native-core-removal/README.md#direct-native-networking-calls--2026-10-17)
+for loopback/cancellation execution and completion evidence. Remaining bootstrap
+services still prevent declaring production core construction native-only.
