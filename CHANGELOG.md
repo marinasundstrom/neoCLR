@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-18
+
+- Prepare Preview 16 draft notes covering native metadata construction, bounded type contracts, ranges/checked operations, introspection and editor fixes. Keep platform qualification and publication explicitly pending.
+
 ### 2026-10-17
 
 - Fix native SDK qualification for explicitly cleared async helpers using Raven `c0854cdda`: empty/whitespace settings select existing heap state machines; the configured generator remains unchanged. All nine interpreter/JIT/AOT checks pass with frozen inputs. Extend the validator and pin refreshed packages to `0.1.16-neoclr.20261017.1`. Retain passing hosted security, networking, runtime-product and host-prerequisite evidence; full package/editor qualification remains pending.
