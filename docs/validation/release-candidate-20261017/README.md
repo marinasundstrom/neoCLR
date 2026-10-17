@@ -81,3 +81,22 @@ against that extracted bundle. This establishes build readiness only, not worklo
 correctness or performance. No measurements have been taken. Windows validation,
 full package acceptance and final SDK/editor qualification remain pending.
 See [release readiness](../../release-readiness.md).
+
+## Native union coverage in Raven
+
+Raven `codex/neoclr` commit `743e229a6` adds the missing structural constituent
+coverage path to the existing match evaluator. Nominal interface conformance and
+ordinary .NET union behavior are unchanged. This target-specific symbol is absent
+from Raven main, so no main change or branch merge is needed for this fix.
+
+[Validation](union-exhaustiveness.json) records an isolated copy of the installed
+compiler with its Release/net10.0 `Raven.CodeAnalysis.dll` replaced. Ten existing
+baseline checks pass; the new regressions fail in three expected cases before the
+fix and all 21 selected native/.NET checks pass afterward. Public semantic-model
+coverage answers are checked alongside diagnostics, not a full LSP/editor session.
+
+The unchanged packaged HTTP server compiles. The client no longer reports missing
+union coverage, but native metadata emission fails with `NEOMETA003: unsupported
+authored method signature`. No sample catch-all or contract workaround was added.
+The isolated composition is qualification evidence, not a replacement release SDK.
+The installed SDK and previous archive are unchanged.

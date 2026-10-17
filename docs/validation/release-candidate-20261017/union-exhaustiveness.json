@@ -1,0 +1,46 @@
+{
+  "ravenRevision": "743e229a6",
+  "compilerComposition": "Isolated copy of SDK 0.1.15-neoclr.20261017.2 with Raven.CodeAnalysis Release/net10.0 replaced from 743e229a6; installed SDK unchanged",
+  "tests": {
+    "baselinePassed": 10,
+    "newRegressionBeforeFix": {
+      "passed": 3,
+      "failed": 3
+    },
+    "focusedAfterFixPassed": 21
+  },
+  "commands": [
+    {
+      "sample": "http-json-server",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-union-exhaustiveness/compiler/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "sample": "http-json-client",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-union-exhaustiveness/compiler/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-candidate-json-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpClient.rvn(22,9): warning RAV0162: Unreachable code\nerror NEOMETA003: Native metadata encoding failed: unsupported authored method signature.\n"
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/release-union-exhaustiveness/compiler/rvnc.dll": "a4d68592a42b07ac0c07081b2e7fa76cbd62b9a199e5f0e180ff4bd4297ad7a0",
+    "/Users/robert/Projects/neoclr/target/release-union-exhaustiveness/compiler/Raven.CodeAnalysis.dll": "ef4e5dd87046b4f2c02c01f5b605dd381825dc69db9cbd990dcc1ff2efb74849",
+    "/Users/robert/Projects/neoclr/target/release-union-exhaustiveness/compiler/Raven.CodeAnalysis.NeoClr.dll": "e9a9a2efece77ce4fc8c32cf99a59b205424f69b3f7676e5517133c69ec4c901",
+    "/Users/robert/Projects/neoclr/target/release-union-exhaustiveness/compiler/NeoCLR.Metadata.Experimental.dll": "9347acc126352cee0ada42e55ae133fba27df1d021bf2385802f890c1c758e09"
+  }
+}

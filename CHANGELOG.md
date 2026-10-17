@@ -8,7 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
-- Record fresh optimized macOS archive acceptance: collections, tasks and JSON pass with the bundled backend; HTTP JSON source compilation exposes a native union-exhaustiveness diagnostic that remains a release blocker. CPU/JSON benchmark workers now build against the extracted archive; no performance measurements or Windows qualification are claimed.
+- Qualify Raven `743e229a6` native structural-union exhaustiveness repair: 21 focused diagnostic/semantic-model checks pass and the unchanged packaged HTTP JSON server compiles with an isolated compiler update. The HTTP client now reaches a separate authored-method signature encoding failure. Installed SDK, archived candidate, runtime contracts and .NET behavior remain unchanged; record the remaining release blocker.
+
+- Record fresh optimized macOS archive acceptance: collections, tasks and JSON pass with the bundled backend; HTTP JSON source compilation identifies a native union-exhaustiveness regression. CPU/JSON benchmark workers now build against the extracted archive; no performance measurements or Windows qualification are claimed.
 
 - Lower identity patterns on native value-only unions without boxing: same-shape tests inspect the initialized tag and identity unboxing preserves payload/default values. Different shapes and escaping test results remain rejected; 13 related union tests pass. The packaged async JSON/reflection/error-alternative consumer passes interpreter/JIT/AOT with the corrected backend; whole-package and Windows qualification remain separate gates.
 

@@ -12781,3 +12781,16 @@ language server supplies native System completion. See the
 [installed preview evidence](validation/native-core-removal/installed-preview.json).
 Production construction uses native metadata; isolated CLI fixtures and legacy
 documentation projections are not application dependencies.
+
+
+## Native union match coverage — 2026-10-17
+
+Raven `743e229a6` consumes structural union constituent symbols directly in its
+match exhaustiveness evaluator. It reuses existing alternative/guard coverage
+without a nominal carrier or new bridge encoding. Runtime Contract configuration,
+native signatures, backend emission and ordinary .NET behavior are unchanged.
+The compiler owns this analysis; public semantic-model answers agree with binder
+diagnostics. Twenty-one focused checks pass and the packaged HTTP server compiles.
+The client still fails authored-method signature encoding in the metadata library.
+See [release qualification](validation/release-candidate-20261017/README.md#native-union-coverage-in-raven).
+Full packaged editor and cross-platform acceptance remain separate gates.

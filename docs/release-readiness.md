@@ -41,12 +41,19 @@ codegen gaps before measurements began:
   Fresh archive acceptance is recorded below.
 
 A second macOS archive with the corrected backend was staged, extracted and
-validated without overrides. Collections, tasks and JSON pass. Acceptance now stops
-while compiling the HTTP JSON server: Raven reports `RAV2100: Missing match case:
-'_'` for the `HttpError | JsonError` match in `AdaptClientResult<T>`. Preserve the
-exhaustive sample and investigate the compiler/import contract; adding a catch-all
-would hide the blocker. [Archive acceptance](validation/release-candidate-20261017/package-acceptance.json)
-records the archive hash and exact commands/failure.
+validated without overrides. Collections, tasks and JSON pass. Its original
+acceptance stopped at Raven's `RAV2100` diagnostic on the HTTP JSON server's
+`HttpError | JsonError` match. [Archive acceptance](validation/release-candidate-20261017/package-acceptance.json)
+retains that failure and archive hash.
+
+Raven `743e229a6` on `codex/neoclr` fixes the missing structural-union coverage
+analysis. Twenty-one focused native/.NET diagnostic and semantic-model checks pass;
+the unchanged HTTP server compiles using an isolated compiler update. The client
+gets past coverage analysis but fails with `NEOMETA003: unsupported authored method
+signature`. This is the next compiler/metadata-library blocker. See
+[qualification](validation/release-candidate-20261017/union-exhaustiveness.json).
+The installed SDK and archive are unchanged; rebuild a coherent compiler/server/
+library package after the remaining encoding failure is resolved.
 
 CPU/JSON benchmark preparation now compiles and links successfully against this
 extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)
