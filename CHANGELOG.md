@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Retain the refreshed canonical source pass at efa1687c8 (full suite, 25 smokes, host/MSRV/Clippy checks) and verify its qualified-source archive checksum. Matching-package macOS HTTPS passes all 15 AOT security/recovery/cleartext cases; keep low-level three-mode security coverage separate.
+
 - Retain final Windows package/editor qualification: extracted samples, HTTP, JSON, GC, headers, 24 await cases, exact inlays and twenty diagnostic-recovery cycles pass. Verify matching SDK/VSIX servers and both publication archive manifests; only README notices change, with executable/library bytes preserved. Repacked macOS acceptance passes.
 
 - Qualify HTTPS project builds against the selected native-toolchain archive and its shipped backend instead of mixing an obsolete SDK with a freshly built backend. Record compiler, manifest and backend identities; preserve the legacy bootstrap path only for explicit no-bundle use. HTTPS orchestration tests pass; matching-package execution results are recorded separately.

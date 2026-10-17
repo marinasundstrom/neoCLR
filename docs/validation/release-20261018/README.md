@@ -53,3 +53,19 @@ repacked archive. Windows execution evidence is reused because its executable by
 are identical; this is not a claim of another Windows execution after repacking.
 
 Windows JSON copies normalize CRLF to LF; their data and embedded input hashes are unchanged.
+
+## Source and HTTPS qualification
+
+[Canonical CI](canonical-ci.json) at `efa1687c8` passes all jobs, including the
+[extracted-source full suite](canonical-source.json), 25 smoke programs, host checks,
+formatting/Clippy and three minimum-Rust targets. The published qualified-source
+archive is this exact tested `efa1687c8` snapshot (SHA-256 in the report); the release
+tag additionally contains documentation, qualification evidence and benchmark/tooling
+repairs. Runtime and class-library source are unchanged across that delta.
+
+The [matching macOS HTTPS project](macos-https-project.json) passes 15 AOT checks:
+TLS 1.2/1.3, fragmented input, trust/hostname/ALPN rejection, malformed and closed
+connections, timeout/cancellation, recovery, credential failures and cleartext
+isolation. It uses the packaged compiler/backend and library hashes. Low-level
+security-provider interpreter/JIT/AOT coverage remains separately recorded in the
+[hosted contracts](../release-candidate-20261017/hosted-native-contracts.json).
