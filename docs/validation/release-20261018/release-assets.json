@@ -1,0 +1,166 @@
+{
+  "release": "v0.1.0-preview.16",
+  "qualificationPassed": true,
+  "packageVersion": "0.1.16-neoclr.20261017.1",
+  "ravenRevision": "c0854cdda4115c9ec3153a26e73375db14011bd8",
+  "qualifiedSourceRevision": "efa1687c8fc06902b42c3ebaa7a9f1f8143f60f7",
+  "macosRuntimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+  "windowsRuntimeRevision": "efa1687c8fc06902b42c3ebaa7a9f1f8143f60f7",
+  "sourceDelta": "Release tag adds documentation, qualification and benchmark/tooling fixes to qualified source; runtime/class-library source unchanged.",
+  "assetsSha256": {
+    "neoclr-preview16-osx-arm64.tar.gz": "1efbce28b78c962bf01d9459ef9dcfa51f6f477e6db064ce6c34512db570d644",
+    "neoclr-preview16-qualified-source.tar": "8f996473d619ab5edd8107eab546755efdb2bb5f9519b0135cd5e9c97e91da65",
+    "neoclr-preview16-win-x64.tar.gz": "08d3752b6e80bad5c5200a8f6179118f799955f640d59fca4284775a2a123df7",
+    "raven-0.1.16-neoclr.20261017.1-osx-arm64.vsix": "0908370f81c002ec9cff422d404a8b0220c4ffae86714227f502934221bdf95c",
+    "raven-0.1.16-neoclr.20261017.1-win-x64.vsix": "6a973fa053c1e9a9d9a514bcbc1edde787f87fecb772f027c373f86b8ea224c8",
+    "raven-sdk-0.1.16-neoclr.20261017.1-osx-arm64.tar.gz": "b355084eebff271b028ea99d95e44c82fc273f2c72e4ee6661efe2a3d8f19e48",
+    "raven-sdk-0.1.16-neoclr.20261017.1-win-x64.tar.gz": "5bc57f05b08b5cca295d295e114185da310b2155f5bb67a8c4a9a37f3ea027df",
+    "raven-tool-notices-osx-arm64.tar.gz": "0b4cdae939cdf0648d3864ad0c2022fc1a175f1628426cda62c2193c3d5cffe1",
+    "raven-tool-notices-win-x64.tar.gz": "f08517a0d0e9b05dd944301b1e4a97c587280ba3af72e203ba72b6154df05ec4"
+  },
+  "qualificationUrl": "https://github.com/marinasundstrom/neoCLR/tree/v0.1.0-preview.16/docs/validation/release-20261018",
+  "checks": {
+    "canonicalSource": "39073227013",
+    "windowsPackage": "39073227105",
+    "windowsBenchmarks": "39075237776",
+    "windowsHttps": "39076063898"
+  },
+  "platforms": {
+    "macos": {
+      "identity": {
+        "version": "0.1.16-neoclr.20261017.1",
+        "ravenRevision": "c0854cdda4115c9ec3153a26e73375db14011bd8",
+        "runtimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+        "matchedServerFiles": {
+          "Raven.LanguageServer.dll": "1760014fec308d64c93ad48bb536c6d77c0306e820fa1f78e499a9f53089696c",
+          "Raven.CodeAnalysis.dll": "e17ee5edc8285d9917c450b9dd6efab7f25fd9ae907b29f8ac803e9656bc8ccf",
+          "Raven.CodeAnalysis.NeoClr.dll": "6bdea24c46c37611333d85f35edc4dba8f56876f7569ef27c2963a30e9fda5de",
+          "NeoCLR.Metadata.Experimental.dll": "431989af9148b0203b7d4e1ad2b0cfafa222e9206f142678c5c44deeeae3e518"
+        },
+        "neoclr-native-candidate-osx-arm64.tar.gz": "8af31409e66990bcbb3fb7e8121b0162e7db257823b1d0975a7f24075ed967d6",
+        "raven-vscode.vsix": "0908370f81c002ec9cff422d404a8b0220c4ffae86714227f502934221bdf95c",
+        "neoclr": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+        "neoclr-codegen": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+        "runtimeReusedUnchanged": true,
+        "sdkBuildLogSha256": "cb5737cf722cd6c4069d84517dc97dcad0d70b64412976844dc0767cc464aa9c",
+        "installedServerSelections": [
+          {
+            "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T001045/window1/exthost/output_logging_20261018T001046/1-Raven.log",
+            "selection": [
+              "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+            ]
+          },
+          {
+            "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T000902/window1/exthost/output_logging_20261018T000903/1-Raven.log",
+            "selection": [
+              "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+            ]
+          },
+          {
+            "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T000953/window1/exthost/output_logging_20261018T000954/1-Raven.log",
+            "selection": [
+              "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+            ]
+          },
+          {
+            "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T000804/window1/exthost/output_logging_20261018T000806/1-Raven.log",
+            "selection": [
+              "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+            ]
+          }
+        ]
+      },
+      "documentationRepack": {
+        "qualifiedArchiveSha256": "8af31409e66990bcbb3fb7e8121b0162e7db257823b1d0975a7f24075ed967d6",
+        "publicationArchiveSha256": "1efbce28b78c962bf01d9459ef9dcfa51f6f477e6db064ce6c34512db570d644",
+        "changedPayloadFiles": [
+          "README.md"
+        ],
+        "changedMetadataFiles": [
+          "manifest.json"
+        ],
+        "oldReadmeSha256": "49838cb4f9ae4535a03d1e0b07c8526a46d0aa6271807c2d0cca12f2fa2bf2e4",
+        "newReadmeSha256": "a38571bb4c4419d0662d092d84b06eb27455094bcacf4a1405c646043d0a3a79",
+        "verifiedUnchangedPayloadFiles": 1601,
+        "executablePayloadUnchanged": true
+      }
+    },
+    "windows": {
+      "identity": {
+        "passed": true,
+        "version": "0.1.16-neoclr.20261017.1",
+        "ravenRevision": "c0854cdda4115c9ec3153a26e73375db14011bd8",
+        "sourceRevision": "efa1687c8fc06902b42c3ebaa7a9f1f8143f60f7",
+        "matchedServerFiles": {
+          "System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+          "System.Reactive.dll": "be602eb01817ddf5f1ed3f377787c65f68f509d66688302c030797ce851f8e21",
+          "Raven.Macros.dll": "8ca1da46ff07abb91c8845c07952315112482f8a5f11cf0883464bff5a0d5d20",
+          "Raven.LanguageServer.dll": "f61f1d51c73031730eda513ac4dd5b9915a8969be93d02cbc40da7ee53a74c7e",
+          "Raven.Core.dll": "2b9bcacc47711a98358154f96fa08b4939471e11c266dac54c8e06e87f2d1145",
+          "Raven.CodeAnalysis.NeoClr.dll": "5405c9be54702512458f757698df2c74a877ca8b58c105e38288dc1881196bb0",
+          "Raven.CodeAnalysis.dll": "a7d849144d086fb1cdddda63e4c62c66b7e6fa0a71fd611e54b2f43f2e041f3a",
+          "OmniSharp.Extensions.LanguageServer.Shared.dll": "887cb91497acfcbfdf9c7c95ab0b0ba5364a2288ae2c708b2ce56d7bf992e014",
+          "OmniSharp.Extensions.LanguageServer.dll": "801669d8a0b10bb4580b6e26b58f684796f4276a022c65710b0f66a0c18827c7",
+          "OmniSharp.Extensions.LanguageProtocol.dll": "b14dd84ecd7b30e9ad8c2cda7bf6e4650317b18a269e258372ce841ba83c9fa9",
+          "OmniSharp.Extensions.JsonRpc.dll": "4e6fa11db8cf793d008c5e30bd1dec43b8e666e3bfd6b92b8f57b7695565d444",
+          "Newtonsoft.Json.dll": "22c649f75fce5be7c7ccda8880473b634ef69ecf33f5d1ab8ad892caf47d5a07",
+          "Nerdbank.Streams.dll": "dbe4a2156386137302541658f3065cf98a6edf1d4517d058c1df417ded0a4d47",
+          "NeoCLR.Metadata.Experimental.dll": "0a22d60b2f2af31ee809b4d7d9317131c29fce94809d3663c2a420784d30ba7d",
+          "Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+          "Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+          "Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+          "Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+          "Microsoft.VisualStudio.Validation.dll": "ed82e313f30fe4f317e17acbae37bea406448dec6791abdeb871933d53f0fd39",
+          "Microsoft.VisualStudio.Threading.dll": "9df500b0d09390bf2272bc780b4cff3711cd72bac5313d0b03cb409f5aeeec1d",
+          "Microsoft.Extensions.Options.ConfigurationExtensions.dll": "794e9ea487c5c7c17054371c63e61fe5d3636626ff99e5d985172393cdea512d",
+          "Microsoft.Extensions.Logging.dll": "faed6cb5c9ca0d6077feaeb2df251251adccf0241f7a80b91c58e014cd5ad48f",
+          "Microsoft.Extensions.Logging.Console.dll": "3aa1faff03499b2fe80cd75ee8fbc15c63972a1ace381e319aa9ba33417e5572",
+          "Microsoft.Extensions.Logging.Configuration.dll": "ab309abb90efb69ea92dbe14c7acad3edd3d4088febc3b852b91a82f046c30b6",
+          "Microsoft.Extensions.DependencyInjection.dll": "09c80cce213152ced75d791fc4fd57b34f79a2026c69d133b0380f10128096ce",
+          "Microsoft.Extensions.Configuration.dll": "d2ba98f7ca6f7ae49e54bb2974b22d62a15695d5a11236a164ae71eac87abcc5",
+          "Microsoft.Extensions.Configuration.Binder.dll": "231dcfc3042cceb64351f68e59c569eba22226e89fa579b0ae961826339ddcd6",
+          "Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+          "Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+          "Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+          "Microsoft.Bcl.AsyncInterfaces.dll": "299ddf949035e52e4758732c202029e2c89a16174d83904bef0cc04205e097b7",
+          "MediatR.dll": "e550c060b286b10b10e83cd566908bbe0c200422ea92269fea28addf26e786cc",
+          "Microsoft.VisualStudio.Validation.resources.dll": "7bb90a76e40c1ed78ef9db5ef74a64c89a7e6e6a9fbc720a0617348351e7c655",
+          "Microsoft.VisualStudio.Threading.resources.dll": "1959b57893e6222bb80d14d981fa32076d7a4dd1a6851c40e09f548ca756838e",
+          "Microsoft.CodeAnalysis.resources.dll": "aa029203bbbd501902fe7bd72b4073891676de5fc599ee3e6ee97c5eba4237fd",
+          "Microsoft.CodeAnalysis.CSharp.resources.dll": "8a4981588d9918e67b6524219c3d4e94c7a98c943b877add612a195c30c45f6a"
+        },
+        "installedServerSelections": [
+          "Using language server (installed extension bundle): d:\\a\\neoCLR\\neoCLR\\neoclr\\target\\vscode-extensions\\raven.raven-vscode-0.1.16-neoclr.20261017.1\\server\\Raven.LanguageServer.dll",
+          "Using language server (installed extension bundle): d:\\a\\neoCLR\\neoCLR\\neoclr\\target\\vscode-extensions\\raven.raven-vscode-0.1.16-neoclr.20261017.1\\server\\Raven.LanguageServer.dll",
+          "Using language server (installed extension bundle): d:\\a\\neoCLR\\neoCLR\\neoclr\\target\\vscode-extensions\\raven.raven-vscode-0.1.16-neoclr.20261017.1\\server\\Raven.LanguageServer.dll",
+          "Using language server (installed extension bundle): d:\\a\\neoCLR\\neoCLR\\neoclr\\target\\vscode-extensions\\raven.raven-vscode-0.1.16-neoclr.20261017.1\\server\\Raven.LanguageServer.dll"
+        ],
+        "qualifiedArchiveSha256": "81f6f4c9fff896bf384542aca6a03f187d7ced1fa6db8ec2f3c327070c772dd3",
+        "runtimeSha256": "e17bd681348b73b1b68a6eb761fc279c11dfaf8449a496fae71eef35bd6993e2",
+        "backendSha256": "d06e42154d756bb5d3f09dd22f0697a4d6ad11b81e9233f27c42739ab9b2966d"
+      },
+      "documentationRepack": {
+        "qualifiedArchiveSha256": "81f6f4c9fff896bf384542aca6a03f187d7ced1fa6db8ec2f3c327070c772dd3",
+        "publicationArchiveSha256": "08d3752b6e80bad5c5200a8f6179118f799955f640d59fca4284775a2a123df7",
+        "changedPayloadFiles": [
+          "README.md"
+        ],
+        "changedMetadataFiles": [
+          "manifest.json"
+        ],
+        "oldReadmeSha256": "24efa2a64061c155028d345e8f69981babae8d8fc00afaf19a54192751affe70",
+        "newReadmeSha256": "a38571bb4c4419d0662d092d84b06eb27455094bcacf4a1405c646043d0a3a79",
+        "verifiedUnchangedPayloadFiles": 1596,
+        "executablePayloadUnchanged": true
+      }
+    }
+  },
+  "limitations": [
+    "Experimental preview with bounded AOT and type support",
+    "Broader structural expansion remains parked",
+    "No source debugging",
+    "HTTPS source-host qualification is distinct from packaged HTTP samples",
+    "Windows package excludes optional PostgreSQL provider",
+    "Benchmarks do not establish production capacity or cross-platform rankings"
+  ]
+}

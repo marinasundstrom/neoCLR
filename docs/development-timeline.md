@@ -25,6 +25,20 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-18 — Preview 16 qualification completed
+
+- **Author direction:** continues the explicit request to release neoCLR for macOS
+  and Windows, keeping structural expansion parked and committing validated slices.
+- **Assistant actions:** closes the source suite, async-helper configuration and
+  benchmark reflection-root issues; qualifies matching native-core SDK/VSIX packages
+  and retains interpreter/JIT/AOT, repeated editor, HTTPS and performance evidence.
+- **Observed outcome:** both platform packages pass; each benchmark series validates
+  55 CPU/JSON processes and 1,152 HTTP responses. Eleven draft release assets match
+  local SHA-256 digests. Raven `codex/neoclr` is pushed to `c0854cdda`; main is separate.
+- **Remaining action:** publish Preview 16 and deploy/verify the website. See the
+  [qualification record](validation/release-20261018/README.md). Unrelated HTTP design
+  discussion is not part of these implementation or performance claims.
+
 ## 2026-10-17 — Complete and publish the next release
 
 - **Author:** “Continue until you have released neoclr”, following closure of six

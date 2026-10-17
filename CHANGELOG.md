@@ -6,7 +6,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+## 0.1.0-preview.16 — 2026-10-18
+
 ### 2026-10-18
+
+- Prepare Preview 16 for macOS ARM64 and Windows x64 with Raven SDK/VSIX 0.1.16-neoclr.20261017.1. Complete all source/package/editor/HTTPS/performance gates, retain exact identities and migration limits, and verify all eleven uploaded draft asset digests. Promote this selected development record; publication and website deployment follow separately.
 
 - Close final Windows execution gates: matching-package HTTPS passes 27 JIT/AOT security/recovery cases; CPU/JSON benchmarks pass 55 processes and plain/typed-JSON HTTP validates 1,152 responses. Retain complete compressed reports, archive identity, ranges and startup, and update website benchmark tables for both platforms without cross-host speed claims.
 
