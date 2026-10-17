@@ -1,0 +1,113 @@
+# Production bootstrap removal audit — 2026-10-17
+
+The author asked to identify the issues before fixing them in a sweep, and authorized
+adding real neoCLR types/attributes needed by Raven and the samples. Implementation
+is paused for this inventory. This is a migration plan, not completed support.
+Broader structural work remains parked; ordinary Raven/.NET remains separate.
+
+The author clarified the destination: **Raven targeting neoCLR must load native
+metadata references, including its core library, without a CLI bootstrap assembly.**
+This applies to compiler binding and editor symbols as well as emitted artifacts.
+The audit identifies obstacles to that destination; preserving the bootstrap is
+not its goal. Required types/attributes belong in native libraries; compiler-required
+operations need explicit native contracts. Raven itself running on .NET does not
+require target reference assemblies to use CLI metadata.
+
+## Evidence and boundaries
+
+[Artifact inventory](production-inventory.json) inspects the unchanged four-library
+`local-libraries-20261017` bundle and its CLI core, recording hashes. The public
+metadata SDK reads the native definitions directly. The installed SDK remains unchanged.
+
+| Artifact | Bootstrap dependency | Confirmed TypeRefs into bootstrap |
+| --- | --- | --- |
+| System.Runtime | NeoCLR.CoreProbe | System.ParamArrayAttribute |
+| System.Data | NeoCLR.CoreProbe | System.ParamArrayAttribute |
+| System.Networking | NeoCLR.CoreProbe | None; retained System binding calls IsValue/UnpackValue |
+| System.Web | None directly | None; transitive dependencies still matter |
+
+This inventory does **not** prove the library sources can compile without CLI input.
+Removing the final emitted reference is a different gate from removing build-time
+semantic dependencies. Nor does an absent TypeRef establish that an AssemblyRef is
+safe to delete. The [direct-call inventory](retained-call-inventory.json) shows
+Networking calls `System.Runtime.CompilerServices.RuntimeServices.IsValue` and
+`UnpackValue`; its native module bindings map NeoCLR.CoreProbe to retained `System`.
+Runtime also calls retained services for strings, parsing, files, scheduling, type
+metadata and other operations. These need native ownership/contracts, not merely
+AssemblyRef removal. The inventory records direct `call` instructions only and is
+not exhaustive call coverage. It also includes canonical native `System.*` primitive
+aliases: their names alone do not establish CLI bootstrap dependence.
+
+## Confirmed migration requirements
+
+| Layer | Present dependency or restriction | Required replacement / acceptance |
+| --- | --- | --- |
+| Parameter arrays | Native writer imports a marker through the legacy core binding; reader recognizes its legacy System module identity | Native-owned and separately imported marker support, shape validation, parameter introspection, compiler params import and calls, with legacy behavior retained |
+| Runtime-service declarations | Native extern admission requires MethodImplAttribute from the selected binding core | Real MethodImplAttribute/MethodImplOptions declarations and an explicit native owner contract; preserve exact InternalCall admission and reject spoofed owners/invalid signatures |
+| Self | Production ownership manifest selects NeoCLR.CoreProbe for Self | Native compiler/library Self contract; verify interface implementations and substituted signatures; do not reintroduce nominal delegate or structural feature expansion |
+| RuntimeServices facade | Production sources extend/import a bootstrap static container | Port needed declarations or retarget adapters to native namespace services; preserve supported public API shapes and ensure no placeholder bodies execute |
+| Type handles | Emitter recognizes RuntimeServices.TypeHandle<T>() only through BootstrapReference identity | Native intrinsic contract with the same argument/result validation and runtime descriptor identity |
+| Allocation | CheckedStorage.Reserve<T>() is also admitted only through BootstrapReference | Native allocation contract; preserve checked size, element layout and GC behavior; do not replace with unchecked allocation |
+| Core production | Native-only project mode rejects source-root/ownership/bootstrap-intrinsic settings used by the production build | Native source-core production path with explicit primitive/Object/unit owners and no CLI semantic reference; no fixture Object stubs |
+| Async/generator integration | Bundle injects RuntimeAwait/RuntimeGenerator sources; native-only project mode rejects current helper configuration | Audit actual helper/service requirements, then provide explicit native contracts and validate await/generator consumers; a helper name containing Bridge alone does not prove CLI translation |
+| Distribution | Library builder, seed preparation, documentation and editor config still consume the CLI core | Rebuild matching artifacts, API snapshots and SDK configuration only after production compile and consumer gates pass |
+
+Source anchors: Raven `NeoClrRuntimeServiceDeclaration.cs`, `Int32Emitter.cs`
+(`IsTypeHandleIntrinsic`, `IsCheckedReservation`, enum marker handling),
+`NeoClrProjectMetadataProvider.cs`; neoCLR
+`runtime/raven/projects/System.Runtime/ownership.json`, `runtime/raven/native/`,
+`scripts/build-native-class-library.py`, and `NativeAssemblyWriter.cs`.
+
+## CLI-only declarations: classify before porting
+
+The inventory lists every declaration present only in the selected CLI core. That
+list is a candidate set, **not** a list of required new public APIs.
+
+- Port needed nominal marker contracts deliberately: ParamArrayAttribute,
+  MethodImplAttribute/MethodImplOptions, FlagsAttribute and compiler-generated or
+  reference-only markers where actual producers/consumers require them. Validate
+  constructors, constants, targets and ownership; preserve .NET semantics where used.
+- Audit System.ValueType, System.Enum and nongeneric System.Array as compiler base
+  assumptions. Existing native primitive/array contracts may need compiler changes
+  rather than dummy public classes. System.Array<T> already exists.
+- Keep Action/Func/Delegate/MulticastDelegate separate from native function contracts.
+  Do not port them merely to satisfy a CLI-oriented lookup.
+- Do not add NotImplementedException to satisfy a placeholder body. neoCLR faults
+  are not CLR exceptions. Likewise, assess System.Type against the existing TypeInfo
+  mapping instead of exposing an empty compatibility type.
+- Nullable, IsExternalInit, RefSafetyRules, TupleElementNames and other emission
+  markers require a use-site audit. Their presence in the CLI core alone does not
+  establish a native need. Tuple expansion remains parked.
+
+## Proposed order and validation gates
+
+1. Finish the source/use-site inventory, including retained runtime services,
+   marker use sites and the generated async helper requirements. The Networking
+   retained-call dependency is established; exhaustive call coverage remains open.
+2. Port required attributes and implement native local **and imported** metadata
+   handling. Validate rejection paths, parameter expansion and introspection.
+3. Replace runtime-service and intrinsic authorization with explicit native owners;
+   port required declarations, preserving validation and avoiding placeholder bodies.
+4. Complete native source-core production and rebuild Runtime, then Data/Networking/Web.
+   Assert all semantic references and transitive artifacts are native, with no
+   NeoCLR.CoreProbe dependency. Missing contracts must remain diagnostics.
+5. Validate reflection/initialization, params, collections, constrained numerics,
+   callbacks and async consumers. Use interpreter/JIT/AOT for changed execution paths.
+   Check LSP completion/hover/diagnostics against the production bundle, not only the fixture.
+6. Refresh matching API documentation and SDK/VSIX, then install and open the samples.
+
+The sequence may change when the unresolved inventory produces evidence. No blanket
+port of every CLI type, no completion-only filtering, and no metadata dependency
+stripping are accepted substitutes for the above gates.
+
+## Uncommitted prototype status
+
+Before the audit request, a native-owned ParamArray marker writer/reader prototype
+passed a focused SDK roundtrip/introspection/invalid-target test, and the legacy
+parameter-array probe still passed. Production source/seed changes were attempted,
+but the rebuild stopped at duplicate ownership: ParamArrayAttribute remains in the
+CLI core as well as the new source declaration. Imported-native marker handling,
+production compilation, runtime consumers and API snapshot refresh are unfinished.
+These implementation changes are uncommitted and are **not** validated production
+support. Keep them separate from this audit commit and reconsider them against the
+complete migration sequence.

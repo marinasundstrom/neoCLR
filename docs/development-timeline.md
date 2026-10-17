@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-17 — Native reference migration audit before fixes
+
+- **Author:** directs porting needed types and attributes into neoCLR, then asks to
+  identify the issues before fixing them in a sweep. Clarifies: “the goal is that
+  the compiler should load native metadata references for neoCLR”.
+- **Assistant response/action:** pauses implementation and inventories the existing
+  production bundle, compiler contracts and retained runtime-service calls. Defines
+  native core and dependency metadata as the end state for compilation and editor
+  symbols, with ordinary Raven/.NET behavior unchanged and structural work parked.
+- **Observed outcome:** Runtime/Data retain the bootstrap parameter-array marker;
+  Networking retains runtime-service calls despite having no bootstrap TypeRef.
+  Compiler service/intrinsic authorization and native source-core production also
+  require migration. See the [audit and evidence](validation/native-core-removal/production-audit.md).
+- **Open:** complete marker/helper use-site analysis, then implement and validate
+  the ordered migration. A preceding parameter-array prototype remains uncommitted;
+  its production build failed duplicate ownership. No replacement production bundle
+  or SDK installation is claimed.
+
 ## 2026-10-16 — Fluent map entry proposal
 
 - **Author:** suggests a Rust-inspired collection interface, illustrated by

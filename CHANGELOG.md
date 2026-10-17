@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Record the production bootstrap-removal audit, native artifact dependencies and retained direct-call inventory. Clarify that Raven neoCLR compilation and editor symbols must use native metadata references, including the core library. Separate confirmed migration blockers from pending use-site analysis and unvalidated prototypes; no production bundle or installed SDK is replaced.
+
 - Qualify native-only Raven project contract handling and System namespace completion without CLI delegate transport symbols. Qualify artifact-derived native core identity without an inherited CLI preset and retain explicit mismatch rejection. Clarify the website’s bootstrap status. Record the production System.Runtime dependency on NeoCLR.CoreProbe as a remaining bootstrap-removal blocker; do not switch the installed SDK to the reduced fixture core.
 
 - Prepare a local macOS ARM64 Raven SDK and VS Code reflection preview with matching native libraries and isolated editor state. Include an editable field/type-initializer consumer and a task that validates interpreter, JIT and sanitized AOT execution; record installed artifact hashes and editor validation. This is a local development installation, not a release or website publication.

@@ -1,0 +1,486 @@
+{
+  "scope": "Read-only inventory of the unchanged installed-preview producer bundle; not the uncommitted ParamArray prototype.",
+  "bundle": "target/local-libraries-20261017",
+  "files": {
+    "target/local-libraries-20261017/System.Runtime.dll": "a84446a98bc89549b6509f37b266af5d3035c9f590240be7b90befbec415468a",
+    "target/local-libraries-20261017/System.Data.dll": "06ae3d36920966a8b7b39c00ca59ef6de483c6c2313861aaa76c3d292558c66a",
+    "target/local-libraries-20261017/System.Networking.dll": "b5ebef898ba4b8ac8d57d0cc00537c8b55c0e6eb6539fc0d2690de1b0c42ddbc",
+    "target/local-libraries-20261017/System.Web.dll": "19002dab884506d7b25b756b37c408453f3fe730e82fe0c03b59343c52bb11e1",
+    "target/local-libraries-20261017/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4"
+  },
+  "artifacts": {
+    "System.Runtime": {
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "NeoCLR.CoreProbe"
+        }
+      ],
+      "typeReferences": [
+        {
+          "Namespace": "System",
+          "Name": "ParamArrayAttribute",
+          "ResolutionScopeToken": 587202561
+        }
+      ]
+    },
+    "System.Data": {
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        },
+        {
+          "MetadataToken": 587202562,
+          "Name": "NeoCLR.CoreProbe"
+        }
+      ],
+      "typeReferences": [
+        {
+          "Namespace": "System.Collections",
+          "Name": "Map`2",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "Sequence`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Runtime.CompilerServices",
+          "Name": "AsyncStateMachine",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Disposable",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "TextReadError",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "StreamError",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Runtime.Reflection",
+          "Name": "ReflectionError",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "ArrayList`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Option`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Runtime.CompilerServices",
+          "Name": "AsyncTaskMethodBuilder`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Result`2",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency.Tasks",
+          "Name": "Task`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "InputStream",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "StreamReader",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "OutputStream",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Void",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "StreamWriter",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Object",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Introspection",
+          "Name": "TypeInfo",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "Iterator`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "KeyValuePair`2",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Introspection",
+          "Name": "PropertyInfo",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "ParamArrayAttribute",
+          "ResolutionScopeToken": 587202562
+        }
+      ]
+    },
+    "System.Networking": {
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        },
+        {
+          "MetadataToken": 587202562,
+          "Name": "NeoCLR.CoreProbe"
+        }
+      ],
+      "typeReferences": [
+        {
+          "Namespace": "System",
+          "Name": "EquatableTo`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "InputStream",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "OutputStream",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Disposable",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Runtime.CompilerServices",
+          "Name": "AsyncStateMachine",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency.Tasks",
+          "Name": "Promise`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Result`2",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency",
+          "Name": "CancellationToken",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency",
+          "Name": "CancellationRegistration",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency",
+          "Name": "CancellationTokenSource",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "Sequence`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Runtime.CompilerServices",
+          "Name": "AsyncTaskMethodBuilder`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Void",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency.Tasks",
+          "Name": "Task`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "StreamError",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Value",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Object",
+          "ResolutionScopeToken": 587202561
+        }
+      ]
+    },
+    "System.Web": {
+      "assemblies": [
+        {
+          "MetadataToken": 587202561,
+          "Name": "System.Runtime"
+        },
+        {
+          "MetadataToken": 587202562,
+          "Name": "System.Networking"
+        },
+        {
+          "MetadataToken": 587202563,
+          "Name": "System.Data"
+        }
+      ],
+      "typeReferences": [
+        {
+          "Namespace": "System",
+          "Name": "EquatableTo`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Disposable",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "InputStream",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "OutputStream",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "Sequence`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "Iterator`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Runtime.CompilerServices",
+          "Name": "AsyncStateMachine",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "UriError",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Networking",
+          "Name": "DnsError",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.Networking.Sockets",
+          "Name": "SocketError",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.IO",
+          "Name": "StreamError",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Networking.Security",
+          "Name": "SslError",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System",
+          "Name": "Option`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Collections",
+          "Name": "ArrayList`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Time",
+          "Name": "Duration",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency",
+          "Name": "CancellationTokenSource",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Networking.Security",
+          "Name": "SslClientAuthenticationOptions",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.Concurrency",
+          "Name": "CancellationToken",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency.Tasks",
+          "Name": "Promise`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Result`2",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency.Tasks",
+          "Name": "Task`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Networking",
+          "Name": "IPAddress",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.Networking.Sockets",
+          "Name": "Socket",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System",
+          "Name": "Void",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Concurrency",
+          "Name": "CancellationRegistration",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Networking.Security",
+          "Name": "SslServerAuthenticationOptions",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.Networking",
+          "Name": "NetworkDeadline",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.Data.Json",
+          "Name": "JsonError",
+          "ResolutionScopeToken": 587202563
+        },
+        {
+          "Namespace": "System.Introspection",
+          "Name": "TypeInfo",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Networking.Security",
+          "Name": "SslStream",
+          "ResolutionScopeToken": 587202562
+        },
+        {
+          "Namespace": "System.Runtime.CompilerServices",
+          "Name": "AsyncTaskMethodBuilder`1",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Object",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System",
+          "Name": "Uri",
+          "ResolutionScopeToken": 587202561
+        },
+        {
+          "Namespace": "System.Data.Json",
+          "Name": "JsonValue",
+          "ResolutionScopeToken": 587202563
+        },
+        {
+          "Namespace": "System.Text",
+          "Name": "EncodingError",
+          "ResolutionScopeToken": 587202561
+        }
+      ]
+    }
+  },
+  "cliOnlyDeclarations": [
+    ".<Module>",
+    "Microsoft.CodeAnalysis.EmbeddedAttribute",
+    "System.Action",
+    "System.Action`1",
+    "System.Action`2",
+    "System.Action`3",
+    "System.Action`4",
+    "System.Array",
+    "System.Delegate",
+    "System.Enum",
+    "System.FlagsAttribute",
+    "System.Func`1",
+    "System.Func`2",
+    "System.Func`3",
+    "System.Func`4",
+    "System.Func`5",
+    "System.MulticastDelegate",
+    "System.NotImplementedException",
+    "System.ParamArrayAttribute",
+    "System.Runtime.CompilerServices.CheckedStorage",
+    "System.Runtime.CompilerServices.CompilerGeneratedAttribute",
+    "System.Runtime.CompilerServices.IsExternalInit",
+    "System.Runtime.CompilerServices.MethodImplAttribute",
+    "System.Runtime.CompilerServices.MethodImplOptions",
+    "System.Runtime.CompilerServices.NullableAttribute",
+    "System.Runtime.CompilerServices.NullableContextAttribute",
+    "System.Runtime.CompilerServices.RefSafetyRulesAttribute",
+    "System.Runtime.CompilerServices.ReferenceAssemblyAttribute",
+    "System.Runtime.CompilerServices.RuntimeServices",
+    "System.Runtime.CompilerServices.Self",
+    "System.Runtime.CompilerServices.SpecialNameAttribute",
+    "System.Runtime.CompilerServices.TopLevelAttribute",
+    "System.Runtime.CompilerServices.TupleElementNamesAttribute",
+    "System.Type",
+    "System.ValueType"
+  ]
+}
