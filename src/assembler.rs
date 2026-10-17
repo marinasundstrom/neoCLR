@@ -359,12 +359,15 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     if !def.generic_variance.is_empty() || rest.trim().is_empty() {
                         return Err(Fault::new("duplicate or empty .variance"));
                     }
-                    def.generic_variance = rest.split_whitespace().map(|word| match word {
-                        "invariant" => Ok(crate::metadata::Variance::Invariant),
-                        "out" => Ok(crate::metadata::Variance::Covariant),
-                        "in" => Ok(crate::metadata::Variance::Contravariant),
-                        _ => Err(Fault::new("expected invariant, out or in variance")),
-                    }).collect::<Result<Vec<_>, _>>()?;
+                    def.generic_variance = rest
+                        .split_whitespace()
+                        .map(|word| match word {
+                            "invariant" => Ok(crate::metadata::Variance::Invariant),
+                            "out" => Ok(crate::metadata::Variance::Covariant),
+                            "in" => Ok(crate::metadata::Variance::Contravariant),
+                            _ => Err(Fault::new("expected invariant, out or in variance")),
+                        })
+                        .collect::<Result<Vec<_>, _>>()?;
                     return Ok(());
                 }
                 if word == ".implements" {
@@ -1639,10 +1642,16 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
 pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) -> Type {
     match ty {
         Type::Union(parts) => Type::Union(
-            parts.into_iter().map(|t| bind_parameters(t, names, method)).collect(),
+            parts
+                .into_iter()
+                .map(|t| bind_parameters(t, names, method))
+                .collect(),
         ),
         Type::Intersection(parts) => Type::Intersection(
-            parts.into_iter().map(|t| bind_parameters(t, names, method)).collect(),
+            parts
+                .into_iter()
+                .map(|t| bind_parameters(t, names, method))
+                .collect(),
         ),
         Type::Tuple(parts) => Type::Tuple(
             parts

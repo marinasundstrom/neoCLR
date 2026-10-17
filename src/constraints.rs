@@ -56,10 +56,15 @@ pub(crate) fn validate(constraints: &[GenericConstraint], arity: usize) -> Resul
         }) {
             return Err(Fault::new("conflicting reference/value constraints"));
         }
-        if constraint.kind == ConstraintKind::FunctionType && constraints.iter().any(|other|
-            other.parameter == constraint.parameter && other.kind != ConstraintKind::FunctionType)
+        if constraint.kind == ConstraintKind::FunctionType
+            && constraints.iter().any(|other| {
+                other.parameter == constraint.parameter
+                    && other.kind != ConstraintKind::FunctionType
+            })
         {
-            return Err(Fault::new("function-kind constraint cannot be combined with other constraints"));
+            return Err(Fault::new(
+                "function-kind constraint cannot be combined with other constraints",
+            ));
         }
         if constraints[..index].contains(constraint) {
             return Err(Fault::new("duplicate generic constraint"));
@@ -162,7 +167,10 @@ pub(crate) fn check(
             .ok_or_else(|| Fault::new("generic constraint argument missing"))?;
         let violates = match &constraint.kind {
             ConstraintKind::FunctionType => {
-                if matches!(argument, Type::TypeParameter(_) | Type::MethodTypeParameter(_)) {
+                if matches!(
+                    argument,
+                    Type::TypeParameter(_) | Type::MethodTypeParameter(_)
+                ) {
                     continue;
                 }
                 !matches!(argument, Type::Function(_))

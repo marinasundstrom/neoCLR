@@ -223,7 +223,10 @@ fn composition_keys_preserve_kind_constituents_and_generic_arguments() {
     );
     assert!(
         program
-            .resolve_type_identity(&Type::Intersection(vec![Type::Int32, Type::from_name("Left")]))
+            .resolve_type_identity(&Type::Intersection(vec![
+                Type::Int32,
+                Type::from_name("Left")
+            ]))
             .is_err()
     );
 }
@@ -279,7 +282,10 @@ fn composition_descriptors_expose_recursive_constituents_separately_from_argumen
     assert!(describe("Left").constituents.is_empty());
     assert!(
         program
-            .describe_type(&Type::Intersection(vec![Type::Int32, Type::from_name("Left")]))
+            .describe_type(&Type::Intersection(vec![
+                Type::Int32,
+                Type::from_name("Left")
+            ]))
             .is_err()
     );
 }

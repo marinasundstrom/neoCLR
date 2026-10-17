@@ -236,11 +236,9 @@ impl Value {
             match &self {
                 Self::NullObjectReference(_) => (),
                 Self::Function(binding)
-                    if crate::compositions::matches_object(module, &binding.ty, ty) => (),
+                    if crate::compositions::matches_object(module, &binding.ty, ty) => {}
                 Self::ObjectReference(object)
-                    if crate::compositions::matches_object(module, &object.concrete_type(), ty) =>
-                {
-                    ()
+                    if crate::compositions::matches_object(module, &object.concrete_type(), ty) => {
                 }
                 _ => {
                     return Err(crate::Fault::coded(

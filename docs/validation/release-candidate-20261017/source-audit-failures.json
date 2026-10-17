@@ -1,0 +1,17 @@
+{
+  "failures": [
+    "test array_interface_is_invariant_and_null_dispatch_faults ... FAILED",
+    "test member_object_identity_includes_kind_closed_owner_and_definition ... FAILED",
+    "test member_queries_currently_enumerate_declarations_only ... FAILED",
+    "test reflection_snapshots_implement_public_info_interfaces ... FAILED",
+    "test returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit ... FAILED",
+    "test source_tokens_reach_type_member_and_parameter_interfaces ... FAILED"
+  ],
+  "reflectionError": "reflection snapshot field count mismatch",
+  "toolchainEnvironment": {
+    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "CC": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+  },
+  "fullLog": "target/release-range-fixed-20261017/source-validation-optimized.log"
+}

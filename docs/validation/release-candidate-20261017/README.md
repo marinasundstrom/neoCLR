@@ -284,3 +284,18 @@ evidence instead of claiming all earlier package checks passed.
 
 An independent [second real-editor run](callback-inlays-development-repeat.json)
 also passes the exact task hint, comment edits and concurrent ranges.
+
+## Extracted-source release audit
+
+The optimized source archive at `8061e1b86` completed all-target tests with
+[six failures](source-audit-failures.json): one array-interface error-message
+assertion and five legacy Raven reflection tests reporting a snapshot field-count
+mismatch. The [report](source-audit-report.json) is failed; later smoke stages
+were not reached. This source-profile result does not certify production native
+libraries, and native-package acceptance does not replace this source gate.
+The local run used explicit Xcode compiler/SDK paths recorded with the failures.
+
+The legacy `RuntimeFieldInfo` fixture has six declared fields beyond its base;
+the current runtime snapshot also supplies readonly, literal and constant-value
+data. Repair and focused revalidation remain open, as does investigation of the
+array-interface assertion. Windows and minimum-Rust checks remain separate.

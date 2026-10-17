@@ -1083,7 +1083,8 @@ impl Module {
                 || (self
                     .type_definition(target)
                     .is_some_and(|d| d.representation == Representation::Interface)
-                    && crate::interfaces::ensure_reference_implementation(self, source, target).is_ok()))
+                    && crate::interfaces::ensure_reference_implementation(self, source, target)
+                        .is_ok()))
     }
 
     pub(crate) fn array_backing(&self) -> Option<&TypeDef> {

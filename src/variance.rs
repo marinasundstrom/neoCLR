@@ -154,7 +154,11 @@ fn reference_conversion(module: &Module, source: &Type, target: &Type, depth: us
     }) {
         return true;
     }
-    if *source == Type::String && module.type_definition(target).is_some_and(|d| d.native_string_view) {
+    if *source == Type::String
+        && module
+            .type_definition(target)
+            .is_some_and(|d| d.native_string_view)
+    {
         return true;
     }
     // Native selection erases generic owners and the source array-backing registry.
@@ -167,7 +171,12 @@ fn reference_conversion(module: &Module, source: &Type, target: &Type, depth: us
             if backings.next().is_some() {
                 return false;
             }
-            return reference_conversion(module, &Type::Named(backing.name.clone()), target, depth + 1);
+            return reference_conversion(
+                module,
+                &Type::Named(backing.name.clone()),
+                target,
+                depth + 1,
+            );
         }
     }
     if module.array_nominal(source).as_ref() == Some(target) {

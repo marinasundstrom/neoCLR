@@ -121,17 +121,21 @@ pub fn prepare(input: &mut Module, source: &Module) -> Result<Vec<Query>, Error>
             target
         } else {
             // Explicit legacy bridge fixtures retain one extra managed facade.
-            let wrapper_owner = target.owner.as_ref()
+            let wrapper_owner = target
+                .owner
+                .as_ref()
                 .and_then(|ty| source.type_definition(ty))
                 .and_then(|ty| ty.origin.as_ref())
                 .ok_or("missing ExecutingAssembly service owner")?;
             if target.instance
-                || wrapper_owner.name != "System.Runtime.CompilerServices.IntrospectionRuntimeServices"
+                || wrapper_owner.name
+                    != "System.Runtime.CompilerServices.IntrospectionRuntimeServices"
                 || wrapper_owner.assembly != scope.assembly
                 || wrapper_owner.module != scope.module
                 || !target.origin.as_ref().is_some_and(|origin| {
                     origin.name == "ExecutingAssembly"
-                        && origin.assembly == scope.assembly && origin.module == scope.module
+                        && origin.assembly == scope.assembly
+                        && origin.module == scope.module
                 })
             {
                 return Err("ExecutingAssembly requires its scoped runtime service facade".into());

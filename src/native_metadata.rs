@@ -607,18 +607,30 @@ pub fn retain_interface_shape(
     index: usize,
     arguments: Vec<Type>,
 ) -> Result<(), Fault> {
-    let original = source.types.get(index).ok_or_else(|| Fault::new("missing source interface"))?;
-    if original.representation != crate::metadata::Representation::Interface ||
-        !original.generic_variance.iter().any(|v| *v != crate::metadata::Variance::Invariant) {
+    let original = source
+        .types
+        .get(index)
+        .ok_or_else(|| Fault::new("missing source interface"))?;
+    if original.representation != crate::metadata::Representation::Interface
+        || !original
+            .generic_variance
+            .iter()
+            .any(|v| *v != crate::metadata::Variance::Invariant)
+    {
         return Ok(());
     }
     if arguments.len() != original.generic_parameters.len() {
         return Err(Fault::new("native interface argument arity mismatch"));
     }
     target.native_interface = Some(crate::variance::NativeInterface {
-        source: original.definition.clone().unwrap_or(crate::metadata::TypeDefId {
-            module: source.name.clone(), revision: source.revision.clone(), index: index as u32,
-        }),
+        source: original
+            .definition
+            .clone()
+            .unwrap_or(crate::metadata::TypeDefId {
+                module: source.name.clone(),
+                revision: source.revision.clone(),
+                index: index as u32,
+            }),
         arguments,
         annotations: original.generic_variance.clone(),
     });
@@ -665,20 +677,36 @@ pub fn retain_array_shape(
     Ok(())
 }
 /// Preserve a variant contract slot across closed owner specialization.
-pub fn retain_interface_slot(target: &mut crate::metadata::Function, source: &Module, index: usize) {
+pub fn retain_interface_slot(
+    target: &mut crate::metadata::Function,
+    source: &Module,
+    index: usize,
+) {
     let original = &source.functions[index];
-    if original.owner.as_ref().is_some_and(|owner| interface_has_variance(source, owner)) {
-        target.native_interface_slot = Some(original.definition.clone().unwrap_or(crate::metadata::MemberId {
-            module: source.name.clone(), revision: source.revision.clone(), index: index as u32,
-        }));
+    if original
+        .owner
+        .as_ref()
+        .is_some_and(|owner| interface_has_variance(source, owner))
+    {
+        target.native_interface_slot = Some(original.definition.clone().unwrap_or(
+            crate::metadata::MemberId {
+                module: source.name.clone(),
+                revision: source.revision.clone(),
+                index: index as u32,
+            },
+        ));
     }
 }
 
 /// Whether a source or private specialized interface carries declared variance.
 pub fn interface_has_variance(module: &Module, interface: &Type) -> bool {
-    module.type_definition(interface).is_some_and(|definition|
-        definition.native_interface.is_some() || definition.generic_variance.iter()
-            .any(|v| *v != crate::metadata::Variance::Invariant))
+    module.type_definition(interface).is_some_and(|definition| {
+        definition.native_interface.is_some()
+            || definition
+                .generic_variance
+                .iter()
+                .any(|v| *v != crate::metadata::Variance::Invariant)
+    })
 }
 
 /// Resolve the declared interface view used to satisfy a reference conversion.
@@ -689,7 +717,11 @@ pub fn interface_view(module: &Module, source: &Type, target: &Type) -> Result<T
 /// Validate an exact closed nominal interface bound before native specialization.
 /// Requires complete linked metadata; structural matching and variant conversions do not qualify.
 /// Self contracts must be declared for this implementing type, including exact member signatures.
-pub fn validate_self_interface_bound(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fault> {
+pub fn validate_self_interface_bound(
+    module: &Module,
+    concrete: &Type,
+    interface: &Type,
+) -> Result<(), Fault> {
     if crate::constraints::symbolic(concrete) || crate::constraints::symbolic(interface) {
         return Err(Fault::new("interface specialization requires closed types"));
     }
@@ -697,33 +729,54 @@ pub fn validate_self_interface_bound(module: &Module, concrete: &Type, interface
     crate::vm::check_type(interface, module)?;
     crate::interfaces::ensure_implementation(module, concrete, interface)?;
     if !crate::interfaces::satisfies_self_bound(module, concrete, interface)? {
-        return Err(Fault::new("interface specialization requires exact Self conformance"));
+        return Err(Fault::new(
+            "interface specialization requires exact Self conformance",
+        ));
     }
     Ok(())
 }
 
 /// Resolve a closed static Self contract to its nominal implementation for code generation.
 /// This does not execute code; instance and borrowed receiver adaptation remain unsupported here.
-pub fn resolve_static_self_call(module: &Module, concrete: &Type, target: &crate::metadata::FunctionRef) -> Result<crate::metadata::Function, Fault> {
+pub fn resolve_static_self_call(
+    module: &Module,
+    concrete: &Type,
+    target: &crate::metadata::FunctionRef,
+) -> Result<crate::metadata::Function, Fault> {
     if crate::constraints::symbolic(concrete) || target.instance {
-        return Err(Fault::new("static Self specialization requires a closed implementing type"));
+        return Err(Fault::new(
+            "static Self specialization requires a closed implementing type",
+        ));
     }
     let contract = crate::vm::resolve(module, target)?;
-    let interface = contract.owner.as_ref().ok_or_else(|| Fault::new("Self contract requires an owner"))?;
+    let interface = contract
+        .owner
+        .as_ref()
+        .ok_or_else(|| Fault::new("Self contract requires an owner"))?;
     validate_self_interface_bound(module, concrete, interface)?;
     crate::self_types::implementation(module, concrete, target)
 }
 
 /// Closed contract peers needed to preserve a specialized interface slot.
 pub fn interface_slot_peers(module: &Module, function: &crate::metadata::Function) -> Vec<usize> {
-    let Some(slot) = &function.native_interface_slot else { return vec![]; };
-    module.functions.iter().enumerate().filter_map(|(i, f)|
-        (f.native_interface_slot.as_ref() == Some(slot)).then_some(i)).collect()
+    let Some(slot) = &function.native_interface_slot else {
+        return vec![];
+    };
+    module
+        .functions
+        .iter()
+        .enumerate()
+        .filter_map(|(i, f)| (f.native_interface_slot.as_ref() == Some(slot)).then_some(i))
+        .collect()
 }
 
 /// Type dependencies of the private native interface proof.
 pub fn interface_shape_arguments(definition: &crate::metadata::TypeDef) -> &[Type] {
-    definition.native_interface.as_ref().map(|shape| shape.arguments.as_slice()).unwrap_or(&[])
+    definition
+        .native_interface
+        .as_ref()
+        .map(|shape| shape.arguments.as_slice())
+        .unwrap_or(&[])
 }
 
 /// Preserve the verified Object root's reference role before its private native rename.
@@ -751,16 +804,30 @@ pub fn restore_interface_proofs(
     original: &Module,
     map_type: impl Fn(&Type) -> Result<Type, String>,
 ) -> Result<(), Fault> {
-    if target.types.len() != original.types.len() || target.functions.len() != original.functions.len() {
-        return Err(Fault::new("variance proof restoration requires identical rows"));
+    if target.types.len() != original.types.len()
+        || target.functions.len() != original.functions.len()
+    {
+        return Err(Fault::new(
+            "variance proof restoration requires identical rows",
+        ));
     }
     for (target, original) in target.types.iter_mut().zip(&original.types) {
         target.native_object_root = original.native_object_root;
         target.native_string_view = original.native_string_view;
-        target.native_array_element = original.native_array_element.as_ref().map(&map_type).transpose().map_err(Fault::new)?;
+        target.native_array_element = original
+            .native_array_element
+            .as_ref()
+            .map(&map_type)
+            .transpose()
+            .map_err(Fault::new)?;
         target.native_interface = original.native_interface.clone();
         if let Some(shape) = &mut target.native_interface {
-            shape.arguments = shape.arguments.iter().map(&map_type).collect::<Result<_, _>>().map_err(Fault::new)?;
+            shape.arguments = shape
+                .arguments
+                .iter()
+                .map(&map_type)
+                .collect::<Result<_, _>>()
+                .map_err(Fault::new)?;
         }
     }
     for (target, original) in target.functions.iter_mut().zip(&original.functions) {

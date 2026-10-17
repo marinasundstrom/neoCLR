@@ -47,11 +47,12 @@ fn union_requires_narrowing_and_checks_concrete_object() {
         "",
     );
     bad.verify().unwrap();
-    assert!(bad
-        .run(Limits::default())
-        .unwrap_err()
-        .to_string()
-        .contains("does not satisfy"));
+    assert!(
+        bad.run(Limits::default())
+            .unwrap_err()
+            .to_string()
+            .contains("does not satisfy")
+    );
     let bad_static = program(
         ".local union<Left,Right> value\nnewobj LeftOnly\nstloc value\nldloc value\ncallvirt instance Left::Get()",
         "",
@@ -246,7 +247,9 @@ fn sealed_intersection_bounds_reject_before_normalization() {
         "intersection<Both,Both>",
         "intersection<Left,union<Both,Right>>",
     ] {
-        let source = format!(".module Bad\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 0\nret\n.end");
+        let source = format!(
+            ".module Bad\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 0\nret\n.end"
+        );
         let source = source.replace(".type class Both", ".type class Both\n.sealed");
         assert!(assemble(&source).is_err(), "{ty}");
     }
@@ -351,7 +354,9 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
         "union<Read<Missing>,Marker<Int32>>",
         "intersection<Read<Int32,Int32>,Marker<Int32>>",
     ] {
-        let source = format!(".module InvalidGeneric\n.entry Main\n{GENERIC_TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module InvalidGeneric\n.entry Main\n{GENERIC_TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end"
+        );
         assert!(assemble(&source).is_err(), "{ty}");
     }
     for (ty, accepted) in [
@@ -359,11 +364,16 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
         ("intersection<Cell<Int32>,Cell<Int32>>", false),
         ("union<Cell<Int32>,Marker<Int32>>", true),
         ("union<Read<Void>,Marker<Int32>>", true),
-        ("union<Read<union<Read<Int32>,Marker<Int32>>>,Marker<Int32>>", true),
+        (
+            "union<Read<union<Read<Int32>,Marker<Int32>>>,Marker<Int32>>",
+            true,
+        ),
         ("intersection<Read<Cell<Int32>>,Marker<Cell<Int32>>>", true),
     ] {
         let types = GENERIC_TYPES.replace(".type class Cell<T>", ".type class Cell<T>\n.sealed");
-        let source = format!(".module SealedGeneric\n.entry Main\n{types}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module SealedGeneric\n.entry Main\n{types}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end"
+        );
         assert_eq!(assemble(&source).is_ok(), accepted, "{ty}");
     }
 }
@@ -453,7 +463,9 @@ ret
 #[test]
 fn composition_wrappers_reject_unsupported_storage_after_substitution() {
     for (kind, field) in [("class", "T&"), ("", "T*")] {
-        let source = format!(".module InvalidWrapper\n.entry Main\n{TYPES}\n.type {kind} Wrapper<T>\n.field Value {field}\n.end\n.function Main() -> Int32\n.local Wrapper<union<Left,Right>> value\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module InvalidWrapper\n.entry Main\n{TYPES}\n.type {kind} Wrapper<T>\n.field Value {field}\n.end\n.function Main() -> Int32\n.local Wrapper<union<Left,Right>> value\nldc.i4 42\nret\n.end"
+        );
         assert!(assemble(&source).is_err(), "{kind} {field}");
     }
 }
@@ -464,7 +476,9 @@ fn composition_wrappers_preserve_invariance_and_validate_field_writes() {
         "ldc.i4 42\nnewobj Both\nnewobj Wrapper<union<Left,Right>>\ncall Need(Wrapper<intersection<Left,Right>>)\npop",
         "ldc.i4 42\nnewobj Both\nnewobj Wrapper<union<Left,Right>>\nnewobj Neither\nstfld Wrapper<union<Left,Right>>::Value",
     ] {
-        let source = format!(".module InvalidUse\n.entry Main\n{TYPES}\n.type class Wrapper<T>\n.field Value T\n.end\n.function Need(Wrapper<intersection<Left,Right>> value) -> Int32\nldc.i4 42\nret\n.end\n.function Main() -> Int32\n{body}\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module InvalidUse\n.entry Main\n{TYPES}\n.type class Wrapper<T>\n.field Value T\n.end\n.function Need(Wrapper<intersection<Left,Right>> value) -> Int32\nldc.i4 42\nret\n.end\n.function Main() -> Int32\n{body}\nldc.i4 42\nret\n.end"
+        );
         let module = assemble(&source).unwrap();
         let p = LoadedProgram::new(&module).unwrap();
         assert!(p.verify().is_err(), "{body}");
@@ -559,14 +573,15 @@ ret
 
 #[test]
 fn wrapper_method_substitution_checks_transitive_bodies() {
-    for operation in [
-        "sizeof T\npop\n",
-    ] {
+    {
+        let operation = "sizeof T\npop\n";
         let methods = WRAPPER_METHODS.replace(
             ".method instance Get() -> T\n",
             &format!(".method instance Get() -> T\n{operation}"),
         );
-        let source = format!(".module HiddenCompound\n.entry Main\n{TYPES}\n{methods}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module HiddenCompound\n.entry Main\n{TYPES}\n{methods}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end"
+        );
         // The operation is legal for an ordinary reference argument; only closing
         // over a composition triggers the additional experimental admission rule.
         assert!(assemble(&source.replace("union<Left,Right>", "Both")).is_ok());
@@ -581,21 +596,26 @@ fn wrapper_calls_reject_wrong_receiver_payload_and_null() {
         "newobj Neither\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\npop",
         "ldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<intersection<Left,Right>>::Get()\npop",
     ] {
-        let source = format!(".module WrongCall\n.entry Main\n{TYPES}\n{WRAPPER_METHODS}\n.function Main() -> Int32\n{body}\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module WrongCall\n.entry Main\n{TYPES}\n{WRAPPER_METHODS}\n.function Main() -> Int32\n{body}\nldc.i4 42\nret\n.end"
+        );
         let module = assemble(&source).unwrap();
         let p = LoadedProgram::new(&module).unwrap();
         assert!(p.verify().is_err());
         assert!(p.run(Limits::default()).is_err());
     }
-    let source = format!(".module NullCall\n.entry Main\n{TYPES}\n{WRAPPER_METHODS}\n.function Main() -> Int32\nnewobj Neither\nisinst Wrapper<union<Left,Right>>\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end");
+    let source = format!(
+        ".module NullCall\n.entry Main\n{TYPES}\n{WRAPPER_METHODS}\n.function Main() -> Int32\nnewobj Neither\nisinst Wrapper<union<Left,Right>>\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end"
+    );
     let module = assemble(&source).unwrap();
     let p = LoadedProgram::new(&module).unwrap();
     p.verify().unwrap();
-    assert!(p
-        .run(Limits::default())
-        .unwrap_err()
-        .to_string()
-        .contains("null class receiver"));
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .to_string()
+            .contains("null class receiver")
+    );
 }
 
 #[test]
@@ -642,7 +662,9 @@ fn wrapper_call_admission_deduplicates_recursive_specializations() {
         "call instance Wrapper<T>::Get()",
         "call instance Wrapper<T>::Forward()",
     );
-    let source = format!(".module RecursiveWrapper\n.entry Main\n{TYPES}\n{methods}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end");
+    let source = format!(
+        ".module RecursiveWrapper\n.entry Main\n{TYPES}\n{methods}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end"
+    );
     let module = assemble(&source).unwrap();
     LoadedProgram::new(&module).unwrap().verify().unwrap();
     // This body recurses at execution; admission must finish without executing it.
@@ -917,7 +939,10 @@ fn closed_hierarchies_are_valid_intersection_bounds() {
 .implements Trait
 .end
 "#;
-    let p = program(".local intersection<Family,Trait> value\nnewobj Member\nstloc value\nldloc value\ncastclass Family\npop\nldc.i4 42", helpers);
+    let p = program(
+        ".local intersection<Family,Trait> value\nnewobj Member\nstloc value\nldloc value\ncastclass Family\npop\nldc.i4 42",
+        helpers,
+    );
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
@@ -970,8 +995,12 @@ fn composition_type_tokens_are_runtime_known() {
 #[test]
 fn nominal_static_methods_preserve_composition_parameters_and_returns() {
     for kind in ["union", "intersection"] {
-        let helpers = format!(".type class Helpers\n.method static Echo({kind}<Left,Right> value) -> {kind}<Left,Right>\nldarg value\nret\n.end\n.end");
-        let body = format!("ldc.i4 42\nnewobj Both\ncall Helpers::Echo({kind}<Left,Right>)\ncastclass Left\ncallvirt instance Left::Get()");
+        let helpers = format!(
+            ".type class Helpers\n.method static Echo({kind}<Left,Right> value) -> {kind}<Left,Right>\nldarg value\nret\n.end\n.end"
+        );
+        let body = format!(
+            "ldc.i4 42\nnewobj Both\ncall Helpers::Echo({kind}<Left,Right>)\ncastclass Left\ncallvirt instance Left::Get()"
+        );
         let p = program(&body, &helpers);
         p.verify().unwrap();
         assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
@@ -1072,7 +1101,9 @@ fn callback_roundtrips_union_value_payload() {
 
 #[test]
 fn callback_union_signature_requires_exact_target() {
-    let source = format!(".module BadCallback\n.entry Main\n{TYPES}\n.function Wrong(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Int32,union<Int32,Both>> = Wrong(Int32)\npop\nldc.i4 0\nret\n.end");
+    let source = format!(
+        ".module BadCallback\n.entry Main\n{TYPES}\n.function Wrong(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Int32,union<Int32,Both>> = Wrong(Int32)\npop\nldc.i4 0\nret\n.end"
+    );
     assert!(assemble(&source).is_err());
 }
 
@@ -1175,11 +1206,12 @@ fn union_object_extraction_checks_payload_membership() {
         "",
     );
     p.verify().unwrap();
-    assert!(p
-        .run(Limits::default())
-        .unwrap_err()
-        .to_string()
-        .contains("does not satisfy"));
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .to_string()
+            .contains("does not satisfy")
+    );
 }
 
 #[test]
@@ -1208,7 +1240,9 @@ fn open_nominal_union_constituent_uses_method_scope() {
     );
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
-    let bad = format!(".module BadScope\n{TYPES}\n.type class Response<T>\n.field Value T\n.end\n.function Echo(union<Response<!!0>,Both> value) -> Int32\nldc.i4 0\nret\n.end");
+    let bad = format!(
+        ".module BadScope\n{TYPES}\n.type class Response<T>\n.field Value T\n.end\n.function Echo(union<Response<!!0>,Both> value) -> Int32\nldc.i4 0\nret\n.end"
+    );
     assert!(assemble(&bad).is_err());
 }
 

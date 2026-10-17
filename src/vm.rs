@@ -1592,8 +1592,10 @@ fn check_type_context_seen(
             }
             if crate::compositions::contains(ty) {
                 crate::compositions::check_shape(ty)?;
-                if !matches!(def.representation, Representation::Interface | Representation::Record)
-                {
+                if !matches!(
+                    def.representation,
+                    Representation::Interface | Representation::Record
+                ) {
                     return Err(Fault::new(
                         "composition arguments require a record or interface wrapper",
                     ));
@@ -1602,7 +1604,8 @@ fn check_type_context_seen(
                 // must not bypass the current compound value-array/byref restrictions.
                 for field in &def.fields {
                     let storage = field.ty.substitute_type_parameters(arguments)?;
-                    if matches!(&storage, Type::ByRef(t) | Type::ReadOnlyByRef(t) if crate::compositions::contains(t)) {
+                    if matches!(&storage, Type::ByRef(t) | Type::ReadOnlyByRef(t) if crate::compositions::contains(t))
+                    {
                         return Err(Fault::new(
                             "compound managed-reference fields are not supported",
                         ));
@@ -3782,7 +3785,9 @@ fn interpret_instructions_with_dispatch(
                             args = args
                                 .into_iter()
                                 .zip(&callee.parameters)
-                                .map(|(value, ty)| variant_reference_view(value, module, ty, heap, &limits))
+                                .map(|(value, ty)| {
+                                    variant_reference_view(value, module, ty, heap, &limits)
+                                })
                                 .collect::<Result<Vec<_>, _>>()?;
                         }
                         if callee.receiver_byref {
@@ -3814,8 +3819,8 @@ fn interpret_instructions_with_dispatch(
                                 "frame limit exceeded",
                             ));
                         }
-                        let return_view = (callee.returns != contract.returns)
-                            .then(|| contract.returns.clone());
+                        let return_view =
+                            (callee.returns != contract.returns).then(|| contract.returns.clone());
                         let mut called = Frame::new(callee, args)?;
                         called.return_view = return_view;
                         frames.push(called);
@@ -4040,7 +4045,11 @@ fn interpret_instructions_with_dispatch(
                             if *target != binding.ty
                                 && *target != Type::from_name("System.Object")
                                 && !(crate::compositions::is_compound(target)
-                                    && crate::compositions::matches_object(module, &binding.ty, target))
+                                    && crate::compositions::matches_object(
+                                        module,
+                                        &binding.ty,
+                                        target,
+                                    ))
                             {
                                 return Err(Fault::coded(
                                     crate::FaultCode::InvalidCast,
@@ -4937,7 +4946,8 @@ fn interpret_instructions_with_dispatch(
                                     crate::reflection_members::adapter(
                                         module, &callee, &args, kind,
                                     )?
-                                } else if matches!(binding, crate::native::Binding::InvokeFunction) {
+                                } else if matches!(binding, crate::native::Binding::InvokeFunction)
+                                {
                                     let shapes = match &args[0] {
                                         Value::Function(function) => vec![function.ty.clone()],
                                         _ => vec![],

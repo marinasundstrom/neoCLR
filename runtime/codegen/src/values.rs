@@ -516,26 +516,31 @@ pub(crate) fn compile_into(
         .collect::<Result<_, _>>()?;
     let string_variance = p.dispatch.iter().any(|(contract, targets)| {
         targets.iter().any(|(_, target)| {
-            p.args[*contract].iter().zip(&p.args[*target]).any(|(from, to)| *from == Ty::Literal && from != to)
-                || p.results[*target] == Some(Ty::Literal) && p.results[*contract] != Some(Ty::Literal)
+            p.args[*contract]
+                .iter()
+                .zip(&p.args[*target])
+                .any(|(from, to)| *from == Ty::Literal && from != to)
+                || p.results[*target] == Some(Ty::Literal)
+                    && p.results[*contract] != Some(Ty::Literal)
         })
     });
-    let text_identity = string_variance || input.functions.iter().enumerate().any(|(i, f)| {
-        f.body.iter().enumerate().any(|(pc, op)| {
-            let Some(shape) = flows[i].get(pc).and_then(Option::as_ref) else {
-                return false;
-            };
-            match op {
-                Op::CastClass(t) | Op::IsInstance(t) => {
-                    shape.last() == Some(&Ty::Literal) && *t != neoclr::metadata::Type::String
-                        || *t == neoclr::metadata::Type::String
-                            && shape.last() != Some(&Ty::Literal)
+    let text_identity = string_variance
+        || input.functions.iter().enumerate().any(|(i, f)| {
+            f.body.iter().enumerate().any(|(pc, op)| {
+                let Some(shape) = flows[i].get(pc).and_then(Option::as_ref) else {
+                    return false;
+                };
+                match op {
+                    Op::CastClass(t) | Op::IsInstance(t) => {
+                        shape.last() == Some(&Ty::Literal) && *t != neoclr::metadata::Type::String
+                            || *t == neoclr::metadata::Type::String
+                                && shape.last() != Some(&Ty::Literal)
+                    }
+                    Op::ReferenceEqual => shape.iter().rev().take(2).any(|t| *t == Ty::Literal),
+                    _ => false,
                 }
-                Op::ReferenceEqual => shape.iter().rev().take(2).any(|t| *t == Ty::Literal),
-                _ => false,
-            }
-        })
-    });
+            })
+        });
     let string_interfaces = details.and_then(|d| d.string_interfaces.as_ref());
     if text_identity {
         let interface_casts = input.functions.iter().any(|f| f.body.iter().any(|op| {
@@ -1517,9 +1522,17 @@ pub(crate) fn compile_into(
     };
     let record_array_service = if references
         && input.functions.iter().any(|f| {
-            f.body
-                .iter()
-                .any(|op| matches!(op, Op::ReserveArray(neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::Tuple(_) | neoclr::metadata::Type::Union(_) | neoclr::metadata::Type::Intersection(_))))
+            f.body.iter().any(|op| {
+                matches!(
+                    op,
+                    Op::ReserveArray(
+                        neoclr::metadata::Type::Named(_)
+                            | neoclr::metadata::Type::Tuple(_)
+                            | neoclr::metadata::Type::Union(_)
+                            | neoclr::metadata::Type::Intersection(_)
+                    )
+                )
+            })
         }) {
         let mut sig = module.make_signature();
         sig.params
@@ -1704,8 +1717,11 @@ pub(crate) fn compile_into(
                         let next = b.create_block();
                         b.ins().brif(exact, matched, &[], next, &[]);
                         b.switch_to_block(matched);
-                        let identity = type_tokens.iter().position(|t| t == token)
-                            .ok_or("missing function token producer")? + 1;
+                        let identity = type_tokens
+                            .iter()
+                            .position(|t| t == token)
+                            .ok_or("missing function token producer")?
+                            + 1;
                         let value = b.ins().iconst(types::I64, identity as i64);
                         write(&mut b, output, &[value]);
                         let zero = b.ins().iconst(types::I32, 0);
@@ -1945,15 +1961,21 @@ pub(crate) fn compile_into(
                     for (from, to) in p.args[i].iter().zip(&p.args[target]) {
                         if *from == Ty::Literal && from != to {
                             if !string_view(to) {
-                                return Err("variant String argument requires a verified reference view".into());
+                                return Err(
+                                    "variant String argument requires a verified reference view"
+                                        .into(),
+                                );
                             }
                             adapted[offset] = text_object_view(&mut b, adapted[offset]);
                         }
                         offset += p.lanes(from);
                     }
-                    let string_result = p.results[target] == Some(Ty::Literal) && p.results[i] != Some(Ty::Literal);
+                    let string_result =
+                        p.results[target] == Some(Ty::Literal) && p.results[i] != Some(Ty::Literal);
                     if string_result && !p.results[i].as_ref().is_some_and(&string_view) {
-                        return Err("variant String result requires a verified reference view".into());
+                        return Err(
+                            "variant String result requires a verified reference view".into()
+                        );
                     }
                     let target = module.declare_func_in_func(ids[target], b.func);
                     let call = b.ins().call(target, &adapted);
@@ -3177,11 +3199,17 @@ pub(crate) fn compile_into(
                                     let function = b.create_block();
                                     let done = b.create_block();
                                     b.append_block_param(done, types::I8);
-                                    b.ins().brif(callable, function, &[], done, &[matches.into()]);
+                                    b.ins()
+                                        .brif(callable, function, &[], done, &[matches.into()]);
                                     b.switch_to_block(function);
-                                    let identity = b.ins().load(types::I64, MemFlags::new(), value, 8);
+                                    let identity =
+                                        b.ins().load(types::I64, MemFlags::new(), value, 8);
                                     for index in p.callable_targets(shape)? {
-                                        let equal = b.ins().icmp_imm(IntCC::Equal, identity, (index + 1) as i64);
+                                        let equal = b.ins().icmp_imm(
+                                            IntCC::Equal,
+                                            identity,
+                                            (index + 1) as i64,
+                                        );
                                         matches = b.ins().bor(matches, equal);
                                     }
                                     b.ins().jump(done, &[matches.into()]);
@@ -3283,7 +3311,12 @@ pub(crate) fn compile_into(
                     }
                     _ if crate::checked_conversion::spec(op).is_some() => {
                         let value = pop(&mut stack);
-                        stack.push(crate::checked_conversion::emit(&mut b, op, value, site.as_ref()));
+                        stack.push(crate::checked_conversion::emit(
+                            &mut b,
+                            op,
+                            value,
+                            site.as_ref(),
+                        ));
                     }
                     Op::ConvertInt32 | Op::ConvertUInt32 => {
                         if matches!(top(), Ty::Size | Ty::Wide) {
@@ -3330,8 +3363,12 @@ pub(crate) fn compile_into(
                     Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
                     Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
                     Op::LoadMetadataToken(index) => {
-                        let identity = type_tokens.len() + metadata_tokens.iter()
-                            .position(|i| i == index).expect("collected metadata token") + 1;
+                        let identity = type_tokens.len()
+                            + metadata_tokens
+                                .iter()
+                                .position(|i| i == index)
+                                .expect("collected metadata token")
+                            + 1;
                         stack.push(b.ins().iconst(types::I64, identity as i64));
                     }
                     Op::LoadTypeToken(t) => {
@@ -3503,7 +3540,15 @@ pub(crate) fn compile_into(
                         }
                         stack.push(array);
                     }
-                    Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::Tuple(_) | neoclr::metadata::Type::Union(_) | neoclr::metadata::Type::Intersection(_)) => {
+                    Op::ReserveArray(t)
+                        if matches!(
+                            t,
+                            neoclr::metadata::Type::Named(_)
+                                | neoclr::metadata::Type::Tuple(_)
+                                | neoclr::metadata::Type::Union(_)
+                                | neoclr::metadata::Type::Intersection(_)
+                        ) =>
+                    {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                         let output = b.ins().stack_addr(types::I64, call_result, 0);
@@ -3602,8 +3647,13 @@ pub(crate) fn compile_into(
                         stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
                     }
                     Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                        if matches!(t, neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::Tuple(_) | neoclr::metadata::Type::Union(_) | neoclr::metadata::Type::Intersection(_))
-                            || crate::selection::scalar_array_element(t) =>
+                        if matches!(
+                            t,
+                            neoclr::metadata::Type::Named(_)
+                                | neoclr::metadata::Type::Tuple(_)
+                                | neoclr::metadata::Type::Union(_)
+                                | neoclr::metadata::Type::Intersection(_)
+                        ) || crate::selection::scalar_array_element(t) =>
                     {
                         let ty = p.ty(t)?;
                         let width = p.lanes(&ty);

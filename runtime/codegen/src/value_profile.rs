@@ -753,10 +753,15 @@ impl<'a> Profile<'a> {
                 self.ty(t)?;
                 Ty::CallableArray(t.as_ref().clone())
             }
-            Type::ArrayRef(t) if self.references && matches!(**t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+            Type::ArrayRef(t)
+                if self.references
+                    && matches!(**t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+            {
                 let element = self.ty(t)?;
                 if self.lanes(&element) > crate::limits::INLINE_LANES {
-                    return Err("structural array element exceeds flattened inline lane limit".into());
+                    return Err(
+                        "structural array element exceeds flattened inline lane limit".into(),
+                    );
                 }
                 Ty::StructuralArray(t.as_ref().clone())
             }
@@ -1459,7 +1464,10 @@ impl<'a> Profile<'a> {
         for (pc, op) in f.body.iter().enumerate() {
             match op {
                 Op::IsInstance(t) | Op::UnboxAny(t)
-                    if crate::scalar_unions::value_only(self.input, t) => (),
+                    if crate::scalar_unions::value_only(self.input, t) =>
+                {
+                    ()
+                }
                 Op::IsInstance(t) if crate::scalar_unions::inline(self.input, t) => {
                     return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
                 }
@@ -1621,7 +1629,8 @@ impl<'a> Profile<'a> {
                     ()
                 }
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                    if self.references && matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                    if self.references
+                        && matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
                 {
                     self.ty(&Type::ArrayRef(Box::new(t.clone())))?;
                 }
@@ -1723,11 +1732,17 @@ impl<'a> Profile<'a> {
                     if crate::scalar_unions::value_only(self.input, t) =>
                 {
                     if pop(&mut stack)? != self.ty(t)? {
-                        return Err(fail(pc, "value union identity query requires the same union"));
+                        return Err(fail(
+                            pc,
+                            "value union identity query requires the same union",
+                        ));
                     }
                     if matches!(op, Op::IsInstance(_)) {
                         if !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull)) {
-                            return Err(fail(pc, "value union identity test requires immediate null test"));
+                            return Err(fail(
+                                pc,
+                                "value union identity test requires immediate null test",
+                            ));
                         }
                         stack.push(Ty::ScalarUnionTest);
                     } else {
@@ -1784,12 +1799,17 @@ impl<'a> Profile<'a> {
                 Op::Float32 { .. } => stack.push(Ty::Single),
                 _ if crate::checked_conversion::spec(op).is_some() => {
                     let source = pop(&mut stack)?;
-                    if !matches!(source, Ty::Int | Ty::Wide | Ty::Size | Ty::Single | Ty::Double) {
+                    if !matches!(
+                        source,
+                        Ty::Int | Ty::Wide | Ty::Size | Ty::Single | Ty::Double
+                    ) {
                         return Err(fail(pc, "checked conversion requires a numeric operand"));
                     }
                     stack.push(match op {
-                        Op::CheckedNativeInt | Op::CheckedNativeUInt
-                        | Op::CheckedNativeIntUnsigned | Op::CheckedNativeUIntUnsigned => Ty::Size,
+                        Op::CheckedNativeInt
+                        | Op::CheckedNativeUInt
+                        | Op::CheckedNativeIntUnsigned
+                        | Op::CheckedNativeUIntUnsigned => Ty::Size,
                         _ if crate::checked_conversion::spec(op).unwrap().0 == 64 => Ty::Wide,
                         _ => Ty::Int,
                     });
@@ -1839,7 +1859,8 @@ impl<'a> Profile<'a> {
                 Op::Bool(_) => stack.push(Ty::Bool),
                 Op::Void => stack.push(Ty::Unit),
                 Op::LoadMetadataToken(index) => {
-                    neoclr::native_metadata::descriptor(self.input, *index).map_err(|e| e.to_string())?;
+                    neoclr::native_metadata::descriptor(self.input, *index)
+                        .map_err(|e| e.to_string())?;
                     stack.push(Ty::TypeToken);
                 }
                 Op::LoadTypeToken(t) => {
@@ -1934,7 +1955,10 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
                     if matches!(op, Op::IsInstance(_)) && matches!(self.ty(t)?, Ty::ValueUnion(_)) {
-                        return Err(fail(pc, "value union target tests require structural result lowering"));
+                        return Err(fail(
+                            pc,
+                            "value union target tests require structural result lowering",
+                        ));
                     }
                     let source = pop(&mut stack)?;
                     if let Ty::MixedUnion(parts) | Ty::ValueUnion(parts) = &source {
@@ -2044,7 +2068,9 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
-                Op::ReserveArray(t) if matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+                Op::ReserveArray(t)
+                    if matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
@@ -2053,14 +2079,20 @@ impl<'a> Profile<'a> {
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
                 Op::ArrayElement(t)
-                    if matches!(t, Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t) =>
+                    if matches!(
+                        t,
+                        Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
+                    ) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
                     stack.push(Self::stack_type(&self.ty(t)?));
                 }
                 Op::StoreArrayElement(t)
-                    if matches!(t, Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t) =>
+                    if matches!(
+                        t,
+                        Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
+                    ) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &self.ty(t)?)?;
                     take(&mut stack, &Ty::Int)?;

@@ -260,9 +260,7 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     ));
                 }
                 if def.representation != Representation::Record {
-                    return Err(Fault::new(
-                        "compound fields require record storage",
-                    ));
+                    return Err(Fault::new("compound fields require record storage"));
                 }
                 crate::vm::check_type(&field.ty, module)?;
             }
@@ -291,9 +289,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
         }
         if function.owner.as_ref().is_some_and(|owner| {
             inherited_context.is_none()
-                && !module.type_definition(owner).is_some_and(|def| {
-                    def.representation == Representation::Record
-                })
+                && !module
+                    .type_definition(owner)
+                    .is_some_and(|def| def.representation == Representation::Record)
         }) || function.is_internal_call()
             || function.pinvoke.is_some()
         {

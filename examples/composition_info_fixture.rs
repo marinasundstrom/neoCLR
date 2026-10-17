@@ -5,14 +5,17 @@ use neoclr::{
 };
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
-    let mut module = metadata_container::decode(&std::fs::read(&args[1])?).map_err(|e| e.to_string())?;
+    let mut module =
+        metadata_container::decode(&std::fs::read(&args[1])?).map_err(|e| e.to_string())?;
     let find = |name: &str| {
-        Type::from_name(&module
-            .types
-            .iter()
-            .find(|t| t.origin.as_ref().is_some_and(|o| o.name == name))
-            .unwrap()
-            .name)
+        Type::from_name(
+            &module
+                .types
+                .iter()
+                .find(|t| t.origin.as_ref().is_some_and(|o| o.name == name))
+                .unwrap()
+                .name,
+        )
     };
     let left = find("Left");
     let right = find("Right");
@@ -51,6 +54,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     assert_eq!(count, 4, "fixture token count changed");
-    std::fs::write(&args[2], metadata_container::write_module(&module).map_err(|e| e.to_string())?)?;
+    std::fs::write(
+        &args[2],
+        metadata_container::write_module(&module).map_err(|e| e.to_string())?,
+    )?;
     Ok(())
 }

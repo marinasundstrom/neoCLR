@@ -141,8 +141,7 @@ pub(super) fn class_contract(input: &neoclr::Module, f: &neoclr::metadata::Funct
             .as_ref()
             .and_then(|t| input.type_definition(t))
             .is_some_and(|t| {
-                t.is_reference_type
-                    && t.representation == neoclr::metadata::Representation::Record
+                t.is_reference_type && t.representation == neoclr::metadata::Representation::Record
             })
 }
 
@@ -413,7 +412,10 @@ pub(super) fn object_display_contract(f: &neoclr::metadata::Function) -> bool {
 
 /// Traverse verified class/interface inheritance with closed owner arguments.
 pub(super) fn implements_interface(input: &neoclr::Module, concrete: &Type, target: &Type) -> bool {
-    if input.type_definition(target).is_some_and(|d| d.representation == neoclr::metadata::Representation::Interface) {
+    if input
+        .type_definition(target)
+        .is_some_and(|d| d.representation == neoclr::metadata::Representation::Interface)
+    {
         return neoclr::native_metadata::assignable(input, concrete, target).unwrap_or(false);
     }
     let mut pending = vec![concrete.clone()];
@@ -474,11 +476,16 @@ pub(super) fn implicit_implementation(
     concrete: &Type,
     contract: &neoclr::metadata::Function,
 ) -> Result<(usize, FunctionRef), Error> {
-    if contract.owner.as_ref().is_some_and(|owner| neoclr::native_metadata::interface_has_variance(input, owner)) || input.type_definition(concrete).is_some_and(|t| {
-        t.base
-            .as_ref()
-            .is_some_and(|b| b.definition_name() != Some("System.Object"))
-    }) {
+    if contract
+        .owner
+        .as_ref()
+        .is_some_and(|owner| neoclr::native_metadata::interface_has_variance(input, owner))
+        || input.type_definition(concrete).is_some_and(|t| {
+            t.base
+                .as_ref()
+                .is_some_and(|b| b.definition_name() != Some("System.Object"))
+        })
+    {
         let method = neoclr::native_metadata::interface_implementation(input, concrete, contract)
             .map_err(|e| e.to_string())?;
         let index = input
@@ -876,7 +883,11 @@ fn retained_types(
                 pending_types.extend(t.fields.iter().map(|f| f.ty.clone()));
                 pending_types.extend(t.static_fields.iter().map(|f| f.ty.clone()));
                 pending_types.extend(t.base.iter().chain(&t.implements).cloned());
-                pending_types.extend(neoclr::native_metadata::interface_shape_arguments(t).iter().cloned());
+                pending_types.extend(
+                    neoclr::native_metadata::interface_shape_arguments(t)
+                        .iter()
+                        .cloned(),
+                );
                 if let Some(owner) = &t.declaring_type {
                     if owner.module != input.name || owner.revision != input.revision {
                         return Err("external lexical owner is unsupported".into());
@@ -902,7 +913,16 @@ fn retained_types(
             {
                 ()
             }
-            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+            Type::ArrayRef(t)
+                if matches!(
+                    *t,
+                    Type::Function(_)
+                        | Type::Named(_)
+                        | Type::Tuple(_)
+                        | Type::Union(_)
+                        | Type::Intersection(_)
+                ) =>
+            {
                 pending_types.push(*t)
             }
             Type::ArrayRef(t) if *t == Type::Byte => {
@@ -983,7 +1003,10 @@ pub(super) fn select_inventory_with_host_roots(
                 return Err("selected functions exceed the value profile limit".into());
             }
             pending.extend(virtual_base_contracts(input, &input.functions[i]));
-            pending.extend(neoclr::native_metadata::interface_slot_peers(input, &input.functions[i]));
+            pending.extend(neoclr::native_metadata::interface_slot_peers(
+                input,
+                &input.functions[i],
+            ));
             if object_dispatch_contract(&input.functions[i]) {
                 continue;
             }

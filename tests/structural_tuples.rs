@@ -178,9 +178,8 @@ fn tuple_verifier_rejects_wrong_elements_and_positions() {
             ".module InvalidTuple\n.entry Main\n.function Main() -> Int32\n{body}\nret\n.end"
         ))
         .unwrap();
-        match neoclr::LoadedProgram::new(&module) {
-            Ok(program) => assert!(program.verify().is_err()),
-            Err(_) => (),
+        if let Ok(program) = neoclr::LoadedProgram::new(&module) {
+            assert!(program.verify().is_err());
         }
     }
 }

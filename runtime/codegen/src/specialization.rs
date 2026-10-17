@@ -19,9 +19,14 @@ struct Shape {
     name: String,
 }
 // Admit only closed nongeneric nominal interface bounds and the existing function category.
-fn check_method_constraints(module: &neoclr::Module, function: &Function, arguments: &[Type]) -> Result<(), Error> {
+fn check_method_constraints(
+    module: &neoclr::Module,
+    function: &Function,
+    arguments: &[Type],
+) -> Result<(), Error> {
     for constraint in &function.generic_constraints {
-        let argument = arguments.get(constraint.parameter as usize)
+        let argument = arguments
+            .get(constraint.parameter as usize)
             .ok_or("generic method constraint argument missing")?;
         match &constraint.kind {
             neoclr::metadata::ConstraintKind::FunctionType => {
@@ -30,10 +35,18 @@ fn check_method_constraints(module: &neoclr::Module, function: &Function, argume
                 }
             }
             neoclr::metadata::ConstraintKind::TypeBound(bound @ Type::Named(_))
-                if module.type_definition(bound).is_some_and(|t|
-                    t.representation == neoclr::metadata::Representation::Interface && t.generic_parameters.is_empty()) => {
+                if module.type_definition(bound).is_some_and(|t| {
+                    t.representation == neoclr::metadata::Representation::Interface
+                        && t.generic_parameters.is_empty()
+                }) =>
+            {
                 neoclr::native_metadata::validate_self_interface_bound(module, argument, bound)
-                    .map_err(|e| format!("method {} bound {bound:?} for {argument:?}: {e}", function.name))?;
+                    .map_err(|e| {
+                        format!(
+                            "method {} bound {bound:?} for {argument:?}: {e}",
+                            function.name
+                        )
+                    })?;
             }
             _ => return Err("unsupported generic method constraint".into()),
         }
@@ -211,7 +224,12 @@ impl Specializer<'_> {
             Type::ArrayRef(t)
                 if matches!(
                     **t,
-                    Type::Function(_) | Type::Named(_) | Type::Constructed { .. } | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
+                    Type::Function(_)
+                        | Type::Named(_)
+                        | Type::Constructed { .. }
+                        | Type::Tuple(_)
+                        | Type::Union(_)
+                        | Type::Intersection(_)
                 ) =>
             {
                 let lowered = self.lower(t)?;
@@ -246,19 +264,24 @@ impl Specializer<'_> {
         };
         let i = self.type_index(name)?;
         let definition = &self.source.types[i];
-        if definition.generic_constraints.iter().any(|constraint| {
-            match &constraint.kind {
+        if definition
+            .generic_constraints
+            .iter()
+            .any(|constraint| match &constraint.kind {
                 neoclr::metadata::ConstraintKind::ReferenceType
                 | neoclr::metadata::ConstraintKind::ValueType
                 | neoclr::metadata::ConstraintKind::DefaultConstructor
                 | neoclr::metadata::ConstraintKind::FunctionType => false,
-                neoclr::metadata::ConstraintKind::TypeBound(bound) => !matches!(bound, Type::Named(_))
-                    || !self.source.type_definition(bound).is_some_and(|owner|
-                        owner.is_reference_type && owner.generic_parameters.is_empty()
-                            && owner.representation == neoclr::metadata::Representation::Record),
+                neoclr::metadata::ConstraintKind::TypeBound(bound) => {
+                    !matches!(bound, Type::Named(_))
+                        || !self.source.type_definition(bound).is_some_and(|owner| {
+                            owner.is_reference_type
+                                && owner.generic_parameters.is_empty()
+                                && owner.representation == neoclr::metadata::Representation::Record
+                        })
+                }
                 _ => true,
-            }
-        })
+            })
             || definition.generic_parameters.len() != arguments.len()
         {
             return Err(format!("unsupported generic type category, arity or constraints: {name}; reference={}, arity={}/{}, constraints={:?}", definition.is_reference_type, arguments.len(), definition.generic_parameters.len(), definition.generic_constraints).into());
@@ -439,9 +462,11 @@ impl Specializer<'_> {
                     | Type::ArrayRef(_)
             )
         }) {
-            return Err(
-                format!("generic method arguments require supported closed shapes: {} {:?}", target.name, target.generic_arguments).into(),
-            );
+            return Err(format!(
+                "generic method arguments require supported closed shapes: {} {:?}",
+                target.name, target.generic_arguments
+            )
+            .into());
         }
         let arguments = match &target.owner {
             Some(Type::Constructed { arguments, .. }) => arguments.clone(),
@@ -483,7 +508,11 @@ impl Specializer<'_> {
             .into());
         };
         let i = *i;
-        check_method_constraints(self.conformance, &self.source.functions[i], &target.generic_arguments)?;
+        check_method_constraints(
+            self.conformance,
+            &self.source.functions[i],
+            &target.generic_arguments,
+        )?;
         if let Some(instance) = self.instances.iter().find(|v| {
             v.source == i && v.types == arguments && v.methods == target.generic_arguments
         }) {
@@ -521,13 +550,8 @@ impl Specializer<'_> {
         methods: &[Type],
         pending: &mut Vec<Instance>,
     ) -> Result<Function, Error> {
-        if f.generic_parameters.len() != methods.len()
-            || !f.generic_arguments.is_empty()
-        {
-            return Err(
-                "generic method arity or pre-instantiated bodies are unsupported"
-                    .into(),
-            );
+        if f.generic_parameters.len() != methods.len() || !f.generic_arguments.is_empty() {
+            return Err("generic method arity or pre-instantiated bodies are unsupported".into());
         }
         check_method_constraints(self.conformance, f, methods)?;
         let mut result = f.clone();
@@ -616,15 +640,30 @@ impl Specializer<'_> {
                 *owner =
                     self.lower(&substitute(owner, arguments, methods).map_err(|e| e.to_string())?)?;
             }
-            if let Op::CallSelf { borrowed, self_type, target } = op {
+            if let Op::CallSelf {
+                borrowed,
+                self_type,
+                target,
+            } = op
+            {
                 if *borrowed || target.instance {
                     return Err("instance Self specialization is unsupported".into());
                 }
-                let concrete = substitute(self_type, arguments, methods).map_err(|e| e.to_string())?;
+                let concrete =
+                    substitute(self_type, arguments, methods).map_err(|e| e.to_string())?;
                 let mut contract = target.clone();
-                contract.owner = contract.owner.as_ref().map(|t| substitute(t, arguments, methods)).transpose().map_err(|e| e.to_string())?;
-                let implementation = neoclr::native_metadata::resolve_static_self_call(self.conformance, &concrete, &contract)
-                    .map_err(|e| format!("static Self call {contract:?} for {concrete:?}: {e}"))?;
+                contract.owner = contract
+                    .owner
+                    .as_ref()
+                    .map(|t| substitute(t, arguments, methods))
+                    .transpose()
+                    .map_err(|e| e.to_string())?;
+                let implementation = neoclr::native_metadata::resolve_static_self_call(
+                    self.conformance,
+                    &concrete,
+                    &contract,
+                )
+                .map_err(|e| format!("static Self call {contract:?} for {concrete:?}: {e}"))?;
                 *op = Op::Call(FunctionRef {
                     definition: implementation.definition,
                     name: implementation.name,
@@ -1105,22 +1144,40 @@ pub(crate) fn expand_with_conformance(
                 {
                     return Err("interface dispatch requires constructed classes".into());
                 }
-                if contract.owner.as_ref().is_some_and(|target| neoclr::native_metadata::interface_has_variance(input, target)) {
-                    let view = neoclr::native_metadata::interface_view(input, owner, contract.owner.as_ref().unwrap())
-                        .map_err(|e| e.to_string())?;
+                if contract.owner.as_ref().is_some_and(|target| {
+                    neoclr::native_metadata::interface_has_variance(input, target)
+                }) {
+                    let view = neoclr::native_metadata::interface_view(
+                        input,
+                        owner,
+                        contract.owner.as_ref().unwrap(),
+                    )
+                    .map_err(|e| e.to_string())?;
                     if Some(&view) != contract.owner.as_ref() {
-                        let template = input.functions.iter().find(|f| f.definition == contract.definition && f.name == contract.name)
+                        let template = input
+                            .functions
+                            .iter()
+                            .find(|f| {
+                                f.definition == contract.definition && f.name == contract.name
+                            })
                             .ok_or("missing original variant contract")?;
                         let arguments = match &view {
-                            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => arguments.as_slice(),
+                            Type::Constructed { arguments, .. }
+                            | Type::Scoped { arguments, .. } => arguments.as_slice(),
                             _ => &[],
                         };
                         let actual = super::selection::closed_signature(template, arguments)?;
                         let peer = context.resolve(&FunctionRef {
-                            definition: actual.definition, name: actual.name, owner: actual.owner,
-                            instance: actual.instance, generic_arguments: vec![], parameters: actual.parameters,
+                            definition: actual.definition,
+                            name: actual.name,
+                            owner: actual.owner,
+                            instance: actual.instance,
+                            generic_arguments: vec![],
+                            parameters: actual.parameters,
                         })?;
-                        if !visited.contains(&peer.row) { pending.push(peer); }
+                        if !visited.contains(&peer.row) {
+                            pending.push(peer);
+                        }
                     }
                 }
                 let (_, reference) = if super::selection::object_dispatch_contract(&contract) {
@@ -1204,11 +1261,20 @@ pub(crate) fn expand_with_conformance(
             }
         };
         neoclr::native_metadata::retain_string_view(&mut t, input, &source_interface);
-        let native_arguments = shape.arguments.iter().map(|argument| context.lower(argument)).collect::<Result<Vec<_>, _>>()?;
+        let native_arguments = shape
+            .arguments
+            .iter()
+            .map(|argument| context.lower(argument))
+            .collect::<Result<Vec<_>, _>>()?;
         neoclr::native_metadata::retain_array_shape(&mut t, input, shape.source, &native_arguments)
             .map_err(|e| e.to_string())?;
-        neoclr::native_metadata::retain_interface_shape(&mut t, input, shape.source, native_arguments)
-            .map_err(|e| e.to_string())?;
+        neoclr::native_metadata::retain_interface_shape(
+            &mut t,
+            input,
+            shape.source,
+            native_arguments,
+        )
+        .map_err(|e| e.to_string())?;
         t.generic_parameters.clear();
         t.generic_variance.clear();
         t.generic_constraints.clear();
@@ -1429,106 +1495,254 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 mod tests {
     #[test]
     fn nominal_static_self_methods_specialize_without_erasing_conformance() {
-        let source = neoclr::assemble(include_str!("../../../docs/validation/numerics-interfaces/StaticSelf.neoil")).unwrap();
+        let source = neoclr::assemble(include_str!(
+            "../../../docs/validation/numerics-interfaces/StaticSelf.neoil"
+        ))
+        .unwrap();
         let original = serde_json::to_value(&source).unwrap();
         let (expanded, _) = super::expand(&source, "Main").unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
         assert_eq!(serde_json::to_value(&source).unwrap(), original);
-        assert!(selected.functions.iter().all(|f| f.generic_constraints.is_empty() &&
-            !f.body.iter().any(|op| matches!(op, super::Op::CallSelf { .. }))));
+        assert!(selected.functions.iter().all(|f| {
+            f.generic_constraints.is_empty()
+                && !f
+                    .body
+                    .iter()
+                    .any(|op| matches!(op, super::Op::CallSelf { .. }))
+        }));
         // Native linking keeps value conformance as proof, not executable interface views.
         let mut projected = source.clone();
-        projected.types.iter_mut().find(|t| t.name == "Count").unwrap().implements.clear();
-        let (expanded, _) = super::expand_with_conformance(&projected, &source, "Main", &[]).unwrap();
+        projected
+            .types
+            .iter_mut()
+            .find(|t| t.name == "Count")
+            .unwrap()
+            .implements
+            .clear();
+        let (expanded, _) =
+            super::expand_with_conformance(&projected, &source, "Main", &[]).unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
-        assert_eq!(neoclr::LoadedProgram::new(&selected).unwrap().run(neoclr::Limits::default()).unwrap().value,
-                   neoclr::Value::Int32(42));
+        assert_eq!(
+            neoclr::LoadedProgram::new(&selected)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
         // Mutate linked metadata directly: do not rely on source-language diagnostics.
         for mutation in 0..4 {
             let mut invalid = source.clone();
             match mutation {
-                0 => invalid.types.iter_mut().find(|t| t.name == "Count").unwrap().implements.clear(),
-                1 => invalid.functions.iter_mut().find(|f| f.name == "Count.Add").unwrap().visibility = neoclr::metadata::Visibility::Private,
-                2 => invalid.functions.iter_mut().find(|f| f.name == "Count.Add").unwrap().returns = super::Type::Int32,
-                _ => invalid.functions.iter_mut().find(|f| f.name == "Sum").unwrap().generic_constraints[0].kind =
-                    neoclr::metadata::ConstraintKind::TypeBound(super::Type::Named("Missing".into())),
+                0 => invalid
+                    .types
+                    .iter_mut()
+                    .find(|t| t.name == "Count")
+                    .unwrap()
+                    .implements
+                    .clear(),
+                1 => {
+                    invalid
+                        .functions
+                        .iter_mut()
+                        .find(|f| f.name == "Count.Add")
+                        .unwrap()
+                        .visibility = neoclr::metadata::Visibility::Private
+                }
+                2 => {
+                    invalid
+                        .functions
+                        .iter_mut()
+                        .find(|f| f.name == "Count.Add")
+                        .unwrap()
+                        .returns = super::Type::Int32
+                }
+                _ => {
+                    invalid
+                        .functions
+                        .iter_mut()
+                        .find(|f| f.name == "Sum")
+                        .unwrap()
+                        .generic_constraints[0]
+                        .kind = neoclr::metadata::ConstraintKind::TypeBound(super::Type::Named(
+                        "Missing".into(),
+                    ))
+                }
             }
-            assert!(super::expand(&invalid, "Main").is_err(), "mutation {mutation} accepted");
+            assert!(
+                super::expand(&invalid, "Main").is_err(),
+                "mutation {mutation} accepted"
+            );
         }
     }
 
     #[test]
     fn function_kind_constraint_preserves_typed_calls_after_specialization() {
-        let source = neoclr::assemble(include_str!("../../../docs/validation/function-kind-constraint/Main.neoil")).unwrap();
+        let source = neoclr::assemble(include_str!(
+            "../../../docs/validation/function-kind-constraint/Main.neoil"
+        ))
+        .unwrap();
         let original = serde_json::to_value(&source).unwrap();
         let (expanded, _) = super::expand(&source, "Main").unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
         assert_eq!(serde_json::to_value(&source).unwrap(), original);
-        assert!(selected.functions.iter().all(|f| f.generic_constraints.is_empty()));
+        assert!(
+            selected
+                .functions
+                .iter()
+                .all(|f| f.generic_constraints.is_empty())
+        );
         let constrained = source.functions.iter().find(|f| f.name == "Keep").unwrap();
-        assert!(super::check_method_constraints(&source, constrained, &[super::Type::Int32]).is_err());
-        assert!(super::check_method_constraints(&source, constrained, &[super::Type::MethodTypeParameter(0)]).is_err());
+        assert!(
+            super::check_method_constraints(&source, constrained, &[super::Type::Int32]).is_err()
+        );
+        assert!(
+            super::check_method_constraints(
+                &source,
+                constrained,
+                &[super::Type::MethodTypeParameter(0)]
+            )
+            .is_err()
+        );
         assert!(super::check_method_constraints(&source, constrained, &[]).is_err());
         let mut invalid = neoclr::assemble(".module Invalid\n.entry Main\n.function Keep<F>(F) -> F\nldarg 0\nret\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Keep<Int32>(Int32)\nret\n.end").unwrap();
         invalid.functions[0].generic_constraints = constrained.generic_constraints.clone();
-        assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("function-kind"));
+        assert!(
+            super::expand(&invalid, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("function-kind")
+        );
     }
 
     #[test]
     fn special_type_constraints_are_checked_before_specialization() {
-        let source = neoclr::assemble(include_str!("../../../docs/validation/special-type-constraints/Main.neoil")).unwrap();
+        let source = neoclr::assemble(include_str!(
+            "../../../docs/validation/special-type-constraints/Main.neoil"
+        ))
+        .unwrap();
         let original = serde_json::to_value(&source).unwrap();
         neoclr::verify(&source).unwrap();
         let (expanded, _) = super::expand(&source, "Main").unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
         assert_eq!(serde_json::to_value(&source).unwrap(), original);
-        assert!(selected.types.iter().all(|t| t.generic_constraints.is_empty()));
+        assert!(
+            selected
+                .types
+                .iter()
+                .all(|t| t.generic_constraints.is_empty())
+        );
         // The value box must not satisfy reference requirements, and a reference
         // argument must not satisfy value requirements. Constructor visibility
         // and abstractness are checked against the original declaration.
         for case in 0..4 {
             let mut invalid = source.clone();
             match case {
-                0 => invalid.types.iter_mut().find(|t| t.name == "ValueBox").unwrap().generic_constraints[0].kind = neoclr::metadata::ConstraintKind::ReferenceType,
-                1 => invalid.types.iter_mut().find(|t| t.name == "ReferenceBox").unwrap().generic_constraints[0].kind = neoclr::metadata::ConstraintKind::ValueType,
-                2 => invalid.functions.iter_mut().find(|f| f.name.ends_with("..ctor")).unwrap().visibility = neoclr::metadata::Visibility::Private,
-                _ => invalid.types.iter_mut().find(|t| t.name == "Payload").unwrap().is_abstract = true,
+                0 => {
+                    invalid
+                        .types
+                        .iter_mut()
+                        .find(|t| t.name == "ValueBox")
+                        .unwrap()
+                        .generic_constraints[0]
+                        .kind = neoclr::metadata::ConstraintKind::ReferenceType
+                }
+                1 => {
+                    invalid
+                        .types
+                        .iter_mut()
+                        .find(|t| t.name == "ReferenceBox")
+                        .unwrap()
+                        .generic_constraints[0]
+                        .kind = neoclr::metadata::ConstraintKind::ValueType
+                }
+                2 => {
+                    invalid
+                        .functions
+                        .iter_mut()
+                        .find(|f| f.name.ends_with("..ctor"))
+                        .unwrap()
+                        .visibility = neoclr::metadata::Visibility::Private
+                }
+                _ => {
+                    invalid
+                        .types
+                        .iter_mut()
+                        .find(|t| t.name == "Payload")
+                        .unwrap()
+                        .is_abstract = true
+                }
             }
-            assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("violates"));
+            assert!(
+                super::expand(&invalid, "Main")
+                    .unwrap_err()
+                    .to_string()
+                    .contains("violates")
+            );
         }
     }
 
     #[test]
     fn nominal_class_constraints_are_checked_before_specialization() {
         let text = include_str!("../../../docs/validation/special-type-constraints/Main.neoil")
-            .replace(".constraint T reference new", ".constraint T reference new Payload");
+            .replace(
+                ".constraint T reference new",
+                ".constraint T reference new Payload",
+            );
         let source = neoclr::assemble(&(text + "\n.type class Other\n.end\n")).unwrap();
         let original = serde_json::to_value(&source).unwrap();
         let (expanded, _) = super::expand(&source, "Main").unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
         assert_eq!(serde_json::to_value(&source).unwrap(), original);
         let mut invalid = source.clone();
-        let owner = invalid.types.iter_mut().find(|t| t.name == "ReferenceBox").unwrap();
-        let bound = owner.generic_constraints.iter_mut().find(|c| matches!(c.kind, neoclr::metadata::ConstraintKind::TypeBound(_))).unwrap();
-        bound.kind = neoclr::metadata::ConstraintKind::TypeBound(super::Type::Named("Other".into()));
-        assert!(super::expand(&invalid, "Main").unwrap_err().to_string().contains("violates"));
+        let owner = invalid
+            .types
+            .iter_mut()
+            .find(|t| t.name == "ReferenceBox")
+            .unwrap();
+        let bound = owner
+            .generic_constraints
+            .iter_mut()
+            .find(|c| matches!(c.kind, neoclr::metadata::ConstraintKind::TypeBound(_)))
+            .unwrap();
+        bound.kind =
+            neoclr::metadata::ConstraintKind::TypeBound(super::Type::Named("Other".into()));
+        assert!(
+            super::expand(&invalid, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("violates")
+        );
     }
 
     #[test]
     fn generic_class_override_without_base_call_retains_closed_slot() {
-        let source = neoclr::assemble(r#"
+        let source = neoclr::assemble(
+            r#"
 .module GenericVirtual
 .entry Main
 .type class Base<T>
@@ -1553,17 +1767,25 @@ ldc.i4 99
 callvirt instance Derived<Boolean,Int32>::Echo(Int32)
 ret
 .end
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let (expanded, _) = expand(&source, "Main").unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
     }
 
     #[test]
     fn variant_interfaces_preserve_dispatch_and_identity_after_specialization() {
-        let input = neoclr::assemble(include_str!("../../../docs/validation/interface-variance/Main.neoil")).unwrap();
+        let input = neoclr::assemble(include_str!(
+            "../../../docs/validation/interface-variance/Main.neoil"
+        ))
+        .unwrap();
         let (expanded, _) = super::expand(&input, "Main").unwrap();
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
@@ -1574,7 +1796,8 @@ ret
 
     #[test]
     fn variant_interface_dispatch_closes_generic_implementations() {
-        let input = neoclr::assemble(r#".module GenericVariance
+        let input = neoclr::assemble(
+            r#".module GenericVariance
 .entry Main
 .type class Base
 .end
@@ -1603,11 +1826,16 @@ callvirt instance Producer<Base>::Get()
 pop
 ldc.i4 42
 ret
-.end"#).unwrap();
+.end"#,
+        )
+        .unwrap();
         let (selected, _) = super::super::selection::prepare(&input, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
         // Serialized artifacts cannot install the native compiler's trusted proof.
         let mut json = serde_json::to_value(&input).unwrap();
         json["types"][0]["native_interface"] = serde_json::json!({"arguments": []});

@@ -317,7 +317,8 @@ pub fn prepare(
             .any(|f| !f.generic_parameters.is_empty())
     {
         Some(super::specialization::expand_with_conformance(
-            &joined, &source_conformance,
+            &joined,
+            &source_conformance,
             root,
             &reflection_roots,
         )?)
@@ -388,7 +389,8 @@ pub fn prepare(
         if !host_roots.is_empty() {
             host_roots.extend_from_slice(&reflection_roots);
             specialized = Some(super::specialization::expand_with_conformance(
-                &joined, &source_conformance,
+                &joined,
+                &source_conformance,
                 root,
                 &host_roots,
             )?);
@@ -419,7 +421,10 @@ pub fn prepare(
             roots.push(getter);
         }
         specialized = Some(super::specialization::expand_with_conformance(
-            &joined, &source_conformance, root, &roots,
+            &joined,
+            &source_conformance,
+            root,
+            &roots,
         )?);
         let expanded = &specialized.as_ref().unwrap().0;
         (selected, report) = super::selection::select_inventory_with_host_roots(
@@ -1433,8 +1438,10 @@ fn rename_nominal(
         let mut value = serde_json::to_value(ty).map_err(|e| e.to_string())?;
         rename(&mut value, old, new, root);
         serde_json::from_value(value).map_err(|e| e.to_string())
-    }).map_err(|e| e.to_string())?;
-    neoclr::native_metadata::restore_descriptor_table(&mut rewritten, module).map_err(|e| e.to_string())?;
+    })
+    .map_err(|e| e.to_string())?;
+    neoclr::native_metadata::restore_descriptor_table(&mut rewritten, module)
+        .map_err(|e| e.to_string())?;
     *module = rewritten;
     Ok(())
 }
@@ -1489,8 +1496,12 @@ mod variance_projection_tests {
         assert!(neoclr::native_metadata::assignable(&target, &narrow, &wide).unwrap());
         assert!(!neoclr::native_metadata::assignable(&target, &wide, &narrow).unwrap());
         assert!(
-            !neoclr::native_metadata::assignable(&target, &parse("Producer<arrayref<Int32>>"), &wide)
-                .unwrap()
+            !neoclr::native_metadata::assignable(
+                &target,
+                &parse("Producer<arrayref<Int32>>"),
+                &wide
+            )
+            .unwrap()
         );
         let encoded = serde_json::to_value(&target).unwrap();
         assert!(encoded["types"][0].get("native_array_element").is_none());
@@ -1510,7 +1521,8 @@ mod variance_projection_tests {
             .unwrap()
         );
         assert!(
-            neoclr::native_metadata::retain_array_shape(&mut target.types[0], &source, 0, &[]).is_err()
+            neoclr::native_metadata::retain_array_shape(&mut target.types[0], &source, 0, &[])
+                .is_err()
         );
     }
 
@@ -1535,19 +1547,33 @@ mod variance_projection_tests {
         let mut forged = encoded;
         forged["types"][0]["native_object_root"] = serde_json::json!(true);
         assert!(serde_json::from_value::<neoclr::Module>(forged).is_err());
-        assert!(neoclr::native_metadata::retain_object_reference_root(&mut source.types[1]).is_err());
+        assert!(
+            neoclr::native_metadata::retain_object_reference_root(&mut source.types[1]).is_err()
+        );
     }
 
     #[test]
     fn nominal_rename_preserves_native_variance_and_slot_identity() {
-        let source = neoclr::assemble(include_str!("../../../docs/validation/interface-variance/Main.neoil")).unwrap();
+        let source = neoclr::assemble(include_str!(
+            "../../../docs/validation/interface-variance/Main.neoil"
+        ))
+        .unwrap();
         let (mut selected, _) = crate::selection::prepare(&source, "Main").unwrap();
         // Even a rewrite unrelated to these interfaces used to discard all
         // private proof fields through the serialization round trip.
-        super::rename_nominal(&mut selected, "UnrelatedStaticOwner", "PrivateStaticOwner", "Main").unwrap();
+        super::rename_nominal(
+            &mut selected,
+            "UnrelatedStaticOwner",
+            "PrivateStaticOwner",
+            "Main",
+        )
+        .unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
     }
 }
 

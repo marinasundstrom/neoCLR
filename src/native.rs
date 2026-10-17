@@ -351,9 +351,15 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         "neoCLR.Runtime.InvokeFunction" | "neoCLR.Runtime.InvokeFunctionCheck"
     ) {
         let object = Type::from_name("System.Object");
-        let returns = if function.name.ends_with("Check") { Type::Int32 } else { object.clone() };
+        let returns = if function.name.ends_with("Check") {
+            Type::Int32
+        } else {
+            object.clone()
+        };
         if function.parameters != [object.clone(), Type::ArrayRef(Box::new(object))]
-            || function.returns != returns || function.no_result {
+            || function.returns != returns
+            || function.no_result
+        {
             return Err(Fault::new("dynamic function invocation signature mismatch"));
         }
         return Ok(Binding::InvokeFunction);
@@ -2056,7 +2062,12 @@ mod local_time_array_tests {
             );
             let parsed = crate::assembler::parse_module(&source).unwrap();
             let assembled = super::bind(&parsed.functions[0]);
-            assert_eq!(assembled.is_ok(), accepted, "{result}: {:?}", assembled.as_ref().err());
+            assert_eq!(
+                assembled.is_ok(),
+                accepted,
+                "{result}: {:?}",
+                assembled.as_ref().err()
+            );
         }
         let module = crate::assembler::parse_module(".module Test\n.entry Main\n.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> arrayref<Int32>\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i8 0\ncall neoCLR.Runtime.UnixTimeToLocal(Int64)\nldlen\nconv.i4\nret\n.end\n").unwrap();
         let library = crate::assemble(".module System\n").unwrap();

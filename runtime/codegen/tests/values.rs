@@ -690,7 +690,10 @@ fn cyclic_and_unknown_inline_layouts_never_emit() {
             "recursive inline",
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
-        (".type A\n.field Child tuple<Int32,A>\n.end", "recursive inline"),
+        (
+            ".type A\n.field Child tuple<Int32,A>\n.end",
+            "recursive inline",
+        ),
     ] {
         let source = format!(
             ".module Invalid\n.entry Main\n{fields}\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n"
@@ -2973,19 +2976,30 @@ fn structural_scalar_union_pattern_tests_preserve_exact_types_and_null() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_record_union_snapshots_calls_and_exact_extraction() {
-    let source = include_str!("../../../docs/experiments/native-structural-types/record-union.neoil");
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/record-union.neoil");
     for (entry, status, fault) in [
         ("Main", 0, None),
         ("Wrong", 11, Some(neoclr::FaultCode::InvalidCast)),
         ("Null", 6, Some(neoclr::FaultCode::NullReference)),
     ] {
-        let m = neoclr::assemble(&source.replace(".entry Main", &format!(".entry {entry}"))).unwrap();
+        let m =
+            neoclr::assemble(&source.replace(".entry Main", &format!(".entry {entry}"))).unwrap();
         let reference = neoclr::run(&m, neoclr::Limits::default());
-        if let Some(fault) = fault { assert_eq!(reference.unwrap_err().code, fault); }
-        else { assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42)); }
-        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0,
-            status, if status == 0 { 42 } else { 12345 }, "@entry", true,
-            &["--compile-system", "--reference-arena"]);
+        if let Some(fault) = fault {
+            assert_eq!(reference.unwrap_err().code, fault);
+        } else {
+            assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42));
+        }
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            status,
+            if status == 0 { 42 } else { 12345 },
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
     }
 }
 
@@ -3024,9 +3038,19 @@ ret
 .end
 "#;
     let m = neoclr::assemble(source).unwrap();
-    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
-    native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
-        "@entry", true, &["--compile-system", "--reference-arena"]);
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    native_mode_flags(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        0,
+        42,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
 }
 
 #[test]
@@ -3049,7 +3073,9 @@ fn structural_arguments_specialize_generic_methods_and_record_fields() {
             "ref.isnull\nbrfalse bad\nldc.i4 42\nret\nbad:\nldc.i4 0",
         ),
     ] {
-        let field_roundtrip = format!("newobj Box<{shape}>\nstloc box\nldloca box\ncall instance Box<{shape}>::Read()\n");
+        let field_roundtrip = format!(
+            "newobj Box<{shape}>\nstloc box\nldloca box\ncall instance Box<{shape}>::Read()\n"
+        );
         let source = format!(
             ".module StructuralGeneric\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.type Box<T>\n.field Item T\n.method instance byref Read() -> T\nldarg this\nldfld Box<T>::Item\nret\n.end\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.entry Main\n.function Main() -> Int32\n.local {shape} value\n.local Box<{shape}> box\n{make}\ncall Copy<{shape}>({shape})\n{field_roundtrip}{extract}\nret\n.end"
         );
@@ -3562,10 +3588,19 @@ ret
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn value_union_identity_patterns_preserve_payload_and_null() {
     for (shape, make, extract) in [
-        ("union<Int32,Int64>", "ldc.i4 42\nbox Int32", "unbox.any Int32"),
-        ("union<First,Second>", "ldc.i4 42\nnewobj First\nbox First", "unbox.any First\nldfld First::Value"),
+        (
+            "union<Int32,Int64>",
+            "ldc.i4 42\nbox Int32",
+            "unbox.any Int32",
+        ),
+        (
+            "union<First,Second>",
+            "ldc.i4 42\nnewobj First\nbox First",
+            "unbox.any First\nldfld First::Value",
+        ),
     ] {
-        let source = format!(r#"
+        let source = format!(
+            r#"
 .module IdentityPattern
 .type class abstract System.Object
 .end
@@ -3599,34 +3634,74 @@ Bad:
 ldc.i4 -1
 ret
 .end
-"#);
+"#
+        );
         let m = neoclr::assemble(&source).unwrap();
-        assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
-        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
-            "@entry", true, &["--compile-system", "--reference-arena"]);
+        assert_eq!(
+            neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
 
-        let null = source.replacen(&format!("isinst {shape}\nref.isnull"),
-            &format!("unbox.any {shape}\nref.isnull"), 1);
+        let null = source.replacen(
+            &format!("isinst {shape}\nref.isnull"),
+            &format!("unbox.any {shape}\nref.isnull"),
+            1,
+        );
         let m = neoclr::assemble(&null).unwrap();
-        assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
-        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
-            "@entry", true, &["--compile-system", "--reference-arena"]);
+        assert_eq!(
+            neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
 
-        let different = source.replacen(&format!("isinst {shape}\nref.isnull"),
-            "isinst union<Int32,Int64,Boolean>\nref.isnull", 1);
+        let different = source.replacen(
+            &format!("isinst {shape}\nref.isnull"),
+            "isinst union<Int32,Int64,Boolean>\nref.isnull",
+            1,
+        );
         let m = neoclr::assemble(&different).unwrap();
         let temp = Temp::new();
-        let result = compile_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(),
-            &temp, "@entry", true, &["--compile-system", "--reference-arena"]);
+        let result = compile_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
         assert!(!result.status.success());
         assert!(String::from_utf8_lossy(&result.stderr).contains("same union"));
 
-        let escaped = source.replacen(&format!("isinst {shape}\nref.isnull"),
-            &format!("isinst {shape}\ndup\npop\nref.isnull"), 1);
+        let escaped = source.replacen(
+            &format!("isinst {shape}\nref.isnull"),
+            &format!("isinst {shape}\ndup\npop\nref.isnull"),
+            1,
+        );
         let m = neoclr::assemble(&escaped).unwrap();
         let temp = Temp::new();
-        let result = compile_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(),
-            &temp, "@entry", true, &["--compile-system", "--reference-arena"]);
+        let result = compile_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
         assert!(!result.status.success());
         assert!(String::from_utf8_lossy(&result.stderr).contains("immediate null test"));
     }

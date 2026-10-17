@@ -1,0 +1,13 @@
+{
+  "clippy": {
+    "command": "cargo clippy --locked --all-targets -- -D warnings",
+    "exitCode": 0
+  },
+  "scope": "Formatting and equivalent control-flow cleanup only; no runtime or API changes",
+  "sourceAudit": "source-audit-report.json",
+  "remainingFailures": 6,
+  "format": {
+    "command": "cargo fmt --check",
+    "exitCode": 0
+  }
+}

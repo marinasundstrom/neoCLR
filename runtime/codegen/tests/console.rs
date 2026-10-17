@@ -1149,9 +1149,15 @@ fn structural_intersection_views_require_every_nominal_bound() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_intersection_generic_transport_preserves_conformance_and_identity() {
-    let source = include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
-        .replace("stloc view", "call Forward<intersection<View,Marker>>(intersection<View,Marker>)\nstloc view");
-    let source = format!("{source}\n.type Wrapper<T>\n.field Item T\n.end\n.function Forward<T>(!!0 value) -> !!0\nldarg value\nnewobj Wrapper<!!0>\nldfld 0\nret\n.end\n");
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
+            .replace(
+                "stloc view",
+                "call Forward<intersection<View,Marker>>(intersection<View,Marker>)\nstloc view",
+            );
+    let source = format!(
+        "{source}\n.type Wrapper<T>\n.field Item T\n.end\n.function Forward<T>(!!0 value) -> !!0\nldarg value\nnewobj Wrapper<!!0>\nldfld 0\nret\n.end\n"
+    );
     verify_reference_views(&source);
     verify_reference_views(&source.replace(".implements Marker\n", ""));
 }
@@ -1195,7 +1201,8 @@ fn structural_union_reference_payloads_accept_either_nominal_bound() {
     );
     assert!(!denied.status.success());
     assert!(
-        String::from_utf8_lossy(&denied.stderr).contains("instance tests require tagged conversion lowering"),
+        String::from_utf8_lossy(&denied.stderr)
+            .contains("instance tests require tagged conversion lowering"),
         "{}",
         String::from_utf8_lossy(&denied.stderr)
     );
@@ -1242,7 +1249,11 @@ int main(int argc, char **argv) {
     .unwrap();
     if let Some(bytes) = arena_bytes {
         let host = dir.0.join("host.c");
-        let expected = bytes.iter().map(u64::to_string).collect::<Vec<_>>().join(",");
+        let expected = bytes
+            .iter()
+            .map(u64::to_string)
+            .collect::<Vec<_>>()
+            .join(",");
         let text = fs::read_to_string(&host).unwrap().replace(
             "    if (status) {",
             &format!("    uint64_t expected[8] = {{{expected}}};\n    if (ctx.text.used != expected[argc>1 ? atoi(argv[1]) : 0]) return 93;\n    if (status) {{"),
@@ -11901,13 +11912,18 @@ int main(void) {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_mixed_union_keeps_numeric_bits_separate_from_references() {
-    let source = include_str!(
-        "../../../docs/experiments/native-structural-types/mixed-union.neoil"
-    );
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/mixed-union.neoil");
     verify_reference_views_with_arena(source, Some([16, 16, 16, 16, 16, 16, 0, 16]));
     let interface = source
-        .replace(".type class Cell", ".interface View\n.end\n.type class Cell\n.implements View")
-        .replace("union<Int32,Int64,Boolean,Cell>", "union<Int32,Int64,Boolean,View>");
+        .replace(
+            ".type class Cell",
+            ".interface View\n.end\n.type class Cell\n.implements View",
+        )
+        .replace(
+            "union<Int32,Int64,Boolean,Cell>",
+            "union<Int32,Int64,Boolean,View>",
+        );
     verify_reference_views_with_arena(&interface, Some([16, 16, 16, 16, 16, 16, 0, 16]));
     let null_scalar = source.replace(
         "ldloc value\ncastclass Cell\nref.isnull\nbrtrue Yes",
@@ -11918,20 +11934,35 @@ fn structural_mixed_union_keeps_numeric_bits_separate_from_references() {
     let dir = Temp::new();
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let denied = compile_source(
-        &dir, &seed, &source.replace("isinst Cell", "isinst System.Object"),
-        &["--compile-system", "--reference-arena"], false,
+        &dir,
+        &seed,
+        &source.replace("isinst Cell", "isinst System.Object"),
+        &["--compile-system", "--reference-arena"],
+        false,
     );
     assert!(!denied.status.success());
-    assert!(String::from_utf8_lossy(&denied.stderr).contains("views require boxing"), "{}", String::from_utf8_lossy(&denied.stderr));
+    assert!(
+        String::from_utf8_lossy(&denied.stderr).contains("views require boxing"),
+        "{}",
+        String::from_utf8_lossy(&denied.stderr)
+    );
     assert!(!dir.0.join("app.o").exists());
     let denied = compile_source(
-        &dir, &seed,
-        &source.replace("ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)",
-            "ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)\ncastclass System.Object"),
-        &["--compile-system", "--reference-arena"], false,
+        &dir,
+        &seed,
+        &source.replace(
+            "ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)",
+            "ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)\ncastclass System.Object",
+        ),
+        &["--compile-system", "--reference-arena"],
+        false,
     );
     assert!(!denied.status.success());
-    assert!(String::from_utf8_lossy(&denied.stderr).contains("boxed-payload classification"), "{}", String::from_utf8_lossy(&denied.stderr));
+    assert!(
+        String::from_utf8_lossy(&denied.stderr).contains("boxed-payload classification"),
+        "{}",
+        String::from_utf8_lossy(&denied.stderr)
+    );
     assert!(!dir.0.join("app.o").exists());
 }
 
@@ -11939,7 +11970,9 @@ fn structural_mixed_union_keeps_numeric_bits_separate_from_references() {
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_record_union_preserves_embedded_reference_identity() {
     verify_reference_views_with_arena(
-        include_str!("../../../docs/experiments/native-structural-types/record-reference-union.neoil"),
+        include_str!(
+            "../../../docs/experiments/native-structural-types/record-reference-union.neoil"
+        ),
         Some([16, 16, 0, 0, 16, 0, 16, 16]),
     );
 }
@@ -11968,7 +12001,6 @@ fn structural_record_union_accepts_direct_reference_alternatives() {
         "Extract:\nldloc value\ncastclass Cell",
     );
     verify_reference_views_with_arena(&reference_faults, Some([16, 16, 0, 0, 16, 0, 16, 16]));
-
 }
 
 #[test]
@@ -12133,9 +12165,14 @@ fn structural_callable_union_roots_survive_native_collection() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_union_reserved_arrays_retain_callable_receivers() {
-    let prefix = include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
-        .split(".function Pressure").next().unwrap();
-    let source = format!("{prefix}{}", r#"
+    let prefix =
+        include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
+            .split(".function Pressure")
+            .next()
+            .unwrap();
+    let source = format!(
+        "{prefix}{}",
+        r#"
 .function MakeArray() -> arrayref<union<fn<Int32>,Int32>>
 .local arrayref<union<fn<Int32>,Int32>> items
 ldc.i4 1
@@ -12177,9 +12214,13 @@ castclass fn<Int32>
 call instance fn<Int32>::Invoke()
 ret
 .end
-"#);
+"#
+    );
     let uninitialized = source.replace("stelem union<fn<Int32>,Int32>", "pop\npop\npop");
-    let outside = source.replace("ldarg items\nldc.i4 0\nldelem", "ldarg items\nldc.i4 1\nldelem");
+    let outside = source.replace(
+        "ldarg items\nldc.i4 0\nldelem",
+        "ldarg items\nldc.i4 1\nldelem",
+    );
     verify_structural_union_gc(&[(&source, 0), (&uninitialized, 3), (&outside, 8)], 664);
 }
 
@@ -12187,11 +12228,25 @@ ret
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_reserved_arrays_copy_initialized_tuple_and_scalar_elements() {
     for (shape, make, extract) in [
-        ("tuple<Int32,Int64>", "ldc.i4 42\nldc.i8 99\nnewobj tuple<Int32,Int64>", "ldfld 0"),
-        ("union<Int32,Int64>", "ldc.i4 42\nbox Int32\ncastclass union<Int32,Int64>", "stloc value\nldloc value\nunbox.any Int32"),
-        ("intersection<View,Marker>", "ldloca value\ninitobj intersection<View,Marker>\nldloc value", "ref.isnull\nbrfalse Bad\nldc.i4 42\nret\nBad:\nldc.i4 -1"),
+        (
+            "tuple<Int32,Int64>",
+            "ldc.i4 42\nldc.i8 99\nnewobj tuple<Int32,Int64>",
+            "ldfld 0",
+        ),
+        (
+            "union<Int32,Int64>",
+            "ldc.i4 42\nbox Int32\ncastclass union<Int32,Int64>",
+            "stloc value\nldloc value\nunbox.any Int32",
+        ),
+        (
+            "intersection<View,Marker>",
+            "ldloca value\ninitobj intersection<View,Marker>\nldloc value",
+            "ref.isnull\nbrfalse Bad\nldc.i4 42\nret\nBad:\nldc.i4 -1",
+        ),
     ] {
-        let source = format!(".module StructuralArrays\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.function Calculate() -> Int32\n.local arrayref<{shape}> items\n.local {shape} value\n.local Int32 remaining\nldc.i4 1\narray.reserve {shape}\nstloc items\nldloc items\nldc.i4 0\n{make}\nstelem {shape}\nldc.i4 80\nstloc remaining\nLoop:\nldc.i4 128\nnewarr Byte\npop\nldloc remaining\nldc.i4 1\nsub\nstloc remaining\nldloc remaining\nbrtrue Loop\nldloc items\nldc.i4 0\nldelem {shape}\n{extract}\nret\n.end");
+        let source = format!(
+            ".module StructuralArrays\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.function Calculate() -> Int32\n.local arrayref<{shape}> items\n.local {shape} value\n.local Int32 remaining\nldc.i4 1\narray.reserve {shape}\nstloc items\nldloc items\nldc.i4 0\n{make}\nstelem {shape}\nldc.i4 80\nstloc remaining\nLoop:\nldc.i4 128\nnewarr Byte\npop\nldloc remaining\nldc.i4 1\nsub\nstloc remaining\nldloc remaining\nbrtrue Loop\nldloc items\nldc.i4 0\nldelem {shape}\n{extract}\nret\n.end"
+        );
         verify_structural_union_gc(&[(&source, 0)], 648);
     }
 }
@@ -12200,10 +12255,21 @@ fn structural_reserved_arrays_copy_initialized_tuple_and_scalar_elements() {
 fn structural_arrays_reject_default_allocation_and_element_borrows() {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     for shape in ["tuple<Int32,Int64>", "union<Int32,Int64>"] {
-        for body in [format!("ldc.i4 1\nnewarr {shape}\npop"), format!("ldc.i4 1\narray.reserve {shape}\nldc.i4 0\nldelema {shape}\npop")] {
-            let source = format!(".module InvalidStructuralArray\n.function Calculate() -> Int32\n{body}\nldc.i4 0\nret\n.end");
+        for body in [
+            format!("ldc.i4 1\nnewarr {shape}\npop"),
+            format!("ldc.i4 1\narray.reserve {shape}\nldc.i4 0\nldelema {shape}\npop"),
+        ] {
+            let source = format!(
+                ".module InvalidStructuralArray\n.function Calculate() -> Int32\n{body}\nldc.i4 0\nret\n.end"
+            );
             let dir = Temp::new();
-            let result = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+            let result = compile_source(
+                &dir,
+                &seed,
+                &source,
+                &["--compile-system", "--reference-arena"],
+                false,
+            );
             assert!(!result.status.success());
             assert!(!dir.0.join("app.o").exists());
             assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
@@ -12214,14 +12280,30 @@ fn structural_arrays_reject_default_allocation_and_element_borrows() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn structural_union_record_fields_retain_callable_receivers() {
-    let source = include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
-        .replace(".function Make()", ".type Holder\n.field Value union<fn<Int32>,Int32>\n.end\n.function Make()")
-        .replace(".function Pressure(union<fn<Int32>,Int32> value) -> union<fn<Int32>,Int32>", ".function Pressure(Holder value) -> Holder")
-        .replace(".local union<fn<Int32>,Int32> value", ".local Holder value")
-        .replace("call Make()", "call Make()\nnewobj Holder")
-        .replace("call Pressure(union<fn<Int32>,Int32>)", "call Pressure(Holder)")
-        .replace("ldloc value\nisinst", "ldloc value\nldfld Holder::Value\nisinst")
-        .replace("ldloc value\ncastclass", "ldloc value\nldfld Holder::Value\ncastclass");
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
+            .replace(
+                ".function Make()",
+                ".type Holder\n.field Value union<fn<Int32>,Int32>\n.end\n.function Make()",
+            )
+            .replace(
+                ".function Pressure(union<fn<Int32>,Int32> value) -> union<fn<Int32>,Int32>",
+                ".function Pressure(Holder value) -> Holder",
+            )
+            .replace(".local union<fn<Int32>,Int32> value", ".local Holder value")
+            .replace("call Make()", "call Make()\nnewobj Holder")
+            .replace(
+                "call Pressure(union<fn<Int32>,Int32>)",
+                "call Pressure(Holder)",
+            )
+            .replace(
+                "ldloc value\nisinst",
+                "ldloc value\nldfld Holder::Value\nisinst",
+            )
+            .replace(
+                "ldloc value\ncastclass",
+                "ldloc value\nldfld Holder::Value\ncastclass",
+            );
     verify_structural_union_gc(&[(&source, 0)], 656);
 }
 

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Apply canonical Rust formatting and simplify two no-op unit match arms and an equivalent short-circuit dispatch condition identified by release Clippy checks; simplify equivalent single-case test control flow. These are source-maintenance changes; nominal interface conformance, structural semantics and runtime ABI remain unchanged. All-target Clippy passes with warnings denied. Retain the optimized extracted-source audit’s six failing tests as open release blockers, distinct from native package acceptance.
+
 - Correct release qualification for callback-result inlays: Raven main `752d240b4` / native `40fcae6d0` preserve unresolved generic overload candidates, yielding `Task<int>` for `Task.Run(() => 41)`. Record 60 main and 66 native focused checks, a native metadata probe and two passing real-editor development checks. Add an exact task-type assertion and align startup waiting with package acceptance; retain earlier failed inlay evidence. A refreshed SDK/VSIX and Windows qualification remain pending.
 
 - Qualify Raven 368e5ca39 exclusive unit-step range guard removal: 23 compiler checks and an expanded signed-boundary consumer pass interpreter/JIT/AOT. Retain a repeatable bundle validator and compiler-only CPU comparison; interpreter median rises from 4.27 to 6.31 operations/s, largely recovering the candidate regression without weakening inclusive/general-step overflow safety. Runtime/libraries are unchanged; a complete optimized SDK/library refresh and Windows/HTTP release gates remain pending.

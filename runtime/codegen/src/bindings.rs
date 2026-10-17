@@ -2096,7 +2096,10 @@ mod task_queue_tests {
         let mut no_result = source.clone();
         no_result.functions[0].no_result = true;
         task_queue(&mut no_result, &inventory, &source).unwrap();
-        assert!(matches!(no_result.functions[0].body.as_slice(), [Op::Return]));
+        assert!(matches!(
+            no_result.functions[0].body.as_slice(),
+            [Op::Return]
+        ));
         for change in 0..8 {
             let mut input = source.clone();
             match change {
@@ -2561,7 +2564,10 @@ mod native_text_array_tests {
                 let mut valid = source.clone();
                 assert_eq!(utf8_text(&mut valid, &inventory).unwrap().len(), 1);
                 assert_eq!(valid.functions[0].returns, source.functions[0].returns);
-                assert!(matches!(valid.functions[0].body.as_slice(), [Op::Branch(0)]));
+                assert!(matches!(
+                    valid.functions[0].body.as_slice(),
+                    [Op::Branch(0)]
+                ));
                 for mutation in 0..4 {
                     let mut invalid = source.clone();
                     match mutation {

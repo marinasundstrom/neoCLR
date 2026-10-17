@@ -449,9 +449,15 @@ pub(crate) fn implementation(
     }
     let adapted;
     let contract = if view != *interface && contract.native_interface_slot.is_some() {
-        adapted = module.functions.iter().find(|method|
-            method.owner.as_ref() == Some(&view) && method.native_interface_slot == contract.native_interface_slot)
-            .ok_or_else(|| Fault::new("missing specialized variant interface slot"))?.clone();
+        adapted = module
+            .functions
+            .iter()
+            .find(|method| {
+                method.owner.as_ref() == Some(&view)
+                    && method.native_interface_slot == contract.native_interface_slot
+            })
+            .ok_or_else(|| Fault::new("missing specialized variant interface slot"))?
+            .clone();
         &adapted
     } else if view != *interface {
         let template = module
@@ -843,8 +849,8 @@ pub(crate) fn dispatch_targets(
                 ));
             }
             let mut bindings = vec![None; definition.generic_parameters.len()];
-            if !infer(implemented, interface, &mut bindings)
-                && !(definition.generic_parameters.is_empty()
+            if !(infer(implemented, interface, &mut bindings)
+                || definition.generic_parameters.is_empty()
                     && crate::variance::compatible(module, implemented, interface))
             {
                 continue;

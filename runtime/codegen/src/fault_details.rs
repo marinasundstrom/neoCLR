@@ -284,11 +284,20 @@ impl Options {
                 .collect(),
             object_function_queries: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "object-type-closed-v1")
-                .map(|r| (r["compiledIndex"].as_u64().unwrap() as usize,
-                    r["functionTokens"].as_array().into_iter().flatten()
-                        .map(|t| serde_json::from_value(t.clone()).unwrap()).collect()))
+                .map(|r| {
+                    (
+                        r["compiledIndex"].as_u64().unwrap() as usize,
+                        r["functionTokens"]
+                            .as_array()
+                            .into_iter()
+                            .flatten()
+                            .map(|t| serde_json::from_value(t.clone()).unwrap())
+                            .collect(),
+                    )
+                })
                 .collect(),
             object_type_queries: report
                 .and_then(|r| r["nativeBindings"].as_array())

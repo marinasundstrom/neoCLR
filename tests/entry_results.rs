@@ -85,15 +85,18 @@ ret
 .end
 "#;
     let source = if no_result {
-        source.replace("call Wait()\npop", "call Wait()")
+        source
+            .replace("call Wait()\npop", "call Wait()")
             .replace(".function Wait() -> Void", ".function Wait() -> noresult")
     } else {
         source.to_owned()
     };
-    let app =
-        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &system)
-            .unwrap()
-            .remove(0);
+    let app = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(&source)],
+        &system,
+    )
+    .unwrap()
+    .remove(0);
     neoclr::LoadedProgram::with_library(&app, &system).unwrap()
 }
 

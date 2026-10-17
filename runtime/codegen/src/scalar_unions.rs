@@ -25,9 +25,9 @@ pub(crate) fn supported(ty: &Type) -> bool {
 }
 
 pub(crate) fn record(module: &Module, ty: &Type) -> bool {
-    module.type_definition(ty).is_some_and(|d| {
-        !d.is_reference_type && d.representation == Representation::Record
-    })
+    module
+        .type_definition(ty)
+        .is_some_and(|d| !d.is_reference_type && d.representation == Representation::Record)
 }
 
 // Records and callable descriptors use disjoint, independently traced payload regions.
