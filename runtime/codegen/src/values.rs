@@ -2616,6 +2616,13 @@ pub(crate) fn compile_into(
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
                 if let Some(ty) = &p.results[i] {
+                    // The legacy helper produces an immutable value snapshot. A native
+                    // Byte[] result owns this fresh allocation as an ordinary array.
+                    if *ty == Ty::ByteArray && details.unwrap().utf8_encode.contains(&i) {
+                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        let kind = b.ins().iconst(types::I64, 0x80000001);
+                        b.ins().store(MemFlags::new(), kind, array, 0);
+                    }
                     if p.backing_for_array(ty).is_some() {
                         let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
                         tag_array(&mut b, &p, ty, array);

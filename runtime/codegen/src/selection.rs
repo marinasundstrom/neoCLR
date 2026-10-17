@@ -666,6 +666,11 @@ pub(super) fn dispatch_targets_with_array(
         .map(|i| Type::Named(input.types[i].name.clone()))
         .or_else(|| byte_array_owner(input));
     for &i in reached {
+        if input.functions[i].returns == Type::ArrayRef(Box::new(Type::Byte)) {
+            if let Some(Type::Named(name)) = &array_owner {
+                constructed.insert(name.as_str());
+            }
+        }
         for &index in reference_backings {
             if input.types[index]
                 .fields

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Correct native UTF-8/grapheme array results in JIT/AOT: retain exact InternalCall contracts, publish fresh UTF-8 results as managed byte arrays, and include returned byte-array backings in nominal interface dispatch. The native text consumer passes interpreter/JIT/AOT; binding rejection and five existing UTF-8 tests pass. Extracted candidate JSON acceptance still fails on union instance-test lowering; release benchmarks and Windows qualification remain pending.
+
 - Prepare CPU/JSON and plain/JSON HTTP benchmark harnesses for macOS ARM64 and Windows x64: select the matching native profile and executable, use the active Python interpreter, and record host-appropriate diagnostics without treating missing Windows load averages as zero. Windows database benchmarking remains explicitly unsupported. Thirteen framework tests pass on retry after a transient process-cleanup permission error; Windows runtime qualification remains pending.
 
 - Audit upcoming macOS ARM64 and Windows x64 release readiness: record candidate pin/package gaps, distinguish legacy API redirects from unverified pages, and establish correctness-first runtime benchmark gates on both platforms. Replace the stale unpublished release-note draft; measurements and release qualification remain pending.

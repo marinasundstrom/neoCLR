@@ -24,6 +24,26 @@ Evidence already available:
 - Website HTML and local links pass for 4,441 pages, alongside 22 website and four
   native snapshot tests. Published download links still identify Preview 15.
 
+## Candidate validation checkpoint (2026-10-17)
+
+An optimized macOS runtime/backend and extracted native-core bundle were built
+locally. Archive acceptance and untimed CPU/JSON preparation exposed two native
+codegen gaps before measurements began:
+
+- Native UTF-8 byte arrays and grapheme arrays needed exact InternalCall result
+  admission. UTF-8 results also needed an ordinary managed-array tag and inclusion
+  in nominal interface dispatch. The focused fix and executable evidence are in
+  [text-vector validation](validation/release-candidate-20261017/README.md).
+- The packaged JSON consumer still fails on a scalar-union instance test in an
+  async function. This is a blocker in an existing packaged workload, not an
+  expansion of the parked structural-type scope.
+
+The original archive retains the pre-fix backend and is not qualified. Rebuild it
+from a validated revision after the remaining correctness failures are closed.
+Windows execution, editor package qualification and runtime measurements remain
+pending. The local Raven revision is ahead of the remote branch; candidate pinning
+must establish a remotely available, matching compiler/server/extension cohort.
+
 ## Required before release
 
 | Gate | Observed gap | Required outcome |
@@ -48,11 +68,11 @@ Compiler performance is outside this gate. Build source programs and AOT outputs
 before timed execution. Report process startup separately: it can include loading,
 verification and JIT preparation, but must not be mixed into steady-state throughput.
 
-1. Make the existing harnesses runnable on both targets. `benchmarks/execution/prepare.py`
-   currently selects the macOS `console` profile and `app` filename; Windows needs
-   `windows-console` and the actual executable path. `benchmarks/http-server/benchmark.py`
-   explicitly rejects non-macOS hosts. Adapt host selection and subprocess/build
-   handling while preserving workloads, correctness checks and timing boundaries.
+1. Host selection is implemented for CPU/JSON and plain/JSON HTTP preparation:
+   macOS ARM64 uses `console`/`http` and `app`; Windows x64 uses
+   `windows-console`/`windows-http` and `app.exe`. Thirteen framework tests pass.
+   Actual Windows execution remains unqualified. Windows database preparation
+   explicitly remains unsupported.
 2. Run untimed correctness/preparation checks against each fresh extracted release
    bundle. Do not time builds concurrently with a benchmark or publish failed runs.
 3. Rerun CPU summation, JSON DOM serialization/deserialization, and HTTP plain/typed

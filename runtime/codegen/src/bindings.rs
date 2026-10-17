@@ -862,13 +862,21 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
         let f = &mut input.functions[row["compiledIndex"]
             .as_u64()
             .ok_or("missing compiled index")? as usize];
+        // Native source declarations expose managed vectors directly. The old
+        // seed's copied-array spelling remains admitted only for these exact
+        // runtime-owned result contracts; do not relax arbitrary array bindings.
+        let native_array_result = match name {
+            "neoCLR.Runtime.Utf8Encode" => f.returns == Type::ArrayRef(Box::new(Type::Byte)),
+            "neoCLR.Runtime.StringGraphemes" => f.returns == Type::ArrayRef(Box::new(Type::Char)),
+            _ => false,
+        };
         if f.name != name
             || f.owner.is_some()
             || f.instance
             || f.receiver_byref
             || f.receiver_readonly
             || f.parameters != parameters
-            || f.returns != result
+            || (f.returns != result && !native_array_result)
             || f.no_result
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
@@ -2534,6 +2542,37 @@ mod tls_tests {
                 _ => f.no_result = true,
             }
             assert!(tls(&mut bad, &selection).is_err());
+        }
+    }
+}
+
+#[cfg(test)]
+mod native_text_array_tests {
+    use super::*;
+
+    #[test]
+    fn source_owned_text_vectors_keep_exact_elements_and_internal_contracts() {
+        for (name, element) in [("Utf8Encode", "Byte"), ("StringGraphemes", "Char")] {
+            for result in [format!("{element}[]"), format!("arrayref<{element}>")] {
+                let source = neoclr::assemble(&format!(
+                    ".module System\n.references ()\n.function neoCLR.Runtime.{name}(String) -> {result}\n.methodimpl InternalCall\n.end\n"
+                )).unwrap();
+                let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{name}"),"compiledIndex":0}]});
+                let mut valid = source.clone();
+                assert_eq!(utf8_text(&mut valid, &inventory).unwrap().len(), 1);
+                assert_eq!(valid.functions[0].returns, source.functions[0].returns);
+                assert!(matches!(valid.functions[0].body.as_slice(), [Op::Branch(0)]));
+                for mutation in 0..4 {
+                    let mut invalid = source.clone();
+                    match mutation {
+                        0 => invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int64)),
+                        1 => invalid.functions[0].parameters[0] = Type::Int32,
+                        2 => invalid.functions[0].impl_flags = 0,
+                        _ => invalid.functions[0].body = vec![Op::Branch(0)],
+                    }
+                    assert!(utf8_text(&mut invalid, &inventory).is_err());
+                }
+            }
         }
     }
 }

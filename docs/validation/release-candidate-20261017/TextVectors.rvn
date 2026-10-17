@@ -1,0 +1,19 @@
+import System.*
+import System.Result.*
+import System.Text.*
+
+func Main() -> int {
+    if let Ok(bytes) = Encodings.Utf8.Encode("Café 🌍") {
+        if bytes.Count != 10 {
+            return 1
+        }
+        var count = 0
+        for element in "Café 🌍" {
+            count += 1
+        }
+        if count == 6 {
+            return 42
+        }
+    }
+    return 2
+}
