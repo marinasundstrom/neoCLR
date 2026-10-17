@@ -68,6 +68,7 @@ def main():
     parser.add_argument('--rounds', type=int, default=5)
     parser.add_argument('--prepare-only', action='store_true', help='Build inputs without measuring; prepared is not a passing benchmark')
     parser.add_argument('--workload', choices=['plain','json','database'], default='plain')
+    parser.add_argument('--server-source', type=Path, help='Explicit server fixture for syntax-compatible historical comparisons; its bytes are hashed')
     parser.add_argument('--postgres-port', type=int)
     parser.add_argument('--postgres-container')
     args = parser.parse_args()
@@ -90,7 +91,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     project = out/'project'
     project.mkdir()
-    source = ROOT/('benchmarks/jit-http/Server.rvn' if args.workload=='plain' else 'benchmarks/http-server/'+('JsonServer.rvn' if args.workload=='json' else 'DatabaseServer.rvn'))
+    source = args.server_source.resolve() if args.server_source else ROOT/('benchmarks/jit-http/Server.rvn' if args.workload=='plain' else 'benchmarks/http-server/'+('JsonServer.rvn' if args.workload=='json' else 'DatabaseServer.rvn'))
     (project/'Main.rvn').write_bytes(source.read_bytes())
     if args.workload != 'plain':
         (project/'Model.rvn').write_bytes((ROOT/'benchmarks/http-server/Model.rvn').read_bytes())

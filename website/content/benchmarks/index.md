@@ -5,14 +5,15 @@ Each report identifies the measured build, workload, machine and execution mode.
 
 | Report | What it measures |
 | --- | --- |
-| [HTTP request processing](/benchmarks/http/) | Plain text, JSON, and JSON with database access, each across interpreter, JIT and AOT |
+| [HTTP request processing](/benchmarks/http/) | Plain text and typed JSON across interpreter, JIT and AOT |
 | [Garbage collection](/benchmarks/gc/) | Matched collector-path HTTP comparisons, allocation/reclamation diagnostics and correctness evidence |
 | [General execution](/benchmarks/execution/) | CPU work, JSON serialization/deserialization and startup across interpreter, JIT and AOT |
 
-The Preview 14 macOS ARM64 baselines include all three HTTP workloads and general
-CPU/JSON cases. These short workstation runs show measured behavior, with variability
-and limitations visible; they are not controlled-host regression gates. Development GC reports now include macOS and Windows x64 comparisons; these are
-separate from the release baselines. Sustained cross-runtime measurements remain open.
+The current macOS ARM64 native-core candidate reports cover CPU/JSON execution
+and plain/typed-JSON HTTP. These short workstation runs retain variability and
+limitations; they are not controlled-host regression gates. Windows candidate
+measurements remain pending. Database and collector reports identify their own
+builds separately. Sustained cross-runtime measurements remain open.
 
 [Benchmark history](/benchmarks/history/) preserves dated results and their raw evidence
 so future comparable runs can show progress, including regressions.

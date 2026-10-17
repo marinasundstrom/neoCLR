@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Compare refreshed macOS HTTP workloads with Preview 15: both cohorts validate 1,152 responses across interpreter/JIT/AOT. Add an explicit hashed server-fixture option for historical syntax; adapt only the old JSON loop to `0..<32` and retain its unadapted timeout. Record medians and host-load limits without claiming controlled speedups.
+
+- Refresh current website CPU/JSON and HTTP benchmark pages from the measured native-core candidate. Keep earlier evidence in benchmark history, explicit host/load limits and pending Windows/database coverage; avoid presenting old development follow-ups as current package measurements. All 26 website/snapshot tests and 4,441-page build/link checks pass.
+
 - Add Windows release measurement orchestration that waits for successful native-toolchain qualification, extracts its exact archive, records its hash and runs CPU/JSON and plain/typed-JSON HTTP sequentially. Preserve five rounds, larger native CPU batches and raw reports; execution results remain pending.
 
 - Update the unpublished release draft with verified macOS editor, source-repair, cross-platform minimum-Rust and runtime measurement evidence. Keep Windows package/performance qualification and HTTP baseline comparison explicit; no version, publication date or download link changes.

@@ -1,129 +1,48 @@
 # HTTP request-processing benchmarks
 
-Three Raven server cases measure the complete request path: plain text, object JSON,
-and a PostgreSQL query mapped to an object and serialized as JSON. Each case runs
-in interpreter, JIT and AOT using the Preview 14 macOS ARM64 tools.
-
-**Exploratory baseline — 13 October 2026, Apple M1, macOS 27.0.** The Python client
-shares the machine with the server. Desktop/indexing activity was present. These
-short, fixed-count runs are not controlled regression gates or production-capacity
-claims. All **1,728 responses across 54 processes** passed validation, with zero errors.
+Plain-text and typed-JSON Raven servers exercise the request path in interpreter,
+JIT and AOT. These **17 October 2026, Apple M1/macOS 27.0** measurements use the
+refreshed native-core candidate with Raven `40fcae6d0`. All **1,152 responses across
+36 processes** pass validation, with zero errors. Windows measurements remain pending.
 
 <a id="plain-text-baseline"></a>
 <a id="publication-status"></a>
 
-## Development follow-up
+## Workloads and results
 
-A source-build URI parser refinement on 14 October reduces managed allocations per
-request by **24% for plain text** and **32% for JSON**. Matched AOT runs improve
-sequential throughput by **1.56×** and **1.24×**, respectively, with 1,024 validated
-responses and complete reclamation in separate GC profiles. These use stress GC
-and explicit state-machine fixtures on macOS; they are not new SDK matrix results,
-Windows qualification or sustained server-capacity figures.
-[Method and raw development evidence](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/uri-byte-parsing.md).
+Plain text returns ten UTF-8 bytes, `Café 🌍`. Typed JSON creates a `Person` and
+serializes `id: 42`, `name: "Café team"` and `active: true` for every request,
+including object construction and reflection. Every response checks framing,
+status and content before it contributes to the result.
 
-A further [known-header byte matching slice](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/header-name-bytes.md) saves another 10 plain-text / 8 JSON allocations per request. All 87 wire checks pass across execution modes; the small timing changes remain exploratory.
-
-The subsequent [static catalog](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/header-static-names.md) shares 13 names across requests, with all 132 wire checks passing across execution modes and complete reclamation in separate profiles. JSON saves two more text allocations per request; plain-text allocations are unchanged. The matched stress-GC AOT runs are about 4% slower, so this is a functionality/allocation result, not a throughput improvement. These development results do not replace the released matrix below.
-
-A [collector follow-up](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/gc-index/README.md#direct-marking-of-atomic-payloads--2026-10-14) avoids tracing work for text/byte buffers with no references. Matched AOT runs improve 4.7% plain / 4.8% JSON against the static catalog, approximately recovering its measured cost. All 132 HTTP checks pass, with full reclamation in separate profiles. These remain short development measurements.
-
-## Workload matrix
-
-Median successful requests per second across five rounds:
-
-| Server workload | Interpreter | JIT | AOT |
-| --- | ---: | ---: | ---: |
-| Plain text | 1.71 | 60.96 | 63.43 |
-| Object JSON | 0.93 | 33.36 | 34.76 |
-| PostgreSQL + JSON | 0.55 | 15.65 | 16.06 |
-
-The database's AOT executable links precompiled guest code to the released **shared
-native host** for runtime-async services. It performs no guest JIT compilation, but
-this is not a standalone SQL deployment qualification. Plain-text and object-JSON
-AOT use the standalone HTTP host. Compare modes within their recorded workload;
-do not subtract rows to infer an isolated database or serialization cost.
-
-### What each request does
-
-- **Plain text:** returns ten UTF-8 bytes, `Café 🌍`.
-- **Object JSON:** creates a `Person` and serializes `id: 42`, `name: "Café team"`,
-  and `active: true` for every request. This includes construction and reflection.
-- **PostgreSQL + JSON:** executes a parameterized SELECT returning those three
-  values, maps one buffered row to `Person`, then uses the same JSON response code.
-  One database connection is opened before readiness and reused for 32 requests.
-
-PostgreSQL **18.6** runs in an ARM64 Docker container with **2 CPUs and 512 MiB**,
-using loopback-only trust authentication. The image digest is in the raw report.
-The query uses no table or persistent dataset; this is a query/map/serialize baseline,
-not disk-backed database scalability. The benchmark's container was stopped afterward.
-
-## Variability and startup
-
-Ranges include every measured round. Startup is process launch to the listening-port
-message, including metadata loading, JIT compilation and database connection setup
-where applicable. Native builds are excluded from startup and request timing.
-
-| Workload | Mode | Requests/s range | Median startup (s) |
-| --- | --- | ---: | ---: |
-| Plain text | Interpreter | 1.61–1.83 | 2.510 |
-| Plain text | JIT | 44.52–61.30 | 4.313 |
-| Plain text | AOT | 57.77–64.11 | 0.018 |
-| Object JSON | Interpreter | 0.92–0.94 | 2.432 |
-| Object JSON | JIT | 30.77–33.77 | 6.095 |
-| Object JSON | AOT | 17.71–35.32 | 0.013 |
-| PostgreSQL + JSON | Interpreter | 0.55–0.56 | 3.255 |
-| PostgreSQL + JSON | JIT | 13.21–15.82 | 8.241 |
-| PostgreSQL + JSON | AOT (shared host) | 15.83–16.09 | 0.083 |
-
-## Request latency
-
-Latency includes connection setup, request/response transfer, server processing,
-client validation and connection close. Each row pools 120 measured requests.
-Percentiles use nearest rank; p99 is a coarse estimate at this sample size.
-
-| Workload | Mode | p50 (ms) | p95 (ms) | p99 (ms) |
+| Workload | Mode | Median requests/s | Range | Median startup s |
 | --- | --- | ---: | ---: | ---: |
-| Plain text | interpreter | 562.83 | 670.24 | 796.22 |
-| Plain text | jit | 16.36 | 19.64 | 31.09 |
-| Plain text | aot | 15.80 | 17.68 | 18.73 |
-| Object JSON | interpreter | 1052.18 | 1228.85 | 1385.10 |
-| Object JSON | jit | 30.03 | 32.40 | 35.22 |
-| Object JSON | aot | 28.60 | 38.58 | 78.94 |
-| PostgreSQL + JSON | interpreter | 1770.58 | 2068.41 | 2260.97 |
-| PostgreSQL + JSON | jit | 63.56 | 68.12 | 111.48 |
-| PostgreSQL + JSON | aot | 62.35 | 63.77 | 64.91 |
+| plain | interpreter | 2.22 | 2.18–2.27 | 2.717 |
+| plain | jit | 150.52 | 143.73–150.67 | 5.056 |
+| plain | aot | 156.91 | 148.10–157.58 | 0.005 |
+| json | interpreter | 1.20 | 1.19–1.20 | 2.721 |
+| json | jit | 81.42 | 78.25–82.13 | 8.388 |
+| json | aot | 84.65 | 81.78–85.16 | 0.013 |
 
-## How to reproduce
+## Measurement boundaries
 
-All requests use HTTP/1.1, no TLS, concurrency one and a new loopback connection.
-One full 32-request process per mode warms the host. Five measured rounds rotate
-mode order. Each process discards eight requests and measures the remaining 24.
-Throughput is measured requests divided by their total wall time; tables report
-medians and observed ranges rather than selecting the fastest round.
+Each mode has one whole-process warmup and five measured fresh processes, with
+rotating mode order. Each process validates 32 responses; the first eight are
+excluded from timing. Startup measures process launch to listening-port readiness,
+including metadata loading and JIT preparation. Builds complete before measurement.
 
-The harness verifies bundle hashes, builds one assembly per workload for all three
-modes and validates every response. Text is byte-checked; JSON is parsed and its
-complete three-field value checked. Native heap admission is 32 MiB. Interpreter
-GC policy differs. No concurrent benchmark/build was launched during measurement.
+The Python client shares the machine with the server. Requests are sequential,
+use HTTP/1.1 loopback and close each connection. Host indexing was active. These
+short, fixed-count workstation runs do not measure concurrent server capacity or
+establish a controlled regression threshold. Request latency samples, host-load
+observations and artifact/input hashes are retained in the raw reports.
 
-[Reproduction instructions and source](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/README.md). Raw reports: [Plain text](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/results-20261013.json) · [Object JSON](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/json-results-20261013.json) · [PostgreSQL + JSON](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/database-results-20261013.json).
+The optional PostgreSQL workload has not been rerun for this candidate. Its
+[historical measurements](/benchmarks/history/) do not qualify the current package.
+HTTPS, keep-alive, RSS and managed allocation rate are outside these measurements.
 
-## History and next measurements
+[Raw plain/JSON samples and package identity](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/candidate-refreshed-20261017) ·
+[Reproduction instructions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server) ·
+[Garbage-collection measurements](/benchmarks/gc/)
 
-[Benchmark history](/benchmarks/history/) preserves dated runs and their workload
-versions. The goal is stable or improving performance under comparable conditions;
-controlled hosts, calibrated durations and noise-aware regression checks come next.
-These exploratory baselines cannot yet enforce that goal.
-
-Longer quiet-host runs, guest CPU/peak memory, Windows, HTTPS, connection reuse,
-concurrency sweeps and sustained cross-runtime measurements remain open. Use a
-separate load generator before making saturation claims.
-
-Development now retains [direct-handler comparison projects and pilot results](/benchmarks/http-comparison/)
-for Kestrel (.NET JIT/AOT), Go and Node.js alongside neoCLR. Routing is excluded.
-Those short-run development comparisons do not replace the published baseline above.
-They remain local, with publication on hold pending neoCLR HTTP improvements.
-
-[HTTP server case](/cases/http-server/) · [SQL databases](/features/sql/) ·
-[General execution benchmarks](/benchmarks/execution/)
+[General execution](/benchmarks/execution/) · [All benchmark reports](/benchmarks/)

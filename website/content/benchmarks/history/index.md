@@ -12,11 +12,11 @@ its output checks. Reports retain all rounds, startup timings and input hashes.
 
 | Workload series | Measurement | Results and evidence |
 | --- | --- | --- |
-| HTTP plain text v1 | GET, 10-byte UTF-8 response, one client, connection close | [Report](/benchmarks/http/#plain-text-baseline) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/http-server/results-20261013.json) |
-| HTTP object JSON v1 | Construct and serialize a Person per request | [Report](/benchmarks/http/) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/http-server/json-results-20261013.json) |
-| HTTP PostgreSQL + JSON v1 | Parameterized SELECT, object mapping and serialization; reused connection | [Report](/benchmarks/http/) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/http-server/database-results-20261013.json) |
-| CPU sum v1 | Sum integers 0 through 9,999 per operation | [Report](/benchmarks/execution/) · [Interpreter run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/execution/results-20261013.json) · [Native run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/execution/cpu-native-results-20261013.json) |
-| JSON nodes serialize/deserialize v1 | Nested Unicode document, separate serialization and parsing cases | [Report](/benchmarks/execution/) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/execution/results-20261013.json) |
+| HTTP plain text v1 | GET, 10-byte UTF-8 response, one client, connection close | [Report](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/website/content/benchmarks/http/index.md) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/http-server/results-20261013.json) |
+| HTTP object JSON v1 | Construct and serialize a Person per request | [Report](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/website/content/benchmarks/http/index.md) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/http-server/json-results-20261013.json) |
+| HTTP PostgreSQL + JSON v1 | Parameterized SELECT, object mapping and serialization; reused connection | [Report](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/website/content/benchmarks/http/index.md) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/http-server/database-results-20261013.json) |
+| CPU sum v1 | Sum integers 0 through 9,999 per operation | [Report](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/website/content/benchmarks/execution/index.md) · [Interpreter run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/execution/results-20261013.json) · [Native run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/execution/cpu-native-results-20261013.json) |
+| JSON nodes serialize/deserialize v1 | Nested Unicode document, separate serialization and parsing cases | [Report](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/website/content/benchmarks/execution/index.md) · [Raw run](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce1/benchmarks/execution/results-20261013.json) |
 
 These are separate series, not interchangeable measures of runtime speed. The SQL
 AOT case links the shared native host; other HTTP AOT cases use the standalone HTTP
