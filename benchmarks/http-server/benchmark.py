@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Measure the same plain-text Raven HTTP server with a qualified macOS bundle."""
+"""Measure the same plain-text Raven HTTP server with a qualified macOS or Windows bundle."""
 import argparse
+import sys
 import importlib.util
 import json
 import math
@@ -20,6 +21,7 @@ spec = importlib.util.spec_from_file_location('http_workbench', ROOT/'benchmarks
 workbench = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(workbench)
 sha = workbench.sha
+from host import target, cpu_description, load_average, process_snapshot
 
 
 def server_sample(command, workload):
@@ -69,8 +71,14 @@ def main():
     parser.add_argument('--postgres-port', type=int)
     parser.add_argument('--postgres-container')
     args = parser.parse_args()
-    if platform.system() != 'Darwin' or platform.machine() != 'arm64' or args.rounds < 5:
-        parser.error('Requires macOS ARM64 and at least five measured rounds')
+    try:
+        host_target = target()
+    except ValueError as error:
+        parser.error(str(error))
+    if args.rounds < 5:
+        parser.error('Requires at least five measured rounds')
+    if args.workload == 'database' and host_target['http'] == 'windows-http':
+        parser.error('The optional database benchmark shared-host linker is not yet supported on Windows')
     bundle = args.bundle.resolve()
     manifest = json.loads((bundle/'manifest.json').read_text())
     if not manifest.get('jit', {}).get('default'):
@@ -100,7 +108,7 @@ def main():
 </Project>
 ''' % escape(str(bundle/'lib/NeoCLR.ClassLibrary.props'), {'"':'&quot;'}))
     report = dict(passed=False, revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
-                  platform=platform.platform(), cpu=subprocess.check_output(['sysctl','-n','machdep.cpu.brand_string'],text=True).strip(),
+                  platform=platform.platform(), cpu=cpu_description(), hostTarget=host_target,
                   date=time.strftime('%Y-%m-%d'), rounds=args.rounds,
                   workload=args.workload, scope='GET /greeting; HTTP/1.1 loopback; connection close; concurrency 1; Python load generator on same machine',
                   requestsPerProcess=32, discardedRequestsPerProcess=8,
@@ -109,7 +117,7 @@ def main():
                   limitations=['Short fixed-count baseline, not saturation or sustained throughput.',
                                'p99 is a nearest-rank estimate from 120 measured requests per mode at five rounds.',
                                'No RSS/CPU profile, HTTPS, keep-alive or cross-runtime comparison.'])
-    inputs=[*project.glob('*.rvn'), Path(__file__).resolve(), ROOT/'benchmarks/jit-http/benchmark.py', ROOT/'benchmarks/framework/process.py',source,bundle/'manifest.json']
+    inputs=[*project.glob('*.rvn'), Path(__file__).resolve(), ROOT/'benchmarks/jit-http/benchmark.py', ROOT/'benchmarks/framework/process.py',ROOT/'benchmarks/framework/host.py',source,bundle/'manifest.json']
     report['inputHashes']={str(p):sha(p) for p in inputs}
     try:
         native=out/'native'
@@ -128,7 +136,7 @@ def main():
                 'query':'SELECT $1::int AS id, $2::text AS name, $3::bool AS active',
                 'parameters':[42,'Café team',True], 'rows':1,'connection':'One reused SQL connection per server process, opened before readiness; no tables or persistent dataset.'}
 
-        build=['python3',str(ROOT/'scripts/build-native-project.py'),'--profile','http','--project',str(project/'App.rvnproj'),
+        build=[sys.executable,str(ROOT/'scripts/build-native-project.py'),'--profile',host_target['http'],'--project',str(project/'App.rvnproj'),
                '--bundle',str(bundle),'--aot',str(bundle/manifest['jit']['compiler']),'--output',str(native),
                '--http-heap-bytes',str(manifest['jit']['heapBytes']),'--byte-array-limit',str(manifest['jit']['byteArrayLimit']),
                '--command-timeout','600',*roots]
@@ -171,13 +179,13 @@ def main():
         for module in manifest['modules']:
             context += ['--module',str(bundle/module)]
         report['commands']={'interpreter':[runtime,'run',str(assembly),'--execution','interpreter','--instructions','100000000',*context],
-                            'jit':[runtime,'run',str(assembly),*roots],'aot':[str(native/'app')]}
+                            'jit':[runtime,'run',str(assembly),*roots],'aot':[str(native/host_target['executable'])]}
         report['bundleManifest']=manifest
         if args.prepare_only:
             report['prepared']=True
             return
-        report['loadBefore']=os.getloadavg()
-        report['hostProcessesBefore']=subprocess.check_output(['ps','-axo','%cpu,comm'],text=True)
+        report['loadBefore']=load_average()
+        report['hostProcessesBefore']=process_snapshot()
         modes=['interpreter','jit','aot']
         for index in range(-1,args.rounds):
             offset=max(index,0)%3
@@ -187,7 +195,7 @@ def main():
                 report['warmups' if index<0 else 'samples'].append(row)
                 (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')
                 print(f'{mode} round {index}: {row["requestsPerSecond"]:.2f} requests/s',flush=True)
-        report['loadAfter']=os.getloadavg()
+        report['loadAfter']=load_average()
         for mode in modes:
             rows=[r for r in report['samples'] if r['mode']==mode]
             rates=[r['requestsPerSecond'] for r in rows]

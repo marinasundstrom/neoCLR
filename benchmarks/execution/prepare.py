@@ -5,9 +5,12 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 from xml.sax.saxutils import quoteattr
 
 ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "benchmarks/framework"))
+from host import target, cpu_description
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -16,6 +19,7 @@ def main():
     p.add_argument('--bundle',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     a=p.parse_args()
+    host = target()
     root,out=a.bundle.resolve(),a.output.resolve()
     m=json.loads((root/'manifest.json').read_text())
     for name,digest in m['files'].items():
@@ -29,7 +33,7 @@ def main():
     (project/'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project='+quoteattr(str(root/'lib/NeoCLR.ClassLibrary.props'))+'/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>App</AssemblyName></PropertyGroup></Project>')
     native=out/'native'
     with (out/'build.log').open('w') as log:
-        subprocess.run(['python3',str(ROOT/'scripts/build-native-project.py'),'--profile','console','--project',str(project/'App.rvnproj'),
+        subprocess.run([sys.executable,str(ROOT/'scripts/build-native-project.py'),'--profile',host['console'],'--project',str(project/'App.rvnproj'),
           '--bundle',str(root),'--aot',str(root/m['jit']['compiler']),'--output',str(native),
           '--byte-array-limit',str(m['jit']['byteArrayLimit']),'--command-timeout','600'],stdout=log,stderr=subprocess.STDOUT,check=True)
     context=['--execution','interpreter','--system',str(root/m['runtimeSeed']),'--object-root',str(root/m['objectRoot']),'--instructions','100000000']
@@ -38,10 +42,10 @@ def main():
     runtime=str(root/m['runtime']);assembly=str(native/'app.dll')
     inputs={str(root/name):digest for name,digest in m['files'].items()}
     inputs.update(json.loads((native/'build.json').read_text())['inputs'])
-    for path in [Path(__file__).resolve(),*sources,root/'manifest.json',native/'app.dll',native/'app']:
+    for path in [Path(__file__).resolve(),ROOT/'benchmarks/framework/host.py',*sources,root/'manifest.json',native/'app.dll',native/host['executable']]:
         inputs[str(path)]=sha(path)
-    report={'schemaVersion':1,'commands':{'interpreter':[runtime,'run',assembly,*context], 'jit':[runtime,'run',assembly], 'aot':[str(native/'app')]},
-      'cases':['cpu.sum','json.serialize','json.deserialize'],'inputs':inputs}
+    report={'schemaVersion':1,'commands':{'interpreter':[runtime,'run',assembly,*context], 'jit':[runtime,'run',assembly], 'aot':[str(native/host['executable'])]},
+      'host':host, 'cpu':cpu_description(), 'cases':['cpu.sum','json.serialize','json.deserialize'],'inputs':inputs}
     (out/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
     print(out/'manifest.json')
 

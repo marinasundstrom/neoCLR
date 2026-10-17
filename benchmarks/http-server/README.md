@@ -157,3 +157,12 @@ are maintained as the HTTP comparison matrix. Routing is excluded. Also see the
 local throughput improvement from removing duplicate diagnostic root reads while
 retaining validation and full collection. Raw evidence and correctness limits are
 recorded separately from published release benchmarks.
+
+## Candidate host preparation
+
+Plain and JSON workloads select macOS ARM64 or Windows x64 native HTTP profiles.
+Run Windows preparation from an MSVC x64 developer shell. Request counts, response
+validation and timing boundaries are shared. Windows reports an unavailable load
+average as null and records `tasklist` output instead of a POSIX CPU process listing.
+The optional database workload still requires macOS: its shared-host linker has not
+been ported. Host-selection tests alone do not qualify Windows execution.

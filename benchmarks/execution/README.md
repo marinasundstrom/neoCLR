@@ -77,3 +77,11 @@ python3 benchmarks/framework/runner.py --manifest /fresh/path/to/execution/manif
   --output /fresh/path/to/execution/cpu-native-longer.json --filter cpu.sum \
   --mode jit --mode aot --rounds 5 --warmups 20 --operations 10000 --timeout 300
 ```
+
+## Candidate host preparation
+
+Preparation selects `console` on macOS ARM64 and `windows-console` on Windows x64,
+including the native executable suffix. Use a matching optimized bundle and run
+Windows preparation from an MSVC x64 developer shell. The active Python interpreter
+is used for child tooling. Host-selection tests are not Windows runtime qualification;
+that requires preparing and running the candidate on Windows.
