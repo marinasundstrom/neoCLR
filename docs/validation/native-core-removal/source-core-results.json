@@ -1,0 +1,22 @@
+{
+  "compilerRevision": "87698cd00",
+  "generalFix": {
+    "main": "2766516e1",
+    "neoclr": "0606260b0",
+    "before": {
+      "failed": 4
+    },
+    "after": {
+      "passed": 4
+    }
+  },
+  "nativeSourceCore": "PASS reference-free source core, source native-call markers, array views, consumer emission/completion and configuration/signature rejection",
+  "existingNativeProjectRegression": "PASS native-only references, compilation/emission, System completion, explicit typeof retention/clearing/rejection, execution paths and nine rejected configurations",
+  "interpreterExitCode": 42,
+  "sha256": {
+    "target/native-source-core-first/SourceCore.dll": "55952e87a32f585feba629b1ad6166eb5322d94d4bf72db17eb0ca575a8a6f87",
+    "target/native-source-core-first/Consumer.dll": "e82bea2e8c23d07857d0e691d8e49f35b3fad127a5455263307cf8df8e8b7975",
+    "target/native-source-core-first/System.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
+  },
+  "scope": "Test core only; production foundational declarations and remaining managed compiler-service bodies still require migration."
+}

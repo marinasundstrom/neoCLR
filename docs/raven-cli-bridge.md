@@ -12706,3 +12706,14 @@ source no longer calls RuntimeServices. Fresh five-library compilation, UTC epoc
 negative-timestamp interpreter checks, completion and API fingerprints pass.
 Compiler source-core construction and CoreProbe metadata dependencies remain open.
 See docs/validation/native-core-removal/local-time-results.json.
+
+### Reference-free source-core compiler contract (2026-10-17)
+
+Raven 87698cd00 supports `RavenNeoClrSourceCore=true` with an explicit ownership
+manifest, matching library/core identity and no reference core. Source primitive
+identities, root, array views and attributes replace imported bootstrap symbols;
+ordinary .NET remains unchanged. A native consumer of the test core compiles,
+provides completion and returns 42. Existing native-project checks still pass.
+See [validation](validation/native-core-removal/README.md#reference-free-native-source-core--2026-10-17).
+This compiler capability does not yet publish a migrated production core; source
+foundational declarations and managed compiler services remain the next boundary.

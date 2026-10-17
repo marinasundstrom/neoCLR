@@ -243,3 +243,10 @@ source no longer calls RuntimeServices. Fresh five-library compilation, UTC epoc
 negative-timestamp interpreter checks, completion and API fingerprints pass.
 Compiler source-core construction and CoreProbe metadata dependencies remain open.
 See docs/validation/native-core-removal/local-time-results.json.
+
+### Source-core construction contract (2026-10-17)
+
+Raven 87698cd00 can construct a core without a reference artifact. The focused
+native-only consumer, array/interface/extension execution and completion pass.
+Production adoption still requires the foundational marker/base declarations and
+managed allocation/entry-drain services. No SDK replacement is claimed.

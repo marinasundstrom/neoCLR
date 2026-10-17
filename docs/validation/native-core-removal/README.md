@@ -467,3 +467,22 @@ negative timestamps under UTC; [execution](local-time-results.json) and
 This qualifies interpreter execution, not new JIT/AOT local-time support.
 Compiler source-core construction and the CoreProbe metadata dependency remain
 open; the installed SDK is unchanged and broader structural work stays parked.
+
+## Reference-free native source core — 2026-10-17
+
+Raven 87698cd00 adds explicit `RavenNeoClrSourceCore=true` library construction.
+The output owns primitive/root symbols and uses an ownership manifest; it imports
+no CLI/native reference core and performs no CLI projection. Native Object,
+array views, source attributes and emitted extension ownership have source-aware
+binding. Main 2766516e1 fixes exact metadata arity (four regressions fail before
+and pass after); codex/neoclr carries it as 0606260b0.
+
+Raven's `tools/NeoClrMetadataProbe --native-source-core <directory>` constructs
+a small core, imports it into a consumer, checks completion and rejects conflicting
+configuration/native-call flags. The consumer exercises an array interface through
+a generic extension and returns 42 against an empty System seed. The existing
+native-core project checks also pass. [Evidence](source-core-results.json) records
+revisions and hashes. The test Object methods are fixture bodies, never production
+implementations. Production core declarations and managed allocation/entry-drain
+contracts remain to migrate; installed artifacts and broader structural work are
+unchanged.

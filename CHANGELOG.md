@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Record Raven 87698cd00 reference-free native source-core construction and exact metadata-arity fixes on Raven main/codex-neoclr. Native consumer compilation, array-interface/extension interpreter execution, completion and existing native-project checks pass. Production foundational declarations and managed compiler services still require migration; no SDK replacement is claimed.
+
 - Move local-time conversion to native source ownership and remove the last production RuntimeServices call/imports. Validate exact Int32 array admission/materialization, fresh five-library compilation, UTC epoch/negative timestamp interpreter consumption, completion and API fingerprints. Compiler source-core contracts remain open.
 
 - Move 14 file/time/worker/task services to native source ownership with CLI/seed removal. Admit no-result ScheduleTask calls, avoid pushing a unit in the interpreter, and preserve the return shape in native bindings. Focused signature/execution/codegen tests, fresh five-library compilation, async task/worker/file consumer, completion and API fingerprints pass. Local-time conversion and compiler source-core contracts remain open.
