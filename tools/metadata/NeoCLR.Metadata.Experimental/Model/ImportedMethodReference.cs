@@ -196,7 +196,6 @@ public sealed partial class AssemblyBuilder
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, visibility: (definition.Attributes & 7) == 4 ? MethodVisibility.Protected : MethodVisibility.Public, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
         if (type is null && definition.ImplementationAttributes == 0x1000)
         {
-            if (definition.GenericArity != 0) throw new InvalidDataException("generic internal-call imports are unsupported");
             reference.Target.SetInternalCall();
         }
         foreach (var constraint in definition.SpecialConstraints)

@@ -194,9 +194,9 @@ public sealed partial class AssemblyBuilder
                 }
                 else if (method.Definition.ImplementationAttributes == 0x1000)
                 {
-                    if (method.DeclaringType is not null || method.Signature.GenericParameterNames.Count != 0 ||
+                    if (method.DeclaringType is not null ||
                         method.Instructions.Count != 0 || method.Locals.Count != 0 || method.Definition.Body.Labels.Count != 0)
-                        throw new InvalidDataException("internal calls require bodyless nongeneric assembly functions");
+                        throw new InvalidDataException("internal calls require bodyless assembly functions");
                 }
                 else if (method.IsAbstract)
                 {

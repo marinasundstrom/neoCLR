@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Preserve generic method parameters on bodyless native runtime-service declarations and imports. Add explicit InternalCall selection to symbol-authored function references, with conflicting-contract rejection and unchanged runtime binding validation. Qualify generic queue-service references against production TaskQueue; complete production service migration remains open.
+
 - Support native-owned and explicitly imported native ParamArrayAttribute markers in metadata emission and import, preserving exact dependency ownership and parameter introspection. Reject ambiguous owners or missing marker constructors; retain the legacy marker binding. Honor explicit symbol-authored native markers without requiring an SDK definition import or synthesizing a second marker. Port the marker into native System.Runtime, remove its duplicate CLI/seed declarations during staged bootstrap preparation, and rebuild all libraries. Raven a6006e458 selects its native constructor. Validate an expanded-call consumer returning 42, native-only LSP completion and matching API snapshots. Runtime-service and source-core migration remain open.
 
 - Record the production bootstrap-removal audit, native artifact dependencies and retained direct-call inventory. Clarify that Raven neoCLR compilation and editor symbols must use native metadata references, including the core library. Complete compiler/helper use-site analysis and separate confirmed migration blockers from unvalidated prototypes; no production bundle or installed SDK is replaced.

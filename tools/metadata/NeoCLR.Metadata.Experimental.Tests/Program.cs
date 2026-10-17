@@ -195,6 +195,10 @@ if (args.Length == 3 && args[0] == "--source-module-runtime")
 {
     await SourceModuleInfoChecks.RunRuntime(args[1], args[2]); return 0;
 }
+if (args is ["--generic-internal-calls", var queueBundle, var queueOutput])
+{
+    GenericInternalCallChecks.Write(queueBundle, queueOutput); return 0;
+}
 if (args.Length == 3 && args[0] == "--internal-call-runtime")
 {
     await InternalCallChecks.RunRuntime(args[1], args[2]); return 0;

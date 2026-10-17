@@ -12502,3 +12502,15 @@ completed by this SDK slice; see the [migration audit](validation/native-core-re
 Raven's symbol-only native emitter supplies the selected imported marker constructor
 explicitly. The SDK honors that metadata without requiring a second definition graph
 or a CLI binding. The focused SDK probe also covers this symbol-authored path.
+
+### Generic runtime-service metadata migration (2026-10-17)
+
+The runtime's existing generic GetDefaultTaskQueue/GetCurrentTaskQueue services can
+now be declared and imported through native metadata. The SDK preserves generic
+parameters on bodyless InternalCall functions. Symbol-authored callable contracts
+explicitly carry the InternalCall flag, preventing an ordinary generated-function
+name from replacing the runtime service identity. Runtime binding retains its exact
+signature and TaskQueue layout checks. This closes an API-boundary gap; the retained
+production service seed and core migration are still separate work. The model reuses
+the existing .NET-compatible implementation flag and generic method metadata rather
+than adding a new runtime operation. No Runtime Contract default changes.

@@ -7250,11 +7250,11 @@ handle-service comparisons remain integration gates.
 
 ## Runtime internal calls (development, 2026-10-05)
 
-`MethodDefinition.SetInternalCall() -> void` marks an authored, nongeneric assembly
+`MethodDefinition.SetInternalCall() -> void` marks an authored assembly
 function with implementation attributes `0x1000`. `MethodBuilder.SetInternalCall()`
 is a convenience method over the same canonical definition. Both require an empty
-body, no locals or labels and no type owner. Loaded snapshots, generic declarations,
-type methods and nonempty declarations throw InvalidOperationException. Setting the
+body, no locals or labels and no type owner. Generic method parameters are preserved.
+Loaded snapshots, type methods and nonempty declarations throw InvalidOperationException. Setting the
 same valid declaration again is idempotent. There is no implicit P/Invoke library or
 entry-point lookup.
 
@@ -9954,3 +9954,24 @@ own flags. Readers accept legacy instance-only token tables. Guest introspection
 reports no source token for a legacy static/literal declaration instead of inventing
 one. Metadata ordinals are separate from instance/static storage indices. SDK static
 field and class-constant roundtrip tests cover the emitted/projection contract.
+
+### Generic runtime-service references (development, 2026-10-17)
+
+`AssemblyBuilder.CreateFunctionReference` accepts an optional final
+`bool isInternalCall = false` argument. Pass true only when the selected native
+symbol has MethodImplAttributes.InternalCall; the emitted reference then retains
+the exact runtime service name rather than the generated ordinary-function name.
+A repeated reference with a conflicting flag is rejected. The existing dependency
+identity, snapshot digest, parameter scope and signature checks still apply.
+
+Bodyless assembly-function internal calls may now have generic method parameters.
+SDK authoring, native reading, definition import and reference projection preserve
+those parameters. No host type erasure, runtime registration, dynamic library loading
+or new instruction is implied. The runtime independently validates the service name,
+exact signature and concrete type arguments; arbitrary generic services are not
+thereby implemented. Type-owned internal calls remain unsupported by this API.
+
+The native queue-service probe exercises definition and symbol-authored references
+against production TaskQueue, replacing the two corresponding legacy seed declarations
+in the test dependency to avoid duplicate implementations. It does not replace the
+production service bundle or establish complete native core production.

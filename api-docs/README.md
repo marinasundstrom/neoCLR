@@ -2305,3 +2305,9 @@ not construct attributes. Compiler-reference projection remains documentation to
 not the desired target semantic reference. The themed audit includes the optional
 PostgreSql provider required by the current API content; its omission correctly fails
 content-ID validation. Native service bootstrap removal is still in progress.
+
+2026-10-17: the host metadata manual documents generic InternalCall authoring/import
+and the optional `CreateFunctionReference(..., isInternalCall: true)` contract.
+These host C# APIs are outside the guest RavenDoc type selection; no guest declaration
+or reference snapshot change is needed for this API-boundary slice. Generic queue
+service qualification does not establish production core migration.

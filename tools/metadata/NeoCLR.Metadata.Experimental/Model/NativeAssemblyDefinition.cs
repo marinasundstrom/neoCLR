@@ -1018,9 +1018,9 @@ public sealed partial class NativeAssemblyDefinition
                     Require(explicitMappings.Count != 0, "empty explicit mapping list");
                 }
                 if (implementationAttributes == 0x1000)
-                    Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
+                    Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
-                        "internal calls require bodyless nongeneric assembly functions");
+                        "internal calls require bodyless assembly functions");
                 if (nativeImport is not null)
                 {
                     Require(!instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&

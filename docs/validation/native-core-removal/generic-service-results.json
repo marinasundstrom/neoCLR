@@ -1,0 +1,116 @@
+{
+  "scope": "Generic runtime-service metadata and imported/symbol-authored calls against production TaskQueue. Interpreter execution; production seed is not replaced.",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/ImportedQueueConsumer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/NativeQueueServices.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_49BD7AA171E926C4C108F58849C83AA8D08952D1311EAC0512602D1BA6F88B39: typed-stack/control-flow verification passed (3326 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/ImportedQueueConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/NativeQueueServices.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/SymbolicQueueConsumer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/NativeQueueServices.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_8C3CF9335793521402F25D7F4855093A50E4B4B24429050D8DF434B8FA3887FF: typed-stack/control-flow verification passed (3326 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/SymbolicQueueConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-param-marker-libraries-v3/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-generic-queue-services/NativeQueueServices.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "seedReplacement": "Remove exactly neoCLR.Runtime.GetDefaultTaskQueue and neoCLR.Runtime.GetCurrentTaskQueue from the staged retained seed, and supply NativeQueueServices.dll implementing those same runtime contracts. Retained wrappers are unchanged.",
+  "hashes": {
+    "SymbolicQueueConsumer.dll": "f51c3471e7992993ef19a40cf2c6572fff0ef023ceeae6cf7df0906f85d4c1aa",
+    "System.neox": "a8b7f793e7a4c770a4761bb32f4823335ba6af462e537be97d000aa67d603dc9",
+    "results.json": "361e8736cda3dac28c61f20ee07c2116a59f1c251f7647392c7d7782050055ed",
+    "NativeQueueServices.dll": "b56f4b23dd7e0fd4769d4b478fc9bcf0db527d8b1cc30555d2bffcbceda3cfa7",
+    "System.replaced.json": "c6fbbfbb40e9a89e00c964c33fe4f8fd823f13c0755f2365ef2c1fff97a815d3",
+    "ImportedQueueConsumer.dll": "8431fbd4eb3f4411153ba4094518a680a99bc24e779bf65b5b95ed079a7890d7"
+  },
+  "compilerProbe": "PASS native generic runtime-service declaration/import, invalid flag/visibility rejection and completion",
+  "legacyInternalCallProbePassed": true
+}

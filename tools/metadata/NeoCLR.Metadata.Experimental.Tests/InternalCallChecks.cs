@@ -58,7 +58,15 @@ internal static class InternalCallChecks
         if (describe.ImplementationAttributes != 0x1000 || !describe.TryGetSignature(out var localSignature) || localSignature!.ReturnType.Primitive is not null)
             throw new Exception("source-owned nominal service signature lost");
         var generic = graph.AddFunction("Generic", new(PrimitiveType.Void, [], ["T"]));
-        Reject(() => generic.SetInternalCall());
+        generic.SetInternalCall();
+        var genericImage = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), graph.CoreLibrary));
+        var genericDefinition = genericImage.MainModule.Methods.Single(m => m.Name == "Generic");
+        if (genericDefinition.GenericArity != 1 || genericDefinition.ImplementationAttributes != 0x1000)
+            throw new Exception("generic internal-call metadata lost");
+        var genericConsumer = new AssemblyBuilder(new("GenericInternalCallConsumer", new(1, 0, 0, 0)), graph.CoreLibrary);
+        var genericReference = genericConsumer.ImportReference(genericDefinition, graph.CoreLibrary);
+        if (genericReference.Signature.GenericParameterNames.Count != 1)
+            throw new Exception("generic internal-call import lost arity");
         var owned = graph.AddClass("Example", "Owner").AddMethod("Service", new(PrimitiveType.Void, []));
         Reject(() => owned.SetInternalCall());
         var nonempty = graph.AddFunction("Nonempty"); nonempty.LoadConstant(0);
@@ -118,6 +126,7 @@ internal static class InternalCallChecks
         {
             var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
             start.ArgumentList.Add(command); start.ArgumentList.Add(target);
+            if (command == "run") { start.ArgumentList.Add("--execution"); start.ArgumentList.Add("interpreter"); }
             if (target == consumerPath) { start.ArgumentList.Add("--module"); start.ArgumentList.Add(libraryPath); }
             start.ArgumentList.Add("--system"); start.ArgumentList.Add(seed);
             using var process = Process.Start(start)!;

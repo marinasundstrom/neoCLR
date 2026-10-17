@@ -40,6 +40,11 @@ var markerCtor = core.AddClass("System.Runtime.CompilerServices", "ReferenceAsse
 markerCtor.GetILGenerator().LoadArgument(0);
 markerCtor.GetILGenerator().Call(attributeCtor);
 markerCtor.GetILGenerator().Return();
+var methodImplCtor = core.AddClass("System.Runtime.CompilerServices", "MethodImplAttribute", attribute)
+    .AddConstructor(new MethodSignature(PrimitiveType.Void, [PrimitiveType.Int32]));
+methodImplCtor.GetILGenerator().LoadArgument(0);
+methodImplCtor.GetILGenerator().Call(attributeCtor);
+methodImplCtor.GetILGenerator().Return();
 foreach (var primitive in new[] { PrimitiveType.Byte, PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Double, PrimitiveType.Boolean, PrimitiveType.Void })
     core.AddValueType("System", primitive.ToString()).SetNativePrimitive(primitive);
 var stringType = core.AddClass("System", "String", root);
