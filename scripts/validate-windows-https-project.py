@@ -41,6 +41,12 @@ def main():
         report['revision'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
         if args.bundle:
             bundle = args.bundle.resolve()
+            manifest_path = bundle / 'manifest.json'
+            manifest = json.loads(manifest_path.read_text())
+            backend = bundle / manifest['jit']['compiler']
+            report['bundleManifestSha256'] = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+            report['compilerRevision'] = json.loads((bundle / 'provenance.json').read_text())['libraryBuild']['compilerRevision']
+            report['backendSha256'] = hashlib.sha256(backend.read_bytes()).hexdigest()
         else:
             spec = importlib.util.spec_from_file_location('windows_project', ROOT / 'scripts/validate-windows-project.py')
             bootstrap = importlib.util.module_from_spec(spec)
@@ -57,11 +63,13 @@ def main():
                 '--bundle', out / 'neoclr-native-poc', '--output', out / 'development',
                 '--build-compiler', '--compiler-revision', COMPILER])
             bundle = out / 'development/bundle'
-        run('aot-build', ['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'])
+        if not args.bundle:
+            run('aot-build', ['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'])
+            backend = ROOT / 'target/debug/neoclr-codegen.exe'
         for label, flags in [('https', ['--https-server']), ('cleartext', [])]:
             run(label + '-build', [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http',
                 '--project', ROOT / 'docs/experiments/https-server/Native.rvnproj', '--bundle', bundle,
-                '--aot', ROOT / 'target/debug/neoclr-codegen.exe',
+                '--aot', backend,
                 '--output', out / label, *flags])
         run('https-validation', [sys.executable, ROOT / 'docs/experiments/https-server/validate.py',
             '--bundle', bundle, '--project-build', out / 'https', '--cleartext-build', out / 'cleartext',

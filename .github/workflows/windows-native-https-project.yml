@@ -1,6 +1,11 @@
 name: Windows native HTTPS project
 on:
   workflow_dispatch:
+    inputs:
+      bundle_run:
+        description: Successful native-toolchain run with a matching SDK and backend
+        required: true
+        default: '39073227105'
   push:
     paths:
       - 'tools/native-tls/**'
@@ -23,12 +28,14 @@ on:
       - '.github/workflows/windows-native-https-project.yml'
 permissions:
   contents: read
+  actions: read
 jobs:
   https-project:
     runs-on: windows-2022
     timeout-minutes: 45
     env:
       PYTHONUTF8: '1'
+      BUNDLE_RUN: ${{ inputs.bundle_run || '39073227105' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -40,6 +47,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.BUNDLE_RUN }}
+          name: windows-native-qualification
+          path: target/qualification
+      - name: Extract qualified package
+        shell: pwsh
+        run: |
+          $archives = @(Get-ChildItem target/qualification -Recurse -Filter neoclr-native-poc.tar.gz)
+          if ($archives.Count -ne 1) { throw 'Expected exactly one qualified archive' }
+          New-Item -ItemType Directory target/qualified
+          tar -xzf $archives[0].FullName -C target/qualified
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build and qualify HTTPS and cleartext hosts
         shell: pwsh
         run: |
@@ -48,7 +69,7 @@ jobs:
           $env:PATH = "$openssl;$env:PATH"
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-windows-https-project.py --output target/windows-https-project-validation"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-windows-https-project.py --bundle target/qualified/neoclr-native-poc --output target/windows-https-project-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
