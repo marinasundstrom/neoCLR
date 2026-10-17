@@ -1,0 +1,42 @@
+{
+  "bin/neoclr": {
+    "old": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+    "new": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+    "identical": true
+  },
+  "lib/System.runtime.neox": {
+    "old": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "new": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "identical": true
+  },
+  "lib/System.Runtime.dll": {
+    "old": "76c7535f5fa680b2630b30df1ff0f67091c5191b12228513d22e5ec2e892d219",
+    "new": "b4856f4cc2dc34ac3ddcc63e74659384e7f7c02d0ec629bcf361eeeaa46655c4",
+    "identical": false
+  },
+  "lib/System.Data.dll": {
+    "old": "db1e66d845e7efaddf3cd4b70fd1636d480ab476a9644e8fb63edbacf1d843b7",
+    "new": "2d81f34521ae3b7a5a1cae81068662d2a47eb84ef612934cd28d0a31bb4c892c",
+    "identical": false
+  },
+  "lib/System.Networking.dll": {
+    "old": "b4633bb9bd83117655fccf9fdfe6545905fc71d93a9a15323013fdacbeeb9490",
+    "new": "4bbbbec458458a5be3d8bf1c182deb1e2088608be1ac248f4a1528e564f4e330",
+    "identical": false
+  },
+  "lib/System.Web.dll": {
+    "old": "d9465447ee0f0f86392af12b59f53fb694af2e598473392d905019590d2d7069",
+    "new": "ee571bb0fe93cae4a67e76cf3de185eac0fa3f3654e5ef06b4f4229e14e4f1f2",
+    "identical": false
+  },
+  "lib/System.Data.PostgreSql.dll": {
+    "old": "de88625559a06d031743fd1c9ada1df120ae6419db65c45a719d9988c8b08bb2",
+    "new": "5172db25ee91e96cdac1d6e81d8fcd41f40e8e25c0c1d60243d376ba12f58810",
+    "identical": false
+  },
+  "bin/neoclr-codegen": {
+    "old": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+    "new": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+    "identical": true
+  }
+}

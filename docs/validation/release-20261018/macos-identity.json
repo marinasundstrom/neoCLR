@@ -1,0 +1,43 @@
+{
+  "version": "0.1.16-neoclr.20261017.1",
+  "ravenRevision": "c0854cdda4115c9ec3153a26e73375db14011bd8",
+  "runtimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+  "matchedServerFiles": {
+    "Raven.LanguageServer.dll": "1760014fec308d64c93ad48bb536c6d77c0306e820fa1f78e499a9f53089696c",
+    "Raven.CodeAnalysis.dll": "e17ee5edc8285d9917c450b9dd6efab7f25fd9ae907b29f8ac803e9656bc8ccf",
+    "Raven.CodeAnalysis.NeoClr.dll": "6bdea24c46c37611333d85f35edc4dba8f56876f7569ef27c2963a30e9fda5de",
+    "NeoCLR.Metadata.Experimental.dll": "431989af9148b0203b7d4e1ad2b0cfafa222e9206f142678c5c44deeeae3e518"
+  },
+  "neoclr-native-candidate-osx-arm64.tar.gz": "8af31409e66990bcbb3fb7e8121b0162e7db257823b1d0975a7f24075ed967d6",
+  "raven-vscode.vsix": "0908370f81c002ec9cff422d404a8b0220c4ffae86714227f502934221bdf95c",
+  "neoclr": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+  "neoclr-codegen": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+  "runtimeReusedUnchanged": true,
+  "sdkBuildLogSha256": "cb5737cf722cd6c4069d84517dc97dcad0d70b64412976844dc0767cc464aa9c",
+  "installedServerSelections": [
+    {
+      "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T001045/window1/exthost/output_logging_20261018T001046/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+      ]
+    },
+    {
+      "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T000902/window1/exthost/output_logging_20261018T000903/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+      ]
+    },
+    {
+      "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T000953/window1/exthost/output_logging_20261018T000954/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+      ]
+    },
+    {
+      "log": "target/release-async-fixed-20261017/vscode-profile/logs/20261018T000804/window1/exthost/output_logging_20261018T000806/1-Raven.log",
+      "selection": [
+        "Using language server (installed extension bundle): /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/vscode-extensions/raven.raven-vscode-0.1.16-neoclr.20261017.1/server/Raven.LanguageServer.dll"
+      ]
+    }
+  ]
+}

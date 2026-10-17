@@ -1,0 +1,272 @@
+{
+  "passed": true,
+  "root": "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/collections/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/collections/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/collections/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/tasks/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Suspended\n42\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Main.rvn(65,33): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Main.rvn(80,39): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-_h_qwrph/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-_h_qwrph/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/json/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-8p851509/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-8p851509/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/HttpClient.rvn(22,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-jq72qdxe/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-jq72qdxe/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/tools/verify-native-http-json.py",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+        "--server",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+        "--client",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+        "--seed",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll",
+        "--execution",
+        "default",
+        "--server-reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--client-reflection-roots",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.reflection.json",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/acceptance-http.json"
+      ],
+      "exitCode": 0,
+      "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+      "stderr": ""
+    }
+  ],
+  "verifiedFiles": 1602,
+  "execution": "default",
+  "http": {
+    "execution": "default",
+    "inputs": {
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll": "9c1a9b4e0c6ccd21241cbd8124e8b4e3ccd92358f9b7ee497552adbe7c4244e6",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll": "8028d4fe4a501d51b3faeba2fb547002ffc100158df2e0d930b9a6a16bbd78ec",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Runtime.dll": "b4856f4cc2dc34ac3ddcc63e74659384e7f7c02d0ec629bcf361eeeaa46655c4",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.dll": "2d81f34521ae3b7a5a1cae81068662d2a47eb84ef612934cd28d0a31bb4c892c",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Networking.dll": "4bbbbec458458a5be3d8bf1c182deb1e2088608be1ac248f4a1528e564f4e330",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Web.dll": "ee571bb0fe93cae4a67e76cf3de185eac0fa3f3654e5ef06b4f4229e14e4f1f2",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/lib/System.Data.PostgreSql.dll": "5172db25ee91e96cdac1d6e81d8fcd41f40e8e25c0c1d60243d376ba12f58810",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.reflection.json": "70b58551becdceb3196042e9fef87e964b8bb35bd52e04f88b0f05a1102a3521",
+      "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.reflection.json": "7b5f0fa6496763b241e15867e8db86e6e850dbda005ad528cd709ae75248329b"
+    },
+    "runs": [
+      {
+        "serverCommand": [
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+          "run",
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.reflection.json",
+          "--",
+          "4"
+        ],
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/report",
+            "status": 200,
+            "body": {
+              "station": "Caf\u00e9"
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 201,
+            "body": {
+              "accepted": true
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 400,
+            "body": {
+              "error": "Invalid report"
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/missing",
+            "status": 404,
+            "body": {
+              "error": "Not found"
+            }
+          }
+        ],
+        "port": "63732",
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      },
+      {
+        "serverCommand": [
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+          "run",
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-server/bin/neoclr/App.reflection.json",
+          "--",
+          "2"
+        ],
+        "requests": [],
+        "port": "63739",
+        "clientCommand": [
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/bin/neoclr",
+          "run",
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/release-async-fixed-20261017/extracted/neoclr-native-poc/samples/http-json-client/bin/neoclr/App.reflection.json",
+          "--",
+          "http://127.0.0.1:63739/"
+        ],
+        "client": {
+          "exitCode": 0,
+          "stdout": "{\"accepted\":true}\n",
+          "stderr": ""
+        },
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true
+  }
+}
