@@ -12854,3 +12854,21 @@ metadata encoding, emission, ABI or public API change. The native probe and
 [development editor evidence](validation/release-candidate-20261017/callback-inlays-development.json)
 pass. A rebuilt release SDK/VSIX still needs qualification; structural expansion
 remains parked.
+
+
+## Native async configuration clearing — 2026-10-17
+
+The first Windows native-core release candidate passed extracted samples and
+runtime-async language, cleanup, fault, HTTP server and client consumers in all
+three execution modes. It then failed the explicit state-machine test: native
+project configuration treated an empty `RavenNeoClrRuntimeAsyncHelper` as a type
+name, unlike the legacy project path which normalized it to disabled.
+
+Raven `c0854cdda` normalizes empty/whitespace helper settings in the native project
+snapshot. Explicit clearing selects existing heap state-machine lowering; nonempty
+helpers preserve runtime await/generator lowering. This is native configuration
+repair, with no bootstrap dependency, metadata/ABI change or ordinary .NET change.
+All nine empty/whitespace/generator checks pass on interpreter/JIT/AOT using an
+isolated compiler cohort and unchanged native libraries/runtime. See the
+[report](validation/release-candidate-20261017/async-helper-clearing.json).
+Rebuilt SDK/editor and Windows package qualification remain required separately.

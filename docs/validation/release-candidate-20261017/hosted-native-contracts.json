@@ -1,0 +1,66 @@
+{
+  "security": {
+    "run": 39071070128,
+    "revision": "504d122733d7b14ddbec173dcd31147d3ec42f16",
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39071070128",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "provider (macos-14)",
+        "conclusion": "success"
+      },
+      {
+        "name": "provider (windows-2022)",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "network": {
+    "run": 39071070221,
+    "revision": "504d122733d7b14ddbec173dcd31147d3ec42f16",
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39071070221",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "contracts (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "contracts (windows-2022)",
+        "conclusion": "success"
+      },
+      {
+        "name": "runtime-product",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "runtime-product": {
+    "run": 39071070144,
+    "revision": "504d122733d7b14ddbec173dcd31147d3ec42f16",
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39071070144",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "qualify (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "qualify (windows-2022)",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "host-prerequisites": {
+    "run": 39071070163,
+    "revision": "504d122733d7b14ddbec173dcd31147d3ec42f16",
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/39071070163",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "guarded-heap",
+        "conclusion": "success"
+      }
+    ]
+  }
+}

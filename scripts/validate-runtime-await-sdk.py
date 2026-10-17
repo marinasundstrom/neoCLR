@@ -34,7 +34,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('bundle', 'runtime', 'aot', 'output'):
         p.add_argument('--' + name, type=Path, required=True)
-    p.add_argument('--cases', nargs='+', choices=('language', 'cleanup', 'fault', 'server', 'client', 'state-machine', 'generator'), help='Run only selected cases; default is all')
+    p.add_argument('--cases', nargs='+', choices=('language', 'cleanup', 'fault', 'server', 'client', 'state-machine', 'state-machine-whitespace', 'generator'), help='Run only selected cases; default is all')
     a = p.parse_args()
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -57,6 +57,7 @@ def main():
                  ('server', 'docs/experiments/http-server/Server.rvn'),
                  ('client', 'docs/experiments/native-http-client/Client.rvn'),
                  ('state-machine', None),
+                 ('state-machine-whitespace', None),
                  ('generator', 'docs/experiments/runtime-async/RuntimeGeneratorLanguage.rvn')]
         if a.cases:
             cases = [(name, source) for name, source in cases if name in a.cases]
@@ -69,16 +70,18 @@ def main():
                 report['inputs'][source] = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
             else:
                 (project / 'Main.rvn').write_text('import System.*\nimport System.Concurrency.Tasks.*\nasync func Main() -> Task<()> {\n    await Task.CompletedTask\n    Console.WriteLine("PASS explicit state-machine fallback")\n}\n')
-            fallback = '<RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper>' if name == 'state-machine' else ''
+            state_machine = name.startswith('state-machine')
+            helper_text = '   ' if name == 'state-machine-whitespace' else ''
+            fallback = f'<RavenNeoClrRuntimeAsyncHelper>{helper_text}</RavenNeoClrRuntimeAsyncHelper>' if state_machine else ''
             (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>SdkAwait</AssemblyName>' + fallback + '</PropertyGroup></Project>')
-            profile = 'console' if name in ('cleanup', 'state-machine') else 'http'
+            profile = 'console' if name == 'cleanup' or state_machine else 'http'
             run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', ('windows-' if windows else '') + profile,
                  '--project', project / 'App.rvnproj', '--bundle', bundle, '--aot', a.aot.resolve(), '--output', project / 'native'])
             assembly = project / 'native/app.dll'
             listing = project / 'app.neoil'
             run([a.runtime.resolve(), 'disassemble', assembly, listing])
             has_machine = 'AsyncStateMachine' in listing.read_text()
-            if has_machine != (name == 'state-machine'):
+            if has_machine != state_machine:
                 raise RuntimeError('Unexpected lowering: ' + name)
             if installed is None:
                 run([sys.executable, ROOT / 'scripts/prepare-jit-bundle.py', '--bundle', bundle, '--runtime', a.runtime.resolve(),

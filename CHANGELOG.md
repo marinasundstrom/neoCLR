@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Fix native SDK qualification for explicitly cleared async helpers using Raven `c0854cdda`: empty/whitespace settings select existing heap state machines; the configured generator remains unchanged. All nine interpreter/JIT/AOT checks pass with frozen inputs. Extend the validator and pin refreshed packages to `0.1.16-neoclr.20261017.1`. Retain passing hosted security, networking, runtime-product and host-prerequisite evidence; full package/editor qualification remains pending.
+
 - Compare refreshed macOS HTTP workloads with Preview 15: both cohorts validate 1,152 responses across interpreter/JIT/AOT. Add an explicit hashed server-fixture option for historical syntax; adapt only the old JSON loop to `0..<32` and retain its unadapted timeout. Record medians and host-load limits without claiming controlled speedups.
 
 - Refresh current website CPU/JSON and HTTP benchmark pages from the measured native-core candidate. Keep earlier evidence in benchmark history, explicit host/load limits and pending Windows/database coverage; avoid presenting old development follow-ups as current package measurements. All 26 website/snapshot tests and 4,441-page build/link checks pass.
