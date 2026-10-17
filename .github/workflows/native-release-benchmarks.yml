@@ -1,0 +1,82 @@
+name: Native release benchmarks
+on:
+  push:
+    paths:
+      - .github/workflows/native-release-benchmarks.yml
+  workflow_dispatch:
+    inputs:
+      bundle_run:
+        description: Successful native-toolchain run containing windows-native-qualification
+        required: true
+        default: '39071070147'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 150
+    env:
+      PYTHONUTF8: '1'
+      BUNDLE_RUN: ${{ inputs.bundle_run || '39071070147' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for matching package qualification
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $deadline = (Get-Date).AddMinutes(85)
+          do {
+            $run = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:BUNDLE_RUN" | ConvertFrom-Json
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+            if ($run.status -eq 'completed') { break }
+            if ((Get-Date) -gt $deadline) { throw 'Timed out waiting for package qualification' }
+            Start-Sleep -Seconds 30
+          } while ($true)
+          if ($run.conclusion -ne 'success') { throw "Package qualification failed: $($run.conclusion)" }
+          New-Item -ItemType Directory target/benchmarks -Force
+          $run | ConvertTo-Json -Depth 20 | Set-Content target/benchmarks/package-run.json
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.BUNDLE_RUN }}
+          name: windows-native-qualification
+          path: target/qualification
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.100-rc.1.26425.128
+      - name: Measure extracted package sequentially
+        shell: pwsh
+        run: |
+          $archives = @(Get-ChildItem target/qualification -Recurse -Filter neoclr-native-poc.tar.gz)
+          if ($archives.Count -ne 1) { throw 'Expected exactly one qualified archive' }
+          Get-FileHash $archives[0].FullName -Algorithm SHA256 | ConvertTo-Json | Set-Content target/benchmarks/archive-hash.json
+          New-Item -ItemType Directory target/extracted
+          tar -xzf $archives[0].FullName -C target/extracted
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$vs) { throw 'MSVC x64 tools not found' }
+          $commands = @(
+            'python benchmarks/execution/prepare.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/execution',
+            'python benchmarks/framework/runner.py --manifest target/benchmarks/execution/manifest.json --output target/benchmarks/execution/results.json --rounds 5 --warmups 2 --operations 16 --timeout 300',
+            'python benchmarks/framework/runner.py --manifest target/benchmarks/execution/manifest.json --output target/benchmarks/execution/cpu-native-longer.json --filter cpu.sum --mode jit --mode aot --rounds 5 --warmups 20 --operations 10000 --timeout 300',
+            'python benchmarks/http-server/benchmark.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/http-plain --rounds 5',
+            'python benchmarks/http-server/benchmark.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/http-json --workload json --rounds 5'
+          )
+          foreach ($command in $commands) {
+            cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && $command"
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-native-benchmarks
+          path: |
+            target/benchmarks/**/*.json
+            target/benchmarks/**/*.log

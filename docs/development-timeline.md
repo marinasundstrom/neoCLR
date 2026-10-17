@@ -25,6 +25,16 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-17 — Complete and publish the next release
+
+- **Author:** “Continue until you have released neoclr”, following closure of six
+  source-test failures and local macOS package/editor/runtime qualification.
+- **Assistant action:** continues Windows qualification and prepares measurements
+  against its exact archive. Publication is authorized by this request; qualification
+  remains required for both macOS ARM64 and Windows x64.
+- **Open:** Windows package/editor and measurement results, final release assets,
+  release notes and website publication. Broader structural work remains parked.
+
 ## 2026-10-17 — Native reference migration audit before fixes
 
 - **Author:** directs porting needed types and attributes into neoCLR, then asks to

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Add Windows release measurement orchestration that waits for successful native-toolchain qualification, extracts its exact archive, records its hash and runs CPU/JSON and plain/typed-JSON HTTP sequentially. Preserve five rounds, larger native CPU batches and raw reports; execution results remain pending.
+
 - Update the unpublished release draft with verified macOS editor, source-repair, cross-platform minimum-Rust and runtime measurement evidence. Keep Windows package/performance qualification and HTTP baseline comparison explicit; no version, publication date or download link changes.
 
 - Measure plain and typed-JSON HTTP on the refreshed macOS candidate across interpreter/JIT/AOT: 36 processes validate 1,152 responses with zero errors. Retain five-round samples, separate startup, input hashes and host-load limitations. Windows measurements and matched baseline HTTP comparisons remain open release gates.
