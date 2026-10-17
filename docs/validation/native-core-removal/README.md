@@ -231,3 +231,32 @@ remain test-only. Production System.Value/RuntimeServices ownership must move as
 part of coherent native-core construction; existing payload callers remain unchanged.
 The .NET analogue is runtime-owned representation/intrinsic helpers behind CoreLib,
 not a new public .NET API. Structural work remains parked.
+
+## Payload native execution and production ownership boundary
+
+The native-owned byte/Int32/unit payload path now passes managed JIT and sanitized
+AOT in addition to the interpreter. Successful byte extraction returns 42; wrong-type
+extraction reports RuntimeError in all modes. The host also checks root cleanup.
+[Native evidence](payload-native-results.json) records compile/link/run commands and
+artifact hashes; [the runner](validate-payload-native.py) reuses the existing macOS
+ARM64 host recipe and real console input adapter. Supply `*` followed by EOF. This
+qualifies the tested scalar/unit shapes, not arbitrary reference payloads or all
+System.Value storage shapes.
+
+The native-only rvnc project builds, and fresh [LSP completion](payload-native-completion.json)
+exposes both helpers. No CLI semantic reference or BootstrapReference is involved
+in these checks. The source and SDK helpers are unchanged from the preceding slice.
+
+**Production ownership is not yet moved.** System.Value already belongs to native
+System.Runtime in ownership.json. IsValue/UnpackValue still belong to the CLI
+RuntimeServices declaration and retained-seed methods. The production build currently
+compiles Raven source first, then translates retained implementations against the
+result. Raven's source bodyless-method contract permits exact native InternalCalls;
+these generic helpers are managed opcode bodies, not InternalCalls. Removing their
+CLI/seed declarations alone therefore does not provide production definitions.
+The next construction slice must supply native method definitions/bodies coherently
+with their owner and update reference selection before removing the old declarations.
+The SDK already authors those bodies and Raven already imports/calls them; the
+remaining work is production construction/ownership, not an interpreter or scalar
+JIT/AOT payload implementation. Do not use the reduced fixture Object as the
+production core. No production bundle or installed SDK was replaced here.

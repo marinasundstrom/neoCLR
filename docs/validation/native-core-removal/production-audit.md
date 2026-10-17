@@ -187,3 +187,10 @@ stripping are accepted substitutes for the above gates.
   membership/extraction/EOF and wrong-type rejection, and LSP completion. No compiler
   intrinsic interception is needed for these imported bodies. Production owner
   migration and native backend payload qualification remain open.
+
+- Native-owned byte/Int32/unit payload checks and wrong-type extraction now pass
+  interpreter, managed JIT and sanitized AOT, plus native-only project compilation
+  and LSP completion. The production blocker is definition/body construction: native
+  System.Value exists, but RuntimeServices helper declarations/implementations remain
+  CLI/seed-owned. Their managed opcode bodies cannot simply become InternalCalls.
+  See the explicit ownership boundary in README; no production migration is claimed.

@@ -12603,3 +12603,14 @@ byte extraction and unit EOF checks pass in the interpreter; incompatible extrac
 faults. Native-only completion exposes both methods. See the
 [payload gate](validation/native-core-removal/README.md#native-payload-helper-qualification).
 Production ownership and JIT/AOT payload qualification remain open.
+
+### Payload native execution boundary (2026-10-17)
+
+Native-owned IsValue/UnpackValue byte/Int32/unit consumers now pass interpreter,
+managed JIT and sanitized AOT, including wrong-type RuntimeError propagation and
+root cleanup. Native-only project compilation and completion also pass. See the
+[execution and ownership boundary](validation/native-core-removal/README.md#payload-native-execution-and-production-ownership-boundary).
+Production System.Value is native-owned; RuntimeServices helper declarations and
+bodies remain CLI/seed-owned until the production construction stage supplies native
+managed bodies. These are not new runtime InternalCalls. No Runtime Contract switch,
+.NET semantics or installed SDK changes. Wider payload-shape coverage remains open.
