@@ -1,0 +1,92 @@
+{
+  "ravenRevision": "368e5ca39c8a09d067cb727de23c47b7d1f4a291",
+  "experiment": "Only sdk/tools/rvnc/Raven.CodeAnalysis.dll replaced; Debug/net11.0 build, not a release package",
+  "baseBundleManifest": "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/extracted/neoclr-native-poc/manifest.json",
+  "experimentManifestSha256": "af7ad9e82d810aba93f6869c0e51b67684e343d67f6bef88ba9dfaae1b649320",
+  "compilerDllSha256": "b7401016ec586b0d703f7d9f87a0d3d7532375c15deceba53e42b44f7a464f94",
+  "compilerSourceSha256": "294599e8e7877d0bc0443e775647d5dc17c65d7f29257ee6810e7e6a34894478",
+  "benchmarkInputsVerifiedAfterRuns": 3262,
+  "correctProcesses": 20,
+  "summaries": {
+    "before-cpu": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.3167489590000003,
+            "minimum": 3.2599139170000004,
+            "maximum": 3.384224583
+          },
+          "batchSeconds": {
+            "median": 3.7480686660000018,
+            "minimum": 3.7130983339999997,
+            "maximum": 3.7922738339999995
+          },
+          "operationsPerSecond": {
+            "median": 4.268865227881605,
+            "minimum": 4.219104605936008,
+            "maximum": 4.309069828151769
+          }
+        }
+      }
+    },
+    "after-cpu": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.324967084,
+            "minimum": 3.292322167000002,
+            "maximum": 3.767391334
+          },
+          "batchSeconds": {
+            "median": 2.536897292,
+            "minimum": 2.527445333000001,
+            "maximum": 2.954843167
+          },
+          "operationsPerSecond": {
+            "median": 6.306916740561525,
+            "minimum": 5.414838993382014,
+            "maximum": 6.330502895984889
+          }
+        }
+      }
+    },
+    "after-cpu-native": {
+      "cpu.sum": {
+        "jit": {
+          "startupSeconds": {
+            "median": 2.7267888329999987,
+            "minimum": 2.7016761670000005,
+            "maximum": 2.896665625
+          },
+          "batchSeconds": {
+            "median": 0.24811850000000035,
+            "minimum": 0.2465569999999997,
+            "maximum": 0.2499229999999999
+          },
+          "operationsPerSecond": {
+            "median": 40303.3228074488,
+            "minimum": 40012.3237957291,
+            "maximum": 40558.5726627109
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.00721979200000078,
+            "minimum": 0.00720879200000013,
+            "maximum": 0.18306037500000016
+          },
+          "batchSeconds": {
+            "median": 0.2450642080000005,
+            "minimum": 0.24448491600000022,
+            "maximum": 0.24600112500000115
+          },
+          "operationsPerSecond": {
+            "median": 40805.63245694361,
+            "minimum": 40650.220603665744,
+            "maximum": 40902.31889807055
+          }
+        }
+      }
+    }
+  }
+}

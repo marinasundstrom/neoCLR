@@ -25,11 +25,44 @@ Generic Interval, nominal slicing and explicit stepping remain separate
 - Native branch: 72 range/loop/async/portable-comprehension tests pass on .NET 11.
   Native compiler build passes. These tests reuse main's semantics without merging
   unrelated branches; native-only comprehension endpoint checks are retained.
-- [Main.rvn](Main.rvn) checks eight signed-limit scenarios, overshooting and
-  minimum-valued steps, continue/break and side-effect evaluation order. It returns
+- The original consumer (fingerprinted in results.json) checked eight signed-limit scenarios, overshooting and
+  minimum-valued steps, continue/break and side-effect evaluation order. It returned
   42 in interpreter, macOS ARM64 AOT and managed JIT, without arena allocation.
   AOT uses undefined/bounds sanitizers; JIT is not sanitizer-instrumented.
 - [results.json](results.json) records commands and source/binary fingerprints. The
   existing five-library range bundle and runtime are unchanged. Native execution
   covers synchronous loops; .NET pending-await tests do not establish additional
   native async scheduling behavior. No throughput claim is made.
+
+
+## Exclusive unit-step optimization — 2026-10-17
+
+Raven's native portable lowerer can omit the advance overflow guard when the
+signed Int32/Int64 step is a literal one and the endpoint is exclusive.
+`current < limit <= MaxValue` proves the addition representable. Inclusive,
+descending, larger and dynamic steps retain their domain checks. Bounds and step
+still evaluate once in order, and `continue` uses the same advance as fallthrough.
+This preserves the .NET-target observable iteration contract; it changes no
+Runtime Contract option, semantic symbol, metadata, public API or runtime opcode.
+Ordinary .NET emission is unchanged and broader structural work remains parked.
+
+The expanded [consumer](Main.rvn) checks maximum exclusive bounds, empty/reversed
+loops, explicit unit steps, evaluation order and continue/break alongside the
+original general-step/inclusive cases. It now prints a success marker and returns
+zero, using the bundled host instead of the original custom host. Run it with:
+
+```sh
+python3 scripts/validate-native-range-iteration.py --bundle /absolute/bundle --output /new/output
+```
+
+[The new report](unit-step-20261017.json) records passing interpreter, JIT and AOT
+runs on macOS ARM64 and checks input hashes before/after execution. Unlike the
+October 15 run, this uses the normal optimized package host without sanitizers.
+The isolated bundle replaces only `sdk/tools/rvnc/Raven.CodeAnalysis.dll` with a
+fresh Debug/net11.0 compiler build; runtime, codegen and native libraries remain
+byte-identical to the fixed editor candidate. This is a controlled compiler
+experiment, not a qualified release archive. Twenty-three portable range compiler
+checks pass, including eight new .NET boundary/parity and native-lowering admission
+cases. [CPU measurements](../../../benchmarks/execution/unit-step-20261017/README.md)
+track the measured effect. A fresh complete SDK/library cohort remains necessary
+before release qualification; Windows execution is not established by this run.

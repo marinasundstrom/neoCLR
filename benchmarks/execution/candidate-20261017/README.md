@@ -76,3 +76,9 @@ candidate pinning also remain open. Published Preview 14 measurements are unchan
 Each report preserves exact inputs, commands, configuration, all samples and
 median/minimum/maximum summaries. The initial failed unadapted run contributes
 no timing samples to the comparison.
+
+
+Follow-up: [the isolated unit-step compiler fix](../unit-step-20261017/README.md)
+largely recovers the CPU interpreter regression, with signed boundary validation
+on interpreter/JIT/AOT. The measurements above remain the original candidate
+record; they are not retroactively replaced. Full package refresh remains pending.

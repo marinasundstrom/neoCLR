@@ -12827,3 +12827,17 @@ for recovery. Focused regressions and ten real-editor cycles across both native
 projects pass with the development server; packaged validation remains separate.
 No native signature, Runtime Contract, CLI encoding or runtime ABI changes.
 See the [qualification](validation/release-candidate-20261017/README.md#watched-file-fixes-and-repeated-recovery).
+
+
+## Exclusive unit-step range optimization (2026-10-17)
+
+The native portable compiler omits redundant advance overflow checks only for
+signed Int32/Int64 exclusive ranges whose bound step is a literal one. The loop
+condition proves `current + 1` representable; inclusive and other-step ranges
+retain the existing guard. Start/end/step evaluation and continue/break behavior
+are preserved. No Runtime Contract setting, metadata, opcode, public API or CLI
+bridge representation changes. Ordinary .NET emission is unchanged, and its
+observable boundary semantics remain the comparison baseline. See the paired
+Raven `docs/compiler/neoclr-cli-bridge.md` and [native qualification](validation/range-iteration/README.md#exclusive-unit-step-optimization--2026-10-17).
+The isolated compiler replacement passes interpreter/JIT/AOT; release packaging
+and Windows qualification remain separate. Structural expansion stays parked.

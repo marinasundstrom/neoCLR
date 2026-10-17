@@ -69,10 +69,13 @@ extracted bundle. [Preparation evidence](validation/release-candidate-20261017/b
 identifies the workloads and artifacts; it is not an execution or timing result.
 
 Local CPU/JSON measurements now pass 45 candidate and 45 syntax-adapted Preview 15
-processes. CPU interpreter throughput is about 35% lower; portable range overflow
-checks are a concrete investigation lead. See [measurements and limitations](../benchmarks/execution/candidate-20261017/README.md).
-Windows execution/editor qualification, HTTP measurements and that performance
-investigation remain pending. The local Raven revision is ahead of the remote branch; candidate pinning
+processes. The initial CPU interpreter result was about 35% lower. Raven 368e5ca39
+removes a redundant guard only for provably safe exclusive unit-step ranges;
+23 compiler tests and interpreter/JIT/AOT boundary consumers pass. A compiler-only
+repeat improves median throughput from 4.27 to 6.31 operations/s, close to the
+previous Preview 15 result of 6.45. See [isolated evidence and limitations](../benchmarks/execution/unit-step-20261017/README.md).
+A full SDK/library refresh must carry that fix and be requalified. Windows
+execution/editor qualification and HTTP measurements remain pending. The local Raven revision is ahead of the remote branch; candidate pinning
 must establish a remotely available, matching compiler/server/extension cohort.
 
 ## Required before release
@@ -86,7 +89,7 @@ must establish a remotely available, matching compiler/server/extension cohort.
 | Editor | macOS fixed packaged editor passes 26 main checks, inlays and twenty two-project configuration recovery cycles. Windows editor qualification is pending. | Validate native-only completion, hover, navigation, inlays, configuration recovery and build/run tasks with the exact shipped SDK/VSIX on both platforms. Test stale-output rejection and HTTP task inputs. |
 | API coverage | The website reports 123 unmatched legacy routes. Inspection shows 104 flat redirect routes and 19 hierarchical pages, not 123 missing APIs. | Verify redirect destinations; classify the 19 pages against native metadata. Preserve documented current APIs, remove obsolete scaffolds from current navigation, and retain honest notices/manual references for real coverage gaps. |
 | Documentation and packaging | The previous next-preview draft described the already released unified runtime. Native-core migration changes the compiler/library cohort. | Finalize current release notes, supported-feature limits, notices, package prerequisites and checksums. Change published download URLs only when actual new assets exist. |
-| Runtime performance | Local candidate/Preview 15 CPU/JSON measurements are recorded; CPU interpreter throughput is about 35% lower and requires investigation. HTTP/Windows measurements remain incomplete. | Complete the benchmark preparation below, then retain and review runtime measurements on both release targets before publication. |
+| Runtime performance | Local candidate/Preview 15 CPU/JSON measurements are recorded; the isolated unit-step guard fix largely recovers the CPU interpreter regression. Fresh complete-package and HTTP/Windows measurements remain incomplete. | Complete the benchmark preparation below, then retain and review runtime measurements on both release targets before publication. |
 
 The 19 hierarchical API pages comprise two Enum helper pages, two namespace
 containers and 15 exception/compiler-scaffold pages. This is a route inventory,
@@ -145,7 +148,7 @@ invalidates affected measurements and checks; a prose-only correction does not
 require rerunning runtime workloads.
 
 Both target packages and their benchmark records are required by the author.
-Fresh local CPU/JSON measurements and their unresolved CPU interpreter regression
+Fresh local CPU/JSON measurements and the subsequent isolated compiler fix
 are recorded above. This audit does not claim remote CI status, Windows execution
 or publication. Structural expansion remains
 parked; known bounded limitations do not imply a requirement to implement every

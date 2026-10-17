@@ -110,5 +110,69 @@ func Main() -> int {
     for value in 2147483647..=2147483647 {
         break
     }
-    return 42
+    // Exclusive unit-step ranges stop safely at the signed maximum.
+    count = 0
+    for value in 2147483646..2147483647 {
+        count += 1
+        if value != 2147483646 || count > 1 {
+            return 40
+        }
+        continue
+    }
+    if count != 1 {
+        return 41
+    }
+    for value in 2147483647..2147483647 {
+        return 42
+    }
+    for value in 2147483647..2147483646 by 1 {
+        return 43
+    }
+    count = 0
+    for value in 9223372036854775806L..9223372036854775807L {
+        count += 1
+        if value != 9223372036854775806L || count > 1 {
+            return 50
+        }
+        continue
+    }
+    if count != 1 {
+        return 51
+    }
+    for value in 9223372036854775807L..9223372036854775807L {
+        return 52
+    }
+    for value in 9223372036854775807L..9223372036854775806L by 1L {
+        return 53
+    }
+    order = 0
+    count = 0
+    for value in ({
+        order = order * 10 + 1
+        -2147483648
+    })..({
+        order = order * 10 + 2
+        -2147483646
+    }) {
+        count += 1
+        continue
+    }
+    if order != 12 || count != 2 {
+        return 60
+    }
+    count = 0
+    for value in 0..10 by 1 {
+        if value == 0 {
+            continue
+        }
+        if value == 2 {
+            break
+        }
+        count += 1
+    }
+    if count != 1 {
+        return 61
+    }
+    Console.WriteLine("PASS signed range boundaries")
+    return 0
 }
