@@ -15,7 +15,9 @@ selections without overrides.
 The [runtime/library comparison](macos-runtime-library-comparison.json) confirms
 unchanged runtime and backend binaries but changed library hashes. Earlier candidate
 measurements therefore remain separate; the final package will be measured again.
-Full runtime-await validation is also in progress.
+The [full runtime-await matrix](macos-runtime-await.json) passes all 24 cases:
+language, cleanup, fault, HTTP server/client, empty/whitespace state-machine
+configuration and generator, each in interpreter/JIT/AOT.
 
 [Canonical source CI](../release-candidate-20261017/canonical-ci-passed.json)
 passes all source, host and minimum-Rust jobs. The

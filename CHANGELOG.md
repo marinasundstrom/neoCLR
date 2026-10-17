@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Complete final macOS SDK runtime-await qualification: all 24 language, cleanup, fault, HTTP server/client, empty/whitespace state-machine and generator checks pass across interpreter/JIT/AOT. Final-package measurements are running; Windows remains separate.
+
 - Qualify the refreshed macOS `0.1.16-neoclr.20261017.1` package: extracted samples/HTTP, installed editor checks, twenty two-project recovery cycles, exact inlays and three-mode range consumers pass. Record matching server and archive identities. Runtime/backend bytes are unchanged but library hashes differ, so final-package measurements are queued separately. Windows and full runtime-await qualification remain in progress.
 
 - Close the source qualification gate: CI run `39072006701` at `25828f59e` passes the canonical extracted-source full suite and all 25 smoke programs, strict Clippy/formatting, release-host checks and all three minimum-Rust checks. Retain the report and job identities; native SDK/editor qualification remains separate.
