@@ -18,7 +18,7 @@ public struct Double : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<double, NumberParseError> {
-        let payload = RuntimeServices.ParseDouble(value)
+        let payload = neoCLR.Runtime.ParseDouble(value)
         if neoCLR.Runtime.IsValue<double>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<double>(payload))
         }

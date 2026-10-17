@@ -43,7 +43,7 @@ public static class Console {
     }
 
     static func WriteLine(value0: int) {
-        neoCLR.Runtime.WriteLine(RuntimeServices.Int32ToString(value0))
+        neoCLR.Runtime.WriteLine(neoCLR.Runtime.Int32ToString(value0))
     }
 
     static func WriteLine(value: bool) {
@@ -51,23 +51,23 @@ public static class Console {
     }
 
     static func WriteLine(value: char) {
-        WriteLine(RuntimeServices.CharText(value))
+        WriteLine(neoCLR.Runtime.CharText(value))
     }
 
     static func WriteLine(value: sbyte) {
-        WriteLine(RuntimeServices.Int32ToString(value))
+        WriteLine(neoCLR.Runtime.Int32ToString(value))
     }
 
     static func WriteLine(value: byte) {
-        WriteLine(RuntimeServices.Int32ToString(value))
+        WriteLine(neoCLR.Runtime.Int32ToString(value))
     }
 
     static func WriteLine(value: short) {
-        WriteLine(RuntimeServices.Int32ToString(value))
+        WriteLine(neoCLR.Runtime.Int32ToString(value))
     }
 
     static func WriteLine(value: ushort) {
-        WriteLine(RuntimeServices.Int32ToString(value))
+        WriteLine(neoCLR.Runtime.Int32ToString(value))
     }
 
     static func WriteLine(value: uint) {
@@ -75,7 +75,7 @@ public static class Console {
     }
 
     static func WriteLine(value: long) {
-        WriteLine(RuntimeServices.Int64ToString(value))
+        WriteLine(neoCLR.Runtime.Int64ToString(value))
     }
 
     static func WriteLine(value: ulong) {
@@ -83,7 +83,7 @@ public static class Console {
     }
 
     static func WriteLine(value: nint) {
-        WriteLine(RuntimeServices.Int64ToString(neoCLR.Runtime.IntPtrToInt64(value)))
+        WriteLine(neoCLR.Runtime.Int64ToString(neoCLR.Runtime.IntPtrToInt64(value)))
     }
 
     static func WriteLine(value: nuint) {
@@ -133,7 +133,7 @@ public static class Console {
     }
 
     static func Write(value0: int) -> Task<unit> {
-        return Write(RuntimeServices.Int32ToString(value0))
+        return Write(neoCLR.Runtime.Int32ToString(value0))
     }
 
     static func WriteLine() {

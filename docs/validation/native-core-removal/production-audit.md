@@ -219,3 +219,8 @@ stripping are accepted substitutes for the above gates.
   a fresh five-library build, generic type consumer, metadata ownership inspection
   and TypeInfo completion qualify this ownership migration. Remaining string,
   parsing, scheduling and compiler bootstrap work remains open.
+
+- 33 direct text/parsing services are native-owned with CLI/seed removal. Remove
+  the obsolete seed Console facade too, closing its internal formatting-call
+  access failure. String equality and three managed-array text helper bodies
+  remain for a separate slice; provider semantics are unchanged.

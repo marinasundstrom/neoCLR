@@ -18,7 +18,7 @@ public struct Single : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<float, NumberParseError> {
-        let payload = RuntimeServices.ParseSingle(value)
+        let payload = neoCLR.Runtime.ParseSingle(value)
         if neoCLR.Runtime.IsValue<float>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<float>(payload))
         }

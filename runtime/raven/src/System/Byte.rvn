@@ -18,7 +18,7 @@ public struct Byte : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<byte, NumberParseError> {
-        let payload = RuntimeServices.ParseByte(value)
+        let payload = neoCLR.Runtime.ParseByte(value)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<byte>(payload))
         }

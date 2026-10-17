@@ -1,0 +1,634 @@
+{
+  "passed": true,
+  "methods": [
+    {
+      "name": "neoCLR.Runtime.Int32ToString",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "Int32ToString",
+        "parameter_tokens": [
+          134217762
+        ],
+        "token": 100663327
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "Int32"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.Int64ToString",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "Int64ToString",
+        "parameter_tokens": [
+          134217763
+        ],
+        "token": 100663328
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "Int64"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringFromChars",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringFromChars",
+        "parameter_tokens": [
+          134217764
+        ],
+        "token": 100663329
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        {
+          "ArrayRef": "Char"
+        }
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringGraphemeAt",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringGraphemeAt",
+        "parameter_tokens": [
+          134217765,
+          134217766
+        ],
+        "token": 100663330
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "Int32"
+      ],
+      "returns": "Char"
+    },
+    {
+      "name": "neoCLR.Runtime.StringIntern",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringIntern",
+        "parameter_tokens": [
+          134217767
+        ],
+        "token": 100663331
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringConcat",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringConcat",
+        "parameter_tokens": [
+          134217768,
+          134217769
+        ],
+        "token": 100663332
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringCompareOrdinal",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringCompareOrdinal",
+        "parameter_tokens": [
+          134217770,
+          134217771
+        ],
+        "token": 100663333
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.StringCompareOrdinalIgnoreCase",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringCompareOrdinalIgnoreCase",
+        "parameter_tokens": [
+          134217772,
+          134217773
+        ],
+        "token": 100663334
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.StringReplaceOrdinal",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringReplaceOrdinal",
+        "parameter_tokens": [
+          134217774,
+          134217775,
+          134217776
+        ],
+        "token": 100663335
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String",
+        "String"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringContainsOrdinal",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringContainsOrdinal",
+        "parameter_tokens": [
+          134217777,
+          134217778
+        ],
+        "token": 100663336
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String"
+      ],
+      "returns": "Boolean"
+    },
+    {
+      "name": "neoCLR.Runtime.StringStartsWithOrdinal",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringStartsWithOrdinal",
+        "parameter_tokens": [
+          134217779,
+          134217780
+        ],
+        "token": 100663337
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String"
+      ],
+      "returns": "Boolean"
+    },
+    {
+      "name": "neoCLR.Runtime.StringEndsWithOrdinal",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringEndsWithOrdinal",
+        "parameter_tokens": [
+          134217781,
+          134217782
+        ],
+        "token": 100663338
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "String"
+      ],
+      "returns": "Boolean"
+    },
+    {
+      "name": "neoCLR.Runtime.StringGraphemeCount",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringGraphemeCount",
+        "parameter_tokens": [
+          134217783
+        ],
+        "token": 100663339
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.CharFromString",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "CharFromString",
+        "parameter_tokens": [
+          134217784
+        ],
+        "token": 100663340
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Char"
+    },
+    {
+      "name": "neoCLR.Runtime.CharText",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "CharText",
+        "parameter_tokens": [
+          134217785
+        ],
+        "token": 100663341
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "Char"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.CharCategory",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "CharCategory",
+        "parameter_tokens": [
+          134217786
+        ],
+        "token": 100663342
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "UInt32"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.StringByteCount",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringByteCount",
+        "parameter_tokens": [
+          134217787
+        ],
+        "token": 100663343
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.StringSliceUtf8",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringSliceUtf8",
+        "parameter_tokens": [
+          134217788,
+          134217789,
+          134217790
+        ],
+        "token": 100663344
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String",
+        "Int32",
+        "Int32"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.StringToUpperInvariant",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringToUpperInvariant",
+        "parameter_tokens": [
+          134217791
+        ],
+        "token": 100663345
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringToLowerInvariant",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringToLowerInvariant",
+        "parameter_tokens": [
+          134217792
+        ],
+        "token": 100663346
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "String"
+    },
+    {
+      "name": "neoCLR.Runtime.StringHashOrdinalIgnoreCase",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "StringHashOrdinalIgnoreCase",
+        "parameter_tokens": [
+          134217793
+        ],
+        "token": 100663347
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Int32"
+    },
+    {
+      "name": "neoCLR.Runtime.Utf8Decode",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "Utf8Decode",
+        "parameter_tokens": [
+          134217794
+        ],
+        "token": 100663348
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        {
+          "ArrayRef": "Byte"
+        }
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseBoolean",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseBoolean",
+        "parameter_tokens": [
+          134217983
+        ],
+        "token": 100663460
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseSByte",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseSByte",
+        "parameter_tokens": [
+          134217984
+        ],
+        "token": 100663461
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseByte",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseByte",
+        "parameter_tokens": [
+          134217985
+        ],
+        "token": 100663462
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseInt16",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseInt16",
+        "parameter_tokens": [
+          134217986
+        ],
+        "token": 100663463
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseUInt16",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseUInt16",
+        "parameter_tokens": [
+          134217987
+        ],
+        "token": 100663464
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseInt32",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseInt32",
+        "parameter_tokens": [
+          134217988
+        ],
+        "token": 100663465
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseUInt32",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseUInt32",
+        "parameter_tokens": [
+          134217989
+        ],
+        "token": 100663466
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseInt64",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseInt64",
+        "parameter_tokens": [
+          134217990
+        ],
+        "token": 100663467
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseUInt64",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseUInt64",
+        "parameter_tokens": [
+          134217991
+        ],
+        "token": 100663468
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseSingle",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseSingle",
+        "parameter_tokens": [
+          134217992
+        ],
+        "token": 100663469
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    },
+    {
+      "name": "neoCLR.Runtime.ParseDouble",
+      "origin": {
+        "assembly": "[\"System.Runtime\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+        "member_access": "Assembly",
+        "module": "System.Runtime.dll",
+        "name": "ParseDouble",
+        "parameter_tokens": [
+          134217993
+        ],
+        "token": 100663470
+      },
+      "impl_flags": 4096,
+      "parameters": [
+        "String"
+      ],
+      "returns": "Value"
+    }
+  ],
+  "retainedDefinitions": 0,
+  "retainedConsole": false,
+  "sha256": {
+    "target/native-text-direct-library-v2/System.Runtime.dll": "e949208d8f09612f06682c109ea6b8a57bc207f8e626e55f24a25ae90fc66e5f",
+    "target/native-text-bootstrap-v2/Core.dll": "da0c2d03043b9c8e2cf66922b9b1dec48d47640db98af1da5aa676165588f3b1",
+    "target/native-text-bootstrap-v2/System.retained.json": "cf98f84386143f07a60b28a255e374de50de92c002421c6bd74e06664378c361",
+    "target/native-text-bootstrap-v2/preparation-evidence.json": "4813493f70419032fed51a9a08c62eef3bc4089b5a3b812e13aacc59656f62a0",
+    "target/native-text-direct-library-v2/build-evidence.json": "b48f64d909b4b62be1b5472b3de2fa20a9aff2680cda1fb615e17e897c65aa21"
+  }
+}

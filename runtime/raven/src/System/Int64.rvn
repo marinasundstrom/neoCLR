@@ -12,7 +12,7 @@ public struct Int64 : Number {
     static val MaxValue: long => 9223372036854775807L
 
     static func Parse(value: string) -> Result<long, NumberParseError> {
-        let payload = RuntimeServices.ParseInt64(value)
+        let payload = neoCLR.Runtime.ParseInt64(value)
         if neoCLR.Runtime.IsValue<long>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<long>(payload))
         }
@@ -28,7 +28,7 @@ public struct Int64 : Number {
     }
 
     func ToString() -> string {
-        return RuntimeServices.Int64ToString(m_value)
+        return neoCLR.Runtime.Int64ToString(m_value)
     }
 
     static val Zero: long => (long)0

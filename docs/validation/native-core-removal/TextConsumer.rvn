@@ -1,0 +1,118 @@
+import System.*
+import System.Result.*
+import System.Text.*
+
+func Main() -> int {
+    let Ok(parsed1) = bool.Parse("true") else {
+        return 1
+    }
+    if parsed1 != true {
+        return 1
+    }
+    let Ok(parsed2) = sbyte.Parse("-12") else {
+        return 2
+    }
+    if parsed2 != -12 {
+        return 2
+    }
+    let Ok(parsed3) = byte.Parse("42") else {
+        return 3
+    }
+    if parsed3 != 42 {
+        return 3
+    }
+    let Ok(parsed4) = short.Parse("-123") else {
+        return 4
+    }
+    if parsed4 != -123 {
+        return 4
+    }
+    let Ok(parsed5) = ushort.Parse("123") else {
+        return 5
+    }
+    if parsed5 != 123 {
+        return 5
+    }
+    let Ok(parsed6) = int.Parse("42") else {
+        return 6
+    }
+    if parsed6 != 42 {
+        return 6
+    }
+    let Ok(parsed7) = uint.Parse("42") else {
+        return 7
+    }
+    if parsed7 != 42 {
+        return 7
+    }
+    let Ok(parsed8) = long.Parse("42") else {
+        return 8
+    }
+    if parsed8 != 42 {
+        return 8
+    }
+    let Ok(parsed9) = ulong.Parse("42") else {
+        return 9
+    }
+    if parsed9 != (ulong)42 {
+        return 9
+    }
+    let Ok(parsed10) = float.Parse("1.5") else {
+        return 10
+    }
+    if parsed10 != 1.5 {
+        return 10
+    }
+    let Ok(parsed11) = double.Parse("1.5") else {
+        return 11
+    }
+    if parsed11 != 1.5 {
+        return 11
+    }
+    if int.Parse("2147483648") is not Error(NumberParseError.Overflow()) {
+        return 12
+    }
+    if int.Parse("invalid") is not Error(NumberParseError.InvalidFormat()) {
+        return 13
+    }
+    if bool.Parse("invalid") is not Error(_) {
+        return 14
+    }
+    let text = string.Concat("hé", "llo")
+    if text.Length != 5 || text.GetUtf8ByteCount() != 6 || text[1].ToString() != "é" {
+        return 15
+    }
+    if text.ToUpperInvariant() != "HÉLLO" || "ABC".ToLowerInvariant() != "abc" {
+        return 16
+    }
+    if !text.StartsWithOrdinal("hé") || !text.EndsWithOrdinal("llo") || !text.ContainsOrdinal("él") {
+        return 17
+    }
+    if text.Replace("llo", "y") != "héy" || string.CompareOrdinal("a", "b") >= 0 || string.CompareOrdinalIgnoreCase("A", "a") != 0 {
+        return 18
+    }
+    if string.Intern(text) != text || char.FromString("é").ToString() != "é" {
+        return 19
+    }
+    let Ok(slice) = text.SliceUtf8(0, 3) else {
+        return 20
+    }
+    if slice != "hé" || text.SliceUtf8(2, 1) is not Error(_) {
+        return 21
+    }
+    let bytes: byte[] = [(byte)104, (byte)195, (byte)169]
+    let Ok(decoded) = Encodings.Utf8.Decode(bytes) else {
+        return 22
+    }
+    if decoded != "hé" {
+        return 23
+    }
+    let invalid: byte[] = [(byte)255]
+    if Encodings.Utf8.Decode(invalid) is not Error(_) {
+        return 24
+    }
+    if parsed6.ToString() != "42" || parsed8.ToString() != "42" {
+        return 25
+    }
+    return 42
+}

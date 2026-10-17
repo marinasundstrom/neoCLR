@@ -10,6 +10,20 @@ import re
 
 ROOT = Path(__file__).resolve().parent.parent
 
+SOURCE_TEXT_SERVICES = (
+    'Int32ToString', 'Int64ToString', 'StringFromChars',
+    'StringGraphemeAt', 'StringIntern', 'StringConcat',
+    'StringCompareOrdinal', 'StringCompareOrdinalIgnoreCase', 'StringReplaceOrdinal',
+    'StringContainsOrdinal', 'StringStartsWithOrdinal', 'StringEndsWithOrdinal',
+    'StringGraphemeCount', 'CharFromString', 'CharText',
+    'CharCategory', 'StringByteCount', 'StringSliceUtf8',
+    'StringToUpperInvariant', 'StringToLowerInvariant', 'StringHashOrdinalIgnoreCase',
+    'ParseBoolean', 'ParseSByte', 'ParseByte',
+    'ParseInt16', 'ParseUInt16', 'ParseInt32',
+    'ParseUInt32', 'ParseInt64', 'ParseUInt64',
+    'ParseSingle', 'ParseDouble', 'Utf8Decode',
+)
+
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -22,13 +36,20 @@ def retained_model(model):
     model['types'] = [t for t in model['types'] if t['name'] != 'System.Object']
     model['functions'] = [f for f in model['functions'] if f.get('owner') != {'Named': 'System.Object'}]
 
-    handle_services = {'neoCLR.Runtime.' + name for name in
+    # Production Console is source-owned; its obsolete seed facade would retain
+    # a cross-assembly call to the now-internal native formatting service.
+    if sum(t['name'] == 'System.Console' for t in model['types']) != 1:
+        raise ValueError('Expected exactly one bootstrap Console declaration')
+    model['types'] = [t for t in model['types'] if t['name'] != 'System.Console']
+    model['functions'] = [f for f in model['functions'] if f.get('owner') != {'Named': 'System.Console'}]
+
+    source_services = {'neoCLR.Runtime.' + name for name in
                        ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
-                        'TypeArgumentCount', 'TypeEquals', 'TypeName')}
-    for name in handle_services:
+                        'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES}
+    for name in source_services:
         if sum(f['name'] == name for f in model['functions']) != 1:
-            raise ValueError('Expected exactly one retained handle service: ' + name)
-    model['functions'] = [f for f in model['functions'] if f['name'] not in handle_services]
+            raise ValueError('Expected exactly one retained native service: ' + name)
+    model['functions'] = [f for f in model['functions'] if f['name'] not in source_services]
 
     def clear_ids(value):
         if isinstance(value, dict):
@@ -91,15 +112,15 @@ def main():
         if seed_text.count(declaration) != 1:
             raise ValueError('Expected exactly one retained payload helper: ' + name)
         seed_text = seed_text.replace(declaration, '')
-    # Native System.Runtime owns these handle primitives. Remove the old facade;
+    # Native System.Runtime owns these handle/text primitives. Remove the old facade;
     # seed service declarations remain available to assemble the temporary Object
     # body and are removed from the retained model after that body is discarded.
     for name in ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
-                 'TypeArgumentCount', 'TypeEquals', 'TypeName'):
+                 'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES:
         pattern = r'(?m)^\.method static ' + name + r'\([^\n]*\n.*?^\.end\n'
         seed_text, count = re.subn(pattern, '', seed_text, flags=re.DOTALL)
         if count != 1:
-            raise ValueError('Expected exactly one retained handle facade: ' + name)
+            raise ValueError('Expected exactly one retained native facade: ' + name)
     for path in (args.probe or args.core_reference, args.runtime, args.translator):
         if not path.is_file():
             raise FileNotFoundError(path)

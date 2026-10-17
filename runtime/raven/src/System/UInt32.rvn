@@ -18,7 +18,7 @@ public struct UInt32 : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<uint, NumberParseError> {
-        let payload = RuntimeServices.ParseUInt32(value)
+        let payload = neoCLR.Runtime.ParseUInt32(value)
         if neoCLR.Runtime.IsValue<uint>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<uint>(payload))
         }

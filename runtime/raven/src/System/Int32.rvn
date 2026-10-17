@@ -9,7 +9,7 @@ public struct Int32 : Number, EquatableTo<int> {
     private field m_value: int
 
     static func Parse(value: string) -> Result<int, NumberParseError> {
-        let payload = RuntimeServices.ParseInt32(value)
+        let payload = neoCLR.Runtime.ParseInt32(value)
         if neoCLR.Runtime.IsValue<int>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
         }
@@ -39,7 +39,7 @@ public struct Int32 : Number, EquatableTo<int> {
     }
 
     func ToString() -> string {
-        return RuntimeServices.Int32ToString(m_value)
+        return neoCLR.Runtime.Int32ToString(m_value)
     }
 
     static val Zero: int => (int)0

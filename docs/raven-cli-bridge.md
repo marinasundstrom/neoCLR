@@ -12664,3 +12664,16 @@ Runtime Contract switch or ordinary .NET compiler change is required. Raven
 type consumer, native ownership inspection, editor completion and API fingerprints
 qualify the [slice](validation/native-core-removal/README.md#native-type-handle-ownership--2026-10-17).
 Remaining core services/compiler bootstrap contracts still need migration.
+
+### Native direct text/parsing ownership (2026-10-17)
+
+33 direct string/character/formatting/parsing/UTF-8 decode services are declared by
+System.Runtime source and removed from prepared CLI/seed inputs. The obsolete
+seed Console facade is removed to prevent cross-assembly access to the now-internal
+formatting service. Existing public APIs and providers are unchanged. Raven
+70bf9be9c qualifies five-library compilation, text/parsing execution, ownership
+inspection, Parse completion and API fingerprints. No Runtime Contract switch or
+ordinary .NET compiler change is required. See the
+[gate](validation/native-core-removal/README.md#native-direct-textparsing-ownership--2026-10-17).
+Managed string equality and text-array helpers remain, as do other core/compiler
+bootstrap contracts; broader structural work stays parked.

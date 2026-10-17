@@ -21,7 +21,18 @@ if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
         // These runtime functions are now declared by the native System.Runtime sources.
         var sourceServices = new HashSet<string> { "GetDefaultTaskQueue", "GetCurrentTaskQueue", "RegisterTaskQueue", "IsValue", "UnpackValue",
             "TypeMetadataToken", "TypeDisplayName", "TypeShape", "TypeArgument",
-            "TypeArgumentCount", "TypeEquals", "TypeName" };
+            "TypeArgumentCount", "TypeEquals", "TypeName",
+            "Int32ToString", "Int64ToString", "StringFromChars",
+            "StringGraphemeAt", "StringIntern", "StringConcat",
+            "StringCompareOrdinal", "StringCompareOrdinalIgnoreCase", "StringReplaceOrdinal",
+            "StringContainsOrdinal", "StringStartsWithOrdinal", "StringEndsWithOrdinal",
+            "StringGraphemeCount", "CharFromString", "CharText",
+            "CharCategory", "StringByteCount", "StringSliceUtf8",
+            "StringToUpperInvariant", "StringToLowerInvariant", "StringHashOrdinalIgnoreCase",
+            "ParseBoolean", "ParseSByte", "ParseByte",
+            "ParseInt16", "ParseUInt16", "ParseInt32",
+            "ParseUInt32", "ParseInt64", "ParseUInt64",
+            "ParseSingle", "ParseDouble", "Utf8Decode" };
         var services = module.GetType("System.Runtime.CompilerServices.RuntimeServices");
         if (services is not null)
             foreach (var method in services.Methods.Where(m => sourceServices.Contains(m.Name)).ToArray())

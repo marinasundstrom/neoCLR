@@ -4,3 +4,69 @@ module neoCLR.Runtime
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringJoinParts(parts: string[], count: int, separator: string, expectedUtf8Bytes: int) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func Int32ToString(arg0: int) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func Int64ToString(arg0: long) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringFromChars(arg0: char[]) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringGraphemeAt(arg0: string, arg1: int) -> char;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringIntern(arg0: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringConcat(arg0: string, arg1: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringCompareOrdinal(arg0: string, arg1: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringCompareOrdinalIgnoreCase(arg0: string, arg1: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringReplaceOrdinal(arg0: string, arg1: string, arg2: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringContainsOrdinal(arg0: string, arg1: string) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringStartsWithOrdinal(arg0: string, arg1: string) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringEndsWithOrdinal(arg0: string, arg1: string) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringGraphemeCount(arg0: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharFromString(arg0: string) -> char;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharText(arg0: char) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharCategory(arg0: uint) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringByteCount(arg0: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringSliceUtf8(arg0: string, arg1: int, arg2: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringToUpperInvariant(arg0: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringToLowerInvariant(arg0: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringHashOrdinalIgnoreCase(arg0: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func Utf8Decode(arg0: byte[]) -> System.Value;

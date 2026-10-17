@@ -387,3 +387,28 @@ Strings/parsing, scheduling and other retained services plus compiler bootstrap
 contracts still require migration before production native-only core construction.
 The installed SDK is unchanged. Existing structural descriptor behavior is preserved;
 broader structural work remains parked.
+
+## Native direct text/parsing ownership — 2026-10-17
+
+33 direct string/character/formatting/parsing/UTF-8 decode services now belong to
+native System.Runtime declarations. All source callers select them directly.
+Preparation removes their CLI facade methods and retained seed definitions. It
+also removes the obsolete seed Console type/methods: its WriteLine(int) called
+Int32ToString across the new internal ownership boundary and caused access denial.
+Source Console already supplies the production API; no helper is made public.
+
+The strict invariant parsing grammar, Result error cases, grapheme/UTF-8 semantics
+and native providers are unchanged. Existing documented differences from .NET
+text representation/parsing are retained, not redesigned. Raven 70bf9be9c builds
+five libraries in target/native-text-direct-library-v2 against freshly prepared
+native-text-bootstrap-v2. The [consumer](TextConsumer.rvn) checks all eleven
+parsers, format/overflow rejection, string operations, graphemes, UTF-8 slicing
+and valid/invalid decoding. [Execution](text-results.json),
+[ownership](text-ownership.json) and [completion](text-completion.json) record the
+checks. API source fingerprints are refreshed; no public signatures change.
+Provider implementations are unchanged; no new JIT/AOT qualification is claimed.
+
+StringEquals still has a managed opcode body. StringGraphemes, StringScalars and
+Utf8Encode still materialize managed arrays through retained helper bodies. These
+are the next text migration boundary, followed by remaining services and compiler
+bootstrap contracts. The installed SDK is unchanged and structural work is parked.

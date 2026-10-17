@@ -18,7 +18,7 @@ public struct Int16 : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<short, NumberParseError> {
-        let payload = RuntimeServices.ParseInt16(value)
+        let payload = neoCLR.Runtime.ParseInt16(value)
         if neoCLR.Runtime.IsValue<short>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<short>(payload))
         }

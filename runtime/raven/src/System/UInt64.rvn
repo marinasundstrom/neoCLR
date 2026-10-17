@@ -18,7 +18,7 @@ public struct UInt64 : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<ulong, NumberParseError> {
-        let payload = RuntimeServices.ParseUInt64(value)
+        let payload = neoCLR.Runtime.ParseUInt64(value)
         if neoCLR.Runtime.IsValue<ulong>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<ulong>(payload))
         }

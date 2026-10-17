@@ -8,18 +8,18 @@ public struct Char : ComparableTo<char> {
     private field m_value: char
 
     static func FromString(text: string) -> char {
-        return RuntimeServices.CharFromString(text)
+        return neoCLR.Runtime.CharFromString(text)
     }
 
     func ToString() -> string {
-        return RuntimeServices.CharText(m_value)
+        return neoCLR.Runtime.CharText(m_value)
     }
 
     func Equals(other: char) -> bool {
-        return RuntimeServices.StringEquals(RuntimeServices.CharText(m_value), RuntimeServices.CharText(other))
+        return RuntimeServices.StringEquals(neoCLR.Runtime.CharText(m_value), neoCLR.Runtime.CharText(other))
     }
 
     func CompareTo(other: char) -> int {
-        return RuntimeServices.StringCompareOrdinal(RuntimeServices.CharText(m_value), RuntimeServices.CharText(other))
+        return neoCLR.Runtime.StringCompareOrdinal(neoCLR.Runtime.CharText(m_value), neoCLR.Runtime.CharText(other))
     }
 }

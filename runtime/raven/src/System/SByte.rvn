@@ -18,7 +18,7 @@ public struct SByte : Number {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<sbyte, NumberParseError> {
-        let payload = RuntimeServices.ParseSByte(value)
+        let payload = neoCLR.Runtime.ParseSByte(value)
         if neoCLR.Runtime.IsValue<sbyte>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<sbyte>(payload))
         }

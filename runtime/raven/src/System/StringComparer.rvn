@@ -27,7 +27,7 @@ public class StringComparer : Collections.EqualityComparer<string>, Collections.
 
     func GetHashCode(value: string) -> int {
         if ignoreCase {
-            return RuntimeServices.StringHashOrdinalIgnoreCase(value)
+            return neoCLR.Runtime.StringHashOrdinalIgnoreCase(value)
         }
         return neoCLR.Runtime.StringHashOrdinal(value)
     }

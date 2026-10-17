@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Move 33 direct text/parsing services to native System.Runtime ownership and remove prepared CLI/seed definitions. Remove the obsolete seed Console facade that otherwise calls an internal formatting service across assembly boundaries. Validate five-library compilation, all scalar parsers, text/UTF-8 behavior, native ownership, Parse completion and API fingerprints. Managed text helper bodies and remaining core/compiler bootstrap contracts stay open.
+
 - Move seven type-handle primitives to native System.Runtime source ownership and retarget descriptor callers. Remove their CLI facade methods and retained seed facade/native definitions during preparation. Validate fresh five-library compilation, generic type identity/argument/name/token interpreter checks, native metadata ownership, TypeInfo completion and API fingerprints. Provider semantics and public contracts are unchanged; remaining bootstrap services and compiler contracts stay open.
 
 - Remove 49 introspection RuntimeServices wrappers; bind callers to existing native declarations and the source-owned type-info factory. Update ownership source lists and the JSON mapping harness. Fresh five-library compilation, interpreter field/construction/function reflection regressions, TypeInfo completion and API fingerprints pass. Public contracts and native providers are unchanged; retained primitive/core bootstrap services remain open.

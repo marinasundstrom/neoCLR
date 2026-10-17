@@ -10,7 +10,7 @@ public struct Boolean : ComparableTo<bool> {
 
     /// Parses the complete text using the strict, culture-independent grammar.
     static func Parse(value: string) -> Result<bool, BooleanParseError> {
-        let payload = RuntimeServices.ParseBoolean(value)
+        let payload = neoCLR.Runtime.ParseBoolean(value)
         if neoCLR.Runtime.IsValue<bool>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<bool>(payload))
         }

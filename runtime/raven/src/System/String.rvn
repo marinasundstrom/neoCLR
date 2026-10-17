@@ -28,18 +28,18 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         if index != count {
             System.Fail("Character sequence count changed during construction")
         }
-        return RuntimeServices.StringFromChars(snapshot)
+        return neoCLR.Runtime.StringFromChars(snapshot)
     }
 
-    val Collections.Collection<char>.Count: int => RuntimeServices.StringGraphemeCount(m_value)
+    val Collections.Collection<char>.Count: int => neoCLR.Runtime.StringGraphemeCount(m_value)
 
     val self[index: int]: char {
-        get => RuntimeServices.StringGraphemeAt(m_value, index)
+        get => neoCLR.Runtime.StringGraphemeAt(m_value, index)
     }
 
     /// Applies a directional grapheme index; invalid element bounds fault.
     val self[index: Index]: char {
-        get => RuntimeServices.StringGraphemeAt(m_value, index.GetOffset(Length))
+        get => neoCLR.Runtime.StringGraphemeAt(m_value, index.GetOffset(Length))
     }
 
     /// Copies a half-open grapheme range; invalid bounds fault.
@@ -58,7 +58,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         if index >= Length {
             return None
         }
-        return Some(RuntimeServices.StringGraphemeAt(m_value, index))
+        return Some(neoCLR.Runtime.StringGraphemeAt(m_value, index))
     }
 
     /// Returns a grapheme at a directional index, or None when outside the text.
@@ -73,11 +73,11 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
     }
 
     static func Intern(text: string) -> string {
-        return RuntimeServices.StringIntern(text)
+        return neoCLR.Runtime.StringIntern(text)
     }
 
     static func Concat(left: string, right: string) -> string {
-        return RuntimeServices.StringConcat(left, right)
+        return neoCLR.Runtime.StringConcat(left, right)
     }
 
     /// Joins initialized non-null strings, inserting separator between every pair.
@@ -108,7 +108,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
     static func Concat(left: Object?, right: Object?) -> string {
         let first = if left is Object value { value.ToString() } else { "" }
         let second = if right is Object value { value.ToString() } else { "" }
-        return RuntimeServices.StringConcat(first, second)
+        return neoCLR.Runtime.StringConcat(first, second)
     }
 
     static func ==(left: string, right: string) -> bool => RuntimeServices.StringEquals(left, right)
@@ -133,49 +133,49 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
 
     /// Uses Unicode 17 default simple folding without normalization or expansion.
     static func CompareOrdinalIgnoreCase(left: string, right: string) -> int {
-        return RuntimeServices.StringCompareOrdinalIgnoreCase(left, right)
+        return neoCLR.Runtime.StringCompareOrdinalIgnoreCase(left, right)
     }
 
     static func CompareOrdinal(left: string, right: string) -> int {
-        return RuntimeServices.StringCompareOrdinal(left, right)
+        return neoCLR.Runtime.StringCompareOrdinal(left, right)
     }
 
     /// Unicode 17 full default uppercase; no locale tailoring or normalization.
     func ToUpperInvariant() -> string {
-        return RuntimeServices.StringToUpperInvariant(m_value)
+        return neoCLR.Runtime.StringToUpperInvariant(m_value)
     }
 
     /// Unicode 17 full default lowercase, including final sigma context.
     func ToLowerInvariant() -> string {
-        return RuntimeServices.StringToLowerInvariant(m_value)
+        return neoCLR.Runtime.StringToLowerInvariant(m_value)
     }
 
     /// Replaces exact, non-overlapping matches without modifying this string.
     /// Empty replacement deletes matches; empty search faults with RuntimeError.
     /// Arguments must be non-null. Matching uses UTF-8 without culture or normalization.
     func Replace(oldValue: string, newValue: string) -> string {
-        return RuntimeServices.StringReplaceOrdinal(m_value, oldValue, newValue)
+        return neoCLR.Runtime.StringReplaceOrdinal(m_value, oldValue, newValue)
     }
 
     func ContainsOrdinal(substring: string) -> bool {
-        return RuntimeServices.StringContainsOrdinal(m_value, substring)
+        return neoCLR.Runtime.StringContainsOrdinal(m_value, substring)
     }
 
     func StartsWithOrdinal(prefix: string) -> bool {
-        return RuntimeServices.StringStartsWithOrdinal(m_value, prefix)
+        return neoCLR.Runtime.StringStartsWithOrdinal(m_value, prefix)
     }
 
     func EndsWithOrdinal(suffix: string) -> bool {
-        return RuntimeServices.StringEndsWithOrdinal(m_value, suffix)
+        return neoCLR.Runtime.StringEndsWithOrdinal(m_value, suffix)
     }
 
     /// Legacy byte-oriented API; byte counting belongs to explicit encoding.
     [Obsolete("Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.")]
     func GetUtf8ByteCount() -> int {
-        return RuntimeServices.StringByteCount(m_value)
+        return neoCLR.Runtime.StringByteCount(m_value)
     }
 
-    val Length: int => RuntimeServices.StringGraphemeCount(m_value)
+    val Length: int => neoCLR.Runtime.StringGraphemeCount(m_value)
 
 
     func GetIterator() -> Collections.Iterator<char> {
@@ -192,7 +192,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
     /// Legacy byte-oriented API; byte slicing belongs to explicit encoding and buffers.
     [Obsolete("Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.")]
     func SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError> {
-        let payload = RuntimeServices.StringSliceUtf8(m_value, byteStart, byteLength)
+        let payload = neoCLR.Runtime.StringSliceUtf8(m_value, byteStart, byteLength)
         if neoCLR.Runtime.IsValue<string>(payload) {
             return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
         }

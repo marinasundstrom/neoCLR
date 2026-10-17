@@ -4,47 +4,47 @@ import System.Runtime.CompilerServices.RuntimeServices
 
 public static class UnicodeScalar {
     static func IsDigit(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category == 8
     }
 
     static func IsNumber(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category >= 8 && category <= 10
     }
 
     static func IsLetter(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category >= 0 && category <= 4
     }
 
     static func IsUpper(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category == 0
     }
 
     static func IsLower(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category == 1
     }
 
     static func IsSeparator(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category >= 11 && category <= 13
     }
 
     static func IsControl(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category == 14
     }
 
     static func IsPunctuation(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category >= 18 && category <= 24
     }
 
     static func IsSymbol(value: uint) -> bool {
-        let category = RuntimeServices.CharCategory(value)
+        let category = neoCLR.Runtime.CharCategory(value)
         return category >= 25 && category <= 28
     }
 

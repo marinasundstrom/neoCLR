@@ -1,0 +1,36 @@
+import System.Runtime.CompilerServices.*
+
+module neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseBoolean(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseSByte(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseByte(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseInt16(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseUInt16(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseInt32(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseUInt32(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseInt64(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseUInt64(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseSingle(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ParseDouble(arg0: string) -> System.Value;
