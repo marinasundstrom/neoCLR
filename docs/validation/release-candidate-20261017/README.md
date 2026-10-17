@@ -145,3 +145,43 @@ overridden for JIT; the archived package and installed SDK are not modified.
 Review of the introspection website found no new API or signature to document;
 this repairs the existing generic-argument/retention contract. Full coherent
 package/editor acceptance, Windows validation and runtime measurements remain open.
+
+## Coherent macOS SDK and installed editor candidate
+
+The local candidate `0.0.0-native-candidate.20261017` is a qualification identifier,
+not a selected published release. NeoCLR `a9b01a0e1` and Raven `e5d6afe82` produce
+an optimized runtime/backend, freshly packaged SDK (compiler, project tool and
+language server), matching VSIX and all five native libraries. The normal Raven
+packager uses net11.0 tooling, with the installed .NET 11 RC SDK; native sample
+projects still target net10.0. This host requirement must remain explicit when
+selecting the eventual release toolchain.
+
+[Build commands](coherent-package-build.json) and [identity checks](coherent-package-identity.json)
+record exact inputs and archive identity. The VSIX embeds the same server, compiler
+analysis, native adapter and metadata-library binaries as the SDK server directory.
+The archive is `target/release-coherent-20261017/neoclr-native-candidate-osx-arm64.tar.gz`.
+[Extracted-package acceptance](coherent-package-acceptance.json) passes collections,
+tasks, JSON and HTTP client/server checks using the bundled compiler and default
+JIT, without binary overrides. Prior focused AOT and interpreter evidence remains
+separate; this run does not claim full source or Windows qualification.
+
+The packaged VSIX was installed in an isolated VS Code profile. The
+[main editor suite](coherent-editor-acceptance.json) passes 26 checks including
+native hover/completion/documentation/navigation, dependency replacement and
+recovery, configuration recovery, build/run, failed-build artifact preservation,
+ordinary .NET editor behavior and Tasks/await execution. [Inlay checks](coherent-editor-inlays.json)
+pass after edits and concurrent range queries. Existing user SDK/default profiles
+are unchanged.
+
+The [initial editor run](coherent-editor-legacy-harness-failure.json) exposed an
+obsolete harness assumption: it tried to invalidate the removed ObjectLibrary
+property. Both configuration harnesses now mutate `RavenNeoClrNativeCoreReference`
+to a missing DLL; syntax checks pass and the main suite confirms invalidation and
+recovery. The [repeated configuration test](coherent-editor-configuration.json)
+recovers twice, then times out waiting for the third missing-core diagnostic.
+The harness restores the valid configuration in `finally`. This remains an editor
+release blocker; no cause or runtime failure is inferred from that timeout.
+
+No publication, global SDK replacement, Windows run or benchmark measurement is
+claimed. Next: investigate repeated configuration diagnostic publication/reload,
+then qualify the repaired editor and complete Windows/source/benchmark gates.

@@ -1,0 +1,14 @@
+{
+  "passed": false,
+  "rounds": [
+    {
+      "round": 0,
+      "recovered": true
+    },
+    {
+      "round": 1,
+      "recovered": true
+    }
+  ],
+  "error": "Error: Timeout: configuration diagnostic\n\tat until (/Users/robert/Projects/neoclr/scripts/native-vscode-configuration-acceptance.cjs:16:11)\n\tat async exports.run (/Users/robert/Projects/neoclr/scripts/native-vscode-configuration-acceptance.cjs:29:7)"
+}

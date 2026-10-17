@@ -1,0 +1,93 @@
+{
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "scripts/build-native-class-library.py",
+        "--compiler",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/sdk/raven-sdk-0.0.0-native-candidate.20261017-osx-arm64/tools/rvnc/rvnc.dll",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/libraries",
+        "--compiler-revision",
+        "e5d6afe8285f8b5fb8d3f5333b9892e9ad0b8784",
+        "--with-postgresql"
+      ],
+      "exitCode": 0,
+      "stdout": "Built native System.Runtime/System.Data/System.Networking/System.Web/System.Data.PostgreSql bundle: /Users/robert/Projects/neoclr/target/release-coherent-20261017/libraries\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "npx",
+        "--no-install",
+        "vsce",
+        "package",
+        "0.0.0-native-candidate.20261017",
+        "--no-update-package-json",
+        "--no-dependencies",
+        "--out",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/raven-vscode.vsix"
+      ],
+      "exitCode": 0,
+      "stdout": " INFO  Files included in the VSIX:\nraven-vscode.vsix\n\u251c\u2500 [Content_Types].xml \n\u251c\u2500 extension.vsixmanifest \n\u2514\u2500 extension/\n   \u251c\u2500 LICENSE.txt [1.05 KB]\n   \u251c\u2500 language-configuration.json [0.51 KB]\n   \u251c\u2500 package.json [16.08 KB]\n   \u251c\u2500 readme.md [6.97 KB]\n   \u251c\u2500 dist/ (1 file) [392.12 KB]\n   \u251c\u2500 server/ (87 files) [29.64 MB]\n   \u2514\u2500 syntaxes/ (1 file) [38.01 KB]\n\n=> Run vsce ls --tree to see all included files.\n\n DONE  Packaged: /Users/robert/Projects/neoclr/target/release-coherent-20261017/raven-vscode.vsix (95 files, 10.34 MB)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/package-native-poc.py",
+        "--sdk",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/sdk/raven-sdk-0.0.0-native-candidate.20261017-osx-arm64",
+        "--vsix",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/raven-vscode.vsix",
+        "--libraries",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/libraries",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "--runtime-revision",
+        "a9b01a0e14c53ecbffa764d57897032806313f2b",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/base"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-coherent-20261017/base/neoclr-native-poc.tar.gz\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/prepare-jit-bundle.py",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/base/neoclr-native-poc",
+        "--runtime",
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen",
+        "--host-recipe",
+        "docs/experiments/runtime-async/native-validation.json",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/jit"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-coherent-20261017/jit/bundle\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/extracted/neoclr-native-poc/tools/verify-native-bundle.py",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/extracted/neoclr-native-poc",
+        "--report",
+        "/Users/robert/Projects/neoclr/target/release-coherent-20261017/acceptance.json"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-coherent-20261017/acceptance.json\n",
+      "stderr": ""
+    }
+  ],
+  "runtimeRevision": "a9b01a0e14c53ecbffa764d57897032806313f2b",
+  "ravenRevision": "e5d6afe8285f8b5fb8d3f5333b9892e9ad0b8784",
+  "archiveSha256": "ba9aea20108b371c3dbc1b55d2d1c89baacef1ea32727bf8c850fa5226549561"
+}

@@ -55,14 +55,18 @@ The backend repair now preserves union generic-argument metadata recursively.
 Unchanged HTTP server requests and client/server execution pass in JIT and AOT;
 seven backend tests and one interpreter visibility test pass.
 See [qualification](validation/release-candidate-20261017/README.md#authored-method-union-signatures).
-The installed SDK and archive are unchanged; rebuild a coherent compiler/server/
-library package for complete package/editor acceptance.
+A new coherent macOS candidate now passes extracted-package acceptance with fresh
+SDK/server/VSIX and five native libraries. Its main installed-editor suite passes
+26 checks and inlay checks pass. Repeated missing-core configuration changes recover
+twice but the third cycle times out waiting for a project diagnostic; this remains
+an editor release blocker. See [candidate evidence](validation/release-candidate-20261017/README.md#coherent-macos-sdk-and-installed-editor-candidate).
+The existing user SDK/profile and published archives are unchanged.
 
 CPU/JSON benchmark preparation now compiles and links successfully against this
 extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)
 identifies the workloads and artifacts; it is not an execution or timing result.
 
-Windows execution, editor package qualification and runtime measurements remain
+Windows execution, complete editor qualification and runtime measurements remain
 pending. The local Raven revision is ahead of the remote branch; candidate pinning
 must establish a remotely available, matching compiler/server/extension cohort.
 
@@ -72,9 +76,9 @@ must establish a remotely available, matching compiler/server/extension cohort.
 | --- | --- | --- |
 | Candidate identity | The native-toolchain workflow pins Raven `51dd22f5a`, before the `57dbabb17` execution-core deduplication and native Console fixes. Its package version still identifies the old release. | Select exact available Raven/runtime revisions and a distinct candidate package version. Record hashes for compiler, server, extension, libraries, runtime, codegen and native hosts. |
 | Source qualification | No fresh complete source gate is recorded for this candidate. The native source validator still checks the legacy seed fixture. Its pinned hash was reproduced successfully, but that is not production-core acceptance. | Run canonical extracted-source full tests once, formatting/Clippy and minimum-Rust checks; retain focused macOS/Windows host/ABI checks. Keep legacy fixture evidence distinct from the native library/package gate. |
-| Optimized packages | Local installed preview is debug; no fresh Windows native-core package acceptance is recorded. | Build optimized macOS ARM64 and Windows x64 runtime/backend/host packages from the same selected revisions. Extract and validate each actual archive, not a working checkout. |
+| Optimized packages | A fresh optimized macOS candidate passes extracted-package acceptance; no fresh Windows native-core package acceptance is recorded. | Build optimized macOS ARM64 and Windows x64 runtime/backend/host packages from the same selected revisions. Extract and validate each actual archive, not a working checkout. |
 | Runtime/library correctness | Narrow bootstrap consumers do not qualify all production wrappers or all newly integrated type-system behavior. | On both targets exercise packaged collections, parsing/text, checked arithmetic, readonly/type initialization, variance/imported generics, Function invocation, reflection/JSON, async, HTTP/TLS and GC. Use interpreter/JIT/AOT for supported workloads. Reuse unchanged focused evidence only with explicit dependency justification. |
-| Editor | The new preview has focused completion evidence, not the full packaged editor gate on both hosts. | Validate native-only completion, hover, navigation, inlays, configuration recovery and build/run tasks with the exact shipped SDK/VSIX on both platforms. Test stale-output rejection and HTTP task inputs. |
+| Editor | macOS main packaged editor/inlay checks pass; repeated configuration diagnostics fail on the third cycle. Windows editor qualification is pending. | Validate native-only completion, hover, navigation, inlays, configuration recovery and build/run tasks with the exact shipped SDK/VSIX on both platforms. Test stale-output rejection and HTTP task inputs. |
 | API coverage | The website reports 123 unmatched legacy routes. Inspection shows 104 flat redirect routes and 19 hierarchical pages, not 123 missing APIs. | Verify redirect destinations; classify the 19 pages against native metadata. Preserve documented current APIs, remove obsolete scaffolds from current navigation, and retain honest notices/manual references for real coverage gaps. |
 | Documentation and packaging | The previous next-preview draft described the already released unified runtime. Native-core migration changes the compiler/library cohort. | Finalize current release notes, supported-feature limits, notices, package prerequisites and checksums. Change published download URLs only when actual new assets exist. |
 | Runtime performance | Existing published CPU/JSON/HTTP measurements use Preview 14; the installed debug preview is not a release benchmark baseline. Windows workload preparation is incomplete. | Complete the benchmark preparation below, then retain and review runtime measurements on both release targets before publication. |

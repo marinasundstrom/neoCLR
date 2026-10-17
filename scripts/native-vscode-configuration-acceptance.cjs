@@ -21,8 +21,8 @@ exports.run = async () => {
     await vscode.window.showTextDocument(doc);
     await until(async () => (await vscode.commands.executeCommand('vscode.executeHoverProvider', doc.uri,
       doc.positionAt(doc.getText().indexOf('ArrayList') + 2)))?.length, 'initial workspace');
-    const invalid = original.replace('<RavenNeoClrObjectLibrary>System.Runtime</RavenNeoClrObjectLibrary>',
-      '<RavenNeoClrObjectLibrary>Missing.Owner</RavenNeoClrObjectLibrary>');
+    const invalid = original.replace('<RavenNeoClrNativeCoreReference>$(MSBuildThisFileDirectory)System.Runtime.dll</RavenNeoClrNativeCoreReference>',
+      '<RavenNeoClrNativeCoreReference>$(MSBuildThisFileDirectory)Missing.Owner.dll</RavenNeoClrNativeCoreReference>');
     assert.notStrictEqual(original, invalid);
     for (let round = 0; round < 3; round++) {
       fs.writeFileSync(config, invalid);

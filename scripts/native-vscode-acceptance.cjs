@@ -147,8 +147,8 @@ exports.run = async function () {
       const configurationPath = path.join(root, 'references/NeoCLR.ClassLibrary.props');
       const originalConfiguration = fs.readFileSync(configurationPath, 'utf8');
       const invalidConfiguration = originalConfiguration.replace(
-        '<RavenNeoClrObjectLibrary>System.Runtime</RavenNeoClrObjectLibrary>',
-        '<RavenNeoClrObjectLibrary>Missing.Owner</RavenNeoClrObjectLibrary>');
+        '<RavenNeoClrNativeCoreReference>$(MSBuildThisFileDirectory)System.Runtime.dll</RavenNeoClrNativeCoreReference>',
+        '<RavenNeoClrNativeCoreReference>$(MSBuildThisFileDirectory)Missing.Owner.dll</RavenNeoClrNativeCoreReference>');
       assert.notStrictEqual(originalConfiguration, invalidConfiguration);
       try {
         fs.writeFileSync(configurationPath, invalidConfiguration);

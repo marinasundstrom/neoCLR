@@ -1,0 +1,246 @@
+{
+  "vscode": "1.142.0",
+  "checks": [
+    "native imported hover",
+    "native imported Markdown documentation hover",
+    "native Markdown sidecar edit refreshes hover",
+    "native XML fallback after Markdown member deletion",
+    "read-only metadata declaration navigation",
+    "native imported completion",
+    "native imported completion documentation",
+    "actual file watcher invalidates replaced native library",
+    "unsaved buffer survives native workspace reload",
+    "missing native reference produces a project diagnostic",
+    "native dependency recovery clears the project diagnostic",
+    "System.Data.Json.JsonValue native hover and metadata navigation",
+    "shipped native Networking documentation appears in hover",
+    "System.Networking.IPAddress native hover and metadata navigation",
+    "System.Web.Http.HttpClient native hover and metadata navigation"
+  ],
+  "passed": false,
+  "hoverTimings": [
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:06.470Z",
+      "elapsedMs": 68,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:07.041Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:07.544Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:08.047Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:08.550Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:09.052Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:09.555Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:10.058Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:10.561Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:11.064Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:11.567Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:12.071Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:12.574Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:13.075Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:13.578Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:14.081Z",
+      "elapsedMs": 1,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:14.584Z",
+      "elapsedMs": 500,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:15.086Z",
+      "elapsedMs": 38,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:15.625Z",
+      "elapsedMs": 4593,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:20.218Z",
+      "elapsedMs": 1408,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:22.128Z",
+      "elapsedMs": 2616,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:29.317Z",
+      "elapsedMs": 996,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-17T15:15:30.816Z",
+      "elapsedMs": 3,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 43,
+      "startedAt": "2026-10-17T15:15:35.860Z",
+      "elapsedMs": 801,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 44,
+      "startedAt": "2026-10-17T15:15:36.679Z",
+      "elapsedMs": 105,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 42,
+      "startedAt": "2026-10-17T15:15:36.795Z",
+      "elapsedMs": 112,
+      "hasResult": true
+    }
+  ],
+  "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+  "diagnostics": [],
+  "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+  "completion": [
+    {
+      "label": "VersionOne",
+      "description": "EditorApi"
+    }
+  ],
+  "bundleHovers": {
+    "System.Data.Json.JsonValue": "```raven\nsealed class JsonValue\n```\n\nType in `Json`",
+    "System.Networking.IPAddress": "```raven\nsealed class IPAddress: EquatableTo<IPAddress>\n```\n\nType in `Networking`\n\n---\n\nAn immutable IP address in the closed IPv4 and IPv6 family.",
+    "System.Web.Http.HttpClient": "```raven\nclass HttpClient: Disposable\n```\n\nType in `Http`"
+  },
+  "error": "AssertionError [ERR_ASSERTION]: Expected \"actual\" to be strictly unequal to:\n\n'<Project>\\n' +\n  '  <PropertyGroup>\\n' +\n  '    <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>\\n' +\n  '    <RavenMetadataFormat>NeoCLR</RavenMetadataFormat>\\n' +\n  '    <RavenNeoClrNativeCoreReference>$(MSBuildThisFileDirectory)System.Runtime.dll</RavenNeoClrNativeCoreReference>\\n' +\n  '    <RavenNeoClrRuntimeSeed>$(MSBuildThisFileDirectory)System.runtime.neox</RavenNeoClrRuntimeSeed>\\n' +\n  '    <RavenNeoClrRuntimeContracts>$(MSBuildThisFileDirectory)ownership.json</RavenNeoClrRuntimeContracts>\\n' +\n  '    <RavenNeoClrAsyncLibrary>System.Runtime</RavenNeoClrAsyncLibrary>\\n' +\n  `    <RavenNeoClrRuntimeAsyncHelper Condition=\"'$(RavenNeoClrRuntimeAsyncHelper)' == ''\">RuntimeAwaitProvider.Bridge</RavenNeoClrRuntimeAsyncHelper>\\n` +\n  '    <RavenNeoClrRuntimeAsyncProviderImported>true</RavenNeoClrRuntimeAsyncProviderImported>\\n' +\n  '  </PropertyGroup>\\n' +\n  '  <ItemGroup>\\n' +\n  `    <Compile Include=\"$(MSBuildThisFileDirectory)RuntimeAwait.rvn\" Condition=\"'$(RavenNeoClrRuntimeAsyncHelper)' == 'RuntimeAwaitProvider.Bridge'\" />\\n` +\n  `    <Compile Include=\"$(MSBuildThisFileDirectory)RuntimeGenerator.rvn\" Condition=\"'$(RavenNeoClrRuntimeAsyncHelper)' == 'RuntimeAwaitProvider.Bridge'\" />\\n` +\n  '  </ItemGroup>\\n' +\n  '  <ItemGroup>\\n' +\n  '    <Reference Include=\"System.Runtime\">\\n' +\n  '      <HintPath>$(MSBuildThisFileDirectory)System.Runtime.dll</HintPath>\\n' +\n  '    </Reference>\\n' +\n  '    <Reference Include=\"System.Data\">\\n' +\n  '      <HintPath>$(MSBuildThisFileDirectory)System.Data.dll</HintPath>\\n' +\n  '    </Reference>\\n' +\n  '    <Reference Include=\"System.Networking\">\\n' +\n  '      <HintPath>$(MSBuildThisFileDirectory)System.Networking.dll</HintPath>\\n' +\n  '    </Reference>\\n' +\n  '    <Reference Include=\"System.Web\">\\n' +\n  '      <HintPath>$(MSBuildThisFileDirectory)System.Web.dll</HintPath>\\n' +\n  '    </Reference>\\n' +\n  '    <Reference Include=\"System.Data.PostgreSql\">\\n' +\n  '      <HintPath>$(MSBuildThisFileDirectory)System.Data.PostgreSql.dll</HintPath>\\n' +\n  '    </Reference>\\n' +\n  '  </ItemGroup>\\n' +\n  '</Project>'\n\n\tat exports.run (/Users/robert/Projects/neoclr/scripts/native-vscode-acceptance.cjs:152:14)"
+}

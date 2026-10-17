@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Build a coherent optimized macOS candidate with fresh Raven SDK/server/VSIX and five native libraries; extracted-package collections/tasks/JSON/HTTP acceptance passes without overrides. Update editor configuration tests to invalidate the native core reference instead of the removed ObjectLibrary property. The main installed-editor suite passes 26 checks and inlay checks pass; repeated configuration recovery times out on the third missing-core diagnostic and remains a release blocker. Retain exact package identity and passing/failing evidence; no release publication, global SDK replacement, Windows qualification or benchmark claim.
+
 - Preserve structural union generic-argument identity in native metadata token mapping, display names and shape queries; missing/open constituent metadata still rejects. Require public union constituents for visibility in interpreter and backend. Seven focused backend tests and one interpreter visibility test pass; unchanged HTTP client/server execution passes JIT and AOT, complementing prior interpreter evidence. Coherent release package/editor and Windows qualification remain pending.
 
 - Admit native unions recursively in authored method signatures, including imported `Task<Result<T, HttpError | JsonError>>` results, while preserving constituent, ownership and generic-scope validation. Improve rejection diagnostics with the exact method signature. Focused metadata roundtrip/bounds tests and unchanged HTTP client compilation/interpreter execution pass; JIT exposes a separate generic-union metadata-retention blocker. No ABI change or SDK replacement.
