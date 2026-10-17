@@ -4671,7 +4671,9 @@ fn interpret_instructions_with_dispatch(
                                 args.remove(0),
                                 options.clone(),
                             )?;
-                            frames.last_mut().unwrap().stack.push(Value::Void);
+                            if !callee.no_result {
+                                frames.last_mut().unwrap().stack.push(Value::Void);
+                            }
                             return Ok(None);
                         }
 

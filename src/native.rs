@@ -251,7 +251,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if function.no_result
         && !matches!(
             function.name.as_str(),
-            "neoCLR.Runtime.RuntimeAsyncYield"
+            "neoCLR.Runtime.ScheduleTask"
+                | "neoCLR.Runtime.RuntimeAsyncYield"
                 | "neoCLR.Runtime.RuntimeAsyncAwaitUnit"
                 | "neoCLR.Runtime.ReflectionPropertySet"
                 | "neoCLR.Runtime.GCCollect"
@@ -1968,10 +1969,12 @@ mod task_callback_tests {
             ("fn<Int32>", false),
             ("fn<Int32,Void>", false),
         ] {
-            let module = crate::assemble(&format!(
-                ".module Test\n.function neoCLR.Runtime.ScheduleTask({callback} callback) -> Void\n.methodimpl InternalCall\n.end\n"
-            ));
-            assert_eq!(module.is_ok(), accepted, "{callback}");
+            for result in ["Void", "noresult"] {
+                let module = crate::assemble(&format!(
+                    ".module Test\n.function neoCLR.Runtime.ScheduleTask({callback} callback) -> {result}\n.methodimpl InternalCall\n.end\n"
+                ));
+                assert_eq!(module.is_ok(), accepted, "{callback} -> {result}");
+            }
         }
     }
 }

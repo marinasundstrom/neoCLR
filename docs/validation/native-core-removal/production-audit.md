@@ -228,3 +228,10 @@ stripping are accepted substitutes for the above gates.
 - All remaining text helper facades are removed. Native managed-array results serve
   graphemes/scalars/UTF-8 bytes; source null-safe ordinal equality replaces its
   seed body. Fresh compilation, interpreter consumption and completion pass.
+
+- Fourteen file/time/worker/task services are native-owned. No-result ScheduleTask
+  admission, interpreter stack behavior and codegen binding are corrected and
+  tested. Async Task.Run/worker/file consumption passes against the fresh bundle.
+  UnixTimeToLocal remains the final source facade call. A native-only production
+  core probe still diagnoses missing NeoCLR.CoreProbe, so compiler contract closure
+  remains separate from source forward removal.

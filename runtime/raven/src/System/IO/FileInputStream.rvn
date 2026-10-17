@@ -15,7 +15,7 @@ public class FileInputStream : InputStream, SeekableStream {
     }
 
     static func Open(path: string) -> Result<FileInputStream, StreamError> {
-        let payload = RuntimeServices.FileOpenRead(path)
+        let payload = neoCLR.Runtime.FileOpenRead(path)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -40,7 +40,7 @@ public class FileInputStream : InputStream, SeekableStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = RuntimeServices.FileReadInto(handle, buffer, offset, count)
+        let payload = neoCLR.Runtime.FileReadInto(handle, buffer, offset, count)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -51,7 +51,7 @@ public class FileInputStream : InputStream, SeekableStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = RuntimeServices.FilePosition(handle)
+        let payload = neoCLR.Runtime.FilePosition(handle)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -62,7 +62,7 @@ public class FileInputStream : InputStream, SeekableStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = RuntimeServices.FileSeek(handle, position)
+        let payload = neoCLR.Runtime.FileSeek(handle, position)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -71,7 +71,7 @@ public class FileInputStream : InputStream, SeekableStream {
 
     func Close() {
         if !closed {
-            _ = RuntimeServices.FileClose(handle)
+            _ = neoCLR.Runtime.FileClose(handle)
             closed = true
         }
     }

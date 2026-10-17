@@ -1,0 +1,45 @@
+import System.Runtime.CompilerServices.*
+
+module neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SystemCultureName() -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func UnixTimeTicks() -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileOpenRead(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileCreateNew(arg0: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FilePosition(arg0: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileSeek(arg0: int, arg1: long) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileReadInto(arg0: int, arg1: byte[], arg2: int, arg3: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileWriteChunk(arg0: int, arg1: byte[], arg2: int, arg3: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileFlush(arg0: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileClose(arg0: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StartWorker(arg0: (string) -> string, arg1: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func QueueWorker(arg0: (string) -> string, arg1: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func JoinWorker(arg0: int) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ScheduleTask(arg0: () -> System.Void) -> System.Void;

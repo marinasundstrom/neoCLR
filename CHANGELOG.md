@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Move 14 file/time/worker/task services to native source ownership with CLI/seed removal. Admit no-result ScheduleTask calls, avoid pushing a unit in the interpreter, and preserve the return shape in native bindings. Focused signature/execution/codegen tests, fresh five-library compilation, async task/worker/file consumer, completion and API fingerprints pass. Local-time conversion and compiler source-core contracts remain open.
+
 - Remove the four remaining text helper facades: use native managed-array results for graphemes/scalars/UTF-8 bytes and source null-safe ordinal equality. Remove CLI/seed bodies and validate fresh five-library compilation, Unicode/empty-array/null-equality interpreter consumption, completion and API fingerprints. Public APIs and providers are unchanged; other services and compiler bootstrap contracts remain open.
 
 - Move 33 direct text/parsing services to native System.Runtime ownership and remove prepared CLI/seed definitions. Remove the obsolete seed Console facade that otherwise calls an internal formatting service across assembly boundaries. Validate five-library compilation, all scalar parsers, text/UTF-8 behavior, native ownership, Parse completion and API fingerprints. Managed text helper bodies and remaining core/compiler bootstrap contracts stay open.

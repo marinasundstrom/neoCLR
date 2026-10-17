@@ -1,0 +1,75 @@
+import System.*
+import System.IO.*
+import System.Time.*
+import System.Globalization.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+
+func Echo(text: string) -> string => string.Concat(text, "!")
+
+async func Main() -> Task<int> {
+    if SystemClock().Now.UnixTimeTicks <= 0 {
+        return 1
+    }
+    let culture = SystemCultureProvider()
+    let resolved = SystemCultureProvider.FromPreference(culture.PreferredCultureName)
+    if culture.Current.Name != resolved.Current.Name {
+        return 2
+    }
+    let scheduled = await Task.Run(() => 42)
+    if scheduled != 42 {
+        return 14
+    }
+    let thread = Thread(Echo, "thread")
+    thread.Start()
+    let first = await thread.Task
+    if first != "thread!" {
+        return 3
+    }
+    let second = await ThreadPool.Queue(Echo, "pool")
+    if second != "pool!" {
+        return 4
+    }
+    let path = "/Users/robert/Projects/neoclr/target/native-core-services-consumer/data.bin"
+    let Ok(output) = FileOutputStream.CreateNew(path) else {
+        return 5
+    }
+    let bytes: byte[] = [(byte)40, (byte)42]
+    let written = await output.Write(bytes, 0, 2)
+    if written is not Ok(_) {
+        output.Close()
+        return 6
+    }
+    let flushed = await output.Flush()
+    if flushed is not Ok(_) {
+        output.Close()
+        return 7
+    }
+    output.Close()
+    let Ok(input) = FileInputStream.Open(path) else {
+        return 8
+    }
+    let Ok(position) = input.Seek(1) else {
+        input.Close()
+        return 9
+    }
+    let Ok(current) = input.GetPosition() else {
+        input.Close()
+        return 10
+    }
+    if position != 1 || current != 1 {
+        input.Close()
+        return 11
+    }
+    let read = await input.Read(bytes, 0, 1)
+    let Ok(count) = read else {
+        input.Close()
+        return 12
+    }
+    input.Close()
+    if count != 1 || bytes[0] != (byte)42 {
+        return 13
+    }
+    return 42
+}

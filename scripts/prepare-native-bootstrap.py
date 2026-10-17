@@ -26,6 +26,14 @@ SOURCE_TEXT_SERVICES = (
 )
 
 
+SOURCE_CORE_SERVICES = (
+    'SystemCultureName', 'UnixTimeTicks', 'FileOpenRead',
+    'FileCreateNew', 'FilePosition', 'FileSeek',
+    'FileReadInto', 'FileWriteChunk', 'FileFlush',
+    'FileClose', 'StartWorker', 'QueueWorker',
+    'JoinWorker', 'ScheduleTask',
+)
+
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -46,7 +54,7 @@ def retained_model(model):
 
     source_services = {'neoCLR.Runtime.' + name for name in
                        ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
-                        'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES}
+                        'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES + SOURCE_CORE_SERVICES}
     for name in source_services:
         if sum(f['name'] == name for f in model['functions']) != 1:
             raise ValueError('Expected exactly one retained native service: ' + name)
@@ -117,7 +125,7 @@ def main():
     # seed service declarations remain available to assemble the temporary Object
     # body and are removed from the retained model after that body is discarded.
     for name in ('TypeMetadataToken', 'TypeDisplayName', 'TypeShape', 'TypeArgument',
-                 'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES + ('StringEquals',):
+                 'TypeArgumentCount', 'TypeEquals', 'TypeName') + SOURCE_TEXT_SERVICES + SOURCE_CORE_SERVICES + ('StringEquals',):
         pattern = r'(?m)^\.method static ' + name + r'\([^\n]*\n.*?^\.end\n'
         seed_text, count = re.subn(pattern, '', seed_text, flags=re.DOTALL)
         if count != 1:

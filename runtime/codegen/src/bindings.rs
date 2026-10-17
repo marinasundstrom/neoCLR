@@ -1389,7 +1389,7 @@ fn completion_services(
                                 .expect("fixed no-result task callback signature"),
                         ]))
             || f.returns != result
-            || f.no_result
+            || (f.no_result && implementation != "task-schedule-v1")
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
             || !f.body.is_empty()
@@ -1408,7 +1408,9 @@ fn completion_services(
             return Err("native completion binding requires exact reserved TimerStart/TimerCancel/SchedulerSubmit InternalCall contract".into());
         }
         f.impl_flags = 0;
-        f.body = if result == Type::Void {
+        f.body = if f.no_result {
+            vec![Op::Return]
+        } else if result == Type::Void {
             vec![Op::Void, Op::Return]
         } else if result == Type::Boolean {
             vec![Op::Bool(false), Op::Return]
@@ -1783,6 +1785,7 @@ mod deadline_tests {
         for (name, signature) in [
             ("ScheduleTask", "fn<Void> callback) -> Void"),
             ("ScheduleTask", "fn<noresult Void> callback) -> Void"),
+            ("ScheduleTask", "fn<noresult Void> callback) -> noresult"),
             ("SchedulerSubmit", "fn<Void> callback) -> Int32"),
             ("SchedulerCapture", ") -> Int64"),
             (
@@ -1834,7 +1837,12 @@ mod deadline_tests {
                         }
                     }
                     3 => input.functions[0].returns = Type::String,
-                    4 => input.functions[0].no_result = true,
+                    4 => {
+                        input.functions[0].no_result = true;
+                        if name == "ScheduleTask" {
+                            input.functions[0].returns = Type::Int32;
+                        }
+                    }
                     _ => input.functions[0].out_parameters = vec![0],
                 }
                 assert!(

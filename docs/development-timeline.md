@@ -18705,3 +18705,16 @@ then began replacing production queue-service declarations. Execution exposed Ra
 no-result registration signature; the runtime/backend binding was extended specifically
 for that signature, preserving nominal queue validation. Native-only production core
 construction and remaining service/intrinsic contracts are still open.
+
+## 2026-10-17 — Continue through native compiler bootstrap contracts
+
+The author directed: “Continue through the remaning issues, until you've solved
+the compiler bootstrap contracts for the neoclr target.” The assistant proposed
+separate validated commits for source-service ownership and actual removal of CLI
+semantic-reference dependencies. Direct string/parsing ownership and managed text
+helpers are implemented (c53648caf, 7477c5ebc). A retained Console facade exposed an
+internal-call access failure and was removed rather than widening helper access.
+File/time/scheduling migration then exposed a no-result scheduling contract gap;
+interpreter and native-binding corrections are in validation. Full native source
+core construction and compiler contract closure remain open at this entry. Broader
+structural work remains parked; ordinary Raven/.NET behavior remains the default.

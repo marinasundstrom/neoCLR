@@ -12687,3 +12687,14 @@ all five libraries, and text-array/equality interpreter and completion checks pa
 No Runtime Contract switch or ordinary .NET change is required. See the
 [gate](validation/native-core-removal/README.md#native-text-arrays-and-equality--2026-10-17).
 Other retained services and native compiler/core construction remain open.
+
+### Native file/time/worker/task services (2026-10-17)
+
+Fourteen direct services move to source-owned internal native declarations with
+prepared CLI/seed removal. ScheduleTask accepts no-result calls as well as legacy
+unit returns, with no extra interpreter stack value and matching native binding
+generation. Raven 66c31932a qualifies the fresh five-library bundle, async worker/
+task/file consumer and stream completion. No Runtime Contract setting or .NET
+compiler behavior changes. See the
+[gate](validation/native-core-removal/README.md#native-filetimeworkertask-services--2026-10-17).
+Local-time array conversion and compiler source-core contracts remain open.

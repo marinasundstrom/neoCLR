@@ -23,21 +23,21 @@ public static class Task {
     static func Run(callback: () -> System.Void) -> Task<System.Void> {
         let source = Promise<System.Void>(TaskQueue.Default)
         let work = TaskRunWork<System.Void>(callback, source)
-        System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
+        neoCLR.Runtime.ScheduleTask(work.Run)
         return source.Task
     }
 
     static func Run<T>(callback: () -> T) -> Task<T> {
         let source = Promise<T>(TaskQueue.Default)
         let work = TaskRunWork<T>(callback, source)
-        System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
+        neoCLR.Runtime.ScheduleTask(work.Run)
         return source.Task
     }
 
     static func Run<T>(callback: () -> Task<T>) -> Task<T> {
         let source = Promise<T>(TaskQueue.Default)
         let work = TaskRunAsyncWork<T>(callback, source)
-        System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
+        neoCLR.Runtime.ScheduleTask(work.Run)
         return source.Task
     }
 }

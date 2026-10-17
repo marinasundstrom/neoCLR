@@ -15,7 +15,7 @@ public class FileOutputStream : OutputStream {
     }
 
     static func CreateNew(path: string) -> Result<FileOutputStream, StreamError> {
-        let payload = RuntimeServices.FileCreateNew(path)
+        let payload = neoCLR.Runtime.FileCreateNew(path)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -68,7 +68,7 @@ public class FileOutputStream : OutputStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = RuntimeServices.FileWriteChunk(handle, buffer, offset, count)
+        let payload = neoCLR.Runtime.FileWriteChunk(handle, buffer, offset, count)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -79,7 +79,7 @@ public class FileOutputStream : OutputStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = RuntimeServices.FileFlush(handle)
+        let payload = neoCLR.Runtime.FileFlush(handle)
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
@@ -88,7 +88,7 @@ public class FileOutputStream : OutputStream {
 
     func Close() {
         if !closed {
-            _ = RuntimeServices.FileClose(handle)
+            _ = neoCLR.Runtime.FileClose(handle)
             closed = true
         }
     }

@@ -26,7 +26,7 @@ public class Thread {
         if started {
             System.Fail("Thread has already been started")
         }
-        let handle = RuntimeServices.StartWorker(callback, input)
+        let handle = neoCLR.Runtime.StartWorker(callback, input)
         started = true
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
@@ -43,7 +43,7 @@ public class ThreadPool {
     static func Queue(callback: (string) -> string, input: string) -> Task<string> {
         let source = Promise<string>()
         let queue = neoCLR.Runtime.GetCurrentTaskQueue<TaskQueue>()
-        let handle = RuntimeServices.QueueWorker(callback, input)
+        let handle = neoCLR.Runtime.QueueWorker(callback, input)
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
         return source.Task
@@ -60,6 +60,6 @@ internal class WorkerCompletion {
     }
 
     internal func Complete() {
-        _ = source.Complete(RuntimeServices.JoinWorker(handle))
+        _ = source.Complete(neoCLR.Runtime.JoinWorker(handle))
     }
 }

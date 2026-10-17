@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "compilerRevision": "66c31932a",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-core-services-consumer/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-core-services-consumer/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-core-services-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-core-services-consumer/bin/neoclr/App.dll": "efa22b899e08746aa97674b88fc7239dbe37d5d4af6aa0a0abf574f868292935",
+    "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.Runtime.dll": "a6b6bc07d464bb222ab8dbea7f3708303118d41dfb0f2f3c0af3440f358320bd",
+    "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/build-evidence.json": "7e9aec3cb6e30085dbdc82626722abb6d73426c960c6fed5457de4952253a111",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "313b541a529c3a8439f2d72c83efef123412d240350bb936c7d2982900c1af4f",
+    "/Users/robert/Projects/neoclr/docs/validation/native-core-removal/CoreServicesConsumer.rvn": "1337d15957ab35f901fc8098039d3e12199d256ce15096a0fdace1e82654ff46",
+    "/Users/robert/Projects/neoclr/target/native-core-services-library-v2/System.runtime.neox": "fc923ed74c9ce757e77878af5beffcdaaed7ac78de1a56c4ccd497a4d3dc2e54",
+    "/Users/robert/Projects/neoclr/target/native-core-services-bootstrap/Core.dll": "e7156dae8d442ad3ad6767c5e1c9cac4c911f1ea6280a82ae7eda5e9f0beb184",
+    "/Users/robert/Projects/neoclr/src/native.rs": "43bb974402b7bfaab42e9efe089f7ba4aba86647bd0a2b4d00f7c68965a71946",
+    "/Users/robert/Projects/neoclr/src/vm.rs": "03afbdde4daaa1b20c681f7c535893cb44592481018013bb7a82af4a2ddf5d45",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/bindings.rs": "3b2c7b40739424cee4734f9daa00a11925b3af8643196f843d698e86dba50b40"
+  },
+  "focusedTests": {
+    "binding": "\nrunning 1 test\n.\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 311 filtered out; finished in 1.43s\n\n",
+    "vm": "\nrunning 1 test\n.\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 311 filtered out; finished in 0.83s\n\n",
+    "codegen": "\nrunning 1 test\n.\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 3.15s\n\n"
+  }
+}

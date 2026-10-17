@@ -7,7 +7,7 @@ public class SystemCultureProvider : CultureProvider {
     private var preference: string
 
     init() {
-        preference = RuntimeServices.SystemCultureName()
+        preference = neoCLR.Runtime.SystemCultureName()
     }
 
     private init(preference: string) {

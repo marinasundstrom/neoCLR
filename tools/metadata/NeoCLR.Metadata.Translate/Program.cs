@@ -33,7 +33,12 @@ if (args.Length == 3 && args[0] == "--prepare-source-attribute-core")
             "ParseInt16", "ParseUInt16", "ParseInt32",
             "ParseUInt32", "ParseInt64", "ParseUInt64",
             "ParseSingle", "ParseDouble", "Utf8Decode",
-            "StringGraphemes", "StringScalars", "Utf8Encode", "StringEquals" };
+            "StringGraphemes", "StringScalars", "Utf8Encode", "StringEquals",
+            "SystemCultureName", "UnixTimeTicks", "FileOpenRead",
+            "FileCreateNew", "FilePosition", "FileSeek",
+            "FileReadInto", "FileWriteChunk", "FileFlush",
+            "FileClose", "StartWorker", "QueueWorker",
+            "JoinWorker", "ScheduleTask" };
         var services = module.GetType("System.Runtime.CompilerServices.RuntimeServices");
         if (services is not null)
             foreach (var method in services.Methods.Where(m => sourceServices.Contains(m.Name)).ToArray())

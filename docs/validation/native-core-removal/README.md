@@ -429,3 +429,27 @@ iteration, Unicode scalar snapshots, UTF-8 encode/decode and empty arrays. API
 fingerprints pass. Existing JIT/AOT provider support is reused without rerunning a
 backend matrix. No text helper remains on RuntimeServices; file/time/scheduling
 and compiler bootstrap contracts remain open. Structural work is parked.
+
+## Native file/time/worker/task services — 2026-10-17
+
+14 direct services now have internal System.Runtime declarations: file streaming,
+host culture/current time, worker start/queue/join and task scheduling. Preparation
+removes their CLI facade and retained native definitions. ScheduleTask additionally
+admits Raven's no-result signature: interpreter dispatch does not push a unit value,
+and native binding generation preserves the no-result return body. Legacy unit
+returns and exact callback restrictions remain supported. Focused admission,
+interpreter callback completion and native binding tests pass.
+
+Raven 66c31932a builds five libraries in native-core-services-library-v2 using
+native-core-services-bootstrap. The [consumer](CoreServicesConsumer.rvn) exercises
+Task.Run, thread/pool completion, isolated file write/flush/read/seek, clock and
+culture; [execution/test evidence](core-services-results.json) and
+[completion](core-services-completion.json) pass. API fingerprints are current.
+Awaited results are bound to locals: the attempted nested await/conditional form
+hit an existing native lowerer value-block exit restriction, outside this slice.
+Native binding validation is not a new full JIT/AOT application qualification.
+
+UnixTimeToLocal is the last source RuntimeServices call. A separate native-only
+production consumer still reports missing NeoCLR.CoreProbe: compiler source-core
+construction and remaining metadata dependencies are not closed by these forwards.
+The installed SDK remains unchanged; structural work is parked.
