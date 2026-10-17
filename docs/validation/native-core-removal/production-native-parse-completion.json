@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "expression": "System.Int32.",
+  "labels": [
+    "Parse",
+    "Divide",
+    "Zero",
+    "One"
+  ],
+  "serverSha256": "501cac3d886234b5e19ccec8d276e20671d6c6b348454d8a0c1ffef701326398",
+  "project": "/Users/robert/Projects/neoclr/target/native-core-qualified-editor"
+}

@@ -18718,3 +18718,21 @@ File/time/scheduling migration then exposed a no-result scheduling contract gap;
 interpreter and native-binding corrections are in validation. Full native source
 core construction and compiler contract closure remain open at this entry. Broader
 structural work remains parked; ordinary Raven/.NET behavior remains the default.
+
+### 2026-10-17 — Finish compiler bootstrap contracts
+
+- Author directed continued work until the neoCLR compiler bootstrap contracts
+  were solved, keeping broader structural work parked. Earlier instructions
+  require native metadata references and adding missing native library contracts.
+- Assistant replaced production core inputs with source-owned foundational types,
+  explicit runtime contracts, managed array reservation and native async startup
+  ownership. Raven's project loader coalesces a core also listed as a dependency.
+- Five native libraries and a fresh async/parsing consumer compile. The consumer
+  returns 42 in the interpreter; native project/editor completion passes with no
+  CLI references or Action/Func transport declarations. Runtime no-result draining
+  and direct executing-assembly preparation have focused tests. Native API pages
+  render from the native core. [Qualification](validation/native-core-removal/README.md)
+  records backend results and exact artifacts.
+- Installed SDK replacement and release publication are separate actions; neither
+  is claimed here. Legacy fixture/documentation bridge tooling remains isolated
+  from the production native build.

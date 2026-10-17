@@ -2,6 +2,12 @@ module System.Runtime.CompilerServices
 
 /// Library operations used by compiler lowering.
 public static class RuntimeHelpers {
+    /// Compiler startup hook that drains registered entry work before observing its result.
+    /// Reentrant pumping and invocation from a task callback fault.
+    static func DrainEntryTasks() {
+        neoCLR.Runtime.DrainEntryTasks()
+    }
+
     /// Copies a half-open range into a new array. Elements are shallow-copied; invalid ranges fault.
     static func GetSubArray<T>(array: T[], range: System.Range) -> T[] {
         let bounds = range.GetOffsetAndLength(array.Length)

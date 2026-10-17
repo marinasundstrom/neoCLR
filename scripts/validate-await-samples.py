@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 import threading
+from native_source_project import create_project
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,13 +34,17 @@ def main():
             text = p.read_text()
             for before, after in (replacements or {}).items(): text = text.replace(before, after)
             target = out / (name + '-' + p.name); target.write_text(text); sources.append(target)
+        if catalog.get('kind') == 'native-source-core-class-library':
+            project, dll = create_project(out / name, name, lib, sources)
+            run(['dotnet', compiler, 'neoclr', '--project', project], name + '-compile')
+            return dll
         dll = out / (name + '.dll')
         run(['dotnet', compiler, 'neoclr', '--core-reference', lib / 'Core.dll', '--runtime-seed', lib / catalog['runtimeSeed'],
              *[arg for p in libraries for arg in ('--reference', p)], '--bootstrap-intrinsics', '--bootstrap-ownership', lib / 'ownership.json',
              '--object-library', 'System.Runtime', '--async-library', 'System.Runtime', '-o', dll, *sources], name + '-compile')
         return dll
     try:
-        for p in [Path(__file__).resolve(), compiler, vm, lib / 'Core.dll', lib / catalog['runtimeSeed'], lib / 'ownership.json', *libraries]:
+        for p in [Path(__file__).resolve(), compiler, vm, lib / ('System.Runtime.dll' if catalog.get('kind') == 'native-source-core-class-library' else 'Core.dll'), lib / catalog['runtimeSeed'], lib / 'ownership.json', *libraries]:
             report['inputs'][str(p)] = sha(p)
         for name, source, expected in [('producer','library-task-producer.rvn','42\n'), ('result','library-task-result.rvn','42\n'), ('cancellation','library-async-cancellation.rvn','Cancelled\n')]:
             dll = compile_case(name, ['raven-target/samples/' + source])

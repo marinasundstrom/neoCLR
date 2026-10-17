@@ -5,6 +5,16 @@
 
 # Raven CLI bridge
 
+## Native production core (2026-10-17)
+
+Production native projects now use source-owned System.Runtime and explicit
+RavenNeoClrRuntimeContracts; dependent projects select RavenNeoClrNativeCoreReference.
+Raven `51dd22f5a` supports source primitives, native Self signatures, managed array
+reservation, exact native-call markers and source-owned async entry draining.
+There is no CLI semantic reference in this path. Legacy bridge tools remain for
+historical fixtures and the aggregate documentation reference only. The native API
+snapshot renders the actual native libraries. See [validation and configuration](validation/native-core-removal/README.md).
+
 ## Standard structural compiler contract (2026-10-15)
 
 The paired Raven neoCLR branch now binds and emits structural unions, intersections

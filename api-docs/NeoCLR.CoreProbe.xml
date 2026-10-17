@@ -3231,6 +3231,9 @@
     <member name="T:System.Range">
       <summary>A half-open range: the start boundary is inclusive and the end is exclusive.</summary>
     </member>
+    <member name="M:System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks">
+      <summary>Drains registered entry work before native process exit. Compiler startup hook; reentrant drains and callback failures fault.</summary>
+    </member>
     <member name="T:System.Runtime.CompilerServices.RuntimeHelpers">
       <summary>Library operations used by compiler lowering.</summary>
     </member>

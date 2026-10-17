@@ -46,3 +46,6 @@ internal extern func ScheduleTask(arg0: () -> System.Void) -> System.Void;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func UnixTimeToLocal(ticks: long) -> int[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func DrainEntryTasks();

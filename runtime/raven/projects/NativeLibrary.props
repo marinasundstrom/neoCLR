@@ -5,9 +5,8 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>
     <RavenMetadataFormat>NeoCLR</RavenMetadataFormat>
-    <RavenNeoClrBootstrapOwnership>../System.Runtime/ownership.json</RavenNeoClrBootstrapOwnership>
-    <RavenNeoClrObjectLibrary>System.Runtime</RavenNeoClrObjectLibrary>
+    <RavenNeoClrNativeCoreReference>../System.Runtime/bin/neoclr/System.Runtime.dll</RavenNeoClrNativeCoreReference>
+    <RavenNeoClrRuntimeContracts>../System.Runtime/ownership.json</RavenNeoClrRuntimeContracts>
     <RavenNeoClrAsyncLibrary>System.Runtime</RavenNeoClrAsyncLibrary>
-    <RavenNeoClrBootstrapIntrinsics>true</RavenNeoClrBootstrapIntrinsics>
   </PropertyGroup>
 </Project>

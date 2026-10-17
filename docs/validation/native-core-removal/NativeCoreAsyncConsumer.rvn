@@ -1,0 +1,15 @@
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+async func Main() -> Task<int> {
+    let value = await Answer()
+    return value
+}
+
+async func Answer() -> Task<int> {
+    if let Ok(value) = Int32.Parse("42") {
+        return value
+    }
+    return 1
+}

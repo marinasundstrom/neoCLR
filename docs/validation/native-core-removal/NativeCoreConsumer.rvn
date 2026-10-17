@@ -1,0 +1,10 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks()
+    if let Ok(value) = Int32.Parse("42") {
+        return value
+    }
+    return 1
+}

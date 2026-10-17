@@ -212,7 +212,9 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise ValueError('Bundle file mismatch: ' + relative)
         libraries = [lib / (name + '.dll') for name in catalog['assemblyNames']]
         seed = lib / catalog['runtimeSeed']
-        required = [*libraries, seed, lib / catalog['projectConfiguration'], lib / 'Core.dll', lib / 'ownership.json']
+        required = [*libraries, seed, lib / catalog['projectConfiguration'], lib / 'ownership.json']
+        if catalog.get('kind') != 'native-source-core-class-library':
+            required.append(lib / 'Core.dll')
         if any(path.relative_to(lib).as_posix() not in catalog['files'] for path in required):
             raise ValueError('Bundle catalog omits a required input')
         base = ROOT / 'docs/experiments/aot-console'

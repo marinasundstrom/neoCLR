@@ -4,6 +4,7 @@
 This is a bounded coverage survey, not an acceptance gate or a benchmark. Failures
 are retained, not skipped. HTTP requires its separate peer-driving verifier.
 """
+from native_source_project import create_project
 import argparse
 import hashlib
 import json
@@ -36,6 +37,9 @@ def main():
     lib = bundle / 'lib' if (bundle / 'lib').is_dir() else bundle
     refs = [lib / n for n in ('System.Runtime.dll', 'System.Data.dll', 'System.Networking.dll', 'System.Web.dll')]
     seed, core, ownership = (lib / n for n in ('System.runtime.neox', 'Core.dll', 'ownership.json'))
+    native_core = json.loads((lib / 'bundle.json').read_text()).get('kind') == 'native-source-core-class-library'
+    if native_core:
+        core = refs[0]
     context = ['--system', seed, *[x for f in refs for x in ('--module', f)], '--object-root', refs[0]]
     flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
              '--native-stack-budget', '--bind-console-read-byte', '--bind-console-write-line',
@@ -90,6 +94,9 @@ def main():
         compile_cmd = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
                        '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--object-library', 'System.Runtime',
                        '--async-library', 'System.Runtime', *[x for f in refs for x in ('--reference', f)], '-o', assembly, *sources]
+        if native_core:
+            project, assembly = create_project(directory, 'sample', lib, sources)
+            compile_cmd = ['dotnet', compiler, 'neoclr', '--project', project]
         case['emission'] = run(compile_cmd, directory, 120)
         if case['emission'].get('exit') != 0:
             case['status'] = 'emission-blocked'

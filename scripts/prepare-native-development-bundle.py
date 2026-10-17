@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild source libraries using a verified bundle's compiler and primitive core."""
+"""Rebuild source libraries using a verified bundle's compiler and source-owned native core."""
 import argparse
 import hashlib
 import json
@@ -72,15 +72,10 @@ def main():
                 os.chmod(path, stat.S_IWRITE)
                 function(path)
             shutil.rmtree(source, onerror=remove_readonly)
-    translator_project = ROOT / 'tools/metadata/NeoCLR.Metadata.Translate/NeoCLR.Metadata.Translate.csproj'
-    translator = translator_project.parent / 'bin/Release/net10.0/NeoCLR.Metadata.Translate.dll'
-    run(['dotnet', 'build', translator_project, '-c', 'Release', '-p:WarningLevel=0', '-p:Platform=AnyCPU'])
     vm = original / ('bin/neoclr.exe' if sys.platform == 'win32' else 'bin/neoclr')
-    run([sys.executable, ROOT / 'scripts/prepare-native-bootstrap.py', '--core-reference', original / 'lib/Core.dll',
-         '--runtime', vm, '--translator', translator, '--output', out / 'bootstrap'])
     # The library evidence retains compiler binaries as well as its declared revision.
     run([sys.executable, ROOT / 'scripts/build-native-class-library.py', '--compiler', compiler,
-         '--core', out / 'bootstrap/Core.dll', '--bootstrap-directory', out / 'bootstrap', '--translator', translator,
+         '--runtime', vm,
          '--output', out / 'libraries', '--compiler-revision', args.compiler_revision,
          *(['--with-postgresql'] if 'lib/System.Data.PostgreSql.dll' in manifest['modules'] else [])])
     bundle = out / 'bundle'

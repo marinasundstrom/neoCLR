@@ -1,0 +1,15 @@
+module System
+
+/// Nominal base for value-type declarations; the base itself is a reference class.
+public abstract class ValueType {}
+
+/// Nominal base for enum declarations; the base itself is a reference class.
+public abstract class Enum : ValueType {}
+
+/// Nongeneric array base. Typed array members are supplied by Array<T>.
+public abstract class Array {}
+
+/// Marks an enum whose constants can be combined as flags.
+public class FlagsAttribute : Attribute {
+    init() {}
+}

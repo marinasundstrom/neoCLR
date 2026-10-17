@@ -1,0 +1,21 @@
+module System.Runtime.CompilerServices
+
+/// Compiler marker for the native Self signature kind; not a concrete callback or payload type.
+public struct Self {}
+
+/// Supported runtime method implementation flags.
+public enum MethodImplOptions {
+    InternalCall = 4096
+}
+
+/// Declares a runtime-supplied implementation. The compiler validates supported targets and flags.
+public class MethodImplAttribute : System.Attribute {
+    init(options: MethodImplOptions) {}
+}
+
+/// Compiler storage operations with checked initialization.
+public static class CheckedStorage {
+    /// Reserves an array whose slots must be written before they can be read.
+    /// Negative lengths, allocation limits and uninitialized reads fault.
+    static func Reserve<T>(count: int) -> T[] => neoCLR.Runtime.ReserveArray<T>(count)
+}

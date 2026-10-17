@@ -62,6 +62,15 @@ var settings = new Dictionary<string, string>
     ["RavenNeoClrObjectLibrary"] = "System.Runtime",
     ["RavenNeoClrAsyncLibrary"] = "System.Runtime"
 };
+if (JsonDocument.Parse(File.ReadAllText(Path.Combine(bundle, "bundle.json"))).RootElement
+    .GetProperty("kind").GetString() == "native-source-core-class-library")
+{
+    settings.Remove("RavenNeoClrCoreReference");
+    settings.Remove("RavenNeoClrBootstrapOwnership");
+    settings.Remove("RavenNeoClrObjectLibrary");
+    settings["RavenNeoClrNativeCoreReference"] = Path.Combine(bundle, "System.Runtime.dll");
+    settings["RavenNeoClrRuntimeContracts"] = Path.Combine(bundle, "ownership.json");
+}
 var config = provider.Load(Path.Combine(bundle, "Docs.rvnproj"), "Documentation", CompilationOptions.NeoCLR.WithOutputKind(OutputKind.DynamicallyLinkedLibrary), settings, paths);
 var compilation = Compilation.Create("Documentation", syntaxTrees: [], references: config.References.ToArray(), options: config.Options);
 var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
@@ -193,4 +202,4 @@ var booleanPage = File.ReadAllText(Path.Combine(apiOutput, "System/Boolean/index
 if (booleanPage.Contains("ConsoleFlush", StringComparison.Ordinal) ||
     booleanPage.Contains("ConsoleWriteBytes", StringComparison.Ordinal))
     throw new InvalidDataException("Internal console service extensions leaked into the Boolean reference.");
-Console.WriteLine("PASS production native metadata rendering, with explicit temporary CLI bootstrap");
+Console.WriteLine("PASS production native metadata rendering with selected explicit core contract");

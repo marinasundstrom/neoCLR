@@ -1,0 +1,6 @@
+import System.*
+
+module neoCLR.Runtime
+
+// The native compiler emits a managed checked-reservation body for this exact contract.
+internal extern func ReserveArray<T>(count: int) -> T[];

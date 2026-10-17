@@ -14,19 +14,30 @@ types. Run check-completion.py SERVER_DLL PROJECT_DIR OUTPUT_JSON to repeat.
 The server used for completion is the installed 20261017 SDK; the new contract
 regression runs against the rebuilt compiler adapter.
 
-## Remaining production work
+## Production source-core construction
 
-A project selecting target/local-libraries-20261017/System.Runtime.dll with
-RavenNeoClrNativeCoreReference, matching System.Runtime metadata/target core names
-and `func Main() -> int => 42` fails with RAVT003:
-`missing or mismatched native dependency: NeoCLR.CoreProbe`.
+The production projects now construct System.Runtime from Raven source with
+`RavenNeoClrSourceCore=true` and `RavenNeoClrRuntimeContracts=ownership.json`.
+Dependent libraries and generated bundle imports select that native assembly with
+`RavenNeoClrNativeCoreReference`. There is no production CoreProbe/CLI core input,
+translation step, or retained service seed. The reserved System execution module
+is empty; it does not supply primitive declarations or bodies.
 
-The production build still uses CLI primitive declarations, an ownership manifest
-and retained runtime services. Replace these with native core production and
-explicit runtime contracts, rebuild all dependent libraries, then validate the
-reflection/async consumers and install a fresh SDK. Do not remove dependency
-validation, hide completions, or use fixture Object implementations to claim
-production readiness. Structural feature expansion is parked.
+The core owns ValueType, Enum, the nongeneric array base, FlagsAttribute, Self,
+MethodImpl markers and CheckedStorage.Reserve. The compiler validates the exact
+managed reserve intrinsic and native method flags. Self remains a signature kind;
+the marker is not its runtime storage. Unlike .NET's mscorlib/System.Private.CoreLib
+packaging, these declarations are in System.Runtime. Ordinary Raven/.NET behavior
+is unchanged. Existing native backend bounds remain separate from this ownership
+migration; broader structural work remains parked.
+
+Five production libraries (including PostgreSql) compile with Raven `51dd22f5a`.
+A consumer importing generated bundle props parses 42, awaits a task and returns
+42 in the interpreter. Native project/editor checks verify all references are
+native, Int32/Parse/TypeInfo completions are present and Action/Func transport types
+are absent. The core project regression includes a repeated core reference and
+retains nine rejected configurations. API rendering also consumes the native core.
+The installed SDK has not been replaced by this development validation.
 
 ## Artifact-derived core identity
 
@@ -523,3 +534,34 @@ recipes and receiver checks remain unchanged. Four `runtime_context` codegen
 tests pass, including native direct calls and malformed/indirect rejection.
 This closes a preparation dependency on the removed IntrospectionRuntimeServices
 wrapper; it does not relax native service admission.
+
+## Final production qualification
+
+[Build and compiler evidence](production-native-core.json) records Raven
+`51dd22f5a`, five native library hashes, source inputs and a fresh consumer.
+[System completion](production-native-completion.json) and
+[Parse completion](production-native-parse-completion.json) use the rebuilt
+language server against generated bundle imports. No host Action/Func types appear.
+The [async consumer](NativeCoreAsyncConsumer.rvn) parses a value through a nominal
+Result pattern and awaits it. It returns 42 in interpreter, JIT and sanitized AOT;
+[backend evidence](production-native-async-backends.json) retains exact commands,
+hashes and cleanup checks. The [plain consumer](NativeCoreConsumer.rvn) exercises
+parsing plus no-result entry draining directly; its [three-backend checks](production-native-plain-backends.json) also pass.
+
+Reproduce the backend checks after compiling a consumer against the generated
+`NeoCLR.ClassLibrary.props`:
+
+```sh
+python3 docs/validation/native-core-removal/validate-production-core.py \
+  /absolute/path/bundle /absolute/path/consumer.dll /absolute/path/fresh-evidence
+```
+
+The runner is the existing macOS ARM64 qualification host, including task/scheduler
+scopes, native async shutdown and heap/root cleanup. It does not qualify other
+architectures or publish a release. The reserved empty System seed is explicitly
+assembled as NEOX for both interpreter and codegen readers. Runtime source/build
+contracts are complete for this migration; wider backend limitations are unchanged.
+The production workflow and packaging no longer require bootstrap preparation.
+Publishing the paired Raven revision, remote CI and installing a rebuilt SDK remain
+separate delivery actions. API snapshots and four snapshot checks pass; no unrelated
+website build is required.

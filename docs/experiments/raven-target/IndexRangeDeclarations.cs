@@ -33,6 +33,7 @@ static class IndexRangeDeclarations
         }
         namespace Runtime.CompilerServices {
             public static class RuntimeHelpers {
+                public static void DrainEntryTasks() { }
                 public static T[] GetSubArray<T>(T[] array, Range range) => default;
             }
         }

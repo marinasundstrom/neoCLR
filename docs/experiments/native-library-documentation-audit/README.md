@@ -123,3 +123,10 @@ Keep the declaration paths inclusive of provider libraries. Snapshot packaging
 checks type/member/generic/provider links before replacing the publication archive;
 extraction repeats those checks when provenance settings are present in the manifest.
 These are configured declaration-file links, not exact member-span source maps.
+
+## Source-core bundles (2026-10-17)
+
+For `native-source-core-class-library` bundles the audit selects native System.Runtime
+and RavenNeoClrRuntimeContracts, without Core.dll or a CLI projection. The same
+commands above render all five libraries when PostgreSql is present. Historical
+explicit bootstrap bundles retain their existing isolated loader path.

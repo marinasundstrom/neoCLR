@@ -10,7 +10,7 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: 793219d855b17f01fb805e215968b78871eb3804
+        default: 51dd22f5a0dc5dd7b20b5c2ec92806164fd020c4
       delta_only:
         description: Reuse qualified SDK/runtime and check only JSON/editor release deltas
         type: boolean
@@ -42,7 +42,7 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || '793219d855b17f01fb805e215968b78871eb3804' }}
+          ref: ${{ inputs.raven_revision || '51dd22f5a0dc5dd7b20b5c2ec92806164fd020c4' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
         if: ${{ !inputs.bundle_run }}
@@ -82,14 +82,6 @@ jobs:
           export RAVEN_NEOCLR_METADATA_PROJECT="$(cygpath -m "$GITHUB_WORKSPACE/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj")"
           export RAVEN_PACKAGE_OUTPUT="$(cygpath -m "$GITHUB_WORKSPACE/packages")"
           scripts/package-sdk.sh win-x64 "$PACKAGE_VERSION"
-      - name: Build bootstrap tools sequentially
-        if: ${{ !inputs.bundle_run }}
-        shell: pwsh
-        run: |
-          dotnet build neoclr/tools/metadata/NeoCLR.Metadata.Translate/NeoCLR.Metadata.Translate.csproj -c Release
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          dotnet build neoclr/docs/experiments/raven-target/Probe.csproj "-p:RavenRoot=$env:GITHUB_WORKSPACE/raven"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Build editor package with matching server
         if: ${{ !inputs.bundle_run }}
         shell: pwsh
@@ -109,13 +101,11 @@ jobs:
         working-directory: neoclr
         run: |
           $runtime = "$PWD/target/release/neoclr.exe"
-          $translator = "$PWD/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll"
           $sdk = "$env:GITHUB_WORKSPACE/packages/raven-sdk-$env:PACKAGE_VERSION-win-x64"
           $ravenRevision = git -C ../raven rev-parse HEAD
           $runtimeRevision = git rev-parse HEAD
-          python scripts/prepare-native-bootstrap.py --probe docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll --runtime $runtime --translator $translator --output target/bootstrap
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python scripts/build-native-class-library.py --compiler "$sdk/tools/rvnc/rvnc.dll" --compiler-revision $ravenRevision --core target/bootstrap/Core.dll --bootstrap-directory target/bootstrap --translator $translator --output target/libraries
+          python scripts/build-native-class-library.py --compiler "$sdk/tools/rvnc/rvnc.dll" --compiler-revision $ravenRevision --runtime $runtime --output target/libraries
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python scripts/package-native-poc.py --sdk $sdk --vsix ../packages/raven-vscode.vsix --libraries target/libraries --runtime $runtime --runtime-revision $runtimeRevision --output target/distribution
           if ($LASTEXITCODE) { exit $LASTEXITCODE }

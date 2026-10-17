@@ -176,7 +176,10 @@
         "runtime/raven/src/System/Collections/AsyncIterator.rvn",
         "runtime/raven/src/System/Diagnostics/StackTrace.rvn",
         "runtime/raven/native/RuntimeDiagnosticsCalls.rvn",
-        "runtime/raven/src/System/ParamArrayAttribute.rvn"
+        "runtime/raven/src/System/ParamArrayAttribute.rvn",
+        "runtime/raven/core/Foundations.rvn",
+        "runtime/raven/core/CompilerServices.rvn",
+        "runtime/raven/core/Storage.rvn"
       ],
       "types": [
         "System.AttributeTargets",
@@ -333,7 +336,7 @@
     "typeName": "System.Void"
   },
   "self": {
-    "assemblyName": "NeoCLR.CoreProbe",
+    "assemblyName": "System.Runtime",
     "typeName": "System.Runtime.CompilerServices.Self"
   },
   "nativePrimitives": {

@@ -38,14 +38,16 @@ def main():
         build = json.loads((args.libraries / 'build-evidence.json').read_text())
         if not build['commands'] or any(command['exitCode'] for command in build['commands']):
             raise ValueError('Library build did not pass')
-        original_bundle = Path(build['environment']['RavenNeoClrRuntimeSeed']).parent
+        original_bundle = Path(build['output']) if 'output' in build else Path(build['environment']['RavenNeoClrRuntimeSeed']).parent
         built_files = {Path(path).relative_to(original_bundle).as_posix(): digest
                        for path, digest in build['hashes'].items()
                        if original_bundle in Path(path).parents}
         if catalog['files'] != built_files:
             raise ValueError('Bundle file catalog differs from build evidence')
         required = [name + '.dll' for name in catalog['assemblyNames']] + [
-            'Core.dll', 'ownership.json', catalog['runtimeSeed'], catalog['projectConfiguration']]
+            'ownership.json', catalog['runtimeSeed'], catalog['projectConfiguration']]
+        if catalog.get('kind') != 'native-source-core-class-library':
+            required.append('Core.dll')
         if any(name not in catalog['files'] for name in required):
             raise ValueError('Bundle is missing required dependency hashes')
         producer = Path(build['commands'][0]['command'][1]).parent

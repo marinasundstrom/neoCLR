@@ -2311,3 +2311,16 @@ and the optional `CreateFunctionReference(..., isInternalCall: true)` contract.
 These host C# APIs are outside the guest RavenDoc type selection; no guest declaration
 or reference snapshot change is needed for this API-boundary slice. Generic queue
 service qualification does not establish production core migration.
+
+### Source-owned native core (2026-10-17)
+
+The production native snapshot now includes source-owned ValueType/Enum/Array,
+FlagsAttribute, Self, MethodImplAttribute/MethodImplOptions, CheckedStorage and
+RuntimeHelpers.DrainEntryTasks in System.Runtime. No native renderer core projection
+is required. The MethodImplOptions subset contains only InternalCall; other .NET
+flags are not implied. Reserve creates checked uninitialized slots; reads before
+writes fault. DrainEntryTasks is a compiler startup hook, not a scheduling API;
+reentrancy and callback failures fault. All new public declarations have source XML
+and native rendered type/member entries. Self denotes a native signature marker.
+The legacy aggregate reference is regenerated for the added drain helper and kept
+only for documentation compatibility; it is no longer a production compiler input.
