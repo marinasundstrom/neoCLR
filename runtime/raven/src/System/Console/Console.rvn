@@ -10,7 +10,7 @@ import System.Runtime.CompilerServices.RuntimeServices
 
 public static class Console {
     static func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
-        let payload = RuntimeServices.ConsoleReadByte()
+        let payload = neoCLR.Runtime.ConsoleReadByte()
         if RuntimeServices.IsValue<int>(payload) {
             let status = RuntimeServices.UnpackValue<int>(payload)
             if status == 1 {
@@ -31,7 +31,7 @@ public static class Console {
     }
 
     static func WriteLine(value0: string) {
-        RuntimeServices.WriteLine(value0)
+        neoCLR.Runtime.WriteLine(value0)
     }
 
     static func WriteLine(value: object?) {
@@ -43,7 +43,7 @@ public static class Console {
     }
 
     static func WriteLine(value0: int) {
-        RuntimeServices.WriteLine(RuntimeServices.Int32ToString(value0))
+        neoCLR.Runtime.WriteLine(RuntimeServices.Int32ToString(value0))
     }
 
     static func WriteLine(value: bool) {
@@ -71,7 +71,7 @@ public static class Console {
     }
 
     static func WriteLine(value: uint) {
-        WriteLine(RuntimeServices.UInt64ToString(value))
+        WriteLine(neoCLR.Runtime.UInt64ToString(value))
     }
 
     static func WriteLine(value: long) {
@@ -79,7 +79,7 @@ public static class Console {
     }
 
     static func WriteLine(value: ulong) {
-        WriteLine(RuntimeServices.UInt64ToString(value))
+        WriteLine(neoCLR.Runtime.UInt64ToString(value))
     }
 
     static func WriteLine(value: nint) {
@@ -87,7 +87,7 @@ public static class Console {
     }
 
     static func WriteLine(value: nuint) {
-        WriteLine(RuntimeServices.UInt64ToString(neoCLR.Runtime.UIntPtrToUInt64(value)))
+        WriteLine(neoCLR.Runtime.UInt64ToString(neoCLR.Runtime.UIntPtrToUInt64(value)))
     }
 
     // Fresh non-owning wrappers share the host's channels; closing one closes only it.
@@ -137,6 +137,6 @@ public static class Console {
     }
 
     static func WriteLine() {
-        RuntimeServices.WriteLine("")
+        neoCLR.Runtime.WriteLine("")
     }
 }

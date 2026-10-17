@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "compilerRevision": "d83ea51e7",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-consumer/App.rvnproj"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr/target/native-console-storage-consumer",
+      "stdin": null,
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/native-console-storage-consumer/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-consumer/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.Web.dll"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr/target/native-console-storage-consumer",
+      "stdin": "A",
+      "exitCode": 42,
+      "stdout": "native console/storage\n42\nB\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-console-storage-consumer/bin/neoclr/App.dll": "b1414a271e8e470ae5c775b964aaf8c642e00dc14e200f32f5392afb615c707e",
+    "/Users/robert/Projects/neoclr/target/native-console-storage-library/System.Runtime.dll": "063a99fa70a9efba58d8e9e933a7864d631e8691dec87e32c5417bf3605072d8",
+    "/Users/robert/Projects/neoclr/target/native-console-storage-library/build-evidence.json": "6f254242121a866e29356eb6fb8cbae550a066c7ba70f6ebe013a21b58468c67",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e2c8cd3635fae07f9676c39ea4fded670950f22f0c214817c62b85eb57bb4c64"
+  }
+}

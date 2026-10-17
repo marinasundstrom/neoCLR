@@ -7,7 +7,7 @@ import System.Runtime.CompilerServices.RuntimeServices
 
 // Synchronous host-path lookup; no file contents or open resource are retained.
 public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
-    let payload = RuntimeServices.StorageKind(path)
+    let payload = neoCLR.Runtime.StorageKind(path)
     if RuntimeServices.IsValue<byte>(payload) {
         let status = RuntimeServices.UnpackValue<byte>(payload)
         if status == 1 {

@@ -2,15 +2,14 @@ module System.Storage
 
 import System.*
 import System.Result.*
-import System.Runtime.CompilerServices.RuntimeServices
 
 public class Path : EquatableTo<Path> {
     static func Combine(value0: string, value1: string) -> string {
-        return RuntimeServices.PathCombine(value0, value1)
+        return neoCLR.Runtime.PathCombine(value0, value1)
     }
 
     static func GetFileName(value0: string) -> string {
-        return RuntimeServices.PathGetFileName(value0)
+        return neoCLR.Runtime.PathGetFileName(value0)
     }
 
     private field text: string

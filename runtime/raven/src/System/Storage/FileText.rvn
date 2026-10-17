@@ -6,7 +6,7 @@ import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
 public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Result<System.Void, FileWriteError> {
-    let status = RuntimeServices.WriteAllText(path, text, maxBytes)
+    let status = neoCLR.Runtime.WriteAllText(path, text, maxBytes)
     if status == 0 {
         return Ok(())
     }
@@ -36,7 +36,7 @@ public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Re
 }
 
 public func ReadAllText(path: string, maxBytes: int) -> System.Result<string, FileReadError> {
-    let payload = RuntimeServices.ReadAllText(path, maxBytes)
+    let payload = neoCLR.Runtime.ReadAllText(path, maxBytes)
     if !RuntimeServices.IsValue<byte>(payload) {
         return Ok(RuntimeServices.UnpackValue<string>(payload))
     }

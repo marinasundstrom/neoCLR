@@ -166,3 +166,31 @@ counters, collection progress and KeepAlive for a reference and null.
 [Execution evidence](time-heap-results.json) includes compiler/runtime commands and
 bundle hashes. JIT/AOT service implementations are unchanged; this forwarding-only
 slice does not repeat their platform matrix or claim new backend coverage.
+
+## Direct console and storage services
+
+Twelve console, file-text and storage forwarding methods are removed. Their public
+callers select the existing native namespace functions directly. Payload interpretation
+still uses IsValue/UnpackValue; this does not establish native-only production core
+construction or change public API/error contracts. No new Runtime Contract setting
+or runtime binding is introduced.
+
+Raven `d83ea51e7` builds the five-library `target/native-console-storage-library`
+bundle. [Console completion](console-completion.json) resolves ReadByte and
+OpenStandardOutput, and [FileText completion](storage-completion.json) resolves
+ReadAllText/WriteAllText against that bundle. Public signatures and reference content
+are unchanged; matching API source fingerprints pass. The installed SDK is unchanged.
+
+The [consumer](ConsoleStorageConsumer.rvn) uses piped input and a dedicated `files`
+directory beneath its working directory, never application files. It exercises
+console byte input/EOF, unsigned formatting, awaited output/flush, UTF-8 file round
+trip, size-limit errors, path helpers, kind lookup and directory enumeration.
+JIT/AOT implementations are unchanged; this forwarding-only slice does not extend
+backend coverage or repeat their matrix. Broader structural work remains parked.
+
+[Execution evidence](console-storage-results.json) records compilation and interpreter
+exit 42, exact console output, commands, working directory and artifact hashes.
+Create an empty `files` directory beneath the recorded working directory before
+reproduction; supply the single input byte `A` followed by EOF. The harness also
+verifies `files/roundtrip.txt` remains `Hello, värld!` after the rejected oversized
+write.

@@ -1,0 +1,78 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import System.Option.*
+import System.Storage.*
+
+async func Main() -> Task<int> {
+    let Ok(input) = Console.ReadByte() else {
+        return 1
+    }
+    let Some(value) = input else {
+        return 2
+    }
+    if value != (byte)65 {
+        return 3
+    }
+    let Ok(end) = Console.ReadByte() else {
+        return 4
+    }
+    if end is Some(_) {
+        return 5
+    }
+    Console.WriteLine("native console/storage")
+    Console.WriteLine((ulong)42)
+    let output = Console.OpenStandardOutput()
+    let bytes: byte[] = [(byte)66, (byte)10]
+    let Ok(_) = await output.Write(bytes, 0, 2) else {
+        return 6
+    }
+    let Ok(_) = await output.Flush() else {
+        return 7
+    }
+    let path = Path.Combine("files", "roundtrip.txt")
+    if Path.GetFileName(path) != "roundtrip.txt" {
+        return 8
+    }
+    let Ok(_) = FileText.WriteAllText(path, "Hello, värld!", 64) else {
+        return 9
+    }
+    let Ok(text) = FileText.ReadAllText(path, 64) else {
+        return 10
+    }
+    if text != "Hello, värld!" {
+        return 11
+    }
+    let Error(_) = FileText.ReadAllText(path, 2) else {
+        return 12
+    }
+    let Error(_) = FileText.WriteAllText(path, "oversized", 2) else {
+        return 13
+    }
+    let Ok(kind) = Metadata.GetKind(path) else {
+        return 14
+    }
+    if kind != EntryKind.File {
+        return 15
+    }
+    let fs = FileSystem("files")
+    let Ok(root) = Path.Parse(".") else {
+        return 16
+    }
+    let Ok(directory) = fs.GetDirectory(root) else {
+        return 17
+    }
+    let Ok(items) = directory.GetItems(8) else {
+        return 18
+    }
+    if items.Count != 1 {
+        return 19
+    }
+    let Error(_) = directory.GetItems(0) else {
+        return 20
+    }
+    let Error(_) = Metadata.GetKind("files/missing.txt") else {
+        return 21
+    }
+    return 42
+}

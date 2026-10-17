@@ -160,7 +160,7 @@ internal class LocalDirectory : Directory {
     }
 
     func GetItems(maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
-        let payload = RuntimeServices.StorageList(nativePath, maxItems)
+        let payload = neoCLR.Runtime.StorageList(nativePath, maxItems)
         if RuntimeServices.IsValue<byte>(payload) {
             let status = RuntimeServices.UnpackValue<byte>(payload)
             if status == 1 {
@@ -183,7 +183,7 @@ internal class LocalDirectory : Directory {
             }
             return Error(StorageLookupError.IoFailure())
         }
-        let names = RuntimeServices.StorageNames(payload)
+        let names = neoCLR.Runtime.StorageNames(payload)
         let items: List<StorageItem> = ArrayList<StorageItem>()
         for name in names {
             match FileAt(name) {

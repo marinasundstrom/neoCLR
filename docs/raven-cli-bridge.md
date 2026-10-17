@@ -12570,3 +12570,16 @@ implementations are unchanged; no new Runtime Contract setting or .NET behavior
 is introduced. The [migration gate](validation/native-core-removal/README.md#direct-time-zone-and-heap-services)
 records compilation and editor validation. Production CLI core input and remaining
 facade/payload services are still temporary dependencies, not permanent platform rules.
+
+### Direct console and storage service calls (2026-10-17)
+
+System.Runtime's console, file-text and storage public implementations now call the
+existing native namespace declarations directly. Twelve RuntimeServices extension
+forwards and their source-list entries are removed. Native service signatures and
+bindings are unchanged; this does not add a Runtime Contract setting or alter
+ordinary Raven/.NET behavior. IsValue/UnpackValue remain explicit bootstrap payload
+dependencies: forwarding removal is not a claim that production core construction
+is native-only. Structural work stays parked.
+
+See the [console/storage gate](validation/native-core-removal/README.md#direct-console-and-storage-services)
+for the matching bundle, compiler revision and executable/editor evidence.

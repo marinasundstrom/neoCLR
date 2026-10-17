@@ -173,3 +173,8 @@ stripping are accepted substitutes for the above gates.
   directly; 13 forwards and their source-list entries are removed. A fresh five-library
   bundle, interpreter consumer and TimeZone/GC completion pass. Payload services,
   other forwards and production core construction remain open.
+
+- Console, file-text and storage callers now bind native namespace declarations
+  directly; 12 forwards are removed. Five-library compilation, interpreter input/
+  output and filesystem consumer, plus Console/FileText completion pass. IsValue/
+  UnpackValue and other retained core services remain explicit migration dependencies.

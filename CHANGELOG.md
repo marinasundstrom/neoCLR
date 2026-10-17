@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Remove 12 console, file-text and storage RuntimeServices forwards; callers bind existing native namespace declarations. Validate a fresh five-library bundle, interpreter consumer with piped input/exact output and isolated file operations, Console/FileText completion and API fingerprints. Public contracts and runtime bindings are unchanged; payload helpers and production native-core construction remain open.
+
 - Remove 13 time-zone and heap RuntimeServices forwards; bind public TimeZone and GC callers directly to existing native service declarations. Validate a fresh five-library bundle with Raven d83ea51e7, an interpreter consumer returning 42, TimeZone/GC editor completion and API source fingerprints. Public contracts and backend implementations are unchanged; remaining services and production native-core construction stay open.
 
 - Qualify native integral conversions with Raven main babd5fad0 carried to codex/neoclr d83ea51e7. Admit IntPtr/UIntPtr under the existing verified primitive receiver projection for JIT/AOT. Fresh native-library consumers preserve signed widening and high UInt32 bits, expose cast member completion, and report checked ArithmeticOverflow in interpreter/JIT/sanitized AOT. Target-typed native literals, full float/decimal conversions and production native-core construction remain open.
