@@ -1,0 +1,584 @@
+{
+  "passed": true,
+  "rounds": [
+    {
+      "round": 0,
+      "recovered": true
+    },
+    {
+      "round": 1,
+      "recovered": true
+    },
+    {
+      "round": 2,
+      "recovered": true
+    },
+    {
+      "round": 3,
+      "recovered": true
+    },
+    {
+      "round": 4,
+      "recovered": true
+    },
+    {
+      "round": 5,
+      "recovered": true
+    },
+    {
+      "round": 6,
+      "recovered": true
+    },
+    {
+      "round": 7,
+      "recovered": true
+    },
+    {
+      "round": 8,
+      "recovered": true
+    },
+    {
+      "round": 9,
+      "recovered": true
+    }
+  ],
+  "events": [
+    {
+      "phase": "invalidate-0",
+      "at": "2026-10-17T22:32:11.506Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:13.463Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-0",
+      "at": "2026-10-17T22:32:13.512Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:14.456Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:18.197Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-1",
+      "at": "2026-10-17T22:32:18.526Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:20.321Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-1",
+      "at": "2026-10-17T22:32:20.548Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:23.297Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-2",
+      "at": "2026-10-17T22:32:23.565Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:25.011Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-2",
+      "at": "2026-10-17T22:32:25.071Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:28.069Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-3",
+      "at": "2026-10-17T22:32:28.121Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:29.676Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-3",
+      "at": "2026-10-17T22:32:30.141Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:32.996Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-4",
+      "at": "2026-10-17T22:32:33.188Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:34.357Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:34.427Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-4",
+      "at": "2026-10-17T22:32:34.706Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:37.332Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-5",
+      "at": "2026-10-17T22:32:37.724Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:38.899Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:38.965Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-5",
+      "at": "2026-10-17T22:32:39.236Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:41.668Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-6",
+      "at": "2026-10-17T22:32:41.781Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:42.974Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:43.068Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-6",
+      "at": "2026-10-17T22:32:43.299Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:45.570Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-7",
+      "at": "2026-10-17T22:32:45.830Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:46.999Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:47.084Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-7",
+      "at": "2026-10-17T22:32:47.331Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:49.560Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-8",
+      "at": "2026-10-17T22:32:49.851Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:50.975Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:51.084Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-8",
+      "at": "2026-10-17T22:32:51.377Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:53.597Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-9",
+      "at": "2026-10-17T22:32:53.895Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:55.029Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:55.114Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-9",
+      "at": "2026-10-17T22:32:55.422Z",
+      "diagnostics": [
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'd:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file 'D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\references\\Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T22:32:57.639Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "finished",
+      "at": "2026-10-17T22:32:57.956Z",
+      "diagnostics": []
+    }
+  ]
+}

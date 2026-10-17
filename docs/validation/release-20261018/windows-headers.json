@@ -1,0 +1,958 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "mode": "aot",
+      "name": "mixed-known",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "known-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "catalog-first",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "catalog-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "catalog-fragmented",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "chunked",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e673d6368756e6b65640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "unknown-and-empty",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2035390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a782d637573746f6d3d74776f20776f7264730a782d656d7074793d0a782d637573746f6d3d7365636f6e640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f73783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f7374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e6774783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e677468783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6578706563783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a657870656374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d747970783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d74797065783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-accept",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-accept",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a616363657074783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-accept-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-accept-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-authorization",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a617574686f72697a6174696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-authorization",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a617574686f72697a6174696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-cookie",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6f6b69783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-cookie",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6f6b6965783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-user-agent",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a757365722d6167656e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-user-agent",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a757365722d6167656e74783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-cache-control",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a63616368652d636f6e74726f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-cache-control",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a63616368652d636f6e74726f6c783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "unsupported-ExPeCt",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "aot",
+      "name": "unsupported-CoNtEnT-EnCoDiNg",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "aot",
+      "name": "duplicate-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate Host"
+    },
+    {
+      "mode": "aot",
+      "name": "duplicate-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Content-Length"
+    },
+    {
+      "mode": "aot",
+      "name": "duplicate-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Transfer-Encoding"
+    },
+    {
+      "mode": "aot",
+      "name": "ambiguous",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Ambiguous request framing"
+    },
+    {
+      "mode": "aot",
+      "name": "invalid-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request Content-Length"
+    },
+    {
+      "mode": "aot",
+      "name": "invalid-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request transfer encoding unsupported"
+    },
+    {
+      "mode": "aot",
+      "name": "empty-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Empty Host"
+    },
+    {
+      "mode": "aot",
+      "name": "space-in-name",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request header name"
+    },
+    {
+      "mode": "aot",
+      "name": "underscore-not-hyphen",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e745f6c656e6774683d300a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "mixed-known",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "known-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "catalog-first",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "catalog-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "catalog-fragmented",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "chunked",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e673d6368756e6b65640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "unknown-and-empty",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2035390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a782d637573746f6d3d74776f20776f7264730a782d656d7074793d0a782d637573746f6d3d7365636f6e640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f73783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f7374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e6774783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e677468783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6578706563783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a657870656374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d747970783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d74797065783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-accept",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-accept",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a616363657074783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-accept-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-accept-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-authorization",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a617574686f72697a6174696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-authorization",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a617574686f72697a6174696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-cookie",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6f6b69783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-cookie",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6f6b6965783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-user-agent",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a757365722d6167656e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-user-agent",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a757365722d6167656e74783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-cache-control",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a63616368652d636f6e74726f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-cache-control",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a63616368652d636f6e74726f6c783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "unsupported-ExPeCt",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "interpreter",
+      "name": "unsupported-CoNtEnT-EnCoDiNg",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "interpreter",
+      "name": "duplicate-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate Host"
+    },
+    {
+      "mode": "interpreter",
+      "name": "duplicate-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Content-Length"
+    },
+    {
+      "mode": "interpreter",
+      "name": "duplicate-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Transfer-Encoding"
+    },
+    {
+      "mode": "interpreter",
+      "name": "ambiguous",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Ambiguous request framing"
+    },
+    {
+      "mode": "interpreter",
+      "name": "invalid-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request Content-Length"
+    },
+    {
+      "mode": "interpreter",
+      "name": "invalid-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request transfer encoding unsupported"
+    },
+    {
+      "mode": "interpreter",
+      "name": "empty-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Empty Host"
+    },
+    {
+      "mode": "interpreter",
+      "name": "space-in-name",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request header name"
+    },
+    {
+      "mode": "interpreter",
+      "name": "underscore-not-hyphen",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e745f6c656e6774683d300a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "mixed-known",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "known-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "catalog-first",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "catalog-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "catalog-fragmented",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a203138370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a6163636570743d2a2f2a0a6163636570742d656e636f64696e673d6964656e746974790a617574686f72697a6174696f6e3d4578616d706c6520746f6b656e0a636f6f6b69653d613d620a757365722d6167656e743d746573740a63616368652d636f6e74726f6c3d6e6f2d63616368650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "chunked",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e673d6368756e6b65640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "unknown-and-empty",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2035390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a782d637573746f6d3d74776f20776f7264730a782d656d7074793d0a782d637573746f6d3d7365636f6e640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f73783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f7374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e6774783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e677468783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6578706563783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a657870656374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d747970783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d74797065783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-accept",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-accept",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a616363657074783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-accept-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-accept-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6163636570742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-authorization",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a617574686f72697a6174696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-authorization",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a617574686f72697a6174696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-cookie",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6f6b69783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-cookie",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6f6b6965783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-user-agent",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a757365722d6167656e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-user-agent",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a757365722d6167656e74783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-cache-control",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a63616368652d636f6e74726f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-cache-control",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a63616368652d636f6e74726f6c783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "unsupported-ExPeCt",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "jit",
+      "name": "unsupported-CoNtEnT-EnCoDiNg",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "jit",
+      "name": "duplicate-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate Host"
+    },
+    {
+      "mode": "jit",
+      "name": "duplicate-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Content-Length"
+    },
+    {
+      "mode": "jit",
+      "name": "duplicate-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Transfer-Encoding"
+    },
+    {
+      "mode": "jit",
+      "name": "ambiguous",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Ambiguous request framing"
+    },
+    {
+      "mode": "jit",
+      "name": "invalid-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request Content-Length"
+    },
+    {
+      "mode": "jit",
+      "name": "invalid-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request transfer encoding unsupported"
+    },
+    {
+      "mode": "jit",
+      "name": "empty-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Empty Host"
+    },
+    {
+      "mode": "jit",
+      "name": "space-in-name",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request header name"
+    },
+    {
+      "mode": "jit",
+      "name": "underscore-not-hyphen",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e745f6c656e6774683d300a",
+      "outcome": "OK"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-headers\\project\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-headers\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-headers\\native\\app.exe\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\benchmarks\\http-server\\check-header-names.py": "2f9a49ffb9c9ef87df8941d0ddd506327f9a8f9e2203439b7c6500676d7efba3",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\benchmarks\\http-server\\HeaderNames.rvn": "2ea4d6e8106bbe2602664090bdb1922606cc82ae0ede47ceaf41d33d2d937611",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\manifest.json": "faefccac240e56e316026c8e67faf1fd769675d76098be30b3372c845f8f35d7",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-headers\\native\\build.json": "72b8b777a0044d4e2917e7999ad05e1ab9227fb0287eeb2181dd819b63b9af87",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe": "e17bd681348b73b1b68a6eb761fc279c11dfaf8449a496fae71eef35bd6993e2",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe": "d06e42154d756bb5d3f09dd22f0697a4d6ad11b81e9233f27c42739ab9b2966d"
+  }
+}

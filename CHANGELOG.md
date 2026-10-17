@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Retain final Windows package/editor qualification: extracted samples, HTTP, JSON, GC, headers, 24 await cases, exact inlays and twenty diagnostic-recovery cycles pass. Verify matching SDK/VSIX servers and both publication archive manifests; only README notices change, with executable/library bytes preserved. Repacked macOS acceptance passes.
+
 - Qualify HTTPS project builds against the selected native-toolchain archive and its shipped backend instead of mixing an obsolete SDK with a freshly built backend. Record compiler, manifest and backend identities; preserve the legacy bootstrap path only for explicit no-bundle use. HTTPS orchestration tests pass; matching-package execution results are recorded separately.
 
 - Record final macOS package measurements: 55 CPU/JSON processes and 1,152 plain/typed-JSON HTTP responses pass across interpreter/JIT/AOT. Preserve full raw reports losslessly compressed with SHA-256 checks, summary ranges/startup and the failed stale-root run. Interpreter CPU median is 6.26 operations/s; keep host-load limitations and Windows results separate.

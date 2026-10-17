@@ -1,0 +1,951 @@
+{
+  "passed": true,
+  "platform": "Windows-2025Server-10.0.26100-SP0",
+  "commands": [
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\prepare-jit-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--runtime",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "--jit-compiler",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--host-recipe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\build.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Raven runtime async language support\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Raven runtime async language support\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Raven runtime async language support\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.exe"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: runtime async sample terminal fault\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at $closure$0.Invoke [instruction 14]\n   at RuntimeAwaitProvider.Body`1.Run [instruction 2]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n   at Raven.Generated.<AsyncEntry> [instruction 1]\n"
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: runtime async sample terminal fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FE52BFDFF6E49266FE30CAC4936AC7AEE00A5CDC704BBEA2A58BB57FD53CF135.T__24636C6F737572652430.M_496E766F6B65 [instruction 14]\n   at NeoMetadata_FE52BFDFF6E49266FE30CAC4936AC7AEE00A5CDC704BBEA2A58BB57FD53CF135.T_52756E74696D65417761697450726F7669646572_426F64796031.M_52756E [instruction 2]\n   at NeoMetadata_FE52BFDFF6E49266FE30CAC4936AC7AEE00A5CDC704BBEA2A58BB57FD53CF135.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n"
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: runtime async sample terminal fault\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at $closure$0.Invoke [instruction 14]\n   at RuntimeAwaitProvider.Body`1.Run [instruction 2]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n   at Raven.Generated.<AsyncEntry> [instruction 1]\n"
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS explicit state-machine fallback\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS explicit state-machine fallback\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS explicit state-machine fallback\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS explicit state-machine fallback\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS explicit state-machine fallback\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS explicit state-machine fallback\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS native Raven async generator language\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS native Raven async generator language\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS native Raven async generator language\n",
+      "stderr": ""
+    }
+  ],
+  "cases": [
+    {
+      "name": "language",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "language",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "language",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\language\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\cleanup\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "fault",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "fault",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "fault",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\fault\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "server",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "server",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "server",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\server\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "client",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "client",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "client",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\client\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "state-machine",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "state-machine",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "state-machine",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "state-machine-whitespace",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "state-machine-whitespace",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "state-machine-whitespace",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\state-machine-whitespace\\native\\app.dll"
+      ]
+    },
+    {
+      "name": "generator",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "generator",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "generator",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-runtime-await\\generator\\native\\app.dll"
+      ]
+    }
+  ],
+  "inputs": {
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\validate-runtime-await-sdk.py": "7a1ad188d6e6f13aaabde1292349b48328a96ab165d4a64bcc0107e56849a85c",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\raven\\compiler-services\\RuntimeAwait.rvn": "0dc6b0883f1b2a44ef78089405b53e709808c9d0d50b81f77ad11b48f7a05721",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\raven\\compiler-services\\RuntimeGenerator.rvn": "39ff24308871096baf1c89c954a91d89e937b6959f5bcf9d5e47ad09125af695",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\async\\native-runtime.c": "3e468fdf02f2e124b293b4303c85d4bb0de33ca445181070704259567968d29e",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\async\\native-runtime.h": "f77577df4c154f00bcd53ca9749f1250f4b928753d835c5cd40aa4a0fcf6b642",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\diagnostics\\attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\diagnostics\\attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\faults\\fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\faults\\render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\gc\\native-gc.c": "650b527b1b48410f87d6db532b9928c4dfb848da3ab4691af699dc511eb78d63",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\gc\\native-gc.h": "118e27d83eebfa88677c17db80892956c5ea763c8445982939414a13dc0d6df4",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\gc\\root-probe.c": "cd0ef22e957cb969f12d2230eaac7cf7c39c1be4124fe56507b0c6ece77cbf97",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\gc\\root-probe.h": "0861c1d4c6c96abb346948fa081e619d2b4a546c08fca031969bf7377e8bb841",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\memory\\static-storage-test.c": "ebe264df23a3c1dc4af02a39ccfd3650ea4f533e096ca06109dfb16a1039145e",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\memory\\text-arena.c": "a5846b5973e6c8e07c8680dcef8030e608bc14c9847873d6123cb88685fa0ec5",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\runtime\\native\\memory\\text-arena.h": "e3f5da646d4a6e5b439c81705a1e74993389404e32feb80c6de4510c13f2496e",
+    "docs/experiments/runtime-async/RuntimeAwait.rvn": "2941cbc64c251e3ed6f46e48ba9cabaf70ff2f65beafdaffa34d50bdadcbf9db",
+    "docs/experiments/runtime-async/RuntimeUse.rvn": "dd4ccb314cf0902e903a03831ecc4af7631b7938a4e3f628efef4a77885630bc",
+    "docs/experiments/runtime-async/RuntimeAwaitFault.rvn": "45b1082d47e234b87ce5c143002f53d6a380d6b166f3bed61012545738a2f80d",
+    "docs/experiments/http-server/Server.rvn": "7c93679e3fc4fd4fdea136fd8057be01b8623f445031c56fe8bd698a8f4d1e1f",
+    "docs/experiments/native-http-client/Client.rvn": "db071d9791ada630eb9ca0d378d1906d78b9f56df0b5289e40b0fc309b51c713",
+    "docs/experiments/runtime-async/RuntimeGeneratorLanguage.rvn": "c41eafa3a06d8dda120b1680ef6f25535d023fd4316e7b20479eb2bac6743d10"
+  }
+}

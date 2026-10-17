@@ -1,0 +1,269 @@
+{
+  "passed": true,
+  "root": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\collections\\App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\collections\\bin\\neoclr\\App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\collections\\bin\\neoclr\\App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\tasks\\App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\tasks\\bin\\neoclr\\App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\tasks\\bin\\neoclr\\App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Suspended\n42\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.dll\n",
+      "stderr": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Main.rvn(65,33): warning RAV0168: 'error' shadows a previous declaration.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Main.rvn(80,39): warning RAV0168: 'error' shadows a previous declaration.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.dll",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\neoclr-sample-reflection-luf3cxcs\\module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.dll -> C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\neoclr-sample-reflection-luf3cxcs\\module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.dll",
+        "--reflection-roots",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\bin\\neoclr\\App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll\n",
+      "stderr": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpServer.rvn(82,9): warning RAV0162: Unreachable code\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\neoclr-sample-reflection-_6we7p4q\\module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll -> C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\neoclr-sample-reflection-_6we7p4q\\module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll\n",
+      "stderr": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nD:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\HttpClient.rvn(22,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll",
+        "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\neoclr-sample-reflection-in72fz0q\\module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll -> C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\neoclr-sample-reflection-in72fz0q\\module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\tools\\verify-native-http-json.py",
+        "--runtime",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "--server",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+        "--client",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll",
+        "--seed",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--execution",
+        "default",
+        "--server-reflection-roots",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.reflection.json",
+        "--client-reflection-roots",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.reflection.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\windows-native-acceptance-http.json"
+      ],
+      "exitCode": 0,
+      "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+      "stderr": ""
+    }
+  ],
+  "verifiedFiles": 1597,
+  "execution": "default",
+  "http": {
+    "execution": "default",
+    "inputs": {
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe": "e17bd681348b73b1b68a6eb761fc279c11dfaf8449a496fae71eef35bd6993e2",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll": "5063148e2dfc524ec1288cab6526e271c4ccf3149fdf816ae34c77014f597cbf",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll": "f6a62e0a23b1d81f6d8f3d0e91c2b334dbbbb1281ca4cd94eca8caac9f01409d",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll": "744310c9b1c0e48a7ebf6d5698e596f991d3cd64100e1ce6ede8cfe2e51090e7",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll": "8594df8f524ed170dc03384fba6826e038380799968b0f499cecc9663cf8be3f",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll": "79d0cff7b8bc322ebdc3da0d3d13e384d593f46377830c1d34eeaeffea733230",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll": "eced5972f506302566f64e97db33452fa0bafa60bbffec98a860eaf6b185f803",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.reflection.json": "3e07305ba97cb176db83ef3dac5476209f5977833c0dbac6cf6e64ec46f1b796",
+      "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.reflection.json": "0ecd4b1f9665cc6dbadba46072734dd369255663999e56290cd8755575c15e78"
+    },
+    "runs": [
+      {
+        "serverCommand": [
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+          "--reflection-roots",
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.reflection.json",
+          "--",
+          "4"
+        ],
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/report",
+            "status": 200,
+            "body": {
+              "station": "Caf\u00e9"
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 201,
+            "body": {
+              "accepted": true
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 400,
+            "body": {
+              "error": "Invalid report"
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/missing",
+            "status": 404,
+            "body": {
+              "error": "Not found"
+            }
+          }
+        ],
+        "port": "62773",
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      },
+      {
+        "serverCommand": [
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.dll",
+          "--reflection-roots",
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-server\\bin\\neoclr\\App.reflection.json",
+          "--",
+          "2"
+        ],
+        "requests": [],
+        "port": "62792",
+        "clientCommand": [
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.dll",
+          "--reflection-roots",
+          "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\http-json-client\\bin\\neoclr\\App.reflection.json",
+          "--",
+          "http://127.0.0.1:62792/"
+        ],
+        "client": {
+          "exitCode": 0,
+          "stdout": "{\"accepted\":true}\n",
+          "stderr": ""
+        },
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true
+  }
+}

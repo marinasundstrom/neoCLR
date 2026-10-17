@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "platform": "Windows-2025Server-10.0.26100-SP0",
+  "commands": [
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native",
+        "--reflection-type",
+        "StationReport"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native\\app.dll",
+        "--jit-compiler",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe",
+        "--reflection-roots",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native\\app.reflection.json"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "cases": [
+    {
+      "mode": "interpreter",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "passed": true
+    }
+  ],
+  "inputs": {
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\validate-native-json-sample.py": "d105ba4e5d922ec59587d3f0c9359bca7d05d4bf40c6d44b79e52bf67d9cfdd9",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\bin\\neoclr.exe": "e17bd681348b73b1b68a6eb761fc279c11dfaf8449a496fae71eef35bd6993e2",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr-codegen.exe": "d06e42154d756bb5d3f09dd22f0697a4d6ad11b81e9233f27c42739ab9b2966d",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\manifest.json": "faefccac240e56e316026c8e67faf1fd769675d76098be30b3372c845f8f35d7",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Main.rvn": "eb40bd6b32881dfcc3c94e959e16a2c3c183b7f959a8c890f00bb8468a6ba8f8",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\extracted bundle\\neoclr-native-poc\\samples\\json\\Mapping.rvn": "31a891405c12408d473cce5e2068479c99ec88bc7cc53cadf90d198cc13958eb",
+    "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release-json\\native\\build.json": "aa29542e6d528d3af0f9e5ec392b848b525ee1096d3b7ba75a68267f3c9f709c"
+  }
+}

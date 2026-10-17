@@ -1,0 +1,14 @@
+{
+  "qualifiedArchiveSha256": "8af31409e66990bcbb3fb7e8121b0162e7db257823b1d0975a7f24075ed967d6",
+  "publicationArchiveSha256": "1efbce28b78c962bf01d9459ef9dcfa51f6f477e6db064ce6c34512db570d644",
+  "changedPayloadFiles": [
+    "README.md"
+  ],
+  "changedMetadataFiles": [
+    "manifest.json"
+  ],
+  "oldReadmeSha256": "49838cb4f9ae4535a03d1e0b07c8526a46d0aa6271807c2d0cca12f2fa2bf2e4",
+  "newReadmeSha256": "a38571bb4c4419d0662d092d84b06eb27455094bcacf4a1405c646043d0a3a79",
+  "verifiedUnchangedPayloadFiles": 1601,
+  "executablePayloadUnchanged": true
+}

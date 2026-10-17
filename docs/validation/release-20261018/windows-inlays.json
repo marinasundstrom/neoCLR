@@ -1,0 +1,459 @@
+{
+  "passed": true,
+  "samples": [
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 101,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 486,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 4,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 2,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 1,
+      "hints": []
+    },
+    {
+      "label": "warmup",
+      "version": 2,
+      "elapsedMs": 409,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-0-100ms",
+      "version": 3,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-0-350ms",
+      "version": 3,
+      "elapsedMs": 23,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-0-900ms",
+      "version": 3,
+      "elapsedMs": 4,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-1-100ms",
+      "version": 4,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-1-350ms",
+      "version": 4,
+      "elapsedMs": 8,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-1-900ms",
+      "version": 4,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-2-100ms",
+      "version": 5,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-2-350ms",
+      "version": 5,
+      "elapsedMs": 26,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-2-900ms",
+      "version": 5,
+      "elapsedMs": 6,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-3-100ms",
+      "version": 6,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-3-350ms",
+      "version": 6,
+      "elapsedMs": 9,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "comment-edit-3-900ms",
+      "version": 6,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        },
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-0-0",
+      "version": 6,
+      "elapsedMs": 10,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-0-1",
+      "version": 6,
+      "elapsedMs": 12,
+      "hints": [
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-1-0",
+      "version": 6,
+      "elapsedMs": 4,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-1-1",
+      "version": 6,
+      "elapsedMs": 6,
+      "hints": [
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-2-0",
+      "version": 6,
+      "elapsedMs": 4,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-2-1",
+      "version": 6,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-3-0",
+      "version": 6,
+      "elapsedMs": 5,
+      "hints": [
+        {
+          "line": 1,
+          "character": 14,
+          "label": ": int"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-3-1",
+      "version": 6,
+      "elapsedMs": 6,
+      "hints": [
+        {
+          "line": 2,
+          "character": 12,
+          "label": ": string"
+        }
+      ]
+    },
+    {
+      "label": "native-task-result",
+      "hints": [
+        {
+          "line": 5,
+          "character": 17,
+          "label": ": Task<int>"
+        },
+        {
+          "line": 5,
+          "character": 29,
+          "label": "callback:"
+        },
+        {
+          "line": 5,
+          "character": 31,
+          "label": " -> int"
+        },
+        {
+          "line": 6,
+          "character": 14,
+          "label": "value0:"
+        },
+        {
+          "line": 7,
+          "character": 13,
+          "label": ": int"
+        },
+        {
+          "line": 8,
+          "character": 14,
+          "label": "value0:"
+        }
+      ]
+    }
+  ]
+}
