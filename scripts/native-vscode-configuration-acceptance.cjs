@@ -8,7 +8,8 @@ exports.run = async () => {
   const root = vscode.workspace.workspaceFolders.find(f => f.name === 'Native').uri.fsPath;
   const config = path.join(root, 'references/NeoCLR.ClassLibrary.props');
   const original = fs.readFileSync(config, 'utf8');
-  const project = vscode.Uri.file(path.join(root, 'App.rvnproj'));
+  const asyncRoot = vscode.workspace.workspaceFolders.find(f => f.name === 'Async').uri.fsPath;
+  const projects = [vscode.Uri.file(path.join(root, 'App.rvnproj')), vscode.Uri.file(path.join(asyncRoot, 'Async.rvnproj'))];
   const report = { passed: false, rounds: [], events: [] };
   const diagnostics = () => vscode.languages.getDiagnostics().flatMap(([uri, items]) =>
     items.filter(d => d.source === 'raven-project').map(d => ({ uri: uri.toString(), source: d.source, message: d.message })));
@@ -16,7 +17,7 @@ exports.run = async () => {
   const listener = vscode.languages.onDidChangeDiagnostics(event => {
     if (event.uris.some(uri => uri.fsPath.endsWith('.rvnproj'))) record('diagnostics');
   });
-  const hasError = () => vscode.languages.getDiagnostics(project).some(d => d.source === 'raven-project');
+  const hasError = project => vscode.languages.getDiagnostics(project).some(d => d.source === 'raven-project');
   async function until(check, label) {
     for (let i = 0; i < 180; i++) { if (await check()) return; await delay(500); }
     throw Error('Timeout: ' + label);
@@ -33,10 +34,10 @@ exports.run = async () => {
     for (let round = 0; round < 10; round++) {
       record(`invalidate-${round}`);
       fs.writeFileSync(config, invalid);
-      await until(hasError, 'configuration diagnostic');
+      await until(() => projects.every(hasError), 'configuration diagnostics for both native projects');
       record(`restore-${round}`);
       fs.writeFileSync(config, original);
-      await until(() => !hasError(), 'configuration recovery');
+      await until(() => projects.every(project => !hasError(project)), 'configuration recovery for both native projects');
       report.rounds.push({ round, recovered: true });
     }
     report.passed = true;

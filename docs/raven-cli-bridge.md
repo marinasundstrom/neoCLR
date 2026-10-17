@@ -12817,3 +12817,13 @@ retains unsaved text and refreshes open documents. Runtime Contract selection,
 native metadata, CLI representation and runtime ABI are unchanged. The separate
 intermittent native-core project-diagnostic failure remains open; see the
 [release investigation](validation/release-candidate-20261017/README.md#reload-recovery-investigation).
+
+### Native editor dependency snapshots (2026-10-17)
+
+Raven main `860fe15fd` / native `b6590c2d2` scopes watch exclusions to the opened
+workspace. Native `7bfbce21f` captures metadata inputs while loading projects and
+filters later notifications without reevaluation. Failed loads retain dependencies
+for recovery. Focused regressions and ten real-editor cycles across both native
+projects pass with the development server; packaged validation remains separate.
+No native signature, Runtime Contract, CLI encoding or runtime ABI changes.
+See the [qualification](validation/release-candidate-20261017/README.md#watched-file-fixes-and-repeated-recovery).

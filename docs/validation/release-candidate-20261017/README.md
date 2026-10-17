@@ -214,3 +214,26 @@ restores valid configuration in `finally`. This is diagnostic evidence, not a
 qualification of the archived candidate or a claim that the original intermittent
 failure is fixed. Next: trace watched-file delivery and evaluation/publication
 ordering across both roots before selecting the next fix.
+
+## Watched-file fixes and repeated recovery
+
+Raven main `860fe15fd` fixes output-directory exclusions to be relative to the
+opened workspace; native carry `b6590c2d2` passes the same six focused tests.
+Previously an explicitly opened workspace under `target` or `artifacts` ignored
+its own ordinary configuration events. Native metadata discovery happened to
+bypass that exclusion, while reevaluating projects during file-event filtering.
+
+Native `7bfbce21f` snapshots metadata dependencies during project loading instead.
+Unrelated file events cannot populate the evaluation cache during filtering;
+failed reloads retain prior and newly discovered dependencies for recovery.
+Five focused tests pass, including a regression that failed before the change.
+These fixes remove observed filtering/evaluation hazards; the precise scheduling
+of every earlier intermittent failure is not claimed to have been reproduced.
+
+The [fixed development-server check](editor-fixed-development-both-projects.json)
+passes ten invalidation/recovery cycles, requiring diagnostics from **both** native
+projects and recovery of **both** before continuing. This uses Raven `7bfbce21f`
+Debug/net10.0 with the explicit server override. Fresh SDK/VSIX packaging and a
+no-override installed-server run are the next qualification step. The older
+archive remains unchanged. Runtime contracts, emission and ABI are unaffected;
+structural expansion remains parked.

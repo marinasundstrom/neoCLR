@@ -1,0 +1,552 @@
+{
+  "passed": true,
+  "rounds": [
+    {
+      "round": 0,
+      "recovered": true
+    },
+    {
+      "round": 1,
+      "recovered": true
+    },
+    {
+      "round": 2,
+      "recovered": true
+    },
+    {
+      "round": 3,
+      "recovered": true
+    },
+    {
+      "round": 4,
+      "recovered": true
+    },
+    {
+      "round": 5,
+      "recovered": true
+    },
+    {
+      "round": 6,
+      "recovered": true
+    },
+    {
+      "round": 7,
+      "recovered": true
+    },
+    {
+      "round": 8,
+      "recovered": true
+    },
+    {
+      "round": 9,
+      "recovered": true
+    }
+  ],
+  "events": [
+    {
+      "phase": "invalidate-0",
+      "at": "2026-10-17T18:56:07.582Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "restore-0",
+      "at": "2026-10-17T18:56:09.592Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:09.626Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:09.711Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:13.738Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-1",
+      "at": "2026-10-17T18:56:14.114Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:15.617Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-1",
+      "at": "2026-10-17T18:56:15.619Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:19.376Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-2",
+      "at": "2026-10-17T18:56:19.647Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:21.030Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-2",
+      "at": "2026-10-17T18:56:21.152Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:23.912Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-3",
+      "at": "2026-10-17T18:56:24.173Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:26.550Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-3",
+      "at": "2026-10-17T18:56:26.763Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:29.961Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-4",
+      "at": "2026-10-17T18:56:30.277Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:31.610Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-4",
+      "at": "2026-10-17T18:56:31.782Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:34.600Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-5",
+      "at": "2026-10-17T18:56:34.794Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:36.103Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-5",
+      "at": "2026-10-17T18:56:36.301Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:36.526Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:38.971Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-6",
+      "at": "2026-10-17T18:56:39.315Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:40.518Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:40.609Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-6",
+      "at": "2026-10-17T18:56:40.822Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:43.536Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-7",
+      "at": "2026-10-17T18:56:43.835Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:45.313Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-7",
+      "at": "2026-10-17T18:56:45.340Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "invalidate-8",
+      "at": "2026-10-17T18:56:47.850Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:47.852Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:49.127Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:49.218Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-8",
+      "at": "2026-10-17T18:56:49.355Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:52.793Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "invalidate-9",
+      "at": "2026-10-17T18:56:52.873Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:54.077Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:54.152Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "restore-9",
+      "at": "2026-10-17T18:56:54.378Z",
+      "diagnostics": [
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/App.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        },
+        {
+          "uri": "file:///Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core-async/Async.rvnproj",
+          "source": "raven-project",
+          "message": "Project reload failed; editor retains the last successful snapshot. Could not find file '/Users/robert/Projects/neoclr/target/release-coherent-20261017/editor-native-core/references/Missing.Owner.dll'."
+        }
+      ]
+    },
+    {
+      "phase": "diagnostics",
+      "at": "2026-10-17T18:56:56.868Z",
+      "diagnostics": []
+    },
+    {
+      "phase": "finished",
+      "at": "2026-10-17T18:56:56.887Z",
+      "diagnostics": []
+    }
+  ]
+}
