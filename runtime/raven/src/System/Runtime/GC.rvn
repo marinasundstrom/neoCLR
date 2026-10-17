@@ -1,29 +1,28 @@
 module System.Runtime
 
-import System.Runtime.CompilerServices.RuntimeServices
 
 /// Queries and controls the current execution's tracing heap.
 public static class GC {
     /// Completed collections in this execution, including explicit requests.
-    static val CollectionCount: long => RuntimeServices.GCCollectionCount()
+    static val CollectionCount: long => neoCLR.Runtime.GCCollectionCount()
     /// Total tracked objects allocated since this execution started.
-    static val AllocatedObjectCount: long => RuntimeServices.GCAllocatedObjectCount()
+    static val AllocatedObjectCount: long => neoCLR.Runtime.GCAllocatedObjectCount()
     /// Tracked objects currently retained, including garbage not yet collected.
-    static val HeapObjectCount: long => RuntimeServices.GCHeapObjectCount()
+    static val HeapObjectCount: long => neoCLR.Runtime.GCHeapObjectCount()
     /// Largest retained object count observed in this execution.
-    static val PeakHeapObjectCount: long => RuntimeServices.GCPeakHeapObjectCount()
+    static val PeakHeapObjectCount: long => neoCLR.Runtime.GCPeakHeapObjectCount()
     /// Total tracked objects reclaimed by completed collections.
-    static val ReclaimedObjectCount: long => RuntimeServices.GCReclaimedObjectCount()
+    static val ReclaimedObjectCount: long => neoCLR.Runtime.GCReclaimedObjectCount()
     /// Host-configured maximum retained object count; collection cannot raise it.
-    static val HeapObjectLimit: long => RuntimeServices.GCHeapObjectLimit()
+    static val HeapObjectLimit: long => neoCLR.Runtime.GCHeapObjectLimit()
 
     /// Synchronously collects unreachable objects in the current execution.
     static func Collect() {
-        RuntimeServices.GCCollect()
+        neoCLR.Runtime.GCCollect()
     }
 
     /// Retains a reference through this call; null is accepted.
     static func KeepAlive(value: object?) {
-        RuntimeServices.GCKeepAlive(value)
+        neoCLR.Runtime.GCKeepAlive(value)
     }
 }

@@ -12560,3 +12560,13 @@ passes interpreter/JIT/sanitized AOT against the fresh production library bundle
 Target-typed native literals and complete float/decimal conversions remain gaps.
 Production core input still includes the CLI bridge; native-only core construction
 and other runtime-service wrappers remain open. Structural work stays parked.
+
+### Direct time-zone and heap service calls (2026-10-17)
+
+System.Runtime no longer includes 13 RuntimeServices extension forwards for time-zone
+and GC operations. Public methods bind existing `neoCLR.Runtime` declarations
+directly using Raven `d83ea51e7`. Native service identity, signatures and runtime
+implementations are unchanged; no new Runtime Contract setting or .NET behavior
+is introduced. The [migration gate](validation/native-core-removal/README.md#direct-time-zone-and-heap-services)
+records compilation and editor validation. Production CLI core input and remaining
+facade/payload services are still temporary dependencies, not permanent platform rules.

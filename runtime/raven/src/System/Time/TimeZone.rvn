@@ -3,7 +3,6 @@ module System.Time
 import System.*
 
 import System.Result.*
-import System.Runtime.CompilerServices.RuntimeServices
 
 /// Named IANA rules, separate from culture, calendar and the system clock.
 public class TimeZone {
@@ -14,13 +13,13 @@ public class TimeZone {
     }
 
     static val Utc: TimeZone => TimeZone("UTC")
-    static val DatabaseVersion: string => RuntimeServices.TimeZoneDatabaseVersion()
+    static val DatabaseVersion: string => neoCLR.Runtime.TimeZoneDatabaseVersion()
     val Id: string => identifier
     val MinYear: int => 1900
     val MaxYear: int => 2099
 
     static func Find(id: string) -> Result<TimeZone, TimeZoneError> {
-        if !RuntimeServices.TimeZoneExists(id) {
+        if !neoCLR.Runtime.TimeZoneExists(id) {
             return Error(TimeZoneError.UnknownZone)
         }
         return Ok(TimeZone(id))
@@ -28,7 +27,7 @@ public class TimeZone {
 
     /// Reads the system's IANA name; no silent UTC fallback.
     static func GetSystem() -> Result<TimeZone, TimeZoneError> {
-        let name = RuntimeServices.SystemTimeZoneName()
+        let name = neoCLR.Runtime.SystemTimeZoneName()
         if name.Length == 0 {
             return Error(TimeZoneError.SystemZoneUnavailable)
         }
@@ -36,7 +35,7 @@ public class TimeZone {
     }
 
     func GetUtcOffset(instant: Instant) -> Result<TimeOffset, TimeZoneError> {
-        let seconds = RuntimeServices.TimeZoneOffset(identifier, instant.UnixTimeTicks)
+        let seconds = neoCLR.Runtime.TimeZoneOffset(identifier, instant.UnixTimeTicks)
         let Ok(offset) = TimeOffset.FromSeconds(seconds) else {
             return Error(TimeZoneError.OutOfRange)
         }
@@ -50,7 +49,7 @@ public class TimeZone {
     /// Reports overlap candidates in increasing instant order; never chooses or shifts.
     func MapLocal(local: LocalDateTime) -> Result<LocalTimeMapping, TimeZoneError> {
         let ticks = TimeOffset.Zero.ToInstant(local).UnixTimeTicks
-        let values = RuntimeServices.TimeZoneMapLocal(identifier, ticks)
+        let values = neoCLR.Runtime.TimeZoneMapLocal(identifier, ticks)
         if values[0] == 0L {
             return Ok(LocalTimeMapping.Skipped)
         }

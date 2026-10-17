@@ -141,3 +141,28 @@ Raven neoCLR `d83ea51e7` is the validated compiler carry. The
 [overflow consumer](NativeIntegerOverflow.rvn) reports ArithmeticOverflow in interpreter,
 managed JIT and sanitized AOT. [Execution evidence](native-integer-conversion-results.json)
 records commands, result codes and binary hashes for both consumers.
+
+## Direct time-zone and heap services
+
+The five time-zone and eight GC forwarding methods are removed from System.Runtime's
+source list. Public TimeZone and GC members now call the existing native declarations
+directly; their signatures, result contracts, service ownership and runtime bindings
+are unchanged. This is the same semantic intent as the old forwards and introduces
+no .NET API divergence or Runtime Contract setting.
+
+Raven `d83ea51e7` builds the fresh five-library `target/native-time-heap-library`
+bundle. [TimeZone completion](time-heap-completion.json) exposes Find/DatabaseVersion;
+[GC completion](heap-completion.json) exposes Collect/KeepAlive. API source fingerprints
+are refreshed; public signatures and rendered API content are unchanged.
+
+This still uses the staged CLI core input. Console/storage/string/object/introspection
+forwards and retained payload/intrinsic services need further migration; production
+native-core construction remains open. Structural work stays parked. No installed SDK
+or website deployment is changed.
+
+The [consumer](TimeHeapConsumer.rvn) returns 42 in the interpreter: it checks
+unknown-zone rejection, explicit UTC offset/mapping, system-zone query, all heap
+counters, collection progress and KeepAlive for a reference and null.
+[Execution evidence](time-heap-results.json) includes compiler/runtime commands and
+bundle hashes. JIT/AOT service implementations are unchanged; this forwarding-only
+slice does not repeat their platform matrix or claim new backend coverage.

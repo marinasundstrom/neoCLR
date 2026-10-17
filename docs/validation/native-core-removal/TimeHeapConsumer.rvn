@@ -1,0 +1,46 @@
+import System.*
+import System.Time.*
+import System.Runtime.GC
+import System.Result.*
+import System.Time.LocalTimeMapping.*
+
+func Main() -> int {
+    if TimeZone.DatabaseVersion.Length == 0 {
+        return 1
+    }
+    let Error(_) = TimeZone.Find("Invalid/UnknownZone") else {
+        return 2
+    }
+    let Ok(zone) = TimeZone.Find("UTC") else {
+        return 3
+    }
+    let instant = Instant.FromUnixTimeTicks(0L)
+    let Ok(offset) = zone.GetUtcOffset(instant) else {
+        return 4
+    }
+    if offset.Seconds != 0 {
+        return 5
+    }
+    let Ok(local) = TimeOffset.Zero.AtInstant(instant) else {
+        return 10
+    }
+    let Ok(mapping) = zone.MapLocal(local) else {
+        return 6
+    }
+    let Unique(value) = mapping else {
+        return 7
+    }
+    if value.Instant.UnixTimeTicks != 0L {
+        return 8
+    }
+    // System-zone availability is host dependent; exercise either Result outcome.
+    let systemZone = TimeZone.GetSystem()
+    let before = GC.CollectionCount
+    GC.Collect()
+    if GC.CollectionCount <= before || GC.AllocatedObjectCount < 0L || GC.HeapObjectCount < 0L || GC.PeakHeapObjectCount < 0L || GC.ReclaimedObjectCount < 0L || GC.HeapObjectLimit <= 0L {
+        return 9
+    }
+    GC.KeepAlive(zone)
+    GC.KeepAlive(null)
+    return 42
+}

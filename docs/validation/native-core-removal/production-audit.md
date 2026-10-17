@@ -168,3 +168,8 @@ stripping are accepted substitutes for the above gates.
   and explicit neoCLR lowering. Native comparisons and high-bit conversions pass
   interpreter/JIT/AOT; LSP member completion passes. Target-typed native literals
   and full float/decimal conversions remain open. See the conversion gate in README.
+
+- Time-zone and heap public callers now bind existing native namespace declarations
+  directly; 13 forwards and their source-list entries are removed. A fresh five-library
+  bundle, interpreter consumer and TimeZone/GC completion pass. Payload services,
+  other forwards and production core construction remain open.
