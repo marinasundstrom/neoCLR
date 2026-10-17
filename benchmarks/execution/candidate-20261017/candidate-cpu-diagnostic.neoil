@@ -1,0 +1,97 @@
+// Diagnostic disassembly excerpt, not an executable test or reassemblable source.
+.method #12 {
+  "impl_flags": 0,
+  "instance": false,
+  "is_abstract": false,
+  "is_override": false,
+  "is_virtual": false,
+  "local_names": [],
+  "locals": [
+    "Int32",
+    "Int32",
+    "Int32",
+    "Int32",
+    "Int32"
+  ],
+  "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_2466756E6374696F6E2433",
+  "origin": {
+    "assembly": "[\"App\",\"1.0.0.0\",\"\",\"\",\"0\"]",
+    "member_access": "Assembly",
+    "module": "App.dll",
+    "name": "$function$3",
+    "token": 100663309
+  },
+  "owner": null,
+  "parameter_names": [],
+  "parameters": [],
+  "pinvoke": null,
+  "receiver_byref": false,
+  "receiver_readonly": false,
+  "returns": "Int32",
+  "visibility": "internal"
+}
+.code
+  I_0000: ldc.i4 0
+  I_0001: stloc 0
+  I_0002: ldc.i4 0
+  I_0003: stloc 1
+  I_0004: ldc.i4 10000
+  I_0005: stloc 2
+  I_0006: ldc.i4 1
+  I_0007: stloc 3
+  I_0008: ldloc 3
+  I_0009: ldc.i4 0
+  I_0010: ceq
+  I_0011: brtrue 52
+  I_0012: ldloc 3
+  I_0013: ldc.i4 0
+  I_0014: clt
+  I_0015: brtrue 21
+  I_0016: ldloc 1
+  I_0017: ldloc 2
+  I_0018: clt
+  I_0019: brfalse 52
+  I_0020: br 25
+  I_0021: ldloc 1
+  I_0022: ldloc 2
+  I_0023: cgt
+  I_0024: brfalse 52
+  I_0025: ldloc 1
+  I_0026: stloc 4
+  I_0027: ldloc 0
+  I_0028: ldloc 4
+  I_0029: add
+  I_0030: stloc 0
+  I_0031: ldloc 3
+  I_0032: ldc.i4 0
+  I_0033: clt
+  I_0034: brfalse 41
+  I_0035: ldloc 1
+  I_0036: ldc.i4 -2147483648
+  I_0037: ldloc 3
+  I_0038: sub
+  I_0039: clt
+  I_0040: br 46
+  I_0041: ldloc 1
+  I_0042: ldc.i4 2147483647
+  I_0043: ldloc 3
+  I_0044: sub
+  I_0045: cgt
+  I_0046: brtrue 52
+  I_0047: ldloc 1
+  I_0048: ldloc 3
+  I_0049: add
+  I_0050: stloc 1
+  I_0051: br 12
+  I_0052: ldloc 0
+  I_0053: ldc.i4 49995000
+  I_0054: ceq
+  I_0055: ldc.bool false
+  I_0056: ceq
+  I_0057: brfalse 61
+  I_0058: ldstr "CPU checksum changed"
+  I_0059: call {"instance":false,"name":"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643","owner":null,"parameters":["String"]}
+  I_0060: fault "A terminal runtime failure unexpectedly returned."
+  I_0061: ldc.i4 1
+  I_0062: ret
+.end

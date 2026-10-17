@@ -1,0 +1,27 @@
+{
+  "publishedBundleDigestVerified": true,
+  "change": "CPU range 0..10000 becomes 0..<10000 for Preview 15; both are half-open on their respective compilers.",
+  "historicalSource": "b1f3f492f^:benchmarks/execution/Worker.rvn",
+  "sourceMatchesHistorical": true,
+  "iterations": 10000,
+  "expectedChecksum": 49995000,
+  "frameworkWorkerUnchanged": true,
+  "buildCommand": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+    "--profile",
+    "console",
+    "--project",
+    "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/preview15-compatible-execution/project/App.rvnproj",
+    "--bundle",
+    "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/preview15-extracted/neoclr-native-poc",
+    "--aot",
+    "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/preview15-extracted/neoclr-native-poc/bin/neoclr-codegen",
+    "--output",
+    "/Users/robert/Projects/neoclr/target/release-editor-fixed-20261017/preview15-compatible-execution/native",
+    "--byte-array-limit",
+    "4194304",
+    "--command-timeout",
+    "600"
+  ]
+}

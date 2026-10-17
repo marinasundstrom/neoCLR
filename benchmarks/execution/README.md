@@ -1,5 +1,10 @@
 # Preview 14 general execution baselines
 
+For the current local candidate and an explicitly syntax-adapted Preview 15
+comparison, see [2026-10-17 measurements](candidate-20261017/README.md). The CPU
+interpreter slowdown remains an open release concern. The published baseline
+below is retained unchanged.
+
 Three explicitly registered cases use the existing `BenchmarkSuite` and external
 process runner. They use the same compiled Raven application in interpreter/JIT
 and its native AOT compilation, with the released macOS bundle's compiler/libraries.

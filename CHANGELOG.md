@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Record five-round local CPU/JSON measurements for the fixed macOS candidate and published-digest Preview 15: 45 successful processes per cohort, separate startup/batch timings and retained input hashes. Adapt only the baseline CPU range spelling to its historical half-open syntax; retain the failed unadapted checksum run. CPU interpreter throughput is about 35% lower in the candidate; document extra range overflow checks as an investigation lead, not a completed optimization. HTTP/Windows and full release gates remain open.
+
 - Validate workspace-relative watching and native metadata dependency snapshots in Raven: six shared watcher checks and five native recovery checks pass. Strengthen the real-editor check to require both native projects to invalidate and recover; ten cycles pass with the fixed development server. A fresh SDK/VSIX and matching five-library candidate passes extracted-package acceptance, all 26 installed-editor checks, inlays and two ten-cycle runs requiring both native projects to recover. Close the macOS stale-project-diagnostic blocker; optimized runtime/codegen binaries are unchanged. Windows/source/performance gates and publication remain separate.
 
 - Strengthen the repeated editor configuration check to ten cycles with timed project diagnostics; retain both intermittent passing and failing evidence. Record Raven workspace recovery fix 24898a8d5 / e7ce2f8ee, validated on both compiler lines, preserving unsaved buffers through failed then successful reloads. The separate configuration-diagnostic failure remains a release blocker; the archived SDK/VSIX is unchanged.

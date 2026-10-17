@@ -1,0 +1,374 @@
+{
+  "date": "2026-10-17",
+  "candidate": "0.0.0-native-candidate.20261017.2",
+  "candidateIdentity": "../../../docs/validation/release-candidate-20261017/editor-fixed-package-identity.json",
+  "ravenRevision": "7bfbce21f",
+  "candidateProcessesPassed": 45,
+  "preview15ProcessesPassed": 45,
+  "order": [
+    "candidate all cases",
+    "Preview 15 all cases"
+  ],
+  "sameHost": true,
+  "limitations": [
+    "Interactive host; no thermal, affinity or background-load isolation.",
+    "Cohorts ran sequentially, not interleaved; small differences are not causal regression conclusions.",
+    "Preview 15 uses the historical 0..<10000 spelling; current candidate uses 0..10000. Both sum 0 through 9999 and require 49995000.",
+    "External batch timing includes callback dispatch, checks, pipe markers and scheduling. Startup is separate; compilation is excluded.",
+    "No Windows, HTTP, allocation or controlled statistical-regression qualification is claimed."
+  ],
+  "rows": [
+    {
+      "case": "cpu.sum",
+      "mode": "interpreter",
+      "candidate": {
+        "startupSeconds": {
+          "median": 3.2771410420000002,
+          "minimum": 3.26968325,
+          "maximum": 3.3703490000000045
+        },
+        "batchSeconds": {
+          "median": 3.801916499999999,
+          "minimum": 3.7075651249999986,
+          "maximum": 3.899557999999999
+        },
+        "operationsPerSecond": {
+          "median": 4.208403840536741,
+          "minimum": 4.103029112530191,
+          "maximum": 4.3155007290667635
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 3.136631458,
+          "minimum": 3.0799410829999996,
+          "maximum": 3.544708041
+        },
+        "batchSeconds": {
+          "median": 2.4793906660000005,
+          "minimum": 2.4447871250000013,
+          "maximum": 2.583814083
+        },
+        "operationsPerSecond": {
+          "median": 6.453198448880503,
+          "minimum": 6.19239600297511,
+          "maximum": 6.544537083162196
+        }
+      },
+      "throughputChangePercent": -34.785767493841554
+    },
+    {
+      "case": "cpu.sum",
+      "mode": "jit",
+      "candidate": {
+        "startupSeconds": {
+          "median": 2.714511166,
+          "minimum": 2.6901699579999985,
+          "maximum": 3.150651708
+        },
+        "batchSeconds": {
+          "median": 0.2556850829999995,
+          "minimum": 0.2549617919999996,
+          "maximum": 0.26490258400000055
+        },
+        "operationsPerSecond": {
+          "median": 39110.61170510295,
+          "minimum": 37749.72614083666,
+          "maximum": 39221.56304894506
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 2.5994947919999998,
+          "minimum": 2.584067458,
+          "maximum": 2.776718583
+        },
+        "batchSeconds": {
+          "median": 0.24591874999999996,
+          "minimum": 0.2454312500000011,
+          "maximum": 0.24805008299999987
+        },
+        "operationsPerSecond": {
+          "median": 40663.83714133225,
+          "minimum": 40314.43924169138,
+          "maximum": 40744.60770582375
+        }
+      },
+      "throughputChangePercent": -3.819672577457145
+    },
+    {
+      "case": "cpu.sum",
+      "mode": "aot",
+      "candidate": {
+        "startupSeconds": {
+          "median": 0.007454540999999537,
+          "minimum": 0.007392166999999006,
+          "maximum": 0.24555770899999985
+        },
+        "batchSeconds": {
+          "median": 0.25568587499999973,
+          "minimum": 0.2545041250000004,
+          "maximum": 0.26420266700000283
+        },
+        "operationsPerSecond": {
+          "median": 39110.4905579943,
+          "minimum": 37849.731471483945,
+          "maximum": 39292.09398865336
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 0.007335625000000068,
+          "minimum": 0.0072394170000009694,
+          "maximum": 0.1841210000000002
+        },
+        "batchSeconds": {
+          "median": 0.24561670800000002,
+          "minimum": 0.2450979160000002,
+          "maximum": 0.2613906660000005
+        },
+        "operationsPerSecond": {
+          "median": 40713.842642985015,
+          "minimum": 38256.91312175616,
+          "maximum": 40800.02051098628
+        }
+      },
+      "throughputChangePercent": -3.938100608803552
+    },
+    {
+      "case": "json.serialize",
+      "mode": "interpreter",
+      "candidate": {
+        "startupSeconds": {
+          "median": 3.3091305419999983,
+          "minimum": 3.290766208000001,
+          "maximum": 3.42479875
+        },
+        "batchSeconds": {
+          "median": 4.195220583000001,
+          "minimum": 4.1732595,
+          "maximum": 4.766895083000001
+        },
+        "operationsPerSecond": {
+          "median": 3.8138638203759014,
+          "minimum": 3.3564825156442395,
+          "maximum": 3.8339336434746025
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 3.132047417,
+          "minimum": 3.0929037920000013,
+          "maximum": 3.236300790999998
+        },
+        "batchSeconds": {
+          "median": 4.250821,
+          "minimum": 4.232720499999999,
+          "maximum": 4.771863917000001
+        },
+        "operationsPerSecond": {
+          "median": 3.763978770218741,
+          "minimum": 3.352987486294236,
+          "maximum": 3.780074776966729
+        }
+      },
+      "throughputChangePercent": 1.3253276174632012
+    },
+    {
+      "case": "json.serialize",
+      "mode": "jit",
+      "candidate": {
+        "startupSeconds": {
+          "median": 2.731556916999999,
+          "minimum": 2.6761180000000024,
+          "maximum": 2.7347757500000007
+        },
+        "batchSeconds": {
+          "median": 0.03688229200000137,
+          "minimum": 0.036399417000000156,
+          "maximum": 0.038533917000002305
+        },
+        "operationsPerSecond": {
+          "median": 433.81251902672983,
+          "minimum": 415.21862415386016,
+          "maximum": 439.56747988573363
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 2.638882416999998,
+          "minimum": 2.5779631250000037,
+          "maximum": 2.7273940420000002
+        },
+        "batchSeconds": {
+          "median": 0.0397873330000067,
+          "minimum": 0.03950470800000261,
+          "maximum": 0.0415008750000041
+        },
+        "operationsPerSecond": {
+          "median": 402.1380372491242,
+          "minimum": 385.5340399449028,
+          "maximum": 405.01501745055157
+        }
+      },
+      "throughputChangePercent": 7.8765197130515
+    },
+    {
+      "case": "json.serialize",
+      "mode": "aot",
+      "candidate": {
+        "startupSeconds": {
+          "median": 0.008023041999999592,
+          "minimum": 0.007415458000000541,
+          "maximum": 0.01625649999999723
+        },
+        "batchSeconds": {
+          "median": 0.03551925000000011,
+          "minimum": 0.03494320800000139,
+          "maximum": 0.03634166599999844
+        },
+        "operationsPerSecond": {
+          "median": 450.4599618516705,
+          "minimum": 440.2660021145064,
+          "maximum": 457.88583578243197
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 0.007626625000000331,
+          "minimum": 0.007374333999999649,
+          "maximum": 0.016513832999997646
+        },
+        "batchSeconds": {
+          "median": 0.03794187499999957,
+          "minimum": 0.037454916999998034,
+          "maximum": 0.03962412500000312
+        },
+        "operationsPerSecond": {
+          "median": 421.69766254303937,
+          "minimum": 403.794405554665,
+          "maximum": 427.18022843304766
+        }
+      },
+      "throughputChangePercent": 6.820597281754104
+    },
+    {
+      "case": "json.deserialize",
+      "mode": "interpreter",
+      "candidate": {
+        "startupSeconds": {
+          "median": 3.325477082999999,
+          "minimum": 3.2753118330000017,
+          "maximum": 3.3944302500000028
+        },
+        "batchSeconds": {
+          "median": 3.8777088340000034,
+          "minimum": 3.7841241250000017,
+          "maximum": 3.963192416000002
+        },
+        "operationsPerSecond": {
+          "median": 4.126147858165873,
+          "minimum": 4.037149429183807,
+          "maximum": 4.228191114106225
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 3.1030416249999995,
+          "minimum": 3.094262667,
+          "maximum": 3.2326532919999984
+        },
+        "batchSeconds": {
+          "median": 3.8508392909999998,
+          "minimum": 3.8355429579999996,
+          "maximum": 4.1823260829999995
+        },
+        "operationsPerSecond": {
+          "median": 4.1549383889881994,
+          "minimum": 3.8256223169770482,
+          "maximum": 4.171508486595863
+        }
+      },
+      "throughputChangePercent": -0.6929231706210071
+    },
+    {
+      "case": "json.deserialize",
+      "mode": "jit",
+      "candidate": {
+        "startupSeconds": {
+          "median": 2.7092874159999996,
+          "minimum": 2.6985023750000003,
+          "maximum": 2.7976422920000026
+        },
+        "batchSeconds": {
+          "median": 0.04748062500000039,
+          "minimum": 0.04690179199999989,
+          "maximum": 0.051205416999998477
+        },
+        "operationsPerSecond": {
+          "median": 336.9795574510628,
+          "minimum": 312.46694075356277,
+          "maximum": 341.13835138751284
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 2.566488249999999,
+          "minimum": 2.555021332999999,
+          "maximum": 2.6095272089999995
+        },
+        "batchSeconds": {
+          "median": 0.047010333000001125,
+          "minimum": 0.046693791000002705,
+          "maximum": 0.04891158299999887
+        },
+        "operationsPerSecond": {
+          "median": 340.350705450217,
+          "minimum": 327.1208785043896,
+          "maximum": 342.6579778026392
+        }
+      },
+      "throughputChangePercent": -0.9904924377032831
+    },
+    {
+      "case": "json.deserialize",
+      "mode": "aot",
+      "candidate": {
+        "startupSeconds": {
+          "median": 0.007497958000001859,
+          "minimum": 0.0071187089999984465,
+          "maximum": 0.008129374999995775
+        },
+        "batchSeconds": {
+          "median": 0.04473333299999993,
+          "minimum": 0.04455237500000209,
+          "maximum": 0.04884558399999861
+        },
+        "operationsPerSecond": {
+          "median": 357.6751144387123,
+          "minimum": 327.5628765130632,
+          "maximum": 359.1278803879535
+        }
+      },
+      "preview15": {
+        "startupSeconds": {
+          "median": 0.007332374999998947,
+          "minimum": 0.0072843749999993435,
+          "maximum": 0.018331374999995376
+        },
+        "batchSeconds": {
+          "median": 0.04435483299999987,
+          "minimum": 0.04395787499999848,
+          "maximum": 0.04595804200000231
+        },
+        "operationsPerSecond": {
+          "median": 360.7273191627178,
+          "minimum": 348.14363936564564,
+          "maximum": 363.9848377566148
+        }
+      },
+      "throughputChangePercent": -0.8461251925942159
+    }
+  ],
+  "releaseConcern": "CPU interpreter median throughput is about 35% below Preview 15. Candidate disassembly adds per-iteration range overflow guards; this is a concrete investigation lead, not an isolated causal proof or a completed optimization."
+}

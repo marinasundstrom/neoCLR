@@ -1,0 +1,33 @@
+{
+  "capturedAt": "2026-10-17T19:16:12.013189+00:00",
+  "commands": [
+    {
+      "command": [
+        "pmset",
+        "-g",
+        "batt"
+      ],
+      "exitCode": 0,
+      "stdout": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=23593059)\t80%; AC attached; not charging present: true\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "pmset",
+        "-g",
+        "therm"
+      ],
+      "exitCode": 0,
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uptime"
+      ],
+      "exitCode": 0,
+      "stdout": "21:16  up 31 days, 26 mins, 1 user, load averages: 2.72 4.18 5.67\n",
+      "stderr": ""
+    }
+  ]
+}

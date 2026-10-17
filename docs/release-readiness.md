@@ -68,8 +68,11 @@ CPU/JSON benchmark preparation now compiles and links successfully against this
 extracted bundle. [Preparation evidence](validation/release-candidate-20261017/benchmark-preparation.json)
 identifies the workloads and artifacts; it is not an execution or timing result.
 
-Windows execution/editor qualification and runtime measurements remain
-pending. The local Raven revision is ahead of the remote branch; candidate pinning
+Local CPU/JSON measurements now pass 45 candidate and 45 syntax-adapted Preview 15
+processes. CPU interpreter throughput is about 35% lower; portable range overflow
+checks are a concrete investigation lead. See [measurements and limitations](../benchmarks/execution/candidate-20261017/README.md).
+Windows execution/editor qualification, HTTP measurements and that performance
+investigation remain pending. The local Raven revision is ahead of the remote branch; candidate pinning
 must establish a remotely available, matching compiler/server/extension cohort.
 
 ## Required before release
@@ -83,7 +86,7 @@ must establish a remotely available, matching compiler/server/extension cohort.
 | Editor | macOS fixed packaged editor passes 26 main checks, inlays and twenty two-project configuration recovery cycles. Windows editor qualification is pending. | Validate native-only completion, hover, navigation, inlays, configuration recovery and build/run tasks with the exact shipped SDK/VSIX on both platforms. Test stale-output rejection and HTTP task inputs. |
 | API coverage | The website reports 123 unmatched legacy routes. Inspection shows 104 flat redirect routes and 19 hierarchical pages, not 123 missing APIs. | Verify redirect destinations; classify the 19 pages against native metadata. Preserve documented current APIs, remove obsolete scaffolds from current navigation, and retain honest notices/manual references for real coverage gaps. |
 | Documentation and packaging | The previous next-preview draft described the already released unified runtime. Native-core migration changes the compiler/library cohort. | Finalize current release notes, supported-feature limits, notices, package prerequisites and checksums. Change published download URLs only when actual new assets exist. |
-| Runtime performance | Existing published CPU/JSON/HTTP measurements use Preview 14; the installed debug preview is not a release benchmark baseline. Windows workload preparation is incomplete. | Complete the benchmark preparation below, then retain and review runtime measurements on both release targets before publication. |
+| Runtime performance | Local candidate/Preview 15 CPU/JSON measurements are recorded; CPU interpreter throughput is about 35% lower and requires investigation. HTTP/Windows measurements remain incomplete. | Complete the benchmark preparation below, then retain and review runtime measurements on both release targets before publication. |
 
 The 19 hierarchical API pages comprise two Enum helper pages, two namespace
 containers and 15 exception/compiler-scaffold pages. This is a route inventory,
@@ -142,7 +145,8 @@ invalidates affected measurements and checks; a prose-only correction does not
 require rerunning runtime workloads.
 
 Both target packages and their benchmark records are required by the author.
-No fresh runtime measurements have been taken by this audit. It does not claim
-remote CI status, Windows execution or publication. Structural expansion remains
+Fresh local CPU/JSON measurements and their unresolved CPU interpreter regression
+are recorded above. This audit does not claim remote CI status, Windows execution
+or publication. Structural expansion remains
 parked; known bounded limitations do not imply a requirement to implement every
 unsupported feature before this release.
