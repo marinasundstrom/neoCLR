@@ -185,3 +185,32 @@ release blocker; no cause or runtime failure is inferred from that timeout.
 No publication, global SDK replacement, Windows run or benchmark measurement is
 claimed. Next: investigate repeated configuration diagnostic publication/reload,
 then qualify the repaired editor and complete Windows/source/benchmark gates.
+
+## Reload recovery investigation
+
+The unchanged packaged server passed a [traced three-cycle run](coherent-editor-configuration-three-traced.json),
+but the [ten-cycle run](coherent-editor-configuration-ten-traced.json) again missed
+the third invalidation diagnostic. The harness now records edit phases and all
+project-load diagnostic transitions. This is intermittent, not qualified by the
+short passing run. Server logs for the failing cycle show Async rejecting the
+missing core without a corresponding App load failure, although they share the
+imported props file; the cause remains unproven.
+
+A separate deterministic regression exposed loss of open-document membership
+when restoring a failed reload snapshot. Raven main `24898a8d5` preserves that
+membership; `codex/neoclr` `e7ce2f8ee` carries it deliberately. Two focused reload
+tests pass on each line, including unsaved text preservation through failure and
+recovery. A ten-edit imported-property evaluation test passes on main. No Runtime
+Contract, signature, lowering or ABI change is involved. The archived candidate
+has not been rebuilt with this fix; its identity and previous evidence remain
+unchanged.
+
+The [development-server ten-cycle run](development-editor-configuration-recovery.json)
+uses the same isolated extension with an explicit server override to Raven
+`e7ce2f8ee` Debug/net10.0, including the native metadata adapter. It recovers four
+times, then times out waiting for the fifth recovery: App retains the missing-core
+error after the props file is restored, while Async has cleared. The harness
+restores valid configuration in `finally`. This is diagnostic evidence, not a
+qualification of the archived candidate or a claim that the original intermittent
+failure is fixed. Next: trace watched-file delivery and evaluation/publication
+ordering across both roots before selecting the next fix.

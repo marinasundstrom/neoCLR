@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Strengthen the repeated editor configuration check to ten cycles with timed project diagnostics; retain both intermittent passing and failing evidence. Record Raven workspace recovery fix 24898a8d5 / e7ce2f8ee, validated on both compiler lines, preserving unsaved buffers through failed then successful reloads. The separate configuration-diagnostic failure remains a release blocker; the archived SDK/VSIX is unchanged.
+
 - Build a coherent optimized macOS candidate with fresh Raven SDK/server/VSIX and five native libraries; extracted-package collections/tasks/JSON/HTTP acceptance passes without overrides. Update editor configuration tests to invalidate the native core reference instead of the removed ObjectLibrary property. The main installed-editor suite passes 26 checks and inlay checks pass; repeated configuration recovery times out on the third missing-core diagnostic and remains a release blocker. Retain exact package identity and passing/failing evidence; no release publication, global SDK replacement, Windows qualification or benchmark claim.
 
 - Preserve structural union generic-argument identity in native metadata token mapping, display names and shape queries; missing/open constituent metadata still rejects. Require public union constituents for visibility in interpreter and backend. Seven focused backend tests and one interpreter visibility test pass; unchanged HTTP client/server execution passes JIT and AOT, complementing prior interpreter evidence. Coherent release package/editor and Windows qualification remain pending.

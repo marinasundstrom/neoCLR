@@ -12807,3 +12807,13 @@ metadata and open arguments still reject. The unchanged HTTP client/server workf
 passes interpreter/JIT/AOT with the corrected metadata library/backend. See
 [focused qualification](validation/release-candidate-20261017/README.md#union-generic-argument-metadata-retention).
 This qualifies the existing workload, not broader parked structural work or a new SDK.
+
+### Editor reload snapshot recovery (2026-10-17)
+
+Raven main `24898a8d5`, carried to `codex/neoclr` as `e7ce2f8ee`, preserves
+open-document membership when a failed project reload restores its prior
+snapshot. Focused tests on both lines verify that the next successful reload
+retains unsaved text and refreshes open documents. Runtime Contract selection,
+native metadata, CLI representation and runtime ABI are unchanged. The separate
+intermittent native-core project-diagnostic failure remains open; see the
+[release investigation](validation/release-candidate-20261017/README.md#reload-recovery-investigation).
