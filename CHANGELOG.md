@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
-- Support native-owned and explicitly imported native ParamArrayAttribute markers in metadata emission and import, preserving exact dependency ownership and parameter introspection. Reject ambiguous owners or missing marker constructors; retain the legacy marker binding. Production library ownership and compiler marker selection remain separate migration steps.
+- Support native-owned and explicitly imported native ParamArrayAttribute markers in metadata emission and import, preserving exact dependency ownership and parameter introspection. Reject ambiguous owners or missing marker constructors; retain the legacy marker binding. Honor explicit symbol-authored native markers without requiring an SDK definition import or synthesizing a second marker. Production library ownership and compiler marker selection remain separate migration steps.
 
 - Record the production bootstrap-removal audit, native artifact dependencies and retained direct-call inventory. Clarify that Raven neoCLR compilation and editor symbols must use native metadata references, including the core library. Complete compiler/helper use-site analysis and separate confirmed migration blockers from unvalidated prototypes; no production bundle or installed SDK is replaced.
 

@@ -92,6 +92,16 @@ internal static class ParameterArrayChecks
         var importedContext = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([loaded, imported]);
         Check(importedContext.Resolve(imported.Identity).GetTypes().Single(t => t.Name == "Operations").GetMethods()
             .All(m => m.GetParameters().Single().IsParameterArray), "imported native introspection lost parameter arrays");
+        var symbolic = Create(core, "SymbolicParameters");
+        var symbolicOwner = symbolic.CreateTypeReference(loaded.Identity, core,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(RuntimeAssemblyContainer.WriteBinary(image, core))),
+            "System", "ParamArrayAttribute", 0);
+        var symbolicConstructor = symbolic.CreateMethodReference(symbolicOwner, ".ctor", new(PrimitiveType.Void, []), isStatic: false);
+        foreach (var method in symbolic.Definition.MainModule.Types.Single(t => t.Name == "Operations").Methods)
+            method.GetParameterCustomAttributes(0).Add(new CustomAttributeDefinition(symbolicConstructor, []));
+        var symbolicLoaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(symbolic.WriteNativeAssembly(), core));
+        Check(symbolicLoaded.MainModule.Types.Single(t => t.Name == "Operations").Methods.All(m => m.ParameterArrayIndex == 0),
+            "explicit symbol-authored marker was lost");
         var missingConstructor = Create(core);
         missingConstructor.AddClass("System", "ParamArrayAttribute");
         Reject(() => missingConstructor.WriteNativeAssembly());

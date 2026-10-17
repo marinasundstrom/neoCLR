@@ -12498,3 +12498,7 @@ and separate-provider native roundtrips, exact reference ownership, introspectio
 invalid targets and missing constructors. The legacy `--parameter-arrays` probe
 still passes. Compiler marker selection and production source ownership are not
 completed by this SDK slice; see the [migration audit](validation/native-core-removal/production-audit.md).
+
+Raven's symbol-only native emitter supplies the selected imported marker constructor
+explicitly. The SDK honors that metadata without requiring a second definition graph
+or a CLI binding. The focused SDK probe also covers this symbol-authored path.

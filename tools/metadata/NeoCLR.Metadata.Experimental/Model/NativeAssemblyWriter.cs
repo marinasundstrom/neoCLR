@@ -39,7 +39,7 @@ public sealed partial class AssemblyBuilder
         }
         var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
         var parameterAttributes = new Dictionary<MethodBuilder, CustomAttributeDefinition>();
-        if (methods.Any(m => m.Definition.ParameterArrayIndex is not null))
+        if (methods.Any(m => m.Definition.ParameterArrayIndex is { } index && !HasParameterArrayAttribute(m, index, native: true)))
         {
             var localMarker = types.SingleOrDefault(t => t.Namespace == "System" && t.Name == "ParamArrayAttribute" && t.Definition.DeclaringType is null);
             var importedMarkers = nativeImportedDefinitions.Where(p => p.Key.Namespace == "System" &&
@@ -77,7 +77,7 @@ public sealed partial class AssemblyBuilder
             }
             foreach (var method in methods.Where(m => m.Definition.ParameterArrayIndex is not null))
             {
-                if (HasParameterArrayAttribute(method, method.Definition.ParameterArrayIndex!.Value)) continue;
+                if (HasParameterArrayAttribute(method, method.Definition.ParameterArrayIndex!.Value, native: true)) continue;
                 var attribute = markerAttribute;
                 attributeOwners.TryAdd(attribute, marker); parameterAttributes.Add(method, attribute);
             }
