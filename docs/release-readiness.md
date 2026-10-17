@@ -34,9 +34,11 @@ codegen gaps before measurements began:
   admission. UTF-8 results also needed an ordinary managed-array tag and inclusion
   in nominal interface dispatch. The focused fix and executable evidence are in
   [text-vector validation](validation/release-candidate-20261017/README.md).
-- The packaged JSON consumer still fails on a scalar-union instance test in an
-  async function. This is a blocker in an existing packaged workload, not an
-  expansion of the parked structural-type scope.
+- The packaged JSON consumer's identity test on a value-only union now has bounded
+  native lowering, with exact-shape admission and preserved default/null semantics.
+  Its unchanged async/error/reflection workload passes interpreter/JIT/AOT against
+  the corrected backend; see [JSON evidence](validation/release-candidate-20261017/json-patterns.json).
+  Whole-package acceptance still requires a freshly staged archive.
 
 The original archive retains the pre-fix backend and is not qualified. Rebuild it
 from a validated revision after the remaining correctness failures are closed.

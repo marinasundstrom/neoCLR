@@ -2816,7 +2816,7 @@ ret
     );
     let unsupported = source.replace(
         "unbox.any Int32",
-        "isinst union<Int32,Int64>\nref.isnull\npop\nldc.i4 42",
+        "isinst union<Int32,Int64,Boolean>\nref.isnull\npop\nldc.i4 42",
     );
     let m = neoclr::assemble(&unsupported).unwrap();
     let temp = Temp::new();
@@ -2830,7 +2830,7 @@ ret
     assert!(!result.status.success());
     assert!(
         String::from_utf8_lossy(&result.stderr)
-            .contains("scalar union instance tests require tagged conversion lowering")
+            .contains("value union identity query requires the same union")
     );
     assert!(!temp.0.join("value.o").exists());
 }
@@ -3555,5 +3555,79 @@ ret
             if overflow { 2 } else { 0 },
             if overflow { 12345 } else { 42 },
         );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn value_union_identity_patterns_preserve_payload_and_null() {
+    for (shape, make, extract) in [
+        ("union<Int32,Int64>", "ldc.i4 42\nbox Int32", "unbox.any Int32"),
+        ("union<First,Second>", "ldc.i4 42\nnewobj First\nbox First", "unbox.any First\nldfld First::Value"),
+    ] {
+        let source = format!(r#"
+.module IdentityPattern
+.type class abstract System.Object
+.end
+.type First
+.field Value Int32
+.end
+.type Second
+.field Value Int32
+.end
+.entry Main
+.function Main() -> Int32
+.local {shape} value
+ldloca value
+initobj {shape}
+ldloc value
+isinst {shape}
+ref.isnull
+brfalse Bad
+{make}
+castclass {shape}
+stloc value
+ldloc value
+isinst {shape}
+ref.isnull
+brtrue Bad
+ldloc value
+unbox.any {shape}
+{extract}
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#);
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
+            "@entry", true, &["--compile-system", "--reference-arena"]);
+
+        let null = source.replacen(&format!("isinst {shape}\nref.isnull"),
+            &format!("unbox.any {shape}\nref.isnull"), 1);
+        let m = neoclr::assemble(&null).unwrap();
+        assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
+            "@entry", true, &["--compile-system", "--reference-arena"]);
+
+        let different = source.replacen(&format!("isinst {shape}\nref.isnull"),
+            "isinst union<Int32,Int64,Boolean>\nref.isnull", 1);
+        let m = neoclr::assemble(&different).unwrap();
+        let temp = Temp::new();
+        let result = compile_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp, "@entry", true, &["--compile-system", "--reference-arena"]);
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("same union"));
+
+        let escaped = source.replacen(&format!("isinst {shape}\nref.isnull"),
+            &format!("isinst {shape}\ndup\npop\nref.isnull"), 1);
+        let m = neoclr::assemble(&escaped).unwrap();
+        let temp = Temp::new();
+        let result = compile_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp, "@entry", true, &["--compile-system", "--reference-arena"]);
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("immediate null test"));
     }
 }

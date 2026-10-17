@@ -8,7 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
-- Correct native UTF-8/grapheme array results in JIT/AOT: retain exact InternalCall contracts, publish fresh UTF-8 results as managed byte arrays, and include returned byte-array backings in nominal interface dispatch. The native text consumer passes interpreter/JIT/AOT; binding rejection and five existing UTF-8 tests pass. Extracted candidate JSON acceptance still fails on union instance-test lowering; release benchmarks and Windows qualification remain pending.
+- Lower identity patterns on native value-only unions without boxing: same-shape tests inspect the initialized tag and identity unboxing preserves payload/default values. Different shapes and escaping test results remain rejected; 13 related union tests pass. The packaged async JSON/reflection/error-alternative consumer passes interpreter/JIT/AOT with the corrected backend; whole-package and Windows qualification remain separate gates.
+
+- Correct native UTF-8/grapheme array results in JIT/AOT: retain exact InternalCall contracts, publish fresh UTF-8 results as managed byte arrays, and include returned byte-array backings in nominal interface dispatch. The native text consumer passes interpreter/JIT/AOT; binding rejection and five existing UTF-8 tests pass. Release benchmarks and Windows qualification remain pending.
 
 - Prepare CPU/JSON and plain/JSON HTTP benchmark harnesses for macOS ARM64 and Windows x64: select the matching native profile and executable, use the active Python interpreter, and record host-appropriate diagnostics without treating missing Windows load averages as zero. Windows database benchmarking remains explicitly unsupported. Thirteen framework tests pass on retry after a transient process-cleanup permission error; Windows runtime qualification remains pending.
 

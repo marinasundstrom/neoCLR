@@ -41,6 +41,13 @@ pub(crate) fn inline(module: &Module, ty: &Type) -> bool {
     supported(ty) || payloads(module, ty)
 }
 
+// Identity tests for non-reference alternatives need only their initialized tag.
+// Unions with reference alternatives retain their separate null/assignability rules.
+pub(crate) fn value_only(module: &Module, ty: &Type) -> bool {
+    matches!(ty, Type::Union(parts) if !parts.is_empty()
+        && parts.iter().all(|t| tag(t).is_some() || bank_scalar(t) || record(module, t)))
+}
+
 // Preserve both original instructions and their diagnostic positions. The native
 // analyzer permits the pending scalar only as input to this following checked cast.
 pub(crate) fn box_pair(module: &Module, f: &Function, pc: usize) -> bool {
@@ -61,7 +68,7 @@ pub(crate) fn query(module: &Module, f: &Function, pc: usize) -> bool {
             .argument_types()
             .get(*i)
             .is_some_and(|t| inline(module, t)),
-        Op::CastClass(t) => inline(module, t),
+        Op::CastClass(t) | Op::UnboxAny(t) => inline(module, t),
         _ => false,
     }
 }

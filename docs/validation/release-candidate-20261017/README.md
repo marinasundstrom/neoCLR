@@ -39,10 +39,37 @@ Additional checks:
 - `cargo test --locked -p neoclr-codegen --lib source_owned_text_vectors_keep_exact_elements_and_internal_contracts`: one test passes, covering both legacy/native results and invalid signatures/implementations.
 - `cargo test --locked -p neoclr-codegen --test console utf8_text_`: five tests pass with Xcode clang and its macOS 26.2 SDK. The first run using `/usr/bin/clang` and Command Line Tools macOS 27 SDK failed to link (`unknown architecture arm64e.x1`); no product failure is inferred from that toolchain mismatch.
 
-## Remaining release blocker
+## JSON identity-pattern regression
 
-The extracted package's JSON sample gets past the text binding gate but fails at
-an async generated function's scalar-union instance test: `scalar union instance
-tests require tagged conversion lowering`. Keep the packaged sample as the
-acceptance workload; do not bypass its error-alternative checks to obtain a pass.
+The packaged JSON sample exposed an `isinst`/`unbox.any` pair targeting the same
+value-only structural union already held by an `Error(value)` payload. Native
+lowering now checks the initialized tag and preserves the payload without an Object
+allocation. A default/null union does not match the type test; identity unboxing
+preserves that default/null value, matching the interpreter. Concrete alternative
+extraction retains its existing null and wrong-type faults.
+
+Admission requires the same union shape, value-type alternatives, and an immediate
+null test after `isinst`. Different union targets, reference-alternative union tests
+and escaping test results remain outside this slice. This repairs an existing
+packaged workload; it does not resume structural expansion. .NET has no corresponding
+structural-union metadata signature; ordinary nominal boxing and .NET Raven are unchanged.
+
+The unchanged JSON sample covers async stream/JSON/mapping error alternatives,
+reflection construction/property access, UTF-8 streams and serializer round trips.
+[json-patterns.json](json-patterns.json) records interpreter/JIT/AOT commands,
+output, matching reflection roots and final artifact hashes. The final AOT compile
+and link reuse the frozen assembly from the source build, avoiding stale reflection
+row identities after recompilation. Generate reflection roots again whenever the
+assembly is rebuilt.
+
+Focused regression: `cargo test --locked -p neoclr-codegen --test values union_`
+with Xcode clang/SDK as above: 13 tests pass. The new differential identity test covers initialized
+and default scalar/record unions, identity unboxing and rejection of different
+shapes or escaped test results. Existing exact-extraction, null and wrong-type
+checks remain in the same suite.
+
+## Package status
+
+Focused JSON validation uses a backend override; the old archive remains unqualified.
+Rebuild and extract the candidate before rerunning whole-package acceptance.
 Windows validation and benchmarks remain pending. See [release readiness](../../release-readiness.md).

@@ -1458,6 +1458,8 @@ impl<'a> Profile<'a> {
         // Admission is independent of reachability. Never silently trim unsupported IL.
         for (pc, op) in f.body.iter().enumerate() {
             match op {
+                Op::IsInstance(t) | Op::UnboxAny(t)
+                    if crate::scalar_unions::value_only(self.input, t) => (),
                 Op::IsInstance(t) if crate::scalar_unions::inline(self.input, t) => {
                     return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
                 }
@@ -1716,6 +1718,21 @@ impl<'a> Profile<'a> {
                         ));
                     }
                     stack.push(self.ty(t)?);
+                }
+                Op::IsInstance(t) | Op::UnboxAny(t)
+                    if crate::scalar_unions::value_only(self.input, t) =>
+                {
+                    if pop(&mut stack)? != self.ty(t)? {
+                        return Err(fail(pc, "value union identity query requires the same union"));
+                    }
+                    if matches!(op, Op::IsInstance(_)) {
+                        if !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull)) {
+                            return Err(fail(pc, "value union identity test requires immediate null test"));
+                        }
+                        stack.push(Ty::ScalarUnionTest);
+                    } else {
+                        stack.push(self.ty(t)?);
+                    }
                 }
                 Op::IsInstance(t)
                     if crate::scalar_unions::tag(t).is_some()

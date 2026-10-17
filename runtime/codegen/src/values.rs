@@ -2909,6 +2909,19 @@ pub(crate) fn compile_into(
                     {
                         ()
                     }
+                    Op::IsInstance(target) | Op::UnboxAny(target)
+                        if crate::scalar_unions::value_only(input, target) =>
+                    {
+                        let start = stack.len() - p.lanes(top());
+                        let tag = stack[start];
+                        if matches!(op, Op::IsInstance(_)) {
+                            stack.truncate(start);
+                            let present = b.ins().icmp_imm(IntCC::NotEqual, tag, 0);
+                            stack.push(b.ins().uextend(types::I32, present));
+                        }
+                        // Identity unboxing preserves the default/null union, matching
+                        // the interpreter; extracting a concrete value still faults.
+                    }
                     Op::BoxValue(_) => {
                         // The adjacent admitted union cast consumes this scalar;
                         // no Object box exists or escapes in the native program.
