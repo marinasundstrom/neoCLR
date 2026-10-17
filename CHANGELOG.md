@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Update the unpublished release draft with verified macOS editor, source-repair, cross-platform minimum-Rust and runtime measurement evidence. Keep Windows package/performance qualification and HTTP baseline comparison explicit; no version, publication date or download link changes.
+
 - Measure plain and typed-JSON HTTP on the refreshed macOS candidate across interpreter/JIT/AOT: 36 processes validate 1,152 responses with zero errors. Retain five-round samples, separate startup, input hashes and host-load limitations. Windows measurements and matched baseline HTTP comparisons remain open release gates.
 
 - Classify the API-reference route backlog: 104 compatibility redirects have existing local targets; 19 hierarchical legacy pages represent old Enum helpers, namespace containers or CLI compiler/exception scaffolds. Correct the maintenance inventory so these are not described as 123 missing native APIs. Retain legacy-route limitation notices and current native navigation; no public API or publication change.

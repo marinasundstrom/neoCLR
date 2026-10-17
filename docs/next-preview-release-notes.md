@@ -34,10 +34,19 @@ snapshot includes the source-owned core types.
 
 ## Performance and qualification
 
-Runtime benchmarks must be rerun on the optimized macOS and Windows packages after
-correctness acceptance. Compilation is outside execution measurements; startup and
-steady-state results are reported separately. No performance improvement is claimed
-until those measurements and regression investigations are recorded.
+The refreshed macOS package passes installed-editor acceptance, including exact
+`Task<int>` inlays and repeated two-project diagnostic recovery. The six extracted
+source-test failures are closed by focused array-interface and reflection checks;
+the repaired source smoke gate also passes. Rust 1.85 all-target checks pass on
+macOS, Windows and Linux. These checks do not replace Windows package acceptance.
+
+Fresh macOS [CPU/JSON](../benchmarks/execution/candidate-refreshed-20261017/README.md)
+and [plain/typed-JSON HTTP](../benchmarks/http-server/candidate-refreshed-20261017/README.md)
+measurements pass correctness checks across interpreter, JIT and AOT. Compilation
+is outside execution measurements; startup and steady-state results are separate.
+Active host indexing limits performance conclusions. Windows measurements and
+matched HTTP baseline comparisons remain open; no cross-platform speed claim is
+made.
 
 Final release notes must link exact package hashes, platform qualification and
 benchmark results, document remaining API-reference gaps and state the actual
