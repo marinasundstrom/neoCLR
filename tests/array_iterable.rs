@@ -108,7 +108,7 @@ fn array_interface_is_invariant_and_null_dispatch_faults() {
         ),
         (
             "ldc.i4 0\nnewarr Int32\ncastclass System.Collections.Iterable<String>\npop\nldc.i4 0\nret",
-            "matching interface",
+            "no compatible nominal interface view",
         ),
         (
             ".local arrayref<Int32> empty\nldloca empty\ninitobj arrayref<Int32>\nldloc empty\ncastclass System.Collections.Iterable<Int32>\ncallvirt instance System.Collections.Iterable<Int32>::GetIterator()\npop\nldc.i4 0\nret",
@@ -117,11 +117,10 @@ fn array_interface_is_invariant_and_null_dispatch_faults() {
     ] {
         let (m, library) = module(&format!(".function Main() -> Int32\n{body}\n.end"));
         verify_with_library(&m, &library).unwrap();
+        let error = run_with_library(&m, &library, Limits::default()).unwrap_err();
         assert!(
-            run_with_library(&m, &library, Limits::default())
-                .unwrap_err()
-                .to_string()
-                .contains(message)
+            error.message.contains(message),
+            "expected {message}: {error}"
         );
     }
 }

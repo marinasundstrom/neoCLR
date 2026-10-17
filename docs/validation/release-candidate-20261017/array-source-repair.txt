@@ -1,0 +1,10 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Finished `release` profile [optimized] target(s) in 5.03s
+     Running tests/array_iterable.rs (target/release/deps/array_iterable-060ec71f975f7724)
+
+running 3 tests
+test array_isinst_through_interface_returns_null_for_wrong_element_type ... ok
+test array_interface_preserves_identity_and_dispatches_the_original_buffer ... ok
+test array_interface_is_invariant_and_null_dispatch_faults ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

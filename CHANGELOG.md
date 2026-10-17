@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Repair the array-interface source test’s stale diagnostic expectation after nominal-view dispatch changes. Preserve its incompatible-element and null-receiver checks, and print the actual fault on assertion failure. All three array-interface tests pass in release mode; runtime behavior is unchanged.
+
 - Rebuild the macOS SDK, VSIX and five native libraries with Raven `40fcae6d0`. Extracted-package acceptance, 26 installed-editor checks, two ten-cycle two-project recovery runs and exact `Task<int>` inlays pass without overrides; signed-range consumers pass interpreter/JIT/AOT. Preserve archive and server hashes. Runtime/backend binaries are unchanged; Windows, source-test failures, minimum-Rust and fresh timed measurements remain release gates.
 
 - Apply canonical Rust formatting and simplify two no-op unit match arms and an equivalent short-circuit dispatch condition identified by release Clippy checks; simplify equivalent single-case test control flow. These are source-maintenance changes; nominal interface conformance, structural semantics and runtime ABI remain unchanged. All-target Clippy passes with warnings denied. Retain the optimized extracted-source audit’s six failing tests as open release blockers, distinct from native package acceptance.
