@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Complete the repaired macOS extracted-source smoke gate at `80c381a41`: archive membership/notices, optimized build, pinned historical seed and all 25 source/artifact programs pass. Reuse the prior full-run results with focused repairs rather than claiming a new full-suite pass. Start Windows qualification on isolated candidate branches at workflow revision `504d1227`; publication remains separate.
+
 - Pin Windows native-toolchain qualification to the validated Raven `40fcae6d0` compiler and the `.20261017.4` local candidate version. Require two independent ten-cycle packaged-editor configuration-recovery runs in addition to main/inlay acceptance, retaining separate reports. This prepares Windows qualification; it does not claim a Windows pass or publish a release.
 
 - Adapt the archived Raven test profile’s RuntimeFieldInfo storage to the current readonly/literal/constant snapshot payload, without modifying generated bridge artifacts or production native libraries. All 26 reflection tests pass in release mode, closing the five reflection failures; the separate array repair closes the sixth source failure. Rust 1.85 all-target checking passes on macOS. The earlier full-run failure remains retained; Windows and subsequent source smoke stages remain separate.

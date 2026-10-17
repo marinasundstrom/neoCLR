@@ -342,3 +342,17 @@ previous failures. These focused results close the six failures; the unaffected
 results of the earlier full source run remain evidence, not a newly passing full run.
 [Rust 1.85 all-target checking](minimum-rust-macos.txt) also passes on macOS.
 Windows and source-validator stages skipped after the original failure remain open.
+
+## Repaired source smoke and Windows candidate
+
+The [fresh source smoke report](source-smoke-repaired.json) at `80c381a41` passes
+archive membership, notices, optimized compilation, the historical seed checksum
+and all 25 source/artifact programs. It explicitly records `full_tests: false`: the
+earlier full suite plus the focused repair suites provide the test evidence.
+Native production library qualification remains the separate `.20261017.4` package.
+
+Windows qualification runs on isolated `codex/release-native-core-20261017`
+branches: neoCLR `504d1227`, Raven `40fcae6d0`.
+[Native toolchain run](https://github.com/marinasundstrom/neoCLR/actions/runs/39071070147)
+is in progress, not a Windows pass or a publication. The workflow additionally
+requires two ten-cycle installed-editor recovery runs.
