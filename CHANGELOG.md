@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Record final macOS package measurements: 55 CPU/JSON processes and 1,152 plain/typed-JSON HTTP responses pass across interpreter/JIT/AOT. Preserve full raw reports losslessly compressed with SHA-256 checks, summary ranges/startup and the failed stale-root run. Interpreter CPU median is 6.26 operations/s; keep host-load limitations and Windows results separate.
+
 - Correct generated bundle README notices for native source-core libraries: production compilation has no CLI primitive-core/CoreProbe dependency, while the retained seed supplies execution support. Historical profiles retain their distinct notice. Validate both rendered notice branches; release archive documentation repacking remains separately recorded.
 
 - Fix typed-JSON HTTP benchmark preparation to resolve reflection roots from the final compiled assembly and reuse them in JIT/AOT. A preliminary compile had selected Person index 6 while the final assembly used index 0; retain the failure diagnosis. The repaired five-round final-package run validates 576 responses with zero errors. Include worker diagnostics for incomplete responses and retain error text in failed reports.

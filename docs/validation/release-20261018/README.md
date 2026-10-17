@@ -13,8 +13,10 @@ backend hashes, matching SDK/extension server files and four installed-server
 selections without overrides.
 
 The [runtime/library comparison](macos-runtime-library-comparison.json) confirms
-unchanged runtime and backend binaries but changed library hashes. Earlier candidate
-measurements therefore remain separate; the final package will be measured again.
+unchanged runtime and backend binaries but changed library hashes. Earlier candidate measurements remain separate. The
+[final macOS measurements](../../../benchmarks/release-20261018/macos/README.md)
+pass 55 CPU/JSON processes and 1,152 HTTP responses. The JSON harness resolves
+reflection roots from the final assembly; its earlier stale-root failure is retained.
 The [full runtime-await matrix](macos-runtime-await.json) passes all 24 cases:
 language, cleanup, fault, HTTP server/client, empty/whitespace state-machine
 configuration and generator, each in interpreter/JIT/AOT.

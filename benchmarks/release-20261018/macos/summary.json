@@ -1,0 +1,347 @@
+{
+  "execution": {
+    "passed": true,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "rawSha256": "2d40a93cfb938ad7c8bc6aec81376237b1b1cd88f6355712bb21b296675fd7ae",
+    "gzipSha256": "07fddddefe456a5db968b2b0fc196e8cbf8d00a9416ee7392886670b7be90b31",
+    "summary": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.316342833,
+            "minimum": 3.2746129159999953,
+            "maximum": 3.590995707999994
+          },
+          "batchSeconds": {
+            "median": 2.556746125,
+            "minimum": 2.4901288750000035,
+            "maximum": 2.6194676249999986
+          },
+          "operationsPerSecond": {
+            "median": 6.257954140832031,
+            "minimum": 6.10811137625723,
+            "maximum": 6.425370253176144
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 2.687243875,
+            "minimum": 2.679760625,
+            "maximum": 2.790076707999999
+          },
+          "batchSeconds": {
+            "median": 0.00038429200000678065,
+            "minimum": 0.00036891600000110714,
+            "maximum": 0.0003944580000023734
+          },
+          "operationsPerSecond": {
+            "median": 41635.0067129102,
+            "minimum": 40561.98632022605,
+            "maximum": 43370.30651951117
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.007214457999999979,
+            "minimum": 0.007023249999988934,
+            "maximum": 0.18839900000000043
+          },
+          "batchSeconds": {
+            "median": 0.00040966699999955836,
+            "minimum": 0.0004038330000000201,
+            "maximum": 0.0004176670000006766
+          },
+          "operationsPerSecond": {
+            "median": 39056.11142712801,
+            "minimum": 38308.03008131857,
+            "maximum": 39620.33811005837
+          }
+        }
+      },
+      "json.serialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.362571291,
+            "minimum": 3.262245000000007,
+            "maximum": 3.384643208
+          },
+          "batchSeconds": {
+            "median": 4.200853207999998,
+            "minimum": 4.153594999999999,
+            "maximum": 4.233002749999997
+          },
+          "operationsPerSecond": {
+            "median": 3.80875008189527,
+            "minimum": 3.7798227274952776,
+            "maximum": 3.852084760310045
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 2.723393625,
+            "minimum": 2.6839138749999982,
+            "maximum": 2.778188708000002
+          },
+          "batchSeconds": {
+            "median": 0.036502875000000046,
+            "minimum": 0.036244459000002394,
+            "maximum": 0.037779167000010716
+          },
+          "operationsPerSecond": {
+            "median": 438.32163904897845,
+            "minimum": 423.51383766602004,
+            "maximum": 441.44678776965446
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.007584749999999474,
+            "minimum": 0.006975084000004017,
+            "maximum": 0.01548391600000798
+          },
+          "batchSeconds": {
+            "median": 0.034585375000006024,
+            "minimum": 0.03446287500000267,
+            "maximum": 0.03588891699999408
+          },
+          "operationsPerSecond": {
+            "median": 462.62329091407025,
+            "minimum": 445.82008423387754,
+            "maximum": 464.2677083673014
+          }
+        }
+      },
+      "json.deserialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 3.346679666,
+            "minimum": 3.271023332999988,
+            "maximum": 3.6846584159999907
+          },
+          "batchSeconds": {
+            "median": 3.8398997920000113,
+            "minimum": 3.8069019589999975,
+            "maximum": 3.905809416000011
+          },
+          "operationsPerSecond": {
+            "median": 4.166775402143086,
+            "minimum": 4.0964620379214,
+            "maximum": 4.202892580980179
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 2.7695116249999785,
+            "minimum": 2.6743879170000007,
+            "maximum": 2.885908291
+          },
+          "batchSeconds": {
+            "median": 0.04688104199999543,
+            "minimum": 0.0462570840000005,
+            "maximum": 0.0485384579999959
+          },
+          "operationsPerSecond": {
+            "median": 341.2893425022754,
+            "minimum": 329.6355232381167,
+            "maximum": 345.89296636164585
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.008145583000001011,
+            "minimum": 0.007105499999994436,
+            "maximum": 0.008826334000001879
+          },
+          "batchSeconds": {
+            "median": 0.044784249999999304,
+            "minimum": 0.044270499999996105,
+            "maximum": 0.04614458300000024
+          },
+          "operationsPerSecond": {
+            "median": 357.26845933559787,
+            "minimum": 346.736257211381,
+            "maximum": 361.4144859443966
+          }
+        }
+      }
+    },
+    "rounds": 5,
+    "warmupsPerProcess": 2,
+    "operationsPerProcess": 16,
+    "samplesCount": 45
+  },
+  "cpu-native-longer": {
+    "passed": true,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "rawSha256": "4fa70ba909a9350d322cd670ed339b3060c8cdca865d65d56d250a29edca5eae",
+    "gzipSha256": "8af0fe0fc7f841c5a7d317c9df7fd14c7092eddcff125bd872bd2797ae24eadc",
+    "summary": {
+      "cpu.sum": {
+        "jit": {
+          "startupSeconds": {
+            "median": 2.7704055829999996,
+            "minimum": 2.7616532089999986,
+            "maximum": 2.8283809579999994
+          },
+          "batchSeconds": {
+            "median": 0.25365291699999837,
+            "minimum": 0.25278183300000023,
+            "maximum": 0.25370045900000004
+          },
+          "operationsPerSecond": {
+            "median": 39423.95032657978,
+            "minimum": 39416.56250610094,
+            "maximum": 39559.804916835106
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.007626249999999946,
+            "minimum": 0.007229957999999925,
+            "maximum": 0.007921083000001161
+          },
+          "batchSeconds": {
+            "median": 0.25278029199999974,
+            "minimum": 0.2519216670000013,
+            "maximum": 0.2598823750000001
+          },
+          "operationsPerSecond": {
+            "median": 39560.046081440596,
+            "minimum": 38478.94648492417,
+            "maximum": 39694.878646543526
+          }
+        }
+      }
+    },
+    "rounds": 5,
+    "warmupsPerProcess": 20,
+    "operationsPerProcess": 10000,
+    "samplesCount": 10
+  },
+  "http-plain": {
+    "passed": true,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "rawSha256": "c0517f5a466561d5030fea4c7791e456fe3a57b4aba4268872068f5b23a1a805",
+    "gzipSha256": "52f4e158840715355867e548fcb9dd981e86011f6375a22f6d9a56a1f81e35a5",
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 2.1613321103537637,
+          "min": 2.113213901085673,
+          "max": 2.1921058337385086
+        },
+        "startupSecondsMedian": 2.9014106669999933,
+        "latencySeconds": {
+          "p50": 0.4651158329999987,
+          "p95": 0.47951745799998946,
+          "p99": 0.49887049999999533
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 142.79275947181748,
+          "min": 137.5403124925134,
+          "max": 150.22330130406124
+        },
+        "startupSecondsMedian": 5.363807000000008,
+        "latencySeconds": {
+          "p50": 0.007004250000008483,
+          "p95": 0.00731633300000567,
+          "p99": 0.007422750000003475
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 147.21047738186655,
+          "min": 143.4759898162037,
+          "max": 155.81835272964202
+        },
+        "startupSecondsMedian": 0.006130084000005809,
+        "latencySeconds": {
+          "p50": 0.0067133330000075375,
+          "p95": 0.007019750000011982,
+          "p99": 0.007084417000001508
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    },
+    "rounds": 5,
+    "workload": "plain",
+    "requestsPerProcess": 32,
+    "discardedRequestsPerProcess": 8,
+    "wholeProcessWarmupsPerMode": 1,
+    "samplesCount": 15,
+    "warmupsCount": 3
+  },
+  "http-json": {
+    "passed": true,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "rawSha256": "784c2a0b0a54fce36d2d2a9846ea8d0cc8ee8559c5b5c63597e54092a00bfaf4",
+    "gzipSha256": "7f7fa595a4513f5e3c94ff3008ed1f617fb2fc93273c6908300cb0780652bd0a",
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 1.1654164088496874,
+          "min": 1.1556254095077234,
+          "max": 1.1801573964708172
+        },
+        "startupSecondsMedian": 2.782299834,
+        "latencySeconds": {
+          "p50": 0.8555975840000087,
+          "p95": 0.8825793329999954,
+          "p99": 0.9118486659999974
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 79.87406548966004,
+          "min": 79.55147341293677,
+          "max": 81.47911730454737
+        },
+        "startupSecondsMedian": 8.431557916000003,
+        "latencySeconds": {
+          "p50": 0.012501708000002054,
+          "p95": 0.012647499999999923,
+          "p99": 0.012956625000001054
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 83.17992211912761,
+          "min": 78.1714186056812,
+          "max": 83.38738080629017
+        },
+        "startupSecondsMedian": 0.00527737499999148,
+        "latencySeconds": {
+          "p50": 0.012031708999998614,
+          "p95": 0.012820541999985835,
+          "p99": 0.01290845799999829
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    },
+    "rounds": 5,
+    "workload": "json",
+    "requestsPerProcess": 32,
+    "discardedRequestsPerProcess": 8,
+    "wholeProcessWarmupsPerMode": 1,
+    "samplesCount": 15,
+    "warmupsCount": 3
+  }
+}
