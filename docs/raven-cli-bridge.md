@@ -12532,3 +12532,11 @@ APIs are unchanged; source ownership and the selected native function identity r
 explicit. Compilation, interpreter and Math completion validation are recorded in the
 [native migration evidence](validation/native-core-removal/README.md#direct-math-and-environment-services).
 The native-integer adapters are retained pending their consumer binding gap.
+
+Native core construction can own CheckedStorage.Reserve<T> and TypeHandle<T> as real
+native methods using the SDK's checked reservation and type-token operations. The
+[native-only qualification](experiments/native-core-bootstrap/README.md#native-intrinsic-method-ownership-2026-10-17)
+imports/calls these through ordinary native symbols without BootstrapReference or new
+compiler switches; interpreter/JIT/AOT preserve execution. Legacy bootstrap intrinsic
+recognition remains only for existing CLI production inputs until their core ownership
+moves. This does not authorize name-only intrinsic recognition from arbitrary libraries.

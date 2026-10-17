@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-17
 
+- Qualify native metadata-owned CheckedStorage.Reserve<T> and RuntimeServices.TypeHandle<T> bodies without a CLI reference or BootstrapReference. Generic value/reference reservations and type-token calls compile and return 42 in interpreter/JIT/sanitized AOT; negative reservation faults in the interpreter. Extend the reduced native-core probe and editor checks. This establishes the intrinsic ownership path; production native-core construction remains unfinished.
+
 - Remove 18 math/environment forwarding adapters from native System.Runtime and bind callers directly to the existing native service declarations. Preserve public contracts and runtime implementations; validate a fresh four-library build, executable consumer, Math editor completion and API source fingerprints. Native-integer adapters remain pending a separate consumer binding gap.
 
 - Preserve generic method parameters on bodyless native runtime-service declarations and imports. Add explicit InternalCall selection to symbol-authored function references, with conflicting-contract rejection and unchanged runtime binding validation. Qualify generic queue-service references against production TaskQueue. Port GetDefaultTaskQueue, GetCurrentTaskQueue and RegisterTaskQueue into native System.Runtime source and remove their staged CLI/seed counterparts. Accept Raven’s no-result registration signature in interpreter and JIT/AOT bindings while preserving exact queue validation and legacy unit returns. Complete production service migration remains open.

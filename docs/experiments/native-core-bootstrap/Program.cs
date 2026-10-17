@@ -4,7 +4,7 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.NeoClr;
 using Raven.CodeAnalysis.Syntax;
 
-if (args.Length is < 1 or > 2 || args.Length == 2 && args[1] is not ("--text-services" or "--source-string")) throw new ArgumentException("Specify a fresh output directory and optional --text-services or --source-string.");
+if (args.Length is < 1 or > 2 || args.Length == 2 && args[1] is not ("--text-services" or "--source-string" or "--intrinsics")) throw new ArgumentException("Specify a fresh output directory and optional --text-services, --source-string or --intrinsics.");
 var sourceString = args.Length == 2 && args[1] == "--source-string";
 var output = Path.GetFullPath(args[0]);
 if (Directory.Exists(output)) throw new IOException("Output directory already exists.");
@@ -50,7 +50,7 @@ foreach (var primitive in new[] { PrimitiveType.Byte, PrimitiveType.Int32, Primi
 var stringType = core.AddClass("System", "String", root);
 if (sourceString) stringType.SetNativePrimitiveReference(PrimitiveType.String);
 else stringType.SetNativePrimitive(PrimitiveType.String);
-if (args.Length == 2)
+if (args.Length == 2 && args[1] != "--intrinsics")
 {
     var charType = core.AddValueType("System", "Char");
     charType.SetNativeGrapheme();
@@ -148,6 +148,21 @@ if (args.Length == 2)
         failure.LoadArgument(0); failure.Call(fail); failure.Return();
     }
 }
+if (args.Length == 2 && args[1] == "--intrinsics")
+{
+    // Real native method bodies, imported without bootstrap-specific compiler interception.
+    core.AddValueType("System", "RuntimeTypeHandle").SetNativePrimitive(PrimitiveType.RuntimeTypeHandle);
+    var storage = core.AddType("System.Runtime.CompilerServices", "CheckedStorage");
+    var element = SignatureType.MethodParameter(0);
+    var reserve = storage.AddMethod("Reserve", new(SignatureType.ArrayOf(element), [PrimitiveType.Int32], ["T"]));
+    reserve.LoadArgument(0);
+    reserve.ReserveArray(element);
+    reserve.Return();
+    var services = core.AddType("System.Runtime.CompilerServices", "RuntimeServices");
+    var handle = services.AddMethod("TypeHandle", new(PrimitiveType.RuntimeTypeHandle, [], ["T"]));
+    handle.GetILGenerator().LoadTypeToken(element);
+    handle.Return();
+}
 var bytes = RuntimeAssemblyContainer.WriteLibraryBinary(core);
 File.WriteAllBytes(Path.Combine(output, "NativeCore.dll"), bytes);
 if (sourceString) return SourceString.Build(core, output);
@@ -203,6 +218,8 @@ var emitted = compilation.Emit(image, null, new EmitOptions().WithBackend(new Ne
     new(new("Consumer", new(1, 0, 0, 0)), identity, catalog.Dependencies))));
 if (!emitted.Success) throw new Exception(string.Join("\n", emitted.Diagnostics));
 File.WriteAllBytes(Path.Combine(output, "Consumer.dll"), image.ToArray());
+if (args.Length == 2 && args[1] == "--intrinsics")
+    IntrinsicConsumer.Build(output, catalog, options);
 Console.WriteLine("PASS native-only core symbols, consumer emission, missing-core/identity rejection and CLI output guard");
 
 return 0;

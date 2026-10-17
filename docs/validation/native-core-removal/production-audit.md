@@ -152,3 +152,9 @@ stripping are accepted substitutes for the above gates.
   methods are removed. Fresh production compilation, interpreter execution and Math
   LSP completion pass. Native-integer migration is deferred after the consumer found
   unresolved IntPtr/UIntPtr conversion/member binding; its existing adapters remain.
+
+- Native intrinsic ownership is now qualified independently: SDK-authored generic
+  Reserve and TypeHandle bodies are imported and called with no BootstrapReference.
+  Interpreter/JIT/sanitized AOT pass and negative reservation faults. The existing
+  native operations suffice; new compiler interception is unnecessary for that path.
+  Production ownership still needs to move when constructing its native core.

@@ -549,3 +549,27 @@ suites, and native character/String/array profiles. The AOT unit suite uses an
 8 MiB test-thread stack for its existing 256-type dependency-depth stress case;
 the default debug test-thread stack overflowed. An initial broad native test attempt
 used the incompatible default SDK and was stopped; focused checks use Xcode's SDK.
+
+## Native intrinsic method ownership (2026-10-17)
+
+Pass `--intrinsics` after the fresh output directory to include SDK-authored
+CheckedStorage.Reserve<T> and RuntimeServices.TypeHandle<T> methods in the reduced
+native core. Their real native bodies use ReserveArray and LoadTypeToken. Raven
+imports and calls them normally, with no CLI metadata or BootstrapReference; no
+additional compiler interception or new Runtime Contract setting is required.
+
+The probe emits IntrinsicConsumer.dll and InvalidReservation.dll. The first reserves
+value/reference arrays and requests both type handles; the second requests a negative
+length. Compilation and completion pass; interpreter/JIT/sanitized AOT return 42 for
+the valid consumer, while the interpreter reports RuntimeError at Reserve for the
+invalid length. [Execution evidence](../../validation/native-core-removal/intrinsic-results.json)
+and [LSP completion](../../validation/native-core-removal/intrinsic-completion.json)
+record the native-only references. Use the empty System seed and explicit Object root
+as in the existing verifier. Fixture Object methods remain deliberately incomplete;
+this does not establish production Object behavior or native-only production readiness.
+
+This keeps ownership in native metadata and reuses runtime checking/specialization,
+instead of porting legacy bootstrap identity checks into a new special-case compiler
+path. Production must still author these contracts under its eventual native core
+identity and remove the corresponding CLI owners. No public runtime API is added by
+this qualification fixture.

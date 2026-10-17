@@ -1,0 +1,168 @@
+{
+  "passed": true,
+  "interpreterCommands": [
+    {
+      "label": "IntrinsicConsumer",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/IntrinsicConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "InvalidReservation",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/InvalidReservation.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_4DE248ADCA1FABE1E213929455DAFA2025C18A096D1E8DF4FEECF48A9E322B33.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_436865636B656453746F72616765.M_52657365727665 [instruction 1]\n   at NeoMetadata_8E3C928BD0254C2245B9DF5BC2C4B71ABB551CD6DB947896F6F54E826C0613D4.F_4D61696E [instruction 1]\n"
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll": "cc1ab0dfaa33682689264c3e0f3bc07b946f25f6196f865d0b583b3d20297028",
+    "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/IntrinsicConsumer.dll": "c220e9d9839ec04f7740ba0d1627c8c94876744fa81689641147cb9750d011c9",
+    "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/InvalidReservation.dll": "697f8bfd0b6d185187920da6e2ed4ab06f58fcea52372a9e77f1860397fb996b"
+  },
+  "commands": [
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/IntrinsicConsumer.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "output": "Local selection manifest",
+      "logSha256": "881c08d9ee78cdd91bcfde16280741529006d9400af1ac262075506769f4570a"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/app"
+      ],
+      "exitCode": 0,
+      "output": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/host.dylib"
+      ],
+      "exitCode": 0,
+      "output": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/app"
+      ],
+      "exitCode": 42,
+      "output": "",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/IntrinsicConsumer.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/System.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-core-intrinsics-v2/NativeCore.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.529653583,\"guestExitCode\":42,\"invocationSeconds\":0.000041584,\"metadataLoadSeconds\":0.001835333,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":0.193569417}\n",
+      "logSha256": "d631cd38f2d306ec257e392ad40c105df3fe5bbde3fa3ba81c527bee7daab7d2"
+    }
+  ]
+}
