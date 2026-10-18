@@ -1,0 +1,47 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Web.Http.*
+
+class Application {
+    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        // Exercise a genuinely queued await without imposing an artificial timer.
+        let resumed = await Task.Run(() => 1)
+        if resumed != 1 {
+            System.Fail("Handler continuation failed")
+        }
+        let stopping = request.Target == "/stop"
+        let size = if stopping { 0 } else if request.Target == "/bulk" { 8192 } else { 10 }
+        let body = ArrayList<byte>(size)
+        for index in 0..size {
+            body.Add((byte)120)
+        }
+        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), body))
+    }
+
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port failed") }
+    let application = Application()
+    let lifetime = server.Serve(application.Respond)
+    Console.WriteLine(port)
+    Console.WriteLine(controlPort)
+    // The controller signals only after response validation and draining finish.
+    let Ok(signal) = await control.Accept() else { System.Fail("Control accept failed") }
+    signal.Close()
+    control.Close()
+    server.Close()
+    if let Error(_) = await lifetime { System.Fail("Serve failed") }
+    Console.WriteLine("DONE")
+    Console.WriteLine(server.CompletedRequests - 1L)
+    Console.WriteLine(0)
+    Console.WriteLine(server.FailedRequests)
+    Console.WriteLine(TaskQueue.Default.DiagnosticHighWater)
+    Console.WriteLine(TaskQueue.Default.DiagnosticCapacity)
+}

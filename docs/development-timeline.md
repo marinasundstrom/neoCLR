@@ -71,6 +71,19 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   capacity to avoid unnecessary growth. The assistant agrees and distinguishes
   reservation from a hard maximum; measuring queued-work high water is the next
   sizing investigation.
+- **Author proposal:** explore recycling arrays across operations, asking whether
+  .NET already does so. **Assistant response:** confirms ArrayPool<T> from primary
+  sources; distinguishes reservation, owner-local reuse and pooling. Records a
+  bounded HTTP-buffer lease investigation with ownership, clearing, GC-retention
+  and measurement requirements in [the design](http-server-design.md#capacity-reservation-and-pooling-investigation--2026-10-18).
+  No public pool is implemented or implied by this discussion.
+- **Sizing result:** a diagnostic-only 8,000-request run peaks at 15 queued callbacks
+  with capacity 16. Initial reservation would avoid startup growth, while the queue
+  already reuses that capacity thereafter; no global sizing rule is inferred.
+- **Author follow-up:** pooling should fit future Span/Memory-style slicing, starting
+  with HTTP buffers. **Assistant:** records ownership separately from borrowed views
+  and async lifetime, identifies the existing 256-byte receive/4 KiB streaming
+  scratch buffers, and keeps pooling as an investigation, not a shipped API.
 
 ## 2026-10-18 — Serve as the application documentation default
 

@@ -1,0 +1,8 @@
+--- a/runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn
++++ b/runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn
+@@ -80,0 +81,3 @@
++    private var highWater = 0
++    val DiagnosticHighWater: int => highWater
++    val DiagnosticCapacity: int => pending.Capacity
+@@ -110,0 +114 @@
++        if pending.Count > highWater { highWater = pending.Count }

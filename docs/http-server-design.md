@@ -490,3 +490,54 @@ belong above it. Do not advertise the proposed callback as available or migrate 
 before it compiles. [Task/Serve allocation investigation](../benchmarks/http-server/serve/task-completion-20261018/README.md)
 records the separate measured performance work; a signature change alone is not a
 throughput optimization.
+
+## Capacity reservation and pooling investigation — 2026-10-18
+
+The author points out that known item counts should inform initial capacity, then
+proposes recycling arrays across operations. These are related but distinct: a
+reservation avoids growth/copies; a reusable queue keeps its backing array across
+drains; a pool transfers buffers between owners. None sets a hard item limit.
+
+.NET exposes [ArrayPool<T>](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Buffers/ArrayPool.cs)
+with Rent/Return, and its [return contract](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1.return)
+requires relinquishing ownership and returning to the same pool only once. It
+allows clearing and may retain or discard a returned buffer. This is the comparison
+for a possible neoCLR facility, not an implemented neoCLR public API.
+
+First candidate: bounded HTTP-owned temporary byte buffers whose final I/O
+completion provides an explicit return point. Keep logical length separate from
+rented capacity, and account for snapshots/native transfer copies; pooling a managed
+array may leave those copies untouched. Cancellation must wait for the actual
+transfer ownership to end, and returned storage must not remain reachable through
+request/response views. Reference-containing arrays must release old references;
+byte-buffer clearing needs an explicit data-isolation contract. Prefer an internal
+lease at this boundary before deciding whether a general public pool is warranted.
+
+Measure allocation counts, copied bytes, CPU, tail latency and retained memory under
+steady load, bursts and idle periods. Bound retained bytes/count per size class and
+oversized-buffer behavior. Pool roots can increase retained live data and collector
+work; clearing, lookup and synchronization also have costs. Reuse does not remove
+GC ownership requirements. Do not infer a speedup from fewer allocations alone.
+
+### Future slices and async memory
+
+The author also asks that pooling fit future spans and slicing. Follow the ownership
+separation in [.NET's Memory/Span guidance](https://learn.microsoft.com/en-us/dotnet/standard/memory-and-spans/memory-t-usage-guidelines):
+Span-like values are scoped views; Memory-like values can travel through asynchronous
+work, while IMemoryOwner/MemoryPool express ownership. Neither a slice nor a read-only
+view by itself owns storage or prevents its owner from returning it too early.
+
+For neoCLR, keep a prospective lease separate from a `(storage, offset, length)`
+view. An async operation must keep storage rooted and unrecycled through completion;
+a future borrowed span requires compiler-enforced lifetime/escape rules, not merely
+an array wrapper. Managed/native backing can share the ownership abstraction later.
+This is design intent, not a claim that these types or compiler rules exist today.
+
+The first source-level HTTP candidates are HttpServerExchange.ReceiveNext's lazy
+256-byte receive array and HttpContext.Send's 4 KiB scratch array for streamed/large
+responses. The request decoder explicitly copies consumed bytes into owned storage.
+Still audit every cancellation/failure/streaming ownership path before returning
+receive storage. The tiny buffered-response Serve benchmark exercises the receive
+array but not the 4 KiB streaming block; use a separate streaming workload for that
+case. Existing small buffered sends already avoid the scratch allocation, so a pool
+there cannot deliver a saving. Keep response snapshots owned until consumers finish.

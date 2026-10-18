@@ -70,3 +70,27 @@ The queue allocation reduction is useful but modest relative to the remaining Go
 CPU gap. No rate above 400/sec was tested and these short local trials do not
 establish long-duration production capacity. Earlier noisy failures are retained
 in the preceding investigation rather than replaced by this cleaner run.
+
+## Initial-capacity investigation
+
+At the author's request, a diagnostic-only queue build records high-water Count and
+final Capacity; it adds no output during request processing. At 400/sec for 20
+seconds, all 8,000 measured requests validate, peak queued callbacks are **15** and
+final capacity is **16**. Counts include startup, warm-up and shutdown, so they are
+not a universal queue bound. Instrumentation adds a comparison to Post and is not
+capacity/speedup evidence. The production source/API is restored unchanged.
+
+An initial reservation of 16 would avoid growth through 4 and 8 for this workload.
+The reusable queue already retains 16 thereafter; reservation therefore targets
+startup/burst growth rather than repeated per-batch allocation. Do not infer a
+general TaskQueue maximum from Serve's lane count, or size every application's
+queue from this single workload. No global initial-capacity change is made here.
+
+[Results](evidence/queue-sizing.json), [diagnostic source patch](evidence/queue-sizing.patch),
+[diagnostic application](evidence/SizingServer.rvn), and compressed library/build
+manifests preserve the experiment. To reproduce, apply the patch temporarily with git apply --unidiff-zero, build
+a separate library with build-native-class-library.py, restore Tasks.rvn, and use
+the shared build.py with --source pointing at SizingServer.rvn. Run diagnose.py
+with --rate 400 --duration 20; after guest.finish(), record int(guest.output[-2])
+and int(guest.output[-1]) as queueHighWater and queueCapacity. The application emits
+these two diagnostic lines after the standard DONE/totals protocol.
