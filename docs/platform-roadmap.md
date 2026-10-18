@@ -5364,3 +5364,13 @@ intern/static ownership release and exactly-once cleanup. Deterministic midwalk
 invalidation and full reclamation pass UBSan/bounds; no collector fix was needed.
 This qualifies native boundaries only. Managed async/exception dispatch, scheduler
 integration and sustained-pressure performance remain open.
+
+
+**AOT callback integration checkpoint (2026-10-18):** [generated-code qualification](experiments/concurrent-gc-compiled/README.md)
+exposes eager allocation safepoints invalidating every allocating callback snapshot.
+A generated-copy adapter defers those eager collections while a cycle is pending,
+retaining root validation and synchronous pressure fallback. The matched control
+and candidate pass generated instance/static/fault dispatch and complete reclamation;
+discards fall from 41 to the single required pressure discard. No production files
+or compiler semantics changed. Timing comparisons, Raven async state machines and
+scheduler integration remain open; this does not establish Serve/Go capacity.

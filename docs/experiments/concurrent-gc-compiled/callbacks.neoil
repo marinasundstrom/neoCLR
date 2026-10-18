@@ -1,0 +1,71 @@
+.module HostCallbacks
+.type class Counter
+.field Number Int32
+.field Next Counter
+.method instance .ctor(Int32 number) -> noresult
+ldarg 0
+ldarg number
+stfld Counter::Number
+ret
+.end
+.method instance Tick() -> Void
+ldarg 0
+ldarg 0
+ldfld Counter::Number
+ldc.i4 1
+add
+stfld Counter::Number
+ldarg 0
+ldarg 0
+ldfld Counter::Number
+newobj.ctor instance Counter::.ctor(Int32)
+stfld Counter::Next
+ldvoid
+ret
+.end
+.end
+.function Unit() -> Void
+ldvoid
+ret
+.end
+.function Fail() -> Void
+ldc.i4 1
+ldc.i4 0
+div
+pop
+ldvoid
+ret
+.end
+.function WrongShape() -> Int32
+ldc.i4 42
+ret
+.end
+.function Calculate(Int32 mode) -> fn<Void>
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Static
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Fault
+ldarg mode
+ldc.i4 3
+ceq
+brtrue BootstrapFault
+ldc.i4 0
+newobj.ctor instance Counter::.ctor(Int32)
+function.bind fn<Void> = instance Counter::Tick()
+ret
+Static:
+function.bind fn<Void> = Unit()
+ret
+Fault:
+function.bind fn<Void> = Fail()
+ret
+BootstrapFault:
+call Fail()
+pop
+function.bind fn<Void> = Unit()
+ret
+.end

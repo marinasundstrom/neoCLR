@@ -147,7 +147,10 @@ allocation-pressure tests also verify synchronous fallback, temporary-root survi
 and stale-result rejection after reclaimed memory is reused; sustained application
 pressure remains unqualified. Native lifecycle tests cover parked roots, fault
 retention after frame unwinding, invocation completion and exactly-once cleanup.
-Managed async and exception dispatch still require integration validation.
+A separate AOT experiment now exercises generated allocating and faulting callbacks.
+Its experimental adapter defers eager collections during a pending background cycle
+while preserving synchronous allocation-pressure fallback. Raven async state machines
+and scheduler integration still require validation; this is not production support.
 
 A native callback fixture now allocates replacements and retires live objects while
 tracing runs, with bounded memory and complete reclamation checks. With eight

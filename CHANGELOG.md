@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Exercise AOT-generated allocating/static/faulting callbacks against the concurrent-GC POC. Identify eager safepoint collection as a source of unusable snapshots; an isolated adapter defers eager collection while a cycle is pending, preserving root checks and synchronous pressure retry. UBSan/bounds control/candidate checks reduce discards from 41 to the single required pressure discard, with state/fault checks and full reclamation. Production selection, Raven async integration and throughput claims remain unchanged.
+
 - Qualify native suspension/fault lifetimes in the concurrent-GC POC: park, resume/discard and successful invocation completion reject pending snapshots without heap mutation; fault-root transfer survives frame unwinding, intern/static ownership ends at completion, and resources clean up exactly once. Focused lifecycle tests and existing UBSan/bounds checks pass with full reclamation. This is native boundary validation, not managed async integration or a new speedup.
 
 - Qualify rooted allocation pressure during concurrent-GC POC tracing: synchronous fallback preserves helper roots, safely reuses reclaimed addresses and invalidates pending marks; failed retries also discard, while impossible requests avoid collection. Deterministic midwalk tests and existing UBSan/bounds qualification pass with full reclamation. Production behavior and measured performance are unchanged.

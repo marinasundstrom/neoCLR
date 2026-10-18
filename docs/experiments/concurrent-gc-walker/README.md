@@ -379,3 +379,12 @@ frames, parked ownership and fault slots; they do not execute Raven async state
 machines, exception dispatch or the scheduler. This closes those native boundary
 checks, not managed integration. Performance evidence is unchanged; sustained
 pressure and managed execution remain the next validation work.
+
+
+### Generated callback integration
+
+The [AOT callback experiment](../concurrent-gc-compiled/README.md) now exercises
+actual generated allocation and fault dispatch against this collector. It identifies
+and isolates eager safepoint collection as an integration conflict, with a bounded
+pending-cycle deferral adapter and preserved pressure fallback. This extends the
+native fixtures; it does not yet qualify Raven async state machines or scheduling.
