@@ -208,3 +208,13 @@ an actual queued await in its handler, on both old and new libraries. Supply
 `run.py --server-source benchmarks/http-server/load/ServeOneServer.rvn` to retain
 the matching fixture identity. Several async serving loops provide bounded request
 concurrency; one sequential awaited loop does not dispatch concurrent requests.
+
+## Serve latency attribution
+
+`--diagnostics` adds per-arrival connect, send, first-byte, EOF and client-close
+timestamps. Every admitted or missed arrival records slot occupancy. These phases
+are client observations: response wait includes server work, TCP queues and client
+scheduling, not an isolated server processing timer. `analyze.py REPORT --output
+SUMMARY` preserves per-second losses and the slowest requests alongside percentiles.
+Instrumentation is opt-in so diagnostic runs remain separate from capacity runs.
+See the [Serve investigation](../serve/capacity-20261018/README.md).

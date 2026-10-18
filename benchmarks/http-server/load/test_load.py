@@ -39,6 +39,28 @@ class LoadContract(unittest.IsolatedAsyncioTestCase):
             outcome = await load.request(server.sockets[0].getsockname()[1], '/', 1, 1)
         self.assertEqual(outcome, 'invalid_body')
 
+    async def test_diagnostics_separate_connection_and_response_wait(self):
+        async def peer(reader, writer):
+            await reader.readuntil(b'\r\n\r\n')
+            await asyncio.sleep(.03)
+            writer.write(b'HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 1\r\n\r\nx')
+            await writer.drain()
+            writer.close()
+            await writer.wait_closed()
+        server = await asyncio.start_server(peer, '127.0.0.1', 0)
+        async with server:
+            report = await load.window(server.sockets[0].getsockname()[1], '/', 1,
+                                       10, .1, 2, 1, diagnostics=True)
+        record = report['requests'][0]
+        self.assertEqual(record['result'], 'ok')
+        phases = record['phases']
+        ordered = [phases[key] for key in ['connectedSeconds', 'sentSeconds',
+                   'firstByteSeconds', 'eofSeconds', 'closedSeconds']]
+        self.assertEqual(ordered, sorted(ordered))
+        self.assertGreaterEqual(phases['firstByteSeconds'] - phases['sentSeconds'], .025)
+        self.assertEqual(record['inflightAtAdmission'], 1)
+        self.assertGreaterEqual(record['serviceLatencySeconds'], phases['closedSeconds'])
+
     async def test_transport_failures_are_counted(self):
         async def fail(*args):
             return 'timeout'

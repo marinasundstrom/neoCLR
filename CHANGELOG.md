@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Add opt-in HTTP load phase timing and arrival-slot diagnostics, per-second analysis and independent generator/native-sampling controls. Retain the first Serve capacity sweep: admission misses cluster in bursts and larger client limits do not establish a stable rate; no runtime or GC policy change.
+
 - Add HttpServer.Serve(handler) with server-owned bounded concurrent requests, a separate lifetime task, failure diagnostics and joined handler shutdown. Preserve ServeOne behavior; reject mixed manual acceptance while Serve owns the listener. Add callback-path load comparisons and lifecycle tests, plus matching API reference snapshots.
 
 - Defer HTTP request parser and receive-buffer allocation until an accepted connection can read; avoid rejection promises on successful accepts. Preserve queued cancellation, admission and shutdown. Add callback-based `ServeOne` load comparisons with an awaited handler operation, alongside explicit-accept mechanism profiles. Callback profiles reduce 410→405 allocations/request and about 15% of the 16-loop live payload; both versions pass the 30-second 250/sec paced control, so no increased capacity limit is claimed.

@@ -26,6 +26,19 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Serve latency and sustained-rate follow-up
+
+- **Author:** asked to continue profiling Serve, investigate admission misses and
+  latency variation, establish a reliable sustained rate, and commit each slice.
+- **Assistant action:** added optional client phase/slot diagnostics and per-second
+  reporting. The first four 20-second runs retain 18,000 offered arrivals, with
+  losses clustered in short bursts and substantial generator lag in two runs.
+  Larger client limits did not establish a stable rate. These are observations,
+  not proof that a specific server phase causes the pauses.
+- **Next validation:** independent trivial-peer control, native sampling and longer
+  unprofiled repeats, retaining failures and experimental/default GC distinctions.
+  [Evidence and procedure](../benchmarks/http-server/serve/capacity-20261018/README.md).
+
 ## 2026-10-18 — Measure HTTP buffer costs and server capacity honestly
 
 - **Author:** asked which memory-management costs can slow the HTTP stack, then

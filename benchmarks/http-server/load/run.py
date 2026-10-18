@@ -35,22 +35,33 @@ def resource_sample(pid):
     return dict(cpuSeconds=seconds, rssKiB=int(rss))
 
 
-async def request(port, path, expected_size, timeout):
+async def request(port, path, expected_size, timeout, timings=None):
+    started = time.monotonic()
+
+    def mark(name):
+        if timings is not None:
+            timings[name] = time.monotonic() - started
+
     writer = None
     try:
         async def exchange():
             nonlocal writer
             reader, writer = await asyncio.open_connection('127.0.0.1', port)
+            mark('connectedSeconds')
             writer.write(f'GET {path} HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n'.encode())
             await writer.drain()
+            mark('sentSeconds')
             wire = bytearray()
             while True:
                 chunk = await reader.read(16384)
                 if not chunk:
                     break
+                if not wire:
+                    mark('firstByteSeconds')
                 wire.extend(chunk)
                 if len(wire) > expected_size + 32768:
                     return 'oversized_response'
+            mark('eofSeconds')
             if b'\r\n\r\n' not in wire:
                 return 'closed_without_headers'
             head, body = bytes(wire).split(b'\r\n\r\n', 1)
@@ -73,9 +84,10 @@ async def request(port, path, expected_size, timeout):
                 await writer.wait_closed()
             except OSError:
                 pass
+        mark('closedSeconds')
 
 
-async def window(port, path, size, rate, duration, concurrency, timeout, pid=None):
+async def window(port, path, size, rate, duration, concurrency, timeout, pid=None, diagnostics=False):
     loop = asyncio.get_running_loop()
     start = loop.time()
     count = math.floor(rate * duration)
@@ -95,15 +107,20 @@ async def window(port, path, size, rate, duration, concurrency, timeout, pid=Non
 
     sampler = asyncio.create_task(sample_resources()) if pid else None
 
-    async def arrival(index, intended):
+    async def arrival(index, intended, inflight):
         actual = loop.time()
-        result = await request(port, path, size, timeout)
+        phases = {}
+        if diagnostics:
+            result = await request(port, path, size, timeout, phases)
+        else:
+            result = await request(port, path, size, timeout)
         finished = loop.time()
         records.append(dict(index=index, intendedSeconds=intended-start,
                             startSeconds=actual-start, endSeconds=finished-start,
                             dispatchLagSeconds=actual-intended, result=result,
                             offeredLatencySeconds=finished-intended,
-                            serviceLatencySeconds=finished-actual))
+                            serviceLatencySeconds=finished-actual,
+                            inflightAtAdmission=inflight, **(dict(phases=phases) if diagnostics else {})))
 
     peak = 0
     for index in range(count):
@@ -113,9 +130,9 @@ async def window(port, path, size, rate, duration, concurrency, timeout, pid=Non
         if len(tasks) >= concurrency:
             records.append(dict(index=index, intendedSeconds=intended-start,
                                 dispatchLagSeconds=loop.time()-intended,
-                                result='generator_inflight_limit'))
+                                result='generator_inflight_limit', inflightAtAdmission=len(tasks)))
             continue
-        task = asyncio.create_task(arrival(index, intended))
+        task = asyncio.create_task(arrival(index, intended, len(tasks)+1))
         tasks.add(task)
         task.add_done_callback(tasks.discard)
         peak = max(peak, len(tasks))
@@ -150,6 +167,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--executable', default='app')
     p.add_argument('--server-source', type=Path, default=Path(__file__).with_name('Server.rvn'))
+    p.add_argument('--diagnostics', action='store_true', help='Record connect, send, first-byte, EOF and close timings per admitted request')
     p.add_argument('--control-stop', action='store_true', help='Read a second control port and signal shutdown after the stop response')
     p.add_argument('--workers', type=int, choices=[1, 4, 16], default=16)
     p.add_argument('--workload', choices=['plain', 'bulk'], default='plain')
@@ -174,7 +192,7 @@ def main():
                            a.server_source.resolve(), ROOT/'benchmarks/framework/process.py']}
     report = dict(completed=False, platform=platform.platform(), inputs=inputs, build=evidence,
                   loadBefore=load_average(), processesBefore=process_snapshot(), trials=[],
-                  serverWorkers=a.workers, executable=a.executable, fixtureSource=str(a.server_source.resolve()),
+                  diagnostics=a.diagnostics, serverWorkers=a.workers, executable=a.executable, fixtureSource=str(a.server_source.resolve()),
                   contract='AOT loopback, configured server workers, HTTP/1.1 connection close, no TLS. Fixed offered schedule; client cap drops arrivals without queueing. Each response fully validated. Misses/failures remain in denominator. Graceful /stop after draining.',
                   qualification='Exploratory local load sweep, not production capacity. Same-machine generator and sampled RSS; no allocation profiler during timing.',
                   target=dict(p99Milliseconds=a.p99_target_ms, minimumSuccessFraction=1.0,
@@ -194,7 +212,7 @@ def main():
                     trial['startupSeconds'] = ready-guest.started
                     trial['warmup'] = asyncio.run(window(int(port), path, size, min(rate, 10), a.warmup, concurrency, a.timeout))
                     trial['resourceBefore'] = resource_sample(guest.process.pid)
-                    trial['measurement'] = asyncio.run(window(int(port), path, size, rate, a.duration, concurrency, a.timeout, guest.process.pid))
+                    trial['measurement'] = asyncio.run(window(int(port), path, size, rate, a.duration, concurrency, a.timeout, guest.process.pid, a.diagnostics))
                     m = trial['measurement']
                     cpu = m['endOfWindowResource']['cpuSeconds'] - trial['resourceBefore']['cpuSeconds']
                     m['serverCpuSecondsInWindow'] = cpu
