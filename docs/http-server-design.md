@@ -464,3 +464,29 @@ joined completion; there is no forced cancellation of arbitrary managed work.
 [Contract and load evidence](../benchmarks/http-server/serve/README.md) cover concurrency,
 bounds, error recovery, shutdown and callback-path cost. Public API reference and
 native/CLI documentation snapshots are refreshed; no Raven compiler change is needed.
+
+
+## Context callback direction — 2026-10-18
+
+The author asks whether Serve/ServeOne should expose HttpContext, as Accept already
+does. Their primary motivation is a ready-to-use response: Serve initializes and
+owns the context, and application code configures it without constructing and
+returning HttpResponse. This is an API direction, not implemented behavior.
+
+The proposed lifetime keeps Serve's bounded supervision: the callback task means
+application work has finished; the server then completes the response and disposes
+the context. Before implementation, specify explicit streaming/early completion,
+response errors after headers, cancellation and access after callback completion.
+Preserve the existing request-to-response handler as a convenience adapter if both
+contracts can coexist without ambiguous callback overloads. Compare ASP.NET Core's
+[RequestDelegate](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.requestdelegate),
+while retaining neoCLR's explicit Result errors and current transport limits.
+
+The author directs website documentation and application-sample migration with the
+implementation. Retain Accept only for samples explicitly teaching low-level context
+ownership. The author subsequently prioritizes the discovered allocation/GC fixes
+before this API work. Serve remains low-level; routing and minimal-endpoint frameworks
+belong above it. Do not advertise the proposed callback as available or migrate examples
+before it compiles. [Task/Serve allocation investigation](../benchmarks/http-server/serve/task-completion-20261018/README.md)
+records the separate measured performance work; a signature change alone is not a
+throughput optimization.

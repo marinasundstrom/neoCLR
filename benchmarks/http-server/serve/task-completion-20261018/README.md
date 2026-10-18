@@ -37,10 +37,15 @@ avoidable allocations; a separate awaitable needs measured justification and its
 own compiler/runtime contract.
 
 Serve's supervised concurrency/lifetime is useful, while its request-to-response
-callback is a convenience contract, not a complete web hosting foundation.
+callback is a convenience contract, not a complete web hosting foundation. The
+author clarifies the primary motivation: Accept already returns HttpContext, and
+Serve should initialize that context for the consumer so the callback can configure
+its response without constructing and returning HttpResponse.
 [ASP.NET Core RequestDelegate](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.requestdelegate)
 accepts HttpContext and returns Task. A future context-based handler would better
-support streaming request/response access and middleware. It must define who
+provide that consistent, ready-to-use request/response experience, with streaming
+and middleware as further benefits. The proposed default is server completion and
+disposal after the handler task settles. It must define who
 completes/disposes the response, errors after headers, cancellation and context
 lifetime. Prefer retaining the existing response-returning callback as an adapter
 rather than silently changing its ownership contract. This is a proposal, not a
@@ -97,5 +102,79 @@ python3 verify.py --library LIBRARY --compiler COMPILER --runtime RUNTIME \
   --backend CODEGEN --host NATIVE_HOST --output NEW_CONTRACT_RESULTS
 ```
 
-Sustained-load results will be recorded separately after the uninstrumented runs
-finish. No higher operating rate or HTTP speedup is claimed by this allocation slice.
+## Sustained-load comparison
+
+Two reversed-order rounds run baseline/candidate/Go then Go/candidate/baseline,
+reversing rates in round two. Each point has a separate warm-up and a 60-second
+measurement window. The same ten-byte connection-close Serve workload, 16 server
+lanes and 64 generator slots is used. neoCLR has experimental paced GC; Go uses
+GOMAXPROCS=1 and GOGC=100. No builds or profilers run during these windows.
+
+Qualification requires all offered arrivals to succeed, offered p99 <=250 ms and
+generator dispatch-lag p99 <=5 ms. Missed arrivals remain failures; drain completions
+are excluded from timed throughput. These are same-host observations, not production
+capacity or a Go maximum-throughput measurement.
+
+| Arm | Offered/sec | Timed completions/sec | Misses | CPU ms/completion | Offered p99 ms | Generator lag p99 ms | Target |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| baseline-1 | 300 | 300.00 | 0 | 2.429 | 57.43 | 1.12 | Pass |
+| baseline-1 | 400 | 399.47 | 31 | 2.273 | 116.04 | 1.45 | Fail |
+| candidate-1 | 300 | 299.80 | 11 | 2.409 | 187.03 | 14.80 | Fail |
+| candidate-1 | 400 | 399.78 | 12 | 2.252 | 101.57 | 1.22 | Fail |
+| go-1 | 300 | 300.00 | 0 | 0.208 | 23.31 | 10.64 | Fail |
+| go-1 | 400 | 400.00 | 0 | 0.217 | 9.39 | 4.64 | Pass |
+| go-2 | 400 | 400.00 | 0 | 0.212 | 8.31 | 3.67 | Pass |
+| go-2 | 300 | 300.00 | 0 | 0.239 | 7.91 | 3.37 | Pass |
+| candidate-2 | 400 | 399.18 | 48 | 2.274 | 158.49 | 2.76 | Fail |
+| candidate-2 | 300 | 293.58 | 385 | 2.443 | 281.85 | 388.39 | Fail |
+| baseline-2 | 400 | 399.27 | 43 | 2.262 | 106.23 | 1.58 | Fail |
+| baseline-2 | 300 | 299.65 | 21 | 2.413 | 154.96 | 1.90 | Fail |
+
+The first pair uses about 0.8–0.9% less CPU per completion, but the second pair
+reverses the difference (candidate about 0.5% higher at 400/sec and 1.3% at 300/sec).
+There is **no repeatable CPU speedup and no higher reliable sustained request rate**.
+All four candidate points miss arrivals; the second 300/sec candidate also suffers
+388 ms generator-lag p99, so that deterioration cannot be attributed solely to the
+server. Baseline passes only its first 300/sec point. Go validates every offered
+request and passes three of four points; its first 300/sec generator-lag failure
+remains visible. At 400/sec, candidate CPU/completion is about 10.4–10.7 times Go's.
+
+All admitted requests validate, server request failures are zero and shutdown
+accounting agrees. Sampled candidate RSS is 13,040–13,056 KiB versus baseline
+12,928–12,944 KiB, so lower allocation count is not a lower process-RSS claim.
+The isolated allocation reduction is worth retaining, but it does not resolve the
+larger allocation/collection/root-publication costs. This matrix establishes no
+repeatably qualified neoCLR point at the tested rates under current host conditions.
+
+[Run order](evidence/comparison.json); compact reports link their lossless full data:
+[baseline 1](evidence/baseline-1.json), [candidate 1](evidence/candidate-1.json),
+[Go 1](evidence/go-1.json), [Go 2](evidence/go-2.json),
+[candidate 2](evidence/candidate-2.json), [baseline 2](evidence/baseline-2.json).
+Reproduce with `../root-validation/compare.py --baseline BASELINE --candidate CANDIDATE
+--go GO --rates 300 400 --duration 60 --output NEW_DIRECTORY`.
+
+
+
+## Next allocation targets
+
+A separate candidate-only diagnostic charges each successful managed allocation to
+its current published guest frame. It validates the same 200-request workload plus
+warm-up/stop. This is caller attribution, not allocated-type identity or exact CPU
+cost: ReserveArray, for example, serves many callers. Instrumentation is excluded
+from every capacity run.
+
+The report exposes thousands of ArrayList.GetIterator allocations, plus TaskQueue
+Drain and Promise construction/completion bookkeeping. These are stronger concrete
+follow-ups than changing Task's reference semantics blindly: consider indexed
+iteration over private callback lists and reducing empty/backing-storage objects,
+while preserving deferred delivery, reentrancy rules, cancellation and GC roots.
+HTTP response configuration and the already-initialized context response are further
+inspection targets, not measured improvements in this slice.
+
+[Allocation caller report](evidence/allocation-summary.json),
+[instrumented build](evidence/allocation-build.json),
+[request outcomes](evidence/allocation-requests.json).
+Reproduce on macOS with `allocation-sites.py --build CANDIDATE --output NEW_DIRECTORY`.
+
+Website validation: regenerated the unchanged public reference from the matching
+bridge, refreshed source fingerprints and built/checked all 4,449 pages. No deployment.

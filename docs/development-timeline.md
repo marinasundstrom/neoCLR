@@ -38,8 +38,24 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   investigate a context-based hosting callback for streaming/middleware with an
   explicit ownership contract. This is not implemented or inferred approval for an
   API redesign. [Investigation and evidence](../benchmarks/http-server/serve/task-completion-20261018/README.md).
-- **Open:** uninstrumented longer load comparisons and total Task allocation
-  attribution; a wrapper's reference type alone does not establish its CPU cost.
+- **Author clarification:** HttpContext is proposed primarily for consistency with
+  Accept and convenience: Serve initializes the context, and the handler configures
+  its response instead of constructing and returning HttpResponse. The author asks
+  for website documentation and Serve-based application samples once implemented,
+  retaining Accept examples only where they teach the low-level primitive.
+- **Assistant response:** proposes server completion/disposal after the handler task
+  settles, with explicit streaming/early-completion rules still to be designed.
+- **Outcome:** reversed 60-second comparisons retain all misses and generator-lag
+  failures; the small allocation reduction yields no repeatable CPU gain or higher
+  reliable sustained rate. Total Task allocation attribution remains distinct from
+  wrapper cost.
+- **Next author direction:** continue directly into context-based Serve after this
+  measurement slice; discuss Task<void> and an optional cancellation parameter
+  versus Result-returning callbacks. The assistant recommends the two-argument
+  Task<void> handler, with server-owned response completion and explicit diagnostics.
+- **Author sequencing correction:** fix the allocation/GC issues discovered in this
+  investigation before implementing the Serve API change. Serve remains a low-level
+  primitive; routing and minimal-endpoint frameworks belong above it.
 
 ## 2026-10-18 — Serve as the application documentation default
 

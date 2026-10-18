@@ -131,3 +131,19 @@ fails the generator-lag target. No higher reliable sustained rate is established
 The same guest object and experimental paced-GC policy are fixed. Separate collector
 benchmarks show gains and an overflow-path regression; all results, including rejected
 experiments, remain [in the evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/seed-walk-20261018).
+
+
+## Development: Task completion allocations
+
+Promise settlement now skips replacing an empty continuation list. A separate Serve
+diagnostic records 0.78% fewer allocations and 0.47% fewer allocated payload bytes;
+Task identity and callback timing are unchanged. Interpreter/JIT/AOT contract checks pass.
+
+Two reversed-order 60-second comparisons at 300/400 offered requests/sec show no
+repeatable CPU gain: a small first-pair reduction reverses in the second pair.
+All four candidate points miss arrivals, and one suffers 388 ms generator-lag p99.
+Go validates every arrival but fails one of four generator-lag targets. No higher
+reliable sustained rate or lower process RSS is established. Both neoCLR arms use
+the same current compiler/native runtime and separately built library cohorts;
+this is not the older fixed-guest comparison.
+[Full results, allocation counts and failures](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/task-completion-20261018).

@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
-- Avoid replacement empty callback-list allocations when Promise completion/cancellation has no registered continuations. Preserve deferred late callbacks and Task identity; validate interpreter/JIT/AOT contracts. A separate Serve diagnostic records 0.78% fewer allocations, without a timing or capacity claim.
+- Avoid replacement empty callback-list allocations when Promise completion/cancellation has no registered continuations. Preserve deferred late callbacks and Task identity; validate interpreter/JIT/AOT contracts. A separate Serve diagnostic records 0.78% fewer allocations. Reversed 60-second Serve/Go comparisons show no repeatable CPU gain or higher reliable rate; retain all missed arrivals and generator-lag failures, allocation-caller diagnostics and updated benchmark pages. Regenerate the unchanged public reference and refresh source fingerprints.
 
 - Make Serve the primary HTTP web-application API in the feature, case and lifetime documentation. Extract the tested Serve lifecycle fixture into the walkthrough; label sequential Accept samples as lower-level interoperability examples and clarify lifetime awaiting, bounded task supervision and cooperative dispatch.
 
