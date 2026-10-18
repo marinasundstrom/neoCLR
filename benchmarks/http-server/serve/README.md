@@ -177,3 +177,11 @@ For load, pass `load/run.py --server-source FIXTURE --control-stop --workers 16
 --concurrency 16 --rates ... --duration ... --rounds 1 --build BUILD/native --output
 NEW_DIRECTORY`. Explicitly relink the same guest object with `-DNEOCLR_GC_PACED`
 for the experimental paced control; retained commands identify each executable.
+
+## Subsequent sustained-rate investigation
+
+[Phase attribution, native profiles and longer repeats](capacity-20261018/README.md)
+retain the earlier failures, distinguish the author's activity change, and qualify
+400/sec locally under paced GC with two 120-second trials. The separate 500/sec
+check exposes CPU saturation and admission misses. These are fixture/policy-specific
+points, not an implementation speedup or a production maximum.

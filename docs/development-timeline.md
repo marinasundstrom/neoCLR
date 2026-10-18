@@ -40,6 +40,15 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   publication/plan checks as concrete CPU costs. GC counters reclaim all allocations.
   Two-minute unprofiled repeats now use prospectively recorded success, latency,
   generator-lag and memory criteria, retaining default/experimental GC distinctions.
+- **Author correction to conditions:** “OK. I stop side activities”. The assistant
+  retained ongoing transition trials and started fresh repeats afterward.
+- **Assistant outcome:** the quieter paced-GC Serve fixture passes two 120-second
+  400/sec trials (96,000 validated responses). A separate 500/sec check saturates
+  one CPU core and records 2,606 admission misses. Earlier noisy failures and the
+  default-GC 5/sec controls remain separate; no implementation speedup is claimed.
+- **Author goal reaffirmed:** comparison with a web server/application in Go remains
+  the objective. The assistant began a new matched Go net/http fixture, preserving
+  the older 32-request pilot as a different workload. Go results are pending here.
   [Evidence and procedure](../benchmarks/http-server/serve/capacity-20261018/README.md).
 
 ## 2026-10-18 — Measure HTTP buffer costs and server capacity honestly

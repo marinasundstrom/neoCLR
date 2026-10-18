@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 import importlib.util
 import json
+import statistics
 from pathlib import Path
 
 spec = importlib.util.spec_from_file_location('load_driver', Path(__file__).with_name('run.py'))
@@ -37,13 +38,18 @@ def summarize(report):
                                 dispatchLag=load.percentiles([r['dispatchLagSeconds'] for r in arrivals]),
                                 offeredLatency=load.percentiles([r['offeredLatencySeconds'] for r in arrivals if r['result'] == 'ok'])))
         rss = [r for r in m['resources'] if 'rssKiB' in r]
+        first = [r['rssKiB'] for r in rss if r['atSeconds'] < 10]
+        last = [r['rssKiB'] for r in rss if m['durationSeconds'] - 10 <= r['atSeconds'] <= m['durationSeconds']]
         trials.append(dict(round=trial['round'], rate=trial['rate'], concurrency=trial['concurrency'],
                            outcomes=m['outcomes'], completionsPerSecond=m['successfulCompletionsPerSecond'],
                            target=m['meetsProvisionalTarget'], latency=m['offeredLatencySeconds'],
                            dispatchLag=m['dispatchLagSeconds'], cpuPerCompletion=m['serverCpuSecondsPerCompletion'],
                            rssFirstKiB=rss[0]['rssKiB'] if rss else None,
                            rssLastKiB=rss[-1]['rssKiB'] if rss else None,
-                           rssPeakKiB=m['sampledPeakRssKiB'], phaseLatencies=phases, seconds=seconds,
+                           rssPeakKiB=m['sampledPeakRssKiB'],
+                           rssFirstTenSecondsMedianKiB=statistics.median(first) if first else None,
+                           rssLastTenSecondsMedianKiB=statistics.median(last) if last else None,
+                           phaseLatencies=phases, seconds=seconds,
                            slowest=sorted((r for r in records if r['result'] == 'ok'),
                                           key=lambda r: r['offeredLatencySeconds'], reverse=True)[:10]))
     return dict(completed=report['completed'], trials=trials)

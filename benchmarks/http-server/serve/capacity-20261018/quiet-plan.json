@@ -1,0 +1,10 @@
+{
+  "authorTransition": "2026-10-18 10:22:26 UTC observed: author says they stopped side activities",
+  "currentRun": "100/sec pair spans transition; retain both and label it. Do not silently relabel the first trial as quiet.",
+  "freshRuns": [
+    {"policy": "experimental paced", "rate": 150, "durationSeconds": 120, "rounds": 2},
+    {"policy": "default stress", "rate": 5, "durationSeconds": 60, "rounds": 2}
+  ],
+  "followup": "If both fresh paced 150/sec trials pass, test 200/sec twice for 60 seconds. Otherwise test 100/sec twice for 60 seconds. Same existing success/latency/lag criteria; no software change. Additional coincident-peer and GC-overload diagnostics run separately afterward.",
+  "qualification": "Quieter author activity, not a dedicated/isolated machine. Record remaining background load, all failures and RSS. Distinguish changed host conditions from runtime improvement."
+}

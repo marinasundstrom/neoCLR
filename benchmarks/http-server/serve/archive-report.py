@@ -19,7 +19,8 @@ report.pop('build', None)
 report['rawReport'] = dict(file=a.destination.with_suffix('.json.gz').name,
                          sha256=hashlib.sha256(compressed).hexdigest(),
                          uncompressedSha256=hashlib.sha256(data).hexdigest())
-for trial in report.get('trials', [report]):
+sections = report.get('trials', [report]) + [report[key] for key in ('serve', 'control') if key in report]
+for trial in sections:
     for key in ('measurement', 'warmup'):
         if key in trial:
             trial[key].pop('requests', None)

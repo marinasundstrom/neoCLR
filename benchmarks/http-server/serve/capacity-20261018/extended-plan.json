@@ -1,0 +1,5 @@
+{
+  "trigger": "The post-activity coincident diagnostic at 400 Serve arrivals/sec and 100 trivial-peer arrivals/sec completes all responses for 30 seconds, with Serve offered p99 45.4 ms and control 3.1 ms. No sustained maximum is inferred.",
+  "nextQualification": {"rate": 400, "policy": "experimental paced", "durationSeconds": 120, "rounds": 2, "clientSlots": 64, "sameCriteria": true, "noConcurrentControlPeer": true},
+  "boundaryCheck": "After the paired 400/sec qualification, test 500/sec for 30 seconds as an exploratory overload point. Retain failure and do not call a short success a sustained maximum. Stop this profiling slice with the highest repeat-qualified point and the explicit next CPU bottleneck."
+}

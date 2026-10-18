@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Qualify the Serve fixture at 400 offered/sec in two quieter-host 120-second paced-GC trials (96,000 valid responses); retain earlier noisy failures and a 500/sec overload check with 2,606 admission misses. Separate default stress-GC controls, generator headroom, CPU saturation and memory evidence; no runtime/collector-policy change or production-capacity claim.
+
 - Profile Serve native memory costs: allocator span validation, collection and root-publication checks dominate the retained sample. Add GC timing-only evidence with complete reclamation and a successful independent 600/sec generator control; record prospective sustained-rate criteria without changing runtime semantics or collector defaults.
 
 - Add opt-in HTTP load phase timing and arrival-slot diagnostics, per-second analysis and independent generator/native-sampling controls. Retain the first Serve capacity sweep: admission misses cluster in bursts and larger client limits do not establish a stable rate; no runtime or GC policy change.

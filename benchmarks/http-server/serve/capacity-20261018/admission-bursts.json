@@ -1,0 +1,2534 @@
+[
+  {
+    "round": 0,
+    "firstMissIndex": 1098,
+    "maximumGeneratorLag": {
+      "index": 3311,
+      "intendedSeconds": 22.073333333333334,
+      "startSeconds": 22.288783209,
+      "endSeconds": 22.336313792000002,
+      "dispatchLagSeconds": 0.21544987566666762,
+      "result": "ok",
+      "offeredLatencySeconds": 0.26298045866666797,
+      "serviceLatencySeconds": 0.04753058300000035,
+      "inflightAtAdmission": 5
+    },
+    "nearFirstMiss": [
+      {
+        "index": 1028,
+        "intendedSeconds": 6.8533333333333335,
+        "startSeconds": 6.853463292000001,
+        "endSeconds": 7.190924917,
+        "dispatchLagSeconds": 0.000129958666667207,
+        "result": "ok",
+        "offeredLatencySeconds": 0.33759158366666675,
+        "serviceLatencySeconds": 0.33746162499999954,
+        "inflightAtAdmission": 37
+      },
+      {
+        "index": 1029,
+        "intendedSeconds": 6.860000000000001,
+        "startSeconds": 6.862756542000001,
+        "endSeconds": 7.193651625000001,
+        "dispatchLagSeconds": 0.002756542000000195,
+        "result": "ok",
+        "offeredLatencySeconds": 0.3336516249999999,
+        "serviceLatencySeconds": 0.3308950829999997,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 1030,
+        "intendedSeconds": 6.866666666666667,
+        "startSeconds": 6.867198792,
+        "endSeconds": 7.272743834,
+        "dispatchLagSeconds": 0.0005321253333328002,
+        "result": "ok",
+        "offeredLatencySeconds": 0.40607716733333277,
+        "serviceLatencySeconds": 0.40554504199999997,
+        "inflightAtAdmission": 37
+      },
+      {
+        "index": 1031,
+        "intendedSeconds": 6.873333333333333,
+        "startSeconds": 6.873605417,
+        "endSeconds": 7.289044334,
+        "dispatchLagSeconds": 0.00027208366666719996,
+        "result": "ok",
+        "offeredLatencySeconds": 0.41571100066666666,
+        "serviceLatencySeconds": 0.41543891699999946,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 1032,
+        "intendedSeconds": 6.880000000000001,
+        "startSeconds": 6.880832209000001,
+        "endSeconds": 7.302496459,
+        "dispatchLagSeconds": 0.0008322090000003612,
+        "result": "ok",
+        "offeredLatencySeconds": 0.42249645899999955,
+        "serviceLatencySeconds": 0.4216642499999992,
+        "inflightAtAdmission": 35
+      },
+      {
+        "index": 1033,
+        "intendedSeconds": 6.886666666666667,
+        "startSeconds": 6.887216042,
+        "endSeconds": 7.302931084000001,
+        "dispatchLagSeconds": 0.0005493753333336571,
+        "result": "ok",
+        "offeredLatencySeconds": 0.4162644173333341,
+        "serviceLatencySeconds": 0.4157150420000004,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 1034,
+        "intendedSeconds": 6.893333333333334,
+        "startSeconds": 6.906263750000001,
+        "endSeconds": 7.367686584000001,
+        "dispatchLagSeconds": 0.012930416666666389,
+        "result": "ok",
+        "offeredLatencySeconds": 0.4743532506666668,
+        "serviceLatencySeconds": 0.4614228340000004,
+        "inflightAtAdmission": 37
+      },
+      {
+        "index": 1035,
+        "intendedSeconds": 6.9,
+        "startSeconds": 6.915427125000001,
+        "endSeconds": 7.368685209000001,
+        "dispatchLagSeconds": 0.01542712500000043,
+        "result": "ok",
+        "offeredLatencySeconds": 0.4686852090000002,
+        "serviceLatencySeconds": 0.4532580839999998,
+        "inflightAtAdmission": 38
+      },
+      {
+        "index": 1036,
+        "intendedSeconds": 6.906666666666666,
+        "startSeconds": 6.920807209000001,
+        "endSeconds": 7.379926834000001,
+        "dispatchLagSeconds": 0.014140542333334949,
+        "result": "ok",
+        "offeredLatencySeconds": 0.47326016733333454,
+        "serviceLatencySeconds": 0.4591196249999996,
+        "inflightAtAdmission": 39
+      },
+      {
+        "index": 1037,
+        "intendedSeconds": 6.913333333333334,
+        "startSeconds": 6.922161584000001,
+        "endSeconds": 7.421464334000001,
+        "dispatchLagSeconds": 0.008828250666667259,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5081310006666673,
+        "serviceLatencySeconds": 0.49930275,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1038,
+        "intendedSeconds": 6.92,
+        "startSeconds": 6.922434667000001,
+        "endSeconds": 7.433181959000001,
+        "dispatchLagSeconds": 0.002434667000001056,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5131819590000006,
+        "serviceLatencySeconds": 0.5107472919999996,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1039,
+        "intendedSeconds": 6.926666666666668,
+        "startSeconds": 6.92727425,
+        "endSeconds": 7.435284625000001,
+        "dispatchLagSeconds": 0.0006075833333323288,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5086179583333337,
+        "serviceLatencySeconds": 0.5080103750000013,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1040,
+        "intendedSeconds": 6.933333333333334,
+        "startSeconds": 6.933671917,
+        "endSeconds": 7.442053125000001,
+        "dispatchLagSeconds": 0.00033858366666628115,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5087197916666675,
+        "serviceLatencySeconds": 0.5083812080000012,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1041,
+        "intendedSeconds": 6.940000000000001,
+        "startSeconds": 6.940474250000001,
+        "endSeconds": 7.445476667000001,
+        "dispatchLagSeconds": 0.00047424999999989836,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5054766669999999,
+        "serviceLatencySeconds": 0.505002417,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1042,
+        "intendedSeconds": 6.946666666666667,
+        "startSeconds": 6.947573250000001,
+        "endSeconds": 7.4590260000000015,
+        "dispatchLagSeconds": 0.0009065833333341544,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5123593333333343,
+        "serviceLatencySeconds": 0.5114527500000001,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1043,
+        "intendedSeconds": 6.953333333333333,
+        "startSeconds": 6.95370475,
+        "endSeconds": 7.461381375,
+        "dispatchLagSeconds": 0.00037141666666684614,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5080480416666671,
+        "serviceLatencySeconds": 0.5076766250000002,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1044,
+        "intendedSeconds": 6.960000000000001,
+        "startSeconds": 6.961499542,
+        "endSeconds": 7.470797125000001,
+        "dispatchLagSeconds": 0.0014995419999994652,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5107971249999999,
+        "serviceLatencySeconds": 0.5092975830000004,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1045,
+        "intendedSeconds": 6.966666666666667,
+        "startSeconds": 6.966899709,
+        "endSeconds": 7.471795500000001,
+        "dispatchLagSeconds": 0.00023304233333298896,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5051288333333339,
+        "serviceLatencySeconds": 0.5048957910000009,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1046,
+        "intendedSeconds": 6.9733333333333345,
+        "startSeconds": 6.982229709,
+        "endSeconds": 7.478890167000001,
+        "dispatchLagSeconds": 0.00889637566666579,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5055568336666667,
+        "serviceLatencySeconds": 0.4966604580000009,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1047,
+        "intendedSeconds": 6.98,
+        "startSeconds": 6.985795042000001,
+        "endSeconds": 7.480191125000001,
+        "dispatchLagSeconds": 0.005795042000000805,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5001911250000006,
+        "serviceLatencySeconds": 0.4943960829999998,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1048,
+        "intendedSeconds": 6.986666666666666,
+        "startSeconds": 6.988679917000001,
+        "endSeconds": 7.4919199590000005,
+        "dispatchLagSeconds": 0.0020132503333343266,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5052532923333342,
+        "serviceLatencySeconds": 0.5032400419999998,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1049,
+        "intendedSeconds": 6.993333333333334,
+        "startSeconds": 6.995080459,
+        "endSeconds": 7.495013167,
+        "dispatchLagSeconds": 0.0017471256666663493,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5016798336666657,
+        "serviceLatencySeconds": 0.49993270799999934,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1050,
+        "intendedSeconds": 7.0,
+        "startSeconds": 7.001454334,
+        "endSeconds": 7.504679209000001,
+        "dispatchLagSeconds": 0.001454333999999946,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5046792090000007,
+        "serviceLatencySeconds": 0.5032248750000008,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1051,
+        "intendedSeconds": 7.006666666666668,
+        "startSeconds": 7.007035084,
+        "endSeconds": 7.5057761670000005,
+        "dispatchLagSeconds": 0.00036841733333226045,
+        "result": "ok",
+        "offeredLatencySeconds": 0.4991095003333328,
+        "serviceLatencySeconds": 0.49874108300000053,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1052,
+        "intendedSeconds": 7.013333333333334,
+        "startSeconds": 7.013869167000001,
+        "endSeconds": 7.514024542000001,
+        "dispatchLagSeconds": 0.000535833666667429,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5006912086666677,
+        "serviceLatencySeconds": 0.5001553750000003,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1053,
+        "intendedSeconds": 7.02,
+        "startSeconds": 7.020298834,
+        "endSeconds": 7.515320375,
+        "dispatchLagSeconds": 0.0002988340000005252,
+        "result": "ok",
+        "offeredLatencySeconds": 0.49532037500000037,
+        "serviceLatencySeconds": 0.49502154099999984,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1054,
+        "intendedSeconds": 7.026666666666667,
+        "startSeconds": 7.027391167000001,
+        "endSeconds": 7.529627084000001,
+        "dispatchLagSeconds": 0.0007245003333338218,
+        "result": "ok",
+        "offeredLatencySeconds": 0.502960417333334,
+        "serviceLatencySeconds": 0.5022359170000001,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1055,
+        "intendedSeconds": 7.033333333333333,
+        "startSeconds": 7.034506542000001,
+        "endSeconds": 7.530623292000001,
+        "dispatchLagSeconds": 0.0011732086666675912,
+        "result": "ok",
+        "offeredLatencySeconds": 0.49728995866666814,
+        "serviceLatencySeconds": 0.49611675000000055,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1056,
+        "intendedSeconds": 7.040000000000001,
+        "startSeconds": 7.040754959000001,
+        "endSeconds": 7.544179,
+        "dispatchLagSeconds": 0.0007549589999999995,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5041789999999988,
+        "serviceLatencySeconds": 0.5034240409999988,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1057,
+        "intendedSeconds": 7.046666666666667,
+        "startSeconds": 7.046981167,
+        "endSeconds": 7.545974792000001,
+        "dispatchLagSeconds": 0.00031450033333335625,
+        "result": "ok",
+        "offeredLatencySeconds": 0.499308125333334,
+        "serviceLatencySeconds": 0.49899362500000066,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1058,
+        "intendedSeconds": 7.053333333333335,
+        "startSeconds": 7.053583875000001,
+        "endSeconds": 7.5592176250000005,
+        "dispatchLagSeconds": 0.0002505416666664928,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5058842916666659,
+        "serviceLatencySeconds": 0.5056337499999994,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1059,
+        "intendedSeconds": 7.0600000000000005,
+        "startSeconds": 7.060458375000001,
+        "endSeconds": 7.561760459,
+        "dispatchLagSeconds": 0.00045837500000089904,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5017604589999998,
+        "serviceLatencySeconds": 0.5013020839999989,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1060,
+        "intendedSeconds": 7.066666666666666,
+        "startSeconds": 7.067355459,
+        "endSeconds": 7.571892417000001,
+        "dispatchLagSeconds": 0.0006887923333334101,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5052257503333344,
+        "serviceLatencySeconds": 0.504536958000001,
+        "inflightAtAdmission": 39
+      },
+      {
+        "index": 1061,
+        "intendedSeconds": 7.073333333333334,
+        "startSeconds": 7.074146500000001,
+        "endSeconds": 7.572747125000001,
+        "dispatchLagSeconds": 0.0008131666666670867,
+        "result": "ok",
+        "offeredLatencySeconds": 0.499413791666667,
+        "serviceLatencySeconds": 0.4986006249999999,
+        "inflightAtAdmission": 38
+      },
+      {
+        "index": 1062,
+        "intendedSeconds": 7.08,
+        "startSeconds": 7.089963709000001,
+        "endSeconds": 7.589445792000001,
+        "dispatchLagSeconds": 0.009963709000000875,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5094457920000011,
+        "serviceLatencySeconds": 0.4994820830000002,
+        "inflightAtAdmission": 39
+      },
+      {
+        "index": 1063,
+        "intendedSeconds": 7.086666666666668,
+        "startSeconds": 7.090459834000001,
+        "endSeconds": 7.590010459,
+        "dispatchLagSeconds": 0.003793167333332903,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5033437923333324,
+        "serviceLatencySeconds": 0.49955062499999947,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 1064,
+        "intendedSeconds": 7.093333333333334,
+        "startSeconds": 7.106079084000001,
+        "endSeconds": 7.604473542000001,
+        "dispatchLagSeconds": 0.012745750666667277,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5111402086666672,
+        "serviceLatencySeconds": 0.49839445799999993,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 1065,
+        "intendedSeconds": 7.1,
+        "startSeconds": 7.11968875,
+        "endSeconds": 7.605001459,
+        "dispatchLagSeconds": 0.019688750000000255,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5050014590000007,
+        "serviceLatencySeconds": 0.48531270900000045,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 1066,
+        "intendedSeconds": 7.106666666666667,
+        "startSeconds": 7.120199792000001,
+        "endSeconds": 7.624080125000001,
+        "dispatchLagSeconds": 0.013533125333333729,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5174134583333334,
+        "serviceLatencySeconds": 0.5038803329999997,
+        "inflightAtAdmission": 43
+      },
+      {
+        "index": 1067,
+        "intendedSeconds": 7.113333333333333,
+        "startSeconds": 7.122417584000001,
+        "endSeconds": 7.713537584000001,
+        "dispatchLagSeconds": 0.009084250666667515,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6002042506666676,
+        "serviceLatencySeconds": 0.5911200000000001,
+        "inflightAtAdmission": 44
+      },
+      {
+        "index": 1068,
+        "intendedSeconds": 7.120000000000001,
+        "startSeconds": 7.122927125,
+        "endSeconds": 7.7136695,
+        "dispatchLagSeconds": 0.0029271249999993643,
+        "result": "ok",
+        "offeredLatencySeconds": 0.593669499999999,
+        "serviceLatencySeconds": 0.5907423749999996,
+        "inflightAtAdmission": 45
+      },
+      {
+        "index": 1069,
+        "intendedSeconds": 7.126666666666667,
+        "startSeconds": 7.127018959000001,
+        "endSeconds": 7.713675334000001,
+        "dispatchLagSeconds": 0.0003522923333338923,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5870086673333343,
+        "serviceLatencySeconds": 0.5866563750000005,
+        "inflightAtAdmission": 43
+      },
+      {
+        "index": 1070,
+        "intendedSeconds": 7.133333333333335,
+        "startSeconds": 7.135546875000001,
+        "endSeconds": 7.7149655,
+        "dispatchLagSeconds": 0.00221354166666643,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5816321666666653,
+        "serviceLatencySeconds": 0.5794186249999989,
+        "inflightAtAdmission": 43
+      },
+      {
+        "index": 1071,
+        "intendedSeconds": 7.140000000000001,
+        "startSeconds": 7.14062575,
+        "endSeconds": 7.744791084000001,
+        "dispatchLagSeconds": 0.0006257499999993144,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6047910840000004,
+        "serviceLatencySeconds": 0.604165334000001,
+        "inflightAtAdmission": 44
+      },
+      {
+        "index": 1072,
+        "intendedSeconds": 7.1466666666666665,
+        "startSeconds": 7.1887796250000005,
+        "endSeconds": 7.765527334,
+        "dispatchLagSeconds": 0.04211295833333395,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6188606673333332,
+        "serviceLatencySeconds": 0.5767477089999993,
+        "inflightAtAdmission": 45
+      },
+      {
+        "index": 1073,
+        "intendedSeconds": 7.153333333333334,
+        "startSeconds": 7.190866667,
+        "endSeconds": 7.769324042000001,
+        "dispatchLagSeconds": 0.03753333366666567,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6159907086666667,
+        "serviceLatencySeconds": 0.578457375000001,
+        "inflightAtAdmission": 46
+      },
+      {
+        "index": 1074,
+        "intendedSeconds": 7.16,
+        "startSeconds": 7.191900417000001,
+        "endSeconds": 7.774938542000001,
+        "dispatchLagSeconds": 0.03190041700000101,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6149385420000009,
+        "serviceLatencySeconds": 0.5830381249999999,
+        "inflightAtAdmission": 47
+      },
+      {
+        "index": 1075,
+        "intendedSeconds": 7.166666666666668,
+        "startSeconds": 7.192462209,
+        "endSeconds": 7.7763805,
+        "dispatchLagSeconds": 0.025795542333332477,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6097138333333323,
+        "serviceLatencySeconds": 0.5839182909999998,
+        "inflightAtAdmission": 48
+      },
+      {
+        "index": 1076,
+        "intendedSeconds": 7.173333333333334,
+        "startSeconds": 7.193629417,
+        "endSeconds": 7.786271000000001,
+        "dispatchLagSeconds": 0.020296083666666576,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6129376666666673,
+        "serviceLatencySeconds": 0.5926415830000007,
+        "inflightAtAdmission": 48
+      },
+      {
+        "index": 1077,
+        "intendedSeconds": 7.18,
+        "startSeconds": 7.193761792,
+        "endSeconds": 7.7876868340000005,
+        "dispatchLagSeconds": 0.013761792000000383,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6076868340000008,
+        "serviceLatencySeconds": 0.5939250420000004,
+        "inflightAtAdmission": 49
+      },
+      {
+        "index": 1078,
+        "intendedSeconds": 7.186666666666667,
+        "startSeconds": 7.1938981250000005,
+        "endSeconds": 7.795597000000001,
+        "dispatchLagSeconds": 0.007231458333333052,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6089303333333334,
+        "serviceLatencySeconds": 0.6016988750000003,
+        "inflightAtAdmission": 50
+      },
+      {
+        "index": 1079,
+        "intendedSeconds": 7.193333333333333,
+        "startSeconds": 7.194382042000001,
+        "endSeconds": 7.796694292,
+        "dispatchLagSeconds": 0.0010487086666675083,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6033609586666664,
+        "serviceLatencySeconds": 0.6023122499999989,
+        "inflightAtAdmission": 50
+      },
+      {
+        "index": 1080,
+        "intendedSeconds": 7.200000000000001,
+        "startSeconds": 7.203022459000001,
+        "endSeconds": 7.804714667000001,
+        "dispatchLagSeconds": 0.0030224590000003104,
+        "result": "ok",
+        "offeredLatencySeconds": 0.6047146669999997,
+        "serviceLatencySeconds": 0.6016922079999993,
+        "inflightAtAdmission": 51
+      },
+      {
+        "index": 1081,
+        "intendedSeconds": 7.206666666666667,
+        "startSeconds": 7.266595667000001,
+        "endSeconds": 7.805656000000001,
+        "dispatchLagSeconds": 0.059929000333333704,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5989893333333338,
+        "serviceLatencySeconds": 0.5390603330000001,
+        "inflightAtAdmission": 52
+      },
+      {
+        "index": 1082,
+        "intendedSeconds": 7.213333333333333,
+        "startSeconds": 7.2714827920000005,
+        "endSeconds": 7.813281209000001,
+        "dispatchLagSeconds": 0.05814945866666754,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5999478756666683,
+        "serviceLatencySeconds": 0.5417984170000008,
+        "inflightAtAdmission": 53
+      },
+      {
+        "index": 1083,
+        "intendedSeconds": 7.220000000000001,
+        "startSeconds": 7.271954792000001,
+        "endSeconds": 7.8144286250000015,
+        "dispatchLagSeconds": 0.05195479200000008,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5944286250000008,
+        "serviceLatencySeconds": 0.5424738330000007,
+        "inflightAtAdmission": 54
+      },
+      {
+        "index": 1084,
+        "intendedSeconds": 7.226666666666667,
+        "startSeconds": 7.272253167000001,
+        "endSeconds": 7.82200875,
+        "dispatchLagSeconds": 0.045586500333334,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5953420833333336,
+        "serviceLatencySeconds": 0.5497555829999996,
+        "inflightAtAdmission": 55
+      },
+      {
+        "index": 1085,
+        "intendedSeconds": 7.233333333333334,
+        "startSeconds": 7.272720625,
+        "endSeconds": 7.822824834,
+        "dispatchLagSeconds": 0.03938729166666555,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5894915006666661,
+        "serviceLatencySeconds": 0.5501042090000006,
+        "inflightAtAdmission": 56
+      },
+      {
+        "index": 1086,
+        "intendedSeconds": 7.24,
+        "startSeconds": 7.273072834000001,
+        "endSeconds": 7.830413625,
+        "dispatchLagSeconds": 0.033072834000000384,
+        "result": "ok",
+        "offeredLatencySeconds": 0.590413625,
+        "serviceLatencySeconds": 0.5573407909999997,
+        "inflightAtAdmission": 57
+      },
+      {
+        "index": 1087,
+        "intendedSeconds": 7.246666666666668,
+        "startSeconds": 7.274121292,
+        "endSeconds": 7.8339595840000005,
+        "dispatchLagSeconds": 0.027454625333332316,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5872929173333326,
+        "serviceLatencySeconds": 0.5598382920000002,
+        "inflightAtAdmission": 58
+      },
+      {
+        "index": 1088,
+        "intendedSeconds": 7.253333333333334,
+        "startSeconds": 7.2814425840000006,
+        "endSeconds": 7.8444044590000015,
+        "dispatchLagSeconds": 0.028109250666666696,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5910711256666676,
+        "serviceLatencySeconds": 0.5629618750000009,
+        "inflightAtAdmission": 58
+      },
+      {
+        "index": 1089,
+        "intendedSeconds": 7.26,
+        "startSeconds": 7.289003625000001,
+        "endSeconds": 7.845565334,
+        "dispatchLagSeconds": 0.02900362500000142,
+        "result": "ok",
+        "offeredLatencySeconds": 0.585565334,
+        "serviceLatencySeconds": 0.5565617089999986,
+        "inflightAtAdmission": 59
+      },
+      {
+        "index": 1090,
+        "intendedSeconds": 7.2666666666666675,
+        "startSeconds": 7.2891988340000005,
+        "endSeconds": 7.856210084000001,
+        "dispatchLagSeconds": 0.022532167333332964,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5895434173333332,
+        "serviceLatencySeconds": 0.5670112500000002,
+        "inflightAtAdmission": 60
+      },
+      {
+        "index": 1091,
+        "intendedSeconds": 7.273333333333333,
+        "startSeconds": 7.28935725,
+        "endSeconds": 7.858148042,
+        "dispatchLagSeconds": 0.016023916666666693,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5848147086666664,
+        "serviceLatencySeconds": 0.5687907919999997,
+        "inflightAtAdmission": 61
+      },
+      {
+        "index": 1092,
+        "intendedSeconds": 7.280000000000001,
+        "startSeconds": 7.289489750000001,
+        "endSeconds": 7.869372209,
+        "dispatchLagSeconds": 0.009489750000000186,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5893722089999986,
+        "serviceLatencySeconds": 0.5798824589999985,
+        "inflightAtAdmission": 61
+      },
+      {
+        "index": 1093,
+        "intendedSeconds": 7.286666666666667,
+        "startSeconds": 7.289607875,
+        "endSeconds": 7.870322917000001,
+        "dispatchLagSeconds": 0.0029412083333326677,
+        "result": "ok",
+        "offeredLatencySeconds": 0.583656250333334,
+        "serviceLatencySeconds": 0.5807150420000013,
+        "inflightAtAdmission": 62
+      },
+      {
+        "index": 1094,
+        "intendedSeconds": 7.293333333333333,
+        "startSeconds": 7.2977887500000005,
+        "endSeconds": 7.878347,
+        "dispatchLagSeconds": 0.004455416666667489,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5850136666666668,
+        "serviceLatencySeconds": 0.5805582499999993,
+        "inflightAtAdmission": 63
+      },
+      {
+        "index": 1095,
+        "intendedSeconds": 7.300000000000001,
+        "startSeconds": 7.300611375000001,
+        "endSeconds": 7.879678834,
+        "dispatchLagSeconds": 0.0006113750000000806,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5796788339999992,
+        "serviceLatencySeconds": 0.5790674589999991,
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1096,
+        "intendedSeconds": 7.306666666666667,
+        "startSeconds": 7.3315744590000005,
+        "endSeconds": 7.895415709,
+        "dispatchLagSeconds": 0.024907792333333845,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5887490423333333,
+        "serviceLatencySeconds": 0.5638412499999994,
+        "inflightAtAdmission": 63
+      },
+      {
+        "index": 1097,
+        "intendedSeconds": 7.313333333333334,
+        "startSeconds": 7.34025025,
+        "endSeconds": 7.895752125000001,
+        "dispatchLagSeconds": 0.02691691666666607,
+        "result": "ok",
+        "offeredLatencySeconds": 0.582418791666667,
+        "serviceLatencySeconds": 0.5555018750000009,
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1098,
+        "intendedSeconds": 7.32,
+        "dispatchLagSeconds": 0.020326125000000417,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1099,
+        "intendedSeconds": 7.326666666666668,
+        "dispatchLagSeconds": 0.01607162533333195,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1100,
+        "intendedSeconds": 7.333333333333334,
+        "dispatchLagSeconds": 0.009513916666666233,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1101,
+        "intendedSeconds": 7.34,
+        "dispatchLagSeconds": 0.0032443340000014587,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1102,
+        "intendedSeconds": 7.346666666666668,
+        "dispatchLagSeconds": 0.0014022083333333768,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1103,
+        "intendedSeconds": 7.3533333333333335,
+        "dispatchLagSeconds": 0.0027694586666662246,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1104,
+        "intendedSeconds": 7.360000000000001,
+        "dispatchLagSeconds": 0.0031012500000002774,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1105,
+        "intendedSeconds": 7.366666666666667,
+        "dispatchLagSeconds": 0.001056375333332582,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1106,
+        "intendedSeconds": 7.373333333333333,
+        "startSeconds": 7.374460834000001,
+        "endSeconds": 7.906571709000001,
+        "dispatchLagSeconds": 0.001127500666667558,
+        "result": "ok",
+        "offeredLatencySeconds": 0.5332383756666683,
+        "serviceLatencySeconds": 0.5321108750000008,
+        "inflightAtAdmission": 63
+      },
+      {
+        "index": 1107,
+        "intendedSeconds": 7.380000000000001,
+        "startSeconds": 7.380179917000001,
+        "endSeconds": 7.908156084,
+        "dispatchLagSeconds": 0.00017991700000052901,
+        "result": "ok",
+        "offeredLatencySeconds": 0.528156083999999,
+        "serviceLatencySeconds": 0.5279761669999985,
+        "inflightAtAdmission": 63
+      }
+    ],
+    "misses": [
+      {
+        "index": 1098,
+        "intendedSeconds": 7.32,
+        "dispatchLagSeconds": 0.020326125000000417,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1099,
+        "intendedSeconds": 7.326666666666668,
+        "dispatchLagSeconds": 0.01607162533333195,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1100,
+        "intendedSeconds": 7.333333333333334,
+        "dispatchLagSeconds": 0.009513916666666233,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1101,
+        "intendedSeconds": 7.34,
+        "dispatchLagSeconds": 0.0032443340000014587,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1102,
+        "intendedSeconds": 7.346666666666668,
+        "dispatchLagSeconds": 0.0014022083333333768,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1103,
+        "intendedSeconds": 7.3533333333333335,
+        "dispatchLagSeconds": 0.0027694586666662246,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1104,
+        "intendedSeconds": 7.360000000000001,
+        "dispatchLagSeconds": 0.0031012500000002774,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1105,
+        "intendedSeconds": 7.366666666666667,
+        "dispatchLagSeconds": 0.001056375333332582,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1109,
+        "intendedSeconds": 7.393333333333334,
+        "dispatchLagSeconds": 0.02808312566666693,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1110,
+        "intendedSeconds": 7.4,
+        "dispatchLagSeconds": 0.02205770900000026,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1112,
+        "intendedSeconds": 7.413333333333334,
+        "dispatchLagSeconds": 0.008812791666667152,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1113,
+        "intendedSeconds": 7.42,
+        "dispatchLagSeconds": 0.0024872920000014176,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1114,
+        "intendedSeconds": 7.426666666666668,
+        "dispatchLagSeconds": 0.0008688753333334631,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1143,
+        "intendedSeconds": 7.620000000000001,
+        "dispatchLagSeconds": 0.003986624999999577,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1145,
+        "intendedSeconds": 7.633333333333335,
+        "dispatchLagSeconds": 0.046699000666665214,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1146,
+        "intendedSeconds": 7.640000000000001,
+        "dispatchLagSeconds": 0.04900387500000036,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1147,
+        "intendedSeconds": 7.6466666666666665,
+        "dispatchLagSeconds": 0.05627100033333399,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1148,
+        "intendedSeconds": 7.653333333333334,
+        "dispatchLagSeconds": 0.060086291666666014,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1149,
+        "intendedSeconds": 7.66,
+        "dispatchLagSeconds": 0.05354662500000096,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1151,
+        "intendedSeconds": 7.673333333333334,
+        "dispatchLagSeconds": 0.040738750666667656,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1154,
+        "intendedSeconds": 7.693333333333333,
+        "dispatchLagSeconds": 0.021624708666667658,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1155,
+        "intendedSeconds": 7.700000000000001,
+        "dispatchLagSeconds": 0.015079458999998963,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1157,
+        "intendedSeconds": 7.713333333333333,
+        "dispatchLagSeconds": 0.003051166666667271,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1158,
+        "intendedSeconds": 7.720000000000001,
+        "dispatchLagSeconds": 0.006983208999999491,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1159,
+        "intendedSeconds": 7.726666666666667,
+        "dispatchLagSeconds": 0.004923250333334295,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1161,
+        "intendedSeconds": 7.74,
+        "dispatchLagSeconds": 0.006309917000001164,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1162,
+        "intendedSeconds": 7.746666666666668,
+        "dispatchLagSeconds": 0.006283583333333453,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1163,
+        "intendedSeconds": 7.753333333333334,
+        "dispatchLagSeconds": 0.001981500666666136,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 1164,
+        "intendedSeconds": 7.76,
+        "dispatchLagSeconds": 0.0018450000000012068,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      }
+    ]
+  },
+  {
+    "round": 1,
+    "firstMissIndex": 4231,
+    "maximumGeneratorLag": {
+      "index": 4189,
+      "intendedSeconds": 27.926666666666662,
+      "startSeconds": 28.688937832999997,
+      "endSeconds": 28.865094458,
+      "dispatchLagSeconds": 0.7622711663333348,
+      "result": "ok",
+      "offeredLatencySeconds": 0.9384277913333392,
+      "serviceLatencySeconds": 0.1761566250000044,
+      "inflightAtAdmission": 34
+    },
+    "nearFirstMiss": [
+      {
+        "index": 4161,
+        "intendedSeconds": 27.739999999999995,
+        "startSeconds": 27.740658208,
+        "endSeconds": 28.692311790999995,
+        "dispatchLagSeconds": 0.0006582080000043788,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9523117909999996,
+        "serviceLatencySeconds": 0.9516535829999953,
+        "inflightAtAdmission": 15
+      },
+      {
+        "index": 4162,
+        "intendedSeconds": 27.746666666666655,
+        "startSeconds": 27.74854729100001,
+        "endSeconds": 28.69409154099999,
+        "dispatchLagSeconds": 0.0018806243333528982,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9474248743333362,
+        "serviceLatencySeconds": 0.9455442499999833,
+        "inflightAtAdmission": 16
+      },
+      {
+        "index": 4163,
+        "intendedSeconds": 27.753333333333345,
+        "startSeconds": 27.75801725000001,
+        "endSeconds": 28.694099457999997,
+        "dispatchLagSeconds": 0.004683916666664345,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9407661246666521,
+        "serviceLatencySeconds": 0.9360822079999878,
+        "inflightAtAdmission": 16
+      },
+      {
+        "index": 4164,
+        "intendedSeconds": 27.760000000000005,
+        "startSeconds": 27.76112695799999,
+        "endSeconds": 28.694558165999993,
+        "dispatchLagSeconds": 0.001126957999986189,
+        "result": "ok",
+        "offeredLatencySeconds": 0.934558165999988,
+        "serviceLatencySeconds": 0.9334312080000018,
+        "inflightAtAdmission": 16
+      },
+      {
+        "index": 4165,
+        "intendedSeconds": 27.766666666666666,
+        "startSeconds": 27.767794666,
+        "endSeconds": 28.706102583000003,
+        "dispatchLagSeconds": 0.0011279993333346283,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9394359163333377,
+        "serviceLatencySeconds": 0.938307917000003,
+        "inflightAtAdmission": 17
+      },
+      {
+        "index": 4166,
+        "intendedSeconds": 27.773333333333326,
+        "startSeconds": 27.775311540999994,
+        "endSeconds": 28.714287333,
+        "dispatchLagSeconds": 0.001978207666667231,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9409539996666751,
+        "serviceLatencySeconds": 0.9389757920000079,
+        "inflightAtAdmission": 18
+      },
+      {
+        "index": 4167,
+        "intendedSeconds": 27.780000000000015,
+        "startSeconds": 27.785992041,
+        "endSeconds": 28.772963415999996,
+        "dispatchLagSeconds": 0.005992040999984738,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9929634159999807,
+        "serviceLatencySeconds": 0.986971374999996,
+        "inflightAtAdmission": 19
+      },
+      {
+        "index": 4168,
+        "intendedSeconds": 27.786666666666676,
+        "startSeconds": 27.78812141600001,
+        "endSeconds": 28.772968957999993,
+        "dispatchLagSeconds": 0.0014547493333338934,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9863022913333168,
+        "serviceLatencySeconds": 0.9848475419999829,
+        "inflightAtAdmission": 20
+      },
+      {
+        "index": 4169,
+        "intendedSeconds": 27.793333333333337,
+        "startSeconds": 27.79417608300001,
+        "endSeconds": 28.787098957999987,
+        "dispatchLagSeconds": 0.0008427496666740808,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9937656246666506,
+        "serviceLatencySeconds": 0.9929228749999766,
+        "inflightAtAdmission": 19
+      },
+      {
+        "index": 4170,
+        "intendedSeconds": 27.799999999999997,
+        "startSeconds": 27.80191595800001,
+        "endSeconds": 28.789938375000006,
+        "dispatchLagSeconds": 0.0019159580000120968,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9899383750000084,
+        "serviceLatencySeconds": 0.9880224169999963,
+        "inflightAtAdmission": 20
+      },
+      {
+        "index": 4171,
+        "intendedSeconds": 27.806666666666658,
+        "startSeconds": 27.807972541000012,
+        "endSeconds": 28.79532587499999,
+        "dispatchLagSeconds": 0.0013058743333544953,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9886592083333312,
+        "serviceLatencySeconds": 0.9873533339999767,
+        "inflightAtAdmission": 21
+      },
+      {
+        "index": 4172,
+        "intendedSeconds": 27.81333333333332,
+        "startSeconds": 27.817806000000004,
+        "endSeconds": 28.797275375000012,
+        "dispatchLagSeconds": 0.004472666666686109,
+        "result": "ok",
+        "offeredLatencySeconds": 0.983942041666694,
+        "serviceLatencySeconds": 0.9794693750000079,
+        "inflightAtAdmission": 21
+      },
+      {
+        "index": 4173,
+        "intendedSeconds": 27.820000000000007,
+        "startSeconds": 27.823770208,
+        "endSeconds": 28.804654500000012,
+        "dispatchLagSeconds": 0.003770207999991726,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9846545000000049,
+        "serviceLatencySeconds": 0.9808842920000131,
+        "inflightAtAdmission": 21
+      },
+      {
+        "index": 4174,
+        "intendedSeconds": 27.826666666666668,
+        "startSeconds": 27.83352808299999,
+        "endSeconds": 28.806567541000007,
+        "dispatchLagSeconds": 0.006861416333322268,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9799008743333388,
+        "serviceLatencySeconds": 0.9730394580000166,
+        "inflightAtAdmission": 22
+      },
+      {
+        "index": 4175,
+        "intendedSeconds": 27.83333333333333,
+        "startSeconds": 27.840601957999993,
+        "endSeconds": 28.816070915999987,
+        "dispatchLagSeconds": 0.007268624666664891,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9827375826666582,
+        "serviceLatencySeconds": 0.9754689579999933,
+        "inflightAtAdmission": 23
+      },
+      {
+        "index": 4176,
+        "intendedSeconds": 27.83999999999999,
+        "startSeconds": 27.84112658299999,
+        "endSeconds": 28.816654750000012,
+        "dispatchLagSeconds": 0.0011265830000013466,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9766547500000229,
+        "serviceLatencySeconds": 0.9755281670000215,
+        "inflightAtAdmission": 24
+      },
+      {
+        "index": 4177,
+        "intendedSeconds": 27.84666666666668,
+        "startSeconds": 27.872266833000012,
+        "endSeconds": 28.822617499999993,
+        "dispatchLagSeconds": 0.025600166333333618,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9759508333333144,
+        "serviceLatencySeconds": 0.9503506669999808,
+        "inflightAtAdmission": 25
+      },
+      {
+        "index": 4178,
+        "intendedSeconds": 27.85333333333334,
+        "startSeconds": 27.87309649999999,
+        "endSeconds": 28.823448,
+        "dispatchLagSeconds": 0.019763166666649568,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9701146666666602,
+        "serviceLatencySeconds": 0.9503515000000107,
+        "inflightAtAdmission": 25
+      },
+      {
+        "index": 4179,
+        "intendedSeconds": 27.86,
+        "startSeconds": 27.873272916000005,
+        "endSeconds": 28.829272375000002,
+        "dispatchLagSeconds": 0.013272916000005353,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9692723750000027,
+        "serviceLatencySeconds": 0.9559994589999974,
+        "inflightAtAdmission": 26
+      },
+      {
+        "index": 4180,
+        "intendedSeconds": 27.86666666666666,
+        "startSeconds": 27.873382957999993,
+        "endSeconds": 28.831607000000005,
+        "dispatchLagSeconds": 0.006716291333333402,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9649403333333453,
+        "serviceLatencySeconds": 0.9582240420000119,
+        "inflightAtAdmission": 26
+      },
+      {
+        "index": 4181,
+        "intendedSeconds": 27.87333333333332,
+        "startSeconds": 27.873652541,
+        "endSeconds": 28.836551333000003,
+        "dispatchLagSeconds": 0.0003192076666778121,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9632179996666821,
+        "serviceLatencySeconds": 0.9628987920000043,
+        "inflightAtAdmission": 27
+      },
+      {
+        "index": 4182,
+        "intendedSeconds": 27.88000000000001,
+        "startSeconds": 28.034888415999987,
+        "endSeconds": 28.837502165999993,
+        "dispatchLagSeconds": 0.15488841599997727,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9575021659999834,
+        "serviceLatencySeconds": 0.8026137500000061,
+        "inflightAtAdmission": 28
+      },
+      {
+        "index": 4183,
+        "intendedSeconds": 27.88666666666667,
+        "startSeconds": 28.199502291,
+        "endSeconds": 28.842681041000006,
+        "dispatchLagSeconds": 0.31283562433333145,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9560143743333356,
+        "serviceLatencySeconds": 0.6431787500000041,
+        "inflightAtAdmission": 29
+      },
+      {
+        "index": 4184,
+        "intendedSeconds": 27.89333333333333,
+        "startSeconds": 28.19982237500001,
+        "endSeconds": 28.84358433300001,
+        "dispatchLagSeconds": 0.3064890416666799,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9502509996666788,
+        "serviceLatencySeconds": 0.6437619579999989,
+        "inflightAtAdmission": 30
+      },
+      {
+        "index": 4185,
+        "intendedSeconds": 27.89999999999999,
+        "startSeconds": 28.260911916000012,
+        "endSeconds": 28.850829999999988,
+        "dispatchLagSeconds": 0.3609119160000205,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9508299999999963,
+        "serviceLatencySeconds": 0.5899180839999758,
+        "inflightAtAdmission": 31
+      },
+      {
+        "index": 4186,
+        "intendedSeconds": 27.90666666666668,
+        "startSeconds": 28.625506625,
+        "endSeconds": 28.851601874999986,
+        "dispatchLagSeconds": 0.7188399583333194,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9449352083333054,
+        "serviceLatencySeconds": 0.22609524999998598,
+        "inflightAtAdmission": 32
+      },
+      {
+        "index": 4187,
+        "intendedSeconds": 27.91333333333334,
+        "startSeconds": 28.673193958,
+        "endSeconds": 28.856717665999994,
+        "dispatchLagSeconds": 0.7598606246666577,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9433843326666533,
+        "serviceLatencySeconds": 0.18352370799999562,
+        "inflightAtAdmission": 33
+      },
+      {
+        "index": 4188,
+        "intendedSeconds": 27.92,
+        "startSeconds": 28.673587041000005,
+        "endSeconds": 28.85759825000001,
+        "dispatchLagSeconds": 0.753587041000003,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9375982500000077,
+        "serviceLatencySeconds": 0.18401120900000478,
+        "inflightAtAdmission": 34
+      },
+      {
+        "index": 4189,
+        "intendedSeconds": 27.926666666666662,
+        "startSeconds": 28.688937832999997,
+        "endSeconds": 28.865094458,
+        "dispatchLagSeconds": 0.7622711663333348,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9384277913333392,
+        "serviceLatencySeconds": 0.1761566250000044,
+        "inflightAtAdmission": 34
+      },
+      {
+        "index": 4190,
+        "intendedSeconds": 27.933333333333323,
+        "startSeconds": 28.689771040999986,
+        "endSeconds": 28.865841040999996,
+        "dispatchLagSeconds": 0.7564377076666631,
+        "result": "ok",
+        "offeredLatencySeconds": 0.932507707666673,
+        "serviceLatencySeconds": 0.17607000000000994,
+        "inflightAtAdmission": 35
+      },
+      {
+        "index": 4191,
+        "intendedSeconds": 27.940000000000012,
+        "startSeconds": 28.690552915999987,
+        "endSeconds": 28.870447707999986,
+        "dispatchLagSeconds": 0.7505529159999753,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9304477079999742,
+        "serviceLatencySeconds": 0.17989479199999892,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 4192,
+        "intendedSeconds": 27.946666666666673,
+        "startSeconds": 28.691356957999986,
+        "endSeconds": 28.87157041600001,
+        "dispatchLagSeconds": 0.7446902913333133,
+        "result": "ok",
+        "offeredLatencySeconds": 0.924903749333339,
+        "serviceLatencySeconds": 0.18021345800002564,
+        "inflightAtAdmission": 34
+      },
+      {
+        "index": 4193,
+        "intendedSeconds": 27.953333333333333,
+        "startSeconds": 28.692244916000007,
+        "endSeconds": 28.876339958000003,
+        "dispatchLagSeconds": 0.7389115826666739,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9230066246666695,
+        "serviceLatencySeconds": 0.1840950419999956,
+        "inflightAtAdmission": 35
+      },
+      {
+        "index": 4194,
+        "intendedSeconds": 27.959999999999994,
+        "startSeconds": 28.69305687500001,
+        "endSeconds": 28.87737187500001,
+        "dispatchLagSeconds": 0.7330568750000168,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9173718750000148,
+        "serviceLatencySeconds": 0.184314999999998,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 4195,
+        "intendedSeconds": 27.966666666666654,
+        "startSeconds": 28.694052541000005,
+        "endSeconds": 28.883434874999992,
+        "dispatchLagSeconds": 0.7273858743333506,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9167682083333375,
+        "serviceLatencySeconds": 0.18938233399998694,
+        "inflightAtAdmission": 37
+      },
+      {
+        "index": 4196,
+        "intendedSeconds": 27.973333333333343,
+        "startSeconds": 28.69436016600001,
+        "endSeconds": 28.884180290999993,
+        "dispatchLagSeconds": 0.7210268326666665,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9108469576666494,
+        "serviceLatencySeconds": 0.1898201249999829,
+        "inflightAtAdmission": 35
+      },
+      {
+        "index": 4197,
+        "intendedSeconds": 27.980000000000004,
+        "startSeconds": 28.694534125000004,
+        "endSeconds": 28.888611541000003,
+        "dispatchLagSeconds": 0.7145341250000001,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9086115409999991,
+        "serviceLatencySeconds": 0.19407741599999895,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 4198,
+        "intendedSeconds": 27.986666666666665,
+        "startSeconds": 28.697529999999986,
+        "endSeconds": 28.889587958000007,
+        "dispatchLagSeconds": 0.7108633333333216,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9029212913333424,
+        "serviceLatencySeconds": 0.1920579580000208,
+        "inflightAtAdmission": 35
+      },
+      {
+        "index": 4199,
+        "intendedSeconds": 27.993333333333325,
+        "startSeconds": 28.698988375000013,
+        "endSeconds": 28.895078166000005,
+        "dispatchLagSeconds": 0.705655041666688,
+        "result": "ok",
+        "offeredLatencySeconds": 0.9017448326666795,
+        "serviceLatencySeconds": 0.19608979099999146,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 4200,
+        "intendedSeconds": 27.999999999999986,
+        "startSeconds": 28.699277541,
+        "endSeconds": 28.896756749999994,
+        "dispatchLagSeconds": 0.6992775410000149,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8967567500000087,
+        "serviceLatencySeconds": 0.19747920899999372,
+        "inflightAtAdmission": 36
+      },
+      {
+        "index": 4201,
+        "intendedSeconds": 28.006666666666675,
+        "startSeconds": 28.69952154100001,
+        "endSeconds": 28.901354124999997,
+        "dispatchLagSeconds": 0.6928548743333351,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8946874583333226,
+        "serviceLatencySeconds": 0.2018325839999875,
+        "inflightAtAdmission": 37
+      },
+      {
+        "index": 4202,
+        "intendedSeconds": 28.013333333333335,
+        "startSeconds": 28.699926999999988,
+        "endSeconds": 28.902099790999998,
+        "dispatchLagSeconds": 0.6865936666666528,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8887664576666623,
+        "serviceLatencySeconds": 0.2021727910000095,
+        "inflightAtAdmission": 38
+      },
+      {
+        "index": 4203,
+        "intendedSeconds": 28.019999999999996,
+        "startSeconds": 28.700867790999993,
+        "endSeconds": 28.907074666000014,
+        "dispatchLagSeconds": 0.6808677909999972,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8870746660000179,
+        "serviceLatencySeconds": 0.20620687500002077,
+        "inflightAtAdmission": 39
+      },
+      {
+        "index": 4204,
+        "intendedSeconds": 28.026666666666657,
+        "startSeconds": 28.701331708000012,
+        "endSeconds": 28.90764204099999,
+        "dispatchLagSeconds": 0.6746650413333555,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8809753743333317,
+        "serviceLatencySeconds": 0.20631033299997625,
+        "inflightAtAdmission": 40
+      },
+      {
+        "index": 4205,
+        "intendedSeconds": 28.033333333333346,
+        "startSeconds": 28.70150658300001,
+        "endSeconds": 28.91467754099999,
+        "dispatchLagSeconds": 0.6681732496666655,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8813442076666433,
+        "serviceLatencySeconds": 0.21317095799997787,
+        "inflightAtAdmission": 41
+      },
+      {
+        "index": 4206,
+        "intendedSeconds": 28.040000000000006,
+        "startSeconds": 28.70170816599999,
+        "endSeconds": 28.915468375000003,
+        "dispatchLagSeconds": 0.6617081659999826,
+        "result": "ok",
+        "offeredLatencySeconds": 0.875468374999997,
+        "serviceLatencySeconds": 0.21376020900001436,
+        "inflightAtAdmission": 42
+      },
+      {
+        "index": 4207,
+        "intendedSeconds": 28.046666666666667,
+        "startSeconds": 28.702413625000005,
+        "endSeconds": 28.919998207999996,
+        "dispatchLagSeconds": 0.6557469583333386,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8733315413333287,
+        "serviceLatencySeconds": 0.21758458299999006,
+        "inflightAtAdmission": 43
+      },
+      {
+        "index": 4208,
+        "intendedSeconds": 28.053333333333327,
+        "startSeconds": 28.702855541000005,
+        "endSeconds": 28.920752000000007,
+        "dispatchLagSeconds": 0.6495222076666778,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8674186666666799,
+        "serviceLatencySeconds": 0.2178964590000021,
+        "inflightAtAdmission": 44
+      },
+      {
+        "index": 4209,
+        "intendedSeconds": 28.059999999999988,
+        "startSeconds": 28.70313129099999,
+        "endSeconds": 28.92542829099999,
+        "dispatchLagSeconds": 0.6431312910000031,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8654282910000006,
+        "serviceLatencySeconds": 0.22229699999999752,
+        "inflightAtAdmission": 45
+      },
+      {
+        "index": 4210,
+        "intendedSeconds": 28.066666666666677,
+        "startSeconds": 28.703278583,
+        "endSeconds": 28.926198208000002,
+        "dispatchLagSeconds": 0.6366119163333224,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8595315413333253,
+        "serviceLatencySeconds": 0.22291962500000295,
+        "inflightAtAdmission": 46
+      },
+      {
+        "index": 4211,
+        "intendedSeconds": 28.073333333333338,
+        "startSeconds": 28.703418125,
+        "endSeconds": 28.932657708000008,
+        "dispatchLagSeconds": 0.6300847916666612,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8593243746666701,
+        "serviceLatencySeconds": 0.2292395830000089,
+        "inflightAtAdmission": 47
+      },
+      {
+        "index": 4212,
+        "intendedSeconds": 28.08,
+        "startSeconds": 28.703546040999996,
+        "endSeconds": 28.933419333000003,
+        "dispatchLagSeconds": 0.6235460409999973,
+        "result": "ok",
+        "offeredLatencySeconds": 0.853419333000005,
+        "serviceLatencySeconds": 0.22987329200000772,
+        "inflightAtAdmission": 48
+      },
+      {
+        "index": 4213,
+        "intendedSeconds": 28.08666666666666,
+        "startSeconds": 28.70477341600001,
+        "endSeconds": 28.93768337499999,
+        "dispatchLagSeconds": 0.6181067493333501,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8510167083333329,
+        "serviceLatencySeconds": 0.2329099589999828,
+        "inflightAtAdmission": 49
+      },
+      {
+        "index": 4214,
+        "intendedSeconds": 28.093333333333348,
+        "startSeconds": 28.705089374999986,
+        "endSeconds": 28.938501499999987,
+        "dispatchLagSeconds": 0.6117560416666379,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8451681666666389,
+        "serviceLatencySeconds": 0.23341212500000097,
+        "inflightAtAdmission": 50
+      },
+      {
+        "index": 4215,
+        "intendedSeconds": 28.10000000000001,
+        "startSeconds": 28.705308165999995,
+        "endSeconds": 28.943000166000004,
+        "dispatchLagSeconds": 0.6053081659999862,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8430001659999959,
+        "serviceLatencySeconds": 0.23769200000000978,
+        "inflightAtAdmission": 51
+      },
+      {
+        "index": 4216,
+        "intendedSeconds": 28.10666666666667,
+        "startSeconds": 28.705469291,
+        "endSeconds": 28.944367041000007,
+        "dispatchLagSeconds": 0.5988026243333309,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8377003743333375,
+        "serviceLatencySeconds": 0.23889775000000668,
+        "inflightAtAdmission": 52
+      },
+      {
+        "index": 4217,
+        "intendedSeconds": 28.11333333333333,
+        "startSeconds": 28.705896665999987,
+        "endSeconds": 28.95061916600001,
+        "dispatchLagSeconds": 0.5925633326666571,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8372858326666801,
+        "serviceLatencySeconds": 0.24472250000002305,
+        "inflightAtAdmission": 53
+      },
+      {
+        "index": 4218,
+        "intendedSeconds": 28.11999999999999,
+        "startSeconds": 28.70608137500001,
+        "endSeconds": 28.951382374999994,
+        "dispatchLagSeconds": 0.5860813750000204,
+        "result": "ok",
+        "offeredLatencySeconds": 0.831382375000004,
+        "serviceLatencySeconds": 0.24530099999998356,
+        "inflightAtAdmission": 54
+      },
+      {
+        "index": 4219,
+        "intendedSeconds": 28.12666666666665,
+        "startSeconds": 28.70644608299999,
+        "endSeconds": 28.95632716600001,
+        "dispatchLagSeconds": 0.5797794163333378,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8296604993333574,
+        "serviceLatencySeconds": 0.24988108300001954,
+        "inflightAtAdmission": 55
+      },
+      {
+        "index": 4220,
+        "intendedSeconds": 28.13333333333334,
+        "startSeconds": 28.70660258299999,
+        "endSeconds": 28.957197375000007,
+        "dispatchLagSeconds": 0.5732692496666516,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8238640416666669,
+        "serviceLatencySeconds": 0.25059479200001533,
+        "inflightAtAdmission": 56
+      },
+      {
+        "index": 4221,
+        "intendedSeconds": 28.14,
+        "startSeconds": 28.70674345799999,
+        "endSeconds": 28.963679749999997,
+        "dispatchLagSeconds": 0.5667434579999906,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8236797499999966,
+        "serviceLatencySeconds": 0.256936292000006,
+        "inflightAtAdmission": 56
+      },
+      {
+        "index": 4222,
+        "intendedSeconds": 28.14666666666666,
+        "startSeconds": 28.70714254100001,
+        "endSeconds": 28.964449375,
+        "dispatchLagSeconds": 0.5604758743333491,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8177827083333398,
+        "serviceLatencySeconds": 0.25730683399999066,
+        "inflightAtAdmission": 57
+      },
+      {
+        "index": 4223,
+        "intendedSeconds": 28.15333333333332,
+        "startSeconds": 28.707502458000008,
+        "endSeconds": 28.96865637500001,
+        "dispatchLagSeconds": 0.5541691246666858,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8153230416666872,
+        "serviceLatencySeconds": 0.26115391700000146,
+        "inflightAtAdmission": 58
+      },
+      {
+        "index": 4224,
+        "intendedSeconds": 28.16000000000001,
+        "startSeconds": 28.71385254100001,
+        "endSeconds": 28.969408374999986,
+        "dispatchLagSeconds": 0.5538525409999977,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8094083749999754,
+        "serviceLatencySeconds": 0.2555558339999777,
+        "inflightAtAdmission": 59
+      },
+      {
+        "index": 4225,
+        "intendedSeconds": 28.16666666666667,
+        "startSeconds": 28.714257458000006,
+        "endSeconds": 28.97403041599999,
+        "dispatchLagSeconds": 0.5475907913333344,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8073637493333194,
+        "serviceLatencySeconds": 0.259772957999985,
+        "inflightAtAdmission": 60
+      },
+      {
+        "index": 4226,
+        "intendedSeconds": 28.173333333333332,
+        "startSeconds": 28.769100499999993,
+        "endSeconds": 28.97480370800001,
+        "dispatchLagSeconds": 0.5957671666666613,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8014703746666783,
+        "serviceLatencySeconds": 0.20570320800001696,
+        "inflightAtAdmission": 61
+      },
+      {
+        "index": 4227,
+        "intendedSeconds": 28.179999999999993,
+        "startSeconds": 28.770657000000014,
+        "endSeconds": 28.98095124999999,
+        "dispatchLagSeconds": 0.5906570000000215,
+        "result": "ok",
+        "offeredLatencySeconds": 0.8009512499999971,
+        "serviceLatencySeconds": 0.2102942499999756,
+        "inflightAtAdmission": 62
+      },
+      {
+        "index": 4228,
+        "intendedSeconds": 28.186666666666653,
+        "startSeconds": 28.771833540999992,
+        "endSeconds": 28.98174645799999,
+        "dispatchLagSeconds": 0.5851668743333391,
+        "result": "ok",
+        "offeredLatencySeconds": 0.7950797913333361,
+        "serviceLatencySeconds": 0.20991291699999692,
+        "inflightAtAdmission": 62
+      },
+      {
+        "index": 4229,
+        "intendedSeconds": 28.193333333333342,
+        "startSeconds": 28.772144124999997,
+        "endSeconds": 28.98632208299999,
+        "dispatchLagSeconds": 0.5788107916666547,
+        "result": "ok",
+        "offeredLatencySeconds": 0.7929887496666481,
+        "serviceLatencySeconds": 0.2141779579999934,
+        "inflightAtAdmission": 63
+      },
+      {
+        "index": 4230,
+        "intendedSeconds": 28.200000000000003,
+        "startSeconds": 28.772635375000007,
+        "endSeconds": 28.987237041,
+        "dispatchLagSeconds": 0.5726353750000044,
+        "result": "ok",
+        "offeredLatencySeconds": 0.7872370409999974,
+        "serviceLatencySeconds": 0.21460166599999297,
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4231,
+        "intendedSeconds": 28.206666666666663,
+        "dispatchLagSeconds": 0.5659809163333307,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4232,
+        "intendedSeconds": 28.213333333333324,
+        "dispatchLagSeconds": 0.5594430416666683,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4233,
+        "intendedSeconds": 28.220000000000013,
+        "dispatchLagSeconds": 0.5528683749999743,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4234,
+        "intendedSeconds": 28.226666666666674,
+        "dispatchLagSeconds": 0.5462914163333323,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4235,
+        "intendedSeconds": 28.233333333333334,
+        "dispatchLagSeconds": 0.5421219576666658,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4236,
+        "intendedSeconds": 28.239999999999995,
+        "startSeconds": 28.78034504099999,
+        "endSeconds": 28.99166883299999,
+        "dispatchLagSeconds": 0.5403450409999948,
+        "result": "ok",
+        "offeredLatencySeconds": 0.7516688329999965,
+        "serviceLatencySeconds": 0.21132379200000173,
+        "inflightAtAdmission": 63
+      },
+      {
+        "index": 4237,
+        "intendedSeconds": 28.246666666666655,
+        "startSeconds": 28.782257916000006,
+        "endSeconds": 28.992466499999992,
+        "dispatchLagSeconds": 0.5355912493333506,
+        "result": "ok",
+        "offeredLatencySeconds": 0.7457998333333364,
+        "serviceLatencySeconds": 0.21020858399998588,
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4238,
+        "intendedSeconds": 28.253333333333345,
+        "dispatchLagSeconds": 0.5289499166666474,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4239,
+        "intendedSeconds": 28.260000000000005,
+        "dispatchLagSeconds": 0.5223647079999978,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4240,
+        "intendedSeconds": 28.266666666666666,
+        "dispatchLagSeconds": 0.5157158333333314,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      }
+    ],
+    "misses": [
+      {
+        "index": 4231,
+        "intendedSeconds": 28.206666666666663,
+        "dispatchLagSeconds": 0.5659809163333307,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4232,
+        "intendedSeconds": 28.213333333333324,
+        "dispatchLagSeconds": 0.5594430416666683,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4233,
+        "intendedSeconds": 28.220000000000013,
+        "dispatchLagSeconds": 0.5528683749999743,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4234,
+        "intendedSeconds": 28.226666666666674,
+        "dispatchLagSeconds": 0.5462914163333323,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4235,
+        "intendedSeconds": 28.233333333333334,
+        "dispatchLagSeconds": 0.5421219576666658,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4238,
+        "intendedSeconds": 28.253333333333345,
+        "dispatchLagSeconds": 0.5289499166666474,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4239,
+        "intendedSeconds": 28.260000000000005,
+        "dispatchLagSeconds": 0.5223647079999978,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4240,
+        "intendedSeconds": 28.266666666666666,
+        "dispatchLagSeconds": 0.5157158333333314,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4241,
+        "intendedSeconds": 28.273333333333326,
+        "dispatchLagSeconds": 0.5091143326666838,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4242,
+        "intendedSeconds": 28.280000000000015,
+        "dispatchLagSeconds": 0.5025289159999886,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4243,
+        "intendedSeconds": 28.286666666666676,
+        "dispatchLagSeconds": 0.4959646663333217,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4244,
+        "intendedSeconds": 28.293333333333337,
+        "dispatchLagSeconds": 0.4895974996666723,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4245,
+        "intendedSeconds": 28.299999999999997,
+        "dispatchLagSeconds": 0.48295787500001097,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4246,
+        "intendedSeconds": 28.306666666666658,
+        "dispatchLagSeconds": 0.47792195833335427,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4247,
+        "intendedSeconds": 28.31333333333332,
+        "dispatchLagSeconds": 0.47128954166669246,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4248,
+        "intendedSeconds": 28.320000000000007,
+        "dispatchLagSeconds": 0.46476375000000303,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4249,
+        "intendedSeconds": 28.326666666666668,
+        "dispatchLagSeconds": 0.45822583333333,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4250,
+        "intendedSeconds": 28.33333333333333,
+        "dispatchLagSeconds": 0.45204237466666086,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4251,
+        "intendedSeconds": 28.33999999999999,
+        "dispatchLagSeconds": 0.44539037500001655,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4252,
+        "intendedSeconds": 28.34666666666668,
+        "dispatchLagSeconds": 0.43900433333331534,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4253,
+        "intendedSeconds": 28.35333333333334,
+        "dispatchLagSeconds": 0.43246479166666063,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4254,
+        "intendedSeconds": 28.36,
+        "dispatchLagSeconds": 0.4258687079999959,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4255,
+        "intendedSeconds": 28.36666666666666,
+        "dispatchLagSeconds": 0.42007016633334615,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4256,
+        "intendedSeconds": 28.37333333333332,
+        "dispatchLagSeconds": 0.4137382916666752,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4257,
+        "intendedSeconds": 28.38000000000001,
+        "dispatchLagSeconds": 0.4071790829999884,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4259,
+        "intendedSeconds": 28.39333333333333,
+        "dispatchLagSeconds": 0.39427612466667483,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4260,
+        "intendedSeconds": 28.39999999999999,
+        "dispatchLagSeconds": 0.3895440830000041,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4261,
+        "intendedSeconds": 28.40666666666668,
+        "dispatchLagSeconds": 0.3829268333333289,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4262,
+        "intendedSeconds": 28.41333333333334,
+        "dispatchLagSeconds": 0.3763502916666539,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4263,
+        "intendedSeconds": 28.42,
+        "dispatchLagSeconds": 0.3697832080000012,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4264,
+        "intendedSeconds": 28.426666666666662,
+        "dispatchLagSeconds": 0.36315449933334776,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4265,
+        "intendedSeconds": 28.433333333333323,
+        "dispatchLagSeconds": 0.3565611666666655,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4266,
+        "intendedSeconds": 28.440000000000012,
+        "dispatchLagSeconds": 0.34993287499997905,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4267,
+        "intendedSeconds": 28.446666666666673,
+        "dispatchLagSeconds": 0.3432919583333387,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4269,
+        "intendedSeconds": 28.459999999999994,
+        "dispatchLagSeconds": 0.33002266600001917,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4270,
+        "intendedSeconds": 28.466666666666654,
+        "dispatchLagSeconds": 0.3235091663333378,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4271,
+        "intendedSeconds": 28.473333333333343,
+        "dispatchLagSeconds": 0.3168619996666564,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4272,
+        "intendedSeconds": 28.480000000000004,
+        "dispatchLagSeconds": 0.3102127909999979,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4273,
+        "intendedSeconds": 28.486666666666665,
+        "dispatchLagSeconds": 0.3035578333333433,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4274,
+        "intendedSeconds": 28.493333333333325,
+        "dispatchLagSeconds": 0.2969400826666799,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4275,
+        "intendedSeconds": 28.499999999999986,
+        "dispatchLagSeconds": 0.29031350000002476,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4276,
+        "intendedSeconds": 28.506666666666675,
+        "dispatchLagSeconds": 0.2837376243333267,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4277,
+        "intendedSeconds": 28.513333333333335,
+        "dispatchLagSeconds": 0.27716595766665364,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4278,
+        "intendedSeconds": 28.519999999999996,
+        "dispatchLagSeconds": 0.2705229999999972,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4279,
+        "intendedSeconds": 28.526666666666657,
+        "dispatchLagSeconds": 0.2638742913333374,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4280,
+        "intendedSeconds": 28.533333333333346,
+        "dispatchLagSeconds": 0.2572454996666522,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4281,
+        "intendedSeconds": 28.540000000000006,
+        "dispatchLagSeconds": 0.2506287079999936,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4282,
+        "intendedSeconds": 28.546666666666667,
+        "dispatchLagSeconds": 0.2439828333333196,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4283,
+        "intendedSeconds": 28.553333333333327,
+        "dispatchLagSeconds": 0.23733212466666487,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4284,
+        "intendedSeconds": 28.559999999999988,
+        "dispatchLagSeconds": 0.2306812500000035,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4285,
+        "intendedSeconds": 28.566666666666677,
+        "dispatchLagSeconds": 0.22403154133331782,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4286,
+        "intendedSeconds": 28.573333333333338,
+        "dispatchLagSeconds": 0.2173820416666672,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4287,
+        "intendedSeconds": 28.58,
+        "dispatchLagSeconds": 0.21073187499999335,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4288,
+        "intendedSeconds": 28.58666666666666,
+        "dispatchLagSeconds": 0.20408124933334193,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4289,
+        "intendedSeconds": 28.593333333333348,
+        "dispatchLagSeconds": 0.19743116666666083,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4290,
+        "intendedSeconds": 28.60000000000001,
+        "dispatchLagSeconds": 0.19077991599999677,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4291,
+        "intendedSeconds": 28.60666666666667,
+        "dispatchLagSeconds": 0.18413020833332894,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4292,
+        "intendedSeconds": 28.61333333333333,
+        "dispatchLagSeconds": 0.177480166666669,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4293,
+        "intendedSeconds": 28.61999999999999,
+        "dispatchLagSeconds": 0.17082941600000368,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4294,
+        "intendedSeconds": 28.62666666666665,
+        "dispatchLagSeconds": 0.16417924933335826,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4295,
+        "intendedSeconds": 28.63333333333334,
+        "dispatchLagSeconds": 0.15752912466666658,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4296,
+        "intendedSeconds": 28.64,
+        "dispatchLagSeconds": 0.15087870799999337,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4297,
+        "intendedSeconds": 28.64666666666666,
+        "dispatchLagSeconds": 0.14422908333332884,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4298,
+        "intendedSeconds": 28.65333333333332,
+        "dispatchLagSeconds": 0.13757983266668816,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4299,
+        "intendedSeconds": 28.66000000000001,
+        "dispatchLagSeconds": 0.13092845799999964,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4300,
+        "intendedSeconds": 28.66666666666667,
+        "dispatchLagSeconds": 0.12427712433333227,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4301,
+        "intendedSeconds": 28.673333333333332,
+        "dispatchLagSeconds": 0.11762658266667358,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4302,
+        "intendedSeconds": 28.679999999999993,
+        "dispatchLagSeconds": 0.11097687500000575,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4303,
+        "intendedSeconds": 28.686666666666653,
+        "dispatchLagSeconds": 0.10432737433333727,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4304,
+        "intendedSeconds": 28.693333333333342,
+        "dispatchLagSeconds": 0.09768429166666692,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4305,
+        "intendedSeconds": 28.700000000000003,
+        "dispatchLagSeconds": 0.09105170800000906,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4306,
+        "intendedSeconds": 28.706666666666663,
+        "dispatchLagSeconds": 0.08442379133333588,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4307,
+        "intendedSeconds": 28.713333333333324,
+        "dispatchLagSeconds": 0.07778812466668228,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4308,
+        "intendedSeconds": 28.720000000000013,
+        "dispatchLagSeconds": 0.07114116599998965,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4309,
+        "intendedSeconds": 28.726666666666674,
+        "dispatchLagSeconds": 0.0644910413333264,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4310,
+        "intendedSeconds": 28.733333333333334,
+        "dispatchLagSeconds": 0.057851332666672306,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4311,
+        "intendedSeconds": 28.739999999999995,
+        "dispatchLagSeconds": 0.05120404100000542,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4312,
+        "intendedSeconds": 28.746666666666655,
+        "dispatchLagSeconds": 0.04455499933334295,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4313,
+        "intendedSeconds": 28.753333333333345,
+        "dispatchLagSeconds": 0.03790579166664543,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4314,
+        "intendedSeconds": 28.760000000000005,
+        "dispatchLagSeconds": 0.03125604100000601,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4315,
+        "intendedSeconds": 28.766666666666666,
+        "dispatchLagSeconds": 0.02460537433333343,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4316,
+        "intendedSeconds": 28.773333333333326,
+        "dispatchLagSeconds": 0.01795462466668596,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4317,
+        "intendedSeconds": 28.780000000000015,
+        "dispatchLagSeconds": 0.011305457999981172,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4318,
+        "intendedSeconds": 28.786666666666676,
+        "dispatchLagSeconds": 0.004659833333334973,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      },
+      {
+        "index": 4319,
+        "intendedSeconds": 28.793333333333337,
+        "dispatchLagSeconds": 0.0006426666666641268,
+        "result": "generator_inflight_limit",
+        "inflightAtAdmission": 64
+      }
+    ]
+  }
+]

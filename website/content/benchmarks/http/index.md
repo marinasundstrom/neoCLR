@@ -83,3 +83,12 @@ Development `Serve(handler)` now owns bounded concurrent dispatch and handler
 completion. Its [matched load comparison](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve)
 uses the same asynchronous handler and shutdown control as application-managed
 `ServeOne` loops, retaining overload misses and latency alongside throughput.
+
+## Development Serve sustained-load follow-up
+
+After reducing concurrent desktop activity, the connection-close Serve fixture
+passes two 120-second trials at 400 offered requests/sec with experimental paced
+GC: all 96,000 responses validate, with p99 latency 115.8/98.6 ms. A 500/sec check
+saturates one CPU core and loses 2,606 of 15,000 arrivals at the client admission
+limit. These are local tested points, not default-GC or production capacity claims.
+[Profiles, noisy counterexamples and full measurement contract](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/capacity-20261018).
