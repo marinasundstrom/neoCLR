@@ -1,3 +1,7 @@
+> Historical validation: Sliceable was removed on 2026-10-19 when Array ranges
+> migrated to borrowed Slice<T>. This fixture targets the former copy-based API;
+> use ../memory-views-20261019 for the current foundation.
+
 # Nominal slicing qualification — 2026-10-15
 
 Development implementation on neoCLR main, paired with Raven codex/neoclr

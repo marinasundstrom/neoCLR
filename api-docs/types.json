@@ -332,7 +332,6 @@
   "System.Security.Cryptography.RandomNumberGenerator",
   "System.Security.Cryptography.SHA256",
   "System.Single",
-  "System.Sliceable`1",
   "System.Storage.Directory",
   "System.Storage.EntryKind",
   "System.Storage.File",

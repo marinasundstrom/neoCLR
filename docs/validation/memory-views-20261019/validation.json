@@ -1,0 +1,89 @@
+{
+  "scope": "Raven slice foundation, interpreter only",
+  "compilerRevision": "d3519e49b",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "docs/validation/memory-views-20261019/Consumer.rvnproj"
+      ],
+      "exitCode": 0,
+      "output": "Native build output: /Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/bin/neoclr/SliceConsumer.dll\n"
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "docs/validation/memory-views-20261019/bin/neoclr/SliceConsumer.dll",
+        "--module",
+        "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--object-root",
+        "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--system",
+        "target/memory-view-System.neoil",
+        "--execution",
+        "interpreter",
+        "--show-result"
+      ],
+      "exitCode": 0,
+      "output": "=> Int32(0)\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--native-core-reference",
+        "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--library",
+        "-o",
+        "target/reject-field-final.dll",
+        "docs/validation/memory-views-20261019/reject-field.rvn"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/reject-field.rvn(2,39): error RAV2811: Ref-like type 'Slice<int>' cannot be used as a field of non-ref-like type 'Bad'\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--native-core-reference",
+        "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--library",
+        "-o",
+        "target/reject-readonly-write-final.dll",
+        "docs/validation/memory-views-20261019/reject-readonly-write.rvn"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/reject-readonly-write.rvn(2,42): error RAV0131: Assignment target must be settable\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--native-core-reference",
+        "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--library",
+        "-o",
+        "target/reject-array-final.dll",
+        "docs/validation/memory-views-20261019/reject-array.rvn"
+      ],
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/reject-array.rvn(2,27): error RAV2812: Ref-like type 'Slice<int>' cannot be used as an array element type\n"
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ec9af30d181c4ec25edb3b033571058ed6250a87f110c251c06adcc1dcf96fd1",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "52e76313569996a11cd40eeee2e2a19665a7f80275fbfbc22871cbbd92f3a843",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "d04e871d789c31ee16e8cfd818a50d33d77afea41401febdba9f5b3a866e9fb3",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "83db7f5e0676f9820445c0a3721d4b107aa253a3c58f2c2c205c9e62308652fe",
+    "target/debug/neoclr": "bd15cb444a8737491df3f0cc49c947dbe06446ece8cdc35f3b55ec50651d387a",
+    "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll": "ef79f020968360894bbff3ad267236579471b00f4b60b4641755a35565f6a6bd",
+    "docs/validation/memory-views-20261019/bin/neoclr/SliceConsumer.dll": "e76cff00c47a8a4a6d1a296865d1f1eb28571bf9bd575c517e7baf5cf188d3f1"
+  }
+}

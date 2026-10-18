@@ -1,0 +1,51 @@
+module System
+
+/// A borrowed writable view of contiguous managed memory. Copies share storage.
+/// This ref struct cannot escape into heap storage or cross suspension.
+public ref struct Slice<T> {
+    /// Borrows an array; no elements are copied.
+    static func implicit(source: T[]) -> Slice<T> => neoCLR.Runtime.ViewCreateSlice<T>(source)
+
+    /// Number of elements in this view.
+    val Length: int => neoCLR.Runtime.ViewLength<T>(self)
+    /// Whether this view has no elements.
+    val IsEmpty: bool => Length == 0
+
+    /// Reads or replaces an element. Invalid indexes fault.
+    var self[index: int]: T {
+        get => neoCLR.Runtime.ViewGet<T>(self, index)
+        set { neoCLR.Runtime.ViewSet<T>(self, index, value) }
+    }
+
+    /// Reads or replaces an element using a start- or end-relative index.
+    var self[index: Index]: T {
+        get => self[index.GetOffset(Length)]
+        set { self[index.GetOffset(Length)] = value }
+    }
+
+    /// Borrows a half-open range without copying.
+    val self[range: Range]: Slice<T> => self.Slice(range)
+    /// Copies this view into a newly owned array.
+    func ToArray() -> T[] {
+        let result = Runtime.CompilerServices.CheckedStorage.Reserve<T>(Length)
+        var index = 0
+        while index < Length {
+            result[index] = self[index]
+            index += 1
+        }
+        return result
+    }
+}
+
+/// Explicit slicing operations for writable views.
+public extension SliceOperations<T> for Slice<T> {
+    /// Borrows a nested window. Invalid bounds fault; elements are not copied.
+    func Slice(start: int, length: int) -> Slice<T> => neoCLR.Runtime.ViewSlice<T>(self, start, length)
+    /// Borrows from start to the end of this view.
+    func Slice(start: int) -> Slice<T> => neoCLR.Runtime.ViewSlice<T>(self, start)
+    /// Borrows a half-open range relative to this view.
+    func Slice(range: Range) -> Slice<T> {
+        let bounds = range.GetOffsetAndLength(self.Length)
+        return self.Slice(bounds.Item1, bounds.Item2)
+    }
+}

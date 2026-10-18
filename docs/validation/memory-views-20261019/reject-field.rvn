@@ -1,0 +1,2 @@
+import System.*
+public class Bad { private var value: Slice<int> }

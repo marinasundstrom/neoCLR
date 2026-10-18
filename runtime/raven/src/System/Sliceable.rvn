@@ -1,9 +1,0 @@
-module System
-
-/// Explicit capability for recoverable collection-relative slicing.
-/// The receiver defines coordinate units and whether the result is a copy or view.
-public interface Sliceable<TSlice> {
-    /// Returns a slice or InvalidRangeError for reversed or out-of-bounds selections.
-    /// Empty ranges at valid boundaries succeed. Invalid bounds are never clamped.
-    func Slice(range: Range) -> Result<TSlice, InvalidRangeError>
-}

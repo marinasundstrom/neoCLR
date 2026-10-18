@@ -24,7 +24,7 @@ Covariant interfaces produce T; contravariant interfaces consume T. Differing
 arguments require supported reference conversions; identical value arguments remain
 valid. Conversions preserve the receiver and do not box elements. String argument/result
 views use the existing representation adaptation described below.
-Concrete classes, mutable collections, array storage, Option/Result and Sliceable
+Concrete classes, mutable collections, array storage, Option/Result
 remain invariant. A class may still expose a wider read-only interface through its
 explicit implementations.
 
@@ -49,7 +49,7 @@ are qualified in Raven interpreter, AOT and managed JIT.
 
 Array arguments may also widen to their declared `Iterable<int>` contract: producer
 and consumer conversions between int[] and `Iterable<int>` preserve array identity
-and support iteration in interpreter/AOT/JIT. Result and Sliceable remain invariant.
+and support iteration in interpreter/AOT/JIT. Result remains invariant. Sliceable was removed with borrowed array views.
 
 String is also a reference argument. `Producer<string>` can widen to `Producer<Object>`
 or Producer<`Iterable<char>`>, and the corresponding consumers narrow to

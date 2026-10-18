@@ -538,7 +538,7 @@ def main():
     guide_paths = {Path(path) for path in re.findall(r'^\s*href: (.+)$', guide_toc, re.M)}
     guide_outputs = []
     structural_reference = {"structural-types.md", "arrays.md", "functions.md",
-                            "tuples.md", "unions.md", "intersections.md"}
+                            "tuples.md", "unions.md", "intersections.md", "memory-views.md"}
     for source, relative in sources:
         template = source.read_text().replace('{{TOUR_OUTPUT}}', output_text).replace('{{ARRAY_OUTPUT}}', array_output)
         markdown = render(template, samples, html=source.suffix == '.html')

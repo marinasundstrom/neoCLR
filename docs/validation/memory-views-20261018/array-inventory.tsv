@@ -1,0 +1,267 @@
+path	line	code
+runtime/raven/src/System/Array.rvn	6	public class Array<T> : Collections.MutableSequence<T>, Sliceable<T[]> {
+runtime/raven/src/System/Array.rvn	8	private field m_value: T[]
+runtime/raven/src/System/Array.rvn	13	static val Empty: T[] {
+runtime/raven/src/System/Array.rvn	14	get => Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Array.rvn	37	func Slice(range: Range) -> Result<T[], InvalidRangeError> {
+runtime/raven/src/System/Array.rvn	45	val self[range: Range]: T[] {
+runtime/raven/src/System/Array.rvn	51	return Array<T>.Empty
+runtime/raven/src/System/Array.rvn	70	private field data: T[]
+runtime/raven/src/System/Array.rvn	73	init(buffer: T[]) {
+runtime/raven/src/System/Collections/ArrayList.rvn	8	public open class ArrayList<T> : List<T>, Sliceable<T[]> {
+runtime/raven/src/System/Collections/ArrayList.rvn	9	private field data: T[]
+runtime/raven/src/System/Collections/ArrayList.rvn	13	data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Collections/ArrayList.rvn	21	data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(capacity)
+runtime/raven/src/System/Collections/ArrayList.rvn	29	data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Collections/ArrayList.rvn	61	val self[range: Range]: T[] {
+runtime/raven/src/System/Collections/ArrayList.rvn	67	return Array<T>.Empty
+runtime/raven/src/System/Collections/ArrayList.rvn	73	func Slice(range: Range) -> Result<T[], InvalidRangeError> {
+runtime/raven/src/System/Collections/ArrayList.rvn	94	buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(capacity)
+runtime/raven/src/System/Collections/ArrayList.rvn	222	private field data: T[]
+runtime/raven/src/System/Collections/ArrayList.rvn	226	init(buffer: T[], extent: int) {
+runtime/raven/src/System/Collections/HashMap.rvn	8	private field buckets: int[]
+runtime/raven/src/System/Collections/HashMap.rvn	166	let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(size)
+runtime/raven/src/System/Collections/HashSet.rvn	10	private var buckets: int[] = [0, 0, 0, 0]
+runtime/raven/src/System/Collections/HashSet.rvn	91	let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(buckets.Length * 2)
+runtime/raven/src/System/Collections/List.rvn	9	val self[range: Range]: T[] { get }
+runtime/raven/src/System/Collections/SequenceAccess.rvn	14	val self[range: Range]: T[] {
+runtime/raven/src/System/Collections/SequenceAccess.rvn	39	func Slice(range: Range) -> Result<T[], InvalidRangeError> {
+runtime/raven/src/System/Collections/SequenceAccess.rvn	44	let result = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(bounds.Item2)
+runtime/raven/src/System/Console/Streams.rvn	15	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Console/Streams.rvn	20	func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Console/Streams.rvn	29	private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+runtime/raven/src/System/Console/Streams.rvn	76	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/Console/Streams.rvn	81	func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/Console/Streams.rvn	90	private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+runtime/raven/src/System/Console/Streams.rvn	118	private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+runtime/raven/src/System/Data/Json/CollectionAdapters.rvn	22	static func SequenceCreate<T>(values: Object[], keys: string[]) -> Object {
+runtime/raven/src/System/Data/Json/CollectionAdapters.rvn	49	static func MapCreate<T>(values: Object[], keys: string[]) -> Object {
+runtime/raven/src/System/Data/Json/CollectionCalls.rvn	21	internal extern func ReflectionCollectionCreate(type: TypeInfo, values: Object[], keys: string[]) -> Object;
+runtime/raven/src/System/Data/Json/ObjectMapper.rvn	205	let items = CheckedStorage.Reserve<Object>(sequence.Count)
+runtime/raven/src/System/Data/Json/ObjectMapper.rvn	214	return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, []))
+runtime/raven/src/System/Data/Json/ObjectMapper.rvn	219	let items = CheckedStorage.Reserve<Object>(map.Count)
+runtime/raven/src/System/Data/Json/ObjectMapper.rvn	220	let keys = CheckedStorage.Reserve<string>(map.Count)
+runtime/raven/src/System/Data/Json/ObjectMapper.rvn	240	let items = CheckedStorage.Reserve<Object>(array.Count)
+runtime/raven/src/System/Data/Sql/SqlMapper.rvn	30	static func Query<T>(connection: SqlConnection, text: string, params parameters: Object?[]) -> Task<Result<Sequence<T>, SqlError>> {
+runtime/raven/src/System/Data/Sql/SqlMapper.rvn	38	static func Query<T>(connection: SqlConnection, text: string, map: (SqlRow) -> Result<T, SqlError>, params parameters: Object?[]) -> Task<Result<Sequence<T>, SqlError>> {
+runtime/raven/src/System/Data/Sql/SqlParameters.rvn	12	static func Create(text: string, parameters: Object?[]) -> Result<SqlStatement, SqlError> {
+runtime/raven/src/System/Environment/Functions.rvn	7	public func GetCommandLineArgs() -> string[] {
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	11	private var source: byte[]
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	18	init(source: byte[]) {
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	53	private func Tree(lengths: int[], count: int, allowEmpty: bool) -> GZipTree {
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	81	func Decode() -> Result<byte[], StreamError> {
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	143	let lengths = CheckedStorage.Reserve<int>(320)
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	168	let codeOrder: int[] = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	169	let codeLengths = CheckedStorage.Reserve<int>(19)
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	220	let distanceLengths = CheckedStorage.Reserve<int>(distances)
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	238	let bases: int[] = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258]
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	239	let extras: int[] = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	282	let result = CheckedStorage.Reserve<byte>(output.Count)
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	293	val Counts: int[]
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	294	val Symbols: int[]
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	299	init(lengths: int[], count: int) {
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	300	Counts = CheckedStorage.Reserve<int>(16)
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	301	Symbols = CheckedStorage.Reserve<int>(count)
+runtime/raven/src/System/IO/Compression/GZipDecoder.rvn	326	let offsets = CheckedStorage.Reserve<int>(16)
+runtime/raven/src/System/IO/Compression/GZipEncoder.rvn	48	func Encode(source: byte[], offset: int, count: int) -> byte[] {
+runtime/raven/src/System/IO/Compression/GZipEncoder.rvn	49	let last = CheckedStorage.Reserve<int>(4096)
+runtime/raven/src/System/IO/Compression/GZipEncoder.rvn	73	let lengths: int[] = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258]
+runtime/raven/src/System/IO/Compression/GZipEncoder.rvn	74	let extras: int[] = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]
+runtime/raven/src/System/IO/Compression/GZipEncoder.rvn	110	let result = CheckedStorage.Reserve<byte>(bytes.Count)
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	24	private var decoded: byte[] = []
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	60	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	70	async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	94	let chunk = CheckedStorage.Reserve<byte>(4096)
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	117	let compressed = CheckedStorage.Reserve<byte>(bytes.Count)
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	140	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	150	async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	201	let header: byte[] = [(byte)31,(byte)139,(byte)8,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)255]
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	239	let trailer = CheckedStorage.Reserve<byte>(13)
+runtime/raven/src/System/IO/Compression/GZipStream.rvn	301	self.decoded = []
+runtime/raven/src/System/IO/FileInputStream.rvn	25	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/IO/FileInputStream.rvn	30	func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/IO/FileInputStream.rvn	39	private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+runtime/raven/src/System/IO/FileOutputStream.rvn	25	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/IO/FileOutputStream.rvn	30	func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/IO/FileOutputStream.rvn	39	private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+runtime/raven/src/System/IO/FileOutputStream.rvn	67	private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+runtime/raven/src/System/IO/InputStream.rvn	11	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>>
+runtime/raven/src/System/IO/InputStream.rvn	18	func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>>
+runtime/raven/src/System/IO/MemoryStream.rvn	47	private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+runtime/raven/src/System/IO/MemoryStream.rvn	72	private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+runtime/raven/src/System/IO/MemoryStream.rvn	117	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/IO/MemoryStream.rvn	121	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/IO/MemoryStream.rvn	131	func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/IO/MemoryStream.rvn	142	func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/IO/OutputStream.rvn	11	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>>
+runtime/raven/src/System/IO/OutputStream.rvn	20	func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>>
+runtime/raven/src/System/IO/StreamReader.rvn	55	let buffer: byte[] = [(byte)0]
+runtime/raven/src/System/IO/StreamReader.rvn	105	let line = CheckedStorage.Reserve<byte>(length)
+runtime/raven/src/System/IO/StreamReader.rvn	130	let buffer = CheckedStorage.Reserve<byte>(256)
+runtime/raven/src/System/IO/StreamReader.rvn	157	private async func ReadPart(buffer: byte[], request: int, remaining: int) -> Task<Result<string, TextReadError>> {
+runtime/raven/src/System/IO/StreamWriter.rvn	81	let buffer = CheckedStorage.Reserve<byte>(256)
+runtime/raven/src/System/Introspection/Descriptors.rvn	88	return CheckedStorage.Reserve<CustomAttributeData>(0)
+runtime/raven/src/System/Introspection/Descriptors.rvn	234	let result = CheckedStorage.Reserve<ParameterInfo>(count)
+runtime/raven/src/System/Introspection/Descriptors.rvn	304	let result = CheckedStorage.Reserve<ParameterInfo>(count)
+runtime/raven/src/System/Introspection/Descriptors.rvn	374	let result = CheckedStorage.Reserve<ParameterInfo>(count)
+runtime/raven/src/System/Introspection/Descriptors.rvn	499	let result = CheckedStorage.Reserve<TypeInfo>(count)
+runtime/raven/src/System/Introspection/Descriptors.rvn	866	private var storedArguments: CustomAttributeTypedArgument[]
+runtime/raven/src/System/Introspection/Descriptors.rvn	867	private var storedNamedArguments: CustomAttributeNamedArgument[]
+runtime/raven/src/System/Introspection/Descriptors.rvn	869	private init(type: TypeInfo, constructor: ConstructorInfo, arguments: CustomAttributeTypedArgument[], namedArguments: CustomAttributeNamedArgument[]) {
+runtime/raven/src/System/Introspection/Descriptors.rvn	880	let result = CheckedStorage.Reserve<CustomAttributeTypedArgument>(storedArguments.Length)
+runtime/raven/src/System/Introspection/Descriptors.rvn	890	let result = CheckedStorage.Reserve<CustomAttributeNamedArgument>(storedNamedArguments.Length)
+runtime/raven/src/System/Introspection/ParameterInfo.rvn	55	return CheckedStorage.Reserve<CustomAttributeData>(0)
+runtime/raven/src/System/Linq/Operators.rvn	225	private field cached: T[]
+runtime/raven/src/System/Linq/Operators.rvn	232	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+runtime/raven/src/System/Linq/Operators.rvn	269	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Linq/Operators.rvn	289	private field cached: U[]
+runtime/raven/src/System/Linq/Operators.rvn	295	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+runtime/raven/src/System/Linq/Operators.rvn	332	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+runtime/raven/src/System/Linq/Operators.rvn	354	private field cached: U[]
+runtime/raven/src/System/Linq/Operators.rvn	361	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+runtime/raven/src/System/Linq/Operators.rvn	395	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+runtime/raven/src/System/Linq/Operators.rvn	416	private field cursor: Iterator<T>[]
+runtime/raven/src/System/Linq/Operators.rvn	418	private field cached: T[]
+runtime/raven/src/System/Linq/Operators.rvn	424	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	426	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+runtime/raven/src/System/Linq/Operators.rvn	468	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Linq/Operators.rvn	471	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	492	private field cursor: Iterator<T>[]
+runtime/raven/src/System/Linq/Operators.rvn	494	private field cached: T[]
+runtime/raven/src/System/Linq/Operators.rvn	500	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	502	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+runtime/raven/src/System/Linq/Operators.rvn	546	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Linq/Operators.rvn	549	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	569	private field sources: Iterable<T>[]
+runtime/raven/src/System/Linq/Operators.rvn	570	private field cursor: Iterator<T>[]
+runtime/raven/src/System/Linq/Operators.rvn	572	private field cached: T[]
+runtime/raven/src/System/Linq/Operators.rvn	578	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	580	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+runtime/raven/src/System/Linq/Operators.rvn	600	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	622	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+runtime/raven/src/System/Linq/Operators.rvn	625	cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	627	sources = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterable<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	648	private field outer: Iterator<T>[]
+runtime/raven/src/System/Linq/Operators.rvn	649	private field inner: Iterator<U>[]
+runtime/raven/src/System/Linq/Operators.rvn	650	private field cached: U[]
+runtime/raven/src/System/Linq/Operators.rvn	657	outer = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	658	inner = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<U>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	659	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+runtime/raven/src/System/Linq/Operators.rvn	680	inner = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<U>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	708	cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+runtime/raven/src/System/Linq/Operators.rvn	711	inner = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<U>>(0)
+runtime/raven/src/System/Linq/Operators.rvn	715	outer = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+runtime/raven/src/System/Networking/IPAddress.rvn	8	private var octets: byte[]
+runtime/raven/src/System/Networking/IPAddress.rvn	10	protected init(bytes: byte[]) {
+runtime/raven/src/System/Networking/IPAddress.rvn	121	let narrowBytes: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+runtime/raven/src/System/Networking/IPAddress.rvn	128	let bytes: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0]
+runtime/raven/src/System/Networking/IPAddress.rvn	208	private static func ReadIPv4(text: string, bytes: byte[], offset: int) -> bool {
+runtime/raven/src/System/Networking/IPAddress.rvn	282	internal init(bytes: byte[]) : base(bytes) {
+runtime/raven/src/System/Networking/IPAddress.rvn	291	internal init(bytes: byte[]) : base(bytes) {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	12	private val owner: byte[] = []
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	17	static func Create(trustPem: byte[]) -> Result<SslClientAuthenticationOptions, SslError> {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	19	let status = neoCLR.Runtime.TlsCreateClient(options.owner, trustPem, [])
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	26	internal func CreateSession(session: byte[], host: string) -> int {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	45	private val owner: byte[] = []
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	50	static func Create(certificatePem: byte[], privateKeyPem: byte[]) -> Result<SslServerAuthenticationOptions, SslError> {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	52	let status = neoCLR.Runtime.TlsCreateServer(options.owner, certificatePem, privateKeyPem, [])
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	59	internal func CreateSession(session: byte[]) -> int {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	63	return neoCLR.Runtime.TlsCreateSession(session, owner, [])
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	76	internal static func Allocate(count: int) -> byte[] {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	77	let bytes = CheckedStorage.Reserve<byte>(count)
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	85	internal static func Encode(text: string) -> byte[] {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	105	internal static func ReadCount(buffer: byte[], offset: int) -> int {
+runtime/raven/src/System/Networking/Security/SslOptions.rvn	108	internal static func WriteCount(buffer: byte[], offset: int, count: int) {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	16	private val owner: byte[] = []
+runtime/raven/src/System/Networking/Security/SslStream.rvn	97	if let Error(error) = await Pump(1, [], operation.Token) {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	111	private async func Pump(kind: int, plaintext: byte[], token: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	159	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	163	async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	194	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	198	async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/Networking/Security/SslStream.rvn	274	_ = (await Pump(4, [], operation.Token))?
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	173	func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	178	func Receive(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	184	func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	193	internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	197	internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	204	func Send(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	209	func Send(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	215	func SendUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	224	internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	228	internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	334	let snapshot = CheckedStorage.Reserve<string>(count)
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	412	internal func StartReceive(handle: long, buffer: byte[], offset: int, count: int) {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	416	internal func StartReceiveUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	437	internal func StartSend(handle: long, buffer: byte[], offset: int, count: int) {
+runtime/raven/src/System/Networking/Sockets/Socket.rvn	441	internal func StartSendUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
+runtime/raven/src/System/Runtime/CompilerServices/RuntimeHelpers.rvn	12	static func GetSubArray<T>(array: T[], range: System.Range) -> T[] {
+runtime/raven/src/System/Runtime/CompilerServices/RuntimeHelpers.rvn	17	internal static func CopyRange<T>(array: T[], offset: int, count: int) -> T[] {
+runtime/raven/src/System/Runtime/CompilerServices/RuntimeHelpers.rvn	18	let result = CheckedStorage.Reserve<T>(count)
+runtime/raven/src/System/Runtime/Reflection/ArrayReflection.rvn	28	static func Create(arrayType: TypeInfo, values: Object?[]) -> Object {
+runtime/raven/src/System/Runtime/Reflection/FunctionReflection.rvn	18	static func Invoke(function: Object?, arguments: Object?[]) -> Result<Object?, ReflectionError> {
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	10	func CreateInstance(params arguments: Object?[]) -> Result<Object, ReflectionError> {
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	45	func CreateInstance<T>(params arguments: Object?[]) -> Result<T, ReflectionError> {
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	143	func Invoke(receiver: Object?, params arguments: Object?[]) -> Result<Object?, ReflectionError> {
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	190	let status = neoCLR.Runtime.ReflectionFieldGetCheck(handle, implementation.DefinitionIndex, receiver, [])
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	192	let value: Object? = neoCLR.Runtime.ReflectionFieldGet(handle, implementation.DefinitionIndex, receiver, [])
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	267	let snapshot = CheckedStorage.Reserve<Object?>(arguments.Count)
+runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn	274	func Invoke(params arguments: Object?[]) -> Result<Object, ReflectionError> {
+runtime/raven/src/System/Security/Cryptography/HMACSHA256.rvn	14	static func HashData(key: byte[], data: byte[], destination: byte[]) -> Result<int, CryptographyError> {
+runtime/raven/src/System/Security/Cryptography/HMACSHA256.rvn	31	static func VerifyData(key: byte[], data: byte[], tag: byte[]) -> bool {
+runtime/raven/src/System/Security/Cryptography/RandomNumberGenerator.rvn	12	static func Fill(destination: byte[]) -> Result<unit, CryptographyError> {
+runtime/raven/src/System/Security/Cryptography/SHA256.rvn	13	static func HashData(data: byte[], destination: byte[]) -> Result<int, CryptographyError> {
+runtime/raven/src/System/String.rvn	19	let snapshot = Runtime.CompilerServices.CheckedStorage.Reserve<char>(count)
+runtime/raven/src/System/String.rvn	84	static func Join(separator: string, values: string[]) -> string {
+runtime/raven/src/System/Text/Decoder.rvn	6	func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError>
+runtime/raven/src/System/Text/Encoder.rvn	7	func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError>
+runtime/raven/src/System/Text/Encodings.rvn	99	private var carry: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+runtime/raven/src/System/Text/Encodings.rvn	104	func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+runtime/raven/src/System/Text/Encodings.rvn	164	func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+runtime/raven/src/System/Text/Encodings.rvn	244	func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+runtime/raven/src/System/Text/StringBuilder.rvn	7	private var parts: string[] = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(0)
+runtime/raven/src/System/Text/StringBuilder.rvn	49	buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(capacity)
+runtime/raven/src/System/Text/StringBuilder.rvn	79	let empty = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(0)
+runtime/raven/src/System/Text/StringBuilder.rvn	92	let compact = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(1)
+runtime/raven/src/System/Text/Utf8.rvn	15	let snapshot = CheckedStorage.Reserve<byte>(count)
+runtime/raven/src/System/Web/Http/HttpBodyInput.rvn	16	private val buffer: byte[]
+runtime/raven/src/System/Web/Http/HttpBodyInput.rvn	29	private var output: byte[]? = null
+runtime/raven/src/System/Web/Http/HttpBodyInput.rvn	37	internal init(connection: HttpConnection, buffer: byte[], start: int, end: int,
+runtime/raven/src/System/Web/Http/HttpBodyInput.rvn	54	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Web/Http/HttpBodyInput.rvn	58	func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Web/Http/HttpBodyInput.rvn	122	if output is byte[] destination {
+runtime/raven/src/System/Web/Http/HttpClient.rvn	570	internal async func ReadUpload(buffer: byte[], count: int, cancellationToken: CancellationToken) -> Task<Result<int, HttpError>> {
+runtime/raven/src/System/Web/Http/HttpClient.rvn	1792	private var buffer: byte[]
+runtime/raven/src/System/Web/Http/HttpClient.rvn	1808	buffer = CheckedStorage.Reserve<byte>(256)
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	19	func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	22	async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	32	func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	35	async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	99	internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, token: CancellationToken) -> Task<Result<int, HttpError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	103	internal async func Receive(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, HttpError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	112	internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, token: CancellationToken) -> Task<Result<int, HttpError>> {
+runtime/raven/src/System/Web/Http/HttpConnection.rvn	116	internal async func Send(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, HttpError>> {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	49	internal func Push(buffer: byte[], count: int) -> Result<bool, HttpError> {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	62	private func PushCore(buffer: byte[], count: int) -> Result<bool, HttpError> {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	424	private var smallReceiveBuffer: byte[]? = null
+runtime/raven/src/System/Web/Http/HttpServer.rvn	425	private var largeReceiveBuffer: byte[]? = null
+runtime/raven/src/System/Web/Http/HttpServer.rvn	427	internal func RentReceiveBuffer(size: int) -> byte[] {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	429	if smallReceiveBuffer is byte[] available {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	434	if largeReceiveBuffer is byte[] available {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	439	return CheckedStorage.Reserve<byte>(size)
+runtime/raven/src/System/Web/Http/HttpServer.rvn	442	internal func ReturnReceiveBuffer(buffer: byte[]) {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	666	internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<byte[], HttpError> {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	747	let bytes = CheckedStorage.Reserve<byte>(result.Count + bodyCount)
+runtime/raven/src/System/Web/Http/HttpServer.rvn	864	private var buffer: byte[] = Array<byte>.Empty
+runtime/raven/src/System/Web/Http/HttpServer.rvn	865	private var outgoing: byte[] = Array<byte>.Empty
+runtime/raven/src/System/Web/Http/HttpServer.rvn	954	buffer = CheckedStorage.Reserve<byte>(4096)
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1016	outgoing = Array<byte>.Empty
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1027	outgoing = Array<byte>.Empty
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1119	outgoing = Array<byte>.Empty
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1171	private var buffer: byte[]? = null
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1218	if buffer is byte[] completed {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1290	buffer = if streaming { CheckedStorage.Reserve<byte>(256) } else { owner.RentReceiveBuffer(256) }
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1292	if buffer is byte[] receiving {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1303	if buffer is byte[] received {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1309	private func OnReceived(decoder: HttpRequestDecoder, received: byte[]) {
+runtime/raven/src/System/Web/Http/HttpServer.rvn	1359	buffer = if streaming { CheckedStorage.Reserve<byte>(4096) } else { owner.RentReceiveBuffer(4096) }

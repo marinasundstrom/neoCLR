@@ -47,7 +47,16 @@ The author subsequently clarified that .NET backward-compatibility requirements
 must not dictate neoCLR API design: prefer consistent Slice/ReadOnlySlice APIs.
 The assistant adopted synchronous readonly input/writable output views, persistent
 views for asynchronous ownership and arrays for owned storage as the migration
-criteria. Compatibility-only overloads are not a default requirement. Runtime
+criteria. Compatibility-only overloads are not a default requirement. The author then
+clarified that repeated AsSlice helpers are also unwanted: correct parameter and
+result types belong in the primary API. Explicit array contracts remain valid.
+The assistant removed uncommitted public AsSlice/AsReadOnlySlice methods and is
+qualifying implicit array-to-view and writable-to-readonly conversions instead. The author then
+required Array<T> slicing to return Slice<T> and suggested removing Sliceable when
+it no longer fits. The assistant removed Array's copy-based slicing contract and
+removed Sliceable from Raven and the legacy reference scaffold. ArrayList retains
+its documented owned-copy operation without that interface; a growable-buffer
+borrow contract is still open. Runtime
 metadata and service tests are being implemented first; production APIs remain
 Raven-owned, with native backend integration still open.
 

@@ -1,0 +1,2 @@
+import System.*
+func Main() { let values: Slice<int>[] = [] }

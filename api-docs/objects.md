@@ -378,6 +378,8 @@ follows their owner. Holding a Rust Value does not itself root its managed owner
 Host publication validates the execution heap, and expired owners fault. Immutable
 UTF-8 views share the String owner and are borrowed capabilities for storage checks.
 
-Public Raven APIs, nominal metadata admission, suspension rules and native lowering
-are pending. This payload is not a supported host factory or a new guest API; see
+Nominal metadata admission and interpreter suspension rules are implemented.
+Public Raven APIs and native lowering remain pending. This payload is not a
+supported host factory; checked guest factories are documented in the
+[memory-view reference](memory-views.md). See
 the [implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md).

@@ -218,8 +218,22 @@ are documented in the [Object guide](objects.md#rust-host-string-payloads) and s
 rustdoc; StringValue is not a guest CLI type selected for RavenDoc.
 The opaque Rust-only `MemoryView`/`Value::MemoryView` payload is likewise covered
 by the [host value reference](objects.md#rust-host-memory-view-payloads). Its
-constructors remain internal and guest Slice/Memory APIs are not yet admitted;
-there is no RavenDoc type-selection or reference-assembly change for this payload.
+constructors remain internal. Public Raven Slice/ReadOnlySlice APIs and
+String.Utf8Bytes have a [manual member reference](memory-views.md). The native
+metadata contract is explicit; the CLI reference projection rejects these types
+rather than emitting unsafe fieldless ordinary records. The legacy aggregate
+reference cannot represent these additions. The exact manual coverage is
+System.Slice`1, System.ReadOnlySlice`1, System.SliceOperations`1 and
+System.String.Utf8Bytes; Memory/ReadOnlyMemory are still runtime-only test shapes.
+The native snapshot is regenerated from the matching source-owned five-library
+bundle, including both view types, their members, SliceOperations, Array ranges
+and String.Utf8Bytes. No new public type is omitted from native selection.
+The renderer currently spells the type headers `struct Slice<T>` and
+`struct ReadOnlySlice<T>` without the ref modifier; the linked manual reference
+states the required ref-like lifetime rules. All members remain rendered.
+The legacy CLI scaffold excludes GetSubArray from the site and no longer includes
+Sliceable; its retained Array signatures are compatibility documentation inputs,
+not the current native contract. The native pages override those signatures.
 
 Sequence, Collection, Iterable and Iterator now have generated reference coverage,
 including String construction and its read-only grapheme indexer. String Count is

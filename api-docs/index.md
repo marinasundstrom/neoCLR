@@ -35,6 +35,8 @@ member for parameters, return values, errors and usage notes.
 | Runtime diagnostics | [StackTrace](xref:System.Diagnostics.StackTrace) · [Capture and limits](stack-trace.md) · [GC](gc.md) |
 | Introspection and reflection | [System.Introspection](xref:System.Introspection) · [Descriptor contracts](introspection.md) · [Runtime reflection](reflection.md) |
 
+Development interpreter APIs: [System.Slice, ReadOnlySlice, Memory and ReadOnlyMemory](memory-views.md).
+
 ## Using the reference
 
 This reference follows the **development class library**. Individual pages describe

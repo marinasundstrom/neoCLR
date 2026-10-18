@@ -1,0 +1,40 @@
+module System
+
+/// A borrowed readonly view of contiguous managed memory. Readonly is shallow:
+/// writes through another alias remain visible. This ref struct cannot be stored.
+public ref struct ReadOnlySlice<T> {
+    /// Borrows an array for readonly access; aliases may still write.
+    static func implicit(source: T[]) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewCreateReadOnlySlice<T>(source)
+    /// Restricts a writable view to readonly access without copying.
+    static func implicit(source: Slice<T>) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewAsReadOnly<T>(source)
+
+    /// Number of elements in this view.
+    val Length: int => neoCLR.Runtime.ViewLength<T>(self)
+    /// Whether this view has no elements.
+    val IsEmpty: bool => Length == 0
+    /// Reads an element. Invalid indexes fault.
+    val self[index: int]: T => neoCLR.Runtime.ViewGet<T>(self, index)
+    /// Reads an element using a start- or end-relative index.
+    val self[index: Index]: T => self[index.GetOffset(Length)]
+    /// Borrows a nested window. Invalid bounds fault; elements are not copied.
+    func Slice(start: int, length: int) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewSlice<T>(self, start, length)
+    /// Borrows from start to the end of this view.
+    func Slice(start: int) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewSlice<T>(self, start)
+    /// Borrows a half-open range relative to this view.
+    func Slice(range: Range) -> ReadOnlySlice<T> {
+        let bounds = range.GetOffsetAndLength(Length)
+        return Slice(bounds.Item1, bounds.Item2)
+    }
+    /// Borrows a half-open range without copying.
+    val self[range: Range]: ReadOnlySlice<T> => Slice(range)
+    /// Copies this view into a newly owned array.
+    func ToArray() -> T[] {
+        let result = Runtime.CompilerServices.CheckedStorage.Reserve<T>(Length)
+        var index = 0
+        while index < Length {
+            result[index] = self[index]
+            index += 1
+        }
+        return result
+    }
+}

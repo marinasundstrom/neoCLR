@@ -1,0 +1,93 @@
+path	line	code
+runtime/System/Collections/ArrayList.neoil	3	.field internal Data T[]&
+runtime/System/Collections/ArrayList.neoil	41	call System.Collections.ArrayIterator<T>::Create(T[]&,Int32)
+runtime/System/Collections/ArrayList.neoil	109	.local T[]& data
+runtime/System/Collections/ArrayList.neoil	110	.local T[]& oldData
+runtime/System/Collections/ArrayList.neoil	185	.local T[]& data
+runtime/System/Collections/Iterator.neoil	15	.field private Data T[]&
+runtime/System/Collections/Iterator.neoil	19	.method internal static Create(T[]& data, Int32 count) -> System.Collections.Iterator<T>&
+runtime/System/Environment.neoil	2	.method static GetCommandLineArgs() -> String[]
+runtime/System/Function.neoil	3	.method static ForEach<T>(readonly T[]& array, fn<T,Void> action) -> Void
+runtime/System/LocalDateTime.neoil	7	call System.Time.LocalDateTime::FromParts(Int32[])
+runtime/System/LocalDateTime.neoil	10	.method private static FromParts(Int32[] parts) -> System.Time.LocalDateTime
+runtime/System/Reflection.neoil	188	.method internal instance byref .ctor(String name, System.Type declaringType, System.Type returnType, Boolean isStatic, Boolean isPublic, Boolean isPrivate, Boolean isAssembly, Boolean isReceiverByRef, Int32 definitionIndex, System.Introspection.ParameterInfo[] parameters, Boolean isReadOnly, Boolean isVirtual, Boolean isOverride, Boolean isAbstract) -> Void
+runtime/System/Reflection.neoil	252	.field private Parameters System.Introspection.ParameterInfo[]
+runtime/System/Reflection.neoil	313	.method instance readonly byref GetParameters() -> System.Introspection.ParameterInfo[]
+runtime/System/Reflection.neoil	356	.method internal instance byref .ctor(String name, System.Type declaringType, System.Type propertyType, Boolean isStatic, Boolean canRead, Boolean canWrite, Int32 definitionIndex, System.Introspection.ParameterInfo[] indexParameters, System.Option<System.Introspection.MethodInfo> getter, System.Option<System.Introspection.MethodInfo> setter) -> Void
+runtime/System/Reflection.neoil	402	.field private IndexParameters System.Introspection.ParameterInfo[]
+runtime/System/Reflection.neoil	445	.method instance readonly byref GetIndexParameters() -> System.Introspection.ParameterInfo[]
+runtime/System/Type.neoil	52	.method instance GetInterfaces() -> System.Type[]
+runtime/System/Type.neoil	58	.method instance GetGenericArguments() -> System.Type[]
+runtime/System/Type.neoil	90	.method instance GetEnumNames() -> String[]
+runtime/System/Type.neoil	176	.method instance GetFields() -> System.Introspection.FieldInfo[]
+runtime/System/Type.neoil	182	.method instance GetFields(System.Introspection.BindingFlags flags) -> System.Introspection.FieldInfo[]
+runtime/System/Type.neoil	189	.method instance GetMethods() -> System.Introspection.MethodInfo[]
+runtime/System/Type.neoil	195	.method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Introspection.MethodInfo[]
+runtime/System/Type.neoil	202	.method instance GetProperties() -> System.Introspection.PropertyInfo[]
+runtime/System/Type.neoil	208	.method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Introspection.PropertyInfo[]
+runtime/System/TypeInfo.neoil	32	.method instance GetInterfaces() -> System.Type[]
+runtime/System/TypeInfo.neoil	38	.method instance GetEnumNames() -> String[]
+runtime/System/TypeInfo.neoil	50	.method instance GetFields() -> System.Introspection.FieldInfo[]
+runtime/System/TypeInfo.neoil	57	.method instance GetFields(System.Introspection.BindingFlags flags) -> System.Introspection.FieldInfo[]
+runtime/System/TypeInfo.neoil	65	.method instance GetMethods() -> System.Introspection.MethodInfo[]
+runtime/System/TypeInfo.neoil	72	.method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Introspection.MethodInfo[]
+runtime/System/TypeInfo.neoil	80	.method instance GetProperties() -> System.Introspection.PropertyInfo[]
+runtime/System/TypeInfo.neoil	87	.method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Introspection.PropertyInfo[]
+runtime/neoCLR/Runtime/AssemblyInfo.neoil	10	.function neoCLR.Runtime.AssemblyReferences(String arg0) -> System.Introspection.AssemblyInfo[]
+runtime/neoCLR/Runtime/AssemblyInfo.neoil	13	.function neoCLR.Runtime.AssemblyModules(String arg0) -> System.Introspection.ModuleInfo[]
+runtime/neoCLR/Runtime/AssemblyInfo.neoil	16	.function neoCLR.Runtime.AssemblyTypes(String arg0) -> System.Introspection.TypeInfo[]
+runtime/neoCLR/Runtime/AssemblyInfo.neoil	22	.function neoCLR.Runtime.ModuleTypes(String arg0,String arg1) -> System.Introspection.TypeInfo[]
+runtime/neoCLR/Runtime/AssemblyInfo.neoil	35	.function neoCLR.Runtime.ModuleFunctions(String arg0,String arg1) -> System.Introspection.MethodInfo[]
+runtime/neoCLR/Runtime/AssemblyInfo.neoil	38	.function neoCLR.Runtime.ModuleMemberCustomAttributes(String arg0,String arg1,Int32 arg2) -> System.Introspection.CustomAttributeData[]
+runtime/neoCLR/Runtime/ConsoleStreams.neoil	1	.function neoCLR.Runtime.ConsoleWriteBytes(Boolean error,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
+runtime/neoCLR/Runtime/Cryptography.neoil	4	.function neoCLR.Runtime.CryptoSha256(arrayref<Byte> data,arrayref<Byte> output) -> Int32
+runtime/neoCLR/Runtime/Cryptography.neoil	7	.function neoCLR.Runtime.CryptoHmacSha256(arrayref<Byte> key,arrayref<Byte> data,arrayref<Byte> output) -> Int32
+runtime/neoCLR/Runtime/Cryptography.neoil	10	.function neoCLR.Runtime.CryptoHmacSha256Verify(arrayref<Byte> key,arrayref<Byte> data,arrayref<Byte> tag) -> Boolean
+runtime/neoCLR/Runtime/Cryptography.neoil	13	.function neoCLR.Runtime.CryptoRandomFill(arrayref<Byte> output) -> Int32
+runtime/neoCLR/Runtime/Dns.neoil	7	.function neoCLR.Runtime.DnsAddresses(Value payload) -> String[]
+runtime/neoCLR/Runtime/Dns.neoil	9	value.unpack String[]
+runtime/neoCLR/Runtime/EnumInspection.neoil	2	.function neoCLR.Runtime.TypeEnumValues(System.RuntimeTypeHandle type) -> System.Object[]
+runtime/neoCLR/Runtime/EnvironmentArguments.neoil	1	.function neoCLR.Runtime.EnvironmentArguments() -> String[]
+runtime/neoCLR/Runtime/FileStreams.neoil	14	.function neoCLR.Runtime.FileWriteChunk(Int32 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
+runtime/neoCLR/Runtime/FileStreams.neoil	29	.function neoCLR.Runtime.FileReadInto(Int32 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> Value
+runtime/neoCLR/Runtime/FileStreams.neoil	36	.function neoCLR.Runtime.StorageNames(Value payload) -> String[]
+runtime/neoCLR/Runtime/FileStreams.neoil	38	value.unpack String[]
+runtime/neoCLR/Runtime/ReflectionExecution.neoil	28	.function neoCLR.Runtime.ReflectionArrayCreate(System.Introspection.TypeInfo type,arrayref<System.Object> values) -> System.Object
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	9	.function neoCLR.Runtime.ReflectionConstructArgs(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	13	.function neoCLR.Runtime.ReflectionConstructArgsCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	17	.function neoCLR.Runtime.ReflectionInvoke(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	21	.function neoCLR.Runtime.ReflectionInvokeCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	25	.function neoCLR.Runtime.ReflectionFieldGet(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	29	.function neoCLR.Runtime.ReflectionFieldGetCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	33	.function neoCLR.Runtime.ReflectionFieldSet(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	37	.function neoCLR.Runtime.ReflectionFieldSetCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	41	.function neoCLR.Runtime.TypeConstructors(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.ConstructorInfo[]
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	45	.function neoCLR.Runtime.MemberCustomAttributes(System.Introspection.TypeInfo owner, Int32 token) -> System.Introspection.CustomAttributeData[]
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	49	.function neoCLR.Runtime.ReflectionConstructorInvoke(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> System.Object
+runtime/neoCLR/Runtime/ReflectionMembers.neoil	53	.function neoCLR.Runtime.ReflectionConstructorInvokeCheck(System.RuntimeTypeHandle owner, Int32 index, System.Object receiver, arrayref<System.Object> arguments) -> Int32
+runtime/neoCLR/Runtime/Sockets.neoil	7	.function neoCLR.Runtime.SocketReceive(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,fn<Void> callback) -> Value
+runtime/neoCLR/Runtime/Sockets.neoil	16	.function neoCLR.Runtime.SocketSend(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,fn<Void> callback) -> Value
+runtime/neoCLR/Runtime/Sockets.neoil	28	.function neoCLR.Runtime.SocketConnectAddresses(arrayref<String> addresses,Int32 port,fn<Void> callback) -> Value
+runtime/neoCLR/Runtime/Sockets.neoil	37	.function neoCLR.Runtime.SocketConnectAddressesUntil(arrayref<String> addresses,Int32 port,Int64 deadline,fn<Void> callback) -> Value
+runtime/neoCLR/Runtime/Sockets.neoil	40	.function neoCLR.Runtime.SocketReceiveUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,fn<Void> callback) -> Value
+runtime/neoCLR/Runtime/Sockets.neoil	43	.function neoCLR.Runtime.SocketSendUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,fn<Void> callback) -> Value
+runtime/neoCLR/Runtime/StringJoinParts.neoil	1	.function neoCLR.Runtime.StringJoinParts(arrayref<String> parts, Int32 count, String separator, Int32 expectedUtf8Bytes) -> String
+runtime/neoCLR/Runtime/StringScalars.neoil	10	.function neoCLR.Runtime.StringScalars(String value) -> UInt32[]
+runtime/neoCLR/Runtime/StringScalars.neoil	13	.function neoCLR.Runtime.StringGraphemes(String value) -> Char[]
+runtime/neoCLR/Runtime/StringScalars.neoil	17	.function neoCLR.Runtime.StringFromChars(arrayref<Char> value) -> String
+runtime/neoCLR/Runtime/TimeZones.neoil	7	.function neoCLR.Runtime.TimeZoneMapLocal(String,Int64) -> Int64[]
+runtime/neoCLR/Runtime/Tls.neoil	4	.function neoCLR.Runtime.TlsCreateClient(arrayref<Byte> owner,arrayref<Byte> roots,arrayref<Byte> alpn) -> Int32
+runtime/neoCLR/Runtime/Tls.neoil	7	.function neoCLR.Runtime.TlsCreateServer(arrayref<Byte> owner,arrayref<Byte> cert,arrayref<Byte> key,arrayref<Byte> alpn) -> Int32
+runtime/neoCLR/Runtime/Tls.neoil	10	.function neoCLR.Runtime.TlsCreateSession(arrayref<Byte> owner,arrayref<Byte> config,arrayref<Byte> name) -> Int32
+runtime/neoCLR/Runtime/Tls.neoil	13	.function neoCLR.Runtime.TlsRelease(arrayref<Byte> owner) -> Int32
+runtime/neoCLR/Runtime/Tls.neoil	16	.function neoCLR.Runtime.TlsAbort(arrayref<Byte> owner) -> Int32
+runtime/neoCLR/Runtime/Tls.neoil	22	.function neoCLR.Runtime.TlsPump(arrayref<Byte> owner,arrayref<Byte> input,arrayref<Byte> output,arrayref<Byte> plaintext,arrayref<Byte> control) -> Int32
+runtime/neoCLR/Runtime/TypeInspection.neoil	14	.function neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.FieldInfo[]
+runtime/neoCLR/Runtime/TypeInspection.neoil	17	.function neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.MethodInfo[]
+runtime/neoCLR/Runtime/TypeInspection.neoil	20	.function neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.PropertyInfo[]
+runtime/neoCLR/Runtime/TypeInspection.neoil	23	.function neoCLR.Runtime.TypeInterfaces(System.RuntimeTypeHandle type) -> System.Type[]
+runtime/neoCLR/Runtime/TypeInspection.neoil	26	.function neoCLR.Runtime.TypeGenericArguments(System.RuntimeTypeHandle type) -> System.Type[]
+runtime/neoCLR/Runtime/TypeInspection.neoil	42	.function neoCLR.Runtime.TypeEnumNames(System.RuntimeTypeHandle type) -> String[]
+runtime/neoCLR/Runtime/UnixTimeTicks.neoil	5	.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> Int32[]
+runtime/neoCLR/Runtime/Utf8.neoil	1	.function neoCLR.Runtime.Utf8Encode(String text) -> Byte[]
+runtime/neoCLR/Runtime/Utf8.neoil	4	.function neoCLR.Runtime.Utf8Decode(arrayref<Byte> bytes) -> Value

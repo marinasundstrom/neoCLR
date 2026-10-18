@@ -1,0 +1,35 @@
+import System.*
+import System.Runtime.CompilerServices.*
+
+module neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewCreateSlice<T>(source: T[]) -> Slice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewCreateSlice<T>(source: T[], start: int, length: int) -> Slice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewCreateReadOnlySlice<T>(source: T[]) -> ReadOnlySlice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewCreateReadOnlySlice<T>(source: T[], start: int, length: int) -> ReadOnlySlice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewLength<T>(view: Slice<T>) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewLength<T>(view: ReadOnlySlice<T>) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewGet<T>(view: Slice<T>, index: int) -> T;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewGet<T>(view: ReadOnlySlice<T>, index: int) -> T;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSet<T>(view: Slice<T>, index: int, value: T) -> unit;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: Slice<T>, start: int, length: int) -> Slice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: ReadOnlySlice<T>, start: int, length: int) -> ReadOnlySlice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: Slice<T>, start: int) -> Slice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: ReadOnlySlice<T>, start: int) -> ReadOnlySlice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewAsReadOnly<T>(view: Slice<T>) -> ReadOnlySlice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewUtf8(text: string) -> ReadOnlySlice<byte>;

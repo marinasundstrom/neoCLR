@@ -44,12 +44,11 @@ See [member contracts and callback rules](/docs/collection-entries.html).
 
 ## Recoverable slicing
 
-Array and ArrayList explicitly implement `Sliceable<T[]>`: `Slice(range)` returns
-`Result<T[], InvalidRangeError>`, while their range indexers fault for invalid
-bounds. ArrayList resolves boundaries against Count, not Capacity. Results are
-independent shallow array copies. The capability does not imply enumeration,
-mutation or indexing; a similarly named method alone does not provide conformance.
-See the [API contract](../../docs/arrays.html).
+Array ranges now return borrowed Slice<T> values; ToArray requests a copy.
+ArrayList range operations still return owned arrays. The former Sliceable<TSlice>
+interface has been removed because its Result-based contract does not fit borrowed
+views. Growable collections need explicit invalidation rules before exposing them.
+See the [view contract](../../docs/memory-views.html).
 
 ## Filter and transform
 
@@ -141,7 +140,7 @@ writable interface stays invariant.
 
 Raven imports and emits these annotations into native metadata. The runtime keeps
 nominal conformance explicit; variance does not box elements or widen Result values.
-Sliceable, mutable collections and array storage remain invariant. Generic metadata
+Mutable collections and array storage remain invariant. Generic metadata
 must remain available independently of native executable specialization.
 
 Variance follows explicit nominal interfaces, including those inherited through
@@ -170,5 +169,5 @@ and control flow remain backend gaps.
 
 Native dependency imports preserve reference/value/default-constructor requirements
 and nongeneric nominal class bounds. Constrained methods, constructed/interface
-bounds and external source-bound authoring have remaining gaps. Result and Sliceable
+bounds and external source-bound authoring have remaining gaps. Result
 variance remain postponed.

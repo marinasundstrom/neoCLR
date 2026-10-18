@@ -5,6 +5,9 @@ import System.Option.*
 import System.Text.Utf8SliceError
 
 public class String : EquatableTo<string>, Collections.Sequence<char> {
+    /// Borrows immutable UTF-8 bytes. Byte offsets are independent of grapheme indexes.
+    val Utf8Bytes: ReadOnlySlice<byte> => neoCLR.Runtime.ViewUtf8(self)
+
     // Intrinsic storage supplied by the runtime, never an allocated class field.
     #pragma warning disable-next-line RAV9032
     private field m_value: string

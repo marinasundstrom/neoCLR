@@ -59,16 +59,16 @@ A byte array is a useful I/O buffer, but being managed does not make it safe for
 
 The API includes Length, Count, indexed access, iteration, Empty and ForEach, with the runtime’s supported element types. The generic shape is not a promise that every possible element signature or .NET Array helper is admitted. Direct array loops use indexed access; Iterable consumers use the declared interface contract.
 
-Slicing contract: `Array<T>` explicitly implements `Sliceable<T[]>`.
-`Slice(range)` returns `Result<T[], InvalidRangeError>`; the range indexer returns a
-shallow copy and faults on invalid bounds. Both use the same Range validator.
-Valid empty ranges succeed, from-end boundaries resolve against Length, and bounds
-are never clamped. Copies have independent slots but share referenced elements.
-Array size and allocation remain constrained by runtime budgets; the Result handles
-invalid slice bounds, not every possible runtime fault.
-See the [slicing API contract](../../docs/arrays.html).
+Development slicing returns `Slice<T>`: both `array[range]` and
+`array.Slice(range)` borrow the same storage. Writes through the slice affect the
+array. Request an independent shallow copy with `array[range].ToArray()`.
+Valid empty windows succeed and invalid bounds fault without clamping. Array
+no longer implements Sliceable<T[]>; array-specific and owned-result APIs still
+use arrays. This deliberately replaces the former copy-based range contract.
+See the [slice API](../../docs/memory-views.html). This view path currently runs
+in the interpreter; native JIT/AOT lowering and persistent Memory APIs remain work
+in progress. Array size and allocation remain constrained by runtime budgets.
 
-Span/Memory APIs and immutable or frozen array families remain future work.
 Read-only interface views support [reference variance](../collections/#interface-variance); mutable array storage remains invariant.
 
 <a id="direction"></a>
@@ -96,19 +96,19 @@ Questions, sample programs and documentation corrections are welcome. See [how t
 
 The matching development compiler and native libraries support `values[^1]`,
 from-end assignment and half-open slices such as `values[1..^1]` and `values[..]`.
-Each array slice makes an independent shallow copy; referenced elements remain shared.
+Each array slice shares storage. ToArray makes an independent shallow copy.
 `^0` describes the end boundary, so it can end a slice but cannot select an element.
 
 Indexing and slicing syntax are convenience APIs that may fault on invalid bounds;
 callers must establish valid input. `values.Get(index)` returns an `Option<T>` for
-an integer or Index. `values.Slice(range)` returns `Result<T[], InvalidRangeError>`.
+an integer or Index. `values.Slice(range)` returns `Slice<T>`.
 Index and Range describe positions and boundaries; applying them determines validity.
 
 Raven uses `..` for an exclusive end and `..=` for an inclusive end in slices,
 range patterns and integer iteration. Inclusive Range construction checks endpoint
 conversion before arithmetic; the library Range contract remains half-open.
 String slices use grapheme boundaries. [Sequences and lists](../collections/) also
-support indexing and slicing. Borrowed views remain future work.
+support indexing and slicing. Array views are currently interpreter-only.
 
 Signed int/long range patterns follow the same endpoints. A long subject currently
 requires long literal bounds, such as `1L..=3L`. Signed int/long loops and

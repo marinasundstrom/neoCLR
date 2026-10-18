@@ -36,5 +36,6 @@
   "T:System.Union`2": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
   "T:System.Union`3": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
   "T:System.Union`4": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
-  "T:System.Union`5": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html."
+  "T:System.Union`5": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
+  "M:System.Runtime.CompilerServices.RuntimeHelpers.GetSubArray``1(``0[],System.Range)": "Legacy CLI compiler scaffold only. Native array ranges now use GetSlice and return Slice<T>; see /docs/memory-views.html."
 }

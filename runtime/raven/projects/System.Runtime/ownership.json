@@ -179,7 +179,9 @@
         "runtime/raven/src/System/ParamArrayAttribute.rvn",
         "runtime/raven/core/Foundations.rvn",
         "runtime/raven/core/CompilerServices.rvn",
-        "runtime/raven/core/Storage.rvn"
+        "runtime/raven/core/Storage.rvn",
+        "runtime/raven/src/System/Slice.rvn",
+        "runtime/raven/src/System/ReadOnlySlice.rvn"
       ],
       "types": [
         "System.AttributeTargets",
@@ -307,7 +309,9 @@
         "System.Diagnostics.StackTrace",
         "System.ParamArrayAttribute",
         "System.IntPtr",
-        "System.UIntPtr"
+        "System.UIntPtr",
+        "System.Slice`1",
+        "System.ReadOnlySlice`1"
       ]
     }
   ],

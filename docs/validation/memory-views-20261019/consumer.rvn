@@ -1,0 +1,36 @@
+import System.*
+
+func Sum(data: ReadOnlySlice<int>) -> int {
+    var sum = 0
+    var index = 0
+    while index < data.Length {
+        sum += data[index]
+        index += 1
+    }
+    return sum
+}
+
+func ReplaceFirst(data: Slice<int>, value: int) {
+    data[0] = value
+}
+
+func Main() -> int {
+    let data = [10, 20, 30, 40]
+    let view: Slice<int> = data
+    let nested: Slice<int> = data[1..3]
+    ReplaceFirst(nested, 42)
+    let readOnly: ReadOnlySlice<int> = view
+    let tail = readOnly[1..]
+    if tail[0] != 42 || tail.Length != 3 {
+        return 3
+    }
+    let snapshot = data[..].ToArray()
+    ReplaceFirst(data, 7)
+    if data[1] != 42 || snapshot[0] != 10 || readOnly[^1] != 40 {
+        return 1
+    }
+    if Sum(data) != 119 || "é".Utf8Bytes[1] != 169 {
+        return 2
+    }
+    return 0
+}

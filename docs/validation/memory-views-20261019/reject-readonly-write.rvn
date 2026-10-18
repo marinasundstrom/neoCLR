@@ -1,0 +1,2 @@
+import System.*
+func Mutate(value: ReadOnlySlice<int>) { value[0] = 1 }

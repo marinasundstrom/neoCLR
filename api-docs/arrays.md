@@ -15,8 +15,8 @@ shape with a nominal API representation.
 | `Length: int` | Number of element slots; does not change after creation. |
 | `Count: int` | The same number of slots through the sequence contract. |
 | `self[index: int]: T` | Reads or replaces an element. An index outside the array bounds fails. |
-| `Slice(range: Range): Result<T[], InvalidRangeError>` | Safe shallow copy; invalid bounds return Error. |
-| `self[range: Range]: T[]` | Shallow copy using the same validation; invalid bounds fault. |
+| `Slice(range: Range): Slice<T>` | Borrowed zero-copy window; invalid bounds fault. |
+| `self[range: Range]: Slice<T>` | Borrowed zero-copy window; invalid bounds fault. |
 | `Empty: T[]` | Static library property returning an empty array of the element type. |
 | `ForEach(action: (T) -> Void)` | Invokes the callback once per element, in index order. |
 | `GetIterator(): Iterator<T>` | Traverses elements through the collection iterator contract. |
@@ -33,12 +33,16 @@ storage, mutation and Object conversion limits.
 
 ## Nominal slicing
 
-Array and ArrayList explicitly implement [Sliceable&lt;TSlice&gt;](xref:System.Sliceable`1)
-with `TSlice = T[]`. The safe method accepts empty ranges at valid boundaries,
-resolves from-end boundaries against Length (Array) or Count (ArrayList), and
-rejects reversed/out-of-bounds ranges without clamping. Result allocation follows
-validation. Copies have independent element slots but retain shared referenced
-elements. The interface does not imply enumeration or a range indexer.
+Development (2026-10-19): Array.Slice and array range syntax return
+[Slice<T>](memory-views.md). Writes through the view affect the array. Use
+`array[range].ToArray()` for an independent shallow copy. Bounds are checked
+against Length; empty windows at valid endpoints succeed and invalid bounds fault.
+`T[]` range syntax uses RuntimeHelpers.GetSlice. This intentionally changes the
+previous copy contract; callers relying on independent storage must add ToArray.
 
-Declared range indexers delegate to the safe method and fault on Error. Intrinsic
-T[] range syntax uses RuntimeHelpers.GetSubArray and the same Range validator.
+Sliceable<TSlice> has been removed: its Result-based contract cannot carry a
+borrowed slice under the current generic lifetime rules. ArrayList's existing
+range operation still returns owned copies without that interface; growing
+collections need a separate invalidation/ownership design before exposing borrowed
+storage.
+The new view path is currently interpreter-only; JIT/AOT lowering is pending.

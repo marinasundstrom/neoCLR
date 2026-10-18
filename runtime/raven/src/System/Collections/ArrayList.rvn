@@ -5,7 +5,7 @@ import System.*
 import System.Option.*
 import System.Result.*
 
-public open class ArrayList<T> : List<T>, Sliceable<T[]> {
+public open class ArrayList<T> : List<T> {
     private field data: T[]
     private field count: int
 

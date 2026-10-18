@@ -4,10 +4,11 @@
 as the preferred contiguous-memory abstraction, followed by persistent
 Memory/ReadOnlyMemory and measured buffer integration. The
 [contract and implementation status](native-memory-views.md) distinguish the
-internal checked-view foundation and interpreter value tracing/storage/return
-guards from pending guest metadata/suspension rules,
-Raven syntax and JIT/AOT support. Index/Range already exist; array ranges still
-copy until the coordinated public migration. This direction does not infer a
+callable interpreter foundation, explicit guest metadata and tracing/storage/return/
+suspension guards from pending JIT/AOT support. The author also
+directs a whole-class-library audit of array APIs after the slice types work. Index/Range already exist; the author selects array ranges returning Slice<T>,
+implicit view conversion and explicit ToArray copying, without compatibility-only
+array overloads or repeated AsSlice helpers. This direction does not infer a
 permanent reprioritization of unrelated milestones.
 
 **Preview 16 compiler investigation (author direction, 2026-10-18):** reproduce reported record and Object-display failures, repair native boxing/generic display with GC-safe value semantics, then investigate adjacent gaps and commit each slice. [Reproduction and bounds](experiments/preview16-record-display/README.md) distinguish the unreproduced emitter message from confirmed backend failures and separate JSON mapping/retention limits. This bounded corrective work does not permanently reorder the platform roadmap. The author next requests [JSON record serialization](experiments/json-records/README.md), preserving interpreter/JIT/AOT behavior, and raises ValueType ancestry as a separate familiar-semantics foundation question. Imported ValueType ancestry for application structs/record structs is now repaired with [three-mode semantics evidence](experiments/type-semantics/README.md); [Application enum ancestry and boxed identity](experiments/enum-ancestry/README.md) now also pass interpreter/JIT/AOT; [Intrinsic primitive and core-enum ancestry](experiments/primitive-ancestry/README.md) now also passes interpreter/JIT/AOT against a freshly rebuilt four-library cohort. [All fourteen numeric/Boolean/Char box kinds](experiments/primitive-boxes/README.md) now preserve exact identity and ValueType ancestry across the three modes. Additional-kind default Object display and local ordinary value-record authoring remain separate.
@@ -4875,7 +4876,10 @@ and [signed integer domain termination](validation/range-iteration/README.md), w
 main-first compiler work carried separately to the native line. The author's
 [approved capability direction](design/slicing-capabilities.md) separates Result-based
 safe slicing, optional faulting indexers, bounds and explicit enumerable progressions.
-System.Sliceable<TSlice> now provides the nominal safe slicing capability, with
+**Superseded 2026-10-19:** the borrowed-view implementation removes Sliceable;
+Array ranges return Slice<T>. The following records the earlier copying design.
+
+System.Sliceable<TSlice> provided the nominal safe slicing capability, with
 Array<T>/ArrayList<T> implementations and faulting range indexers sharing Range
 validation; see [native qualification](validation/sliceable/README.md). Generic
 Interval/progression APIs and other numeric-domain stepping remain unimplemented.

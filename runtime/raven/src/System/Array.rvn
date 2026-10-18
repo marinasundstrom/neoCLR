@@ -3,7 +3,7 @@ module System
 import System.Option.*
 import System.Result.*
 
-public class Array<T> : Collections.MutableSequence<T>, Sliceable<T[]> {
+public class Array<T> : Collections.MutableSequence<T> {
     #pragma warning disable-next-line RAV9032
     private field m_value: T[]
 
@@ -33,24 +33,11 @@ public class Array<T> : Collections.MutableSequence<T>, Sliceable<T[]> {
     /// Resolves a directional index and returns the element, or None when outside this array.
     func Get(index: Index) -> Option<T> => Get(index.GetOffset(m_value.Length))
 
-    /// Returns a shallow copy of the range, or InvalidRangeError for invalid bounds.
-    func Slice(range: Range) -> Result<T[], InvalidRangeError> {
-        if range.TryGetOffsetAndLength(m_value.Length) is Ok(let bounds) {
-            return Ok(Runtime.CompilerServices.RuntimeHelpers.CopyRange<T>(m_value, bounds.Item1, bounds.Item2))
-        }
-        return Error(InvalidRangeError())
-    }
+    /// Borrows a checked range without copying; writes affect this array.
+    func Slice(range: Range) -> Slice<T> => Runtime.CompilerServices.RuntimeHelpers.GetSlice<T>(m_value, range)
 
-    /// Returns an independent shallow copy; invalid receiver-relative bounds fault.
-    val self[range: Range]: T[] {
-        get {
-            if Slice(range) is Ok(let slice) {
-                return slice
-            }
-            Fail("Range is outside the value")
-            return Array<T>.Empty
-        }
-    }
+    /// Borrows a checked range without copying.
+    val self[range: Range]: Slice<T> => Slice(range)
 
     func ForEach(action: (T) -> Void) {
         let buffer = m_value

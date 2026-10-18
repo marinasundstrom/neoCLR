@@ -8,10 +8,10 @@ public static class RuntimeHelpers {
         neoCLR.Runtime.DrainEntryTasks()
     }
 
-    /// Copies a half-open range into a new array. Elements are shallow-copied; invalid ranges fault.
-    static func GetSubArray<T>(array: T[], range: System.Range) -> T[] {
+    /// Borrows a range without copying; invalid ranges fault.
+    static func GetSlice<T>(array: T[], range: System.Range) -> System.Slice<T> {
         let bounds = range.GetOffsetAndLength(array.Length)
-        return CopyRange<T>(array, bounds.Item1, bounds.Item2)
+        return neoCLR.Runtime.ViewCreateSlice<T>(array, bounds.Item1, bounds.Item2)
     }
 
     internal static func CopyRange<T>(array: T[], offset: int, count: int) -> T[] {

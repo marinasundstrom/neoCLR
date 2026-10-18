@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Implement Slice<T>/ReadOnlySlice<T> in Raven with checked indexing, Index/Range windows, implicit array/readonly conversions and explicit ToArray copies. Array ranges and Slice(range) now return shared Slice<T> views; remove Sliceable and expose immutable String.Utf8Bytes. No public AsSlice helpers. Qualify the native-library/interpreter consumer and rejection fixtures, refresh the class-library/API snapshots, and inventory further buffer migrations. Native JIT/AOT view lowering and public persistent Memory APIs remain pending; array callers relying on copies must use ToArray.
+
 - Preserve opaque memory-view kinds in the native metadata authoring, import and introspection APIs. Validate canonical fieldless shapes and reject unsafe CLI reference projection; native-only library containers round-trip all four kinds. Preserve canonical identities through imported constructions, symbol-only references and method owners; the Raven consumer validates cross-library calls. Document the host metadata API and validate identity/shape/projection guards.
 
 - Admit explicit opaque memory-view metadata and exact interpreter services for checked factories, indexing, nested windows, readonly conversion, persistent ownership and UTF-8 views. Reject borrowed storage/boxing/generic escapes and suspension; native codegen rejects selected view types pending lowering. Keep executable neoIL declarations as test fixtures, with production Raven APIs in a separate integration step. Record the author’s preference for consistent APIs over compatibility-only overloads.

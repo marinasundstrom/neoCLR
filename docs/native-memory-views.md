@@ -9,8 +9,8 @@ low-level work. This does not change the platform's separate UTF-8 text model.
 The interpreter recognizes explicit opaque memory-view metadata and checked runtime
 services. The four shapes are exercised by [neoIL test fixtures](../tests/fixtures/memory_views.neoil),
 not hand-authored class-library implementations. Production APIs belong in Raven
-`.rvn` source; source/compiler integration is the next bounded step. Existing array
-range syntax still copies. Native JIT/AOT lowering is not implemented and selected
+`.rvn` source; source/compiler integration supplies ref-like types, implicit conversions and
+array range views. Native JIT/AOT lowering is not implemented and selected
 view types reject instead of being treated as empty records.
 
 `.memoryview slice|read_only_slice|memory|read_only_memory` serializes as the
@@ -69,13 +69,13 @@ still publish their owner when collected. Array element types remain exact;
 readonly is shallow access restriction, not immutable storage. Writes through a
 separate writable alias remain visible through readonly views.
 
-The proposed `data[1..4]` changes the existing array range contract from copy to
-alias. The public migration must provide an explicit copying operation, update
-consumers and test aliasing before changing syntax. `Index`/`Range` already exist;
-their direction and half-open endpoint semantics should be reused. The existing
-fallible `Slice(range)` API also needs a coordinated signature migration because
-ordinary Result containers must not carry byref-like slices without a separately
-validated generic contract. This is a gap to solve, not permission to box them.
+The author explicitly selected `data[1..4] -> Slice<T>` (2026-10-19).
+Array range syntax and Array.Slice return views; callers request copying through
+ToArray(). This intentionally breaks the previous copy contract and removes
+Array's Sliceable<T[]> implementation. Owned-array APIs remain arrays where
+ownership is their purpose. Implicit array-to-view and writable-to-readonly
+conversions avoid repeated AsSlice call-site plumbing. Raven's ordinary .NET
+target retains its existing GetSubArray copy contract.
 
 String indexing/slicing remains grapheme-based. The internal UTF-8 view shares
 the immutable String owner; its offsets count bytes and may split a UTF-8 scalar.
@@ -132,3 +132,11 @@ Third-slice validation, 2026-10-19: `cargo test --test memory_views` passes all
 nine executable contracts for shared windows, readonly/UTF-8 access, persistent
 GC roots and suspension, bounds/default/null behavior, borrowed escapes and
 caller-versus-callee frame lifetimes. These declarations live only in test fixtures.
+
+Raven source integration (2026-10-19): compiler `d3519e49b` and the matching
+native metadata provider compile Slice/ReadOnlySlice ref structs, implicit array
+and readonly conversions, Array range views and String.Utf8Bytes. The checked-in
+[Raven consumer](validation/memory-views-20261019/README.md) returns 0; three
+negative programs reject. Sliceable was removed from Raven and the documentation
+bridge. Public persistent Memory source APIs and native JIT/AOT execution remain
+next steps. The complete native class-library bundle and API renderer build.
