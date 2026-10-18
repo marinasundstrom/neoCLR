@@ -71,5 +71,20 @@ func Main() {
     Require(observer.Order == 0)
     queue.Drain()
     Require(observer.Order == 123)
+    // Force queue growth, ring wraparound and reuse across empty drains.
+    for round in 0..3 {
+        observer.Order = 0
+        queue.Post(observer.First)
+        queue.Post(observer.Second)
+        for index in 0..7 {
+            queue.Post(observer.Hit)
+        }
+        Require(observer.Order == 0)
+        queue.Drain()
+        Require(observer.Order == 123)
+        Require(observer.Count == 40 + (round + 1) * 7)
+        queue.Drain()
+        Require(observer.Order == 123)
+    }
     Console.WriteLine("Task completion contracts passed")
 }

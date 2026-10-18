@@ -76,11 +76,11 @@ internal class TaskRunAsyncWork<T> {
 
 // Explicit, single-invocation dispatcher for the provisional Task proof of concept.
 public class TaskQueue {
-    private field pending: ArrayList<() -> System.Void>
+    private field pending: ArrayQueue<() -> System.Void>
     private field running: bool
 
     init() {
-        pending = ArrayList<() -> System.Void>()
+        pending = ArrayQueue<() -> System.Void>()
         running = false
     }
 
@@ -107,7 +107,7 @@ public class TaskQueue {
     }
 
     func Post(callback: () -> System.Void) {
-        pending.Add(callback)
+        pending.Enqueue(callback)
     }
 
     func Run(callback: () -> System.Void) {
@@ -126,13 +126,10 @@ public class TaskQueue {
         }
         running = true
         while pending.Count != 0 {
-            let batch = pending
-            pending = ArrayList<() -> System.Void>()
-            // The detached batch cannot be mutated by callbacks posting new work.
-            var index = 0
-            while index < batch.Count {
-                batch[index]()
-                index += 1
+            // Dequeue clears the stored reference before invoking user code.
+            // Newly posted work stays behind callbacks already in the FIFO.
+            if pending.Dequeue() is Some(let callback) {
+                callback()
             }
         }
         running = false

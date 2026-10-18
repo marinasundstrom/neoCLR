@@ -63,6 +63,14 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   5.6–7.2% lower CPU/completion; earlier failures remain in the
   [evidence](../benchmarks/http-server/serve/callback-storage-20261018/README.md).
   The author then approves testing the existing ArrayQueue for TaskQueue storage.
+- **Assistant outcome:** reusable queue contracts pass interpreter/JIT/AOT. Separate
+  diagnostics remove 11.71% of allocations with increased roots/retained capacity;
+  both 400/sec candidate trials pass with 1.5–3.0% lower CPU/completion but higher
+  p99 latency. [Evidence](../benchmarks/http-server/serve/task-queue-20261018/README.md).
+- **Author clarification:** known item/post counts should inform initial collection
+  capacity to avoid unnecessary growth. The assistant agrees and distinguishes
+  reservation from a hard maximum; measuring queued-work high water is the next
+  sizing investigation.
 
 ## 2026-10-18 — Serve as the application documentation default
 

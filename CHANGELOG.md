@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Reuse ArrayQueue storage in TaskQueue instead of allocating each callback batch. Preserve deferred FIFO posting across growth/wraparound in interpreter/JIT/AOT; refresh the unchanged API snapshot. Diagnostics show 11.71% fewer allocations, with higher root publications and retained capacity. Matched 400/sec Serve trials pass with 1.5–3.0% lower CPU/completion but higher p99 latency; retain all Go controls and raw evidence.
+
 - Allocate Promise callback storage lazily, release it on settlement and traverse private promise/queue callback batches by index. Preserve deferred FIFO delivery, reentrant posting and duplicate-settlement semantics across interpreter/JIT/AOT. Separate Serve diagnostics show 13.37% fewer allocations and 4.94% fewer root publications than the preceding empty-settlement fix; refresh the unchanged API snapshot. Retain both initial and requested repeat Serve/Go load comparisons: the repeat uses 5.6–7.2% less CPU/completion, but earlier losses prevent a reliable 400/sec claim.
 
 - Avoid replacement empty callback-list allocations when Promise completion/cancellation has no registered continuations. Preserve deferred late callbacks and Task identity; validate interpreter/JIT/AOT contracts. A separate Serve diagnostic records 0.78% fewer allocations. Reversed 60-second Serve/Go comparisons show no repeatable CPU gain or higher reliable rate; retain all missed arrivals and generator-lag failures, allocation-caller diagnostics and updated benchmark pages. Regenerate the unchanged public reference and refresh source fingerprints.

@@ -161,3 +161,15 @@ lag in one. Both comparisons are retained: the cleaner repeat does not establish
 consistently lossless 400/sec or a higher sustained rate. These are same-host,
 60-second trials with experimental paced GC.
 [All trials, settings and allocation evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/callback-storage-20261018).
+
+## Development: reusable TaskQueue storage
+
+TaskQueue now reuses ArrayQueue storage. Focused interpreter/JIT/AOT tests cover
+FIFO posting, growth and wraparound. A separate diagnostic records 11.71% fewer
+allocations, but 1.29% more root publications and about 3.2 KB more peak live payload.
+
+Both 60-second candidate trials validate every arrival at 400 offered requests/sec.
+Sampled CPU per completion falls 1.5–3.0% against the lazy-callback baseline; p99
+latency rises, so no latency gain is claimed. The same-host, experimental paced-GC
+configuration remains far behind Go in CPU cost. Higher rates were not tested.
+[Tradeoffs, all trials and raw evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/task-queue-20261018).
