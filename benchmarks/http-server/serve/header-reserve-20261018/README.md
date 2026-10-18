@@ -54,4 +54,39 @@ then task-completion-20261018/build.py with --source Probe.rvn. Run verify.py wi
 Serve/Server.rvn using the same helper without --source. Run allocation-sites.py
 and the profile-native.c diagnostic separately from root-validation/compare.py.
 
-Matched sustained-load results follow in a separate measurement slice.
+## Sustained Serve/Go comparison
+
+400 offered requests/sec for 60 seconds, 16 server lanes, 64 client slots,
+ten-byte response, HTTP/1.1 connection-close and queued handler work. Baseline is
+the encoding-cache cohort. Both neoCLR builds use experimental paced GC; Go uses
+GOMAXPROCS=1/GOGC=100. Baseline/candidate/Go then Go/candidate/baseline order.
+No builds or diagnostics overlap timing. The generator shares the host.
+
+Every offered arrival counts; drain completions do not inflate timed throughput.
+Provisional qualification requires every arrival valid, offered p99 ≤250 ms and
+generator-lag p99 ≤5 ms. Each compact report links its lossless compressed report
+with per-request and sampled resource records, build provenance and hashes.
+
+| Arm | Timed req/s | Misses | CPU ms/completion | Offered p99 ms | Lag p99 ms | Target |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| [baseline-1](evidence/baseline-1.json) | 399.98 | 0 | 2.0393 | 21.50 | 0.65 | pass |
+| [candidate-1](evidence/candidate-1.json) | 399.98 | 0 | 2.0184 | 8.82 | 0.63 | pass |
+| [go-1](evidence/go-1.json) | 400.00 | 0 | 0.2621 | 6.19 | 2.37 | pass |
+| [go-2](evidence/go-2.json) | 400.00 | 0 | 0.2733 | 6.31 | 2.63 | pass |
+| [candidate-2](evidence/candidate-2.json) | 400.00 | 0 | 2.0158 | 10.19 | 0.63 | pass |
+| [baseline-2](evidence/baseline-2.json) | 399.98 | 0 | 2.0347 | 11.91 | 0.64 | pass |
+
+All trials validate 24,000 arrivals. Candidate CPU/completion is 1.02% lower in the
+first pair and 0.93% lower in the second. Offered p99 is lower in both pairs, but
+baseline latency itself varies substantially. Two short pairs do not establish a
+statistical guarantee, a general latency reduction or a higher sustained rate.
+
+Candidate CPU remains about 7.4–7.7 times its paired Go controls. Go CPU varies
+between benchmark sessions; do not compare this ratio directly with the earlier
+encoding-cache session's 9.7–9.9 ratio as an improvement. The relevant neoCLR gain
+is the small within-session difference above. No higher offered rate is tested.
+
+Reproduce timing with root-validation/compare.py --baseline pointing to the
+encoding-cache candidate-final build, --candidate to this candidate, --go to the
+same Go build, --rates 400 --duration 60 --output a fresh directory. These are local
+sustained test points, not production capacity or maximum throughput.

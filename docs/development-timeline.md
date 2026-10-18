@@ -38,7 +38,10 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   requests. Tiny headers may retain more capacity. Diagnostic allocations fall
   1.76%, but collection count rises 3.57%; these counts do not establish speed.
   [Validation and load evidence](../benchmarks/http-server/serve/header-reserve-20261018/README.md)
-  records passing interpreter/JIT/AOT boundary tests; sustained timing follows separately.
+  records passing interpreter/JIT/AOT boundary tests. All six 400/sec trials pass;
+  CPU/completion falls 0.9–1.0% in both pairs, with lower p99 but substantial
+  baseline latency variation. No higher-rate or general latency claim is made.
+  Website evidence is updated without publication.
 
 ## 2026-10-18 — Encoding provider allocation follow-up
 

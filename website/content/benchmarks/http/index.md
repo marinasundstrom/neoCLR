@@ -207,3 +207,21 @@ improvement, without establishing a higher sustained rate. Latency is mixed. The
 candidate still uses about 9.7–9.9 times the corresponding single-processor Go
 control's CPU. These remain same-host checks with experimental paced GC.
 [Tests, limitations, failed experiment and all measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/encoding-cache-20261018).
+
+## Development: request-header reservation
+
+The request decoder now reserves up to 128 header bytes initially, capped by the
+configured limit, to avoid repeated small-array growth. Larger headers still grow
+normally. Exact-limit and overflow tests pass in interpreter, JIT and AOT. This
+trades a small initial reservation for fewer allocations; it adds no pooling API.
+
+Diagnostics show 1.76% fewer allocations and 0.43% fewer root publications, but
+3.57% more collections. All six alternating 60-second Serve/Go trials pass at 400
+requests/sec. Candidate CPU/completion is 0.9–1.0% lower in both orders, with lower
+p99 latency. Two short pairs and variable baseline latency do not establish a
+general latency improvement or higher sustained capacity.
+
+The candidate uses roughly 7.4–7.7 times the matching Go controls' CPU. This ratio
+must not be compared directly with earlier sessions: Go CPU also varies between
+runs. The small within-session neoCLR improvement is the relevant comparison.
+[Boundary tests and complete measurement evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/header-reserve-20261018).

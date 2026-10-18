@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
-- Reserve a bounded 128-byte request-header prefix (capped by the configured limit) to avoid repeated ArrayList startup growth. Preserve larger-header growth and exact limit enforcement; 12 boundary cases pass in interpreter/JIT/AOT, and the unchanged API snapshot is refreshed. Diagnostics show 1.76% fewer allocations but 3.57% more collections; sustained Serve measurement follows separately.
+- Reserve a bounded 128-byte request-header prefix (capped by the configured limit) to avoid repeated ArrayList startup growth. Preserve larger-header growth and exact limit enforcement; 12 boundary cases pass in interpreter/JIT/AOT, and the unchanged API snapshot is refreshed. Diagnostics show 1.76% fewer allocations but 3.57% more collections; all six matched 400/sec Serve/Go trials pass, with 0.9–1.0% lower candidate CPU/completion in both orders and lower p99 latency. Retain raw evidence and update the website; no higher sustained rate is established.
 
 - Cache stateless UTF-8/ASCII providers in invocation-owned storage while keeping encoder/decoder sessions independent. Preserve strict errors and BOM behavior across interpreter/JIT/AOT under allocation pressure; refresh API summaries/snapshot. Serve diagnostics show 3.07% fewer allocations and 0.55% fewer root publications with slightly higher retained memory; all matched 400/sec Serve/Go trials pass, with 1.1–1.2% lower candidate CPU/completion in two orders but no higher sustained rate established. Update website evidence and record an exposed concrete-static-field interface-selection gap separately.
 
