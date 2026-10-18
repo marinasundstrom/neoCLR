@@ -352,3 +352,75 @@ python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFIC
 Next test root churn/invalidation and realistic collection cadence before runtime
 integration. The capture scaling defect is fixed; it does not establish support
 for every interpreter/JIT/AOT access path or a production concurrent collector.
+
+## Rotating graph and invalidation cost (2026-10-18)
+
+Add opt-in `--churn-every N`. With N > 0, move the first node to the tail of the
+rooted chain each batch, preserving the same live objects, and replace one strong
+host-root value every N batches. A host replacement invalidates the POC epoch;
+ordinary managed pointer/root transfers do not. Both sync and concurrent perform
+the same application operations. Default zero leaves the original stable workload.
+
+The benchmark now explicitly falls back to a synchronous collection after a rejected
+concurrent result, charging all waiting, discarded work and fallback time inside
+the measurement window. This is benchmark policy, not production integration or a
+new runtime API. Successful collections remain exactly one per batch: either an
+applied snapshot or a fallback. Report replacement, discard and fallback counts;
+assert exact correspondence. A skipped failed collection cannot inflate throughput.
+Sync collects at batch start; invalidated concurrent cycles collect at batch end,
+so transient garbage lifetimes differ. Final managed allocation/reclamation totals
+must still agree and the heap must be empty.
+
+After timing, traverse and verify the complete graph in its expected rotated order,
+including its null terminator, then release handles and prove final reclamation.
+This catches lost edges or cycles that checking only the first/last objects could
+miss. Five focused boundary runs cover a one-node graph, stable no-handle sync and
+concurrent modes, and a churn period not dividing the 100 measured batches.
+No runtime collector code changed; existing qualification is reused. This preserves
+managed reachability semantics, with no .NET-facing divergence.
+
+4096 live nodes, 64 strong handles, 2000 measured batches, 128,000 allocations:
+means of two trials per mode/workload, milliseconds:
+
+| Discarded cycles | Scalar iterations | Sync elapsed | Concurrent elapsed | Sync CPU | Concurrent CPU | Sync owner interruption | Concurrent owner interruption |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0/2000 | 0 | 1429.27 | 1425.26 | 1428.08 | 1535.94 | 119.88 | 96.99 |
+| 0/2000 | 50000 | 1526.97 | 1525.93 | 1526.09 | 1636.17 | 120.20 | 97.17 |
+| 500/2000 | 0 | 1430.40 | 1438.47 | 1429.69 | 1548.15 | 120.54 | 111.83 |
+| 500/2000 | 50000 | 1535.65 | 1573.85 | 1534.29 | 1669.74 | 120.68 | 118.44 |
+| 2000/2000 | 0 | 1455.17 | 1474.74 | 1451.20 | 1581.90 | 120.28 | 153.66 |
+| 2000/2000 | 50000 | 1549.33 | 1576.08 | 1548.63 | 1683.21 | 119.11 | 153.54 |
+
+Rotation without measured host replacement (`N=3000`; one replacement occurs during
+warmup) retains the earlier large-graph result: near-equal elapsed, about 7–8% more
+CPU, and about 19% less total owner interruption. This demonstrates supported
+pointer/root mutation, not changing live-set size or arbitrary native access.
+
+Every-fourth-batch replacement yields exactly 500 discards and 500 fallback
+collections; every-batch replacement yields exactly 2000 of each. In the latter,
+concurrent costs 1.3%/1.7% more elapsed, 9.0%/8.7% more CPU, and 27.8%/28.9% more
+owner interruption than sync. Wasted worker work and fallback eliminate the pause
+benefit. A quarter-invalidated scalar trial takes 1599.65 ms versus 1548.05 ms on
+its repeat; retain both, so no precise tail-latency advantage is claimed.
+
+The initial quarter-invalidated run preceded the explicit full-chain assertion and
+is retained separately, not substituted for the checked repeat. Reports:
+[initial quarter](churn-quarter.json), [checked quarter](churn-quarter-checked.json),
+[all invalidated](churn-all.json), [rotation only during measurement](churn-rotation.json),
+[boundary checks](churn-boundaries.json). No trial overlaps our other builds/tests.
+These short local runs are not sustained HTTP/Go capacity evidence, nor a measurement
+of how often actual Serve invalidates snapshots. Raw reports retain source hashes.
+
+Next audit unnecessary invalidations narrowly. Current POC hooks invalidate even a
+read from an unchanged strong handle, whose value was already a snapshot root.
+Conditional reads can rescue snapshot-white values and must remain protected;
+creation/replacement/release, teardown and root ownership changes require separate
+reasoning and tests. Removing a hook without demonstrating safe ownership and
+publication is not an optimization. Root churn data motivates this investigation,
+but this slice changes no invalidation rule and claims no new speedup.
+
+Example:
+
+```
+python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build VALIDATED_BUILD --output NEW_RESULTS --rounds 2000 --live-count 4096 --host-roots 64 --churn-every 4
+```

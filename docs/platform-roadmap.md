@@ -5309,3 +5309,13 @@ eight roots. Zero-root control is unchanged within variation. Capture correctnes
 and full reclamation pass; production and Serve remain unchanged. Next evaluate
 root churn/invalidation and cadence before integration, without extrapolating root
 counts into concurrent HTTP requests.
+
+
+**Mutation/invalidation evaluation (2026-10-18):** benchmark graph rotation and
+controlled host-root replacement with fully charged synchronous fallback. Verify
+full graph order, exact discards/fallbacks and eventual complete reclamation.
+[Evidence](../benchmarks/gc-concurrent-poc/README.md#rotating-graph-and-invalidation-cost-2026-10-18)
+shows rotation preserves the larger-graph pause benefit, while every-cycle invalidation
+raises owner interruption about 28–29% versus sync. Next audit read-only strong-handle
+invalidation separately from conditional resurrection and mutation. Production
+behavior and collector eligibility are unchanged; this is not a Serve measurement.

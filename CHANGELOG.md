@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Extend concurrent-GC POC comparisons with rooted-graph rotation, controlled host-root replacement and explicitly charged synchronous fallback. Verify full graph order, exact discard/fallback counts and complete reclamation, including boundary cases. Rotation retains a roughly 19% owner-interruption reduction on the tested larger graph; invalidating every cycle instead raises interruption 28–29% and CPU about 9% versus sync. Retain all runs; no production policy, invalidation change or new speedup is claimed.
+
 - Remove per-registered-root full-heap validation from concurrent-GC POC capture by reusing the existing bounded block index. Exact-base/corrupt-tail regressions and reclamation qualification pass. Matched 64-root trials and a longer repeat reduce elapsed 47–49% and process CPU 46–47%; eight roots gain about 10%, with no material zero-root regression. Record raw evidence and limitations: this fixes POC overhead, does not beat sync CPU, and establishes no HTTP capacity or production collector support.
 
 - Combine concurrent-GC POC integrity/identity validation into one read-only walk, checking split free-span boundaries and the complete appended tail before mutation. Five new rejection regressions and existing UBSan/bounds reclamation checks pass. Larger-graph owner interruption falls another 14–17%; elapsed approaches sync in these local trials, with 7–8% more CPU. Small graphs still lose to sync. Preserve phase/control evidence; production GC and Serve capacity remain unchanged.

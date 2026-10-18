@@ -1,0 +1,222 @@
+[
+  {
+    "command": [
+      "target/gc-churn-rotation/bench",
+      "sync",
+      "100",
+      "0",
+      "1",
+      "1",
+      "1"
+    ],
+    "result": {
+      "churnEvery": 1,
+      "replacements": 100,
+      "discardedCycles": 0,
+      "fallbackCollections": 0,
+      "phaseTiming": false,
+      "phaseNs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "sync",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 1,
+      "hostRoots": 1,
+      "elapsedNs": 605000,
+      "cpuNs": 605000,
+      "ownerCpuNs": 600958,
+      "pauseTotalNs": 64000,
+      "captureOrSyncNs": 64000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 6000,
+      "pauseP99Ns": 1000,
+      "peakArenaBytes": 10296,
+      "maxRssBytes": 1720320,
+      "allocations": 6400,
+      "collections": 100,
+      "checksum": 1,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-churn-rotation/bench",
+      "concurrent",
+      "100",
+      "0",
+      "1",
+      "1",
+      "1"
+    ],
+    "result": {
+      "churnEvery": 1,
+      "replacements": 100,
+      "discardedCycles": 100,
+      "fallbackCollections": 100,
+      "phaseTiming": false,
+      "phaseNs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "concurrent",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 1,
+      "hostRoots": 1,
+      "elapsedNs": 729000,
+      "cpuNs": 880000,
+      "ownerCpuNs": 724750,
+      "pauseTotalNs": 174000,
+      "captureOrSyncNs": 102000,
+      "waitApplyNs": 72000,
+      "batchP99Ns": 11000,
+      "pauseP99Ns": 2000,
+      "peakArenaBytes": 10296,
+      "maxRssBytes": 1835008,
+      "allocations": 6400,
+      "collections": 100,
+      "checksum": 1,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-churn-rotation/bench",
+      "sync",
+      "100",
+      "0",
+      "64",
+      "0",
+      "0"
+    ],
+    "result": {
+      "churnEvery": 0,
+      "replacements": 0,
+      "discardedCycles": 0,
+      "fallbackCollections": 0,
+      "phaseTiming": false,
+      "phaseNs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "sync",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 64,
+      "hostRoots": 0,
+      "elapsedNs": 1716000,
+      "cpuNs": 1716000,
+      "ownerCpuNs": 1713209,
+      "pauseTotalNs": 131000,
+      "captureOrSyncNs": 131000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 20000,
+      "pauseP99Ns": 2000,
+      "peakArenaBytes": 13824,
+      "maxRssBytes": 1720320,
+      "allocations": 6400,
+      "collections": 100,
+      "checksum": 1,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-churn-rotation/bench",
+      "concurrent",
+      "100",
+      "0",
+      "64",
+      "0",
+      "0"
+    ],
+    "result": {
+      "churnEvery": 0,
+      "replacements": 0,
+      "discardedCycles": 0,
+      "fallbackCollections": 0,
+      "phaseTiming": false,
+      "phaseNs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "concurrent",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 64,
+      "hostRoots": 0,
+      "elapsedNs": 3059000,
+      "cpuNs": 3460000,
+      "ownerCpuNs": 3042500,
+      "pauseTotalNs": 525000,
+      "captureOrSyncNs": 322000,
+      "waitApplyNs": 203000,
+      "batchP99Ns": 35000,
+      "pauseP99Ns": 8000,
+      "peakArenaBytes": 24064,
+      "maxRssBytes": 1884160,
+      "allocations": 6400,
+      "collections": 100,
+      "checksum": 1,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-churn-rotation/bench",
+      "concurrent",
+      "100",
+      "0",
+      "64",
+      "8",
+      "3"
+    ],
+    "result": {
+      "churnEvery": 3,
+      "replacements": 33,
+      "discardedCycles": 33,
+      "fallbackCollections": 33,
+      "phaseTiming": false,
+      "phaseNs": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "mode": "concurrent",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 64,
+      "hostRoots": 8,
+      "elapsedNs": 2634000,
+      "cpuNs": 2981000,
+      "ownerCpuNs": 2610500,
+      "pauseTotalNs": 388000,
+      "captureOrSyncNs": 206000,
+      "waitApplyNs": 182000,
+      "batchP99Ns": 33000,
+      "pauseP99Ns": 6000,
+      "peakArenaBytes": 24064,
+      "maxRssBytes": 1900544,
+      "allocations": 6400,
+      "collections": 100,
+      "checksum": 1,
+      "finalArenaBytes": 0
+    }
+  }
+]

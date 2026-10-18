@@ -148,5 +148,7 @@ tests. Larger-graph elapsed approaches synchronous GC, but CPU use remains highe
 and smaller graphs still run slower. Indexed registered-root capture removes a
 POC scaling defect: matched 64-root trials use 47–49% less elapsed time than the
 preceding POC, with a longer repeat and zero-root control. This is not a speedup
-over synchronous GC or an HTTP capacity claim. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
+over synchronous GC or an HTTP capacity claim. Graph-rotation tests preserve the
+local pause benefit, but frequent snapshot invalidation and synchronous fallback
+can eliminate it. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
 See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).
