@@ -40,9 +40,16 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   rooted byref display; discovered generic Result overrides before owner erasure.
   Compared copied consumers with the installed compiler/backend and interpreter,
   without modifying the user sample or installed binaries. Added GC/copy/fault tests.
+- **Author clarification:** experience should be consistent across interpreter, JIT
+  and AOT. The assistant expanded the consumer comparisons to all three modes.
+- **Assistant follow-up:** corrected native nominal/interpreter interface casts to
+  InvalidCast, refreshed the helper-budget assertion, and repaired interpreted boxed
+  record default display. Seven consumers now match across three modes (21 executions),
+  including both successful and error Result values. Ten interpreter display checks
+  and focused native structural/GC/fault checks pass; each repair has its own commit.
 - **Scope and open items:** JSON record mapping remains an explicit UnsupportedMapping
-  result. Adjacent tests expose nominal cast-fault classification and a stale helper
-  budget assertion; those are follow-up slices. See the
+  result; the exact original NEOMETA001 declaration continues to compile in Preview 16.
+  The installation is unchanged; no Windows qualification is claimed. See the
   [reproduction evidence](experiments/preview16-record-display/README.md).
 
 

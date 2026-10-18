@@ -156,3 +156,17 @@ fn boxed_enum_display_uses_metadata_names_and_numeric_fallback() {
         assert_eq!(result.value, Value::String(expected.into()));
     }
 }
+
+#[test]
+fn boxed_records_without_overrides_use_default_object_display() {
+    for declarations in [
+        ".type Plain\n.end",
+        ".type Plain\n.field Number Int32\n.end",
+    ] {
+        let result = run(
+            ".local Plain value\nldloca value\ninitobj Plain\nldloc value\nbox Plain\ncallvirt instance System.Object::ToString()",
+            declarations,
+        ).unwrap();
+        assert_eq!(result.value, Value::String("Plain".into()));
+    }
+}

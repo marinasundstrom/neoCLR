@@ -12931,3 +12931,16 @@ the interpreter and .NET cast semantics; no metadata or Runtime Contract change.
 The existing empty-box and five structural fault regressions exercise the repair.
 The same investigation found interpreter interface casts leaking RuntimeError;
 those failed casts now also report InvalidCast.
+
+### Default record display and three-mode parity
+
+Interpreter dispatch now permits the concrete Object.ToString default for boxed
+nominal records without overrides. This matches native type-name fallback and .NET
+default value display; explicit overrides still take precedence. Equality/hash and
+unsupported intrinsic floating display are not changed. Ten focused interpreter
+display tests pass. Seven consumers emitted by the installed Preview 16 compiler
+have matching output/exit codes across interpreter, JIT and AOT (21 executions),
+including error/success Result display and direct Person display. The direct record
+case requires the repaired interpreter. Full commands/hashes and the earlier failure
+are retained in the linked experiment. No Raven/CLI representation or public API
+change; this validation is macOS ARM64 development evidence.

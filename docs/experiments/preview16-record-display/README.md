@@ -8,6 +8,7 @@ isolated fixtures, while using the installed compiler and libraries.
 python3 docs/experiments/preview16-record-display/verify.py \
   --bundle /path/to/preview16/neoclr-native-poc \
   --backend /path/to/candidate/neoclr-codegen \
+  --interpreter /path/to/candidate/neoclr \
   --output /new/output/directory
 ```
 
@@ -17,9 +18,22 @@ installed native host. No installation, publication or Windows qualification is
 implied. The candidate is a debug macOS ARM64 build; these are correctness checks,
 not performance measurements.
 
-The [retained interpreter/JIT report](interpreter-jit-results.json) passes all five
-fixtures. AOT consumer verification is being added in the next validation slice;
-the low-level record/primitive GC tests already compile and link native objects.
+The [initial interpreter/JIT report](interpreter-jit-results.json) passes five
+fixtures. The [three-mode report](three-mode-results.json.gz) adds ahead-of-time
+object compilation, native linking and execution for all five. The
+[additional three-mode report](additional-three-mode-results.json.gz) covers direct
+record display and successful Result display: seven fixtures, 21 matching executions.
+AOT links generated object code against the exact installed native service dylib
+and calls its host entry wrapper; it does not invoke JIT code generation. The script
+fixes the executable's dylib install-name reference, never the installed dylib.
+The low-level record/primitive GC tests also compile and link native objects.
+
+The original five cases use the installed interpreter. The two additional cases
+use the rebuilt interpreter because direct record display exposed an interpreter
+fallback gap. The [before report](record-display-before.json.gz) retains that failure.
+Use --interpreter for the candidate runtime and --cases to select a subset. Native
+backend/host hashes are unchanged across these reports; the subsequent checked-cast
+slice is validated separately by focused native/interpreter fault tests.
 
 ## Findings
 
@@ -40,6 +54,13 @@ the low-level record/primitive GC tests already compile and link native objects.
 - Class mapping requires explicit reflection retention. The class fixture uses
   ordinary storage fields, not public properties; successful execution must not be
   interpreted as proof that Name/Age properties were serialized.
+
+- Direct Person display without a ToString override previously failed in the
+  interpreter. The repaired interpreter and both native modes print `Person`, using
+  the same Object default as .NET's type-name fallback. Explicit overrides still win;
+  unsupported floating formatting and value equality/hash are not silently changed.
+- A successful scalar JSON serialization exercises Result.Ok display in all three
+  modes, complementing the class error-result fixtures.
 
 ## Regression coverage and bounds
 

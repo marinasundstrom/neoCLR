@@ -4,7 +4,6 @@ import argparse
 import hashlib
 import importlib.util
 import json
-import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -13,6 +12,8 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--bundle', type=Path, required=True)
 p.add_argument('--backend', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--interpreter', type=Path, help='Candidate runtime for interpreter comparisons; defaults to installed runtime')
+p.add_argument('--cases', nargs='+', default=['wrapper', 'value', 'pattern', 'record-construction', 'record-json', 'record-display', 'success'])
 a = p.parse_args()
 bundle = a.bundle.resolve()
 out = a.output.resolve()
@@ -29,8 +30,9 @@ spec = importlib.util.spec_from_file_location('sample', bundle/'tools/run-native
 helper = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(helper)
 runtime = bundle/'bin/neoclr'
+interpreter = a.interpreter.resolve() if a.interpreter else runtime
 report = dict(passed=False, bundle=str(bundle), backend=str(a.backend.resolve()), commands=[], inputs={})
-for path in [bundle/'bin/neoclr-jit-host.dylib', runtime, bundle/'bin/neoclr-codegen', bundle/'sdk/tools/rvnc/rvnc.dll', a.backend.resolve(), bundle/'manifest.json']:
+for path in [bundle/'bin/neoclr-jit-host.dylib', runtime, interpreter, bundle/'bin/neoclr-codegen', bundle/'sdk/tools/rvnc/rvnc.dll', a.backend.resolve(), bundle/'manifest.json']:
     report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
 
 def run(label, command):
@@ -50,7 +52,7 @@ int main(int argc, const char **argv) {
 """)
 flags = '--compile-system --bind-user-fault --bind-stack-trace --reference-arena --native-gc --bind-console-read-byte --bind-console-write-line --bind-console-stream-output --bind-int32-to-string --bind-utf8-text --native-stack-budget --bind-integer-text --bind-character-text --bind-system-culture --bind-time-zone-rules --bind-cryptography --bind-tls --bind-task-queue --bind-scheduler --bind-timers --bind-socket-listener --bind-socket-accept --bind-socket-transfer --bind-socket-client --bind-runtime-async'.split()
 try:
-    for name in ['wrapper', 'value', 'pattern', 'record-construction', 'record-json']:
+    for name in a.cases:
         expression = {'wrapper': 'Console.WriteLine(result)', 'value': 'Console.WriteLine(result.Value)',
                       'pattern': 'if let .Ok(text) = result {\n        Console.WriteLine(text)\n    }'}.get(name, '')
         source = '''import System.*
@@ -63,13 +65,17 @@ class Person {
 async func Main() -> Task<unit> {
     let result = JsonSerializer.Serialize(Person { Name = "Bob", Age = 42 })
     ''' + expression + '\n}\n'
+        if name == 'success':
+            source = source.replace('JsonSerializer.Serialize(Person { Name = "Bob", Age = 42 })', 'JsonSerializer.Serialize("Bob")').replace('    \n}', '    Console.WriteLine(result)\n}')
         if name.startswith('record-'):
             source = """import System.*
 import System.Data.Json.*
 record struct Person(val Name: string, val Age: int)
 func Main() {
 """
-            if name == 'record-construction':
+            if name == 'record-display':
+                source += '    Console.WriteLine(Person("Bob", 42))\n'
+            elif name == 'record-construction':
                 source += '    let person = Person("Bob", 42)\n    Console.WriteLine(person.Name)\n'
             else:
                 source += '    let result = JsonSerializer.Serialize(Person("Bob", 42))\n    if let .Error(error) = result {\n        Console.WriteLine("unsupported record mapping")\n    }\n'
@@ -89,7 +95,7 @@ func Main() {
         if name == 'record-construction':
             assert old.returncode == 0 and old.stdout == 'Bob\n'
         new = run(name+'-candidate', [*command,'--jit-compiler',a.backend.resolve()])
-        interpreted = run(name+'-interpreter', [runtime,'run',assembly,'--execution','interpreter','--system',bundle/'lib/System.runtime.neox','--object-root',bundle/'lib/System.Runtime.dll',*[part for module in json.loads((bundle/'manifest.json').read_text())['modules'] for part in ['--module',bundle/module]]])
+        interpreted = run(name+'-interpreter', [interpreter,'run',assembly,'--execution','interpreter','--system',bundle/'lib/System.runtime.neox','--object-root',bundle/'lib/System.Runtime.dll',*[part for module in json.loads((bundle/'manifest.json').read_text())['modules'] for part in ['--module',bundle/module]]])
         assert new.returncode == interpreted.returncode == 0, (new.stderr, interpreted.stderr)
         assert new.stdout == interpreted.stdout, (new.stdout, interpreted.stdout)
         obj, executable = out/(name+'.o'), out/(name+'-aot')

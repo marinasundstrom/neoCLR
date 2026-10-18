@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Use the Object type-name fallback for interpreted boxed records without ToString overrides, matching native execution. Add a regression and retain seven Preview 16-compiled consumers with matching interpreter/JIT/AOT output, including successful/error Result display; leave JSON record mapping and other documented limits explicit.
+
 - Report InvalidCast for failed native nominal reference casts and interpreter interface casts, including narrowing from structural views; preserve null casts and source sites. Refresh the boxing-helper budget regression for the current 2,048-function bound.
 
 - Add native boxed Int64/Boolean Object display with exact integer formatting, Boolean text and rooted allocation; preserve explicit formatter binding and allow verified reference boxing in display-bearing programs. Add interpreter-parity/GC regression coverage. Also copy/trace nonempty closed value-record boxes, checked unboxing and byref display overrides; discover generic Result overrides before owner erasure. Retain Preview 16 compiler/backend/interpreter reproduction and document separate JSON mapping/retention limits.
