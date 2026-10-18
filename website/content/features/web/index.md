@@ -179,6 +179,15 @@ per completion in its final 60-second pair, but worse tail latency and missed
 arrivals prevent a sustained throughput claim. See the
 [complete experiment and Go controls](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/incoming-url-20261018/README.md).
 
+A subsequent development change replaces blind async idle sleeps with bounded
+socket-readiness waits. After removing a busy background process, all eight
+60-second control/candidate/Go runs complete every arrival at 300 requests/sec.
+Readiness reduces median latency by 25–29% and p99 by 12–19% versus URI removal
+alone; CPU changes are mixed. Unchanged controls also pass, so the admission
+recovery cannot be attributed solely to the fix. Go still uses substantially less
+CPU per request; maximum capacity remains unmeasured. See the
+[readiness investigation and full evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/admission-followup-20261018/README.md).
+
 Bodies, headers, URLs and JSON documents have separate size limits. Supported
 admission bounds are not a throughput guarantee; use the [HTTP API reference](/docs/api/System/Web/Http/index.html)
 for exact limits and error behavior. Choose a matching development toolchain for

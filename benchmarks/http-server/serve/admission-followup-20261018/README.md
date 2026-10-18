@@ -70,3 +70,65 @@ waits; older evidence retains the earlier separate pause hook. Use build.py to
 relink a retained guest without recompiling managed code and verify.py for the
 focused native contracts. The ordinary native-network validator now includes the
 POSIX wait regression. Performance measurements follow separately.
+
+## Sustained-load comparison
+
+All eight uninstrumented points run after terminating the busy orphan. No builds
+or profilers run during timing. Each fresh process gets two seconds of warmup,
+then 60 seconds at 300 offered requests/sec with a 64-request client limit.
+Round one orders baseline, previous, candidate, Go; round two reverses that order.
+The 16-lane Serve fixture returns ten bytes after queued Task work, closes each
+connection, and uses the same 32 MiB paced synchronous heap. Go uses GOMAXPROCS=1,
+GOGC=100 and no GOMEMLIMIT. Client and server share this macOS ARM64 machine.
+
+Baseline is the retained freshly rebuilt managed cohort before URI removal;
+previous is URI removal alone. Candidate relinks that exact previous managed
+object with readiness waits. This isolates the native change without introducing
+another managed rebuild. Build identities and start/end input hashes are retained.
+
+| Arm | Round | Successful arrivals | CPU ms/completion | Offered p50 ms | Offered p99 ms | Peak sampled CPU cores |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Fresh baseline | 1 | 18,000/18,000 | 2.197 | 3.233 | 9.759 | 0.792 |
+| Fresh baseline | 2 | 18,000/18,000 | 2.015 | 3.280 | 6.981 | 0.673 |
+| URI removal only | 1 | 18,000/18,000 | 2.054 | 3.101 | 6.302 | 0.654 |
+| URI removal only | 2 | 18,000/18,000 | 1.862 | 3.280 | 7.029 | 0.634 |
+| Readiness candidate | 1 | 18,000/18,000 | 1.902 | 2.325 | 5.573 | 0.674 |
+| Readiness candidate | 2 | 18,000/18,000 | 1.904 | 2.331 | 5.671 | 0.673 |
+| Go | 1 | 18,000/18,000 | 0.288 | 1.981 | 5.505 | 0.099 |
+| Go | 2 | 18,000/18,000 | 0.257 | 1.907 | 4.826 | 0.099 |
+
+All 144,000 arrivals succeed with clean shutdown and exact server/client accounting.
+Within-window completion rates are 299.97–300/sec; the remaining one/two requests
+finish during drain. All points pass the provisional 100% success, offered p99
+under 250 ms and generator p99 under 5 ms criterion. These are repeated local
+60-second qualifications of 300/sec, not maximum capacity or long-run stability.
+
+Against URI removal alone, readiness reduces p50 by 25.0%/28.9% and p99 by
+11.6%/19.3%. CPU changes by -7.4%/+2.2%: no repeatable CPU reduction. Coarse peaks
+increase slightly relative to URI removal alone; candidate RSS is 12,880 KiB
+versus 12,816 KiB. CPU peaks are half-second process samples, not instantaneous
+spikes. Against the fresh pre-URI baseline, combined CPU reductions are about
+13.4%/5.5%; those include both changes and cannot be attributed solely to waiting.
+Go still needs roughly 6.6–7.4 times less CPU/completion. Similar fixed-rate latency
+does not establish equal throughput capacity.
+
+The unchanged controls also pass now. Admission recovery cannot be credited to
+the readiness change alone: removal of the environment confounder applies to all
+arms. The earlier long stall's exact cause remains unproved; this slice fixes an
+independently observed blind wait and shows repeatable latency improvement.
+Even this matrix contains a 45.5 ms maximum generator gap in baseline round one,
+despite 0.75 ms p99. Raw request records remain necessary for short stalls.
+
+[Summary and paired deltas](evidence/load-summary.json),
+[execution order and identities](evidence/comparison.json), and eight compact
+`*-300.json` reports retain the measurements; adjacent `.json.gz` archives retain
+all request/resource records with checksums. Earlier diagnostic failures remain
+alongside them. Reproduce using compare.py with the retained baseline, previous,
+candidate and Go build paths; use the load/archive.py helper for lossless archives.
+Next increase offered load in a separate matched matrix and profile CPU at the
+first sustained-capacity boundary, keeping client scheduling checks explicit.
+
+For the readiness contract, Apple's primary [poll documentation](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/poll.2.html)
+describes descriptor arrays, readiness events, millisecond timeouts and EINTR.
+This internal POSIX choice preserves managed .NET-style semantics; it does not
+claim equivalence to the CLR's platform-specific thread-pool implementation.

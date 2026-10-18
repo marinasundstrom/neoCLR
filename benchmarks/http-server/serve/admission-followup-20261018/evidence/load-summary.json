@@ -1,0 +1,195 @@
+{
+  "rows": [
+    {
+      "mode": "baseline",
+      "round": 1,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 18000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 2.1966666666666668,
+      "offeredP99Ms": 9.759041999998885,
+      "dispatchLagP99Ms": 0.7547916666652554,
+      "peakRssKiB": 12896,
+      "peakSampledCpuCores": 0.7924221336988945,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 3.2330840000014405,
+      "dispatchLagMaxMs": 45.45512533333351
+    },
+    {
+      "mode": "baseline",
+      "round": 2,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 17999,
+      "throughput": 299.98333333333335,
+      "cpuMsPerCompletion": 2.015111950663926,
+      "offeredP99Ms": 6.981291333332251,
+      "dispatchLagP99Ms": 0.7194579999989514,
+      "peakRssKiB": 12912,
+      "peakSampledCpuCores": 0.6734928241330357,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 3.279833333333926,
+      "dispatchLagMaxMs": 3.2108753333339735
+    },
+    {
+      "mode": "candidate",
+      "round": 1,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 17998,
+      "throughput": 299.96666666666664,
+      "cpuMsPerCompletion": 1.9024336037337484,
+      "offeredP99Ms": 5.572833333332028,
+      "dispatchLagP99Ms": 0.6161660000003621,
+      "peakRssKiB": 12880,
+      "peakSampledCpuCores": 0.6739496173105939,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 2.3253749999980755,
+      "dispatchLagMaxMs": 6.211415999999748
+    },
+    {
+      "mode": "candidate",
+      "round": 2,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 18000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 1.9038888888888887,
+      "offeredP99Ms": 5.670750333337082,
+      "dispatchLagP99Ms": 0.5777086666665099,
+      "peakRssKiB": 12880,
+      "peakSampledCpuCores": 0.6734258485103798,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 2.3309166666649617,
+      "dispatchLagMaxMs": 2.8809999999950264
+    },
+    {
+      "mode": "go",
+      "round": 1,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 18000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 0.2883333333333334,
+      "offeredP99Ms": 5.505499999998165,
+      "dispatchLagP99Ms": 2.1299996666668264,
+      "peakRssKiB": 15072,
+      "peakSampledCpuCores": 0.09882512579331644,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 1.9808753333379059,
+      "dispatchLagMaxMs": 7.532708000006494
+    },
+    {
+      "mode": "go",
+      "round": 2,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 18000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 0.25666666666666665,
+      "offeredP99Ms": 4.826208333334137,
+      "dispatchLagP99Ms": 1.4977080000022625,
+      "peakRssKiB": 15024,
+      "peakSampledCpuCores": 0.09868817110337273,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 1.907374333335099,
+      "dispatchLagMaxMs": 17.141124666668617
+    },
+    {
+      "mode": "previous",
+      "round": 1,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 18000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 2.054444444444444,
+      "offeredP99Ms": 6.301624999998978,
+      "dispatchLagP99Ms": 0.681375333333456,
+      "peakRssKiB": 12816,
+      "peakSampledCpuCores": 0.6537593764324203,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 3.101249666670469,
+      "dispatchLagMaxMs": 5.684333000000041
+    },
+    {
+      "mode": "previous",
+      "round": 2,
+      "rate": 300,
+      "offered": 18000,
+      "admitted": 18000,
+      "outcomes": {
+        "ok": 18000
+      },
+      "completedWithinWindow": 18000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 1.862222222222222,
+      "offeredP99Ms": 7.028916333332802,
+      "dispatchLagP99Ms": 0.8544166666695219,
+      "peakRssKiB": 12816,
+      "peakSampledCpuCores": 0.6343997310636799,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0,
+      "offeredP50Ms": 3.279874333337318,
+      "dispatchLagMaxMs": 3.049082666663594
+    }
+  ],
+  "cpuPeakMethod": "Largest process CPU delta / elapsed delta between resource samples; coarse ~0.5-second samples, not instantaneous peaks. One core is 1.0. Timing excludes allocation instrumentation.",
+  "pairedImpact": [
+    {
+      "round": 1,
+      "cpuMsPerCompletionChangePercent": -7.399121505658524,
+      "offeredP50MsChangePercent": -25.018129788479104,
+      "offeredP99MsChangePercent": -11.5651386216582
+    },
+    {
+      "round": 2,
+      "cpuMsPerCompletionChangePercent": 2.237470167064437,
+      "offeredP50MsChangePercent": -28.932744679482237,
+      "offeredP99MsChangePercent": -19.322551807239073
+    }
+  ]
+}

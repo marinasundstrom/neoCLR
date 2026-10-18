@@ -19485,3 +19485,30 @@ while the baseline misses none and has worse p99/coarse CPU peaks. Both Go
 confirmations complete all arrivals. No reliable throughput gain is claimed;
 admission/latency attribution remains open. Website and roadmap describe the
 allocation improvement separately from capacity qualification.
+
+## 2026-10-18 — Separate admission confounders from an avoidable readiness delay
+
+The author asked to investigate admission misses and worse tail latency despite
+lower CPU, make a targeted fix, compare the fresh baseline and Go, and commit each
+slice. The assistant correlated individual requests with generator phases and a
+separate GC/scheduler trace. Short dispatch gaps were hidden by overall p99. It
+found a busy orphan Raven language server, confirmed VS Code was closed, and
+terminated only that orphan under the prior instruction to close VS Code. This
+is a confounder, not proof of every stall's cause. The traced run did not reproduce
+the long stall and therefore does not establish GC as its cause.
+
+The assistant identified blind 1 ms async-pump sleeps and implemented bounded
+socket-readiness waits through the existing scheduler, preserving outcome/root
+ownership. Eight native network contracts, focused sanitizer lifetime/wait checks,
+a failing old-code negative control and 50 HTTP wire cases qualify the change.
+Windows execution of the changed pump path remains unqualified locally.
+
+The [reversed load matrix](../benchmarks/http-server/serve/admission-followup-20261018/README.md)
+completes all 144,000 arrivals across eight 60-second 300/sec points. Relative to
+URI removal alone, readiness improves p50 by 25–29% and p99 by 12–19%; CPU changes
+by -7.4%/+2.2%, with slightly higher sampled peaks. Unchanged controls also pass
+after environment cleanup: admission recovery cannot be credited solely to the
+fix. Go retains a large CPU advantage. Raw failures and successful measurements
+remain archived; maximum sustained capacity and the exact old stall cause remain
+open. The assistant committed diagnosis and implementation separately, followed
+by the measurement/documentation slice.

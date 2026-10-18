@@ -1,0 +1,767 @@
+{
+  "completed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/load/run.py": "27de73100821ee3dca8bedb8bd3ba2db23cc42d878b3f8e94f50068a7e064b21",
+    "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/go/app": "5494f10931b4a50817047dde2ef0744904eafe3e90dcaea3ee9761145a29912c",
+    "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/go/build.json": "d996e279d9f97e5d551aac7b9f5ab89aab6bd21bcbee6f1b34416a1e58e3926e",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/go/main.go": "5c644ed6f6530c84c5fbcf2e35b7a37fb8c1a0c1157b6e3a096fa7cce0f4fe7e",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/process.py": "8f431f98dedaa45bcb86091feea953097f6b94a6e3c6f948c18fec03da17d80c"
+  },
+  "build": {
+    "passed": true,
+    "runtime": "go",
+    "version": "go version go1.26.3 darwin/arm64",
+    "command": [
+      "go",
+      "build",
+      "-trimpath",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/go/app",
+      "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/go/main.go"
+    ],
+    "exitCode": 0,
+    "stderr": "",
+    "environment": {
+      "GOTOOLCHAIN": "local",
+      "CGO_ENABLED": "0",
+      "GOOS": null,
+      "GOARCH": null
+    },
+    "sourceSha256": "5c644ed6f6530c84c5fbcf2e35b7a37fb8c1a0c1157b6e3a096fa7cce0f4fe7e",
+    "builtAtUnixSeconds": 1792355349.146235,
+    "executableSha256": "5494f10931b4a50817047dde2ef0744904eafe3e90dcaea3ee9761145a29912c"
+  },
+  "loadBefore": [
+    1.8173828125,
+    2.7548828125,
+    3.47021484375
+  ],
+  "processesBefore": {
+    "command": [
+      "ps",
+      "-axo",
+      "%cpu,comm"
+    ],
+    "output": " %CPU COMM\n  0.0 /sbin/launchd\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /usr/libexec/logd\n  0.0 /usr/libexec/UserEventAgent\n  0.1 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/FSEvents.framework/Versions/A/Support/fseventsd\n  0.0 /System/Library/PrivateFrameworks/MediaRemote.framework/Support/mediaremoted\n  0.0 /usr/sbin/systemstats\n  0.0 /usr/libexec/configd\n  0.0 /System/Library/CoreServices/powerd.bundle/powerd\n  0.0 /usr/libexec/IOMFB_bics_daemon\n  0.0 /usr/libexec/remoted\n  0.0 /System/Library/PrivateFrameworks/CoreSpeech.framework/corespeechd_system\n  0.0 /usr/libexec/watchdogd\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds\n  0.0 /usr/libexec/kernelmanagerd\n  0.0 /usr/libexec/diskarbitrationd\n  0.0 /usr/sbin/syslogd\n  0.0 /usr/libexec/thermalmonitord\n  0.0 /System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/contextstored\n  0.0 /usr/libexec/xprotectd\n  0.0 /usr/libexec/opendirectoryd\n  0.0 /System/Library/PrivateFrameworks/ApplePushService.framework/apsd\n  0.0 /System/Library/CoreServices/launchservicesd\n  0.0 /usr/libexec/timed\n  0.0 /System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/Resources/usbmuxd\n  0.0 /usr/sbin/securityd\n  0.1 /usr/libexec/locationd\n  0.0 /usr/libexec/nesessionmanager\n  0.0 autofsd\n  0.0 /usr/libexec/dasd\n  0.0 /usr/sbin/distnoted\n  0.0 /System/Library/CoreServices/logind\n  0.0 /System/Library/PrivateFrameworks/GenerationalStorage.framework/Versions/A/Support/revisiond\n  0.0 /usr/sbin/KernelEventAgent\n  0.0 /usr/sbin/bluetoothd\n  0.0 /usr/sbin/notifyd\n  0.0 /usr/libexec/corebrightnessd\n  0.0 /System/Library/Frameworks/CoreMediaIO.framework/Versions/A/Resources/com.apple.cmio.registerassistantservice\n  0.2 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer\n  0.0 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd\n  0.0 /usr/sbin/cfprefsd\n  0.0 /System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow\n  0.0 /usr/libexec/runningboardd\n  0.0 /System/Library/PrivateFrameworks/CoreAnalytics.framework/Support/analyticsd\n  0.0 /System/Library/CoreServices/coreservicesd\n  0.4 /usr/libexec/clocksyncd\n  0.0 /usr/libexec/lsd\n  0.0 /usr/libexec/nsurlsessiond\n  0.0 /usr/libexec/eligibilityd\n  2.3 /usr/libexec/airportd\n 28.2 /usr/libexec/syspolicyd\n  0.0 /usr/sbin/mDNSResponder\n  0.0 /usr/sbin/distnoted\n  0.6 /usr/libexec/symptomsd\n  0.0 /usr/sbin/mDNSResponderHelper\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /usr/libexec/ApplicationFirewall/socketfilterfw\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds_stores\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /System/Library/Frameworks/Security.framework/Versions/A/XPCServices/authd.xpc/Contents/MacOS/authd\n  0.0 /usr/libexec/TouchBarServer\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/sbin/WirelessRadioManagerd\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/sbin/distnoted\n  0.0 /System/Library/PrivateFrameworks/People.framework/peopled\n  0.0 /usr/libexec/gamepolicyd\n  0.0 /System/Library/CoreServices/appleeventsd\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/libexec/searchpartyd\n  1.2 /System/Library/DriverExtensions/com.apple.DriverKit-AppleBCMWLAN.dext/com.apple.DriverKit-AppleBCMWLAN\n  0.0 /System/Library/DriverExtensions/com.apple.AppleUserHIDDrivers.dext/com.apple.AppleUserHIDDrivers\n  0.0 /System/Library/DriverExtensions/com.apple.DriverKit-IOUserDockChannelSerial.dext/com.apple.DriverKit-IOUserDockChannelSerial\n  0.0 /System/Library/CoreServices/Software Update.app/Contents/Resources/suhelperd\n  0.0 /System/Library/Frameworks/LocalAuthentication.framework/Support/coreauthd\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/libexec/com.apple.cmio.videodriverkithostextension.systemextension/Contents/MacOS/com.apple.cmio.videodriverkithostextension\n  0.0 /usr/sbin/appleh13camerad\n  0.0 /System/Library/PrivateFrameworks/BackgroundTaskManagement.framework/Resources/backgroundtaskmanagementd\n  0.0 /usr/sbin/distnoted\n  0.0 /Library/PrivilegedHelperTools/com.docker.vmnetd\n  0.0 /usr/libexec/cameracaptured\n  0.0 /System/Library/Frameworks/CoreMediaIO.framework/Versions/A/Resources/UVCAssistant.systemextension/Contents/MacOS/UVCAssistant\n  0.0 /usr/sbin/coreaudiod\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/sbin/distnoted\n  0.0 Core Audio Driver (MSTeamsAudioDevice.driver)\n  0.0 /usr/libexec/modelmanagerd\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/sbin/cfprefsd\n  0.0 /usr/libexec/secd\n  0.0 /usr/libexec/audiomxd\n  0.0 /usr/libexec/UserEventAgent\n  0.0 /System/Library/CoreServices/WindowManager.app/Contents/MacOS/WindowManager\n  0.0 /usr/sbin/universalaccessd\n  0.0 /usr/libexec/ContinuityCaptureAgent\n  0.0 /usr/libexec/pboard\n  0.0 /usr/libexec/containermanagerd\n  0.0 /usr/libexec/lsd\n  0.0 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd\n  0.0 /System/Library/PrivateFrameworks/UserNotificationsCore.framework/Support/usernotificationsd\n  0.0 /usr/libexec/rapportd\n  0.0 /System/Library/CoreServices/WallpaperAgent.app/Contents/MacOS/WallpaperAgent\n  0.0 /System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd\n  0.0 /System/Library/CoreServices/MenuBarAgent.app/Contents/MacOS/MenuBarAgent\n  0.0 /usr/sbin/distnoted\n  0.0 /System/Library/CoreServices/lockoutagent\n  0.0 /usr/sbin/usernoted\n  0.0 /usr/libexec/nsurlsessiond\n  0.0 /System/Library/CoreServices/WiFiAgent.app/Contents/MacOS/WiFiAgent\n  0.0 /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ATS.framework/Support/fontd\n  0.0 /System/Library/Frameworks/Accounts.framework/Versions/A/Support/accountsd\n  0.0 /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/ATS.framework/Versions/A/Support/fontworker\n  0.0 /usr/libexec/sharingd\n  0.0 /System/Library/ExtensionKit/Extensions/WallpaperAerialsExtension.appex/Contents/MacOS/WallpaperAerialsExtension\n  0.0 /usr/libexec/nearbyd\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/corespotlightd\n  0.0 /System/Library/PrivateFrameworks/ChronoCore.framework/Support/chronod\n  0.0 /System/Library/Frameworks/CryptoTokenKit.framework/ctkd\n  0.0 /System/Library/CoreServices/Dock.app/Contents/MacOS/Dock\n  0.3 /System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter\n  0.0 /System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer\n  0.3 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder\n  0.0 /System/Library/CoreServices/sharedfilelistd\n  0.0 /System/Library/CoreServices/AccessibilityUIServer.app/Contents/MacOS/AccessibilityUIServer\n  0.0 /System/Library/PrivateFrameworks/ViewBridge.framework/Versions/A/XPCServices/ViewBridgeAuxiliary.xpc/Contents/MacOS/ViewBridgeAuxiliary\n  0.0 automountd\n  0.0 /System/Library/PrivateFrameworks/AMPDevices.framework/Versions/A/Support/AMPDeviceDiscoveryAgent\n  0.0 /System/Library/PrivateFrameworks/UserActivity.framework/Agents/useractivityd\n  0.0 /usr/sbin/filecoordinationd\n  0.0 /System/Library/CoreServices/Dock.app/Contents/XPCServices/com.apple.dock.extra.xpc/Contents/MacOS/com.apple.dock.extra\n  0.0 /System/Library/CoreServices/Dock.app/Contents/XPCServices/com.apple.dock.external.extra.arm64.xpc/Contents/MacOS/com.apple.dock.external.extra.arm64\n  0.0 /System/Library/PrivateFrameworks/IMCore.framework/imagent.app/Contents/MacOS/imagent\n  0.0 /System/Library/PrivateFrameworks/PassKitCore.framework/passd\n  0.0 /System/Library/CoreServices/SubmitDiagInfo\n  0.0 /System/Library/CoreServices/NotificationCenter.app/Contents/MacOS/NotificationCenter\n  0.0 /System/Library/CoreServices/UIKitSystem.app/Contents/MacOS/UIKitSystem\n  0.0 /System/Library/PrivateFrameworks/MediaRemote.framework/Support/mediaremoteagent\n  0.0 /usr/libexec/avconferenced\n  0.0 /System/Library/PrivateFrameworks/CommunicationsFilter.framework/CMFSyncAgent\n  0.0 /System/Library/DriverExtensions/IOUserBluetoothSerialDriver.dext/IOUserBluetoothSerialDriver\n  0.0 /System/Library/PrivateFrameworks/CoreFP.framework/Versions/A/fairplayd\n  0.0 /System/Library/PrivateFrameworks/CoreSpeech.framework/corespeechd\n  0.0 /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/CVMServer\n  0.0 /System/Library/CoreServices/UniversalControl.app/Contents/MacOS/UniversalControl\n  0.0 /usr/libexec/SidecarRelay\n  0.0 2BUA8C4S2C.com.1password.browser-helper\n  0.0 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent\n  0.0 /System/Library/Image Capture/Support/icdd\n  0.0 com.apple.Passwords.MenuBarExtra\n  0.0 /System/Library/CoreServices/AirPlayUIAgent.app/Contents/MacOS/AirPlayUIAgent\n  0.0 com.apple.weather.menu\n  0.0 /System/Applications/Siri AI.app/Contents/MacOS/Siri AI\n  0.0 /System/Library/CoreServices/diagnostics_agent\n  0.0 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent\n  0.0 /System/Library/Frameworks/CryptoTokenKit.framework/ctkahp.bundle/Contents/MacOS/ctkahp\n  0.0 /System/Library/PrivateFrameworks/AgentSessionKitRuntime.framework/Versions/A/agentstored\n  0.0 /usr/libexec/InternetSharing\n  0.0 /usr/sbin/distnoted\n  0.0 /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex-code-mode-host\n  0.0 /System/Library/CoreServices/ControlStrip.app/Contents/MacOS/ControlStrip\n  0.0 /System/Library/PrivateFrameworks/TextInputUIMacHelper.framework/Versions/A/XPCServices/CursorUIViewService.xpc/Contents/MacOS/CursorUIViewService\n  0.0 /System/Library/Input Methods/PressAndHold.app/Contents/PlugIns/PAH_Extension.appex/Contents/MacOS/PAH_Extension\n  0.0 /System/Library/Input Methods/EmojiFunctionRowIM.app/Contents/PlugIns/EmojiFunctionRowIM_Extension.appex/Contents/MacOS/EmojiFunctionRowIM_Extension\n  0.0 /System/Applications/Weather.app/Contents/PlugIns/WeatherWidget.appex/Contents/MacOS/WeatherWidget\n  0.0 /Applications/Microsoft Outlook.app/Contents/PlugIns/CalendarWidgetExtension.appex/Contents/MacOS/CalendarWidgetExtension\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/libexec/appleaccountd\n  0.0 /usr/libexec/secinitd\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdbulkimport\n  0.0 /usr/libexec/dhcp6d\n  0.0 /usr/libexec/containermanagerd_system\n  0.0 /usr/sbin/distnoted\n  0.0 /System/Library/PrivateFrameworks/ScreenTimeCore.framework/Versions/A/ScreenTimeAgent\n  0.0 /usr/libexec/knowledge-agent\n  0.0 /System/Library/PrivateFrameworks/SyncedDefaults.framework/Support/syncdefaultsd\n  0.0 /System/Library/CoreServices/ReportCrash\n  0.0 /System/Library/PrivateFrameworks/CoreSymbolication.framework/coresymbolicationd\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/sbin/systemstats\n  0.0 /usr/libexec/wifivelocityd\n  0.0 /usr/libexec/spotlightknowledged.importer\n  0.0 /usr/sbin/distnoted\n  0.0 /System/Library/CoreServices/CrashReporterSupportHelper\n  0.0 /usr/libexec/aned\n  0.0 /usr/libexec/routined\n  0.0 /System/Library/ExtensionKit/Extensions/NotificationsSettingsIntents.appex/Contents/MacOS/NotificationsSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/DateTimeIntentsExtension.appex/Contents/MacOS/DateTimeIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/BluetoothSettingsAppIntentsWidgetExtension.appex/Contents/MacOS/BluetoothSettingsAppIntentsWidgetExtension\n  0.0 /System/Library/ExtensionKit/Extensions/DesktopSettingsIntents.appex/Contents/MacOS/DesktopSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/ControlCenterSettingsIntents.appex/Contents/MacOS/ControlCenterSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/MouseIntentsExtension.appex/Contents/MacOS/MouseIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/TrackpadIntentsExtension.appex/Contents/MacOS/TrackpadIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/WallpaperSettingsIntents.appex/Contents/MacOS/WallpaperSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/TimeMachineSettingsIntents.appex/Contents/MacOS/TimeMachineSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/BatterySettingsIntentsExtension.appex/Contents/MacOS/BatterySettingsIntentsExtension\n  0.0 /usr/sbin/distnoted\n  0.0 /System/Cryptexes/App/usr/libexec/PasswordBreachAgent\n  0.0 /System/Library/ExtensionKit/Extensions/TGOnDeviceInferenceProviderService.appex/Contents/MacOS/TGOnDeviceInferenceProviderService\n  0.0 /usr/sbin/distnoted\n  0.0 /usr/libexec/findmydevice-user-agent\n  0.0 /System/Library/ExtensionKit/Extensions/PCCAgentClientExtension.appex/Contents/MacOS/PCCAgentClientExtension\n  0.0 /System/Library/ExtensionKit/Extensions/GenerativeExperiencesSafetyInferenceProvider.appex/Contents/MacOS/GenerativeExperiencesSafetyInferenceProvider\n  0.0 /System/Library/ExtensionKit/Extensions/TGOnDeviceInferenceProviderService.appex/Contents/MacOS/TGOnDeviceInferenceProviderService\n  0.0 /usr/libexec/apfsd\n  0.0 /usr/libexec/searchpartyuseragent\n  0.0 /usr/libexec/findmylocateagent\n  0.0 /System/Applications/System Settings.app/Contents/MacOS/System Settings\n  0.0 /System/Library/ExtensionKit/Extensions/GeneralSettings.appex/Contents/MacOS/GeneralSettings\n  0.0 /System/Library/ExtensionKit/Extensions/AppleIDSettings.appex/Contents/MacOS/AppleIDSettings\n  0.0 /System/Library/ExtensionKit/Extensions/FamilySettings.appex/Contents/MacOS/FamilySettings\n  0.0 /System/Library/ExtensionKit/Extensions/FollowUpSettingsExtension.appex/Contents/MacOS/FollowUpSettingsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/ClassroomSettings.appex/Contents/MacOS/ClassroomSettings\n  0.0 /System/Library/ExtensionKit/Extensions/HeadphoneSettingsExtension.appex/Contents/MacOS/HeadphoneSettingsExtension\n  0.0 /usr/libexec/studentd\n  0.0 /System/Library/ExtensionKit/Extensions/SoftwareUpdateSettingsExtension.appex/Contents/MacOS/SoftwareUpdateSettingsExtension\n  0.0 /Applications/OneDrive.app/Contents/StandaloneUpdaterDaemon.xpc/Contents/MacOS/StandaloneUpdaterDaemon\n  0.0 /usr/libexec/ioupsd\n  0.1 /System/Library/DriverExtensions/com.apple.DriverKit.AppleUserECM.dext/com.apple.DriverKit.AppleUserECM\n  0.0 /System/Library/DriverExtensions/com.apple.DriverKit.AppleUserECM.dext/com.apple.DriverKit.AppleUserECM\n  0.0 /usr/libexec/milod\n  0.0 /System/Library/PrivateFrameworks/CoreParsec.framework/parsecd\n  0.0 /usr/libexec/PerfPowerServices\n  0.0 /System/Library/Frameworks/LocalAuthentication.framework/Support/coreauthd\n  0.0 /System/Library/PrivateFrameworks/AmbientDisplay.framework/Versions/A/XPCServices/com.apple.AmbientDisplayAgent.xpc/Contents/MacOS/com.apple.AmbientDisplayAgent\n  0.2 /Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/msedge_crashpad_handler\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper.app/Contents/MacOS/Microsoft Edge Helper\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper.app/Contents/MacOS/Microsoft Edge Helper\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper.app/Contents/MacOS/Microsoft Edge Helper\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /System/Cryptexes/App/System/Library/CoreServices/PasswordManagerBrowserExtensionHelper.app/Contents/MacOS/PasswordManagerBrowserExtensionHelper\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper.app/Contents/MacOS/Microsoft Edge Helper\n  0.0 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd\n  0.0 /System/Applications/Passwords.app/Contents/MacOS/Passwords\n  0.0 /System/Library/PrivateFrameworks/LocalAuthenticationUI.framework/Versions/A/XPCServices/LocalAuthenticationRemoteService.xpc/Contents/MacOS/LocalAuthenticationRemoteService\n  0.0 /System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/ContextStoreAgent\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdwrite\n  0.0 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl\n  0.0 /System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd\n  0.0 /System/Library/PrivateFrameworks/BiomeStreams.framework/Support/biomed\n  0.0 /System/Library/CoreServices/UserNotificationCenter.app/Contents/MacOS/UserNotificationCenter\n  0.0 /System/Library/ExtensionKit/Extensions/TGOnDeviceInferenceProviderService.appex/Contents/MacOS/TGOnDeviceInferenceProviderService\n  0.0 /usr/libexec/linkd\n  0.0 /System/Library/PrivateFrameworks/AssistantServices.framework/Versions/A/Support/assistantd\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)\n  0.0 /System/Library/Frameworks/CoreTelephony.framework/Support/CommCenter\n  0.0 /System/Library/CoreServices/audioaccessoryd\n  0.0 /usr/libexec/mobileassetd\n  0.0 /System/Library/PrivateFrameworks/ModelCatalogRuntime.framework/Versions/A/modelcatalogd\n  0.0 /System/Library/PrivateFrameworks/AppleMediaServices.framework/Resources/amsaccountsd\n  0.0 /System/Library/Frameworks/CryptoTokenKit.framework/ctkd\n  0.0 /usr/libexec/pkd\n  0.0 /usr/libexec/amfid\n  0.0 cloudphotod\n  0.0 /System/Library/PrivateFrameworks/CoreCDP.framework/Versions/A/Resources/cdpd\n  0.0 /usr/libexec/rtcreportingd\n  0.0 /usr/libexec/mobileactivationd\n  0.0 /System/Library/PrivateFrameworks/IntelligenceFlowContextRuntime.framework/Versions/A/intelligencecontextd\n  0.0 /usr/libexec/triald\n  0.0 /usr/libexec/wifip2pd\n  0.0 /System/Library/PrivateFrameworks/PowerLog.framework/Versions/A/XPCServices/PerfPowerTelemetryClientRegistrationService.xpc/Contents/MacOS/PerfPowerTelemetryClientRegistrationService\n  0.0 /System/Library/CoreServices/Keychain Circle Notification.app/Contents/MacOS/Keychain Circle Notification\n  0.0 /System/Library/PrivateFrameworks/SkyLight.framework//Versions/A/Resources/AquaAppearanceHelper.app/Contents/MacOS/AquaAppearanceHelper\n  0.0 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XprotectService.xpc/Contents/MacOS/XprotectService\n  0.0 /System/Library/CoreServices/ReportCrash\n  0.4 /Applications/Fork.app/Contents/MacOS/Fork\n  0.0 /System/Library/PrivateFrameworks/SystemStatusServer.framework/Support/systemstatusd\n  0.0 /System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.Networking.xpc/Contents/MacOS/com.apple.WebKit.Networking\n  0.0 /usr/libexec/securityd_system\n  0.0 /System/Library/Frameworks/ManagedSettings.framework/Versions/A/ManagedSettingsAgent\n  0.0 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Support/cloudtelemetryd\n  0.0 /usr/libexec/duetexpertd\n  0.0 /usr/libexec/sandboxd\n  0.0 /System/Library/Frameworks/Contacts.framework/Support/contactsd\n  0.0 /System/Library/PrivateFrameworks/DoNotDisturbServer.framework/Support/donotdisturbd\n  0.0 /System/Library/CoreServices/CoreServicesUIAgent.app/Contents/MacOS/CoreServicesUIAgent\n  0.0 /usr/libexec/coreduetd\n  0.0 /System/Library/PrivateFrameworks/CoreSuggestions.framework/Versions/A/Support/suggestd\n  0.0 /System/Library/PrivateFrameworks/AppPredictionFoundation.framework/Versions/A/XPCServices/AppPredictionIntentsHelperService.xpc/Contents/MacOS/AppPredictionIntentsHelperService\n  0.0 /System/Library/PrivateFrameworks/SessionCore.framework/Support/liveactivitiesd\n  0.0 /usr/libexec/relatived\n  0.0 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/CoreServices/PowerChime.app/Contents/MacOS/PowerChime\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate\n  0.0 /Users/robert/Library/Caches/com.openai.codex/org.sparkle-project.Sparkle/Launcher/yh4CVKrJC/Updater.app/Contents/MacOS/Updater\n  0.0 /System/Library/CoreServices/TimeMachine/backupd\n  0.0 /usr/libexec/audioanalyticsd\n  0.0 /usr/libexec/networkserviceproxy\n  0.0 /System/Library/PrivateFrameworks/UsageTracking.framework/Versions/A/UsageTrackingAgent\n  0.0 /System/Library/CoreServices/Setup Assistant.app/Contents/Resources/mbuseragent\n  0.0 /System/Library/PrivateFrameworks/AppSSO.framework/Support/AppSSODaemon\n  0.0 /System/Library/PrivateFrameworks/IMDPersistence.framework/XPCServices/IMDPersistenceAgent.xpc/Contents/MacOS/IMDPersistenceAgent\n  0.0 /System/Library/PrivateFrameworks/iCloudNotification.framework/iCloudNotificationAgent\n  0.0 /System/Library/PrivateFrameworks/CoreFollowUp.framework/Versions/A/Support/followupd\n  0.0 /System/Library/PrivateFrameworks/iTunesCloud.framework/Support/itunescloudd\n  0.0 /Applications/Docker.app/Contents/MacOS/com.docker.backend\n  0.7 /Applications/Docker.app/Contents/MacOS/com.docker.backend\n  0.0 /Applications/Docker.app/Contents/MacOS/com.docker.backend\n  0.0 /Applications/Docker.app/Contents/MacOS/com.docker.build\n  0.0 /Applications/Docker.app/Contents/MacOS/Docker Desktop.app/Contents/MacOS/Docker Desktop\n  0.0 /Applications/Docker.app/Contents/MacOS/Docker Desktop.app/Contents/Frameworks/Docker Desktop Helper (GPU).app/Contents/MacOS/Docker Desktop Helper (GPU)\n  0.0 /Applications/Docker.app/Contents/MacOS/Docker Desktop.app/Contents/Frameworks/Docker Desktop Helper.app/Contents/MacOS/Docker Desktop Helper\n  0.0 /Applications/Docker.app/Contents/MacOS/Docker Desktop.app/Contents/Frameworks/Docker Desktop Helper (Renderer).app/Contents/MacOS/Docker Desktop Helper (Renderer)\n  0.0 /Library/Developer/PrivateFrameworks/CoreSimulator.framework/Resources/bin/simdiskimaged\n  0.0 /System/Applications/Notes.app/Contents/MacOS/Notes\n  0.0 /System/Library/PrivateFrameworks/HearingCore.framework/heard\n  0.0 /System/Library/Services/AppleSpell.service/Contents/MacOS/AppleSpell\n  0.0 /System/Library/CoreServices/Software Update.app/Contents/Resources/softwareupdated\n  0.0 /Users/robert/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/CUALockScreenGuardian.app/Contents/MacOS/CUALockScreenGuardian\n  0.0 /System/Applications/FindMy.app/Contents/PlugIns/FindMyWidgetItems.appex/Contents/MacOS/FindMyWidgetItems\n  0.0 /System/Applications/Home.app/Contents/PlugIns/HomeWidget.appex/Contents/MacOS/HomeWidget\n  0.0 /System/Applications/Home.app/Contents/PlugIns/HomeEnergyWidgetsExtension.appex/Contents/MacOS/HomeEnergyWidgetsExtension\n  0.0 /usr/libexec/biometrickitd\n  0.0 /System/Library/PrivateFrameworks/TelephonyUtilities.framework/callservicesd\n  0.0 /System/Library/PrivateFrameworks/HomeKitDaemon.framework/Support/homed\n  0.0 /System/Library/PrivateFrameworks/CoreAnalytics.framework/Support/analyticsagent\n  0.0 /usr/libexec/spotlightknowledged.updater\n  0.0 /System/Applications/Notes.app/Contents/PlugIns/com.apple.Notes.SpotlightIndexExtension.appex/Contents/MacOS/com.apple.Notes.SpotlightIndexExtension\n  0.0 /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex\n  0.0 /System/Library/CoreServices/talagentd\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /System/Library/PrivateFrameworks/CoreADI.framework/adid\n  0.0 /System/Applications/Photos.app/Contents/MacOS/Photos\n  0.0 /System/Library/Frameworks/ImageCaptureCore.framework/Versions/A/XPCServices/mscamerad-xpc.xpc/Contents/MacOS/mscamerad-xpc\n  0.0 /usr/libexec/ptpcamerad\n  0.0 /System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/com.apple.appkit.xpc.openAndSavePanelService.xpc/Contents/MacOS/com.apple.appkit.xpc.openAndSavePanelService\n  0.0 /usr/libexec/transparencyd\n  0.0 /Applications/Microsoft Outlook.app/Contents/MacOS/Microsoft Outlook\n  0.0 /System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.GPU.xpc/Contents/MacOS/com.apple.WebKit.GPU\n  0.0 /System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc/Contents/MacOS/com.apple.WebKit.WebContent\n  0.0 /System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.Networking.xpc/Contents/MacOS/com.apple.WebKit.Networking\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper\n  0.0 /System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/com.apple.appkit.xpc.openAndSavePanelService.xpc/Contents/MacOS/com.apple.appkit.xpc.openAndSavePanelService\n  0.0 /usr/sbin/distnoted\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /System/Library/CoreServices/ControlCenter.app/Contents/PlugIns/DisplayControls.appex/Contents/MacOS/DisplayControls\n  0.0 /usr/libexec/gamecontrollerd\n  0.0 /System/Library/CoreServices/TimeMachine/backupd-helper\n  0.0 /System/Library/Frameworks/LocalAuthentication.framework/Support/coreautha.bundle/Contents/MacOS/coreautha\n  0.0 /System/Library/Frameworks/VideoToolbox.framework/Versions/A/XPCServices/VTDecoderXPCService.xpc/Contents/MacOS/VTDecoderXPCService\n  0.0 /usr/libexec/powerexperienced\n  0.0 /usr/libexec/PowerUIAgent\n  0.0 /usr/libexec/intelligentroutingd\n  0.0 /usr/libexec/mlhostd\n  0.0 /usr/libexec/ciphermld\n  0.0 /System/Library/PrivateFrameworks/JetCore.framework/Support/jetpackassetd\n  0.0 /System/Library/CoreServices/ScopedBookmarkAgent\n  0.0 /usr/libexec/textunderstandingd\n  0.0 /usr/libexec/countryd\n  0.0 /System/Library/PrivateFrameworks/ReplicatorCore.framework/Support/replicatord\n  0.0 /System/Library/PrivateFrameworks/MediaAnalysisAccess.framework/Versions/A/XPCServices/mediaanalysisd-access.xpc/Contents/MacOS/mediaanalysisd-access\n  0.0 /System/Library/PrivateFrameworks/SafariSafeBrowsing.framework/com.apple.Safari.SafeBrowsing.Service\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /usr/libexec/AirPlayXPCHelper\n  0.0 /usr/libexec/assessmentagent\n  0.0 /System/Library/PrivateFrameworks/IntelligenceFlowRuntime.framework/Versions/A/intelligenceflowd\n  0.0 /System/Library/PrivateFrameworks/SiriAppIntentsRuntime.framework/siriappintentsd\n  0.0 /usr/libexec/feedbackd\n  0.0 /usr/libexec/nfcd\n  0.0 /usr/libexec/findmybeaconingd\n  0.0 /System/Library/PrivateFrameworks/NearFieldPrivateServices.framework/Versions/A/XPCServices/NFStorageServer.xpc/Contents/MacOS/NFStorageServer\n  0.0 /System/Library/PrivateFrameworks/CommerceKit.framework/Versions/A/Resources/commerce\n  0.0 /System/Library/PrivateFrameworks/ContextKit.framework/Versions/A/XPCServices/ContextService.xpc/Contents/MacOS/ContextService\n  0.0 /usr/libexec/replayd\n  0.0 /System/Library/Frameworks/QuickLookThumbnailing.framework/Support/com.apple.quicklook.ThumbnailsAgent\n  0.0 /usr/libexec/usermanagerd\n  0.0 /usr/libexec/storagekitd\n  0.0 /usr/libexec/fskitd\n  0.0 /System/Library/PrivateFrameworks/CloudKitDaemon.framework/Support/cloudd\n  0.0 /System/Library/PrivateFrameworks/CacheDelete.framework/deleted\n  0.0 /System/Library/Frameworks/Security.framework/Versions/A/XPCServices/TrustedPeersHelper.xpc/Contents/MacOS/TrustedPeersHelper\n  0.0 /System/Library/PrivateFrameworks/CacheDelete.framework/deleted_helper\n  0.0 /System/Library/PrivateFrameworks/AssetCacheServices.framework/Versions/A/XPCServices/AssetCacheLocatorService.xpc/Contents/MacOS/AssetCacheLocatorService\n  0.0 /usr/libexec/nehelper\n  0.0 /usr/libexec/neagent\n  0.0 /System/Library/PrivateFrameworks/CloudSubscriptionFeatures.framework/FeatureAccessAgent\n  0.0 /usr/libexec/gamecontrolleragentd\n  0.0 /usr/libexec/triald_system\n  0.0 /usr/libexec/AssetCache/AssetCache\n  0.0 /System/Library/PrivateFrameworks/CloudKitDaemon.framework/Support/cloudd\n  0.0 /System/Library/PrivateFrameworks/PackageKit.framework/Resources/system_installd\n  0.0 /System/Library/PrivateFrameworks/GeoServices.framework/geodMachServiceBridge\n  0.0 /System/Library/PrivateFrameworks/PackageKit.framework/Resources/installd\n  0.0 /System/Library/PrivateFrameworks/TrialServer.framework/Versions/A/XPCServices/TrialArchivingService.xpc/Contents/MacOS/TrialArchivingService\n  0.0 /System/Library/PrivateFrameworks/AssetCacheServicesExtensions.framework/XPCServices/AssetCacheTetheratorService.xpc/Contents/MacOS/AssetCacheTetheratorService\n  0.0 /usr/libexec/sysmond\n  0.0 /usr/libexec/ospredictiond\n  0.0 /System/Library/CoreServices/Siri.app/Contents/MacOS/Siri\n  0.0 /System/Library/Frameworks/Security.framework/Versions/A/XPCServices/com.apple.CodeSigningHelper.xpc/Contents/MacOS/com.apple.CodeSigningHelper\n  0.0 /usr/libexec/dmd\n  0.0 /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/XPCServices/com.apple.hiservices-xpcservice.xpc/Contents/MacOS/com.apple.hiservices-xpcservice\n  0.0 /System/Library/PrivateFrameworks/FamilyCircle.framework/Versions/A/Resources/familycircled\n  0.0 /System/Library/PrivateFrameworks/IntelligencePlatformCompute.framework/Versions/A/XPCServices/IntelligencePlatformComputeService.xpc/Contents/MacOS/IntelligencePlatformComputeService\n  0.0 /System/Library/CoreServices/Siri.app/Contents/XPCServices/SiriNCService.xpc/Contents/MacOS/SiriNCService\n  0.0 /usr/libexec/siriknowledged\n  0.0 /System/Library/Frameworks/QuickLookUI.framework/Versions/A/XPCServices/QuickLookUIService.xpc/Contents/MacOS/QuickLookUIService\n  0.0 /System/Library/CoreServices/osanalyticshelper\n  0.0 /usr/libexec/keybagd\n  0.0 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod\n  0.0 /usr/libexec/secinitd\n  0.0 /usr/libexec/containermanagerd\n  0.0 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod\n  0.0 /usr/libexec/secinitd\n  0.0 /usr/sbin/cfprefsd\n  0.0 /usr/libexec/trustd\n  0.0 /usr/libexec/containermanagerd\n  0.0 /usr/libexec/wifianalyticsd\n  0.0 /System/Library/PrivateFrameworks/AppleCredentialManager.framework/AppleCredentialManagerDaemon\n  0.0 /System/Library/PrivateFrameworks/SiriAnalytics.framework/Versions/A/XPCServices/SAExtensionOrchestrator.xpc/Contents/MacOS/SAExtensionOrchestrator\n  0.0 /System/Library/ExtensionKit/Extensions/GMSSELFIngestor.appex/Contents/MacOS/GMSSELFIngestor\n  0.0 /System/Library/ExtensionKit/Extensions/IFTranscriptSELFIngestor.appex/Contents/MacOS/IFTranscriptSELFIngestor\n  0.0 /System/Library/ExtensionKit/Extensions/BiomeSELFIngestor.appex/Contents/MacOS/BiomeSELFIngestor\n  0.0 /System/Library/ExtensionKit/Extensions/AppleIntelligenceReportingSELFIngestor.appex/Contents/MacOS/AppleIntelligenceReportingSELFIngestor\n  0.0 /System/Library/ExtensionKit/Extensions/IFTelemetrySELFIngestor.appex/Contents/MacOS/IFTelemetrySELFIngestor\n  0.0 /usr/libexec/online-auth-agent\n  0.0 /usr/libexec/seputil\n  0.0 /usr/libexec/logd_helper\n  0.0 /usr/libexec/SidecarDisplayAgent\n  0.0 /System/Library/PrivateFrameworks/CoreEmbeddedSpeechRecognition.framework/speechmaintenanced\n  0.0 /System/Library/PrivateFrameworks/IntlPreferences.framework/Support/localizationswitcherd\n  0.0 /usr/libexec/keychainsharingmessagingd\n  0.0 /System/Library/CoreServices/TextInputSwitcher.app/Contents/MacOS/TextInputSwitcher\n  0.0 /System/Library/PrivateFrameworks/Synapse.framework/Support/contentlinkingd\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Cryptexes/App/usr/libexec/AuthenticationServicesAgent\n  0.0 /usr/libexec/proactived\n  0.0 /System/Library/PrivateFrameworks/CalendarDaemon.framework/Support/calaccessd\n  0.0 /System/Library/PrivateFrameworks/CommunicationTrust.framework/Support/communicationtrustd\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/PrivateFrameworks/iCloudDriveService.framework/XPCServices/ContainerMetadataExtractor.xpc/Contents/MacOS/ContainerMetadataExtractor\n  0.0 /System/Library/PrivateFrameworks/VoiceShortcuts.framework/Versions/A/Support/siriactionsd\n  0.0 /System/Library/PrivateFrameworks/WorkflowKit.framework/XPCServices/ShortcutsViewService.xpc/Contents/MacOS/ShortcutsViewService\n  0.0 /System/Library/PrivateFrameworks/MobileTimer.framework/Executables/mobiletimerd\n  0.0 /usr/sbin/spindump\n  0.0 /usr/libexec/spindump_agent\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/PrivateFrameworks/MapsSync.framework/mapssyncd\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /usr/libexec/swcd\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/Frameworks/Metal.framework/Versions/A/XPCServices/MTLCompilerService.xpc/Contents/MacOS/MTLCompilerService\n  0.0 /System/Library/Frameworks/AudioToolbox.framework/AudioComponentRegistrar\n  0.0 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper\n  0.0 /System/Library/CoreServices/NowPlayingTouchUI.app/Contents/MacOS/NowPlayingTouchUI\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/CoreServices/iconservicesagent\n  0.0 /System/Library/CoreServices/iconservicesd\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /usr/sbin/BTLEServerAgent\n  0.0 /usr/sbin/BTLEServer\n  0.0 /System/Library/PrivateFrameworks/CoreAccessories.framework/Support/accessoryd\n  0.0 /usr/libexec/uarpd\n  0.0 /usr/libexec/uarpassetmanagerd\n  0.0 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod\n  0.0 /usr/libexec/secinitd\n  0.0 /usr/sbin/cfprefsd\n  0.0 /usr/libexec/trustd\n  0.0 /System/Library/PrivateFrameworks/UARPAssetManager.framework/XPCServices/UARPAssetManagerServiceMobileAsset.xpc/Contents/MacOS/UARPAssetManagerServiceMobileAsset\n  0.0 /usr/libexec/containermanagerd\n  0.0 /System/Library/PrivateFrameworks/CoreSpeech.framework/Versions/A/XPCServices/CoreSpeechXPC.xpc/Contents/MacOS/CoreSpeechXPC\n  0.0 /usr/libexec/bluetoothuserd\n  0.0 /System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated\n  0.0 /System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Versions/A/XPCServices/com.apple.MobileSoftwareUpdate.CleanupPreparePathService.xpc/Contents/MacOS/com.apple.MobileSoftwareUpdate.CleanupPreparePathService\n  0.0 /System/Library/PrivateFrameworks/UIFoundation.framework/Versions/A/XPCServices/nsattributedstringagent.xpc/Contents/MacOS/nsattributedstringagent\n  0.0 /System/Library/Frameworks/MediaAccessibility.framework/Versions/A/XPCServices/com.apple.accessibility.mediaaccessibilityd.xpc/Contents/MacOS/com.apple.accessibility.mediaaccessibilityd\n  0.0 /usr/sbin/cfprefsd\n  0.0 /System/Library/PrivateFrameworks/SoftwareUpdate.framework/Resources/SoftwareUpdateNotificationManager.app/Contents/MacOS/SoftwareUpdateNotificationManager\n  0.0 /System/Library/PrivateFrameworks/UIFoundation.framework/Versions/A/XPCServices/nsattributedstringagent.xpc/Contents/MacOS/nsattributedstringagent\n  0.0 /System/Library/PrivateFrameworks/UIFoundation.framework/Versions/A/XPCServices/nsattributedstringagent.xpc/Contents/MacOS/nsattributedstringagent\n  0.0 /System/Library/Frameworks/MediaAccessibility.framework/Versions/A/XPCServices/com.apple.accessibility.mediaaccessibilityd.xpc/Contents/MacOS/com.apple.accessibility.mediaaccessibilityd\n  0.0 /System/Library/PrivateFrameworks/IASUtilities.framework/Versions/A/Resources/installerauthagent\n  0.0 /System/Library/CoreServices/diagnosticservicesd\n  0.0 /System/Library/PrivateFrameworks/DeviceCheckInternal.framework/devicecheckd\n  0.0 /usr/libexec/taskgated\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.1 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper.app/Contents/MacOS/Microsoft Edge Helper\n  0.0 /usr/libexec/MTLAssetUpgraderD\n  0.0 /System/Library/Frameworks/MediaExtension.framework/Versions/A/Helpers/MENotificationAgent\n  0.0 /System/Library/PrivateFrameworks/BackgroundTaskManagement.framework/Support/BackgroundTaskManagementAgent.app/Contents/MacOS/BackgroundTaskManagementAgent\n  0.0 /System/Library/PrivateFrameworks/GenerativeExperiencesRuntime.framework/Versions/A/generativeexperiencesd\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XProtectBridgeService.xpc/Contents/MacOS/XProtectBridgeService\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /usr/libexec/hybridsearchd\n  0.0 /System/Library/PrivateFrameworks/AXAssetLoader.framework/Support/axassetsd\n  0.0 /System/Library/CoreServices/pbs\n  0.0 /usr/libexec/remindd\n  0.0 /usr/libexec/peakpowermanagerd\n  0.0 /usr/libexec/inputanalyticsd\n  0.0 /System/Library/Frameworks/Metal.framework/Versions/A/XPCServices/MTLCompilerService.xpc/Contents/MacOS/MTLCompilerService\n  0.0 /Applications/Microsoft Edge.app/Contents/Frameworks/Microsoft Edge Framework.framework/Versions/155.0.4283.62/Helpers/Microsoft Edge Helper (Renderer).app/Contents/MacOS/Microsoft Edge Helper (Renderer)\n  0.0 /usr/libexec/symptomsd-diag\n  0.0 /System/Library/PrivateFrameworks/CoreParsec.framework/parsec-fbf\n  0.0 /System/Library/CoreServices/ReportSystemMemory\n  0.0 /System/Library/CoreServices/Dock.app/Contents/XPCServices/DockHelper.xpc/Contents/MacOS/DockHelper\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/Library/PrivateFrameworks/ProtectedCloudStorage.framework/Helpers/ProtectedCloudKeySyncing\n  0.0 /System/Library/Frameworks/StoreKit.framework/Support/storekitagent\n  0.0 /System/Library/PrivateFrameworks/AppleMediaServicesUI.framework/amsengagementd\n  0.0 /System/Library/Frameworks/QuickLookUI.framework/Versions/A/PlugIns/QLPreviewGenerationExtension.appex/Contents/MacOS/QLPreviewGenerationExtension\n  0.0 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService\n  0.0 /System/iOSSupport/System/Library/PrivateFrameworks/HomeEnergyDaemon.framework/Support/homeenergyd\n  0.4 /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python\n  0.0 /System/Library/CoreServices/sharedfilelistd\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared\n  0.0 /System/Applications/Podcasts.app/Contents/PlugIns/com.apple.podcasts.SpotlightIndexExtension.appex/Contents/MacOS/com.apple.podcasts.SpotlightIndexExtension\n  0.0 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared\n 14.0 /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python\n  0.0 ps\n  0.0 /System/Library/CoreServices/screencaptureui.app/Contents/MacOS/screencaptureui\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /System/Library/PrivateFrameworks/StatusKit.framework/StatusKitAgent\n  0.0 /usr/libexec/trustd\n  0.0 /usr/libexec/trustd\n  0.0 /System/Library/Frameworks/GroupActivities.framework/Versions/A/XPCServices/GroupSessionService.xpc/Contents/MacOS/GroupSessionService\n  0.0 /System/Library/PrivateFrameworks/KerberosHelper/Helpers/DiskUnmountWatcher\n  0.0 /usr/local/bin/container-apiserver\n  0.0 /usr/local/libexec/container/plugins/container-network-vmnet/bin/container-network-vmnet\n  0.0 /usr/local/libexec/container/plugins/machine-apiserver/bin/machine-apiserver\n  0.0 /usr/local/libexec/container/plugins/container-core-images/bin/container-core-images\n  0.0 /System/Library/PrivateFrameworks/BiomeStreams.framework/Support/BiomeAgent\n  0.0 natpmpd\n  0.0 rtadvd\n  0.0 /usr/libexec/assetsubscriptiond\n  0.0 /usr/sbin/netbiosd\n  0.0 Contents/Library/LaunchAgents/com.microsoft.teams2.agent\n  0.0 /System/Library/PrivateFrameworks/AuthKit.framework/Versions/A/Support/akd\n  0.0 /System/Library/ExtensionKit/Extensions/PlaceholderSettingsSearchTermsIntents.appex/Contents/MacOS/PlaceholderSettingsSearchTermsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/InternationalSettingsExtension.appex/Contents/MacOS/InternationalSettingsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/VpnSettingsIntents.appex/Contents/MacOS/VpnSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/StorageSettingsIntentsExtension.appex/Contents/MacOS/StorageSettingsIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/AppleAccountIntents_macOS.appex/Contents/MacOS/AppleAccountIntents_macOS\n  0.0 /System/Library/ExtensionKit/Extensions/WiFiMacSettingsIntents.appex/Contents/MacOS/WiFiMacSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/PasswordSettingsAppIntentsExtension.appex/Contents/MacOS/PasswordSettingsAppIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/ProfilesSettingsIntents.appex/Contents/MacOS/ProfilesSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/CDsAndDvDsSettingsIntents.appex/Contents/MacOS/CDsAndDvDsSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/PrefPaneSearchIntent.appex/Contents/MacOS/PrefPaneSearchIntent\n  0.0 /System/Library/ExtensionKit/Extensions/SpotlightSettingsIntentsExtension.appex/Contents/MacOS/SpotlightSettingsIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/GameControllerSettingsIntents.appex/Contents/MacOS/GameControllerSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/ClassKitAppIntents.appex/Contents/MacOS/ClassKitAppIntents\n  0.0 /System/Library/ExtensionKit/Extensions/FamilyIntents.appex/Contents/MacOS/FamilyIntents\n  0.0 /System/Library/ExtensionKit/Extensions/SoftwareUpdateSettingsExtensionIntents.appex/Contents/MacOS/SoftwareUpdateSettingsExtensionIntents\n  0.0 /System/Library/ExtensionKit/Extensions/StartupDiskWidgetExtension.appex/Contents/MacOS/StartupDiskWidgetExtension\n  0.0 /System/Library/ExtensionKit/Extensions/AccessibilitySettingsSearchExtension.appex/Contents/MacOS/AccessibilitySettingsSearchExtension\n  0.0 /System/Library/ExtensionKit/Extensions/BiometricsAndPasswordSettingsAppIntentsExtension.appex/Contents/MacOS/BiometricsAndPasswordSettingsAppIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/DoNotDisturbAppIntents.appex/Contents/MacOS/DoNotDisturbAppIntents\n  0.0 /System/Library/ExtensionKit/Extensions/ClassroomDeviceExpert.appex/Contents/MacOS/ClassroomDeviceExpert\n  0.0 /System/Library/ExtensionKit/Extensions/SiriSetupSettingsIntents.appex/Contents/MacOS/SiriSetupSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/KeyboardSettingsIntents.appex/Contents/MacOS/KeyboardSettingsIntents\n  0.0 /System/Library/ExtensionKit/Extensions/GameCenterSettingsSearchExtension.appex/Contents/MacOS/GameCenterSettingsSearchExtension\n  0.0 /System/Library/ExtensionKit/Extensions/ScreenTimeAppIntentsExtension.appex/Contents/MacOS/ScreenTimeAppIntentsExtension\n  0.0 /System/Library/ExtensionKit/Extensions/AccountsUISettingsAppIntents.appex/Contents/MacOS/AccountsUISettingsAppIntents\n  0.0 /System/Library/PrivateFrameworks/PhotoLibraryServices.framework/Versions/A/Support/photolibraryd\n  0.0 /System/Library/PrivateFrameworks/iCloudDriveCore.framework/Versions/A/Support/bird\n  0.0 /System/Library/CoreServices/CoreLocationAgent.app/Contents/MacOS/CoreLocationAgent\n  0.0 /System/Library/PrivateFrameworks/FileProvider.framework/Support/fileproviderd\n  0.0 /System/Library/PrivateFrameworks/CloudDocs.framework/PlugIns/com.apple.CloudDocs.iCloudDriveFileProvider.appex/Contents/MacOS/com.apple.CloudDocs.iCloudDriveFileProvider\n  0.0 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper\n  0.8 /Applications/ChatGPT.app/Contents/MacOS/ChatGPT\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/browser_crashpad_handler\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/browser_crashpad_handler\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)\n  0.0 /Applications/ChatGPT.app/Contents/Resources/native/bare-modifier-monitor\n  0.3 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.3 /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)\n  0.0 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.1 /Users/robert/.codex/computer-use/Codex Computer Use.app/Contents/MacOS/SkyComputerUseService\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.1 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl\n  0.0 /Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.1 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n  0.0 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/155.0.8059.40/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)\n"
+  },
+  "trials": [
+    {
+      "round": 0,
+      "workload": "plain",
+      "concurrency": 64,
+      "rate": 300.0,
+      "startupSeconds": 0.005798167000000007,
+      "warmup": {
+        "rate": 10,
+        "durationSeconds": 2,
+        "clientInflightLimit": 64,
+        "offered": 20,
+        "admitted": 20,
+        "outcomes": {
+          "ok": 20
+        },
+        "completedWithinWindow": 20,
+        "successfulCompletionsPerSecond": 10.0,
+        "successfulOfferedFraction": 1.0,
+        "drainSeconds": 0.002204375000000258,
+        "peakClientInflight": 1,
+        "offeredLatencySeconds": {
+          "p50": 0.004173375000000146,
+          "p95": 0.004397290999999859,
+          "p99": 0.004415625000000034,
+          "max": 0.004415625000000034
+        },
+        "serviceLatencySeconds": {
+          "p50": 0.0019228339999999844,
+          "p95": 0.0020558340000000896,
+          "p99": 0.0020664159999999043,
+          "max": 0.0020664159999999043
+        },
+        "dispatchLagSeconds": {
+          "p50": 0.00228512500000011,
+          "p95": 0.002345374999999983,
+          "p99": 0.0023597909999999445,
+          "max": 0.0023597909999999445
+        },
+        "sampledPeakRssKiB": null,
+        "endOfWindowResource": null,
+        "resources": [],
+        "rawRequestCount": 20
+      },
+      "resourceBefore": {
+        "cpuSeconds": 0.01,
+        "rssKiB": 9824
+      },
+      "measurement": {
+        "rate": 300.0,
+        "durationSeconds": 60.0,
+        "clientInflightLimit": 64,
+        "offered": 18000,
+        "admitted": 18000,
+        "outcomes": {
+          "ok": 18000
+        },
+        "completedWithinWindow": 18000,
+        "successfulCompletionsPerSecond": 300.0,
+        "successfulOfferedFraction": 1.0,
+        "drainSeconds": 0.00967016599999937,
+        "peakClientInflight": 6,
+        "offeredLatencySeconds": {
+          "p50": 0.001907374333335099,
+          "p95": 0.002181708333338861,
+          "p99": 0.004826208333334137,
+          "max": 0.018094999666669054
+        },
+        "serviceLatencySeconds": {
+          "p50": 0.0014071659999999042,
+          "p95": 0.0016327080000024807,
+          "p99": 0.0023733330000004216,
+          "max": 0.009414499999998327
+        },
+        "dispatchLagSeconds": {
+          "p50": 0.000538457666671377,
+          "p95": 0.0006437493333351085,
+          "p99": 0.0014977080000022625,
+          "max": 0.017141124666668617
+        },
+        "sampledPeakRssKiB": 15024,
+        "endOfWindowResource": {
+          "cpuSeconds": 4.63,
+          "rssKiB": 15024
+        },
+        "resources": [
+          {
+            "atSeconds": 0.004478665999999798,
+            "cpuSeconds": 0.01,
+            "rssKiB": 9824
+          },
+          {
+            "atSeconds": 0.5134262079999998,
+            "cpuSeconds": 0.06,
+            "rssKiB": 10496
+          },
+          {
+            "atSeconds": 1.0224733329999998,
+            "cpuSeconds": 0.11,
+            "rssKiB": 11056
+          },
+          {
+            "atSeconds": 1.5323775,
+            "cpuSeconds": 0.16,
+            "rssKiB": 11664
+          },
+          {
+            "atSeconds": 2.037598583,
+            "cpuSeconds": 0.2,
+            "rssKiB": 12288
+          },
+          {
+            "atSeconds": 2.545790625,
+            "cpuSeconds": 0.25,
+            "rssKiB": 12800
+          },
+          {
+            "atSeconds": 3.0551264999999996,
+            "cpuSeconds": 0.29,
+            "rssKiB": 13968
+          },
+          {
+            "atSeconds": 3.5629449999999996,
+            "cpuSeconds": 0.34,
+            "rssKiB": 14400
+          },
+          {
+            "atSeconds": 4.073068665999999,
+            "cpuSeconds": 0.39,
+            "rssKiB": 14416
+          },
+          {
+            "atSeconds": 4.58321525,
+            "cpuSeconds": 0.43,
+            "rssKiB": 14416
+          },
+          {
+            "atSeconds": 5.093678833,
+            "cpuSeconds": 0.48,
+            "rssKiB": 14416
+          },
+          {
+            "atSeconds": 5.60340025,
+            "cpuSeconds": 0.52,
+            "rssKiB": 14416
+          },
+          {
+            "atSeconds": 6.113306290999999,
+            "cpuSeconds": 0.57,
+            "rssKiB": 14432
+          },
+          {
+            "atSeconds": 6.623067124999999,
+            "cpuSeconds": 0.61,
+            "rssKiB": 14752
+          },
+          {
+            "atSeconds": 7.131936,
+            "cpuSeconds": 0.66,
+            "rssKiB": 14784
+          },
+          {
+            "atSeconds": 7.639596832999999,
+            "cpuSeconds": 0.7,
+            "rssKiB": 14784
+          },
+          {
+            "atSeconds": 8.148079583,
+            "cpuSeconds": 0.74,
+            "rssKiB": 14784
+          },
+          {
+            "atSeconds": 8.653553416,
+            "cpuSeconds": 0.78,
+            "rssKiB": 14784
+          },
+          {
+            "atSeconds": 9.162909165999999,
+            "cpuSeconds": 0.83,
+            "rssKiB": 14816
+          },
+          {
+            "atSeconds": 9.673166958,
+            "cpuSeconds": 0.87,
+            "rssKiB": 14816
+          },
+          {
+            "atSeconds": 10.182726375,
+            "cpuSeconds": 0.92,
+            "rssKiB": 14928
+          },
+          {
+            "atSeconds": 10.692680082999999,
+            "cpuSeconds": 0.95,
+            "rssKiB": 14928
+          },
+          {
+            "atSeconds": 11.203177875,
+            "cpuSeconds": 0.97,
+            "rssKiB": 14928
+          },
+          {
+            "atSeconds": 11.713399707999999,
+            "cpuSeconds": 1.01,
+            "rssKiB": 14928
+          },
+          {
+            "atSeconds": 12.223868666,
+            "cpuSeconds": 1.06,
+            "rssKiB": 14928
+          },
+          {
+            "atSeconds": 12.732277625,
+            "cpuSeconds": 1.1,
+            "rssKiB": 14928
+          },
+          {
+            "atSeconds": 13.241035875,
+            "cpuSeconds": 1.14,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 13.745360125,
+            "cpuSeconds": 1.18,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 14.253527749999998,
+            "cpuSeconds": 1.21,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 14.762695040999999,
+            "cpuSeconds": 1.25,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 15.269836332999999,
+            "cpuSeconds": 1.29,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 15.778484416,
+            "cpuSeconds": 1.34,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 16.285969125,
+            "cpuSeconds": 1.38,
+            "rssKiB": 14992
+          },
+          {
+            "atSeconds": 16.795439458,
+            "cpuSeconds": 1.43,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 17.303753791000002,
+            "cpuSeconds": 1.47,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 17.81080675,
+            "cpuSeconds": 1.51,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 18.319076541,
+            "cpuSeconds": 1.56,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 18.829029208,
+            "cpuSeconds": 1.61,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 19.33782875,
+            "cpuSeconds": 1.65,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 19.846304666,
+            "cpuSeconds": 1.69,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 20.3554245,
+            "cpuSeconds": 1.74,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 20.863142833,
+            "cpuSeconds": 1.78,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 21.372367625000003,
+            "cpuSeconds": 1.83,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 21.882722583,
+            "cpuSeconds": 1.87,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 22.392832166,
+            "cpuSeconds": 1.92,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 22.901097916,
+            "cpuSeconds": 1.96,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 23.409757875,
+            "cpuSeconds": 2.01,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 23.919975125,
+            "cpuSeconds": 2.06,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 24.428931000000002,
+            "cpuSeconds": 2.09,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 24.937133791,
+            "cpuSeconds": 2.12,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 25.445889875000002,
+            "cpuSeconds": 2.15,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 25.968249333000003,
+            "cpuSeconds": 2.18,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 26.475701583000003,
+            "cpuSeconds": 2.2,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 26.98432275,
+            "cpuSeconds": 2.23,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 27.493271125,
+            "cpuSeconds": 2.27,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 28.004642125,
+            "cpuSeconds": 2.31,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 28.511351166,
+            "cpuSeconds": 2.35,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 29.019286791000003,
+            "cpuSeconds": 2.39,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 29.523952708,
+            "cpuSeconds": 2.42,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 30.031596625,
+            "cpuSeconds": 2.47,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 30.540727250000003,
+            "cpuSeconds": 2.51,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 31.049429083,
+            "cpuSeconds": 2.56,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 31.559456000000004,
+            "cpuSeconds": 2.61,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 32.068059833,
+            "cpuSeconds": 2.65,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 32.575700541,
+            "cpuSeconds": 2.7,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 33.084833083,
+            "cpuSeconds": 2.74,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 33.593988125,
+            "cpuSeconds": 2.79,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 34.103291541000004,
+            "cpuSeconds": 2.83,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 34.613707916,
+            "cpuSeconds": 2.88,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 35.121882875000004,
+            "cpuSeconds": 2.92,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 35.630111375,
+            "cpuSeconds": 2.97,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 36.140816458,
+            "cpuSeconds": 3.01,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 36.650451958,
+            "cpuSeconds": 3.06,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 37.159613916,
+            "cpuSeconds": 3.1,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 37.669088708000004,
+            "cpuSeconds": 3.15,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 38.175735041,
+            "cpuSeconds": 3.2,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 38.684881083,
+            "cpuSeconds": 3.25,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 39.192116625000004,
+            "cpuSeconds": 3.3,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 39.699478875000004,
+            "cpuSeconds": 3.35,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 40.210373833,
+            "cpuSeconds": 3.38,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 40.719983416,
+            "cpuSeconds": 3.41,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 41.230577583,
+            "cpuSeconds": 3.44,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 41.740183416,
+            "cpuSeconds": 3.47,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 42.249618958,
+            "cpuSeconds": 3.5,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 42.7576585,
+            "cpuSeconds": 3.53,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 43.265733208,
+            "cpuSeconds": 3.55,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 43.773755791,
+            "cpuSeconds": 3.58,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 44.282322916,
+            "cpuSeconds": 3.61,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 44.7908435,
+            "cpuSeconds": 3.64,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 45.302085291000004,
+            "cpuSeconds": 3.66,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 45.810341458,
+            "cpuSeconds": 3.69,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 46.3185765,
+            "cpuSeconds": 3.72,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 46.827866791,
+            "cpuSeconds": 3.75,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 47.335243041,
+            "cpuSeconds": 3.78,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 47.843260791,
+            "cpuSeconds": 3.81,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 48.352805083,
+            "cpuSeconds": 3.84,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 48.860847166,
+            "cpuSeconds": 3.87,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 49.368873916,
+            "cpuSeconds": 3.9,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 49.876961791,
+            "cpuSeconds": 3.93,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 50.38504875,
+            "cpuSeconds": 3.96,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 50.893349833,
+            "cpuSeconds": 3.98,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 51.402371166,
+            "cpuSeconds": 4.01,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 51.910767583,
+            "cpuSeconds": 4.04,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 52.419221875,
+            "cpuSeconds": 4.07,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 52.927494833000004,
+            "cpuSeconds": 4.1,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 53.431884000000004,
+            "cpuSeconds": 4.12,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 53.940462000000004,
+            "cpuSeconds": 4.14,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 54.449251291,
+            "cpuSeconds": 4.17,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 54.958168166,
+            "cpuSeconds": 4.2,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 55.466460583,
+            "cpuSeconds": 4.23,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 55.975366458,
+            "cpuSeconds": 4.28,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 56.482855083000004,
+            "cpuSeconds": 4.32,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 56.99290425,
+            "cpuSeconds": 4.37,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 57.498966333,
+            "cpuSeconds": 4.41,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 58.0079075,
+            "cpuSeconds": 4.45,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 58.516872333,
+            "cpuSeconds": 4.5,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 59.02629825,
+            "cpuSeconds": 4.54,
+            "rssKiB": 15024
+          },
+          {
+            "atSeconds": 59.535321708,
+            "cpuSeconds": 4.59,
+            "rssKiB": 15024
+          }
+        ],
+        "rawRequestCount": 18000,
+        "serverCpuSecondsInWindow": 4.62,
+        "serverCpuSecondsPerCompletion": 0.00025666666666666665,
+        "meetsProvisionalTarget": true
+      },
+      "serverTotals": {
+        "completed": 18020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "serverCompletedMinusClientSuccesses": 0,
+      "cleanShutdown": true
+    }
+  ],
+  "runtime": "go",
+  "environment": {
+    "GOMAXPROCS": "1",
+    "GOGC": "100",
+    "GOMEMLIMIT": null
+  },
+  "diagnostics": false,
+  "serverWorkers": 16,
+  "executable": "app",
+  "fixtureSource": "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/go/main.go",
+  "contract": "AOT loopback, configured server workers, HTTP/1.1 connection close, no TLS. Fixed offered schedule; client cap drops arrivals without queueing. Each response fully validated. Misses/failures remain in denominator. Graceful /stop after draining.",
+  "qualification": "Exploratory local load sweep, not production capacity. Same-machine generator and sampled RSS; no allocation profiler during timing.",
+  "target": {
+    "p99Milliseconds": 250,
+    "minimumSuccessFraction": 1.0,
+    "maximumDispatchLagP99Milliseconds": 5,
+    "note": "Provisional reporting target, not a product SLO. Memory stability needs longer runs."
+  },
+  "loadAfter": [
+    2.4248046875,
+    2.7529296875,
+    3.41796875
+  ],
+  "rawReport": {
+    "file": "go-2-300.json.gz",
+    "sha256": "b3802ea098f62da70883a6644f545b0e96ad67bdc345d911ef6881c8cff9519c",
+    "compressedSha256": "5d9111476e3b74b01aec087a58999f52f938cf316e5c3c67b6c1824aa25acfbd"
+  }
+}

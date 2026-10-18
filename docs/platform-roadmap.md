@@ -5438,3 +5438,15 @@ finds that the retained guest predates the current ArrayQueue implementation, an
 identifies incoming-request URL reconstruction/reparsing as a concrete HTTP
 candidate. Next refresh the full managed cohort, then test that candidate against
 current semantics; keep collector cadence as a separate experimental variable.
+
+**Admission follow-up (2026-10-18):** the fresh managed cohort and direct Host/Target
+construction are complete. A [phase/scheduler investigation](../benchmarks/http-server/serve/admission-followup-20261018/README.md)
+finds brief client scheduling gaps and a busy orphan language server; a separate
+GC trace does not reproduce the long stall. Native async idle now uses bounded
+socket readiness instead of blind sleeps, preserving owner-side roots/outcomes.
+Focused sanitizer checks and 50 HTTP wire cases pass. After environment cleanup,
+all eight 60-second baseline/URI-only/readiness/Go points complete 300 arrivals/sec.
+Readiness lowers p50 25–29% and p99 12–19% versus URI-only, with mixed CPU results.
+Unchanged controls also pass, so historical admission recovery is not solely a
+code-fix claim. Next establish a higher-rate boundary with matched controls and
+profile its CPU bottleneck; Windows execution of the new pump call remains open.
