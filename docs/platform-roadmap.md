@@ -5236,3 +5236,9 @@ comparisons against synchronous collection and conditional-root/array/error case
 This fixes strong promotion in the isolated tracing experiment; parked capture,
 changed-root/host-handle publication safety and live reclamation remain open. No
 production collector, three-mode qualification or Serve capacity gain is claimed.
+
+
+The isolated walker now captures up to 128 parked registrations without promoting
+owned frames to strong roots. [Guarded oracle checks](experiments/concurrent-gc-walker/README.md#parked-frame-capture-checkpoint)
+pass for strong/conditional frames, chained activation, expiry and capture bounds.
+Concurrent resumption/handle access and safe application of marks remain open.

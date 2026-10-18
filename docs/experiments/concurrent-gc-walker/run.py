@@ -18,10 +18,15 @@ def instrument(source):
         nonlocal source
         assert source.count(old) == 1, old
         source = source.replace(old, new)
+    source = source.replace('neoclr_roots_parked_v1()', 'experiment_parked_roots()')
     replace('static _Thread_local neoclr_gc_statistics statistics;', '''static _Thread_local neoclr_gc_statistics statistics;
 static _Thread_local int experiment_snapshot;
 static _Thread_local uintptr_t experiment_source;
 static _Thread_local const atomic_bool *experiment_cancel;
+static _Thread_local neoclr_parked_roots *experiment_parked;
+static const neoclr_parked_roots *experiment_parked_roots(void) {
+    return experiment_snapshot ? experiment_parked : neoclr_roots_parked_v1();
+}
 static uintptr_t experiment_original(neoclr_aot_text_arena *a, uintptr_t value) {
     if (!experiment_snapshot || !value) return value;
     return experiment_source + (value - (uintptr_t)a->data);
@@ -64,7 +69,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     generated = out / 'native-gc.c'
     generated.write_text(instrument(SOURCE.read_text()))
-    files = [SOURCE, generated, HERE / 'snapshot.inc', HERE / 'test.c', Path(__file__),
+    files = [SOURCE, generated, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', Path(__file__),
              WORKER / 'worker.c', WORKER / 'worker.h', ROOT / 'runtime/native/gc/root-probe.c']
     report = dict(passed=False, productionReady=False, platform=platform.platform(), commands=[],
                   inputs={str(f): hashlib.sha256(f.read_bytes()).hexdigest() for f in files})

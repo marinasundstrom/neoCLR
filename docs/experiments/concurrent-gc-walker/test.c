@@ -177,11 +177,6 @@ static void failure_and_mutation(gc_worker *worker) {
     int status;
     assert(gc_worker_take(worker, true, true, &status) && status == 7);
     free(s->copy.text.data);
-    /* Reject unsupported parked frames instead of silently treating as strong. */
-    neoclr_parked_roots parked = {0};
-    neoclr_roots_park_v1(&parked);
-    assert(!capture(s, &c));
-    neoclr_roots_resume_v1(&parked);
     neoclr_probe_leave_v1(&frame);
     free(s);
 }
@@ -237,10 +232,13 @@ static void arrays_and_invalid_descriptor(gc_worker *worker) {
     free(s);
     neoclr_probe_leave_v1(&frame);
 }
+#include "parked-tests.inc"
 int main(void) {
     owner_thread = pthread_self();
     gc_worker worker;
     assert(!gc_worker_init(&worker));
+    for (unsigned mode = 0; mode < 3; mode++) parked_case(&worker, mode);
+    parked_limits();
     conditional_regression(&worker);
     specialized_roots(&worker);
     failure_and_mutation(&worker);
@@ -248,5 +246,6 @@ int main(void) {
     for (unsigned seed = 1; seed <= 100; seed++) compare_case(&worker, seed, 64, true);
     compare_case(&worker, 123, 3000, true);
     gc_worker_destroy(&worker);
-    puts("101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation and parked rejection passed");
+    puts("Parked roots: three guarded oracle cases, expiry and capacity rejection passed");
+    puts("101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation passed");
 }

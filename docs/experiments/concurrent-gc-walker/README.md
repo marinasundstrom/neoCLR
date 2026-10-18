@@ -31,8 +31,11 @@ successful completion makes the mark results available to inspect; error/cancell
 jobs are discarded. Job storage remains alive until result pickup or joined shutdown.
 
 Bounds: 4,096 captured frame/strong-root words and 1,024 conditional handles, with
-explicit capture failure on overflow. Parked registrations are rejected rather than
-flattened into strong roots. Explicit caller-supplied conditional arrays are not yet
+explicit capture failure on overflow. Up to 128 parked registrations are captured with private flattened frames. Unowned
+registrations remain strong; owned registrations keep a copied owner and participate
+in the existing conditional fixed point. Expired registrations are skipped; unrelated
+owner contexts are excluded. Parked words share the 4,096-word budget and are not
+added to the unconditional frame roots. Explicit caller-supplied conditional arrays are not yet
 a capture input. Fault/static roots are copied through the context and traced by the
 existing walker. Registered resource owners are validated during capture, but no
 resource callbacks are copied or run on the worker.
@@ -66,7 +69,7 @@ The final UBSan/bounds run passes:
   unchanged. The current live graph can therefore have a different correct result;
   the test deliberately discards snapshot marks instead of applying them.
 - Cancellation before tracing, malformed copied descriptors, successful worker reuse
-  after failure, and explicit rejection of parked-frame capture.
+  after failure, and (in the initial slice) explicit rejection of parked-frame capture.
 
 The first fixture attempt aborted because it passed null empty-storage metadata and
 an invalid spill-plan marker to the existing root-probe API. The fixture was corrected;
@@ -83,7 +86,7 @@ scanned word or index step; worst-case cancellation latency has not been measure
 ## What this permits next
 
 The worker can reuse the current walker without consulting live heap storage for
-these captured cases. Next, cover parked/async roots and define how host-handle reads,
+these captured cases. Next, define how host-handle reads,
 root changes and allocation epochs invalidate or preserve a result before attempting
 live reclamation. Repeated snapshots fixing a retention bug does not establish that
 applying old marks is safe. Keep the synchronous collector as the lifetime oracle.
@@ -93,3 +96,16 @@ remains applicable; no managed semantics change or new collector design is selec
 No throughput, pause reduction or Go comparison is claimed by this correctness slice.
 Copy cost, worker CPU, retained memory and sustained Serve behavior remain unmeasured
 for this integration.
+
+
+## Parked-frame capture checkpoint
+
+`parked-results.json` records the updated passing UBSan/bounds run, including all
+previous graph/root/error checks. Three additional cases compare two parked frames
+with synchronous collection: unrooted owners, a rooted owner activating another
+owner through its parked frame, and an unowned strong frame activating an owned
+frame. Interior references are preserved. Both original heap pages and frame/slot
+storage are unreadable during worker tracing. Owner-side synchronous collection
+confirms retention/expiry; a second capture skips expired registrations. A 129th
+registration fails capture without leaking the copied heap. These checks do not yet
+qualify resumption or handle reads while the worker result is outstanding.
