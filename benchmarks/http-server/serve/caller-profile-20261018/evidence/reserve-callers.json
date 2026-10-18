@@ -1,0 +1,117 @@
+[
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Concurrency.Tasks_Promise`1..ctor",
+    "allocations": 2909,
+    "bytes": 1115421
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1.M_Add -> T_System.Concurrency.Tasks_Promise`1.M_Register",
+    "allocations": 2687,
+    "bytes": 139724
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Concurrency.Tasks_Promise`1.M_Register",
+    "allocations": 2687,
+    "bytes": 42992
+  },
+  {
+    "caller": "T_System.Text_Utf8.M_Decode -> T_System.Text_Utf8Encoding.M_Decode",
+    "allocations": 1326,
+    "bytes": 38008
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1.M_Add -> T_System.Web.Http_HttpRequest.M_Text",
+    "allocations": 1105,
+    "bytes": 35360
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1.M_Add -> T_System.Web.Http_HttpServer.M_AppendStatusPrefix",
+    "allocations": 663,
+    "bytes": 22984
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpRequest.M_Text",
+    "allocations": 442,
+    "bytes": 7072
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpRequest..ctor",
+    "allocations": 442,
+    "bytes": 8840
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpRequestDecoder..ctor",
+    "allocations": 442,
+    "bytes": 63648
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpContext..ctor",
+    "allocations": 442,
+    "bytes": 8840
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1.M_Add -> T_System.Web.Http_HttpServer.M_AppendLengthPrefix",
+    "allocations": 442,
+    "bytes": 49504
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T__Application.N_$closure$0.M_Invoke",
+    "allocations": 442,
+    "bytes": 13240
+  },
+  {
+    "caller": "T_System_Array`1.M_get_Empty -> T_System.Web.Http_HttpContext..ctor",
+    "allocations": 442,
+    "bytes": 7072
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpServer.M_EncodeResponse",
+    "allocations": 221,
+    "bytes": 3536
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1.M_Add -> T_System.Web.Http_HttpRequestDecoder.M_Parse",
+    "allocations": 221,
+    "bytes": 13260
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpRequestDecoder.M_Parse",
+    "allocations": 221,
+    "bytes": 5304
+  },
+  {
+    "caller": "T_System_Array`1.M_get_Empty -> T_System.Web.Http_HttpContext.M_Finish",
+    "allocations": 221,
+    "bytes": 3536
+  },
+  {
+    "caller": "T_System.Web.Http_HttpServer.M_EncodeResponse -> T_System.Web.Http_HttpContext.M_Send",
+    "allocations": 221,
+    "bytes": 33570
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Collections_ArrayQueue`1.M_Enqueue",
+    "allocations": 3,
+    "bytes": 772
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpServerRun.M_Finished",
+    "allocations": 1,
+    "bytes": 24
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Web.Http_HttpServerRun..ctor",
+    "allocations": 1,
+    "bytes": 168
+  },
+  {
+    "caller": "T_System.Collections_ArrayList`1..ctor -> T_System.Collections_ArrayQueue`1..ctor",
+    "allocations": 1,
+    "bytes": 24
+  },
+  {
+    "caller": "T_System.Web.Http_HttpServer.M_RentReceiveBuffer -> T_System.Web.Http_HttpServerExchange.M_ReceiveNext",
+    "allocations": 1,
+    "bytes": 528
+  }
+]

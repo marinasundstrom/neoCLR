@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Attribute the remaining Serve allocation and CPU costs
+
+- **Author:** asks for concrete next actions, then directs continuation.
+- **Assistant proposal/action:** profile CPU and array callers before selecting
+  another optimization. The diagnostic records bounded caller chains and payload
+  sizes with tested overflow accounting, plus paced-collection trigger reasons.
+- **Findings:** allocation/root publication/collection lead sampled leaf costs.
+  Promise.Register allocates an empty callback array then grows it on the first
+  registration 2,687 times. Promise result-slot arrays account for about 1.12 MB
+  of 3.33 MB total diagnostic allocation. Equal paced-boundary trigger totals do
+  not explain the earlier higher collection total; explicit idle counts vary.
+- **Next selected action:** reserve capacity for the known first callback and
+  measure it. Replacing Promise result storage and changing GC/root validation
+  remain separate investigations. [Diagnostic evidence](../benchmarks/http-server/serve/caller-profile-20261018/README.md).
+
 ## 2026-10-18 — Bounded request-header reservation
 
 - **Author context:** continue Serve/GC profiling and commit each slice; earlier
