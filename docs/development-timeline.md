@@ -26,6 +26,20 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Serve as the application documentation default
+
+- **Author:** selected `Serve` as the main API for HTTP web-app documentation,
+  retaining `Accept` and `ServeOne` for lower-level uses, and asked whether unawaited
+  handling already moves work off-thread.
+- **Assistant:** clarified that awaiting context acquisition is appropriate;
+  awaiting each whole exchange in a loop serializes processing. Omitting await
+  does not offload work. Serve supervises concurrent callbacks on the cooperative
+  dispatcher; blocking synchronous code can stall it.
+- **Action:** promoted Serve in the website feature/case and API lifetime guide,
+  extracted the existing tested fixture's lifecycle example, and labelled the
+  sequential JSON interoperability fixtures explicitly. Awaiting Serve's lifetime
+  task remains normal application control flow. No scheduler behavior changed.
+
 ## 2026-10-18 — JSON record serialization and ValueType ancestry
 
 - **Author:** requested record-struct JSON serialization, regression tests, consistent

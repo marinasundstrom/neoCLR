@@ -1,5 +1,11 @@
 # Minimal HTTP server — development POC, 2026-09-24
 
+**Application guidance (2026-10-18):** use `Serve(handler)` as the primary web-app
+API. Await its server lifetime task while the dispatcher supervises concurrent
+callbacks. `Accept`/`AcceptHeaders` and `ServeOne` are lower-level alternatives;
+manual loops need bounded task supervision, ownership and shutdown handling. Not
+awaiting a task does not move it off-thread. See the [current lifetime guide](../api-docs/http-server.md).
+
 **Current design guidance:** see the [2026-10-17 performance review](#performance-architecture-review--2026-10-17) for current implementation pointers and proposed next measurements. The dated POC sections below retain historical limitations.
 
 **Development update 2026-10-11:** the [HTTP foundation](http-foundation.md) supersedes

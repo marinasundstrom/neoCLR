@@ -19,9 +19,42 @@ This case acknowledges a report; it does not save it. The downloadable project
 contains the client, server, shared JSON/error code and an interoperability verifier.
 Use the [setup guide](/try/) for the matching runtime and compiler.
 
+## Start web applications with Serve
+
+Use `HttpServer.Serve(handler)` for application hosting with a matching development
+toolchain after Preview 16. The callback receives an `HttpRequest` and returns
+`Task<Result<HttpResponse, HttpError>>`; return the response for the server to send
+and dispose. The server supervises up to 16 concurrent exchanges. Route selection,
+JSON parsing and acknowledgement logic belong inside that callback.
+
+The following lifecycle example comes directly from the
+[tested Serve fixture](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/Server.rvn).
+Its `Application.Respond` is a small benchmark handler, and its separate control
+socket lets the verifier request shutdown after responses finish:
+
+```raven
+{{HTTP_SERVE_LIFETIME_SAMPLE}}
+```
+
+A normal application's shutdown signal can be different. Awaiting `Serve`'s lifetime
+task is correct and does not serialize callbacks; retain the task only when you
+need to coordinate other work before awaiting it. Handle its Result. `Close` closes
+connections, then the lifetime task joins all started handlers. It does not drain
+in-flight responses successfully or forcibly cancel arbitrary callback work.
+
+Async handlers can suspend while other requests advance. Neither calling a task
+without awaiting it nor the cooperative dispatcher guarantees execution on another
+thread. Blocking synchronous code can stall other requests.
+See the [Serve contract](/docs/http-server.html#server-managed-callbacks).
+
 <a id="accept-loop"></a>
 
-## Server: accept requests in a loop
+## Lower-level example: accept requests in a loop
+
+The downloadable JSON interoperability samples below retain explicit context
+ownership and a bounded sequential loop so their verifiers can finish. They
+demonstrate request/response operations, not the recommended hosting pattern for
+concurrent web applications. `ServeOne` similarly handles only one exchange.
 
 The listener and the application model are separate. This sample calls
 `HttpServer.Listen("127.0.0.1", 0, 4)` once, then repeatedly awaits `Accept()`.
@@ -43,7 +76,11 @@ The program's completion callback closes the listener.
 
 `Configure` is where this application chooses its model. The later routing and
 attribute-mapper examples change dispatch inside the handler; they do not require
-a different listening model. A long-running application also needs an explicit
+a different listening model in these fixtures. With `Serve`, adapt context-based
+configuration to return `HttpResponse` from the callback instead. With manual
+acceptance, await context acquisition, then supervise bounded processing tasks if
+concurrency is needed; simply ignoring them loses error and lifetime observation.
+A long-running application also needs an explicit
 shutdown policy. `Accept(token)` supports cancellation, while `server.Close()`
 stops the listener and closes its owned exchanges; it does not drain handlers.
 See [exchange ownership and limits](/features/web/#own-an-http-exchange).

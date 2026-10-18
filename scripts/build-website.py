@@ -300,6 +300,7 @@ def main():
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
+        'HTTP_SERVE_LIFETIME_SAMPLE': ('benchmarks/http-server/serve/Server.rvn', 'async func Main()', '\n}', True),
         'HTTP_REPORT_ACCEPT_LOOP': ('docs/experiments/http-json/Server.rvn', '    async func Serve(', '\n    }', True),
         'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    func Configure(', '\n    }', True),
         'HTTP_ATTRIBUTED_ROUTES': ('docs/experiments/runtime-route-mapper/Routes.rvn', 'public union AppRoutes {', '\n}', True),

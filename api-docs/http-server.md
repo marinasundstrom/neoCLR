@@ -3,6 +3,69 @@ title: HTTP server lifetime and concurrency
 ---
 # HTTP server lifetime and concurrency
 
+Use `HttpServer.Serve(handler)` for HTTP web applications. The server manages
+concurrent requests, observes handler tasks and owns response/connection cleanup.
+This API is development behavior after Preview 16; use a matching toolchain.
+
+## Server-managed callbacks
+
+Development after Preview 16 adds:
+
+- `Serve(handler) -> Task<Result<System.Void, HttpError>>`
+- `Serve(handler, cancellationToken) -> Task<Result<System.Void, HttpError>>`
+- `CompletedRequests: long`, `FailedRequests: long`, `LastRequestError: Option<HttpError>`
+
+The handler has the same signature as ServeOne:
+`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`. Calling Serve starts the
+server-managed dispatcher. Its returned task represents server lifetime, not one
+request. Awaiting that lifetime task in async Main is normal: the dispatcher still
+advances concurrent requests. If application code needs to coordinate shutdown or
+do other work, retain the task and await it after requesting shutdown. Observe its
+Result rather than discarding the task. The server owns and observes every request
+task; applications do not need a request-dispatch loop. Suspended callbacks do not prevent other requests
+from advancing. Synchronous blocking code still blocks the cooperative dispatcher.
+
+Serve owns at most 16 queued/active exchanges. At the bound it waits for a slot;
+additional connections wait in the configured TCP backlog. It requires an open idle
+server. Duplicate Serve, mixed Accept/AcceptHeaders/ServeOne, and starting Serve with
+an outstanding manual exchange return InvalidRequest. Pre-cancellation cancels the
+returned task without starting Serve or closing the listener.
+
+Request parse, handler, response validation and transfer errors close that exchange
+and serving continues. Cancelled handler tasks count as a request failure. The
+cumulative counters cover Serve only; shutdown-driven cancellations are excluded.
+LastRequestError retains only the latest failure, not an unbounded error history.
+There is no automatic error response or retry. A listener failure stops the server
+and returns Error from its lifetime task, taking precedence over concurrent caller
+cancellation. Runtime Faults remain terminal.
+
+Close stops accepting and closes connections immediately. Serve's lifetime task
+then waits for all started handlers to settle and disposes late successful responses,
+including owned streaming content. Close completes that task successfully; cancellation
+of the supplied token closes the server and ultimately cancels the lifetime task.
+Handlers must settle cooperatively; arbitrary callback work cannot be forcibly
+cancelled, and a never-completing handler prevents lifetime completion. Capture an
+application cancellation token when the handler's work needs cancellation. This is
+joined shutdown after connection closure, not graceful completion of in-flight HTTP
+responses. ServeOne retains its existing single-exchange cancellation behavior.
+
+The [tested Serve fixture](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/Server.rvn)
+starts Serve, waits independently for shutdown, closes the listener, then awaits its
+lifetime task. HTTP/1.1 connection-close behavior and existing read/write limits remain.
+
+## Lower-level acceptance and single exchanges
+
+Use `Accept` when you need direct context ownership (or `AcceptHeaders` for incoming
+streaming), and `ServeOne` when you need one callback exchange. They remain supported
+for adapters, tests and applications with their own dispatch policy.
+
+Awaiting `Accept()` waits for a context; it does not wait for your subsequent handler.
+Awaiting the entire handling/completion step before accepting again serializes the
+loop, as does repeatedly awaiting `ServeOne`. To process concurrently, the caller
+must supervise a bounded set of processing tasks, observe failures, dispose contexts
+and join work on shutdown. Simply dropping a task does not move work onto another
+thread or provide that supervision. Prefer `Serve` for this ownership policy.
+
 Development behavior after Preview 14. `HttpServer.Accept` and `ServeOne` can be
 started concurrently. At most 16 outstanding queued accepts and live exchange
 contexts belong to one server; further calls return `HttpError.LimitExceeded`.
@@ -53,50 +116,6 @@ cooperative. Caller cancellation returns a cancelled task; deadline expiry retur
 closes owned content. No unbounded producer queue or complete body copy is created.
 
 Incoming bodies can now be read through [headers-first APIs](http-body-streams.md).
-Accept/ServeOne and default client Send remain buffered; unknown-length output
+`Serve`, `Accept`, `ServeOne` and default client `Send` buffer incoming bodies; unknown-length output
 is still unsupported. This does not introduce
 connection reuse. See the [stream contract](streams.md) for buffer ownership.
-
-## Server-managed callbacks
-
-Development after Preview 16 adds:
-
-- `Serve(handler) -> Task<Result<System.Void, HttpError>>`
-- `Serve(handler, cancellationToken) -> Task<Result<System.Void, HttpError>>`
-- `CompletedRequests: long`, `FailedRequests: long`, `LastRequestError: Option<HttpError>`
-
-The handler has the same signature as ServeOne:
-`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`. Calling Serve starts the
-server-managed dispatcher. Its returned task represents server lifetime, not one
-request. Application code can retain that task while doing other work, then await
-it for shutdown. The server owns and observes every request task; applications do
-not need a request-dispatch loop. Suspended callbacks do not prevent other requests
-from advancing. Synchronous blocking code still blocks the cooperative dispatcher.
-
-Serve owns at most 16 queued/active exchanges. At the bound it waits for a slot;
-additional connections wait in the configured TCP backlog. It requires an open idle
-server. Duplicate Serve, mixed Accept/AcceptHeaders/ServeOne, and starting Serve with
-an outstanding manual exchange return InvalidRequest. Pre-cancellation cancels the
-returned task without starting Serve or closing the listener.
-
-Request parse, handler, response validation and transfer errors close that exchange
-and serving continues. Cancelled handler tasks count as a request failure. The
-cumulative counters cover Serve only; shutdown-driven cancellations are excluded.
-LastRequestError retains only the latest failure, not an unbounded error history.
-There is no automatic error response or retry. A listener failure stops the server
-and returns Error from its lifetime task, taking precedence over concurrent caller
-cancellation. Runtime Faults remain terminal.
-
-Close stops accepting and closes connections immediately. Serve's lifetime task
-then waits for all started handlers to settle and disposes late successful responses,
-including owned streaming content. Close completes that task successfully; cancellation
-of the supplied token closes the server and ultimately cancels the lifetime task.
-Handlers must settle cooperatively; arbitrary callback work cannot be forcibly
-cancelled, and a never-completing handler prevents lifetime completion. Capture an
-application cancellation token when the handler's work needs cancellation. This is
-joined shutdown after connection closure, not graceful completion of in-flight HTTP
-responses. ServeOne retains its existing single-exchange cancellation behavior.
-
-The [tested Serve fixture](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/Server.rvn)
-starts Serve, waits independently for shutdown, closes the listener, then awaits its
-lifetime task. HTTP/1.1 connection-close behavior and existing read/write limits remain.

@@ -1,8 +1,12 @@
 ---
 uid: M:System.Web.Http.HttpServer.Serve(Function)
 ---
-Starts concurrent, server-owned request dispatch. This method returns immediately;
+Recommended entry point for HTTP web applications. Starts concurrent, server-owned request dispatch. This method returns immediately;
 its task represents the lifetime of the server, not an individual request.
+
+Awaiting this lifetime task in async Main does not serialize requests. Retain and
+observe it when coordinating shutdown separately; dropping a task does not offload
+work to another thread.
 
 ## Parameters
 

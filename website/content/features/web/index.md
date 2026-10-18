@@ -11,6 +11,29 @@ control flow; handlers and completion adapters can still use callbacks.
 Use a matching development toolchain. [Native compilation](../native-compilation/)
 explains supported hosts and execution modes.
 
+## HttpServer: serve concurrent requests
+
+Use `HttpServer.Serve(handler)` as the main API for HTTP web applications. After
+listening, pass an async callback with the signature
+`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`. The server observes each
+handler task and owns its response and connection. Development after Preview 16
+admits up to 16 exchanges; suspended async handlers allow other requests to advance.
+
+Awaiting the task returned by `Serve` in async Main waits for **server lifetime**;
+it does not serialize requests. Alternatively, retain that task while coordinating
+shutdown, call `Close`, then await it and handle its Result. Shutdown closes
+connections and joins started handlers; handlers must settle cooperatively.
+
+Concurrency does not imply a thread per request. Blocking synchronous handler code
+blocks the cooperative dispatcher, and omitting `await` does not offload work to a
+thread. `Accept`/`AcceptHeaders` and `ServeOne` remain lower-level options: callers
+must manage bounded concurrency and cleanup if they use them to build a server.
+Awaiting context acquisition is fine; awaiting all processing before accepting the
+next context makes a loop sequential.
+
+See the [server lifetime reference](/docs/http-server.html) and
+[server application walkthrough](/cases/http-server/) for ownership and examples.
+
 ## HttpClient: call an HTTP service
 
 Use HttpClient on its own to call a service. This example sets a base address and
@@ -97,7 +120,7 @@ Development after Preview 16 reduces server response copying and uses larger
 bounded transfers; buffered responses still preserve their snapshot semantics.
 
 Both client uploads and server responses accept known-length `HttpContent.FromStream`
-sources. Default Get/Send, Accept and ServeOne remain buffered, so the JSON showcase
+sources. Default Get/Send and server Serve/Accept/ServeOne buffer incoming bodies, so the JSON showcase
 continues to use its existing content helpers. Incoming streaming works with fixed
 and chunked framing, plus close-delimited client responses; unknown-length outgoing
 bodies are still unsupported.
@@ -125,6 +148,7 @@ transport for tests. It owns its inner handlers and freezes after sending begins
 
 Dispose clients when finished. Default calls buffer responses; headers-first calls
 transfer a body stream that the response owns. Dispose streaming responses as well. On the server,
+`Serve` owns response and connection cleanup. When using `Accept` directly,
 complete or dispose each request context so its connection is closed. Use async `InputStream`/`OutputStream`
 operations for transfer and explicit encoding when converting bytes to text.
 
@@ -166,10 +190,3 @@ remains unsupported. See the
 - [SQL databases](/features/sql/) — query and map application data.
 - [TCP networking](/features/networking/) — lower-level socket operations.
 - [HTTP benchmarks](/benchmarks/http/) — workload matrix and measurement status.
-
-
-Development after Preview 16 adds `HttpServer.Serve(handler)` for server-managed
-concurrent requests. The callback returns a task; the server owns its completion,
-response and connection. The separate lifetime task joins handlers after shutdown.
-Concurrency is bounded at 16 exchanges, with request failure diagnostics. See the
-[server lifetime reference](/docs/http-server.html) for cancellation, ownership and limits.
