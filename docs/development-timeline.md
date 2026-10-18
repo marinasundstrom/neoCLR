@@ -19435,3 +19435,11 @@ Serve host and passes deterministic pressure/stale/cancellation checks plus real
 suspended-request recovery. Sanitizer load missed arrivals and is explicitly not
 a speedup claim. See [implementation and evidence](experiments/concurrent-gc-http/APPLY.md).
 Matched uninstrumented measurements are the next step; this is not production adoption.
+
+The subsequent HTTP comparison and targeted confirmation complete with real
+concurrent reclamation but about 23–24% higher CPU per completion, without a
+throughput win. Initial generator-lag failures prevent attributing all admission
+misses to GC. The author then requested a thorough code review informed by
+existing collectors/algorithms after the run. The assistant agreed to distinguish
+measured costs and small POC improvements from barrier/runtime-contract changes.
+See [all load results](experiments/concurrent-gc-http/LOAD.md); the code review follows.

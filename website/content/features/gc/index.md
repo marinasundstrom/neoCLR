@@ -203,3 +203,9 @@ on the owner thread after epoch and heap validation. Focused pressure, cancellat
 suspended-request and shutdown checks demonstrate live reclamation. This remains
 a bounded AOT experiment; production collector selection is unchanged, and these
 checks alone establish no HTTP throughput improvement.
+
+The subsequent fixed-rate HTTP comparison shows about 23–24% more CPU per
+completion for this concurrent policy and no demonstrated throughput gain over
+paced synchronous GC. Both modes vary at 300 requests/sec; all initial and
+confirmation trials, including generator-lag failures, are retained. The next
+step is reducing avoidable collector work, not changing production defaults.

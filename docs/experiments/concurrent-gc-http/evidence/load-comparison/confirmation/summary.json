@@ -1,0 +1,172 @@
+{
+  "contract": "CPU cores = process CPU seconds / wall seconds. Peak uses adjacent approximately 0.5-second samples inside the window; misses shorter spikes. Successful-response p99 must be read with outcomes. GC totals include warmup and teardown.",
+  "rows": [
+    {
+      "name": "sync-1-300",
+      "mode": "sync",
+      "round": 1,
+      "rate": 300,
+      "offered": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedPerSecond": 299.96666666666664,
+      "cpuMillisecondsPerCompletion": 2.234692743638182,
+      "meanCpuCores": 0.6703333333333334,
+      "sampledPeakCpuCores": 0.7137551180777267,
+      "sampledPeakRssKiB": 12912,
+      "p99Milliseconds": 4.700042333332988,
+      "generatorP99Milliseconds": 0.49912566666643343,
+      "passed": true,
+      "serverTotals": {
+        "completed": 9020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "apply-1-300",
+      "mode": "apply",
+      "round": 1,
+      "rate": 300,
+      "offered": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedPerSecond": 299.96666666666664,
+      "cpuMillisecondsPerCompletion": 2.751416824091566,
+      "meanCpuCores": 0.8253333333333334,
+      "sampledPeakCpuCores": 1.1507635870949413,
+      "sampledPeakRssKiB": 14192,
+      "p99Milliseconds": 110.69637433333313,
+      "generatorP99Milliseconds": 1.0853326666655505,
+      "passed": true,
+      "serverTotals": {
+        "completed": 9020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": {
+        "started": 262164,
+        "applied": 175728,
+        "discarded": 86436,
+        "concurrentReclaimedBytes": 105868633,
+        "traceErrors": 0,
+        "captureRejected": 0,
+        "deferred": 14599668,
+        "fallbacks": 1065757,
+        "allocations": 3472230,
+        "reclaimedAllocations": 3472230
+      }
+    },
+    {
+      "name": "go-1-300",
+      "mode": "go",
+      "round": 1,
+      "rate": 300,
+      "offered": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedPerSecond": 300.0,
+      "cpuMillisecondsPerCompletion": 0.19111111111111112,
+      "meanCpuCores": 0.05733333333333333,
+      "sampledPeakCpuCores": 0.07922397470693793,
+      "sampledPeakRssKiB": 14432,
+      "p99Milliseconds": 8.242458333334923,
+      "generatorP99Milliseconds": 3.742708666671035,
+      "passed": true,
+      "serverTotals": {
+        "completed": 9020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "go-2-300",
+      "mode": "go",
+      "round": 2,
+      "rate": 300,
+      "offered": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedPerSecond": 300.0,
+      "cpuMillisecondsPerCompletion": 0.20555555555555555,
+      "meanCpuCores": 0.06166666666666667,
+      "sampledPeakCpuCores": 0.07939950818912381,
+      "sampledPeakRssKiB": 15056,
+      "p99Milliseconds": 5.857584000001026,
+      "generatorP99Milliseconds": 2.138750333333661,
+      "passed": true,
+      "serverTotals": {
+        "completed": 9020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "apply-2-300",
+      "mode": "apply",
+      "round": 2,
+      "rate": 300,
+      "offered": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedPerSecond": 300.0,
+      "cpuMillisecondsPerCompletion": 2.752222222222222,
+      "meanCpuCores": 0.8256666666666667,
+      "sampledPeakCpuCores": 0.8918490950266472,
+      "sampledPeakRssKiB": 14192,
+      "p99Milliseconds": 5.497499333333877,
+      "generatorP99Milliseconds": 0.5095833333332855,
+      "passed": true,
+      "serverTotals": {
+        "completed": 9020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": {
+        "started": 263546,
+        "applied": 177210,
+        "discarded": 86336,
+        "concurrentReclaimedBytes": 106295269,
+        "traceErrors": 0,
+        "captureRejected": 0,
+        "deferred": 14478327,
+        "fallbacks": 1025198,
+        "allocations": 3473390,
+        "reclaimedAllocations": 3473390
+      }
+    },
+    {
+      "name": "sync-2-300",
+      "mode": "sync",
+      "round": 2,
+      "rate": 300,
+      "offered": 9000,
+      "outcomes": {
+        "ok": 8998,
+        "generator_inflight_limit": 2
+      },
+      "completedPerSecond": 299.93333333333334,
+      "cpuMillisecondsPerCompletion": 2.226050233385197,
+      "meanCpuCores": 0.6676666666666667,
+      "sampledPeakCpuCores": 0.8728079161392776,
+      "sampledPeakRssKiB": 12912,
+      "p99Milliseconds": 139.08037566666565,
+      "generatorP99Milliseconds": 0.8996666666671871,
+      "passed": false,
+      "serverTotals": {
+        "completed": 9018,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    }
+  ]
+}

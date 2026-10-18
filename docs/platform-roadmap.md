@@ -5425,4 +5425,7 @@ qualification precede an uninstrumented sync/concurrent/Go comparison.
 [applying adapter](experiments/concurrent-gc-http/APPLY.md) now validates live
 reclamation, synchronous pressure fallback, stale rejection and pending cancellation,
 plus actual suspended HTTP requests and clean teardown. Production GC is unchanged.
-Next: matched uninstrumented synchronous/concurrent/Go offered-load measurements.
+The [matched HTTP measurements](experiments/concurrent-gc-http/LOAD.md) now show
+23–24% higher concurrent CPU/request without a demonstrated throughput win.
+Initial and confirmation trials retain admission/latency variation and generator
+limitations. Next: author-requested code/algorithm review of avoidable GC work.

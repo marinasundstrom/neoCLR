@@ -79,3 +79,7 @@ small-heap override, and validate it before load. Use the same retained guest an
 32 MiB arena as the synchronous baseline. Compare fixed offered rates and reverse
 order, retaining every missed arrival, offered latency, generator lag, server CPU,
 GC counters and exit/response validation. No HTTP speedup is claimed by this slice.
+
+[Completed HTTP comparison](LOAD.md): the applying policy costs about 23–24%
+more CPU per completion without a demonstrated throughput gain. Both initial and
+confirmation trials are retained, including generator-lag failures.

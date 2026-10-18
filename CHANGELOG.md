@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Compare the applying concurrent GC experiment with paced synchronous Serve and Go at fixed HTTP arrival rates, retaining initial and targeted confirmation runs. Concurrent GC costs about 23–24% more CPU per completion without a throughput win; both neoCLR modes show 300 req/s variation, and generator-lag failures remain explicit. Record coarse CPU peaks, live reclamation and full raw evidence; keep production defaults unchanged.
+
 - Apply private background GC traces in the isolated Serve experiment using owner-side epoch/heap validation and existing sweep, with synchronous pressure fallback. Add deterministic stale/pressure/cancellation checks and real HTTP suspension/recovery tests, including a 96 KiB heap; verify actual reclamation and clean teardown. Production collector selection is unchanged; sanitizer overload results are not a performance claim.
 
 - Run private background snapshot tracing through the actual asynchronous Serve host while paced synchronous GC remains authoritative. A diagnostic 250-request run completes 14,153 traces without errors/rejections (about 42% unchanged epochs); malformed-request recovery and concurrent peers also pass, with full reclamation and joined worker teardown. No live marks are imported and no HTTP speedup or concurrent collector support is claimed.
