@@ -416,6 +416,37 @@ public class HttpServer {
     private var completedRequests: long = 0L
     private var failedRequests: long = 0L
     private var lastRequestError: Option<HttpError> = None()
+    // Private, dispatcher-owned scratch storage. Never exposed through a request.
+    // One retained buffer per size class bounds idle payload retention to 4352 bytes.
+    private var smallReceiveBuffer: byte[]? = null
+    private var largeReceiveBuffer: byte[]? = null
+
+    internal func RentReceiveBuffer(size: int) -> byte[] {
+        if size == 256 {
+            if smallReceiveBuffer is byte[] available {
+                smallReceiveBuffer = null
+                return available
+            }
+        } else if size == 4096 {
+            if largeReceiveBuffer is byte[] available {
+                largeReceiveBuffer = null
+                return available
+            }
+        }
+        return CheckedStorage.Reserve<byte>(size)
+    }
+
+    internal func ReturnReceiveBuffer(buffer: byte[]) {
+        if closed { return }
+        // Only completed receive bytes are read, then copied by the decoder.
+        // Uncleared tails remain private; streaming buffers are never returned here.
+        if buffer.Length == 256 && smallReceiveBuffer is null {
+            smallReceiveBuffer = buffer
+        } else if buffer.Length == 4096 && largeReceiveBuffer is null {
+            largeReceiveBuffer = buffer
+        }
+    }
+
 
     /// Successful responses completed by Serve; excludes explicit Accept/ServeOne calls.
     val CompletedRequests: long => completedRequests
@@ -623,6 +654,8 @@ public class HttpServer {
             return
         }
         closed = true
+        smallReceiveBuffer = null
+        largeReceiveBuffer = null
         shutdown.Cancel()
         listener.Close()
     }
@@ -1132,7 +1165,7 @@ internal class HttpServerExchange {
     private var accepting: Option<Task<Result<Socket, SocketError>>> = None()
     private var transfer: Option<Task<Result<int, HttpError>>> = None()
     private var requestDecoder: HttpRequestDecoder? = null
-    private var buffer: byte[] = Array<byte>.Empty
+    private var buffer: byte[]? = null
     private var deadline = NetworkDeadline.Expired
 
     internal init(owner: HttpServer, listener: Socket, token: CancellationToken, streaming: bool) {
@@ -1175,6 +1208,16 @@ internal class HttpServerExchange {
         cancellation.Dispose()
         accepting = None()
         transfer = None()
+        ReleaseReceiveBuffer()
+    }
+
+    private func ReleaseReceiveBuffer() {
+        if buffer is byte[] completed {
+            buffer = null
+            if !streaming {
+                owner.ReturnReceiveBuffer(completed)
+            }
+        }
     }
 
     private func Fail(reason: HttpError) {
@@ -1235,28 +1278,32 @@ internal class HttpServerExchange {
         if let Some(connection) = socket {
             // Queued accepts and TLS handshakes need cancellation state, but no
             // HTTP parser or receive storage until they can read request bytes.
-            if buffer.Length == 0 {
+            if buffer is null {
                 let decoder = HttpRequestDecoder(owner.Settings, owner.SslOptions is SslServerAuthenticationOptions)
                 if streaming {
                     decoder.EnableStreaming()
                 }
                 requestDecoder = decoder
-                buffer = CheckedStorage.Reserve<byte>(256)
+                buffer = if streaming { CheckedStorage.Reserve<byte>(256) } else { owner.RentReceiveBuffer(256) }
             }
-            let pending = connection.ReceiveUntil(buffer, 0, buffer.Length, deadline, cancellation.Token)
-            transfer = Some(pending)
-            pending.OnCompleted(self.OnReceived)
+            if buffer is byte[] receiving {
+                let pending = connection.ReceiveUntil(receiving, 0, receiving.Length, deadline, cancellation.Token)
+                transfer = Some(pending)
+                pending.OnCompleted(self.OnReceived)
+            }
         }
     }
 
     private func OnReceived() {
         // ReceiveNext initializes the parser before registering this callback.
         if requestDecoder is HttpRequestDecoder decoder {
-            OnReceived(decoder)
+            if buffer is byte[] received {
+                OnReceived(decoder, received)
+            }
         }
     }
 
-    private func OnReceived(decoder: HttpRequestDecoder) {
+    private func OnReceived(decoder: HttpRequestDecoder, received: byte[]) {
         if let Some(pending) = transfer {
             transfer = None()
             if pending.IsCancelled || cancellation.IsCancellationRequested {
@@ -1272,7 +1319,7 @@ internal class HttpServerExchange {
                     Fail(HttpError.Protocol("EOF before complete request"))
                     return
                 }
-                if let Error(reason) = decoder.Push(buffer, count) {
+                if let Error(reason) = decoder.Push(received, count) {
                     Fail(reason)
                     return
                 }
@@ -1280,7 +1327,7 @@ internal class HttpServerExchange {
                     if let Ok(request) = decoder.FinishHeaders() {
                         if let Some(connection) = socket {
                             let length = decoder.BodyLength
-                            let stream = HttpBodyInput(connection, buffer, decoder.Consumed, count, length,
+                            let stream = HttpBodyInput(connection, received, decoder.Consumed, count, length,
                                 owner.Settings.BodyBytes, Some(deadline), false,
                                 request.Method.Method == "GET" || request.Method.Method == "DELETE" || request.Method.Method == "HEAD")
                             request.SetContent(HttpContent.Incoming(stream, if length < 0 { -1 } else { length }))
@@ -1304,8 +1351,9 @@ internal class HttpServerExchange {
                 } else {
                     // Keep tiny requests cheap; grow only after a partial request.
                     // Push has already copied all bytes out of the receive block.
-                    if buffer.Length < 4096 {
-                        buffer = CheckedStorage.Reserve<byte>(4096)
+                    if received.Length < 4096 {
+                        ReleaseReceiveBuffer()
+                        buffer = if streaming { CheckedStorage.Reserve<byte>(4096) } else { owner.RentReceiveBuffer(4096) }
                     }
                     ReceiveNext()
                 }

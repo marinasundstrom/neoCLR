@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — First HTTP receive-pooling slice
+
+- **Author:** asks to continue the measured optimization work after proposing array
+  pooling compatible with future spans and slicing.
+- **Assistant action:** audits buffered versus streaming ownership, implements a
+  per-server cache bounded to one 256-byte and one 4 KiB array, and keeps streaming
+  storage outside the pool. A first attempt allocates empty replacements; nullable
+  exchange state removes that counterproductive allocation.
+- **Validation:** buffered ownership, malformed/EOF input, cancellation and retained
+  requests pass interpreter/JIT/AOT. The original streaming interpreter fixture
+  fails on both baseline and candidate; a fixture-only 60-second budget passes all
+  modes. Production defaults remain unchanged. Diagnostics record 0.70% fewer
+  allocations/3.43% fewer payload bytes and more collections. These are not sustained
+  throughput claims. [Evidence](../benchmarks/http-server/serve/receive-pool-20261018/README.md).
+
 ## 2026-10-18 — Task allocations and HTTP callback shape
 
 - **Author:** requests renewed Serve/GC profiling against Go, questions reference-type

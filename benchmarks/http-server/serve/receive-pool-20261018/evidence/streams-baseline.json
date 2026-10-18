@@ -1,0 +1,35 @@
+{
+  "passed": false,
+  "commands": {
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/json-records/runtime-primitive-1",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-receive-pool-20261018/stream-baseline/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-task-queue-20261018/library-final/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-task-queue-20261018/library-final/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-task-queue-20261018/library-final/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-task-queue-20261018/library-final/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-task-queue-20261018/library-final/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-task-queue-20261018/library-final/System.Web.dll"
+    ]
+  },
+  "cases": {},
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/receive-pool-20261018/verify-streaming.py": "4f75393e4e52f07d40f3546d783e19a96f79c284bcf59071ac80657474b13876",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/validate.py": "c3207ed6232e50efd07b2e8f1217afd42393a3ddb05779b869c0c4fd51b2ee5e",
+    "/Users/robert/Projects/neoclr/target/http-receive-pool-20261018/contracts-final.json": "6d3f599bb7c3d566876e67fe0786a20d086ea01739b58fd5b236bb6f95d6c021",
+    "/Users/robert/Projects/neoclr/target/http-receive-pool-20261018/stream-baseline/app": "3d1cdd290d123340b25cd7de2ceaea9fc3df2148eb85df0fe02d2e9ac996b024",
+    "/Users/robert/Projects/neoclr/target/http-receive-pool-20261018/stream-baseline/app.dll": "4656107cc5f8a1fa8cdf31a4ca97b868c17d1b772248ffb1ad68a7b75d7843c6",
+    "/Users/robert/Projects/neoclr/target/http-receive-pool-20261018/stream-baseline/build.json": "4f8e73883c608286d14635862883efe401a1847e426735d2020a7d35ac897528"
+  }
+}

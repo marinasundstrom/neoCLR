@@ -1,0 +1,62 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import System.Time.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value { System.Fail("Receive buffer ownership failed") }
+}
+
+// Outcome adapter observes cancellation without cancelling the fixture itself.
+func Cancelled(pending: Task<Result<HttpContext, HttpError>>) -> Task<bool> {
+    let source = Promise<bool>()
+    pending.OnCompleted(() => { _ = source.Complete(pending.IsCancelled) })
+    return source.Task
+}
+
+async func Echo(context: HttpContext) -> Task<()> {
+    context.Respond(HttpStatusCode.OK, HttpContent(context.Request.Content.Bytes))
+    Check((await context.Complete()) is Ok(_))
+    context.Dispose()
+}
+
+async func Main() -> Task<()> {
+    let options = HttpServerOptions()
+    options.RequestReadTimeout = Duration.FromTicks(600000000L)
+    options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else { System.Fail("Listen failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    Console.WriteLine(port)
+    let Ok(retained) = await server.Accept() else { System.Fail("First accept failed") }
+    Console.WriteLine("HOLD")
+    for index in 0..8 {
+        let cancellation = CancellationTokenSource()
+        if index == 4 { cancellation.CancelAfter(Duration.FromTicks(5000000L)) }
+        let pending = server.Accept(cancellation.Token)
+        Console.WriteLine("READY")
+        let cancelled = await Cancelled(pending)
+        if index == 4 {
+            Check(cancelled)
+        } else {
+            Check(!cancelled)
+            let result = pending.GetResult()
+            if index == 2 || index == 3 {
+                Check(result is Error(_))
+            } else {
+                let Ok(context) = result else { System.Fail("Accept failed") }
+                await Echo(context)
+            }
+        }
+        cancellation.Dispose()
+        Console.WriteLine("CASE")
+    }
+    let bytes = retained.Request.Content.Bytes
+    Check(bytes.Count == 4097)
+    for index in 0..bytes.Count { Check(bytes[index] == 65) }
+    await Echo(retained)
+    server.Close()
+    Console.WriteLine("DONE")
+}

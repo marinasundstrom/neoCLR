@@ -1,0 +1,14 @@
+PASS aot
+Traceback (most recent call last):
+  File "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/validate.py", line 73, in run_case
+    assert wire.startswith(b'HTTP/1.1 200 OK\r\n')
+AssertionError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/receive-pool-20261018/verify-streaming.py", line 25, in <module>
+    r['cases'][mode]=m.run_case(command,'server');print('PASS',mode,flush=True)
+  File "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/validate.py", line 82, in run_case
+    raise RuntimeError(f'{kind} case {case}: {error}; {guest.errors()}') from error
+RuntimeError: server case 2: ; b''

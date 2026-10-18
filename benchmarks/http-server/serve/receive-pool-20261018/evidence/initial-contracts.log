@@ -1,0 +1,7 @@
+PASS aot
+Traceback (most recent call last):
+  File "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/receive-pool-20261018/verify.py", line 60, in <module>
+    wire=read(peer);assert wire.split(b'\r\n\r\n',1)[1]==body,(mode,index)
+  File "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/receive-pool-20261018/verify.py", line 39, in read
+    block=peer.recv(8192)
+ConnectionResetError: [Errno 54] Connection reset by peer

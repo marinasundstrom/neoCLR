@@ -541,3 +541,15 @@ receive storage. The tiny buffered-response Serve benchmark exercises the receiv
 array but not the 4 KiB streaming block; use a separate streaming workload for that
 case. Existing small buffered sends already avoid the scratch allocation, so a pool
 there cannot deliver a saving. Keep response snapshots owned until consumers finish.
+
+### Bounded buffered-receive implementation
+
+The first development slice now caches at most one 256-byte and one 4 KiB array
+per HttpServer for buffered receives. Exchange cleanup and growth detach storage
+after completed I/O; shutdown drops retained cache references. Streaming-owned
+arrays remain outside the cache. No public ArrayPool/Span API or native transfer
+copy behavior changes. Nullable exchange storage avoids allocating an empty
+replacement. [Ownership tests and allocation evidence](../benchmarks/http-server/serve/receive-pool-20261018/README.md)
+record interpreter/JIT/AOT coverage, default-budget interpreter failures reproduced
+on baseline, and the longer correctness-fixture budget. Allocation savings are
+measured separately from sustained throughput.
