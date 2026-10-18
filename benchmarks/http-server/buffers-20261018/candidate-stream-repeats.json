@@ -1,0 +1,282 @@
+{
+  "command": [
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/app"
+  ],
+  "runs": [
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    }
+  ]
+}

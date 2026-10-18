@@ -1,0 +1,169 @@
+{
+  "passed": true,
+  "commands": {
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/boundaries/native/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--array-elements",
+      "2097152",
+      "--array-bytes",
+      "268435456",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/boundaries/native/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/boundaries/native/app"
+    ]
+  },
+  "cases": [
+    {
+      "mode": "aot",
+      "size": 0,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 255,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 256,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 257,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 4096,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 65410,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 65536,
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "size": 70000,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 0,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 255,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 256,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 257,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 4096,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 65410,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 65536,
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "size": 70000,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 0,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 255,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 256,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 257,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 4096,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 65410,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 65536,
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "size": 70000,
+      "passed": true
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/buffer-validation/validate.py": "75881be254d18d0129a20f3dd9d2c1f381899350cf5096868e2695ea5367fc31",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/buffer-validation/Server.rvn": "b0cd181e7d59f795767bfbd7f01e9d05079b1147aafa9df879372dac2ed35c66",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/boundaries/native/app.dll": "6462d6389bda392d278a1080b9e8da0b23b9a972198843a8ea50be3294b343c9",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/boundaries/native/app": "07c4d1281efc3d359b456b72b8bb1dbdbddc56971184742e792117b8c0cad4a8",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/manifest.json": "9775bdf24a9f4b1c335ba3fb46c3b501257a10d251fcbd04c2d8a4c78b14fb91"
+  }
+}

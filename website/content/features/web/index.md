@@ -92,7 +92,9 @@ complete projects, run instructions and expected responses.
 `Send(request, HttpCompletionOption.ResponseHeadersRead)` returns after final
 response headers. `HttpServer.AcceptHeaders()` does the same for incoming requests.
 Use `Content.TryGetStream()` to consume their bytes on demand. The shared reader
-retains a bounded 256-byte transport block, including read-ahead from header parsing.
+retains a bounded transport block, including read-ahead from header parsing.
+Development after Preview 16 reduces server response copying and uses larger
+bounded transfers; buffered responses still preserve their snapshot semantics.
 
 Both client uploads and server responses accept known-length `HttpContent.FromStream`
 sources. Default Get/Send, Accept and ServeOne remain buffered, so the JSON showcase

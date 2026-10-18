@@ -52,6 +52,14 @@ def main():
         shutil.rmtree(bundle / 'lib')
         shutil.copytree(libraries, bundle / 'lib')
     props = ET.parse(bundle / 'lib/NeoCLR.ClassLibrary.props')
+    native_core = props.getroot().find('.//RavenNeoClrNativeCoreReference') is not None
+    if native_core:
+        # Match NativeLibrary.props rather than importing application-local await
+        # providers into System.Web itself.
+        for group in props.getroot():
+            for item in list(group):
+                if item.tag in ('RavenNeoClrRuntimeAsyncHelper', 'RavenNeoClrRuntimeAsyncProviderImported', 'Compile'):
+                    group.remove(item)
     for group in props.getroot().findall('ItemGroup'):
         for reference in list(group):
             if reference.attrib.get('Include') == 'System.Web':
@@ -60,8 +68,11 @@ def main():
     project = ET.Element('Project')
     ET.SubElement(project, 'Import', Project=str(bundle / 'lib/BuildWeb.props'))
     properties = ET.SubElement(project, 'PropertyGroup')
-    for key, value in dict(TargetFramework='net10.0', OutputType='Library', AssemblyName='System.Web',
-                           EnableDefaultCompileItems='false', RavenNeoClrBootstrapIntrinsics='true').items():
+    settings = dict(TargetFramework='net10.0', OutputType='Library', AssemblyName='System.Web',
+                    EnableDefaultCompileItems='false')
+    if not native_core:
+        settings['RavenNeoClrBootstrapIntrinsics'] = 'true'
+    for key, value in settings.items():
         ET.SubElement(properties, key).text = value
     items = ET.SubElement(project, 'ItemGroup')
     ET.SubElement(items, 'Compile', Include=str(ROOT / 'runtime/raven/src/System/Web/**/*.rvn'))

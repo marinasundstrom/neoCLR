@@ -43,8 +43,10 @@ A positive-count read returns zero only at the framing boundary. Content-Length,
 chunked bodies, and close-delimited client responses share the same reader.
 Request bodies cannot use EOF-delimited framing.
 
-The receiver retains one 256-byte transport block, including any body bytes that
-arrived with the headers. Further reads happen only on consumer demand. Chunk
+The receiver retains one bounded transport block, including any body bytes that
+arrived with the headers. Development after Preview 16: server acceptance starts
+with 256 bytes and grows to 4 KiB when a partial request requires another read;
+the body stream keeps that block. Client reception retains its 256-byte block. Further reads happen only on consumer demand. Chunk
 metadata is bounded separately; chunk extensions and trailers remain unsupported.
 The decoded limit is enforced cumulatively, not per chunk. There is no implicit
 whole-body string decoding or buffer allocation.

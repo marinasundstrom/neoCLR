@@ -151,7 +151,7 @@ internal class HttpBodyInput : InputStream {
             }
         }
         if written > 0 || ended { Finish(Ok(written)); return }
-        var wanted = 256
+        var wanted = buffer.Length
         if remaining > 0 && remaining < wanted { wanted = remaining }
         if chunks is null && outputCount < wanted { wanted = outputCount }
         if let Some(until) = deadline {

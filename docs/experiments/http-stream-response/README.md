@@ -1,6 +1,6 @@
 # Known-length server response streams
 
-Development slice, 2026-10-13. `HttpContent.FromStream` now works for server output,
+Development slice, 2026-10-13. **Update 2026-10-18:** [buffer refinement](../../../benchmarks/http-server/buffers-20261018/README.md) increases producer blocks to 4 KiB; the current fixture additionally checks an 8,193-byte borrowed source completes in three reads. Historical evidence below retains its original 256-byte limit. `HttpContent.FromStream` now works for server output,
 as well as the existing client upload path. This is not incoming-body streaming.
 
 The sender snapshots framing and source ownership, writes headers, then alternates

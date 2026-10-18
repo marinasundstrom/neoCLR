@@ -40,7 +40,7 @@ def describe_sites(sites, build, totals):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--build',type=Path,required=True)
-    p.add_argument('--workload',choices=['plain','json'],required=True)
+    p.add_argument('--workload',choices=['plain','json','bulk'],required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--allocation-sites', action='store_true', help='Attribute measured allocations to logical managed frames')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)

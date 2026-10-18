@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "commands": {
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "modes": {
+    "aot": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-stream-response/validate.py": "68ff10655085d5b3a698154f77df6eaffc7f60d8667a5b56f06375d553fd31eb",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-stream-response/Server.rvn": "e5fda2657aa60e1d8e7054c9ef42e8110f4433d1599197acf82de24369cc3ea2",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/app.dll": "17567a05c1646d8306c1dd07c2ec002255c32fa1c3a8a28bc12549710fbd72b8",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/app": "864a519e50784bd64e3cd75e14983df05285159590204e128a086ff282c769be",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/streams-blocks/native/build.json": "5bf6198c82134a6a982fd694350b9b1c0288529a78461b43daa0cf76b44143e8",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/manifest.json": "9775bdf24a9f4b1c335ba3fb46c3b501257a10d251fcbd04c2d8a4c78b14fb91"
+  },
+  "scope": "Known-length server response streams: deferred short reads, owned/borrowed sources, HEAD, empty body, premature EOF, source error, overread disposed content, caller cancellation and deadline cancellation of a waiting producer; not a throughput measurement"
+}

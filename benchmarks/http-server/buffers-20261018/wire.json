@@ -1,0 +1,189 @@
+{
+  "passed": true,
+  "commands": {
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/wire/native/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "200000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/wire/native/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/wire/native/app"
+    ]
+  },
+  "cases": [
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-byte-paths/validate.py": "0c29d3378b4b000325c0b8489f67d9bb0273797fb9707b240b940e28584cf145",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-byte-paths/Server.rvn": "3f706d1a8e2c15bebd5deb9c92770f1f47d74f1fb66ca90d5549fd7d38f60c65",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/wire/native/app.dll": "9ea86beed6334fc105a24a7d42cca181dc170f6a80330db2f62a915291c8ebf5",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/final-runs/wire/native/app": "94132835ec1ede58f81d148aac0a80daa8b1fa1e19c419e0db453c86f0311f16",
+    "/Users/robert/Projects/neoclr/target/http-buffers-20261018/candidate-bounded/bundle/manifest.json": "9775bdf24a9f4b1c335ba3fb46c3b501257a10d251fcbd04c2d8a4c78b14fb91"
+  }
+}

@@ -563,7 +563,7 @@ public class HttpServer {
         listener.Close()
     }
 
-    internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<Sequence<byte>, HttpError> {
+    internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<byte[], HttpError> {
         let status = (int)response.StatusCode
         if !(status >= 200 && status <= 599) {
             return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
@@ -641,15 +641,23 @@ public class HttpServer {
         }
         result.Add((byte)13)
         result.Add((byte)10)
-        if response.Content.IsBuffered && headOnly == 0 {
+        // Snapshot once into exact storage. Appending the body to the growable
+        // header list repeatedly reallocates and copies the full response.
+        let bodyCount = if response.Content.IsBuffered && headOnly == 0 { count } else { 0 }
+        let bytes = CheckedStorage.Reserve<byte>(result.Count + bodyCount)
+        index = 0
+        while index < result.Count {
+            bytes[index] = result[index]
+            index += 1
+        }
+        if bodyCount > 0 {
             let body = response.Content.Bytes
-            index = 0
-            while index < count {
-                result.Add(body[index])
-                index += 1
+            var offset = 0
+            while offset < bodyCount {
+                bytes[index + offset] = body[offset]
+                offset += 1
             }
         }
-        let bytes: Sequence<byte> = result
         return Ok(bytes)
     }
 
@@ -753,8 +761,8 @@ public class HttpContext : Disposable {
     private var shutdownRegistration: CancellationRegistration? = null
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
     private var transfer: Option<Task<Result<int, HttpError>>> = None()
-    private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
-    private var outgoing: Sequence<byte> = ArrayList<byte>()
+    private var buffer: byte[] = Array<byte>.Empty
+    private var outgoing: byte[] = Array<byte>.Empty
     private var sent: int = 0
     private var token: CancellationToken = CancellationToken.None
     private var deadline = NetworkDeadline.Expired
@@ -840,6 +848,11 @@ public class HttpContext : Disposable {
                 }
             }
             outgoing = bytes
+            // Socket providers currently admit arrays up to 64 KiB. Large
+            // snapshots and stream producers use one reusable bounded block.
+            if ownsContent || bytes.Length > 65536 {
+                buffer = CheckedStorage.Reserve<byte>(4096)
+            }
             deadline = NetworkDeadline.AfterMilliseconds(owner.Settings.WriteMilliseconds)
             if ownsContent {
                 let cancellation = CancellationTokenSource()
@@ -896,7 +909,7 @@ public class HttpContext : Disposable {
 
     private func Finish(result: Result<System.Void, HttpError>) {
         Close()
-        outgoing = ArrayList<byte>()
+        outgoing = Array<byte>.Empty
         _ = source.Complete(result)
     }
 
@@ -907,7 +920,7 @@ public class HttpContext : Disposable {
         }
         if closed || token.IsCancellationRequested {
             Close()
-            outgoing = ArrayList<byte>()
+            outgoing = Array<byte>.Empty
             _ = source.Cancel()
             return
         }
@@ -915,13 +928,13 @@ public class HttpContext : Disposable {
             Finish(Error(HttpError.TimedOut))
             return
         }
-        if sent == outgoing.Count && remainingContent > 0 {
+        if sent == outgoing.Length && remainingContent > 0 {
             if contentOffset < contentCount {
                 let bodyWrite = connection.SendUntil(buffer, contentOffset, contentCount - contentOffset, deadline, token)
                 transfer = Some(bodyWrite)
                 bodyWrite.OnCompleted(self.OnSent)
             } else {
-                let wanted = if remainingContent < 256 { remainingContent } else { 256 }
+                let wanted = if remainingContent < buffer.Length { remainingContent } else { buffer.Length }
                 if sendingContent is HttpContent content {
                     let bodyRead = content.ReadUpload(buffer, wanted, token)
                     readingContent = bodyRead
@@ -932,14 +945,23 @@ public class HttpContext : Disposable {
             }
             return
         }
-        if sent == outgoing.Count {
+        if sent == outgoing.Length {
             let shutdownTask = connection.Shutdown(token)
             finishing = shutdownTask
             shutdownTask.OnCompleted(self.OnShutdown)
             return
         }
+        if outgoing.Length <= 65536 {
+            // Bound native transfer copies even when the snapshot is larger.
+            let remaining = outgoing.Length - sent
+            let directCount = if remaining < 4096 { remaining } else { 4096 }
+            let directWrite = connection.SendUntil(outgoing, sent, directCount, deadline, token)
+            transfer = Some(directWrite)
+            directWrite.OnCompleted(self.OnSent)
+            return
+        }
         var count = 0
-        while count < 256 && sent + count < outgoing.Count {
+        while count < buffer.Length && sent + count < outgoing.Length {
             buffer[count] = outgoing[sent + count]
             count += 1
         }
@@ -990,7 +1012,7 @@ public class HttpContext : Disposable {
             }
             if pending.IsCancelled || closed || token.IsCancellationRequested {
                 Close()
-                outgoing = ArrayList<byte>()
+                outgoing = Array<byte>.Empty
                 _ = source.Cancel()
                 return
             }
@@ -1003,7 +1025,7 @@ public class HttpContext : Disposable {
                     Finish(Error(HttpError.Protocol("Response send made no progress")))
                     return
                 }
-                if sent == outgoing.Count && remainingContent > 0 {
+                if sent == outgoing.Length && remainingContent > 0 {
                     contentOffset += count
                     remainingContent -= count
                 } else {
@@ -1144,7 +1166,7 @@ internal class HttpServerExchange {
             return
         }
         if let Some(connection) = socket {
-            let pending = connection.ReceiveUntil(buffer, 0, 256, deadline, cancellation.Token)
+            let pending = connection.ReceiveUntil(buffer, 0, buffer.Length, deadline, cancellation.Token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnReceived)
         }
@@ -1196,6 +1218,11 @@ internal class HttpServerExchange {
                         Fail(HttpError.Protocol("Invalid request"))
                     }
                 } else {
+                    // Keep tiny requests cheap; grow only after a partial request.
+                    // Push has already copied all bytes out of the receive block.
+                    if buffer.Length < 4096 {
+                        buffer = CheckedStorage.Reserve<byte>(4096)
+                    }
                     ReceiveNext()
                 }
             } else if let Error(reason) = pending.GetResult() {

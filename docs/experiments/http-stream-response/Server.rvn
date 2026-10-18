@@ -45,12 +45,12 @@ class GeneratedInput : InputStream {
     }
 
     private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
-        Check(Closes == 0 && offset == 0 && count > 0 && count <= 256)
+        Check(Closes == 0 && offset == 0 && count > 0 && count <= 4096)
         Reads += 1
         if mode == 4 { return Ok(0) }
         if mode == 5 { return Error(StreamError.AccessDenied) }
         if mode == 6 { return Ok(count + 1) }
-        let read = if count > 71 { 71 } else { count }
+        let read = if mode == 1 { count } else if count > 71 { 71 } else { count }
         var index = 0
         while index < read {
             buffer[index] = (byte)((Position + index) % 251)
@@ -93,7 +93,7 @@ async func Main() -> Task<()> {
             System.Fail("Accept failed")
         }
         let input = GeneratedInput(mode)
-        let length = if mode == 3 { 0 } else { 1025 }
+        let length = if mode == 3 { 0 } else if mode == 1 { 8193 } else { 1025 }
         let Ok(content) = HttpContent.FromStream(input, length, mode == 1) else {
             System.Fail("Content failed")
         }
@@ -123,7 +123,9 @@ async func Main() -> Task<()> {
         }
         cancellation.Dispose()
         Check(input.Closes == if mode == 1 { 0 } else { 1 })
-        if mode == 0 || mode == 1 {
+        if mode == 1 {
+            Check(input.Position == 8193 && input.Reads == 3)
+        } else if mode == 0 {
             Check(input.Position == 1025 && input.Reads == 15)
         } else if mode == 2 || mode == 3 || mode == 7 {
             Check(input.Reads == 0)

@@ -1,0 +1,65 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+import System.Time.*
+
+async func Main() -> Task<()> {
+    let options = HttpServerOptions()
+    options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4, options) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port failed")
+    }
+    Console.WriteLine(port)
+    var test = 0
+    while test < 8 {
+        let Ok(context) = await server.Accept() else {
+            System.Fail("Accept failed")
+        }
+        let incoming = context.Request.Content.Bytes
+        if incoming.Count != 4097 {
+            System.Fail("Request length changed")
+        }
+        var offset = 0
+        while offset < incoming.Count {
+            if incoming[offset] != (byte)122 {
+                System.Fail("Request bytes changed")
+            }
+            offset += 1
+        }
+        let size = match test {
+            0 => 0
+            1 => 255
+            2 => 256
+            3 => 257
+            4 => 4096
+            5 => 65410
+            6 => 65536
+            _ => 70000
+        }
+        let bytes = ArrayList<byte>(size)
+        offset = 0
+        while offset < size {
+            bytes.Add((byte)120)
+            offset += 1
+        }
+        context.Respond(HttpStatusCode.OK, HttpContent(bytes))
+        let pending = context.Complete()
+        // Complete must capture bytes before returning, even across many writes.
+        if size > 0 {
+            bytes[size - 1] = (byte)121
+        }
+        context.RespondText("Replacement must not affect the pending snapshot")
+        if let Error(error) = await pending {
+            System.Fail(error.ToString())
+        }
+        context.Dispose()
+        test += 1
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+}

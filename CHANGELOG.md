@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Reduce HTTP server buffer churn: snapshot buffered responses into exact-sized arrays, send admitted arrays directly in bounded 4 KiB writes, use 4 KiB stream/fallback blocks, and grow request buffers only after incomplete parsing. Preserve response mutation isolation and stream cancellation/ownership. Add matched tiny/8 KiB allocation and throughput evidence plus buffer-boundary tests; no public signature or runtime GC policy change.
+
 - Publish Preview 16 and all eleven macOS/Windows runtime, Raven SDK/VSIX, qualified-source, notice and checksum assets. Verify public download availability and SHA-256 identities. Deploy the website manually and verify live Preview 16 links, two-platform benchmark tables and API pages; preserve published notes and unrelated working changes.
 
 ## 0.1.0-preview.16 — 2026-10-18

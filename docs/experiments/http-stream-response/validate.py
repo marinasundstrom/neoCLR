@@ -27,23 +27,23 @@ def run_case(command):
                     if not part:
                         break
                     wire += part
-                    assert len(wire) < 4096
+                    assert len(wire) < 16384
             guest.line(b'CASE')
             if mode == 7:
                 assert wire == b'', wire
             else:
                 head, body = wire.split(b'\r\n\r\n', 1)
                 assert head.startswith(b'HTTP/1.1 200 OK\r\n')
-                length = 0 if mode == 3 else 1025
+                length = 0 if mode == 3 else 8193 if mode == 1 else 1025
                 assert b'Content-Length: '+str(length).encode() in head
-                expected = bytes(i%251 for i in range(1025)) if mode in (0,1) else b''
+                expected = bytes(i%251 for i in range(length)) if mode in (0,1) else b''
                 assert body == expected, (mode,len(body))
             results.append(dict(case=mode,passed=True,wireBytes=len(wire)))
         guest.line(b'DONE')
         guest.finish()
         return dict(passed=True,cases=results)
     except Exception as error:
-        raise RuntimeError(str(error)+'; guest errors: '+str(guest.errors())) from error
+        raise RuntimeError(f'case {mode}: '+str(error)+'; guest errors: '+str(guest.errors())) from error
     finally:
         guest.close()
 

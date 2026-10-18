@@ -1,0 +1,283 @@
+{
+  "purpose": "Check reproducibility of stream cancellation failure with unchanged HTTP library",
+  "validatorSha256": "cd59c5da42fd7c7f027e3d982c55e297ff2ed887289c42b8063a748bddc74bf3",
+  "build": "target/http-buffers-20261018/baseline-runs/streams/native/build.json",
+  "appSha256": "0f42408f2c41c697d6b1bd3e0f2e3e7e730d05293b974030a1a780dbff1c75f0",
+  "runs": [
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    }
+  ]
+}

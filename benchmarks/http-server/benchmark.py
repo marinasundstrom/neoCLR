@@ -39,7 +39,7 @@ def server_sample(command, workload):
                     if not chunk:
                         break
                     data += chunk
-                    if len(data) > 8192:
+                    if len(data) > (16384 if workload == 'bulk' else 8192):
                         raise ValueError('Oversized response')
                 if b'\r\n\r\n' not in data:
                     raise RuntimeError(f'Incomplete HTTP response at request {index}: {len(data)} bytes; '
@@ -52,6 +52,9 @@ def server_sample(command, workload):
                 if workload == 'plain':
                     if body != workbench.BODY:
                         raise ValueError('Invalid text body')
+                elif workload == 'bulk':
+                    if body != b'x' * 8192:
+                        raise ValueError('Invalid bulk body')
                 elif fields.get(b'content-type') != b'application/json; charset=utf-8' or json.loads(body) != {'id':42,'name':'Café team','active':True}:
                     raise ValueError('Invalid JSON body')
             if index >= 8:
@@ -70,7 +73,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rounds', type=int, default=5)
     parser.add_argument('--prepare-only', action='store_true', help='Build inputs without measuring; prepared is not a passing benchmark')
-    parser.add_argument('--workload', choices=['plain','json','database'], default='plain')
+    parser.add_argument('--workload', choices=['plain','json','bulk','database'], default='plain')
     parser.add_argument('--server-source', type=Path, help='Explicit server fixture for syntax-compatible historical comparisons; its bytes are hashed')
     parser.add_argument('--postgres-port', type=int)
     parser.add_argument('--postgres-container')
@@ -94,9 +97,9 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     project = out/'project'
     project.mkdir()
-    source = args.server_source.resolve() if args.server_source else ROOT/('benchmarks/jit-http/Server.rvn' if args.workload=='plain' else 'benchmarks/http-server/'+('JsonServer.rvn' if args.workload=='json' else 'DatabaseServer.rvn'))
+    source = args.server_source.resolve() if args.server_source else ROOT/('benchmarks/jit-http/Server.rvn' if args.workload=='plain' else 'benchmarks/http-server/'+('JsonServer.rvn' if args.workload=='json' else 'BulkServer.rvn' if args.workload=='bulk' else 'DatabaseServer.rvn'))
     (project/'Main.rvn').write_bytes(source.read_bytes())
-    if args.workload != 'plain':
+    if args.workload in ('json', 'database'):
         (project/'Model.rvn').write_bytes((ROOT/'benchmarks/http-server/Model.rvn').read_bytes())
     if args.workload == 'database':
         if not args.postgres_port or not args.postgres_container:
