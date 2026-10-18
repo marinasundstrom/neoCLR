@@ -125,6 +125,8 @@ pub struct Options {
     pub int64_boxes: HashMap<usize, usize>,
     pub int32_boxes: HashMap<usize, usize>,
     pub boxed_int32_display: bool,
+    pub boxed_int64_display: bool,
+    pub boxed_boolean_display: bool,
     pub object_default_display: Vec<(usize, String)>,
     pub empty_record_boxes: HashMap<usize, usize>,
     pub object_base: Option<usize>,
@@ -223,6 +225,8 @@ impl Options {
                 })
                 .collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
+            boxed_int64_display: report.is_some_and(|r| r["boxedInt64Display"] == true),
+            boxed_boolean_display: report.is_some_and(|r| r["boxedBooleanDisplay"] == true),
             descriptor_queries: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()

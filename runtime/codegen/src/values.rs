@@ -613,6 +613,24 @@ pub(crate) fn compile_into(
             default_display_literals.push((*index, id));
         }
     }
+    let mut boolean_display_literals = vec![];
+    if details.is_some_and(|d| d.boxed_boolean_display) {
+        for text in ["False", "True"] {
+            let id = module.declare_data(
+                &format!("neoclr_boolean_display_{text}"),
+                Linkage::Local,
+                false,
+                false,
+            )?;
+            let mut data = DataDescription::new();
+            let mut bytes = (text.len() as u64).to_le_bytes().to_vec();
+            bytes.extend_from_slice(text.as_bytes());
+            data.define(bytes.into_boxed_slice());
+            data.set_align(8);
+            module.define_data(id, &data)?;
+            boolean_display_literals.push(id);
+        }
+    }
     let text_copy = if text_identity {
         let id = module.declare_data("neoclr_identity_empty", Linkage::Local, false, false)?;
         let mut data = DataDescription::new();
@@ -1341,6 +1359,23 @@ pub(crate) fn compile_into(
         } else {
             None
         };
+    let boxed_wide_format_service = if details.is_some_and(|d| d.boxed_int64_display) {
+        let mut sig = module.make_signature();
+        sig.params
+            .extend([types::I64, types::I64, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function(
+            if details.is_some_and(|d| d.native_gc) {
+                "neoclr_int64_to_string_rooted_v1"
+            } else {
+                "neoclr_int64_to_string_v1"
+            },
+            Linkage::Import,
+            &sig,
+        )?)
+    } else {
+        None
+    };
     let mut wide_format_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol) in [
@@ -1919,16 +1954,36 @@ pub(crate) fn compile_into(
                     b.switch_to_block(object);
                 }
                 let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
-                if display && details.is_some_and(|d| d.boxed_int32_display) {
-                    for &type_index in details.unwrap().int32_boxes.values() {
+                if display
+                    && details.is_some_and(|d| d.boxed_int32_display || d.boxed_int64_display)
+                {
+                    for (type_index, wide) in details
+                        .unwrap()
+                        .int32_boxes
+                        .values()
+                        .map(|i| (*i, false))
+                        .chain(details.unwrap().int64_boxes.values().map(|i| (*i, true)))
+                    {
                         let matched = b.create_block();
                         let next = b.create_block();
                         let equal = matches_type(&mut b, &p, tag, type_index);
                         b.ins().brif(equal, matched, &[], next, &[]);
                         b.switch_to_block(matched);
-                        let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
+                        let value = b.ins().load(
+                            if wide { types::I64 } else { types::I32 },
+                            MemFlags::new(),
+                            parameters[0],
+                            8,
+                        );
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let service = module.declare_func_in_func(format_service.unwrap(), b.func);
+                        let service = module.declare_func_in_func(
+                            if wide {
+                                boxed_wide_format_service.unwrap()
+                            } else {
+                                format_service.unwrap()
+                            },
+                            b.func,
+                        );
                         let call = b.ins().call(service, &[value, arena, output]);
                         let raw = b.inst_results(call)[0];
                         let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
@@ -1945,6 +2000,25 @@ pub(crate) fn compile_into(
                         );
                         site.capture_frame = false;
                         return_if_detailed(&mut b, failed, status, Some(&site));
+                        let zero = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[zero]);
+                        b.switch_to_block(next);
+                    }
+                }
+                if display && details.is_some_and(|d| d.boxed_boolean_display) {
+                    for &type_index in details.unwrap().boolean_boxes.values() {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let equal = matches_type(&mut b, &p, tag, type_index);
+                        b.ins().brif(equal, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
+                        let no = module.declare_data_in_func(boolean_display_literals[0], b.func);
+                        let yes = module.declare_data_in_func(boolean_display_literals[1], b.func);
+                        let no = b.ins().global_value(types::I64, no);
+                        let yes = b.ins().global_value(types::I64, yes);
+                        let text = b.ins().select(value, yes, no);
+                        write(&mut b, output, &[text]);
                         let zero = b.ins().iconst(types::I32, 0);
                         b.ins().return_(&[zero]);
                         b.switch_to_block(next);

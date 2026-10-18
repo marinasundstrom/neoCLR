@@ -3645,10 +3645,10 @@ fn object_display_rejects_base_calls_and_unverified_overrides() {
             assert!(error.contains("boxing or arrays"), "{r:?}");
         }
         if mode == 7 {
-            assert!(error.contains("leading base constructor"), "{r:?}");
+            assert!(error.contains("leading base initializer"), "{r:?}");
         }
         if mode == 8 {
-            assert!(error.contains("single leading base initializer"), "{r:?}");
+            assert!(error.contains("leading base initializer"), "{r:?}");
         }
         if mode == 4 {
             assert!(error.contains("requires --reference-arena"), "{r:?}");
@@ -8854,6 +8854,8 @@ fn object_display_accepts_string_boxing_with_unboxed_value_construction() {
     let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
     let source = r#"
 .module StringBox
+.type class ReferencePayload
+.end
 .type Marker<T>
 .method instance byref .ctor() -> noresult
 ret
@@ -8865,6 +8867,12 @@ box T
 ret
 .end
 .function Calculate(Int32 mode) -> Int32
+.local ReferencePayload reference
+ldloca reference
+initobj ReferencePayload
+ldloc reference
+call Box<ReferencePayload>(ReferencePayload)
+pop
 newobj.ctor instance Marker<Int32>::.ctor()
 pop
 ldstr "hé🙂\u0000z"
@@ -11601,6 +11609,139 @@ int main(int argc,char **argv) {
             .unwrap();
         assert_eq!(r.status.code(), Some(0), "{r:?}");
         assert_eq!(r.stdout, format!("{value}\n{value}\n").as_bytes());
+        assert_eq!(r.stdout, expected.stdout);
+        assert!(r.stderr.is_empty());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_boxed_wide_and_boolean_display_matches_interpreter() {
+    let seed=neoclr::assemble(&format!("{OBJECT_DISPLAY_SEED}\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n")).unwrap();
+    let source = r#"
+.module BoxedDisplay
+.function Calculate(Int32 ignored) -> Int32
+ldc.i8 -9223372036854775808
+box Int64
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i8 9223372036854775807
+box Int64
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i8 0
+box Int64
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.bool false
+box Boolean
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.bool true
+box Boolean
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i4 0
+ret
+.end
+"#;
+    let app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed)
+            .unwrap()
+            .remove(0);
+    let dir = Temp::new();
+    let flags = [
+        "--compile-system",
+        "--reference-arena",
+        "--bind-integer-text",
+        "--bind-console-write-line",
+        "--native-gc",
+    ];
+    let denied = Temp::new();
+    let rejected = compile_linked_module(
+        &denied,
+        &seed,
+        &app,
+        &[
+            "--compile-system",
+            "--reference-arena",
+            "--bind-console-write-line",
+            "--native-gc",
+        ],
+    );
+    assert!(!rejected.status.success());
+    assert!(String::from_utf8_lossy(&rejected.stderr).contains("--bind-integer-text"));
+    let r = compile_linked_module(&dir, &seed, &app, &flags);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["int64Boxes"].as_array().unwrap().len(), 1);
+    assert_eq!(report["boxedInt64Display"], true);
+    assert_eq!(report["boxedBooleanDisplay"], true);
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "native-gc.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[513]={0};storage[512]=UINT64_C(0xa5a5a5a5a5a5a5a5);
+    int32_t value=argc>1?(int32_t)strtol(argv[1],NULL,10):0;
+    unsigned capacity=argc>2?(unsigned)strtoul(argv[2],NULL,10):4096;
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,capacity,0}};
+    int32_t result=-99;int status=neoclr_entry_v4(value,&result,&ctx);
+    if(storage[512]!=UINT64_C(0xa5a5a5a5a5a5a5a5) || ctx.text.used>capacity)return 93;
+    if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used || neoclr_gc_entry_check_v1(&ctx)) return 94;
+    return result;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args([
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-DNEOCLR_NATIVE_GC",
+            "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-console/native-gc.c"))
+        .arg(base.join("aot-console/console.c"))
+        .arg(base.join("aot-scalar/console.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    for value in [0] {
+        let expected = method
+            .invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default())
+            .unwrap();
+        assert_eq!(expected.value, neoclr::Value::Int32(0));
+        let r = Command::new(dir.0.join("app"))
+            .arg(value.to_string())
+            .env_clear()
+            .output()
+            .unwrap();
+        assert_eq!(r.status.code(), Some(0), "{r:?}");
+        assert_eq!(
+            r.stdout,
+            b"-9223372036854775808\n9223372036854775807\n0\nFalse\nTrue\n"
+        );
         assert_eq!(r.stdout, expected.stdout);
         assert!(r.stderr.is_empty());
     }

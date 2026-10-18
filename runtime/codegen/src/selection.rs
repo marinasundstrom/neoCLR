@@ -687,11 +687,11 @@ pub(super) fn dispatch_targets_with_array(
                 constructed.insert(input.types[index].name.as_str());
             }
         }
-        for op in &input.functions[i].body {
+        for (pc, op) in input.functions[i].body.iter().enumerate() {
             if object_display_contract(f)
-                && matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::String))
+                && matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::Int64 | Type::Boolean | Type::String) && !input.is_object_reference_type(t))
             {
-                return Err("Object display with boxing or arrays requires a later receiver/metadata profile".into());
+                return Err(format!("Object display with boxing or arrays requires a later receiver/metadata profile: {op:?} in {} at instruction {pc}", input.functions[i].name).into());
             }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
                 if let Some(Type::Named(name)) = &array_owner {

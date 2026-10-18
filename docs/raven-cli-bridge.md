@@ -12872,3 +12872,30 @@ All nine empty/whitespace/generator checks pass on interpreter/JIT/AOT using an
 isolated compiler cohort and unchanged native libraries/runtime. See the
 [report](validation/release-candidate-20261017/async-helper-clearing.json).
 Rebuilt SDK/editor and Windows package qualification remain required separately.
+
+
+## Preview 16 boxed display investigation — 2026-10-18
+
+The installed Preview 16 compiler accepts `record struct Person(val Name: string,
+val Age: int)` in the reported task sample; the earlier NEOMETA001 text is not
+reproduced for that exact shape. Native execution instead rejects boxing that
+nonempty value into Object. Both the class sample printing `result` and printing
+`result.Value` reproduce the broad Object-display/boxing error. Unwrapping with
+an Ok pattern gets past that gate but requires explicit reflection retention.
+These are separate emitter, backend and library/retention contracts.
+
+The first native backend slice admits copied Int64/Boolean boxes in Object display,
+formats all Int64 bits through the existing rooted formatter, and returns exact
+`True`/`False` text. Int64 display requires the existing `--bind-integer-text` binding;
+verified reference views also no longer trip the scalar-box guard. Native type
+identity, null/cast checks and GC roots remain unchanged. No Raven Runtime Contract,
+semantic model or temporary CLI representation changes. The comparison remains
+.NET Object.ToString value dispatch; this closes a native backend gap rather than
+introducing different semantics. The nonempty Result/record box path is still a
+separate gap at this slice, so the original consumer is not yet claimed fixed.
+
+Focused native tests compare Int64 minimum/maximum/zero and both Boolean values
+against interpreter output, require explicit formatter admission, and verify GC
+reclamation. Existing reference/String display and malformed override checks remain
+required. macOS ARM64 is the tested target; this is development work, not an update
+to the installed Preview 16 binaries.

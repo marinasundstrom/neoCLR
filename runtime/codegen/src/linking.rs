@@ -1265,24 +1265,23 @@ pub fn prepare(
         return Err("boxed Int32 display requires --bind-int32-to-string".into());
     }
     report["boxedInt32Display"] = json!(boxed_display);
-    if report["int64Boxes"]
+    let display = report["objectDisplayDispatch"]
         .as_array()
-        .is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"]
+        .is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"));
+    let wide_display = display
+        && report["int64Boxes"]
             .as_array()
-            .is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"))
-    {
-        return Err("boxed Int64 display is not yet admitted".into());
+            .is_some_and(|r| !r.is_empty());
+    if wide_display && !bind_integer_text {
+        return Err("boxed Int64 display requires --bind-integer-text".into());
     }
-    if report["booleanBoxes"]
-        .as_array()
-        .is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"]
-            .as_array()
-            .is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"))
-    {
-        return Err("boxed Boolean display is not yet admitted".into());
-    }
+    report["boxedInt64Display"] = json!(wide_display);
+    report["boxedBooleanDisplay"] = json!(
+        display
+            && report["booleanBoxes"]
+                .as_array()
+                .is_some_and(|r| !r.is_empty())
+    );
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?
         .types

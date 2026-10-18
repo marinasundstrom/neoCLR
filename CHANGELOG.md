@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Add native boxed Int64/Boolean Object display with exact integer formatting, Boolean text and rooted allocation; preserve explicit formatter binding and allow verified reference boxing in display-bearing programs. Add interpreter-parity/GC regression coverage. Nonempty value-record boxing remains a separate follow-up exposed by the Preview 16 Result/JSON sample.
+
 - Reduce repeated root-plan substring searches with bounded, revalidated offset hints; preserve current-length, live descriptor, fault and GC-policy checks. Add mutable-plan rejection/relocation coverage and matched Serve/Go measurements: the clean 400/sec pair uses 6.5% less CPU per completion, while noisy repeats and overload losses prevent a higher sustained-rate claim. Retain all outcomes and Green Tea research as a separate future tracing input.
 
 - Add a matched Go net/http Serve benchmark with bounded connections, queued handler work and identical response/load validation. Alternating trials with Go GOMAXPROCS=1 expose an 8.6–8.9× neoCLR paced-GC CPU/request gap at 400/sec; Go passes 500/sec and separate 2,000/sec lower-bound checks while neoCLR overload losses remain visible. Retain a 1,000/sec Go generator-lag failure, toolchain/configuration hashes, reproducible builds and focused limiter/wire tests; no universal Go-capacity or production ranking claim.
