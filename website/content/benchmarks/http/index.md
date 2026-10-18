@@ -117,3 +117,17 @@ production capacity claim. The earlier 400/sec qualification is historical, not 
 guarantee. Separate sampling still identifies allocation, collection and root
 publication as the leading areas to investigate.
 [Full contract, losses, build hashes and profile](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/gc-return-20261018).
+
+## Development: collection seed-walk optimization
+
+A follow-up gathers a bounded set of intern roots during GC header validation,
+avoiding a second full-heap walk when marks are clean and the set fits. At 400
+requests/sec the final candidate uses 2.212/2.207 ms CPU per timed completion,
+versus 2.305/2.506 ms for baseline. The first pair is about 4% lower; deterioration
+in the second baseline prevents attributing its larger difference wholly to the
+patch. The candidate still misses arrivals in two of four trials, and a Go control
+fails the generator-lag target. No higher reliable sustained rate is established.
+
+The same guest object and experimental paced-GC policy are fixed. Separate collector
+benchmarks show gains and an overflow-path regression; all results, including rejected
+experiments, remain [in the evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/seed-walk-20261018).

@@ -1,0 +1,22 @@
+--- a/runtime/native/gc/native-gc.c
++++ b/runtime/native/gc/native-gc.c
+@@ -275,10 +275,17 @@
+     /* Validate every span even after finding a fit: malformed trailing headers
+      * must fail before any heap/output mutation. Remember first-fit during that
+      * same walk rather than searching the entire heap again. */
+-    for (uint64_t at = 0; at < a->used;) {
++    uint64_t at = 0;
++    while (at < a->used && !chosen) {
+         if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+         block *b = (void *)(a->data + at);
+-        if (!chosen && !b->state && b->span >= needed) chosen = b;
++        if (!b->state && b->span >= needed) chosen = b;
++        at += b->span;
++    }
++    /* Once first-fit is known, only integrity validation remains. */
++    for (; at < a->used;) {
++        if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
++        const block *b = (const void *)(a->data + at);
+         at += b->span;
+     }
+     if (oversized) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;

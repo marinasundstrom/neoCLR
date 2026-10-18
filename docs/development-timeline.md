@@ -81,6 +81,14 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   website content; no deployment or new optimization is claimed. The
   [retained repeat](../benchmarks/http-server/serve/gc-return-20261018/README.md) keeps
   the fixed-guest scope distinct from the new compiler/library cohort.
+- **Author:** then asked what improvement could be made. **Assistant action:**
+  rejected an allocator loop split after negative timings, then refined an initial
+  no-intern-only collector optimization after Serve diagnostics showed intern roots
+  in almost every collection. The final bounded intern list preserves stale-mark
+  and overflow fallbacks; 46 GC/root tests pass. Collection gains and a roughly 3%
+  overflow-case cost are retained alongside noisy HTTP comparisons. The first
+  400/sec pair uses about 4% less CPU/completion; no higher reliable sustained rate
+  is claimed. [Evidence and alternatives](../benchmarks/http-server/serve/seed-walk-20261018/README.md).
 
 
 ## 2026-10-18 — Preview 16 records and boxed display

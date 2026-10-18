@@ -340,7 +340,23 @@ int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context, const neoclr_p
  * No allocation, retained addresses or heap ABI change.
  * A bucket points to the block containing its first byte, including free spans.
  * Interior/tagged candidates still require the exact allocated payload bounds. */
-typedef struct { block **start; unsigned capacity, shift; uint64_t blocks, atomic_marks; } block_index;
+enum { INTERN_SEED_LIMIT = 32 };
+typedef struct {
+    block **start, **interns;
+    unsigned capacity, shift, intern_count;
+    uint64_t blocks, atomic_marks;
+    int reset_required;
+} block_index;
+/* Record candidates without mutating heap state. Overflow retains the original
+ * full seed walk; these pointers live only through this synchronous collection. */
+static void index_seed(block_index *index, block *b) {
+    index->reset_required |= b->state > ALLOCATED;
+    if (b->state && b->kind == NEOCLR_GC_INTERN && index->intern_count <= INTERN_SEED_LIMIT) {
+        if (index->intern_count < INTERN_SEED_LIMIT)
+            index->interns[index->intern_count] = b;
+        index->intern_count++;
+    }
+}
 static int build_index(neoclr_aot_text_arena *a, block_index *index) {
     if (!valid(a)) return 0;
     uint64_t blocks = 0;
@@ -351,6 +367,7 @@ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
         if (!block_valid(a, at)) return 0;
         block *b = (void *)(a->data + at);
         blocks++;
+        index_seed(index, b);
         uint64_t end = at + b->span;
         while (bucket < index->capacity && ((uint64_t)bucket << index->shift) < end)
             index->start[bucket++] = b;
@@ -439,15 +456,20 @@ static int32_t collect_indexed(neoclr_aot_context *context,
     for (neoclr_parked_roots *p = (neoclr_parked_roots *)neoclr_roots_parked_v1(); p; p = p->next)
         if (p->owner_context == context) p->traced = 0;
     block *pending = NULL;
-    // Reset marks while seeding intern entries. mark() enqueues only the current
-    // block here; it cannot mark later blocks until the worklist runs below.
-    // Intern entries and their exact original String owners live until entry reset.
-    for (uint64_t at = 0; at < a->used;) {
-        block *b = (void *)(a->data + at);
-        b->state &= ALLOCATED;
-        if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
-            mark(a, &index, (uintptr_t)(b + 1), &pending);
-        at += b->span;
+    /* Header validation recorded a bounded list of intern seeds. Clean marks
+     * need no reset walk. Stale marks or overflow retain the original full walk,
+     * where mark() only enqueues the current block until the worklist runs. */
+    if (index.reset_required || index.intern_count > INTERN_SEED_LIMIT) {
+        for (uint64_t at = 0; at < a->used;) {
+            block *b = (void *)(a->data + at);
+            b->state &= ALLOCATED;
+            if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
+                mark(a, &index, (uintptr_t)(b + 1), &pending);
+            at += b->span;
+        }
+    } else {
+        for (unsigned i = 0; i < index.intern_count; i++)
+            mark(a, &index, (uintptr_t)(index.interns[i] + 1), &pending);
     }
     mark_slots(a, &index, fault, (uint32_t)count, &pending);
     for (host_root *root = host_head; root; root = root->next)
@@ -604,8 +626,8 @@ __attribute__((noinline))
 #endif
 static int32_t collect_dense(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
-    block *starts[4096];
-    block_index index = {.start = starts, .capacity = 4096};
+    block *starts[4096], *interns[INTERN_SEED_LIMIT];
+    block_index index = {.start = starts, .interns = interns, .capacity = 4096};
     /* The caller has validated every span in this synchronous collection.
      * No guest code, cleanup callback or heap mutation runs between the walks.
      * Rebuild only bucket starts; do not repeat validation or population counting. */
@@ -615,6 +637,7 @@ static int32_t collect_dense(neoclr_aot_context *context,
     unsigned bucket = 0;
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
+        index_seed(&index, b);
         uint64_t end = at + b->span;
         while (bucket < index.capacity && ((uint64_t)bucket << index.shift) < end)
             index.start[bucket++] = b;
@@ -625,8 +648,8 @@ static int32_t collect_dense(neoclr_aot_context *context,
 static int32_t collect_conditional(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
     if (!context || resource_cleanup_active) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    block *starts[256];
-    block_index index = {.start = starts, .capacity = 256};
+    block *starts[256], *interns[INTERN_SEED_LIMIT];
+    block_index index = {.start = starts, .interns = interns, .capacity = 256};
     if (!build_index(&context->text, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     /* Population, not arena size: a few large atomic buffers do not warrant a
      * denser table. Rebuild only before any marks or cleanup state are changed. */

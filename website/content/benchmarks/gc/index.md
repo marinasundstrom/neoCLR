@@ -302,6 +302,24 @@ from capacity qualification. These are HTTP workload observations, not standalon
 collector throughput or pause-distribution measurements.
 [Matched Go controls, full results and profile](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/gc-return-20261018).
 
+## Development: bounded intern seeding
+
+The native collector now gathers up to 32 intern entries during its existing header
+validation pass. Clean heaps seed those entries directly; stale marks or overflow
+retain the full reset/seed walk. It adds bounded stack scratch space and preserves
+all validation and root-lifetime checks. All 46 native GC/root tests pass, including
+sparse/dense heaps, stale marks and the 32/33-entry boundary.
+
+Five alternating collection-only pairs on macOS ARM64 show 12–27% higher throughput
+on the existing graph matrix. Dedicated two-intern cases improve 6.5–16.5%; a
+33-intern overflow case is about 3% slower. These results expose the fallback cost
+rather than claiming every heap improves. The shared native JIT/AOT collector changes;
+interpreter collection and default GC policy do not.
+
+A matched Serve pair at 400 offered requests/sec uses about 4% less CPU per timed
+completion. Scheduling noise and admission misses across repeats prevent a higher
+reliable sustained-rate claim. [Implementation, tradeoffs, safety tests and all results](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/seed-walk-20261018).
+
 ## What the results guide
 
 The matched wait experiment above separates a large Windows waiting cost from

@@ -1,0 +1,39 @@
+--- a/runtime/native/gc/native-gc.c
++++ b/runtime/native/gc/native-gc.c
+@@ -340,7 +340,7 @@
+  * No allocation, retained addresses or heap ABI change.
+  * A bucket points to the block containing its first byte, including free spans.
+  * Interior/tagged candidates still require the exact allocated payload bounds. */
+-typedef struct { block **start; unsigned capacity, shift; uint64_t blocks, atomic_marks; } block_index;
++typedef struct { block **start; unsigned capacity, shift; uint64_t blocks, atomic_marks; int seed_required; } block_index;
+ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
+     if (!valid(a)) return 0;
+     uint64_t blocks = 0;
+@@ -351,6 +351,7 @@
+         if (!block_valid(a, at)) return 0;
+         block *b = (void *)(a->data + at);
+         blocks++;
++        index->seed_required |= b->state > ALLOCATED || (b->state && b->kind == NEOCLR_GC_INTERN);
+         uint64_t end = at + b->span;
+         while (bucket < index->capacity && ((uint64_t)bucket << index->shift) < end)
+             index->start[bucket++] = b;
+@@ -442,7 +443,10 @@
+     // Reset marks while seeding intern entries. mark() enqueues only the current
+     // block here; it cannot mark later blocks until the worklist runs below.
+     // Intern entries and their exact original String owners live until entry reset.
+-    for (uint64_t at = 0; at < a->used;) {
++    // The index pass observes every validated header before marking begins.
++    // Skip this walk only when all marks are already clear and no intern entry
++    // needs seeding. The decision is local to this synchronous collection.
++    for (uint64_t at = 0; index.seed_required && at < a->used;) {
+         block *b = (void *)(a->data + at);
+         b->state &= ALLOCATED;
+         if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
+@@ -615,6 +619,7 @@
+     unsigned bucket = 0;
+     for (uint64_t at = 0; at < a->used;) {
+         block *b = (void *)(a->data + at);
++        index.seed_required |= b->state > ALLOCATED || (b->state && b->kind == NEOCLR_GC_INTERN);
+         uint64_t end = at + b->span;
+         while (bucket < index.capacity && ((uint64_t)bucket << index.shift) < end)
+             index.start[bucket++] = b;

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Avoid a redundant native GC heap walk by gathering up to 32 intern seeds during header validation; preserve the full-walk fallback for stale marks or overflow. Add sparse/dense boundary regressions and measured GC/Serve comparisons. Two-intern collection cases improve 6.5–16.5%; overflow costs about 3%. One 400/sec Serve pair uses about 4% less CPU/completion, but noisy/lossy repeats establish no higher sustained rate.
+
 - Resume GC/Serve benchmarking with a fixed qualified guest and current native adapters: retain alternating Go controls, successful 300/sec checks, failed 400/sec repeats and separate GC sampling. Update the HTTP/GC website pages with explicit short-run and same-host limits; map Serve sidecars to the legacy renderer’s generic-arity IDs while preserving native Function IDs; no new optimization, release or deployment is claimed.
 
 - Extend native boxing to the remaining numeric primitive kinds and Char, preserving ValueType ancestry, exact type tests/unboxing and GetType identity through existing rooted payload layouts. Add a fourteen-kind interpreter/JIT/AOT regression with repeated allocation checks. Keep unsupported default Object display for these additional kinds explicitly diagnosed.

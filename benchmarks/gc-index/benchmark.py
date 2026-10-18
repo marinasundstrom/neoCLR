@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rounds', type=int, default=5)
     parser.add_argument('--collection-scale', type=int, default=1, choices=range(1, 11), help='Multiply collection counts for longer timing intervals')
+    parser.add_argument('--shapes', nargs='+', choices=['chain', 'wide', 'holes', 'atomic', 'intern', 'intern-overflow'], help='Run only selected graph shapes')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -75,7 +76,10 @@ def main():
                 executables[label] = exe
         matrix = [('chain', 64, 10000), ('chain', 1024, 1000), ('chain', 2048, 500),
                   ('chain', 2049, 500), ('chain', 4096, 300), ('chain', 16384, 100),
-                  ('wide', 16384, 100), ('holes', 4096, 300), ('atomic', 64, 10000)]
+                  ('wide', 16384, 100), ('holes', 4096, 300), ('atomic', 64, 10000),
+                  ('intern', 64, 10000), ('intern', 4096, 300), ('intern-overflow', 4096, 300)]
+        if args.shapes:
+            matrix = [case for case in matrix if case[0] in args.shapes]
         for shape, nodes, collections in matrix:
             collections *= args.collection_scale
             case = dict(shape=shape, nodes=nodes, collections=collections, samples=[], warmup=[], diagnostics={})

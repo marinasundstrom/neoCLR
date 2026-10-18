@@ -27,12 +27,21 @@ int main(int argc, char **argv) {
     int nodes = atoi(argv[1]), rounds = atoi(argv[2]);
     int atomic = !strcmp(argv[3], "atomic"), wide = !strcmp(argv[3], "wide");
     int holes = !strcmp(argv[3], "holes");
+    unsigned interns = !strcmp(argv[3], "intern") ? 2 : (!strcmp(argv[3], "intern-overflow") ? 33 : 0);
     if (nodes < 1 || nodes > 65536 || rounds < 1 || rounds > 100000) return 1;
     uint64_t bytes = atomic ? 16384 : 16;
-    uint64_t capacity = (uint64_t)nodes * (bytes + 80) + 64;
+    uint64_t capacity = (uint64_t)nodes * (bytes + 80) + 64 + (interns ? 8192 : 0);
     unsigned char *buffer = malloc((size_t)capacity);
     if (!buffer) return 2;
     neoclr_aot_context c = {.text = {buffer, capacity, 0}};
+    const neoclr_aot_text *strings[33] = {0};
+    for (unsigned i = 0; i < interns; i++) {
+        void *p = NULL;
+        if (neoclr_gc_allocate_v1(&c.text, 16, NEOCLR_GC_TEXT, &p)) return 3;
+        ((neoclr_aot_text *)p)->length = 1;
+        ((neoclr_aot_text *)p)->bytes[0] = (unsigned char)i;
+        if (neoclr_string_intern_v1(p, &c.text, &strings[i]) || strings[i] != p) return 3;
+    }
     uint64_t root = 0;
     void *hub = NULL;
     if ((wide || atomic) && neoclr_gc_allocate_v1(&c.text, 8 + (uint64_t)nodes * 8, NEOCLR_GC_OBJECT, &hub)) return 3;
@@ -71,8 +80,15 @@ int main(int argc, char **argv) {
     }
     if ((!hub && cursor) || neoclr_gc_statistics_v1().reclaimed_allocations != (holes ? (uint64_t)nodes : 0)) return 5;
     root = 0;
-    if (neoclr_gc_collect_v1(&c, &frame) || c.text.used ||
-        neoclr_gc_statistics_v1().allocations != neoclr_gc_statistics_v1().reclaimed_allocations) return 6;
+    if (neoclr_gc_collect_v1(&c, &frame) ||
+        neoclr_gc_statistics_v1().allocations - neoclr_gc_statistics_v1().reclaimed_allocations != 2 * interns) return 6;
+    for (unsigned i = 0; i < interns; i++)
+        if (strings[i]->length != 1 || strings[i]->bytes[0] != i) return 6;
+    if (interns) {
+        if (neoclr_gc_entry_check_v1(&c)) return 6;
+        c.text.used = 0; /* Explicit entry reset releases the intern pool. */
+    }
+    if (c.text.used) return 6;
     printf("{\"seconds\":%.9f,\"lookupSteps\":%llu,\"validationSteps\":%llu,\"reclaimed\":%llu}\n", elapsed,
         (unsigned long long)steps, (unsigned long long)validations, (unsigned long long)neoclr_gc_statistics_v1().reclaimed_allocations);
     free(buffer);
