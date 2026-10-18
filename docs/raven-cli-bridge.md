@@ -13134,3 +13134,27 @@ Validation: the neoCLR Raven consumer checks array range aliasing, nested view
 access, typed parameters receiving arrays directly, readonly aliases, explicit
 copying and UTF-8 bytes; it returns 0. Rejection fixtures diagnose ordinary fields
 (RAV2811), readonly writes (RAV0131) and arrays of slices (RAV2812).
+
+## 2026-10-19 — Persistent memory source contracts
+
+The neoCLR source-core contract now emits opaque Memory/ReadOnlyMemory metadata
+for canonical ordinary generic structs, alongside borrowed ref structs. It rejects
+constructors and incorrect ref-like shapes for all four kinds. Native imports
+preserve persistent identity without marking Memory as ref-like. No Runtime
+Contract configuration fields, grammar, CLI representation or .NET defaults change.
+The runtime and metadata SDK own layout/tracing; native JIT/AOT lowering remains
+unsupported. Opaque assemblies still cannot be projected to CLI references.
+
+Array conversions and writable-to-readonly conversions are implicit. Borrowed
+conversions are declared on the destination Slice/ReadOnlySlice types, avoiding
+return-type-only operator overloads in native metadata. This provides the role
+of .NET Memory.Span through typed call boundaries instead of public AsSlice
+helpers. Slice-to-Memory conversion is absent because an arbitrary borrowed
+window need not have a persistent owner. Persistent windows have range accessors;
+element access is through a borrowed parameter or local. Public API compatibility
+cost: callers must choose synchronous borrowing versus retained asynchronous use.
+
+Validation: neoCLR's MemoryConsumer returns 0 with object fields holding both
+persistent types, awaited Task.Run, two explicit GC collections, nested windows,
+borrowed mutation/read aliases and independent copies. Illegal Slice-to-Memory
+and ReadOnlyMemory-to-Slice conversions produce RAV1503 with no output artifact.

@@ -181,6 +181,8 @@
         "runtime/raven/core/CompilerServices.rvn",
         "runtime/raven/core/Storage.rvn",
         "runtime/raven/src/System/Slice.rvn",
+        "runtime/raven/src/System/Memory.rvn",
+        "runtime/raven/src/System/ReadOnlyMemory.rvn",
         "runtime/raven/src/System/ReadOnlySlice.rvn"
       ],
       "types": [
@@ -311,6 +313,8 @@
         "System.IntPtr",
         "System.UIntPtr",
         "System.Slice`1",
+        "System.Memory`1",
+        "System.ReadOnlyMemory`1",
         "System.ReadOnlySlice`1"
       ]
     }

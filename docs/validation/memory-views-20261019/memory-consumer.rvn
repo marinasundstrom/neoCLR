@@ -1,0 +1,46 @@
+import System.*
+import System.Runtime.*
+import System.Concurrency.Tasks.*
+
+class BufferOwner {
+    val Data: Memory<int>
+    val ReadOnlyData: ReadOnlyMemory<int>
+
+    init(data: Memory<int>) {
+        Data = data
+        ReadOnlyData = data
+    }
+}
+
+func CreateOwner() -> BufferOwner {
+    let data = [10, 20, 30, 40]
+    let memory: Memory<int> = data
+    return BufferOwner(memory[1..^1])
+}
+
+func Write(data: Slice<int>) {
+    data[0] = 42
+}
+
+func First(data: ReadOnlySlice<int>) -> int => data[0]
+
+async func Main() -> Task<int> {
+    let owner = CreateOwner()
+    GC.Collect()
+    let scheduled = await Task.Run(() => 7)
+    GC.Collect()
+    if scheduled != 7 || owner.Data.Length != 2 || owner.ReadOnlyData.IsEmpty {
+        return 1
+    }
+    Write(owner.Data)
+    if First(owner.ReadOnlyData) != 42 || First(owner.Data) != 42 {
+        return 2
+    }
+    let snapshot = owner.ReadOnlyData.ToArray()
+    let nested = owner.ReadOnlyData[1..]
+    let values: ReadOnlyMemory<int> = [1, 2]
+    if First(nested) != 30 || snapshot[0] != 42 || values.Length != 2 {
+        return 3
+    }
+    return 0
+}

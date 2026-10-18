@@ -5,7 +5,10 @@ as the preferred contiguous-memory abstraction, followed by persistent
 Memory/ReadOnlyMemory and measured buffer integration. The
 [contract and implementation status](native-memory-views.md) distinguish the
 callable interpreter foundation, explicit guest metadata and tracing/storage/return/
-suspension guards from pending JIT/AOT support. The author also
+suspension guards from pending JIT/AOT support. All four Raven source types now
+work in the interpreter, including object-field ownership and awaited retention.
+The [library audit](memory-view-library-audit.md) records buffer candidates and
+the native-backend gate for shared service migration. The author also
 directs a whole-class-library audit of array APIs after the slice types work. Index/Range already exist; the author selects array ranges returning Slice<T>,
 implicit view conversion and explicit ToArray copying, without compatibility-only
 array overloads or repeated AsSlice helpers. This direction does not infer a

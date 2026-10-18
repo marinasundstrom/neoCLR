@@ -94,9 +94,9 @@ remove a copy or establish native support.
 
 ## Order and acceptance
 
-1. Finish Raven/compiler and native metadata/ABI/GC support before migrating the
-   shipped source library. Interpreter-only bootstrap types are insufficient for
-   native HTTP, crypto providers and source-facing interfaces.
+1. Raven/compiler APIs and interpreter metadata/GC support now cover all four
+   types. Finish JIT/AOT ABI support before migrating shared buffer services.
+   Interpreter-only support is insufficient for native HTTP and crypto providers.
 2. Migrate codec and cryptography synchronous contracts first, without redundant
    compatibility overloads. Test subwindows, empty input, overlapping buffers, readonly
    aliasing, destination sentinels, bounds and no mutation on documented failures.

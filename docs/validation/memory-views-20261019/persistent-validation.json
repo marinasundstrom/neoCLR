@@ -1,0 +1,36 @@
+{
+  "scope": "Persistent Raven memory views, interpreter only",
+  "compilerRevision": "c173a723c",
+  "checks": [
+    {
+      "name": "source core build",
+      "exitCode": 0
+    },
+    {
+      "name": "MemoryConsumer compile",
+      "exitCode": 0,
+      "output": "Native build output: /Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/bin/neoclr/MemoryConsumer.dll\n"
+    },
+    {
+      "name": "MemoryConsumer interpreter",
+      "exitCode": 0,
+      "output": "=> Int32(0)\n"
+    },
+    {
+      "name": "existing SliceConsumer interpreter",
+      "exitCode": 0,
+      "output": "=> Int32(0)\n"
+    },
+    {
+      "name": "reject-memory-conversions",
+      "exitCode": 1,
+      "output": "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/reject-memory-conversions.rvn(3,51): error RAV1503: Cannot convert from 'Slice<int>' to 'Memory<int>'\n/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/reject-memory-conversions.rvn(4,59): error RAV1503: Cannot convert from 'ReadOnlyMemory<int>' to 'Slice<int>'\n",
+      "outputArtifactExists": false
+    }
+  ],
+  "sha256": {
+    "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll": "92b80be31da5f9ebba12d2a5e7cb53236e1c39f0c7384191d242fb7d45333777",
+    "docs/validation/memory-views-20261019/bin/neoclr/MemoryConsumer.dll": "6b11300eeb375b712bd30ea06edc109b35ffd5ab3c9082fc87334b70fcf5ae75",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "ce445b3bceaec5a087ae293a8fa5a5fae696535e91e89367cab04da5b5e0b3ee"
+  }
+}

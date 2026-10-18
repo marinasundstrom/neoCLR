@@ -1,0 +1,31 @@
+module System
+
+/// A persistent readonly window retaining its managed backing owner.
+/// Copies share storage. Safe to store and carry across await; concurrent access is not synchronized.
+public struct ReadOnlyMemory<T> {
+    /// Retains an array without copying its elements.
+    static func implicit(source: T[]) -> ReadOnlyMemory<T> => neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(source)
+    /// Restricts a persistent writable window to readonly access without copying.
+    static func implicit(source: Memory<T>) -> ReadOnlyMemory<T> => neoCLR.Runtime.ViewAsReadOnly<T>(source)
+
+    /// Number of elements in this window.
+    val Length: int => neoCLR.Runtime.ViewLength<T>(self)
+    /// Whether this window has no elements.
+    val IsEmpty: bool => Length == 0
+    /// Retains a nested window. Invalid bounds fault; elements are not copied.
+    func Slice(start: int, length: int) -> ReadOnlyMemory<T> => neoCLR.Runtime.ViewSlice<T>(self, start, length)
+    /// Retains a window from start to the end.
+    func Slice(start: int) -> ReadOnlyMemory<T> => neoCLR.Runtime.ViewSlice<T>(self, start)
+    /// Retains a half-open range relative to this window.
+    func Slice(range: Range) -> ReadOnlyMemory<T> {
+        let bounds = range.GetOffsetAndLength(Length)
+        return Slice(bounds.Item1, bounds.Item2)
+    }
+    /// Retains a half-open range without copying.
+    val self[range: Range]: ReadOnlyMemory<T> => Slice(range)
+    /// Copies the current window into a newly owned array.
+    func ToArray() -> T[] {
+        let borrowed: ReadOnlySlice<T> = neoCLR.Runtime.ViewAsSlice<T>(self)
+        return borrowed.ToArray()
+    }
+}

@@ -33,3 +33,25 @@ internal extern func ViewSlice<T>(view: ReadOnlySlice<T>, start: int) -> ReadOnl
 internal extern func ViewAsReadOnly<T>(view: Slice<T>) -> ReadOnlySlice<T>;
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ViewUtf8(text: string) -> ReadOnlySlice<byte>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewCreateMemory<T>(source: T[]) -> Memory<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewLength<T>(view: Memory<T>) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: Memory<T>, start: int, length: int) -> Memory<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: Memory<T>, start: int) -> Memory<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewAsSlice<T>(view: Memory<T>) -> Slice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewCreateReadOnlyMemory<T>(source: T[]) -> ReadOnlyMemory<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewLength<T>(view: ReadOnlyMemory<T>) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: ReadOnlyMemory<T>, start: int, length: int) -> ReadOnlyMemory<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewSlice<T>(view: ReadOnlyMemory<T>, start: int) -> ReadOnlyMemory<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewAsSlice<T>(view: ReadOnlyMemory<T>) -> ReadOnlySlice<T>;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewAsReadOnly<T>(view: Memory<T>) -> ReadOnlyMemory<T>;

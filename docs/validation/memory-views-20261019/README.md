@@ -34,7 +34,25 @@ in PortableDefaultReceiverTests.ReadOnlyFieldReceiverUsesDefensiveCopy (expected
 ref-like, value-indexer and ordinary .NET range checks pass: 33 tests, zero failures.
 
 JIT/AOT ABI, native GC maps, optimizations, borrowed generic anti-constraints,
-element byref returns and public persistent Memory APIs remain unimplemented.
+element byref returns remain unimplemented.
 Array range callers now share storage and must use ToArray to retain copy
 semantics. ArrayList still returns owned range copies pending a separate growth
 and invalidation contract. No native-performance claim follows from these tests.
+
+## Persistent source follow-up
+
+MemoryConsumer.rvnproj selects `RavenNeoClrAsyncLibrary=System.Runtime` and the
+same native core/ownership contract. Compile it with the same compiler and run
+bin/neoclr/MemoryConsumer.dll using the core module, object root and interpreter
+flags above. Result: Int32(0). It tests owner escape from the creator frame, two
+persistent fields, receiver-relative windows, explicit GC before/after awaited
+Task.Run, shared writable/readonly borrowing, array conversion and explicit copying.
+
+reject-memory-conversions.rvn diagnoses both illegal conversions with RAV1503
+and publishes no artifact. The prior SliceConsumer still returns 0 against the
+extended core. See persistent-validation.json for binary identity and outputs.
+Native JIT/AOT and actual stream/codec/crypto signature migrations remain pending.
+
+Persistent compiler integration: Raven `c173a723c`. All five source libraries and
+the production native API renderer build successfully; four native snapshot
+checks pass. The generated reference includes both persistent types and members.

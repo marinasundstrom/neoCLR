@@ -138,5 +138,15 @@ native metadata provider compile Slice/ReadOnlySlice ref structs, implicit array
 and readonly conversions, Array range views and String.Utf8Bytes. The checked-in
 [Raven consumer](validation/memory-views-20261019/README.md) returns 0; three
 negative programs reject. Sliceable was removed from Raven and the documentation
-bridge. Public persistent Memory source APIs and native JIT/AOT execution remain
-next steps. The complete native class-library bundle and API renderer build.
+bridge. This was followed by the persistent source integration below; native
+JIT/AOT execution remains pending. The complete native class-library bundle and API renderer build.
+
+Persistent Raven integration (2026-10-19): Memory/ReadOnlyMemory are canonical
+ordinary structs with shared range windows, ToArray copying and implicit array,
+readonly and borrowed conversions. The [Memory consumer](validation/memory-views-20261019/memory-consumer.rvn)
+retains a subwindow in object fields, returns its creator frame, crosses an awaited
+Task.Run and collects twice before exercising aliases. It returns 0. Invalid
+borrowed-to-persistent and readonly-to-writable conversions reject with RAV1503.
+The [class-library audit](memory-view-library-audit.md) identifies synchronous
+codec/crypto candidates and Memory-based async I/O candidates. Shared service
+migration awaits native ABI/codegen so existing JIT/AOT workloads remain supported.

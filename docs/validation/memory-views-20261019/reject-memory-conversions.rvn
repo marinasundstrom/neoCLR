@@ -1,0 +1,4 @@
+import System.*
+
+func Retain(source: Slice<int>) -> Memory<int> => source
+func Mutate(source: ReadOnlyMemory<int>) -> Slice<int> => source

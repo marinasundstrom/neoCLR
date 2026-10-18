@@ -19572,3 +19572,20 @@ fix. Go retains a large CPU advantage. Raw failures and successful measurements
 remain archived; maximum sustained capacity and the exact old stall cause remain
 open. The assistant committed diagnosis and implementation separately, followed
 by the measurement/documentation slice.
+
+
+## 2026-10-19 — Persistent views after the borrowed foundation
+
+The author directed continuing with Slice, ReadOnlySlice, Memory and ReadOnlyMemory
+and checking their use throughout the neoCLR class library. This follows the
+explicit preference for primary view APIs rather than compatibility-only overloads
+or repeated AsSlice calls, and array ranges returning shared Slice values.
+
+The assistant committed the borrowed Raven foundation and Sliceable removal, then
+implemented persistent ordinary structs plus implicit conversions to borrowed
+parameters. The interpreter consumer retains a subwindow in object fields across
+await and forced collection; shared mutation and readonly access pass. Invalid
+lifetime/mutability conversions are rejected. The [library audit](memory-view-library-audit.md)
+separates synchronous codec/crypto borrowing, asynchronous I/O ownership and owned
+array results. JIT/AOT view lowering and those shared-service migrations remain
+open; no native performance improvement is claimed.

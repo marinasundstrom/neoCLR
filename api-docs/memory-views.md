@@ -1,10 +1,10 @@
-# Slice and ReadOnlySlice
+# Slices and persistent memory
 
 Development APIs authored in Raven (`System.Runtime`). The interpreter provides
 checked zero-copy storage; native JIT/AOT lowering remains unavailable. Array
 range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
-copy. Memory/ReadOnlyMemory have internal runtime test coverage but are not
-public Raven APIs yet.
+copy. Memory<T> and ReadOnlyMemory<T> retain managed backing storage and may be
+stored in objects and carried across asynchronous operations.
 
 ## Slice<T>
 
@@ -33,6 +33,38 @@ A borrowed readonly contiguous view. `T[]` and `Slice<T>` convert implicitly to
 Readonly restricts this access path. Another writable alias may change the
 underlying elements, and those changes remain visible through readonly views.
 Element reads return values, not writable element references.
+
+## Memory<T> and ReadOnlyMemory<T>
+
+Ordinary value types representing an owner, offset and length. They retain the
+actual managed backing owner; copying a window does not copy elements. Unlike
+slices, persistent windows can be stored in fields and carried across `await`.
+They do not synchronize concurrent reads or writes.
+
+Both types provide:
+
+- `Length: int` and `IsEmpty: bool`.
+- `Slice(start: int)`, `Slice(start: int, length: int)` and `Slice(range: Range)`.
+- `self[range: Range]`, returning the same persistent type.
+- `ToArray(): T[]`, allocating an independent shallow copy.
+
+Arrays convert implicitly to either persistent type. `Memory<T>` converts to
+`ReadOnlyMemory<T>`. For synchronous element access, `Memory<T>` converts to
+`Slice<T>` or `ReadOnlySlice<T>`; `ReadOnlyMemory<T>` converts to `ReadOnlySlice<T>`.
+There is no conversion from a borrowed slice to persistent memory, or from a
+readonly window to a writable window. Persistent types have no element indexer:
+the API accepting an element buffer declares Slice or ReadOnlySlice, and the
+implicit conversion borrows the window at that call boundary. This serves the
+same purpose as .NET Memory.Span without requiring a public AsSlice adapter.
+
+```raven
+func ReplaceFirst(buffer: Slice<int>) {
+    buffer[0] = 42
+}
+let data = [10, 20, 30]
+let memory: Memory<int> = data
+ReplaceFirst(memory[1..])
+```
 
 ## Bounds, lifetime and errors
 

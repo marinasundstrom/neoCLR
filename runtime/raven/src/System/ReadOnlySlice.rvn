@@ -8,6 +8,11 @@ public ref struct ReadOnlySlice<T> {
     /// Restricts a writable view to readonly access without copying.
     static func implicit(source: Slice<T>) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewAsReadOnly<T>(source)
 
+    /// Borrows a persistent readonly window without copying.
+    static func implicit(source: ReadOnlyMemory<T>) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewAsSlice<T>(source)
+    /// Borrows a persistent writable window for readonly access.
+    static func implicit(source: Memory<T>) -> ReadOnlySlice<T> => neoCLR.Runtime.ViewAsReadOnly<T>(neoCLR.Runtime.ViewAsSlice<T>(source))
+
     /// Number of elements in this view.
     val Length: int => neoCLR.Runtime.ViewLength<T>(self)
     /// Whether this view has no elements.

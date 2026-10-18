@@ -6,6 +6,9 @@ public ref struct Slice<T> {
     /// Borrows an array; no elements are copied.
     static func implicit(source: T[]) -> Slice<T> => neoCLR.Runtime.ViewCreateSlice<T>(source)
 
+    /// Borrows a persistent writable window without copying.
+    static func implicit(source: Memory<T>) -> Slice<T> => neoCLR.Runtime.ViewAsSlice<T>(source)
+
     /// Number of elements in this view.
     val Length: int => neoCLR.Runtime.ViewLength<T>(self)
     /// Whether this view has no elements.

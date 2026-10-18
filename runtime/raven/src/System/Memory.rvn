@@ -1,0 +1,29 @@
+module System
+
+/// A persistent writable window retaining its managed backing owner.
+/// Copies share storage. Safe to store and carry across await; concurrent access is not synchronized.
+public struct Memory<T> {
+    /// Retains an array without copying its elements.
+    static func implicit(source: T[]) -> Memory<T> => neoCLR.Runtime.ViewCreateMemory<T>(source)
+
+    /// Number of elements in this window.
+    val Length: int => neoCLR.Runtime.ViewLength<T>(self)
+    /// Whether this window has no elements.
+    val IsEmpty: bool => Length == 0
+    /// Retains a nested window. Invalid bounds fault; elements are not copied.
+    func Slice(start: int, length: int) -> Memory<T> => neoCLR.Runtime.ViewSlice<T>(self, start, length)
+    /// Retains a window from start to the end.
+    func Slice(start: int) -> Memory<T> => neoCLR.Runtime.ViewSlice<T>(self, start)
+    /// Retains a half-open range relative to this window.
+    func Slice(range: Range) -> Memory<T> {
+        let bounds = range.GetOffsetAndLength(Length)
+        return Slice(bounds.Item1, bounds.Item2)
+    }
+    /// Retains a half-open range without copying.
+    val self[range: Range]: Memory<T> => Slice(range)
+    /// Copies the current window into a newly owned array.
+    func ToArray() -> T[] {
+        let borrowed: Slice<T> = neoCLR.Runtime.ViewAsSlice<T>(self)
+        return borrowed.ToArray()
+    }
+}
