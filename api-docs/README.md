@@ -2384,3 +2384,11 @@ Native sidecars and the pinned native snapshot remain unchanged, with separate
 overload contracts. A focused regression preserves both full contract bodies and
 native IDs; the full site build validates the translated IDs against the renderer.
 Remove this adapter when the legacy rendering pass is removed.
+
+### Encoding provider reuse (2026-10-18 development)
+
+Encodings.Utf8/Ascii reuse stateless providers within invocation-owned storage.
+Consumers must not require distinct provider identities; CreateEncoder/CreateDecoder
+still create independent mutable sessions. Strict errors, BOM handling and size
+limits are unchanged. Source XML summaries and the matching reference snapshot are
+refreshed; no public signature change. See the [three-mode tests and profiling](../benchmarks/http-server/serve/encoding-cache-20261018/README.md).

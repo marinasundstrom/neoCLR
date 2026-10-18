@@ -11,10 +11,12 @@ import xml.etree.ElementTree as ET
 p = argparse.ArgumentParser(description=__doc__)
 for name in ('library', 'compiler', 'runtime', 'backend', 'host', 'output'):
     p.add_argument('--' + name, type=Path, required=True)
+p.add_argument('--source', type=Path, default=Path(__file__).with_name('Contracts.rvn'))
+p.add_argument('--expected-line', default='Task completion contracts passed')
 a = p.parse_args()
 lib, out = a.library.resolve(), a.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
-source = Path(__file__).with_name('Contracts.rvn').resolve()
+source = a.source.resolve()
 manifest = json.loads((lib/'bundle.json').read_text())
 modules = [lib/(name+'.dll') for name in manifest['assemblyNames']]
 context = ['--system',lib/'System.runtime.neox','--object-root',lib/'System.Runtime.dll']
@@ -42,7 +44,7 @@ try:
     run('metadata',[a.runtime,'disassemble',assembly,out/'module.neoil'])
     text=(out/'module.neoil').read_text()
     metadata,_=json.JSONDecoder().raw_decode(text[text.index('{'):])
-    expected='Task completion contracts passed\n'
+    expected=a.expected_line+'\n'
     interpreted=run('interpreter',[a.runtime,'run',assembly,'--execution','interpreter',*context])
     assert interpreted.stdout==expected, interpreted.stdout
     flags='--compile-system --bind-user-fault --bind-stack-trace --reference-arena --native-gc --bind-console-read-byte --bind-console-write-line --bind-console-stream-output --bind-int32-to-string --bind-utf8-text --native-stack-budget --bind-integer-text --bind-character-text --bind-system-culture --bind-time-zone-rules --bind-cryptography --bind-tls --bind-task-queue --bind-scheduler --bind-timers --bind-socket-listener --bind-socket-accept --bind-socket-transfer --bind-socket-client --bind-runtime-async'.split()

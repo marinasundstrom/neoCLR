@@ -1,0 +1,57 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+func Check(value: bool) {
+    if !value { System.Fail("Encoding provider contract failed") }
+}
+
+func Providers() {
+    let Ok(bytes) = Encodings.Utf8.Encode("hé") else { System.Fail("Encode failed") }
+    Check(bytes.Count == 3)
+    Check(Encodings.Utf8.Decode(bytes) is Ok("hé"))
+    Check(Encodings.Ascii.Encode("é") is Error(EncodingError.UnrepresentableText))
+    Check(Encodings.Ascii.Decode([(byte)255]) is Error(EncodingError.InvalidData))
+    Check(Encodings.Utf8.Decode([(byte)195]) is Error(EncodingError.InvalidUtf8))
+    Check(Encodings.Utf8.Decode([(byte)239, (byte)187, (byte)191]) is Ok("\uFEFF"))
+}
+
+func Sessions() {
+    let first = Encodings.Utf8.CreateDecoder()
+    let second = Encodings.Utf8.CreateDecoder()
+    Check(first.Decode([(byte)195], 0, 1, false) is Ok(""))
+    Check(second.Decode([(byte)65], 0, 1, true) is Ok("A"))
+    Check(first.Decode([(byte)169], 0, 1, true) is Ok("é"))
+    Check(second.Decode([(byte)66], 0, 1, true) is Error(EncodingError.Finished))
+    Check(Encodings.Utf8.CreateDecoder().Decode([(byte)66], 0, 1, true) is Ok("B"))
+    let ascii = Encodings.Ascii.CreateDecoder()
+    Check(ascii.Decode([(byte)65], 0, 1, true) is Ok("A"))
+    Check(Encodings.Ascii.CreateDecoder().Decode([(byte)66], 0, 1, true) is Ok("B"))
+
+    let left = Encodings.Utf8.CreateEncoder()
+    let right = Encodings.Utf8.CreateEncoder()
+    Check(left.Accept("A", true) is Ok(_))
+    Check(right.Accept("B", true) is Ok(_))
+    let output: byte[] = [(byte)0, (byte)0]
+    let Ok(a) = left.Drain(output, 0, 2) else { System.Fail("Drain failed") }
+    Check(a.BytesWritten == 1 && output[0] == 65)
+    let Ok(b) = right.Drain(output, 0, 2) else { System.Fail("Drain failed") }
+    Check(b.BytesWritten == 1 && output[0] == 66)
+    Check(Encodings.Ascii.CreateEncoder().Accept("é", true) is Error(EncodingError.UnrepresentableText))
+}
+
+func Main() {
+    Providers()
+    // Provider locals leave scope before allocation pressure; static storage owns reuse.
+    for round in 0..8 {
+        for index in 0..16 {
+            let pressure = ArrayList<byte>(128)
+            pressure.Add((byte)index)
+            Check(pressure[0] == index)
+        }
+        Providers()
+        Sessions()
+    }
+    Console.WriteLine("Encoding provider contracts passed")
+}

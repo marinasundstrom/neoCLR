@@ -26,6 +26,22 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Encoding provider allocation follow-up
+
+- **Author:** asks to continue performance work after receive-buffer reuse.
+- **Assistant investigation:** checks empty-array/static-storage constraints and
+  profiles the updated Serve path. The fixed diagnostic attributes 1,989 allocations
+  to the stateless UTF-8 provider getter; selects provider caching as the next bounded
+  change, keeping array caching separate.
+- **Action:** caches UTF-8/ASCII providers in invocation-owned storage while preserving
+  independent sessions and existing strict encoding behavior. Three-mode contracts
+  pass. A concrete-field cache triggers an unrelated native interface-selection gap
+  in UTF-8-only Serve; interface-typed fields compile without changing the public
+  contract. The failed attempt and unresolved broader gap are recorded.
+- **Diagnostic outcome:** 3.07% fewer allocations and 0.55% fewer root publications;
+  cache retention slightly raises peak live bytes. [Evidence](../benchmarks/http-server/serve/encoding-cache-20261018/README.md).
+  These counters do not establish a throughput gain.
+
 ## 2026-10-18 — First HTTP receive-pooling slice
 
 - **Author:** asks to continue the measured optimization work after proposing array

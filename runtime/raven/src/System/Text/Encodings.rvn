@@ -5,8 +5,33 @@ import System.Collections.*
 import System.Result.*
 
 public static class Encodings {
-    static val Utf8: Encoding => Utf8Encoding()
-    static val Ascii: Encoding => AsciiEncoding()
+    // Invocation-owned provider caches; encoder/decoder session state is never shared.
+    private static var utf8: Encoding?
+    private static var ascii: Encoding?
+
+    /// Returns the stateless UTF-8 provider. CreateEncoder/CreateDecoder create independent sessions.
+    static val Utf8: Encoding {
+        get {
+            if utf8 is Encoding cached {
+                return cached
+            }
+            let created = Utf8Encoding()
+            utf8 = created
+            return created
+        }
+    }
+
+    /// Returns the stateless ASCII provider. CreateEncoder/CreateDecoder create independent sessions.
+    static val Ascii: Encoding {
+        get {
+            if ascii is Encoding cached {
+                return cached
+            }
+            let created = AsciiEncoding()
+            ascii = created
+            return created
+        }
+    }
 }
 
 internal class Utf8Encoding : Encoding {
