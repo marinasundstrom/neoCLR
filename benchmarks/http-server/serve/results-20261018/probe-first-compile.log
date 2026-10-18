@@ -1,0 +1,3 @@
+native build: /Users/robert/Projects/neoclr/target/http-serve-20261018/probe/project/Main.rvn(15,7): error RAV0330: Type 'OwnedInput' does not implement abstract member 'Read(buffer: byte[], offset: int, count: int)' from base type 'InputStream'
+/Users/robert/Projects/neoclr/target/http-serve-20261018/probe/project/Main.rvn(18,19): error RAV0307: 'func Read(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>>': no suitable method found to override
+/Users/robert/Projects/neoclr/target/http-serve-20261018/probe/project/Main.rvn(21,19): error RAV0307: 'func Close() -> ()': no suitable method found to override

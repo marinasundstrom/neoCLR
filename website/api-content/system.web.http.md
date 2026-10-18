@@ -40,3 +40,8 @@ budgets. Pass it to the four-argument `HttpServer.Listen`; validation occurs bef
 binding and later option mutations do not affect the server. Existing defaults
 remain 1 MiB bodies, 32 KiB/100 headers and 15-second phase deadlines. Positive
 timeouts through 60 seconds are supported; no infinite deadline is admitted.
+
+Development `HttpServer.Serve(handler)` owns bounded concurrent callback dispatch.
+Its task represents the server lifetime; applications do not await each request in
+an accept loop. See [server-managed callbacks](/docs/http-server.html#server-managed-callbacks)
+for outcome diagnostics, ownership and joined shutdown.

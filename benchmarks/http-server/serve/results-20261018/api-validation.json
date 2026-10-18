@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "serveOverloads": 2,
+  "diagnosticProperties": [
+    "CompletedRequests",
+    "FailedRequests",
+    "LastRequestError"
+  ],
+  "inputs": {
+    "api-docs/native-reference.zip": "d02d759c85e36bddde032dc7e57fb215c3c3acea43d68cde448ade726c5982f7",
+    "api-docs/native-reference.json": "59623a0e60df1570b2a5a3b8f8601e9f279659aa66a70842d59ce5daa8e41cc1",
+    "api-docs/reference/NeoCLR.CoreProbe.dll": "5bd0bcaeaecf9bbe89c957dfc715935edc3a0fbcbc63b2762eec7d55a4839444",
+    "api-docs/snapshot.json": "b475f0708722a4c39855327ab9c7af425bd0857ffe18dd4ae3a6f1df23114340",
+    "target/http-serve-20261018/api-complete/site/docs/api/System/Web/Http/HttpServer/method_Serve.html": "669e3f072918e76fdf44e654052a8a5cd9486c07d64b85bd6a980cb9a2eba0c6",
+    "target/http-serve-20261018/api-complete/site/docs/api/System/Web/Http/HttpServer/index.html": "960fdd3f329d3ea11c071d30690897f202703ac332520b66564f3a0c5df18247",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/RavenDoc.dll": "99c862ba05b756b03046376b4be9ebbcb1c831c76492eb1a7abe500024fce4e2"
+  },
+  "scope": "Native member signatures, type overview and parameter/return contracts rendered; matching CLI reference/source fingerprint validation; no full website build or publication."
+}

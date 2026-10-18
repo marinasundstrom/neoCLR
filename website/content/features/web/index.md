@@ -163,3 +163,10 @@ JSON can be represented as typed models or explicit JsonValue nodes. See the
 - [SQL databases](/features/sql/) — query and map application data.
 - [TCP networking](/features/networking/) — lower-level socket operations.
 - [HTTP benchmarks](/benchmarks/http/) — workload matrix and measurement status.
+
+
+Development after Preview 16 adds `HttpServer.Serve(handler)` for server-managed
+concurrent requests. The callback returns a task; the server owns its completion,
+response and connection. The separate lifetime task joins handlers after shutdown.
+Concurrency is bounded at 16 exchanges, with request failure diagnostics. See the
+[server lifetime reference](/docs/http-server.html) for cancellation, ownership and limits.

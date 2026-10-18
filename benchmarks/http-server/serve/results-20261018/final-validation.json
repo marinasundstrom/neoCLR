@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-probe/native/app"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-probe/native/app.dll"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-probe/native/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "cases": {
+    "aot-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "aot-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "aot-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    },
+    "jit-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "jit-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "jit-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    },
+    "interpreter-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "interpreter-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "interpreter-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/validate.py": "b393dc63bc5650753d82c66b3fad87b0a861fb878e70974f3ea7fef7c3742e2c",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/Probe.rvn": "a7a0ff15012e3085fed8e78a39b9a2790bfa7bdfccb9f54d21e8025a67ed7940",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-probe/native/app": "a8b2c4518f9b31d68d85cb18b317b492d4b7245b92174e5f289e804b9748cbd9",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-probe/native/app.dll": "dd8dcbc87ce21f92e6b639f7fd7cf3440ae8e35c81612d5a096f1c802082d35c",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-probe/native/build.json": "de1df83a911a63e37fc38a2ec79d7db06875202e33f593b5ebeac42480486b8e",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/manifest.json": "1f629e555068073eee738b39533c43c1eb7c4e40a0c6eaaff83bfcdd12d24090"
+  }
+}

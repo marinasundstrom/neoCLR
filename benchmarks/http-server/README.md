@@ -199,3 +199,7 @@ from sustainable capacity claims.
 [Lazy accept and asynchronous ServeOne comparison](lazy-accept/README.md) measures
 callback-based handlers on both library versions, with explicit concurrency and
 queued-await work. Earlier explicit-accept results remain a separate fixture.
+
+[Server-managed Serve callbacks](serve/README.md) implement the author-selected API
+and compare it with equivalent application-managed ServeOne loops, including async
+handlers, controlled shutdown and explicit overload accounting.

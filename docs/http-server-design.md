@@ -422,3 +422,39 @@ requires the application to arrange its own context handling. Compare the same
 callback fixture across versions rather than treating raw-accept rates as callback
 capacity. This retains the existing .NET-style asynchronous handler/transport
 separation; it changes internal allocation timing, not the platform contract.
+
+### Server-owned Serve lifecycle — 2026-10-18
+
+Author direction now explicitly requests `Serve(handler)` and measurement of that
+path. The managed dispatcher owns 16 reusable lanes and observes the full exchange
+and handler task in each. Calling Serve starts work immediately; its task represents
+the server lifetime. The application has no accept/dispatch loop. This implements
+the author's correction; earlier Run/Serve suggestions above are historical proposals.
+
+Compare .NET's [RequestDelegate](https://source.dot.net/Microsoft.AspNetCore.Http.Abstractions/RequestDelegate.cs.html)
+and [WebApplication.RunAsync](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.webapplication?view=aspnetcore-10.0):
+an asynchronous request callback and a server-lifetime task are distinct. Primary
+sources checked 2026-10-18. neoCLR retains its existing Task<Result<HttpResponse,
+HttpError>> callback and the author-selected Serve name. This is a small HTTP library,
+not ASP.NET hosting: no dependency-injection host, middleware pipeline, keep-alive,
+automatic error pages or thread-pool dispatch is implied.
+
+The alternatives were an unbounded detached task per request, application-owned
+ServeOne loops, and server-owned bounded supervision. The selected model bounds
+memory and admission while keeping request outcome/response disposal inside the
+library. Fixed concurrency reuses the existing 16-exchange contract; configurable
+limits and graceful response draining remain separate work. Pre-cancellation leaves
+the listener open; active cancellation/Close closes it and joins started handlers.
+Explicit Accept/AcceptHeaders/ServeOne cannot compete with active Serve. Request
+errors are observed, counted and retained as one last error while other requests
+continue. Listener failure terminates the lifetime task. Runtime Faults are terminal.
+
+Serve owns successful handler responses, including invalid or late streaming content.
+A managed exchange retains its handler outcome subscription after Close, disposes a
+late response, and only then acknowledges cancellation. This differs deliberately
+from ServeOne's existing early cancellation acknowledgement. An explicit lane list
+roots supervised operations until all finish. A handler that never settles prevents
+joined completion; there is no forced cancellation of arbitrary managed work.
+[Contract and load evidence](../benchmarks/http-server/serve/README.md) cover concurrency,
+bounds, error recovery, shutdown and callback-path cost. Public API reference and
+native/CLI documentation snapshots are refreshed; no Raven compiler change is needed.

@@ -9,6 +9,7 @@ import math
 import os
 from pathlib import Path
 import platform
+import socket
 import subprocess
 import sys
 import time
@@ -149,6 +150,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--executable', default='app')
     p.add_argument('--server-source', type=Path, default=Path(__file__).with_name('Server.rvn'))
+    p.add_argument('--control-stop', action='store_true', help='Read a second control port and signal shutdown after the stop response')
     p.add_argument('--workers', type=int, choices=[1, 4, 16], default=16)
     p.add_argument('--workload', choices=['plain', 'bulk'], default='plain')
     p.add_argument('--rates', nargs='+', type=float, required=True)
@@ -188,6 +190,7 @@ def main():
                 report['trials'].append(trial)
                 try:
                     port, ready = guest.line()
+                    control_port = int(guest.line()[0]) if a.control_stop else None
                     trial['startupSeconds'] = ready-guest.started
                     trial['warmup'] = asyncio.run(window(int(port), path, size, min(rate, 10), a.warmup, concurrency, a.timeout))
                     trial['resourceBefore'] = resource_sample(guest.process.pid)
@@ -202,6 +205,9 @@ def main():
                     stop = asyncio.run(request(int(port), '/stop', 0, 20))
                     if stop != 'ok':
                         raise RuntimeError('Shutdown request: '+stop)
+                    if control_port is not None:
+                        with socket.create_connection(('127.0.0.1', control_port), timeout=10):
+                            pass
                     guest.line(b'DONE')
                     trial['serverTotals'] = dict(zip(['completed', 'limitErrors', 'otherErrors'],
                                                    [int(guest.line()[0]) for _ in range(3)]))

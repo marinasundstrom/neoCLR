@@ -1,0 +1,212 @@
+{
+  "passed": true,
+  "commands": {
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-streams/native/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-streams/native/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-streams/native/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "modes": {
+    "jit": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    "aot": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    "interpreter": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 8253
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-stream-response/validate.py": "68ff10655085d5b3a698154f77df6eaffc7f60d8667a5b56f06375d553fd31eb",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-stream-response/Server.rvn": "e5fda2657aa60e1d8e7054c9ef42e8110f4433d1599197acf82de24369cc3ea2",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-streams/native/app.dll": "8ec3dd377a7b7f59807b5abb20ba79867b9527b5d03485fc47a072d2892188de",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-streams/native/app": "caae5d61a0f6c09f22acbfc187491aa6d2db8b220c45b6dbe581b88f688632d6",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/final-streams/native/build.json": "14482c2c8bcd7160cb800bc47b74f125d2485e0250680ae1798bf0b0ab781bca",
+    "/Users/robert/Projects/neoclr/target/http-serve-20261018/library-owned-v2/bundle/manifest.json": "1f629e555068073eee738b39533c43c1eb7c4e40a0c6eaaff83bfcdd12d24090"
+  },
+  "scope": "Known-length server response streams: deferred short reads, owned/borrowed sources, HEAD, empty body, premature EOF, source error, overread disposed content, caller cancellation and deadline cancellation of a waiting producer; not a throughput measurement"
+}

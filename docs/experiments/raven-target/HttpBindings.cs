@@ -195,6 +195,11 @@ static class HttpBindings
                 public void Release() { }
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
+                public long CompletedRequests => default;
+                public long FailedRequests => default;
+                public Option<HttpError> LastRequestError => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
                 public static Result<Collections.Sequence<byte>, HttpError> EncodeResponse(HttpResponse response, int headOnly) => default;
             }
@@ -272,8 +277,10 @@ static class HttpBindings
             ("HttpServer", ".ctor") when library => ("System.Networking.Sockets.Socket", "noresult", false),
             ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,System.Web.Http.HttpError>", true),
             ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,System.Web.Http.HttpError>", false),
+            ("HttpServer", "get_CompletedRequests" or "get_FailedRequests") => ("", "Int64", false),
+            ("HttpServer", "get_LastRequestError") => ("", "System.Option<System.Web.Http.HttpError>", false),
             ("HttpServer", "Close") => ("", "noresult", false),
-            ("HttpServer", "ServeOne") => ($"fn<{request},{task}>" + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "ServeOne" or "Serve") => ($"fn<{request},{task}>" + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpServer", "EncodeResponse") when library => (response + ",Int32", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
             ("HttpRequest", "FromIncoming") when library => ($"String,String,String,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpHeader", "FindValues") when library => ($"System.Collections.Sequence<{Prefix}HttpHeader>,String", "System.Collections.Sequence<String>", true),

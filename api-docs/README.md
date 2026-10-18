@@ -2348,3 +2348,22 @@ containers and 15 CLI-only compiler/exception scaffold pages. The latter retain
 reference-limitation notices and do not advertise native support. Native navigation
 comes from the native snapshot; retained URLs preserve older links. This route
 classification does not qualify the legacy signatures or add those APIs to NeoCLR.
+
+
+### Server-managed HTTP callbacks (2026-10-18)
+
+The selected HttpServer type now includes both Serve overloads and CompletedRequests,
+FailedRequests and LastRequestError. The matching CLI documentation bridge, XML and
+native rendering cover all five members; there is no renderer exclusion. The
+[server lifetime guide](http-server.md#server-managed-callbacks) documents handler
+ownership, bounded concurrent dispatch, diagnostics, startup exclusivity, cancellation
+and joined shutdown. ServeOne's single-exchange behavior remains unchanged.
+
+The native snapshot uses the HTTP-only rebuild in `target/http-serve-20261018/library-owned-v2`
+and the existing unchanged native dependencies, rendered in `target/http-serve-20261018/api-complete`.
+The native Function documentation IDs have explicit member-contract Markdown for
+parameters/returns in `website/api-content/http-server-serve*.md`; the CLI XML sidecar
+retains its matching delegate IDs. Neither overload is excluded.
+Its renderer identity is recorded by binary SHA-256 rather than guessing a source
+revision for the existing local renderer executable. No Raven compiler changes or
+new CLI function encoding are introduced. This refresh does not publish the website.

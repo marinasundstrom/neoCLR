@@ -84,6 +84,23 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   13.4→14.5/sec, but both versions remain overloaded. Both subsequently pass all
   7,500 responses at 250 offered/sec for 30 seconds under experimental paced GC;
   this does not establish an increased capacity limit or lower process RSS.
+- **Author decision:** explicitly requested implementation of `Serve(handler)` with
+  server-managed concurrent requests and load measurement of that API.
+- **Assistant implementation:** added bounded server-owned lanes, a server-lifetime
+  task, request failure counts/last error, exclusivity with manual acceptance, and
+  observation/disposal of late handler results during joined shutdown. Kept existing
+  ServeOne completion behavior. Request failures continue serving; listener failure
+  ends the lifetime task. API/reference documentation and matched callback fixtures
+  accompany the [implementation evidence](../benchmarks/http-server/serve/README.md).
+- **Serve outcome:** all nine concurrency/ownership/shutdown scenarios and 30 existing
+  stream cases pass across interpreter/JIT/AOT. Matched profiles measure 385 versus
+  405 objects/request for Serve versus application ServeOne loops. In the 30-second
+  300/sec test, timed completions are 293.8 versus 221.5/sec, but both lose offered
+  arrivals to client admission limits and show generator lag; no sustainable maximum
+  is claimed. The 200/sec Serve trial has worse misses/latency and is retained.
+- **Author workflow direction:** requested a commit for each slice. The assistant
+  separated validated buffer, offered-load/timeout, lazy-accept and Serve work, with
+  changelog entries and matching source/provenance rather than one combined commit.
 - **Open:** broader sustained qualification, slow-client memory and equivalent .NET comparisons. No claim to have
   found every performance issue or changed published performance baselines.
 

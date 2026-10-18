@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Add HttpServer.Serve(handler) with server-owned bounded concurrent requests, a separate lifetime task, failure diagnostics and joined handler shutdown. Preserve ServeOne behavior; reject mixed manual acceptance while Serve owns the listener. Add callback-path load comparisons and lifecycle tests, plus matching API reference snapshots.
+
 - Defer HTTP request parser and receive-buffer allocation until an accepted connection can read; avoid rejection promises on successful accepts. Preserve queued cancellation, admission and shutdown. Add callback-based `ServeOne` load comparisons with an awaited handler operation, alongside explicit-accept mechanism profiles. Callback profiles reduce 410→405 allocations/request and about 15% of the 16-loop live payload; both versions pass the 30-second 250/sec paced control, so no increased capacity limit is claimed.
 
 - Add fixed-offered-rate HTTP load measurement with explicit client admission misses, errors, latency, CPU/RSS samples and clean shutdown accounting. Attribute stress-GC worker scaling costs separately from experimental paced collection; two 30-second paced trials validate all 12,000 responses at 200 offered/sec, while higher rates expose admission misses (local fixture evidence, not production capacity). Repair a response-producer timeout race caused by rounded network deadlines versus unrounded timers; 500 paced regression waits and 30 stream lifecycle cases pass without changing GC defaults.
@@ -15,6 +17,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Reduce HTTP server buffer churn: snapshot buffered responses into exact-sized arrays, send admitted arrays directly in bounded 4 KiB writes, use 4 KiB stream/fallback blocks, and grow request buffers only after incomplete parsing. Preserve response mutation isolation and stream cancellation/ownership. Add matched tiny/8 KiB allocation and throughput evidence plus buffer-boundary tests; no public signature or runtime GC policy change.
 
 - Publish Preview 16 and all eleven macOS/Windows runtime, Raven SDK/VSIX, qualified-source, notice and checksum assets. Verify public download availability and SHA-256 identities. Deploy the website manually and verify live Preview 16 links, two-platform benchmark tables and API pages; preserve published notes and unrelated working changes.
+
+### 2026-10-17
+
+- Record HttpServer performance design input against current managed parsing, streaming, admission and benchmark evidence. Document provisional implementation-placement advice, buffer-lifetime requirements and proposed concurrent/slow-client measurements; no runtime or API change.
 
 ## 0.1.0-preview.16 — 2026-10-18
 

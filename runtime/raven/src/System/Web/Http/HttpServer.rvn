@@ -412,6 +412,39 @@ public class HttpServer {
     private var listener: Socket
     private var shutdown: CancellationTokenSource = CancellationTokenSource()
     private var active: int = 0
+    private var serving: HttpServerRun? = null
+    private var completedRequests: long = 0L
+    private var failedRequests: long = 0L
+    private var lastRequestError: Option<HttpError> = None()
+
+    /// Successful responses completed by Serve; excludes explicit Accept/ServeOne calls.
+    val CompletedRequests: long => completedRequests
+    /// Failed Serve exchanges, excluding cancellation caused by server shutdown.
+    val FailedRequests: long => failedRequests
+    /// Most recent Serve request error; None before any failure.
+    val LastRequestError: Option<HttpError> {
+        get {
+            if let Some(error) = lastRequestError {
+                return Some(error)
+            }
+            return None()
+        }
+    }
+    internal val IsClosed: bool => closed
+    internal func RecordServed() { completedRequests += 1L }
+    internal func RecordFailure(error: HttpError) {
+        failedRequests += 1L
+        lastRequestError = Some(error)
+    }
+    internal func ListenerFailed(error: HttpError) {
+        if serving is HttpServerRun run {
+            run.Fail(error)
+        }
+    }
+    internal func AcceptForServe() -> Task<Result<HttpContext, HttpError>> {
+        return AcceptCore(CancellationToken.None, false, true)
+    }
+
     private var accepting: bool = false
     private var acceptHead: HttpServerExchange? = null
     private var acceptTail: HttpServerExchange? = null
@@ -526,6 +559,13 @@ public class HttpServer {
     }
 
     private func AcceptCore(cancellationToken: CancellationToken, streaming: bool) -> Task<Result<HttpContext, HttpError>> {
+        return AcceptCore(cancellationToken, streaming, false)
+    }
+
+    private func AcceptCore(cancellationToken: CancellationToken, streaming: bool, managed: bool) -> Task<Result<HttpContext, HttpError>> {
+        if !managed && serving is HttpServerRun {
+            return Task.FromResult<Result<HttpContext, HttpError>>(Result<HttpContext, HttpError>.Error(HttpError.InvalidRequest("Serve owns request acceptance")))
+        }
         if cancellationToken.IsCancellationRequested {
             let rejected = Promise<Result<HttpContext, HttpError>>()
             _ = rejected.Cancel()
@@ -543,6 +583,28 @@ public class HttpServer {
         }
         active += 1
         return HttpServerExchange(self, listener, cancellationToken, streaming).Start()
+    }
+
+    /// Starts server-managed concurrent request handling. The returned task represents server lifetime.
+    /// Up to 16 exchanges run concurrently; request failures are recorded and do not stop serving.
+    func Serve(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) -> Task<Result<System.Void, HttpError>> {
+        return Serve(handler, CancellationToken.None)
+    }
+
+    /// Cancellation closes the server. Completion waits for every started handler task to settle.
+    /// Close completes normally; caller cancellation cancels the lifetime task; listener failure returns Error.
+    func Serve(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<System.Void, HttpError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        if closed || serving is HttpServerRun || active != 0 {
+            return Task.FromResult<Result<System.Void, HttpError>>(Result<System.Void, HttpError>.Error(HttpError.InvalidRequest("Serve requires an open idle server")))
+        }
+        let run = HttpServerRun(self, handler, cancellationToken)
+        serving = run
+        return run.Start()
     }
 
     /// Handles one accepted context and sends the callback's buffered or known-length stream response.
@@ -1148,6 +1210,7 @@ internal class HttpServerExchange {
                     handshake.OnCompleted(self.OnAuthenticated)
                 } else { ReceiveNext() }
             } else if let Error(reason) = pending.GetResult() {
+                owner.ListenerFailed(HttpError.Transport(reason))
                 Fail(HttpError.Transport(reason))
             }
         }
@@ -1254,6 +1317,10 @@ internal class HttpServerExchange {
 }
 
 internal class HttpServeOperation {
+    private val managed: bool
+    private var stopping: bool = false
+    private var invoking: bool = false
+    private var managedResponse: HttpResponse? = null
     private var server: HttpServer
     private var handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
     private var token: CancellationToken
@@ -1269,10 +1336,18 @@ internal class HttpServeOperation {
         self.server = server
         self.handler = handler
         self.token = token
+        managed = false
+    }
+
+    internal init(server: HttpServer, handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) {
+        self.server = server
+        self.handler = handler
+        token = CancellationToken.None
+        managed = true
     }
 
     internal func Start() -> Task<Result<System.Void, HttpError>> {
-        let pending = server.Accept(token)
+        let pending = if managed { server.AcceptForServe() } else { server.Accept(token) }
         accepting = Some(pending)
         pending.OnCompleted(self.OnAccepted)
         return source.Task
@@ -1294,9 +1369,14 @@ internal class HttpServeOperation {
         }
         context = None()
         handling = None()
+        if managedResponse is HttpResponse response {
+            response.Dispose()
+        }
+        managedResponse = null
     }
 
     private func Cancel() {
+        stopping = true
         // During a send the socket callback owns acknowledgement. During an
         // application handler wait there is no transport operation to acknowledge.
         if let Some(active) = context {
@@ -1304,6 +1384,15 @@ internal class HttpServeOperation {
         }
         if let Some(_) = sending {
             return
+        }
+        if managed {
+            if invoking {
+                return
+            }
+            if let Some(_) = handling {
+                // Keep observing the handler after Close; dispose a late response.
+                return
+            }
         }
         Cleanup()
         _ = source.Cancel()
@@ -1329,7 +1418,9 @@ internal class HttpServeOperation {
                     Cleanup()
                     return
                 }
+                invoking = true
                 let response = handler(active.Request)
+                invoking = false
                 if source.Task.IsCompleted {
                     Cleanup()
                     return
@@ -1348,12 +1439,24 @@ internal class HttpServeOperation {
         }
         if let Some(pending) = handling {
             handling = None()
+            if managed && stopping {
+                if !pending.IsCancelled {
+                    if let Ok(response) = pending.GetResult() {
+                        response.Dispose()
+                    }
+                }
+                Cancel()
+                return
+            }
             if pending.IsCancelled {
                 Cancel()
                 return
             }
             if let Ok(response) = pending.GetResult() {
                 if let Some(active) = context {
+                    if managed {
+                        managedResponse = response
+                    }
                     let result = active.Send(response, token)
                     sending = Some(result)
                     result.OnCompleted(self.OnSent)
@@ -1372,6 +1475,103 @@ internal class HttpServeOperation {
                 return
             }
             Finish(pending.GetResult())
+        }
+    }
+}
+
+
+// Outcome-observation adapters own all Serve exchanges and their lifetime task.
+// They reuse a fixed number of lanes rather than allocating an unbounded task queue.
+internal class HttpServerRun {
+    private val server: HttpServer
+    private val handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
+    private val token: CancellationToken
+    private val source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
+    private var registration: CancellationRegistration? = null
+    private var lanes: ArrayList<HttpServerLane> = ArrayList<HttpServerLane>(16)
+    private var remaining: int = 16
+    private var failure: Option<HttpError> = None()
+
+    internal init(server: HttpServer, handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, token: CancellationToken) {
+        self.server = server
+        self.handler = handler
+        self.token = token
+    }
+
+    internal func Start() -> Task<Result<System.Void, HttpError>> {
+        registration = token.Register(server.Close)
+        for index in 0..16 {
+            let lane = HttpServerLane(self, server, handler)
+            lanes.Add(lane)
+            lane.Start()
+        }
+        return source.Task
+    }
+
+    internal func Fail(error: HttpError) {
+        if failure is None {
+            failure = Some(error)
+        }
+        server.Close()
+    }
+
+    internal func Finished() {
+        remaining -= 1
+        if remaining != 0 {
+            return
+        }
+        lanes = ArrayList<HttpServerLane>()
+        if registration is CancellationRegistration active {
+            active.Dispose()
+        }
+        registration = null
+        if let Some(error) = failure {
+            _ = source.Complete(Error(error))
+        } else if token.IsCancellationRequested {
+            _ = source.Cancel()
+        } else {
+            _ = source.Complete(Ok(()))
+        }
+    }
+}
+
+internal class HttpServerLane {
+    private val owner: HttpServerRun
+    private val server: HttpServer
+    private val handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
+    private var pending: Task<Result<System.Void, HttpError>>? = null
+
+    internal init(owner: HttpServerRun, server: HttpServer, handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) {
+        self.owner = owner
+        self.server = server
+        self.handler = handler
+    }
+
+    internal func Start() {
+        if server.IsClosed {
+            owner.Finished()
+            return
+        }
+        let operation = HttpServeOperation(server, handler).Start()
+        pending = operation
+        operation.OnCompleted(self.Completed)
+    }
+
+    private func Completed() {
+        if pending is Task<Result<System.Void, HttpError>> operation {
+            pending = null
+            if operation.IsCancelled {
+                if !server.IsClosed {
+                    server.RecordFailure(HttpError.Handler("Request handler cancelled"))
+                }
+            } else if let Error(error) = operation.GetResult() {
+                if !server.IsClosed {
+                    server.RecordFailure(error)
+                }
+            } else {
+                server.RecordServed()
+            }
+            Start()
         }
     }
 }

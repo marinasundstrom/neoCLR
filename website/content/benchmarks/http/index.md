@@ -78,3 +78,8 @@ The [callback-path follow-up](https://github.com/marinasundstrom/neoCLR/tree/mai
 compares `ServeOne` handlers that await queued work, measuring deferred queued-accept
 storage separately from the earlier explicit-accept fixture. Public API semantics
 and collection defaults are unchanged.
+
+Development `Serve(handler)` now owns bounded concurrent dispatch and handler
+completion. Its [matched load comparison](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve)
+uses the same asynchronous handler and shutdown control as application-managed
+`ServeOne` loops, retaining overload misses and latency alongside throughput.

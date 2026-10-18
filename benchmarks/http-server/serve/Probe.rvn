@@ -1,0 +1,125 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Networking.Sockets.*
+import System.Option.*
+import System.Result.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value { System.Fail("Serve contract failed") }
+}
+
+class OwnedInput : InputStream {
+    private val owner: Application
+    init(owner: Application) { self.owner = owner }
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    func Read(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {
+        return Task.FromResult<Result<int, StreamError>>(Result<int, StreamError>.Ok(0))
+    }
+    func Close() { owner.Disposed += 1 }
+}
+
+class Application {
+    val Server: HttpServer
+    val Gates = ArrayList<Promise<Result<HttpResponse, HttpError>>>()
+    var Released: int = 0
+    var Disposed: int = 0
+    init(server: HttpServer) { Server = server }
+
+    func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        if request.Target == "/error" {
+            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Error(HttpError.Handler("expected")))
+        }
+        if request.Target == "/cancel" {
+            let cancelled = Promise<Result<HttpResponse, HttpError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        if request.Target == "/hold" || request.Target == "/inline" {
+            if request.Target == "/inline" { Server.Close() }
+            let gate = Promise<Result<HttpResponse, HttpError>>()
+            Gates.Add(gate)
+            Console.WriteLine("HOLD")
+            return gate.Task
+        }
+        let response = HttpResponse(if request.Target == "/invalid" { 100 } else { 200 }, ArrayList<HttpHeader>(), [(byte)120])
+        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+    }
+
+    func ReleaseOne(late: bool) {
+        let response = HttpResponse(200, ArrayList<HttpHeader>(), [(byte)120])
+        if late {
+            let Ok(content) = HttpContent.FromStream(OwnedInput(self), 1, false) else { System.Fail("Content failed") }
+            response.Respond(HttpStatusCode.OK, content)
+        }
+        _ = Gates[Released].Complete(Ok(response))
+        Released += 1
+    }
+}
+
+// Observe lifetime cancellation without cancelling the test itself.
+func Outcome(task: Task<Result<System.Void, HttpError>>) -> Task<bool> {
+    let done = Promise<bool>()
+    task.OnCompleted(() => {
+        if !task.IsCancelled { Check(task.GetResult() is Ok(_)) }
+        _ = done.Complete(task.IsCancelled)
+    })
+    return done.Task
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Port failed") }
+    let application = Application(server)
+    let cancellation = CancellationTokenSource()
+    let preCancelled = CancellationTokenSource()
+    preCancelled.Cancel()
+    Check(await Outcome(server.Serve(application.Respond, preCancelled.Token)))
+    preCancelled.Dispose()
+    Check(server.LastRequestError is None)
+    let lifetime = server.Serve(application.Respond, cancellation.Token)
+    Check((await server.Serve(application.Respond)) is Error(HttpError.InvalidRequest(_)))
+    Check((await server.Accept()) is Error(HttpError.InvalidRequest(_)))
+    Check((await server.ServeOne(application.Respond)) is Error(HttpError.InvalidRequest(_)))
+    Console.WriteLine(port)
+    Console.WriteLine(controlPort)
+    let Ok(signal) = await control.Accept() else { System.Fail("Control failed") }
+    let buffer: byte[] = [(byte)0]
+    while true {
+        Check((await signal.Receive(buffer, 0, 1)) is Ok(1))
+        if buffer[0] == 1 {
+            application.ReleaseOne(false)
+        } else if buffer[0] == 2 || buffer[0] == 3 {
+            if buffer[0] == 3 { cancellation.Cancel() } else { server.Close() }
+            Check(!lifetime.IsCompleted)
+            Console.WriteLine("CLOSING")
+        } else if buffer[0] == 4 {
+            Check(!lifetime.IsCompleted)
+            let late = application.Gates.Count - application.Released
+            while application.Released < application.Gates.Count { application.ReleaseOne(true) }
+            Check(await Outcome(lifetime) == cancellation.IsCancellationRequested)
+            Check(application.Disposed == late)
+            if server.FailedRequests == 0L {
+                Check(server.LastRequestError is None)
+            } else {
+                Check(server.LastRequestError is Some(_))
+            }
+            Console.WriteLine("DONE")
+            Console.WriteLine(server.CompletedRequests)
+            Console.WriteLine(server.FailedRequests)
+            Console.WriteLine(application.Disposed)
+            Check((await server.Serve(application.Respond)) is Error(HttpError.InvalidRequest(_)))
+            signal.Close()
+            control.Close()
+            cancellation.Dispose()
+            return
+        }
+    }
+}
