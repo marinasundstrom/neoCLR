@@ -122,4 +122,7 @@ Development builds also preserve imported `ValueType` ancestry for application
 structs and record structs, including boxed ancestry tests across interpreter, JIT
 and AOT. Application enum ancestry now also retains the Enum/ValueType/Object chain, with
 exact boxed enum identity across all three modes. Intrinsic primitive and core-enum ancestry are also validated against a rebuilt
-source library set; ordinary local value-record authoring remains separate work.
+source library set. All numeric primitive kinds, Boolean and Char retain exact boxed
+identity and ValueType ancestry in matched interpreter/JIT/AOT checks. Default Object
+display for the additional primitive box kinds and ordinary local value-record authoring
+remain separate work.

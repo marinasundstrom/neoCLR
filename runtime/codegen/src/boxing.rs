@@ -4,6 +4,26 @@ use neoclr::metadata::{Function, FunctionRef, Instruction as Op, MemberId, Repre
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
+fn scalar_box_type(ty: &Type) -> bool {
+    matches!(
+        ty,
+        Type::SByte
+            | Type::Byte
+            | Type::Int16
+            | Type::UInt16
+            | Type::Int32
+            | Type::UInt32
+            | Type::Int64
+            | Type::UInt64
+            | Type::IntPtr
+            | Type::UIntPtr
+            | Type::Single
+            | Type::Double
+            | Type::Boolean
+            | Type::Char
+    )
+}
+
 pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
     let module: &neoclr::Module = input;
     let sites: Vec<_> = input
@@ -42,6 +62,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     let mut int32_helper = None;
     let mut bool_index = None;
     let mut bool_helper = None;
+    let mut extra_scalars = std::collections::BTreeMap::<String, (usize, Type)>::new();
     let mut helpers = std::collections::BTreeMap::new();
     let mut rows = vec![];
     let mut int64_rows = vec![];
@@ -62,6 +83,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
             continue;
         }
         let primitive = matches!(ty, Type::Int32 | Type::Int64 | Type::Boolean);
+        let extra_scalar = scalar_box_type(&ty) && !primitive;
         let wide = ty == Type::Int64;
         let boolean = ty == Type::Boolean;
         let index = if primitive {
@@ -92,30 +114,6 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
                 input
                     .types
                     .push(serde_json::from_value(json!({"name":name,"fields":[]}))?);
-                // A primitive box has the primitive's nominal ValueType ancestry,
-                // while its private tag and scalar payload retain exact identity.
-                if let Some(base) = input
-                    .types
-                    .iter()
-                    .find(|t| {
-                        t.origin
-                            .as_ref()
-                            .map(|o| o.name.as_str())
-                            .unwrap_or(&t.name)
-                            == "System.ValueType"
-                    })
-                    .map(|t| Type::Named(t.name.clone()))
-                {
-                    input.types[index].base = Some(base);
-                    if !neoclr::native_metadata::has_value_type_base(
-                        input,
-                        &Type::Named(input.types[index].name.clone()),
-                    ) {
-                        return Err(
-                            "primitive box requires the verified ValueType foundation".into()
-                        );
-                    }
-                }
                 if boolean {
                     bool_index = Some(index);
                 } else if wide {
@@ -125,10 +123,52 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
                 }
                 index
             }
+        } else if extra_scalar {
+            let key = format!("{ty:?}");
+            if let Some((index, _)) = extra_scalars.get(&key) {
+                *index
+            } else {
+                if input.types.len() >= crate::limits::TYPES {
+                    return Err("boxing tags exceed the selected type limit".into());
+                }
+                let index = input.types.len();
+                let mut name = format!("$aot_Boxed_{key}");
+                while input.types.iter().any(|t| t.name == name) {
+                    name.push('_');
+                }
+                input.types.push(serde_json::from_value(json!({"name":name,
+                    "fields":[{"name":"payload", "ty":ty, "visibility":"private"}]}))?);
+                extra_scalars.insert(key, (index, ty.clone()));
+                index
+            }
         } else {
             input.types.iter().position(|t| Type::Named(t.name.clone()) == ty)
-            .ok_or_else(|| format!("record boxing requires Int32, Int64, Boolean or a local closed value record; found {ty:?} in {} at instruction {pc}", input.functions[caller].name))?
+            .ok_or_else(|| format!("boxing requires a supported primitive or a local closed value record; found {ty:?} in {} at instruction {pc}", input.functions[caller].name))?
         };
+        if primitive || extra_scalar {
+            // A primitive box has the primitive's nominal ValueType ancestry,
+            // while its private tag and scalar payload retain exact identity.
+            if let Some(base) = input
+                .types
+                .iter()
+                .find(|t| {
+                    t.origin
+                        .as_ref()
+                        .map(|o| o.name.as_str())
+                        .unwrap_or(&t.name)
+                        == "System.ValueType"
+                })
+                .map(|t| Type::Named(t.name.clone()))
+            {
+                input.types[index].base = Some(base);
+                if !neoclr::native_metadata::has_value_type_base(
+                    input,
+                    &Type::Named(input.types[index].name.clone()),
+                ) {
+                    return Err("primitive box requires the verified ValueType foundation".into());
+                }
+            }
+        }
         let t = &input.types[index];
         if t.is_reference_type
             || t.representation != Representation::Record
@@ -206,6 +246,15 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         };
         sites.push(json!({"functionCompiledIndex":caller,"instruction":pc,"helperCompiledIndex":helper,"typeCompiledIndex":index}));
     }
+    if !extra_scalars.is_empty()
+        && report["objectDisplayDispatch"]
+            .as_array()
+            .is_some_and(|rows| !rows.is_empty())
+    {
+        return Err(
+            "Object display for additional primitive box kinds is not yet supported".into(),
+        );
+    }
     report["stringBoxSites"] = json!(string_rows);
     report["referenceBoxSites"] = json!(reference_rows);
     report["int64BoxSites"] = json!(int64_rows);
@@ -218,7 +267,13 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
             .filter(|(ty, _)| Some(*ty) != int32_index
                 && Some(*ty) != int64_index
                 && Some(*ty) != bool_index)
-            .map(|(ty, helper)| json!({"typeCompiledIndex":ty,"helperCompiledIndex":helper}))
+            .map(|(ty, helper)| {
+                let primitive = extra_scalars
+                    .values()
+                    .find(|(index, _)| *index == ty)
+                    .map(|(_, ty)| ty);
+                json!({"typeCompiledIndex":ty,"helperCompiledIndex":helper,"primitive":primitive})
+            })
             .collect::<Vec<_>>()
     );
     if let (Some(index), Some(helper)) = (int64_index, int64_helper) {
@@ -313,15 +368,13 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .enumerate()
                 .filter_map(move |(pc, op)| match op {
                     Op::IsInstance(t)
-                        if (matches!(t, Type::Int32 | Type::Int64 | Type::Boolean)
-                            || crate::scalar_unions::record(module, t))
+                        if (scalar_box_type(t) || crate::scalar_unions::record(module, t))
                             && !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), false))
                     }
                     Op::UnboxAny(t)
-                        if (matches!(t, Type::Int32 | Type::Int64 | Type::Boolean)
-                            || crate::scalar_unions::record(module, t))
+                        if (scalar_box_type(t) || crate::scalar_unions::record(module, t))
                             && !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), true))
@@ -401,7 +454,17 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .types
                 .iter()
                 .position(|t| Type::Named(t.name.clone()) == ty);
-            let tag = if let Some(record) = record {
+            let tag = if scalar_box_type(&ty)
+                && !matches!(ty, Type::Int32 | Type::Int64 | Type::Boolean)
+            {
+                report["emptyRecordBoxes"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .find(|r| r["primitive"] == json!(ty))
+                    .map(|r| r["typeCompiledIndex"].clone())
+                    .unwrap_or(Value::Null)
+            } else if let Some(record) = record {
                 report["emptyRecordBoxes"]
                     .as_array()
                     .into_iter()

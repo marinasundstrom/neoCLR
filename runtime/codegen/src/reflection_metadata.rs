@@ -1071,8 +1071,14 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
     ] {
         for row in report[key].as_array().into_iter().flatten() {
             let index = row["typeCompiledIndex"].as_u64().ok_or("missing box tag")? as usize;
+            let extra_primitive: Option<Type> = row
+                .get("primitive")
+                .filter(|v| !v.is_null())
+                .map(|v| serde_json::from_value(v.clone()))
+                .transpose()?;
             let token = primitive
                 .clone()
+                .or(extra_primitive)
                 .unwrap_or_else(|| Type::Named(input.types[index].name.clone()));
             targets.push(json!({"typeCompiledIndex":index,"token":token}));
         }

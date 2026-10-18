@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Extend native boxing to the remaining numeric primitive kinds and Char, preserving ValueType ancestry, exact type tests/unboxing and GetType identity through existing rooted payload layouts. Add a fourteen-kind interpreter/JIT/AOT regression with repeated allocation checks. Keep unsupported default Object display for these additional kinds explicitly diagnosed.
+
 - Bind intrinsic primitive and core-enum definitions to their owned ValueType/Enum foundations without changing storage; preserve primitive box ancestry. Rebuild the four-library cohort and add matched reflection/boxing tests. Repair selected Object binding for closed roots and imported Object-slot virtual metadata exposed by that rebuild.
 
 - Preserve application enum ancestry through the verified Enum/ValueType/Object foundation; support native enum boxing with exact enum identity and direct Enum conversions. Add metadata/runtime rejection checks and a three-mode consumer. Existing Int32 enum limits remain unchanged.

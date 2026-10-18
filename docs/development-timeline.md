@@ -61,11 +61,19 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   ancestry passed matched interpreter/JIT/AOT consumers. Rebuilding Runtime/Data/Networking/Web
   exposed closed-root Object binding and imported Object-slot virtual flags; both were
   repaired with regressions. The assistant then extended testing to the remaining
-  numeric and Char box shapes.
+  numeric and Char box shapes; all fourteen numeric/Boolean/Char kinds passed
+  interpreter/JIT/AOT, including exact identity and payload checks with native GC enabled.
+  The author asked whether numeric suffixes such as `10b` work; the assistant confirmed
+  lexer/spec support and added byte/float/double suffixes to the matched regression.
+  Additional-kind default Object display and some comparison-operator admission
+  gaps remain explicit separate work.
 - **Evidence and limits:** see the [JSON record experiment](experiments/json-records/README.md).
   Public-model visibility and native reflection retention remain required. Record
   deserialization, custom record collection elements and broader ancestry coverage remain
   distinct gaps; the installed Preview 16 bundle is not modified.
+- **Author next direction:** after closing this story, return to GC and HttpServer
+  benchmarking and update the website. The assistant will retain the matched Go
+  control and explicit workload, GC-policy and sustained-rate qualification limits.
 
 
 ## 2026-10-18 — Preview 16 records and boxed display
