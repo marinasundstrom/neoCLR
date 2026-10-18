@@ -1,0 +1,7 @@
+{
+  "command": [
+    "target/gc-worker-20261018/asan/test"
+  ],
+  "outcome": "Python subprocess.TimeoutExpired after 60 seconds; process killed by subprocess.run",
+  "note": "The original runner did not append timeout attempts to its commands array. This supplemental record preserves the observed tool result; asan-startup-sample.txt shows sanitizer initialization before main."
+}

@@ -19285,3 +19285,20 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   exactly-once owner-thread cleanup. Retain the counterexample, not a selectable
   concurrent collector. UBSan/bounds passes; ThreadSanitizer fails even for an empty
   control. Concurrent lifetime qualification and Serve/Go measurements remain open.
+
+
+### 2026-10-18 — Validate concurrent infrastructure before collector integration
+
+- **Author:** directed continuing the next step, then authorized integrating existing
+  collector parts once ready, while first validating infrastructure for concurrency.
+- **Assistant:** measured collection phases before choosing reusable work. Two sampling
+  intervals attribute about 60% of sampled Serve GC CPU to graph tracing. Both short
+  300/sec diagnostics complete all arrivals; this is not a new capacity claim.
+- **Action/outcome:** built an isolated one-job worker with explicit input/scratch
+  ownership and cancellation/join semantics. UBSan/bounds passes repeated handoffs,
+  shutdown races and completed/error/idle transitions. ASan stalls during startup;
+  ThreadSanitizer crashes before output. Dynamic race validation remains unavailable.
+- **Open:** integrate tracing on immutable captured data, compare with the synchronous
+  oracle and solve conditional-root/publication safety before live reclamation. The
+  [worker evidence](experiments/concurrent-gc-worker/README.md) is a proof of concept,
+  not production concurrent GC.

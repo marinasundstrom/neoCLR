@@ -5220,3 +5220,11 @@ now identifies graph tracing as about 60% of sampled Serve collector CPU in two
 sampling intervals. This motivates testing worker handoff/lifetime infrastructure
 before reusing the walker on isolated data; no production concurrency or capacity
 gain is established by these diagnostics.
+
+
+The author subsequently asked to validate concurrent infrastructure before integrating
+existing GC parts. The isolated [worker proof of concept](experiments/concurrent-gc-worker/README.md)
+passes UBSan/bounds lifecycle tests for ownership transfer, completion, cancellation
+and joined teardown. ASan startup and ThreadSanitizer failures remain validation limits.
+Live-heap/root integration, dynamic race qualification and performance benefit remain
+open; no production collector is changed.

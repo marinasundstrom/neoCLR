@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/test.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-worker-20261018/final-ubsan/test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-worker-20261018/final-ubsan/test"
+      ],
+      "exitCode": 0,
+      "stdout": "1000 reusable handoffs, 100 shutdown races, completed/error/idle paths passed\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+    "worker.c": "b3120e46741e7a8e5fc253f9cbb08eb0f6c309b1f098e0717eabe8c13ab58280",
+    "test.c": "ff26ff9d6ed563d9c8ed15bd74949370611e027f0c5dedf4428a30fd476fdff5",
+    "run.py": "a2bc28f3ae0f05fe67604ac141f6cf55b2e153c1601406c2aa8845171931133b"
+  }
+}

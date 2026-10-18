@@ -1,0 +1,40 @@
+{
+  "passed": false,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=thread",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/test.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-worker-20261018/tsan/test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-worker-20261018/tsan/test"
+      ],
+      "exitCode": -11,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+    "worker.c": "6133171e38e79f4da944e3e286dcbc9ae141c0532eb087847d2374bf0b10bbf0",
+    "test.c": "086bea2060822dd489685ae02530f4c292813f43709f004db90aa0d54bba0e7b",
+    "run.py": "a2bc28f3ae0f05fe67604ac141f6cf55b2e153c1601406c2aa8845171931133b"
+  }
+}
