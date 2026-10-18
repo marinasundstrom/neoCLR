@@ -139,6 +139,14 @@ nongeneric declarations and faults for unretained handles. It grants no callable
 rights. [Interpreter/JIT/AOT consumer and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/declaring-type/README.md).
 This backend-only helper is outside guest RavenDoc selection; guest signatures are unchanged.
 
+The development helper
+`neoclr::native_metadata::base_type(&Module, &metadata::Type) -> Result<Value, Fault>`
+returns the interpreter's optional base-type recipe. Native `TypeInfo.BaseType`
+queries use closed type tokens retained by the compiled program and return the same
+base identity or None; unretained handles fault. This grants no constructor or
+member invocation rights. The helper is outside guest RavenDoc selection and adds
+no guest signature. See the [type-semantics experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/type-semantics/README.md).
+
 The same unstable backend bridge provides
 `module_assembly(&Module, identity: &str, name: &str) -> Result<Value, Fault>` and
 `assembly_name(&Module, identity: &str) -> Result<Value, Fault>`. These validate

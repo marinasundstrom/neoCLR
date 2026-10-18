@@ -1,6 +1,7 @@
 import System.*
 import System.IO.*
 
+public record ReferenceRecord(var Number: int)
 public class Reference {
     var Number: int { get; set; } = 1
 }
@@ -15,6 +16,20 @@ public class InitOnly {
 }
 
 func Main() {
+    if let .Some(parent) = typeof(Reference).BaseType {
+        if !parent.Equals(typeof(Object)) {
+            Fail("Class has the wrong base")
+        }
+    } else {
+        Fail("Class Object base is missing")
+    }
+    if let .Some(parent) = typeof(ReferenceRecord).BaseType {
+        if !parent.Equals(typeof(Object)) {
+            Fail("Reference record has the wrong base")
+        }
+    } else {
+        Fail("Reference record Object base is missing")
+    }
     let initialized = InitOnly { Number = 42 }
     if initialized.Number != 42 {
         Fail("Init accessor did not initialize class")
@@ -22,6 +37,15 @@ func Main() {
     let immutable = ImmutableRecord(42)
     if immutable.Number != 42 {
         Fail("Positional init accessor did not initialize record")
+    }
+    let referenceRecord = ReferenceRecord(1)
+    let recordAlias = referenceRecord
+    recordAlias.Number = 2
+    if referenceRecord.Number != 2 {
+        Fail("Reference record did not alias")
+    }
+    if typeof(ReferenceRecord).IsValueType {
+        Fail("Ordinary record is a value type")
     }
     let reference = Reference()
     let alias = reference
@@ -59,5 +83,5 @@ func Main() {
     if !typeof(ValueRecord).IsValueType {
         Fail("Record struct is a reference type")
     }
-    Console.WriteLine("class aliases; structs copy; boxing isolates; init accessors initialize")
+    Console.WriteLine("classes and records alias; structs copy; boxing isolates; init accessors initialize")
 }

@@ -113,3 +113,7 @@ JIT/AOT use explicitly retained metadata and operations (reflection-roots schema
 See the [API contract](/docs/reflection.html#fields-and-type-initializers-development)
 for exact value/owner restrictions and the distinction between Result errors and
 terminal initializer faults.
+
+Development native `TypeInfo.BaseType` queries now use the interpreter's metadata
+recipe for closed type tokens present in the compiled program. The reference-record
+consumer verifies explicit Object ancestry across interpreter, JIT and AOT.

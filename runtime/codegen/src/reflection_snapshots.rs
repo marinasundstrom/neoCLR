@@ -396,6 +396,7 @@ pub fn bind(
                     | "neoCLR.Runtime.AssemblyTypes"
                     | "neoCLR.Runtime.ModuleTypes"
                     | "neoCLR.Runtime.TypeElementType"
+                    | "neoCLR.Runtime.TypeBaseType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
                     | "neoCLR.Runtime.ModuleMemberCustomAttributes"
                     | "neoCLR.Runtime.ModuleFunctions"
@@ -421,10 +422,16 @@ pub fn bind(
             _ => {}
         }
     }
+    let mut base_tokens = vec![];
     let mut tokens = vec![];
     for op in input.functions.iter().flat_map(|f| &f.body) {
         match op {
-            Op::LoadTypeToken(t) => vectors(t, &mut tokens),
+            Op::LoadTypeToken(t) => {
+                vectors(t, &mut tokens);
+                if concrete(t) && !base_tokens.contains(t) {
+                    base_tokens.push(t.clone());
+                }
+            }
             Op::Call(target)
             | Op::CallVirtual(target)
             | Op::Construct(target)
@@ -489,6 +496,7 @@ pub fn bind(
         let f = &input.functions[index];
         let modules = f.name.ends_with("TypeModule");
         let declaring = f.name.ends_with("TypeDeclaringType");
+        let base_type = f.name == "neoCLR.Runtime.TypeBaseType";
         let module_assembly = f.name.ends_with("ModuleAssembly");
         let assembly_name = f.name.ends_with("AssemblyName");
         let assembly_modules = f.name.ends_with("AssemblyModules");
@@ -833,6 +841,36 @@ pub fn bind(
             factory.body.push(Op::Fault(
                 "native declaring-type metadata was not retained; configure --reflection-roots"
                     .into(),
+            ));
+        } else if base_type {
+            let Type::Constructed { arguments, .. } = &expected else {
+                return Err("TypeBaseType requires scoped Option<TypeInfo>".into());
+            };
+            if !matches!(
+                name(source, &expected),
+                Some("System.Option" | "System.Option`1")
+            ) || arguments.len() != 1
+                || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
+            {
+                return Err("TypeBaseType requires scoped Option<TypeInfo>".into());
+            }
+            for t in &base_tokens {
+                let branch = factory.body.len() + 3;
+                factory.body.extend([
+                    Op::Arg(0),
+                    Op::LoadTypeToken(t.clone()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
+                ]);
+                factory.emit(
+                    &neoclr::native_metadata::base_type(source, t).map_err(|e| e.to_string())?,
+                    &expected,
+                )?;
+                factory.body.push(Op::Return);
+                factory.body[branch] = Op::BranchFalse(factory.body.len());
+            }
+            factory.body.push(Op::Fault(
+                "native base-type query requires a retained type token".into(),
             ));
         } else if modules {
             if name(source, &expected) != Some("System.Introspection.ModuleInfo") {

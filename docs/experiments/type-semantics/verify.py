@@ -20,8 +20,8 @@ modules = [lib/(name+'.dll') for name in manifest['assemblyNames']]
 context = ['--system',lib/'System.runtime.neox','--object-root',lib/'System.Runtime.dll']
 for module in modules:
     context += ['--module',module]
-report = dict(passed=False, commands=[], inputs={})
-for path in [source, Path(__file__), lib/'bundle.json', *modules, a.compiler, a.runtime, a.backend, a.host]:
+report = dict(passed=False, commands=[], inputs={}, source=source.read_text())
+for path in [source, Path(__file__), lib/'bundle.json', *modules, a.compiler, a.compiler.parent/'Raven.CodeAnalysis.dll', a.compiler.parent/'Raven.CodeAnalysis.NeoClr.dll', lib/'System.runtime.neox', lib/'NeoCLR.ClassLibrary.props', a.runtime, a.backend, a.host]:
     report['inputs'][str(path.resolve())] = hashlib.sha256(path.read_bytes()).hexdigest()
 def run(label, command):
     result = subprocess.run(list(map(str, command)), capture_output=True, text=True, timeout=240)
@@ -42,14 +42,15 @@ try:
     run('metadata',[a.runtime,'disassemble',assembly,out/'module.neoil'])
     text=(out/'module.neoil').read_text()
     metadata,_=json.JSONDecoder().raw_decode(text[text.index('{'):])
-    selected=[]
-    for name in []:
-        suffix='.T__'+name.encode().hex().upper()
-        index=next(i for i,t in enumerate(metadata['types']) if t['name'].endswith(suffix))
-        selected.append(dict(definition=dict(module=metadata['name'],revision=metadata['revision'],index=index),construct=False,properties=True,getters=True,setters=False))
-    roots=out/'roots.json'
-    roots.write_text(json.dumps(dict(schemaVersion=2,types=selected)))
-    expected='class aliases; structs copy; boxing isolates; init accessors initialize\n'
+    declarations = {t.get('origin', {}).get('name'): t for t in metadata['types']}
+    for name in ['Reference', 'ReferenceRecord', 'InitOnly']:
+        assert declarations[name].get('is_reference_type'), name
+        assert declarations[name].get('base') == {'Named': 'System.Object'}, declarations[name]
+    for name in ['ValueCell', 'ValueRecord', 'ImmutableRecord']:
+        assert not declarations[name].get('is_reference_type', False), name
+    assert declarations['ImmutableRecord']['properties'][0].get('init_only'), 'immutable setter metadata'
+    assert not declarations['ValueRecord']['properties'][0].get('init_only', False), 'mutable setter metadata'
+    expected='classes and records alias; structs copy; boxing isolates; init accessors initialize\n'
     interpreted=run('interpreter',[a.runtime,'run',assembly,'--execution','interpreter',*context])
     assert interpreted.stdout==expected, interpreted.stdout
     flags='--compile-system --bind-user-fault --bind-stack-trace --reference-arena --native-gc --bind-console-read-byte --bind-console-write-line --bind-console-stream-output --bind-int32-to-string --bind-utf8-text --native-stack-budget --bind-integer-text --bind-character-text --bind-system-culture --bind-time-zone-rules --bind-cryptography --bind-tls --bind-task-queue --bind-scheduler --bind-timers --bind-socket-listener --bind-socket-accept --bind-socket-transfer --bind-socket-client --bind-runtime-async'.split()

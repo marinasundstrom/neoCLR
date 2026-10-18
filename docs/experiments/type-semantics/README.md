@@ -28,8 +28,28 @@ services to an already compiled AOT object; it does not JIT the AOT application.
 
 [Minimal Preview 16 rejections](preview16-rejections.json) retain separate reference
 record and mutable value-record repros. Mutable setters are repaired in this slice.
-Reference records are still rejected by native emission, with an inaccurate
-record-struct diagnostic. ValueType already exists and derives from Object, but
+Reference-record storage is repaired in the next slice below. ValueType already exists and derives from Object, but
 value-type ancestry metadata and assignability need further work. Record synthesized
 equality/hash/display support is also separate from positional storage. These gaps
 must not be described as deliberate semantic differences.
+
+## Reference records and Object ancestry
+
+The native target now explicitly admits positional reference-record storage, using
+a separate portable-plan capability from value-record storage. `record` remains a
+reference class. Root classes and reference records bind the imported runtime Object
+as their base, and constructors perform the corresponding base initialization.
+Ordinary .NET compilation and Runtime Contract configuration are unchanged. Additional
+record members and synthesized equality/hash/display remain separate limitations.
+
+`Main.rvn` additionally checks reference-record aliasing, reference classification
+and `BaseType == typeof(Object)` for classes and records. The verifier asserts native
+reference flags, explicit Object base metadata and init-only versus ordinary setters.
+All checks agree across interpreter/JIT/AOT in
+[the retained reference-record run](reference-three-mode-results.json.gz).
+
+This exposed a missing native `TypeInfo.BaseType` service. Native snapshot lowering
+now reuses the interpreter's base descriptor recipe for closed type tokens in the
+compiled program; unknown/unretained handles fault. One focused recipe test covers
+base identity, no base and unknown type. No new guest signature or reflection
+invocation permission is added. ValueType ancestry is the next slice.

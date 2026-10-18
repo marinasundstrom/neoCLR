@@ -60,6 +60,18 @@ pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     )
 }
 
+/// Return the optional base descriptor using the same query as interpreted reflection.
+pub fn base_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
+    crate::reflection::Query::BaseType.invoke_profile(
+        module,
+        &[Value::RuntimeTypeHandle(Box::new(
+            crate::type_identity::describe_loaded(module, owner)?,
+        ))],
+        &Limits::default(),
+        true,
+    )
+}
+
 /// Return the optional declaring-type recipe using the interpreter's identity rules.
 /// Native callers must explicitly retain the queried declaration; this grants no invocation.
 pub fn declaring_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
@@ -418,6 +430,27 @@ fault "test body must not execute"
             panic!("expected descriptor");
         };
         fields
+    }
+
+    #[test]
+    fn base_type_recipe_preserves_identity_and_absence() {
+        let module = crate::assemble(
+            ".module Bases\n.type Parent\n.end\n.type Child\n.extends Parent\n.end\n",
+        )
+        .unwrap();
+        let result = base_type(&module, &Type::from_name("Child")).unwrap();
+        assert_eq!(fields(&result)[0], Value::Boolean(true));
+        assert_eq!(
+            fields(&fields(&result)[1])[0],
+            Value::RuntimeTypeHandle(Box::new(
+                crate::type_identity::describe_loaded(&module, &Type::from_name("Parent")).unwrap()
+            ))
+        );
+        assert_eq!(
+            fields(&base_type(&module, &Type::from_name("Parent")).unwrap()),
+            [Value::Boolean(false)]
+        );
+        assert!(base_type(&module, &Type::from_name("Missing")).is_err());
     }
 
     #[test]
