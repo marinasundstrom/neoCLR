@@ -1,0 +1,1 @@
+{"attempts":20911,"gcNanoseconds":205449000,"maximumPauseNanoseconds":339000,"failures":0,"allocatedBytes":4164908,"allocations":85838,"reclaimed":85838,"peakLiveBytes":46260,"peakArenaBytes":70664,"rootPublications":745242,"pauseBuckets":[3,0,0,0,0,0,0,0,0,0,6,15,5150,15478,225,25,5,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}

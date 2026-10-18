@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Avoid replacement empty callback-list allocations when Promise completion/cancellation has no registered continuations. Preserve deferred late callbacks and Task identity; validate interpreter/JIT/AOT contracts. A separate Serve diagnostic records 0.78% fewer allocations, without a timing or capacity claim.
+
 - Make Serve the primary HTTP web-application API in the feature, case and lifetime documentation. Extract the tested Serve lifecycle fixture into the walkthrough; label sequential Accept samples as lower-level interoperability examples and clarify lifetime awaiting, bounded task supervision and cooperative dispatch.
 
 - Avoid a redundant native GC heap walk by gathering up to 32 intern seeds during header validation; preserve the full-walk fallback for stale marks or overflow. Add sparse/dense boundary regressions and measured GC/Serve comparisons. Two-intern collection cases improve 6.5–16.5%; overflow costs about 3%. One 400/sec Serve pair uses about 4% less CPU/completion, but noisy/lossy repeats establish no higher sustained rate.

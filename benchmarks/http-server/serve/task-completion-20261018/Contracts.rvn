@@ -1,0 +1,57 @@
+import System.*
+import System.Concurrency.Tasks.*
+
+class Observer {
+    var Count: int = 0
+    func Hit() {
+        Count = Count + 1
+    }
+}
+
+func Require(condition: bool) {
+    if !condition {
+        System.Fail("Task completion contract failed")
+    }
+}
+
+func Main() {
+    let queue = TaskQueue.Default
+    let observer = Observer()
+    // Explicit callbacks test deferred observation before and after settlement.
+    for index in 0..10 {
+        let completed = Promise<int>(queue)
+        let task = completed.Task
+        Require(completed.Complete(index))
+        Require(!completed.Complete(999))
+        Require(!completed.Cancel())
+        Require(task.GetResult() == index)
+        task.OnCompleted(observer.Hit)
+        Require(observer.Count == index * 4)
+        queue.Drain()
+        Require(observer.Count == index * 4 + 1)
+
+        let cancelled = Promise<int>(queue)
+        Require(cancelled.Cancel())
+        Require(!cancelled.Cancel())
+        Require(!cancelled.Complete(999))
+        Require(cancelled.Task.State == TaskState.Cancelled)
+        cancelled.Task.OnCompleted(observer.Hit)
+        Require(observer.Count == index * 4 + 1)
+        queue.Drain()
+
+        let pending = Promise<int>(queue)
+        pending.Task.OnCompleted(observer.Hit)
+        Require(pending.Complete(42))
+        Require(observer.Count == index * 4 + 2)
+        queue.Drain()
+        Require(pending.Task.GetResult() == 42)
+
+        let pendingCancel = Promise<int>(queue)
+        pendingCancel.Task.OnCompleted(observer.Hit)
+        Require(pendingCancel.Cancel())
+        Require(observer.Count == index * 4 + 3)
+        queue.Drain()
+        Require(observer.Count == index * 4 + 4)
+    }
+    Console.WriteLine("Task completion contracts passed")
+}

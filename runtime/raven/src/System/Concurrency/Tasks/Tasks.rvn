@@ -219,6 +219,10 @@ public class Promise<T> {
             return false
         }
         slot.Add(value)
+        // No continuations to detach; later registrations are posted directly.
+        if callbacks.Count == 0 {
+            return true
+        }
         let pending = callbacks
         callbacks = ArrayList<() -> System.Void>()
         for callback in pending {
@@ -232,6 +236,10 @@ public class Promise<T> {
             return false
         }
         cancelled = true
+        // Preserve deferred registration without allocating another empty list.
+        if callbacks.Count == 0 {
+            return true
+        }
         let pending = callbacks
         callbacks = ArrayList<() -> System.Void>()
         for callback in pending {

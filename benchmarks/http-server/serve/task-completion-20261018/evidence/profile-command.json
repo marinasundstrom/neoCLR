@@ -1,0 +1,23 @@
+[
+  "python3",
+  "benchmarks/http-server/load/run.py",
+  "--build",
+  "target/http-gc-return-20261018/intern-candidate",
+  "--executable",
+  "app-paced",
+  "--server-source",
+  "benchmarks/http-server/serve/Server.rvn",
+  "--control-stop",
+  "--workers",
+  "16",
+  "--concurrency",
+  "64",
+  "--rates",
+  "300",
+  "--duration",
+  "15",
+  "--rounds",
+  "1",
+  "--output",
+  "target/http-next-20261018/profile"
+]

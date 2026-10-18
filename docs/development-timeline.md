@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Task allocations and HTTP callback shape
+
+- **Author:** requests renewed Serve/GC profiling against Go, questions reference-type
+  Task overhead and the lack of HttpContext in Serve/ServeOne callbacks, and directs
+  avoiding unnecessary allocations particularly in HTTP and Task APIs.
+- **Assistant action:** samples the existing Serve guest, then removes empty callback
+  list replacement on Promise settlement; validates three execution modes and
+  records a small allocation reduction in a separate diagnostic run.
+- **Assistant proposal:** retain supervised Serve lifetime and Task semantics;
+  investigate a context-based hosting callback for streaming/middleware with an
+  explicit ownership contract. This is not implemented or inferred approval for an
+  API redesign. [Investigation and evidence](../benchmarks/http-server/serve/task-completion-20261018/README.md).
+- **Open:** uninstrumented longer load comparisons and total Task allocation
+  attribution; a wrapper's reference type alone does not establish its CPU cost.
+
 ## 2026-10-18 — Serve as the application documentation default
 
 - **Author:** selected `Serve` as the main API for HTTP web-app documentation,
