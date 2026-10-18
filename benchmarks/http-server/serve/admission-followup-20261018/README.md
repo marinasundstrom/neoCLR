@@ -38,3 +38,35 @@ Evidence retains phase requests, traced requests, all intervals, source/link
 hashes and environment observation. Instrumented runs are diagnostic only.
 Reproduce with the existing serve/diagnose.py and admission-stalls-20261018
 capture.py/analyze.py against the direct-construction candidate.
+
+## Readiness change and safety
+
+The native async pump now calls the shared scheduler wait only when it has no
+ready continuation. POSIX uses poll with a 64-entry stack array and a 1 ms cap;
+Windows retains its existing select implementation. Legacy/no-watchable-I/O
+fallback remains bounded sleep. The existing deadline scan avoids waiting for
+already-expired operations. EINTR returns to the owner poll; provider failure
+falls back to sleep rather than spinning.
+
+No callback runs and no socket data/result/root is consumed inside this wait.
+The next ordinary poll still arbitrates and settles operations; collection and
+conditional-root behavior are unchanged. This is an internal readiness mechanism
+behind the existing .NET-style Task/Socket APIs, not a new managed API or adoption
+of CLR scheduling policy. poll avoids select's descriptor-number limit on POSIX.
+This remains a bounded cooperative scheduler, not a new epoll/kqueue reactor.
+
+UBSan/bounds passes eight native network contracts, the retained-owner and idle
+pump contracts, plus explicit wait checks for descriptor 1024+, read/write/connect
+directions, unconsumed readable bytes, unchanged collection/delivery state, EINTR,
+expired deadlines, queued work and pending delivery. The old implementation fails
+the new readiness regression as expected. All 50 public HTTP wire cases pass
+against the retained pre-URI-change oracle using the relinked AOT probe.
+Windows execution was not rerun locally; its wait algorithm is unchanged, but
+the async pump now reaches it. No managed/compiler changes require a new
+interpreter library cohort or public API reference.
+
+The diagnostic capture tool now wraps the shared wait once, including async pump
+waits; older evidence retains the earlier separate pause hook. Use build.py to
+relink a retained guest without recompiling managed code and verify.py for the
+focused native contracts. The ordinary native-network validator now includes the
+POSIX wait regression. Performance measurements follow separately.

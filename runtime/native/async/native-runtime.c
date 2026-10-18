@@ -479,7 +479,9 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
             status = resume(f);
             drain_needed = 1;
         } else if (progress == NEOCLR_SCHEDULER_PENDING) {
-            if (!ready) neoclr_os_pause();
+            /* Wait only after checking ready continuations. The scheduler wait
+             * observes socket readiness without consuming results or roots. */
+            if (!ready) neoclr_scheduler_wait_v1(c);
         }
         else if (progress == NEOCLR_SCHEDULER_IDLE) {
             if (ready) continue;

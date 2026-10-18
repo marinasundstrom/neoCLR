@@ -6,6 +6,8 @@
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "check failed at %d\n", __LINE__); return 1; } } while (0)
 static int polls, drains, queued, consumed, suspended;
 static uint64_t signal_id;
+static int wait_calls;
+void neoclr_scheduler_wait_v1(neoclr_aot_context *c) { (void)c; ++wait_calls; }
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *c, uint64_t *out, const neoclr_probe_frame *f) {
     (void)f;
     if (polls++ < 3) return NEOCLR_SCHEDULER_PENDING;
@@ -44,9 +46,9 @@ int main(void) {
     uint64_t storage[1024] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
     for (suspended = 0; suspended < 2; suspended++) {
-        polls = drains = queued = consumed = 0;
+        polls = drains = queued = consumed = wait_calls = 0;
         CHECK(!neoclr_runtime_async_pump_v1(&c, invoke, drain));
-        CHECK(polls == 5 && drains == 2 && consumed == 1 && !queued);
+        CHECK(polls == 5 && drains == 2 && consumed == 1 && !queued && wait_calls == 3);
         CHECK(!neoclr_runtime_async_shutdown_v1(&c));
         CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
         CHECK(!neoclr_gc_entry_check_v1(&c));

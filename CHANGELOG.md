@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Route native async idle waits through scheduler readiness and add bounded POSIX poll support while retaining Windows select and the 1 ms timer/DNS fallback. Preserve owner-side outcome/root handling and GC behavior. Eight native network contracts, retained-owner/idle-pump checks and 50 HTTP wire cases pass; the old wait fails the new regression. Windows execution remains unqualified locally for the new pump call path.
+
 - Diagnose Serve admission windows with per-request phases and GC/scheduler intervals. Find brief dispatch gaps hidden by p99 and a busy orphan language server; stop only that leftover process after confirming VS Code is closed. A separate clean trace does not reproduce the long stall, but identifies 17,710 blind async-pump sleeps in 60 seconds. Preserve raw evidence and distinguish off-CPU/host uncertainty from the targeted readiness-wait opportunity.
 
 - Measure direct incoming request construction against the fresh Serve baseline and Go: 7.13% fewer diagnostic allocations and 3.73% fewer payload bytes. The final 60-second pair uses 6.38% less CPU/completion but misses 27 arrivals versus none for baseline, with worse p99 and coarse CPU peaks; no reliable throughput gain is claimed. Preserve all 30/60-second runs, raw requests and user-reported activity context, and keep admission/latency attribution open.

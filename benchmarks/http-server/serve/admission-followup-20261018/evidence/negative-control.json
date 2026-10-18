@@ -1,0 +1,19 @@
+{
+  "command": [
+    "clang",
+    "-std=c11",
+    "-O2",
+    "-DNEOCLR_NATIVE_GC",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "/Users/robert/Projects/neoclr/target/http-admission-followup-20261018/negative-control/socket-wait-test.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/http-admission-followup-20261018/negative-control/test"
+  ],
+  "expectedAbort": true,
+  "exitCode": -6,
+  "stderr": "Assertion failed: (observed == 1 && scope.operations[0].state == 1 && !scope.scheduler_delivery), function main, file socket-wait-test.c, line 34.\n"
+}

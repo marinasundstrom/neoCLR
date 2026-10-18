@@ -3,6 +3,9 @@
 #include "native-gc.h"
 #endif
 #include <stdatomic.h>
+#ifndef _WIN32
+#include <poll.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 
@@ -446,11 +449,17 @@ int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset
 /* Owner-thread wait only: no completion, root transfer, collection or guest call.
  * Readiness is a hint; the ordinary poll remains the authority for outcomes. */
 void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
-#if defined(_WIN32) && !defined(NEOCLR_SCHEDULER_LEGACY_WAIT)
+#if !defined(NEOCLR_SCHEDULER_LEGACY_WAIT)
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || context->fault.code || scope->scheduler_delivery || scope->runnable_head) return;
+#ifdef _WIN32
     fd_set reads, writes, errors;
     FD_ZERO(&reads); FD_ZERO(&writes); FD_ZERO(&errors);
+#else
+    /* poll also handles descriptors above FD_SETSIZE; the operation table, not
+     * the descriptor number, bounds this array. Readiness never consumes I/O. */
+    struct pollfd descriptors[64];
+#endif
     uint64_t now = monotonic_ns(), delay = UINT64_C(1000000);
     if (!now) { neoclr_os_pause(); return; }
     unsigned watched = 0;
@@ -475,19 +484,30 @@ void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
             fd = scope->slots[slot].descriptor;
         } else if (kind == 4) fd = scope->operations[i].connecting;
         if (fd == NEOCLR_INVALID_SOCKET) continue;
+#ifdef _WIN32
         if (kind <= 2) FD_SET(fd, &reads);
         else FD_SET(fd, &writes);
         if (kind == 4) FD_SET(fd, &errors);
+#else
+        descriptors[watched] = (struct pollfd){fd, kind <= 2 ? POLLIN : POLLOUT, 0};
+#endif
         watched++;
     }
     if (!watched) { neoclr_os_pause(); return; }
     /* At most 64 pending operations, matching Winsock's default fd_set capacity.
      * Keep the existing 1 ms poll cap for DNS, timers and legacy TLS, which do not
      * yet have a shared wakeup event. OS scheduling can exceed this requested cap. */
+#ifdef _WIN32
     struct timeval timeout = {0, (long)((delay + 999) / 1000)};
     int result = select(0, reads.fd_count ? &reads : NULL,
         writes.fd_count ? &writes : NULL, errors.fd_count ? &errors : NULL, &timeout);
     if (result == SOCKET_ERROR) neoclr_os_pause(); /* Avoid spinning on provider errors. */
+#else
+    int result = poll(descriptors, watched, (int)((delay + 999999) / 1000000));
+    /* EINTR/readiness/errors are hints for the authoritative next scheduler poll.
+     * A provider failure must not turn the owner loop into a busy spin. */
+    if (result < 0 && errno != EINTR) neoclr_os_pause();
+#endif
 #else
     (void)context;
     neoclr_os_pause();

@@ -35,7 +35,7 @@ def main():
         report['revision'] = run(['git', '-C', ROOT, 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
         base = ROOT / 'docs/experiments/aot-console'
         inputs = [base / name for name in ('socket-os.h', 'socket-client-internal.h', 'socket-client-test.c', 'socket-listener.h', 'socket-listener.c',
-                  'socket-listener-test.c', 'socket-accept-test.c', 'socket-transfer-test.c', 'socket-timer-test.c', 'socket-scheduler-test.c',
+                  'socket-listener-test.c', 'socket-accept-test.c', 'socket-transfer-test.c', 'socket-timer-test.c', 'socket-scheduler-test.c', 'socket-wait-test.c',
                   'task-queue.c', 'task-queue.h', 'native-gc.c', 'native-gc.h', 'root-probe.c', 'root-probe.h', 'text-arena.c', 'text-arena.h')]
         inputs += [base.parent / 'aot-fault-details/fault-details.h', Path(__file__).resolve()]
         inputs += sorted((ROOT / 'runtime/native').rglob('*.[ch]'))
@@ -46,20 +46,23 @@ def main():
             clang = run(['xcrun', '--sdk', 'macosx', '--find', 'clang'], 'clang').stdout.decode().strip()
             sdk = run(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], 'sdk').stdout.decode().strip()
             compiler = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-DNEOCLR_CLIENT_TEST', '-fsanitize=undefined,bounds']
-        for name in ('listener', 'accept', 'transfer', 'client', 'timer', 'scheduler', 'scheduler-paced'):
+        names = ('listener', 'accept', 'transfer', 'client', 'timer', 'scheduler', 'scheduler-paced') + (() if windows else ('wait',))
+        for name in names:
             binary = out / (name + ('.exe' if windows else ''))
             sources = [base / ('socket-' + name.removesuffix('-paced') + '-test.c'), base / 'socket-listener.c',
                        base / 'native-gc.c', base / 'root-probe.c', base / 'text-arena.c']
+            if name == 'wait':
+                sources.remove(base / 'socket-listener.c')  # Included with a controlled poll seam.
             if name.startswith('scheduler'):
                 sources.append(base / 'task-queue.c')
             output = ['/Fe:' + str(binary), '/link', 'Ws2_32.lib'] if windows else ['-o', binary]
             defines = [('/D' if windows else '-D') + 'NEOCLR_GC_PACED'] if name.endswith('-paced') else []
             run([*compiler, *defines, *sources, *output], name + '-build')
             result = run([binary], name + '-execute')
-            if result.stdout or result.stderr:
+            if result.stderr or (result.stdout and name != 'wait'):
                 raise ValueError('Unexpected contract output: ' + name)
             report['cases'].append(dict(name=name, passed=True))
-        report['passed'] = len(report['cases']) == 7
+        report['passed'] = len(report['cases']) == len(names)
     except Exception as error:
         report['error'] = str(error)
     finally:

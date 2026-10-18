@@ -18,10 +18,9 @@ for src,name,changes in [(ROOT/'runtime/native/gc/native-gc.c','native-gc.c',[('
  for old,new in changes:
   assert s.count(old)==1;s=s.replace(old,new)
  (out/name).write_text(s)
-# The async pump currently has its own pause path. Capture it as wait status 1.
+# The async pump delegates to the shared wait hook, so it is recorded once.
 s=(ROOT/'runtime/native/async/native-runtime.c').read_text()
-assert s.count('neoclr_os_pause();') == 1
-s=s.replace('#include "native-runtime.h"','#include "native-runtime.h"\nvoid trace_async_pause(void);').replace('neoclr_os_pause();','trace_async_pause();')
+assert 'if (!ready) neoclr_scheduler_wait_v1(c);' in s
 (out/'native-runtime.c').write_text(s)
 c=next(c['command'][:] for c in reversed(m['commands']) if c['phase']=='host-compile-link')
 for name in ['native-gc.c','socket-listener.c']:

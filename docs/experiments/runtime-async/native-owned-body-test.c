@@ -11,6 +11,8 @@
 static uint64_t signal_id;
 static int entered, resumed, managed, collect_at_idle;
 static uint64_t *payload;
+static int wait_calls;
+void neoclr_scheduler_wait_v1(neoclr_aot_context *c) { (void)c; ++wait_calls; }
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *c, uint64_t *out, const neoclr_probe_frame *f) {
     (void)out;
     if (collect_at_idle && neoclr_gc_idle_v1(c,f)) return -3;
