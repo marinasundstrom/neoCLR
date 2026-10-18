@@ -324,3 +324,30 @@ not Raven delegate dispatch or scheduler integration.
 show a repeated elapsed advantage at eight replacements per collection, at higher
 CPU cost; 64-replacement results remain mixed. Managed invocation, async/fault paths,
 variable live-set size and pressure-triggered allocation remain integration gaps.
+
+
+### Rooted allocation pressure during tracing
+
+[UBSan/bounds qualification](rooted-pressure-results.json) now pauses the worker
+midwalk with a full, bounded arena and calls the existing rooted allocator:
+
+- A satisfiable request synchronously collects, preserves an otherwise unregistered
+  borrowed value through explicit helper roots, and reuses a reclaimed address.
+- An arena-sized but currently unsatisfiable request collects once and returns the
+  memory-limit status without publishing an allocation.
+- An impossible single block returns the memory-limit status without collecting;
+  the pending snapshot remains applicable.
+
+Both actual pressure collections invalidate the outstanding snapshot. Consuming
+its result changes neither heap bytes/extent nor reclamation counts. Each case
+checks the rooted chain and ultimately reclaims every allocation. The complete
+qualification reports 427 applied cycles, 29 discards and 294,776 reclaimed payload
+bytes. This exercises the existing native allocation boundary, not a Raven callback
+or scheduler. It changes no production code or collection policy, adds no speedup,
+and does not remove the need to measure pressure-heavy workloads. As with CLR
+allocation-triggered collection, callers must expose live references; this POC uses
+explicit native helper/frame roots rather than CLR-generated GC maps.
+
+Next integration gaps remain managed invocation, suspension/fault paths and pressure
+under sustained application load. The earlier fixed-size fixture results are still
+the performance evidence; these deterministic pressure cases are safety checks.

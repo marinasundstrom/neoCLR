@@ -5348,3 +5348,11 @@ with 21–28% higher CPU; allocation-heavy results remain mixed. The next integr
 gap is managed invocation and suspension/fault/pressure paths, not basic native
 reclamation. Fixed-size native fixtures do not qualify these paths or Serve capacity.
 Production collector selection remains unchanged.
+
+
+**Rooted pressure boundary (2026-10-18):** deterministic midwalk tests qualify
+existing synchronous allocation fallback while a private trace is pending. Helper
+roots survive, immediate address reuse is safe, failed retries discard stale marks,
+and impossible requests avoid collection. [Qualification](experiments/concurrent-gc-walker/README.md#rooted-allocation-pressure-during-tracing)
+passes with complete reclamation; no production or performance change is claimed.
+Managed invocation, suspension/fault paths and sustained pressure remain open.

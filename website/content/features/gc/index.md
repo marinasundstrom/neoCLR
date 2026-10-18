@@ -142,7 +142,10 @@ An isolated native **proof of concept** demonstrates background snapshot tracing
 owner-side reclamation, stale-result rejection and exactly-once resource cleanup.
 It is not selectable in installed runtimes. Audited strong-handle and callback reads
 avoid unnecessary fallbacks; failed/conditional reads and mutations remain protected.
-Frequent invalidation can still eliminate the local pause benefit.
+Frequent invalidation can still eliminate the local pause benefit. Deterministic
+allocation-pressure tests also verify synchronous fallback, temporary-root survival
+and stale-result rejection after reclaimed memory is reused; sustained application
+pressure remains unqualified.
 
 A native callback fixture now allocates replacements and retires live objects while
 tracing runs, with bounded memory and complete reclamation checks. With eight

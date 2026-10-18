@@ -417,7 +417,66 @@ static void executing_callback_churn(void) {
     cycle_destroy(&cycle);
     puts("CALLBACK CHURN: 80 invoked native callbacks, midwalk mutation, 1360 replacements, bounded extent and full reclamation passed");
 }
+/* A synchronous pressure collection may run while the worker still traces its
+ * private copy. Helper-only roots must survive, and old marks must never apply
+ * to reused addresses. The impossible-size control must not collect at all. */
+static void rooted_pressure_during_trace(unsigned event) {
+    uint64_t heap[132 * 7] = {0}; /* Exactly 132 descriptor + 24-byte blocks. */
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    uint64_t allocated = statistics.allocations;
+    uint64_t reclaimed = statistics.reclaimed_allocations;
+    uint64_t *callback = churn_create(&c, 128);
+    void *borrowed = allocate(&c, 24, NEOCLR_GC_BYTES);
+    *(uint64_t *)borrowed = 9876;
+    void *garbage = allocate(&c, 24, NEOCLR_GC_BYTES);
+    allocate(&c, 24, NEOCLR_GC_BYTES);
+    assert(c.text.used == c.text.capacity);
+    neoclr_probe_storage slot = {&callback, 8, 0};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+    collection_cycle cycle;
+    assert(cycle_init(&cycle) && cycle_start(&cycle, &c));
+    cycle.job->pause_midwalk = true;
+    atomic_store(&cycle.job->proceed, true);
+    while (!atomic_load(&cycle.job->midwalk)) sched_yield();
+    uint64_t collections = statistics.collections;
+    const void *values[] = {borrowed};
+    void *fresh = NULL;
+    uint64_t bytes = event == 0 ? 24 : event == 1 ? 200 : sizeof(heap);
+    int32_t status = neoclr_gc_allocate_rooted_values_v1(
+        &c, &frame, values, 1, bytes, NEOCLR_GC_BYTES, &fresh);
+    assert(status == (event == 0 ? 0 : NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT));
+    assert(statistics.collections == collections + (event < 2));
+    assert(*(uint64_t *)borrowed == 9876);
+    churn_check(callback, 128, 0);
+    if (!event) {
+        assert(fresh == garbage); /* Pressure collection and immediate reuse. */
+        *(uint64_t *)fresh = 4321;
+    } else assert(!fresh);
+    uint64_t saved[132 * 7];
+    memcpy(saved, heap, sizeof(heap));
+    uint64_t used = c.text.used;
+    uint64_t freed = statistics.reclaimed_allocations;
+    atomic_store(&cycle.job->resume, true);
+    assert(cycle_poll(&cycle, true, false) ==
+        (event < 2 ? CYCLE_DISCARDED : CYCLE_APPLIED));
+    if (event < 2) {
+        assert(!memcmp(saved, heap, sizeof(heap)) && c.text.used == used);
+        assert(statistics.reclaimed_allocations == freed);
+        assert(*(uint64_t *)borrowed == 9876);
+        if (!event) assert(*(uint64_t *)fresh == 4321);
+    }
+    churn_check(callback, 128, 0);
+    callback = NULL;
+    cycle_run(&cycle, &c);
+    assert(!c.text.used);
+    assert(statistics.allocations - allocated == statistics.reclaimed_allocations - reclaimed);
+    cycle_destroy(&cycle);
+    neoclr_probe_leave_v1(&frame);
+}
 static void reclamation_tests(void) {
+    for (unsigned event = 0; event < 3; event++) rooted_pressure_during_trace(event);
+    puts("PRESSURE: midwalk rooted allocation, helper-root survival, same-address reuse, failed retry and impossible-size control passed");
     executing_callback_churn();
     for (unsigned event = 0; event < 11; event++) callback_handle_read(event);
     for (unsigned event = 0; event < 4; event++) strong_handle_read(event);
