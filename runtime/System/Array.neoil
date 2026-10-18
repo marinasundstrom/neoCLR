@@ -1,3 +1,6 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
 ; Explicit native buffer descriptor. Copies alias Data; Free is a caller obligation.
 .type System.Array<T>
     .property instance Length() -> Int32

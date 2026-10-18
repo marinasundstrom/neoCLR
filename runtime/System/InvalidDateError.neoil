@@ -1,2 +1,5 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
 .include "../raven/generated/InvalidDateError.methods.neoil"
 .include "../raven/generated/InvalidDateError.helpers.neoil"

@@ -1,3 +1,6 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
 ; Explicit resource release; automatic destruction is a separate lifecycle contract.
 .interface System.Disposable
     .method instance byref Dispose() -> Void

@@ -1,3 +1,6 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
 ; Explicit cloning through a borrowed receiver; ordinary value copies do not call it.
 .interface System.Clonable<T>
     .method instance byref Clone() -> T

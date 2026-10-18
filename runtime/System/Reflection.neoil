@@ -1,3 +1,6 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
 ; Metadata snapshots. Member descriptors share a base without a mandatory Object root.
 .type System.Introspection.ParameterInfo
     .field private Name String

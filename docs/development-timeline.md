@@ -26,6 +26,23 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-19 — Raven owns the class library; archive obsolete mirrors deliberately
+
+The author corrects the assistant's Slice implementation direction: “Runtime är i
+Raven-filer ju.” The assistant had begun adding public view declarations to a
+hand-authored neoIL library file. The author directs continuation focused on `.rvn`
+and marking obsolete neoIL files, then clarifies that useful neoIL tests remain:
+it is the files mirroring the Raven class library that are no longer current and
+should eventually be archived.
+
+The assistant acknowledges the mistake, marks the tracked System neoIL mirrors
+and bootstrap manifest as legacy, and documents Raven source/native-project
+ownership in [runtime source ownership](../runtime/README.md). Files remain in
+place while existing bootstrap/test consumers depend on them. This does not
+deprecate neoIL itself, its low-level tests or all runtime bindings. The uncommitted
+Slice API work must be redirected to Raven; this documentation commit does not
+claim that source/native integration is complete.
+
 ## 2026-10-18 — Native slices and persistent memory views
 
 - **Author:** directs implementation of the supplied “Native Slices and Memory

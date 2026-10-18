@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-19
+
+- Mark hand-authored System neoIL class-library mirrors and their bootstrap manifest as obsolete for library development. Raven sources and native projects are authoritative; retain low-level neoIL tests and existing bootstrap consumers until explicit migration and archival. Record the author’s correction of the Slice implementation direction.
+
 ### 2026-10-18
 
 - Add the internal checked memory-view foundation: shared array windows, readonly element capabilities, heap-owner validation for persistent views and immutable zero-copy UTF-8 byte windows. Connect opaque view values to interpreter tracing, storage/erasure rejection for borrowed views, persistent heap-field tracing, host owner validation and recursive VM return checks. Sixteen view tests, nine heap-reference executable tests and native-codegen compilation pass. Document the Rust host payload (exhaustive Value matches need the new variant) and author-directed Slice/Memory design with its .NET comparison. Public Raven APIs, nominal byref-like metadata, suspension checks and JIT/AOT integration remain pending; array range syntax still copies.

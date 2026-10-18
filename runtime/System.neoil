@@ -1,4 +1,6 @@
-; System source manifest. Includes are expanded in order into one module.
+; LEGACY bootstrap/test System manifest; not the current class-library source.
+; The class library is authored in Raven. See runtime/README.md.
+; Includes are expanded in order into one module.
 .module System
 
 .include "System/EquatableTo.neoil"
