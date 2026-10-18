@@ -233,6 +233,30 @@ static void arrays_and_invalid_descriptor(gc_worker *worker) {
     free(s);
     neoclr_probe_leave_v1(&frame);
 }
+static void capture_reuse(gc_worker *worker) {
+    uint64_t heap[256] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *root = allocate(&c, 8, NEOCLR_GC_BYTES);
+    neoclr_probe_storage slot = {&root, 8, 0};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+    snapshot *s = malloc(sizeof(*s));
+    assert(s);
+    memset(s, 0xa5, sizeof(*s));
+    assert(capture(s, &c) && !s->pause_midwalk);
+    assert(gc_worker_submit(worker, trace_snapshot, s));
+    assert(finish(worker, s) == 0 && marked(s, root));
+    free(s->copy.text.data);
+    neoclr_probe_leave_v1(&frame);
+    s->pause_midwalk = true;
+    assert(capture(s, &c));
+    assert(!s->roots_count && !s->strong_count && !s->pairs_count && !s->parked_count);
+    assert(!s->pause_midwalk);
+    assert(gc_worker_submit(worker, trace_snapshot, s));
+    assert(finish(worker, s) == 0 && !marked(s, root));
+    free(s->copy.text.data);
+    free(s);
+}
 #include "parked-tests.inc"
 #include "publication-tests.inc"
 #include "reclaim-tests.inc"
@@ -241,6 +265,7 @@ int main(void) {
     reclamation_tests();
     gc_worker worker;
     assert(!gc_worker_init(&worker));
+    capture_reuse(&worker);
     for (unsigned mode = 0; mode < 3; mode++) parked_case(&worker, mode);
     parked_limits();
     host_read_after_capture(&worker);

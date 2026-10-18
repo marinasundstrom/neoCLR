@@ -5271,3 +5271,11 @@ Pilot and reversed-order repeat data are retained with complete work/reclamation
 checks. Prioritize measured POC overhead and live-set tradeoffs rather than treating
 complete special-case support as a prerequisite. These are local microbenchmarks;
 no Serve/Go capacity or production-concurrency claim is made.
+
+
+**POC overhead follow-up (2026-10-18):** remove redundant snapshot array clearing
+with fresh reclamation qualification. Paired measurements show no convincing overall
+speedup; a 4096-object graph narrows, but does not close, the sync/concurrent gap.
+See the [measurements](../benchmarks/gc-concurrent-poc/README.md#snapshot-initialization-and-larger-graph-2026-10-18).
+Next isolate result-wait versus owner validation/import/sweep cost; production and
+Serve integration remain outside this bounded experiment.

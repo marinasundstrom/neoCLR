@@ -27,13 +27,15 @@ static uint64_t percentile(uint64_t *samples, unsigned count, unsigned percent) 
     return samples[((uint64_t)count * percent + 99) / 100 - 1];
 }
 int main(int argc, char **argv) {
-    assert(argc == 4);
+    assert(argc == 4 || argc == 5);
     bool concurrent = !strcmp(argv[1], "concurrent");
     assert(concurrent || !strcmp(argv[1], "sync"));
     unsigned rounds = (unsigned)strtoul(argv[2], NULL, 10);
     unsigned work = (unsigned)strtoul(argv[3], NULL, 10);
     assert(rounds >= 100 && rounds <= 10000 && work <= 1000000);
-    const unsigned warmup = 100, live_count = 512, batch = 64;
+    const unsigned warmup = 100, batch = 64;
+    unsigned live_count = argc == 5 ? (unsigned)strtoul(argv[4], NULL, 10) : 512;
+    assert(live_count >= 1 && live_count <= 8192);
     unsigned char *heap = calloc(1, 512 * 1024);
     assert(heap);
     neoclr_aot_context c = {.text = {heap, 512 * 1024, 0}};
@@ -113,8 +115,8 @@ int main(int argc, char **argv) {
     assert(!c.text.used && statistics.allocations == statistics.reclaimed_allocations);
     struct rusage usage;
     assert(!getrusage(RUSAGE_SELF, &usage));
-    printf("{\"mode\":\"%s\",\"rounds\":%u,\"work\":%u,\"elapsedNs\":%llu,\"cpuNs\":%llu,\"ownerCpuNs\":%llu,\"pauseTotalNs\":%llu,\"captureOrSyncNs\":%llu,\"waitApplyNs\":%llu,\"batchP99Ns\":%llu,\"pauseP99Ns\":%llu,\"peakArenaBytes\":%llu,\"maxRssBytes\":%ld,\"allocations\":%llu,\"collections\":%llu,\"checksum\":%llu,\"finalArenaBytes\":0}\n",
-        argv[1], rounds, work, (unsigned long long)elapsed, (unsigned long long)cpu,
+    printf("{\"mode\":\"%s\",\"rounds\":%u,\"work\":%u,\"liveCount\":%u,\"elapsedNs\":%llu,\"cpuNs\":%llu,\"ownerCpuNs\":%llu,\"pauseTotalNs\":%llu,\"captureOrSyncNs\":%llu,\"waitApplyNs\":%llu,\"batchP99Ns\":%llu,\"pauseP99Ns\":%llu,\"peakArenaBytes\":%llu,\"maxRssBytes\":%ld,\"allocations\":%llu,\"collections\":%llu,\"checksum\":%llu,\"finalArenaBytes\":0}\n",
+        argv[1], rounds, work, live_count, (unsigned long long)elapsed, (unsigned long long)cpu,
         (unsigned long long)owner_cpu, (unsigned long long)pause_sum,
         (unsigned long long)capture_sum, (unsigned long long)finish_sum,
         (unsigned long long)percentile(latency, rounds, 99),

@@ -230,3 +230,14 @@ was validated with UBSan/bounds, deterministic interleavings and protected-memor
 checks. It does not claim production safety or a speedup. Copy pauses, owner sweep
 pauses, worker CPU, conservative invalidation frequency and memory overhead need
 measurement before deciding whether to integrate this approach into Serve.
+
+
+### Capture initialization follow-up
+
+Capture now initializes counts and control flags without clearing unused bounded
+array storage. Each used entry is assigned before publication. Poisoned storage and
+repeated capture after removing the only root verify that stale tails do not retain
+objects or preserve the test pause flag. [Fresh UBSan/bounds qualification](capture-reuse-results.json)
+passes alongside all existing reclamation/oracle checks. The [paired performance
+comparison](../../../benchmarks/gc-concurrent-poc/README.md#snapshot-initialization-and-larger-graph-2026-10-18)
+shows lower capture cost but no convincing overall throughput improvement.

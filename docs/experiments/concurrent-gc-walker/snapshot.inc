@@ -49,7 +49,10 @@ static bool capture(snapshot *s, neoclr_aot_context *context) {
     for (neoclr_gc_resource *r = resource_head; r; r = r->next)
         if (r->context == context && (!r->owner || !validated_bases(&context->text, r->owner, NULL)))
             return false;
-    *s = (snapshot){0};
+    /* Every used array entry is assigned during capture; stale tails are
+     * excluded by these counts. Avoid clearing the bounded backing arrays. */
+    s->roots_count = s->strong_count = s->pairs_count = s->parked_count = 0;
+    s->pause_midwalk = false;
     atomic_init(&s->entered, false);
     atomic_init(&s->proceed, false);
     atomic_init(&s->tracing, false);

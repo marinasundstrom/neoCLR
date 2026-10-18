@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Avoid redundant clearing of unused concurrent-GC POC snapshot arrays; poisoned-storage/reuse and existing UBSan/bounds reclamation checks pass. Add paired baseline/candidate benchmarks and configurable live graphs. Capture cost falls, but overall gains remain inconclusive; at 4,096 live objects concurrent remains 3–4% slower and uses 11–12% more CPU than sync. Preserve raw evidence and keep production behavior unchanged.
+
 - Benchmark synchronous GC against the reclamation POC on matched, supported workloads before full special-case coverage. Retain pilot and reversed-order repeat trials: concurrent elapsed time is 17.2% worse for allocation-only batches and 12.9% worse with scalar work; process CPU rises 29.1%/20.3% and peak managed extent rises 26.3%. All work/checksums/collection counts match and final reclamation passes. These are local microbenchmarks, not Serve/Go capacity results; prioritize measured POC overhead next.
 
 - Complete a bounded native concurrent-GC reclamation POC: invalidate stale results at host/root/lifetime transitions, retain new allocations, and apply successful snapshot marks through the existing owner-side cleanup/sweep. UBSan/bounds demonstrates 319 applied cycles and 245,776 reclaimed payload bytes, 100 synchronous-oracle graph comparisons, mid-trace mutator progress, reuse/expiry/exactly-once cleanup and 10 rejected results without live mutation. Production collector selection is unchanged; broader runtime qualification and performance benefit remain unproved.

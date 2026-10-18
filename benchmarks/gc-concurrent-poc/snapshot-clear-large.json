@@ -1,0 +1,1001 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "loadBefore": [
+    3.7373046875,
+    3.75439453125,
+    4.33447265625
+  ],
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-I",
+        "/Users/robert/Projects/neoclr/target/gc-clear-qualified",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/workload.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+        "/Users/robert/Projects/neoclr/target/gc-clear-qualified/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "sync",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1376058000,\"cpuNs\":1375696000,\"ownerCpuNs\":1375694458,\"pauseTotalNs\":112035000,\"captureOrSyncNs\":112035000,\"waitApplyNs\":0,\"batchP99Ns\":717000,\"pauseP99Ns\":60000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "sync",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1365937000,\"cpuNs\":1365717000,\"ownerCpuNs\":1365715500,\"pauseTotalNs\":112730000,\"captureOrSyncNs\":112730000,\"waitApplyNs\":0,\"batchP99Ns\":714000,\"pauseP99Ns\":59000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "concurrent",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1434289000,\"cpuNs\":1542401000,\"ownerCpuNs\":1431852458,\"pauseTotalNs\":133970000,\"captureOrSyncNs\":35289000,\"waitApplyNs\":98681000,\"batchP99Ns\":822000,\"pauseP99Ns\":55000,\"peakArenaBytes\":249856,\"maxRssBytes\":2785280,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "concurrent",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1419430000,\"cpuNs\":1530148000,\"ownerCpuNs\":1418918750,\"pauseTotalNs\":132186000,\"captureOrSyncNs\":33999000,\"waitApplyNs\":98187000,\"batchP99Ns\":749000,\"pauseP99Ns\":53000,\"peakArenaBytes\":249856,\"maxRssBytes\":2392064,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "concurrent",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1429438000,\"cpuNs\":1536947000,\"ownerCpuNs\":1426041500,\"pauseTotalNs\":135276000,\"captureOrSyncNs\":34112000,\"waitApplyNs\":101164000,\"batchP99Ns\":748000,\"pauseP99Ns\":52000,\"peakArenaBytes\":249856,\"maxRssBytes\":2703360,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "concurrent",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1416294000,\"cpuNs\":1526122000,\"ownerCpuNs\":1415995209,\"pauseTotalNs\":132818000,\"captureOrSyncNs\":34978000,\"waitApplyNs\":97840000,\"batchP99Ns\":734000,\"pauseP99Ns\":51000,\"peakArenaBytes\":249856,\"maxRssBytes\":2441216,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "sync",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1363478000,\"cpuNs\":1363271000,\"ownerCpuNs\":1363276750,\"pauseTotalNs\":112600000,\"captureOrSyncNs\":112600000,\"waitApplyNs\":0,\"batchP99Ns\":703000,\"pauseP99Ns\":59000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "sync",
+        "2000",
+        "0",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1384315000,\"cpuNs\":1383898000,\"ownerCpuNs\":1383898333,\"pauseTotalNs\":112992000,\"captureOrSyncNs\":112992000,\"waitApplyNs\":0,\"batchP99Ns\":721000,\"pauseP99Ns\":60000,\"peakArenaBytes\":239616,\"maxRssBytes\":1982464,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "sync",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1471193000,\"cpuNs\":1470845000,\"ownerCpuNs\":1470854334,\"pauseTotalNs\":112851000,\"captureOrSyncNs\":112851000,\"waitApplyNs\":0,\"batchP99Ns\":767000,\"pauseP99Ns\":61000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "sync",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1462840000,\"cpuNs\":1462516000,\"ownerCpuNs\":1462519875,\"pauseTotalNs\":112873000,\"captureOrSyncNs\":112873000,\"waitApplyNs\":0,\"batchP99Ns\":764000,\"pauseP99Ns\":60000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "concurrent",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1547846000,\"cpuNs\":1657848000,\"ownerCpuNs\":1546627042,\"pauseTotalNs\":135220000,\"captureOrSyncNs\":35956000,\"waitApplyNs\":99264000,\"batchP99Ns\":852000,\"pauseP99Ns\":53000,\"peakArenaBytes\":249856,\"maxRssBytes\":2785280,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "concurrent",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1518105000,\"cpuNs\":1627528000,\"ownerCpuNs\":1517841125,\"pauseTotalNs\":131446000,\"captureOrSyncNs\":33563000,\"waitApplyNs\":97883000,\"batchP99Ns\":784000,\"pauseP99Ns\":51000,\"peakArenaBytes\":249856,\"maxRssBytes\":2752512,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "concurrent",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1518193000,\"cpuNs\":1627901000,\"ownerCpuNs\":1517681292,\"pauseTotalNs\":131907000,\"captureOrSyncNs\":34163000,\"waitApplyNs\":97744000,\"batchP99Ns\":785000,\"pauseP99Ns\":51000,\"peakArenaBytes\":249856,\"maxRssBytes\":2392064,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "concurrent",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1516715000,\"cpuNs\":1626740000,\"ownerCpuNs\":1516349667,\"pauseTotalNs\":132984000,\"captureOrSyncNs\":35102000,\"waitApplyNs\":97882000,\"batchP99Ns\":785000,\"pauseP99Ns\":51000,\"peakArenaBytes\":249856,\"maxRssBytes\":2441216,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-paired/bench",
+        "sync",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1479030000,\"cpuNs\":1478188000,\"ownerCpuNs\":1478186917,\"pauseTotalNs\":113396000,\"captureOrSyncNs\":113396000,\"waitApplyNs\":0,\"batchP99Ns\":783000,\"pauseP99Ns\":62000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+        "sync",
+        "2000",
+        "50000",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1476494000,\"cpuNs\":1474554000,\"ownerCpuNs\":1474564292,\"pauseTotalNs\":113535000,\"captureOrSyncNs\":113535000,\"waitApplyNs\":0,\"batchP99Ns\":900000,\"pauseP99Ns\":64000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    }
+  ],
+  "trials": [
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1376058000,
+      "cpuNs": 1375696000,
+      "ownerCpuNs": 1375694458,
+      "pauseTotalNs": 112035000,
+      "captureOrSyncNs": 112035000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 717000,
+      "pauseP99Ns": 60000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1365937000,
+      "cpuNs": 1365717000,
+      "ownerCpuNs": 1365715500,
+      "pauseTotalNs": 112730000,
+      "captureOrSyncNs": 112730000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 714000,
+      "pauseP99Ns": 59000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1434289000,
+      "cpuNs": 1542401000,
+      "ownerCpuNs": 1431852458,
+      "pauseTotalNs": 133970000,
+      "captureOrSyncNs": 35289000,
+      "waitApplyNs": 98681000,
+      "batchP99Ns": 822000,
+      "pauseP99Ns": 55000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2785280,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1419430000,
+      "cpuNs": 1530148000,
+      "ownerCpuNs": 1418918750,
+      "pauseTotalNs": 132186000,
+      "captureOrSyncNs": 33999000,
+      "waitApplyNs": 98187000,
+      "batchP99Ns": 749000,
+      "pauseP99Ns": 53000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2392064,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1429438000,
+      "cpuNs": 1536947000,
+      "ownerCpuNs": 1426041500,
+      "pauseTotalNs": 135276000,
+      "captureOrSyncNs": 34112000,
+      "waitApplyNs": 101164000,
+      "batchP99Ns": 748000,
+      "pauseP99Ns": 52000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2703360,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1416294000,
+      "cpuNs": 1526122000,
+      "ownerCpuNs": 1415995209,
+      "pauseTotalNs": 132818000,
+      "captureOrSyncNs": 34978000,
+      "waitApplyNs": 97840000,
+      "batchP99Ns": 734000,
+      "pauseP99Ns": 51000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2441216,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1363478000,
+      "cpuNs": 1363271000,
+      "ownerCpuNs": 1363276750,
+      "pauseTotalNs": 112600000,
+      "captureOrSyncNs": 112600000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 703000,
+      "pauseP99Ns": 59000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 0,
+      "liveCount": 4096,
+      "elapsedNs": 1384315000,
+      "cpuNs": 1383898000,
+      "ownerCpuNs": 1383898333,
+      "pauseTotalNs": 112992000,
+      "captureOrSyncNs": 112992000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 721000,
+      "pauseP99Ns": 60000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1982464,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 1,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1471193000,
+      "cpuNs": 1470845000,
+      "ownerCpuNs": 1470854334,
+      "pauseTotalNs": 112851000,
+      "captureOrSyncNs": 112851000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 767000,
+      "pauseP99Ns": 61000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1462840000,
+      "cpuNs": 1462516000,
+      "ownerCpuNs": 1462519875,
+      "pauseTotalNs": 112873000,
+      "captureOrSyncNs": 112873000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 764000,
+      "pauseP99Ns": 60000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1547846000,
+      "cpuNs": 1657848000,
+      "ownerCpuNs": 1546627042,
+      "pauseTotalNs": 135220000,
+      "captureOrSyncNs": 35956000,
+      "waitApplyNs": 99264000,
+      "batchP99Ns": 852000,
+      "pauseP99Ns": 53000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2785280,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1518105000,
+      "cpuNs": 1627528000,
+      "ownerCpuNs": 1517841125,
+      "pauseTotalNs": 131446000,
+      "captureOrSyncNs": 33563000,
+      "waitApplyNs": 97883000,
+      "batchP99Ns": 784000,
+      "pauseP99Ns": 51000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2752512,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1518193000,
+      "cpuNs": 1627901000,
+      "ownerCpuNs": 1517681292,
+      "pauseTotalNs": 131907000,
+      "captureOrSyncNs": 34163000,
+      "waitApplyNs": 97744000,
+      "batchP99Ns": 785000,
+      "pauseP99Ns": 51000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2392064,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1516715000,
+      "cpuNs": 1626740000,
+      "ownerCpuNs": 1516349667,
+      "pauseTotalNs": 132984000,
+      "captureOrSyncNs": 35102000,
+      "waitApplyNs": 97882000,
+      "batchP99Ns": 785000,
+      "pauseP99Ns": 51000,
+      "peakArenaBytes": 249856,
+      "maxRssBytes": 2441216,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1479030000,
+      "cpuNs": 1478188000,
+      "ownerCpuNs": 1478186917,
+      "pauseTotalNs": 113396000,
+      "captureOrSyncNs": 113396000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 783000,
+      "pauseP99Ns": 62000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "sync",
+      "rounds": 2000,
+      "work": 50000,
+      "liveCount": 4096,
+      "elapsedNs": 1476494000,
+      "cpuNs": 1474554000,
+      "ownerCpuNs": 1474564292,
+      "pauseTotalNs": 113535000,
+      "captureOrSyncNs": 113535000,
+      "waitApplyNs": 0,
+      "batchP99Ns": 900000,
+      "pauseP99Ns": 64000,
+      "peakArenaBytes": 239616,
+      "maxRssBytes": 1998848,
+      "allocations": 128000,
+      "collections": 2000,
+      "checksum": 11250776440710997953,
+      "finalArenaBytes": 0,
+      "version": "baseline"
+    }
+  ],
+  "qualification": {
+    "passed": true,
+    "productionReady": false,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "commands": [
+      {
+        "command": [
+          "clang",
+          "-std=c11",
+          "-O2",
+          "-g",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pthread",
+          "-fsanitize=undefined,bounds",
+          "-I",
+          "/Users/robert/Projects/neoclr/target/gc-clear-qualified",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+          "-I",
+          "/Users/robert/Projects/neoclr/runtime/native/gc",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+          "/Users/robert/Projects/neoclr/target/gc-clear-qualified/root-probe.c",
+          "-o",
+          "/Users/robert/Projects/neoclr/target/gc-clear-qualified/test"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-qualified/test"
+        ],
+        "exitCode": 0,
+        "stdout": "MIDWALK: reference transfer/allocation after 63 scanned objects; reclamation and eventual empty heap passed\nPOC applied=319 discarded=10 reclaimedPayloadBytes=245776\nRECLAMATION: live bytes freed; 100 graph/oracle survivor and byte-count comparisons; stale/error/cancel rejection; floating garbage, free-span allocation and parked expiry passed\nCOUNTEREXAMPLE: conditional host read rescues a snapshot-white value without allocation or collection\nCOUNTEREXAMPLE: parked resume makes a snapshot-white value a strong root without allocation or collection\nCOUNTEREXAMPLE: collection/reallocation reuses an address and descriptor shape for a live replacement\nParked roots: three guarded oracle cases, expiry and capacity rejection passed\n101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation passed\n",
+        "stderr": ""
+      }
+    ],
+    "inputs": {
+      "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+      "/Users/robert/Projects/neoclr/target/gc-clear-qualified/native-gc.c": "5c064455517b0b9b2a0f6ba5c7b5f7f24b1eca6f5a76f4214705caf47d97a723",
+      "/Users/robert/Projects/neoclr/target/gc-clear-qualified/root-probe.c": "8b7786c625060620f43d4acced42238e168c8678dd4d6c74a05153a07cd27840",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/snapshot.inc": "87376cb81d32c81cad08ec24fd32d07a11213c67cb61737a2c0e52e55123b635",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c": "268c176aaf9d95247347fc9683e2df5293619eb1695e5f171266a784ead41a8a",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/parked-tests.inc": "62a967786f51878c7f927caccf8a538d23c2fd7cc1696ddd70146bd4f7811ae0",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/publication-tests.inc": "04ec37ae21f32f668d994ea670544411b895af54ad1b8a1c60df9af510053d11",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim.inc": "24415b33a6029095800495a91aaf6ca4f82d7dbee8e82125559ee5ec32f107a0",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim-tests.inc": "f77e72862ef30b411fdd91d1d1ce35895363225ac69e1757896a369a3297ea7b",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/run.py": "0662f6d11d9d9ce01dee4e901f63c47df124c031b22e3c74ef26c985a7d42d9a",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c": "b3120e46741e7a8e5fc253f9cbb08eb0f6c309b1f098e0717eabe8c13ab58280",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+      "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a"
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/benchmark.py": "dfcd912e51b064c5089d70e3f606bb33d8b80e11e9b4f3cdcba404c757114450",
+    "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/workload.c": "d1a8e9fd293110d970a449a405280ed5200811137b852099b5ea5dc6146a49a7"
+  },
+  "baseline": {
+    "passed": true,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "loadBefore": [
+      3.39013671875,
+      3.697265625,
+      4.35302734375
+    ],
+    "commands": [
+      {
+        "command": [
+          "clang",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pthread",
+          "-I",
+          "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+          "-I",
+          "/Users/robert/Projects/neoclr/runtime/native/gc",
+          "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/workload.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+          "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified/root-probe.c",
+          "-o",
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "sync",
+          "2000",
+          "0",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1406817000,\"cpuNs\":1406234000,\"ownerCpuNs\":1406235750,\"pauseTotalNs\":114360000,\"captureOrSyncNs\":114360000,\"waitApplyNs\":0,\"batchP99Ns\":724000,\"pauseP99Ns\":60000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "concurrent",
+          "2000",
+          "0",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1458651000,\"cpuNs\":1558784000,\"ownerCpuNs\":1447281375,\"pauseTotalNs\":144052000,\"captureOrSyncNs\":34174000,\"waitApplyNs\":109878000,\"batchP99Ns\":790000,\"pauseP99Ns\":54000,\"peakArenaBytes\":249856,\"maxRssBytes\":2785280,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "concurrent",
+          "2000",
+          "0",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1482518000,\"cpuNs\":1568012000,\"ownerCpuNs\":1457818208,\"pauseTotalNs\":150734000,\"captureOrSyncNs\":34651000,\"waitApplyNs\":116083000,\"batchP99Ns\":1084000,\"pauseP99Ns\":54000,\"peakArenaBytes\":249856,\"maxRssBytes\":2801664,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "sync",
+          "2000",
+          "0",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":0,\"liveCount\":4096,\"elapsedNs\":1359121000,\"cpuNs\":1358962000,\"ownerCpuNs\":1358965209,\"pauseTotalNs\":112742000,\"captureOrSyncNs\":112742000,\"waitApplyNs\":0,\"batchP99Ns\":709000,\"pauseP99Ns\":59000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":1,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "sync",
+          "2000",
+          "50000",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1453758000,\"cpuNs\":1453558000,\"ownerCpuNs\":1453558709,\"pauseTotalNs\":112686000,\"captureOrSyncNs\":112686000,\"waitApplyNs\":0,\"batchP99Ns\":747000,\"pauseP99Ns\":58000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "concurrent",
+          "2000",
+          "50000",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1513583000,\"cpuNs\":1621649000,\"ownerCpuNs\":1513295083,\"pauseTotalNs\":130996000,\"captureOrSyncNs\":33270000,\"waitApplyNs\":97726000,\"batchP99Ns\":776000,\"pauseP99Ns\":50000,\"peakArenaBytes\":249856,\"maxRssBytes\":2441216,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "concurrent",
+          "2000",
+          "50000",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"concurrent\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1511906000,\"cpuNs\":1619872000,\"ownerCpuNs\":1511237916,\"pauseTotalNs\":131242000,\"captureOrSyncNs\":33485000,\"waitApplyNs\":97757000,\"batchP99Ns\":792000,\"pauseP99Ns\":51000,\"peakArenaBytes\":249856,\"maxRssBytes\":2703360,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-clear-large-baseline/bench",
+          "sync",
+          "2000",
+          "50000",
+          "4096"
+        ],
+        "exitCode": 0,
+        "stdout": "{\"mode\":\"sync\",\"rounds\":2000,\"work\":50000,\"liveCount\":4096,\"elapsedNs\":1463279000,\"cpuNs\":1462991000,\"ownerCpuNs\":1462993750,\"pauseTotalNs\":112656000,\"captureOrSyncNs\":112656000,\"waitApplyNs\":0,\"batchP99Ns\":767000,\"pauseP99Ns\":58000,\"peakArenaBytes\":239616,\"maxRssBytes\":1998848,\"allocations\":128000,\"collections\":2000,\"checksum\":11250776440710997953,\"finalArenaBytes\":0}\n",
+        "stderr": ""
+      }
+    ],
+    "trials": [
+      {
+        "mode": "sync",
+        "rounds": 2000,
+        "work": 0,
+        "liveCount": 4096,
+        "elapsedNs": 1406817000,
+        "cpuNs": 1406234000,
+        "ownerCpuNs": 1406235750,
+        "pauseTotalNs": 114360000,
+        "captureOrSyncNs": 114360000,
+        "waitApplyNs": 0,
+        "batchP99Ns": 724000,
+        "pauseP99Ns": 60000,
+        "peakArenaBytes": 239616,
+        "maxRssBytes": 1998848,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 1,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "concurrent",
+        "rounds": 2000,
+        "work": 0,
+        "liveCount": 4096,
+        "elapsedNs": 1458651000,
+        "cpuNs": 1558784000,
+        "ownerCpuNs": 1447281375,
+        "pauseTotalNs": 144052000,
+        "captureOrSyncNs": 34174000,
+        "waitApplyNs": 109878000,
+        "batchP99Ns": 790000,
+        "pauseP99Ns": 54000,
+        "peakArenaBytes": 249856,
+        "maxRssBytes": 2785280,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 1,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "concurrent",
+        "rounds": 2000,
+        "work": 0,
+        "liveCount": 4096,
+        "elapsedNs": 1482518000,
+        "cpuNs": 1568012000,
+        "ownerCpuNs": 1457818208,
+        "pauseTotalNs": 150734000,
+        "captureOrSyncNs": 34651000,
+        "waitApplyNs": 116083000,
+        "batchP99Ns": 1084000,
+        "pauseP99Ns": 54000,
+        "peakArenaBytes": 249856,
+        "maxRssBytes": 2801664,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 1,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "sync",
+        "rounds": 2000,
+        "work": 0,
+        "liveCount": 4096,
+        "elapsedNs": 1359121000,
+        "cpuNs": 1358962000,
+        "ownerCpuNs": 1358965209,
+        "pauseTotalNs": 112742000,
+        "captureOrSyncNs": 112742000,
+        "waitApplyNs": 0,
+        "batchP99Ns": 709000,
+        "pauseP99Ns": 59000,
+        "peakArenaBytes": 239616,
+        "maxRssBytes": 1998848,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 1,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "sync",
+        "rounds": 2000,
+        "work": 50000,
+        "liveCount": 4096,
+        "elapsedNs": 1453758000,
+        "cpuNs": 1453558000,
+        "ownerCpuNs": 1453558709,
+        "pauseTotalNs": 112686000,
+        "captureOrSyncNs": 112686000,
+        "waitApplyNs": 0,
+        "batchP99Ns": 747000,
+        "pauseP99Ns": 58000,
+        "peakArenaBytes": 239616,
+        "maxRssBytes": 1998848,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 11250776440710997953,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "concurrent",
+        "rounds": 2000,
+        "work": 50000,
+        "liveCount": 4096,
+        "elapsedNs": 1513583000,
+        "cpuNs": 1621649000,
+        "ownerCpuNs": 1513295083,
+        "pauseTotalNs": 130996000,
+        "captureOrSyncNs": 33270000,
+        "waitApplyNs": 97726000,
+        "batchP99Ns": 776000,
+        "pauseP99Ns": 50000,
+        "peakArenaBytes": 249856,
+        "maxRssBytes": 2441216,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 11250776440710997953,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "concurrent",
+        "rounds": 2000,
+        "work": 50000,
+        "liveCount": 4096,
+        "elapsedNs": 1511906000,
+        "cpuNs": 1619872000,
+        "ownerCpuNs": 1511237916,
+        "pauseTotalNs": 131242000,
+        "captureOrSyncNs": 33485000,
+        "waitApplyNs": 97757000,
+        "batchP99Ns": 792000,
+        "pauseP99Ns": 51000,
+        "peakArenaBytes": 249856,
+        "maxRssBytes": 2703360,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 11250776440710997953,
+        "finalArenaBytes": 0
+      },
+      {
+        "mode": "sync",
+        "rounds": 2000,
+        "work": 50000,
+        "liveCount": 4096,
+        "elapsedNs": 1463279000,
+        "cpuNs": 1462991000,
+        "ownerCpuNs": 1462993750,
+        "pauseTotalNs": 112656000,
+        "captureOrSyncNs": 112656000,
+        "waitApplyNs": 0,
+        "batchP99Ns": 767000,
+        "pauseP99Ns": 58000,
+        "peakArenaBytes": 239616,
+        "maxRssBytes": 1998848,
+        "allocations": 128000,
+        "collections": 2000,
+        "checksum": 11250776440710997953,
+        "finalArenaBytes": 0
+      }
+    ],
+    "qualification": {
+      "passed": true,
+      "productionReady": false,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "commands": [
+        {
+          "command": [
+            "clang",
+            "-std=c11",
+            "-O2",
+            "-g",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-pthread",
+            "-fsanitize=undefined,bounds",
+            "-I",
+            "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified",
+            "-I",
+            "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+            "-I",
+            "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+            "-I",
+            "/Users/robert/Projects/neoclr/runtime/native/gc",
+            "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c",
+            "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+            "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified/root-probe.c",
+            "-o",
+            "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified/test"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified/test"
+          ],
+          "exitCode": 0,
+          "stdout": "MIDWALK: reference transfer/allocation after 63 scanned objects; reclamation and eventual empty heap passed\nPOC applied=319 discarded=10 reclaimedPayloadBytes=245776\nRECLAMATION: live bytes freed; 100 graph/oracle survivor and byte-count comparisons; stale/error/cancel rejection; floating garbage, free-span allocation and parked expiry passed\nCOUNTEREXAMPLE: conditional host read rescues a snapshot-white value without allocation or collection\nCOUNTEREXAMPLE: parked resume makes a snapshot-white value a strong root without allocation or collection\nCOUNTEREXAMPLE: collection/reallocation reuses an address and descriptor shape for a live replacement\nParked roots: three guarded oracle cases, expiry and capacity rejection passed\n101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation passed\n",
+          "stderr": ""
+        }
+      ],
+      "inputs": {
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+        "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified/native-gc.c": "5c064455517b0b9b2a0f6ba5c7b5f7f24b1eca6f5a76f4214705caf47d97a723",
+        "/Users/robert/Projects/neoclr/target/gc-walker-20261018/reclamation-qualified/root-probe.c": "8b7786c625060620f43d4acced42238e168c8678dd4d6c74a05153a07cd27840",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/snapshot.inc": "76bcb4d6b45f903228a92c01e0e0ab27a6db50d038f3b805c6e508ab363fa10f",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c": "b407a9bd280271a5d8b25c04a73df609b0c4e2d346f602dd470f9a568b0d6424",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/parked-tests.inc": "62a967786f51878c7f927caccf8a538d23c2fd7cc1696ddd70146bd4f7811ae0",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/publication-tests.inc": "04ec37ae21f32f668d994ea670544411b895af54ad1b8a1c60df9af510053d11",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim.inc": "24415b33a6029095800495a91aaf6ca4f82d7dbee8e82125559ee5ec32f107a0",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim-tests.inc": "f77e72862ef30b411fdd91d1d1ce35895363225ac69e1757896a369a3297ea7b",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/run.py": "0662f6d11d9d9ce01dee4e901f63c47df124c031b22e3c74ef26c985a7d42d9a",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c": "b3120e46741e7a8e5fc253f9cbb08eb0f6c309b1f098e0717eabe8c13ab58280",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a"
+      }
+    },
+    "inputs": {
+      "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/benchmark.py": "efe98aad812ef037b3750d8b8ce625cefd122d0a2a2f8d84e8ff674dd10ed4ce",
+      "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/workload.c": "d1a8e9fd293110d970a449a405280ed5200811137b852099b5ea5dc6146a49a7"
+    },
+    "loadAfter": [
+      3.64404296875,
+      3.740234375,
+      4.35986328125
+    ]
+  },
+  "baselineBinarySha256": "933836d49fabece10b7bc2d2f11a453109723f469d866c5a0d1d38609876da19",
+  "loadAfter": [
+    3.5771484375,
+    3.7099609375,
+    4.30078125
+  ]
+}

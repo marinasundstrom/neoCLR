@@ -96,3 +96,51 @@ python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFIC
 The benchmark checks every qualification input hash before building, so a changed
 POC requires refreshed validation. Only the supported POSIX/macOS workload and
 reclamation contract are qualified by this experiment.
+
+## Snapshot initialization and larger graph (2026-10-18)
+
+Replace whole-structure zeroing with explicit count/flag initialization. Capture
+assigns every used root, conditional pair, parked registration and frame before the
+worker reads it; array tails are excluded by counts. A poisoned-storage/reuse test
+checks root removal and flag reset, alongside the existing guarded and reclamation
+qualification. No production collector or .NET-facing semantics change.
+
+The harness now accepts `--live-count` (default 512) and `--compare-build` pointing
+to a prior benchmark directory. The latter records the prior report and binary hash,
+requires identical workload source, and alternates baseline/candidate sync/concurrent
+trials in forward then reverse order. All workloads retain equal work/checksums and
+complete final reclamation. The baseline executable predates the initialization edit.
+
+Arithmetic means of two fresh-process trials, milliseconds:
+
+| Live objects / batches | Scalar iterations | Baseline concurrent elapsed | Candidate concurrent elapsed | Candidate sync elapsed | Candidate concurrent CPU | Candidate sync CPU |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 512 / 10,000 | 0 | 1043.59 | 1044.20 | 880.72 | 1139.00 | 880.26 |
+| 512 / 10,000 | 50,000 | 1531.25 | 1514.79 | 1364.47 | 1617.18 | 1364.08 |
+| 4096 / 2,000 | 0 | 1425.29 | 1424.43 | 1364.71 | 1533.55 | 1364.49 |
+| 4096 / 2,000 | 50,000 | 1532.28 | 1518.15 | 1470.94 | 1627.72 | 1470.35 |
+
+The edit reduces small-graph capture totals from 47.37 to 42.14 ms (allocation-only)
+and 48.71 to 37.84 ms (scalar work). End-to-end gains are inconclusive: essentially
+zero without scalar work, about 1% with it, and unchanged sync controls also vary.
+Keep the simpler initialization, but do not claim a meaningful throughput gain.
+
+At 4096 objects concurrent remains 4.4%/3.2% slower and uses 12.4%/10.7% more CPU
+than candidate sync. Total owner interruptions are 133.73/131.68 ms concurrent versus
+112.67/113.14 ms sync. Larger graphs narrow the relative gap without producing a win.
+Concurrent wait/application totals 99.68/97.81 ms, about 49 microseconds per cycle;
+separating worker wait from descriptor validation, mark import and sweep is the next
+useful attribution step. Allocation header scanning also grows with the live set,
+so the narrowing total-runtime gap alone does not prove better tracing overlap.
+
+Raw [small](snapshot-clear-small.json) and [large](snapshot-clear-large.json) reports
+include earlier baseline trials as nested evidence. The initial large baseline
+briefly overlapped qualification compilation; retain it, but use the later alternating
+comparison above for conclusions. Timed paired runs did not overlap our builds/tests.
+These remain short local microbenchmarks, not sustained Serve/Go measurements.
+
+Example after building a baseline with the same workload source:
+
+```
+python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_RESULTS --output NEW_RESULTS --rounds 2000 --live-count 4096
+```
