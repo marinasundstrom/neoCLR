@@ -672,12 +672,7 @@ public class HttpRequest {
     }
 
     internal static func FromIncoming(method: string, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>, secure: bool) -> Result<HttpRequest, HttpError> {
-        let scheme = if secure { "https://" } else { "http://" }
-        let url = String.Concat(String.Concat(scheme, host), target)
-        let request = Get(url)?
-        if request.Target != target {
-            return Error(HttpError.InvalidRequest("Invalid Host authority"))
-        }
+        let request = IncomingRequest(target, host, secure)?
         request.storedHeaders = headers
         request.storedMethod = HttpMethod(method)
         request.storedContent = HttpContent(body)
@@ -686,6 +681,136 @@ public class HttpRequest {
                 request.storedContent = HttpContent(body, header.Value)
             }
         }
+        return Ok(request)
+    }
+
+    // Incoming origin-form requests already own their authority and target. Do not
+    // reconstruct an absolute URL or allocate a Uri merely to recover those fields.
+    // Keep the existing URI grammar/error precedence, including malformed Host
+    // suffixes, before applying the narrower HTTP authority and 1024-byte quota.
+    private static func IncomingCharacters(bytes: Sequence<byte>) -> Result<(), HttpError> {
+        var index = 0
+        while index < bytes.Count {
+            let value = bytes[index]
+            if value == 37 {
+                if index + 2 >= bytes.Count {
+                    return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                }
+                for offset in 1..3 {
+                    let digit = bytes[index + offset]
+                    if !((digit >= 48 && digit <= 57) || (digit >= 65 && digit <= 70) || (digit >= 97 && digit <= 102)) {
+                        return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                    }
+                }
+                index += 3
+                continue
+            }
+            if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+                (value >= 48 && value <= 57) || value == 45 || value == 46 || value == 95 || value == 126 ||
+                value == 58 || value == 47 || value == 63 || value == 35 || value == 64 ||
+                value == 33 || value == 36 || value == 38 || value == 39 || value == 40 || value == 41 ||
+                value == 42 || value == 43 || value == 44 || value == 59 || value == 61) {
+                if value == 91 || value == 93 {
+                    return Error(HttpError.InvalidUri(UriError.UnsupportedAuthority()))
+                }
+                return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+            }
+            index += 1
+        }
+        return Ok(())
+    }
+
+    private static func IncomingRequest(target: string, authority: string, secure: bool) -> Result<HttpRequest, HttpError> {
+        // The decoder admits only nonempty origin-form targets (starting with /),
+        // with no fragment. Thus percent escapes cannot cross these two fields.
+        let prefixLength = if secure { 8 } else { 7 }
+        let length = prefixLength + authority.GetUtf8ByteCount() + target.GetUtf8ByteCount()
+        if length > 4096 {
+            return Error(HttpError.InvalidUri(UriError.TooLong()))
+        }
+        let hostBytes = HttpText.Encode(authority)
+        let targetBytes = HttpText.Encode(target)
+        IncomingCharacters(hostBytes)?
+        IncomingCharacters(targetBytes)?
+        var end = 0
+        var at = -1
+        var lastColon = -1
+        while end < hostBytes.Count && hostBytes[end] != 47 && hostBytes[end] != 63 && hostBytes[end] != 35 {
+            if hostBytes[end] == 64 {
+                if at >= 0 {
+                    return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                }
+                at = end
+                lastColon = -1
+            } else if hostBytes[end] == 58 {
+                lastColon = end
+            }
+            end += 1
+        }
+        var position = at + 1
+        while position < end {
+            let value = hostBytes[position]
+            if (value == 58 && position != lastColon) ||
+                (lastColon >= 0 && position > lastColon && !(value >= 48 && value <= 57)) {
+                return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+            }
+            position += 1
+        }
+        var fragment = false
+        position = end
+        while position < hostBytes.Count {
+            if hostBytes[position] == 35 {
+                if fragment {
+                    return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                }
+                fragment = true
+            }
+            position += 1
+        }
+        if length > 1024 {
+            return Error(HttpError.LimitExceeded("URL limit exceeded"))
+        }
+        var colon = 0
+        while colon < end && hostBytes[colon] != 58 {
+            let value = hostBytes[colon]
+            if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+                (value >= 48 && value <= 57) || value == 45 || value == 46) {
+                return Error(HttpError.Unsupported("Unsupported hostname"))
+            }
+            colon += 1
+        }
+        if colon == 0 || colon > 253 {
+            return Error(HttpError.InvalidRequest("Invalid hostname length"))
+        }
+        var port = if secure { 443 } else { 80 }
+        var host = authority
+        if colon < end {
+            port = 0
+            position = colon + 1
+            if position == end {
+                return Error(HttpError.InvalidRequest("Empty port"))
+            }
+            while position < end {
+                let digit = (int)hostBytes[position] - 48
+                if !(digit >= 0 && digit <= 9) || port > (65535 - digit) / 10 {
+                    return Error(HttpError.InvalidRequest("Invalid port"))
+                }
+                port = port * 10 + digit
+                position += 1
+            }
+            if port == 0 {
+                return Error(HttpError.InvalidRequest("Invalid port"))
+            }
+            host = Text(hostBytes, 0, colon)?
+        }
+        if fragment {
+            return Error(HttpError.Unsupported("Unsupported request target"))
+        }
+        if end != hostBytes.Count {
+            return Error(HttpError.InvalidRequest("Invalid Host authority"))
+        }
+        let request = HttpRequest(host, port, target)
+        request.secure = secure
         return Ok(request)
     }
 

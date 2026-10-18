@@ -171,6 +171,10 @@ HTTP/1.1 responses support fixed-length, chunked and connection-close framing.
 The server buffers a request and closes its connection after the exchange. Connection
 pooling, redirects, HTTP/2/3 and WebSocket upgrades are not implemented.
 
+Development incoming requests now validate Host and Target directly, retaining
+string properties without constructing an intermediate URI. The existing input
+validation and size limits remain in force; client URL/Uri overloads are unchanged.
+
 Bodies, headers, URLs and JSON documents have separate size limits. Supported
 admission bounds are not a throughput guarantee; use the [HTTP API reference](/docs/api/System/Web/Http/index.html)
 for exact limits and error behavior. Choose a matching development toolchain for

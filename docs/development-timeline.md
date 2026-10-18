@@ -19455,3 +19455,21 @@ ArrayQueue. Existing native-policy results remain fixed-cohort evidence; they ar
 not the latest managed runtime's capacity. The [review](experiments/concurrent-gc-http/REVIEW.md)
 records primary-source comparisons and prioritizes a fresh managed cohort before
 HTTP-specific improvements. No further optimization was implemented in the review.
+
+## 2026-10-18 — Rebuild the managed cohort and remove incoming URI reconstruction
+
+The author requested a fresh benchmark built with current managed libraries, then
+removal of redundant incoming URL construction/parsing, preserving behavior and
+measuring against the fresh baseline and Go, with each slice committed. The
+assistant rebuilt all four managed libraries, the Serve guest and Go control; the
+initial 3,000-request smoke passed and the baseline slice was committed.
+
+The assistant initially proposed retaining the old URL path for unusual/rejected
+inputs. The author clarified: “We shouldn’t create full URIs”, then “Not for Http
+API” and “Yes. Host and Target/Path might stay strings”. The assistant changed the
+implementation to validate the already-separated authority and origin-form target
+and construct incoming requests directly, retaining strings and avoiding full URI
+construction even on rejected input. Existing outbound URL/Uri overloads remain
+unchanged. Differential wire checks and matched load results are recorded in the
+[incoming-request experiment](../benchmarks/http-server/serve/incoming-url-20261018/README.md);
+this does not expand the pending HttpContext callback API scope.

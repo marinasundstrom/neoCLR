@@ -1,0 +1,12 @@
+{
+  "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr-jit-host.dylib": "82dda65055472145785c852da6a0b9cb0dbf5d09125ebd43fbcc946a659ef19e",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-library/System.Data.dll": "2f266b4a95b1ce418a701b0ee859e2211555786b56d10ead7989189a19884e52",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-library/System.Networking.dll": "df8d6c69cfc7bfd746688978689a9be15eecc5c7fdc31e532e0d7967f7ed15d1",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-library/System.Runtime.dll": "749a1dbd90fcb95e2ea239db1b2dd3a2186f9b5b6230ebf41c593dee397fe777",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-library/System.Web.dll": "c304cab600a207c7a2a6d56ac7f11ef15db6e5fe86c4f3a7b435d58cc036efcc",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-library/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-probe/app": "b6165c4ce02f28c27f4b22acae78f98cff6caf1ac221d1732b460c0d66b7a236",
+  "/Users/robert/Projects/neoclr/target/http-incoming-url-20261018/candidate-probe/app.dll": "78cf7f3f2a6c4f0bc40b8742a97b044dca4a1fa7e7203d16fa55d78611684526",
+  "/Users/robert/Projects/neoclr/target/json-records/runtime-primitive-1": "aa3560e8fa1afa7bb8a4078f1d59a62d128b86c3e61dd484a9a0926ae2f9e86d",
+  "/Users/robert/Projects/neoclr/target/release/neoclr-codegen": "e1482c0e2a7249cb328e9b32c6cf02cb06c4c58f1412c4090047717ffc4568f2"
+}

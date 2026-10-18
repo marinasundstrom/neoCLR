@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Construct incoming HTTP requests directly from Host and Target strings, removing full URL/Uri construction and reparsing while preserving validation, error precedence, limits, ports and body/header ownership. Fifty differential wire cases pass against the fresh baseline across interpreter/JIT/AOT. Outbound URL/Uri APIs remain unchanged; regenerate the unchanged public reference and refresh its source fingerprint. Retain stale-tool/probe-build failures separately; sustained measurements follow.
+
 - Rebuild the Serve benchmark and all four managed libraries from current source, retaining compiler/backend/native provenance and a freshly built Go control. The 300/sec ten-second smoke completes all 3,000 requests; this qualifies the fixture, not sustained capacity. Use this cohort for the incoming-request URL optimization.
 
 - Review the complete Serve path with fresh native samples/allocation callers and primary GC/library research, without assuming collection dominates HTTP cost. Identify redundant incoming URL construction/parsing and separate HTTP/Task, allocation, metadata, scheduling and collector candidates. The cohort audit finds the retained guest predates current ArrayQueue/managed improvements: qualify the native-only comparison accordingly and require a fresh cohort before current-runtime performance claims. No new speedup is claimed.
