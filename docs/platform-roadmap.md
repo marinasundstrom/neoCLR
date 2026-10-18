@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Native memory views (author direction, 2026-10-18):** implement Slice/ReadOnlySlice
+as the preferred contiguous-memory abstraction, followed by persistent
+Memory/ReadOnlyMemory and measured buffer integration. The
+[contract and implementation status](native-memory-views.md) distinguish the
+internal checked-view foundation from pending guest metadata/lifetime rules,
+Raven syntax and JIT/AOT support. Index/Range already exist; array ranges still
+copy until the coordinated public migration. This direction does not infer a
+permanent reprioritization of unrelated milestones.
+
 **Preview 16 compiler investigation (author direction, 2026-10-18):** reproduce reported record and Object-display failures, repair native boxing/generic display with GC-safe value semantics, then investigate adjacent gaps and commit each slice. [Reproduction and bounds](experiments/preview16-record-display/README.md) distinguish the unreproduced emitter message from confirmed backend failures and separate JSON mapping/retention limits. This bounded corrective work does not permanently reorder the platform roadmap. The author next requests [JSON record serialization](experiments/json-records/README.md), preserving interpreter/JIT/AOT behavior, and raises ValueType ancestry as a separate familiar-semantics foundation question. Imported ValueType ancestry for application structs/record structs is now repaired with [three-mode semantics evidence](experiments/type-semantics/README.md); [Application enum ancestry and boxed identity](experiments/enum-ancestry/README.md) now also pass interpreter/JIT/AOT; [Intrinsic primitive and core-enum ancestry](experiments/primitive-ancestry/README.md) now also passes interpreter/JIT/AOT against a freshly rebuilt four-library cohort. [All fourteen numeric/Boolean/Char box kinds](experiments/primitive-boxes/README.md) now preserve exact identity and ValueType ancestry across the three modes. Additional-kind default Object display and local ordinary value-record authoring remain separate.
 
 **Incoming HTTP construction (author direction, 2026-10-18):** [the fresh-cohort comparison](../benchmarks/http-server/serve/incoming-url-20261018/README.md) rebuilds current managed libraries and removes redundant incoming URL/Uri construction while retaining Host/Target strings. Fifty differential cases pass interpreter/JIT/AOT. Diagnostic allocations fall 7.13%; the final 60-second pair uses 6.38% less CPU/completion but loses 27 arrivals while the baseline loses none, with worse p99 and coarse CPU spikes. User-reported side activity is recorded separately. No higher reliable sustained rate is established; admission/latency remains open.

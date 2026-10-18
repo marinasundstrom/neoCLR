@@ -27,6 +27,17 @@ costs understandable.
 
 [Text design](https://github.com/marinasundstrom/neoCLR/blob/main/docs/text-model.md)
 
+## Contiguous memory views
+
+Work has begun on `Slice<T>` and `ReadOnlySlice<T>` for borrowed memory, followed
+by persistent `Memory<T>` and `ReadOnlyMemory<T>`. The intended views share storage
+without copying and preserve checked bounds and readonly access. Public APIs,
+compiler lifetime checks and native execution are still pending; current array
+range syntax continues to copy. String slicing retains its grapheme semantics,
+with a separate immutable UTF-8 byte view planned.
+
+[Design and implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md)
+
 ## Introspection
 
 [Introspection](../features/introspection/) describes types and members;

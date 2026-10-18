@@ -26,6 +26,27 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Native slices and persistent memory views
+
+- **Author:** directs implementation of the supplied “Native Slices and Memory
+  Views in neoCLR” proposal: Slice replaces the Span concept, Memory supplies
+  persistent ownership, array slicing shares storage, text retains grapheme
+  semantics, and raw pointers remain available. Specifies slices, then Memory,
+  then measured optimization and buffer integration. Subsequently asks to
+  “Commit each slice”.
+- **Assistant investigation:** finds existing Index/Range and copying Array.Slice,
+  existing managed interior-reference tracking, and missing complete byref-like
+  guest/native integration. Explains why an ordinary array-owning struct alone
+  cannot satisfy the requested lifetime contract.
+- **Assistant action:** adds checked internal borrowed/persistent view primitives,
+  readonly propagation, explicit root/frame-return helpers and immutable UTF-8
+  byte windows, with focused executable contracts. Records the .NET comparison,
+  copy-to-alias migration and implementation gates in the
+  [memory-view design](native-memory-views.md).
+- **Open:** public APIs, automatic guest tracing and escape checks, Raven
+  compilation and native backend qualification remain incomplete. The internal
+  foundation is not reported as completion of the proposal or of phase 1.
+
 ## 2026-10-18 — Attribute the remaining Serve allocation and CPU costs
 
 - **Author:** asks for concrete next actions, then directs continuation.

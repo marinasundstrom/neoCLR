@@ -56,6 +56,11 @@ case requires selecting exclusive borrowing as the only solution.
 
 ## Current priority
 
+The author-directed [native slices and memory views](native-memory-views.md)
+work extends this model with borrowed contiguous views and persistent heap-owned
+views. Its checked internal foundation is separate from the still-pending public
+Slice/Memory APIs, compiler lifetime enforcement and native backend integration.
+
 The managed-reference/GC foundation is implemented: frame-backed T&, direct managed
 heap allocation, tracing through interior/interface views, heap-backed reference
 fields and checked reference returns. The [Neo companion compiler](neo.md) exercises

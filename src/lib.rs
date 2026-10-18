@@ -1,4 +1,7 @@
 mod arrays;
+// Checked memory-view foundation; guest metadata/compiler integration is pending.
+#[allow(dead_code)]
+mod memory_views;
 pub mod assembler;
 pub mod cil;
 mod compositions;
