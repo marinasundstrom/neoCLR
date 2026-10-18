@@ -19319,3 +19319,19 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   and its failed evidence retained.
 - **Open:** no live reclamation is enabled. Parked roots, host-handle/root changes
   during a cycle, publication safety and actual Serve/Go benefit remain separate work.
+
+
+### 2026-10-18 — Parked roots and stale-result publication checks
+
+- **Author:** requested continuing the concurrent-GC proof of concept.
+- **Assistant action:** extended isolated capture to strong and conditional parked
+  frames, preserving the existing fixed point. Three guarded oracle cases, expired
+  registration skipping and overflow rejection pass with prior UBSan/bounds checks.
+- **Findings:** executable tests show that conditional host reads and parked resume
+  can rescue values after capture without allocation or collection. A separate test
+  reproduces address/descriptor reuse after synchronous reclamation. Old marks are
+  therefore unsafe to apply based only on allocation counters or heap shape.
+- **Next:** invalidate outstanding results at audited host/root transitions and across
+  reclamation/identity changes before enabling live application. Keep worker storage
+  until completion. [Evidence](experiments/concurrent-gc-walker/README.md#publication-counterexamples)
+  is a safety investigation, not a performance or production-concurrency claim.

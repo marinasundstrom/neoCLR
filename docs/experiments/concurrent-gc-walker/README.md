@@ -109,3 +109,40 @@ storage are unreadable during worker tracing. Owner-side synchronous collection
 confirms retention/expiry; a second capture skips expired registrations. A 129th
 registration fails capture without leaking the copied heap. These checks do not yet
 qualify resumption or handle reads while the worker result is outstanding.
+
+## Publication counterexamples
+
+`publication-results.json` retains three additional executable counterexamples,
+with all previous checks still passing under UBSan/bounds. The success of this test
+means the unsafe publication assumptions were disproved; it does not qualify live
+reclamation.
+
+1. **Conditional host read:** capture an otherwise unreachable owner/value pair,
+   then read its still-valid handle and publish the value as an active root before
+   worker completion. The snapshot marks neither object. Synchronous collection
+   retains the value and expires the owner. Owner allocation and collection counters
+   are unchanged between capture and completion.
+2. **Parked resume:** capture an unrooted owner with a conditionally parked frame,
+   then resume that frame. The snapshot marks neither owner nor frame value.
+   Synchronous collection retains the now-active value. Again, no intervening
+   allocation or collection is necessary to change the required retained set.
+3. **Address reuse:** capture an unrooted allocation, collect it synchronously, then
+   allocate and root a replacement at the same address with the same descriptor
+   shape and arena extent. Old marks would reclaim the replacement. Comparing only
+   addresses, sizes, kinds and extent cannot detect this; the collection epoch changes.
+
+These use current native handle/park/resume/allocation APIs, not invented graph
+mutations. The original prototype's descriptor checks alone are therefore not a safe
+publication gate. A practical next implementation should cancel/invalidate an
+outstanding result before conditional-handle access and parked resumption can expose
+previously unmarked objects, and invalidate it across synchronous reclamation/arena
+reuse. Registration/replacement, native access and lifetime transitions still need
+an audit; the examples are not an exhaustive list of invalidation points. Cancellation
+must preserve job storage until worker completion, as required by the existing worker.
+
+Do not add a generic mutation framework just to mask this issue. Start with the audited
+host/root transitions and explicit cycle identity, keep cleanup/reclamation on the
+owner, and test that stale results are refused. Ordinary graph changes are a separate
+snapshot-at-capture correctness question; these failures specifically demonstrate
+reachability emerging through conditional roots and identity reuse. There is still no
+live publication operation in this experiment, so no unsafe result is applied.

@@ -107,3 +107,14 @@ protected-heap graph cases plus focused root/array/error checks. It reuses the c
 walker and does not apply results to the live heap. Parked capture and mutation/handle
 publication safety remain unresolved; this result is not qualification of concurrent
 reclamation or a measured performance improvement.
+
+
+### Parked-root and publication checkpoint
+
+Parked capture now preserves owned/unowned semantics in guarded oracle tests. The
+[publication counterexamples](../experiments/concurrent-gc-walker/README.md#publication-counterexamples)
+show why accurate snapshot tracing is insufficient for reclamation: conditional
+handle access and parked resume can expose old unmarked values without allocating,
+and synchronous collection can reuse an address with identical descriptor shape.
+Audited transition invalidation and cycle identity are the next bounded implementation
+work; a general provider/mutation framework remains unnecessary at this stage.

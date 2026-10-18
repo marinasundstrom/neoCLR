@@ -69,7 +69,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     generated = out / 'native-gc.c'
     generated.write_text(instrument(SOURCE.read_text()))
-    files = [SOURCE, generated, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', Path(__file__),
+    files = [SOURCE, generated, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', HERE / 'publication-tests.inc', Path(__file__),
              WORKER / 'worker.c', WORKER / 'worker.h', ROOT / 'runtime/native/gc/root-probe.c']
     report = dict(passed=False, productionReady=False, platform=platform.platform(), commands=[],
                   inputs={str(f): hashlib.sha256(f.read_bytes()).hexdigest() for f in files})

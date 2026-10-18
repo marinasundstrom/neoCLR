@@ -1,0 +1,82 @@
+/* Counterexamples: a valid snapshot mark set need not be valid for reclamation. */
+static void host_read_after_capture(gc_worker *worker) {
+    uint64_t heap[1024] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *owner = allocate(&c, 8, NEOCLR_GC_BYTES);
+    void *value = allocate(&c, 8, NEOCLR_GC_BYTES);
+    uint64_t handle;
+    assert(!neoclr_gc_host_root_create_owned_v1(&c, owner, value, &handle));
+    snapshot *s = malloc(sizeof(*s));
+    assert(s && capture(s, &c));
+    uint64_t allocations = statistics.allocations, collections = statistics.collections;
+    assert(gc_worker_submit(worker, trace_snapshot, s));
+    wait_entered(s);
+    void *rescued = NULL;
+    assert(!neoclr_gc_host_root_read_v1(&c, handle, &rescued) && rescued == value);
+    neoclr_probe_storage slot = {&rescued, 8, 0};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+    assert(finish(worker, s) == 0);
+    assert(statistics.allocations == allocations && statistics.collections == collections);
+    assert(!marked(s, owner) && !marked(s, value));
+    assert(!neoclr_gc_collect_v1(&c, &frame));
+    assert(validated_bases(&c.text, value, NULL) && !validated_bases(&c.text, owner, NULL));
+    assert(neoclr_gc_host_root_read_v1(&c, handle, &rescued) == 3);
+    neoclr_probe_leave_v1(&frame);
+    assert(!neoclr_gc_host_root_release_v1(&c, handle));
+    assert(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    free(s->copy.text.data);
+    free(s);
+    puts("COUNTEREXAMPLE: conditional host read rescues a snapshot-white value without allocation or collection");
+}
+static void resume_after_capture(gc_worker *worker) {
+    uint64_t heap[1024] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *owner = allocate(&c, 8, NEOCLR_GC_BYTES);
+    void *value = allocate(&c, 8, NEOCLR_GC_BYTES);
+    neoclr_probe_storage slot = {&value, 8, 0};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+    neoclr_parked_roots parked = {0};
+    assert(!neoclr_gc_roots_park_owned_v1(&c, owner, &parked));
+    snapshot *s = malloc(sizeof(*s));
+    assert(s && capture(s, &c));
+    uint64_t allocations = statistics.allocations, collections = statistics.collections;
+    assert(gc_worker_submit(worker, trace_snapshot, s));
+    wait_entered(s);
+    neoclr_roots_resume_v1(&parked);
+    assert(finish(worker, s) == 0);
+    assert(statistics.allocations == allocations && statistics.collections == collections);
+    assert(!marked(s, owner) && !marked(s, value));
+    assert(!neoclr_gc_collect_v1(&c, &frame));
+    assert(validated_bases(&c.text, value, NULL) && !validated_bases(&c.text, owner, NULL));
+    neoclr_probe_leave_v1(&frame);
+    assert(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    free(s->copy.text.data);
+    free(s);
+    puts("COUNTEREXAMPLE: parked resume makes a snapshot-white value a strong root without allocation or collection");
+}
+static void reused_address_after_capture(gc_worker *worker) {
+    uint64_t heap[1024] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *old = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    snapshot *s = malloc(sizeof(*s));
+    assert(s && capture(s, &c));
+    uint64_t collections = statistics.collections;
+    assert(gc_worker_submit(worker, trace_snapshot, s));
+    wait_entered(s);
+    assert(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    void *replacement = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    assert(replacement == old && c.text.used == s->copy.text.used);
+    neoclr_probe_storage slot = {&replacement, 8, 0};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+    assert(finish(worker, s) == 0);
+    assert(!marked(s, replacement) && statistics.collections != collections);
+    assert(!neoclr_gc_collect_v1(&c, &frame) && validated_bases(&c.text, replacement, NULL));
+    neoclr_probe_leave_v1(&frame);
+    assert(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    free(s->copy.text.data);
+    free(s);
+    puts("COUNTEREXAMPLE: collection/reallocation reuses an address and descriptor shape for a live replacement");
+}

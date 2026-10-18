@@ -5242,3 +5242,11 @@ The isolated walker now captures up to 128 parked registrations without promotin
 owned frames to strong roots. [Guarded oracle checks](experiments/concurrent-gc-walker/README.md#parked-frame-capture-checkpoint)
 pass for strong/conditional frames, chained activation, expiry and capture bounds.
 Concurrent resumption/handle access and safe application of marks remain open.
+
+
+[Publication counterexamples](experiments/concurrent-gc-walker/README.md#publication-counterexamples)
+now show that host reads and parked resumption can invalidate old marks without
+allocation/collection, and reclamation can reuse identical addresses/descriptors.
+The next bounded step is audited transition invalidation and cycle identity before
+owner-side application of marks; allocation counts or descriptor checks alone are
+insufficient. No live snapshot reclamation is enabled.

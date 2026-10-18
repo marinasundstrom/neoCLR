@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Add concurrent-GC publication counterexamples: conditional host reads and parked resumption can rescue snapshot-unmarked objects without allocation or collection; collection/reallocation can reuse the same address and descriptor shape. UBSan/bounds reproduces all three alongside existing snapshot checks. Record required result invalidation work; no live reclamation or performance gain is enabled.
+
 - Extend isolated GC snapshots to bounded parked-frame capture, preserving strong versus conditional ownership and the existing fixed point. UBSan/bounds passes three additional oracle cases with original heap/frame memory unreadable, expiry skipping and overflow rejection, alongside prior graph tests. Live result application remains disabled; production GC behavior is unchanged.
 
 - Reuse the native GC walker in an isolated worker snapshot, preserving conditional host-root pairs instead of promoting owners to strong roots. UBSan/bounds passes 101 graph/oracle comparisons with the original heap unreadable, plus conditional-cycle, initialized-array, intern/static/fault-root, mutation, cancellation and error checks. Reject parked-root capture for now. No snapshot result reclaims live objects; production GC selection and behavior remain unchanged, with no performance gain claimed.

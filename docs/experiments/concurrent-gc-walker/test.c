@@ -233,12 +233,16 @@ static void arrays_and_invalid_descriptor(gc_worker *worker) {
     neoclr_probe_leave_v1(&frame);
 }
 #include "parked-tests.inc"
+#include "publication-tests.inc"
 int main(void) {
     owner_thread = pthread_self();
     gc_worker worker;
     assert(!gc_worker_init(&worker));
     for (unsigned mode = 0; mode < 3; mode++) parked_case(&worker, mode);
     parked_limits();
+    host_read_after_capture(&worker);
+    resume_after_capture(&worker);
+    reused_address_after_capture(&worker);
     conditional_regression(&worker);
     specialized_roots(&worker);
     failure_and_mutation(&worker);
