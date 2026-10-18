@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Diagnose Serve admission windows with per-request phases and GC/scheduler intervals. Find brief dispatch gaps hidden by p99 and a busy orphan language server; stop only that leftover process after confirming VS Code is closed. A separate clean trace does not reproduce the long stall, but identifies 17,710 blind async-pump sleeps in 60 seconds. Preserve raw evidence and distinguish off-CPU/host uncertainty from the targeted readiness-wait opportunity.
+
 - Measure direct incoming request construction against the fresh Serve baseline and Go: 7.13% fewer diagnostic allocations and 3.73% fewer payload bytes. The final 60-second pair uses 6.38% less CPU/completion but misses 27 arrivals versus none for baseline, with worse p99 and coarse CPU peaks; no reliable throughput gain is claimed. Preserve all 30/60-second runs, raw requests and user-reported activity context, and keep admission/latency attribution open.
 
 - Construct incoming HTTP requests directly from Host and Target strings, removing full URL/Uri construction and reparsing while preserving validation, error precedence, limits, ports and body/header ownership. Fifty differential wire cases pass against the fresh baseline across interpreter/JIT/AOT. Outbound URL/Uri APIs remain unchanged; regenerate the unchanged public reference and refresh its source fingerprint. Retain stale-tool/probe-build failures separately; sustained measurements follow.

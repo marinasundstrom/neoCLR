@@ -1,0 +1,5 @@
+{
+  "orphan": "14420     1 03:45:28  98.5 dotnet /Users/robert/Library/Application Support/Code/User/globalStorage/raven.raven-vscode/language-server/a345b9d0f4df/Raven.LanguageServer.dll\n",
+  "editorCheck": "No VS Code editor or Code Helper process remained; only crashpad and orphaned language servers. Prior author direction closed VS Code.",
+  "action": "Terminate only busy orphan PID 14420 with SIGTERM; do not stop active apps."
+}
