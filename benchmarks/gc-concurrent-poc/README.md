@@ -169,3 +169,51 @@ combine mark import's blanket marking and overwrite walks while keeping validati
 before mutation and retaining allocations in old free spans or beyond the snapshot.
 The collector still follows the existing reachability/cleanup contract; these are
 internal POC diagnostics, not a .NET API divergence or production runtime change.
+
+## Single mark-import walk (2026-10-18)
+
+Import now writes captured allocation marks once, retaining new allocations in
+captured free spans and beyond the captured extent. It no longer marks every live
+allocation and then overwrites captured marks in a second walk. Validation still
+finishes before any live state changes; invalidation and owner cleanup semantics
+are unchanged. This internal POC optimization preserves the existing reachability
+contract and introduces no .NET-facing API divergence.
+
+Fresh UBSan/bounds qualification passes 319 applied cycles, ten rejected results,
+100 reclamation-oracle graph comparisons and all prior guarded snapshot tests.
+The expanded free-span regression allocates two objects inside one captured free
+span, leaves a free remainder, and appends another object: all survive apply, retain
+their payloads, and are reclaimed on the next cycle after roots are removed.
+
+Uninstrumented paired means (two trials each), milliseconds:
+
+| Live objects / batches | Scalar iterations | Baseline concurrent elapsed | Candidate concurrent elapsed | Candidate sync elapsed | Baseline owner interruption | Candidate owner interruption |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4096 / 2000 | 0 | 1459.03 | 1452.47 | 1409.88 | 133.79 | 118.22 |
+| 4096 / 2000 | 50,000 | 1559.80 | 1546.78 | 1522.73 | 134.20 | 117.87 |
+| 512 / 10000 | 0 | 1089.33 | 1081.65 | 912.38 | 155.82 | 144.10 |
+| 512 / 10000 | 50,000 | 1585.00 | 1581.44 | 1410.83 | 151.96 | 145.64 |
+
+At 4096 objects, owner interruption falls 11.6%/12.2% and process CPU falls
+0.8%/1.0%, but elapsed gains are only 0.4%/0.8%. Candidate concurrent still takes
+3.0%/1.6% longer than candidate sync and consumes 10.1%/8.4% more process CPU.
+Small-graph elapsed gains are 0.7%/0.2%; CPU gains 0.8%/0.4%. Sync controls vary,
+so these short trials do not establish a substantial sustained throughput gain.
+
+The paired diagnostic confirms the intended phase reduction: import totals fall
+from 40.26–40.38 ms to 19.70–20.67 ms. Validation remains about 40 ms and sweep
+about 20 ms in most trials. One candidate allocation-only diagnostic takes 1562 ms
+versus 1442 ms on its repeat; it includes increased wait/validation/sweep and a
+wall/CPU gap. Two baseline diagnostics also record roughly 7 ms worker-wait totals.
+All trials are retained; these observations limit precise latency claims. Default
+uninstrumented measurements, rather than clock-instrumented elapsed times, determine
+the table above. Every trial matches checksums, allocations and collection counts
+within its workload and drains the managed heap completely.
+
+Raw evidence: [large graph](import-large.json), [small graph](import-small.json),
+[phase comparison](import-phases.json), and [qualification](../../docs/experiments/concurrent-gc-walker/import-results.json).
+Each paired report includes baseline provenance. No timed run overlaps our builds
+or tests. The next measured owner cost is validation's separate heap-integrity and
+captured-descriptor walks. Investigate combining those without weakening rejection
+before mutation; do not infer that worker wait is negligible for other workloads.
+Production GC and Serve/Go capacity remain unchanged and unmeasured by this slice.

@@ -241,3 +241,14 @@ objects or preserve the test pause flag. [Fresh UBSan/bounds qualification](capt
 passes alongside all existing reclamation/oracle checks. The [paired performance
 comparison](../../../benchmarks/gc-concurrent-poc/README.md#snapshot-initialization-and-larger-graph-2026-10-18)
 shows lower capture cost but no convincing overall throughput improvement.
+
+
+### Single import walk
+
+Owner application now imports captured marks once and marks only new allocations
+in captured free spans or the appended tail. All validation remains before mutation.
+The expanded split-free-span/tail regression and existing UBSan/bounds suite pass:
+319 applied cycles, ten discards and 246,304 reclaimed payload bytes. See
+[qualification](import-results.json) and the [paired performance evidence](../../../benchmarks/gc-concurrent-poc/README.md#single-mark-import-walk-2026-10-18).
+Mark-import time roughly halves on the larger graph; overall elapsed gains are
+small and concurrent GC still trails sync. This remains an isolated bounded POC.

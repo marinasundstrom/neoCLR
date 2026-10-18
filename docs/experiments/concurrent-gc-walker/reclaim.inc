@@ -49,18 +49,29 @@ static bool cycle_apply(collection_cycle *cycle) {
         at += old->span;
     }
     RECLAIM_PHASE(2); /* Validation complete, no live state changed yet. */
-    /* New allocations are black for this cycle, including allocations in free
-     * spans that existed at capture. Only captured allocations can be reclaimed. */
-    for (uint64_t at = 0; at < a->used;) {
+    /* Import captured marks once. Allocations in captured free spans and the
+     * appended tail are new, so retain them without overwriting captured marks.
+     * Validation above finishes before any live state is changed. */
+    uint64_t at = 0;
+    while (at < s->copy.text.used) {
+        const block *old = (const void *)(s->copy.text.data + at);
+        uint64_t end = at + old->span;
+        if (old->state & ALLOCATED) {
+            ((block *)(void *)(a->data + at))->state = ALLOCATED | (old->state & MARKED);
+            at = end;
+        } else {
+            /* Allocation can split one captured free span into several blocks. */
+            while (at < end) {
+                block *live = (void *)(a->data + at);
+                if (live->state) live->state = ALLOCATED | MARKED;
+                at += live->span;
+            }
+        }
+    }
+    while (at < a->used) {
         block *live = (void *)(a->data + at);
         if (live->state) live->state = ALLOCATED | MARKED;
         at += live->span;
-    }
-    for (uint64_t at = 0; at < s->copy.text.used;) {
-        const block *old = (const void *)(s->copy.text.data + at);
-        if (old->state & ALLOCATED)
-            ((block *)(void *)(a->data + at))->state = ALLOCATED | (old->state & MARKED);
-        at += old->span;
     }
     RECLAIM_PHASE(3);
     uint64_t reclaimed_before = statistics.reclaimed_bytes;

@@ -5279,3 +5279,12 @@ speedup; a 4096-object graph narrows, but does not close, the sync/concurrent ga
 See the [measurements](../benchmarks/gc-concurrent-poc/README.md#snapshot-initialization-and-larger-graph-2026-10-18).
 Next isolate result-wait versus owner validation/import/sweep cost; production and
 Serve integration remain outside this bounded experiment.
+
+
+**Owner application attribution and improvement (2026-10-18):** phase diagnostics
+identify repeated validation/import walks rather than worker wait on the supported
+stable graph. One-pass mark import preserves new allocations and passes expanded
+reclamation checks; larger-graph owner interruption falls about 12%, with only small
+elapsed gains and no sync crossover. [Paired evidence](../benchmarks/gc-concurrent-poc/README.md#single-mark-import-walk-2026-10-18)
+retains variable diagnostic runs. Next investigate merging validation walks while
+preserving rejection before mutation. This does not change production GC selection.

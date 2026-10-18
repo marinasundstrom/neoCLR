@@ -60,7 +60,7 @@ static void free_span_allocation(void) {
     uint64_t heap[1024] = {0};
     neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
     void *a = allocate(&c, 8, NEOCLR_GC_BYTES);
-    void *hole = allocate(&c, 64, NEOCLR_GC_BYTES);
+    void *hole = allocate(&c, 256, NEOCLR_GC_BYTES);
     void *b = allocate(&c, 8, NEOCLR_GC_BYTES);
     uint64_t roots[2] = {(uintptr_t)a, (uintptr_t)b};
     neoclr_probe_frame frame;
@@ -72,9 +72,18 @@ static void free_span_allocation(void) {
     void *fresh = allocate(&c, 16, NEOCLR_GC_BYTES);
     assert(fresh == hole);
     *(uint64_t *)fresh = 99;
+    void *fresh_second = allocate(&c, 16, NEOCLR_GC_BYTES);
+    assert((uintptr_t)fresh_second > (uintptr_t)hole &&
+        (uintptr_t)fresh_second < (uintptr_t)hole + 256);
+    *(uint64_t *)fresh_second = 101;
+    void *tail = allocate(&c, 512, NEOCLR_GC_BYTES);
+    assert((uintptr_t)tail > (uintptr_t)b);
+    *(uint64_t *)tail = 103;
     atomic_store(&cycle.job->proceed, true);
     assert(cycle_poll(&cycle, true, false) == CYCLE_APPLIED);
     assert(validated_bases(&c.text, fresh, NULL) && *(uint64_t *)fresh == 99);
+    assert(validated_bases(&c.text, fresh_second, tail));
+    assert(*(uint64_t *)fresh_second == 101 && *(uint64_t *)tail == 103);
     roots[0] = roots[1] = 0;
     cycle_run(&cycle, &c);
     assert(!c.text.used);

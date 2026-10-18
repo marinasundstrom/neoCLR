@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Combine concurrent-GC POC mark import into one walk while retaining new allocations in split free spans and appended storage. Expanded regressions and UBSan/bounds reclamation checks pass. Paired diagnostics halve import time; uninstrumented larger-graph owner interruption falls about 12%, but elapsed gains are only 0.4–0.8% and concurrent still trails sync. Retain small/large/control evidence; production GC and HTTP capacity are unchanged.
+
 - Attribute concurrent-GC POC result handling with opt-in, compiled-out-by-default phase clocks and an uninstrumented control. On the supported 4,096-object workload, validation/import each consume about 40 ms per 2,000 cycles, sweep about 20 ms and worker wait under 0.1 ms. Fresh UBSan/bounds and complete benchmark reclamation checks pass; prioritize redundant owner heap walks.
 
 - Avoid redundant clearing of unused concurrent-GC POC snapshot arrays; poisoned-storage/reuse and existing UBSan/bounds reclamation checks pass. Add paired baseline/candidate benchmarks and configurable live graphs. Capture cost falls, but overall gains remain inconclusive; at 4,096 live objects concurrent remains 3–4% slower and uses 11–12% more CPU than sync. Preserve raw evidence and keep production behavior unchanged.
