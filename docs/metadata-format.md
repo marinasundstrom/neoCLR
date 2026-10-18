@@ -180,4 +180,8 @@ System name and `is_borrowed()` identifies the two slice kinds. Canonical names
 without this metadata are rejected, as are mismatched identity/shape declarations.
 See [admission and lifetime rules](native-memory-views.md) and the
 [neoIL directive](neoil.md#interpreter-memory-view-declarations-development).
-The experimental native metadata and CLI bridge do not yet carry this contract.
+The experimental native metadata writer/reader preserves this contract through
+`TypeBuilder.SetMemoryView`, `TypeDefinition.MemoryView` and
+`NominalTypeInfo.MemoryView`. The CLI reference projection rejects view-bearing
+assemblies; no empty-record substitute is permitted. Native metadata support does
+not imply JIT/AOT ABI support.

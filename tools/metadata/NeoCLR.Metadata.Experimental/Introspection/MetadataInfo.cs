@@ -158,6 +158,8 @@ public sealed class NominalTypeInfo : TypeInfo
     public PrimitiveType? NativePrimitive => definition.NativePrimitive;
     /// <summary>Whether this declaration owns native Unicode grapheme storage.</summary>
     public bool NativeGrapheme => definition.NativeGrapheme;
+    /// <summary>Gets the explicit opaque memory-view contract.</summary>
+    public MemoryViewKind? MemoryView => definition.MemoryView;
     /// <summary>Gets whether the declaration is a nominal enum.</summary>
     public bool IsEnum => definition.IsEnum;
 }

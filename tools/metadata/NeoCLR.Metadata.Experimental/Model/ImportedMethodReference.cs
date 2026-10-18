@@ -190,6 +190,7 @@ public sealed partial class AssemblyBuilder
             result.Definition.AuthoredDeclaringType = MakeOwner(declaration.DeclaringType)?.Definition;
             if (declaration.NativePrimitive is { } primitive) result.SetNativePrimitive(primitive);
             if (declaration.NativeGrapheme) result.SetNativeGrapheme();
+            if (declaration.MemoryView is { } view) result.SetMemoryView(view);
             return result;
         }
         var owner = MakeOwner(type);

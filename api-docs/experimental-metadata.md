@@ -10391,3 +10391,20 @@ RavenDoc selection. `SetBaseType(ImportedTypeReference)` additionally permits a
 closed reference root to bind the selected external Object, preserving all other
 ownership/member-order checks. Imported Object slot references retain virtual
 classification for exact inherited override validation.
+
+## Opaque memory-view metadata (development)
+
+`MemoryViewKind` selects `Slice`, `ReadOnlySlice`, `Memory` or `ReadOnlyMemory`.
+`TypeBuilder.SetMemoryView(kind)` marks a canonical System generic value type with
+one type parameter and no fields, interfaces or constraints. An invalid enum
+throws `ArgumentOutOfRangeException`; incompatible names/shapes or a conflicting
+previous kind throw `InvalidOperationException`. A failed selection leaves the
+previous contract intact. Writing validates the final declaration again.
+
+`TypeDefinition.MemoryView` and `NominalTypeInfo.MemoryView` expose the nullable
+contract on authored or imported declarations. Native serialization/import and
+imported method owners preserve it. `CreateReferenceAssembly` rejects assemblies
+containing these types: no CLI projection of an empty ordinary record is safe.
+Use `RuntimeAssemblyContainer.WriteLibraryBinary` for a native-only library.
+The interpreter owns the layout and enforces lifetimes; native JIT/AOT lowering
+is not established by this metadata support.

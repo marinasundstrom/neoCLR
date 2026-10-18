@@ -11,6 +11,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType)
     {
+        internal MemoryViewKind? MemoryView { get; init; }
         internal bool BeforeFieldInit { get; init; }
         internal GenericVariance[] Variance { get; init; } = [];
         internal FieldRow[] StaticFields { get; init; } = [];
@@ -301,6 +302,24 @@ public sealed partial class NativeAssemblyDefinition
                     }).ToArray();
                     Require(enumMembers.Select(m => m.Name).Distinct().Count() == enumMembers.Length && typeNames.Length == 0 && declaringType < 0 && baseInterfaces.Length == 0, "unsupported enum relationships or duplicate members");
                 }
+                MemoryViewKind? memoryView = null;
+                if (type.TryGetProperty("memory_view", out var memoryViewNode))
+                {
+                    typeFields.Add("memory_view");
+                    memoryView = memoryViewNode.GetString() switch {
+                        "slice" => MemoryViewKind.Slice, "read_only_slice" => MemoryViewKind.ReadOnlySlice,
+                        "memory" => MemoryViewKind.Memory, "read_only_memory" => MemoryViewKind.ReadOnlyMemory,
+                        _ => throw new InvalidDataException("invalid memory-view kind")
+                    };
+                    Require(Text(type, "name") == "System." + memoryView.ToString() && typeNames.Length == 1 &&
+                        !type.GetProperty("is_reference_type").GetBoolean() && !type.GetProperty("is_abstract").GetBoolean() &&
+                        !isInterface && !isPrimitive && Array(type, "fields", 256).Length == 0 &&
+                        constraints.Count == 0 && specialConstraints.Count == 0 && baseInterfaces.Length == 0 && declaringType < 0 &&
+                        !type.TryGetProperty("base", out _) && variance.All(v => v == GenericVariance.Invariant) &&
+                        (!type.TryGetProperty("static_fields", out _) || Array(type, "static_fields", 256).Length == 0) &&
+                        (!type.TryGetProperty("literal_fields", out _) || Array(type, "literal_fields", 256).Length == 0),
+                        "invalid memory-view declaration");
+                }
                 Shape(type, typeFields.ToArray());
                 var isObjectRoot = Text(type, "name") == "System.Object";
                 Require(!isObjectRoot || !isInterface && !isPrimitive && !closedHierarchy && visibility == TypeVisibility.Public &&
@@ -357,10 +376,11 @@ public sealed partial class NativeAssemblyDefinition
                 Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
                 Require(nextFieldToken + fieldRows.Count + staticRows.Length + literalRows.Length + (enumMembers?.Length ?? 0) <= 0x04001001, "too many fields");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
-                Require(isObjectRoot || isPrimitive || nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
+                Require(memoryView is not null || isObjectRoot || isPrimitive || nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
                 string ns, name;
                 PrimitiveType? primitive = null;
-                if (isObjectRoot) { ns = "System"; name = "Object"; }
+                if (memoryView is { } viewKind) { ns = "System"; name = viewKind.ToString() + "`1"; }
+                else if (isObjectRoot) { ns = "System"; name = "Object"; }
                 else if (isPrimitive)
                 {
                     Require(nativeName.StartsWith("System.", StringComparison.Ordinal), "primitive requires canonical identity");
@@ -419,7 +439,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + staticRows.Length + literalRows.Length + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { BeforeFieldInit = beforeFieldInit, Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, key == "field_tokens" ? 768 : 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { MemoryView = memoryView, BeforeFieldInit = beforeFieldInit, Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, key == "field_tokens" ? 768 : 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -1156,6 +1176,8 @@ public sealed partial class NativeAssemblyDefinition
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
+        if (types.Any(type => type.MemoryView is not null))
+            throw new NotSupportedException("memory views require direct native metadata import");
         if (assemblyConstants.Length != 0)
             throw new NotSupportedException("standalone CLI projection of assembly-level constants is not implemented");
         if (types.Any(type => type.BaseName is not null))

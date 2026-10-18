@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--memory-views"]) { MemoryViewChecks.Run(); return 0; }
+
 if (args is ["--core-base-types"]) { CoreBaseTypeChecks.Run(); return 0; }
 
 if (args is ["--type-initialization"]) { TypeInitializationChecks.Run(); return 0; }
