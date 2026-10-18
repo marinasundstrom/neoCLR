@@ -86,3 +86,14 @@ memory manager, not necessarily GC. The immediate scope was subsequently narrowe
 proof of concept. General provider machinery is deferred. The unvalidated snapshot
 scaffold stays isolated; build-time experimental macros alone do not satisfy runtime
 selection.
+
+### Snapshot proof-of-concept result
+
+The isolated [executable experiment](../experiments/concurrent-gc-snapshot/README.md)
+demonstrates owner progress during an outstanding worker job and exposes a retention
+flaw: promoting conditional roots keeps an unreachable owner alive across repeated
+cycles. The synchronous oracle expires it and cleans up its native resource once.
+UBSan/bounds reproduces both observations; ThreadSanitizer is unavailable on this host
+(even an empty control crashes). The prototype is not integrated or selectable.
+Phase-cost measurements should guide the next practical offload experiment; this
+result establishes no throughput improvement or complete concurrent-GC safety.

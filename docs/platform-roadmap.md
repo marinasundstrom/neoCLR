@@ -5206,3 +5206,10 @@ continued concurrent-GC investigation. Development now exposes `--gc mark-sweep`
 execution-local Rust selection, with native backend validation. Only the existing
 collector is available; broader provider composition and concurrent collection remain
 open. See [selection semantics](runtime-gc.md#explicit-collector-selection-development).
+
+The isolated [snapshot proof of concept](experiments/concurrent-gc-snapshot/README.md)
+now demonstrates progress with an outstanding worker and reproduces conditional-owner
+retention across repeated cycles. It remains excluded from production. UBSan/bounds
+passes the counterexample; ThreadSanitizer is unavailable on this host. No concurrent
+collector or new sustained Serve rate is qualified. Keep subsequent experiments small
+and use phase costs to choose useful off-thread work.

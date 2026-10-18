@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Preserve an isolated concurrent snapshot proof of concept and executable retention counterexample. The owner progresses while a worker job is outstanding, but repeated cycles retain an otherwise unreachable conditional owner; synchronous collection expires it and performs cleanup once. UBSan/bounds reproduces the result. ThreadSanitizer fails before output even for an empty control, so race validation remains unavailable. Keep the experiment out of production and collector selection; no Serve/Go performance gain is claimed.
+
 - Add explicit `--gc mark-sweep` selection for interpreter and native JIT/AOT tooling, with execution-local Rust configuration and worker inheritance. Keep the existing collector as the sole available/default choice; reject missing, duplicate, unavailable or incompatible selections. Explicit JIT selection needs a matching updated backend; standalone AOT selection is at compile time. Exhaustive Rust `ExecutionOptions` literals need the new `garbage_collector` field. Validate 28 focused tests, byte-identical default/explicit native objects and a Task JIT consumer. Defer broader memory-manager composition and keep concurrent work a practical proof of concept. No new collector or performance improvement is claimed.
 
 - Record author-directed concurrent-GC evaluation beyond CLR: compare Go/Green Tea, Shenandoah, LXR and recent Opportunistic ZGC research, with explicit status, tradeoffs, root/mutation safety and sustained-load gates. Update the roadmap direction; no concurrent collector or performance gain is claimed by this research slice.

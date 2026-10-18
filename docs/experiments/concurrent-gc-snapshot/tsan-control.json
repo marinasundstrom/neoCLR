@@ -1,0 +1,13 @@
+{
+  "build": [
+    "clang",
+    "-fsanitize=thread",
+    "target/concurrent-gc-20261018/tsan-control.c",
+    "-o",
+    "target/concurrent-gc-20261018/tsan-control"
+  ],
+  "buildExit": 0,
+  "exitCode": -11,
+  "stdout": "",
+  "stderr": ""
+}

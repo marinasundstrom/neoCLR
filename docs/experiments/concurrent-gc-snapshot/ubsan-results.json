@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "productionReady": false,
+  "commands": [
+    {
+      "command": [
+        "patch",
+        "/Users/robert/Projects/neoclr/target/concurrent-gc-20261018/repro-resources/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-snapshot/native-gc.patch"
+      ],
+      "exitCode": 0,
+      "stdout": "patching file '/Users/robert/Projects/neoclr/target/concurrent-gc-20261018/repro-resources/native-gc.c'\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "/Users/robert/Projects/neoclr/target/concurrent-gc-20261018/repro-resources/test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/concurrent-gc-20261018/repro-resources/test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/concurrent-gc-20261018/repro-resources/test"
+      ],
+      "exitCode": 0,
+      "stdout": "mutator progressed during outstanding snapshot; old/new reachable objects survived\nCOUNTEREXAMPLE: three snapshot cycles retain an unrooted conditional owner\nsynchronous oracle expires the same owner and reclaims all memory\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-snapshot/native-gc.patch": "3780efe8495779c3dc710b5e3625815f849cf947d076b02f8ff97b2da2482bd5",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-snapshot/concurrent-snapshot.inc": "1a801a436a98d2e72f08699aee043e224ebdb867cfa9c64209e75d237dc578bc",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-snapshot/test.c": "bb1c325063105318f93cd203742c7b699c4b13b1b05b0f1db4ee8b16c4a5a202",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-snapshot/run.py": "53301bfb650509062d33af3d70da5600bdb4c3f8d103c1f6f803837ba671fcca"
+  }
+}

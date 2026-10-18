@@ -19277,3 +19277,11 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   general framework work. Keep the concurrent experiment isolated; use executable
   lifetime checks and measurements to decide what merits integration. Proof-of-concept
   scope does not justify claiming safety or performance that has not been established.
+
+- **Outcome:** the named selector passes 28 focused tests and a Task JIT consumer.
+  The isolated [snapshot reproducer](experiments/concurrent-gc-snapshot/README.md)
+  demonstrates owner progress while a worker is outstanding, but conditional owners
+  remain alive across repeated cycles. The synchronous oracle reclaims them with
+  exactly-once owner-thread cleanup. Retain the counterexample, not a selectable
+  concurrent collector. UBSan/bounds passes; ThreadSanitizer fails even for an empty
+  control. Concurrent lifetime qualification and Serve/Go measurements remain open.
