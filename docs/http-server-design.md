@@ -1,5 +1,7 @@
 # Minimal HTTP server — development POC, 2026-09-24
 
+**Current design guidance:** see the [2026-10-17 performance review](#performance-architecture-review--2026-10-17) for current implementation pointers and proposed next measurements. The dated POC sections below retain historical limitations.
+
 **Development update 2026-10-11:** the [HTTP foundation](http-foundation.md) supersedes
 older POC body/header bounds and adds shared chunked request reception, client interim
 responses and content-oriented JSON APIs. Historical dated validation below records
@@ -274,3 +276,149 @@ bounded fixed-length responses. Passing stream-backed content to a response retu
 Unsupported during completion, rather than silently sending an empty body. Request
 streaming, response writers, trailers and newer protocol providers remain deferred.
 The author selects a finite POC finish line and thematic tracking consolidation next.
+
+
+## Performance architecture review — 2026-10-17
+
+The author supplied architectural optimization guidance covering asynchronous I/O,
+byte ownership, incremental framing, scheduling, streaming, admission/backpressure,
+and sustained-load measurement. Treat the suggested MapGet/Listen/OpenWriter forms
+as illustrative, and the suggested version-0.1 order as input rather than a reset
+of the [platform roadmap](platform-roadmap.md). No new public API, native provider,
+or implementation placement is selected by this review.
+
+### Existing implementation and evidence
+
+- HTTP protocol and exchange control are already managed Raven code:
+  [HttpServer](../runtime/raven/src/System/Web/Http/HttpServer.rvn),
+  [HttpWire](../runtime/raven/src/System/Web/Http/HttpWire.rvn) and
+  [HttpBodyInput](../runtime/raven/src/System/Web/Http/HttpBodyInput.rvn).
+  Preserve byte-oriented incremental parsing and framing checks when optimizing.
+- [Server options](http-server-options.md) bound headers, bodies and read/write
+  deadlines; the current exchange cap is 16. These are bounded development
+  contracts, not evidence for thousands of concurrent connections.
+- [Body streams](../api-docs/http-body-streams.md) already provide headers-first
+  acceptance and known-length response sources. This is narrower than arbitrary
+  unknown-length response streaming. [Current server APIs](../api-docs/http-server.md)
+  retain one-exchange connection ownership; persistence remains a separate change.
+- Native transport already supports nonblocking socket operations. The
+  [platform boundary](native-http-parity.md#platform-boundary-and-tradeoffs) and
+  [Windows readiness measurements](../benchmarks/http-scheduling/README.md)
+  distinguish provider behavior from HTTP logic. Do not describe the existing
+  transport as a Tokio service or claim scalable IOCP/kqueue support from these checks.
+- [Byte-path measurements](../benchmarks/http-server/byte-paths.md) and subsequent
+  [allocation attribution](../benchmarks/http-server/allocation-sites.md) already
+  motivate fewer parser temporaries. The [benchmark](../benchmarks/http-server/README.md)
+  uses sequential loopback requests and connection close. It does not measure
+  sustained capacity, fixed offered-rate latency or high concurrency.
+
+### Placement and ownership recommendation — provisional
+
+The assistant recommends retaining a managed HTTP engine over reusable socket,
+stream and task primitives. This makes HTTP a demanding consumer of the runtime
+and keeps the same foundations useful for other networking libraries. A native
+protocol engine remains an alternative if equivalent measurements justify its
+boundary and maintenance costs; Rust alone does not establish a speedup.
+
+Compare three options before a substantial transport change: managed protocol over
+runtime I/O, a runtime-owned native service, and a separate native library behind
+an explicit ABI. Follow the [placement criteria](design-research.md#choose-runtime-services-or-foreign-libraries-deliberately):
+GC roots, thread entry, cancellation, shutdown and interpreter/JIT/AOT availability
+must be specified. A runtime adapter may use an external implementation without
+making HTTP itself a privileged runtime service. Tokio/provider selection and
+application-worker scheduling remain open.
+
+Keep platform event mechanisms behind the runtime transport contract. Completion
+and readiness providers can share public operation semantics without identical
+internals. Inline completion needs a fairness budget; arbitrary handler execution
+must not indefinitely delay other connections. Do not assume cooperative await
+preempts CPU-bound code, or equate a suspended task with a dedicated OS thread.
+
+Reuse the [byte ownership design](http-foundation.md#byte-ownership-and-lazy-materialization-direction--2026-10-14).
+A native-backed view needs an enforceable owner/lease, bounded range and explicit
+release semantics across await, cancellation and disposal. Retained public header
+values must remain valid after buffer reuse; copy or retain ownership as needed.
+An ordinary byte array remains appropriate for independently owned data. Pooling
+must account for idle retention and global budgets, not just allocations/request.
+Vectored writes, sendfile, larger read blocks and custom allocators are measurement
+candidates, not prerequisites or universal zero-copy promises.
+
+### .NET/protocol comparison and proposed bounded next work
+
+Primary sources checked 2026-10-17: [.NET pipelines](https://learn.microsoft.com/en-us/dotnet/standard/io/pipelines)
+describe segmented buffering, consumption lifetimes and backpressure;
+[Kestrel .NET 10 limits](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/options?view=aspnetcore-10.0)
+separate connection limits, header timeout, body/data-rate policy and keep-alive.
+These are library contracts to compare with neoCLR's current smaller surface, not
+reasons to change CLR semantics. [RFC 9112 sections 6 and 9](https://www.rfc-editor.org/rfc/rfc9112.html)
+govern framing and connection management. Persistence must preserve message
+boundaries and reject ambiguous framing; it cannot be enabled by changing a header.
+Reuse the broader alternatives in the linked byte-ownership research. This review
+adds no new contract requiring a new framework selection.
+
+After current release qualification, the assistant proposes a bounded load-harness
+extension for the existing connection-close server before choosing another hot-path
+optimization. Sweep concurrency within current admission, then deliberately exceed
+it; test slow headers, slow response readers and cancellation/shutdown. Record
+errors and rejected work as well as throughput, p50/p95/p99, CPU, allocated bytes,
+peak retained memory and cleanup. Use independently scheduled offered requests and
+measure latency from their intended start, recording missed arrivals so overload
+cannot disappear through client waiting. Keep warmup, artifact hashes, GC policy,
+TLS mode and machine load explicit; use a separate generator host when available.
+Compare equivalent .NET workloads with identical connection/body/TLS policies.
+This is a proposed experiment; no new load results are claimed here.
+
+Persistent HTTP/1.1 then requires explicit connection-versus-exchange ownership,
+unread-body drain-or-close policy, preservation of surplus bytes, idle deadlines,
+and per-connection/global budgets. Validate fragmented and coalesced requests,
+ambiguous framing, disconnects and slow clients before measuring reuse benefits.
+TLS already has development integration evidence; its load behavior remains a
+separate measurement. HTTP/2, routing tries and additional write optimizations stay
+follow-ups governed by evidence and the roadmap, not automatic scope additions.
+
+
+## Measured buffer refinement — 2026-10-18
+
+The author selected profiling and targeted buffer/response-copy improvements, then
+clarified the objective of honestly measuring sustainable server capacity. See the
+[implementation, profiles and validation](../benchmarks/http-server/buffers-20261018/README.md).
+Response snapshots remain independent of caller mutations; exact storage removes
+list-growth copies and admitted arrays avoid the transport staging copy. Writes
+and stream blocks are bounded at 4 KiB; receive buffers grow after partial parsing.
+This is development after Preview 16, not a new public buffer ownership contract.
+Native transport still copies data. Sustained offered-rate/concurrency and retained
+memory measurements remain necessary before describing a server capacity limit.
+
+
+### Offered load and timeout follow-up — 2026-10-18
+
+The [load investigation](../benchmarks/http-server/load/README.md) adds independent
+arrival scheduling, explicit generator misses and failed responses, intended-start
+latency, CPU/RSS sampling and graceful shutdown accounting. One/four/sixteen-worker
+profiles isolate the cost of repeatedly collecting a larger live graph from HTTP
+allocation rate. Paced collection remains an explicit experimental comparison.
+
+A 5 ms waiting-producer probe reproduced incorrect cancelled tasks under paced GC:
+network deadlines round upward, but the producer cancellation timer did not account
+for that rounding. An extra millisecond on that timer prevents it preceding the
+network deadline. Existing send deadline checks and caller cancellation precedence
+are unchanged. The probe and three-mode stream checks validate the fix; the original
+unindexed intermittent failure cannot be causally identified retrospectively.
+
+
+### Lazy accept state and callback-path measurement — 2026-10-18
+
+[The follow-up investigation](../benchmarks/http-server/lazy-accept/README.md) moves
+request-only parser/buffer storage from queued exchange construction to the first
+HTTP read. Cancellation and shutdown registrations remain live while queued, and the
+16-exchange bound remains unchanged. Successful accepts no longer allocate their
+unused rejection promise. There is no public API or ownership change.
+
+The author clarified that `ServeOne` with an async callback is the usual application
+path. The matched benchmark therefore includes an awaited queued operation inside
+that callback, with bounded concurrent serving loops. A sequential `await ServeOne`
+loop suspends efficiently but still serves one exchange at a time; explicit `Accept`
+requires the application to arrange its own context handling. Compare the same
+callback fixture across versions rather than treating raw-accept rates as callback
+capacity. This retains the existing .NET-style asynchronous handler/transport
+separation; it changes internal allocation timing, not the platform contract.

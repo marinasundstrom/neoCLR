@@ -1,0 +1,243 @@
+{
+  "passed": true,
+  "cases": {
+    "queue-aot": {
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue-fixed/native/app"
+      ],
+      "checks": "16-slot limit; queued middle/tail/head cancellation; replacement admission; active accept and successor cancellation; pre-cancellation; listener recovery; 16 pending shutdown cancellations; closed-server rejection"
+    },
+    "queue-jit": {
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue-fixed/native/app.dll"
+      ],
+      "checks": "16-slot limit; queued middle/tail/head cancellation; replacement admission; active accept and successor cancellation; pre-cancellation; listener recovery; 16 pending shutdown cancellations; closed-server rejection"
+    },
+    "queue-interpreter": {
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue-fixed/native/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "2000000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Data.PostgreSql.dll"
+      ],
+      "checks": "16-slot limit; queued middle/tail/head cancellation; replacement admission; active accept and successor cancellation; pre-cancellation; listener recovery; 16 pending shutdown cancellations; closed-server rejection"
+    },
+    "body-aot": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/body/native/app"
+      ]
+    },
+    "body-jit": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/body/native/app.dll"
+      ]
+    },
+    "body-interpreter": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/body/native/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "2000000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/lib/System.Data.PostgreSql.dll"
+      ]
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/lazy-accept/validate.py": "69b425c62fcd9452556d5fa9e5e9b5ca58129129eae1f63ee56e0a0aea4c6370",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/lazy-accept/QueueProbe.rvn": "c2752b41c20648405e5d68e2f06f43dc15f9ad574c9a85bc0687821b238840b3",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/Common.rvn": "4d5fa8c3de7c5f9bc39f9b651c8264dbe60bc6d9f17d9b941a3ba17d26677523",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/server/Main.rvn": "e7fa985242e5912d055dae61a03332b20e36176cb91747d7e13e36d134dd279b",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/validate.py": "c3207ed6232e50efd07b2e8f1217afd42393a3ddb05779b869c0c4fd51b2ee5e",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/library/bundle/manifest.json": "ef980ee799bdda3b45bfc6e7abe82ccbe3c606ee1337d4802e9814f8abb9242c",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue-fixed/native/app": "0ece6a37a221a3697ea55b1bd4f14bab61b3ffd30a308a9074eb353c2f2fe5e9",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue-fixed/native/app.dll": "12e73a009e93546e99a991290fcc8d06ab168e0f35771fc39c26c214883f0939",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue-fixed/native/build.json": "a2b7bd5031c71cd34c7a62708f56ab20cc7ef3953c3170d160fb6b451fa7dd10",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/body/native/app": "b222d2f0d98c79ef8915fd4709cda3467521f45d0b77b9b2c9bb0f50e27f6846",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/body/native/app.dll": "bc3eb76fc4d0e17beda34ec18790e3802fbfd91806182fdc27db83f391cd4a26",
+    "/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/body/native/build.json": "557c76020a3f2b26da61d9f49082f0918f106f745adc149ee7f122dd0d9d334e"
+  }
+}

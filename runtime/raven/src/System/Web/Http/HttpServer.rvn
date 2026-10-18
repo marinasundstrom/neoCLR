@@ -526,16 +526,18 @@ public class HttpServer {
     }
 
     private func AcceptCore(cancellationToken: CancellationToken, streaming: bool) -> Task<Result<HttpContext, HttpError>> {
-        let rejected = Promise<Result<HttpContext, HttpError>>()
         if cancellationToken.IsCancellationRequested {
+            let rejected = Promise<Result<HttpContext, HttpError>>()
             _ = rejected.Cancel()
             return rejected.Task
         }
         if closed {
+            let rejected = Promise<Result<HttpContext, HttpError>>()
             _ = rejected.Complete(Error(HttpError.InvalidRequest("Server is closed")))
             return rejected.Task
         }
         if active >= 16 {
+            let rejected = Promise<Result<HttpContext, HttpError>>()
             _ = rejected.Complete(Error(HttpError.LimitExceeded("Server exchange limit exceeded")))
             return rejected.Task
         }
@@ -1067,14 +1069,12 @@ internal class HttpServerExchange {
     private var socket: Option<HttpConnection> = None()
     private var accepting: Option<Task<Result<Socket, SocketError>>> = None()
     private var transfer: Option<Task<Result<int, HttpError>>> = None()
-    private val decoder: HttpRequestDecoder
-    private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
+    private var requestDecoder: HttpRequestDecoder? = null
+    private var buffer: byte[] = Array<byte>.Empty
     private var deadline = NetworkDeadline.Expired
 
     internal init(owner: HttpServer, listener: Socket, token: CancellationToken, streaming: bool) {
         self.streaming = streaming
-        decoder = HttpRequestDecoder(owner.Settings, owner.SslOptions is SslServerAuthenticationOptions)
-        if streaming { decoder.EnableStreaming() }
         self.owner = owner
         self.listener = listener
         callerRegistration = token.Register(self.RequestCancellation)
@@ -1170,6 +1170,16 @@ internal class HttpServerExchange {
             return
         }
         if let Some(connection) = socket {
+            // Queued accepts and TLS handshakes need cancellation state, but no
+            // HTTP parser or receive storage until they can read request bytes.
+            if buffer.Length == 0 {
+                let decoder = HttpRequestDecoder(owner.Settings, owner.SslOptions is SslServerAuthenticationOptions)
+                if streaming {
+                    decoder.EnableStreaming()
+                }
+                requestDecoder = decoder
+                buffer = CheckedStorage.Reserve<byte>(256)
+            }
             let pending = connection.ReceiveUntil(buffer, 0, buffer.Length, deadline, cancellation.Token)
             transfer = Some(pending)
             pending.OnCompleted(self.OnReceived)
@@ -1177,6 +1187,13 @@ internal class HttpServerExchange {
     }
 
     private func OnReceived() {
+        // ReceiveNext initializes the parser before registering this callback.
+        if requestDecoder is HttpRequestDecoder decoder {
+            OnReceived(decoder)
+        }
+    }
+
+    private func OnReceived(decoder: HttpRequestDecoder) {
         if let Some(pending) = transfer {
             transfer = None()
             if pending.IsCancelled || cancellation.IsCancellationRequested {

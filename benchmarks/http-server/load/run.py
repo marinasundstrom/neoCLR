@@ -148,6 +148,7 @@ def main():
     p.add_argument('--build', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--executable', default='app')
+    p.add_argument('--server-source', type=Path, default=Path(__file__).with_name('Server.rvn'))
     p.add_argument('--workers', type=int, choices=[1, 4, 16], default=16)
     p.add_argument('--workload', choices=['plain', 'bulk'], default='plain')
     p.add_argument('--rates', nargs='+', type=float, required=True)
@@ -168,10 +169,10 @@ def main():
         p.error('Build must pass before measurement')
     inputs = {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in [Path(__file__).resolve(), build/a.executable, build/'app.dll', build/'build.json',
-                           Path(__file__).with_name('Server.rvn'), ROOT/'benchmarks/framework/process.py']}
+                           a.server_source.resolve(), ROOT/'benchmarks/framework/process.py']}
     report = dict(completed=False, platform=platform.platform(), inputs=inputs, build=evidence,
                   loadBefore=load_average(), processesBefore=process_snapshot(), trials=[],
-                  serverWorkers=a.workers, executable=a.executable,
+                  serverWorkers=a.workers, executable=a.executable, fixtureSource=str(a.server_source.resolve()),
                   contract='AOT loopback, configured server workers, HTTP/1.1 connection close, no TLS. Fixed offered schedule; client cap drops arrivals without queueing. Each response fully validated. Misses/failures remain in denominator. Graceful /stop after draining.',
                   qualification='Exploratory local load sweep, not production capacity. Same-machine generator and sampled RSS; no allocation profiler during timing.',
                   target=dict(p99Milliseconds=a.p99_target_ms, minimumSuccessFraction=1.0,

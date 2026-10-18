@@ -25,6 +25,68 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+
+## 2026-10-18 — Measure HTTP buffer costs and server capacity honestly
+
+- **Author:** asked which memory-management costs can slow the HTTP stack, then
+  directed profiling the current build and targeting 256-byte buffers and buffered
+  response duplication before measuring the impact.
+- **Assistant:** identified the existing response snapshot guarantee and native
+  transport copies. Preserved mutation isolation while replacing full-response
+  list growth with exact storage, bypassing staging copies for admitted arrays,
+  bounding writes/stream blocks at 4 KiB, and growing receive blocks on demand.
+- **Author clarification:** the broader aim is to discover performance issues,
+  measure improvements and determine how many requests the server can sustain,
+  using honest measurement methods.
+- **Assistant response/action:** separates isolated before/after evidence from
+  sustained capacity. Records [profiles, validation and measurements](../benchmarks/http-server/buffers-20261018/README.md)
+  and a ranked follow-up measurement plan. Short sequential rates are not claimed
+  as saturation capacity; failed runs and admission limits remain visible.
+- **Follow-up action:** added the [offered-load investigation](../benchmarks/http-server/load/README.md),
+  with client admission misses and failures retained. Matched worker-count profiles
+  identify stress-GC scanning cost as a major concurrency bottleneck. A short-deadline
+  probe reproduces a timeout/cancellation race under paced GC; accounting for clock
+  rounding fixes that reproducer and passes existing stream lifecycle checks.
+- **Measured follow-up:** 30-second offered-load runs validate 5/sec with 16 workers
+  under stress GC and 200/sec under experimental paced GC (two 6,000-response trials). Higher-rate sweeps expose
+  admission misses rather than hiding overload; the one-worker stress control and
+  unchanged per-request allocation counts support GC live-graph cost as a priority.
+  Reports retain per-arrival outcomes, build identities and overload failures.
+- **Author correction:** emphasized that applications normally use `ServeOne` with
+  an asynchronous callback; explicit `Accept` loops leave context dispatch to the
+  application. **Assistant response/action:** made the next matched comparison use
+  `ServeOne` and a handler that awaits queued work. Several async serving loops provide
+  bounded concurrency; a single awaited loop remains sequential. Kept the earlier
+  explicit-accept results as mechanism evidence, not a substitute for callback-path
+  capacity. Deferred parser/receive storage until the accepted connection can read,
+  and moved rejection-promise allocation off successful accepts. Queue/admission and
+  existing headers-first body checks pass in interpreter, JIT and AOT; matched timing
+  evidence is linked in the [lazy-accept investigation](../benchmarks/http-server/lazy-accept/README.md).
+- **Author question:** asked whether callers should normally leave `ServeOne`
+  unawaited so the handler remains independent of the main loop. **Assistant
+  clarification:** the desired independent acceptance/handling is valid; current
+  `ServeOne` represents one complete exchange, so unawaited submission still needs
+  bounded admission, outcome observation and shutdown ownership. Multiple awaited
+  serving loops supply this in the benchmark. Proposed a higher-level `Run(handler)`
+  whose lifetime task would be awaited until shutdown; this is a proposal, not an
+  implemented API or an author-approved contract change.
+- **Author clarification:** the callback itself represents asynchronous work returning
+  `Task`; a normal server should dispatch it independently rather than awaiting each
+  complete `ServeOne` exchange in its main accept loop. **Assistant correction:**
+  agreed with that intended application model, distinguished the existing full-exchange
+  completion contract from it, and identified the benchmark's bounded serving loops
+  as scaffolding rather than a desired burden on application authors. Server-owned
+  dispatch, completion/error observation and shutdown remain a separate API/design
+  follow-up, not an implemented change in this allocation comparison.
+- **Measured outcome:** the callback fixture drops 410→405 objects/request and
+  20,299→19,562 allocated bytes/request, with about 15% less peak live payload for
+  16 loops. Paired short stress-GC overload runs improve mean timed completions
+  13.4→14.5/sec, but both versions remain overloaded. Both subsequently pass all
+  7,500 responses at 250 offered/sec for 30 seconds under experimental paced GC;
+  this does not establish an increased capacity limit or lower process RSS.
+- **Open:** broader sustained qualification, slow-client memory and equivalent .NET comparisons. No claim to have
+  found every performance issue or changed published performance baselines.
+
 ## 2026-10-18 — Preview 16 qualification completed
 
 - **Author direction:** continues the explicit request to release neoCLR for macOS
@@ -42,6 +104,24 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Scope:** the [qualification record](validation/release-20261018/README.md)
   preserves source/package provenance and bounded support. Unrelated HTTP design
   discussion is not part of these implementation or performance claims.
+
+## 2026-10-17 — HttpServer optimization guidance
+
+- **Author:** supplied a layered HTTP performance analysis and asked that it inform
+  optimization, emphasizing buffer lifetime, backpressure, nonblocking I/O and
+  predictable latency. Asked whether managed code should implement a performant
+  server or HTTP should primarily be a native Rust service. API examples were
+  explicitly illustrative.
+- **Assistant:** compared the guidance with existing Raven protocol/exchange code,
+  bounded options, streaming APIs and sequential benchmark evidence. Recommends
+  managed HTTP over reusable runtime I/O, with native implementation alternatives
+  evaluated by boundary costs and equivalent measurements.
+- **Action/outcome:** recorded the [design review](http-server-design.md#performance-architecture-review--2026-10-17),
+  ownership constraints and a proposed bounded concurrent/slow-client load-harness
+  extension. Documentation only; no new performance result or API implementation.
+- **Open:** author response to the placement recommendation, sustained-load evidence,
+  persistent connection ownership and any provider selection. Release qualification
+  and roadmap priorities remain unchanged.
 
 ## 2026-10-17 — Complete and publish the next release
 

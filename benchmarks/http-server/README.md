@@ -195,3 +195,7 @@ establishes sustainable server capacity.
 scheduling, client admission/failure accounting, latency, CPU/RSS samples and explicit
 stress-versus-paced policy controls. It records tested operating points separately
 from sustainable capacity claims.
+
+[Lazy accept and asynchronous ServeOne comparison](lazy-accept/README.md) measures
+callback-based handlers on both library versions, with explicit concurrency and
+queued-await work. Earlier explicit-accept results remain a separate fixture.

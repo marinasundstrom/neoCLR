@@ -1,0 +1,86 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("Queued accept assertion failed")
+    }
+}
+
+// Outcome adapter observes cancellation without cancelling the test's async Main.
+func Cancelled(pending: Task<Result<HttpContext, HttpError>>) -> Task<bool> {
+    let result = Promise<bool>()
+    pending.OnCompleted(() => {
+        _ = result.Complete(pending.IsCancelled)
+    })
+    return result.Task
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16) else {
+        System.Fail("Listen failed")
+    }
+    let sources = ArrayList<CancellationTokenSource>()
+    let outcomes = ArrayList<Task<bool>>()
+    for index in 0..16 {
+        let cancellation = CancellationTokenSource()
+        sources.Add(cancellation)
+        outcomes.Add(Cancelled(server.Accept(cancellation.Token)))
+    }
+    Check((await server.Accept()) is Error(HttpError.LimitExceeded(_)))
+    // Remove a middle node, the tail and the queue head before any connection.
+    for index in [7, 15, 1] {
+        sources[index].Cancel()
+        Check(await outcomes[index])
+    }
+    for index in 0..3 {
+        let cancellation = CancellationTokenSource()
+        sources.Add(cancellation)
+        outcomes.Add(Cancelled(server.Accept(cancellation.Token)))
+    }
+    Check((await server.Accept()) is Error(HttpError.LimitExceeded(_)))
+    // Acknowledge the native pending accept, then its newly promoted successor.
+    sources[0].Cancel()
+    Check(await outcomes[0])
+    sources[2].Cancel()
+    Check(await outcomes[2])
+    for cancellation in sources {
+        cancellation.Cancel()
+    }
+    for outcome in outcomes {
+        Check(await outcome)
+    }
+    for cancellation in sources {
+        cancellation.Dispose()
+    }
+    let preCancelled = CancellationTokenSource()
+    preCancelled.Cancel()
+    Check(await Cancelled(server.Accept(preCancelled.Token)))
+    preCancelled.Dispose()
+    // The same listener must still admit and complete an ordinary request.
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port failed")
+    }
+    Console.WriteLine(port)
+    let Ok(context) = await server.Accept() else {
+        System.Fail("Accept after cancellation failed")
+    }
+    Check(context.Request.Target == "/recovered")
+    context.RespondText("OK")
+    Check((await context.Complete()) is Ok(_))
+    context.Dispose()
+    let closing = ArrayList<Task<bool>>()
+    for index in 0..16 {
+        closing.Add(Cancelled(server.Accept()))
+    }
+    server.Close()
+    for outcome in closing {
+        Check(await outcome)
+    }
+    Check((await server.Accept()) is Error(HttpError.InvalidRequest(_)))
+    Console.WriteLine("DONE")
+}

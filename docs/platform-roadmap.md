@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**HTTP buffer investigation (author direction, 2026-10-18):** [matched profiles and validation](../benchmarks/http-server/buffers-20261018/README.md) target small transfer blocks and response snapshot growth while preserving ownership. The author clarifies that the broader objective is measured sustainable capacity: follow with offered-rate/concurrency sweeps, error/rejection accounting, latency and memory/CPU attribution. Sequential microbenchmarks remain isolated evidence, not maximum server capacity. The [offered-load follow-up](../benchmarks/http-server/load/README.md) records worker/GC attribution, explicit paced-policy comparisons and a validated response timeout classification repair; collection defaults remain unchanged. The [lazy-accept comparison](../benchmarks/http-server/lazy-accept/README.md) now measures the author-preferred `ServeOne` callback path with an awaited handler, while preserving queued cancellation and admission.
+
 **Native bootstrap release (author direction, 2026-10-17; qualification 2026-10-18):** production core and dependent libraries use native metadata and explicit runtime-service contracts without CoreProbe semantic references. [Preview 16 is published](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16) for macOS ARM64 and Windows x64 with Raven `c0854cdda`, matching optimized runtime/SDK/VSIX bundles, passing source, installed-editor, async/JSON/GC/HTTP/security qualification and fresh two-platform runtime measurements. See [release qualification](validation/release-20261018/README.md), [release notes](preview-16-release-notes.md) and [native migration evidence](validation/native-core-removal/README.md). All eleven public assets verify; manual website deployment and live download/API/benchmark checks pass. Broader structural work remains parked; Raven main and `codex/neoclr` remain separate.
 
 **Mutable collection helper slice (author direction, 2026-10-16):** implemented
@@ -226,6 +228,12 @@ final reclamation is complete with zero GC/poll failures. GC elapsed time is lar
 unchanged and remains the next large work interval. DNS/timer-only and legacy TLS
 waits retain bounded polling; macOS policy is unchanged. Hosted, sequential results
 do not qualify sustained concurrency or Windows ARM64.
+
+**HTTP design input (2026-10-17):** the [architecture review](http-server-design.md#performance-architecture-review--2026-10-17)
+records author-supplied optimization guidance, existing managed HTTP capabilities,
+and the assistant's proposed concurrent/slow-client measurement slice. Native
+provider selection, buffer leases and persistent connection work remain explicit
+open decisions; this input does not displace current release qualification.
 
 **HTTP performance objective (2026-10-13):** the author targets competitive
 throughput with Go and .NET, especially AOT; landing between their equivalent

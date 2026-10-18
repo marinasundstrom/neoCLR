@@ -73,3 +73,8 @@ separates offered arrivals, successful completions, client admission misses and
 errors, with latency and CPU/RSS samples. It also compares worker-count and GC-policy
 costs. These local development experiments do not replace the release measurements
 above or establish production capacity; paced collection remains experimental.
+
+The [callback-path follow-up](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/lazy-accept)
+compares `ServeOne` handlers that await queued work, measuring deferred queued-accept
+storage separately from the earlier explicit-accept fixture. Public API semantics
+and collection defaults are unchanged.

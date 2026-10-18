@@ -1,0 +1,115 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+class LoadState {
+    val Server: HttpServer
+    var Completed: int = 0
+    var Limits: int = 0
+    var Failures: int = 0
+
+    init(server: HttpServer) {
+        Server = server
+    }
+}
+
+// Outcome adapter observes cancelled ServeOne calls when the listener closes.
+func ServeOutcome(pending: Task<Result<System.Void, HttpError>>) -> Task<Option<Result<System.Void, HttpError>>> {
+    let result = Promise<Option<Result<System.Void, HttpError>>>()
+    pending.OnCompleted(() => {
+        if pending.IsCancelled {
+            _ = result.Complete(None())
+        } else {
+            _ = result.Complete(Some(pending.GetResult()))
+        }
+    })
+    return result.Task
+}
+
+class ServingLoop {
+    private val state: LoadState
+    private var stopping: bool = false
+
+    init(state: LoadState) {
+        self.state = state
+    }
+
+    private async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        // Exercise a genuinely queued await without imposing an artificial timer.
+        let resumed = await Task.Run(() => 1)
+        if resumed != 1 {
+            System.Fail("Handler continuation failed")
+        }
+        stopping = request.Target == "/stop"
+        let size = if stopping { 0 } else if request.Target == "/bulk" { 8192 } else { 10 }
+        let body = ArrayList<byte>(size)
+        for index in 0..size {
+            body.Add((byte)120)
+        }
+        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), body))
+    }
+
+    async func Run() -> Task<()> {
+        while true {
+            let outcome = await ServeOutcome(state.Server.ServeOne(self.Respond))
+            if outcome is None {
+                return
+            }
+            if let Some(result) = outcome {
+                if let Error(error) = result {
+                    if error is HttpError.LimitExceeded(_) {
+                        state.Limits += 1
+                    } else {
+                        state.Failures += 1
+                    }
+                } else if !stopping {
+                    state.Completed += 1
+                }
+            }
+            if stopping {
+                state.Server.Close()
+                return
+            }
+        }
+    }
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    var workerCount = 16
+    if arguments.Length > 0 {
+        workerCount = match arguments[0] {
+            "1" => 1
+            "4" => 4
+            "16" => 16
+            _ => 0
+        }
+    }
+    if workerCount == 0 {
+        System.Fail("Worker count must be 1, 4 or 16")
+    }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port failed")
+    }
+    let state = LoadState(server)
+    let workers = ArrayList<Task<()>>()
+    var index = 0
+    while index < workerCount {
+        workers.Add(ServingLoop(state).Run())
+        index += 1
+    }
+    Console.WriteLine(port)
+    for worker in workers {
+        await worker
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+    Console.WriteLine(state.Completed)
+    Console.WriteLine(state.Limits)
+    Console.WriteLine(state.Failures)
+}

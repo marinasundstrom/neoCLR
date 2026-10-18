@@ -197,3 +197,14 @@ isolation unless a deliberately different ownership API is designed and validate
 Further qualification needs longer runs, a separate load-generator host, bulk/JSON,
 TLS, slow readers/writers and repeated memory-pressure/recovery cycles. This fixture
 uses one request per connection; it does not establish keep-alive performance.
+
+
+## Callback-path follow-up
+
+The author clarified that `ServeOne` is the normal application entry point. The
+results above use explicit `Accept`/`Complete` and remain mechanism measurements.
+[The next comparison](../lazy-accept/README.md) uses `ServeOneServer.rvn`, including
+an actual queued await in its handler, on both old and new libraries. Supply
+`run.py --server-source benchmarks/http-server/load/ServeOneServer.rvn` to retain
+the matching fixture identity. Several async serving loops provide bounded request
+concurrency; one sequential awaited loop does not dispatch concurrent requests.

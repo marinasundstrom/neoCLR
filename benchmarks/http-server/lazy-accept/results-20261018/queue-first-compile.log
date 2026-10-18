@@ -1,0 +1,7 @@
+native build: /Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(26,29): error RAV0103: 'CancellationTokenSource' is not in scope.
+/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(29,28): error RAV0103: 'CancellationTokenSource' is not in scope.
+/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(36,9): error RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.
+/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(40,28): error RAV0103: 'CancellationTokenSource' is not in scope.
+/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(46,5): error RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.
+/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(48,5): error RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.
+/Users/robert/Projects/neoclr/target/http-lazy-accept-20261018/queue/project/Main.rvn(59,24): error RAV0103: 'CancellationTokenSource' is not in scope.
