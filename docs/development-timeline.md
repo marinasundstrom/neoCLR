@@ -19423,3 +19423,15 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   The author did not approve a specific new scheduling policy; proposed integration
   steps are recorded separately from implemented behavior. No HTTP speedup or reliable
   300–400 req/s operating point is inferred from mixed results.
+
+## 2026-10-18 — Apply concurrent results to real HTTP execution
+
+The author requested: “Continue with safely applying the background GC results in
+Serve, then measure concurrent versus synchronous GC under HTTP load and compare
+against Go. Commit each slice.” The assistant proposed reusing the qualified owner
+coordinator, retaining synchronous pressure fallback, and separating qualification
+from load measurement. The first implemented slice applies results in the isolated
+Serve host and passes deterministic pressure/stale/cancellation checks plus real
+suspended-request recovery. Sanitizer load missed arrivals and is explicitly not
+a speedup claim. See [implementation and evidence](experiments/concurrent-gc-http/APPLY.md).
+Matched uninstrumented measurements are the next step; this is not production adoption.

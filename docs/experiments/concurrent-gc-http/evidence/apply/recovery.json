@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "commands": [
+    [
+      "/Users/robert/Projects/neoclr/target/http-apply-safety/app-paced"
+    ]
+  ],
+  "serverTotals": [
+    18,
+    0,
+    1
+  ],
+  "shadow": {
+    "started": 654,
+    "applied": 523,
+    "discarded": 131,
+    "concurrentReclaimedBytes": 319354,
+    "traceErrors": 0,
+    "captureRejected": 0,
+    "deferred": 26794,
+    "fallbacks": 528,
+    "allocations": 8200,
+    "reclaimedAllocations": 8200
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-http/validate.py": "03dc8c46b61896d023cdc3e139b994a45e719aaa6b11bb892a6cf66a60b326a4",
+    "/Users/robert/Projects/neoclr/target/http-apply-safety/app-paced": "7eda0b42ea86d2239f32be753799fc5b3a7bae0e3994540b9b6f217aff45e59d",
+    "/Users/robert/Projects/neoclr/target/http-apply-safety/build.json": "a42070f1031fdc901e82bfa4a327e92191ee84aae5562e2335576299c2a11028"
+  }
+}

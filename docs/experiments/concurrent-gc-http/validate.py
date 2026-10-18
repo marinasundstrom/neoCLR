@@ -13,6 +13,7 @@ from process import Guest
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--apply', action='store_true')
 a = p.parse_args()
 out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
 report = dict(passed=False, commands=[[str((a.build / 'app-paced').resolve())]])
@@ -42,18 +43,26 @@ try:
     port = int(guest.line()[0]); control = int(guest.line()[0])
     malformed = connect(port, b'GET / HTTP/1.1\r\n\r\n')
     assert read(malformed) == b''
+    suspended = connect(port, b'GET / HTTP/1.1\r\nHost: local')
     batch = [connect(port, b'GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n') for _ in range(16)]
     for peer in batch: valid(read(peer), 10)
+    suspended.sendall(b'host\r\nConnection: close\r\n\r\n')
+    valid(read(suspended), 10)
     valid(read(connect(port, b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n')), 10)
     valid(read(connect(port, b'GET /stop HTTP/1.1\r\nHost: localhost\r\n\r\n')), 0)
     with socket.create_connection(('127.0.0.1', control), timeout=10): pass
     guest.line(b'DONE')
     totals = [int(guest.line()[0]) for _ in range(3)]
-    assert totals == [17, 0, 1], totals
+    assert totals == [18, 0, 1], totals
     guest.finish()
     shadow = json.loads((out / 'shadow.json').read_text())
-    assert shadow['started'] > 0 and shadow['applied'] == 0
-    assert shadow['traceErrors'] == 0 and shadow['captureRejected'] == 0
+    assert shadow['started'] > 0
+    if a.apply:
+        assert shadow['applied'] > 0 and shadow['concurrentReclaimedBytes'] > 0
+        assert shadow['started'] == shadow['applied'] + shadow['discarded']
+    else:
+        assert shadow['applied'] == 0 and shadow['traceErrors'] == 0
+    assert shadow['captureRejected'] == 0 and shadow['traceErrors'] == 0
     assert shadow['allocations'] == shadow['reclaimedAllocations']
     report.update(passed=True, serverTotals=totals, shadow=shadow)
 finally:
@@ -62,4 +71,4 @@ finally:
     report['inputs'] = {str(path.resolve()): hashlib.sha256(path.read_bytes()).hexdigest()
                         for path in [Path(__file__), a.build / 'app-paced', a.build / 'build.json']}
     (out / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
-print('HTTP shadow recovery/concurrent peers: PASS')
+print('HTTP GC recovery/suspension/concurrent peers: PASS')

@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "commands": [
+    [
+      "/Users/robert/Projects/neoclr/target/http-apply-release/app-paced"
+    ]
+  ],
+  "serverTotals": [
+    18,
+    0,
+    1
+  ],
+  "shadow": {
+    "started": 561,
+    "applied": 389,
+    "discarded": 172,
+    "concurrentReclaimedBytes": 240121,
+    "traceErrors": 0,
+    "captureRejected": 0,
+    "deferred": 32846,
+    "fallbacks": 1744,
+    "allocations": 8200,
+    "reclaimedAllocations": 8200
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-http/validate.py": "03dc8c46b61896d023cdc3e139b994a45e719aaa6b11bb892a6cf66a60b326a4",
+    "/Users/robert/Projects/neoclr/target/http-apply-release/app-paced": "f5a1f18e0c2521623023945efc3343fbe731d4b69eff3f70a2cc073fe190ed26",
+    "/Users/robert/Projects/neoclr/target/http-apply-release/build.json": "ad60c283de6a58427ddcca737c93c634f5a62be397e762390d7482f957d86144"
+  }
+}

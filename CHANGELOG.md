@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Apply private background GC traces in the isolated Serve experiment using owner-side epoch/heap validation and existing sweep, with synchronous pressure fallback. Add deterministic stale/pressure/cancellation checks and real HTTP suspension/recovery tests, including a 96 KiB heap; verify actual reclamation and clean teardown. Production collector selection is unchanged; sanitizer overload results are not a performance claim.
+
 - Run private background snapshot tracing through the actual asynchronous Serve host while paced synchronous GC remains authoritative. A diagnostic 250-request run completes 14,153 traces without errors/rejections (about 42% unchanged epochs); malformed-request recovery and concurrent peers also pass, with full reclamation and joined worker teardown. No live marks are imported and no HTTP speedup or concurrent collector support is claimed.
 
 - Return GC evaluation to actual asynchronous HTTP Serve loads against Go. Relink the retained qualified guest with current native sources and repeat 30-second 300/400 req/s points in reversed order. Serve passes the first round but misses 238/8 arrivals in the second; Go passes all points. Retain byte validation, shutdown accounting and full provenance. Record scheduler/root-lifetime integration work for concurrent GC; no HTTP concurrent collector or speedup is claimed.

@@ -98,3 +98,10 @@ shutdown/error/cancellation cases before producing an uninstrumented HTTP candid
 Compare that candidate with the [refreshed Serve/Go baseline](../../../benchmarks/http-server/serve/concurrent-readiness-20261018/README.md)
 using the same offered-load contract. Larger heaps, saturation, TLS, terminal guest
 faults and cancellation with suspended handlers remain unqualified for this adapter.
+
+## Subsequent live-application experiment
+
+[Owner-side application in Serve](APPLY.md) now qualifies the separate `--mode apply`
+adapter. The shadow mode and the historical results above remain tracing-only.
+The current recovery script additionally holds a partial request across other
+clients and checks 18 ordinary successes.

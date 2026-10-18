@@ -5420,3 +5420,9 @@ private traces; about 42% retain their epoch, with no capture rejections/trace e
 Malformed-request recovery, concurrent peers and final reclamation pass. No live marks
 are applied: productive boundary selection and actual application/pressure/lifecycle
 qualification precede an uninstrumented sync/concurrent/Go comparison.
+
+**Serve background-result application (2026-10-18):** the isolated
+[applying adapter](experiments/concurrent-gc-http/APPLY.md) now validates live
+reclamation, synchronous pressure fallback, stale rejection and pending cancellation,
+plus actual suspended HTTP requests and clean teardown. Production GC is unchanged.
+Next: matched uninstrumented synchronous/concurrent/Go offered-load measurements.

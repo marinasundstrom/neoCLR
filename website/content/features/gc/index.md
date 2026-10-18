@@ -197,3 +197,9 @@ malformed-input recovery, concurrent clients and clean shutdown pass; background
 marks are never applied. About 42% of completed traces keep their invalidation epoch,
 which is a useful observation, not proof that applying them is safe. See the
 [HTTP shadow-tracing evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-http/README.md).
+
+The development-only Serve experiment now also applies completed private traces
+on the owner thread after epoch and heap validation. Focused pressure, cancellation,
+suspended-request and shutdown checks demonstrate live reclamation. This remains
+a bounded AOT experiment; production collector selection is unchanged, and these
+checks alone establish no HTTP throughput improvement.
