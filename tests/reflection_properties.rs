@@ -318,3 +318,22 @@ fn string_and_null_reference_properties_round_trip_through_object() {
         Value::Int32(0)
     );
 }
+
+#[test]
+fn boxed_record_getter_mutates_box_and_preserves_original_value() {
+    let module = assemble(include_str!(
+        "../docs/experiments/aot-console/reflection-record-getter.neoil"
+    ))
+    .unwrap();
+    let program = neoclr::LoadedProgram::new(&module).unwrap();
+    let method = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    assert_eq!(
+        method
+            .invoke(vec![Value::Int32(0)], Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+}

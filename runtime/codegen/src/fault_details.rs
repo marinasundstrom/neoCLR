@@ -117,6 +117,7 @@ pub struct Options {
     pub reference_arena: bool,
     pub descriptor_queries: Vec<usize>,
     pub reflection_construction: Vec<usize>,
+    pub boxed_property_receivers: HashSet<(usize, usize)>,
     pub reflection_array_sites: HashMap<(usize, usize), usize>,
     pub object_type_queries: HashMap<usize, Vec<(usize, neoclr::metadata::Type)>>,
     pub object_function_queries: HashMap<usize, Vec<neoclr::metadata::Type>>,
@@ -249,6 +250,21 @@ impl Options {
                     )
                 })
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            boxed_property_receivers: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "reflection-property-retained-v1")
+                .flat_map(|r| {
+                    r["boxedReceivers"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .filter_map(move |pc| {
+                            Some((r["compiledIndex"].as_u64()? as usize, pc.as_u64()? as usize))
+                        })
+                })
                 .collect(),
             reflection_array_sites: report
                 .and_then(|r| r["nativeBindings"].as_array())

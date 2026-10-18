@@ -141,6 +141,8 @@ pub fn bind(
         let no_result = f.no_result;
         let mut body = vec![];
         let mut map = vec![];
+        let mut locals = vec![];
+        let mut boxed_receivers = vec![];
         for row in retention["types"].as_array().unwrap() {
             if row["properties"] != true {
                 continue;
@@ -159,7 +161,8 @@ pub fn bind(
                 Op::Equal,
                 Op::BranchFalse(0),
             ]);
-            if !ty.is_reference_type
+            if (setter && !ty.is_reference_type)
+                || ty.enum_info.is_some()
                 || ty.representation != Representation::Record
                 || !ty.generic_parameters.is_empty()
             {
@@ -195,7 +198,7 @@ pub fn bind(
                         2
                     } else if let Some(i) = target_index {
                         let f = &source.functions[i];
-                        if f.receiver_byref
+                        if f.receiver_byref == ty.is_reference_type
                             || !f.instance
                             || f.is_internal_call()
                             || f.pinvoke.is_some()
@@ -223,7 +226,14 @@ pub fn bind(
                     if status != 0 {
                         reject(&mut body, check, status);
                     } else {
-                        if !reference && !matches!(p.ty, Type::Int32 | Type::Int64 | Type::Boolean)
+                        if !reference
+                            && !matches!(p.ty, Type::Int32 | Type::Int64 | Type::Boolean)
+                            && !source.type_definition(&p.ty).is_some_and(|d| {
+                                !d.is_reference_type
+                                    && d.representation == Representation::Record
+                                    && d.enum_info.is_none()
+                                    && d.generic_parameters.is_empty()
+                            })
                         {
                             return Err("native property adapters currently require Int32, Int64, Boolean or reference values".into());
                         }
@@ -274,7 +284,19 @@ pub fn bind(
                                 generic_arguments: vec![],
                             };
                             let start = body.len();
-                            body.extend([Op::Arg(2), Op::CastClass(owner.clone())]);
+                            body.push(Op::Arg(2));
+                            if ty.is_reference_type {
+                                body.push(Op::CastClass(owner.clone()));
+                            } else {
+                                // Verifiable value-call placeholder. Native lowering borrows
+                                // the rooted box at the recorded address site, preserving
+                                // mutations from user getter code instead of copying this.
+                                let local = locals.len();
+                                locals.push(owner.clone());
+                                body.extend([Op::UnboxAny(owner.clone()), Op::Store(local)]);
+                                boxed_receivers.push(body.len());
+                                body.push(Op::LocalAddress(local));
+                            }
                             if setter {
                                 body.extend([
                                     Op::Arg(3),
@@ -285,7 +307,11 @@ pub fn bind(
                                     },
                                 ]);
                             }
-                            body.push(Op::CallVirtual(call));
+                            body.push(if ty.is_reference_type {
+                                Op::CallVirtual(call)
+                            } else {
+                                Op::Call(call)
+                            });
                             if setter {
                                 if target.no_result && !no_result {
                                     body.push(Op::Void);
@@ -320,7 +346,8 @@ pub fn bind(
         let f = &mut input.functions[index];
         f.impl_flags = 0;
         f.body = body;
-        bindings.push(json!({"definition":methods[index],"name":f.name,"instructionMap":map}));
+        f.locals = locals;
+        bindings.push(json!({"definition":methods[index],"name":f.name,"instructionMap":map,"boxedReceivers":boxed_receivers}));
     }
     retention["propertyBindings"] = json!(bindings);
     retention["accessorRoots"] = json!(roots.iter().map(|i| &methods[*i]).collect::<Vec<_>>());

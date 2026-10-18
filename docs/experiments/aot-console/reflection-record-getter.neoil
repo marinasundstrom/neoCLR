@@ -1,0 +1,56 @@
+.module Properties
+.type class abstract System.Object
+.end
+.type Model
+.field Number Int32
+.method instance byref get_Number() -> Int32
+ldarg 0
+ldarg 0
+ldfld Model::Number
+ldc.i4 1
+add
+stfld Model::Number
+pop
+ldarg 0
+ldfld Model::Number
+ret
+.end
+.property instance Number() -> Int32
+.get instance Model::get_Number()
+.end
+.end
+.function neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object) -> System.Object
+.methodimpl InternalCall
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Model original
+.local System.Object boxed
+ldloca original
+initobj Model
+ldloca original
+ldc.i4 40
+stfld Model::Number
+pop
+ldloc original
+box Model
+stloc boxed
+ldtoken Model
+ldc.i4 0
+ldloc boxed
+call neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object)
+pop
+ldloc original
+ldfld Model::Number
+ldc.i4 40
+ceq
+brfalse Bad
+ldtoken Model
+ldc.i4 0
+ldloc boxed
+call neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object)
+unbox.any Int32
+ret
+Bad:
+ldc.i4 99
+ret
+.end

@@ -12944,3 +12944,27 @@ including error/success Result display and direct Person display. The direct rec
 case requires the repaired interpreter. Full commands/hashes and the earlier failure
 are retained in the linked experiment. No Raven/CLI representation or public API
 change; this validation is macOS ARM64 development evidence.
+
+## Boxed value-record property getters — 2026-10-18
+
+Property reflection now admits public nonindexed getters on nongeneric non-enum
+value records, plus record-valued properties. It borrows the exact boxed receiver;
+user getter mutations affect that box while the original unboxed value remains a
+copy. This follows .NET PropertyInfo getter execution/value boxing semantics, not
+backing-field serialization. Public visibility, explicit native retention, exact
+receiver matching and terminal getter faults remain enforced. Value-record setters,
+construction/deserialization and enum/structural-union mapping are separate gaps.
+
+The interpreter adapts the checked Object argument to its existing managed slot.
+Native lowering records trusted address sites in private property bindings: a
+verifiable copy/local-address placeholder becomes the payload address of the rooted
+Object argument. The wrapper retains the box across allocating getters; record
+results use existing typed boxing. No exposed native pointer, metadata format,
+Raven Runtime Contract switch or temporary CLI encoding is added. This projection
+belongs to the native backend and can be replaced by a general checked box-borrow
+primitive when that exists; it is not a new guest-language contract.
+
+Validation: nine interpreter property tests, existing native class property checks,
+and a new GC-enabled native test for repeated mutating getters and original-value
+isolation pass on macOS ARM64. Compiler source/emission and ordinary .NET behavior
+are unchanged. JSON mapper admission is the following slice.

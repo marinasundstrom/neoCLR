@@ -4934,7 +4934,7 @@ fn interpret_instructions_with_dispatch(
                                 if let crate::native::Binding::ReflectionProperty(setter) = binding
                                 {
                                     crate::reflection_properties::adapter(
-                                        module, &callee, &args, setter,
+                                        module, &callee, &mut args, setter,
                                     )?
                                 } else if let crate::native::Binding::ReflectionArray(kind) =
                                     binding

@@ -21,10 +21,17 @@ struct Accessor {
     value_type: Type,
     target: FunctionRef,
     no_result: bool,
+    value_receiver: bool,
 }
 
 pub(crate) fn supported_value(module: &Module, ty: &Type) -> bool {
     module.is_object_reference_type(ty)
+        || module.type_definition(ty).is_some_and(|d| {
+            !d.is_reference_type
+                && d.representation == Representation::Record
+                && d.enum_info.is_none()
+                && d.generic_parameters.is_empty()
+        })
         || matches!(
             ty,
             Type::Boolean
@@ -70,7 +77,8 @@ fn resolve(module: &Module, args: &[Value], setter: bool) -> Result<Accessor, Er
     let definition = module
         .type_definition(&owner)
         .ok_or(Error::UnsupportedShape)?;
-    if !definition.is_reference_type
+    if (setter && !definition.is_reference_type)
+        || definition.enum_info.is_some()
         || definition.representation != Representation::Record
         || !definition.generic_parameters.is_empty()
     {
@@ -97,7 +105,7 @@ fn resolve(module: &Module, args: &[Value], setter: bool) -> Result<Accessor, Er
     .clone()
     .ok_or(Error::MissingAccessor)?;
     let method = crate::vm::resolve(module, &target).map_err(|_| Error::InvalidProperty)?;
-    if method.receiver_byref
+    if method.receiver_byref == definition.is_reference_type
         || !method.instance
         || method.is_internal_call()
         || method.pinvoke.is_some()
@@ -112,7 +120,9 @@ fn resolve(module: &Module, args: &[Value], setter: bool) -> Result<Accessor, Er
     let Value::ObjectReference(receiver) = &args[2] else {
         return Err(Error::InvalidReceiver);
     };
-    if !module.reference_assignable(&receiver.concrete_type(), &owner) {
+    if receiver.concrete_type() != owner
+        && !module.reference_assignable(&receiver.concrete_type(), &owner)
+    {
         return Err(Error::InvalidReceiver);
     }
     if setter && !value_matches(module, &args[3], &property.ty) {
@@ -124,6 +134,7 @@ fn resolve(module: &Module, args: &[Value], setter: bool) -> Result<Accessor, Er
         value_type: property.ty.clone(),
         target,
         no_result: method.no_result,
+        value_receiver: !definition.is_reference_type,
     })
 }
 
@@ -134,13 +145,21 @@ pub(crate) fn check(module: &Module, args: &[Value], setter: bool) -> i32 {
 pub(crate) fn adapter(
     module: &Module,
     service: &Function,
-    args: &[Value],
+    args: &mut [Value],
     setter: bool,
 ) -> Result<Function, Fault> {
     let accessor = resolve(module, args, setter)
         .map_err(|error| Fault::new(format!("reflection property access rejected: {error:?}")))?;
     let reference_value = module.is_object_reference_type(&accessor.value_type);
-    let mut body = vec![Op::Arg(2), Op::CastClass(accessor.owner)];
+    let mut body = vec![Op::Arg(2)];
+    if accessor.value_receiver {
+        let Value::ObjectReference(receiver) = &args[2] else {
+            unreachable!()
+        };
+        args[2] = Value::SlotReference(receiver.reference.clone());
+    } else {
+        body.push(Op::CastClass(accessor.owner.clone()));
+    }
     if setter {
         body.push(Op::Arg(3));
         body.push(if reference_value {
@@ -149,7 +168,11 @@ pub(crate) fn adapter(
             Op::UnboxAny(accessor.value_type.clone())
         });
     }
-    body.push(Op::CallVirtual(accessor.target));
+    body.push(if accessor.value_receiver {
+        Op::Call(accessor.target)
+    } else {
+        Op::CallVirtual(accessor.target)
+    });
     if setter {
         if accessor.no_result && !service.no_result {
             body.push(Op::Void);
@@ -165,6 +188,9 @@ pub(crate) fn adapter(
     }
     body.push(Op::Return);
     let mut adapter = service.clone();
+    if accessor.value_receiver {
+        adapter.parameters[2] = Type::ByRef(Box::new(accessor.owner));
+    }
     adapter.impl_flags = 0;
     adapter.body = body;
     Ok(adapter)

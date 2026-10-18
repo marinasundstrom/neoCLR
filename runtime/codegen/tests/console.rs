@@ -10344,6 +10344,20 @@ fn native_int64_properties_preserve_get_set_width_and_faults() {
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn check_retained_property_access(source: &str) {
+    check_retained_property_access_expected(source, &[42, 3, 5, 4, 6, 7, 7, 0, 0, 4]);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_boxed_record_getter_borrows_rooted_payload() {
+    check_retained_property_access_expected(
+        include_str!("../../../docs/experiments/aot-console/reflection-record-getter.neoil"),
+        &[42],
+    );
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_retained_property_access_expected(source: &str, expected_values: &[i32]) {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let app = neoclr::assemble(source).unwrap();
     let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
@@ -10406,7 +10420,7 @@ fn check_retained_property_access(source: &str) {
         "{}",
         String::from_utf8_lossy(&result.stderr)
     );
-    for mode in 0..10 {
+    for mode in 0..expected_values.len() as i32 {
         let interpreted =
             method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
         let native = Command::new(dir.0.join("host"))
@@ -10415,7 +10429,7 @@ fn check_retained_property_access(source: &str) {
             .unwrap();
         assert!(native.stdout.is_empty());
         if !matches!(mode, 7 | 8) {
-            let expected = [42, 3, 5, 4, 6, 7, 7, 0, 0, 4][mode as usize];
+            let expected = expected_values[mode as usize];
             assert_eq!(interpreted.unwrap().value, neoclr::Value::Int32(expected));
             assert_eq!(native.status.code(), Some(expected), "{mode}: {native:?}");
             assert!(native.stderr.is_empty());

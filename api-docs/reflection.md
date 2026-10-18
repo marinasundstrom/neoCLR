@@ -23,13 +23,17 @@ individual contracts.
 ## Values and execution
 
 Properties must be nonindexed and declared on nongeneric reference classes.
+Development getters also support nongeneric, non-enum value records: the receiver
+is the exact boxed record, and getter mutations affect that box, not the original
+unboxed value. Value-record setters remain unsupported.
 Compatible derived receivers are supported, and ordinary virtual dispatch selects
 the implementation. Getters and setters execute user code; reflection does not
 read or overwrite a backing field directly.
 
 Reference values accept compatible objects or null. Scalar values require their
 exact boxed built-in type. There is no numeric coercion, null-to-default conversion,
-custom struct/enum/union value mapping, private binding or static-property support.
+enum/union value mapping, private binding or static-property support. Getters can
+return a nongeneric value record as a fresh box, including nested record properties.
 These limits are narrower than .NET PropertyInfo's binder and indexer overloads.
 Null is represented by a nullable object result because this API observes existing
 object storage; it does not prescribe how application or JSON models express absence.

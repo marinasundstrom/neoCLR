@@ -3513,12 +3513,18 @@ pub(crate) fn compile_into(
                         stack.extend(read(&mut b, &p, t, address));
                     }
                     Op::ArgumentAddress(n) | Op::LocalAddress(n) => {
-                        let s = if matches!(op, Op::ArgumentAddress(_)) {
-                            arguments[*n]
+                        if details.is_some_and(|d| d.boxed_property_receivers.contains(&(i, pc))) {
+                            // The validated adapter has checked exact box identity. Its
+                            // Object argument stays rooted while the getter borrows payload.
+                            stack.push(b.ins().iadd_imm(parameters[2], 8));
                         } else {
-                            locals[*n]
-                        };
-                        stack.push(b.ins().stack_addr(types::I64, s, 0));
+                            let s = if matches!(op, Op::ArgumentAddress(_)) {
+                                arguments[*n]
+                            } else {
+                                locals[*n]
+                            };
+                            stack.push(b.ins().stack_addr(types::I64, s, 0));
+                        }
                     }
                     Op::StoreArg(n) | Op::Store(n) => {
                         let s = if matches!(op, Op::StoreArg(_)) {

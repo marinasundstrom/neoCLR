@@ -794,7 +794,7 @@ pub fn prepare(
                 .iter()
                 .find(|r| r["definition"] == binding["definition"]);
             if let Some(row) = row {
-                let entry = json!({"compiledIndex":row["compiledIndex"],"name":row["name"],"implementation":"reflection-property-retained-v1","instructionMap":binding["instructionMap"]});
+                let entry = json!({"compiledIndex":row["compiledIndex"],"name":row["name"],"implementation":"reflection-property-retained-v1","instructionMap":binding["instructionMap"],"boxedReceivers":binding["boxedReceivers"]});
                 report["nativeBindings"].as_array_mut().unwrap().push(entry);
             }
         }

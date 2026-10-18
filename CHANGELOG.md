@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Support retained public property getters on boxed nongeneric value records and record-valued properties. Borrow the rooted box so getter mutations persist without changing the original value; preserve receiver/access/retention checks and leave value-record setters unsupported. Add interpreter and GC-enabled native mutation/copy regressions.
+
 - Use the Object type-name fallback for interpreted boxed records without ToString overrides, matching native execution. Add a regression and retain seven Preview 16-compiled consumers with matching interpreter/JIT/AOT output, including successful/error Result display; leave JSON record mapping and other documented limits explicit.
 
 - Report InvalidCast for failed native nominal reference casts and interpreter interface casts, including narrowing from structural views; preserve null casts and source sites. Refresh the boxing-helper budget regression for the current 2,048-function bound.
