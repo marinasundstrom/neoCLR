@@ -5213,3 +5213,10 @@ retention across repeated cycles. It remains excluded from production. UBSan/bou
 passes the counterexample; ThreadSanitizer is unavailable on this host. No concurrent
 collector or new sustained Serve rate is qualified. Keep subsequent experiments small
 and use phase costs to choose useful off-thread work.
+
+
+[Sampled phase evidence](../benchmarks/http-server/serve/gc-phases-20261018/README.md)
+now identifies graph tracing as about 60% of sampled Serve collector CPU in two
+sampling intervals. This motivates testing worker handoff/lifetime infrastructure
+before reusing the walker on isolated data; no production concurrency or capacity
+gain is established by these diagnostics.

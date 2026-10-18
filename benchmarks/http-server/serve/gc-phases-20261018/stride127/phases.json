@@ -1,0 +1,1 @@
+{"stride":127,"calls":308498,"samples":2429,"errors":0,"phases":[{"name":"index","wallNs":6365000,"cpuNs":4629970},{"name":"validate-roots","wallNs":729000,"cpuNs":643139},{"name":"seed-roots","wallNs":2074000,"cpuNs":2106164},{"name":"trace","wallNs":17848000,"cpuNs":17811213},{"name":"cleanup","wallNs":545000,"cpuNs":461754},{"name":"sweep","wallNs":3834000,"cpuNs":3842003}]}

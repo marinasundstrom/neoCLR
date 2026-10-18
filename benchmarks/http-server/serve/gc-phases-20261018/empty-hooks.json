@@ -1,0 +1,38 @@
+{
+  "stride": 64,
+  "calls": 64000,
+  "samples": 1000,
+  "errors": 1,
+  "phases": [
+    {
+      "name": "index",
+      "wallNs": 174000,
+      "cpuNs": 164672
+    },
+    {
+      "name": "validate-roots",
+      "wallNs": 149000,
+      "cpuNs": 167707
+    },
+    {
+      "name": "seed-roots",
+      "wallNs": 176000,
+      "cpuNs": 164986
+    },
+    {
+      "name": "trace",
+      "wallNs": 171000,
+      "cpuNs": 167567
+    },
+    {
+      "name": "cleanup",
+      "wallNs": 165000,
+      "cpuNs": 165114
+    },
+    {
+      "name": "sweep",
+      "wallNs": 171000,
+      "cpuNs": 166846
+    }
+  ]
+}
