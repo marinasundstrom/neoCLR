@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Benchmark actual AOT-generated callbacks with matched synchronous/concurrent batch pacing. Longer 4,096-object repeats take 4.1–5.4% less elapsed time and about 20% less owner interruption with concurrent GC, at 15.5–20.1% more CPU; small heaps lose and batch p99 is mixed. Retain raw trials, source/object hashes, UBSan/bounds checks and full reclamation. This is local POC evidence, not sustained HTTP/Go performance or a production policy change.
+
 - Exercise AOT-generated allocating/static/faulting callbacks against the concurrent-GC POC. Identify eager safepoint collection as a source of unusable snapshots; an isolated adapter defers eager collection while a cycle is pending, preserving root checks and synchronous pressure retry. UBSan/bounds control/candidate checks reduce discards from 41 to the single required pressure discard, with state/fault checks and full reclamation. Production selection, Raven async integration and throughput claims remain unchanged.
 
 - Qualify native suspension/fault lifetimes in the concurrent-GC POC: park, resume/discard and successful invocation completion reject pending snapshots without heap mutation; fault-root transfer survives frame unwinding, intern/static ownership ends at completion, and resources clean up exactly once. Focused lifecycle tests and existing UBSan/bounds checks pass with full reclamation. This is native boundary validation, not managed async integration or a new speedup.

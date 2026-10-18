@@ -68,5 +68,8 @@ python3 docs/experiments/concurrent-gc-compiled/run.py \
 ```
 
 Use fresh output directories. The runner rejects changed qualification inputs.
-Next: measure this path against a matched synchronous policy, then exercise managed
-async suspension and scheduler dispatch. No HTTP/Go capacity conclusion follows.
+The [matched compiled-path benchmark](../../../benchmarks/gc-concurrent-poc/README.md#generated-aot-callbacks-with-matched-batch-pacing-2026-10-18)
+now compares synchronous and concurrent collection at identical batch boundaries.
+Larger-graph repeats gain elapsed time at higher CPU cost; small heaps lose. Next:
+reduce overhead and exercise managed async suspension/scheduler dispatch. No HTTP/Go
+capacity conclusion follows.

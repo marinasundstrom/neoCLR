@@ -5374,3 +5374,12 @@ and candidate pass generated instance/static/fault dispatch and complete reclama
 discards fall from 41 to the single required pressure discard. No production files
 or compiler semantics changed. Timing comparisons, Raven async state machines and
 scheduler integration remain open; this does not establish Serve/Go capacity.
+
+
+**Compiled-path performance comparison (2026-10-18):** [matched batch pacing](../benchmarks/gc-concurrent-poc/README.md#generated-aot-callbacks-with-matched-batch-pacing-2026-10-18)
+keeps one collection and eight generated allocating callbacks per batch in both
+modes. Larger-graph repeats show 4.1–5.4% less elapsed time and about 20% less owner
+interruption, with 15.5–20.1% more CPU. Small graphs lose; batch p99 is mixed. Raw
+trials, focused sanitizer checks and full reclamation are retained. No production
+policy or sustained HTTP capacity claim follows. Reduce concurrent CPU overhead
+and qualify scheduler-driven async execution next.

@@ -648,3 +648,69 @@ Reproduce:
 python3 docs/experiments/concurrent-gc-walker/run.py --output NEW_QUALIFICATION
 python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --output NEW_RESULTS --rounds 10000 --live-count 4096 --callback-churn --replace-count 8
 ```
+
+
+## Generated AOT callbacks with matched batch pacing (2026-10-18)
+
+The [compiled integration fixture](../../docs/experiments/concurrent-gc-compiled/README.md)
+now has an uninstrumented timing harness, `compiled-benchmark.py` and
+`compiled-callback.c`. Each batch invokes the actual AOT dispatcher eight times;
+each callback increments a counter and allocates/publishes one replacement child.
+A host-created rooted chain supplies the stated live graph size. Optional scalar
+work is host-side, not a generated handler or HTTP workload.
+
+Both modes defer eager generated safepoint collection within the batch. Sync
+collects immediately before it; concurrent captures at that point and applies after
+it. Each measured batch therefore has exactly one collection, eight allocations,
+and identical callback/scalar work. Root publication/validation and synchronous
+allocation-pressure fallback remain enabled. This compares collectors with matched
+experimental pacing, not an eager-production baseline against a differently paced
+candidate. All expected counts and checksums match; child values survive collection,
+and final cleanup reclaims every allocation. The timing workloads never trigger
+pressure; the preceding qualification covers that safety boundary.
+
+Fresh processes run sync/concurrent/concurrent/sync after 100 warm-up batches.
+A focused UBSan/bounds execution checks each mode before the uninstrumented build.
+Source, generated object and qualification hashes are checked before/after; all
+commands, trials and load averages are retained. C sanitizers do not instrument
+the generated machine code. No builds or other benchmarks ran alongside timings.
+
+Mean results for 4,096 host-chain objects, eight generated callbacks per batch:
+
+| Run / scalar iterations | Sync elapsed ms | Concurrent elapsed ms | Sync CPU ms | Concurrent CPU ms | Sync owner interruption ms | Concurrent owner interruption ms |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2,000 batches / 0 | 431.95 | 411.55 | 431.65 | 514.77 | 113.21 | 90.21 |
+| 2,000 batches / 50,000 | 532.61 | 511.51 | 531.87 | 614.33 | 112.03 | 90.30 |
+| 10,000 repeat / 0 | 2219.35 | 2098.86 | 2192.92 | 2634.56 | 574.17 | 457.78 |
+| 10,000 repeat / 50,000 | 2671.12 | 2560.87 | 2664.67 | 3076.69 | 564.57 | 450.81 |
+
+The longer repeat takes **4.1–5.4% less elapsed time** and about **20% less owner
+interruption**, costing **15.5–20.1% more process CPU**. Owner interruption includes
+snapshot capture plus waiting/applying, or synchronous collection; it is not total
+handler latency. The repeated allocation-only concurrent trials vary from 2050.70
+to 2147.03 ms; both remain below the sync trials. Batch p99 is mixed: about 0.253
+versus 0.300 ms without scalar work, but 0.288 versus 0.281 ms with it. We do not
+claim a consistent tail-latency gain. Peak managed extent is 197,672 versus 197,224
+bytes; this excludes the worker, snapshot and native scratch (RSS is retained too).
+
+The 64-object control loses: allocation-only averages 16.26 ms concurrent versus
+9.33 ms sync (the two concurrent trials vary substantially), and the scalar case
+113.94 versus 110.13 ms. These short small-heap trials establish overhead, not a
+stable percentage estimate. Concurrent collection should not be assumed faster
+for all heap sizes.
+
+Evidence: [initial](compiled-initial.json), [longer repeat](compiled-repeat.json),
+[small-heap control](compiled-small.json). These are short local microbenchmarks,
+not sustained load, Raven async dispatch, production availability or Serve/Go
+capacity. No production runtime policy changed in this slice.
+
+```sh
+python3 benchmarks/gc-concurrent-poc/compiled-benchmark.py \
+  --compiled-build target/gc-compiled-pressure \
+  --walker-build target/gc-lifecycle-qualified-v2 \
+  --output target/gc-compiled-repeat-new --rounds 10000
+```
+
+Use matching fresh qualification builds if sources have changed. Next priorities
+are reducing the CPU/snapshot overhead and qualifying scheduler-driven async work;
+keep a synchronous path for workloads where concurrency loses.

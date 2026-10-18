@@ -160,3 +160,10 @@ Allocation-heavy results remain mixed. These are short native experiments, not
 Raven callback/scheduler integration, production availability or HTTP/Go capacity.
 See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md)
 and [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).
+
+
+A separate generated-AOT callback benchmark now uses identical batch pacing for
+both collectors. Larger-graph repeats take 4.1–5.4% less elapsed time and about 20%
+less owner interruption with concurrent collection, at 15.5–20.1% more CPU. Small
+heaps are slower and batch tail latency is mixed. These remain local POC measurements,
+not sustained HTTP capacity or a reason to replace the synchronous default.
