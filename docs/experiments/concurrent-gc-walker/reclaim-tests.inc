@@ -302,7 +302,43 @@ static void rejected_live_descriptor(unsigned event) {
     assert(!c.text.used);
     cycle_destroy(&cycle);
 }
+static void strong_handle_read(unsigned event) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *value = allocate(&c, 8, NEOCLR_GC_BYTES);
+    void *garbage = allocate(&c, 8, NEOCLR_GC_BYTES);
+    *(uint64_t *)value = 123;
+    uint64_t handle, extra = 0;
+    assert(!neoclr_gc_host_root_create_v1(&c, value, &handle));
+    collection_cycle cycle;
+    assert(cycle_init(&cycle) && cycle_start(&cycle, &c));
+    wait_entered(cycle.job);
+    if (event == 1) assert(!neoclr_gc_host_root_replace_v1(&c, handle, garbage));
+    if (event == 2) assert(!neoclr_gc_host_root_create_v1(&c, garbage, &extra));
+    void *read = NULL;
+    if (event == 3) assert(neoclr_gc_host_root_read_v1(&c, handle, NULL) == 3);
+    else assert(!neoclr_gc_host_root_read_v1(&c, handle, &read));
+    assert((cycle.epoch == experiment_epoch) == (event == 0));
+    unsigned char before[sizeof(heap)];
+    memcpy(before, heap, sizeof(heap));
+    uint64_t collections = statistics.collections;
+    atomic_store(&cycle.job->proceed, true);
+    if (!event) {
+        assert(read == value && cycle_poll(&cycle, true, false) == CYCLE_APPLIED);
+        assert(*(uint64_t *)read == 123);
+        assert(!validated_bases(&c.text, garbage, NULL));
+    } else {
+        assert(cycle_poll(&cycle, true, false) == CYCLE_DISCARDED);
+        assert(!memcmp(before, heap, sizeof(heap)) && statistics.collections == collections);
+    }
+    assert(!neoclr_gc_host_root_release_v1(&c, handle));
+    if (extra) assert(!neoclr_gc_host_root_release_v1(&c, extra));
+    cycle_run(&cycle, &c);
+    assert(!c.text.used);
+    cycle_destroy(&cycle);
+}
 static void reclamation_tests(void) {
+    for (unsigned event = 0; event < 4; event++) strong_handle_read(event);
     for (unsigned event = 0; event < 5; event++) rejected_live_descriptor(event);
     midwalk_progress();
     destroy_outstanding();

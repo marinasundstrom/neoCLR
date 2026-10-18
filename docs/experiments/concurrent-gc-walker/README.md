@@ -279,3 +279,18 @@ and the existing reclamation suite pass [UBSan/bounds qualification](root-index-
 show 47–49% less elapsed and 46–47% less CPU with 64 stable roots, confirmed by a
 longer repeat, and about 10% less elapsed with eight. Zero-root behavior is essentially
 unchanged. This fixes POC overhead; concurrent remains more CPU-expensive than sync.
+
+
+### Unchanged strong-handle reads
+
+Successful ordinary host reads from unchanged strong handles now preserve the POC
+epoch: their values were captured as strong roots. Creation/replacement/release
+still invalidate; subsequent reads cannot revive that result. Conditional reads,
+failed reads and callback-specific hooks retain conservative invalidation. This
+exception applies only to the audited owner-thread POC, not arbitrary native reads.
+[Qualification](strong-read-results.json) passes 329 applied cycles, 18 discards and
+249,088 reclaimed bytes, including new read/mutation regressions and existing
+conditional-resurrection cases. [Paired evidence](../../../benchmarks/gc-concurrent-poc/README.md#preserve-snapshots-across-unchanged-strong-handle-reads-2026-10-18)
+shows unnecessary read-only fallbacks fall from 2000 to zero and owner interruption
+falls about 37%; mixed replacements still invalidate exactly 500 cycles. Overall
+elapsed gains remain modest, and production collector behavior is unchanged.

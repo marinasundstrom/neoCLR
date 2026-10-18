@@ -27,7 +27,7 @@ def instrument(source):
     source = source[:before] + 'static int32_t experiment_finish(neoclr_aot_context *context, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {\n    neoclr_aot_text_arena *a = &context->text;\n' + finish + '}\n' + source[before:]
     # Conservative owner-thread invalidation, including failed calls.
     import re
-    functions = ['host_root_create', 'neoclr_gc_host_root_read_v1',
+    functions = ['host_root_create',
         'neoclr_gc_host_root_replace_v1', 'neoclr_gc_host_root_release_v1',
         'neoclr_gc_callback_read_v1', 'neoclr_gc_callback_read_suspended_v1',
         'neoclr_gc_resource_attach_v1', 'neoclr_gc_resource_release_v1',
@@ -37,6 +37,12 @@ def instrument(source):
         pattern = r'((?:static )?int32_t ' + name + r'\([^;{]*\) \{)'
         source, count = re.subn(pattern, r'\1\n    experiment_invalidate();', source)
         assert count == 1, name
+    # A successful unchanged strong-handle read exposes a value already captured
+    # as a strong root. Creation/replacement/release still invalidate. Conditional
+    # reads can resurrect snapshot-white values; failed reads remain conservative.
+    read_prefix = ('int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {\n'
+                   '    host_root *root = find_host_root(context, handle);')
+    replace(read_prefix, read_prefix + '\n    if (!root || root->conditional || root->expired || !output) experiment_invalidate();')
     source = source.replace('neoclr_roots_parked_v1()', 'experiment_parked_roots()')
     replace('static _Thread_local neoclr_gc_statistics statistics;', '''static _Thread_local neoclr_gc_statistics statistics;
 static _Thread_local uint64_t experiment_epoch;

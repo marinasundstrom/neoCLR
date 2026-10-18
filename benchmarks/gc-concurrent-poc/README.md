@@ -424,3 +424,72 @@ Example:
 ```
 python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build VALIDATED_BUILD --output NEW_RESULTS --rounds 2000 --live-count 4096 --host-roots 64 --churn-every 4
 ```
+
+## Preserve snapshots across unchanged strong-handle reads (2026-10-18)
+
+The generated POC no longer invalidates a snapshot on a successful
+`neoclr_gc_host_root_read_v1` from an unchanged strong handle. Its value was captured
+as a strong root, so exposing that value cannot rescue a snapshot-white object.
+Any creation, replacement or release still advances the epoch; a later read does
+not reset it. Conditional reads can rescue otherwise unreachable values and still
+invalidate, as do failed reads. Callback-specific read hooks and all other audited
+transitions remain unchanged. This is a scoped native POC rule, not production
+integration or a managed API change. It preserves the familiar strong-handle
+retention semantics rather than changing reachability or ownership contracts.
+
+New reclamation regressions demonstrate successful strong reads with garbage freed,
+rejection after replacement/creation followed by a strong read, and conservative
+failed-read rejection. Existing conditional-resurrection, parked-resumption,
+same-address reuse, error/cancel and protected-memory cases remain passing.
+Fresh UBSan/bounds records 329 applied cycles, 18 discards and 249,088 reclaimed
+payload bytes. Existing ASan/ThreadSanitizer startup limitations are unchanged.
+
+The workload adds `--read-every N`, default zero. Both versions/modes read the same
+handles and verify returned values against expected handle contents. Reads and
+replacements are separately counted. Expected discard counts follow the epoch;
+five additional boundary checks assert explicit numeric outcomes for stable/no-read,
+read-only, every-cycle replacement and non-dividing read/replacement periods.
+Fallback collections are still fully charged; all work, graph order and final
+reclamation checks remain. This benchmark uses strong handles, not conditional
+reads, and does not establish real Serve read/invalidation frequency.
+
+4096 nodes, 64 handles, 2000 batches, one read per batch. `paired` and `repeat`
+perform no handle replacement; `mixed` also rotates the graph and replaces a handle
+every fourth batch. Baseline always discards 2000 cycles. Candidate discards zero
+for read-only runs and exactly 500 for mixed runs. Arithmetic means of two trials,
+milliseconds:
+
+| Run | Scalar iterations | Candidate discards | Baseline concurrent elapsed | Candidate concurrent elapsed | Candidate sync elapsed | Baseline owner interruption | Candidate owner interruption |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| paired | 0 | 0 | 1491.39 | 1430.66 | 1447.38 | 170.42 | 97.00 |
+| paired | 50000 | 0 | 1554.15 | 1527.42 | 1521.95 | 153.34 | 97.20 |
+| repeat | 0 | 0 | 1453.74 | 1426.95 | 1419.05 | 153.69 | 96.93 |
+| repeat | 50000 | 0 | 1554.83 | 1528.81 | 1521.12 | 153.77 | 97.39 |
+| mixed | 0 | 500 | 1464.23 | 1445.41 | 1429.82 | 154.26 | 112.47 |
+| mixed | 50000 | 500 | 1561.27 | 1539.60 | 1531.10 | 154.82 | 111.92 |
+
+The read-only repeat reduces owner interruption 36.9%/36.7%, elapsed 1.8%/1.7%
+and process CPU 1.6%/1.5%. Mixed runs reduce owner interruption 27.1%/27.7%, elapsed
+1.3%/1.4% and CPU 1.2% in both cases. The first allocation-only baseline contains
+a 1521 ms run versus a 1461 ms companion, inflating its mean improvement; retain
+both and use the repeat to describe the more modest elapsed effect. Sync controls
+also vary. No substantial throughput or precise tail-latency claim follows.
+
+Candidate concurrent still consumes about 8% more process CPU than candidate sync
+in the repeat (1537/1639 ms versus 1418/1520 ms), with nearly equal elapsed.
+Avoiding unnecessary fallback restores the owner-interruption benefit for this
+supported read pattern; it does not make all host access safe or concurrent GC
+universally faster. Source generation changes only the isolated POC; installed
+collector selection and production behavior remain unchanged.
+
+Raw evidence: [first pair](strong-read-paired.json), [repeat](strong-read-repeat.json),
+[mixed operations](strong-read-mixed.json), [boundary checks](strong-read-boundaries.json),
+[qualification](../../docs/experiments/concurrent-gc-walker/strong-read-results.json).
+Reports retain baseline qualification and binary provenance, all outputs and counts.
+Timed measurements did not overlap our builds/tests. No HTTP/Go rate was measured.
+Further read-hook changes need separate publication/ownership reasoning; callback
+reads remain conservative until audited. Example with a matching baseline build:
+
+```
+python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_WITH_MATCHING_WORKLOAD --output NEW_RESULTS --rounds 2000 --live-count 4096 --host-roots 64 --read-every 1 --churn-every 4
+```

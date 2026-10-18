@@ -40,7 +40,7 @@ static uint64_t percentile(uint64_t *samples, unsigned count, unsigned percent) 
     return samples[((uint64_t)count * percent + 99) / 100 - 1];
 }
 int main(int argc, char **argv) {
-    assert(argc >= 4 && argc <= 7);
+    assert(argc >= 4 && argc <= 8);
     bool concurrent = !strcmp(argv[1], "concurrent");
     assert(concurrent || !strcmp(argv[1], "sync"));
     unsigned rounds = (unsigned)strtoul(argv[2], NULL, 10);
@@ -51,8 +51,11 @@ int main(int argc, char **argv) {
     assert(live_count >= 1 && live_count <= 8192);
     unsigned host_count = argc >= 6 ? (unsigned)strtoul(argv[5], NULL, 10) : 0;
     assert(host_count <= 256 && host_count <= live_count);
-    unsigned churn_every = argc == 7 ? (unsigned)strtoul(argv[6], NULL, 10) : 0;
+    unsigned churn_every = argc >= 7 ? (unsigned)strtoul(argv[6], NULL, 10) : 0;
     assert(!churn_every || host_count);
+    unsigned read_every = argc == 8 ? (unsigned)strtoul(argv[7], NULL, 10) : 0;
+    assert(!read_every || host_count);
+    void *handle_values[256];
     void *nodes[8192];
     uint64_t handles[256];
     unsigned char *heap = calloc(1, 512 * 1024);
@@ -66,8 +69,10 @@ int main(int argc, char **argv) {
         else root = object;
         previous = object;
     }
-    for (unsigned i = 0; i < host_count; i++)
-        assert(!neoclr_gc_host_root_create_v1(&c, nodes[i * live_count / host_count], &handles[i]));
+    for (unsigned i = 0; i < host_count; i++) {
+        handle_values[i] = nodes[i * live_count / host_count];
+        assert(!neoclr_gc_host_root_create_v1(&c, handle_values[i], &handles[i]));
+    }
     neoclr_probe_storage slot = {&root, 8, 0};
     neoclr_probe_frame frame;
     neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
@@ -79,7 +84,7 @@ int main(int argc, char **argv) {
     uint64_t start = 0, cpu_start = 0, owner_start = 0, gc_before = 0, allocations_before = 0;
     uint64_t checksum = 1, pause_sum = 0, capture_sum = 0, finish_sum = 0, peak_extent = 0;
     unsigned pause_count = 0;
-    uint64_t discarded = 0, fallbacks = 0, replacements = 0;
+    uint64_t discarded = 0, fallbacks = 0, replacements = 0, reads = 0, expected_discards = 0;
     for (unsigned round = 0; round < rounds + warmup; round++) {
         if (round == warmup) {
 #ifdef POC_PHASE_TIMING
@@ -107,6 +112,12 @@ int main(int argc, char **argv) {
          * output. References remain in the stable, rooted live chain. */
         for (unsigned i = 0; i < work; i++) checksum = checksum * UINT64_C(6364136223846793005) + 1;
         ((uint64_t *)root)[2] = checksum & UINT64_C(0xffffffff);
+        if (read_every && round % read_every == 0) {
+            void *value = NULL;
+            assert(!neoclr_gc_host_root_read_v1(&c, handles[round % host_count], &value));
+            assert(value == handle_values[round % host_count]);
+            if (round >= warmup) reads++;
+        }
         if (churn_every) {
             /* Rotate the rooted chain without changing its live objects. */
             void *next = (void *)(uintptr_t)((uint64_t *)root)[1];
@@ -118,14 +129,17 @@ int main(int argc, char **argv) {
             }
             if (round % churn_every == 0) {
                 assert(!neoclr_gc_host_root_replace_v1(&c, handles[round % host_count], root));
+                handle_values[round % host_count] = root;
                 if (round >= warmup) replacements++;
             }
         }
         if (c.text.used > peak_extent) peak_extent = c.text.used;
         if (concurrent) {
+            bool invalidated = cycle.epoch != experiment_epoch;
+            if (round >= warmup && invalidated) expected_discards++;
             uint64_t before_finish = ns(CLOCK_MONOTONIC);
             cycle_result result = cycle_poll(&cycle, true, false);
-            assert(result == CYCLE_APPLIED || result == CYCLE_DISCARDED);
+            assert(result == (invalidated ? CYCLE_DISCARDED : CYCLE_APPLIED));
             if (result == CYCLE_DISCARDED) {
                 /* No skipped collection: charge a synchronous fallback in-window. */
                 assert(!neoclr_gc_collect_v1(&c, &frame));
@@ -151,7 +165,8 @@ int main(int argc, char **argv) {
 #ifdef POC_PHASE_TIMING
     phase_enabled = 0;
 #endif
-    assert(discarded == (concurrent ? replacements : 0));
+    assert(discarded == expected_discards);
+    assert(discarded >= (concurrent ? replacements : 0));
     /* Identical post-window live set; final cleanup is outside timing. */
     assert(!neoclr_gc_collect_v1(&c, &frame));
     assert(validated_bases(&c.text, root, previous));
@@ -174,7 +189,8 @@ int main(int argc, char **argv) {
     assert(!c.text.used && statistics.allocations == statistics.reclaimed_allocations);
     struct rusage usage;
     assert(!getrusage(RUSAGE_SELF, &usage));
-    printf("{\"churnEvery\":%u,\"replacements\":%llu,\"discardedCycles\":%llu,\"fallbackCollections\":%llu,",
+    printf("{\"readEvery\":%u,\"reads\":%llu,", read_every, (unsigned long long)reads);
+    printf("\"churnEvery\":%u,\"replacements\":%llu,\"discardedCycles\":%llu,\"fallbackCollections\":%llu,",
         churn_every, (unsigned long long)replacements, (unsigned long long)discarded,
         (unsigned long long)fallbacks);
     printf("\"phaseTiming\":%s,\"phaseNs\":[%llu,%llu,%llu,%llu,%llu],",

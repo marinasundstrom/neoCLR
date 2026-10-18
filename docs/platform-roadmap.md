@@ -5319,3 +5319,12 @@ shows rotation preserves the larger-graph pause benefit, while every-cycle inval
 raises owner interruption about 28–29% versus sync. Next audit read-only strong-handle
 invalidation separately from conditional resurrection and mutation. Production
 behavior and collector eligibility are unchanged; this is not a Serve measurement.
+
+
+**Strong-read invalidation audit (2026-10-18):** the isolated POC now preserves
+snapshots on successful reads from unchanged strong handles. Conditional/failed
+reads, mutation and callback-specific hooks remain conservative. New reclamation
+checks and [paired measurements](../benchmarks/gc-concurrent-poc/README.md#preserve-snapshots-across-unchanged-strong-handle-reads-2026-10-18)
+show removal of unnecessary read-only fallbacks and about 37% less owner interruption;
+mixed mutations still reject their cycles. Overall gains are modest and production
+GC remains unchanged. Further hooks need their own safety audit before relaxation.
