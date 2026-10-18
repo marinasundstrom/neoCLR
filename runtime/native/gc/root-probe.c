@@ -52,10 +52,28 @@ void neoclr_probe_leave_v1(neoclr_probe_frame *frame) {
     depth--;
     memset(frame, 0, sizeof(*frame));
 }
+/* Cache a search hint, never a validation result or an image pointer. Every
+ * publication still checks the current string length and marker bytes. A hash
+ * collision, mutable plan or reused image address can only cause another search.
+ * The bounded thread-local table needs neither allocation nor image teardown. */
+static _Thread_local uint32_t spill_marker_offsets[256];
+static int has_spill_marker(const char *plan, uint32_t length) {
+    static const char marker[] = "requiredSpillLanes";
+    const uint32_t size = sizeof(marker) - 1;
+    uintptr_t key = (uintptr_t)plan;
+    uint32_t bucket = (uint32_t)((key >> 4) ^ (key >> 12)) & 255;
+    uint32_t hint = spill_marker_offsets[bucket];
+    if (hint && length >= size && hint - 1 <= length - size &&
+        !memcmp(plan + hint - 1, marker, size)) return 1;
+    const char *found = strstr(plan, marker);
+    if (!found) return 0;
+    spill_marker_offsets[bucket] = (uint32_t)(found - plan) + 1;
+    return 1;
+}
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length) {
     if (!frame || head != frame || instruction >= 8192 || lane_count > 8192 || !lanes ||
-        !plan || strlen(plan) != length || !strstr(plan, "requiredSpillLanes")) abort();
+        !plan || strlen(plan) != length || !has_spill_marker(plan, length)) abort();
     frame->transient = NULL; frame->transient_plan = NULL;
     frame->transient_count = frame->transient_length = frame->transient_phase = 0;
     frame->instruction = instruction;

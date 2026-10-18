@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "runtime": "neoclr",
+      "executableSha256": "5ee3f705f9198daa557f95c71b10d7554b81229a8c63f5d16afcadc12cb44091",
+      "wire": "HTTP/1.1 200 OK\r\nContent-Length: 10\r\nConnection: close\r\n\r\nxxxxxxxxxx",
+      "totals": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "runtime": "go",
+      "executableSha256": "5494f10931b4a50817047dde2ef0744904eafe3e90dcaea3ee9761145a29912c",
+      "wire": "HTTP/1.1 200 OK\r\nContent-Length: 10\r\nConnection: close\r\n\r\nxxxxxxxxxx",
+      "totals": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

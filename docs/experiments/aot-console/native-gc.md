@@ -903,3 +903,20 @@ checks. The integrated closed workloads improve 3.61–4.14× on those hosts wit
 approximately 23% larger peak arena extent and complete final reclamation. These
 are not managed HTTP results; the separate retained-stack follow-up is identified
 by its own revision and evidence.
+
+
+## Root metadata search hints (2026-10-18)
+
+The shared native root-publication adapter now keeps a bounded thread-local marker
+search hint. Every publication still checks the current plan length and marker
+bytes, all live storage/transient descriptors and fault contexts. No validated
+pointer identity is cached; mutable metadata and reused image addresses remain
+safe under the existing readable-string contract. Frame ABI, root ownership and
+stress/paced collection policy are unchanged. Cost: 1 KiB per native thread.
+
+[Serve validation and matched Go measurements](../../../benchmarks/http-server/serve/root-validation/README.md)
+show 6.5% less CPU per completion in the clean 400/sec pair, with noisy repeats and
+all admission failures retained. This is native GC infrastructure improvement,
+not an HTTP-specific fast path; gains in other workloads remain unmeasured.
+Interpreter-side GC is unchanged. Green Tea page-local tracing research is recorded
+there as a separate possible direction, not an implemented collector replacement.

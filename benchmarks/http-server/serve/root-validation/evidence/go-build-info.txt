@@ -1,0 +1,9 @@
+target/http-serve-capacity-20261018/go/app: go1.26.3
+	path	command-line-arguments
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	GOARCH=arm64
+	build	GOOS=darwin
+	build	GOARM64=v8.0

@@ -17,6 +17,26 @@ int main(int argc, char **argv) {
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+    if (!strncmp(argv[1], "plan-", 5)) {
+        char plan[128] = "{\"requiredSpillLanes\":[]}";
+        /* Warm the search hint, then reuse the same address with changed bytes. */
+        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        if (!strcmp(argv[1], "plan-missing")) plan[2] = 'X';
+        else if (!strcmp(argv[1], "plan-length")) {
+            neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan) - 1);
+            return 0;
+        } else if (!strcmp(argv[1], "plan-short")) strcpy(plan, "{}");
+        else if (!strcmp(argv[1], "plan-moved")) {
+            strcpy(plan, "{\"other\":0,\"requiredSpillLanes\":[]}");
+            neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            strcpy(plan, "requiredSpillLanes"); /* Marker at both bounds. */
+            neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            neoclr_probe_leave_v1(&parent);
+            return 0;
+        } else return 2;
+        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        return 0;
+    }
     if (!strcmp(argv[1], "address")) slot.address = NULL;
     else if (!strcmp(argv[1], "width")) slot.read_bytes = 3;
     else if (!strcmp(argv[1], "flags")) slot.flags = 3;

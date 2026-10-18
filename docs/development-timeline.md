@@ -2796,6 +2796,25 @@ types, not a completed loader or replacement core. Production identity migration
 context lifetime and full cross-origin equivalence remain open.
 See [the executable probe](experiments/raven-target/introspection-v1/README.md).
 
+### 2026-10-18 — Root-validation optimization and Green Tea research
+
+- Author directed optimization of repeated root metadata validation first, with GC
+  safety preserved, Serve measured against Go, and each slice committed.
+- Assistant selected a bounded search-offset hint that rechecks current metadata
+  bytes rather than trusting cached pointer identities. Existing descriptor and
+  fault validation remains in place; collector frequency is unchanged.
+- Author supplied [Go's Green Tea article](https://go.dev/blog/greenteagc). Assistant
+  identified page-local tracing as a later research direction, separate from root
+  publication overhead; no collector replacement or predicted gain was selected.
+- Author clarified that this work benefits neoCLR broadly through its GC. Assistant
+  confirmed that the change lives in the shared native root-publication layer:
+  Serve supplies measured evidence, while other native workloads may benefit
+  according to publication frequency; interpreter-side GC is unchanged.
+- Implementation, 45 native safety checks, nine lifecycle cases and measurements
+  are recorded in the [root-validation investigation](../benchmarks/http-server/serve/root-validation/README.md).
+  The clean 400/sec pair measures 6.5% less CPU per completion. Repeated trials
+  retain host variation and admission misses; no higher sustained rate is established.
+
 ### Runtime-owned descriptor acquisition — 2026-09-17
 
 **Author clarification:** Runtime*Info implementations should not be visible, but
