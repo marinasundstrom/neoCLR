@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Measure direct incoming request construction against the fresh Serve baseline and Go: 7.13% fewer diagnostic allocations and 3.73% fewer payload bytes. The final 60-second pair uses 6.38% less CPU/completion but misses 27 arrivals versus none for baseline, with worse p99 and coarse CPU peaks; no reliable throughput gain is claimed. Preserve all 30/60-second runs, raw requests and user-reported activity context, and keep admission/latency attribution open.
+
 - Construct incoming HTTP requests directly from Host and Target strings, removing full URL/Uri construction and reparsing while preserving validation, error precedence, limits, ports and body/header ownership. Fifty differential wire cases pass against the fresh baseline across interpreter/JIT/AOT. Outbound URL/Uri APIs remain unchanged; regenerate the unchanged public reference and refresh its source fingerprint. Retain stale-tool/probe-build failures separately; sustained measurements follow.
 
 - Rebuild the Serve benchmark and all four managed libraries from current source, retaining compiler/backend/native provenance and a freshly built Go control. The 300/sec ten-second smoke completes all 3,000 requests; this qualifies the fixture, not sustained capacity. Use this cohort for the incoming-request URL optimization.

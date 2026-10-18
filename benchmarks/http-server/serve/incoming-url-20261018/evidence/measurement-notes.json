@@ -1,0 +1,5 @@
+{
+  "activity": "Author reported side activities after the initial 30-second matrix and during the first 60-second confirmation baseline. Exact activity window and host exclusivity are unknown. Retain all runs; do not use the overlapping confirmation baseline as clean speedup evidence. Remaining confirmation runs occurred after this report, without benchmark builds/profiling.",
+  "methodologicalLimits": "Loopback/shared host, short runs, no TLS/keep-alive. Request success does not erase unsent arrivals. Coarse process CPU sampling is not instantaneous peak CPU. No maximum or new reliable sustained-rate claim.",
+  "outcome": "Allocation reduction is deterministic in the diagnostic workload. Final confirmation pair uses 6.4% less CPU/completion but candidate loses 27 arrivals while baseline loses none and candidate p99 is worse. Treat admission/tail behavior as unresolved, not automatically host noise or GC."
+}

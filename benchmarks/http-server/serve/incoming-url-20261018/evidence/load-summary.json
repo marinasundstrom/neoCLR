@@ -1,0 +1,248 @@
+{
+  "rows": [
+    {
+      "mode": "baseline",
+      "round": 1,
+      "rate": 300,
+      "offered": 9000,
+      "admitted": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedWithinWindow": 8999,
+      "throughput": 299.96666666666664,
+      "cpuMsPerCompletion": 1.9957773085898436,
+      "offeredP99Ms": 5.835166000000669,
+      "dispatchLagP99Ms": 0.7208749999998432,
+      "peakRssKiB": 12912,
+      "peakSampledCpuCores": 0.6933497936951554,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "baseline",
+      "round": 1,
+      "rate": 400,
+      "offered": 12000,
+      "admitted": 11932,
+      "outcomes": {
+        "ok": 11932,
+        "generator_inflight_limit": 68
+      },
+      "completedWithinWindow": 11931,
+      "throughput": 397.7,
+      "cpuMsPerCompletion": 2.0442544631631883,
+      "offeredP99Ms": 172.35325000000046,
+      "dispatchLagP99Ms": 1.0378330000015978,
+      "peakRssKiB": 12912,
+      "peakSampledCpuCores": 0.9849715503279798,
+      "provisionalPass": false,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "baseline",
+      "round": 2,
+      "rate": 300,
+      "offered": 9000,
+      "admitted": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedWithinWindow": 9000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 2.0966666666666667,
+      "offeredP99Ms": 42.58949999999828,
+      "dispatchLagP99Ms": 3.102916666666289,
+      "peakRssKiB": 12912,
+      "peakSampledCpuCores": 0.7527009326027903,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "baseline",
+      "round": 2,
+      "rate": 400,
+      "offered": 12000,
+      "admitted": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedWithinWindow": 11998,
+      "throughput": 399.93333333333334,
+      "cpuMsPerCompletion": 1.9553258876479411,
+      "offeredP99Ms": 8.40520799999922,
+      "dispatchLagP99Ms": 0.45520799999998474,
+      "peakRssKiB": 12896,
+      "peakSampledCpuCores": 0.8625265777763496,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "candidate",
+      "round": 1,
+      "rate": 300,
+      "offered": 9000,
+      "admitted": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedWithinWindow": 8999,
+      "throughput": 299.96666666666664,
+      "cpuMsPerCompletion": 1.9157684187131907,
+      "offeredP99Ms": 7.559291999999829,
+      "dispatchLagP99Ms": 0.8658333333340096,
+      "peakRssKiB": 12832,
+      "peakSampledCpuCores": 0.7115751874467419,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "candidate",
+      "round": 1,
+      "rate": 400,
+      "offered": 12000,
+      "admitted": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedWithinWindow": 11999,
+      "throughput": 399.96666666666664,
+      "cpuMsPerCompletion": 1.82348529044087,
+      "offeredP99Ms": 7.36229200000027,
+      "dispatchLagP99Ms": 0.6457920000002559,
+      "peakRssKiB": 12816,
+      "peakSampledCpuCores": 0.7529827041894068,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "candidate",
+      "round": 2,
+      "rate": 300,
+      "offered": 9000,
+      "admitted": 8929,
+      "outcomes": {
+        "ok": 8929,
+        "generator_inflight_limit": 71
+      },
+      "completedWithinWindow": 8927,
+      "throughput": 297.56666666666666,
+      "cpuMsPerCompletion": 2.2235913520779658,
+      "offeredP99Ms": 225.9953330000002,
+      "dispatchLagP99Ms": 93.96341699999766,
+      "peakRssKiB": 12816,
+      "peakSampledCpuCores": 0.9090537043613389,
+      "provisionalPass": false,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "candidate",
+      "round": 2,
+      "rate": 400,
+      "offered": 12000,
+      "admitted": 11952,
+      "outcomes": {
+        "ok": 11952,
+        "generator_inflight_limit": 48
+      },
+      "completedWithinWindow": 11951,
+      "throughput": 398.3666666666667,
+      "cpuMsPerCompletion": 1.8651158898836915,
+      "offeredP99Ms": 89.2444999999995,
+      "dispatchLagP99Ms": 3.2908339999977443,
+      "peakRssKiB": 12816,
+      "peakSampledCpuCores": 0.8921050186741663,
+      "provisionalPass": false,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "go",
+      "round": 1,
+      "rate": 300,
+      "offered": 9000,
+      "admitted": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedWithinWindow": 9000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 0.2822222222222222,
+      "offeredP99Ms": 5.032958333333504,
+      "dispatchLagP99Ms": 1.6443329999979994,
+      "peakRssKiB": 15008,
+      "peakSampledCpuCores": 0.0989813908214927,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "go",
+      "round": 1,
+      "rate": 400,
+      "offered": 12000,
+      "admitted": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedWithinWindow": 12000,
+      "throughput": 400.0,
+      "cpuMsPerCompletion": 0.18833333333333332,
+      "offeredP99Ms": 251.34966599999942,
+      "dispatchLagP99Ms": 243.80670799999749,
+      "peakRssKiB": 15024,
+      "peakSampledCpuCores": 0.11834824315731422,
+      "provisionalPass": false,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "go",
+      "round": 2,
+      "rate": 300,
+      "offered": 9000,
+      "admitted": 9000,
+      "outcomes": {
+        "ok": 9000
+      },
+      "completedWithinWindow": 9000,
+      "throughput": 300.0,
+      "cpuMsPerCompletion": 0.21,
+      "offeredP99Ms": 8.520917000000239,
+      "dispatchLagP99Ms": 4.404042000000885,
+      "peakRssKiB": 14960,
+      "peakSampledCpuCores": 0.07927473526573782,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    },
+    {
+      "mode": "go",
+      "round": 2,
+      "rate": 400,
+      "offered": 12000,
+      "admitted": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedWithinWindow": 12000,
+      "throughput": 400.0,
+      "cpuMsPerCompletion": 0.15999999999999998,
+      "offeredP99Ms": 3.7753329999992147,
+      "dispatchLagP99Ms": 1.118541000000306,
+      "peakRssKiB": 15312,
+      "peakSampledCpuCores": 0.09875502834187391,
+      "provisionalPass": true,
+      "cleanShutdown": true,
+      "accountingDifference": 0
+    }
+  ],
+  "cpuPeakMethod": "Largest process CPU delta / elapsed delta between resource samples; coarse ~0.5-second samples, not instantaneous peaks. One core is 1.0. Timing excludes allocation instrumentation."
+}

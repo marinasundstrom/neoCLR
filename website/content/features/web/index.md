@@ -174,6 +174,10 @@ pooling, redirects, HTTP/2/3 and WebSocket upgrades are not implemented.
 Development incoming requests now validate Host and Target directly, retaining
 string properties without constructing an intermediate URI. The existing input
 validation and size limits remain in force; client URL/Uri overloads are unchanged.
+A fresh local Serve comparison records 7.1% fewer allocations and 6.4% lower CPU
+per completion in its final 60-second pair, but worse tail latency and missed
+arrivals prevent a sustained throughput claim. See the
+[complete experiment and Go controls](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/incoming-url-20261018/README.md).
 
 Bodies, headers, URLs and JSON documents have separate size limits. Supported
 admission bounds are not a throughput guarantee; use the [HTTP API reference](/docs/api/System/Web/Http/index.html)

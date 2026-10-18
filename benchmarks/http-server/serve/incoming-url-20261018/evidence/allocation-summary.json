@@ -1,0 +1,45 @@
+{
+  "baseline": {
+    "allocations": 58914,
+    "allocatedBytes": 3212315,
+    "dropped": 0,
+    "droppedBytes": 0,
+    "idleCalls": 18543,
+    "boundaryReasons": [
+      1,
+      1564,
+      9338
+    ],
+    "method": "Four published frames, including instruction IDs; truncated chains explicitly marked. Whole-process counts including startup/shutdown. Allocation payload sizes, not array element counts. Pacing reasons: context/epoch, >=16 allocations, >=64 boundaries. Instrumented timing is not comparative.",
+    "compiledUriFunctions": [
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269..ctor",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_6765745F54657874",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_6765745F49734162736F6C757465",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_50617274",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_416C706861",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_4469676974",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_486578",
+      "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_557269.M_5061727365"
+    ]
+  },
+  "candidate": {
+    "allocations": 54715,
+    "allocatedBytes": 3092539,
+    "dropped": 0,
+    "droppedBytes": 0,
+    "idleCalls": 17302,
+    "boundaryReasons": [
+      1,
+      1563,
+      8455
+    ],
+    "method": "Four published frames, including instruction IDs; truncated chains explicitly marked. Whole-process counts including startup/shutdown. Allocation payload sizes, not array element counts. Pacing reasons: context/epoch, >=16 allocations, >=64 boundaries. Instrumented timing is not comparative.",
+    "compiledUriFunctions": []
+  },
+  "percentageChange": {
+    "allocations": -7.127338153919272,
+    "allocatedBytes": -3.7286505215086363,
+    "idleCalls": -6.692552445666832
+  },
+  "scope": "200 measured, 20 warm-up and one stop exchange; whole process, including initialization and shutdown. No dropped caller records. Diagnostic timing is not a speed comparison."
+}

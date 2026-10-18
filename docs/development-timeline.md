@@ -19473,3 +19473,15 @@ construction even on rejected input. Existing outbound URL/Uri overloads remain
 unchanged. Differential wire checks and matched load results are recorded in the
 [incoming-request experiment](../benchmarks/http-server/serve/incoming-url-20261018/README.md);
 this does not expand the pending HttpContext callback API scope.
+
+The author clarified that URI work should be eliminated when it adds no useful
+information. The implemented direct path passes 50 differential cases across all
+three execution modes. Separate allocation captures save 7.13% of allocations.
+During the bounded longer confirmation, the author reported: “Sorry. I did some
+side activities”. The assistant retained the earlier points, marked the overlapping
+baseline as potentially contended, and completed the already-running comparison.
+The final pair uses 6.38% less CPU/completion, but the candidate misses 27 arrivals
+while the baseline misses none and has worse p99/coarse CPU peaks. Both Go
+confirmations complete all arrivals. No reliable throughput gain is claimed;
+admission/latency attribution remains open. Website and roadmap describe the
+allocation improvement separately from capacity qualification.
