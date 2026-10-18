@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Record author-directed concurrent-GC evaluation beyond CLR: compare Go/Green Tea, Shenandoah, LXR and recent Opportunistic ZGC research, with explicit status, tradeoffs, root/mutation safety and sustained-load gates. Update the roadmap direction; no concurrent collector or performance gain is claimed by this research slice.
+
 - Correlate Serve admission misses with bounded GC/scheduler wall and thread-CPU traces, including the async pump pause path. Retain both diagnostic runs and all misses: long wall intervals include descheduling, and the overloaded expanded measurement sleeps only twice. Add trace/load checks; no capacity gain or concurrent collector is claimed.
 
 - Reserve space for the known first Promise callback instead of allocating empty storage and immediately growing it. Retain lazy allocation and deferred callback semantics; expanded multi-callback completion/cancellation tests pass interpreter/JIT/AOT and the unchanged API snapshot is refreshed. Serve diagnostics show 4.36% fewer allocations, 3.47% fewer bytes and 1.13% fewer root publications, with more collections. Retain all initial 400/sec, 300/sec fallback and post-activity-change 400/sec comparisons: every neoCLR trial misses arrivals, fresh Go controls pass, and candidate CPU changes direction between repeat pairs. No sustained-rate or repeatable speedup claim; update website evidence and keep admission/latency investigation open.

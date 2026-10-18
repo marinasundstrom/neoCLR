@@ -5183,3 +5183,13 @@ Native roots distinguish descriptive field/constructor metadata from field execu
 Wider literal payloads, native-width/enum constant expression coverage and general
 closed-generic reflection execution remain separate gaps. Structural work stays parked;
 these author-directed slices do not reorder the platform milestones.
+
+
+### Author-directed concurrent GC investigation — 2026-10-18
+
+Following Serve admission diagnostics, the author requested continuing through a
+concurrent collector implementation, informed by alternatives beyond .NET. The
+[comparison and safety/measurement gate](design/concurrent-gc-evaluation.md) supersede
+the earlier provisional ordering for this investigation, without selecting a collector
+or reprioritizing unrelated milestones. Implementation, three-mode lifetime parity,
+worker-overlap proof and sustained Serve/Go qualification remain open.

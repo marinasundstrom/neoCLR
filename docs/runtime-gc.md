@@ -207,3 +207,13 @@ blocks; a trusted persistent index would need a separate integrity/lifetime desi
 The [matched admission benchmark](../benchmarks/gc-handles/README.md) includes early
 bases and small heaps so repeated-walk savings are not confused with universal gains.
 The full collector, suspension ownership and non-GC arena behavior are unchanged.
+
+
+## Concurrent implementation investigation — 2026-10-18
+
+The author now explicitly directs work through concurrent collection and asks for
+research beyond the CLR. See the [collector alternatives and validation gate](design/concurrent-gc-evaluation.md)
+for Go/Green Tea, Shenandoah, LXR and recent scheduling research. This author-directed
+work takes precedence over the earlier provisional generational evaluation order.
+Concurrency, locality, generations and pacing remain distinct choices; no new collector
+is shipped or selected by this research entry.

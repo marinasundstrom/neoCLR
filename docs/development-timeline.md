@@ -19225,3 +19225,19 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
 - **Next work:** test removal of Promise result-list storage, preserve all execution
   modes and GC retention, then compare uninstrumented Serve against Go. This remains
   in progress; concurrent GC is not implemented or selected by this exchange.
+
+
+### 2026-10-18 — Broaden collector research before selecting a design
+
+- **Author:** “Continue through making the GC run concurrently in whatever way you
+  seem fit.” Then requested looking beyond .NET, naming Go and newer research as
+  sources of ideas without requiring selection of any existing collector.
+- **Assistant:** began an unvalidated snapshot-tracing prototype, then broadened
+  research to Go's mutation barriers, Green Tea locality, Shenandoah compaction,
+  LXR reference-count/tracing integration and Opportunistic ZGC scheduling research.
+  Distinguished shipped behavior, historical documentation and research proposals.
+- **Decision/status:** [record alternatives and evidence gates](design/concurrent-gc-evaluation.md);
+  keep concurrency separate from generations, locality and pacing. Snapshot tracing
+  remains an experiment with explicit copy-pause/memory costs, not a selected long-term
+  design. The author has authorized implementation; no additional design approval is
+  required. Collector implementation and new Serve/Go measurements remain unfinished.
