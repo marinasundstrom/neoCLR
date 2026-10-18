@@ -209,7 +209,8 @@ impl<'a> Profile<'a> {
                     || t.is_reference_type || t.fields.len() != 1
                     || t.fields[0].ty != Type::Int32
                     || t.fields[0].visibility != neoclr::metadata::Visibility::Private)
-                || (t.base.is_some() && !reference_base)
+                || (t.base.is_some() && !reference_base
+                    && !neoclr::native_metadata::has_value_type_base(input, &Type::Named(t.name.clone())))
                 || (t.is_abstract && !static_owner && !(references && t.is_reference_type))
                 || !t.generic_parameters.is_empty()
                 || !t.generic_constraints.is_empty()
@@ -252,7 +253,12 @@ impl<'a> Profile<'a> {
             states[i] = 1;
             let fields = p.input.types[i].fields.clone();
             let mut width = 0;
-            if let Some(base) = &p.input.types[i].base {
+            // ValueType supplies nominal ancestry, never inline storage.
+            if let Some(base) = p.input.types[i]
+                .base
+                .as_ref()
+                .filter(|_| p.input.types[i].is_reference_type)
+            {
                 let Ty::Reference(parent) = p.ty(base)? else {
                     return Err("reference base must be a class".into());
                 };
@@ -1052,7 +1058,11 @@ impl<'a> Profile<'a> {
                 .types
                 .iter()
                 .enumerate()
-                .filter(|(n, t)| t.is_reference_type && !t.is_abstract && self.derives_from(*n, *i))
+                .filter(|(n, t)| {
+                    t.representation == Representation::Record
+                        && !t.is_abstract
+                        && self.derives_from(*n, *i)
+                })
                 .map(|(n, _)| n)
                 .collect(),
             Ty::Interface(i) => {

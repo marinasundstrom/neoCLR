@@ -28,8 +28,8 @@ services to an already compiled AOT object; it does not JIT the AOT application.
 
 [Minimal Preview 16 rejections](preview16-rejections.json) retain separate reference
 record and mutable value-record repros. Mutable setters are repaired in this slice.
-Reference-record storage is repaired in the next slice below. ValueType already exists and derives from Object, but
-value-type ancestry metadata and assignability need further work. Record synthesized
+Reference-record storage and imported ValueType ancestry are repaired in the slices
+below. Local-core and primitive/enum ancestry still need further work. Record synthesized
 equality/hash/display support is also separate from positional storage. These gaps
 must not be described as deliberate semantic differences.
 
@@ -52,4 +52,37 @@ This exposed a missing native `TypeInfo.BaseType` service. Native snapshot lower
 now reuses the interpreter's base descriptor recipe for closed type tokens in the
 compiled program; unknown/unretained handles fault. One focused recipe test covers
 base identity, no base and unknown type. No new guest signature or reflection
-invocation permission is added. ValueType ancestry is the next slice.
+invocation permission is added. The following slice addresses imported ValueType ancestry.
+
+## ValueType ancestry — 2026-10-18
+
+Native application structs and record structs now bind an imported, complete,
+fieldless `System.ValueType` foundation. `TypeBuilder.SetValueTypeBase` preserves
+value storage: this nominal edge adds neither reference fields nor a reference-base
+constructor call. Runtime validation requires the selected Object root and a
+fieldless abstract ValueType in that root's defining module/revision. Native private
+root renaming uses a compiler-owned proof that is not serialized.
+
+The native-only `ValueTypeAncestry` capability admits boxing directly to ValueType.
+Interpreter and native cast checks preserve the boxed concrete identity; native
+layout excludes reference-base padding from the value payload. Existing Object
+overrides retain boxed managed receivers with explicit ancestry. Ordinary .NET
+semantics, Runtime Contract configuration and CLI signature encoding are unchanged.
+This is a native metadata/backend repair, not a permanent bridge divergence.
+
+The matched consumer checks BaseType, IsSubclassOf, direct ValueType assignment,
+positive boxed-value and negative class tests, unboxing/copy isolation and init
+accessors. Evidence is retained in neoCLR's
+`docs/experiments/type-semantics/valuetype-three-mode-results.json.gz`. The earlier
+JSON consumer is rerun against this compiler/runtime cohort. Local-core foundation
+authoring, intrinsic primitives/enums, nested root-class mapping and synthesized
+record equality/hash/display remain separate compatibility work.
+
+[Semantics evidence](valuetype-three-mode-results.json.gz) and
+[JSON regression evidence](valuetype-json-results.json.gz) retain exact commands,
+outputs and input hashes. The JSON rerun includes the subsequent boxed Object
+override validation correction; the focused override regression exercises dispatch.
+Compiler integration is Raven `f7b5da49d` on `codex/neoclr`, with the matching
+neoCLR development metadata/runtime changes. Focused validation also includes 36 compiler tests,
+27 Object-root/layout tests, metadata ValueType/external-base checks and a private
+root-proof serialization test. Installed Preview 16 remains unchanged.

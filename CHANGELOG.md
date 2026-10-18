@@ -8,9 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
-- Verify positional reference-record storage and explicit Object ancestry with the repaired native compiler across interpreter/JIT/AOT. Add native BaseType snapshot queries using interpreter metadata recipes, with closed-token retention and no additional invocation rights. ValueType ancestry remains the next compatibility slice.
+- Preserve imported ValueType ancestry for native application structs/record structs without changing inline storage. Admit direct boxing and ancestry casts, retain boxed Object override receivers, and validate foundation ownership. Add metadata rejection/roundtrip tests and interpreter/JIT/AOT semantics and JSON regression evidence. Local-core, primitive/enum and broader synthesized-record support remain separate gaps.
 
-- Validate native mutable positional record structs, class aliasing, value copying, boxed-value isolation and init accessors across interpreter/JIT/AOT with the repaired compiler. Retain reference-record admission and ValueType ancestry as active compatibility gaps.
+- Verify positional reference-record storage and explicit Object ancestry with the repaired native compiler across interpreter/JIT/AOT. Add native BaseType snapshot queries using interpreter metadata recipes, with closed-token retention and no additional invocation rights.
+
+- Validate native mutable positional record structs, class aliasing, value copying, boxed-value isolation and init accessors across interpreter/JIT/AOT with the repaired compiler.
 
 - Serialize public nongeneric record structs and nested class/record properties through checked boxed getters. Preserve unsupported scalar/union rejection, output quotas and explicit record-deserialization errors; keep broader array/method reflection admission unchanged. Add matched interpreter/JIT/AOT JSON regressions and update API guidance.
 

@@ -48,10 +48,15 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   interpreter, JIT and AOT. The assistant started matched copying, aliasing, boxing
   and type-classification checks. The author confirmed corresponding .NET compiler
   mapping/metadata and directed filling the gaps. Mutable record setters now pass
-  interpreter/JIT/AOT checks; reference records and ancestry remain active work.
+  interpreter/JIT/AOT checks; the subsequent slices address reference records and ancestry.
+- **Assistant follow-up:** filled positional reference-record storage and Object ancestry,
+  then imported ValueType ancestry for application structs/record structs. Native
+  layout and boxed override checks required separate corrections. Matched semantics
+  and JSON regression evidence is retained in the [type-semantics investigation](experiments/type-semantics/README.md).
+  Primitive/enum ancestry and broader synthesized record members remain open.
 - **Evidence and limits:** see the [JSON record experiment](experiments/json-records/README.md).
   Public-model visibility and native reflection retention remain required. Record
-  deserialization, custom record collection elements and ancestry integration remain
+  deserialization, custom record collection elements and broader ancestry coverage remain
   distinct gaps; the installed Preview 16 bundle is not modified.
 
 

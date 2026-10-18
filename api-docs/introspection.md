@@ -147,6 +147,12 @@ base identity or None; unretained handles fault. This grants no constructor or
 member invocation rights. The helper is outside guest RavenDoc selection and adds
 no guest signature. See the [type-semantics experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/type-semantics/README.md).
 
+`neoclr::native_metadata::has_value_type_base(&Module, &metadata::Type) -> bool`
+checks the validated fieldless ValueType ancestry contract. Native compilation can
+preserve it across private Object-root renaming using a compiler-only proof that
+serialized applications cannot supply. False means this special storage-category
+exception is unavailable; it does not grant general reference-base inheritance.
+
 The same unstable backend bridge provides
 `module_assembly(&Module, identity: &str, name: &str) -> Result<Value, Fault>` and
 `assembly_name(&Module, identity: &str) -> Result<Value, Fault>`. These validate

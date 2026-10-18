@@ -92,7 +92,7 @@ fn analyze_constructor(module: &Module, function: &Function) -> Result<(), Fault
         may_chain: bool,
     }
     let owner = function.owner.as_ref().unwrap();
-    let base = crate::inheritance::base(module, owner)?;
+    let base = crate::inheritance::construction_base(module, owner)?;
     let start = base
         .as_ref()
         .map(|t| crate::inheritance::fields(module, t).map(|f| f.len()))

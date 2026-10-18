@@ -554,3 +554,100 @@ fn raven_source_object_root_and_override_execute() {
         Value::String("source root override".into())
     );
 }
+
+#[test]
+fn value_record_ancestry_requires_the_selected_fieldless_foundation() {
+    for (foundation, accepted) in [
+        (
+            ".type class abstract System.ValueType\n.extends System.Object\n.end\n",
+            true,
+        ),
+        (
+            ".type class abstract System.ValueType\n.extends System.Object\n.field Storage Int32\n.end\n",
+            false,
+        ),
+        (
+            ".type class System.ValueType\n.extends System.Object\n.end\n",
+            false,
+        ),
+        (".type class abstract System.ValueType\n.end\n", false),
+    ] {
+        let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+        let core = format!(
+            "{}\n{foundation}",
+            ROOT.replace(".module System", ".module Core")
+        );
+        let app = ".module App\n.references (Core)\n.entry Main\n.type ValueRecord\n.extends [Core]System.ValueType\n.field Number Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end";
+        let loaded = neoclr::assembler::read_modules_with_object_root(
+            &[ModuleInput::Source(app), ModuleInput::Source(&core)],
+            &seed,
+            &selected_root(),
+        )
+        .and_then(|modules| {
+            LoadedProgram::with_modules_and_object_root(
+                &modules[0],
+                &seed,
+                &modules[1..],
+                &selected_root(),
+            )
+        });
+        let result = loaded.and_then(|program| program.verify());
+        assert_eq!(result.is_ok(), accepted, "{foundation}: {result:?}");
+    }
+}
+
+#[test]
+fn boxed_value_record_can_be_tested_and_cast_through_value_type() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let core = format!(
+        "{}\n.type class abstract System.ValueType\n.extends System.Object\n.end\n",
+        ROOT.replace(".module System", ".module Core")
+    );
+    let app = ".module App\n.references (Core)\n.entry Main\n.type ValueRecord\n.extends [Core]System.ValueType\n.field Number Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nnewobj ValueRecord\nbox ValueRecord\nisinst [Core]System.ValueType\ncastclass [Core]System.ValueType\nunbox.any ValueRecord\nldfld 0\nret\n.end";
+    let modules = neoclr::assembler::read_modules_with_object_root(
+        &[ModuleInput::Source(app), ModuleInput::Source(&core)],
+        &seed,
+        &selected_root(),
+    )
+    .unwrap();
+    let program = LoadedProgram::with_modules_and_object_root(
+        &modules[0],
+        &seed,
+        &modules[1..],
+        &selected_root(),
+    )
+    .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn explicit_value_type_ancestry_preserves_boxed_object_override() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let core = format!(
+        "{}\n.type class abstract System.ValueType\n.extends System.Object\n.end\n",
+        ROOT.replace(".module System", ".module Core")
+    );
+    let app = ".module App\n.references (Core)\n.entry Main\n.type ValueRecord\n.extends [Core]System.ValueType\n.field Number Int32\n.method instance override byref ToString() -> String\nldstr \"boxed override\"\nret\n.end\n.end\n.function Main() -> String\nldc.i4 42\nnewobj ValueRecord\nbox ValueRecord\ncallvirt instance [Core]System.Object::ToString()\nret\n.end";
+    let modules = neoclr::assembler::read_modules_with_object_root(
+        &[ModuleInput::Source(app), ModuleInput::Source(&core)],
+        &seed,
+        &selected_root(),
+    )
+    .unwrap();
+    let program = LoadedProgram::with_modules_and_object_root(
+        &modules[0],
+        &seed,
+        &modules[1..],
+        &selected_root(),
+    )
+    .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::String("boxed override".into())
+    );
+}

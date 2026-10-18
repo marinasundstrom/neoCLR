@@ -274,7 +274,7 @@ impl SlotReference {
             ));
         }
         crate::inheritance::require_base(module, &slot.ty, owner)?;
-        let base = crate::inheritance::base(module, owner)?;
+        let base = crate::inheritance::construction_base(module, owner)?;
         let start = base
             .as_ref()
             .map(|t| module.instantiated_fields(t).map(|f| f.len()))

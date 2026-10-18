@@ -108,7 +108,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         let t = &input.types[index];
         if t.is_reference_type
             || t.representation != Representation::Record
-            || t.base.is_some()
+            || (t.base.is_some() && !neoclr::native_metadata::has_value_type_base(input, &ty))
             || t.enum_info.is_some()
             || !t.generic_parameters.is_empty()
         {

@@ -430,10 +430,12 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     int baseArity = type.RawBase!.Value.TryGetProperty("Constructed", out var baseConstruction)
                         ? Array(baseConstruction, "arguments", 32).Length : 0;
-                    Require(IsOrdinaryClass(type) && !type.IsClosedHierarchy &&
-                        nativeTypeAliases.TryGetValue((type.BaseName, baseArity), out var alias) &&
-                        !alias.ValueType && alias.Declaring is null,
-                        "external base requires an explicit arity-matched top-level reference binding and ordinary class owner");
+                    Require(nativeTypeAliases.TryGetValue((type.BaseName, baseArity), out var alias) &&
+                        !alias.ValueType && alias.Declaring is null &&
+                        (IsOrdinaryClass(type) && !type.IsClosedHierarchy ||
+                         type.IsValueType && type.EnumMembers is null && type.NativePrimitive is null && !type.NativeGrapheme &&
+                         baseArity == 0 && alias.Namespace == "System" && alias.Name == "ValueType"),
+                        "external base requires an explicit arity-matched top-level reference binding and an ordinary class or ValueType-based value record");
                     continue;
                 }
                 var parent = types[type.BaseIndex];

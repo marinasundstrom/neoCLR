@@ -99,6 +99,7 @@ if (args is ["--assembly-attributes", var assemblyAttributeOutput]) { AssemblyAt
 if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 
+if (args is ["--value-type-base"]) { ValueTypeBaseChecks.Run(); return 0; }
 if (args is ["--external-class-base"]) { ExternalClassBaseAuthoringChecks.Run(); return 0; }
 if (args is ["--external-class-base", var baseOutput]) { ExternalClassBaseAuthoringChecks.Run(baseOutput); return 0; }
 
@@ -726,6 +727,7 @@ var tests = new (string Name, Action Body)[]
     ("Native local class base snapshots and facade identity", ClassBaseReaderChecks.Run),
     ("Native scoped external class base snapshots", ExternalClassBaseReaderChecks.Run),
     ("External fieldless class bases", () => ExternalClassBaseAuthoringChecks.Run()),
+    ("Fieldless ValueType ancestry", ValueTypeBaseChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
     ("CLI and native Int32 enum definitions and builders", EnumChecks.Run),
     ("Bounded library PE profile and native declaration round trip", LibraryPeProfileChecks.Run),

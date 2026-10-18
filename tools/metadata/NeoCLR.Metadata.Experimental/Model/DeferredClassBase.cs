@@ -16,6 +16,24 @@ public sealed partial class TypeBuilder
         Definition.BindExternalBase(baseType);
     }
 
+    /// <summary>Binds the fieldless runtime System.ValueType base of a native value-record definition.</summary>
+    /// <param name="baseType">An owned, complete nongeneric System.ValueType reference with no inherited storage.</param>
+    /// <remarks>Preserves nominal ancestry without adding reference storage or a base-constructor call.</remarks>
+    /// <exception cref="ArgumentException">The base is foreign, has storage or lacks a complete ValueType contract.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not an ordinary value record or already has members/an explicit base.</exception>
+    public void SetValueTypeBase(ImportedTypeReference baseType)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!IsValueType || Definition.IsEnum || NativePrimitive is not null || NativeGrapheme ||
+            ExternalBase is not null || LocalBase is not null || Methods.Count != 0 || Fields.Count != 0 || StaticFields.Count != 0)
+            throw new InvalidOperationException("value base binding requires a value record before its members");
+        if (!ReferenceEquals(baseType.Owner, Assembly) || baseType.Namespace != "System" || baseType.Name != "ValueType" ||
+            baseType.IsValueType || baseType.GenericArity != 0 || baseType.DeclaringType is not null ||
+            !Assembly.HasClassBaseContract(baseType) || Assembly.ExternalClassFieldCount(baseType) != 0)
+            throw new ArgumentException("value base requires a complete fieldless System.ValueType contract", nameof(baseType));
+        Definition.BindExternalBase(baseType);
+    }
+
     private void ValidateDeferredBaseOwner()
     {
         if (IsStatic || IsInterface || IsValueType || IsNativeObjectRoot || NativePrimitive is not null || NativeGrapheme ||

@@ -48,6 +48,7 @@ try:
         assert declarations[name].get('base') == {'Named': 'System.Object'}, declarations[name]
     for name in ['ValueCell', 'ValueRecord', 'ImmutableRecord']:
         assert not declarations[name].get('is_reference_type', False), name
+        assert declarations[name].get('base') is not None, name
     assert declarations['ImmutableRecord']['properties'][0].get('init_only'), 'immutable setter metadata'
     assert not declarations['ValueRecord']['properties'][0].get('init_only', False), 'mutable setter metadata'
     expected='classes and records alias; structs copy; boxing isolates; init accessors initialize\n'

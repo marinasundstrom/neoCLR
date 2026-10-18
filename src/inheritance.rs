@@ -23,6 +23,69 @@ pub(crate) fn has_intrinsic_string_root(
         })
 }
 
+/// A value record may name the selected runtime's fieldless ValueType foundation.
+/// This is nominal ancestry only; arbitrary reference-storage inheritance stays invalid.
+pub(crate) fn has_value_type_root(module: &Module, definition: &crate::metadata::TypeDef) -> bool {
+    if definition.is_reference_type
+        || definition.representation != Representation::Record
+        || definition.enum_info.is_some()
+    {
+        return false;
+    }
+    let Some(parent) = definition
+        .base
+        .as_ref()
+        .and_then(|base| module.type_definition(base))
+    else {
+        return false;
+    };
+    let Some(root_definition) = parent
+        .base
+        .as_ref()
+        .and_then(|base| module.type_definition(base))
+    else {
+        return false;
+    };
+    let Some(root) = root_definition.definition.as_ref() else {
+        return false;
+    };
+    if module.object_root.as_ref() != Some(root) && !root_definition.native_object_root {
+        return false;
+    }
+    parent
+        .origin
+        .as_ref()
+        .map(|o| o.name.as_str())
+        .unwrap_or(&parent.name)
+        == "System.ValueType"
+        && parent.is_reference_type
+        && parent.is_abstract
+        && parent.fields.is_empty()
+        && parent.generic_parameters.is_empty()
+        && parent
+            .definition
+            .as_ref()
+            .is_some_and(|id| id.module == root.module && id.revision == root.revision)
+        && parent
+            .base
+            .as_ref()
+            .and_then(|base| module.type_definition(base))
+            .and_then(|d| d.definition.as_ref())
+            == Some(root)
+}
+
+/// Nominal ValueType ancestry does not require a reference-base constructor.
+pub(crate) fn construction_base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {
+    if module
+        .type_definition(ty)
+        .is_some_and(|definition| has_value_type_root(module, definition))
+    {
+        Ok(None)
+    } else {
+        base(module, ty)
+    }
+}
+
 pub(crate) fn base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {
     if matches!(ty, Type::Function(_)) {
         return Ok(Some(Type::from_name("System.Object")));
@@ -332,7 +395,14 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         } else {
             None
         };
-        let adapted_receiver = boxed_parent.is_some() && method.receiver_byref;
+        // Explicit ValueType ancestry reaches the same Object slot as the
+        // legacy implicit view. A value receiver still borrows its boxed payload.
+        let adapted_receiver = method.receiver_byref
+            && (boxed_parent.is_some()
+                || inherited.as_ref().is_some_and(|parent| {
+                    crate::object_root::owns_slot(module, parent)
+                        && !module.is_reference_type(owner)
+                }));
         if method.is_override {
             let parent = inherited.or(boxed_parent).ok_or_else(|| {
                 Fault::new(format!(

@@ -23,12 +23,33 @@ func Main() {
     } else {
         Fail("Class Object base is missing")
     }
-    if let .Some(parent) = typeof(ReferenceRecord).BaseType {
-        if !parent.Equals(typeof(Object)) {
+    if let .Some(referenceParent) = typeof(ReferenceRecord).BaseType {
+        if !referenceParent.Equals(typeof(Object)) {
             Fail("Reference record has the wrong base")
         }
     } else {
         Fail("Reference record Object base is missing")
+    }
+    if let .Some(valueParent) = typeof(ValueCell).BaseType {
+        if !valueParent.Equals(typeof(ValueType)) {
+            Fail("Struct has the wrong base")
+        }
+    } else {
+        Fail("Struct ValueType base is missing")
+    }
+    if let .Some(recordParent) = typeof(ValueRecord).BaseType {
+        if !recordParent.Equals(typeof(ValueType)) {
+            Fail("Record struct has the wrong base")
+        }
+    } else {
+        Fail("Record struct ValueType base is missing")
+    }
+    if let .Some(rootParent) = typeof(ValueType).BaseType {
+        if !rootParent.Equals(typeof(Object)) {
+            Fail("ValueType has the wrong base")
+        }
+    } else {
+        Fail("ValueType Object base is missing")
     }
     let initialized = InitOnly { Number = 42 }
     if initialized.Number != 42 {
@@ -67,6 +88,24 @@ func Main() {
     }
     let boxed: Object = valueRecord
     valueRecord.Number = 3
+    if !(boxed is ValueType) {
+        Fail("Boxed record is not a ValueType")
+    }
+    let typedValue: ValueType = ValueRecord(42)
+    if typedValue is ValueRecord typedRecord {
+        if typedRecord.Number != 42 {
+            Fail("ValueType assignment changed the boxed value")
+        }
+    } else {
+        Fail("ValueType assignment lost the record identity")
+    }
+    let classBox: Object = reference
+    if classBox is ValueType {
+        Fail("Ordinary class matched ValueType")
+    }
+    if !typeof(ValueRecord).IsSubclassOf(typeof(ValueType)) {
+        Fail("Record subclass relation is missing")
+    }
     if boxed is ValueRecord unboxed {
         if unboxed.Number != 1 {
             Fail("Box did not preserve independent value")

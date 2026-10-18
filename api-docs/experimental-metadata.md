@@ -10335,3 +10335,28 @@ validation. Native metadata retains the explicit category. This matches the
 [.NET Enum hierarchy](https://learn.microsoft.com/en-us/dotnet/api/system.enum?view=net-10.0).
 The focused `--core-base-types` metadata test covers authoring and both native and
 CLI projection roundtrips. No guest runtime API is added by this correction.
+
+
+## Native value-record ancestry (development, 2026-10-18)
+
+`void TypeBuilder.SetValueTypeBase(ImportedTypeReference baseType)` binds the
+selected runtime's fieldless `System.ValueType` as the nominal base of an ordinary
+native value record. Call it before adding members. The reference must belong to
+the same builder, be nongeneric and top-level, and have a complete class-base
+contract with zero inherited instance fields. Native reading preserves the scoped
+base identity and value category. The runtime separately checks that this abstract
+foundation belongs to the host-selected Object module and derives directly from it.
+
+Binding does not add reference storage, alter copy semantics or require a call to
+a reference-base constructor. `ArgumentException` rejects missing, foreign,
+non-ValueType or storage-bearing contracts; `InvalidOperationException` rejects
+reference/enum/primitive owners, repeated binding or binding after members exist;
+null raises `ArgumentNullException`. Existing class `SetBaseType` remains distinct.
+For an imported `System.ValueType` reference `parent`, register its resolved contract
+with `CompleteClassBaseReference(parent, methods, 0)`, then call
+`valueRecord.SetValueTypeBase(parent)` before declaring fields and constructors.
+
+This slice covers an external foundation for ordinary value records. Local-core,
+enum and intrinsic-primitive ancestry are not added by this API. The temporary CLI
+projection keeps its ordinary CLR ValueType base; native metadata records the exact
+imported foundation. [Validation and three-mode consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/type-semantics/README.md).

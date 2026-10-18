@@ -662,6 +662,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
         let intrinsic_string_root =
             crate::inheritance::has_intrinsic_string_root(module, definition);
         if !intrinsic_string_root
+            && !crate::inheritance::has_value_type_root(module, definition)
             && definition
                 .base
                 .as_ref()
@@ -3998,6 +3999,9 @@ fn interpret_instructions_with_dispatch(
                         concrete == *target
                             || *target == Type::Named("System.Object".into())
                             || module.reference_assignable(&concrete, target)
+                            || (module.is_reference_type(target)
+                                && crate::inheritance::require_base(module, &concrete, target)
+                                    .is_ok())
                             || (crate::interfaces::interface_definition(module, target).is_ok()
                                 && crate::interfaces::ensure_reference_implementation(
                                     module, &concrete, target,

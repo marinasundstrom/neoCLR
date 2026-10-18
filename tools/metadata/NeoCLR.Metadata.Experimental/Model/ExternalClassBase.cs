@@ -110,7 +110,7 @@ public sealed partial class TypeDefinition
 public sealed partial class TypeBuilder
 {
     internal ImportedTypeReference? ExternalBase => Definition.AuthoredExternalBase;
-    internal bool HasExplicitClassBase => LocalBase is not null || ExternalBase is not null;
+    internal bool HasExplicitClassBase => !IsValueType && (LocalBase is not null || ExternalBase is not null);
     internal bool HasExternalBase(ImportedTypeReference target)
     {
         SignatureType current = OpenSignature;

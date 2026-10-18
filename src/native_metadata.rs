@@ -60,6 +60,14 @@ pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     )
 }
 
+/// Query the verified fieldless ValueType ancestry contract, including private native root renaming.
+/// The renamed root proof is compiler-owned and cannot be supplied in serialized metadata.
+pub fn has_value_type_base(module: &Module, owner: &Type) -> bool {
+    module
+        .type_definition(owner)
+        .is_some_and(|definition| crate::inheritance::has_value_type_root(module, definition))
+}
+
 /// Return the optional base descriptor using the same query as interpreted reflection.
 pub fn base_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::BaseType.invoke_profile(
@@ -430,6 +438,21 @@ fault "test body must not execute"
             panic!("expected descriptor");
         };
         fields
+    }
+
+    #[test]
+    fn value_type_ancestry_proof_survives_private_root_rename_but_not_serialization() {
+        let mut module = crate::assemble(".module Core\n.type class abstract System.Object\n.end\n.type class abstract System.ValueType\n.extends System.Object\n.end\n.type Item\n.end\n").unwrap();
+        module.types[2].base = Some(Type::from_name("System.ValueType"));
+        let item = Type::from_name("Item");
+        assert!(!has_value_type_base(&module, &item));
+        retain_object_reference_root(&mut module.types[0]).unwrap();
+        module.types[0].name = "$private_root".into();
+        module.types[1].base = Some(Type::from_name("$private_root"));
+        assert!(has_value_type_base(&module, &item));
+        let copied: Module =
+            serde_json::from_value(serde_json::to_value(&module).unwrap()).unwrap();
+        assert!(!has_value_type_base(&copied, &item));
     }
 
     #[test]
