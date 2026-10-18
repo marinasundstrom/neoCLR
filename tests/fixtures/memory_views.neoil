@@ -1,0 +1,382 @@
+; Interpreter foundation. Opaque view values; Raven/native producers are pending.
+.type System.Slice<T>
+.memoryview slice
+.sealed
+.property instance Length() -> Int32
+.get instance System.Slice<T>::get_Length()
+.end
+.method instance get_Length() -> Int32
+ldarg this
+call neoCLR.Runtime.ViewLength<T>(System.Slice<T>)
+ret
+.end
+.method instance Slice(Int32 start,Int32 length) -> System.Slice<T>
+ldarg this
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewSlice<T>(System.Slice<T>,Int32,Int32)
+ret
+.end
+.method instance Slice(Int32 start) -> System.Slice<T>
+ldarg this
+ldarg 1
+call neoCLR.Runtime.ViewSlice<T>(System.Slice<T>,Int32)
+ret
+.end
+.property instance Item(Int32) -> T
+.get instance System.Slice<T>::get_Item(Int32)
+.set instance System.Slice<T>::set_Item(Int32,T)
+.end
+.method instance get_Item(Int32 index) -> T
+ldarg this
+ldarg 1
+call neoCLR.Runtime.ViewGet<T>(System.Slice<T>,Int32)
+ret
+.end
+.method instance set_Item(Int32 index,T value) -> Void
+ldarg this
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewSet<T>(System.Slice<T>,Int32,T)
+ret
+.end
+.method instance AsReadOnly() -> System.ReadOnlySlice<T>
+ldarg this
+call neoCLR.Runtime.ViewAsReadOnly<T>(System.Slice<T>)
+ret
+.end
+.end
+
+.type System.ReadOnlySlice<T>
+.memoryview read_only_slice
+.sealed
+.property instance Length() -> Int32
+.get instance System.ReadOnlySlice<T>::get_Length()
+.end
+.method instance get_Length() -> Int32
+ldarg this
+call neoCLR.Runtime.ViewLength<T>(System.ReadOnlySlice<T>)
+ret
+.end
+.method instance Slice(Int32 start,Int32 length) -> System.ReadOnlySlice<T>
+ldarg this
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewSlice<T>(System.ReadOnlySlice<T>,Int32,Int32)
+ret
+.end
+.method instance Slice(Int32 start) -> System.ReadOnlySlice<T>
+ldarg this
+ldarg 1
+call neoCLR.Runtime.ViewSlice<T>(System.ReadOnlySlice<T>,Int32)
+ret
+.end
+.property instance Item(Int32) -> T
+.get instance System.ReadOnlySlice<T>::get_Item(Int32)
+.end
+.method instance get_Item(Int32 index) -> T
+ldarg this
+ldarg 1
+call neoCLR.Runtime.ViewGet<T>(System.ReadOnlySlice<T>,Int32)
+ret
+.end
+.end
+
+.type System.Memory<T>
+.memoryview memory
+.sealed
+.property instance Length() -> Int32
+.get instance System.Memory<T>::get_Length()
+.end
+.method instance get_Length() -> Int32
+ldarg this
+call neoCLR.Runtime.ViewLength<T>(System.Memory<T>)
+ret
+.end
+.method instance Slice(Int32 start,Int32 length) -> System.Memory<T>
+ldarg this
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewSlice<T>(System.Memory<T>,Int32,Int32)
+ret
+.end
+.method instance Slice(Int32 start) -> System.Memory<T>
+ldarg this
+ldarg 1
+call neoCLR.Runtime.ViewSlice<T>(System.Memory<T>,Int32)
+ret
+.end
+.method instance AsSlice() -> System.Slice<T>
+ldarg this
+call neoCLR.Runtime.ViewAsSlice<T>(System.Memory<T>)
+ret
+.end
+.method instance AsReadOnly() -> System.ReadOnlyMemory<T>
+ldarg this
+call neoCLR.Runtime.ViewAsReadOnly<T>(System.Memory<T>)
+ret
+.end
+.end
+
+.type System.ReadOnlyMemory<T>
+.memoryview read_only_memory
+.sealed
+.property instance Length() -> Int32
+.get instance System.ReadOnlyMemory<T>::get_Length()
+.end
+.method instance get_Length() -> Int32
+ldarg this
+call neoCLR.Runtime.ViewLength<T>(System.ReadOnlyMemory<T>)
+ret
+.end
+.method instance Slice(Int32 start,Int32 length) -> System.ReadOnlyMemory<T>
+ldarg this
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewSlice<T>(System.ReadOnlyMemory<T>,Int32,Int32)
+ret
+.end
+.method instance Slice(Int32 start) -> System.ReadOnlyMemory<T>
+ldarg this
+ldarg 1
+call neoCLR.Runtime.ViewSlice<T>(System.ReadOnlyMemory<T>,Int32)
+ret
+.end
+.method instance AsSlice() -> System.ReadOnlySlice<T>
+ldarg this
+call neoCLR.Runtime.ViewAsSlice<T>(System.ReadOnlyMemory<T>)
+ret
+.end
+.end
+
+.function System.MemoryViews.AsSlice<T>(arrayref<T> source) -> System.Slice<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateSlice<T>(arrayref<T>)
+ret
+.end
+
+.function System.MemoryViews.AsSlice<T>(arrayref<T> source,Int32 start,Int32 length) -> System.Slice<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateSlice<T>(arrayref<T>,Int32,Int32)
+ret
+.end
+
+.function System.MemoryViews.AsSlice<T>(T[]& source) -> System.Slice<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateSlice<T>(T[]&)
+ret
+.end
+
+.function System.MemoryViews.AsSlice<T>(T[]& source,Int32 start,Int32 length) -> System.Slice<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateSlice<T>(T[]&,Int32,Int32)
+ret
+.end
+
+.function System.MemoryViews.AsReadOnlySlice<T>(arrayref<T> source) -> System.ReadOnlySlice<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateReadOnlySlice<T>(arrayref<T>)
+ret
+.end
+
+.function System.MemoryViews.AsReadOnlySlice<T>(arrayref<T> source,Int32 start,Int32 length) -> System.ReadOnlySlice<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateReadOnlySlice<T>(arrayref<T>,Int32,Int32)
+ret
+.end
+
+
+
+.function System.MemoryViews.AsReadOnlySlice<T>(readonly T[]& source) -> System.ReadOnlySlice<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateReadOnlySlice<T>(T[]&)
+ret
+.end
+
+.function System.MemoryViews.AsReadOnlySlice<T>(readonly T[]& source,Int32 start,Int32 length) -> System.ReadOnlySlice<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateReadOnlySlice<T>(T[]&,Int32,Int32)
+ret
+.end
+
+.function System.MemoryViews.AsMemory<T>(arrayref<T> source) -> System.Memory<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateMemory<T>(arrayref<T>)
+ret
+.end
+
+.function System.MemoryViews.AsMemory<T>(arrayref<T> source,Int32 start,Int32 length) -> System.Memory<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateMemory<T>(arrayref<T>,Int32,Int32)
+ret
+.end
+
+.function System.MemoryViews.AsMemory<T>(T[]& source) -> System.Memory<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateMemory<T>(T[]&)
+ret
+.end
+
+.function System.MemoryViews.AsMemory<T>(T[]& source,Int32 start,Int32 length) -> System.Memory<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateMemory<T>(T[]&,Int32,Int32)
+ret
+.end
+
+.function System.MemoryViews.AsReadOnlyMemory<T>(arrayref<T> source) -> System.ReadOnlyMemory<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(arrayref<T>)
+ret
+.end
+
+.function System.MemoryViews.AsReadOnlyMemory<T>(arrayref<T> source,Int32 start,Int32 length) -> System.ReadOnlyMemory<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(arrayref<T>,Int32,Int32)
+ret
+.end
+
+
+
+.function System.MemoryViews.AsReadOnlyMemory<T>(readonly T[]& source) -> System.ReadOnlyMemory<T>
+ldarg 0
+call neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(T[]&)
+ret
+.end
+
+.function System.MemoryViews.AsReadOnlyMemory<T>(readonly T[]& source,Int32 start,Int32 length) -> System.ReadOnlyMemory<T>
+ldarg 0
+ldarg 1
+ldarg 2
+call neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(T[]&,Int32,Int32)
+ret
+.end
+
+.function System.MemoryViews.AsUtf8Slice(String source) -> System.ReadOnlySlice<Byte>
+ldarg 0
+call neoCLR.Runtime.ViewUtf8(String)
+ret
+.end
+
+.function internal neoCLR.Runtime.ViewUtf8(String) -> System.ReadOnlySlice<Byte>
+.methodimpl InternalCall
+.end
+
+.function internal neoCLR.Runtime.ViewLength<T>(System.Slice<T>) -> Int32
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.Slice<T>,Int32,Int32) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.Slice<T>,Int32) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewGet<T>(System.Slice<T>,Int32) -> T
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSet<T>(System.Slice<T>,Int32,T) -> Void
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewAsReadOnly<T>(System.Slice<T>) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewLength<T>(System.ReadOnlySlice<T>) -> Int32
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.ReadOnlySlice<T>,Int32,Int32) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.ReadOnlySlice<T>,Int32) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewGet<T>(System.ReadOnlySlice<T>,Int32) -> T
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewLength<T>(System.Memory<T>) -> Int32
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.Memory<T>,Int32,Int32) -> System.Memory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.Memory<T>,Int32) -> System.Memory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewAsSlice<T>(System.Memory<T>) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewAsReadOnly<T>(System.Memory<T>) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewLength<T>(System.ReadOnlyMemory<T>) -> Int32
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.ReadOnlyMemory<T>,Int32,Int32) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewSlice<T>(System.ReadOnlyMemory<T>,Int32) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewAsSlice<T>(System.ReadOnlyMemory<T>) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateSlice<T>(arrayref<T>) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateSlice<T>(arrayref<T>,Int32,Int32) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateSlice<T>(T[]&) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateSlice<T>(T[]&,Int32,Int32) -> System.Slice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlySlice<T>(arrayref<T>) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlySlice<T>(arrayref<T>,Int32,Int32) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlySlice<T>(readonly T[]&) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlySlice<T>(readonly T[]&,Int32,Int32) -> System.ReadOnlySlice<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateMemory<T>(arrayref<T>) -> System.Memory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateMemory<T>(arrayref<T>,Int32,Int32) -> System.Memory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateMemory<T>(T[]&) -> System.Memory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateMemory<T>(T[]&,Int32,Int32) -> System.Memory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(arrayref<T>) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(arrayref<T>,Int32,Int32) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(readonly T[]&) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end
+.function internal neoCLR.Runtime.ViewCreateReadOnlyMemory<T>(readonly T[]&,Int32,Int32) -> System.ReadOnlyMemory<T>
+.methodimpl InternalCall
+.end

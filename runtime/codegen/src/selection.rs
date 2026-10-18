@@ -903,6 +903,9 @@ fn retained_types(
                     return Err("selected types exceed the value profile limit".into());
                 }
                 let t = &input.types[*i];
+                if t.memory_view.is_some() {
+                    return Err("memory views require interpreter execution; native ABI and GC lowering are not implemented".into());
+                }
                 pending_types.extend(t.fields.iter().map(|f| f.ty.clone()));
                 pending_types.extend(t.static_fields.iter().map(|f| f.ty.clone()));
                 pending_types.extend(t.base.iter().chain(&t.implements).cloned());

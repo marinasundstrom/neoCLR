@@ -23,7 +23,7 @@ pub enum Value {
     Boolean(bool),
     /// Immutable UTF-8 text. Host-owned strings convert with `text.into()`.
     String(crate::StringValue),
-    /// Opaque interpreter capability; guest Slice/Memory admission is pending.
+    /// Opaque interpreter capability for explicitly admitted Slice/Memory metadata.
     MemoryView(crate::MemoryView),
     /// Interpreter storage for explicit erasure, not a guest heap reference.
     Erased(Box<Value>),
@@ -115,6 +115,39 @@ impl Value {
             if reference.is_some_and(&addresses_frame) {
                 return Err(crate::Fault::new(
                     "cannot return a managed reference to the current frame",
+                ));
+            }
+            let children = match value {
+                Self::Object { fields, .. }
+                | Self::Array {
+                    elements: fields, ..
+                } => Some(fields.as_slice()),
+                Self::Erased(value) => Some(std::slice::from_ref(value.as_ref())),
+                Self::Function(function) => function.receiver.as_deref().map(std::slice::from_ref),
+                _ => None,
+            };
+            if let Some(children) = children.filter(|children| !children.is_empty()) {
+                if current.len() != 0 {
+                    pending.push(current);
+                }
+                current = children.iter();
+            }
+        }
+        Ok(())
+    }
+
+    pub(crate) fn check_suspension(&self) -> Result<(), crate::Fault> {
+        let mut pending = Vec::new();
+        let mut current = std::slice::from_ref(self).iter();
+        loop {
+            let Some(value) = current.next() else {
+                let Some(siblings) = pending.pop() else { break };
+                current = siblings;
+                continue;
+            };
+            if matches!(value, Self::MemoryView(view) if view.is_borrowed()) {
+                return Err(crate::Fault::new(
+                    "borrowed memory views cannot cross suspension",
                 ));
             }
             let children = match value {
@@ -309,6 +342,13 @@ impl Value {
         module: &crate::Module,
         ty: &Type,
     ) -> Result<Self, crate::Fault> {
+        if crate::memory_view_contract::kind(module, ty).is_some()
+            && !matches!(self, Self::MemoryView(_))
+        {
+            return Err(crate::Fault::new(
+                "opaque memory-view storage requires a runtime view",
+            ));
+        }
         if crate::compositions::is_compound(ty) {
             match &self {
                 Self::NullObjectReference(_) => (),

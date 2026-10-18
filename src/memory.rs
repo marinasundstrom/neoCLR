@@ -106,6 +106,9 @@ pub fn layout_for(module: &Module, ty: &Type, target: TargetLayout) -> Result<La
             return Err(Fault::new("layout complexity limit exceeded"));
         }
         *budget -= 1;
+        if crate::memory_view_contract::kind(module, ty).is_some() {
+            return Err(Fault::new("memory views have no supported raw-pointer ABI"));
+        }
         if module.is_reference_type(ty) {
             return Err(Fault::new(
                 "class references have no native inline layout in this slice",

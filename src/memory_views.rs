@@ -1,27 +1,128 @@
 //! Checked, zero-copy memory-view capabilities for the interpreter.
 //!
-//! These are internal building blocks, not yet guest System.Slice/Memory types.
+//! These back explicitly admitted guest System.Slice/Memory types.
 //! A SlotReference is a logical managed address, not a host pointer. Its array
 //! path and the start below jointly identify the first element, including an
 //! empty window at the end. No payload is read/copied to construct a view.
-//! Value::MemoryView supplies tracing and storage/return checks. Before guest
-//! exposure, nominal metadata admission, suspension checks and native lowering
-//! must agree on this contract. Do not encode Slice as an ordinary Value::Object.
-use crate::{Fault, FaultCode, ManagedHeap, SlotReference, Value, metadata::Type};
+//! Value::MemoryView supplies tracing and storage/return checks. Metadata admission
+//! and suspension checks enforce interpreter lifetimes; native lowering remains
+//! unsupported. Do not encode Slice as an ordinary Value::Object.
+use crate::{
+    Fault, FaultCode, ManagedHeap, SlotReference, Value,
+    metadata::{MemoryViewKind as Kind, Type},
+};
 
-/// Opaque interpreter memory-view payload. Guest construction and nominal
-/// metadata admission are not enabled yet. Host code cannot fabricate a view.
+/// Opaque interpreter memory-view payload, constructed through checked runtime
+/// services and explicit nominal metadata. Host code cannot fabricate a view.
 #[derive(Debug, Clone)]
 pub struct MemoryView(View);
 
 #[derive(Debug, Clone)]
 enum View {
+    Empty(Kind, Type),
     Slice(Slice),
     Memory(Memory),
     Utf8(Utf8Slice),
 }
 
 impl MemoryView {
+    pub(crate) fn empty(kind: Kind, element: Type) -> Self {
+        Self(View::Empty(kind, element))
+    }
+
+    pub(crate) fn kind(&self) -> Kind {
+        match &self.0 {
+            View::Empty(kind, _) => *kind,
+            View::Slice(slice) => {
+                if slice.array.is_readonly() {
+                    Kind::ReadOnlySlice
+                } else {
+                    Kind::Slice
+                }
+            }
+            View::Memory(memory) => {
+                if memory.view.array.is_readonly() {
+                    Kind::ReadOnlyMemory
+                } else {
+                    Kind::Memory
+                }
+            }
+            View::Utf8(_) => Kind::ReadOnlySlice,
+        }
+    }
+
+    pub(crate) fn length(&self) -> usize {
+        match &self.0 {
+            View::Empty(..) => 0,
+            View::Slice(slice) => slice.length(),
+            View::Memory(memory) => memory.length(),
+            View::Utf8(slice) => slice.window.length,
+        }
+    }
+
+    pub(crate) fn sliced(&self, start: usize, length: usize) -> Result<Self, Fault> {
+        self.assigned()?;
+        Window::new(self.length(), start, length)?;
+        Ok(match &self.0 {
+            View::Empty(..) => self.clone(),
+            View::Slice(slice) => Self::borrowed(slice.slice(start, length)?),
+            View::Memory(memory) => Self::persistent(memory.slice(start, length)?),
+            View::Utf8(slice) => Self::utf8(slice.slice(start, length)?),
+        })
+    }
+
+    pub(crate) fn readonly(&self) -> Self {
+        match &self.0 {
+            View::Empty(kind, element) => Self::empty(
+                if kind.is_borrowed() {
+                    Kind::ReadOnlySlice
+                } else {
+                    Kind::ReadOnlyMemory
+                },
+                element.clone(),
+            ),
+            View::Slice(slice) => Self::borrowed(slice.as_readonly()),
+            View::Memory(memory) => Self::persistent(memory.as_readonly()),
+            View::Utf8(_) => self.clone(),
+        }
+    }
+
+    pub(crate) fn as_slice(&self) -> Self {
+        match &self.0 {
+            View::Empty(kind, element) => Self::empty(
+                match kind {
+                    Kind::Memory => Kind::Slice,
+                    Kind::ReadOnlyMemory => Kind::ReadOnlySlice,
+                    other => *other,
+                },
+                element.clone(),
+            ),
+            View::Memory(memory) => Self::borrowed(memory.as_slice()),
+            _ => self.clone(),
+        }
+    }
+
+    pub(crate) fn get(&self, index: usize) -> Result<Value, Fault> {
+        match &self.0 {
+            View::Slice(slice) => slice.get(index),
+            View::Utf8(slice) => slice
+                .bytes()
+                .get(index)
+                .copied()
+                .map(Value::Byte)
+                .ok_or_else(bounds),
+            _ => Err(bounds()),
+        }
+    }
+
+    pub(crate) fn set(&self, index: usize, value: Value) -> Result<(), Fault> {
+        match &self.0 {
+            View::Slice(slice) if self.kind() == Kind::Slice => slice.set(index, value),
+            _ => Err(Fault::new(
+                "memory-view write requires a writable slice element",
+            )),
+        }
+    }
     pub(crate) fn borrowed(slice: Slice) -> Self {
         Self(View::Slice(slice))
     }
@@ -35,11 +136,12 @@ impl MemoryView {
     }
 
     pub(crate) fn is_borrowed(&self) -> bool {
-        !matches!(self.0, View::Memory(_))
+        self.kind().is_borrowed()
     }
 
     pub(crate) fn reference(&self) -> Option<&SlotReference> {
         match &self.0 {
+            View::Empty(..) => None,
             View::Slice(slice) => Some(&slice.array),
             View::Memory(memory) => Some(&memory.view.array),
             // String has its own immutable shared owner outside the object heap.
@@ -56,6 +158,7 @@ impl MemoryView {
 
     pub(crate) fn ty(&self) -> Type {
         let (name, element) = match &self.0 {
+            View::Empty(kind, element) => return view_type(kind.name(), element.clone()),
             View::Slice(slice) => (
                 if slice.array.is_readonly() {
                     "System.ReadOnlySlice"
@@ -92,6 +195,7 @@ impl PartialEq for MemoryView {
     fn eq(&self, other: &Self) -> bool {
         // Host diagnostic equality only; no guest equality operator is added.
         match (&self.0, &other.0) {
+            (View::Empty(a, at), View::Empty(b, bt)) => a == b && at == bt,
             (View::Slice(a), View::Slice(b)) => same_window(a, b),
             (View::Memory(a), View::Memory(b)) => same_window(&a.view, &b.view),
             (View::Utf8(a), View::Utf8(b)) => a.owner.same_owner(&b.owner) && a.window == b.window,

@@ -43,6 +43,14 @@ deprecate neoIL itself, its low-level tests or all runtime bindings. The uncommi
 Slice API work must be redirected to Raven; this documentation commit does not
 claim that source/native integration is complete.
 
+The author subsequently clarified that .NET backward-compatibility requirements
+must not dictate neoCLR API design: prefer consistent Slice/ReadOnlySlice APIs.
+The assistant adopted synchronous readonly input/writable output views, persistent
+views for asynchronous ownership and arrays for owned storage as the migration
+criteria. Compatibility-only overloads are not a default requirement. Runtime
+metadata and service tests are being implemented first; production APIs remain
+Raven-owned, with native backend integration still open.
+
 ## 2026-10-18 — Native slices and persistent memory views
 
 - **Author:** directs implementation of the supplied “Native Slices and Memory

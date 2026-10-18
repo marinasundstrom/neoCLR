@@ -170,3 +170,14 @@ arguments. See [implementation scope and remaining layers](runtime-static-storag
 This initial interpreter slice does not yet implement type initializers, textual
 assembler syntax, the C# metadata tooling, Raven emission or JIT/AOT operations.
 It is not a new wire-version guarantee; matching development tools are required.
+
+## Opaque interpreter memory views (development)
+
+Rust `TypeDef.memory_view: Option<MemoryViewKind>` is serialized only when present.
+Values are `slice`, `read_only_slice`, `memory`, `read_only_memory`; old artifacts
+without the field are unchanged. The enum's `name()` returns the required canonical
+System name and `is_borrowed()` identifies the two slice kinds. Canonical names
+without this metadata are rejected, as are mismatched identity/shape declarations.
+See [admission and lifetime rules](native-memory-views.md) and the
+[neoIL directive](neoil.md#interpreter-memory-view-declarations-development).
+The experimental native metadata and CLI bridge do not yet carry this contract.

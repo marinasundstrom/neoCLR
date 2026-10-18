@@ -121,6 +121,15 @@ fn resolve_candidates(
     target: &FunctionRef,
     indexes: impl Iterator<Item = usize>,
 ) -> Result<crate::metadata::Function, Fault> {
+    if target
+        .generic_arguments
+        .iter()
+        .any(|ty| crate::memory_view_contract::contains_borrowed(module, ty))
+    {
+        return Err(Fault::new(
+            "borrowed memory views require an unsupported generic anti-constraint",
+        ));
+    }
     let mut found = None;
     for index in indexes {
         let definition = &module.functions[index];
@@ -274,6 +283,7 @@ pub(crate) fn record_fields(
             d.name == name
                 && d.generic_parameters.len() == arguments.len()
                 && d.representation == Representation::Record
+                && d.memory_view.is_none()
         })
         .ok_or_else(|| Fault::new(format!("expected record definition for {ty:?}")))?;
     let fields = crate::inheritance::fields(module, ty)?;
@@ -347,6 +357,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
 }
 
 fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
+    crate::memory_view_contract::validate(module)?;
     crate::type_initialization::validate(module)?;
     crate::compositions::validate_surface(module)?;
     crate::metadata_origin::validate(module)?;
@@ -815,6 +826,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                         crate::native::Binding::GenericDefaultTaskQueue
                             | crate::native::Binding::GenericCurrentTaskQueue
                             | crate::native::Binding::GenericRegisterTaskQueue
+                            | crate::native::Binding::MemoryView(_)
                     ))
                 || function.pinvoke.is_some()
                 || !function.interface_implementations.is_empty()
@@ -872,6 +884,11 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 .iter()
                 .chain([&function.returns])
                 .any(crate::slots::contains)
+            && !(function.is_internal_call()
+                && matches!(
+                    crate::native::bind_in(module, function)?,
+                    crate::native::Binding::MemoryView(_)
+                ))
         {
             return Err(Fault::new(
                 "managed references cannot cross native helper boundaries",
@@ -894,7 +911,11 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 || !matches!(function.parameters.get(*index), Some(Type::ByRef(_)))
                 || function.out_parameters.contains(index)
                 || function.out_when_true.contains(index)
-                || function.is_internal_call()
+                || (function.is_internal_call()
+                    && !matches!(
+                        crate::native::bind_in(module, function)?,
+                        crate::native::Binding::MemoryView(_)
+                    ))
                 || function.pinvoke.is_some()
             {
                 return Err(Fault::new("invalid readonly parameter contract"));
@@ -1239,6 +1260,9 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                     }
                 }
                 Op::New(ty) => {
+                    if crate::memory_view_contract::kind(module, ty).is_some() {
+                        return Err(Fault::new("opaque memory views require a runtime factory"));
+                    }
                     if module
                         .array_backing()
                         .zip(module.type_definition(ty))
@@ -1271,6 +1295,9 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 }
                 Op::BoxValue(ty) | Op::UnboxAny(ty) => {
                     check(ty)?;
+                    if crate::memory_view_contract::contains_borrowed(module, ty) {
+                        return Err(Fault::new("borrowed memory views cannot be boxed"));
+                    }
                     if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_)) {
                         return Err(Fault::new(
                             "box/unbox.any cannot use pointer or byref types",
@@ -1504,6 +1531,7 @@ fn check_type_context_seen(
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
+    crate::memory_view_contract::signature(module, ty)?;
     if !crate::compositions::is_compound(ty)
         && !matches!(
             ty,
@@ -3205,6 +3233,7 @@ fn interpret_instructions_with_dispatch(
 
         // Host Result propagates terminal faults; there is no guest exception machinery.
         let mut host_call = None;
+        let mut suspension = false;
         let step = (|| -> Result<Option<Value>, Fault> {
             let frame = frames
                 .last_mut()
@@ -4516,6 +4545,16 @@ fn interpret_instructions_with_dispatch(
                         return Ok(None);
                     } else if callee.is_internal_call() {
                         let binding = crate::native::bind_in(module, &callee)?;
+                        suspension = matches!(
+                            binding,
+                            crate::native::Binding::RuntimeAsyncStart
+                                | crate::native::Binding::RuntimeAsyncStartManaged
+                                | crate::native::Binding::RuntimeAsyncAwait
+                                | crate::native::Binding::RuntimeAsyncAwaitUnit
+                                | crate::native::Binding::RuntimeAsyncWaitCompletion
+                                | crate::native::Binding::RuntimeAsyncYield
+                                | crate::native::Binding::DrainEntryTasks
+                        );
                         if HostCall::supports(&binding) {
                             host_call = Some(HostCall::new(
                                 callee,
@@ -5139,6 +5178,8 @@ fn interpret_instructions_with_dispatch(
                             crate::native::Binding::RequestWorkerCancellation
                         ) {
                             scheduler.workers.request_cancellation(args)?
+                        } else if let crate::native::Binding::MemoryView(operation) = &binding {
+                            operation.invoke(args, &heap)?
                         } else {
                             binding.invoke(
                                 args,
@@ -5964,6 +6005,20 @@ fn interpret_instructions_with_dispatch(
             }
             Ok(None)
         })();
+        // This interpreter conservatively treats every resident borrowed value as
+        // live; compiler liveness-based relaxation requires a separate contract.
+        if suspension || host_call.is_some() {
+            for frame in frames.iter() {
+                for slot in frame.args.iter().chain(&frame.locals) {
+                    if let Some(value) = slot.borrow().inspect() {
+                        value.check_suspension()?;
+                    }
+                }
+                for value in &frame.stack {
+                    value.check_suspension()?;
+                }
+            }
+        }
         if let Some(mut call) = host_call {
             if task_atomic::active(module, frames) {
                 return Err(Fault::new("Task mutation cannot suspend for host I/O"));

@@ -6,6 +6,7 @@ use crate::{
 use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) enum Binding {
+    MemoryView(crate::memory_view_services::Operation),
     StackTraceCapture,
     Cryptography(crate::cryptography::Operation),
     Tls(crate::tls::Operation),
@@ -207,6 +208,9 @@ pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Bin
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
+    }
+    if let Some(operation) = crate::memory_view_services::bind(function) {
+        return operation.map(Binding::MemoryView);
     }
     if matches!(
         function.name.as_str(),

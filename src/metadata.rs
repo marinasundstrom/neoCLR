@@ -276,6 +276,9 @@ pub enum Variance {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    /// Explicit opaque memory-view contract; never inferred from a type name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory_view: Option<MemoryViewKind>,
     /// Relaxed initialization: first static-field access is the chosen trigger.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub before_field_init: bool,
@@ -344,6 +347,30 @@ pub struct TypeDef {
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub minimum_size: Option<u32>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MemoryViewKind {
+    Slice,
+    ReadOnlySlice,
+    Memory,
+    ReadOnlyMemory,
+}
+
+impl MemoryViewKind {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Slice => "System.Slice",
+            Self::ReadOnlySlice => "System.ReadOnlySlice",
+            Self::Memory => "System.Memory",
+            Self::ReadOnlyMemory => "System.ReadOnlyMemory",
+        }
+    }
+
+    pub fn is_borrowed(self) -> bool {
+        matches!(self, Self::Slice | Self::ReadOnlySlice)
+    }
 }
 
 /// Storage-free Int32 constant declared by a nominal type.

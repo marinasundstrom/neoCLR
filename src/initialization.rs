@@ -25,6 +25,15 @@ fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Resul
             ));
         }
         *remaining -= 1;
+        if let Some(kind) = crate::memory_view_contract::kind(module, ty) {
+            let Type::Constructed { arguments, .. } = ty else {
+                return Err(Fault::new("memory-view default requires a closed type"));
+            };
+            return Ok(Value::MemoryView(crate::MemoryView::empty(
+                kind,
+                arguments[0].clone(),
+            )));
+        }
         if matches!(ty, Type::Function(_)) {
             // Function slots have a null default, but constructors must initialize
             // captured callback fields before publishing their receiver.

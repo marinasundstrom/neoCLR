@@ -780,3 +780,15 @@ covariance are excluded. Native specialization rejects used variant declarations
 until conversion-aware dispatch is implemented. The SDK can inspect native variance
 annotations and preserve snapshots; SDK authoring/emission import and Raven transport
 remain pending.
+
+## Interpreter memory-view declarations (development)
+
+Inside a canonical System view type, `.memoryview slice`, `read_only_slice`,
+`memory` or `read_only_memory` declares the opaque interpreter contract. The
+corresponding JSON field is `memory_view`. Only fieldless single-parameter value
+records named System.Slice, System.ReadOnlySlice, System.Memory or
+System.ReadOnlyMemory in System are admitted. Ordinary construction and raw-pointer
+layout are rejected. Checked factories and initobj produce view values; names alone
+do not activate them. See the [contract](native-memory-views.md) and
+[test fixtures](../tests/fixtures/memory_views.neoil). Native producer integration
+is separate; this is not a portable native struct layout.

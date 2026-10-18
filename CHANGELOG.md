@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Admit explicit opaque memory-view metadata and exact interpreter services for checked factories, indexing, nested windows, readonly conversion, persistent ownership and UTF-8 views. Reject borrowed storage/boxing/generic escapes and suspension; native codegen rejects selected view types pending lowering. Keep executable neoIL declarations as test fixtures, with production Raven APIs in a separate integration step. Record the author’s preference for consistent APIs over compatibility-only overloads.
+
 - Mark hand-authored System neoIL class-library mirrors and their bootstrap manifest as obsolete for library development. Raven sources and native projects are authoritative; retain low-level neoIL tests and existing bootstrap consumers until explicit migration and archival. Record the author’s correction of the Slice implementation direction.
 
 ### 2026-10-18

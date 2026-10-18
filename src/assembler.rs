@@ -325,6 +325,21 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     def.custom_attributes.push(parse_custom_attribute(rest)?);
                     return Ok(());
                 }
+                if word == ".memoryview" {
+                    if def.memory_view.is_some() {
+                        return Err(Fault::new("duplicate .memoryview"));
+                    }
+                    def.memory_view = Some(
+                        serde_json::from_value(serde_json::Value::String(rest.into())).map_err(
+                            |_| {
+                                Fault::new(
+                                    "expected slice, read_only_slice, memory or read_only_memory",
+                                )
+                            },
+                        )?,
+                    );
+                    return Ok(());
+                }
                 if word == ".pack" {
                     if def.packing.is_some() {
                         return Err(Fault::new("duplicate .pack"));
@@ -844,6 +859,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        memory_view: None,
                         before_field_init: false,
                         native_interface: None,
                         native_object_root: false,

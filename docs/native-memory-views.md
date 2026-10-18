@@ -6,36 +6,33 @@ low-level work. This does not change the platform's separate UTF-8 text model.
 
 ## Status
 
-The first implementation is an **internal interpreter foundation** in
-[`src/memory_views.rs`](../src/memory_views.rs). It is not a public standard-library
-API. Its opaque `Value::MemoryView` payload now participates in interpreter
-tracing, stored-value/erasure checks and the VM's return check. Guest construction,
-Raven emission, JIT and AOT are not yet connected. Existing
-array range syntax still makes a shallow copy. Do not use the proposed examples
-as working Raven examples yet.
+The interpreter recognizes explicit opaque memory-view metadata and checked runtime
+services. The four shapes are exercised by [neoIL test fixtures](../tests/fixtures/memory_views.neoil),
+not hand-authored class-library implementations. Production APIs belong in Raven
+`.rvn` source; source/compiler integration is the next bounded step. Existing array
+range syntax still copies. Native JIT/AOT lowering is not implemented and selected
+view types reject instead of being treated as empty records.
 
-| Layer | Implemented here | Remaining integration |
-| --- | --- | --- |
-| Slice capabilities | Checked array windows; shared writes; readonly propagation through element references; nested and empty windows | Public generic Slice/ReadOnlySlice types and byref-like metadata |
-| Lifetimes | Opaque values reject stored-value/erasure paths regardless of owner; VM return traversal checks embedded frame references | Metadata/type validation, guest construction and suspension checks |
-| GC | Ordinary interpreter value/frame tracing marks actual owners, including empty/interior views; host publication validates heap provenance | Guest producers and native backend tracing |
-| Persistent views | Heap-only owner validation, offset/count, slicing; opaque persistent values trace through object fields and erased payloads | Public Memory/ReadOnlyMemory values and real async consumer |
-| UTF-8 | Shared immutable byte view with byte-relative windows | Public String byte-view API and ReadOnlySlice<byte> lowering |
-| Syntax | Existing Index and Range can resolve boundaries | Raven array range result changes, view indexers and explicit conversion APIs |
-| Native execution | No native ABI selected by this change | Metadata recognition, GC maps, lowering and interpreter/JIT/AOT differential tests |
+`.memoryview slice|read_only_slice|memory|read_only_memory` serializes as the
+optional `TypeDef.memory_view` enum. Admission requires the corresponding canonical
+System name, a System declaration or canonical native origin, one type parameter
+and a fieldless value record without base/interfaces/layout/constraints. Name alone
+grants no capability. Ordinary construction and boxing reject; checked factories
+and `initobj` produce an opaque payload. Exact InternalCall signatures cover array
+factories, Length, Get/Set, nested windows, readonly conversion, persistent-to-borrowed
+conversion and immutable String UTF-8 bytes.
 
-The opaque payload has private construction and distinguishes borrowed slices,
-persistent memory and immutable UTF-8 views. It must not be replaced with an
-ordinary `Value::Object`: ordinary records permit heap-backed references, whereas
-borrowed views now reject storage regardless of their owner's lifetime. Persistent
-views are permitted in heap fields and erased payloads and participate in normal
-tracing. A host-side copy alone does not publish a GC root.
+Slices reject heap storage, erasure, arrays, fields, ordinary generic arguments and
+Function signatures regardless of owner. Returns recursively check frame references.
+At suspension boundaries every resident borrowed value in the active stack, locals
+and arguments rejects suspension. This conservative rule may reject a dead local;
+compiler liveness relaxation needs separate validation. Persistent views require
+heap ownership, trace owners through fields and survive collection and suspension.
 
-The payload reports the intended closed nominal type for interpreter bookkeeping.
-This does not register System.Slice/Memory declarations or let guests construct
-them. A later producer must validate nominal identity and reject ordinary-record
-substitutes, generic/capture escapes and suspension. No user-definable type name
-alone activates a view or acquires its capabilities.
+Readonly references restrict access rather than define a separate overload identity.
+Getter results are values, not element byrefs. Null arrays and `initobj` create empty
+views; empty windows over arrays retain their owner. Bounds use the ordinary
+IndexOutOfRange fault category. No native ABI or performance claim is made.
 
 ## Contract and comparison with .NET
 
@@ -130,3 +127,8 @@ The Rust-only opaque payload is documented in the
 No guest API was added, so no RavenDoc type selection or reference assembly/snapshot
 update is required. The website's direction page still accurately describes the
 unfinished public APIs; no website build is needed for this internal runtime change.
+
+Third-slice validation, 2026-10-19: `cargo test --test memory_views` passes all
+nine executable contracts for shared windows, readonly/UTF-8 access, persistent
+GC roots and suspension, bounds/default/null behavior, borrowed escapes and
+caller-versus-callee frame lifetimes. These declarations live only in test fixtures.

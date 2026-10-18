@@ -74,6 +74,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
     if function.is_internal_call() {
         let binding = crate::native::bind_in(module, function)?;
         let service = match &binding {
+            crate::native::Binding::MemoryView(_) => RuntimeService::ManagedArrays,
             crate::native::Binding::Cryptography(_) => RuntimeService::Cryptography,
             crate::native::Binding::Tls(_) => RuntimeService::Tls,
             crate::native::Binding::StackTraceCapture => RuntimeService::StackInspection,
