@@ -25,7 +25,7 @@ internal class HttpRequestDecoder {
         if let Some(parsed) = request { return Ok(parsed) }
         return Error(HttpError.Protocol("Incomplete headers"))
     }
-    private var head: ArrayList<byte> = ArrayList<byte>()
+    private val head: ArrayList<byte>
     private var request: Option<HttpRequest> = None()
     private var complete: bool = false
     private var failed = false
@@ -40,6 +40,9 @@ internal class HttpRequestDecoder {
     internal init(settings: HttpServerSettings, secure: bool) {
         self.settings = settings
         self.secure = secure
+        // Reserve a small header prefix once; larger requests retain normal growth.
+        let capacity = if settings.HeaderBytes < 128 { settings.HeaderBytes } else { 128 }
+        head = ArrayList<byte>(capacity)
     }
     internal val Complete: bool => complete && !failed
 

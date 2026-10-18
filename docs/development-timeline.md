@@ -26,6 +26,20 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Bounded request-header reservation
+
+- **Author context:** continue Serve/GC profiling and commit each slice; earlier
+  guidance emphasizes choosing collection capacity when expected size is known.
+- **Assistant investigation/action:** the updated profile is dominated by array
+  reservation groups. The request parser repeatedly grows an initially empty header
+  list. Test a 128-byte initial reservation capped by the configured header limit;
+  retain ordinary growth for larger requests and keep pooling/API redesign separate.
+- **Tradeoff:** up to 128 bytes are reserved for each decoder, including pending
+  requests. Tiny headers may retain more capacity. Diagnostic allocations fall
+  1.76%, but collection count rises 3.57%; these counts do not establish speed.
+  [Validation and load evidence](../benchmarks/http-server/serve/header-reserve-20261018/README.md)
+  records passing interpreter/JIT/AOT boundary tests; sustained timing follows separately.
+
 ## 2026-10-18 — Encoding provider allocation follow-up
 
 - **Author:** asks to continue performance work after receive-buffer reuse.

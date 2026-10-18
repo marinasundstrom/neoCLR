@@ -1,0 +1,36 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import System.Time.*
+import System.Web.Http.*
+
+async func Main() -> Task<()> {
+    for limit in [1, 127, 128, 129, 256, 512] {
+        let options = HttpServerOptions()
+        options.MaxRequestHeadersTotalSize = limit
+        options.RequestReadTimeout = Duration.FromTicks(600000000L)
+        options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+        let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else {
+            System.Fail("Listen failed")
+        }
+        let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+        Console.WriteLine(port)
+        for attempt in 0..2 {
+            let result = await server.Accept()
+            if let Ok(context) = result {
+                if limit == 1 || attempt == 1 { System.Fail("Header limit bypassed") }
+                context.Respond(HttpStatusCode.OK, HttpContent.FromText("accepted"))
+                let completed = await context.Complete()
+                if completed is Error(_) { System.Fail("Response failed") }
+                context.Dispose()
+                Console.WriteLine("OK")
+            } else {
+                if !(result is Error(HttpError.LimitExceeded(_))) { System.Fail("Unexpected outcome") }
+                if limit != 1 && attempt == 0 { System.Fail("Exact limit rejected") }
+                Console.WriteLine("LIMIT")
+            }
+        }
+        server.Close()
+    }
+    Console.WriteLine("DONE")
+}
