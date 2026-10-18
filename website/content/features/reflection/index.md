@@ -121,5 +121,5 @@ consumer verifies explicit Object ancestry across interpreter, JIT and AOT.
 Development builds also preserve imported `ValueType` ancestry for application
 structs and record structs, including boxed ancestry tests across interpreter, JIT
 and AOT. Application enum ancestry now also retains the Enum/ValueType/Object chain, with
-exact boxed enum identity across all three modes. Primitive ancestry and local-core
-authoring remain separate work.
+exact boxed enum identity across all three modes. Intrinsic primitive and core-enum ancestry are also validated against a rebuilt
+source library set; ordinary local value-record authoring remains separate work.

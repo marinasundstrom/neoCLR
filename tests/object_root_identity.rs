@@ -692,3 +692,31 @@ fn enum_ancestry_requires_the_selected_fieldless_foundations() {
         assert_eq!(result.is_ok(), accepted, "{foundation}: {result:?}");
     }
 }
+
+#[test]
+fn boxed_primitive_can_be_tested_and_cast_through_value_type() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let core = format!(
+        "{}\n.type class abstract System.ValueType\n.extends System.Object\n.end\n.type System.Int32\n.extends System.ValueType\n.end\n",
+        ROOT.replace(".module System", ".module Core")
+    );
+    let app = ".module App\n.references (Core)\n.entry Main\n.function Main() -> Int32\nldc.i4 42\nbox Int32\nisinst [Core]System.ValueType\ncastclass [Core]System.ValueType\nunbox.any Int32\nret\n.end";
+    let modules = neoclr::assembler::read_modules_with_object_root(
+        &[ModuleInput::Source(app), ModuleInput::Source(&core)],
+        &seed,
+        &selected_root(),
+    )
+    .unwrap();
+    let program = LoadedProgram::with_modules_and_object_root(
+        &modules[0],
+        &seed,
+        &modules[1..],
+        &selected_root(),
+    )
+    .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}

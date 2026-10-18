@@ -57,7 +57,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Author follow-up:** requested closing primitive and enum ancestry gaps next, with
   .NET semantics consistent across interpreter/JIT/AOT, regressions and commits per slice.
   The assistant started with enum metadata and boxed nominal identity; primitive
-  core metadata and boxed ancestry are the next slice.
+  core metadata and boxed ancestry followed. Application enums and then intrinsic/core-enum
+  ancestry passed matched interpreter/JIT/AOT consumers. Rebuilding Runtime/Data/Networking/Web
+  exposed closed-root Object binding and imported Object-slot virtual flags; both were
+  repaired with regressions. The assistant then extended testing to the remaining
+  numeric and Char box shapes.
 - **Evidence and limits:** see the [JSON record experiment](experiments/json-records/README.md).
   Public-model visibility and native reflection retention remain required. Record
   deserialization, custom record collection elements and broader ancestry coverage remain

@@ -10372,3 +10372,22 @@ storage-bearing contracts raise `ArgumentException`; non-enum owners or repeated
 binding raise `InvalidOperationException`. Native loading independently verifies
 Enum → ValueType → the selected Object foundation. This producer API is covered
 here outside guest RavenDoc selection; no guest signature changes.
+
+### Owned intrinsic and enum bases (development, 2026-10-18)
+
+- `void TypeBuilder.SetValueTypeBase(TypeBuilder baseType)` binds an intrinsic
+  value primitive/grapheme to the same assembly's fieldless abstract ValueType over
+  its native Object root. Call before members. Ordinary nonintrinsic records are
+  outside this overload.
+- `void TypeBuilder.SetEnumBase(TypeBuilder baseType)` binds a core enum to the
+  same assembly's fieldless abstract Enum over that ValueType/Object foundation.
+  Existing enum literals and value__ storage are retained.
+
+Both reject null (`ArgumentNullException`), foreign or malformed foundations
+(`ArgumentException`), unsupported owners or repeated binding
+(`InvalidOperationException`). Runtime loading validates the actual foundation
+identity. These native producer APIs are manually covered here outside guest
+RavenDoc selection. `SetBaseType(ImportedTypeReference)` additionally permits a
+closed reference root to bind the selected external Object, preserving all other
+ownership/member-order checks. Imported Object slot references retain virtual
+classification for exact inherited override validation.

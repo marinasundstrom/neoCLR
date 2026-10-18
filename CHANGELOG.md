@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Bind intrinsic primitive and core-enum definitions to their owned ValueType/Enum foundations without changing storage; preserve primitive box ancestry. Rebuild the four-library cohort and add matched reflection/boxing tests. Repair selected Object binding for closed roots and imported Object-slot virtual metadata exposed by that rebuild.
+
 - Preserve application enum ancestry through the verified Enum/ValueType/Object foundation; support native enum boxing with exact enum identity and direct Enum conversions. Add metadata/runtime rejection checks and a three-mode consumer. Existing Int32 enum limits remain unchanged.
 
 - Preserve imported ValueType ancestry for native application structs/record structs without changing inline storage. Admit direct boxing and ancestry casts, retain boxed Object override receivers, and validate foundation ownership. Add metadata rejection/roundtrip tests and interpreter/JIT/AOT semantics and JSON regression evidence. Local-core, primitive/enum and broader synthesized-record support remain separate gaps.

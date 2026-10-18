@@ -52,7 +52,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(signature);
         if (!MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, null, root) || signature.OutParameters.Count != 0)
             throw new ArgumentException("Object slot reference requires an exact root signature");
-        return CreateMethodReferenceCore(root, name, signature, false, false, null, true);
+        return CreateMethodReferenceCore(root, name, signature, false, false, null, true, isVirtual: true);
     }
 
     private ImportedMethodReference CreateMethodReferenceCore(ImportedTypeReference declaringType, string name,

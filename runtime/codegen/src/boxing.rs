@@ -92,6 +92,30 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
                 input
                     .types
                     .push(serde_json::from_value(json!({"name":name,"fields":[]}))?);
+                // A primitive box has the primitive's nominal ValueType ancestry,
+                // while its private tag and scalar payload retain exact identity.
+                if let Some(base) = input
+                    .types
+                    .iter()
+                    .find(|t| {
+                        t.origin
+                            .as_ref()
+                            .map(|o| o.name.as_str())
+                            .unwrap_or(&t.name)
+                            == "System.ValueType"
+                    })
+                    .map(|t| Type::Named(t.name.clone()))
+                {
+                    input.types[index].base = Some(base);
+                    if !neoclr::native_metadata::has_value_type_base(
+                        input,
+                        &Type::Named(input.types[index].name.clone()),
+                    ) {
+                        return Err(
+                            "primitive box requires the verified ValueType foundation".into()
+                        );
+                    }
+                }
                 if boolean {
                     bool_index = Some(index);
                 } else if wide {
@@ -108,7 +132,11 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         let t = &input.types[index];
         if t.is_reference_type
             || t.representation != Representation::Record
-            || (t.base.is_some() && !neoclr::native_metadata::has_value_type_base(input, &ty))
+            || (t.base.is_some()
+                && !neoclr::native_metadata::has_value_type_base(
+                    input,
+                    &Type::Named(t.name.clone()),
+                ))
             || !t.generic_parameters.is_empty()
         {
             return Err(format!("record boxing requires closed value records and enums; found {ty:?} in {} at instruction {pc}", input.functions[caller].name).into());

@@ -26,7 +26,12 @@ pub(crate) fn has_intrinsic_string_root(
 /// A value record may name the selected runtime's fieldless ValueType foundation.
 /// This is nominal ancestry only; arbitrary reference-storage inheritance stays invalid.
 pub(crate) fn has_value_type_root(module: &Module, definition: &crate::metadata::TypeDef) -> bool {
-    if definition.is_reference_type || definition.representation != Representation::Record {
+    if definition.is_reference_type
+        || !matches!(
+            definition.representation,
+            Representation::Record | Representation::Runtime
+        )
+    {
         return false;
     }
     let Some(mut parent) = definition
@@ -139,6 +144,7 @@ pub(crate) fn lineage(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
             .ok_or_else(|| Fault::new("unknown base type"))?;
         if definition.representation != Representation::Record
             && !has_intrinsic_string_root(module, definition)
+            && !has_value_type_root(module, definition)
         {
             return Err(Fault::new("base inheritance requires record definitions"));
         }

@@ -1,0 +1,204 @@
+import System.*
+import System.IO.*
+
+func Main() {
+    if let .Some(parent0) = typeof(SByte).BaseType {
+        if !parent0.Equals(typeof(ValueType)) {
+            Fail("SByte base identity")
+        }
+    } else {
+        Fail("Missing SByte base")
+    }
+    if !typeof(SByte).IsSubclassOf(typeof(ValueType)) {
+        Fail("SByte subclass ancestry")
+    }
+    if let .Some(parent1) = typeof(Byte).BaseType {
+        if !parent1.Equals(typeof(ValueType)) {
+            Fail("Byte base identity")
+        }
+    } else {
+        Fail("Missing Byte base")
+    }
+    if !typeof(Byte).IsSubclassOf(typeof(ValueType)) {
+        Fail("Byte subclass ancestry")
+    }
+    if let .Some(parent2) = typeof(Int16).BaseType {
+        if !parent2.Equals(typeof(ValueType)) {
+            Fail("Int16 base identity")
+        }
+    } else {
+        Fail("Missing Int16 base")
+    }
+    if !typeof(Int16).IsSubclassOf(typeof(ValueType)) {
+        Fail("Int16 subclass ancestry")
+    }
+    if let .Some(parent3) = typeof(UInt16).BaseType {
+        if !parent3.Equals(typeof(ValueType)) {
+            Fail("UInt16 base identity")
+        }
+    } else {
+        Fail("Missing UInt16 base")
+    }
+    if !typeof(UInt16).IsSubclassOf(typeof(ValueType)) {
+        Fail("UInt16 subclass ancestry")
+    }
+    if let .Some(parent4) = typeof(Int32).BaseType {
+        if !parent4.Equals(typeof(ValueType)) {
+            Fail("Int32 base identity")
+        }
+    } else {
+        Fail("Missing Int32 base")
+    }
+    if !typeof(Int32).IsSubclassOf(typeof(ValueType)) {
+        Fail("Int32 subclass ancestry")
+    }
+    if let .Some(parent5) = typeof(UInt32).BaseType {
+        if !parent5.Equals(typeof(ValueType)) {
+            Fail("UInt32 base identity")
+        }
+    } else {
+        Fail("Missing UInt32 base")
+    }
+    if !typeof(UInt32).IsSubclassOf(typeof(ValueType)) {
+        Fail("UInt32 subclass ancestry")
+    }
+    if let .Some(parent6) = typeof(Int64).BaseType {
+        if !parent6.Equals(typeof(ValueType)) {
+            Fail("Int64 base identity")
+        }
+    } else {
+        Fail("Missing Int64 base")
+    }
+    if !typeof(Int64).IsSubclassOf(typeof(ValueType)) {
+        Fail("Int64 subclass ancestry")
+    }
+    if let .Some(parent7) = typeof(UInt64).BaseType {
+        if !parent7.Equals(typeof(ValueType)) {
+            Fail("UInt64 base identity")
+        }
+    } else {
+        Fail("Missing UInt64 base")
+    }
+    if !typeof(UInt64).IsSubclassOf(typeof(ValueType)) {
+        Fail("UInt64 subclass ancestry")
+    }
+    if let .Some(parent8) = typeof(IntPtr).BaseType {
+        if !parent8.Equals(typeof(ValueType)) {
+            Fail("IntPtr base identity")
+        }
+    } else {
+        Fail("Missing IntPtr base")
+    }
+    if !typeof(IntPtr).IsSubclassOf(typeof(ValueType)) {
+        Fail("IntPtr subclass ancestry")
+    }
+    if let .Some(parent9) = typeof(UIntPtr).BaseType {
+        if !parent9.Equals(typeof(ValueType)) {
+            Fail("UIntPtr base identity")
+        }
+    } else {
+        Fail("Missing UIntPtr base")
+    }
+    if !typeof(UIntPtr).IsSubclassOf(typeof(ValueType)) {
+        Fail("UIntPtr subclass ancestry")
+    }
+    if let .Some(parent10) = typeof(Single).BaseType {
+        if !parent10.Equals(typeof(ValueType)) {
+            Fail("Single base identity")
+        }
+    } else {
+        Fail("Missing Single base")
+    }
+    if !typeof(Single).IsSubclassOf(typeof(ValueType)) {
+        Fail("Single subclass ancestry")
+    }
+    if let .Some(parent11) = typeof(Double).BaseType {
+        if !parent11.Equals(typeof(ValueType)) {
+            Fail("Double base identity")
+        }
+    } else {
+        Fail("Missing Double base")
+    }
+    if !typeof(Double).IsSubclassOf(typeof(ValueType)) {
+        Fail("Double subclass ancestry")
+    }
+    if let .Some(parent12) = typeof(Boolean).BaseType {
+        if !parent12.Equals(typeof(ValueType)) {
+            Fail("Boolean base identity")
+        }
+    } else {
+        Fail("Missing Boolean base")
+    }
+    if !typeof(Boolean).IsSubclassOf(typeof(ValueType)) {
+        Fail("Boolean subclass ancestry")
+    }
+    if let .Some(parent13) = typeof(Char).BaseType {
+        if !parent13.Equals(typeof(ValueType)) {
+            Fail("Char base identity")
+        }
+    } else {
+        Fail("Missing Char base")
+    }
+    if !typeof(Char).IsSubclassOf(typeof(ValueType)) {
+        Fail("Char subclass ancestry")
+    }
+    if let .Some(parent14) = typeof(RuntimeTypeHandle).BaseType {
+        if !parent14.Equals(typeof(ValueType)) {
+            Fail("RuntimeTypeHandle base identity")
+        }
+    } else {
+        Fail("Missing RuntimeTypeHandle base")
+    }
+    if !typeof(RuntimeTypeHandle).IsSubclassOf(typeof(ValueType)) {
+        Fail("RuntimeTypeHandle subclass ancestry")
+    }
+    if let .Some(enumParent) = typeof(StringComparison).BaseType {
+        if !enumParent.Equals(typeof(Enum)) {
+            Fail("Core enum base identity")
+        }
+    } else {
+        Fail("Missing core Enum base")
+    }
+    let coreEnum: Enum = StringComparison.Ordinal
+    if !(coreEnum is StringComparison) {
+        Fail("Core enum box identity")
+    }
+    let number: ValueType = 42
+    let wide: ValueType = 42L
+    let flag: ValueType = true
+    if !number.GetType().Equals(typeof(int)) {
+        Fail("Boxed Int32 runtime type")
+    }
+    if !wide.GetType().Equals(typeof(long)) {
+        Fail("Boxed Int64 runtime type")
+    }
+    if !flag.GetType().Equals(typeof(bool)) {
+        Fail("Boxed Boolean runtime type")
+    }
+    if !(number is int) {
+        Fail("Int32 box identity")
+    }
+    if !(wide is long) {
+        Fail("Int64 box identity")
+    }
+    if !(flag is bool) {
+        Fail("Boolean box identity")
+    }
+    if number is Enum {
+        Fail("Primitive became Enum")
+    }
+    let boxed: Object = 7
+    if !(boxed is ValueType) {
+        Fail("Object value ancestry")
+    }
+    let text: Object = "text"
+    if text is ValueType {
+        Fail("String became ValueType")
+    }
+    if number is int restored {
+        if restored != 42 { Fail("Unboxing changed payload") }
+    } else {
+        Fail("Unboxing failed")
+    }
+    Console.WriteLine("primitive ancestry and boxed values agree")
+}

@@ -106,7 +106,7 @@ public sealed partial class AssemblyBuilder
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
-                if (type.LocalBase is { } parent && (!(IsOrdinaryDerived(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType) || !(IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && type.LocalBaseSignature?.GenericInstance is not null) || (parent.Definition.Attributes & 0x100) != 0))
+                if (type.LocalBase is { } parent && !type.HasLocalValueTypeBase && !type.HasLocalEnumBase && (!(IsOrdinaryDerived(type) || parent.IsNativeObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType) || !(IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && type.LocalBaseSignature?.GenericInstance is not null) || (parent.Definition.Attributes & 0x100) != 0))
                     throw new InvalidDataException("derived classes require ordinary reference owners and complete base signatures");
             }
             ValidateValueLayouts();

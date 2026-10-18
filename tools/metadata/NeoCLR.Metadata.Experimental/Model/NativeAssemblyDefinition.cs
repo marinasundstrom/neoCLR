@@ -432,7 +432,7 @@ public sealed partial class NativeAssemblyDefinition
                         ? Array(baseConstruction, "arguments", 32).Length : 0;
                     Require(nativeTypeAliases.TryGetValue((type.BaseName, baseArity), out var alias) &&
                         !alias.ValueType && alias.Declaring is null &&
-                        (IsOrdinaryClass(type) && !type.IsClosedHierarchy ||
+                        (IsOrdinaryClass(type) && (!type.IsClosedHierarchy || baseArity == 0 && alias.Namespace == "System" && alias.Name == "Object") ||
                          type.IsValueType && type.EnumMembers is null && type.NativePrimitive is null && !type.NativeGrapheme &&
                          baseArity == 0 && alias.Namespace == "System" && alias.Name == "ValueType" ||
                          type.EnumMembers is not null && baseArity == 0 && alias.Namespace == "System" && alias.Name == "Enum"),
@@ -440,7 +440,7 @@ public sealed partial class NativeAssemblyDefinition
                     continue;
                 }
                 var parent = types[type.BaseIndex];
-                Require((IsOrdinaryClass(type) || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null or PrimitiveType.String && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
+                Require((IsOrdinaryClass(type) || type.IsValueType && (type.NativePrimitive is not null || type.NativeGrapheme) && parent.Namespace == "System" && parent.Name == "ValueType" && parent.IsAbstractClass && parent.Fields.Length == 0 || type.EnumMembers is not null && parent.Namespace == "System" && parent.Name == "Enum" && parent.IsAbstractClass && parent.Fields.Length == 0 || parent.IsObjectRoot && !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null or PrimitiveType.String && !type.NativeGrapheme) && IsOrdinaryClass(parent) && !parent.IsSealedClass, $"unsupported base class category: {type.Namespace}.{type.Name} -> {parent.Namespace}.{parent.Name}");
                 var seen = new HashSet<int>();
                 for (var current = i; current >= 0; current = types[current].BaseName is { } name ? types.FindIndex(candidate => candidate.NativeName == name) : -1)
                     Require(seen.Add(current), "cyclic class inheritance");

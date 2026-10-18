@@ -210,7 +210,9 @@ public sealed partial class TypeBuilder
 
     internal void ValidateClassSlots()
     {
-        if (IsInterface || IsStatic) return;
+        // Intrinsic scalar methods use runtime dispatch, not ordinary class slots.
+        // Their nominal ValueType base does not introduce a reference receiver.
+        if (IsInterface || IsStatic || NativePrimitive is not null || NativeGrapheme) return;
         var inheritedMethods = InheritedClassMethods().ToArray();
         foreach (var method in Methods.Where(m => !m.IsStatic && !m.IsConstructor))
         {
@@ -219,7 +221,7 @@ public sealed partial class TypeBuilder
             {
                 if (inherited.Method is not null ? !inherited.Method.IsVirtual || !inherited.Signature.Matches(method.Signature) :
                     !MethodDefinition.IsObjectOverride(method.Name, method.Signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))
-                    throw new InvalidDataException("override requires an exact inherited virtual contract");
+                    throw new InvalidDataException($"override requires an exact inherited virtual contract: {Namespace}.{Name}.{method.Name}");
             }
             else if (inherited.Method is not null) throw new InvalidDataException("inherited method hiding is unsupported");
         }
