@@ -64,3 +64,12 @@ HTTPS, keep-alive, RSS and managed allocation rate are outside these measurement
 [Garbage-collection measurements](/benchmarks/gc/)
 
 [General execution](/benchmarks/execution/) · [All benchmark reports](/benchmarks/)
+
+
+## Development load investigation
+
+After Preview 16, the [offered-load investigation](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/load)
+separates offered arrivals, successful completions, client admission misses and
+errors, with latency and CPU/RSS samples. It also compares worker-count and GC-policy
+costs. These local development experiments do not replace the release measurements
+above or establish production capacity; paced collection remains experimental.

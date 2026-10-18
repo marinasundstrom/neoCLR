@@ -1,0 +1,33 @@
+{
+  "build": "/Users/robert/Projects/neoclr/target/http-load-20261018/deadline-before/native",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/http-load-20261018/deadline-before/native/app-paced": "e276a55107bea7e8925a1939a01dc85e9238b102230d7ac40c9d5ffd28f750a6",
+    "/Users/robert/Projects/neoclr/target/http-load-20261018/deadline-before/native/app.dll": "02b274e8bad75df9001ca5134e9c3ffce00b6a140cff643995b1ab3309fc8755",
+    "/Users/robert/Projects/neoclr/target/http-load-20261018/deadline-before/native/build.json": "8a665ca03a86e86d9cc3dd41a3b7ce5194fdcb099b23f669d61b9e46cc259173",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/load/deadline-probe.py": "b592bc367d257cf9d36f5ed100a33f04158d1c881ea38c4cd933d12d9a096c38",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/load/DeadlineProbe.rvn": "6ce8b107704687a820f725b082051194e1ac04acad17e11fac235a610d38193d"
+  },
+  "runs": [
+    {
+      "cancelled": 43,
+      "timedOut": 57
+    },
+    {
+      "cancelled": 31,
+      "timedOut": 69
+    },
+    {
+      "cancelled": 47,
+      "timedOut": 53
+    },
+    {
+      "cancelled": 52,
+      "timedOut": 48
+    },
+    {
+      "cancelled": 48,
+      "timedOut": 52
+    }
+  ],
+  "allTimedOut": false
+}

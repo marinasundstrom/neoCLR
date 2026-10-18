@@ -180,3 +180,18 @@ assembly before using its roots.
 `--server-source PATH` selects and hashes an explicit historical syntax fixture;
 it does not change response validation. Incomplete HTTP responses report the
 request index and worker error, and failed reports retain an error description.
+
+
+## Buffer investigation — 2026-10-18
+
+[Matched profiles, boundary checks and timing](buffers-20261018/README.md) compare
+tiny and 8 KiB responses before/after bounded transfer and snapshot improvements.
+Use `--workload bulk` for the 8 KiB body. The response validator checks every byte.
+The comparison controller accepts `--workloads plain bulk`; neither workload alone
+establishes sustainable server capacity.
+
+
+[Offered-load and worker-cost investigation](load/README.md) adds independent arrival
+scheduling, client admission/failure accounting, latency, CPU/RSS samples and explicit
+stress-versus-paced policy controls. It records tested operating points separately
+from sustainable capacity claims.

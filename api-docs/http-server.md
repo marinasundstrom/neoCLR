@@ -29,7 +29,8 @@ through `context.Respond(status, content)` followed by `await context.Complete()
 The same content contract supplies client uploads. Length is required and bounded
 by 1 MiB. HTTP framing headers are validated before the producer is read.
 
-The server sends the headers first, then requests at most 256 bytes at a time.
+Development after Preview 16: the server sends the headers first, then requests
+at most 4 KiB at a time.
 It waits for each write before reading again. Short reads are valid; zero before
 the declared length, or a count larger than requested, returns
 `HttpError.Content(StreamError.IoFailure)`. Producer errors retain their
@@ -42,7 +43,10 @@ length without reading the source. Zero-length content is also never read.
 Response disposal still follows context ownership. Validation failures before
 consumption do not take ownership of the source.
 
-The response-write deadline also cancels a pending producer read. Producers must
+The response-write deadline also cancels a pending producer read. Development
+after Preview 16 accounts for the network clock's millisecond rounding when
+scheduling that cancellation, preserving TimedOut rather than a cancelled task
+when only the deadline expires. Producers must
 honor the supplied cancellation token and settle their task; cancellation remains
 cooperative. Caller cancellation returns a cancelled task; deadline expiry returns
 `HttpError.TimedOut` after acknowledgement. Close cancels the pending producer and

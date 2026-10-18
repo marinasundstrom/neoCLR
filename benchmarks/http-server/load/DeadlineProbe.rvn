@@ -1,0 +1,117 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Time.*
+import System.Result.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("Response stream contract failed")
+    }
+}
+
+class GeneratedInput : InputStream {
+    private val mode: int
+    private var registration: CancellationRegistration? = null
+    var Position: int = 0
+    var Reads: int = 0
+    var Closes: int = 0
+
+    init(mode: int) {
+        self.mode = mode
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        // Deferred producer checks the buffer remains valid across scheduling.
+        let pending = Promise<Result<int, StreamError>>()
+        if mode >= 8 {
+            Reads += 1
+            registration = cancellationToken.Register(() => {
+                _ = pending.Cancel()
+            })
+            return pending.Task
+        }
+        TaskQueue.Default.Post(() => {
+            _ = pending.Complete(ReadCore(buffer, offset, count))
+        })
+        return pending.Task
+    }
+
+    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        Check(Closes == 0 && offset == 0 && count > 0 && count <= 4096)
+        Reads += 1
+        if mode == 4 { return Ok(0) }
+        if mode == 5 { return Error(StreamError.AccessDenied) }
+        if mode == 6 { return Ok(count + 1) }
+        let read = if mode == 1 { count } else if count > 71 { 71 } else { count }
+        var index = 0
+        while index < read {
+            buffer[index] = (byte)((Position + index) % 251)
+            index += 1
+        }
+        Position += read
+        return Ok(read)
+    }
+
+    func Close() {
+        Closes += 1
+        if registration is CancellationRegistration active {
+            registration = null
+            active.Dispose()
+        }
+    }
+}
+
+// Outcome observation: an awaited cancelled task cannot yield a Result value.
+func ObserveCancellation(pending: Task<Result<System.Void, HttpError>>) -> Task<bool> {
+    let observed = Promise<bool>()
+    pending.OnCompleted(() => {
+        _ = observed.Complete(pending.IsCancelled)
+    })
+    return observed.Task
+}
+
+async func Main() -> Task<()> {
+    let options = HttpServerOptions()
+    options.ResponseWriteTimeout = Duration.FromTicks(50000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port failed")
+    }
+    Console.WriteLine(port)
+    var cancelled = 0
+    var timedOut = 0
+    var index = 0
+    while index < 100 {
+        let Ok(context) = await server.Accept() else {
+            System.Fail("Accept failed")
+        }
+        let input = GeneratedInput(9)
+        let Ok(content) = HttpContent.FromStream(input, 1, false) else {
+            System.Fail("Content failed")
+        }
+        context.Respond(HttpStatusCode.OK, content)
+        let pending = context.Complete()
+        if await ObserveCancellation(pending) {
+            cancelled += 1
+        } else {
+            Check(pending.GetResult() is Error(HttpError.TimedOut))
+            timedOut += 1
+        }
+        context.Dispose()
+        index += 1
+    }
+    server.Close()
+    Console.WriteLine(cancelled)
+    Console.WriteLine(timedOut)
+    Console.WriteLine("DONE")
+}

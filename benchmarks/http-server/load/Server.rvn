@@ -1,0 +1,106 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+class LoadState {
+    val Server: HttpServer
+    var Completed: int = 0
+    var Limits: int = 0
+    var Failures: int = 0
+
+    init(server: HttpServer) {
+        Server = server
+    }
+}
+
+// Outcome adapter lets workers observe shutdown cancellation without faulting.
+func AcceptOutcome(pending: Task<Result<HttpContext, HttpError>>) -> Task<Option<Result<HttpContext, HttpError>>> {
+    let result = Promise<Option<Result<HttpContext, HttpError>>>()
+    pending.OnCompleted(() => {
+        if pending.IsCancelled {
+            _ = result.Complete(None())
+        } else {
+            _ = result.Complete(Some(pending.GetResult()))
+        }
+    })
+    return result.Task
+}
+
+async func Worker(state: LoadState) -> Task<()> {
+    while true {
+        let outcome = await AcceptOutcome(state.Server.Accept())
+        if outcome is None {
+            return
+        }
+        if let Some(result) = outcome {
+            if let Error(error) = result {
+                if error is HttpError.LimitExceeded(_) {
+                    state.Limits += 1
+                } else {
+                    state.Failures += 1
+                }
+            } else if let Ok(context) = result {
+                let target = context.Request.Target
+                let stopping = target == "/stop"
+                let size = if stopping { 0 } else if target == "/bulk" { 8192 } else { 10 }
+                let body = ArrayList<byte>(size)
+                var index = 0
+                while index < size {
+                    body.Add((byte)120)
+                    index += 1
+                }
+                context.Respond(HttpStatusCode.OK, HttpContent(body))
+                if let Error(_) = await context.Complete() {
+                    state.Failures += 1
+                } else if !stopping {
+                    state.Completed += 1
+                }
+                context.Dispose()
+                if stopping {
+                    state.Server.Close()
+                    return
+                }
+            }
+        }
+    }
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    var workerCount = 16
+    if arguments.Length > 0 {
+        workerCount = match arguments[0] {
+            "1" => 1
+            "4" => 4
+            "16" => 16
+            _ => 0
+        }
+    }
+    if workerCount == 0 {
+        System.Fail("Worker count must be 1, 4 or 16")
+    }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port failed")
+    }
+    let state = LoadState(server)
+    let workers = ArrayList<Task<()>>()
+    var index = 0
+    while index < workerCount {
+        workers.Add(Worker(state))
+        index += 1
+    }
+    Console.WriteLine(port)
+    for worker in workers {
+        await worker
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+    Console.WriteLine(state.Completed)
+    Console.WriteLine(state.Limits)
+    Console.WriteLine(state.Failures)
+}

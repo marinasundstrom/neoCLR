@@ -168,3 +168,12 @@ not a silently discarded successful run or evidence of a throughput regression.
 
 This is a ranked investigation plan, not a claim that all bottlenecks are known
 or a commitment to adopt every proposed optimization. New evidence may reorder it.
+
+
+## Follow-up
+
+The [offered-load investigation](../load/README.md) adds concurrency/arrival-rate
+measurement, attributes worker-count costs, and fixes a reproducible timeout race
+matching the intermittent cancellation symptom above. These earlier buffer results
+remain tied to their original artifact hashes; the follow-up does not relabel them
+as measurements of the later timeout repair.

@@ -859,7 +859,11 @@ public class HttpContext : Disposable {
                 writeCancellation = cancellation
                 writeCaller = callerToken.Register(() => { cancellation.Cancel() })
                 token = cancellation.Token
-                cancellation.CancelAfter(Duration.FromTicks((long)owner.Settings.WriteMilliseconds * 10000L))
+                // NetworkDeadline rounds its timestamp up to a millisecond;
+                // Timer uses an unrounded timestamp. Allow that rounding before
+                // cancelling a waiting producer, so it observes TimedOut rather
+                // than an unrelated cancelled task just before the deadline.
+                cancellation.CancelAfter(Duration.FromTicks(((long)owner.Settings.WriteMilliseconds + 1L) * 10000L))
             }
             SendNext()
         } else if let Error(reason) = encoded {
