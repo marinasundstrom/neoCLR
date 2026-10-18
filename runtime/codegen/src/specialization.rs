@@ -1284,6 +1284,13 @@ pub(crate) fn expand_with_conformance(
             .iter()
             .map(|argument| context.lower(argument))
             .collect::<Result<Vec<_>, _>>()?;
+        neoclr::native_metadata::retain_memory_view_shape(
+            &mut t,
+            input,
+            shape.source,
+            &native_arguments,
+        )
+        .map_err(|e| e.to_string())?;
         neoclr::native_metadata::retain_array_shape(&mut t, input, shape.source, &native_arguments)
             .map_err(|e| e.to_string())?;
         neoclr::native_metadata::retain_interface_shape(
@@ -1511,6 +1518,70 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn memory_view_shapes_retain_exact_elements_without_admitting_native_layout() {
+        use neoclr::metadata::{MemoryViewKind, Type};
+        let source = neoclr::assemble(
+            r#"
+.module System
+.type System.Slice<T>
+.memoryview slice
+.end
+.type System.ReadOnlySlice<T>
+.memoryview read_only_slice
+.end
+.type System.Memory<T>
+.memoryview memory
+.end
+.type System.ReadOnlyMemory<T>
+.memoryview read_only_memory
+.end
+.type class Element
+.end
+.function Main() -> Int32
+.local System.Slice<Int32> writable
+.local System.Slice<Byte> bytes
+.local System.ReadOnlySlice<Byte> readonly
+.local System.Memory<Element> retained
+.local System.ReadOnlyMemory<Element> retainedReadonly
+ldc.i4 0
+ret
+.end
+"#,
+        )
+        .unwrap();
+        neoclr::verify(&source).unwrap();
+        let (expanded, _) = expand(&source, "Main").unwrap();
+        let shapes: Vec<_> = expanded
+            .types
+            .iter()
+            .filter_map(|t| {
+                neoclr::native_metadata::memory_view_element(t).map(|element| {
+                    assert!(t.generic_parameters.is_empty());
+                    (t.memory_view.unwrap(), element.clone())
+                })
+            })
+            .collect();
+        assert_eq!(shapes.len(), 5);
+        assert!(shapes.contains(&(MemoryViewKind::Slice, Type::Int32)));
+        assert!(shapes.contains(&(MemoryViewKind::Slice, Type::Byte)));
+        assert!(shapes.contains(&(MemoryViewKind::ReadOnlySlice, Type::Byte)));
+        let (_, element) = shapes
+            .iter()
+            .find(|(kind, _)| *kind == MemoryViewKind::Memory)
+            .unwrap();
+        assert!(shapes.contains(&(MemoryViewKind::ReadOnlyMemory, element.clone())));
+        assert!(matches!(element, Type::Named(_)));
+        assert!(expanded.type_definition(element).is_some());
+
+        assert!(
+            crate::selection::select(&expanded, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("native ABI")
+        );
+    }
+
     #[test]
     fn nominal_static_self_methods_specialize_without_erasing_conformance() {
         let source = neoclr::assemble(include_str!(

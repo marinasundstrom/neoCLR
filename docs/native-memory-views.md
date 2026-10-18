@@ -150,3 +150,27 @@ borrowed-to-persistent and readonly-to-writable conversions reject with RAV1503.
 The [class-library audit](memory-view-library-audit.md) identifies synchronous
 codec/crypto candidates and Memory-based async I/O candidates. Shared service
 migration awaits native ABI/codegen so existing JIT/AOT workloads remain supported.
+
+
+Native compiler preparation (2026-10-19): closed specialization now retains each
+view's exact lowered element type in private, nonserialized IR. Nominal renaming
+remaps that dependency. The memory_view kind continues to identify writable,
+readonly, borrowed and persistent shapes. This follows the CLR requirement that
+constructed generic storage retains its element identity; it is not a new guest
+metadata encoding or a physical layout choice. Direct value profiling now rejects
+opaque shapes as well as ordinary selection, preventing accidental empty-record
+layout if a caller bypasses selection. Native operations, ABI lanes, GC tracing
+and executable JIT/AOT consumers remain pending.
+
+Focused native-preparation validation: three new codegen tests pass (closed
+specialization identity, rename/serialization boundaries, direct layout rejection).
+The five projection tests pass, including one of those new tests and four existing
+array/String/Object/interface regressions. All nine interpreter memory-view
+contracts also pass. Commands: `cargo test -p neoclr-codegen --lib memory_view`,
+`cargo test -p neoclr-codegen --lib variance_projection_tests`, and
+`cargo test --test memory_views`. No new guest API or API snapshot is introduced;
+the Rust compiler bridge is covered in the host memory-view reference.
+
+Final configuration checks pass with `cargo check -p neoclr-codegen` and
+`cargo check -p neoclr --no-default-features`. The retained element field is
+compiled only with native-metadata, with no added storage in interpreter-only builds.

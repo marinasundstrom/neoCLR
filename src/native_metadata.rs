@@ -732,6 +732,39 @@ pub fn retain_array_shape(
     target.native_array_element = Some(arguments[0].clone());
     Ok(())
 }
+/// Retain the element of an opaque memory view before native specialization erases
+/// its generic parameters. The source must be verified IR; this private fact grants
+/// no native layout, construction, conversion or execution rights.
+pub fn retain_memory_view_shape(
+    target: &mut crate::metadata::TypeDef,
+    source: &Module,
+    index: usize,
+    arguments: &[Type],
+) -> Result<(), Fault> {
+    let original = source
+        .types
+        .get(index)
+        .ok_or_else(|| Fault::new("missing source memory view"))?;
+    let Some(kind) = original.memory_view else {
+        return Ok(());
+    };
+    crate::memory_view_contract::validate(source)?;
+    if arguments.len() != 1 || target.memory_view != Some(kind) {
+        return Err(Fault::new(
+            "native memory-view proof requires matching kind and one element",
+        ));
+    }
+    target.native_memory_view_element = Some(arguments[0].clone());
+    Ok(())
+}
+
+/// Exact element dependency retained in a private specialized memory-view shape.
+/// Absent on ordinary source metadata and after serialization. This is compiler
+/// bookkeeping, not an executable ABI or a public guest reflection contract.
+pub fn memory_view_element(definition: &crate::metadata::TypeDef) -> Option<&Type> {
+    definition.native_memory_view_element.as_ref()
+}
+
 /// Preserve a variant contract slot across closed owner specialization.
 pub fn retain_interface_slot(
     target: &mut crate::metadata::Function,
@@ -852,7 +885,7 @@ pub fn retain_object_reference_root(
     Ok(())
 }
 
-/// Preserve private variance and reference-root facts across a row-preserving compiler rewrite.
+/// Preserve private variance, memory-view and reference-root facts across a row-preserving compiler rewrite.
 /// The mapper must perform the same type renaming as the rewrite. Serialized input
 /// cannot supply these facts; the original must be verified compiler IR.
 pub fn restore_interface_proofs(
@@ -872,6 +905,12 @@ pub fn restore_interface_proofs(
         target.native_string_view = original.native_string_view;
         target.native_array_element = original
             .native_array_element
+            .as_ref()
+            .map(&map_type)
+            .transpose()
+            .map_err(Fault::new)?;
+        target.native_memory_view_element = original
+            .native_memory_view_element
             .as_ref()
             .map(&map_type)
             .transpose()

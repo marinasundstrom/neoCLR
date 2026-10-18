@@ -1461,6 +1461,72 @@ fn rename_nominal(
 #[cfg(test)]
 mod variance_projection_tests {
     #[test]
+    fn memory_view_element_survives_private_rename_but_not_serialization() {
+        use neoclr::metadata::{MemoryViewKind, Type};
+        let source = neoclr::assemble(".module System\n.type System.Memory<T>\n.memoryview memory\n.end\n.type class Element\n.end\n").unwrap();
+        let mut target = source.clone();
+        let element = Type::Named("Element".into());
+        neoclr::native_metadata::retain_memory_view_shape(
+            &mut target.types[0],
+            &source,
+            0,
+            &[element.clone()],
+        )
+        .unwrap();
+        assert_eq!(
+            neoclr::native_metadata::memory_view_element(&target.types[0]),
+            Some(&element)
+        );
+        let encoded = serde_json::to_value(&target).unwrap();
+        assert!(
+            encoded["types"][0]
+                .get("native_memory_view_element")
+                .is_none()
+        );
+        let decoded: neoclr::Module = serde_json::from_value(encoded.clone()).unwrap();
+        assert!(neoclr::native_metadata::memory_view_element(&decoded.types[0]).is_none());
+        let mut forged = encoded;
+        forged["types"][0]["native_memory_view_element"] = serde_json::json!("Int32");
+        assert!(serde_json::from_value::<neoclr::Module>(forged).is_err());
+        target.types[1].name = "PrivateElement".into();
+        super::rename_nominal(&mut target, "Element", "PrivateElement", "Main").unwrap();
+        assert_eq!(
+            neoclr::native_metadata::memory_view_element(&target.types[0]),
+            Some(&Type::Named("PrivateElement".into()))
+        );
+        assert!(
+            neoclr::native_metadata::retain_memory_view_shape(
+                &mut target.types[0],
+                &source,
+                0,
+                &[]
+            )
+            .is_err()
+        );
+        target.types[0].memory_view = Some(MemoryViewKind::ReadOnlyMemory);
+        assert!(
+            neoclr::native_metadata::retain_memory_view_shape(
+                &mut target.types[0],
+                &source,
+                0,
+                &[element.clone()]
+            )
+            .is_err()
+        );
+        let mut malformed = source.clone();
+        malformed.types[0].is_reference_type = true;
+        assert!(
+            neoclr::native_metadata::retain_memory_view_shape(
+                &mut target.types[0],
+                &malformed,
+                0,
+                &[element]
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
     fn string_conformance_survives_private_projection() {
         let source = neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(".module TextVariance\n.type System.String\n.implements View\n.end\n.interface View\n.end\n.interface Producer<T>\n.variance out\n.end\n")], &neoclr::assemble(".module System").unwrap()).unwrap().remove(0);
         let mut target = source.clone();

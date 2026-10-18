@@ -290,6 +290,10 @@ pub struct TypeDef {
     pub(crate) native_object_root: bool,
     #[serde(skip)]
     pub(crate) native_array_element: Option<Type>,
+    // Exact element identity retained when native specialization erases generic parameters.
+    #[cfg(feature = "native-metadata")]
+    #[serde(skip)]
+    pub(crate) native_memory_view_element: Option<Type>,
     #[serde(skip)]
     pub(crate) native_string_view: bool,
     /// Memberless bootstrap storage declaration; not an executable owner.

@@ -864,6 +864,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         native_interface: None,
                         native_object_root: false,
                         native_array_element: None,
+                        #[cfg(feature = "native-metadata")]
+                        native_memory_view_element: None,
                         native_string_view: false,
                         static_fields: vec![],
                         literal_fields: vec![],

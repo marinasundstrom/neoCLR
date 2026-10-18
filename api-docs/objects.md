@@ -379,7 +379,19 @@ Host publication validates the execution heap, and expired owners fault. Immutab
 UTF-8 views share the String owner and are borrowed capabilities for storage checks.
 
 Nominal metadata admission and interpreter suspension rules are implemented.
-Public Raven APIs and native lowering remain pending. This payload is not a
+Public Raven APIs are implemented; native lowering remains pending. This payload is not a
 supported host factory; checked guest factories are documented in the
 [memory-view reference](memory-views.md). See
 the [implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md).
+
+
+With the `native-metadata` feature, the Rust compiler bridge exposes `retain_memory_view_shape`
+(target TypeDef, source Module, source index, lowered type arguments) and
+`memory_view_element(&TypeDef) -> Option<&Type>` for private specialization IR.
+Retention validates the source opaque declaration, matching view kind and unary
+arity; errors return Fault. Ordinary types are unchanged. Callers supply verified
+source IR and lowered arguments. The retained element is remapped by
+`restore_interface_proofs` alongside other private type facts. These facts are
+omitted on serialization and rejected if supplied as metadata fields. They grant
+no native ABI or execution rights; both selection and direct value profiling
+still reject memory views pending their storage and tracing implementation.

@@ -156,6 +156,14 @@ impl<'a> Profile<'a> {
             }
         }
         for t in &input.types {
+            // Selection also rejects these, but direct profile consumers must not
+            // interpret opaque fieldless declarations as empty, untraced records.
+            if t.memory_view.is_some() || neoclr::native_metadata::memory_view_element(t).is_some()
+            {
+                return Err(
+                    "memory views require native ABI and GC lowering before value profiling".into(),
+                );
+            }
             if references && t.representation == Representation::Interface {
                 if !t.fields.is_empty()
                     || t.base.is_some()
@@ -2501,6 +2509,40 @@ fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
 #[cfg(test)]
 mod object_assignment_tests {
     use super::*;
+
+    #[test]
+    fn memory_views_never_receive_empty_record_layouts() {
+        for (name, kind) in [
+            ("Slice", "slice"),
+            ("ReadOnlySlice", "read_only_slice"),
+            ("Memory", "memory"),
+            ("ReadOnlyMemory", "read_only_memory"),
+        ] {
+            let source = neoclr::assemble(&format!(
+                ".module System\n.type System.{name}<T>\n.memoryview {kind}\n.end\n"
+            ))
+            .unwrap();
+            let mut closed = source.clone();
+            neoclr::native_metadata::retain_memory_view_shape(
+                &mut closed.types[0],
+                &source,
+                0,
+                &[Type::Int32],
+            )
+            .unwrap();
+            closed.name = "NativeMemoryShapes".into();
+            closed.types[0].generic_parameters.clear();
+            for clear_kind in [false, true] {
+                if clear_kind {
+                    closed.types[0].memory_view = None;
+                }
+                let error = Profile::new(&closed, true, None, None, &[], None, None, None, false)
+                    .err()
+                    .expect("opaque shapes cannot become empty records");
+                assert!(error.to_string().contains("native ABI and GC"));
+            }
+        }
+    }
 
     #[test]
     fn base_initializer_accepts_independent_scalar_expressions_only() {

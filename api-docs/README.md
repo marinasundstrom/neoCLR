@@ -218,7 +218,10 @@ are documented in the [Object guide](objects.md#rust-host-string-payloads) and s
 rustdoc; StringValue is not a guest CLI type selected for RavenDoc.
 The opaque Rust-only `MemoryView`/`Value::MemoryView` payload is likewise covered
 by the [host value reference](objects.md#rust-host-memory-view-payloads). Its
-constructors remain internal. Public Raven Slice/ReadOnlySlice and Memory/ReadOnlyMemory APIs and
+constructors remain internal. Private Rust native-specialization element retention
+and rename/serialization limits are documented in the same host reference; these
+compiler helpers are not guest types and do not change the RavenDoc snapshot.
+Public Raven Slice/ReadOnlySlice and Memory/ReadOnlyMemory APIs and
 String.Utf8Bytes have a [manual member reference](memory-views.md). The native
 metadata contract is explicit; the CLI reference projection rejects these types
 rather than emitting unsafe fieldless ordinary records. The legacy aggregate
