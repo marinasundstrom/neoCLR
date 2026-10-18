@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Attribute concurrent-GC POC result handling with opt-in, compiled-out-by-default phase clocks and an uninstrumented control. On the supported 4,096-object workload, validation/import each consume about 40 ms per 2,000 cycles, sweep about 20 ms and worker wait under 0.1 ms. Fresh UBSan/bounds and complete benchmark reclamation checks pass; prioritize redundant owner heap walks.
+
 - Avoid redundant clearing of unused concurrent-GC POC snapshot arrays; poisoned-storage/reuse and existing UBSan/bounds reclamation checks pass. Add paired baseline/candidate benchmarks and configurable live graphs. Capture cost falls, but overall gains remain inconclusive; at 4,096 live objects concurrent remains 3–4% slower and uses 11–12% more CPU than sync. Preserve raw evidence and keep production behavior unchanged.
 
 - Benchmark synchronous GC against the reclamation POC on matched, supported workloads before full special-case coverage. Retain pilot and reversed-order repeat trials: concurrent elapsed time is 17.2% worse for allocation-only batches and 12.9% worse with scalar work; process CPU rises 29.1%/20.3% and peak managed extent rises 26.3%. All work/checksums/collection counts match and final reclamation passes. These are local microbenchmarks, not Serve/Go capacity results; prioritize measured POC overhead next.

@@ -1,4 +1,7 @@
 /* Owner-only POC coordinator. Background tracing never touches the live heap. */
+#ifndef RECLAIM_PHASE
+#define RECLAIM_PHASE(phase) ((void)0)
+#endif
 static uint64_t cycles_applied, cycles_discarded, cycle_reclaimed_bytes;
 typedef enum { CYCLE_PENDING, CYCLE_APPLIED, CYCLE_DISCARDED, CYCLE_EMPTY } cycle_result;
 typedef struct {
@@ -45,6 +48,7 @@ static bool cycle_apply(collection_cycle *cycle) {
         }
         at += old->span;
     }
+    RECLAIM_PHASE(2); /* Validation complete, no live state changed yet. */
     /* New allocations are black for this cycle, including allocations in free
      * spans that existed at capture. Only captured allocations can be reclaimed. */
     for (uint64_t at = 0; at < a->used;) {
@@ -58,9 +62,11 @@ static bool cycle_apply(collection_cycle *cycle) {
             ((block *)(void *)(a->data + at))->state = ALLOCATED | (old->state & MARKED);
         at += old->span;
     }
+    RECLAIM_PHASE(3);
     uint64_t reclaimed_before = statistics.reclaimed_bytes;
     experiment_invalidate(); /* Other outstanding cycles cannot reuse old identity. */
     if (experiment_finish(context, NULL, 0)) abort();
+    RECLAIM_PHASE(4);
     cycle_reclaimed_bytes += statistics.reclaimed_bytes - reclaimed_before;
     return true;
 }
@@ -68,7 +74,9 @@ static cycle_result cycle_poll(collection_cycle *cycle, bool wait, bool cancel) 
     cycle_owner(cycle);
     if (!cycle->job) return CYCLE_EMPTY;
     int status;
+    RECLAIM_PHASE(0);
     if (!gc_worker_take(&cycle->worker, wait, cancel, &status)) return CYCLE_PENDING;
+    RECLAIM_PHASE(1);
     bool applied = !cancel && status == 0 && cycle_apply(cycle);
     if (applied) cycles_applied++;
     else cycles_discarded++;
@@ -76,6 +84,7 @@ static cycle_result cycle_poll(collection_cycle *cycle, bool wait, bool cancel) 
     free(cycle->job);
     cycle->job = NULL;
     cycle->context = NULL;
+    RECLAIM_PHASE(5);
     return applied ? CYCLE_APPLIED : CYCLE_DISCARDED;
 }
 static void cycle_destroy(collection_cycle *cycle) {

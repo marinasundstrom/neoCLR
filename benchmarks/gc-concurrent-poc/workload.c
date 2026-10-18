@@ -5,14 +5,27 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/resource.h>
-#include "native-gc.c"
-#include "snapshot.inc"
-#include "reclaim.inc"
+#include <stdint.h>
 static uint64_t ns(clockid_t clock) {
     struct timespec t;
     if (clock_gettime(clock, &t)) abort();
     return (uint64_t)t.tv_sec * UINT64_C(1000000000) + t.tv_nsec;
 }
+static uint64_t phase_totals[5];
+#ifdef POC_PHASE_TIMING
+static int phase_enabled;
+static uint64_t phase_previous;
+static void phase_event(unsigned phase) {
+    if (!phase_enabled) return;
+    uint64_t now = ns(CLOCK_MONOTONIC);
+    if (phase) phase_totals[phase - 1] += now - phase_previous;
+    phase_previous = now;
+}
+#define RECLAIM_PHASE(phase) phase_event(phase)
+#endif
+#include "native-gc.c"
+#include "snapshot.inc"
+#include "reclaim.inc"
 static void *allocate(neoclr_aot_context *c, uint64_t bytes, uint32_t kind) {
     void *p;
     assert(!neoclr_gc_allocate_v1(&c->text, bytes, kind, &p));
@@ -59,6 +72,9 @@ int main(int argc, char **argv) {
     unsigned pause_count = 0;
     for (unsigned round = 0; round < rounds + warmup; round++) {
         if (round == warmup) {
+#ifdef POC_PHASE_TIMING
+            phase_enabled = 1;
+#endif
             start = ns(CLOCK_MONOTONIC);
             cpu_start = ns(CLOCK_PROCESS_CPUTIME_ID);
             owner_start = ns(CLOCK_THREAD_CPUTIME_ID);
@@ -102,6 +118,9 @@ int main(int argc, char **argv) {
     uint64_t collections = statistics.collections - gc_before;
     uint64_t allocations = statistics.allocations - allocations_before;
     assert(collections == rounds && allocations == (uint64_t)rounds * batch);
+#ifdef POC_PHASE_TIMING
+    phase_enabled = 0;
+#endif
     /* Identical post-window live set; final cleanup is outside timing. */
     assert(!neoclr_gc_collect_v1(&c, &frame));
     assert(validated_bases(&c.text, root, previous));
@@ -115,7 +134,16 @@ int main(int argc, char **argv) {
     assert(!c.text.used && statistics.allocations == statistics.reclaimed_allocations);
     struct rusage usage;
     assert(!getrusage(RUSAGE_SELF, &usage));
-    printf("{\"mode\":\"%s\",\"rounds\":%u,\"work\":%u,\"liveCount\":%u,\"elapsedNs\":%llu,\"cpuNs\":%llu,\"ownerCpuNs\":%llu,\"pauseTotalNs\":%llu,\"captureOrSyncNs\":%llu,\"waitApplyNs\":%llu,\"batchP99Ns\":%llu,\"pauseP99Ns\":%llu,\"peakArenaBytes\":%llu,\"maxRssBytes\":%ld,\"allocations\":%llu,\"collections\":%llu,\"checksum\":%llu,\"finalArenaBytes\":0}\n",
+    printf("{\"phaseTiming\":%s,\"phaseNs\":[%llu,%llu,%llu,%llu,%llu],",
+#ifdef POC_PHASE_TIMING
+        "true",
+#else
+        "false",
+#endif
+        (unsigned long long)phase_totals[0], (unsigned long long)phase_totals[1],
+        (unsigned long long)phase_totals[2], (unsigned long long)phase_totals[3],
+        (unsigned long long)phase_totals[4]);
+    printf("\"mode\":\"%s\",\"rounds\":%u,\"work\":%u,\"liveCount\":%u,\"elapsedNs\":%llu,\"cpuNs\":%llu,\"ownerCpuNs\":%llu,\"pauseTotalNs\":%llu,\"captureOrSyncNs\":%llu,\"waitApplyNs\":%llu,\"batchP99Ns\":%llu,\"pauseP99Ns\":%llu,\"peakArenaBytes\":%llu,\"maxRssBytes\":%ld,\"allocations\":%llu,\"collections\":%llu,\"checksum\":%llu,\"finalArenaBytes\":0}\n",
         argv[1], rounds, work, live_count, (unsigned long long)elapsed, (unsigned long long)cpu,
         (unsigned long long)owner_cpu, (unsigned long long)pause_sum,
         (unsigned long long)capture_sum, (unsigned long long)finish_sum,

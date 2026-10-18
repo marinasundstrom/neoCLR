@@ -144,3 +144,28 @@ Example after building a baseline with the same workload source:
 ```
 python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_RESULTS --output NEW_RESULTS --rounds 2000 --live-count 4096
 ```
+
+## Result-application attribution (2026-10-18)
+
+`--phase-timing` enables POC-only owner timestamps; the default compiles the hooks
+out. `phaseNs` reports worker take/wait, validation, mark import, cleanup/sweep and
+scratch release in that order, excluding warmup and final drain. This diagnostic
+workload completes every cycle successfully; it does not characterize rejection
+paths. Timestamps include their own overhead and 1 microsecond clock granularity.
+
+For 4096 live objects / 2000 batches, [diagnostic trials](phase-large.json) record:
+
+- Worker take/wait: 0.058–0.068 ms total; worker tracing is already complete here.
+- Validation: 40.00–40.56 ms; import: 40.24–40.37 ms.
+- Cleanup/sweep: 20.24–20.35 ms; scratch release: 0.45–0.51 ms.
+- Combined outer wait/apply: 101.10–101.97 ms.
+
+The [uninstrumented control](phase-control.json) retains all work and reclamation
+checks. Diagnostic concurrent elapsed is 1466/1468 and 1564/1555 ms, control
+1463/1462 and 1567/1563 ms; small differences change direction. Do not interpret
+phase timing as a throughput improvement. The evidence points to repeated owner
+heap walks, rather than worker completion wait, for this stable workload. Next
+combine mark import's blanket marking and overwrite walks while keeping validation
+before mutation and retaining allocations in old free spans or beyond the snapshot.
+The collector still follows the existing reachability/cleanup contract; these are
+internal POC diagnostics, not a .NET API divergence or production runtime change.

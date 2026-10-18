@@ -15,6 +15,7 @@ WORKER = POC.parent / 'concurrent-gc-worker'
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--validated-build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--phase-timing', action='store_true')
 p.add_argument('--compare-build', type=Path, help='Prior benchmark directory containing bench and results.json')
 p.add_argument('--live-count', type=int, default=512)
 p.add_argument('--rounds', type=int, default=2000)
@@ -28,6 +29,8 @@ for name, digest in qualification['inputs'].items():
 command = ['clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-pthread',
     '-I', str(build), '-I', str(POC), '-I', str(WORKER), '-I', str(ROOT / 'runtime/native/gc'),
     str(HERE / 'workload.c'), str(WORKER / 'worker.c'), str(build / 'root-probe.c'), '-o', str(out / 'bench')]
+if a.phase_timing:
+    command.insert(1, '-DPOC_PHASE_TIMING')
 report = dict(passed=False, platform=platform.platform(), loadBefore=os.getloadavg(),
     commands=[], trials=[], qualification=qualification,
     inputs={str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in [Path(__file__), HERE / 'workload.c']})
