@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Rebuild the Serve benchmark and all four managed libraries from current source, retaining compiler/backend/native provenance and a freshly built Go control. The 300/sec ten-second smoke completes all 3,000 requests; this qualifies the fixture, not sustained capacity. Use this cohort for the incoming-request URL optimization.
+
 - Review the complete Serve path with fresh native samples/allocation callers and primary GC/library research, without assuming collection dominates HTTP cost. Identify redundant incoming URL construction/parsing and separate HTTP/Task, allocation, metadata, scheduling and collector candidates. The cohort audit finds the retained guest predates current ArrayQueue/managed improvements: qualify the native-only comparison accordingly and require a fresh cohort before current-runtime performance claims. No new speedup is claimed.
 
 - Compare the applying concurrent GC experiment with paced synchronous Serve and Go at fixed HTTP arrival rates, retaining initial and targeted confirmation runs. Concurrent GC costs about 23–24% more CPU per completion without a throughput win; both neoCLR modes show 300 req/s variation, and generator-lag failures remain explicit. Record coarse CPU peaks, live reclamation and full raw evidence; keep production defaults unchanged.
