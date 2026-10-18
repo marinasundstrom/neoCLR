@@ -252,3 +252,17 @@ The expanded split-free-span/tail regression and existing UBSan/bounds suite pas
 [qualification](import-results.json) and the [paired performance evidence](../../../benchmarks/gc-concurrent-poc/README.md#single-mark-import-walk-2026-10-18).
 Mark-import time roughly halves on the larger graph; overall elapsed gains are
 small and concurrent GC still trails sync. This remains an isolated bounded POC.
+
+
+### Combined validation walk
+
+Validate live integrity and captured identity together, with explicit bounds for
+subdivided free spans and full appended-tail validation. All validation still
+precedes mark mutation. Five new corrupt-live-state cases reject without changing
+heap bytes or GC statistics, then restore the injected corruption and drain the
+heap. [Fresh qualification](validation-results.json) passes 324 applied cycles,
+15 discards and 249,024 reclaimed payload bytes, including existing graph oracles.
+[Paired measurements](../../../benchmarks/gc-concurrent-poc/README.md#combined-validation-walk-2026-10-18)
+show validation near half its former cost and lower owner interruption. Large-graph
+elapsed approaches sync, but CPU remains higher and the small graph remains slower.
+No production integration or general safety/performance claim follows.

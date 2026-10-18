@@ -143,6 +143,7 @@ with owner-side reclamation, stale-result rejection and exactly-once resource cl
 It is not selectable in installed runtimes. The first local matched comparison is
 slower and uses more CPU than synchronous GC on the tested small stable graph; this
 is not an HTTP capacity result. A follow-up removes redundant snapshot initialization,
-and combines mark import into one walk, reducing owner interruption in a local
-larger-graph test. Concurrent GC still trails synchronous GC overall. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
+and combines mark import and validation walks, reducing owner interruption in local
+tests. Larger-graph elapsed approaches synchronous GC, but CPU use remains higher
+and smaller graphs still run slower. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
 See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).

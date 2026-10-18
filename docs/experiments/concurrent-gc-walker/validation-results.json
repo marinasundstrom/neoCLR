@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "productionReady": false,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=undefined,bounds",
+        "-I",
+        "/Users/robert/Projects/neoclr/target/gc-validation-qualified",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+        "/Users/robert/Projects/neoclr/target/gc-validation-qualified/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-validation-qualified/test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-validation-qualified/test"
+      ],
+      "exitCode": 0,
+      "stdout": "MIDWALK: reference transfer/allocation after 63 scanned objects; reclamation and eventual empty heap passed\nPOC applied=324 discarded=15 reclaimedPayloadBytes=249024\nRECLAMATION: live bytes freed; 100 graph/oracle survivor and byte-count comparisons; stale/error/cancel rejection; floating garbage, free-span allocation and parked expiry passed\nCOUNTEREXAMPLE: conditional host read rescues a snapshot-white value without allocation or collection\nCOUNTEREXAMPLE: parked resume makes a snapshot-white value a strong root without allocation or collection\nCOUNTEREXAMPLE: collection/reallocation reuses an address and descriptor shape for a live replacement\nParked roots: three guarded oracle cases, expiry and capacity rejection passed\n101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation passed\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+    "/Users/robert/Projects/neoclr/target/gc-validation-qualified/native-gc.c": "5c064455517b0b9b2a0f6ba5c7b5f7f24b1eca6f5a76f4214705caf47d97a723",
+    "/Users/robert/Projects/neoclr/target/gc-validation-qualified/root-probe.c": "8b7786c625060620f43d4acced42238e168c8678dd4d6c74a05153a07cd27840",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/snapshot.inc": "87376cb81d32c81cad08ec24fd32d07a11213c67cb61737a2c0e52e55123b635",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c": "268c176aaf9d95247347fc9683e2df5293619eb1695e5f171266a784ead41a8a",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/parked-tests.inc": "62a967786f51878c7f927caccf8a538d23c2fd7cc1696ddd70146bd4f7811ae0",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/publication-tests.inc": "04ec37ae21f32f668d994ea670544411b895af54ad1b8a1c60df9af510053d11",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim.inc": "fa3b7db1496d650dcd51c6d29328f83901fe2460f619b9c275fde20674f1bcf7",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim-tests.inc": "5d6777b1b9352931c8b702557aa052f8e57e025787dd41c80a4de007591e37d9",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/run.py": "0662f6d11d9d9ce01dee4e901f63c47df124c031b22e3c74ef26c985a7d42d9a",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c": "b3120e46741e7a8e5fc253f9cbb08eb0f6c309b1f098e0717eabe8c13ab58280",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a"
+  }
+}

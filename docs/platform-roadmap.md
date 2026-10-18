@@ -5288,3 +5288,12 @@ reclamation checks; larger-graph owner interruption falls about 12%, with only s
 elapsed gains and no sync crossover. [Paired evidence](../benchmarks/gc-concurrent-poc/README.md#single-mark-import-walk-2026-10-18)
 retains variable diagnostic runs. Next investigate merging validation walks while
 preserving rejection before mutation. This does not change production GC selection.
+
+
+**Validation walk follow-up (2026-10-18):** combined integrity/identity validation
+retains rejection before mutation and adds corrupt-tail/free-span boundary tests.
+[Paired evidence](../benchmarks/gc-concurrent-poc/README.md#combined-validation-walk-2026-10-18)
+shows another 14–17% reduction in larger-graph owner interruption. Elapsed approaches
+sync on that stable graph while CPU remains higher; small graphs still lose.
+Next evaluate cadence and graph/root mutation, including invalidation, before any
+Serve extrapolation. Production collector selection and integration are unchanged.

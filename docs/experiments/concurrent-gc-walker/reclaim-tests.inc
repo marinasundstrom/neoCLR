@@ -260,7 +260,50 @@ static void midwalk_progress(void) {
     neoclr_probe_leave_v1(&frame);
     puts("MIDWALK: reference transfer/allocation after 63 scanned objects; reclamation and eventual empty heap passed");
 }
+/* Corrupt the live heap without advancing the epoch to exercise validation,
+ * including a valid captured prefix followed by an invalid appended block. */
+static void rejected_live_descriptor(unsigned event) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *a = allocate(&c, 8, NEOCLR_GC_BYTES);
+    void *hole = allocate(&c, 256, NEOCLR_GC_BYTES);
+    void *b = allocate(&c, 8, NEOCLR_GC_BYTES);
+    uint64_t roots[2] = {(uintptr_t)a, (uintptr_t)b};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &empty_storage, 0, "{}", 2);
+    neoclr_probe_stack_roots_v2(&frame, 0, roots, 2, "requiredSpillLanes", 18);
+    assert(!neoclr_gc_collect_v1(&c, &frame));
+    collection_cycle cycle;
+    assert(cycle_init(&cycle) && cycle_start(&cycle, &c));
+    void *fresh = allocate(&c, 16, NEOCLR_GC_BYTES);
+    assert(fresh == hole);
+    void *tail = allocate(&c, 512, NEOCLR_GC_BYTES);
+    unsigned char intact[sizeof(heap)], before[sizeof(heap)];
+    memcpy(intact, heap, sizeof(heap));
+    uint64_t used = c.text.used;
+    switch (event) {
+    case 0: ((block *)tail - 1)->span = 1; break;
+    case 1: ((block *)b - 1)->bytes = 2; break;
+    case 2: ((block *)a - 1)->state = ALLOCATED | MARKED; break;
+    case 3: ((block *)fresh - 1)->span = 328; break; /* Cross old free span. */
+    case 4: c.text.used = c.text.capacity + 8; break;
+    default: abort();
+    }
+    memcpy(before, heap, sizeof(heap));
+    neoclr_gc_statistics stats = statistics;
+    atomic_store(&cycle.job->proceed, true);
+    assert(cycle_poll(&cycle, true, false) == CYCLE_DISCARDED);
+    assert(!memcmp(before, heap, sizeof(heap)));
+    assert(!memcmp(&stats, &statistics, sizeof(stats)));
+    memcpy(heap, intact, sizeof(heap));
+    c.text.used = used;
+    neoclr_probe_leave_v1(&frame);
+    cycle_run(&cycle, &c);
+    assert(!c.text.used);
+    cycle_destroy(&cycle);
+}
 static void reclamation_tests(void) {
+    for (unsigned event = 0; event < 5; event++) rejected_live_descriptor(event);
     midwalk_progress();
     destroy_outstanding();
     live_reclamation();

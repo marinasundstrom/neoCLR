@@ -35,18 +35,33 @@ static bool cycle_apply(collection_cycle *cycle) {
     neoclr_aot_context *context = cycle->context;
     if (cycle->epoch != experiment_epoch) return false;
     neoclr_aot_text_arena *a = &context->text;
-    if ((uintptr_t)a->data != s->source || a->used < s->copy.text.used || !blocks_valid(a)) return false;
-    /* Verify original allocated descriptors before changing any live state.
-     * An intervening collection/teardown is rejected by the epoch even if its
-     * replacement objects have identical descriptors at identical addresses. */
-    for (uint64_t at = 0; at < s->copy.text.used;) {
-        const block *old = (const void *)(s->copy.text.data + at);
+    if ((uintptr_t)a->data != s->source || a->used < s->copy.text.used || !valid(a)) return false;
+    /* Validate live integrity and captured identities in one read-only walk.
+     * A matching prefix must never hide a corrupt tail. Epoch rejection still
+     * protects against same-address replacements with identical descriptors. */
+    uint64_t checked = 0;
+    while (checked < s->copy.text.used) {
+        const block *old = (const void *)(s->copy.text.data + checked);
+        uint64_t end = checked + old->span;
         if (old->state & ALLOCATED) {
-            const block *live = (const void *)(a->data + at);
+            if (!block_valid(a, checked)) return false;
+            const block *live = (const void *)(a->data + checked);
             if (live->span != old->span || live->bytes != old->bytes ||
                 live->kind != old->kind || live->state != ALLOCATED) return false;
+            checked = end;
+        } else {
+            /* New blocks may subdivide, but cannot cross, a captured free span. */
+            while (checked < end) {
+                if (!block_valid(a, checked)) return false;
+                const block *live = (const void *)(a->data + checked);
+                if (live->span > end - checked) return false;
+                checked += live->span;
+            }
         }
-        at += old->span;
+    }
+    while (checked < a->used) {
+        if (!block_valid(a, checked)) return false;
+        checked += ((const block *)(const void *)(a->data + checked))->span;
     }
     RECLAIM_PHASE(2); /* Validation complete, no live state changed yet. */
     /* Import captured marks once. Allocations in captured free spans and the

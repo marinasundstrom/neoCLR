@@ -217,3 +217,59 @@ or tests. The next measured owner cost is validation's separate heap-integrity a
 captured-descriptor walks. Investigate combining those without weakening rejection
 before mutation; do not infer that worker wait is negligible for other workloads.
 Production GC and Serve/Go capacity remain unchanged and unmeasured by this slice.
+
+## Combined validation walk (2026-10-18)
+
+Validate live block integrity and captured allocation identity in one read-only
+walk. Captured free spans may contain multiple new blocks, but none may cross the
+captured span boundary. Check the entire appended tail too. Only after all checks
+succeed does import change any live marks. Epoch rejection remains unchanged.
+This preserves the existing reachability/cleanup contract and introduces no .NET
+API divergence; production collector code is untouched.
+
+Fresh UBSan/bounds qualification records 324 applied cycles, 15 rejected results
+and 249,024 reclaimed payload bytes. Five new live-corruption regressions cover an
+invalid appended descriptor, valid-but-changed captured payload size, changed mark
+state, a new block crossing a captured free-span boundary, and used size exceeding
+capacity. Every rejection preserves heap bytes and all GC statistics. Restore the
+injected corruption and prove later complete reclamation. Existing split-span/tail
+retention, guarded snapshots, graph oracles and transition invalidation checks pass.
+
+Uninstrumented paired means, milliseconds (two trials per version/mode/workload):
+
+| Live objects / batches | Scalar iterations | Baseline concurrent elapsed | Candidate concurrent elapsed | Candidate sync elapsed | Baseline owner interruption | Candidate owner interruption | Candidate sync interruption |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4096 / 2000 | 0 | 1453.13 | 1429.44 | 1424.70 | 115.64 | 99.69 | 115.62 |
+| 4096 / 2000 | 50,000 | 1546.69 | 1529.49 | 1528.17 | 114.95 | 95.44 | 115.59 |
+| 512 / 10000 | 0 | 1080.96 | 1069.38 | 916.36 | 143.76 | 131.74 | 79.94 |
+| 512 / 10000 | 50,000 | 1579.05 | 1577.85 | 1414.58 | 139.58 | 133.92 | 79.34 |
+
+For the larger graph, owner interruption falls 13.8%/17.0%, elapsed 1.6%/1.1%
+and process CPU 1.7%/1.0% relative to the previous concurrent POC. Concurrent elapsed
+is within 0.3% of candidate sync here, but process CPU remains 7.7%/7.3% higher
+(1533.95/1637.89 ms versus 1423.73/1526.76 ms). Total owner interruption is now
+lower than sync on this supported workload; sums of two interruptions per batch
+are not a guarantee about individual or HTTP tail latency.
+
+For the small graph, elapsed gains are 1.1%/0.1%, with concurrent still 16.7%/11.5%
+slower than sync. These short uncontrolled-host runs do not establish a general
+concurrent-GC advantage or a sustained server capacity. Sync controls also vary.
+
+Paired phase diagnostics show validation at 20.71–20.78 ms in three candidate
+trials versus 40.39–40.63 ms in three baseline trials. Retain the fourth trial of
+each: candidate validation 24.29 ms, baseline 44.44 ms, with increased wait and
+other phase costs. One candidate diagnostic takes 1566 ms versus its 1422 ms repeat;
+a baseline diagnostic takes 1634 ms versus 1550 ms. Do not selectively discard
+these or substitute instrumented elapsed for the uninstrumented comparison above.
+Import and sweep are each roughly 20 ms in the cleaner diagnostic trials.
+
+Raw evidence: [large graph](validation-large.json), [small graph](validation-small.json),
+[phase comparison](validation-phases.json), [qualification](../../docs/experiments/concurrent-gc-walker/validation-results.json).
+All checksums, work and collection counts match within each workload; final
+reclamation succeeds. Timed trials did not overlap our builds or tests. Existing
+ASan/ThreadSanitizer startup limitations remain; UBSan/bounds is not race detection.
+
+The next useful evaluation is varying collection cadence and graph/root mutation,
+including invalidated cycles, before extrapolating this stable chain to Serve.
+The repeated owner walks are reduced; capture copying, allocation searches while
+garbage awaits reclamation, and invalidation/fallback costs remain relevant.
