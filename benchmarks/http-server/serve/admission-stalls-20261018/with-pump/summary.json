@@ -1,0 +1,1978 @@
+{
+  "outcomes": {
+    "ok": 5611,
+    "generator_inflight_limit": 2389
+  },
+  "clockDriftNs": -3000,
+  "dropped": 0,
+  "totalsIncludingStartup": [
+    {
+      "kind": 0,
+      "calls": 286002,
+      "wallNs": 5600117000,
+      "cpuNs": 4688529361,
+      "maxNs": 4802000
+    },
+    {
+      "kind": 1,
+      "calls": 1518,
+      "wallNs": 2227099000,
+      "cpuNs": 10819514,
+      "maxNs": 2912000
+    },
+    {
+      "kind": 2,
+      "calls": 24074,
+      "wallNs": 442912000,
+      "cpuNs": 377378708,
+      "maxNs": 6482000
+    }
+  ],
+  "measurementWaitCalls": 2,
+  "measurementWaitSeconds": 0.0029769999999999996,
+  "longestIntervals": [
+    {
+      "startSeconds": 10.215183973312378,
+      "wallSeconds": 0.006482,
+      "cpuSeconds": 0.0001135,
+      "kind": 2,
+      "status": 1
+    },
+    {
+      "startSeconds": 3.5106008052825928,
+      "wallSeconds": 0.004802,
+      "cpuSeconds": 6.9084e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 3.8059849739074707,
+      "wallSeconds": 0.004297,
+      "cpuSeconds": 9.2875e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 3.825331926345825,
+      "wallSeconds": 0.002699,
+      "cpuSeconds": 4.3875e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 3.894361972808838,
+      "wallSeconds": 0.002454,
+      "cpuSeconds": 8.1375e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 13.588727951049805,
+      "wallSeconds": 0.002085,
+      "cpuSeconds": 7.6458e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 16.051820039749146,
+      "wallSeconds": 0.001814,
+      "cpuSeconds": 6.0041e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 15.018625974655151,
+      "wallSeconds": 0.001793,
+      "cpuSeconds": 6.4375e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 10.193301916122437,
+      "wallSeconds": 0.001724,
+      "cpuSeconds": 4.1583e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 1.6663777828216553,
+      "wallSeconds": 0.001583,
+      "cpuSeconds": 3e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 3.8999109268188477,
+      "wallSeconds": 0.001582,
+      "cpuSeconds": 8.5041e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 0.0013589859008789062,
+      "wallSeconds": 0.001504,
+      "cpuSeconds": 4.334e-06,
+      "kind": 1,
+      "status": 1
+    },
+    {
+      "startSeconds": 0.0028908252716064453,
+      "wallSeconds": 0.001473,
+      "cpuSeconds": 4.333e-06,
+      "kind": 1,
+      "status": 1
+    },
+    {
+      "startSeconds": 13.666831016540527,
+      "wallSeconds": 0.001466,
+      "cpuSeconds": 5.5334e-05,
+      "kind": 2,
+      "status": 1
+    },
+    {
+      "startSeconds": 1.9348218441009521,
+      "wallSeconds": 0.001351,
+      "cpuSeconds": 3.1334e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 2.850768804550171,
+      "wallSeconds": 0.001286,
+      "cpuSeconds": 3.5875e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 15.161699056625366,
+      "wallSeconds": 0.001259,
+      "cpuSeconds": 6.6583e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 3.5058059692382812,
+      "wallSeconds": 0.001166,
+      "cpuSeconds": 5.8542e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 14.819308042526245,
+      "wallSeconds": 0.001126,
+      "cpuSeconds": 7.1e-05,
+      "kind": 0,
+      "status": 0
+    },
+    {
+      "startSeconds": 13.992756843566895,
+      "wallSeconds": 0.001074,
+      "cpuSeconds": 6.8459e-05,
+      "kind": 0,
+      "status": 0
+    }
+  ],
+  "bins": [
+    {
+      "startSeconds": 0.0,
+      "offered": 40,
+      "misses": 0,
+      "maxDispatchLagSeconds": 0.0036735000000001072,
+      "maxOfferedLatencySeconds": 0.04838741699999982,
+      "tracedGcOverlapSeconds": 0.0017580000000000182,
+      "tracedWaitOverlapSeconds": 0.004297880950927735
+    },
+    {
+      "startSeconds": 0.1,
+      "offered": 40,
+      "misses": 0,
+      "maxDispatchLagSeconds": 0.0012132080000002432,
+      "maxOfferedLatencySeconds": 0.1067554580000003,
+      "tracedGcOverlapSeconds": 0.0022349999999999454,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.2,
+      "offered": 41,
+      "misses": 0,
+      "maxDispatchLagSeconds": 0.0008713330000000852,
+      "maxOfferedLatencySeconds": 0.16926670800000032,
+      "tracedGcOverlapSeconds": 0.003661000000000053,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.3,
+      "offered": 40,
+      "misses": 0,
+      "maxDispatchLagSeconds": 0.001232333000000363,
+      "maxOfferedLatencySeconds": 0.22468858300000027,
+      "tracedGcOverlapSeconds": 0.002916999999999892,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.4,
+      "offered": 39,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0025622500000004322,
+      "maxOfferedLatencySeconds": 0.2484356670000003,
+      "tracedGcOverlapSeconds": 0.004027000000000114,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.5,
+      "offered": 40,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.002110750000000383,
+      "maxOfferedLatencySeconds": 0.2511465420000003,
+      "tracedGcOverlapSeconds": 0.0035330000000000084,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.6,
+      "offered": 41,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0010362079999999274,
+      "maxOfferedLatencySeconds": 0.24833745799999996,
+      "tracedGcOverlapSeconds": 0.0032010000000001204,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.7,
+      "offered": 39,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0012428749999999766,
+      "maxOfferedLatencySeconds": 0.24883020800000022,
+      "tracedGcOverlapSeconds": 0.00584399999999996,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.8,
+      "offered": 41,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0015682500000000488,
+      "maxOfferedLatencySeconds": 0.24344295800000015,
+      "tracedGcOverlapSeconds": 0.0031000000000001027,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 0.9,
+      "offered": 39,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.001291582999999985,
+      "maxOfferedLatencySeconds": 0.2396194170000001,
+      "tracedGcOverlapSeconds": 0.0026240000000001817,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.0,
+      "offered": 40,
+      "misses": 13,
+      "maxDispatchLagSeconds": 0.0011930420000005881,
+      "maxOfferedLatencySeconds": 0.2369385829999997,
+      "tracedGcOverlapSeconds": 0.004462000000000632,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.1,
+      "offered": 41,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.0014606670000003596,
+      "maxOfferedLatencySeconds": 0.23585345800000024,
+      "tracedGcOverlapSeconds": 0.003421999999999814,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.2,
+      "offered": 39,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0014537500000000314,
+      "maxOfferedLatencySeconds": 0.2380612919999998,
+      "tracedGcOverlapSeconds": 0.00477499999999953,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.3,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.001056083000000374,
+      "maxOfferedLatencySeconds": 0.24334999999999996,
+      "tracedGcOverlapSeconds": 0.004417999999999367,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.4,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.0009759579999997214,
+      "maxOfferedLatencySeconds": 0.25839116700000053,
+      "tracedGcOverlapSeconds": 0.0025180000000000202,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.5,
+      "offered": 40,
+      "misses": 16,
+      "maxDispatchLagSeconds": 0.0018466249999997686,
+      "maxOfferedLatencySeconds": 0.25334945800000064,
+      "tracedGcOverlapSeconds": 0.004334999999999978,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.6,
+      "offered": 41,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0028055419999999387,
+      "maxOfferedLatencySeconds": 0.2524727499999999,
+      "tracedGcOverlapSeconds": 0.008223000000000535,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.7,
+      "offered": 39,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.002153208000000184,
+      "maxOfferedLatencySeconds": 0.2517843330000007,
+      "tracedGcOverlapSeconds": 0.004322999999999855,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.8,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.002605625000000167,
+      "maxOfferedLatencySeconds": 0.2494372079999998,
+      "tracedGcOverlapSeconds": 0.004286999999999486,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 1.9,
+      "offered": 40,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0024001250000003083,
+      "maxOfferedLatencySeconds": 0.23835937499999993,
+      "tracedGcOverlapSeconds": 0.003509999999999902,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.0,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.00160920799999964,
+      "maxOfferedLatencySeconds": 0.22686512499999978,
+      "tracedGcOverlapSeconds": 0.002932000000000823,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.1,
+      "offered": 41,
+      "misses": 13,
+      "maxDispatchLagSeconds": 0.002135500000000512,
+      "maxOfferedLatencySeconds": 0.21975750000000005,
+      "tracedGcOverlapSeconds": 0.003826000000000551,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.2,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0010636249999995684,
+      "maxOfferedLatencySeconds": 0.21319333300000043,
+      "tracedGcOverlapSeconds": 0.00241600000000064,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.3,
+      "offered": 39,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0011515830000004001,
+      "maxOfferedLatencySeconds": 0.23561045800000002,
+      "tracedGcOverlapSeconds": 0.0017480000000000828,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.4,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.001047500000000312,
+      "maxOfferedLatencySeconds": 0.25928537500000015,
+      "tracedGcOverlapSeconds": 0.0024239999999999817,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.5,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0023167080000003892,
+      "maxOfferedLatencySeconds": 0.2629419999999998,
+      "tracedGcOverlapSeconds": 0.0035240000000000826,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.6,
+      "offered": 41,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0026937920000005278,
+      "maxOfferedLatencySeconds": 0.26607533300000075,
+      "tracedGcOverlapSeconds": 0.005671999999999677,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.7,
+      "offered": 40,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0025295830000002795,
+      "maxOfferedLatencySeconds": 0.29504366700000073,
+      "tracedGcOverlapSeconds": 0.004053999999999558,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.8,
+      "offered": 39,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.002652125000000005,
+      "maxOfferedLatencySeconds": 0.3160445000000003,
+      "tracedGcOverlapSeconds": 0.00633099999999942,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 2.9,
+      "offered": 40,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0022086250000006302,
+      "maxOfferedLatencySeconds": 0.31395016700000067,
+      "tracedGcOverlapSeconds": 0.0071830000000003835,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.0,
+      "offered": 40,
+      "misses": 20,
+      "maxDispatchLagSeconds": 0.0031613749999994667,
+      "maxOfferedLatencySeconds": 0.30683350000000065,
+      "tracedGcOverlapSeconds": 0.006563999999998682,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.1,
+      "offered": 41,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.002023667000000451,
+      "maxOfferedLatencySeconds": 0.3248477920000008,
+      "tracedGcOverlapSeconds": 0.004294000000000242,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.2,
+      "offered": 40,
+      "misses": 18,
+      "maxDispatchLagSeconds": 0.0019308750000002206,
+      "maxOfferedLatencySeconds": 0.3318761669999999,
+      "tracedGcOverlapSeconds": 0.00602199999999975,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.3,
+      "offered": 39,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.0020095000000006635,
+      "maxOfferedLatencySeconds": 0.3286045420000008,
+      "tracedGcOverlapSeconds": 0.006841000000000541,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.4,
+      "offered": 40,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.002148792000000732,
+      "maxOfferedLatencySeconds": 0.32298870800000046,
+      "tracedGcOverlapSeconds": 0.00964899999999913,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.5,
+      "offered": 40,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.011207749999999628,
+      "maxOfferedLatencySeconds": 0.3245087920000005,
+      "tracedGcOverlapSeconds": 0.012416999999999678,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.6,
+      "offered": 41,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0013492500000005236,
+      "maxOfferedLatencySeconds": 0.3227705830000005,
+      "tracedGcOverlapSeconds": 0.0033689999999997333,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.7,
+      "offered": 40,
+      "misses": 16,
+      "maxDispatchLagSeconds": 0.0009184170000002823,
+      "maxOfferedLatencySeconds": 0.3039636250000006,
+      "tracedGcOverlapSeconds": 0.002089999999999481,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.8,
+      "offered": 39,
+      "misses": 27,
+      "maxDispatchLagSeconds": 0.009755125000000753,
+      "maxOfferedLatencySeconds": 0.30324454199999984,
+      "tracedGcOverlapSeconds": 0.019485073181153112,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 3.9,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.00758729200000019,
+      "maxOfferedLatencySeconds": 0.25030383300000025,
+      "tracedGcOverlapSeconds": 0.003756926818847983,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.0,
+      "offered": 40,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.003070583000000404,
+      "maxOfferedLatencySeconds": 0.2738362080000005,
+      "tracedGcOverlapSeconds": 0.0019279999999994857,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.1,
+      "offered": 41,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0010656670000006585,
+      "maxOfferedLatencySeconds": 0.2723355000000005,
+      "tracedGcOverlapSeconds": 0.0011039999999997718,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.2,
+      "offered": 40,
+      "misses": 18,
+      "maxDispatchLagSeconds": 0.023654625000000706,
+      "maxOfferedLatencySeconds": 0.26917349999999995,
+      "tracedGcOverlapSeconds": 0.0017810000000002546,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.3,
+      "offered": 39,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.005596041999999635,
+      "maxOfferedLatencySeconds": 0.2374912500000006,
+      "tracedGcOverlapSeconds": 0.0033210000000014617,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.4,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.0009332919999991418,
+      "maxOfferedLatencySeconds": 0.22807483299999998,
+      "tracedGcOverlapSeconds": 0.0015239999999998588,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.5,
+      "offered": 40,
+      "misses": 13,
+      "maxDispatchLagSeconds": 0.0031203330000000307,
+      "maxOfferedLatencySeconds": 0.2184336249999994,
+      "tracedGcOverlapSeconds": 0.003336000000000894,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.6,
+      "offered": 41,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.00218562500000008,
+      "maxOfferedLatencySeconds": 0.20197820800000077,
+      "tracedGcOverlapSeconds": 0.0022759999999992786,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.7,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0008126670000008218,
+      "maxOfferedLatencySeconds": 0.19280258299999975,
+      "tracedGcOverlapSeconds": 0.0017269999999980357,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.8,
+      "offered": 39,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0007482920000008164,
+      "maxOfferedLatencySeconds": 0.19016604200000042,
+      "tracedGcOverlapSeconds": 0.001058999999998811,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 4.9,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0008429579999997827,
+      "maxOfferedLatencySeconds": 0.19186595800000017,
+      "tracedGcOverlapSeconds": 0.0009969999999999146,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.0,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0007772500000005067,
+      "maxOfferedLatencySeconds": 0.1872453330000008,
+      "tracedGcOverlapSeconds": 0.0014460000000005024,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.1,
+      "offered": 41,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0014362500000002498,
+      "maxOfferedLatencySeconds": 0.18883062500000136,
+      "tracedGcOverlapSeconds": 0.0010689999999993205,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.2,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.0009376670000005305,
+      "maxOfferedLatencySeconds": 0.1895846669999992,
+      "tracedGcOverlapSeconds": 0.0013760000000013761,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.3,
+      "offered": 39,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.000914458000000451,
+      "maxOfferedLatencySeconds": 0.18929950000000062,
+      "tracedGcOverlapSeconds": 0.0014910000000005752,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.4,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0007601669999992566,
+      "maxOfferedLatencySeconds": 0.19573387500000017,
+      "tracedGcOverlapSeconds": 0.0011019999999994923,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.5,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.000747667000000618,
+      "maxOfferedLatencySeconds": 0.1966845829999997,
+      "tracedGcOverlapSeconds": 0.0015319999999983125,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.6,
+      "offered": 41,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0022655000000000314,
+      "maxOfferedLatencySeconds": 0.20298666700000112,
+      "tracedGcOverlapSeconds": 0.002091000000000953,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.7,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.000870708000000775,
+      "maxOfferedLatencySeconds": 0.21168783300000094,
+      "tracedGcOverlapSeconds": 0.00167899999999932,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.8,
+      "offered": 39,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0034146249999995604,
+      "maxOfferedLatencySeconds": 0.2145242500000002,
+      "tracedGcOverlapSeconds": 0.0017129999999996315,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 5.9,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0007877500000006421,
+      "maxOfferedLatencySeconds": 0.2148227079999998,
+      "tracedGcOverlapSeconds": 0.0014449999999994745,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.0,
+      "offered": 40,
+      "misses": 11,
+      "maxDispatchLagSeconds": 0.0007839579999995294,
+      "maxOfferedLatencySeconds": 0.216916874999999,
+      "tracedGcOverlapSeconds": 0.002744000000000746,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.1,
+      "offered": 41,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0021418749999995157,
+      "maxOfferedLatencySeconds": 0.20750016700000096,
+      "tracedGcOverlapSeconds": 0.0008479999999986276,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.2,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0008159580000004496,
+      "maxOfferedLatencySeconds": 0.19838999999999984,
+      "tracedGcOverlapSeconds": 0.002409999999999357,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.3,
+      "offered": 39,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.0010147919999994315,
+      "maxOfferedLatencySeconds": 0.19253941700000077,
+      "tracedGcOverlapSeconds": 0.0018200000000003769,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.4,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.0008169169999998616,
+      "maxOfferedLatencySeconds": 0.19478470799999847,
+      "tracedGcOverlapSeconds": 0.001512000000000846,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.5,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0006893330000004028,
+      "maxOfferedLatencySeconds": 0.19540779199999925,
+      "tracedGcOverlapSeconds": 0.001098999999999073,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.6,
+      "offered": 41,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0014702500000005614,
+      "maxOfferedLatencySeconds": 0.19426912499999993,
+      "tracedGcOverlapSeconds": 0.002098999999999407,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.7,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0008002920000009794,
+      "maxOfferedLatencySeconds": 0.19394741699999862,
+      "tracedGcOverlapSeconds": 0.0012790000000002522,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.8,
+      "offered": 39,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0008917079999992694,
+      "maxOfferedLatencySeconds": 0.1941512079999992,
+      "tracedGcOverlapSeconds": 0.0018889999999993634,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 6.9,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0007192919999994274,
+      "maxOfferedLatencySeconds": 0.19176404200000086,
+      "tracedGcOverlapSeconds": 0.0014490000000000336,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.0,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0007985420000000687,
+      "maxOfferedLatencySeconds": 0.18223758300000092,
+      "tracedGcOverlapSeconds": 0.0011700000000001154,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.1,
+      "offered": 41,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0018003750000001872,
+      "maxOfferedLatencySeconds": 0.18291445800000083,
+      "tracedGcOverlapSeconds": 0.0010859999999999204,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.2,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0009239999999994808,
+      "maxOfferedLatencySeconds": 0.18137841699999946,
+      "tracedGcOverlapSeconds": 0.002086999999999506,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.3,
+      "offered": 39,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0008160420000002944,
+      "maxOfferedLatencySeconds": 0.17726820800000098,
+      "tracedGcOverlapSeconds": 0.001113999999998505,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.4,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0007210000000004158,
+      "maxOfferedLatencySeconds": 0.18137404199999985,
+      "tracedGcOverlapSeconds": 0.0019079999999993547,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.5,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.000835249999999732,
+      "maxOfferedLatencySeconds": 0.1781657499999998,
+      "tracedGcOverlapSeconds": 0.0013289999999983593,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.6,
+      "offered": 41,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0030953750000008995,
+      "maxOfferedLatencySeconds": 0.1753595420000007,
+      "tracedGcOverlapSeconds": 0.0010940000000001504,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.7,
+      "offered": 40,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0007251250000006593,
+      "maxOfferedLatencySeconds": 0.17732662499999918,
+      "tracedGcOverlapSeconds": 0.0017089999999990724,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.8,
+      "offered": 39,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0007077080000001956,
+      "maxOfferedLatencySeconds": 0.17771433299999906,
+      "tracedGcOverlapSeconds": 0.0012590000000010093,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 7.9,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0007996249999990823,
+      "maxOfferedLatencySeconds": 0.17854179200000075,
+      "tracedGcOverlapSeconds": 0.001624000000000514,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.0,
+      "offered": 40,
+      "misses": 2,
+      "maxDispatchLagSeconds": 0.0007173329999989875,
+      "maxOfferedLatencySeconds": 0.17668258299999984,
+      "tracedGcOverlapSeconds": 0.0009750000000021686,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.1,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0019929580000006553,
+      "maxOfferedLatencySeconds": 0.17382799999999854,
+      "tracedGcOverlapSeconds": 0.0006839999999996849,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.2,
+      "offered": 40,
+      "misses": 2,
+      "maxDispatchLagSeconds": 0.0006909170000000131,
+      "maxOfferedLatencySeconds": 0.17308374999999998,
+      "tracedGcOverlapSeconds": 0.001084000000000529,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.3,
+      "offered": 40,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0007180830000006466,
+      "maxOfferedLatencySeconds": 0.17430245799999966,
+      "tracedGcOverlapSeconds": 0.0010469999999980217,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.4,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0007644579999990242,
+      "maxOfferedLatencySeconds": 0.17606866699999912,
+      "tracedGcOverlapSeconds": 0.0017769999999988073,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.5,
+      "offered": 40,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0007863750000005609,
+      "maxOfferedLatencySeconds": 0.17494624999999964,
+      "tracedGcOverlapSeconds": 0.001915000000000333,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.6,
+      "offered": 40,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0019570000000008747,
+      "maxOfferedLatencySeconds": 0.18337899999999863,
+      "tracedGcOverlapSeconds": 0.0012139999999991602,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.7,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0007709169999987608,
+      "maxOfferedLatencySeconds": 0.18870370800000025,
+      "tracedGcOverlapSeconds": 0.0013359999999984495,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.8,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.0009012500000000756,
+      "maxOfferedLatencySeconds": 0.18669833299999894,
+      "tracedGcOverlapSeconds": 0.001388000000000389,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 8.9,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0008757920000004304,
+      "maxOfferedLatencySeconds": 0.18355999999999995,
+      "tracedGcOverlapSeconds": 0.0023069999999982826,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.0,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0006361669999996877,
+      "maxOfferedLatencySeconds": 0.19708412499999994,
+      "tracedGcOverlapSeconds": 0.0015750000000025466,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.1,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.0014627919999998795,
+      "maxOfferedLatencySeconds": 0.201354499999999,
+      "tracedGcOverlapSeconds": 0.001210999999999629,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.2,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.000869207999999233,
+      "maxOfferedLatencySeconds": 0.20947137500000146,
+      "tracedGcOverlapSeconds": 0.0012609999999995125,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.3,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0007195830000004122,
+      "maxOfferedLatencySeconds": 0.2016097919999993,
+      "tracedGcOverlapSeconds": 0.0016020000000018797,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.4,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.009009416999999686,
+      "maxOfferedLatencySeconds": 0.19072387499999977,
+      "tracedGcOverlapSeconds": 0.0019729999999995584,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.5,
+      "offered": 40,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.000738416999999103,
+      "maxOfferedLatencySeconds": 0.1813446669999994,
+      "tracedGcOverlapSeconds": 0.0006900000000005235,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.6,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0015824579999996757,
+      "maxOfferedLatencySeconds": 0.18062674999999828,
+      "tracedGcOverlapSeconds": 0.0018079999999986995,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.7,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0009376670000005305,
+      "maxOfferedLatencySeconds": 0.1771502500000004,
+      "tracedGcOverlapSeconds": 0.0014500000000001734,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.8,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.00100479199999981,
+      "maxOfferedLatencySeconds": 0.1793977919999996,
+      "tracedGcOverlapSeconds": 0.0010750000000019355,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 9.9,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0007583750000001999,
+      "maxOfferedLatencySeconds": 0.17996370799999895,
+      "tracedGcOverlapSeconds": 0.0015029999999978116,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.0,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0007790419999995635,
+      "maxOfferedLatencySeconds": 0.22172229200000082,
+      "tracedGcOverlapSeconds": 0.0007880000000000109,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.1,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0043490419999994145,
+      "maxOfferedLatencySeconds": 0.2218632920000001,
+      "tracedGcOverlapSeconds": 0.0037599999999997635,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.2,
+      "offered": 40,
+      "misses": 16,
+      "maxDispatchLagSeconds": 0.010143874999998914,
+      "maxOfferedLatencySeconds": 0.21059966700000032,
+      "tracedGcOverlapSeconds": 0.003498000000000445,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.3,
+      "offered": 40,
+      "misses": 4,
+      "maxDispatchLagSeconds": 0.0007750830000006204,
+      "maxOfferedLatencySeconds": 0.18097037500000113,
+      "tracedGcOverlapSeconds": 0.00134999999999863,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.4,
+      "offered": 40,
+      "misses": 3,
+      "maxDispatchLagSeconds": 0.0009293750000001211,
+      "maxOfferedLatencySeconds": 0.2210907500000001,
+      "tracedGcOverlapSeconds": 0.0009770000000006718,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.5,
+      "offered": 40,
+      "misses": 6,
+      "maxDispatchLagSeconds": 0.002078416999999888,
+      "maxOfferedLatencySeconds": 0.22692841699999988,
+      "tracedGcOverlapSeconds": 0.0015030000000013644,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.6,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.014196000000000097,
+      "maxOfferedLatencySeconds": 0.22335066700000006,
+      "tracedGcOverlapSeconds": 0.004882000000000275,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.7,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.007886416999999923,
+      "maxOfferedLatencySeconds": 0.1867952499999994,
+      "tracedGcOverlapSeconds": 0.0027900000000027347,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.8,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0008040829999984567,
+      "maxOfferedLatencySeconds": 0.18789016700000083,
+      "tracedGcOverlapSeconds": 0.0009690000000013299,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 10.9,
+      "offered": 40,
+      "misses": 5,
+      "maxDispatchLagSeconds": 0.0007572920000011862,
+      "maxOfferedLatencySeconds": 0.19446833299999966,
+      "tracedGcOverlapSeconds": 0.0006559999999993238,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.0,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.0008141669999996992,
+      "maxOfferedLatencySeconds": 0.19889454199999967,
+      "tracedGcOverlapSeconds": 0.0008390000000009223,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.1,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0008988750000007428,
+      "maxOfferedLatencySeconds": 0.20893004199999865,
+      "tracedGcOverlapSeconds": 0.0008700000000008146,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.2,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.004572832999999221,
+      "maxOfferedLatencySeconds": 0.22442829199999892,
+      "tracedGcOverlapSeconds": 0.0025400000000033174,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.3,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0009215829999984493,
+      "maxOfferedLatencySeconds": 0.23162070800000123,
+      "tracedGcOverlapSeconds": 0.0016929999999995005,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.4,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.0012718329999987787,
+      "maxOfferedLatencySeconds": 0.23106149999999914,
+      "tracedGcOverlapSeconds": 0.0016800000000003479,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.5,
+      "offered": 40,
+      "misses": 13,
+      "maxDispatchLagSeconds": 0.0021682500000004268,
+      "maxOfferedLatencySeconds": 0.22814654200000106,
+      "tracedGcOverlapSeconds": 0.002098000000003708,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.6,
+      "offered": 40,
+      "misses": 11,
+      "maxDispatchLagSeconds": 0.0008084170000000057,
+      "maxOfferedLatencySeconds": 0.2262449999999987,
+      "tracedGcOverlapSeconds": 0.0022690000000000765,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.7,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.003464041999999168,
+      "maxOfferedLatencySeconds": 0.2358105419999994,
+      "tracedGcOverlapSeconds": 0.0027719999999984424,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.8,
+      "offered": 40,
+      "misses": 11,
+      "maxDispatchLagSeconds": 0.0007227079999996278,
+      "maxOfferedLatencySeconds": 0.25708520799999945,
+      "tracedGcOverlapSeconds": 0.0015150000000030417,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 11.9,
+      "offered": 40,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.002425416999999541,
+      "maxOfferedLatencySeconds": 0.2705507919999999,
+      "tracedGcOverlapSeconds": 0.002877999999999048,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.0,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0010098749999993828,
+      "maxOfferedLatencySeconds": 0.27166566699999883,
+      "tracedGcOverlapSeconds": 0.003946999999996592,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.1,
+      "offered": 40,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.00248233299999967,
+      "maxOfferedLatencySeconds": 0.27196666699999916,
+      "tracedGcOverlapSeconds": 0.003249999999999531,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.2,
+      "offered": 40,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0023189580000000376,
+      "maxOfferedLatencySeconds": 0.26828966699999945,
+      "tracedGcOverlapSeconds": 0.0028729999999992373,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.3,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0008327919999988609,
+      "maxOfferedLatencySeconds": 0.2696967079999997,
+      "tracedGcOverlapSeconds": 0.001919000000004445,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.4,
+      "offered": 40,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.000819332999999034,
+      "maxOfferedLatencySeconds": 0.28496541700000044,
+      "tracedGcOverlapSeconds": 0.0038540000000022445,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.5,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0016249169999991153,
+      "maxOfferedLatencySeconds": 0.30981879199999973,
+      "tracedGcOverlapSeconds": 0.002805999999999642,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.6,
+      "offered": 40,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0015749580000008478,
+      "maxOfferedLatencySeconds": 0.326930041999999,
+      "tracedGcOverlapSeconds": 0.0017929999999992674,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.7,
+      "offered": 40,
+      "misses": 20,
+      "maxDispatchLagSeconds": 0.004350167000000127,
+      "maxOfferedLatencySeconds": 0.3387922500000009,
+      "tracedGcOverlapSeconds": 0.004843000000002817,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.8,
+      "offered": 40,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.00157449999999848,
+      "maxOfferedLatencySeconds": 0.3374216669999992,
+      "tracedGcOverlapSeconds": 0.00426099999999785,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 12.9,
+      "offered": 40,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0010323330000012731,
+      "maxOfferedLatencySeconds": 0.34339408299999974,
+      "tracedGcOverlapSeconds": 0.0030920000000005388,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.0,
+      "offered": 40,
+      "misses": 20,
+      "maxDispatchLagSeconds": 0.0026778749999998297,
+      "maxOfferedLatencySeconds": 0.33255079199999926,
+      "tracedGcOverlapSeconds": 0.004669999999999064,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.1,
+      "offered": 40,
+      "misses": 22,
+      "maxDispatchLagSeconds": 0.011278583000001063,
+      "maxOfferedLatencySeconds": 0.3145319579999999,
+      "tracedGcOverlapSeconds": 0.005171000000002479,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.2,
+      "offered": 40,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.007324832999998421,
+      "maxOfferedLatencySeconds": 0.29444741700000066,
+      "tracedGcOverlapSeconds": 0.005392999999999759,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.3,
+      "offered": 40,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0008903749999991106,
+      "maxOfferedLatencySeconds": 0.316320417,
+      "tracedGcOverlapSeconds": 0.003004876708983417,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.4,
+      "offered": 41,
+      "misses": 18,
+      "maxDispatchLagSeconds": 0.0014016249999997399,
+      "maxOfferedLatencySeconds": 0.34681570800000117,
+      "tracedGcOverlapSeconds": 0.003792123291017191,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.5,
+      "offered": 39,
+      "misses": 18,
+      "maxDispatchLagSeconds": 0.0019309170000028075,
+      "maxOfferedLatencySeconds": 0.369730833000002,
+      "tracedGcOverlapSeconds": 0.004979999999997986,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.6,
+      "offered": 41,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.0021564999999981183,
+      "maxOfferedLatencySeconds": 0.3695313750000011,
+      "tracedGcOverlapSeconds": 0.002716999999998748,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.7,
+      "offered": 40,
+      "misses": 22,
+      "maxDispatchLagSeconds": 0.0009524170000005938,
+      "maxOfferedLatencySeconds": 0.37054604200000085,
+      "tracedGcOverlapSeconds": 0.0009700000000005815,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.8,
+      "offered": 39,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.008544374999999604,
+      "maxOfferedLatencySeconds": 0.36115479200000067,
+      "tracedGcOverlapSeconds": 0.005468999999999724,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 13.9,
+      "offered": 41,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.0016215420000023073,
+      "maxOfferedLatencySeconds": 0.35377466700000326,
+      "tracedGcOverlapSeconds": 0.0064140802764889315,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.0,
+      "offered": 39,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.004062749999999227,
+      "maxOfferedLatencySeconds": 0.34608225000000203,
+      "tracedGcOverlapSeconds": 0.0026069197235134567,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.1,
+      "offered": 41,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0031284999999989793,
+      "maxOfferedLatencySeconds": 0.3188566669999986,
+      "tracedGcOverlapSeconds": 0.003122999999995102,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.2,
+      "offered": 40,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0018954999999998279,
+      "maxOfferedLatencySeconds": 0.30676370800000186,
+      "tracedGcOverlapSeconds": 0.002413999999999916,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.3,
+      "offered": 39,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0048723749999979304,
+      "maxOfferedLatencySeconds": 0.2652855830000007,
+      "tracedGcOverlapSeconds": 0.0014649999999996055,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.4,
+      "offered": 41,
+      "misses": 16,
+      "maxDispatchLagSeconds": 0.0024695420000000468,
+      "maxOfferedLatencySeconds": 0.2504996669999997,
+      "tracedGcOverlapSeconds": 0.000600000000000378,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.5,
+      "offered": 39,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0013206669999981102,
+      "maxOfferedLatencySeconds": 0.26432341699999995,
+      "tracedGcOverlapSeconds": 0.0011669999999988079,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.6,
+      "offered": 41,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0015092920000014942,
+      "maxOfferedLatencySeconds": 0.276186292000002,
+      "tracedGcOverlapSeconds": 0.0007090000000005148,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.7,
+      "offered": 40,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0010533750000014663,
+      "maxOfferedLatencySeconds": 0.2739617920000015,
+      "tracedGcOverlapSeconds": 0.0010289999999990584,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.8,
+      "offered": 39,
+      "misses": 16,
+      "maxDispatchLagSeconds": 0.0041793330000032825,
+      "maxOfferedLatencySeconds": 0.27881945800000096,
+      "tracedGcOverlapSeconds": 0.0026020000000013255,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 14.9,
+      "offered": 41,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0007676670000016372,
+      "maxOfferedLatencySeconds": 0.34056200000000203,
+      "tracedGcOverlapSeconds": 0.001234999999999431,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.0,
+      "offered": 39,
+      "misses": 17,
+      "maxDispatchLagSeconds": 0.0019240420000024017,
+      "maxOfferedLatencySeconds": 0.3580783330000017,
+      "tracedGcOverlapSeconds": 0.0027549999999987307,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.1,
+      "offered": 41,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0012814580000011233,
+      "maxOfferedLatencySeconds": 0.3593205829999988,
+      "tracedGcOverlapSeconds": 0.003920000000000812,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.2,
+      "offered": 40,
+      "misses": 24,
+      "maxDispatchLagSeconds": 0.001617333000002219,
+      "maxOfferedLatencySeconds": 0.33589525000000364,
+      "tracedGcOverlapSeconds": 0.0020799999999994156,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.3,
+      "offered": 39,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.004308791999999784,
+      "maxOfferedLatencySeconds": 0.30345591700000085,
+      "tracedGcOverlapSeconds": 0.001240000000001018,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.4,
+      "offered": 41,
+      "misses": 21,
+      "maxDispatchLagSeconds": 0.0007384170000008794,
+      "maxOfferedLatencySeconds": 0.3209751670000003,
+      "tracedGcOverlapSeconds": 0.00020699999999962415,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.5,
+      "offered": 39,
+      "misses": 15,
+      "maxDispatchLagSeconds": 0.0010412500000001046,
+      "maxOfferedLatencySeconds": 0.37961625000000154,
+      "tracedGcOverlapSeconds": 0.002384000000001052,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.6,
+      "offered": 41,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.006327875000000205,
+      "maxOfferedLatencySeconds": 0.37995049999999964,
+      "tracedGcOverlapSeconds": 0.003989999999998162,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.7,
+      "offered": 40,
+      "misses": 26,
+      "maxDispatchLagSeconds": 0.013501999999999015,
+      "maxOfferedLatencySeconds": 0.3726081249999993,
+      "tracedGcOverlapSeconds": 0.008067999999999742,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.8,
+      "offered": 39,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.005171000000000703,
+      "maxOfferedLatencySeconds": 0.34735533299999943,
+      "tracedGcOverlapSeconds": 0.00412499999999838,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 15.9,
+      "offered": 41,
+      "misses": 24,
+      "maxDispatchLagSeconds": 0.004932917000001424,
+      "maxOfferedLatencySeconds": 0.31836666700000293,
+      "tracedGcOverlapSeconds": 0.004068999999999434,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.0,
+      "offered": 39,
+      "misses": 18,
+      "maxDispatchLagSeconds": 0.001105333000001707,
+      "maxOfferedLatencySeconds": 0.2977976670000011,
+      "tracedGcOverlapSeconds": 0.002625999999999351,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.1,
+      "offered": 40,
+      "misses": 20,
+      "maxDispatchLagSeconds": 0.0010672500000019625,
+      "maxOfferedLatencySeconds": 0.28584650000000167,
+      "tracedGcOverlapSeconds": 0.0008420000000022299,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.2,
+      "offered": 40,
+      "misses": 14,
+      "maxDispatchLagSeconds": 0.0011824580000023843,
+      "maxOfferedLatencySeconds": 0.3214651249999996,
+      "tracedGcOverlapSeconds": 0.0002819999999985612,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.3,
+      "offered": 40,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.0013920420000026468,
+      "maxOfferedLatencySeconds": 0.3296695420000013,
+      "tracedGcOverlapSeconds": 0.0007090000000005148,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.4,
+      "offered": 40,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.003610583000003942,
+      "maxOfferedLatencySeconds": 0.3431995420000007,
+      "tracedGcOverlapSeconds": 0.00385800000000458,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.5,
+      "offered": 40,
+      "misses": 22,
+      "maxDispatchLagSeconds": 0.002580874999999594,
+      "maxOfferedLatencySeconds": 0.3446392500000037,
+      "tracedGcOverlapSeconds": 0.003564999999998264,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.6,
+      "offered": 40,
+      "misses": 20,
+      "maxDispatchLagSeconds": 0.012009875000000392,
+      "maxOfferedLatencySeconds": 0.35558245800000066,
+      "tracedGcOverlapSeconds": 0.002241999999998967,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.7,
+      "offered": 40,
+      "misses": 23,
+      "maxDispatchLagSeconds": 0.0030692080000029875,
+      "maxOfferedLatencySeconds": 0.34361858300000137,
+      "tracedGcOverlapSeconds": 0.003849999999999909,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.8,
+      "offered": 40,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.0009794170000034796,
+      "maxOfferedLatencySeconds": 0.3289715830000013,
+      "tracedGcOverlapSeconds": 0.0017190000000013583,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 16.9,
+      "offered": 40,
+      "misses": 24,
+      "maxDispatchLagSeconds": 0.0044579579999997065,
+      "maxOfferedLatencySeconds": 0.31950758300000004,
+      "tracedGcOverlapSeconds": 0.0026029999999970244,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.0,
+      "offered": 40,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.0013605830000038566,
+      "maxOfferedLatencySeconds": 0.28048858300000035,
+      "tracedGcOverlapSeconds": 0.003517999999999688,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.1,
+      "offered": 40,
+      "misses": 19,
+      "maxDispatchLagSeconds": 0.0010161249999995903,
+      "maxOfferedLatencySeconds": 0.25549120800000225,
+      "tracedGcOverlapSeconds": 0.0022269999999977586,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.2,
+      "offered": 40,
+      "misses": 13,
+      "maxDispatchLagSeconds": 0.0008737920000001509,
+      "maxOfferedLatencySeconds": 0.2307660000000027,
+      "tracedGcOverlapSeconds": 0.0019749999999980616,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.3,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.000773250000001724,
+      "maxOfferedLatencySeconds": 0.22825583300000218,
+      "tracedGcOverlapSeconds": 0.00284900000001187,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.4,
+      "offered": 40,
+      "misses": 13,
+      "maxDispatchLagSeconds": 0.0036118330000043386,
+      "maxOfferedLatencySeconds": 0.21755587500000217,
+      "tracedGcOverlapSeconds": 0.0034350000000031855,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.5,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0008446249999991551,
+      "maxOfferedLatencySeconds": 0.19873933300000246,
+      "tracedGcOverlapSeconds": 0.001188999999996554,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.6,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.0010623330000036901,
+      "maxOfferedLatencySeconds": 0.1988684580000033,
+      "tracedGcOverlapSeconds": 0.0019149999999967804,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.7,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0009116670000040017,
+      "maxOfferedLatencySeconds": 0.2145089579999997,
+      "tracedGcOverlapSeconds": 0.0013579999999997483,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.8,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0009566670000005217,
+      "maxOfferedLatencySeconds": 0.2182295420000031,
+      "tracedGcOverlapSeconds": 0.0023640000000000327,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 17.9,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.0025453330000004826,
+      "maxOfferedLatencySeconds": 0.21742120800000464,
+      "tracedGcOverlapSeconds": 0.0029789999999927375,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.0,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0007406670000023041,
+      "maxOfferedLatencySeconds": 0.20687387500000298,
+      "tracedGcOverlapSeconds": 0.0009989999999966415,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.1,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.00073012500000047,
+      "maxOfferedLatencySeconds": 0.20072358300000204,
+      "tracedGcOverlapSeconds": 0.0013100000000001444,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.2,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0006543749999998738,
+      "maxOfferedLatencySeconds": 0.20024737500000356,
+      "tracedGcOverlapSeconds": 0.0014519999999969002,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.3,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.001074000000002684,
+      "maxOfferedLatencySeconds": 0.19729025000000178,
+      "tracedGcOverlapSeconds": 0.0021249999999994884,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.4,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.001538958000001145,
+      "maxOfferedLatencySeconds": 0.2018180830000027,
+      "tracedGcOverlapSeconds": 0.0013849999999990814,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.5,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.000772333000000458,
+      "maxOfferedLatencySeconds": 0.20310437500000234,
+      "tracedGcOverlapSeconds": 0.0012360000000022353,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.6,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0009978750000030345,
+      "maxOfferedLatencySeconds": 0.20384295799999919,
+      "tracedGcOverlapSeconds": 0.0019580000000019027,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.7,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0008769579999992061,
+      "maxOfferedLatencySeconds": 0.20550737499999983,
+      "tracedGcOverlapSeconds": 0.0016759999999997888,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.8,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0008002920000009794,
+      "maxOfferedLatencySeconds": 0.202468875000001,
+      "tracedGcOverlapSeconds": 0.002198000000003475,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 18.9,
+      "offered": 40,
+      "misses": 7,
+      "maxDispatchLagSeconds": 0.000698875000001209,
+      "maxOfferedLatencySeconds": 0.21014575000000235,
+      "tracedGcOverlapSeconds": 0.000984999999996461,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.0,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.001372750000001588,
+      "maxOfferedLatencySeconds": 0.21486804200000265,
+      "tracedGcOverlapSeconds": 0.0015799999999970282,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.1,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.002344999999998265,
+      "maxOfferedLatencySeconds": 0.2123627920000004,
+      "tracedGcOverlapSeconds": 0.0012779999999992242,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.2,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0008723750000001473,
+      "maxOfferedLatencySeconds": 0.21134825000000035,
+      "tracedGcOverlapSeconds": 0.0008090000000002817,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.3,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0007262080000032256,
+      "maxOfferedLatencySeconds": 0.21359175000000263,
+      "tracedGcOverlapSeconds": 0.0015710000000019875,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.4,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0008590830000017036,
+      "maxOfferedLatencySeconds": 0.2198871670000031,
+      "tracedGcOverlapSeconds": 0.001201000000001784,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.5,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.002386042000001254,
+      "maxOfferedLatencySeconds": 0.22223783300000122,
+      "tracedGcOverlapSeconds": 0.0019159999999978083,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.6,
+      "offered": 40,
+      "misses": 12,
+      "maxDispatchLagSeconds": 0.0007447920000025476,
+      "maxOfferedLatencySeconds": 0.21784083300000034,
+      "tracedGcOverlapSeconds": 0.0020170000000057087,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.7,
+      "offered": 40,
+      "misses": 10,
+      "maxDispatchLagSeconds": 0.0008189580000035335,
+      "maxOfferedLatencySeconds": 0.20853737500000236,
+      "tracedGcOverlapSeconds": 0.0014379999999967197,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.8,
+      "offered": 40,
+      "misses": 8,
+      "maxDispatchLagSeconds": 0.0007871249999986674,
+      "maxOfferedLatencySeconds": 0.2064061670000008,
+      "tracedGcOverlapSeconds": 0.0008879999999926724,
+      "tracedWaitOverlapSeconds": 0
+    },
+    {
+      "startSeconds": 19.9,
+      "offered": 40,
+      "misses": 9,
+      "maxDispatchLagSeconds": 0.0007945420000012859,
+      "maxOfferedLatencySeconds": 0.2057275830000016,
+      "tracedGcOverlapSeconds": 0.0014540000000060616,
+      "tracedWaitOverlapSeconds": 0
+    }
+  ],
+  "method": "100 ms bins by intended arrival. GC/acquire events below 100 us omitted; every wait recorded. Overlap is wall time, not CPU time; acquire includes GC. Unix/monotonic mapping checked for <1 ms endpoint drift. Instrumentation changes timing; correlation is not proof of causation."
+}

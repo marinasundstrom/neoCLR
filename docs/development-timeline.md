@@ -19204,3 +19204,24 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   development check with an exact `Task<int>` assertion.
   Earlier editor evidence did not cover this inferred-task type; refreshed package
   qualification remains required. Broader structural work stays parked.
+
+
+### 2026-10-18 — Admission stalls and concurrent collection
+
+- **Author:** requested correlation of admission stalls with scheduler/GC activity,
+  another measured improvement against Go, and a commit per slice. Subsequently asked
+  whether our GC executes concurrently and proposed offloading work while minimizing
+  interruptions.
+- **Assistant investigation:** the native collector used by Serve is synchronous on
+  the owner thread. Explained that a background thread shares the heap, while safe
+  concurrent tracing requires mutation barriers, root coordination and safe reclamation;
+  a separate process is a substantially different ownership arrangement. Existing
+  [.NET/Go comparison](runtime-gc.md) remains the research basis, not a decision to
+  adopt either collector design.
+- **Evidence:** [bounded traces](../benchmarks/http-server/serve/admission-stalls-20261018/README.md)
+  distinguish wall time from collector CPU. Expanded wait coverage finds just two
+  waits in an overloaded 20-second window. Instrumentation itself perturbs load;
+  these are diagnostic observations, not a sustainable-rate claim.
+- **Next work:** test removal of Promise result-list storage, preserve all execution
+  modes and GC retention, then compare uninstrumented Serve against Go. This remains
+  in progress; concurrent GC is not implemented or selected by this exchange.

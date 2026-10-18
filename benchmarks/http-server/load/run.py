@@ -90,6 +90,7 @@ async def request(port, path, expected_size, timeout, timings=None):
 async def window(port, path, size, rate, duration, concurrency, timeout, pid=None, diagnostics=False):
     loop = asyncio.get_running_loop()
     start = loop.time()
+    unix_start = time.time() if diagnostics else None
     count = math.floor(rate * duration)
     records = []
     tasks = set()
@@ -149,7 +150,8 @@ async def window(port, path, size, rate, duration, concurrency, timeout, pid=Non
     successes = [r for r in records if r['result'] == 'ok']
     within = [r for r in successes if r['endSeconds'] <= duration]
     usable = [r for r in resources if 'rssKiB' in r]
-    return dict(rate=rate, durationSeconds=duration, clientInflightLimit=concurrency,
+    return dict(**(dict(startUnixSeconds=unix_start, startMonotonicSeconds=start) if diagnostics else {}),
+                rate=rate, durationSeconds=duration, clientInflightLimit=concurrency,
                 offered=count, admitted=count-counts['generator_inflight_limit'], outcomes=dict(counts),
                 completedWithinWindow=len(within), successfulCompletionsPerSecond=len(within)/duration,
                 successfulOfferedFraction=len(successes)/count if count else None,

@@ -2,6 +2,7 @@ import asyncio
 import importlib.util
 from pathlib import Path
 import unittest
+import time
 from unittest.mock import patch
 spec = importlib.util.spec_from_file_location('http_load', Path(__file__).with_name('run.py'))
 load = importlib.util.module_from_spec(spec)
@@ -48,9 +49,15 @@ class LoadContract(unittest.IsolatedAsyncioTestCase):
             writer.close()
             await writer.wait_closed()
         server = await asyncio.start_server(peer, '127.0.0.1', 0)
+        before_unix = time.time()
+        before_mono = time.monotonic()
         async with server:
             report = await load.window(server.sockets[0].getsockname()[1], '/', 1,
                                        10, .1, 2, 1, diagnostics=True)
+        self.assertGreaterEqual(report['startUnixSeconds'], before_unix)
+        self.assertLessEqual(report['startUnixSeconds'], time.time())
+        self.assertGreaterEqual(report['startMonotonicSeconds'], before_mono)
+        self.assertLessEqual(report['startMonotonicSeconds'], time.monotonic())
         record = report['requests'][0]
         self.assertEqual(record['result'], 'ok')
         phases = record['phases']
