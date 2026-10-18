@@ -19405,3 +19405,21 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   not Raven async/HTTP requests. No CPU quota or competing workload was imposed;
   the extra CPU's acceptability under contention remains to be established. No
   production default change or user acceptance of a CPU threshold is inferred.
+
+
+### 2026-10-18 — Bring GC evaluation back to HttpServer
+
+- **Author:** “We should work towards testing http server loads.”
+- **Assistant response/action:** stopped pursuing the additional synthetic rate
+  sweep, inspected real Serve scheduler/root boundaries, and relinked the previously
+  qualified Serve guest with current native runtime sources. Ran a freshly built
+  Go control and two reversed-order rounds at 300/400 req/s, 30 seconds per point.
+- **Outcome:** [actual HTTP evidence](../benchmarks/http-server/serve/concurrent-readiness-20261018/README.md)
+  shows first-round Serve success but 238/8 missed arrivals in the reversed round;
+  Go passes all points. Admitted responses and clean shutdown validate. This is the
+  existing paced synchronous collector, not the concurrent POC.
+- **Next/open:** observe concurrent snapshots through actual scheduler callbacks,
+  parked-root transitions and shutdown before permitting background result application.
+  The author did not approve a specific new scheduling policy; proposed integration
+  steps are recorded separately from implemented behavior. No HTTP speedup or reliable
+  300–400 req/s operating point is inferred from mixed results.

@@ -5401,3 +5401,13 @@ retains about 6% more burst completions with concurrent GC. Eight competitors gi
 stop under heavy contention, so the offered base rate is not sustainable. All owned
 competitors stop cleanly and full reclamation passes. Next measure a lower sustainable
 offered rate under contention and reduce CPU overhead; production policy is unchanged.
+
+
+**Return to HTTP loads (2026-10-18, author-directed next step):** set aside further
+synthetic rate sweeps and [refresh actual Serve/Go evidence](../benchmarks/http-server/serve/concurrent-readiness-20261018/README.md).
+The existing paced synchronous collector passes first-round 300/400 req/s points,
+but the reverse round misses 8/238 arrivals; Go passes all four. All admitted responses
+validate and shutdown/heap checks pass. No repeatable rate or HTTP concurrent-GC gain
+is established. Next integrate observation of background tracing with real scheduler
+root/park/idle/shutdown transitions, keeping synchronous reclamation authoritative
+until those paths qualify; then compare actual concurrent Serve under the same load.

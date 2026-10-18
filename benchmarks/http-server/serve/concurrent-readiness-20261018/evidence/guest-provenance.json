@@ -1,0 +1,10 @@
+{
+  "contract": "Retained qualified compiler/library cohort; source equality checked, not a new managed rebuild.",
+  "inputs": {
+    "benchmarks/http-server/serve/Server.rvn": "c24e520d14d05a6fae3c65068054a15f8d5803d925e137ef25785e0e809c8d1f",
+    "target/http-serve-20261018/final-load/project/Main.rvn": "c24e520d14d05a6fae3c65068054a15f8d5803d925e137ef25785e0e809c8d1f",
+    "target/http-serve-20261018/final-load/native/app.dll": "ddc8438d980e1e1b960fa76eb7a67088599305aa17ca437a2a5a84e11c08983e",
+    "target/http-serve-20261018/final-load/native/app.o": "00caa99b08669df15b788e00341afab58fb72f9b33d8c4bd5bb3068edce67245"
+  },
+  "originalBuildArchiveSha256": "169b390b71f9777e69c4b967e52a71e09b7696584c8d20bd401bb2f342215df0"
+}

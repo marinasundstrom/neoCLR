@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Return GC evaluation to actual asynchronous HTTP Serve loads against Go. Relink the retained qualified guest with current native sources and repeat 30-second 300/400 req/s points in reversed order. Serve passes the first round but misses 238/8 arrivals in the second; Go passes all points. Retain byte validation, shutdown accounting and full provenance. Record scheduler/root-lifetime integration work for concurrent GC; no HTTP concurrent collector or speedup is claimed.
+
 - Measure compiled callback bursts alongside bounded CPU competitors. Concurrent GC retains about 6% more burst completions; with eight competitors it finishes the workload 8% sooner at 14% more process CPU, while four competitors cost 31% more CPU for a smaller elapsed gain. Both modes fail to sustain the offered base rate under heavy contention. Retain controls, competitor progress/cleanup, full reclamation and raw evidence; no production policy or HTTP capacity claim.
 
 - Add fixed-arrival burst/recovery measurements for generated callbacks, including queueing in latency and half-second process CPU demand. Concurrent GC completes about 5.6% more batches during the tested burst and drains the backlog sooner, at about 18.7% more CPU overall and a peak of 1.25 cores versus 1.0. Retain all trials, schedule assertions, sanitizer checks and full reclamation. This six-second single-owner POC probe does not establish CPU-constrained or HTTP/Go capacity.

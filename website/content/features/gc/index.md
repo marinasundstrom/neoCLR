@@ -181,3 +181,11 @@ GC, but extra process CPU ranges from 14% to 31% in the tested cases. Under heav
 contention both collectors fall behind even the base arrival rate and drain only
 after arrivals stop. This is an overload benefit, not a sustainable capacity claim;
 see the [contention evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md#controlled-competing-cpu-work-2026-10-18).
+
+
+Evaluation has returned to actual asynchronous Serve/Go loads. A refreshed paced
+synchronous-GC baseline passes the first 300/400 req/s round but loses arrivals in
+the reverse round; Go passes all tested points. Concurrent GC is not yet integrated
+into Serve. The next step is qualification at real scheduler and root-lifetime
+boundaries; [HTTP evidence and integration scope](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/concurrent-readiness-20261018/README.md)
+keep these results separate from callback microbenchmarks.

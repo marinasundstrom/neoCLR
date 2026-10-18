@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "runtime": "go",
+  "version": "go version go1.26.3 darwin/arm64",
+  "command": [
+    "go",
+    "build",
+    "-trimpath",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-readiness/go/app",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/go/main.go"
+  ],
+  "exitCode": 0,
+  "stderr": "",
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "CGO_ENABLED": "0",
+    "GOOS": null,
+    "GOARCH": null
+  },
+  "sourceSha256": "5c644ed6f6530c84c5fbcf2e35b7a37fb8c1a0c1157b6e3a096fa7cce0f4fe7e",
+  "builtAtUnixSeconds": 1792353055.928763,
+  "executableSha256": "5494f10931b4a50817047dde2ef0744904eafe3e90dcaea3ee9761145a29912c"
+}
