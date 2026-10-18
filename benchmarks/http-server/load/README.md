@@ -218,3 +218,9 @@ scheduling, not an isolated server processing timer. `analyze.py REPORT --output
 SUMMARY` preserves per-second losses and the slowest requests alongside percentiles.
 Instrumentation is opt-in so diagnostic runs remain separate from capacity runs.
 See the [Serve investigation](../serve/capacity-20261018/README.md).
+
+`--runtime go` supports the matched [Go net/http fixture](../serve/go/README.md).
+It requires a Go-labelled build manifest and fingerprints the native executable,
+source and toolchain evidence without requiring a neoCLR guest assembly. The load
+schedule, response validator, resource sampling and targets are identical. Reports
+capture GOMAXPROCS/GOGC/GOMEMLIMIT values so execution/GC controls remain explicit.

@@ -106,3 +106,9 @@ versions receive new reports, never replacement scores. Changes to payload, timi
 connection policy or validation require a new workload series under the
 [benchmark history policy](../../docs/benchmark-history.md). The installed SDK and
 published website baseline are unchanged; publication is a separate operation.
+
+## Subsequent sustained-load comparison
+
+The [matched Serve/Go net/http comparison](serve/go/README.md) is a separate
+connection-close, queued-handler workload with offered-rate scheduling and loss
+accounting. Do not combine it with the 32-request pilot results above.

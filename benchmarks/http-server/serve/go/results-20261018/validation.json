@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "reproducedBinarySha256": "5494f10931b4a50817047dde2ef0744904eafe3e90dcaea3ee9761145a29912c",
+  "runs": [
+    {
+      "command": [
+        "/usr/local/go/bin/go",
+        "test",
+        "benchmarks/http-server/serve/go/main.go",
+        "benchmarks/http-server/serve/go/main_test.go"
+      ],
+      "exitCode": 0,
+      "stdout": "ok  \tcommand-line-arguments\t0.237s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "benchmarks/http-server/load",
+        "-p",
+        "test_*.py"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.381s\n\nOK\n"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "benchmarks/http-server/serve/go/verify-wire.py",
+        "--neoclr",
+        "target/http-serve-20261018/final-load/native/app-paced",
+        "--go",
+        "target/http-serve-capacity-20261018/go/app",
+        "--output",
+        "target/http-serve-capacity-20261018/go-wire.json"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "wireEqualityChecked": true,
+      "sourceSha256": "bd832c0d1dff2d3c3facb6e8cfc0da47112c1105ae8f1bd362ae4a0de11a4902"
+    }
+  ]
+}

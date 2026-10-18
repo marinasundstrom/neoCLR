@@ -1,0 +1,9 @@
+{
+  "purpose": "Go higher offered-rate controls beyond neoCLR's tested point, not Go maximum capacity",
+  "policy": "GOMAXPROCS=1 GOGC=100, installed go1.26.3, same matched fixture, 16 accepted connections and 64 client slots",
+  "rates": [1000, 2000],
+  "durationSeconds": 30,
+  "rounds": 2,
+  "criteria": "Same 100% offered success, 250ms offered p99, 5ms generator-lag p99. Reverse rate order on second round. Keep all failures. If the generator falls behind, report that limitation without assigning Go a server ceiling.",
+  "scope": "These shorter operating points are lower bounds only. Do not divide them by neoCLR's qualified rate and call that an exact maximum-throughput speedup. No higher sweep is required in this profiling slice."
+}

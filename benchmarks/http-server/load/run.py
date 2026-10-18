@@ -166,6 +166,7 @@ def main():
     p.add_argument('--build', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--executable', default='app')
+    p.add_argument('--runtime', choices=['neoclr', 'go'], default='neoclr', help='Artifact layout and runtime identity; both use identical load/validation')
     p.add_argument('--server-source', type=Path, default=Path(__file__).with_name('Server.rvn'))
     p.add_argument('--diagnostics', action='store_true', help='Record connect, send, first-byte, EOF and close timings per admitted request')
     p.add_argument('--control-stop', action='store_true', help='Read a second control port and signal shutdown after the stop response')
@@ -187,11 +188,16 @@ def main():
     evidence = json.loads((build / 'build.json').read_text())
     if not evidence['passed']:
         p.error('Build must pass before measurement')
-    inputs = {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
-              for path in [Path(__file__).resolve(), build/a.executable, build/'app.dll', build/'build.json',
-                           a.server_source.resolve(), ROOT/'benchmarks/framework/process.py']}
+    if a.runtime == 'go' and evidence.get('runtime') != 'go':
+        p.error('Go runs require an explicitly identified Go build manifest')
+    artifacts = [Path(__file__).resolve(), build/a.executable, build/'build.json',
+                 a.server_source.resolve(), ROOT/'benchmarks/framework/process.py']
+    if a.runtime == 'neoclr':
+        artifacts.append(build/'app.dll')
+    inputs = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in artifacts}
     report = dict(completed=False, platform=platform.platform(), inputs=inputs, build=evidence,
                   loadBefore=load_average(), processesBefore=process_snapshot(), trials=[],
+                  runtime=a.runtime, environment={key: os.environ.get(key) for key in ('GOMAXPROCS', 'GOGC', 'GOMEMLIMIT')},
                   diagnostics=a.diagnostics, serverWorkers=a.workers, executable=a.executable, fixtureSource=str(a.server_source.resolve()),
                   contract='AOT loopback, configured server workers, HTTP/1.1 connection close, no TLS. Fixed offered schedule; client cap drops arrivals without queueing. Each response fully validated. Misses/failures remain in denominator. Graceful /stop after draining.',
                   qualification='Exploratory local load sweep, not production capacity. Same-machine generator and sampled RSS; no allocation profiler during timing.',

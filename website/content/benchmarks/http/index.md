@@ -92,3 +92,12 @@ GC: all 96,000 responses validate, with p99 latency 115.8/98.6 ms. A 500/sec che
 saturates one CPU core and loses 2,606 of 15,000 arrivals at the client admission
 limit. These are local tested points, not default-GC or production capacity claims.
 [Profiles, noisy counterexamples and full measurement contract](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/capacity-20261018).
+
+A [matched Go net/http comparison](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/go)
+now alternates 400/500 offered requests/sec under a single Go execution processor
+and the same response, connection and client budgets. At 400/sec, neoCLR paced GC
+uses 8.6–8.9× the sampled server CPU per completion; Go passes 500/sec while neoCLR
+records admission misses. Go also passes two separate 30-second 2,000/sec checks.
+A separate 1,000/sec Go repeat fails the generator-lag criterion despite valid
+responses. These are explicit local configurations and tested lower bounds, not
+framework maximum-throughput rankings; the full reports retain latency, misses and limitations.

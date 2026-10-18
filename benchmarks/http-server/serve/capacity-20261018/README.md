@@ -224,5 +224,6 @@ retain the earlier failure context. Six focused harness/analysis tests pass.
 The author subsequently reaffirmed that comparison with a web application in Go
 remains the goal. This qualification supplies neoCLR's matched load contract and
 local baseline; the historical 32-request Go pilot is a different workload. A new
-Go `net/http` fixture is being prepared separately, and no cross-runtime performance
-ratio is claimed by this slice.
+Go `net/http` fixture is measured in the [following matched comparison](../go/README.md).
+This capacity slice remains neoCLR-only evidence; cross-runtime ratios belong to that
+separate alternating series.

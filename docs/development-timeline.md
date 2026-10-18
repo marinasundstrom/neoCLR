@@ -48,7 +48,14 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   default-GC 5/sec controls remain separate; no implementation speedup is claimed.
 - **Author goal reaffirmed:** comparison with a web server/application in Go remains
   the objective. The assistant began a new matched Go net/http fixture, preserving
-  the older 32-request pilot as a different workload. Go results are pending here.
+  the older 32-request pilot as a different workload. Alternating 400/500 offered/sec
+  trials now pass for Go while neoCLR misses at 500; at matched 400/sec neoCLR uses
+  8.6–8.9× the sampled server CPU per response. Two separate 30-second Go trials
+  validate all 120,000 arrivals at 2,000/sec; this is a lower bound, not Go's maximum.
+  One Go 1,000/sec repeat validates all responses but fails generator-lag p99 at
+  7.74 ms, so the higher-rate sweep is not uniformly qualified. Go uses one execution
+  processor and default GC, neoCLR experimental paced GC.
+  [Matched comparison and limitations](../benchmarks/http-server/serve/go/README.md).
   [Evidence and procedure](../benchmarks/http-server/serve/capacity-20261018/README.md).
 
 ## 2026-10-18 — Measure HTTP buffer costs and server capacity honestly

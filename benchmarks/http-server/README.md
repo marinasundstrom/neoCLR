@@ -203,3 +203,7 @@ queued-await work. Earlier explicit-accept results remain a separate fixture.
 [Server-managed Serve callbacks](serve/README.md) implement the author-selected API
 and compare it with equivalent application-managed ServeOne loops, including async
 handlers, controlled shutdown and explicit overload accounting.
+
+[Matched Go net/http load comparison](serve/go/README.md) uses identical response
+validation, queued-handler work and connection/client budgets, with alternating
+offered-rate trials, explicit runtime/GC configuration and retained higher-rate limits.
