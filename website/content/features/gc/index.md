@@ -140,5 +140,7 @@ this option does not make collection concurrent or change its pacing policy.
 
 An isolated native **proof of concept** now demonstrates background snapshot tracing
 with owner-side reclamation, stale-result rejection and exactly-once resource cleanup.
-It is not selectable in installed runtimes and has no established performance benefit.
+It is not selectable in installed runtimes. The first local matched comparison is
+slower and uses more CPU than synchronous GC on the tested small stable graph; this
+is not an HTTP capacity result. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
 See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).

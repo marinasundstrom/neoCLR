@@ -5261,3 +5261,13 @@ mid-trace progress, reuse and cleanup checks pass. This completes the bounded
 reclamation experiment, not a production collector or performance milestone.
 Broader access-path/platform/three-mode qualification and Serve/Go measurements remain
 open; default and selectable production collectors are unchanged.
+
+
+**Performance comparison before exhaustive support (author direction, 2026-10-18):**
+benchmark the supported concurrent POC now, then discover remaining cases. The first
+[matched sync/concurrent comparison](../benchmarks/gc-concurrent-poc/README.md) loses
+on elapsed time, process CPU and peak managed extent for both tested workloads.
+Pilot and reversed-order repeat data are retained with complete work/reclamation
+checks. Prioritize measured POC overhead and live-set tradeoffs rather than treating
+complete special-case support as a prerequisite. These are local microbenchmarks;
+no Serve/Go capacity or production-concurrency claim is made.

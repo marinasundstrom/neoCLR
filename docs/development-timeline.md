@@ -19354,3 +19354,19 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
 - **Status:** the bounded native reclamation POC is complete. Production selection,
   interpreter/JIT/AOT integration and Serve performance remain unchanged/unqualified.
   Sanitizer startup limitations and unsupported external/native access are explicit.
+
+
+### 2026-10-18 — Compare performance before exhaustive case coverage
+
+- **Author:** clarified that the goal is comparing concurrent and synchronous GC
+  performance even before all special cases are supported, then discovering the rest.
+- **Assistant action:** moved directly from the reclamation POC to a matched workload
+  comparison, with a fixed live graph, identical allocation/collection counts and
+  optional application CPU work. Retained pilot and reversed-order repeat evidence.
+- **Outcome:** [performance results](../benchmarks/gc-concurrent-poc/README.md)
+  show the current concurrent POC is slower (17.2% allocation-only, 12.9% with scalar
+  work), consumes more process CPU and retains more arena space. Every trial completes
+  the same work and ultimately reclaims all allocations.
+- **Next:** investigate measured capture/application/allocation overhead and larger
+  live-set tradeoffs; do not block useful benchmarking on exhaustive collector support.
+  HTTP/Go sustained-load comparison and broader runtime qualification remain open.

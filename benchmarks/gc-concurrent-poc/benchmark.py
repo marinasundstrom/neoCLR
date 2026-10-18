@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+"""Alternating process-isolated sync/concurrent POC comparisons on one host."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+POC = ROOT / 'docs/experiments/concurrent-gc-walker'
+WORKER = POC.parent / 'concurrent-gc-worker'
+p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--validated-build', type=Path, required=True)
+p.add_argument('--output', type=Path, required=True)
+p.add_argument('--rounds', type=int, default=2000)
+a = p.parse_args()
+out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
+build = a.validated_build.resolve()
+qualification = json.loads((build / 'results.json').read_text())
+assert qualification['passed']
+for name, digest in qualification['inputs'].items():
+    assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest, name
+command = ['clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-pthread',
+    '-I', str(build), '-I', str(POC), '-I', str(WORKER), '-I', str(ROOT / 'runtime/native/gc'),
+    str(HERE / 'workload.c'), str(WORKER / 'worker.c'), str(build / 'root-probe.c'), '-o', str(out / 'bench')]
+report = dict(passed=False, platform=platform.platform(), loadBefore=os.getloadavg(),
+    commands=[], trials=[], qualification=qualification,
+    inputs={str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in [Path(__file__), HERE / 'workload.c']})
+try:
+    r = subprocess.run(command, capture_output=True, text=True, timeout=60)
+    report['commands'].append(dict(command=command, exitCode=r.returncode, stdout=r.stdout, stderr=r.stderr))
+    r.check_returncode()
+    for work in [0, 50000]:
+        for mode in ['sync', 'concurrent', 'concurrent', 'sync']:
+            command = [str(out / 'bench'), mode, str(a.rounds), str(work)]
+            r = subprocess.run(command, capture_output=True, text=True, timeout=60)
+            report['commands'].append(dict(command=command, exitCode=r.returncode, stdout=r.stdout, stderr=r.stderr))
+            r.check_returncode()
+            trial = json.loads(r.stdout)
+            report['trials'].append(trial)
+            print(mode, work, 'elapsed', round(trial['elapsedNs']/1e6, 2), 'ms CPU', round(trial['cpuNs']/1e6, 2), flush=True)
+        group = report['trials'][-4:]
+        assert len({t['checksum'] for t in group}) == 1
+        assert len({t['collections'] for t in group}) == 1
+        assert len({t['allocations'] for t in group}) == 1
+    report['passed'] = True
+finally:
+    report['loadAfter'] = os.getloadavg()
+    (out / 'results.json').write_text(json.dumps(report, indent=2)+'\n')
