@@ -128,8 +128,11 @@ public class TaskQueue {
         while pending.Count != 0 {
             let batch = pending
             pending = ArrayList<() -> System.Void>()
-            for callback in batch {
-                callback()
+            // The detached batch cannot be mutated by callbacks posting new work.
+            var index = 0
+            while index < batch.Count {
+                batch[index]()
+                index += 1
             }
         }
         running = false
@@ -192,7 +195,7 @@ public class Task<T> : System.Runtime.CompilerServices.TaskAwaiter {
 public class Promise<T> {
     private field queue: TaskQueue
     private field slot: ArrayList<T>
-    private field callbacks: ArrayList<() -> System.Void>
+    private field callbacks: ArrayList<() -> System.Void>?
     private field task: Task<T>
     private field cancelled: bool
 
@@ -200,7 +203,7 @@ public class Promise<T> {
         queue = TaskQueue.Current
         cancelled = false
         slot = ArrayList<T>(1)
-        callbacks = ArrayList<() -> System.Void>()
+        callbacks = null
         task = Task<T>(self)
     }
 
@@ -208,7 +211,7 @@ public class Promise<T> {
         self.queue = queue
         cancelled = false
         slot = ArrayList<T>(1)
-        callbacks = ArrayList<() -> System.Void>()
+        callbacks = null
         task = Task<T>(self)
     }
 
@@ -219,15 +222,7 @@ public class Promise<T> {
             return false
         }
         slot.Add(value)
-        // No continuations to detach; later registrations are posted directly.
-        if callbacks.Count == 0 {
-            return true
-        }
-        let pending = callbacks
-        callbacks = ArrayList<() -> System.Void>()
-        for callback in pending {
-            queue.Post(callback)
-        }
+        PostCallbacks()
         return true
     }
 
@@ -236,16 +231,21 @@ public class Promise<T> {
             return false
         }
         cancelled = true
-        // Preserve deferred registration without allocating another empty list.
-        if callbacks.Count == 0 {
-            return true
-        }
-        let pending = callbacks
-        callbacks = ArrayList<() -> System.Void>()
-        for callback in pending {
-            queue.Post(callback)
-        }
+        PostCallbacks()
         return true
+    }
+
+    private func PostCallbacks() {
+        let pending = callbacks
+        callbacks = null
+        if pending is ArrayList<() -> System.Void> registered {
+            // Settlement precedes posting: later registrations go to the queue.
+            var index = 0
+            while index < registered.Count {
+                queue.Post(registered[index])
+                index += 1
+            }
+        }
     }
 
     internal func Dispatcher() -> TaskQueue => queue
@@ -267,8 +267,12 @@ public class Promise<T> {
     internal func Register(callback: () -> System.Void) {
         if self.Completed() {
             queue.Post(callback)
+        } else if callbacks is ArrayList<() -> System.Void> pending {
+            pending.Add(callback)
         } else {
-            callbacks.Add(callback)
+            let pending = ArrayList<() -> System.Void>()
+            pending.Add(callback)
+            callbacks = pending
         }
     }
 }

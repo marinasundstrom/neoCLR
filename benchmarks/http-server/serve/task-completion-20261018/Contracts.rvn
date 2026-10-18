@@ -3,6 +3,17 @@ import System.Concurrency.Tasks.*
 
 class Observer {
     var Count: int = 0
+    var Order: int = 0
+    func First() {
+        Order = Order * 10 + 1
+        TaskQueue.Default.Post(self.Third)
+    }
+    func Second() {
+        Order = Order * 10 + 2
+    }
+    func Third() {
+        Order = Order * 10 + 3
+    }
     func Hit() {
         Count = Count + 1
     }
@@ -53,5 +64,12 @@ func Main() {
         queue.Drain()
         Require(observer.Count == index * 4 + 4)
     }
+    let ordered = Promise<int>(queue)
+    ordered.Task.OnCompleted(observer.First)
+    ordered.Task.OnCompleted(observer.Second)
+    Require(ordered.Complete(42))
+    Require(observer.Order == 0)
+    queue.Drain()
+    Require(observer.Order == 123)
     Console.WriteLine("Task completion contracts passed")
 }
