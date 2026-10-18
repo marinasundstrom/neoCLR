@@ -192,3 +192,18 @@ Ownership regressions pass interpreter/JIT/AOT. The streaming correctness fixtur
 uses a longer test budget after the original interpreter run fails on both baseline
 and candidate; production timeout defaults remain unchanged.
 [All results, ownership rules and validation limits](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/receive-pool-20261018).
+
+## Development: encoding provider reuse
+
+Encodings.Utf8/Ascii now reuse stateless providers within runtime-owned invocation
+storage. Encoder and decoder sessions remain independent, with strict errors and
+BOM handling preserved in interpreter/JIT/AOT tests. Separate diagnostics record
+3.07% fewer allocations, 3.78% fewer collections and 0.55% fewer root publications;
+peak live payload rises by 48 bytes.
+
+All six matched 60-second Serve/Go trials pass at 400 offered requests/sec. Candidate
+CPU per completion is 1.1–1.2% lower than baseline in both orders—a small measured
+improvement, without establishing a higher sustained rate. Latency is mixed. The
+candidate still uses about 9.7–9.9 times the corresponding single-processor Go
+control's CPU. These remain same-host checks with experimental paced GC.
+[Tests, limitations, failed experiment and all measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/encoding-cache-20261018).

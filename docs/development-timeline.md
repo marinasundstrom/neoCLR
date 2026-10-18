@@ -41,6 +41,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Diagnostic outcome:** 3.07% fewer allocations and 0.55% fewer root publications;
   cache retention slightly raises peak live bytes. [Evidence](../benchmarks/http-server/serve/encoding-cache-20261018/README.md).
   These counters do not establish a throughput gain.
+- **Load outcome:** all six 60-second Serve/Go trials validate every arrival at
+  400/sec. Candidate CPU/completion is 1.1–1.2% lower in both orders, a small measured
+  improvement without a higher-rate claim. Latency is mixed and the corresponding
+  Go controls still use roughly one-tenth the candidate CPU. Website evidence is
+  updated; no publication/deployment is performed.
 
 ## 2026-10-18 — First HTTP receive-pooling slice
 

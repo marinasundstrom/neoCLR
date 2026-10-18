@@ -70,3 +70,37 @@ not an allocated-type census. [Counters](evidence/gc-counts.json),
 [candidate attribution](evidence/allocation-summary.json),
 [request diagnostics](evidence/diagnostic.json). No throughput gain is inferred
 from these counts.
+
+## Sustained Serve/Go comparison
+
+Same 400 offered requests/sec, 60-second windows, 16 server lanes and 64 client
+slots; baseline/candidate/Go then Go/candidate/baseline. Baseline is the receive-cache
+cohort. Both neoCLR builds use experimental paced GC; Go uses GOMAXPROCS=1 and
+GOGC=100. Builds and diagnostics finish before timing. The load generator shares
+the host; these are local tested points, not production or maximum capacity.
+
+Every offered arrival counts in the success denominator. Timed throughput excludes
+drain completions. Provisional qualification requires all arrivals valid, offered
+p99 ≤250 ms and generator-lag p99 ≤5 ms. Full compressed reports retain every
+request and sampled resource record.
+
+| Arm | Timed req/s | Misses | CPU ms/completion | Offered p99 ms | Lag p99 ms | Target |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| [baseline-1](evidence/baseline-1.json) | 399.98 | 0 | 2.0605 | 14.56 | 0.63 | pass |
+| [candidate-1](evidence/candidate-1.json) | 399.98 | 0 | 2.0376 | 16.46 | 0.64 | pass |
+| [go-1](evidence/go-1.json) | 400.00 | 0 | 0.2092 | 4.67 | 1.44 | pass |
+| [go-2](evidence/go-2.json) | 399.95 | 0 | 0.2054 | 4.60 | 1.31 | pass |
+| [candidate-2](evidence/candidate-2.json) | 399.98 | 0 | 2.0338 | 9.78 | 0.63 | pass |
+| [baseline-2](evidence/baseline-2.json) | 399.98 | 0 | 2.0588 | 18.91 | 0.64 | pass |
+
+All six trials validate 24,000 arrivals each and pass the provisional target. The
+candidate uses about 1.1% and 1.2% less sampled CPU/completion than its corresponding
+baseline round. This small difference repeats in both orders, but two short pairs
+do not provide a statistical guarantee or establish a higher sustainable request
+rate. Latency is mixed: candidate p99 is slightly higher in the first pair and
+lower in the second. No general latency improvement is claimed.
+
+Candidate CPU is roughly 9.7–9.9 times the matching Go control here. Use these
+paired results rather than treating Go CPU from earlier, noisier runs as a fixed
+constant. Streaming/ASCII semantics are tested separately; this HTTP load workload
+principally measures UTF-8 provider reuse. No higher rate is tested in this slice.
