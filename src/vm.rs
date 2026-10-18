@@ -1810,23 +1810,13 @@ impl Frame {
         })
     }
     fn check_reference_return(&self, value: &Value) -> Result<(), Fault> {
-        let reference = match value {
-            Value::SlotReference(reference) => reference,
-            Value::SlotInterface { receiver, .. } => receiver,
-            _ => return Ok(()),
-        };
-        if self
-            .args
-            .iter()
-            .chain(&self.locals)
-            .chain(self.construction_storage.iter())
-            .any(|cell| reference.addresses(cell))
-        {
-            return Err(Fault::new(
-                "cannot return a managed reference to the current frame",
-            ));
-        }
-        Ok(())
+        value.check_frame_return(|reference| {
+            self.args
+                .iter()
+                .chain(&self.locals)
+                .chain(self.construction_storage.iter())
+                .any(|cell| reference.addresses(cell))
+        })
     }
 
     fn pop(&mut self) -> Result<Value, Fault> {
@@ -1856,6 +1846,7 @@ impl Frame {
 // remain confined to direct output-argument paths in this implementation slice.
 fn assigned_reference(value: &Value) -> Result<(), Fault> {
     match value {
+        Value::MemoryView(view) => view.assigned(),
         Value::ObjectReference(object) => object.reference.assigned(),
         Value::SlotReference(reference) => reference.assigned(),
         Value::SlotInterface { receiver, .. } => receiver.assigned(),

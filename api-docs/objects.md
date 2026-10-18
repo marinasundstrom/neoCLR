@@ -360,3 +360,24 @@ String, copying only when other owners remain. A retained host Value keeps its t
 alive after heap collection. This host representation is not a new guest type and
 does not enable String ReferenceEquals. Array budgets still count text bytes per
 logical occurrence; GC object counts exclude these text allocations.
+
+### Rust host memory-view payloads
+
+Development-only `Value::MemoryView(MemoryView)` is an opaque interpreter payload.
+`MemoryView` exposes no public constructor, fields or memory-access methods; the
+runtime creates it internally. It implements `Clone`, `Debug` and `PartialEq`.
+Rust hosts with exhaustive matches on `Value` must handle the added variant.
+Cloning preserves the owner/window and access capability. Host equality compares
+view kind, owner, bounds and readonly capability, not element contents; this is
+not a guest equality operator. `Value::ty()` reports the intended closed generic
+Slice/ReadOnlySlice/Memory/ReadOnlyMemory type, but does not register a guest type.
+
+Borrowed views reject heap/field/array storage and erasure, including empty views
+and views over heap-owned arrays. Persistent views can be stored; normal VM tracing
+follows their owner. Holding a Rust Value does not itself root its managed owner.
+Host publication validates the execution heap, and expired owners fault. Immutable
+UTF-8 views share the String owner and are borrowed capabilities for storage checks.
+
+Public Raven APIs, nominal metadata admission, suspension rules and native lowering
+are pending. This payload is not a supported host factory or a new guest API; see
+the [implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md).

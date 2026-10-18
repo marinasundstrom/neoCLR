@@ -164,6 +164,7 @@ impl ManagedHeap {
         let mut roots = Vec::new();
         while let Some(value) = pending.pop() {
             let reference = match value {
+                Value::MemoryView(view) => view.reference(),
                 Value::ObjectReference(object) => Some(&object.reference),
                 Value::SlotReference(reference)
                 | Value::SlotInterface {
@@ -319,6 +320,14 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
     let mut pending = vec![value];
     while let Some(value) = pending.pop() {
         match value {
+            Value::MemoryView(view) => {
+                if let Some(identity) = view
+                    .reference()
+                    .and_then(|reference| reference.allocation_id())
+                {
+                    references.push(identity);
+                }
+            }
             Value::Function(d) => pending.extend(d.receiver.as_deref()),
             Value::ObjectReference(object) => references.push(object.allocation_id()),
             Value::SlotReference(reference)

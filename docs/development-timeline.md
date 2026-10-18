@@ -46,6 +46,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Open:** public APIs, automatic guest tracing and escape checks, Raven
   compilation and native backend qualification remain incomplete. The internal
   foundation is not reported as completion of the proposal or of phase 1.
+- **Continuation:** the author asks to continue. The assistant connects an opaque
+  view payload to normal interpreter tracing, storage/erasure guards, heap-owner
+  publication checks and recursive VM return checks. Guest construction, nominal
+  byref-like metadata and suspension restrictions remain open; this supersedes the
+  earlier lack of value-path tracing, not the public-API or native qualification gaps.
 
 ## 2026-10-18 — Attribute the remaining Serve allocation and CPU costs
 

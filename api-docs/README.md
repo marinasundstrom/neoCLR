@@ -216,6 +216,10 @@ Host Fault/FaultCode and debugger fields remain a complete manual [reference](fa
 not synthetic CLI types. The Rust-only StringValue payload and owned-text migration
 are documented in the [Object guide](objects.md#rust-host-string-payloads) and source
 rustdoc; StringValue is not a guest CLI type selected for RavenDoc.
+The opaque Rust-only `MemoryView`/`Value::MemoryView` payload is likewise covered
+by the [host value reference](objects.md#rust-host-memory-view-payloads). Its
+constructors remain internal and guest Slice/Memory APIs are not yet admitted;
+there is no RavenDoc type-selection or reference-assembly change for this payload.
 
 Sequence, Collection, Iterable and Iterator now have generated reference coverage,
 including String construction and its read-only grapheme indexer. String Count is

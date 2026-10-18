@@ -23,6 +23,8 @@ pub enum Value {
     Boolean(bool),
     /// Immutable UTF-8 text. Host-owned strings convert with `text.into()`.
     String(crate::StringValue),
+    /// Opaque interpreter capability; guest Slice/Memory admission is pending.
+    MemoryView(crate::MemoryView),
     /// Interpreter storage for explicit erasure, not a guest heap reference.
     Erased(Box<Value>),
     /// Owned metadata snapshot, not an arbitrary-value container or native pointer.
@@ -82,7 +84,62 @@ impl ObjectReference {
 }
 
 impl Value {
+    /// Traverse inline payloads at the return boundary. Heap references are not
+    /// followed: heap storage independently rejects borrowed capabilities.
+    pub(crate) fn check_frame_return(
+        &self,
+        addresses_frame: impl Fn(&crate::SlotReference) -> bool,
+    ) -> Result<(), crate::Fault> {
+        // Borrow sibling iterators instead of cloning payloads. Flat records,
+        // arrays and ordinary scalar/reference returns need no traversal allocation.
+        let mut pending = Vec::new();
+        let mut current = std::slice::from_ref(self).iter();
+        loop {
+            let Some(value) = current.next() else {
+                let Some(siblings) = pending.pop() else { break };
+                current = siblings;
+                continue;
+            };
+            let reference = match value {
+                Self::MemoryView(view) => {
+                    view.assigned()?;
+                    view.reference()
+                }
+                Self::SlotReference(reference)
+                | Self::SlotInterface {
+                    receiver: reference,
+                    ..
+                } => Some(reference),
+                _ => None,
+            };
+            if reference.is_some_and(&addresses_frame) {
+                return Err(crate::Fault::new(
+                    "cannot return a managed reference to the current frame",
+                ));
+            }
+            let children = match value {
+                Self::Object { fields, .. }
+                | Self::Array {
+                    elements: fields, ..
+                } => Some(fields.as_slice()),
+                Self::Erased(value) => Some(std::slice::from_ref(value.as_ref())),
+                Self::Function(function) => function.receiver.as_deref().map(std::slice::from_ref),
+                _ => None,
+            };
+            if let Some(children) = children.filter(|children| !children.is_empty()) {
+                if current.len() != 0 {
+                    pending.push(current);
+                }
+                current = children.iter();
+            }
+        }
+        Ok(())
+    }
+
     pub(crate) fn initialized(&self) -> Result<&Self, crate::Fault> {
+        if let Self::MemoryView(view) = self {
+            view.assigned()?;
+        }
         if matches!(self, Self::Char(value) if unicode_segmentation::UnicodeSegmentation::graphemes(value.as_str(), true).count() != 1)
         {
             return Err(crate::Fault::new(
@@ -101,6 +158,14 @@ impl Value {
         let mut pending = vec![self];
         while let Some(value) = pending.pop() {
             match value {
+                Self::MemoryView(view) => {
+                    if view.is_borrowed() {
+                        return Err(crate::Fault::new(
+                            "borrowed memory views cannot escape into stored values",
+                        ));
+                    }
+                    view.assigned()?;
+                }
                 Self::ObjectReference(object) => object.reference.assigned()?,
                 Self::Function(d) => pending.extend(d.receiver.as_deref()),
                 Self::SlotReference(reference)
@@ -140,6 +205,9 @@ impl Value {
             }
             remaining -= 1;
             match item {
+                Self::MemoryView(view) if view.is_borrowed() => {
+                    return Err(crate::Fault::new("borrowed memory views cannot be erased"));
+                }
                 Self::SlotReference(reference)
                 | Self::SlotInterface {
                     receiver: reference,
@@ -151,6 +219,14 @@ impl Value {
                 }
                 Self::Erased(payload) => {
                     pending.push((payload, depth + 1));
+                }
+                Self::Function(function) => {
+                    pending.extend(
+                        function
+                            .receiver
+                            .as_deref()
+                            .map(|receiver| (receiver, depth + 1)),
+                    );
                 }
                 Self::Object { fields, .. }
                 | Self::Array {
@@ -184,6 +260,7 @@ impl Value {
             Self::UIntPtr(_) => Type::UIntPtr,
             Self::Boolean(_) => Type::Boolean,
             Self::String(_) => Type::String,
+            Self::MemoryView(view) => view.ty(),
             Self::Erased(_) => Type::Value,
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),

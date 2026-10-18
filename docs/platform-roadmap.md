@@ -4,7 +4,8 @@
 as the preferred contiguous-memory abstraction, followed by persistent
 Memory/ReadOnlyMemory and measured buffer integration. The
 [contract and implementation status](native-memory-views.md) distinguish the
-internal checked-view foundation from pending guest metadata/lifetime rules,
+internal checked-view foundation and interpreter value tracing/storage/return
+guards from pending guest metadata/suspension rules,
 Raven syntax and JIT/AOT support. Index/Range already exist; array ranges still
 copy until the coordinated public migration. This direction does not infer a
 permanent reprioritization of unrelated milestones.

@@ -4,12 +4,107 @@
 //! A SlotReference is a logical managed address, not a host pointer. Its array
 //! path and the start below jointly identify the first element, including an
 //! empty window at the end. No payload is read/copied to construct a view.
-//! Before guest exposure, metadata, escape checks and native lowering must agree
-//! on the byref-like contract. In particular, do not encode Slice as an ordinary
-//! Value::Object: existing heap-only reference checks are insufficient for that.
+//! Value::MemoryView supplies tracing and storage/return checks. Before guest
+//! exposure, nominal metadata admission, suspension checks and native lowering
+//! must agree on this contract. Do not encode Slice as an ordinary Value::Object.
 use crate::{Fault, FaultCode, ManagedHeap, SlotReference, Value, metadata::Type};
 
-#[derive(Debug, Clone, Copy)]
+/// Opaque interpreter memory-view payload. Guest construction and nominal
+/// metadata admission are not enabled yet. Host code cannot fabricate a view.
+#[derive(Debug, Clone)]
+pub struct MemoryView(View);
+
+#[derive(Debug, Clone)]
+enum View {
+    Slice(Slice),
+    Memory(Memory),
+    Utf8(Utf8Slice),
+}
+
+impl MemoryView {
+    pub(crate) fn borrowed(slice: Slice) -> Self {
+        Self(View::Slice(slice))
+    }
+
+    pub(crate) fn persistent(memory: Memory) -> Self {
+        Self(View::Memory(memory))
+    }
+
+    pub(crate) fn utf8(slice: Utf8Slice) -> Self {
+        Self(View::Utf8(slice))
+    }
+
+    pub(crate) fn is_borrowed(&self) -> bool {
+        !matches!(self.0, View::Memory(_))
+    }
+
+    pub(crate) fn reference(&self) -> Option<&SlotReference> {
+        match &self.0 {
+            View::Slice(slice) => Some(&slice.array),
+            View::Memory(memory) => Some(&memory.view.array),
+            // String has its own immutable shared owner outside the object heap.
+            View::Utf8(_) => None,
+        }
+    }
+
+    pub(crate) fn assigned(&self) -> Result<(), Fault> {
+        match self.reference() {
+            Some(reference) => reference.assigned(),
+            None => Ok(()),
+        }
+    }
+
+    pub(crate) fn ty(&self) -> Type {
+        let (name, element) = match &self.0 {
+            View::Slice(slice) => (
+                if slice.array.is_readonly() {
+                    "System.ReadOnlySlice"
+                } else {
+                    "System.Slice"
+                },
+                slice.array.target(),
+            ),
+            View::Memory(memory) => (
+                if memory.view.array.is_readonly() {
+                    "System.ReadOnlyMemory"
+                } else {
+                    "System.Memory"
+                },
+                memory.view.array.target(),
+            ),
+            View::Utf8(_) => return view_type("System.ReadOnlySlice", Type::Byte),
+        };
+        let Type::Array(element) = element else {
+            unreachable!("validated memory view")
+        };
+        view_type(name, (**element).clone())
+    }
+}
+
+fn view_type(name: &str, element: Type) -> Type {
+    Type::Constructed {
+        definition: name.into(),
+        arguments: vec![element],
+    }
+}
+
+impl PartialEq for MemoryView {
+    fn eq(&self, other: &Self) -> bool {
+        // Host diagnostic equality only; no guest equality operator is added.
+        match (&self.0, &other.0) {
+            (View::Slice(a), View::Slice(b)) => same_window(a, b),
+            (View::Memory(a), View::Memory(b)) => same_window(&a.view, &b.view),
+            (View::Utf8(a), View::Utf8(b)) => a.owner.same_owner(&b.owner) && a.window == b.window,
+            _ => false,
+        }
+    }
+}
+
+fn same_window(a: &Slice, b: &Slice) -> bool {
+    a.array == b.array && a.array.is_readonly() == b.array.is_readonly() && a.window == b.window
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Window {
     start: usize,
     length: usize,
@@ -108,16 +203,6 @@ impl Slice {
         } else {
             Ok(None)
         }
-    }
-
-    /// Used by the future guest return checker; a view may return into a caller's
-    /// frame but must never keep the returning frame's own storage alive.
-    pub(crate) fn check_return(&self, frame: &[crate::slots::Cell]) -> Result<(), Fault> {
-        self.array.assigned()?;
-        if frame.iter().any(|cell| self.array.addresses(cell)) {
-            return Err(Fault::new("cannot return a slice of the current frame"));
-        }
-        Ok(())
     }
 }
 
@@ -272,15 +357,21 @@ mod tests {
         let cell = Slot::cell(Type::Array(Box::new(Type::Int32)), Some(array()));
         let reference = SlotReference::new(&cell);
         let view = Slice::new(reference.clone(), 0, 5).unwrap();
-        assert!(view.check_return(std::slice::from_ref(&cell)).is_err());
+        let value = Value::MemoryView(MemoryView::borrowed(view.clone()));
         assert!(
-            view.as_readonly()
-                .slice(5, 0)
-                .unwrap()
-                .check_return(&[cell])
+            value
+                .check_frame_return(|reference| reference.addresses(&cell))
                 .is_err()
         );
-        assert!(view.check_return(&[]).is_ok());
+        let empty = Value::MemoryView(MemoryView::borrowed(
+            view.as_readonly().slice(5, 0).unwrap(),
+        ));
+        assert!(
+            empty
+                .check_frame_return(|reference| reference.addresses(&cell))
+                .is_err()
+        );
+        assert!(value.check_frame_return(|_| false).is_ok());
         let heap = ManagedHeap::default();
         assert_eq!(view.heap_root(&heap).unwrap(), None);
         assert!(Memory::new(&heap, reference, 0, 5).is_err());
@@ -384,5 +475,181 @@ mod tests {
         assert!(continuation.slice(1, 1).is_err());
         assert!(continuation.slice(usize::MAX, 0).is_err());
         assert!(continuation.slice(1, 0).unwrap().bytes().is_empty());
+    }
+
+    #[test]
+    fn borrowed_values_reject_storage_and_erasure_even_with_heap_owners() {
+        let mut heap = ManagedHeap::default();
+        let slice = Slice::new(allocated(&mut heap), 0, 5).unwrap();
+        let borrowed = [
+            MemoryView::borrowed(slice.clone()),
+            MemoryView::borrowed(slice.as_readonly()),
+            MemoryView::borrowed(slice.slice(5, 0).unwrap()),
+            MemoryView::utf8(Utf8Slice::new("é".into())),
+        ];
+        for view in borrowed {
+            let value = Value::MemoryView(view);
+            let ty = value.ty();
+            assert!(
+                value.clone().for_storage(&ty).is_ok(),
+                "local value copies are permitted"
+            );
+            assert!(value.clone().erase(&ty).is_err());
+            assert!(heap.allocate(value.clone()).is_err());
+            assert!(
+                crate::arrays::create(ty.clone(), 1, value.clone(), &crate::Limits::default())
+                    .is_err()
+            );
+            let nested = Value::Object {
+                ty: Type::Named("Holder".into()),
+                fields: vec![value.clone()],
+            };
+            assert!(nested.ensure_heap_references().is_err());
+            assert!(nested.clone().erase(&nested.ty()).is_err());
+            assert!(heap.allocate(nested).is_err());
+            let field_owner = heap
+                .allocate(Value::Object {
+                    ty: Type::Named("Holder".into()),
+                    fields: vec![Value::Uninitialized(ty.clone())],
+                })
+                .unwrap();
+            assert!(
+                heap.address(field_owner)
+                    .unwrap()
+                    .write_field(0, ty, value)
+                    .is_err()
+            );
+        }
+    }
+
+    #[test]
+    fn ordinary_frame_tracing_roots_borrowed_views() {
+        let mut heap = ManagedHeap::default();
+        let owner = allocated(&mut heap);
+        let id = owner.allocation_id().unwrap();
+        let value = Value::MemoryView(MemoryView::borrowed(Slice::new(owner, 5, 0).unwrap()));
+        let local = Slot::cell(value.ty(), Some(value));
+        let mut roots = vec![];
+        local.borrow().trace_heap(&mut roots);
+        assert_eq!(roots, vec![id]);
+        heap.collect(roots, CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert!(heap.contains(id));
+        drop(local);
+        heap.collect(vec![], CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert!(!heap.contains(id));
+    }
+
+    #[test]
+    fn persistent_value_in_heap_field_traces_owner_automatically() {
+        let mut heap = ManagedHeap::default();
+        let owner = allocated(&mut heap);
+        let owner_id = owner.allocation_id().unwrap();
+        let memory = Memory::new(&heap, owner, 1, 3).unwrap().as_readonly();
+        let value = Value::MemoryView(MemoryView::persistent(memory.clone()));
+        assert_eq!(heap.value_roots(&value).unwrap(), vec![owner_id]);
+        let erased = value.clone().erase(&value.ty()).unwrap();
+        let holder = heap
+            .allocate(Value::Object {
+                ty: Type::Named("Holder".into()),
+                fields: vec![erased],
+            })
+            .unwrap();
+        heap.collect(vec![holder], CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert_eq!(memory.as_slice().get(0).unwrap(), Value::Int32(20));
+        heap.collect(vec![], CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert!(value.initialized().is_err());
+        assert!(memory.as_slice().get(0).is_err());
+    }
+
+    #[test]
+    fn persistent_value_cannot_publish_another_heaps_owner() {
+        let mut first = ManagedHeap::default();
+        let mut second = ManagedHeap::default();
+        let owner = allocated(&mut first);
+        allocated(&mut second);
+        let value = Value::MemoryView(MemoryView::persistent(
+            Memory::new(&first, owner, 0, 5).unwrap(),
+        ));
+        assert!(first.value_roots(&value).is_ok());
+        assert!(second.value_roots(&value).is_err());
+    }
+
+    #[test]
+    fn nested_frame_slice_is_rejected_by_the_vm_return_check() {
+        let cell = Slot::cell(Type::Array(Box::new(Type::Int32)), Some(array()));
+        let view = Slice::new(SlotReference::new(&cell), 0, 5).unwrap();
+        let value = Value::MemoryView(MemoryView::borrowed(view));
+        // Deliberately fabricated inline nesting exercises defense in depth even
+        // though normal stored-value construction rejects this payload earlier.
+        let nested = Value::Erased(Box::new(Value::Object {
+            ty: Type::Named("Holder".into()),
+            fields: vec![value],
+        }));
+        assert!(
+            nested
+                .check_frame_return(|reference| reference.addresses(&cell))
+                .is_err()
+        );
+        assert!(
+            nested.check_frame_return(|_| false).is_ok(),
+            "caller storage can return to its owner"
+        );
+    }
+
+    #[test]
+    fn value_identity_preserves_kind_element_and_readonly_capability() {
+        let mut heap = ManagedHeap::default();
+        let owner = allocated(&mut heap);
+        let slice = Slice::new(owner.clone(), 0, 5).unwrap();
+        let value = Value::MemoryView(MemoryView::borrowed(slice.clone()));
+        let readonly = Value::MemoryView(MemoryView::borrowed(slice.as_readonly()));
+        assert_eq!(value, value.clone());
+        assert_ne!(value, readonly);
+        assert_eq!(value.ty(), view_type("System.Slice", Type::Int32));
+        assert_eq!(
+            readonly.ty(),
+            view_type("System.ReadOnlySlice", Type::Int32)
+        );
+        assert!(readonly.for_storage(&value.ty()).is_err());
+        let memory = Value::MemoryView(MemoryView::persistent(
+            Memory::new(&heap, owner, 0, 5).unwrap(),
+        ));
+        assert_eq!(memory.ty(), view_type("System.Memory", Type::Int32));
+        assert_ne!(memory, value);
+    }
+
+    #[test]
+    fn fabricated_capture_cannot_hide_borrowed_view_from_escape_checks() {
+        let cell = Slot::cell(Type::Array(Box::new(Type::Int32)), Some(array()));
+        let view = Value::MemoryView(MemoryView::borrowed(
+            Slice::new(SlotReference::new(&cell), 0, 5).unwrap(),
+        ));
+        // Binding normally rejects this capture. Exercise the value guards even
+        // for an internally fabricated binding, including erasure traversal.
+        let captured = Value::Function(crate::Function {
+            ty: Type::Function(Box::new(crate::metadata::FunctionType {
+                parameters: vec![],
+                returns: Type::Void,
+                no_result: true,
+                out_parameters: vec![],
+                out_when_true: vec![],
+            })),
+            view: None,
+            identity: std::sync::Arc::new(()),
+            target: None,
+            native: None,
+            receiver: Some(Box::new(view)),
+        });
+        assert!(captured.ensure_heap_references().is_err());
+        assert!(captured.clone().erase(&captured.ty()).is_err());
+        assert!(
+            captured
+                .check_frame_return(|reference| reference.addresses(&cell))
+                .is_err()
+        );
     }
 }
