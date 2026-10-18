@@ -351,3 +351,31 @@ explicit native helper/frame roots rather than CLR-generated GC maps.
 Next integration gaps remain managed invocation, suspension/fault paths and pressure
 under sustained application load. The earlier fixed-size fixture results are still
 the performance evidence; these deterministic pressure cases are safety checks.
+
+
+### Native suspension and fault lifetimes
+
+[UBSan/bounds qualification](lifecycle-results.json) exercises two complete native
+lifetimes: park/resume/fault/unwind/complete and park/discard/complete. Each park,
+resume/discard and successful completion occurs while tracing is paused midwalk.
+The pending result is discarded without changing heap bytes, extent or collection
+and reclamation counters. A separate collection while parked verifies that a
+strongly rooted owner keeps the suspended message alive.
+
+Transferring an already-rooted message into the context fault, then unwinding its
+frame, permits the existing snapshot to apply safely. Completion removes static
+storage and intern ownership. After releasing the callback owner, only the fault
+message survives; clearing the fault allows complete reclamation. Both paths check
+exactly-once owner-thread resource cleanup and a clean final entry check. The
+collector is noncompacting: assertions count survivors, not just arena extent.
+The complete qualification passes 433 applied cycles, 35 discards and 301,032
+reclaimed payload bytes. An initial test-only assertion incorrectly equated one
+surviving object with compacted arena extent; correcting that assertion was the
+only repair needed. No collector change was needed.
+
+Like CLR exception and suspended-state lifetimes, live fault/continuation values
+must remain roots until released. These tests exercise neoCLR's explicit native
+frames, parked ownership and fault slots; they do not execute Raven async state
+machines, exception dispatch or the scheduler. This closes those native boundary
+checks, not managed integration. Performance evidence is unchanged; sustained
+pressure and managed execution remain the next validation work.

@@ -474,7 +474,97 @@ static void rooted_pressure_during_trace(unsigned event) {
     cycle_destroy(&cycle);
     neoclr_probe_leave_v1(&frame);
 }
+static void lifecycle_pending(collection_cycle *cycle, neoclr_aot_context *c) {
+    assert(cycle_start(cycle, c));
+    cycle->job->pause_midwalk = true;
+    atomic_store(&cycle->job->proceed, true);
+    while (!atomic_load(&cycle->job->midwalk)) sched_yield();
+}
+static void lifecycle_discard(collection_cycle *cycle, neoclr_aot_context *c) {
+    void *saved = malloc(c->text.capacity);
+    assert(saved);
+    memcpy(saved, c->text.data, c->text.capacity);
+    uint64_t used = c->text.used, collections = statistics.collections;
+    uint64_t reclaimed = statistics.reclaimed_allocations;
+    atomic_store(&cycle->job->resume, true);
+    assert(cycle_poll(cycle, true, false) == CYCLE_DISCARDED);
+    assert(used == c->text.used && collections == statistics.collections);
+    assert(reclaimed == statistics.reclaimed_allocations);
+    assert(!memcmp(saved, c->text.data, c->text.capacity));
+    free(saved);
+}
+/* Exercise native lifetime transitions together, including a fault that outlives
+ * the invocation. This does not execute a Raven async state machine. */
+static void suspended_invocation_lifecycle(bool abandon) {
+    uint64_t heap[2048] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    uint64_t allocated = statistics.allocations, reclaimed = statistics.reclaimed_allocations;
+    uint64_t *callback = churn_create(&c, 128);
+    void *message = allocate(&c, 8, NEOCLR_GC_TEXT);
+    memcpy(message, "failure", 8);
+    void *intern = allocate(&c, 8, NEOCLR_GC_INTERN);
+    c.static_storage = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t handle;
+    assert(!neoclr_gc_host_root_create_v1(&c, callback, &handle));
+    neoclr_gc_resource resource = {0};
+    unsigned cleaned = 0;
+    assert(!neoclr_gc_resource_attach_v1(&c, callback, &resource, &cleaned, cleanup));
+    neoclr_probe_storage slots[] = {{&callback, 8, 0}, {&message, 8, 0}};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, slots, 2, "{}", 2);
+    collection_cycle cycle;
+    assert(cycle_init(&cycle));
+    neoclr_parked_roots parked = {0};
+    lifecycle_pending(&cycle, &c);
+    assert(!neoclr_gc_roots_park_owned_v1(&c, callback, &parked));
+    lifecycle_discard(&cycle, &c);
+    cycle_run(&cycle, &c); /* Strong owner keeps the suspended message alive. */
+    assert(validated_bases(&c.text, message, intern) && !cleaned && !parked.expired);
+    lifecycle_pending(&cycle, &c);
+    if (abandon) neoclr_roots_discard_v1(&parked);
+    else neoclr_roots_resume_v1(&parked);
+    lifecycle_discard(&cycle, &c);
+    assert(!parked.head && !parked.owner && !parked.owner_context);
+    if (!abandon) {
+        /* Publish an already-rooted value as the fault, then unwind its frame.
+         * Snapshot reachability covers this transfer without another barrier. */
+        lifecycle_pending(&cycle, &c);
+        c.fault.code = 4;
+        c.fault.message = message;
+        neoclr_probe_leave_v1(&frame);
+        atomic_store(&cycle.job->resume, true);
+        assert(cycle_poll(&cycle, true, false) == CYCLE_APPLIED);
+        assert(!memcmp(message, "failure", 8));
+    }
+    lifecycle_pending(&cycle, &c);
+    assert(!neoclr_gc_complete_invocation_v1(&c));
+    assert(!c.static_storage && ((block *)intern - 1)->kind == NEOCLR_GC_BYTES);
+    lifecycle_discard(&cycle, &c);
+    assert(!neoclr_gc_host_root_release_v1(&c, handle));
+    cycle_run(&cycle, &c);
+    assert(cleaned == 1 && !resource.owner);
+    uint64_t survivors = 0;
+    for (uint64_t at = 0; at < c.text.used;) {
+        const block *b = (const void *)(c.text.data + at);
+        survivors += (b->state & ALLOCATED) != 0;
+        at += b->span;
+    }
+    assert(survivors == (abandon ? 0u : 1u));
+    if (!abandon) {
+        assert(validated_bases(&c.text, message, NULL) && !memcmp(message, "failure", 8));
+        c.fault.code = 0;
+        c.fault.message = NULL;
+        cycle_run(&cycle, &c);
+    }
+    assert(!c.text.used && cleaned == 1);
+    assert(statistics.allocations - allocated == statistics.reclaimed_allocations - reclaimed);
+    assert(!neoclr_gc_entry_check_v1(&c));
+    cycle_destroy(&cycle);
+}
 static void reclamation_tests(void) {
+    suspended_invocation_lifecycle(false);
+    suspended_invocation_lifecycle(true);
+    puts("LIFECYCLE: park, resume/discard, fault transfer, successful completion, exactly-once cleanup and full reclamation passed");
     for (unsigned event = 0; event < 3; event++) rooted_pressure_during_trace(event);
     puts("PRESSURE: midwalk rooted allocation, helper-root survival, same-address reuse, failed retry and impossible-size control passed");
     executing_callback_churn();

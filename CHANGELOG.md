@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Qualify native suspension/fault lifetimes in the concurrent-GC POC: park, resume/discard and successful invocation completion reject pending snapshots without heap mutation; fault-root transfer survives frame unwinding, intern/static ownership ends at completion, and resources clean up exactly once. Focused lifecycle tests and existing UBSan/bounds checks pass with full reclamation. This is native boundary validation, not managed async integration or a new speedup.
+
 - Qualify rooted allocation pressure during concurrent-GC POC tracing: synchronous fallback preserves helper roots, safely reuses reclaimed addresses and invalidates pending marks; failed retries also discard, while impossible requests avoid collection. Deterministic midwalk tests and existing UBSan/bounds qualification pass with full reclamation. Production behavior and measured performance are unchanged.
 
 - Exercise an allocating native callback fixture during concurrent-GC tracing, with live-object replacement, bounded heap extent, sequence checks and full reclamation. UBSan/bounds includes deterministic midwalk invocation; matched eight-replacement workloads repeatedly run about 6–7.5% faster than sync with about 20% less owner interruption, at 21–28% more CPU. Retain mixed allocation-heavy results and all evidence. This is native POC evaluation, not Raven callback/scheduler integration or production HTTP performance.

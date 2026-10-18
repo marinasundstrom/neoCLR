@@ -145,7 +145,9 @@ avoid unnecessary fallbacks; failed/conditional reads and mutations remain prote
 Frequent invalidation can still eliminate the local pause benefit. Deterministic
 allocation-pressure tests also verify synchronous fallback, temporary-root survival
 and stale-result rejection after reclaimed memory is reused; sustained application
-pressure remains unqualified.
+pressure remains unqualified. Native lifecycle tests cover parked roots, fault
+retention after frame unwinding, invocation completion and exactly-once cleanup.
+Managed async and exception dispatch still require integration validation.
 
 A native callback fixture now allocates replacements and retires live objects while
 tracing runs, with bounded memory and complete reclamation checks. With eight

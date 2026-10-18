@@ -5356,3 +5356,11 @@ roots survive, immediate address reuse is safe, failed retries discard stale mar
 and impossible requests avoid collection. [Qualification](experiments/concurrent-gc-walker/README.md#rooted-allocation-pressure-during-tracing)
 passes with complete reclamation; no production or performance change is claimed.
 Managed invocation, suspension/fault paths and sustained pressure remain open.
+
+
+**Native suspension/fault boundary (2026-10-18):** [two end-to-end native lifetimes](experiments/concurrent-gc-walker/README.md#native-suspension-and-fault-lifetimes)
+cover park/resume or discard, fault transfer/frame unwind, successful completion,
+intern/static ownership release and exactly-once cleanup. Deterministic midwalk
+invalidation and full reclamation pass UBSan/bounds; no collector fix was needed.
+This qualifies native boundaries only. Managed async/exception dispatch, scheduler
+integration and sustained-pressure performance remain open.
