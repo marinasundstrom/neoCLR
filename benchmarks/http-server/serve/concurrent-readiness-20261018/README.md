@@ -110,3 +110,11 @@ oracles; do not infer coverage from HTTP throughput alone. Once qualified, compa
 sync/concurrent/Go with the same source, transport contract, rates and offered-load
 accounting, then examine CPU demand during real request bursts. These are next
 steps, not implemented support or a new collector selection option.
+
+
+## Follow-up: tracing now reaches the real scheduler
+
+The [HTTP shadow adapter](../../../../docs/experiments/concurrent-gc-http/README.md)
+implements the first tracing-only integration step above. Real requests, malformed
+input recovery and concurrent peers pass with synchronous reclamation authoritative.
+No background result application or timed concurrent-Serve comparison is enabled yet.

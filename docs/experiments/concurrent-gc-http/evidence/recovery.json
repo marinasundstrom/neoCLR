@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "commands": [
+    [
+      "/Users/robert/Projects/neoclr/target/http-shadow-build/app-paced"
+    ]
+  ],
+  "serverTotals": [
+    17,
+    0,
+    1
+  ],
+  "shadow": {
+    "opportunities": 62694,
+    "started": 956,
+    "completed": 956,
+    "epochUnchanged": 434,
+    "invalidated": 522,
+    "captureRejected": 0,
+    "traceErrors": 0,
+    "cancelledAtShutdown": 0,
+    "peakSnapshotBytes": 74672,
+    "allocations": 7752,
+    "reclaimedAllocations": 7752,
+    "applied": 0
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-http/validate.py": "9782b09cf0db447233d81912cc5902de0e74745ce05aec44cba14f11c2c8177b",
+    "/Users/robert/Projects/neoclr/target/http-shadow-build/app-paced": "e705c613d0f4be177fc86df24c5209d7742f5d9b4667e987704930f90d8d7d86",
+    "/Users/robert/Projects/neoclr/target/http-shadow-build/build.json": "fea7270e746408df4ce5d45b2a2ea7af53fd14a99619ec5cdf7951787775731d"
+  }
+}

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Run private background snapshot tracing through the actual asynchronous Serve host while paced synchronous GC remains authoritative. A diagnostic 250-request run completes 14,153 traces without errors/rejections (about 42% unchanged epochs); malformed-request recovery and concurrent peers also pass, with full reclamation and joined worker teardown. No live marks are imported and no HTTP speedup or concurrent collector support is claimed.
+
 - Return GC evaluation to actual asynchronous HTTP Serve loads against Go. Relink the retained qualified guest with current native sources and repeat 30-second 300/400 req/s points in reversed order. Serve passes the first round but misses 238/8 arrivals in the second; Go passes all points. Retain byte validation, shutdown accounting and full provenance. Record scheduler/root-lifetime integration work for concurrent GC; no HTTP concurrent collector or speedup is claimed.
 
 - Measure compiled callback bursts alongside bounded CPU competitors. Concurrent GC retains about 6% more burst completions; with eight competitors it finishes the workload 8% sooner at 14% more process CPU, while four competitors cost 31% more CPU for a smaller elapsed gain. Both modes fail to sustain the offered base rate under heavy contention. Retain controls, competitor progress/cleanup, full reclamation and raw evidence; no production policy or HTTP capacity claim.

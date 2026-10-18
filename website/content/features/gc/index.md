@@ -189,3 +189,11 @@ the reverse round; Go passes all tested points. Concurrent GC is not yet integra
 into Serve. The next step is qualification at real scheduler and root-lifetime
 boundaries; [HTTP evidence and integration scope](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/concurrent-readiness-20261018/README.md)
 keep these results separate from callback microbenchmarks.
+
+
+A tracing-only adapter now runs through real asynchronous Serve requests while
+synchronous GC retains all reclamation responsibility. Diagnostic requests,
+malformed-input recovery, concurrent clients and clean shutdown pass; background
+marks are never applied. About 42% of completed traces keep their invalidation epoch,
+which is a useful observation, not proof that applying them is safe. See the
+[HTTP shadow-tracing evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-http/README.md).

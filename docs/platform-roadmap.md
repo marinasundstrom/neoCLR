@@ -5411,3 +5411,12 @@ validate and shutdown/heap checks pass. No repeatable rate or HTTP concurrent-GC
 is established. Next integrate observation of background tracing with real scheduler
 root/park/idle/shutdown transitions, keeping synchronous reclamation authoritative
 until those paths qualify; then compare actual concurrent Serve under the same load.
+
+
+**Real Serve shadow tracing (2026-10-18):** [isolated HTTP adapter](experiments/concurrent-gc-http/README.md)
+now captures/traces through actual async scheduler boundaries, retaining synchronous
+collection and all invalidation hooks. A 250-request diagnostic run completes 14,153
+private traces; about 42% retain their epoch, with no capture rejections/trace errors.
+Malformed-request recovery, concurrent peers and final reclamation pass. No live marks
+are applied: productive boundary selection and actual application/pressure/lifecycle
+qualification precede an uninstrumented sync/concurrent/Go comparison.
