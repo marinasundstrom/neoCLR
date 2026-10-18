@@ -2883,11 +2883,11 @@ fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
             "{r:?}"
         );
     }
-    let calls = (0..1022)
+    let calls = (0..2046)
         .map(|n| format!("call F{n}()\npop\n"))
         .collect::<String>();
     let mut large = source.replacen("call Box()", &format!("{calls}call Box()"), 1);
-    for n in 0..1022 {
+    for n in 0..2046 {
         large.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n"));
     }
     let app =

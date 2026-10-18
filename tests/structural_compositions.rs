@@ -1408,3 +1408,18 @@ fn string_union_rejects_wrong_payload_and_intersection_bounds() {
     );
     assert!(assemble(&format!(".module Invalid\n{TYPES}\n.function F(intersection<String,Left> value) -> Void\nret\n.end")).is_err());
 }
+
+#[test]
+fn incompatible_nominal_interface_cast_reports_invalid_cast() {
+    for body in [
+        "newobj Neither\ncastclass Left\npop\nldc.i4 0",
+        "newobj LeftOnly\ncastclass union<Left,Right>\ncastclass Right\npop\nldc.i4 0",
+    ] {
+        let p = program(body, "");
+        p.verify().unwrap();
+        assert_eq!(
+            p.run(Limits::default()).unwrap_err().code,
+            neoclr::FaultCode::InvalidCast
+        );
+    }
+}

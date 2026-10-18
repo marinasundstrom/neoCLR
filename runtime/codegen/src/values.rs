@@ -3332,19 +3332,9 @@ pub(crate) fn compile_into(
                                 b.ins()
                                     .icmp_imm(IntCC::NotEqual, source_tag.unwrap_or(value), 0);
                             let invalid = b.ins().band(absent, present);
-                            let code = if matches!(
-                                target_ty,
-                                Ty::Callable(_)
-                                    | Ty::Intersection(_)
-                                    | Ty::ReferenceUnion(_)
-                                    | Ty::MixedUnion(_)
-                                    | Ty::ValueUnion(_)
-                            ) {
-                                11
-                            } else {
-                                3
-                            };
-                            let status = b.ins().iconst(types::I32, code);
+                            // Every failed checked reference cast has InvalidCast semantics,
+                            // including nominal targets reached from structural views.
+                            let status = b.ins().iconst(types::I32, 11);
                             return_if_detailed(&mut b, invalid, status, site.as_ref());
                         }
                         if matches!(target_ty, Ty::MixedUnion(_)) {

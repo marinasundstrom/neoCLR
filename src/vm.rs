@@ -4080,7 +4080,10 @@ fn interpret_instructions_with_dispatch(
                             {
                                 crate::interfaces::ensure_reference_implementation(
                                     module, concrete, target,
-                                )?;
+                                )
+                                .map_err(|fault| {
+                                    Fault::coded(crate::FaultCode::InvalidCast, fault.message)
+                                })?;
                                 object.view = Some(target.clone());
                             } else if *target == Type::from_name("System.Object") {
                                 object.view = Some(target.clone());
@@ -4135,7 +4138,10 @@ fn interpret_instructions_with_dispatch(
                                     module,
                                     &Type::String,
                                     target,
-                                )?;
+                                )
+                                .map_err(|fault| {
+                                    Fault::coded(crate::FaultCode::InvalidCast, fault.message)
+                                })?;
                             }
                             if heap.len() >= limits.heap_objects {
                                 return Err(Fault::coded(

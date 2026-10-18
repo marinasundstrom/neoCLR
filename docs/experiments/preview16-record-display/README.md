@@ -47,9 +47,12 @@ The native `rooted_boxed_records_copy_trace_and_dispatch_payloads` test checks
 copy-in/copy-out isolation, a heap string reachable through the box, byref override
 calls, empty-box compatibility, null/type-mismatch fault kinds and source sites,
 heap canaries and final complete reclamation. Three rooted-boxing and three
-Object-display checks pass. Ten structural checks pass; five nominal cast-fault
-checks expose a separate existing RuntimeError/InvalidCast mismatch, assigned to
-its own follow-up slice. All reference-containing structural GC checks pass.
+Object-display checks pass. The structural suite initially passed ten checks and exposed five nominal
+cast-fault mismatches. The follow-up corrects native nominal casts and interpreter
+interface casts to InvalidCast: fourteen checks pass in the first rerun, and the
+remaining union-to-interface case passes after the interpreter correction. Both
+empty-box checks pass, including the refreshed 2,048-function helper bound. All
+reference-containing structural GC checks pass.
 
 No public signatures, Runtime Contract options or temporary CLI encodings change.
 The native backend owns the repair. Existing layout/type/function bounds remain;

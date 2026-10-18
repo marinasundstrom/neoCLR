@@ -12921,3 +12921,13 @@ explicit reflection retention for class properties and returns UnsupportedMappin
 for non-scalar value records. Do not infer record JSON serialization from successful
 boxing. See the [Preview 16 reproduction](experiments/preview16-record-display/README.md)
 for tool identities, complete consumer checks and remaining limitations.
+
+### Checked nominal casts
+
+Native checked reference casts now report InvalidCast for every incompatible
+non-null target, including nominal targets reached from structural views. Null
+casts remain null. This corrects the previous RuntimeError classification to match
+the interpreter and .NET cast semantics; no metadata or Runtime Contract change.
+The existing empty-box and five structural fault regressions exercise the repair.
+The same investigation found interpreter interface casts leaking RuntimeError;
+those failed casts now also report InvalidCast.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Report InvalidCast for failed native nominal reference casts and interpreter interface casts, including narrowing from structural views; preserve null casts and source sites. Refresh the boxing-helper budget regression for the current 2,048-function bound.
+
 - Add native boxed Int64/Boolean Object display with exact integer formatting, Boolean text and rooted allocation; preserve explicit formatter binding and allow verified reference boxing in display-bearing programs. Add interpreter-parity/GC regression coverage. Also copy/trace nonempty closed value-record boxes, checked unboxing and byref display overrides; discover generic Result overrides before owner erasure. Retain Preview 16 compiler/backend/interpreter reproduction and document separate JSON mapping/retention limits.
 
 - Reduce repeated root-plan substring searches with bounded, revalidated offset hints; preserve current-length, live descriptor, fault and GC-policy checks. Add mutable-plan rejection/relocation coverage and matched Serve/Go measurements: the clean 400/sec pair uses 6.5% less CPU per completion, while noisy repeats and overload losses prevent a higher sustained-rate claim. Retain all outcomes and Green Tea research as a separate future tracing input.
