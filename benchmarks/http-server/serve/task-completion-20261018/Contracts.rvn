@@ -86,5 +86,26 @@ func Main() {
         queue.Drain()
         Require(observer.Order == 123)
     }
+    // Grow past the initial callback reservation for completion and cancellation.
+    for mode in 0..2 {
+        let many = Promise<int>(queue)
+        let before = observer.Count
+        for index in 0..9 {
+            many.Task.OnCompleted(observer.Hit)
+        }
+        if mode == 0 {
+            Require(many.Complete(42))
+        } else {
+            Require(many.Cancel())
+        }
+        Require(observer.Count == before)
+        queue.Drain()
+        Require(observer.Count == before + 9)
+        if mode == 0 {
+            Require(many.Task.GetResult() == 42)
+        } else {
+            Require(many.Task.State == TaskState.Cancelled)
+        }
+    }
     Console.WriteLine("Task completion contracts passed")
 }

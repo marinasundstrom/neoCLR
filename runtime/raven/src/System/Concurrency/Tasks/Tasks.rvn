@@ -267,7 +267,8 @@ public class Promise<T> {
         } else if callbacks is ArrayList<() -> System.Void> pending {
             pending.Add(callback)
         } else {
-            let pending = ArrayList<() -> System.Void>()
+            // The first callback is already known; avoid empty storage then growth.
+            let pending = ArrayList<() -> System.Void>(1)
             pending.Add(callback)
             callbacks = pending
         }

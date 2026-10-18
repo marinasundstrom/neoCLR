@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Reserve space for the known first Promise callback instead of allocating empty storage and immediately growing it. Retain lazy allocation and deferred callback semantics; expanded multi-callback completion/cancellation tests pass interpreter/JIT/AOT and the unchanged API snapshot is refreshed. Serve diagnostics show 4.36% fewer allocations, 3.47% fewer bytes and 1.13% fewer root publications, with more collections. Matched sustained measurements follow separately.
+
 - Add diagnostic-only Serve allocation attribution by payload size, allocation kind and four published caller frames, with explicit truncation/overflow accounting and paced-GC trigger counters. Focused capture tests pass. Fresh CPU sampling identifies allocation/root publication/collection as leading costs; caller counts expose 2,687 avoidable first-callback growth allocations and substantial Promise result-slot storage. Boundary-trigger totals remain equal across the header-reservation comparison; explicit idle counts vary. Runtime behavior and public APIs remain unchanged.
 
 - Reserve a bounded 128-byte request-header prefix (capped by the configured limit) to avoid repeated ArrayList startup growth. Preserve larger-header growth and exact limit enforcement; 12 boundary cases pass in interpreter/JIT/AOT, and the unchanged API snapshot is refreshed. Diagnostics show 1.76% fewer allocations but 3.57% more collections; all six matched 400/sec Serve/Go trials pass, with 0.9–1.0% lower candidate CPU/completion in both orders and lower p99 latency. Retain raw evidence and update the website; no higher sustained rate is established.
