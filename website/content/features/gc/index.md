@@ -174,3 +174,10 @@ overload and drains the queue sooner with concurrent GC. Peak process CPU demand
 is about 1.25 cores versus 1.0, with about 18.7% more CPU overall. This supports
 further throughput work where CPU headroom exists; CPU-constrained and HTTP capacity
 remain unmeasured. See the [burst methodology and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md#fixed-offered-load-burst-cpu-and-recovery-2026-10-18).
+
+
+Controlled CPU contention retains about 6% more burst completions with concurrent
+GC, but extra process CPU ranges from 14% to 31% in the tested cases. Under heavy
+contention both collectors fall behind even the base arrival rate and drain only
+after arrivals stop. This is an overload benefit, not a sustainable capacity claim;
+see the [contention evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md#controlled-competing-cpu-work-2026-10-18).

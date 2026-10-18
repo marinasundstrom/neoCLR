@@ -5392,3 +5392,12 @@ with quicker recovery, at about 18.7% more process CPU overall and a peak near
 1.25 cores versus 1.0. Six-second single-owner trials preserve scheduled queueing
 and reclaim all memory. CPU quotas/contention, long-duration capacity and actual
 scheduler/HTTP integration remain open; production policy is unchanged.
+
+
+**CPU contention checkpoint (2026-10-18):** [controlled competing work](../benchmarks/gc-concurrent-poc/README.md#controlled-competing-cpu-work-2026-10-18)
+retains about 6% more burst completions with concurrent GC. Eight competitors give
+8% less elapsed time for the full workload at 14% more CPU; four competitors cost
+31% more CPU for a smaller elapsed gain. Both collectors drain only after arrivals
+stop under heavy contention, so the offered base rate is not sustainable. All owned
+competitors stop cleanly and full reclamation passes. Next measure a lower sustainable
+offered rate under contention and reduce CPU overhead; production policy is unchanged.

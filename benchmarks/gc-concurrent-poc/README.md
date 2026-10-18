@@ -778,3 +778,74 @@ python3 benchmarks/gc-concurrent-poc/compiled-load.py \
 Next: test contention/CPU-budget sensitivity before extrapolating spare-core results,
 and then carry the validated path into scheduler/HTTP workloads. Production GC
 selection and policy remain unchanged.
+
+
+## Controlled competing CPU work (2026-10-18)
+
+`compiled-contention.py` runs the unchanged 21,000-batch arrival schedule with
+four or eight separately owned arithmetic competitor processes. On this tested
+8-core host (four performance/four efficiency cores), each competitor runs at
+ordinary inherited scheduling priority without affinity or a quota. Competitors
+signal readiness, settle for 250 ms, remain running throughout one trial, and are
+terminated/joined in `finally`; each also has a 60-second self-limit. Only processes
+created by the runner are stopped. Per-process CPU time, iteration counts and exit
+status are retained. A sanitizer check verifies the competitor; the existing load
+qualification supplies the unchanged collector/workload checks. The runner rebuilds
+the exact qualified recipe and checks all source/object hashes.
+
+Trials run sync/concurrent/concurrent/sync at each level. Four competitors ran first,
+then eight, followed by a fresh no-competitor control. This tests real OS scheduling
+contention, not a precisely allocated CPU budget or isolated hardware core. Rates
+are generated callback batches, not HTTP requests.
+
+Mean results from two trials per mode at each level:
+
+| Competitors | Burst batches: sync / concurrent | Full workload elapsed: sync / concurrent | Process CPU-seconds: sync / concurrent |
+| ---: | ---: | ---: | ---: |
+| 0 (fresh control) | 4710 / 4916.5 | 6.000 / 6.000 s | 4.519 / 5.440 |
+| 4 | 3447.5 / 3648.5 | 6.293 / 6.131 s | 5.958 / 7.791 |
+| 8 | 2174 / 2305.5 | 9.638 / 8.865 s | 6.093 / 6.956 |
+
+The burst advantage survives: approximately **5.8%** with four competitors and
+**6.0%** with eight. With eight, total completion is **8.0% sooner**, costing
+**14.2% more process CPU**. With four, elapsed improves only **2.6%**, while CPU
+rises **30.8%**. Variation matters: four-competitor sync burst counts are 3583 and
+3312 versus concurrent 3586 and 3711. Two trials are useful evidence, not a precise
+universal crossover threshold.
+
+Eight-competitor response p99 is 2.757–2.938 seconds concurrent versus 3.574–3.641
+seconds sync. Queue recovery occurs **5.772–5.959 seconds after the burst** versus
+6.602–6.674 seconds. Since offered arrivals stop three seconds after the burst,
+**both modes drain only after input ends**: neither sustains even the 3,000-batch/sec
+base arrival rate at this contention level. Faster overload handling must not be
+reported as a sustainable rate.
+
+Peak half-second process CPU demand is 1.303–1.309 cores concurrent versus about
+0.959 sync with four competitors. With eight it falls to 0.839–0.844 versus
+0.648–0.674 because the benchmark receives less scheduled CPU time; lower consumed
+CPU is not spare capacity. The no-competitor control restores the earlier result
+(about 4.4% more burst completions, roughly 1.26 versus 1.0 peak cores).
+
+Competing work also matters. With eight competitors, their combined iteration rate
+is approximately 3.1% lower during concurrent trials than sync trials. This coarse
+metric includes competitor startup/settling and guest warm-up, not just the six-second
+arrival window; it does not establish a precise fairness penalty. The four-worker
+runs show no consistent competing-work loss. CPU time and scheduling on heterogeneous
+cores do not translate directly to an equal amount of application work.
+
+Evidence: [four competitors](compiled-contention-4.json),
+[eight competitors](compiled-contention-8.json),
+[fresh control](compiled-contention-control.json). All trials complete identical
+callbacks/checksums/collection counts, reclaim every allocation, and stop every owned
+competitor cleanly. No production collector or scheduling policy changes.
+
+```sh
+python3 benchmarks/gc-concurrent-poc/compiled-contention.py \
+  --load-build target/gc-compiled-burst-final --competitors 8 \
+  --output target/gc-contention-new
+```
+
+The throughput direction remains promising, but the CPU increase is workload-dependent
+and neither overload result qualifies a capacity target. Next: lower the offered rate
+under contention to find a rate with bounded queue/recovery, and reduce concurrent
+CPU overhead before moving this path into actual scheduler/HTTP evaluation.

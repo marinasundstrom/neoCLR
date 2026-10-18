@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Measure compiled callback bursts alongside bounded CPU competitors. Concurrent GC retains about 6% more burst completions; with eight competitors it finishes the workload 8% sooner at 14% more process CPU, while four competitors cost 31% more CPU for a smaller elapsed gain. Both modes fail to sustain the offered base rate under heavy contention. Retain controls, competitor progress/cleanup, full reclamation and raw evidence; no production policy or HTTP capacity claim.
+
 - Add fixed-arrival burst/recovery measurements for generated callbacks, including queueing in latency and half-second process CPU demand. Concurrent GC completes about 5.6% more batches during the tested burst and drains the backlog sooner, at about 18.7% more CPU overall and a peak of 1.25 cores versus 1.0. Retain all trials, schedule assertions, sanitizer checks and full reclamation. This six-second single-owner POC probe does not establish CPU-constrained or HTTP/Go capacity.
 
 - Benchmark actual AOT-generated callbacks with matched synchronous/concurrent batch pacing. Longer 4,096-object repeats take 4.1–5.4% less elapsed time and about 20% less owner interruption with concurrent GC, at 15.5–20.1% more CPU; small heaps lose and batch p99 is mixed. Retain raw trials, source/object hashes, UBSan/bounds checks and full reclamation. This is local POC evidence, not sustained HTTP/Go performance or a production policy change.
