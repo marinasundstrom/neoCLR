@@ -10408,3 +10408,10 @@ containing these types: no CLI projection of an empty ordinary record is safe.
 Use `RuntimeAssemblyContainer.WriteLibraryBinary` for a native-only library.
 The interpreter owns the layout and enforces lifetimes; native JIT/AOT lowering
 is not established by this metadata support.
+
+Symbol-only producers use `AssemblyBuilder.SetMemoryView(importedType, kind)`
+after reading the matching native type's explicit contract. It requires a canonical
+unconstructed System value definition owned by that builder; invalid shapes throw
+ArgumentException and conflicting contracts throw InvalidOperationException.
+Imported constructions and method owners keep the canonical runtime identity.
+This explicit contract is not inferred from a type's name alone.

@@ -18,6 +18,13 @@ internal static class MemoryViewChecks
             if (type.MemoryView != kind || !type.IsValueType || type.Fields.Count != 0)
                 throw new Exception("memory-view metadata lost");
         }
+        var consumer = new AssemblyBuilder(new("ViewConsumer", new Version(1, 0, 0, 0)), core);
+        var imported = consumer.ImportReference(read.MainModule.Types.Single(t => t.Name == "Slice`1"), core);
+        var consumerBytes = consumer.WriteNativeAssembly();
+        var consumerJson = JsonNode.Parse(consumerBytes)!;
+        if (consumerJson["assemblies"]![0]!["value_type_references"]![0]!.GetValue<string>() != "System.Slice")
+            throw new Exception("imported view lost canonical runtime identity");
+        _ = NativeAssemblyDefinition.ReadAssembly(consumerBytes);
         var malformed = JsonNode.Parse(bytes)!;
         malformed["types"]![0]!["memory_view"] = "read_only_slice";
         Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(malformed.ToJsonString())));

@@ -111,6 +111,7 @@ public sealed partial class AssemblyBuilder
                 genericNames: Enumerable.Range(0, type.GenericArity).Select(i => "T" + i).ToArray(),
                 isInterface: authoredInterfaces.Contains(type), isValueType: type.IsValueType);
             result.Definition.AuthoredDeclaringType = type.DeclaringType is { } parent ? MaterializeOwner(parent).Definition : null;
+            if (ImportedMemoryView(type) is { } view) result.SetMemoryView(view);
             return result;
         }
         if (nativePrimitive is { } declaredPrimitive) SetNativePrimitive(declaringType, declaredPrimitive);

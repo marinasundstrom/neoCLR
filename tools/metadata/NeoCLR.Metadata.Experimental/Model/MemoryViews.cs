@@ -46,3 +46,29 @@ public sealed partial class TypeBuilder
             throw new InvalidOperationException("memory view requires a canonical fieldless generic value type");
     }
 }
+
+public sealed partial class AssemblyBuilder
+{
+    private readonly Dictionary<ImportedTypeReference, MemoryViewKind> importedMemoryViews = [];
+
+    /// <summary>Preserves an explicitly imported opaque memory-view contract.</summary>
+    /// <remarks>The caller must obtain the kind from the matching native declaration.</remarks>
+    public void SetMemoryView(ImportedTypeReference type, MemoryViewKind kind)
+    {
+        if (!Enum.IsDefined(kind)) throw new ArgumentOutOfRangeException(nameof(kind));
+        if (!ReferenceEquals(type.Owner, this) || type.Namespace != "System" ||
+            type.Name != kind + "`1" || type.GenericArity != 1 || !type.IsValueType ||
+            type.DeclaringType is not null || type.TypeArguments.Count != 0)
+            throw new ArgumentException("memory-view import requires a canonical value definition", nameof(type));
+        if (importedMemoryViews.TryGetValue(type, out var previous) && previous != kind)
+            throw new InvalidOperationException("memory-view import contract already selected");
+        importedMemoryViews[type] = kind;
+    }
+
+    internal MemoryViewKind? ImportedMemoryView(ImportedTypeReference type)
+    {
+        var definition = InterfaceDefinition(type);
+        return importedMemoryViews.TryGetValue(definition, out var kind) ? kind :
+            nativeImportedDefinitions.TryGetValue(definition, out var native) ? native.MemoryView : null;
+    }
+}

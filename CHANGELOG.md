@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
-- Preserve opaque memory-view kinds in the native metadata authoring, import and introspection APIs. Validate canonical fieldless shapes and reject unsafe CLI reference projection; native-only library containers round-trip all four kinds. Document the host metadata API and validate identity/shape/projection guards.
+- Preserve opaque memory-view kinds in the native metadata authoring, import and introspection APIs. Validate canonical fieldless shapes and reject unsafe CLI reference projection; native-only library containers round-trip all four kinds. Preserve canonical identities through imported constructions, symbol-only references and method owners; the Raven consumer validates cross-library calls. Document the host metadata API and validate identity/shape/projection guards.
 
 - Admit explicit opaque memory-view metadata and exact interpreter services for checked factories, indexing, nested windows, readonly conversion, persistent ownership and UTF-8 views. Reject borrowed storage/boxing/generic escapes and suspension; native codegen rejects selected view types pending lowering. Keep executable neoIL declarations as test fixtures, with production Raven APIs in a separate integration step. Record the author’s preference for consistent APIs over compatibility-only overloads.
 
