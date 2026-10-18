@@ -57,6 +57,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   investigation before implementing the Serve API change. Serve remains a low-level
   primitive; routing and minimal-endpoint frameworks belong above it.
 
+- **Follow-up:** lazy Promise callback storage and indexed dispatch pass three-mode
+  contracts and reduce diagnostic allocations 13.37%. The author requests an unchanged
+  rerun after noisy load results. Both repeat candidate trials pass at 400/sec with
+  5.6–7.2% lower CPU/completion; earlier failures remain in the
+  [evidence](../benchmarks/http-server/serve/callback-storage-20261018/README.md).
+  The author then approves testing the existing ArrayQueue for TaskQueue storage.
+
 ## 2026-10-18 — Serve as the application documentation default
 
 - **Author:** selected `Serve` as the main API for HTTP web-app documentation,

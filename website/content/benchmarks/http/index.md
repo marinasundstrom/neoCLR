@@ -147,3 +147,17 @@ reliable sustained rate or lower process RSS is established. Both neoCLR arms us
 the same current compiler/native runtime and separately built library cohorts;
 this is not the older fixed-guest comparison.
 [Full results, allocation counts and failures](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/task-completion-20261018).
+
+## Development: lazy Task callback storage
+
+Lazy Promise callback lists and indexed dispatch reduce diagnostic allocations by
+13.37% and root publications by 4.94%, preserving three-mode callback contracts.
+An unchanged repeat at 400 offered requests/sec passes both candidate trials,
+using 5.6–7.2% less sampled CPU per completion than baseline. Candidate CPU remains
+about 7.8–8.0 times the matched single-processor Go control.
+
+The initial comparison includes losses in both candidate trials and severe generator
+lag in one. Both comparisons are retained: the cleaner repeat does not establish
+consistently lossless 400/sec or a higher sustained rate. These are same-host,
+60-second trials with experimental paced GC.
+[All trials, settings and allocation evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/callback-storage-20261018).
