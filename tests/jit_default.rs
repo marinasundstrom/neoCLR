@@ -43,6 +43,26 @@ fn installed_default_jit_discovers_trusted_siblings_and_preserves_arguments() {
     assert!(arguments.contains(root.join("bin/neoclr-jit-host.dylib").to_str().unwrap()));
     assert!(arguments.contains("--bind-runtime-async\n"));
     assert!(arguments.ends_with("--jit-entry-argument\na b\n--jit-entry-argument\n\n--jit-entry-argument\né\n--jit-entry-argument\n--flag\n"));
+    let selected = Command::new(&runtime)
+        .env("NEO_TEST_ARGS", &recorded)
+        .args([
+            "run",
+            "app.dll",
+            "--gc",
+            "mark-sweep",
+            "--",
+            "--gc",
+            "guest-value",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(selected.status.code(), Some(37));
+    let selected_arguments = fs::read_to_string(&recorded).unwrap();
+    assert!(selected_arguments.contains("--gc\nmark-sweep\n"));
+    assert!(
+        selected_arguments
+            .ends_with("--jit-entry-argument\n--gc\n--jit-entry-argument\nguest-value\n")
+    );
     let custom = root.join("custom.dll");
     fs::write(&custom, []).unwrap();
     let extended = Command::new(&runtime)

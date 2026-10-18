@@ -76,3 +76,13 @@ responsible for every long wall interval. A local snapshot prototype is incomple
 unvalidated. No collector design or new default has been selected. Continue with a
 bounded executable concurrency experiment and correctness evidence before capacity
 comparison or promotion. Review website behavior claims when implementation is validated.
+
+
+### Subsequent author constraint: selectable memory management
+
+The author requests separately includable implementations and activation of an included
+memory manager, not necessarily GC. The immediate scope was subsequently narrowed to
+[named GC selection](memory-management-providers.md), followed by a practical concurrent
+proof of concept. General provider machinery is deferred. The unvalidated snapshot
+scaffold stays isolated; build-time experimental macros alone do not satisfy runtime
+selection.

@@ -5193,3 +5193,16 @@ concurrent collector implementation, informed by alternatives beyond .NET. The
 the earlier provisional ordering for this investigation, without selecting a collector
 or reprioritizing unrelated milestones. Implementation, three-mode lifetime parity,
 worker-overlap proof and sustained Serve/Go qualification remain open.
+
+
+The subsequent author direction requires [separately includable memory-management
+providers](design/memory-management-providers.md), with activation of an included,
+compatible implementation. This includes non-GC possibilities. The initial broader provider-boundary proposal is deferred by the narrower
+author direction below; it is not a prerequisite for the proof of concept.
+
+
+The author narrowed the first implementation to **GC selection only**, then requested
+continued concurrent-GC investigation. Development now exposes `--gc mark-sweep` and
+execution-local Rust selection, with native backend validation. Only the existing
+collector is available; broader provider composition and concurrent collection remain
+open. See [selection semantics](runtime-gc.md#explicit-collector-selection-development).

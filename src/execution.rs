@@ -44,6 +44,8 @@ impl CancellationToken {
 /// Existing calls may pass Limits directly; this is an experimental Rust API.
 #[derive(Debug, Clone, Default)]
 pub struct ExecutionOptions {
+    /// Fixed before heap creation; inherited by isolated workers.
+    pub garbage_collector: crate::GarbageCollector,
     /// Guest-visible argv; CLI includes the input path first. Empty by default.
     /// String-array entry points receive elements after argv[0]; Environment retains all.
     pub arguments: Vec<String>,
@@ -57,6 +59,7 @@ pub struct ExecutionOptions {
 impl From<Limits> for ExecutionOptions {
     fn from(limits: Limits) -> Self {
         Self {
+            garbage_collector: crate::GarbageCollector::default(),
             arguments: Vec::new(),
             debugger: None,
             limits,

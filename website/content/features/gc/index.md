@@ -123,3 +123,16 @@ as the default while managed-workload qualification continues. Short local
 plain-text and JSON HTTP checks reclaim every allocation under both policies;
 pacing greatly reduces full-collection counts, with modestly higher peak arena
 extent. Sustained and concurrent load remain qualification work.
+
+
+## Development: select the collector
+
+The development CLI accepts `--gc mark-sweep` with interpreter or JIT execution.
+This names the existing collector and preserves the default behavior. It is currently
+the only available choice; unknown collectors are rejected. Explicit JIT selection
+requires the matching development backend.
+
+Native JIT/AOT tooling accepts the same selection with `--native-gc` and
+`--reference-arena`. Standalone AOT selection occurs when compiling the image.
+Concurrent collection and additional memory managers remain under investigation;
+this option does not make collection concurrent or change its pacing policy.

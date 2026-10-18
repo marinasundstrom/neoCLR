@@ -217,3 +217,31 @@ for Go/Green Tea, Shenandoah, LXR and recent scheduling research. This author-di
 work takes precedence over the earlier provisional generational evaluation order.
 Concurrency, locality, generations and pacing remain distinct choices; no new collector
 is shipped or selected by this research entry.
+
+
+## Explicit collector selection (development)
+
+`neoclr run input --gc mark-sweep` selects the existing collector. Omitting the option
+preserves the same default. Only `mark-sweep` is available; `concurrent`, `none` and
+unknown names fail rather than falling back. Selection is supported with interpreter
+and JIT execution. Explicit JIT selection requires a matching updated backend; older
+backends reject the new flag. The CLI preserves guest arguments after `--`.
+
+Rust embedding uses `ExecutionOptions.garbage_collector` and can inspect
+`GarbageCollector::available()` or the returned `ManagedHeap::collector()`. The choice
+is fixed at heap construction and inherited by isolated workers. Existing callers
+using default options retain behavior; exhaustive struct literals need the new field.
+
+Native JIT/AOT tooling accepts `--gc mark-sweep` alongside `--native-gc` and its existing
+`--reference-arena` requirement. For standalone AOT this selects the image's collector
+contract at compilation; it does not introduce a command-line parser into arbitrary
+host executables or switch a running heap. The selected collector uses the existing
+native ABI. Stress/paced scheduling policies remain independent of collector identity.
+No public Raven API changed, and this selection slice makes no performance claim.
+
+Validation (2026-10-18): 26 focused interpreter/CLI/GC/JIT-adapter tests pass, plus
+two native selector tests covering errors and byte-identical default/explicit AOT
+objects. The native test was compiled directly against the built library while an
+unrelated Cargo check held the artifact lock; the redundant waiting Cargo retry was
+cancelled. An existing Task-completion consumer also passes actual native JIT with
+explicit selection. This validates selection, not a new collection algorithm.

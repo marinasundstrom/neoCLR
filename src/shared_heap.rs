@@ -108,10 +108,14 @@ pub(crate) struct Access<'a> {
 }
 
 impl Owner {
+    #[cfg(test)]
     pub(crate) fn new(limit: usize) -> Self {
+        Self::with_collector(limit, crate::GarbageCollector::default())
+    }
+    pub(crate) fn with_collector(limit: usize, collector: crate::GarbageCollector) -> Self {
         Self(Arc::new(Shared {
             state: Mutex::new(State {
-                heap: ManagedHeap::default(),
+                heap: ManagedHeap::with_collector(collector),
                 arrays_used: false,
                 participants: Vec::new(),
                 service_roots: Vec::new(),

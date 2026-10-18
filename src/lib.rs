@@ -36,7 +36,7 @@ mod interfaces;
 mod slots;
 mod variance;
 pub use execution::{CancellationToken, ExecutionOptions};
-pub use gc::{CollectionEvent, CollectionReason, GcStatistics, ManagedHeap};
+pub use gc::{CollectionEvent, CollectionReason, GarbageCollector, GcStatistics, ManagedHeap};
 pub use slots::SlotReference;
 mod char_categories;
 mod cryptography;

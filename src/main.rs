@@ -12,7 +12,7 @@ const USAGE: &str = "Usage:
   neoclr disassemble <metadata-input> [output]
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
-  neoclr run <input> [--execution interpreter|jit] [--jit-host <library>] [--jit-compiler <tool>] [--reflection-roots <file.json>] [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
+  neoclr run <input> [--execution interpreter|jit] [--jit-host <library>] [--jit-compiler <tool>] [--reflection-roots <file.json>] [System.neo.json] [--module <input>]... [--system <input>] [--gc mark-sweep] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
@@ -131,6 +131,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut paths = vec![args[1].as_str()];
     let mut system_path = None;
     let mut object_root_path = None;
+    let mut garbage_collector = None;
     let mut gc_stats = false;
     let mut gc_events = false;
     let mut show_result = false;
@@ -148,6 +149,15 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             "--" if matches!(command, "run" | "debug") => {
                 guest_arguments.extend(options.cloned());
                 break;
+            }
+            "--gc" if command == "run" && garbage_collector.is_none() => {
+                garbage_collector = Some(
+                    options
+                        .next()
+                        .filter(|value| !value.starts_with("--"))
+                        .ok_or("Missing collector for --gc; available: mark-sweep")?
+                        .parse::<neoclr::GarbageCollector>()?,
+                );
             }
             "--execution" if command == "run" && execution_mode.is_none() => {
                 execution_mode = Some(
@@ -276,6 +286,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             jit_host,
             jit_compiler,
             reflection_roots,
+            garbage_collector,
             &guest_arguments[1..],
         )?;
         return Ok(Vec::new());
@@ -446,6 +457,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             // SAFETY: CLI run treats the user-selected program and native imports as trusted code.
             let execution = unsafe {
                 program.run_with_native(ExecutionOptions {
+                    garbage_collector: garbage_collector.unwrap_or_default(),
                     arguments: guest_arguments,
                     limits: neoclr::Limits {
                         array_elements: array_element_limit

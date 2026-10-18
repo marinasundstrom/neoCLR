@@ -3,6 +3,40 @@
 use crate::{Fault, Value};
 use std::collections::{BTreeMap, HashSet, VecDeque};
 
+/// Collector selected before an execution heap is created. Only the existing
+/// nonmoving mark/sweep implementation is included today; pacing is independent.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum GarbageCollector {
+    #[default]
+    MarkSweep,
+}
+
+impl GarbageCollector {
+    /// Stable name accepted by the command-line selector.
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::MarkSweep => "mark-sweep",
+        }
+    }
+
+    /// Collectors included in this runtime build.
+    pub const fn available() -> &'static [Self] {
+        &[Self::MarkSweep]
+    }
+}
+
+impl std::str::FromStr for GarbageCollector {
+    type Err = String;
+    fn from_str(name: &str) -> Result<Self, Self::Err> {
+        Self::available()
+            .iter()
+            .copied()
+            .find(|gc| gc.name() == name)
+            .ok_or_else(|| format!("Unavailable garbage collector '{name}'; available: mark-sweep"))
+    }
+}
+
 /// Object-count diagnostics for one execution, including its final collection.
 /// These counts exclude inline values and separately tracked native allocations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,6 +69,7 @@ pub struct CollectionEvent {
 
 #[derive(Debug, Default)]
 pub struct ManagedHeap {
+    collector: GarbageCollector,
     pub(crate) tls: crate::tls::Resources,
     objects: BTreeMap<usize, crate::slots::Cell>,
     next_identity: usize,
@@ -55,6 +90,20 @@ pub(crate) struct ConditionalRoot<'a> {
 }
 
 impl ManagedHeap {
+    /// Create an empty heap with a collector fixed for its lifetime.
+    pub fn with_collector(collector: GarbageCollector) -> Self {
+        match collector {
+            GarbageCollector::MarkSweep => Self {
+                collector,
+                ..Self::default()
+            },
+        }
+    }
+    /// Return this heap's selected collector.
+    pub fn collector(&self) -> GarbageCollector {
+        self.collector
+    }
+
     pub(crate) fn debug_cells(&self) -> impl Iterator<Item = (&usize, &crate::slots::Cell)> {
         self.objects.iter()
     }

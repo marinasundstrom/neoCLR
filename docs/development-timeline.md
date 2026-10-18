@@ -19241,3 +19241,39 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   remains an experiment with explicit copy-pause/memory costs, not a selected long-term
   design. The author has authorized implementation; no additional design approval is
   required. Collector implementation and new Serve/Go measurements remain unfinished.
+
+
+### 2026-10-18 — Selectable memory managers, beyond GC
+
+- **Author:** requested being able to include separate collectors in a runtime and
+  activate them for evaluation, while allowing memory-management approaches other
+  than GC. Did not require every implementation in one package.
+- **Assistant:** separated build composition from per-execution selection, proposed
+  freezing a manager before heap creation, and identified allocation, roots, barriers,
+  cleanup and capability checks as the boundary rather than Collect alone. Active-heap
+  switching was not requested; migration remains a separate possible contract.
+- **Action/status:** recorded the [provider design](design/memory-management-providers.md)
+  and parked the incomplete snapshot scaffold so it does not become a hard-wired
+  architecture. No selectable provider or concurrent runtime is implemented yet.
+
+
+### 2026-10-18 — Narrow GC selection first, continue concurrency afterwards
+
+- **Author:** “You don’t have to go the full length but just make the GC selectable
+  for now”, followed by “Continue through investigating concurrent GC”.
+- **Assistant implementation:** add a shared named collector choice to execution
+  options, interpreter heap creation, worker inheritance and CLI/JIT/AOT validation.
+  Only existing mark/sweep is available; reject unavailable choices. Do not present
+  stress/paced policies as different collectors or advertise the parked prototype.
+- **Scope:** finish and validate this bounded selector, then continue concurrent-GC
+  investigation. The broader provider architecture remains a design input.
+
+
+### 2026-10-18 — Practical concurrent-GC proof of concept
+
+- **Author:** asked not to overcomplicate solutions and then clarified, “Look at this
+  as a proof of concept.”
+- **Assistant:** narrowed the provider note to the implemented selector and deferred
+  general framework work. Keep the concurrent experiment isolated; use executable
+  lifetime checks and measurements to decide what merits integration. Proof-of-concept
+  scope does not justify claiming safety or performance that has not been established.

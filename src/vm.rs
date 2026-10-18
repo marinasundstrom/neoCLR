@@ -2019,7 +2019,10 @@ fn interpret_frames(
     mut native_libraries: Option<crate::interop::NativeLibraries>,
     entry_arguments: bool,
 ) -> Result<Execution, Fault> {
-    let owner = crate::shared_heap::Owner::new(options.limits.frames.saturating_add(1));
+    let owner = crate::shared_heap::Owner::with_collector(
+        options.limits.frames.saturating_add(1),
+        options.garbage_collector,
+    );
     let mut participant = owner.participant()?;
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];

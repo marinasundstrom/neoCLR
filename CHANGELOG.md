@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Add explicit `--gc mark-sweep` selection for interpreter and native JIT/AOT tooling, with execution-local Rust configuration and worker inheritance. Keep the existing collector as the sole available/default choice; reject missing, duplicate, unavailable or incompatible selections. Explicit JIT selection needs a matching updated backend; standalone AOT selection is at compile time. Exhaustive Rust `ExecutionOptions` literals need the new `garbage_collector` field. Validate 28 focused tests, byte-identical default/explicit native objects and a Task JIT consumer. Defer broader memory-manager composition and keep concurrent work a practical proof of concept. No new collector or performance improvement is claimed.
+
 - Record author-directed concurrent-GC evaluation beyond CLR: compare Go/Green Tea, Shenandoah, LXR and recent Opportunistic ZGC research, with explicit status, tradeoffs, root/mutation safety and sustained-load gates. Update the roadmap direction; no concurrent collector or performance gain is claimed by this research slice.
 
 - Correlate Serve admission misses with bounded GC/scheduler wall and thread-CPU traces, including the async pump pause path. Retain both diagnostic runs and all misses: long wall intervals include descheduling, and the overloaded expanded measurement sleeps only twice. Add trace/load checks; no capacity gain or concurrent collector is claimed.

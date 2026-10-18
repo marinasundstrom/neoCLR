@@ -170,6 +170,7 @@ impl Workers {
             function,
             input: input.as_str().to_owned(),
             options: ExecutionOptions {
+                garbage_collector: options.garbage_collector,
                 limits: options.limits,
                 arguments: options.arguments.clone(),
                 cancellation: Some(cancellation.clone()),

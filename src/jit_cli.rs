@@ -19,6 +19,7 @@ pub(crate) fn run(
     host: Option<&str>,
     compiler: Option<&str>,
     reflection_roots: Option<&str>,
+    garbage_collector: Option<neoclr::GarbageCollector>,
     arguments: &[String],
 ) -> Result<i32, String> {
     let windows = cfg!(all(target_os = "windows", target_arch = "x86_64"));
@@ -153,6 +154,9 @@ pub(crate) fn run(
         "--bind-socket-client",
     ]);
     command.arg("--bind-runtime-async");
+    if let Some(collector) = garbage_collector {
+        command.args(["--gc", collector.name()]);
+    }
     if windows {
         command.args([
             "--target",
