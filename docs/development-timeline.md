@@ -40,6 +40,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   modes. Production defaults remain unchanged. Diagnostics record 0.70% fewer
   allocations/3.43% fewer payload bytes and more collections. These are not sustained
   throughput claims. [Evidence](../benchmarks/http-server/serve/receive-pool-20261018/README.md).
+- **Measured outcome:** both 60-second candidate trials validate all arrivals at
+  400/sec. The cleaner pair differs by about 0.3% CPU/completion; the first baseline
+  loses 717 arrivals with severe generator lag. All Go controls and failures remain
+  recorded. No convincing speedup or higher sustained rate is claimed; website
+  content separates allocation savings from capacity.
 
 ## 2026-10-18 — Task allocations and HTTP callback shape
 

@@ -173,3 +173,22 @@ Sampled CPU per completion falls 1.5–3.0% against the lazy-callback baseline; 
 latency rises, so no latency gain is claimed. The same-host, experimental paced-GC
 configuration remains far behind Go in CPU cost. Higher rates were not tested.
 [Tradeoffs, all trials and raw evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/task-queue-20261018).
+
+## Development: bounded receive-buffer reuse
+
+Buffered HTTP requests now reuse at most one 256-byte and one 4 KiB receive array
+per server. Return happens after read completion; streaming-owned buffers remain
+separate, and shutdown releases cached references. Inactive exchanges no longer
+allocate empty arrays. This is an internal cache, not a public pooling or Span API.
+
+Separate diagnostics record 0.70% fewer allocations and 3.43% fewer allocated
+payload bytes, but more collections. Both 60-second candidate trials validate all
+arrivals at 400 offered requests/sec. The cleaner pair differs by only 0.3% sampled
+CPU/completion; the first baseline has severe generator lag and 717 missed arrivals.
+No convincing CPU speedup or higher sustained capacity is established. Candidate
+CPU remains roughly 7.2–7.6 times the corresponding Go control.
+
+Ownership regressions pass interpreter/JIT/AOT. The streaming correctness fixture
+uses a longer test budget after the original interpreter run fails on both baseline
+and candidate; production timeout defaults remain unchanged.
+[All results, ownership rules and validation limits](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/receive-pool-20261018).

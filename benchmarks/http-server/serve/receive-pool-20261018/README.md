@@ -87,3 +87,37 @@ the retained evidence/StreamingProbe.rvn and run verify-streaming.py with
 --contracts pointing at the successful buffered report, --build and --output.
 Build manifests retain commands/hashes. No new public API or native GC policy is
 introduced; the unchanged reference is regenerated and its source snapshot refreshed.
+
+## Sustained-load comparison
+
+Unchanged 400 offered requests/sec, 60 seconds each, 16 server lanes and 64 client
+slots. Order baseline/candidate/Go, then Go/candidate/baseline. Baseline is the
+ArrayQueue candidate. Both neoCLR builds use experimental paced GC; Go uses
+GOMAXPROCS=1 and GOGC=100. All builds/diagnostics finished before timing. The load
+generator shares the host; this is not production capacity or a maximum-rate test.
+
+Every offered arrival remains in the success denominator. Timed throughput excludes
+drain completions. The provisional target requires all arrivals valid, offered p99
+≤250 ms and generator-lag p99 ≤5 ms. Raw compressed reports retain every request
+and resource sample; no failed trial was discarded.
+
+| Arm | Timed req/s | Misses | CPU ms/completion | Offered p99 ms | Lag p99 ms | Target |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| [baseline-1](evidence/baseline-1.json) | 388.03 | 717 | 2.0995 | 242.70 | 464.44 | fail |
+| [candidate-1](evidence/candidate-1.json) | 399.98 | 0 | 2.0601 | 44.34 | 0.65 | pass |
+| [go-1](evidence/go-1.json) | 400.00 | 0 | 0.2842 | 5.65 | 1.96 | pass |
+| [go-2](evidence/go-2.json) | 400.00 | 0 | 0.2717 | 6.24 | 2.37 | pass |
+| [candidate-2](evidence/candidate-2.json) | 399.98 | 0 | 2.0538 | 16.79 | 0.66 | pass |
+| [baseline-2](evidence/baseline-2.json) | 399.98 | 0 | 2.0601 | 13.48 | 0.68 | pass |
+
+Both candidate trials validate all 24,000 requests. Sampled CPU/completion is about
+1.9% lower in the first pair, whose baseline suffered severe generator lag and
+717 admission misses. The cleaner reverse-order pair differs by only about 0.3%,
+with candidate offered p99 slightly higher. This does not establish a convincing
+CPU speedup or higher sustained capacity. Candidate CPU remains roughly 7.2–7.6
+times the corresponding Go control under these explicit settings.
+
+Keep the allocation/byte reduction separate from timing: modest allocation savings
+are demonstrated, but additional pooling is not justified by a throughput claim
+from this experiment. The 4 KiB receive cache is covered by fragmented-body tests;
+this tiny-response capacity workload primarily exercises the 256-byte class.
