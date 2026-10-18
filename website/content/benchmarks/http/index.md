@@ -101,3 +101,19 @@ records admission misses. Go also passes two separate 30-second 2,000/sec checks
 A separate 1,000/sec Go repeat fails the generator-lag criterion despite valid
 responses. These are explicit local configurations and tested lower bounds, not
 framework maximum-throughput rankings; the full reports retain latency, misses and limitations.
+
+## Development GC baseline repeat
+
+After the ancestry fixes, a separate repeat holds the qualified Serve application
+object fixed and relinks current native GC adapters. It does not measure the new
+compiler/library cohort. Two 30-second 300/sec trials validate every response with
+7.8–8.1 ms offered p99 latency. Both 400/sec trials fail qualification: 13 and 1,536
+arrivals are missed; the second also has 325 ms generator-lag p99. Go passes both
+rates in both rounds. At 300/sec, neoCLR uses 2.33–2.46 ms sampled CPU per completion,
+versus Go's 0.27–0.30 ms under the explicit single-processor configuration.
+
+These are short same-host checks with experimental paced GC, not a new speedup or
+production capacity claim. The earlier 400/sec qualification is historical, not a
+guarantee. Separate sampling still identifies allocation, collection and root
+publication as the leading areas to investigate.
+[Full contract, losses, build hashes and profile](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/gc-return-20261018).

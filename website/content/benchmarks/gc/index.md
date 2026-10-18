@@ -286,6 +286,22 @@ regression check validates 768 responses with overlapping timing ranges.
 [Methodology, correctness checks and raw results](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/gc-index#reuse-validated-spans-for-the-dense-index--2026-10-14)
 are retained separately from published release benchmarks.
 
+## Development: Serve root validation and repeat
+
+The native root-marker search optimization preserves live descriptor checks and
+root lifetimes. Its clean 400/sec comparison uses 6.5% less CPU per timed completion;
+no higher reliable sustained rate was established.
+[Optimization and safety evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/root-validation).
+
+A later repeat holds the Serve application object fixed and relinks current native
+GC adapters. Both 30-second 300/sec trials pass; both 400/sec trials fail, with the
+second also affected by large generator scheduling delays. Separate wall sampling
+still places allocation, indexed collection and stack-root publication ahead of
+string-marker searches. Sampling changes timing, so its request results are excluded
+from capacity qualification. These are HTTP workload observations, not standalone
+collector throughput or pause-distribution measurements.
+[Matched Go controls, full results and profile](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/gc-return-20261018).
+
 ## What the results guide
 
 The matched wait experiment above separates a large Windows waiting cost from

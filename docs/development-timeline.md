@@ -74,6 +74,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Author next direction:** after closing this story, return to GC and HttpServer
   benchmarking and update the website. The assistant will retain the matched Go
   control and explicit workload, GC-policy and sustained-rate qualification limits.
+- **Performed follow-up:** relinked the qualified Serve guest against current native
+  adapters and ran two alternating 300/400-sec Go comparisons, separately from profiling.
+  Both neoCLR 300/sec points passed; neither 400/sec point qualified, and the second
+  had substantial generator lag. Go passed all four points. Updated local HTTP/GC
+  website content; no deployment or new optimization is claimed. The
+  [retained repeat](../benchmarks/http-server/serve/gc-return-20261018/README.md) keeps
+  the fixed-guest scope distinct from the new compiler/library cohort.
 
 
 ## 2026-10-18 — Preview 16 records and boxed display

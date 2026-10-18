@@ -21,6 +21,17 @@ NATIVE_PREVIEW = ROOT / 'target/native-api-preview.json'
 NATIVE_SNAPSHOT = ROOT / 'api-docs/native-reference.json'
 
 
+def legacy_api_content(content):
+    """Adapt native sidecar IDs only for the temporary CLI reference render."""
+    for name in ('System.Environment', 'System.Storage.FileText',
+                 'System.Storage.Metadata', 'System.Runtime.InteropServices.NativeMemory'):
+        content = content.replace('uid: N:' + name + '\n', 'uid: T:' + name + '\n')
+    # The pinned CLI renderer keys named generic parameters by definition
+    # arity, unlike native Function IDs and expanded CLI XML documentation IDs.
+    return content.replace('uid: M:System.Web.Http.HttpServer.Serve(Function',
+                           'uid: M:System.Web.Http.HttpServer.Serve(System.Func`2')
+
+
 def excerpt(path, start, end, include_end=True):
     text = (ROOT / path).read_text(encoding='utf-8')
     first = text.index(start)
@@ -508,13 +519,8 @@ def main():
     # Native snapshots consume the original N: IDs; adapt only this bridge pass.
     legacy_content = staging / 'legacy-api-content'
     legacy_content.mkdir()
-    legacy_containers = {'System.Environment', 'System.Storage.FileText',
-                         'System.Storage.Metadata', 'System.Runtime.InteropServices.NativeMemory'}
     for source in (SOURCE / 'api-content').glob('*.md'):
-        content = source.read_text()
-        for name in legacy_containers:
-            content = content.replace('uid: N:' + name + '\n', 'uid: T:' + name + '\n')
-        (legacy_content / source.name).write_text(content)
+        (legacy_content / source.name).write_text(legacy_api_content(source.read_text()))
     config.update(output=str(publisher_output),
                   apiContent=str(legacy_content),
                   types=None,  # Generate every public type, regardless of comment availability.

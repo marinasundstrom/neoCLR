@@ -2374,3 +2374,13 @@ retention, and remaining construction/collection limits. Only ObjectMapper's
 implementation fingerprint changed in the aggregate snapshot; its existing reference
 assembly is reused. The snapshot fingerprint check and four native snapshot tests
 pass; no type/member inventory or rendered signature change is required.
+
+### Serve sidecar rendering (2026-10-18)
+
+The pinned CLI renderer keys named generic parameters by definition arity, so the
+website's temporary CLI pass maps the two Serve Function IDs to System.Func`2.
+This differs from both native structural Function IDs and expanded CLI XML IDs.
+Native sidecars and the pinned native snapshot remain unchanged, with separate
+overload contracts. A focused regression preserves both full contract bodies and
+native IDs; the full site build validates the translated IDs against the renderer.
+Remove this adapter when the legacy rendering pass is removed.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Resume GC/Serve benchmarking with a fixed qualified guest and current native adapters: retain alternating Go controls, successful 300/sec checks, failed 400/sec repeats and separate GC sampling. Update the HTTP/GC website pages with explicit short-run and same-host limits; map Serve sidecars to the legacy renderer’s generic-arity IDs while preserving native Function IDs; no new optimization, release or deployment is claimed.
+
 - Extend native boxing to the remaining numeric primitive kinds and Char, preserving ValueType ancestry, exact type tests/unboxing and GetType identity through existing rooted payload layouts. Add a fourteen-kind interpreter/JIT/AOT regression with repeated allocation checks. Keep unsupported default Object display for these additional kinds explicitly diagnosed.
 
 - Bind intrinsic primitive and core-enum definitions to their owned ValueType/Enum foundations without changing storage; preserve primitive box ancestry. Rebuild the four-library cohort and add matched reflection/boxing tests. Repair selected Object binding for closed roots and imported Object-slot virtual metadata exposed by that rebuild.

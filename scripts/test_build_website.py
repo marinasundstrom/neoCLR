@@ -12,6 +12,20 @@ build = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(build)
 
 
+class LegacyApiContent(unittest.TestCase):
+    def test_serve_sidecars_keep_native_ids_and_preserve_overload_contracts(self):
+        for name, expected in (
+            ('http-server-serve.md', 'M:System.Web.Http.HttpServer.Serve(System.Func`2)'),
+            ('http-server-serve-cancellation.md',
+             'M:System.Web.Http.HttpServer.Serve(System.Func`2,System.Concurrency.CancellationToken)')):
+            source = (build.SOURCE / 'api-content' / name).read_text()
+            rendered = build.legacy_api_content(source)
+            uid = next(line[5:] for line in rendered.splitlines() if line.startswith('uid: '))
+            self.assertEqual(uid, expected)
+            self.assertIn('Serve(Function', source)
+            self.assertEqual(source.split('---', 2)[2], rendered.split('---', 2)[2])
+
+
 class PageLinks(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
