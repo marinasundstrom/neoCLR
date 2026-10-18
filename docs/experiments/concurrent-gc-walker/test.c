@@ -233,6 +233,38 @@ static void arrays_and_invalid_descriptor(gc_worker *worker) {
     free(s);
     neoclr_probe_leave_v1(&frame);
 }
+static void capture_registered_bases(void) {
+    uint64_t heap[256] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *object = allocate(&c, 16, NEOCLR_GC_BYTES);
+    void *tail = allocate(&c, 8, NEOCLR_GC_BYTES);
+    uint64_t handle;
+    assert(!neoclr_gc_host_root_create_v1(&c, object, &handle));
+    host_root *r = find_host_root(&c, handle);
+    snapshot *s = malloc(sizeof(*s));
+    assert(s && r && capture(s, &c));
+    free(s->copy.text.data);
+    uint64_t saved_span = ((block *)tail - 1)->span;
+    ((block *)tail - 1)->span = 1;
+    assert(!capture(s, &c)); /* Valid root prefix cannot hide corrupt tail. */
+    ((block *)tail - 1)->span = saved_span;
+    void *bad[] = {(char *)object + 1, (block *)object - 1,
+                  (char *)object + 16, (char *)heap + sizeof(heap)};
+    for (unsigned i = 0; i < sizeof(bad) / sizeof(bad[0]); i++) {
+        r->value = bad[i];
+        assert(!capture(s, &c));
+    }
+    r->value = object;
+    r->conditional = true;
+    r->owner = (char *)object + 1;
+    assert(!capture(s, &c));
+    r->owner = object;
+    assert(capture(s, &c) && s->pairs_count == 1);
+    free(s->copy.text.data);
+    assert(!neoclr_gc_host_root_release_v1(&c, handle));
+    assert(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    free(s);
+}
 static void capture_reuse(gc_worker *worker) {
     uint64_t heap[256] = {0};
     neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
@@ -265,6 +297,7 @@ int main(void) {
     reclamation_tests();
     gc_worker worker;
     assert(!gc_worker_init(&worker));
+    capture_registered_bases();
     capture_reuse(&worker);
     for (unsigned mode = 0; mode < 3; mode++) parked_case(&worker, mode);
     parked_limits();

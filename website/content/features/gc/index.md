@@ -145,5 +145,8 @@ slower and uses more CPU than synchronous GC on the tested small stable graph; t
 is not an HTTP capacity result. A follow-up removes redundant snapshot initialization,
 and combines mark import and validation walks, reducing owner interruption in local
 tests. Larger-graph elapsed approaches synchronous GC, but CPU use remains higher
-and smaller graphs still run slower. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
+and smaller graphs still run slower. Indexed registered-root capture removes a
+POC scaling defect: matched 64-root trials use 47–49% less elapsed time than the
+preceding POC, with a longer repeat and zero-root control. This is not a speedup
+over synchronous GC or an HTTP capacity claim. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
 See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).

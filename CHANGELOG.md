@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Remove per-registered-root full-heap validation from concurrent-GC POC capture by reusing the existing bounded block index. Exact-base/corrupt-tail regressions and reclamation qualification pass. Matched 64-root trials and a longer repeat reduce elapsed 47–49% and process CPU 46–47%; eight roots gain about 10%, with no material zero-root regression. Record raw evidence and limitations: this fixes POC overhead, does not beat sync CPU, and establishes no HTTP capacity or production collector support.
+
 - Combine concurrent-GC POC integrity/identity validation into one read-only walk, checking split free-span boundaries and the complete appended tail before mutation. Five new rejection regressions and existing UBSan/bounds reclamation checks pass. Larger-graph owner interruption falls another 14–17%; elapsed approaches sync in these local trials, with 7–8% more CPU. Small graphs still lose to sync. Preserve phase/control evidence; production GC and Serve capacity remain unchanged.
 
 - Combine concurrent-GC POC mark import into one walk while retaining new allocations in split free spans and appended storage. Expanded regressions and UBSan/bounds reclamation checks pass. Paired diagnostics halve import time; uninstrumented larger-graph owner interruption falls about 12%, but elapsed gains are only 0.4–0.8% and concurrent still trails sync. Retain small/large/control evidence; production GC and HTTP capacity are unchanged.

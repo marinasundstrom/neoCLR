@@ -273,3 +273,82 @@ The next useful evaluation is varying collection cadence and graph/root mutation
 including invalidated cycles, before extrapolating this stable chain to Serve.
 The repeated owner walks are reduced; capture copying, allocation searches while
 garbage awaits reclamation, and invalidation/fallback costs remain relevant.
+
+## Indexed registered-root capture (2026-10-18)
+
+The author asked to continue until there were real improvements. Inspection found
+that capture validated the entire heap separately for every host handle, resource
+owner and owned parked registration. This was a POC scaling defect: the synchronous
+collector already uses a temporary block index for these checks.
+
+Capture now builds that existing 256-bucket index once when registrations exist,
+validating the full heap during construction. Exact-base checks use the index until
+capture returns. The owner performs no allocation or collection during this scope;
+the index never escapes or becomes worker-owned. The no-registration path retains
+its original full integrity walk without building the index. Costs are bounded
+scratch storage (256 block pointers plus 32 intern-seed pointers, 2304 bytes on this
+host), index construction and bounded bucket lookup. No retained pointer cache,
+managed API, production collector or .NET semantic contract changes.
+
+New regression cases preserve exact-base rejection for interior/header/end/outside
+pointers and invalid conditional owners. A valid registered root cannot hide a
+corrupt trailing descriptor. Valid strong and conditional captures pass, alongside
+the prior protected-memory, parked-owner, invalidation and reclamation suite.
+Fresh UBSan/bounds reports 324 applied cycles, 15 rejected results and 249,024
+reclaimed payload bytes. ASan/ThreadSanitizer startup limitations remain.
+
+The benchmark now accepts `--host-roots` (default 0, at most 256). Both modes register
+the same strong handles at evenly spaced graph nodes before timing and release them
+after timing, then prove complete reclamation. The live graph, allocation batches,
+collection cadence and optional scalar work remain identical. Handles are stable;
+this measures root-count scaling, not task churn, invalidation frequency or Serve.
+The baseline is the immediately preceding POC with the same new workload source,
+compiled before the capture change. All compared binaries use `-O2` without phase
+clocks or sanitizers. Each group runs baseline/candidate sync/concurrent in forward
+then reverse order. Timed runs do not overlap our builds/tests.
+
+Uninstrumented arithmetic means of two trials each, milliseconds:
+
+| Roots | Live nodes | Batches | Scalar iterations | Baseline concurrent elapsed | Candidate concurrent elapsed | Candidate sync elapsed | Baseline concurrent CPU | Candidate concurrent CPU |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 64 | 4096 | 2000 | 0 | 2787.44 | 1431.91 | 1429.55 | 2897.89 | 1539.09 |
+| 64 | 4096 | 2000 | 50000 | 2930.75 | 1529.74 | 1533.18 | 3019.56 | 1640.05 |
+| 64 | 4096 | 5000 | 0 | 6979.61 | 3575.50 | 3569.66 | 7253.58 | 3848.44 |
+| 64 | 4096 | 5000 | 50000 | 7246.11 | 3818.80 | 3826.82 | 7517.52 | 4092.87 |
+| 8 | 4096 | 2000 | 0 | 1601.96 | 1431.74 | 1422.99 | 1710.39 | 1537.73 |
+| 8 | 4096 | 2000 | 50000 | 1692.86 | 1528.73 | 1521.81 | 1801.14 | 1634.39 |
+| 0 | 512 | 10000 | 0 | 1064.44 | 1063.08 | 914.45 | 1155.12 | 1151.61 |
+| 0 | 512 | 10000 | 50000 | 1574.07 | 1575.03 | 1424.14 | 1665.16 | 1663.75 |
+
+The longer 64-root repeat reduces elapsed 48.8%/47.3% and process CPU 46.9%/45.6%
+for allocation-only/scalar work. Owner capture totals fall from 3497/3501 ms to
+89.1/88.6 ms; owner interruption totals fall from 3654/3661 ms to 244/245 ms.
+The shorter 64-root run agrees. Eight roots already reduce elapsed 10.6%/9.7%.
+The zero-root control changes elapsed by -0.1%/+0.1%, consistent with no material
+regression and ordinary host variation. No trial is excluded.
+
+This is a substantial improvement over the preceding concurrent POC, not evidence
+that concurrency itself is faster than synchronous collection. In the longer run,
+candidate concurrent elapsed is approximately equal to candidate sync (3576 versus
+3570 ms; 3819 versus 3827 ms), while process CPU is still 8.0%/7.2% higher. The
+zero-root small graph remains slower than sync. These are short, local GC workloads;
+no HTTP requests or Go baseline were measured and no sustained server rate follows.
+
+Every group matches work, checksum and collection counts; final heaps are empty.
+The improvement removes redundant full-heap validation per registered root rather
+than reducing work, deferring collections, skipping reclamation or adding a hidden
+synchronous retrace. Do not interpret 64 registered roots as 64 HTTP requests: actual
+Serve root counts, lifetimes and invalidation patterns require measurement.
+
+Raw reports: [64 roots](root-index-64.json), [longer repeat](root-index-repeat.json),
+[8 roots](root-index-8.json), [zero-root control](root-index-0.json), and
+[qualification](../../docs/experiments/concurrent-gc-walker/root-index-results.json).
+Reports retain baseline provenance and all outputs. Example:
+
+```
+python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_WITH_MATCHING_WORKLOAD --output NEW_RESULTS --rounds 5000 --live-count 4096 --host-roots 64
+```
+
+Next test root churn/invalidation and realistic collection cadence before runtime
+integration. The capture scaling defect is fixed; it does not establish support
+for every interpreter/JIT/AOT access path or a production concurrent collector.

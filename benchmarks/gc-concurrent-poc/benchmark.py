@@ -17,6 +17,7 @@ p.add_argument('--validated-build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--phase-timing', action='store_true')
 p.add_argument('--compare-build', type=Path, help='Prior benchmark directory containing bench and results.json')
+p.add_argument('--host-roots', type=int, default=0)
 p.add_argument('--live-count', type=int, default=512)
 p.add_argument('--rounds', type=int, default=2000)
 a = p.parse_args()
@@ -54,7 +55,7 @@ try:
             order = first + list(reversed(first))
         for version, mode in order:
             binary = (baseline if version == 'baseline' else out) / 'bench'
-            command = [str(binary), mode, str(a.rounds), str(work), str(a.live_count)]
+            command = [str(binary), mode, str(a.rounds), str(work), str(a.live_count), str(a.host_roots)]
             r = subprocess.run(command, capture_output=True, text=True, timeout=60)
             report['commands'].append(dict(command=command, exitCode=r.returncode, stdout=r.stdout, stderr=r.stderr))
             r.check_returncode()

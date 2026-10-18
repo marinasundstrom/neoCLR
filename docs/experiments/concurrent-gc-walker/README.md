@@ -266,3 +266,16 @@ heap. [Fresh qualification](validation-results.json) passes 324 applied cycles,
 show validation near half its former cost and lower owner interruption. Large-graph
 elapsed approaches sync, but CPU remains higher and the small graph remains slower.
 No production integration or general safety/performance claim follows.
+
+
+### Indexed registered-root capture
+
+Reuse the existing ephemeral block index during capture instead of validating the
+whole heap for every host/resource/parked owner. Index construction still validates
+all descriptors before exact-base lookups; no index survives capture. Zero-registration
+capture keeps its original integrity walk. New pointer-boundary/corrupt-tail cases
+and the existing reclamation suite pass [UBSan/bounds qualification](root-index-results.json).
+[Matched measurements](../../../benchmarks/gc-concurrent-poc/README.md#indexed-registered-root-capture-2026-10-18)
+show 47–49% less elapsed and 46–47% less CPU with 64 stable roots, confirmed by a
+longer repeat, and about 10% less elapsed with eight. Zero-root behavior is essentially
+unchanged. This fixes POC overhead; concurrent remains more CPU-expensive than sync.

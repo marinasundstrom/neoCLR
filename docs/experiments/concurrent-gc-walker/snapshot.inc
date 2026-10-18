@@ -44,10 +44,18 @@ static void *relocate(snapshot *s, const void *value) {
     return s->copy.text.data + ((uintptr_t)value - s->source);
 }
 static bool capture(snapshot *s, neoclr_aot_context *context) {
-    if (!context || !blocks_valid(&context->text) || context->text.used > SNAPSHOT_BYTES ||
+    if (!context || context->text.used > SNAPSHOT_BYTES ||
         resource_cleanup_active) return false;
+    /* Validate once and reuse a bounded index for exact registered bases.
+     * The owner does not allocate or sweep until capture returns; this index
+     * never escapes capture and never observes worker mutation. */
+    block *starts[256], *interns[INTERN_SEED_LIMIT];
+    block_index index = {.start = starts, .interns = interns, .capacity = 256};
+    bool registrations = host_head || resource_head || neoclr_roots_parked_v1();
+    if (registrations ? !build_index(&context->text, &index) : !blocks_valid(&context->text))
+        return false;
     for (neoclr_gc_resource *r = resource_head; r; r = r->next)
-        if (r->context == context && (!r->owner || !validated_bases(&context->text, r->owner, NULL)))
+        if (r->context == context && (!r->owner || !indexed_live_base(&context->text, &index, r->owner)))
             return false;
     /* Every used array entry is assigned during capture; stale tails are
      * excluded by these counts. Avoid clearing the bounded backing arrays. */
@@ -67,7 +75,8 @@ static bool capture(snapshot *s, neoclr_aot_context *context) {
     if (!copy_frames(s, neoclr_root_probe_head_v1(), context)) goto failed;
     for (host_root *r = host_head; r; r = r->next) {
         if (r->context != context || r->expired) continue;
-        if (!validated_bases(&context->text, r->value, r->conditional ? r->owner : NULL)) goto failed;
+        if (!indexed_live_base(&context->text, &index, r->value) ||
+            (r->conditional && !indexed_live_base(&context->text, &index, r->owner))) goto failed;
         if (r->conditional) {
             if (s->pairs_count == SNAPSHOT_PAIRS) goto failed;
             s->pairs[s->pairs_count++] = (neoclr_gc_conditional_root){
@@ -78,7 +87,7 @@ static bool capture(snapshot *s, neoclr_aot_context *context) {
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next) {
         if (p->expired || (p->owner_context && p->owner_context != context)) continue;
         if (s->parked_count == SNAPSHOT_PARKED) goto failed;
-        if (p->owner_context && (!p->owner || !validated_bases(&context->text, p->owner, NULL))) goto failed;
+        if (p->owner_context && (!p->owner || !indexed_live_base(&context->text, &index, p->owner))) goto failed;
         unsigned start = s->roots_count, i = s->parked_count;
         if (!copy_frames(s, p->head, context)) goto failed;
         s->frames[i] = (neoclr_probe_frame){.context = &s->copy,

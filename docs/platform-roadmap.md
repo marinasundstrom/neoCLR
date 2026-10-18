@@ -5297,3 +5297,15 @@ shows another 14–17% reduction in larger-graph owner interruption. Elapsed app
 sync on that stable graph while CPU remains higher; small graphs still lose.
 Next evaluate cadence and graph/root mutation, including invalidation, before any
 Serve extrapolation. Production collector selection and integration are unchanged.
+
+
+**Material POC improvement (author direction, 2026-10-18):** continue beyond small
+microbenchmark gains. Registered-root capture was repeatedly validating the entire
+heap; reuse the existing bounded index with full integrity and exact-base checks.
+[Matched evidence](../benchmarks/gc-concurrent-poc/README.md#indexed-registered-root-capture-2026-10-18)
+shows 47–49% elapsed and 46–47% CPU reductions against the preceding POC with 64
+stable roots, confirmed by a longer repeat, and about 10% elapsed reduction with
+eight roots. Zero-root control is unchanged within variation. Capture correctness
+and full reclamation pass; production and Serve remain unchanged. Next evaluate
+root churn/invalidation and cadence before integration, without extrapolating root
+counts into concurrent HTTP requests.

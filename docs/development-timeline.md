@@ -19370,3 +19370,21 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
 - **Next:** investigate measured capture/application/allocation overhead and larger
   live-set tradeoffs; do not block useful benchmarking on exhaustive collector support.
   HTTP/Go sustained-load comparison and broader runtime qualification remain open.
+
+
+### 2026-10-18 — Continue until improvements are material
+
+- **Author:** “Continue until you have real improvements”.
+- **Assistant action:** moved beyond single heap-walk reductions and identified
+  full-heap validation repeated for every registered root during POC capture.
+  Reused the existing synchronous collector's bounded index, preserving full
+  integrity checks and exact-base rejection. Added matched stable-root workloads,
+  a longer repeat, an eight-root case and the existing zero-root control.
+- **Outcome:** [retained evidence](../benchmarks/gc-concurrent-poc/README.md#indexed-registered-root-capture-2026-10-18)
+  shows 47–49% lower elapsed and 46–47% lower process CPU than the previous concurrent
+  POC with 64 roots, about 10% elapsed improvement with eight, and no material
+  zero-root regression. Reclamation and added invalid-pointer/tail tests pass.
+- **Limits/open:** this removes POC overhead; concurrent elapsed is near sync on
+  the larger graph but CPU remains higher. No Serve/Go sustained rate or production
+  integration is claimed. Root churn, invalidation, realistic cadence and broader
+  runtime access-path qualification remain open.

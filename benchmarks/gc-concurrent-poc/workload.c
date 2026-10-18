@@ -40,25 +40,32 @@ static uint64_t percentile(uint64_t *samples, unsigned count, unsigned percent) 
     return samples[((uint64_t)count * percent + 99) / 100 - 1];
 }
 int main(int argc, char **argv) {
-    assert(argc == 4 || argc == 5);
+    assert(argc >= 4 && argc <= 6);
     bool concurrent = !strcmp(argv[1], "concurrent");
     assert(concurrent || !strcmp(argv[1], "sync"));
     unsigned rounds = (unsigned)strtoul(argv[2], NULL, 10);
     unsigned work = (unsigned)strtoul(argv[3], NULL, 10);
     assert(rounds >= 100 && rounds <= 10000 && work <= 1000000);
     const unsigned warmup = 100, batch = 64;
-    unsigned live_count = argc == 5 ? (unsigned)strtoul(argv[4], NULL, 10) : 512;
+    unsigned live_count = argc >= 5 ? (unsigned)strtoul(argv[4], NULL, 10) : 512;
     assert(live_count >= 1 && live_count <= 8192);
+    unsigned host_count = argc == 6 ? (unsigned)strtoul(argv[5], NULL, 10) : 0;
+    assert(host_count <= 256 && host_count <= live_count);
+    void *nodes[8192];
+    uint64_t handles[256];
     unsigned char *heap = calloc(1, 512 * 1024);
     assert(heap);
     neoclr_aot_context c = {.text = {heap, 512 * 1024, 0}};
     void *root = NULL, *previous = NULL;
     for (unsigned i = 0; i < live_count; i++) {
         void *object = allocate(&c, 24, NEOCLR_GC_OBJECT);
+        nodes[i] = object;
         if (previous) ((uint64_t *)previous)[1] = (uintptr_t)object;
         else root = object;
         previous = object;
     }
+    for (unsigned i = 0; i < host_count; i++)
+        assert(!neoclr_gc_host_root_create_v1(&c, nodes[i * live_count / host_count], &handles[i]));
     neoclr_probe_storage slot = {&root, 8, 0};
     neoclr_probe_frame frame;
     neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
@@ -124,6 +131,8 @@ int main(int argc, char **argv) {
     /* Identical post-window live set; final cleanup is outside timing. */
     assert(!neoclr_gc_collect_v1(&c, &frame));
     assert(validated_bases(&c.text, root, previous));
+    for (unsigned i = 0; i < host_count; i++)
+        assert(!neoclr_gc_host_root_release_v1(&c, handles[i]));
     root = NULL;
     if (concurrent) {
         assert(cycle_start(&cycle, &c));
@@ -143,8 +152,8 @@ int main(int argc, char **argv) {
         (unsigned long long)phase_totals[0], (unsigned long long)phase_totals[1],
         (unsigned long long)phase_totals[2], (unsigned long long)phase_totals[3],
         (unsigned long long)phase_totals[4]);
-    printf("\"mode\":\"%s\",\"rounds\":%u,\"work\":%u,\"liveCount\":%u,\"elapsedNs\":%llu,\"cpuNs\":%llu,\"ownerCpuNs\":%llu,\"pauseTotalNs\":%llu,\"captureOrSyncNs\":%llu,\"waitApplyNs\":%llu,\"batchP99Ns\":%llu,\"pauseP99Ns\":%llu,\"peakArenaBytes\":%llu,\"maxRssBytes\":%ld,\"allocations\":%llu,\"collections\":%llu,\"checksum\":%llu,\"finalArenaBytes\":0}\n",
-        argv[1], rounds, work, live_count, (unsigned long long)elapsed, (unsigned long long)cpu,
+    printf("\"mode\":\"%s\",\"rounds\":%u,\"work\":%u,\"liveCount\":%u,\"hostRoots\":%u,\"elapsedNs\":%llu,\"cpuNs\":%llu,\"ownerCpuNs\":%llu,\"pauseTotalNs\":%llu,\"captureOrSyncNs\":%llu,\"waitApplyNs\":%llu,\"batchP99Ns\":%llu,\"pauseP99Ns\":%llu,\"peakArenaBytes\":%llu,\"maxRssBytes\":%ld,\"allocations\":%llu,\"collections\":%llu,\"checksum\":%llu,\"finalArenaBytes\":0}\n",
+        argv[1], rounds, work, live_count, host_count, (unsigned long long)elapsed, (unsigned long long)cpu,
         (unsigned long long)owner_cpu, (unsigned long long)pause_sum,
         (unsigned long long)capture_sum, (unsigned long long)finish_sum,
         (unsigned long long)percentile(latency, rounds, 99),
