@@ -6,6 +6,11 @@ throughput improvement.** It costs about 23–24% more CPU per completion than t
 paced synchronous baseline. Tail latency varies in both neoCLR modes. Keep the
 adapter experimental; do not promote it as a faster HTTP collector.
 
+**Subsequent cohort audit:** the retained guest still contains the old TaskQueue
+batch-list implementation. Current source already uses ArrayQueue and other
+managed improvements. These results isolate native GC on that fixed guest; they
+are not current complete-runtime capacity. See the [whole-path review](REVIEW.md).
+
 ## Contract and retained evidence
 
 `compare.py` runs fresh servers with identical 16 server lanes / 64 client slots,

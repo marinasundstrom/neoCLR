@@ -5429,3 +5429,10 @@ The [matched HTTP measurements](experiments/concurrent-gc-http/LOAD.md) now show
 23–24% higher concurrent CPU/request without a demonstrated throughput win.
 Initial and confirmation trials retain admission/latency variation and generator
 limitations. Next: author-requested code/algorithm review of avoidable GC work.
+
+**Whole Serve path audit (author clarification, 2026-10-18):** the author requires
+investigating HTTP handling as well as GC. The [code/profile/research review](experiments/concurrent-gc-http/REVIEW.md)
+finds that the retained guest predates the current ArrayQueue implementation, and
+identifies incoming-request URL reconstruction/reparsing as a concrete HTTP
+candidate. Next refresh the full managed cohort, then test that candidate against
+current semantics; keep collector cadence as a separate experimental variable.

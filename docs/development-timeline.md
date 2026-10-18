@@ -19443,3 +19443,15 @@ misses to GC. The author then requested a thorough code review informed by
 existing collectors/algorithms after the run. The assistant agreed to distinguish
 measured costs and small POC improvements from barrier/runtime-contract changes.
 See [all load results](experiments/concurrent-gc-http/LOAD.md); the code review follows.
+
+The author corrected the investigation scope: “We shouldn't assume that GC is
+the main fault HTTP handling is slow. There might be things there also.” The
+assistant broadened the review to the whole Serve path, collected separate native
+samples and allocation callers, and inspected parser/response/Task/socket/scheduler
+code alongside allocator and collector code. It found repeated incoming URL
+construction/parsing and discovered that the fixed benchmark guest still contains
+the older TaskQueue batch implementation, while current source already has
+ArrayQueue. Existing native-policy results remain fixed-cohort evidence; they are
+not the latest managed runtime's capacity. The [review](experiments/concurrent-gc-http/REVIEW.md)
+records primary-source comparisons and prioritizes a fresh managed cohort before
+HTTP-specific improvements. No further optimization was implemented in the review.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Review the complete Serve path with fresh native samples/allocation callers and primary GC/library research, without assuming collection dominates HTTP cost. Identify redundant incoming URL construction/parsing and separate HTTP/Task, allocation, metadata, scheduling and collector candidates. The cohort audit finds the retained guest predates current ArrayQueue/managed improvements: qualify the native-only comparison accordingly and require a fresh cohort before current-runtime performance claims. No new speedup is claimed.
+
 - Compare the applying concurrent GC experiment with paced synchronous Serve and Go at fixed HTTP arrival rates, retaining initial and targeted confirmation runs. Concurrent GC costs about 23–24% more CPU per completion without a throughput win; both neoCLR modes show 300 req/s variation, and generator-lag failures remain explicit. Record coarse CPU peaks, live reclamation and full raw evidence; keep production defaults unchanged.
 
 - Apply private background GC traces in the isolated Serve experiment using owner-side epoch/heap validation and existing sweep, with synchronous pressure fallback. Add deterministic stale/pressure/cancellation checks and real HTTP suspension/recovery tests, including a 96 KiB heap; verify actual reclamation and clean teardown. Production collector selection is unchanged; sanitizer overload results are not a performance claim.

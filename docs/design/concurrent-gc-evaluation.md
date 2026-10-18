@@ -130,3 +130,14 @@ The explicit one-mutator/complete-root invariant argument and UBSan/bounds tests
 formal runtime-wide proof or a chosen production design. Its synchronous copy/sweep
 cost and conservative discard rate must be measured before claiming a latency or
 throughput benefit; existing alternative-collector research remains relevant.
+
+### Whole-path HTTP review after applying results
+
+The [actual HTTP application/comparison](../experiments/concurrent-gc-http/LOAD.md)
+demonstrates reclamation but not a throughput win. The author explicitly requires
+considering HTTP work too. The [subsequent review](../experiments/concurrent-gc-http/REVIEW.md)
+separates parser/request construction, Task adapters, transport, mutator allocation,
+root publication and collection. It also discovers that the retained guest lacks
+already-landed managed queue changes; refresh the full cohort before current-runtime
+claims. Repeated URL parsing is a concrete HTTP candidate. Collector pacing, locality
+and barrier ideas remain separate hypotheses, with their safety/measurement gates.

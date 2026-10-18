@@ -209,3 +209,9 @@ completion for this concurrent policy and no demonstrated throughput gain over
 paced synchronous GC. Both modes vary at 300 requests/sec; all initial and
 confirmation trials, including generator-lag failures, are retained. The next
 step is reducing avoidable collector work, not changing production defaults.
+
+A subsequent whole-path audit found that this comparison's fixed guest predates
+already-landed managed queue improvements. It isolates native GC policy, not the
+latest complete runtime's capacity. Further work must refresh that cohort and
+measure HTTP parsing, Task adapters and transport as well as allocation/collection;
+GC is not assumed to be the primary HTTP bottleneck.

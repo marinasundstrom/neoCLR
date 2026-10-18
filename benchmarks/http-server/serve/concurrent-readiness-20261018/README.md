@@ -118,3 +118,8 @@ The [HTTP shadow adapter](../../../../docs/experiments/concurrent-gc-http/README
 implements the first tracing-only integration step above. Real requests, malformed
 input recovery and concurrent peers pass with synchronous reclamation authoritative.
 No background result application or timed concurrent-Serve comparison is enabled yet.
+
+The later [whole-path audit](../../../../docs/experiments/concurrent-gc-http/REVIEW.md)
+confirms this retained guest still contains the older TaskQueue batch implementation.
+These native relink measurements do not include every current managed improvement;
+refresh the full cohort before making a current-runtime capacity claim.
