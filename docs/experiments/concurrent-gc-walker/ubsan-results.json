@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "productionReady": false,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=undefined,bounds",
+        "-I",
+        "/Users/robert/Projects/neoclr/target/gc-walker-20261018/final",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-walker-20261018/final/test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-walker-20261018/final/test"
+      ],
+      "exitCode": 0,
+      "stdout": "101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation and parked rejection passed\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+    "/Users/robert/Projects/neoclr/target/gc-walker-20261018/final/native-gc.c": "6c18848f5cf0f44e087da2dcc40dfd2067cf1cec85eb01d03aad8b06ac72d099",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/snapshot.inc": "073b130c8e24b0d27e82fc1772ebaedfa6a4f51451e5c1b06aca05e2534fa14b",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c": "a5868a8fc0780e847dbaa71ec1c0748d29738f6bb946f1a85a69934fdcf3d62d",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/run.py": "4a5964e11a55d3d975580893e85601fd9257ae1146f5bc2e1c09cbc0809bd9ff",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c": "b3120e46741e7a8e5fc253f9cbb08eb0f6c309b1f098e0717eabe8c13ab58280",
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a"
+  }
+}

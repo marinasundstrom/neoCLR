@@ -97,3 +97,13 @@ UBSan/bounds reproduces both observations; ThreadSanitizer is unavailable on thi
 (even an empty control crashes). The prototype is not integrated or selectable.
 Phase-cost measurements should guide the next practical offload experiment; this
 result establishes no throughput improvement or complete concurrent-GC safety.
+
+
+### Walker integration checkpoint
+
+The [isolated worker/walker experiment](../experiments/concurrent-gc-walker/README.md)
+now preserves conditional host-root pairs and matches synchronous collection on 101
+protected-heap graph cases plus focused root/array/error checks. It reuses the current
+walker and does not apply results to the live heap. Parked capture and mutation/handle
+publication safety remain unresolved; this result is not qualification of concurrent
+reclamation or a measured performance improvement.

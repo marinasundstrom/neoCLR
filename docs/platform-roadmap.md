@@ -5228,3 +5228,11 @@ passes UBSan/bounds lifecycle tests for ownership transfer, completion, cancella
 and joined teardown. ASan startup and ThreadSanitizer failures remain validation limits.
 Live-heap/root integration, dynamic race qualification and performance benefit remain
 open; no production collector is changed.
+
+
+The [worker/walker integration](experiments/concurrent-gc-walker/README.md) now reuses
+the native tracer on copied heap/root data. UBSan/bounds passes 101 guarded graph
+comparisons against synchronous collection and conditional-root/array/error cases.
+This fixes strong promotion in the isolated tracing experiment; parked capture,
+changed-root/host-handle publication safety and live reclamation remain open. No
+production collector, three-mode qualification or Serve capacity gain is claimed.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Reuse the native GC walker in an isolated worker snapshot, preserving conditional host-root pairs instead of promoting owners to strong roots. UBSan/bounds passes 101 graph/oracle comparisons with the original heap unreadable, plus conditional-cycle, initialized-array, intern/static/fault-root, mutation, cancellation and error checks. Reject parked-root capture for now. No snapshot result reclaims live objects; production GC selection and behavior remain unchanged, with no performance gain claimed.
+
 - Add an isolated one-job concurrent-GC worker proof of concept with explicit scratch ownership, result publication, cooperative cancellation and joined shutdown. UBSan/bounds passes 1,000 reusable handoffs, 100 shutdown races and completed/error/idle cases. Preserve ASan startup timeout and ThreadSanitizer crash evidence as unavailable validation, not passes. No live-heap access, production integration or performance gain is claimed.
 
 - Sample Serve GC phase costs without changing production collection. Two diagnostic sampling intervals put graph tracing at about 60% of sampled collector CPU, ahead of indexing and sweep; retain hook-cost control, exact inputs and every request. Both short 300/sec diagnostics complete all arrivals, but establish no new sustained capacity or Go speedup. Use this evidence to prioritize a worker-infrastructure proof of concept before reusing tracing code.

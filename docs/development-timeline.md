@@ -19302,3 +19302,20 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   oracle and solve conditional-root/publication safety before live reclamation. The
   [worker evidence](experiments/concurrent-gc-worker/README.md) is a proof of concept,
   not production concurrent GC.
+
+
+### 2026-10-18 — Reuse the walker after worker infrastructure checks
+
+- **Author:** requested continuing after the infrastructure slice, within the earlier
+  direction to validate concurrency before integrating existing collector parts.
+- **Assistant action:** integrated the current native walker into a generated,
+  isolated snapshot harness using the tested one-job worker. Preserve conditional
+  owner/value pairs, and reject unsupported parked captures.
+- **Outcome:** [UBSan/bounds evidence](experiments/concurrent-gc-walker/README.md)
+  passes 101 graph/oracle comparisons while original heap memory is unreadable.
+  Unrooted conditional cycles stay unmarked across repeated snapshots; independently
+  rooted chains survive. Additional initialized-array, intern/static/fault, mutation,
+  cancellation and error checks pass. An initial fixture metadata error was corrected
+  and its failed evidence retained.
+- **Open:** no live reclamation is enabled. Parked roots, host-handle/root changes
+  during a cycle, publication safety and actual Serve/Go benefit remain separate work.
