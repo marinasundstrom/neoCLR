@@ -26,6 +26,26 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — Preview 16 records and boxed display
+
+- **Author:** reported positional-record NEOMETA001, then a native Object-display
+  failure after changing the sample. Confirmed that printing result.Value produces
+  the same diagnostic, requested reproduction/fixes/tests with a commit per slice,
+  and subsequently asked to investigate adjacent gaps after the reported cases.
+- **Assistant findings:** the installed compiler accepts the exact positional
+  declaration, so the earlier emitter failure is not reproduced. Nonempty boxing
+  and class result/result.Value Object display do fail in the installed backend.
+  Pattern unwrapping exposes the separate explicit reflection-retention contract.
+- **Assistant action:** added primitive display, closed record copying/unboxing and
+  rooted byref display; discovered generic Result overrides before owner erasure.
+  Compared copied consumers with the installed compiler/backend and interpreter,
+  without modifying the user sample or installed binaries. Added GC/copy/fault tests.
+- **Scope and open items:** JSON record mapping remains an explicit UnsupportedMapping
+  result. Adjacent tests expose nominal cast-fault classification and a stale helper
+  budget assertion; those are follow-up slices. See the
+  [reproduction evidence](experiments/preview16-record-display/README.md).
+
+
 ## 2026-10-18 — Serve latency and sustained-rate follow-up
 
 - **Author:** asked to continue profiling Serve, investigate admission misses and

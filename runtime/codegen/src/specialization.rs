@@ -1007,6 +1007,7 @@ pub(crate) fn expand_with_conformance(
         // Recover closed source contracts before erasing their owner arguments.
         // Dispatch may discover new constructors and further closed interfaces.
         let mut constructed = vec![];
+        let mut boxed_values = vec![];
         let mut contracts = vec![];
         for instance in &context.instances {
             let original = &input.functions[instance.source];
@@ -1042,6 +1043,21 @@ pub(crate) fn expand_with_conformance(
                 }
             }
             for op in &original.body {
+                if let Op::BoxValue(ty) = op {
+                    let owner = substitute(ty, &instance.types, &instance.methods)
+                        .map_err(|e| e.to_string())?;
+                    if input.type_definition(&owner).is_some_and(|t| {
+                        !t.is_reference_type
+                            && t.representation == neoclr::metadata::Representation::Record
+                    }) {
+                        if !constructed.contains(&owner) {
+                            constructed.push(owner.clone());
+                        }
+                        if !boxed_values.contains(&owner) {
+                            boxed_values.push(owner);
+                        }
+                    }
+                }
                 if let Op::NewArray(element) | Op::ReserveArray(element) = op {
                     let element = substitute(element, &instance.types, &instance.methods)
                         .map_err(|e| e.to_string())?;
@@ -1132,14 +1148,16 @@ pub(crate) fn expand_with_conformance(
                 let definition = input
                     .type_definition(owner)
                     .ok_or("constructed interface implementor requires local definition")?;
-                // Unboxed value construction does not create an Object receiver.
-                // Boxed-value admission remains checked independently during selection.
+                // Discover boxed value display before erasing closed generic arguments.
+                let value_display = super::selection::object_display_contract(&contract)
+                    && boxed_values.contains(owner);
                 if super::selection::object_dispatch_contract(&contract)
                     && !definition.is_reference_type
+                    && !value_display
                 {
                     continue;
                 }
-                if !definition.is_reference_type
+                if (!definition.is_reference_type && !value_display)
                     || definition.representation != neoclr::metadata::Representation::Record
                 {
                     return Err("interface dispatch requires constructed classes".into());

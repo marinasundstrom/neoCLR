@@ -333,22 +333,31 @@ pub(super) fn object_value_override(
         let definition = input
             .type_definition(&current)
             .ok_or("Object value dispatch requires a local class")?;
-        if !definition.is_reference_type {
-            return Err("Object value dispatch requires a class receiver".into());
+        let value_display = !definition.is_reference_type
+            && object_display_contract(contract)
+            && definition.representation == neoclr::metadata::Representation::Record;
+        if !definition.is_reference_type && !value_display {
+            return Err(
+                "Object value dispatch requires a class receiver or value display override".into(),
+            );
         }
         let arguments = match &current {
-            Type::Constructed { arguments, .. } => arguments.as_slice(),
+            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
+                arguments.as_slice()
+            }
             _ => &[],
         };
         let mut candidates = vec![];
         for (index, method) in input.functions.iter().enumerate() {
             if method.owner.as_ref().and_then(Type::definition_name) != current.definition_name()
                 || !method.instance
+                || !method.is_override
                 || method.name.rsplit('.').next() != contract.name.rsplit('.').next()
             {
                 continue;
             }
-            let method = closed_signature(method, arguments)?;
+            let method = closed_signature(method, arguments)
+                .map_err(|e| format!("Object override {} on {current:?}: {e}", method.name))?;
             if method.parameters != contract.parameters || !method.generic_parameters.is_empty() {
                 continue;
             }
@@ -357,7 +366,7 @@ pub(super) fn object_value_override(
                 continue;
             }
             if method.is_abstract
-                || method.receiver_byref
+                || method.receiver_byref != value_display
                 || method.returns != contract.returns
                 || method.no_result
             {
@@ -658,6 +667,7 @@ pub(super) fn dispatch_targets_with_array(
         return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
     }
     let mut constructed = BTreeSet::new();
+    let mut boxed_values = BTreeSet::new();
     if !display {
         for &index in conformance_types.into_iter().flatten() {
             let ty = &input.types[index];
@@ -688,10 +698,23 @@ pub(super) fn dispatch_targets_with_array(
             }
         }
         for (pc, op) in input.functions[i].body.iter().enumerate() {
-            if object_display_contract(f)
-                && matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::Int64 | Type::Boolean | Type::String) && !input.is_object_reference_type(t))
-            {
-                return Err(format!("Object display with boxing or arrays requires a later receiver/metadata profile: {op:?} in {} at instruction {pc}", input.functions[i].name).into());
+            if object_display_contract(f) {
+                if let Op::BoxValue(ty) = op {
+                    if let Some(t) = input.type_definition(ty) {
+                        if !t.is_reference_type
+                            && t.representation == neoclr::metadata::Representation::Record
+                        {
+                            constructed.insert(t.name.as_str());
+                            boxed_values.insert(t.name.as_str());
+                        }
+                    } else if !matches!(
+                        ty,
+                        Type::Int32 | Type::Int64 | Type::Boolean | Type::String
+                    ) && !input.is_object_reference_type(ty)
+                    {
+                        return Err(format!("Object display does not support boxed type {ty:?} in {} at instruction {pc}", input.functions[i].name).into());
+                    }
+                }
             }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
                 if let Some(Type::Named(name)) = &array_owner {
@@ -731,10 +754,10 @@ pub(super) fn dispatch_targets_with_array(
         }
         // A value constructor alone cannot contribute a reference dispatch target.
         // Unsupported boxes still reject above; interface dispatch is unchanged.
-        if display && !t.is_reference_type {
+        if display && !t.is_reference_type && !boxed_values.contains(t.name.as_str()) {
             continue;
         }
-        if !t.is_reference_type
+        if (!t.is_reference_type && !boxed_values.contains(t.name.as_str()))
             || !t.generic_parameters.is_empty()
             || t.representation != neoclr::metadata::Representation::Record
         {

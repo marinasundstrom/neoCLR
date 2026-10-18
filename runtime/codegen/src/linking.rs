@@ -1080,9 +1080,21 @@ pub fn prepare(
         .as_array()
         .is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString"))
     {
+        let boxed_values: std::collections::BTreeSet<_> = selected
+            .functions
+            .iter()
+            .flat_map(|f| &f.body)
+            .filter_map(|op| {
+                if let Op::BoxValue(neoclr::metadata::Type::Named(name)) = op {
+                    Some(name.clone())
+                } else {
+                    None
+                }
+            })
+            .collect();
         let mut defaults = vec![];
         for (index, ty) in selected.types.iter().enumerate() {
-            if !ty.is_reference_type
+            if (!ty.is_reference_type && !boxed_values.contains(&ty.name))
                 || ty.representation != neoclr::metadata::Representation::Record
             {
                 continue;
@@ -1106,10 +1118,11 @@ pub fn prepare(
                 neoclr::metadata::Type::Named(ty.name.clone())
             };
             let token =
-                super::reflection_metadata::semantic_token(&selected, &report, &native_type)?;
+                super::reflection_metadata::semantic_token(&selected, &report, &native_type)
+                    .map_err(|e| format!("Object display token {native_type:?}: {e}"))?;
             let neoclr::Value::String(name) =
                 neoclr::native_metadata::display_name(&source_metadata, &token)
-                    .map_err(|e| e.to_string())?
+                    .map_err(|e| format!("Object display name {native_type:?}: {e}"))?
             else {
                 return Err("Object default display requires a String descriptor".into());
             };

@@ -81,3 +81,10 @@ WriteLine overloads accept Boolean, Char and integer types without
 boxing. WriteLine(object?) is the fallback: it calls the object's ToString override,
 or writes an empty line for null. Integer text uses invariant decimal digits.
 Floating-point numeric formatting and format providers remain future work.
+
+
+Development after Preview 16 also supports Object display of boxed Int64, Boolean
+and closed value records, including generic record carriers. Value overrides run
+against the boxed copy with GC roots retained. This closes native backend gaps;
+installed Preview 16 binaries retain their earlier limits. It does not add JSON
+mapping for record structs or floating-point Object formatting.

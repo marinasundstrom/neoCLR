@@ -1833,17 +1833,22 @@ pub(crate) fn compile_into(
                 };
                 b.ins().brif(valid, matched, &[], absent, &[]);
                 b.switch_to_block(matched);
-                let value = if unbox {
-                    let scalar = if p.input.functions[i].returns == neoclr::metadata::Type::Int64 {
-                        types::I64
+                if unbox {
+                    let payload = b.ins().iadd_imm(receiver, 8);
+                    let result = p.results[i].as_ref().unwrap();
+                    let values = if matches!(result, Ty::Record(index) if input.types[*index].fields.is_empty())
+                    {
+                        lanes(&p, result)
+                            .into_iter()
+                            .map(|ty| zero(&mut b, ty))
+                            .collect()
                     } else {
-                        types::I32
+                        read(&mut b, &p, result, payload)
                     };
-                    b.ins().load(scalar, MemFlags::new(), receiver, 8)
+                    write(&mut b, output, &values);
                 } else {
-                    receiver
-                };
-                write(&mut b, output, &[value]);
+                    write(&mut b, output, &[receiver]);
+                }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.switch_to_block(absent);
@@ -1886,7 +1891,14 @@ pub(crate) fn compile_into(
                 let primitive = details.unwrap().int32_boxes.contains_key(&i)
                     || details.unwrap().int64_boxes.contains_key(&i)
                     || details.unwrap().boolean_boxes.contains_key(&i);
-                let bytes = b.ins().iconst(types::I32, if primitive { 16 } else { 8 });
+                let payload = if primitive {
+                    8
+                } else if input.types[record].fields.is_empty() {
+                    0
+                } else {
+                    p.bytes(&p.args[i][0])
+                };
+                let bytes = b.ins().iconst(types::I32, (8 + payload) as i64);
                 let call = b.ins().call(service, &[arena, tag, bytes, output]);
                 let raw = b.inst_results(call)[0];
                 let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
@@ -1903,9 +1915,16 @@ pub(crate) fn compile_into(
                 );
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
-                if primitive {
+                if payload != 0 {
                     let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                    b.ins().store(MemFlags::new(), parameters[0], pointer, 8);
+                    let pointer = b.ins().iadd_imm(pointer, 8);
+                    write_typed(
+                        &mut b,
+                        &p,
+                        &p.args[i][0],
+                        pointer,
+                        &parameters[..p.lanes(&p.args[i][0])],
+                    );
                 }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
@@ -2031,6 +2050,10 @@ pub(crate) fn compile_into(
                     b.ins().brif(equal, matched, &[], next, &[]);
                     b.switch_to_block(matched);
                     let mut adapted = parameters.clone();
+                    if input.functions[target].receiver_byref {
+                        // A value override borrows the payload of the rooted box.
+                        adapted[0] = b.ins().iadd_imm(parameters[0], 8);
+                    }
                     let mut offset = 0;
                     for (from, to) in p.args[i].iter().zip(&p.args[target]) {
                         if *from == Ty::Literal && from != to {

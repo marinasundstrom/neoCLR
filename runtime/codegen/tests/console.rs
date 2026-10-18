@@ -2864,18 +2864,11 @@ fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
     )
     .unwrap();
     let source = include_str!("../../../docs/experiments/aot-console/boxed-empty.neoil");
-    for (source, flags, message) in [
-        (
-            source.to_string(),
-            vec!["--compile-system"],
-            "requires --reference-arena",
-        ),
-        (
-            source.replace(".type Marker<T>", ".type Marker<T>\n.field Value T"),
-            vec!["--compile-system", "--reference-arena"],
-            "requires empty value records",
-        ),
-    ] {
+    for (source, flags, message) in [(
+        source.to_string(),
+        vec!["--compile-system"],
+        "requires --reference-arena",
+    )] {
         let app = neoclr::assembler::read_modules(
             &[neoclr::assembler::ModuleInput::Source(&source)],
             &seed,
@@ -3525,7 +3518,7 @@ fn object_display_rejects_base_calls_and_unverified_overrides() {
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed)
             .unwrap()
             .remove(0);
-    for mode in [1, 3, 4, 6, 7, 8] {
+    for mode in [1, 3, 4, 7, 8] {
         let mut app = original.clone();
         match mode {
             1 => {
@@ -3546,28 +3539,6 @@ fn object_display_rejects_base_calls_and_unverified_overrides() {
                     .find(|f| f.name == "B.ToString")
                     .unwrap()
                     .visibility = neoclr::metadata::Visibility::Private
-            }
-            6 => {
-                let mut marker = neoclr::assemble(".module Marker\n.type Marker\n.end")
-                    .unwrap()
-                    .types[0]
-                    .clone();
-                marker.definition = None;
-                app.types.push(marker);
-                let root = app
-                    .functions
-                    .iter_mut()
-                    .find(|f| f.name == "Calculate")
-                    .unwrap();
-                let ty = neoclr::metadata::Type::Named("Marker".into());
-                root.body.splice(
-                    0..0,
-                    [
-                        neoclr::metadata::Instruction::New(ty.clone()),
-                        neoclr::metadata::Instruction::BoxValue(ty),
-                        neoclr::metadata::Instruction::Pop,
-                    ],
-                );
             }
             7 => {
                 for ty in &mut app.types {
@@ -3600,21 +3571,6 @@ fn object_display_rejects_base_calls_and_unverified_overrides() {
             }
             _ => (),
         }
-        if mode == 6 {
-            for op in &mut app
-                .functions
-                .iter_mut()
-                .find(|f| f.name == "Calculate")
-                .unwrap()
-                .body
-            {
-                if let neoclr::metadata::Instruction::Branch(pc)
-                | neoclr::metadata::Instruction::BranchTrue(pc) = op
-                {
-                    *pc += 3;
-                }
-            }
-        }
         // Removing a function requires fresh local row identities before encoding.
         for f in &mut app.functions {
             f.definition = None;
@@ -3640,9 +3596,6 @@ fn object_display_rejects_base_calls_and_unverified_overrides() {
                 error.contains("Fault:"),
                 "source validation must reject before projection: {r:?}"
             );
-        }
-        if mode == 6 {
-            assert!(error.contains("boxing or arrays"), "{r:?}");
         }
         if mode == 7 {
             assert!(error.contains("leading base initializer"), "{r:?}");
@@ -11611,6 +11564,98 @@ int main(int argc,char **argv) {
         assert_eq!(r.stdout, format!("{value}\n{value}\n").as_bytes());
         assert_eq!(r.stdout, expected.stdout);
         assert!(r.stderr.is_empty());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_boxed_records_copy_trace_and_dispatch_payloads() {
+    let seed=neoclr::assemble(&format!("{OBJECT_DISPLAY_SEED}\n.function neoCLR.Runtime.Int32ToString(Int32) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String) -> Void\n.methodimpl InternalCall\n.end\n")).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/boxed-record.neoil");
+    let app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed)
+            .unwrap()
+            .remove(0);
+    let dir = Temp::new();
+    let flags = [
+        "--compile-system",
+        "--reference-arena",
+        "--bind-int32-to-string",
+        "--bind-console-write-line",
+        "--native-gc",
+    ];
+    let r = compile_linked_module(&dir, &seed, &app, &flags);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
+    assert_eq!(report["emptyRecordBoxes"].as_array().unwrap().len(), 2);
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(dir.0.join("host.c"),r#"
+#include "native-gc.h"
+#include <stdlib.h>
+int main(int argc,char **argv) {
+    uint64_t storage[513]={0};storage[512]=UINT64_C(0xa5a5a5a5a5a5a5a5);
+    int32_t value=argc>1?(int32_t)strtol(argv[1],NULL,10):0;
+    unsigned capacity=argc>2?(unsigned)strtoul(argv[2],NULL,10):4096;
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,capacity,0}};
+    int32_t result=-99;int status=neoclr_entry_v4(value,&result,&ctx);
+    if(storage[512]!=UINT64_C(0xa5a5a5a5a5a5a5a5) || ctx.text.used>capacity)return 93;
+    if(status){if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used || neoclr_gc_entry_check_v1(&ctx)) return 94;
+    return result;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args([
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-DNEOCLR_NATIVE_GC",
+            "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-console/native-gc.c"))
+        .arg(base.join("aot-console/console.c"))
+        .arg(base.join("aot-scalar/console.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    for mode in 0..3 {
+        let expected = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
+        let actual = Command::new(dir.0.join("app"))
+            .arg(mode.to_string())
+            .output()
+            .unwrap();
+        match expected {
+            Ok(value) => {
+                assert_eq!(value.value, neoclr::Value::Int32(0));
+                assert_eq!(actual.status.code(), Some(0), "{actual:?}");
+                assert_eq!(actual.stdout, b"42\n42\n");
+                assert_eq!(actual.stdout, value.stdout);
+            }
+            Err(fault) => {
+                assert_eq!(actual.status.code(), Some(1));
+                let diagnostic = String::from_utf8_lossy(&actual.stderr);
+                let expected = fault.diagnostic().to_string();
+                // Native diagnostics retain the fault kind and source frame; messages
+                // are supplied by the native diagnostic table.
+                assert_eq!(diagnostic.split(':').next(), expected.split(':').next());
+                assert_eq!(diagnostic.lines().nth(1), expected.lines().nth(1));
+            }
+        }
     }
 }
 

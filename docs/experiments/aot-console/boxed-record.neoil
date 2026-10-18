@@ -1,0 +1,93 @@
+.module BoxedRecord
+.type Payload
+.field Text String
+.field Number Int32
+.method instance override byref ToString() -> String
+ldarg 0
+ldfld Payload::Text
+ret
+.end
+.end
+.type Other
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Payload source
+.local Payload copy
+.local Other empty
+.local System.Object boxed
+ldarg mode
+ldc.i4 1
+ceq
+brtrue Null
+ldarg mode
+ldc.i4 2
+ceq
+brtrue Wrong
+ldloca source
+initobj Payload
+ldloca source
+ldc.i4 42
+call neoCLR.Runtime.Int32ToString(Int32)
+stfld Payload::Text
+pop
+ldloca source
+ldc.i4 42
+stfld Payload::Number
+pop
+ldloc source
+box Payload
+stloc boxed
+ldloca source
+initobj Payload
+ldloc boxed
+unbox.any Payload
+stloc copy
+ldloca copy
+ldc.i4 99
+stfld Payload::Number
+pop
+ldloc boxed
+unbox.any Payload
+ldfld Payload::Number
+ldc.i4 42
+ceq
+brfalse Failed
+ldloca copy
+initobj Payload
+ldloc boxed
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloca empty
+initobj Other
+ldloc empty
+box Other
+unbox.any Other
+pop
+ldloc boxed
+callvirt instance System.Object::ToString()
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldc.i4 0
+ret
+Null:
+ldloca boxed
+initobj System.Object
+ldloc boxed
+unbox.any Payload
+pop
+ldc.i4 91
+ret
+Wrong:
+ldloca empty
+initobj Other
+ldloc empty
+box Other
+unbox.any Payload
+pop
+ldc.i4 92
+ret
+Failed:
+ldc.i4 93
+ret
+.end

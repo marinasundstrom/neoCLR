@@ -1,0 +1,382 @@
+{
+  "passed": true,
+  "bundle": "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc",
+  "backend": "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d",
+  "commands": [
+    {
+      "label": "wrapper-compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/library-async.rvn(8,1): warning RAV2706: This async method 'Main' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "label": "wrapper-metadata",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-otmpm0ev/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-otmpm0ev/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "label": "wrapper-preview16",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoclr-codegen: Object display with boxing or arrays requires a later receiver/metadata profile\n"
+    },
+    {
+      "label": "wrapper-candidate",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.reflection.json",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d"
+      ],
+      "exitCode": 0,
+      "stdout": "Result.Error(JSON reflection operation failed)\n",
+      "stderr": ""
+    },
+    {
+      "label": "wrapper-interpreter",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Result.Error(JSON reflection operation failed)\n",
+      "stderr": ""
+    },
+    {
+      "label": "value-compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/library-async.rvn(8,1): warning RAV2706: This async method 'Main' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "label": "value-metadata",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-y5aiu1_3/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-y5aiu1_3/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "label": "value-preview16",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoclr-codegen: Object display with boxing or arrays requires a later receiver/metadata profile\n"
+    },
+    {
+      "label": "value-candidate",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.reflection.json",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d"
+      ],
+      "exitCode": 0,
+      "stdout": "Result.Error(JSON reflection operation failed)\n",
+      "stderr": ""
+    },
+    {
+      "label": "value-interpreter",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Result.Error(JSON reflection operation failed)\n",
+      "stderr": ""
+    },
+    {
+      "label": "pattern-compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/library-async.rvn(8,1): warning RAV2706: This async method 'Main' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "label": "pattern-metadata",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-_of5van1/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-_of5van1/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "label": "pattern-preview16",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "pattern-candidate",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.reflection.json",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "pattern-interpreter",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "record-construction-compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "label": "record-construction-preview16",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Bob\n",
+      "stderr": ""
+    },
+    {
+      "label": "record-construction-candidate",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d"
+      ],
+      "exitCode": 0,
+      "stdout": "Bob\n",
+      "stderr": ""
+    },
+    {
+      "label": "record-construction-interpreter",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Bob\n",
+      "stderr": ""
+    },
+    {
+      "label": "record-json-compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "label": "record-json-preview16",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoclr-codegen: record boxing currently requires empty value records; found Named(\"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.T__506572736F6E\") in NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E at instruction 3\n"
+    },
+    {
+      "label": "record-json-candidate",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d"
+      ],
+      "exitCode": 0,
+      "stdout": "unsupported record mapping\n",
+      "stderr": ""
+    },
+    {
+      "label": "record-json-interpreter",
+      "command": [
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview16-record-display/display-check-4/bundle/samples/tasks/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "unsupported record mapping\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr": "a277785950bc1e9f8d267da74ba17db422c7e052e8b7c700c6ab4f302ffaf1ef",
+    "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/bin/neoclr-codegen": "b1fe59334bbff89fbc356ef7d94d9f264b4565e2326d342dd00ddc31a8d91201",
+    "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "9525fe976922a026db5dd32d52533f0843fb95316cd065f5019f51e011ded516",
+    "/Users/robert/Projects/neoclr/target/preview16-record-display/codegen-slice2d": "a6075de00edb51eb44c4d909550e0c847d0220c1329870b75e4e56debb4ce4bd",
+    "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/manifest.json": "b65dc4cf14a09677ffc77a07b55402208b855eb89fdacae860629f68e282c541"
+  }
+}

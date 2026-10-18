@@ -12899,3 +12899,25 @@ against interpreter output, require explicit formatter admission, and verify GC
 reclamation. Existing reference/String display and malformed override checks remain
 required. macOS ARM64 is the tested target; this is development work, not an update
 to the installed Preview 16 binaries.
+
+
+### Closed value boxes and generic display
+
+The next backend slice copies nonempty closed value records into native boxes and
+copies them back on checked unboxing. Reference fields use existing typed root
+plans; the box stays rooted while a byref ToString override borrows its payload.
+Empty records retain their header-only allocation. Null and wrong-type unboxing
+preserve their fault kinds and source sites. Generic boxed overrides are discovered
+before closed owner arguments are erased, including Result<string, JsonError>.
+The private report keys `emptyRecordBoxes`/`emptyRecordBoxSites` retain their legacy
+names for compatibility, but now also describe nonempty record boxes.
+
+This matches .NET value-copy boxing and Object display dispatch within the existing
+native type/layout bounds. There is no new public API, Runtime Contract switch,
+Raven semantic change or CLI encoding. Native specialization and backend lowering
+own the fix; ordinary .NET emission remains unchanged. Enum/whole structural-union
+boxing and JSON value-record mapping are separate limits. JSON still requires
+explicit reflection retention for class properties and returns UnsupportedMapping
+for non-scalar value records. Do not infer record JSON serialization from successful
+boxing. See the [Preview 16 reproduction](experiments/preview16-record-display/README.md)
+for tool identities, complete consumer checks and remaining limitations.

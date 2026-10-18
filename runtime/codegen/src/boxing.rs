@@ -1,4 +1,4 @@
-//! Private lowering of verified String reference views, empty value-record, Int32, Int64 and Boolean boxing. This is not a native
+//! Private lowering of verified String reference views, closed value-record, Int32, Int64 and Boolean boxing. This is not a native
 //! runtime-service binding: the source instruction retains its identity and fault site.
 use neoclr::metadata::{Function, FunctionRef, Instruction as Op, MemberId, Representation, Type};
 use serde_json::{Value, json};
@@ -103,17 +103,16 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
             }
         } else {
             input.types.iter().position(|t| Type::Named(t.name.clone()) == ty)
-            .ok_or_else(|| format!("record boxing requires Int32, Int64, Boolean or a local closed empty value record; found {ty:?} in {} at instruction {pc}", input.functions[caller].name))?
+            .ok_or_else(|| format!("record boxing requires Int32, Int64, Boolean or a local closed value record; found {ty:?} in {} at instruction {pc}", input.functions[caller].name))?
         };
         let t = &input.types[index];
         if t.is_reference_type
             || t.representation != Representation::Record
-            || !t.fields.is_empty()
             || t.base.is_some()
             || t.enum_info.is_some()
             || !t.generic_parameters.is_empty()
         {
-            return Err(format!("record boxing currently requires empty value records; found {ty:?} in {} at instruction {pc}", input.functions[caller].name).into());
+            return Err(format!("record boxing requires closed non-enum value records; found {ty:?} in {} at instruction {pc}", input.functions[caller].name).into());
         }
         let helper = if let Some(&helper) = helpers.get(&index) {
             helper
@@ -286,13 +285,17 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .iter()
                 .enumerate()
                 .filter_map(move |(pc, op)| match op {
-                    Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
-                        if !crate::scalar_unions::query(module, f, pc) =>
+                    Op::IsInstance(t)
+                        if (matches!(t, Type::Int32 | Type::Int64 | Type::Boolean)
+                            || crate::scalar_unions::record(module, t))
+                            && !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), false))
                     }
-                    Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
-                        if !crate::scalar_unions::query(module, f, pc) =>
+                    Op::UnboxAny(t)
+                        if (matches!(t, Type::Int32 | Type::Int64 | Type::Boolean)
+                            || crate::scalar_unions::record(module, t))
+                            && !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), true))
                     }
@@ -331,7 +334,7 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
     for (caller, pc, ty, unbox) in sites {
         let boolean = ty == Type::Boolean;
         let wide = ty == Type::Int64;
-        let key = (boolean, wide, unbox);
+        let key = (format!("{ty:?}"), unbox);
         let helper = if let Some(&helper) = helpers.get(&key) {
             helper
         } else {
@@ -367,11 +370,25 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
             } else {
                 "int32Boxes"
             };
-            let tag = report[box_key]
-                .as_array()
-                .and_then(|v| v.first())
-                .map(|r| r["typeCompiledIndex"].clone())
-                .unwrap_or(Value::Null);
+            let record = input
+                .types
+                .iter()
+                .position(|t| Type::Named(t.name.clone()) == ty);
+            let tag = if let Some(record) = record {
+                report["emptyRecordBoxes"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .find(|r| r["typeCompiledIndex"].as_u64() == Some(record as u64))
+                    .map(|r| r["typeCompiledIndex"].clone())
+                    .unwrap_or(Value::Null)
+            } else {
+                report[box_key]
+                    .as_array()
+                    .and_then(|v| v.first())
+                    .map(|r| r["typeCompiledIndex"].clone())
+                    .unwrap_or(Value::Null)
+            };
             queries.push(json!({"helperCompiledIndex":helper,"typeCompiledIndex":tag,"unbox":unbox,"primitive":ty}));
             helpers.insert(key, helper);
             helper
