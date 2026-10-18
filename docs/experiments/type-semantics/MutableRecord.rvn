@@ -1,0 +1,5 @@
+public record struct Counter(var Number: int)
+func Main() {
+    var counter = Counter(1)
+    counter.Number = 2
+}

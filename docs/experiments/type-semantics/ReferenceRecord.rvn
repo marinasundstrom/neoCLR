@@ -1,0 +1,4 @@
+public record Person(val Name: string, val Age: int)
+func Main() {
+    let person = Person("Bob", 42)
+}

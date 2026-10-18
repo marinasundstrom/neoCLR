@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Validate native mutable positional record structs, class aliasing, value copying, boxed-value isolation and init accessors across interpreter/JIT/AOT with the repaired compiler. Retain reference-record admission and ValueType ancestry as active compatibility gaps.
+
 - Serialize public nongeneric record structs and nested class/record properties through checked boxed getters. Preserve unsupported scalar/union rejection, output quotas and explicit record-deserialization errors; keep broader array/method reflection admission unchanged. Add matched interpreter/JIT/AOT JSON regressions and update API guidance.
 
 - Support retained public property getters on boxed nongeneric value records and record-valued properties. Borrow the rooted box so getter mutations persist without changing the original value; preserve receiver/access/retention checks and leave value-record setters unsupported. Add interpreter and GC-enabled native mutation/copy regressions.

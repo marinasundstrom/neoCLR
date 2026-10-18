@@ -46,7 +46,9 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   should derive directly from Object. The author then requested investigation of
   reference/value semantics for classes, structs and both record forms across
   interpreter, JIT and AOT. The assistant started matched copying, aliasing, boxing
-  and type-classification checks; ancestry remains under investigation.
+  and type-classification checks. The author confirmed corresponding .NET compiler
+  mapping/metadata and directed filling the gaps. Mutable record setters now pass
+  interpreter/JIT/AOT checks; reference records and ancestry remain active work.
 - **Evidence and limits:** see the [JSON record experiment](experiments/json-records/README.md).
   Public-model visibility and native reflection retention remain required. Record
   deserialization, custom record collection elements and ancestry integration remain

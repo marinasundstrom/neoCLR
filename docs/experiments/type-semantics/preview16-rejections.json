@@ -1,0 +1,30 @@
+[
+  {
+    "case": "ReferenceRecord",
+    "command": [
+      "dotnet",
+      "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/target/json-records/semantics-rejections/ReferenceRecord/App.rvnproj"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "/Users/robert/Projects/neoclr/docs/experiments/type-semantics/ReferenceRecord.rvn(1,1): error NEOMETA001: Native emission does not support positional record structs without additional members.\n",
+    "sourceSha256": "3fd38bb849185989921a5554438649aaba6857c644e996109d4d0fa80a3e4802"
+  },
+  {
+    "case": "MutableRecord",
+    "command": [
+      "dotnet",
+      "/Users/robert/.local/share/neoclr/preview16/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/target/json-records/semantics-rejections/MutableRecord/App.rvnproj"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "/Users/robert/Projects/neoclr/docs/experiments/type-semantics/MutableRecord.rvn(1,1): error NEOMETA001: Native emission does not support constructor-initialized positional val components.\n",
+    "sourceSha256": "3b80b0b7ed076771af17aa02058255dbb62419ad5cc5fcbabc902322ee2b17f7"
+  }
+]

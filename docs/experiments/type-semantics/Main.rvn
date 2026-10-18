@@ -1,0 +1,63 @@
+import System.*
+import System.IO.*
+
+public class Reference {
+    var Number: int { get; set; } = 1
+}
+public struct ValueCell {
+    init() { }
+    var Number: int { get; set; } = 1
+}
+public record struct ValueRecord(var Number: int)
+public record struct ImmutableRecord(val Number: int)
+public class InitOnly {
+    val Number: int { get; init; } = 1
+}
+
+func Main() {
+    let initialized = InitOnly { Number = 42 }
+    if initialized.Number != 42 {
+        Fail("Init accessor did not initialize class")
+    }
+    let immutable = ImmutableRecord(42)
+    if immutable.Number != 42 {
+        Fail("Positional init accessor did not initialize record")
+    }
+    let reference = Reference()
+    let alias = reference
+    alias.Number = 2
+    if reference.Number != 2 {
+        Fail("Class assignment did not alias")
+    }
+    var value = ValueCell()
+    var copy = value
+    copy.Number = 2
+    if value.Number != 1 {
+        Fail("Struct assignment did not copy")
+    }
+    var valueRecord = ValueRecord(1)
+    var recordCopy = valueRecord
+    recordCopy.Number = 2
+    if valueRecord.Number != 1 {
+        Fail("Record struct assignment did not copy")
+    }
+    let boxed: Object = valueRecord
+    valueRecord.Number = 3
+    if boxed is ValueRecord unboxed {
+        if unboxed.Number != 1 {
+            Fail("Box did not preserve independent value")
+        }
+    } else {
+        Fail("Box did not retain value-record identity")
+    }
+    if typeof(Reference).IsValueType {
+        Fail("Class is a value type")
+    }
+    if !typeof(ValueCell).IsValueType {
+        Fail("Struct is a reference type")
+    }
+    if !typeof(ValueRecord).IsValueType {
+        Fail("Record struct is a reference type")
+    }
+    Console.WriteLine("class aliases; structs copy; boxing isolates; init accessors initialize")
+}
