@@ -26,6 +26,33 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-18 — JSON record serialization and ValueType ancestry
+
+- **Author:** requested record-struct JSON serialization, regression tests, consistent
+  interpreter/JIT/AOT behavior and a commit per slice.
+- **Assistant action:** repaired boxed property getters before changing mapper
+  admission. Getters borrow the rooted box and preserve mutations; tests distinguish
+  the box from the original value. Serialization covers public nongeneric records
+  and nested properties while retaining existing quotas and unsupported-type checks.
+- **Author observation:** proposed the missing `ValueType : Object` hierarchy as the
+  gap, and clarified that familiar semantics are useful now while the long-term
+  internal design remains open; sequencing should follow dependencies.
+- **Assistant correction:** initially agreed that the class was missing, then inspected
+  source and emitted metadata. `System.ValueType` already exists and its metadata base
+  is Object; the sample Person record struct has no nominal base recorded. The assistant
+  proposed finishing property/JSON support first, with struct ancestry as a separate
+  follow-up rather than adding a duplicate foundation class.
+- **Author clarification:** ordinary `record Person(...)` is a reference type and
+  should derive directly from Object. The author then requested investigation of
+  reference/value semantics for classes, structs and both record forms across
+  interpreter, JIT and AOT. The assistant started matched copying, aliasing, boxing
+  and type-classification checks; ancestry remains under investigation.
+- **Evidence and limits:** see the [JSON record experiment](experiments/json-records/README.md).
+  Public-model visibility and native reflection retention remain required. Record
+  deserialization, custom record collection elements and ancestry integration remain
+  distinct gaps; the installed Preview 16 bundle is not modified.
+
+
 ## 2026-10-18 — Preview 16 records and boxed display
 
 - **Author:** reported positional-record NEOMETA001, then a native Object-display

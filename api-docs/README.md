@@ -2367,3 +2367,10 @@ retains its matching delegate IDs. Neither overload is excluded.
 Its renderer identity is recorded by binary SHA-256 rather than guessing a source
 revision for the existing local renderer executable. No Raven compiler changes or
 new CLI function encoding are introduced. This refresh does not publish the website.
+
+2026-10-18: public JSON signatures are unchanged. The authored JSON and reflection
+guides document boxed value-record getters and record serialization, explicit
+retention, and remaining construction/collection limits. Only ObjectMapper's
+implementation fingerprint changed in the aggregate snapshot; its existing reference
+assembly is reused. The snapshot fingerprint check and four native snapshot tests
+pass; no type/member inventory or rendered signature change is required.

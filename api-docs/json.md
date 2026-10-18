@@ -84,10 +84,31 @@ The [tested NodeEnvelope sample](https://github.com/marinasundstrom/neoCLR/blob/
 `JsonValue`, `JsonObject` and `JsonValue[]` properties. Supported lists and maps
 can also contain explicitly declared JSON nodes.
 
+## Value-record serialization (development)
+
+`Serialize` also accepts public nongeneric record structs, including read-only
+properties and nested class/record properties. For example, a public
+`record struct Person(val Name: string, val Age: int)` holding `"Bob"` and `42`
+serializes to `{"Name":"Bob","Age":42}`. See the
+[tested consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/json-records/Main.rvn).
+Native builds must retain property metadata and getters for each model type through
+`--reflection-roots`; the test driver demonstrates that configuration.
+
+Getters execute against the boxed value. Mutating getters can change that box;
+the original unboxed value remains unchanged. Nested record results are copied into
+new boxes and traced normally. The same JSON, errors and quotas apply in interpreter,
+JIT and AOT. Empty records serialize as `{}`; fields alone are not JSON properties.
+
+This adds serialization, not constructor mapping for record deserialization.
+Deserializing a non-scalar value record returns `UnsupportedMapping` before executing
+model constructors. Generic records, enum/union mapping, custom value-record array
+or collection elements, nonpublic model types and unsupported scalar properties
+remain outside the supported mapper subset. Existing bounds still apply.
+
 ## Provisional property rules
 
 - Map String, Int32 and Boolean public instance properties, plus nested nongeneric
-  reference objects and typed arrays in development, with exact, case-sensitive
+  reference objects, record structs for serialization, and typed arrays in development, with exact, case-sensitive
   names. No naming policy or attribute support; property order is not promised.
 - Serialize public getters, including read-only properties. Deserialize public
   setters; read-only/private setters and static properties are ignored. Fields are ignored.

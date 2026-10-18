@@ -1,0 +1,58 @@
+import System.*
+import System.Data.Json.*
+import System.IO.*
+import System.Concurrency.Tasks.*
+
+public record struct Person(val Name: string, val Age: int)
+public record struct Family(val Person: Person, val Active: bool)
+public struct Empty { }
+public class Envelope {
+    val Item: Person => Person("Ada", 37)
+}
+public record struct Wrapped(val Item: Envelope)
+public record struct TooWide(val Number: long)
+public union Choice {
+    case Value(number: int)
+}
+
+func Check(value: Object, expected: string) {
+    let result = JsonSerializer.Serialize(value)
+    if let .Ok(text) = result {
+        if text != expected {
+            Fail("Unexpected JSON: " + text)
+        }
+        Console.WriteLine(text)
+    } else {
+        Fail("Serialization failed")
+    }
+}
+
+async func Main() -> Task<unit> {
+    let person = Person("Bob", 42)
+    Check(person, "{\"Name\":\"Bob\",\"Age\":42}")
+    Check(Family(person, true), "{\"Person\":{\"Name\":\"Bob\",\"Age\":42},\"Active\":true}")
+    Check(Empty(), "{}")
+    Check(Wrapped(Envelope()), "{\"Item\":{\"Item\":{\"Name\":\"Ada\",\"Age\":37}}}")
+    Check(Person("Å\"\n", -42), "{\"Name\":\"Å\\\"\\u000a\",\"Age\":-42}")
+    if let .Error(_) = JsonSerializer.Serialize(TooWide(42L)) {
+        Console.WriteLine("unsupported scalar rejected")
+    } else {
+        Fail("Unsupported scalar was serialized")
+    }
+    if let .Error(_) = JsonSerializer.Serialize(Choice.Value(42)) {
+        Console.WriteLine("nominal union rejected")
+    } else {
+        Fail("Nominal union was serialized")
+    }
+    let large = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    if let .Error(_) = JsonSerializer.Serialize(Person(large, 42)) {
+        Console.WriteLine("output quota preserved")
+    } else {
+        Fail("Output quota was exceeded")
+    }
+    if let .Error(_) = JsonSerializer.Deserialize<Person>("{\"Name\":\"Bob\",\"Age\":42}") {
+        Console.WriteLine("record construction remains unsupported")
+    } else {
+        Fail("Unexpected record deserialization")
+    }
+}

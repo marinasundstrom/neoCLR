@@ -34,6 +34,12 @@ type and metadata identity. Discovery does not execute the constructor.
 
 ## Read and write members
 
+Development property getters also support boxed nongeneric value records. The getter
+borrows the rooted box, preserving getter side effects while keeping the original
+unboxed value separate. Record-valued properties return boxed copies. Existing public
+visibility and native retention rules apply; value-record setters remain unsupported.
+
+
 Fields access object storage. Properties execute their getter or setter, preserving
 ordinary virtual dispatch and application behavior. Both use nullable object values
 and exact boxed scalar types.

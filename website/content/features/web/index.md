@@ -154,7 +154,10 @@ the examples rather than assuming every published package has these APIs.
 
 <a id="json-dom"></a>
 
-JSON can be represented as typed models or explicit JsonValue nodes. See the
+JSON can be represented as typed models or explicit JsonValue nodes. Development
+serialization also supports public nongeneric record structs and nested class/record
+properties, with matching interpreter, JIT and AOT behavior. Record deserialization
+remains unsupported. See the
 [JSON guide](/docs/json.html) for nested values, collection mapping and limits.
 
 ## Read further

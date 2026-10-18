@@ -32,8 +32,24 @@ internal class ObjectMapper {
                 return CheckType(element)
             }
         }
-        if type.IsValueType || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 {
-            return Error(JsonError.UnsupportedMapping("Expected a scalar, typed array or nongeneric reference class"))
+        // Primitive descriptors are nominal too; admitting records must not turn
+        // unsupported numeric values into empty JSON objects.
+        if type.Equals(typeof(SByte)) || type.Equals(typeof(Byte)) ||
+           type.Equals(typeof(Int16)) || type.Equals(typeof(UInt16)) ||
+           type.Equals(typeof(UInt32)) || type.Equals(typeof(Int64)) ||
+           type.Equals(typeof(UInt64)) || type.Equals(typeof(IntPtr)) ||
+           type.Equals(typeof(UIntPtr)) || type.Equals(typeof(Single)) ||
+           type.Equals(typeof(Double)) || type.Equals(typeof(Char)) ||
+           type.Equals(typeof(RuntimeTypeHandle)) {
+            return Error(JsonError.UnsupportedMapping("Unsupported scalar type"))
+        }
+        if type is NominalTypeInfo nominal {
+            if nominal.IsUnionDeclaration {
+                return Error(JsonError.UnsupportedMapping("Nominal unions require an explicit JSON mapping"))
+            }
+        }
+        if (type.IsValueType && (!type.IsNominalType || type.IsEnum || type.IsUnion)) || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 {
+            return Error(JsonError.UnsupportedMapping("Expected a scalar, typed array or nongeneric object record"))
         }
         return Ok(())
     }
@@ -174,6 +190,9 @@ internal class ObjectMapper {
                 return Ok(flag.Value)
             }
             return Error(JsonError.TypeMismatch("Boolean"))
+        }
+        if type.IsValueType {
+            return Error(JsonError.UnsupportedMapping("Value-record deserialization requires constructor mapping"))
         }
         if depth >= 4 {
             return Error(JsonError.LimitExceeded("Container depth exceeds four"))

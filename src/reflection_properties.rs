@@ -26,12 +26,6 @@ struct Accessor {
 
 pub(crate) fn supported_value(module: &Module, ty: &Type) -> bool {
     module.is_object_reference_type(ty)
-        || module.type_definition(ty).is_some_and(|d| {
-            !d.is_reference_type
-                && d.representation == Representation::Record
-                && d.enum_info.is_none()
-                && d.generic_parameters.is_empty()
-        })
         || matches!(
             ty,
             Type::Boolean
@@ -93,7 +87,13 @@ fn resolve(module: &Module, args: &[Value], setter: bool) -> Result<Accessor, Er
         .ok_or(Error::InvalidProperty)?;
     if !property.instance
         || !property.parameters.is_empty()
-        || !supported_value(module, &property.ty)
+        || !(supported_value(module, &property.ty)
+            || module.type_definition(&property.ty).is_some_and(|d| {
+                !d.is_reference_type
+                    && d.representation == Representation::Record
+                    && d.enum_info.is_none()
+                    && d.generic_parameters.is_empty()
+            }))
     {
         return Err(Error::UnsupportedShape);
     }

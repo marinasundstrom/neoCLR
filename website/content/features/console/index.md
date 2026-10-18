@@ -87,5 +87,5 @@ Development after Preview 16 also supports Object display of boxed Int64, Boolea
 and closed value records, including generic record carriers. Value overrides run
 against the boxed copy with GC roots retained. Records without an override use the
 type-name default consistently in interpreter, JIT and AOT. This closes native backend gaps;
-installed Preview 16 binaries retain their earlier limits. It does not add JSON
-mapping for record structs or floating-point Object formatting.
+installed Preview 16 binaries retain their earlier limits. Floating-point Object formatting remains unsupported. Development JSON record
+serialization is documented separately in the [JSON guide](/docs/json.html).
