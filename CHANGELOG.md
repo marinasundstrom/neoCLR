@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Profile Serve native memory costs: allocator span validation, collection and root-publication checks dominate the retained sample. Add GC timing-only evidence with complete reclamation and a successful independent 600/sec generator control; record prospective sustained-rate criteria without changing runtime semantics or collector defaults.
+
 - Add opt-in HTTP load phase timing and arrival-slot diagnostics, per-second analysis and independent generator/native-sampling controls. Retain the first Serve capacity sweep: admission misses cluster in bursts and larger client limits do not establish a stable rate; no runtime or GC policy change.
 
 - Add HttpServer.Serve(handler) with server-owned bounded concurrent requests, a separate lifetime task, failure diagnostics and joined handler shutdown. Preserve ServeOne behavior; reject mixed manual acceptance while Serve owns the listener. Add callback-path load comparisons and lifecycle tests, plus matching API reference snapshots.

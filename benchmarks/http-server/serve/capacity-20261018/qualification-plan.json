@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-18",
+  "scope": "Same Apple M1/macOS loopback AOT Serve fixture, ten-byte body, one request/connection, 16 server lanes, 64 client slots. No builds or profilers during timed runs.",
+  "target": {"allOfferedResponsesValid": true, "successfulOfferedLatencyP99Ms": 250, "generatorDispatchLagP99Ms": 5, "cleanShutdown": true, "serverErrors": 0},
+  "initialPlan": [
+    {"policy": "experimental paced", "rate": 150, "durationSeconds": 120, "rounds": 2},
+    {"policy": "default stress", "rate": 5, "durationSeconds": 60, "rounds": 2}
+  ],
+  "followup": "If paced 150 passes both trials, test 200 with two 60-second trials; if it fails, test 100 with two 120-second trials. Retain every result. Inspect per-second bursts and first/last RSS, not just aggregates. A passing point is a local tested operating point, never a universal maximum or production capacity.",
+  "memory": "Report sampled first/last/peak RSS and first/last ten-second medians; stable RSS over these windows is not a leak proof.",
+  "rationale": "64 client slots allow brief bursts to queue rather than hiding them behind the former 16-slot cap. Offered latency includes generator lateness and all misses remain failures. Shared-host pauses are a qualification limitation, not discarded outliers."
+}

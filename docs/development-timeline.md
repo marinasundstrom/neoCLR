@@ -35,8 +35,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   losses clustered in short bursts and substantial generator lag in two runs.
   Larger client limits did not establish a stable rate. These are observations,
   not proof that a specific server phase causes the pauses.
-- **Next validation:** independent trivial-peer control, native sampling and longer
-  unprofiled repeats, retaining failures and experimental/default GC distinctions.
+- **Assistant findings:** the separate trivial peer validates 18,000 arrivals at
+  600/sec. Native samples identify allocation span scans, collection and root
+  publication/plan checks as concrete CPU costs. GC counters reclaim all allocations.
+  Two-minute unprofiled repeats now use prospectively recorded success, latency,
+  generator-lag and memory criteria, retaining default/experimental GC distinctions.
   [Evidence and procedure](../benchmarks/http-server/serve/capacity-20261018/README.md).
 
 ## 2026-10-18 — Measure HTTP buffer costs and server capacity honestly

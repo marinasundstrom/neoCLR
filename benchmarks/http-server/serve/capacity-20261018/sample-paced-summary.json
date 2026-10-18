@@ -1,0 +1,9 @@
+{
+  "sampleCount": 3531,
+  "method": "5 seconds, 1 ms sampling; wall-stack samples, not exact CPU percentages",
+  "raw": {
+    "file": "sample-paced.txt.gz",
+    "sha256": "41bf50c58a243f0d0eb54c5c7cac43ec7db369bb97a2c59a5afdb7d0147e0626"
+  },
+  "topOfStack": "Sort by top of stack, same collapsed (when >= 5):\n        neoclr_gc_allocate_v1  (in app-paced)        749\n        collect_indexed  (in app-paced)        729\n        neoclr_gc_stack_roots_v1  (in app-paced)        576\n        _platform_strlen  (in libsystem_platform.dylib)        244\n        __bzero  (in libsystem_platform.dylib)        203\n        _platform_strstr  (in libsystem_platform.dylib)        182\n        _tlv_get_addr  (in libdyld.dylib)        125\n        neoclr_gc_collect_conditional_v1  (in app-paced)        110\n        _platform_strncmp$VARIANT$Base  (in libsystem_platform.dylib)        91\n        __semwait_signal  (in libsystem_kernel.dylib)        52\n        mark_frames  (in app-paced)        46\n        validated_bases  (in app-paced)        46\n        DYLD-STUB$$_platform_strncmp  (in libsystem_platform.dylib)        27\n        neoclr_gc_transient_v1  (in app-paced)        24\n        _platform_memset  (in libsystem_platform.dylib)        19\n        neoclr_gc_enter_v1  (in app-paced)        17\n        __sendto  (in libsystem_kernel.dylib)        11\n        __sigaltstack  (in libsystem_kernel.dylib)        11\n        sigprocmask  (in libsystem_kernel.dylib)        9\n        DYLD-STUB$$strlen  (in app-paced)        8\n        cerror_nocancel  (in libsystem_kernel.dylib)        8\n        close  (in libsystem_kernel.dylib)        7\n        reap_expired  (in app-paced)        6\n        neoclr_gc_leave_v1  (in app-paced)        5\n        neoclr_native_stack_check_v1  (in app-paced)        5\n        neoclr_value_420  (in app-paced)        5\n        neoclr_value_523  (in app-paced)        5\n\n"
+}
