@@ -167,3 +167,10 @@ both collectors. Larger-graph repeats take 4.1–5.4% less elapsed time and abou
 less owner interruption with concurrent collection, at 15.5–20.1% more CPU. Small
 heaps are slower and batch tail latency is mixed. These remain local POC measurements,
 not sustained HTTP capacity or a reason to replace the synchronous default.
+
+
+A short fixed-arrival burst test completes about 5.6% more generated batches during
+overload and drains the queue sooner with concurrent GC. Peak process CPU demand
+is about 1.25 cores versus 1.0, with about 18.7% more CPU overall. This supports
+further throughput work where CPU headroom exists; CPU-constrained and HTTP capacity
+remain unmeasured. See the [burst methodology and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md#fixed-offered-load-burst-cpu-and-recovery-2026-10-18).

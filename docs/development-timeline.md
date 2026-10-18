@@ -19388,3 +19388,20 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   the larger graph but CPU remains higher. No Serve/Go sustained rate or production
   integration is claimed. Root churn, invalidation, realistic cadence and broader
   runtime access-path qualification remain open.
+
+
+### 2026-10-18 — Throughput first, with CPU headroom for spikes
+
+- **Author:** clarified that throughput is the focus and less elapsed time is
+  positive provided CPU demand is not too high during spikes.
+- **Assistant response:** proposed fixed offered load plus bursts, measuring
+  completions, queue growth, response latency, CPU demand and recovery.
+- **Action/outcome:** added a six-second compiled-callback schedule with a one-second
+  overload burst. [Retained results](../benchmarks/gc-concurrent-poc/README.md#fixed-offered-load-burst-cpu-and-recovery-2026-10-18)
+  show about 5.6% more burst completions and earlier queue drainage with concurrent
+  GC; overall process CPU is about 18.7% higher and peak demand is around 1.25 cores
+  versus 1.0. Both modes finish all work and reclaim every allocation.
+- **Limits/open:** these are generated neoIL callbacks and a virtual arrival queue,
+  not Raven async/HTTP requests. No CPU quota or competing workload was imposed;
+  the extra CPU's acceptability under contention remains to be established. No
+  production default change or user acceptance of a CPU threshold is inferred.

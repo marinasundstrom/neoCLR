@@ -714,3 +714,67 @@ python3 benchmarks/gc-concurrent-poc/compiled-benchmark.py \
 Use matching fresh qualification builds if sources have changed. Next priorities
 are reducing the CPU/snapshot overhead and qualifying scheduler-driven async work;
 keep a synchronous path for workloads where concurrency loses.
+
+
+## Fixed offered load, burst CPU and recovery (2026-10-18)
+
+The author prioritized throughput while preserving CPU headroom during spikes.
+`compiled-load.py` adds scheduled arrivals to the same compiled workload. Both
+collectors still perform one collection per eight allocating callbacks. Rates are
+**batches**, not requests: 3,000 batches/sec for two seconds, 6,000 for one second,
+then 3,000 for three seconds (21,000 batches / 168,000 callbacks in total).
+
+Arrivals are predetermined independently of completions. A delayed owner executes
+the overdue work without shifting future arrivals; response time starts at its
+scheduled arrival, including queueing and sleep overshoot. This avoids hiding
+backlog through a closed-loop driver. The queue is a virtual count, not actual
+allocated request objects, and there is no rejection/backpressure policy. Arrival
+round-trip checks and exact completion counts guard the schedule. The burst rate
+exceeds both collectors' single-owner processing rates on this fixture.
+
+[Final trials](compiled-burst.json) run sync/concurrent/concurrent/sync with no
+competing benchmark/build. Each mode also passes the complete schedule under
+UBSan/bounds with a smaller graph; generated machine code remains unsanitized.
+Checksums, allocation/collection counts and final empty heaps match. Default
+closed-loop hooks remain disabled and pass a [focused control](compiled-load-hooks-control.json).
+The [pilot](compiled-burst-pilot.json) is retained too: before the final run, arrival
+rounding was changed from floor to ceiling (at most one nanosecond) and explicit
+schedule/completion assertions were added. Pilot conclusions are consistent;
+headline numbers below use only the final source revision.
+
+| Metric | Sync (two trials) | Concurrent (two trials) |
+| --- | --- | --- |
+| Completed batches during the one-second burst | 4,551 / 4,630 | 4,866 / 4,829 |
+| Scheduled-arrival response p99 | 320.0 / 290.4 ms | 226.6 / 235.3 ms |
+| Peak queue including active batch, sampled at admission | 1,449 / 1,370 | 1,134 / 1,171 |
+| Queue drained after burst ends | 942.6 / 846.7 ms | 613.3 / 628.9 ms |
+| Peak process CPU demand, half-second window | 0.995 / 1.000 cores | 1.249 / 1.253 cores |
+| Process CPU over the six-second schedule | 4.590 / 4.580 CPU-seconds | 5.441 / 5.440 CPU-seconds |
+
+Concurrent mean burst completions increase about **5.6%**, with lower backlog and
+faster recovery in both trials. All scheduled work finishes within the six-second
+window in both modes, so overall completion rate is arrival-limited; equal total
+elapsed time is not evidence of equal saturation capacity. CPU cost is about
+**18.7% higher overall**, peaking around **1.25 CPU cores versus 1.0**. CPU here is
+process CPU divided by wall time, not percentage of the whole machine. Half-second
+CPU deltas are assigned at completion; bin-boundary attribution has up to one batch
+of timing error. Final partial bins are not used as a saturation estimate.
+
+This supports the throughput direction **when CPU headroom is available**. It does
+not prove behavior under a CPU quota or whole-machine contention: this test drives
+one owner and its optional GC worker, without limiting cores or adding competing
+work. The 4,096-node live graph is host-created, callbacks are generated neoIL, and
+there are no sockets, real request queues, Raven async tasks or Go baseline. Six
+seconds is a burst/recovery probe, not long-duration sustainable capacity evidence.
+Keep those distinctions when deciding whether the extra CPU is acceptable.
+
+```sh
+python3 benchmarks/gc-concurrent-poc/compiled-load.py \
+  --compiled-build target/gc-compiled-pressure \
+  --walker-build target/gc-lifecycle-qualified-v2 \
+  --output target/gc-compiled-burst-new
+```
+
+Next: test contention/CPU-budget sensitivity before extrapolating spare-core results,
+and then carry the validated path into scheduler/HTTP workloads. Production GC
+selection and policy remain unchanged.

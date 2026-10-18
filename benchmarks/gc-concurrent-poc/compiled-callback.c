@@ -27,6 +27,11 @@ static void *allocate(neoclr_aot_context *c, uint64_t bytes, uint32_t kind) {
     return p;
 }
 
+#ifndef LOAD_ARRIVAL
+#define LOAD_ARRIVAL(index, start) ((void)0)
+#define LOAD_COMPLETE(index, start, end) ((void)0)
+#define LOAD_REPORT() ((void)0)
+#endif
 static int compare(const void *a, const void *b) {
     uint64_t x = *(const uint64_t *)a, y = *(const uint64_t *)b;
     return (x > y) - (x < y);
@@ -39,7 +44,7 @@ int main(int argc, char **argv) {
     unsigned work = (unsigned)strtoul(argv[3], NULL, 10);
     unsigned length = (unsigned)strtoul(argv[4], NULL, 10);
     unsigned replace_count = (unsigned)strtoul(argv[5], NULL, 10);
-    assert(rounds >= 100 && rounds <= 10000 && work <= 1000000);
+    assert(rounds >= 100 && rounds <= 100000 && work <= 1000000);
     assert(length >= 1 && length <= 8192 && replace_count >= 1 && replace_count <= 4096);
     assert((length + 2 * replace_count + 8) * 56 <= 512 * 1024);
     unsigned char *heap = calloc(1, 512 * 1024);
@@ -73,6 +78,7 @@ int main(int argc, char **argv) {
             collections_before = statistics.collections;
             allocations_before = statistics.allocations;
         }
+        if (round >= warmup) LOAD_ARRIVAL(round - warmup, start);
         uint64_t begin = ns(CLOCK_MONOTONIC);
         if (concurrent) {
             assert(cycle_start(&cycle, &c));
@@ -97,6 +103,7 @@ int main(int argc, char **argv) {
             capture += after_capture - begin;
             if (concurrent) finish += end - before_finish;
             latencies[round - warmup] = end - begin;
+            LOAD_COMPLETE(round - warmup, start, end);
         }
     }
     uint64_t elapsed = ns(CLOCK_MONOTONIC) - start;
@@ -131,6 +138,7 @@ int main(int argc, char **argv) {
         (unsigned long long)latencies[((uint64_t)rounds * 99 + 99) / 100 - 1],
         (unsigned long long)peak, usage.ru_maxrss, (unsigned long long)allocations,
         (unsigned long long)collections, (unsigned long long)checksum);
+    LOAD_REPORT();
     free(latencies);
     free(heap);
 }

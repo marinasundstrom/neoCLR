@@ -5383,3 +5383,12 @@ interruption, with 15.5–20.1% more CPU. Small graphs lose; batch p99 is mixed.
 trials, focused sanitizer checks and full reclamation are retained. No production
 policy or sustained HTTP capacity claim follows. Reduce concurrent CPU overhead
 and qualify scheduler-driven async execution next.
+
+
+**Throughput and burst headroom (2026-10-18, author-directed emphasis):** prioritize
+usable throughput while checking CPU demand during spikes. [Fixed-arrival evidence](../benchmarks/gc-concurrent-poc/README.md#fixed-offered-load-burst-cpu-and-recovery-2026-10-18)
+shows about 5.6% more compiled batches completed in a one-second overload burst,
+with quicker recovery, at about 18.7% more process CPU overall and a peak near
+1.25 cores versus 1.0. Six-second single-owner trials preserve scheduled queueing
+and reclaim all memory. CPU quotas/contention, long-duration capacity and actual
+scheduler/HTTP integration remain open; production policy is unchanged.
