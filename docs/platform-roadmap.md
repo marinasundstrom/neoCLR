@@ -5250,3 +5250,14 @@ allocation/collection, and reclamation can reuse identical addresses/descriptors
 The next bounded step is audited transition invalidation and cycle identity before
 owner-side application of marks; allocation counts or descriptor checks alone are
 insufficient. No live snapshot reclamation is enabled.
+
+
+**Reclamation POC completed (author direction, 2026-10-18):** the isolated native
+[worker/walker POC](experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint)
+now applies successful marks through owner-side cleanup/sweep with conservative
+transition invalidation and new-allocation retention. UBSan/bounds records 319 applied
+cycles, 245,776 reclaimed payload bytes and ten stale/error/cancel rejections; oracle,
+mid-trace progress, reuse and cleanup checks pass. This completes the bounded
+reclamation experiment, not a production collector or performance milestone.
+Broader access-path/platform/three-mode qualification and Serve/Go measurements remain
+open; default and selectable production collectors are unchanged.

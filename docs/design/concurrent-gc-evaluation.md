@@ -118,3 +118,15 @@ handle access and parked resume can expose old unmarked values without allocatin
 and synchronous collection can reuse an address with identical descriptor shape.
 Audited transition invalidation and cycle identity are the next bounded implementation
 work; a general provider/mutation framework remains unnecessary at this stage.
+
+
+### Completed bounded reclamation POC
+
+The [owner-side reclamation checkpoint](../experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint)
+now demonstrates actual reclamation and reuse with epoch invalidation at host/root
+transitions, new-allocation retention and the existing cleanup/sweep implementation.
+The explicit one-mutator/complete-root invariant argument and UBSan/bounds tests cover
+319 applied cycles and stale-result rejection. This is a practical experiment, not
+formal runtime-wide proof or a chosen production design. Its synchronous copy/sweep
+cost and conservative discard rate must be measured before claiming a latency or
+throughput benefit; existing alternative-collector research remains relevant.

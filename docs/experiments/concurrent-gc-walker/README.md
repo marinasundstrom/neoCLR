@@ -4,7 +4,8 @@
 address index and conditional-root fixed point on worker-private memory. The
 [validated one-job worker](../concurrent-gc-worker/README.md) supplies submission,
 publication, cancellation and joined teardown. Production sources and `--gc`
-choices are unchanged. No result is applied to the live heap.
+choices are unchanged. The POC now applies accepted results through owner-side
+cleanup/sweep; see the [reclamation checkpoint](#live-reclamation-checkpoint).
 
 ## Integration boundary
 
@@ -83,13 +84,13 @@ interpreter/JIT/AOT qualification. Capturing/validating roots and copying the he
 still synchronous. Cancellation checks are between worklist operations, not every
 scanned word or index step; worst-case cancellation latency has not been measured.
 
-## What this permits next
+## Integration limits
 
-The worker can reuse the current walker without consulting live heap storage for
-these captured cases. Next, define how host-handle reads,
-root changes and allocation epochs invalidate or preserve a result before attempting
-live reclamation. Repeated snapshots fixing a retention bug does not establish that
-applying old marks is safe. Keep the synchronous collector as the lifetime oracle.
+The worker reuses the current walker without consulting live heap storage for
+these captured cases. The reclamation checkpoint below supplies conservative
+invalidation and owner-side application for the bounded POC. Broader runtime/native
+access paths, execution modes and Serve remain qualification work. Keep the
+synchronous collector as the lifetime oracle.
 
 The existing [.NET/Go/alternative collector research](../../design/concurrent-gc-evaluation.md)
 remains applicable; no managed semantics change or new collector design is selected.
@@ -144,5 +145,88 @@ Do not add a generic mutation framework just to mask this issue. Start with the 
 host/root transitions and explicit cycle identity, keep cleanup/reclamation on the
 owner, and test that stale results are refused. Ordinary graph changes are a separate
 snapshot-at-capture correctness question; these failures specifically demonstrate
-reachability emerging through conditional roots and identity reuse. There is still no
-live publication operation in this experiment, so no unsafe result is applied.
+reachability emerging through conditional roots and identity reuse. At this checkpoint there was no live publication operation. The following
+reclamation slice adds one and rejects these stale results.
+
+
+## Live reclamation checkpoint
+
+The bounded native POC is complete with **demonstrated arena reclamation**, not just
+marking. `reclamation-results.json` records a passing UBSan/bounds run: **319 applied
+cycles, 10 rejected results and 245,776 reclaimed payload bytes** through the new
+owner-side apply path. These totals exclude bytes reclaimed by synchronous oracle
+calls. Storage is returned to the arena allocator and reused; this is not an OS
+resident-memory reduction or a throughput measurement.
+
+`reclaim.inc` coordinates one outstanding job. Capture and result application run on
+the owner; tracing runs on the persistent worker. After a successful result pickup,
+the owner checks cycle identity and the original allocated descriptors, marks new
+allocations as retained, imports marks for captured allocations, and runs the existing
+cleanup/expiry/sweep body. The generator extracts that body without changing its
+algorithm; the worker never invokes it. No synchronous retracing is hidden in apply.
+
+### Safety argument and supported scope
+
+- Capture occurs at a complete, quiescent root boundary. All managed references must
+  be represented by captured active/parked roots, host handles, fault/static state or
+  the graph reachable from them. One mutator owns the live heap. Foreign code cannot
+  retain unregistered pointers, fabricate references or reset an arena behind the
+  coordinator. This is a POC precondition, not a newly qualified runtime-wide API.
+- The worker traces immutable captured payload/root values and writes private marks.
+  Mutex publication/result pickup transfers ownership of the job; cancellation does
+  not permit freeing job storage before completion/join.
+- Under that root contract, ordinary reference transfers and graph changes cannot
+  create a genuine reference to an old unreachable object. The exceptions exposed
+  by conditional handles and parked frames are covered by invalidation hooks.
+- An owner-thread monotonic epoch invalidates results on host-handle creation/read/
+  replacement/release, callback reads, allocation-info queries, resource attach/release,
+  park/resume/discard, entry/teardown checks and synchronous collection. Hooks run
+  before effects, including failed calls. The epoch is shared across contexts on
+  that owner, so unrelated transitions may discard useful work. Overflow aborts
+  rather than allowing stale identity to match. Root-probe and collector source
+  hashes are pinned before hook generation.
+- No intervening reclamation can reuse a captured allocation identity and still pass
+  the epoch check. New allocations, including ones occupying previously free spans,
+  are retained for the current cycle. Later cycles reclaim them if unreachable.
+- The owner applies marks only after successful result pickup, unchanged epoch,
+  matching arena identity and validated original descriptors. Cancelled, failed or
+  stale jobs change no live heap bytes, cleanup state or collection counters. Cleanup
+  runs once on the owner through the existing sweep path; cleanup callbacks must
+  obey the existing no-reentry/no-heap-mutation collection contract.
+
+This is an invariant argument plus executable evidence for that scope, **not a formal
+proof of all runtime behavior**. Arbitrary native/FFI pointer access, multiple mutators,
+external arena resets, uninstrumented host paths and full interpreter/JIT/AOT/Serve
+integration are not qualified. Invalidated work is discarded; callers can retry or
+use synchronous collection under pressure. There is no automatic pacing/fallback
+policy in this coordinator.
+
+### Reclamation evidence
+
+- 100 deterministic graph pairs produce identical survivor sets and reclaimed
+  allocation/byte counts under POC versus synchronous collection. Each fixture ends
+  with an empty arena after dropping roots.
+- Live parent/child contents survive reference transfer and allocation while work is
+  outstanding. Unreachable conditional owners/values are freed, handles expire,
+  payload poisoning is observed, and the freed address is reused. Native cleanup is
+  exactly once on the owner.
+- A deterministic interleaving stops the worker after 63 graph objects have been
+  scanned. The owner transfers the root, removes an edge and allocates; the worker
+  resumes, and apply frees old garbage while retaining survivors/new allocations.
+  Following cycles reclaim floating garbage and reach an empty arena.
+- Allocation into a pre-existing free span survives the current cycle, then becomes
+  reclaimable later. Unrooted parked owners and frame values are reclaimed and the
+  registration is expired.
+- Ten stale/error/cancel cases preserve live heap bytes and collection/cleanup
+  counters. These include the actual conditional-handle rescue, parked resume and
+  same-address/same-extent replacement counterexamples, handle mutation, resource
+  attachment, malformed worker input and cancellation of an already-completed job.
+  Destroying an outstanding job joins it without applying marks.
+- All earlier guarded snapshot/oracle, array, conditional fixed-point and parked-root
+  tests still pass. The test-only midwalk gate is disabled for ordinary jobs.
+
+ThreadSanitizer/ASan startup limitations remain as previously recorded; this slice
+was validated with UBSan/bounds, deterministic interleavings and protected-memory
+checks. It does not claim production safety or a speedup. Copy pauses, owner sweep
+pauses, worker CPU, conservative invalidation frequency and memory overhead need
+measurement before deciding whether to integrate this approach into Serve.

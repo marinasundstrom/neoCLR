@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reuse the native walker on worker-private snapshots; never reclaim live objects."""
+"""Reuse the native walker on worker-private snapshots; with experimental owner-side reclamation."""
 import argparse
 import hashlib
 import json
@@ -18,11 +18,38 @@ def instrument(source):
         nonlocal source
         assert source.count(old) == 1, old
         source = source.replace(old, new)
+    # Share the unchanged cleanup/sweep body between synchronous and POC paths.
+    start = source.index('    for (neoclr_gc_resource **link = &resource_head; *link;) {\n        neoclr_gc_resource *r = *link;\n        if (r->context == context && !(((const block *)r->owner - 1)->state & MARKED))')
+    end = source.index('invalid_descriptor:', start)
+    finish = source[start:end]
+    source = source[:start] + '    return experiment_finish(context, conditional, conditional_count);\n' + source[end:]
+    before = source.index('static int32_t collect_indexed(')
+    source = source[:before] + 'static int32_t experiment_finish(neoclr_aot_context *context, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {\n    neoclr_aot_text_arena *a = &context->text;\n' + finish + '}\n' + source[before:]
+    # Conservative owner-thread invalidation, including failed calls.
+    import re
+    functions = ['host_root_create', 'neoclr_gc_host_root_read_v1',
+        'neoclr_gc_host_root_replace_v1', 'neoclr_gc_host_root_release_v1',
+        'neoclr_gc_callback_read_v1', 'neoclr_gc_callback_read_suspended_v1',
+        'neoclr_gc_resource_attach_v1', 'neoclr_gc_resource_release_v1',
+        'neoclr_gc_complete_invocation_v1', 'neoclr_gc_entry_check_v1',
+        'neoclr_gc_collect_conditional_v1', 'neoclr_gc_allocation_info_v1']
+    for name in functions:
+        pattern = r'((?:static )?int32_t ' + name + r'\([^;{]*\) \{)'
+        source, count = re.subn(pattern, r'\1\n    experiment_invalidate();', source)
+        assert count == 1, name
     source = source.replace('neoclr_roots_parked_v1()', 'experiment_parked_roots()')
     replace('static _Thread_local neoclr_gc_statistics statistics;', '''static _Thread_local neoclr_gc_statistics statistics;
+static _Thread_local uint64_t experiment_epoch;
+void experiment_invalidate(void) {
+    if (experiment_epoch == UINT64_MAX) abort();
+    experiment_epoch++;
+}
 static _Thread_local int experiment_snapshot;
 static _Thread_local uintptr_t experiment_source;
 static _Thread_local const atomic_bool *experiment_cancel;
+/* Deterministic test interleaving; disabled for ordinary jobs. */
+static _Thread_local atomic_bool *experiment_midwalk, *experiment_resume;
+static _Thread_local unsigned experiment_steps;
 static _Thread_local neoclr_parked_roots *experiment_parked;
 static const neoclr_parked_roots *experiment_parked_roots(void) {
     return experiment_snapshot ? experiment_parked : neoclr_roots_parked_v1();
@@ -48,17 +75,20 @@ static uintptr_t experiment_original(neoclr_aot_text_arena *a, uintptr_t value) 
         uint64_t atomic_before = index.atomic_marks;''')
     replace('        while (pending) {\n            block *b = pending;', '''        while (pending) {
             if (experiment_cancel && atomic_load(experiment_cancel)) goto invalid_descriptor;
+            if (experiment_midwalk && ++experiment_steps == 64) {
+                atomic_store(experiment_midwalk, true);
+                while (!atomic_load(experiment_resume) && !atomic_load(experiment_cancel)) sched_yield();
+                if (atomic_load(experiment_cancel)) goto invalid_descriptor;
+            }
             block *b = pending;''')
-    replace('    for (neoclr_gc_resource **link = &resource_head; *link;) {\n        neoclr_gc_resource *r = *link;\n        if (r->context == context && !(((const block *)r->owner - 1)->state & MARKED))', '''    if (experiment_snapshot) {
+    replace('    return experiment_finish(context, conditional, conditional_count);', '''    if (experiment_snapshot) {
         for (uint32_t i = 0; i < conditional_count; i++)
             conditional[i].retained = conditional[i].owner &&
                 (((const block *)conditional[i].owner - 1)->state & MARKED);
-        return 0; /* No cleanup, expiry or sweep on the worker. */
+        return 0;
     }
-    for (neoclr_gc_resource **link = &resource_head; *link;) {
-        neoclr_gc_resource *r = *link;
-        if (r->context == context && !(((const block *)r->owner - 1)->state & MARKED))''')
-    return '#include "worker.h"\n' + source
+    return experiment_finish(context, conditional, conditional_count);''')
+    return '#include "worker.h"\n#include <stdlib.h>\n#include <sched.h>\n' + source
 
 
 def main():
@@ -69,7 +99,16 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     generated = out / 'native-gc.c'
     generated.write_text(instrument(SOURCE.read_text()))
-    files = [SOURCE, generated, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', HERE / 'publication-tests.inc', Path(__file__),
+    roots_source = ROOT / 'runtime/native/gc/root-probe.c'
+    roots = roots_source.read_text()
+    assert hashlib.sha256(roots.encode()).hexdigest() == 'a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a', 'Review root transition changes before applying invalidation hooks'
+    import re
+    for name in ['neoclr_roots_park_v1', 'neoclr_roots_resume_v1', 'neoclr_roots_discard_v1']:
+        roots, count = re.subn(r'(void ' + name + r'\([^;{]*\) \{)', r'\1\n    experiment_invalidate();', roots)
+        assert count == 1, name
+    generated_roots = out / 'root-probe.c'
+    generated_roots.write_text('extern void experiment_invalidate(void);\n' + roots)
+    files = [SOURCE, generated, generated_roots, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', HERE / 'publication-tests.inc', HERE / 'reclaim.inc', HERE / 'reclaim-tests.inc', Path(__file__),
              WORKER / 'worker.c', WORKER / 'worker.h', ROOT / 'runtime/native/gc/root-probe.c']
     report = dict(passed=False, productionReady=False, platform=platform.platform(), commands=[],
                   inputs={str(f): hashlib.sha256(f.read_bytes()).hexdigest() for f in files})
@@ -86,7 +125,7 @@ def main():
         run(['clang', '-std=c11', '-O2', '-g', '-Wall', '-Wextra', '-Werror', '-pthread',
              '-fsanitize=undefined,bounds', '-I', out, '-I', HERE, '-I', WORKER,
              '-I', ROOT / 'runtime/native/gc', HERE / 'test.c', WORKER / 'worker.c',
-             ROOT / 'runtime/native/gc/root-probe.c', '-o', out / 'test'])
+             generated_roots, '-o', out / 'test'])
         run([out / 'test'])
         report['passed'] = True
     finally:

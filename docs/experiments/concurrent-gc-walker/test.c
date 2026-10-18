@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "native-gc.c"
 #include "snapshot.inc"
+#include "reclaim.inc"
 
 static pthread_t owner_thread;
 static unsigned cleanups;
@@ -234,8 +235,10 @@ static void arrays_and_invalid_descriptor(gc_worker *worker) {
 }
 #include "parked-tests.inc"
 #include "publication-tests.inc"
+#include "reclaim-tests.inc"
 int main(void) {
     owner_thread = pthread_self();
+    reclamation_tests();
     gc_worker worker;
     assert(!gc_worker_init(&worker));
     for (unsigned mode = 0; mode < 3; mode++) parked_case(&worker, mode);

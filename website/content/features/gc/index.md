@@ -136,3 +136,9 @@ Native JIT/AOT tooling accepts the same selection with `--native-gc` and
 `--reference-arena`. Standalone AOT selection occurs when compiling the image.
 Concurrent collection and additional memory managers remain under investigation;
 this option does not make collection concurrent or change its pacing policy.
+
+
+An isolated native **proof of concept** now demonstrates background snapshot tracing
+with owner-side reclamation, stale-result rejection and exactly-once resource cleanup.
+It is not selectable in installed runtimes and has no established performance benefit.
+See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).

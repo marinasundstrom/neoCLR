@@ -19335,3 +19335,22 @@ structural work remains parked; ordinary Raven/.NET behavior remains the default
   reclamation/identity changes before enabling live application. Keep worker storage
   until completion. [Evidence](experiments/concurrent-gc-walker/README.md#publication-counterexamples)
   is a safety investigation, not a performance or production-concurrency claim.
+
+
+### 2026-10-18 — Continue until actual reclamation is demonstrated
+
+- **Author:** “Continue until you have completed a POC with proved memory reclamation”.
+- **Assistant:** scoped the claim to executable native evidence and an explicit
+  ownership/root argument, rather than formal proof or runtime-wide qualification.
+  Added conservative invalidation at audited host/root/lifetime transitions and
+  owner-side application using the existing cleanup/sweep body, with new allocations
+  retained through the current cycle.
+- **Outcome:** the [reclamation run](experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint)
+  passes UBSan/bounds: 319 applied cycles reclaim 245,776 payload bytes; ten unsafe,
+  failed or cancelled results are rejected without mutating live memory. One hundred
+  graph pairs agree with synchronous collection; mid-trace reference transfer and
+  allocation, reclaimed-address reuse, parked/host expiry, eventual empty heaps and
+  exactly-once owner-thread cleanup pass. Earlier tracing/root checks still pass.
+- **Status:** the bounded native reclamation POC is complete. Production selection,
+  interpreter/JIT/AOT integration and Serve performance remain unchanged/unqualified.
+  Sanitizer startup limitations and unsupported external/native access are explicit.

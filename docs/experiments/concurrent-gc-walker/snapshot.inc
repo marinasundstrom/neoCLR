@@ -12,7 +12,8 @@ typedef struct {
     neoclr_parked_roots parked[SNAPSHOT_PARKED];
     neoclr_probe_frame frames[SNAPSHOT_PARKED];
     unsigned roots_count, strong_count, pairs_count, parked_count;
-    atomic_bool entered, proceed, tracing;
+    atomic_bool entered, proceed, tracing, midwalk, resume;
+    bool pause_midwalk;
 } snapshot;
 static bool add_root(snapshot *s, uint64_t value) {
     if (s->roots_count == SNAPSHOT_ROOTS) return false;
@@ -52,6 +53,8 @@ static bool capture(snapshot *s, neoclr_aot_context *context) {
     atomic_init(&s->entered, false);
     atomic_init(&s->proceed, false);
     atomic_init(&s->tracing, false);
+    atomic_init(&s->midwalk, false);
+    atomic_init(&s->resume, false);
     s->copy = *context;
     s->source = (uintptr_t)context->text.data;
     s->copy.text.capacity = context->text.used;
@@ -99,6 +102,9 @@ static int trace_snapshot(void *argument, const atomic_bool *cancel) {
     experiment_snapshot = 1;
     experiment_source = s->source;
     experiment_cancel = cancel;
+    experiment_midwalk = s->pause_midwalk ? &s->midwalk : NULL;
+    experiment_resume = &s->resume;
+    experiment_steps = 0;
     experiment_parked = s->parked_count ? s->parked : NULL;
     neoclr_probe_frame frame = {.context = &s->copy, .lanes = s->roots, .lane_count = s->strong_count};
     atomic_store(&s->tracing, true);
@@ -106,6 +112,7 @@ static int trace_snapshot(void *argument, const atomic_bool *cancel) {
     experiment_snapshot = 0;
     experiment_source = 0;
     experiment_cancel = NULL;
+    experiment_midwalk = experiment_resume = NULL;
     experiment_parked = NULL;
     return atomic_load(cancel) ? 7 : status;
 }
