@@ -385,7 +385,40 @@ static void callback_handle_read(unsigned event) {
     assert(!c.text.used);
     cycle_destroy(&cycle);
 }
+#include "callback-churn.inc"
+static void executing_callback_churn(void) {
+    uint64_t heap[4096] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    uint64_t allocated = statistics.allocations, reclaimed = statistics.reclaimed_allocations;
+    uint64_t *callback = churn_create(&c, 128);
+    uint64_t handle, retired = 0, next = 128, checksum = 1;
+    assert(!neoclr_gc_host_root_create_v1(&c, callback, &handle));
+    collection_cycle cycle;
+    assert(cycle_init(&cycle));
+    for (unsigned round = 0; round < 80; round++) {
+        assert(cycle_start(&cycle, &c));
+        if (!round) cycle.job->pause_midwalk = true;
+        atomic_store(&cycle.job->proceed, true);
+        if (!round) while (!atomic_load(&cycle.job->midwalk)) sched_yield();
+        void *read;
+        assert(!neoclr_gc_callback_read_v1(&c, handle, &read) && read == callback);
+        churn_invoke(&c, read, 17, &retired, &next, &checksum);
+        churn_check(callback, 128, retired);
+        assert(c.text.used <= (128 + 2 * 17 + 1) * 56);
+        if (!round) atomic_store(&cycle.job->resume, true);
+        assert(cycle_poll(&cycle, true, false) == CYCLE_APPLIED);
+        churn_check(callback, 128, retired);
+    }
+    assert(retired == 1360 && next == 1488);
+    assert(!neoclr_gc_host_root_release_v1(&c, handle));
+    cycle_run(&cycle, &c);
+    assert(!c.text.used);
+    assert(statistics.allocations - allocated == statistics.reclaimed_allocations - reclaimed);
+    cycle_destroy(&cycle);
+    puts("CALLBACK CHURN: 80 invoked native callbacks, midwalk mutation, 1360 replacements, bounded extent and full reclamation passed");
+}
 static void reclamation_tests(void) {
+    executing_callback_churn();
     for (unsigned event = 0; event < 11; event++) callback_handle_read(event);
     for (unsigned event = 0; event < 4; event++) strong_handle_read(event);
     for (unsigned event = 0; event < 5; event++) rejected_live_descriptor(event);

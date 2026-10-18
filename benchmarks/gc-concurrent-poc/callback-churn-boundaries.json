@@ -1,0 +1,182 @@
+[
+  {
+    "command": [
+      "target/gc-callback-churn-8-repeat/bench",
+      "sync",
+      "100",
+      "0",
+      "1",
+      "1"
+    ],
+    "result": {
+      "mode": "sync",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 1,
+      "replacementsPerCallback": 1,
+      "elapsedNs": 24000,
+      "cpuNs": 24000,
+      "ownerCpuNs": 22458,
+      "captureOrSyncNs": 11000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 11000,
+      "batchP99Ns": 1000,
+      "peakArenaBytes": 168,
+      "maxRssBytes": 1687552,
+      "allocations": 100,
+      "collections": 100,
+      "checksum": 4330708037256634077,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-callback-churn-8-repeat/bench",
+      "concurrent",
+      "100",
+      "0",
+      "1",
+      "1"
+    ],
+    "result": {
+      "mode": "concurrent",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 1,
+      "replacementsPerCallback": 1,
+      "elapsedNs": 472000,
+      "cpuNs": 528000,
+      "ownerCpuNs": 275583,
+      "captureOrSyncNs": 92000,
+      "waitApplyNs": 368000,
+      "pauseTotalNs": 460000,
+      "batchP99Ns": 8000,
+      "peakArenaBytes": 224,
+      "maxRssBytes": 1835008,
+      "allocations": 100,
+      "collections": 100,
+      "checksum": 4330708037256634077,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-callback-churn-8-repeat/bench",
+      "sync",
+      "100",
+      "0",
+      "1",
+      "3"
+    ],
+    "result": {
+      "mode": "sync",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 1,
+      "replacementsPerCallback": 3,
+      "elapsedNs": 29000,
+      "cpuNs": 28000,
+      "ownerCpuNs": 26583,
+      "captureOrSyncNs": 12000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 12000,
+      "batchP99Ns": 1000,
+      "peakArenaBytes": 280,
+      "maxRssBytes": 1687552,
+      "allocations": 300,
+      "collections": 100,
+      "checksum": 4695178275253143381,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-callback-churn-8-repeat/bench",
+      "concurrent",
+      "100",
+      "0",
+      "1",
+      "3"
+    ],
+    "result": {
+      "mode": "concurrent",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 1,
+      "replacementsPerCallback": 3,
+      "elapsedNs": 503000,
+      "cpuNs": 546000,
+      "ownerCpuNs": 287291,
+      "captureOrSyncNs": 88000,
+      "waitApplyNs": 391000,
+      "pauseTotalNs": 479000,
+      "batchP99Ns": 7000,
+      "peakArenaBytes": 448,
+      "maxRssBytes": 1802240,
+      "allocations": 300,
+      "collections": 100,
+      "checksum": 4695178275253143381,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-callback-churn-8-repeat/bench",
+      "sync",
+      "100",
+      "0",
+      "64",
+      "17"
+    ],
+    "result": {
+      "mode": "sync",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 64,
+      "replacementsPerCallback": 17,
+      "elapsedNs": 451000,
+      "cpuNs": 447000,
+      "ownerCpuNs": 446334,
+      "captureOrSyncNs": 101000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 101000,
+      "batchP99Ns": 6000,
+      "peakArenaBytes": 4592,
+      "maxRssBytes": 1687552,
+      "allocations": 1700,
+      "collections": 100,
+      "checksum": 12784487579826806429,
+      "finalArenaBytes": 0
+    }
+  },
+  {
+    "command": [
+      "target/gc-callback-churn-8-repeat/bench",
+      "concurrent",
+      "100",
+      "0",
+      "64",
+      "17"
+    ],
+    "result": {
+      "mode": "concurrent",
+      "rounds": 100,
+      "work": 0,
+      "liveCount": 64,
+      "replacementsPerCallback": 17,
+      "elapsedNs": 830000,
+      "cpuNs": 1088000,
+      "ownerCpuNs": 760083,
+      "captureOrSyncNs": 170000,
+      "waitApplyNs": 221000,
+      "pauseTotalNs": 391000,
+      "batchP99Ns": 18000,
+      "peakArenaBytes": 5544,
+      "maxRssBytes": 1884160,
+      "allocations": 1700,
+      "collections": 100,
+      "checksum": 12784487579826806429,
+      "finalArenaBytes": 0
+    }
+  }
+]

@@ -138,19 +138,17 @@ Concurrent collection and additional memory managers remain under investigation;
 this option does not make collection concurrent or change its pacing policy.
 
 
-An isolated native **proof of concept** now demonstrates background snapshot tracing
-with owner-side reclamation, stale-result rejection and exactly-once resource cleanup.
-It is not selectable in installed runtimes. The first local matched comparison is
-slower and uses more CPU than synchronous GC on the tested small stable graph; this
-is not an HTTP capacity result. A follow-up removes redundant snapshot initialization,
-and combines mark import and validation walks, reducing owner interruption in local
-tests. Larger-graph elapsed approaches synchronous GC, but CPU use remains higher
-and smaller graphs still run slower. Indexed registered-root capture removes a
-POC scaling defect: matched 64-root trials use 47–49% less elapsed time than the
-preceding POC, with a longer repeat and zero-root control. This is not a speedup
-over synchronous GC or an HTTP capacity claim. Graph-rotation tests preserve the
-local pause benefit, but frequent snapshot invalidation and synchronous fallback
-can eliminate it. Audited strong-handle and callback-read exceptions remove unnecessary
-read-only fallbacks in the POC; failed/conditional reads and mutations remain
-protected. These read tests do not establish callback-execution support. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
-See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).
+An isolated native **proof of concept** demonstrates background snapshot tracing,
+owner-side reclamation, stale-result rejection and exactly-once resource cleanup.
+It is not selectable in installed runtimes. Audited strong-handle and callback reads
+avoid unnecessary fallbacks; failed/conditional reads and mutations remain protected.
+Frequent invalidation can still eliminate the local pause benefit.
+
+A native callback fixture now allocates replacements and retires live objects while
+tracing runs, with bounded memory and complete reclamation checks. With eight
+replacements per collection, repeated local tests take about 6–7.5% less elapsed
+time than sync and about 20% less owner interruption, using 21–28% more CPU.
+Allocation-heavy results remain mixed. These are short native experiments, not
+Raven callback/scheduler integration, production availability or HTTP/Go capacity.
+See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md)
+and [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).

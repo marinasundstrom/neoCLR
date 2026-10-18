@@ -309,3 +309,18 @@ cases and existing tests pass [UBSan/bounds qualification](callback-read-results
 removes 2000 read-only fallbacks with about 37% less owner interruption; mixed
 replacements still discard exactly 500 cycles. These synthetic callback-object
 reads do not qualify callback execution or Serve integration.
+
+
+### Native callback body and ongoing live-object replacement
+
+A shared C fixture now allocates replacement nodes, publishes through rooted state,
+and retires old nodes. An 80-invocation qualification replaces 1360 objects, including
+an invocation while tracing is paused midwalk. Verify payload order, bounded arena
+extent during the run, and complete final reclamation. [Qualification](callback-churn-results.json)
+passes 423 applied cycles, 27 discards and 285,344 reclaimed payload bytes alongside
+all earlier tests. The callback-shaped state is passed to a known C body; this is
+not Raven delegate dispatch or scheduler integration.
+[Matched measurements](../../../benchmarks/gc-concurrent-poc/README.md#invoked-native-fixture-with-live-object-replacement-2026-10-18)
+show a repeated elapsed advantage at eight replacements per collection, at higher
+CPU cost; 64-replacement results remain mixed. Managed invocation, async/fault paths,
+variable live-set size and pressure-triggered allocation remain integration gaps.

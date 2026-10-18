@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Exercise an allocating native callback fixture during concurrent-GC tracing, with live-object replacement, bounded heap extent, sequence checks and full reclamation. UBSan/bounds includes deterministic midwalk invocation; matched eight-replacement workloads repeatedly run about 6–7.5% faster than sync with about 20% less owner interruption, at 21–28% more CPU. Retain mixed allocation-heavy results and all evidence. This is native POC evaluation, not Raven callback/scheduler integration or production HTTP performance.
+
 - Preserve concurrent-GC POC snapshots after successful ordinary/suspended callback reads, retaining all strong-handle, callback-shape and entry-state checks. Failed reads and mutations still invalidate. Eleven added reclamation cases and UBSan/bounds pass. Matched synthetic callback-read runs remove 2,000 unnecessary fallbacks and reduce owner interruption about 37%; mixed replacements still discard 500 cycles. Elapsed/CPU gains are modest; production code and callback execution remain outside this slice.
 
 - Preserve concurrent-GC POC snapshots across successful reads from unchanged strong handles. Conditional/failed reads and handle mutations still invalidate; callback-specific hooks are unchanged. New reclamation regressions and UBSan/bounds pass. Repeated read-only comparisons eliminate 2,000 unnecessary fallbacks and reduce owner interruption about 37%, with 1–2% elapsed/CPU gains; mixed replacements still discard exactly 500 cycles. Production GC and HTTP capacity remain unchanged.

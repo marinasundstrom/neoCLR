@@ -562,3 +562,89 @@ Reports retain baseline qualification/binary provenance and every trial. Example
 ```
 python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_WITH_MATCHING_WORKLOAD --output NEW_RESULTS --rounds 2000 --live-count 4096 --host-roots 64 --read-every 1 --callback-reads --churn-every 4
 ```
+
+## Invoked native fixture with live-object replacement (2026-10-18)
+
+Move beyond reads and rotation of permanently live objects. A known C callback body
+is invoked with validated callback-shaped state. That state holds the head and tail
+of a 4096-node live window. Each invocation consumes the oldest node's expected
+sequence number, allocates a replacement, publishes it through the rooted state,
+unlinks the retired node and updates an observable checksum. Object identities
+change continually; live-set size stays fixed. This is an explicit native test
+fixture, not dispatch through a function pointer stored in a Raven delegate, not
+managed callback execution, and not scheduler/HTTP integration.
+
+The same fixture body is shared with qualification. Eighty callback invocations
+replace 1360 objects in a 128-node window. The first invocation runs while the worker
+is deterministically paused after 63 scanned objects. After each invocation and
+application, verify the full surviving sequence. Heap extent is bounded throughout
+by `(live nodes + 2 * replacements per callback + 1) * 56` bytes; this prevents a
+collector that only reclaims during final cleanup from passing. Release the handle
+and prove an empty heap and matching lifetime allocation/reclamation counts.
+Fresh UBSan/bounds qualification passes 423 applied cycles, 27 discards and 285,344
+reclaimed payload bytes, including all earlier oracle/rejection tests. Existing
+ASan/ThreadSanitizer startup limits remain.
+
+`--callback-churn --replace-count N` selects the new workload. Both modes invoke the
+same body, allocate the same number of nodes, collect once per invocation, and run
+the same optional scalar loop. Sync collects at invocation start; concurrent captures
+there and applies after the body. Every concurrent cycle must apply: no invalidated
+cycles or skipped/fallback collections explain the results. After timing, verify
+the full sequence and exact survivor count, then drop the callback root/handle and
+drain completely. Peak extent is checked each batch and recorded. Fixed 512 KiB
+managed capacity and a 100-batch warmup are shared. Six boundary checks include a
+one-node window, more replacements than nodes and non-dividing window sizes.
+A short default-workload run verifies the harness's original path still works;
+it is functional validation, not a new capacity measurement.
+
+All trials use one `-O2` executable without sanitizers or phase clocks, in
+sync/concurrent/concurrent/sync order. 64 replacements uses 2000 measured invocations
+(128,000 allocations); eight replacements uses 10,000 (80,000 allocations) and has
+an independent repeat. These configurations differ in GC cadence per allocation;
+only compare sync/concurrent within each row. Means of two trials, milliseconds:
+
+| Replacements / run | Scalar iterations | Sync elapsed | Concurrent elapsed | Sync CPU | Concurrent CPU | Sync owner interruption | Concurrent owner interruption |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 64 | 0 | 1448.83 | 1485.28 | 1443.13 | 1573.70 | 117.29 | 101.93 |
+| 64 | 50000 | 1550.38 | 1537.18 | 1545.02 | 1644.15 | 117.49 | 94.99 |
+| 8 | 0 | 1540.64 | 1384.35 | 1505.65 | 1906.55 | 595.34 | 466.16 |
+| 8 | 50000 | 2007.66 | 1883.36 | 1996.77 | 2407.22 | 582.77 | 463.35 |
+| 8-repeat | 0 | 1498.47 | 1386.19 | 1492.06 | 1908.88 | 584.11 | 466.23 |
+| 8-repeat | 50000 | 1997.33 | 1882.21 | 1992.05 | 2406.33 | 581.61 | 462.52 |
+
+The eight-replacement repeat is 7.5%/5.8% faster in elapsed time, with 20.2%/20.5%
+less total owner interruption, but uses 27.9%/20.8% more process CPU. This is a
+measured concurrency tradeoff on a supported frequent-GC workload: parallel tracing
+can shorten elapsed execution while doing more total work. It is not a CPU-efficiency
+win. Initial eight-replacement results also favor concurrent elapsed, but include a
+1594.68 ms sync run versus 1486.59 ms on its companion; retain it and use the repeat
+for the more modest headline. The allocation-heavy 64-replacement results are mixed
+(2.5% slower without scalar work, 0.9% faster with it), not a consistent elapsed win.
+
+Peak managed extent is 230,328 versus 229,880 bytes at eight replacements, and
+236,600 versus 233,016 at 64: concurrent retains an extra batch of floating garbage.
+These figures exclude the copied heap, capture metadata, index and worker stack;
+raw process RSS includes native overhead. Allocation searches still walk retained
+blocks, and all concurrent copy/import costs remain in the measurement window.
+No timed run overlaps our builds/tests. Checksums, allocations and successful
+collections match within every group; all final heaps are empty.
+
+This demonstrates concurrent reclamation with ongoing native fixture execution and
+live-object replacement. The next integration gap is the real managed execution
+boundary: Raven invocation, async suspension/resumption, fault/cancellation paths
+and memory-pressure admission are not exercised here. Allocations use the existing
+non-collecting native allocator within a prechecked budget; automatic pressure
+fallback and variable live-set size remain unqualified. No sustained Serve/Go rate
+or production collector eligibility is established, and no production GC code changed.
+
+Evidence: [64 replacements](callback-churn-64.json), [eight](callback-churn-8.json),
+[eight repeat](callback-churn-8-repeat.json), [boundary checks](callback-churn-boundaries.json),
+[default harness check](callback-churn-default-control.json),
+[qualification](../../docs/experiments/concurrent-gc-walker/callback-churn-results.json).
+The qualification hashes the shared callback body; reports also hash the workload.
+Reproduce:
+
+```
+python3 docs/experiments/concurrent-gc-walker/run.py --output NEW_QUALIFICATION
+python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --output NEW_RESULTS --rounds 10000 --live-count 4096 --callback-churn --replace-count 8
+```

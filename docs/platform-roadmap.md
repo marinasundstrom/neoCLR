@@ -5337,3 +5337,14 @@ confirm avoided read-only fallbacks and about 37% lower owner interruption. The
 benchmark reads callback-shaped objects, not executable handlers. Actual callback
 execution, allocation/live-set churn and runtime integration remain unqualified;
 production collector selection and behavior are unchanged.
+
+
+**Native allocating callback fixture (2026-10-18):** execute a known C body after
+callback-object validation; allocate/publish new nodes and retire old ones while
+tracing runs. Deterministic midwalk execution, bounded extent and full reclamation
+pass. [Matched evidence](../benchmarks/gc-concurrent-poc/README.md#invoked-native-fixture-with-live-object-replacement-2026-10-18)
+shows a repeated 6–7.5% elapsed advantage over sync at eight replacements per GC,
+with 21–28% higher CPU; allocation-heavy results remain mixed. The next integration
+gap is managed invocation and suspension/fault/pressure paths, not basic native
+reclamation. Fixed-size native fixtures do not qualify these paths or Serve capacity.
+Production collector selection remains unchanged.

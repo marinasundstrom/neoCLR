@@ -1,0 +1,381 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "loadBefore": [
+    3.55810546875,
+    2.83935546875,
+    2.78955078125
+  ],
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-I",
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/callback-churn.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "sync",
+        "10000",
+        "0",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":10000,\"work\":0,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":1594685000,\"cpuNs\":1525424000,\"ownerCpuNs\":1525423917,\"captureOrSyncNs\":612988000,\"waitApplyNs\":0,\"pauseTotalNs\":612988000,\"batchP99Ns\":268000,\"peakArenaBytes\":229880,\"maxRssBytes\":2015232,\"allocations\":80000,\"collections\":10000,\"checksum\":7807742344680564401,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "concurrent",
+        "10000",
+        "0",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":10000,\"work\":0,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":1386290000,\"cpuNs\":1907664000,\"ownerCpuNs\":1376668708,\"captureOrSyncNs\":168425000,\"waitApplyNs\":299102000,\"pauseTotalNs\":467527000,\"batchP99Ns\":171000,\"peakArenaBytes\":230328,\"maxRssBytes\":2719744,\"allocations\":80000,\"collections\":10000,\"checksum\":7807742344680564401,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "concurrent",
+        "10000",
+        "0",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":10000,\"work\":0,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":1382418000,\"cpuNs\":1905429000,\"ownerCpuNs\":1375951792,\"captureOrSyncNs\":167708000,\"waitApplyNs\":297090000,\"pauseTotalNs\":464798000,\"batchP99Ns\":155000,\"peakArenaBytes\":230328,\"maxRssBytes\":2473984,\"allocations\":80000,\"collections\":10000,\"checksum\":7807742344680564401,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "sync",
+        "10000",
+        "0",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":10000,\"work\":0,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":1486591000,\"cpuNs\":1485869000,\"ownerCpuNs\":1485868375,\"captureOrSyncNs\":577685000,\"waitApplyNs\":0,\"pauseTotalNs\":577685000,\"batchP99Ns\":152000,\"peakArenaBytes\":229880,\"maxRssBytes\":1998848,\"allocations\":80000,\"collections\":10000,\"checksum\":7807742344680564401,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "sync",
+        "10000",
+        "50000",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":10000,\"work\":50000,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":2009744000,\"cpuNs\":1998989000,\"ownerCpuNs\":1998989625,\"captureOrSyncNs\":583788000,\"waitApplyNs\":0,\"pauseTotalNs\":583788000,\"batchP99Ns\":224000,\"peakArenaBytes\":229880,\"maxRssBytes\":2015232,\"allocations\":80000,\"collections\":10000,\"checksum\":9335557552227566705,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "concurrent",
+        "10000",
+        "50000",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":10000,\"work\":50000,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":1882630000,\"cpuNs\":2405926000,\"ownerCpuNs\":1877276333,\"captureOrSyncNs\":167853000,\"waitApplyNs\":295105000,\"pauseTotalNs\":462958000,\"batchP99Ns\":199000,\"peakArenaBytes\":230328,\"maxRssBytes\":2375680,\"allocations\":80000,\"collections\":10000,\"checksum\":9335557552227566705,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "concurrent",
+        "10000",
+        "50000",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"concurrent\",\"rounds\":10000,\"work\":50000,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":1884094000,\"cpuNs\":2408519000,\"ownerCpuNs\":1877910208,\"captureOrSyncNs\":168274000,\"waitApplyNs\":295463000,\"pauseTotalNs\":463737000,\"batchP99Ns\":203000,\"peakArenaBytes\":230328,\"maxRssBytes\":2637824,\"allocations\":80000,\"collections\":10000,\"checksum\":9335557552227566705,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-callback-churn-8/bench",
+        "sync",
+        "10000",
+        "50000",
+        "4096",
+        "8"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"mode\":\"sync\",\"rounds\":10000,\"work\":50000,\"liveCount\":4096,\"replacementsPerCallback\":8,\"elapsedNs\":2005582000,\"cpuNs\":1994558000,\"ownerCpuNs\":1994557417,\"captureOrSyncNs\":581761000,\"waitApplyNs\":0,\"pauseTotalNs\":581761000,\"batchP99Ns\":227000,\"peakArenaBytes\":229880,\"maxRssBytes\":2015232,\"allocations\":80000,\"collections\":10000,\"checksum\":9335557552227566705,\"finalArenaBytes\":0}\n",
+      "stderr": ""
+    }
+  ],
+  "trials": [
+    {
+      "mode": "sync",
+      "rounds": 10000,
+      "work": 0,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 1594685000,
+      "cpuNs": 1525424000,
+      "ownerCpuNs": 1525423917,
+      "captureOrSyncNs": 612988000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 612988000,
+      "batchP99Ns": 268000,
+      "peakArenaBytes": 229880,
+      "maxRssBytes": 2015232,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 7807742344680564401,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 10000,
+      "work": 0,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 1386290000,
+      "cpuNs": 1907664000,
+      "ownerCpuNs": 1376668708,
+      "captureOrSyncNs": 168425000,
+      "waitApplyNs": 299102000,
+      "pauseTotalNs": 467527000,
+      "batchP99Ns": 171000,
+      "peakArenaBytes": 230328,
+      "maxRssBytes": 2719744,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 7807742344680564401,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 10000,
+      "work": 0,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 1382418000,
+      "cpuNs": 1905429000,
+      "ownerCpuNs": 1375951792,
+      "captureOrSyncNs": 167708000,
+      "waitApplyNs": 297090000,
+      "pauseTotalNs": 464798000,
+      "batchP99Ns": 155000,
+      "peakArenaBytes": 230328,
+      "maxRssBytes": 2473984,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 7807742344680564401,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "sync",
+      "rounds": 10000,
+      "work": 0,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 1486591000,
+      "cpuNs": 1485869000,
+      "ownerCpuNs": 1485868375,
+      "captureOrSyncNs": 577685000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 577685000,
+      "batchP99Ns": 152000,
+      "peakArenaBytes": 229880,
+      "maxRssBytes": 1998848,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 7807742344680564401,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "sync",
+      "rounds": 10000,
+      "work": 50000,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 2009744000,
+      "cpuNs": 1998989000,
+      "ownerCpuNs": 1998989625,
+      "captureOrSyncNs": 583788000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 583788000,
+      "batchP99Ns": 224000,
+      "peakArenaBytes": 229880,
+      "maxRssBytes": 2015232,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 9335557552227566705,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 10000,
+      "work": 50000,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 1882630000,
+      "cpuNs": 2405926000,
+      "ownerCpuNs": 1877276333,
+      "captureOrSyncNs": 167853000,
+      "waitApplyNs": 295105000,
+      "pauseTotalNs": 462958000,
+      "batchP99Ns": 199000,
+      "peakArenaBytes": 230328,
+      "maxRssBytes": 2375680,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 9335557552227566705,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "concurrent",
+      "rounds": 10000,
+      "work": 50000,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 1884094000,
+      "cpuNs": 2408519000,
+      "ownerCpuNs": 1877910208,
+      "captureOrSyncNs": 168274000,
+      "waitApplyNs": 295463000,
+      "pauseTotalNs": 463737000,
+      "batchP99Ns": 203000,
+      "peakArenaBytes": 230328,
+      "maxRssBytes": 2637824,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 9335557552227566705,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    },
+    {
+      "mode": "sync",
+      "rounds": 10000,
+      "work": 50000,
+      "liveCount": 4096,
+      "replacementsPerCallback": 8,
+      "elapsedNs": 2005582000,
+      "cpuNs": 1994558000,
+      "ownerCpuNs": 1994557417,
+      "captureOrSyncNs": 581761000,
+      "waitApplyNs": 0,
+      "pauseTotalNs": 581761000,
+      "batchP99Ns": 227000,
+      "peakArenaBytes": 229880,
+      "maxRssBytes": 2015232,
+      "allocations": 80000,
+      "collections": 10000,
+      "checksum": 9335557552227566705,
+      "finalArenaBytes": 0,
+      "version": "candidate"
+    }
+  ],
+  "qualification": {
+    "passed": true,
+    "productionReady": false,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "commands": [
+      {
+        "command": [
+          "clang",
+          "-std=c11",
+          "-O2",
+          "-g",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pthread",
+          "-fsanitize=undefined,bounds",
+          "-I",
+          "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker",
+          "-I",
+          "/Users/robert/Projects/neoclr/runtime/native/gc",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c",
+          "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified/root-probe.c",
+          "-o",
+          "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified/test"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified/test"
+        ],
+        "exitCode": 0,
+        "stdout": "CALLBACK CHURN: 80 invoked native callbacks, midwalk mutation, 1360 replacements, bounded extent and full reclamation passed\nMIDWALK: reference transfer/allocation after 63 scanned objects; reclamation and eventual empty heap passed\nPOC applied=423 discarded=27 reclaimedPayloadBytes=285344\nRECLAMATION: live bytes freed; 100 graph/oracle survivor and byte-count comparisons; stale/error/cancel rejection; floating garbage, free-span allocation and parked expiry passed\nCOUNTEREXAMPLE: conditional host read rescues a snapshot-white value without allocation or collection\nCOUNTEREXAMPLE: parked resume makes a snapshot-white value a strong root without allocation or collection\nCOUNTEREXAMPLE: collection/reallocation reuses an address and descriptor shape for a live replacement\nParked roots: three guarded oracle cases, expiry and capacity rejection passed\n101 guarded graph/oracle comparisons passed; conditional cycle/fixed point, intern/static/fault roots, initialized arrays, malformed descriptors, mutation, cancellation passed\n",
+        "stderr": ""
+      }
+    ],
+    "inputs": {
+      "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+      "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified/native-gc.c": "7b0f533334890d0a7ef21e90195b1c130bdfd107764c5f873dae251f49a9cf57",
+      "/Users/robert/Projects/neoclr/target/gc-callback-churn-qualified/root-probe.c": "8b7786c625060620f43d4acced42238e168c8678dd4d6c74a05153a07cd27840",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/snapshot.inc": "f2b38717f1aa80256ecaf14268ac25abc58104409f72d3ad6593164e65fa0e3b",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/test.c": "632482097050f223bf3b42d5bc0b8611b7817c92b5bd7c6a40fa60435f1069b9",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/parked-tests.inc": "62a967786f51878c7f927caccf8a538d23c2fd7cc1696ddd70146bd4f7811ae0",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/publication-tests.inc": "04ec37ae21f32f668d994ea670544411b895af54ad1b8a1c60df9af510053d11",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim.inc": "fa3b7db1496d650dcd51c6d29328f83901fe2460f619b9c275fde20674f1bcf7",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/reclaim-tests.inc": "ae27dd28dfead3b365100c69a51467c8c55c3b6bc8726d4023c105af85e6ce2c",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/callback-churn.inc": "20256b5ef9cc603b80a79a859902f449bece4e1f3e66cdb751441b1288fbf782",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-walker/run.py": "de1b08c5285cf19388834f70fd64e08c8fe3051fa2b7dc654f874d6f3badb737",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.c": "b3120e46741e7a8e5fc253f9cbb08eb0f6c309b1f098e0717eabe8c13ab58280",
+      "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-worker/worker.h": "587c30f75c598d6aac48b0b1f9b774427c5adef4f3c52f6603059e1095f66bb3",
+      "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a"
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/benchmark.py": "a43f43e004008a8cab4179dde1382fce7e7ffd438f52b6311c140c1b8b0f7c84",
+    "/Users/robert/Projects/neoclr/benchmarks/gc-concurrent-poc/callback-churn.c": "71460c27ca95d6cbfaa920f96327aa48148c9d1c519d0ed7c1e4334eb09fe7f5"
+  },
+  "loadAfter": [
+    4.31298828125,
+    3.0419921875,
+    2.8623046875
+  ]
+}

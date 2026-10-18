@@ -125,7 +125,7 @@ def main():
         assert count == 1, name
     generated_roots = out / 'root-probe.c'
     generated_roots.write_text('extern void experiment_invalidate(void);\n' + roots)
-    files = [SOURCE, generated, generated_roots, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', HERE / 'publication-tests.inc', HERE / 'reclaim.inc', HERE / 'reclaim-tests.inc', Path(__file__),
+    files = [SOURCE, generated, generated_roots, HERE / 'snapshot.inc', HERE / 'test.c', HERE / 'parked-tests.inc', HERE / 'publication-tests.inc', HERE / 'reclaim.inc', HERE / 'reclaim-tests.inc', HERE / 'callback-churn.inc', Path(__file__),
              WORKER / 'worker.c', WORKER / 'worker.h', ROOT / 'runtime/native/gc/root-probe.c']
     report = dict(passed=False, productionReady=False, platform=platform.platform(), commands=[],
                   inputs={str(f): hashlib.sha256(f.read_bytes()).hexdigest() for f in files})
