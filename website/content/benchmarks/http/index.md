@@ -225,3 +225,29 @@ The candidate uses roughly 7.4–7.7 times the matching Go controls' CPU. This r
 must not be compared directly with earlier sessions: Go CPU also varies between
 runs. The small within-session neoCLR improvement is the relevant comparison.
 [Boundary tests and complete measurement evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/header-reserve-20261018).
+
+## Development: caller profiling and first-callback reservation
+
+A fresh CPU sample still places allocation, root publication and collection at the
+top. Caller attribution identifies Promise callback lists that allocate empty
+storage immediately before their first addition. Reserving one slot removes that
+allocation: 4.36% fewer allocations, 3.47% fewer payload bytes and 1.13% fewer root
+publications in the fixed diagnostic workload. Collections increase 2.26%.
+Interpreter/JIT/AOT tests preserve deferred completion/cancellation and exercise
+multiple callbacks; multiple registrations may incur extra growth from capacity one.
+
+The load results do **not** establish a repeatable CPU speedup or a newly qualified
+300/400 requests/sec rate. Initial 400/sec trials and a 300/sec fallback retain all
+missed arrivals and generator-lag failures. After the author reports stopping
+competing activities, a separate 400/sec repeat still loses arrivals in both neoCLR
+builds; both Go controls pass. Candidate CPU/completion is higher in one pair and
+lower in the other. Earlier successful trials remain historical results, not a
+qualification of this candidate.
+
+The next investigations are scheduler/GC correlation around admission stalls,
+better load-generator isolation, and Promise result storage, which accounts for
+about 1.12 MB of 3.33 MB allocated in the preceding caller diagnostic. That last
+figure identifies where bytes are allocated; it is not a promised saving from
+moving the payload elsewhere.
+[CPU/caller evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/caller-profile-20261018) ·
+[All comparisons, condition changes and limitations](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/callback-reserve-20261018).

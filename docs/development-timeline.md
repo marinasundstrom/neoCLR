@@ -37,9 +37,18 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   registration 2,687 times. Promise result-slot arrays account for about 1.12 MB
   of 3.33 MB total diagnostic allocation. Equal paced-boundary trigger totals do
   not explain the earlier higher collection total; explicit idle counts vary.
-- **Next selected action:** reserve capacity for the known first callback and
-  measure it. Replacing Promise result storage and changing GC/root validation
-  remain separate investigations. [Diagnostic evidence](../benchmarks/http-server/serve/caller-profile-20261018/README.md).
+- **Implemented action:** reserves capacity for the first callback; interpreter,
+  JIT and AOT tests cover one/many callbacks, cancellation, ordering and reentrancy.
+  Allocations fall 4.36%, bytes 3.47%, root publications 1.13%, while collections rise.
+  Replacing Promise result storage and changing GC/root validation remain separate.
+- **Measurement and author correction:** initial 400/sec and fallback 300/sec
+  comparisons miss arrivals. During the latter's second candidate run, the author
+  says “Aha I stopped the competing activities”. The assistant preserves that
+  mixed-condition sequence and starts a fresh 400/sec comparison after it finishes.
+  Both fresh Go controls pass, all neoCLR trials still miss arrivals, and candidate
+  CPU changes direction between pairs. No sustained-rate or repeatable speedup
+  claim is made. [Full measurements](../benchmarks/http-server/serve/callback-reserve-20261018/README.md).
+  Admission/latency correlation and better generator isolation remain open. [Diagnostic evidence](../benchmarks/http-server/serve/caller-profile-20261018/README.md).
 
 ## 2026-10-18 — Bounded request-header reservation
 
