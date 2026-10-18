@@ -26,19 +26,47 @@ pub(crate) fn has_intrinsic_string_root(
 /// A value record may name the selected runtime's fieldless ValueType foundation.
 /// This is nominal ancestry only; arbitrary reference-storage inheritance stays invalid.
 pub(crate) fn has_value_type_root(module: &Module, definition: &crate::metadata::TypeDef) -> bool {
-    if definition.is_reference_type
-        || definition.representation != Representation::Record
-        || definition.enum_info.is_some()
-    {
+    if definition.is_reference_type || definition.representation != Representation::Record {
         return false;
     }
-    let Some(parent) = definition
+    let Some(mut parent) = definition
         .base
         .as_ref()
         .and_then(|base| module.type_definition(base))
     else {
         return false;
     };
+    if definition.enum_info.is_some() {
+        if parent
+            .origin
+            .as_ref()
+            .map(|o| o.name.as_str())
+            .unwrap_or(&parent.name)
+            != "System.Enum"
+            || !parent.is_reference_type
+            || !parent.is_abstract
+            || !parent.fields.is_empty()
+            || !parent.generic_parameters.is_empty()
+        {
+            return false;
+        }
+        let Some(value_type) = parent
+            .base
+            .as_ref()
+            .and_then(|base| module.type_definition(base))
+        else {
+            return false;
+        };
+        if !parent
+            .definition
+            .as_ref()
+            .zip(value_type.definition.as_ref())
+            .is_some_and(|(a, b)| a.module == b.module && a.revision == b.revision)
+        {
+            return false;
+        }
+        parent = value_type;
+    }
     let Some(root_definition) = parent
         .base
         .as_ref()

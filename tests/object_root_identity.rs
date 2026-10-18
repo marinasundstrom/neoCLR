@@ -651,3 +651,44 @@ fn explicit_value_type_ancestry_preserves_boxed_object_override() {
         Value::String("boxed override".into())
     );
 }
+
+#[test]
+fn enum_ancestry_requires_the_selected_fieldless_foundations() {
+    for (foundation, accepted) in [
+        (
+            ".type class abstract System.Enum\n.extends System.ValueType\n.end\n",
+            true,
+        ),
+        (
+            ".type class abstract System.Enum\n.extends System.ValueType\n.field Storage Int32\n.end\n",
+            false,
+        ),
+        (
+            ".type class System.Enum\n.extends System.ValueType\n.end\n",
+            false,
+        ),
+        (".type class abstract System.Enum\n.end\n", false),
+    ] {
+        let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+        let core = format!(
+            "{}\n{foundation}",
+            format!("{}\n.type class abstract System.ValueType\n.extends System.Object\n.end", ROOT.replace(".module System", ".module Core"))
+        );
+        let app = ".module App\n.references (Core)\n.entry Main\n.type ValueRecord\n.extends [Core]System.Enum\n.enum Int32\n.field private Number Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end";
+        let loaded = neoclr::assembler::read_modules_with_object_root(
+            &[ModuleInput::Source(app), ModuleInput::Source(&core)],
+            &seed,
+            &selected_root(),
+        )
+        .and_then(|modules| {
+            LoadedProgram::with_modules_and_object_root(
+                &modules[0],
+                &seed,
+                &modules[1..],
+                &selected_root(),
+            )
+        });
+        let result = loaded.and_then(|program| program.verify());
+        assert_eq!(result.is_ok(), accepted, "{foundation}: {result:?}");
+    }
+}

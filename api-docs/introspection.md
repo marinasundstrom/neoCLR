@@ -148,7 +148,8 @@ member invocation rights. The helper is outside guest RavenDoc selection and add
 no guest signature. See the [type-semantics experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/type-semantics/README.md).
 
 `neoclr::native_metadata::has_value_type_base(&Module, &metadata::Type) -> bool`
-checks the validated fieldless ValueType ancestry contract. Native compilation can
+checks the validated fieldless ValueType ancestry contract, including the additional
+Enum foundation for enum definitions. Native compilation can
 preserve it across private Object-root renaming using a compiler-only proof that
 serialized applications cannot supply. False means this special storage-category
 exception is unavailable; it does not grant general reference-base inheritance.

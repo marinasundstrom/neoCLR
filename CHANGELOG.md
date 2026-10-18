@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Preserve application enum ancestry through the verified Enum/ValueType/Object foundation; support native enum boxing with exact enum identity and direct Enum conversions. Add metadata/runtime rejection checks and a three-mode consumer. Existing Int32 enum limits remain unchanged.
+
 - Preserve imported ValueType ancestry for native application structs/record structs without changing inline storage. Admit direct boxing and ancestry casts, retain boxed Object override receivers, and validate foundation ownership. Add metadata rejection/roundtrip tests and interpreter/JIT/AOT semantics and JSON regression evidence. Local-core, primitive/enum and broader synthesized-record support remain separate gaps.
 
 - Verify positional reference-record storage and explicit Object ancestry with the repaired native compiler across interpreter/JIT/AOT. Add native BaseType snapshot queries using interpreter metadata recipes, with closed-token retention and no additional invocation rights.

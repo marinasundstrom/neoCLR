@@ -10360,3 +10360,15 @@ This slice covers an external foundation for ordinary value records. Local-core,
 enum and intrinsic-primitive ancestry are not added by this API. The temporary CLI
 projection keeps its ordinary CLR ValueType base; native metadata records the exact
 imported foundation. [Validation and three-mode consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/type-semantics/README.md).
+
+### Native enum bases (development, 2026-10-18)
+
+`void TypeBuilder.SetEnumBase(ImportedTypeReference baseType)` binds an enum to
+an owned, complete, nongeneric, top-level `System.Enum` contract with zero inherited
+fields. Register the contract with `CompleteClassBaseReference(parent, methods, 0)`
+then call `enumeration.SetEnumBase(parent)`. Existing literals/value__ storage stay
+unchanged. Null raises `ArgumentNullException`; foreign, incomplete, wrong-name or
+storage-bearing contracts raise `ArgumentException`; non-enum owners or repeated
+binding raise `InvalidOperationException`. Native loading independently verifies
+Enum → ValueType → the selected Object foundation. This producer API is covered
+here outside guest RavenDoc selection; no guest signature changes.

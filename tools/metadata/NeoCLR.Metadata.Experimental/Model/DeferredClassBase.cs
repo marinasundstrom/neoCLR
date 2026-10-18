@@ -34,6 +34,23 @@ public sealed partial class TypeBuilder
         Definition.BindExternalBase(baseType);
     }
 
+    /// <summary>Binds an enum's exact imported, fieldless System.Enum foundation.</summary>
+    /// <param name="baseType">An owned complete nongeneric System.Enum class contract.</param>
+    /// <remarks>Preserves nominal enum identity and its existing Int32 value__ storage.</remarks>
+    /// <exception cref="ArgumentException">The reference is foreign, incomplete, storage-bearing or not System.Enum.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not an enum or already has an explicit base.</exception>
+    public void SetEnumBase(ImportedTypeReference baseType)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!IsEnum || ExternalBase is not null || LocalBase is not null)
+            throw new InvalidOperationException("enum base binding requires an enum without an explicit base");
+        if (!ReferenceEquals(baseType.Owner, Assembly) || baseType.Namespace != "System" || baseType.Name != "Enum" ||
+            baseType.IsValueType || baseType.GenericArity != 0 || baseType.DeclaringType is not null ||
+            !Assembly.HasClassBaseContract(baseType) || Assembly.ExternalClassFieldCount(baseType) != 0)
+            throw new ArgumentException("enum base requires a complete fieldless System.Enum contract", nameof(baseType));
+        Definition.BindExternalBase(baseType);
+    }
+
     private void ValidateDeferredBaseOwner()
     {
         if (IsStatic || IsInterface || IsValueType || IsNativeObjectRoot || NativePrimitive is not null || NativeGrapheme ||

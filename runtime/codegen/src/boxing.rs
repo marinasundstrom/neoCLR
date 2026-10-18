@@ -109,10 +109,9 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         if t.is_reference_type
             || t.representation != Representation::Record
             || (t.base.is_some() && !neoclr::native_metadata::has_value_type_base(input, &ty))
-            || t.enum_info.is_some()
             || !t.generic_parameters.is_empty()
         {
-            return Err(format!("record boxing requires closed non-enum value records; found {ty:?} in {} at instruction {pc}", input.functions[caller].name).into());
+            return Err(format!("record boxing requires closed value records and enums; found {ty:?} in {} at instruction {pc}", input.functions[caller].name).into());
         }
         let helper = if let Some(&helper) = helpers.get(&index) {
             helper

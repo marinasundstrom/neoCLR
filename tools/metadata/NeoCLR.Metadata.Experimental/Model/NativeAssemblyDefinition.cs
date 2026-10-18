@@ -434,7 +434,8 @@ public sealed partial class NativeAssemblyDefinition
                         !alias.ValueType && alias.Declaring is null &&
                         (IsOrdinaryClass(type) && !type.IsClosedHierarchy ||
                          type.IsValueType && type.EnumMembers is null && type.NativePrimitive is null && !type.NativeGrapheme &&
-                         baseArity == 0 && alias.Namespace == "System" && alias.Name == "ValueType"),
+                         baseArity == 0 && alias.Namespace == "System" && alias.Name == "ValueType" ||
+                         type.EnumMembers is not null && baseArity == 0 && alias.Namespace == "System" && alias.Name == "Enum"),
                         "external base requires an explicit arity-matched top-level reference binding and an ordinary class or ValueType-based value record");
                     continue;
                 }

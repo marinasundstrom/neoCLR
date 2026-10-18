@@ -358,7 +358,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
         return Err(Fault::new("unsupported module format (expected 5)"));
     }
     for def in &module.types {
-        crate::enums::validate(def)?;
+        crate::enums::validate(module, def)?;
         if def
             .base
             .as_ref()

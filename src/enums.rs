@@ -4,7 +4,7 @@ use crate::{
     metadata::{EnumInfo, Representation, Type, TypeDef, Visibility},
 };
 
-pub(crate) fn validate(def: &TypeDef) -> Result<(), Fault> {
+pub(crate) fn validate(module: &crate::Module, def: &TypeDef) -> Result<(), Fault> {
     let Some(info) = &def.enum_info else {
         return Ok(());
     };
@@ -13,7 +13,7 @@ pub(crate) fn validate(def: &TypeDef) -> Result<(), Fault> {
         || def.packing.is_some()
         || def.minimum_size.is_some()
         || def.is_abstract
-        || def.base.is_some()
+        || (def.base.is_some() && !crate::inheritance::has_value_type_root(module, def))
         || !def.generic_parameters.is_empty()
         || !def.implements.is_empty()
         || def.fields.len() != 1
@@ -21,7 +21,7 @@ pub(crate) fn validate(def: &TypeDef) -> Result<(), Fault> {
         || def.fields[0].visibility != Visibility::Private
     {
         return Err(Fault::new(
-            "enum requires a concrete nongeneric one-Int32 private-field layout without a base or interfaces",
+            "enum requires a concrete nongeneric one-Int32 private-field layout with no interfaces and only a verified Enum foundation",
         ));
     }
     let mut names = std::collections::HashSet::new();

@@ -54,6 +54,10 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   layout and boxed override checks required separate corrections. Matched semantics
   and JSON regression evidence is retained in the [type-semantics investigation](experiments/type-semantics/README.md).
   Primitive/enum ancestry and broader synthesized record members remain open.
+- **Author follow-up:** requested closing primitive and enum ancestry gaps next, with
+  .NET semantics consistent across interpreter/JIT/AOT, regressions and commits per slice.
+  The assistant started with enum metadata and boxed nominal identity; primitive
+  core metadata and boxed ancestry are the next slice.
 - **Evidence and limits:** see the [JSON record experiment](experiments/json-records/README.md).
   Public-model visibility and native reflection retention remain required. Record
   deserialization, custom record collection elements and broader ancestry coverage remain
