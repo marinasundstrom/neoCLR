@@ -29,7 +29,6 @@ def instrument(source):
     import re
     functions = ['host_root_create',
         'neoclr_gc_host_root_replace_v1', 'neoclr_gc_host_root_release_v1',
-        'neoclr_gc_callback_read_v1', 'neoclr_gc_callback_read_suspended_v1',
         'neoclr_gc_resource_attach_v1', 'neoclr_gc_resource_release_v1',
         'neoclr_gc_complete_invocation_v1', 'neoclr_gc_entry_check_v1',
         'neoclr_gc_collect_conditional_v1', 'neoclr_gc_allocation_info_v1']
@@ -43,6 +42,18 @@ def instrument(source):
     read_prefix = ('int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {\n'
                    '    host_root *root = find_host_root(context, handle);')
     replace(read_prefix, read_prefix + '\n    if (!root || root->conditional || root->expired || !output) experiment_invalidate();')
+    # Callback reads validate a strong handle and callback shape but do not invoke
+    # application code. Preserve successful reads; all rejected entries invalidate.
+    callback_start = source.index('int32_t neoclr_gc_callback_read_v1(')
+    callback_end = source.index('int32_t neoclr_gc_roots_park_owned_v1(', callback_start)
+    callbacks = source[callback_start:callback_end]
+    assert callbacks.count('return 3;') == 2
+    assert callbacks.count('return callback_read(context, handle, output);') == 2
+    callbacks = callbacks.replace('return 3;', '{ experiment_invalidate(); return 3; }')
+    callbacks = callbacks.replace('return callback_read(context, handle, output);',
+        'int32_t status = callback_read(context, handle, output);\n'
+        '    if (status) experiment_invalidate();\n    return status;')
+    source = source[:callback_start] + callbacks + source[callback_end:]
     source = source.replace('neoclr_roots_parked_v1()', 'experiment_parked_roots()')
     replace('static _Thread_local neoclr_gc_statistics statistics;', '''static _Thread_local neoclr_gc_statistics statistics;
 static _Thread_local uint64_t experiment_epoch;

@@ -5328,3 +5328,12 @@ checks and [paired measurements](../benchmarks/gc-concurrent-poc/README.md#prese
 show removal of unnecessary read-only fallbacks and about 37% less owner interruption;
 mixed mutations still reject their cycles. Overall gains are modest and production
 GC remains unchanged. Further hooks need their own safety audit before relaxation.
+
+
+**Callback-read audit (2026-10-18):** successful ordinary and suspended callback
+reads preserve the isolated POC epoch after existing checks; failures and mutations
+remain conservative. Eleven new reclamation cases and [matched comparisons](../benchmarks/gc-concurrent-poc/README.md#callback-read-invalidation-audit-2026-10-18)
+confirm avoided read-only fallbacks and about 37% lower owner interruption. The
+benchmark reads callback-shaped objects, not executable handlers. Actual callback
+execution, allocation/live-set churn and runtime integration remain unqualified;
+production collector selection and behavior are unchanged.

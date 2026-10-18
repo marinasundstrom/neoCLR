@@ -337,7 +337,56 @@ static void strong_handle_read(unsigned event) {
     assert(!c.text.used);
     cycle_destroy(&cycle);
 }
+static void callback_handle_read(unsigned event) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(void *)heap, sizeof(heap), 0}};
+    void *value = allocate(&c, event == 6 ? 16 : 24, NEOCLR_GC_OBJECT);
+    *(uint64_t *)value = event == 5 ? 0 : UINT32_MAX;
+    void *garbage = allocate(&c, 24, NEOCLR_GC_OBJECT);
+    *(uint64_t *)garbage = UINT32_MAX;
+    uint64_t handle;
+    if (event == 7) assert(!neoclr_gc_host_root_create_owned_v1(&c, value, value, &handle));
+    else assert(!neoclr_gc_host_root_create_v1(&c, value, &handle));
+    bool entered = event >= 1 && event <= 4;
+    bool suspended = event == 1 || event == 3 || event == 4;
+    neoclr_probe_frame frame, wrong = {0};
+    if (entered) neoclr_probe_enter_v3(&frame, &c, 0, &empty_storage, 0, "{}", 2);
+    collection_cycle cycle;
+    assert(cycle_init(&cycle) && cycle_start(&cycle, &c));
+    wait_entered(cycle.job);
+    if (event == 9) c.fault.code = 3;
+    if (event == 10) assert(!neoclr_gc_host_root_replace_v1(&c, handle, garbage));
+    void *output = NULL;
+    int status;
+    if (suspended)
+        status = neoclr_gc_callback_read_suspended_v1(&c, handle, &output,
+            event == 3 ? NULL : event == 4 ? &wrong : &frame);
+    else status = neoclr_gc_callback_read_v1(&c, handle, event == 8 ? NULL : &output);
+    assert(status == (event < 2 || event == 10 ? 0 : 3));
+    if (!status) assert(output == (event == 10 ? garbage : value));
+    else assert(!output);
+    assert((cycle.epoch == experiment_epoch) == (event < 2));
+    unsigned char before[sizeof(heap)];
+    memcpy(before, heap, sizeof(heap));
+    uint64_t collections = statistics.collections;
+    atomic_store(&cycle.job->proceed, true);
+    if (event < 2) {
+        assert(cycle_poll(&cycle, true, false) == CYCLE_APPLIED);
+        assert(*(uint64_t *)output == UINT32_MAX);
+        assert(!validated_bases(&c.text, garbage, NULL));
+    } else {
+        assert(cycle_poll(&cycle, true, false) == CYCLE_DISCARDED);
+        assert(!memcmp(before, heap, sizeof(heap)) && statistics.collections == collections);
+    }
+    c.fault.code = 0;
+    if (entered) neoclr_probe_leave_v1(&frame);
+    assert(!neoclr_gc_host_root_release_v1(&c, handle));
+    cycle_run(&cycle, &c);
+    assert(!c.text.used);
+    cycle_destroy(&cycle);
+}
 static void reclamation_tests(void) {
+    for (unsigned event = 0; event < 11; event++) callback_handle_read(event);
     for (unsigned event = 0; event < 4; event++) strong_handle_read(event);
     for (unsigned event = 0; event < 5; event++) rejected_live_descriptor(event);
     midwalk_progress();

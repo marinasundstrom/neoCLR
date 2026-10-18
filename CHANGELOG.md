@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-18
 
+- Preserve concurrent-GC POC snapshots after successful ordinary/suspended callback reads, retaining all strong-handle, callback-shape and entry-state checks. Failed reads and mutations still invalidate. Eleven added reclamation cases and UBSan/bounds pass. Matched synthetic callback-read runs remove 2,000 unnecessary fallbacks and reduce owner interruption about 37%; mixed replacements still discard 500 cycles. Elapsed/CPU gains are modest; production code and callback execution remain outside this slice.
+
 - Preserve concurrent-GC POC snapshots across successful reads from unchanged strong handles. Conditional/failed reads and handle mutations still invalidate; callback-specific hooks are unchanged. New reclamation regressions and UBSan/bounds pass. Repeated read-only comparisons eliminate 2,000 unnecessary fallbacks and reduce owner interruption about 37%, with 1–2% elapsed/CPU gains; mixed replacements still discard exactly 500 cycles. Production GC and HTTP capacity remain unchanged.
 
 - Extend concurrent-GC POC comparisons with rooted-graph rotation, controlled host-root replacement and explicitly charged synchronous fallback. Verify full graph order, exact discard/fallback counts and complete reclamation, including boundary cases. Rotation retains a roughly 19% owner-interruption reduction on the tested larger graph; invalidating every cycle instead raises interruption 28–29% and CPU about 9% versus sync. Retain all runs; no production policy, invalidation change or new speedup is claimed.

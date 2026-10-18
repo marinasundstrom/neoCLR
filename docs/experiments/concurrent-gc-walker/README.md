@@ -294,3 +294,18 @@ conditional-resurrection cases. [Paired evidence](../../../benchmarks/gc-concurr
 shows unnecessary read-only fallbacks fall from 2000 to zero and owner interruption
 falls about 37%; mixed replacements still invalidate exactly 500 cycles. Overall
 elapsed gains remain modest, and production collector behavior is unchanged.
+
+
+### Callback-read audit completed
+
+Successful ordinary/suspended callback reads now preserve the POC epoch after their
+existing strong-handle, heap, callback-shape, fault and entry-state checks succeed.
+They do not invoke callbacks. Failed reads still invalidate; handle mutations and
+parked transitions remain protected. This extends the preceding strong-read exception
+without changing production sources or API semantics. Eleven added reclamation
+cases and existing tests pass [UBSan/bounds qualification](callback-read-results.json):
+342 applied cycles, 27 discards, 249,608 reclaimed payload bytes.
+[Matched evidence](../../../benchmarks/gc-concurrent-poc/README.md#callback-read-invalidation-audit-2026-10-18)
+removes 2000 read-only fallbacks with about 37% less owner interruption; mixed
+replacements still discard exactly 500 cycles. These synthetic callback-object
+reads do not qualify callback execution or Serve integration.

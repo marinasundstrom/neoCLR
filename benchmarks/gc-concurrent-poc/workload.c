@@ -40,7 +40,7 @@ static uint64_t percentile(uint64_t *samples, unsigned count, unsigned percent) 
     return samples[((uint64_t)count * percent + 99) / 100 - 1];
 }
 int main(int argc, char **argv) {
-    assert(argc >= 4 && argc <= 8);
+    assert(argc >= 4 && argc <= 9);
     bool concurrent = !strcmp(argv[1], "concurrent");
     assert(concurrent || !strcmp(argv[1], "sync"));
     unsigned rounds = (unsigned)strtoul(argv[2], NULL, 10);
@@ -53,8 +53,9 @@ int main(int argc, char **argv) {
     assert(host_count <= 256 && host_count <= live_count);
     unsigned churn_every = argc >= 7 ? (unsigned)strtoul(argv[6], NULL, 10) : 0;
     assert(!churn_every || host_count);
-    unsigned read_every = argc == 8 ? (unsigned)strtoul(argv[7], NULL, 10) : 0;
+    unsigned read_every = argc >= 8 ? (unsigned)strtoul(argv[7], NULL, 10) : 0;
     assert(!read_every || host_count);
+    bool callback_reads = argc == 9 && strtoul(argv[8], NULL, 10) != 0;
     void *handle_values[256];
     void *nodes[8192];
     uint64_t handles[256];
@@ -65,6 +66,7 @@ int main(int argc, char **argv) {
     for (unsigned i = 0; i < live_count; i++) {
         void *object = allocate(&c, 24, NEOCLR_GC_OBJECT);
         nodes[i] = object;
+        if (callback_reads) *(uint64_t *)object = UINT32_MAX;
         if (previous) ((uint64_t *)previous)[1] = (uintptr_t)object;
         else root = object;
         previous = object;
@@ -114,7 +116,9 @@ int main(int argc, char **argv) {
         ((uint64_t *)root)[2] = checksum & UINT64_C(0xffffffff);
         if (read_every && round % read_every == 0) {
             void *value = NULL;
-            assert(!neoclr_gc_host_root_read_v1(&c, handles[round % host_count], &value));
+            if (callback_reads)
+                assert(!neoclr_gc_callback_read_suspended_v1(&c, handles[round % host_count], &value, &frame));
+            else assert(!neoclr_gc_host_root_read_v1(&c, handles[round % host_count], &value));
             assert(value == handle_values[round % host_count]);
             if (round >= warmup) reads++;
         }
@@ -189,7 +193,8 @@ int main(int argc, char **argv) {
     assert(!c.text.used && statistics.allocations == statistics.reclaimed_allocations);
     struct rusage usage;
     assert(!getrusage(RUSAGE_SELF, &usage));
-    printf("{\"readEvery\":%u,\"reads\":%llu,", read_every, (unsigned long long)reads);
+    printf("{\"callbackReads\":%s,", callback_reads ? "true" : "false");
+    printf("\"readEvery\":%u,\"reads\":%llu,", read_every, (unsigned long long)reads);
     printf("\"churnEvery\":%u,\"replacements\":%llu,\"discardedCycles\":%llu,\"fallbackCollections\":%llu,",
         churn_every, (unsigned long long)replacements, (unsigned long long)discarded,
         (unsigned long long)fallbacks);

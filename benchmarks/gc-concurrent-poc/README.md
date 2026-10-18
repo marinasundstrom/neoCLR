@@ -493,3 +493,72 @@ reads remain conservative until audited. Example with a matching baseline build:
 ```
 python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_WITH_MATCHING_WORKLOAD --output NEW_RESULTS --rounds 2000 --live-count 4096 --host-roots 64 --read-every 1 --churn-every 4
 ```
+
+## Callback-read invalidation audit (2026-10-18)
+
+Successful ordinary and suspended callback reads now preserve the generated POC's
+snapshot epoch. The shared callback reader already rejects conditional handles and
+validates a strong handle's value, full heap integrity, object kind/size, callback
+tag and fault state. These functions return an object; they do not invoke a callback
+or resume parked roots. The value was captured as a strong root, and creation,
+replacement or release still invalidates independently. All failed callback reads,
+including rejected entry states, continue to invalidate. No epoch is restored or
+reset on a successful read. All production sources and APIs remain unchanged.
+
+This reuses the familiar strong-reference retention argument without changing
+managed/.NET-facing semantics. Native callback entry restrictions remain intact:
+ordinary reads reject active frames for the context; suspended reads require the
+current head frame and matching context. Keeping the same checks is part of this
+change, not a deferred optimization.
+
+Eleven new reclamation cases cover both successful read variants, ordinary reads
+with an active frame, missing/mismatched suspended boundaries, wrong tag/size,
+conditional handles, null output, fault state, and replacement followed by a valid
+read. Successful cases preserve the callback object and reclaim unrelated garbage;
+rejected cycles leave heap bytes and collection counts unchanged. Fresh UBSan/bounds
+qualification passes 342 applied cycles, 27 discards and 249,608 reclaimed payload
+bytes, including previous conditional-resurrection and stale-result regressions.
+ASan/ThreadSanitizer startup limitations remain.
+
+`--callback-reads` selects suspended callback reads in the benchmark, which already
+has a published frame. Graph nodes receive the required 24-byte object shape and
+callback tag. These are synthetic callback-shaped objects: no function is invoked,
+so this is not a callback-dispatch or handler benchmark. Both versions perform the
+same reads and validate returned handle values. Default ordinary host reads are
+unchanged. Six explicit boundary runs cover default modes, a one-node graph,
+every-cycle replacement, non-dividing periods and ordinary strong reads.
+
+4096 live nodes, 64 handles, 2000 batches, one callback read per batch. `mixed` also
+rotates the graph and replaces a handle every fourth batch. Means of two trials per
+mode/workload, milliseconds:
+
+| Run | Scalar iterations | Candidate discards | Baseline concurrent elapsed | Candidate concurrent elapsed | Candidate sync elapsed | Baseline owner interruption | Candidate owner interruption |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| paired | 0 | 0 | 1482.68 | 1455.52 | 1432.96 | 155.85 | 97.23 |
+| paired | 50000 | 0 | 1582.14 | 1547.64 | 1542.34 | 153.75 | 96.75 |
+| mixed | 0 | 500 | 1489.99 | 1461.61 | 1458.59 | 155.56 | 111.48 |
+| mixed | 50000 | 500 | 1582.45 | 1564.62 | 1555.61 | 154.61 | 112.00 |
+
+Baseline always discards 2000 cycles; candidate discards zero in read-only runs and
+exactly 500 in mixed runs, each with a fully charged synchronous fallback. Read-only
+owner interruption falls 37.6%/37.1%; elapsed falls 1.8%/2.2% and CPU 1.6%/2.0%.
+Mixed interruption falls 28.3%/27.6%; elapsed falls 1.9%/1.1% and CPU 1.7%/1.0%.
+These modest elapsed changes are subject to host variation; one mixed baseline
+sync run takes 1549.83 ms versus 1458.87 ms on its companion, and both are retained.
+No precise tail-latency or substantial throughput advantage is claimed.
+
+Candidate concurrent remains more CPU-expensive than candidate sync, despite
+reduced interruption. Every group matches allocations, successful collections,
+application checksum and expected graph order, and drains all managed objects.
+No timed run overlaps our builds/tests. No HTTP/Go rate or production concurrency
+claim follows. This closes the callback-read audit only; actual callback execution,
+live-set churn and runtime integration still need their own evidence.
+
+Raw reports: [read-only](callback-read-paired.json), [mixed](callback-read-mixed.json),
+[boundary checks](callback-read-boundaries.json), and
+[qualification](../../docs/experiments/concurrent-gc-walker/callback-read-results.json).
+Reports retain baseline qualification/binary provenance and every trial. Example:
+
+```
+python3 benchmarks/gc-concurrent-poc/benchmark.py --validated-build NEW_QUALIFICATION --compare-build BASELINE_WITH_MATCHING_WORKLOAD --output NEW_RESULTS --rounds 2000 --live-count 4096 --host-roots 64 --read-every 1 --callback-reads --churn-every 4
+```

@@ -150,6 +150,7 @@ POC scaling defect: matched 64-root trials use 47–49% less elapsed time than t
 preceding POC, with a longer repeat and zero-root control. This is not a speedup
 over synchronous GC or an HTTP capacity claim. Graph-rotation tests preserve the
 local pause benefit, but frequent snapshot invalidation and synchronous fallback
-can eliminate it. An audited strong-handle read exception removes unnecessary
-read-only fallbacks in the POC; conditional reads and mutations still invalidate. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
+can eliminate it. Audited strong-handle and callback-read exceptions remove unnecessary
+read-only fallbacks in the POC; failed/conditional reads and mutations remain
+protected. These read tests do not establish callback-execution support. See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md).
 See the [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).
