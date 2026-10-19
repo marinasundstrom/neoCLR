@@ -2,16 +2,24 @@
 #define NEOCLR_NATIVE_MEMORY_VIEWS_H
 #include "text-arena.h"
 /* Private checked byte-window kernel, not the final guest ABI. The caller supplies
- * a live context and allocator-produced mutable byte-array base. The future typed
- * binder must distinguish array references from immutable value snapshots and
- * supply kind from the exact source/result contract, never a guest integer.
+ * a live context and allocator-produced mutable byte-array base, or a trusted
+ * text pointer produced by the exact ViewUtf8 binding. The binder supplies kind
+ * from the exact source/result contract, never a guest integer.
  * Operations do not allocate,
  * collect or register roots. Publish owner at collecting boundaries, including
  * for empty windows. Publish only owner as a stack root; the other fields are numeric.
- * GC builds validate the exact live allocation/context before dereferencing it.
+ * GC builds validate managed allocation bases; trusted literal text follows
+ * the existing text-service pointer contract described below.
  * Arena builds require the trusted allocation base (no allocation registry).
  * These values do not extend context lifetime or authorize borrowed suspension.
  */
+/* Private three-lane guest encoding: the offset high bit identifies trusted
+ * immutable UTF-8 text storage. The remaining 31 bits are the byte offset.
+ * The owner is untagged, so the existing root lane retains heap text directly.
+ * Only the exact ViewUtf8(String)->ReadOnlySlice<Byte> binding may create it.
+ * Literal text pointers have the same trusted provenance as other text services;
+ * this is not a pointer-validation API for external/native callers. */
+#define NEOCLR_VIEW_UTF8_OFFSET UINT32_C(0x80000000)
 enum { NEOCLR_VIEW_SLICE = 0, NEOCLR_VIEW_READONLY_SLICE = 1,
        NEOCLR_VIEW_MEMORY = 2, NEOCLR_VIEW_READONLY_MEMORY = 3 };
 typedef struct {
@@ -19,6 +27,7 @@ typedef struct {
     uint32_t offset, length;
     uint64_t kind;
 } neoclr_byte_view;
+int32_t neoclr_byte_view_utf8_v1(neoclr_aot_context *, const neoclr_aot_text *, neoclr_byte_view *);
 _Static_assert(sizeof(neoclr_byte_view) == 24, "private byte-window size");
 _Static_assert(offsetof(neoclr_byte_view, owner) == 0, "window owner root");
 /* Null arrays admit only the empty window. Bounds failures return IndexOutOfRange;

@@ -1396,6 +1396,12 @@ pub(crate) fn compile_into(
     } else {
         None
     };
+    let byte_view_utf8 = if details.is_some_and(|d| !d.byte_view_utf8.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64; 3].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_byte_view_utf8_v1", Linkage::Import, &sig)?)
+    } else { None };
     let byte_memory_create = if details.is_some_and(|d| !d.byte_memory_create.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64; 4].map(AbiParam::new));
@@ -1785,6 +1791,7 @@ pub(crate) fn compile_into(
                 d.byte_view_get.contains(&i)
                     || d.byte_view_set.contains(&i)
                     || d.byte_memory_create.contains(&i)
+                    || d.byte_view_utf8.contains(&i)
                     || d.byte_memory_length.contains(&i)
                     || d.byte_memory_slice.contains(&i)
                     || d.byte_memory_readonly.contains(&i)
@@ -1855,7 +1862,10 @@ pub(crate) fn compile_into(
                     let kind = b.ins().iconst(types::I64, kind);
                     let storage = slot(&mut b, 24);
                     let address = b.ins().stack_addr(types::I64, storage, 0);
-                    let call = if details.unwrap().byte_memory_create.contains(&i) {
+                    let call = if details.unwrap().byte_view_utf8.contains(&i) {
+                        let service = module.declare_func_in_func(byte_view_utf8.unwrap(), b.func);
+                        b.ins().call(service, &[fault_context.unwrap(), parameters[0], address])
+                    } else if details.unwrap().byte_memory_create.contains(&i) {
                         if p.args[i].len() == 3 {
                             let service = module.declare_func_in_func(byte_view_create_window.unwrap(), b.func);
                             b.ins().call(service, &[fault_context.unwrap(), parameters[0], parameters[1], parameters[2], kind, address])

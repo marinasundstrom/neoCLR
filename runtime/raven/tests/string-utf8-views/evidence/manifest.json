@@ -1,0 +1,32 @@
+[
+  {
+    "source": "target/utf8-view-native-tests.log",
+    "file": "utf8-view-native-tests.log.gz",
+    "sha256": "3381da1aceee437e456405b69f6c726f87aad6b728d48ab1980e03c77cc73c20"
+  },
+  {
+    "source": "target/utf8-view-binding-tests-v2.log",
+    "file": "utf8-view-binding-tests-v2.log.gz",
+    "sha256": "82598abb9379a4e8672c9554044b3e037aa5c2d620020a101e3963767489fae0"
+  },
+  {
+    "source": "target/utf8-view-consumer-v3/build.json",
+    "file": "utf8-view-consumer-v3--build.json.gz",
+    "sha256": "3bd1e12aa883e90491673777ea9d91a98628821c1d4dd951141a56faca2bbb7a"
+  },
+  {
+    "source": "target/utf8-view-consumer-report-v2.json",
+    "file": "utf8-view-consumer-report-v2.json.gz",
+    "sha256": "fca290f79b472bd0a556112f0044c28352746196bc8ae64caf349ac360504907"
+  },
+  {
+    "source": "target/utf8-view-jit.json",
+    "file": "utf8-view-jit.json.gz",
+    "sha256": "c1d82b45c9fffbad67f0bd71cb8eff3bb79f64f658821a8ac15b49c079ae3869"
+  },
+  {
+    "source": "target/utf8-view-final-report.json",
+    "file": "utf8-view-final-report.json.gz",
+    "sha256": "e5bac69f948d7c3175bbf91958eadb133d5d1da400b8ea695e571a082ea6b315"
+  }
+]

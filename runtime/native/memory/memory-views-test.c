@@ -78,7 +78,7 @@ static int copy_tests(void) {
     CHECK(neoclr_byte_view_copy_v1(&c, NULL, &destination) == 3);
     CHECK(neoclr_byte_view_copy_v1(&c, &source, NULL) == 3);
     CHECK(neoclr_byte_view_copy_v1(NULL, &source, &destination) == 3);
-    neoclr_byte_view bad = source; bad.offset = UINT32_MAX;
+    neoclr_byte_view bad = source; bad.offset = INT32_MAX;
     CHECK(neoclr_byte_view_copy_v1(&c, &bad, &destination) == 8);
     CHECK(neoclr_byte_view_copy_v1(&c, &destination, &bad) == 8);
     CHECK(c.text.used == used);
@@ -193,7 +193,39 @@ static int decode_tests(void) {
     return 0;
 }
 
+static int utf8_view_tests(void) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
+    const struct { uint64_t length; unsigned char bytes[8]; } literal = {8, {65,0,195,169,240,159,152,128}};
+    neoclr_byte_view view, nested;
+    uint64_t used = c.text.used;
+    CHECK(!neoclr_byte_view_utf8_v1(&c, (const neoclr_aot_text *)&literal, &view));
+    CHECK(c.text.used == used && view.owner == &literal && view.length == 8);
+    CHECK(!neoclr_byte_view_slice_v1(&c, &view, 2, 6, &nested));
+    uint8_t value = 0;
+    CHECK(!neoclr_byte_view_get_v1(&c, &nested, 0, &value) && value == 195);
+    CHECK(neoclr_byte_view_set_v1(&c, &nested, 0, 0) == 3);
+    CHECK(neoclr_byte_view_convert_v1(&c, &nested, NEOCLR_VIEW_READONLY_MEMORY, &view) == 3);
+    CHECK(!neoclr_byte_view_slice_v1(&c, &nested, 6, 0, &view));
+    CHECK(neoclr_byte_view_get_v1(&c, &view, 0, &value) == 8);
+    uint64_t decoded[2];
+    CHECK(!neoclr_utf8_decode_slice_v1(&c, nested.owner, (int32_t)nested.offset, nested.length, decoded));
+    const neoclr_aot_text *text = (const void *)(uintptr_t)decoded[1];
+    CHECK(text->length == 6 && !memcmp(text->bytes, literal.bytes + 2, 6));
+    CHECK(!neoclr_byte_view_utf8_v1(&c, text, &view));
+    void *array;
+    CHECK(!neoclr_reserve_bytes_v1(&c.text, 6, &array));
+    neoclr_byte_view destination;
+    CHECK(!neoclr_byte_view_create_all_v1(&c, array, NEOCLR_VIEW_SLICE, &destination));
+    CHECK(!neoclr_byte_view_copy_v1(&c, &view, &destination));
+    CHECK(!neoclr_byte_view_get_v1(&c, &destination, 5, &value) && value == 128);
+    neoclr_byte_access access;
+    CHECK(!neoclr_byte_view_access_v1(&c, &view, 0, &access) && !access.initialized);
+    CHECK(neoclr_byte_view_access_v1(&c, &view, 1, &access) == 3);
+    return 0;
+}
 int main(void) {
+    CHECK(!utf8_view_tests());
     CHECK(!decode_tests());
     CHECK(!copy_tests());
     CHECK(!access_tests());
@@ -289,7 +321,7 @@ int main(void) {
     CHECK(!neoclr_allocate_bytes_v1(&c.text, 3, &array));
     CHECK(!neoclr_byte_view_create_v1(&c, array, 0, 3, 0, &view));
     CHECK(!neoclr_byte_view_get_v1(&c, &view, 2, &value) && !value);
-    neoclr_byte_view bad = view; bad.offset = UINT32_MAX;
+    neoclr_byte_view bad = view; bad.offset = INT32_MAX;
     CHECK(neoclr_byte_view_set_v1(&c, &bad, 0, 1) == 8);
     bad = view; bad.kind = UINT64_MAX;
     CHECK(neoclr_byte_view_get_v1(&c, &bad, 0, &value) == 3);

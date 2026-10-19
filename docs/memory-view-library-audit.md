@@ -335,3 +335,14 @@ request their existing owned range copies at the boundary. Public Encode still
 returns its existing owned Sequence contract; revising that contract is separate.
 Incremental carry storage, lowercase transformations and owned outputs can require
 allocation; no blanket zero-allocation text claim is made.
+
+### String UTF-8 native integration (2026-10-19)
+
+JSON migration exposed missing native lowering for the existing String.Utf8Bytes
+property. The new ViewUtf8 binding retains immutable text as a readonly borrowed
+window, including literals, with no encoding-array snapshot. Native get/slice/copy
+and UTF-8 decode accept this backing; writable and persistent projections remain
+forbidden. The private discriminator/GC contract and replacement boundary are in
+[runtime bridge notes](raven-cli-bridge.md#native-stringutf8bytes-lowering-2026-10-19).
+This completes a prerequisite for JSON token-buffer removal; it alone does not
+establish end-to-end JSON performance.

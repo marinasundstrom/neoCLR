@@ -1,4 +1,4 @@
-//! Bounded array-backed byte-view lowering. Source verification enforces borrowing.
+//! Bounded byte-view lowering, including immutable UTF-8 string windows. Source verification enforces borrowing.
 use neoclr::metadata::{MemoryViewKind, Representation, Type, TypeDef};
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
@@ -54,6 +54,7 @@ pub(crate) fn bind(
             continue;
         }
         let expected_kind = match name {
+            "neoCLR.Runtime.ViewUtf8" => Some(MemoryViewKind::ReadOnlySlice),
             "neoCLR.Runtime.ViewCreateSlice" => Some(MemoryViewKind::Slice),
             "neoCLR.Runtime.ViewCreateReadOnlySlice" => Some(MemoryViewKind::ReadOnlySlice),
             "neoCLR.Runtime.ViewCreateMemory" => Some(MemoryViewKind::Memory),
@@ -67,6 +68,7 @@ pub(crate) fn bind(
             | "neoCLR.Runtime.ViewBoundsFault" => None,
             _ => continue,
         };
+        let utf8 = name == "neoCLR.Runtime.ViewUtf8";
         let slicing = name == "neoCLR.Runtime.ViewSlice";
         let readonly = name == "neoCLR.Runtime.ViewAsReadOnly";
         let borrowing = name == "neoCLR.Runtime.ViewAsSlice";
@@ -111,6 +113,8 @@ pub(crate) fn bind(
             || !f.readonly_parameters.is_empty()
             || if bounds_fault {
                 !f.parameters.is_empty() || f.returns != Type::Void
+            } else if utf8 {
+                f.parameters != [Type::String]
             } else if expected_kind.is_some() {
                 !(f.parameters == [Type::ArrayRef(Box::new(Type::Byte))]
                     || expected_kind.is_some_and(|k| k.is_borrowed())
@@ -142,6 +146,8 @@ pub(crate) fn bind(
         }
         let implementation = if bounds_fault {
             "memory-view-bounds-fault-v1"
+        } else if utf8 {
+            "byte-view-utf8-v1"
         } else if expected_kind.is_some() {
             "byte-memory-create-v1"
         } else if get {
@@ -213,6 +219,31 @@ pub(crate) fn test_module(kind: MemoryViewKind, element: Type) -> neoclr::Module
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn utf8_view_requires_exact_string_readonly_slice_contract() {
+        let mut input = test_module(MemoryViewKind::ReadOnlySlice, Type::Byte);
+        let ty = Type::Named(input.types[0].name.clone());
+        input.functions = vec![serde_json::from_value(json!({
+            "name":"neoCLR.Runtime.ViewUtf8", "parameters":[Type::String],
+            "returns":ty, "impl_flags":4096, "body":[]
+        })).unwrap()];
+        input.functions[0].impl_flags = 0x1000;
+        let report = json!({"functions":[{"name":"neoCLR.Runtime.ViewUtf8", "compiledIndex":0}]});
+        assert_eq!(bind(&mut input.clone(), &report, true).unwrap()[0]["implementation"], "byte-view-utf8-v1");
+        for change in 0..5 {
+            let mut bad = input.clone();
+            match change {
+                0 => bad.functions[0].parameters = vec![Type::ArrayRef(Box::new(Type::Byte))],
+                1 => bad.types[0].memory_view = Some(MemoryViewKind::Slice),
+                2 => bad.types[0].memory_view = Some(MemoryViewKind::ReadOnlyMemory),
+                3 => bad.functions[0].impl_flags = 0,
+                _ => bad.functions[0].body = vec![neoclr::metadata::Instruction::Branch(0)],
+            }
+            assert!(bind(&mut bad, &report, true).is_err());
+        }
+    }
+
 
     #[test]
     fn persistent_byte_memory_verification_copy_keeps_initialization_checks() {

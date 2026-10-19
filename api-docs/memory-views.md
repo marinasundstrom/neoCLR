@@ -7,7 +7,8 @@ windows. Borrowed byte slices support indexing, writable updates, readonly
 conversion, borrowing from persistent views and ToArray. Persistent byte memory
 also supports object-field storage and managed suspension across pending awaits
 with owner tracing and explicit collection. Native I/O completion ownership is
-not yet qualified. Other element types and UTF-8 string views remain interpreter-only. Array
+not yet qualified. Other element types remain interpreter-only. UTF-8 string views now also support
+native JIT/AOT readonly access, nested byte windows, copying and decoding. Array
 range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
 copy. Memory<T> and ReadOnlyMemory<T> retain managed backing storage and may be
 stored in objects and carried across asynchronous operations.
@@ -96,7 +97,10 @@ owners while live. No raw-pointer ABI or native performance guarantee is implied
 `String.Utf8Bytes: ReadOnlySlice<byte>` shares the immutable UTF-8 representation.
 Its offsets count bytes and may split a scalar or grapheme. Ordinary String
 indexing and slicing continue to use grapheme coordinates. Decoding is required
-to interpret a byte window as text.
+to interpret a byte window as text. Literal and managed string storage are supported
+in interpreter/JIT/AOT; the view retains its owner across GC and allocates no
+encoding array. It cannot become writable or persistent memory. ToArray returns
+an independent mutable copy.
 
 ## Example
 

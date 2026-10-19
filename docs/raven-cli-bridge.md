@@ -13293,3 +13293,26 @@ the matching native metadata reference and [manual codec contract](../api-docs/s
 provide the full API. No ordinary fieldless-record projection is introduced. Native
 metadata/codegen already carry this particular view contract; broader generic/
 immutable-view lowering remains tracked independently.
+
+## Native String.Utf8Bytes lowering (2026-10-19)
+
+The existing String.Utf8Bytes property and ViewUtf8(String) InternalCall now have
+native JIT/AOT lowering as well as interpreter semantics. Exact binding admits only
+String -> ReadOnlySlice<Byte>; writable/persistent destinations and array inputs fail.
+No Raven compiler setting or semantic change is required; source borrowing rules remain.
+
+The private native three-lane descriptor keeps an untagged string owner root and
+length. Its offset high bit identifies immutable text storage; the remaining 31 bits
+are a byte offset. Native helpers preserve that bit when slicing, mask it for access,
+and disallow writable/persistent conversion. Managed text is validated against the
+current heap; literal pointers retain the trusted typed provenance used by existing
+native string services. This is not an arbitrary-pointer validator or stable Native
+API. Array views retain their existing representation. Decode and copy consume both
+backings, with no input array allocation for strings. UTF-8 byte slicing may split a
+scalar; text decoding still rejects invalid windows and grapheme indexing is unchanged.
+
+This encoding belongs to neoCLR's current bounded native backend, not Raven's CLI
+metadata or a permanent platform ABI. A future native view representation may replace
+the storage discriminator; a moving collector must preserve/update the owner lane.
+Validation is retained under runtime/raven/tests/string-utf8-views and native memory
+kernel/binding tests. No Raven source compiler or reference signature changes occur.

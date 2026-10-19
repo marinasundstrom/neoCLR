@@ -112,6 +112,7 @@ pub struct Options {
     pub utf8_encode: Vec<usize>,
     pub byte_view_get: Vec<usize>,
     pub byte_view_set: Vec<usize>,
+    pub byte_view_utf8: Vec<usize>,
     pub byte_memory_create: Vec<usize>,
     pub byte_memory_length: Vec<usize>,
     pub byte_memory_slice: Vec<usize>,
@@ -887,6 +888,12 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "byte-view-get-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            byte_view_utf8: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "byte-view-utf8-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             byte_memory_create: report
