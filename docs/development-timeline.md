@@ -19902,3 +19902,10 @@ Native JSON backend/runtime gaps remain open separately.
   within graphemes), and investigate shared writer-oriented formatting for String
   and StringBuilder. These are proposed follow-ups, not implemented APIs or
   performance improvements. Ongoing JSON/compiler release fixes retain priority.
+
+- **Author follow-up:** requests separate String and StringBuilder reviews, then
+  reaffirms: “We are closer to Swift in our string semantics so we should still use
+  that as our model.” **Assistant action:** makes Swift the text-semantic baseline
+  in the [String review](design/string-api-review-20261019.md), records current
+  exact equality as a difference requiring coordinated review, and keeps proposed
+  positions/search/formatting distinct from implemented behavior.

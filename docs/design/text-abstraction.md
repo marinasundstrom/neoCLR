@@ -1004,3 +1004,10 @@ selection, identifies whole-value decode and generic writer completion gaps, and
 compares .NET, WHATWG and encoding_rs contracts. Its implementation sequence is
 provisional: first migrate existing probes to attributed tests, then address
 conversion symmetry and completion. No codec or public signature changes here.
+
+## Author clarification — 2026-10-19
+
+Swift remains the model for String semantics. The [separate API review](string-api-review-20261019.md)
+compares current behavior, including exact equality, with that direction. Earlier
+choices remain recorded above; this clarification does not claim canonical
+equality, typed text positions or substring views are already implemented.
