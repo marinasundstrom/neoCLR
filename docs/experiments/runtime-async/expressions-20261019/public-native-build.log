@@ -1,0 +1,1 @@
+native build: neoclr-codegen: specialization requires closed reference-free local value types: ArrayRef(ArrayRef(Int32))

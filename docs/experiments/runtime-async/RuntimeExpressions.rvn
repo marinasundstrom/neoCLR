@@ -1,0 +1,35 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+
+class Box {
+    var Value: int = 42
+}
+
+class Other {}
+
+func Check(value: bool) {
+    if !value { System.Fail("Expression regression") }
+}
+
+async func Read(success: bool) -> Task<Result<string, string>> {
+    if !success { return Error("expected") }
+    return Ok("value")
+}
+
+async func Evaluate(success: bool) -> Task<Result<int, string>> {
+    let value = await Task.FromResult<Object>(Box())
+    Check(value is Box item && item.Value == 42)
+    let other: Object = Other()
+    Check(!(other is Box missing && missing.Value == 42))
+    Check(other is not Box absent || absent.Value == 42)
+    Check((await Read(success))? == "value")
+    return Ok(42)
+}
+
+async func Main() -> Task<int> {
+    Check((await Evaluate(true)) is Ok(42))
+    Check((await Evaluate(false)) is Error("expected"))
+    Console.WriteLine("PASS async expression propagation and pattern assignment")
+    return 0
+}

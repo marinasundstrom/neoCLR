@@ -13397,3 +13397,20 @@ Raven main; this target-specific fix is not a main merge. The
 [three-mode regression](experiments/runtime-async/match-20261019/README.md) covers
 pending waits, collection and reverse-order disposal on return and cancellation.
 Routing now uses its original match dispatch. Other expression gaps remain open.
+
+### Async expression and logical-value lowering (2026-10-19)
+
+Raven `bab04d508` keeps pattern-success branches intact through logical operands
+before materializing the Boolean result, and applies ordered-call early-exit
+lowering to overloaded operators. This restores CLR short-circuit/return semantics
+without weakening native definite-assignment checks. The existing temporary CLI
+locals, branches and calls retain full behavior for these qualified cases; no
+Runtime Contract setting, public API or native metadata format changes. Raven's
+portable planner owns lowering; neoCLR metadata/backend retain verification and
+execution ownership. A future native backend replaces the CLI bridge separately.
+
+All 79 shared linear-body tests and the reduced async regression in interpreter,
+JIT and AOT pass. See [evidence and limits](experiments/runtime-async/expressions-20261019/README.md).
+Numeric nested-operand early exits remain restricted. The larger JSON public
+fixture now emits metadata, but native specialization rejects nested array locals;
+that backend limitation remains open. No new throughput claim is made.

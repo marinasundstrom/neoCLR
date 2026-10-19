@@ -1,0 +1,56 @@
+{
+  "aot": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/runtime-expressions-v2/app"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS async expression propagation and pattern assignment\n",
+    "stderr": ""
+  },
+  "jit": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/runtime-expressions-v2/app.dll"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS async expression propagation and pattern assignment\n",
+    "stderr": ""
+  },
+  "interpreter": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/runtime-expressions-v2/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "1000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS async expression propagation and pattern assignment\n",
+    "stderr": ""
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/runtime-expressions-v2/app": "226a4fbbe455929991d22f17857be6a13d9bfc050a645428d587296cb975f4c5",
+    "/Users/robert/Projects/neoclr/target/runtime-expressions-v2/app.dll": "86cebc4ac463363272cb595c10964288c49b039763a397a7faad60e16716e6b0",
+    "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "6822fcb055f0f0c8f7607f5f5385544450057c02824520e1fd5907ceb22d6522",
+    "/Users/robert/Projects/neoclr/target/http-expression-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "fc71b1eee35c9f0f96ef967466ccb04daf79e8fa4e2966cadcfdf8225eac7df8",
+    "docs/experiments/runtime-async/RuntimeExpressions.rvn": "116c2f055f1f8493f80d630234774bbdaa8d14b81f8fc373230fe15955f2045b"
+  },
+  "passed": true
+}

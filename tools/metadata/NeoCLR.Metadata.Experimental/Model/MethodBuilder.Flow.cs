@@ -357,7 +357,7 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("initobj requires an owned local address of the exact type");
                     stack.RemoveAt(stack.Count - 1); assigned[initialized] = true; break;
                 case "local.load":
-                    if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
+                    if (!assigned[instruction.Value]) throw new InvalidDataException($"local {instruction.Value} loaded before store at instruction {index}");
                     stack.Add(LocalType(locals[instruction.Value])); break;
                 case "local.store": Pop(LocalType(locals[instruction.Value])); assigned[instruction.Value] = true; break;
                 case "shift.left":

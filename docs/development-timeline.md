@@ -19871,3 +19871,12 @@ available. ReasonPhrase preserves final HTTP/1.1 status text lazily, with explic
 bounded-header retention costs. Twenty-one independent loopback response cases
 pass across the three engines, including metadata before a withheld body.
 Compiler expression lowering remains the next follow-up.
+
+The author asks whether the lowering fix belongs on Raven main. Inspection finds
+that main uses a separate emitter and lacks LinearMethodBody. The assistant
+identifies the regression cases for independent main qualification, with a fix
+on main if a failure reproduces; no main validation or merge is claimed. Raven
+codex/neoclr bab04d508 passes the reduced three-engine regression and 79 compiler
+tests. The larger JSON fixture passes metadata emission but exposes separate
+native specialization and interpreter execution failures, retained in
+[the evidence](experiments/runtime-async/expressions-20261019/README.md).
