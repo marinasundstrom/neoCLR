@@ -16,6 +16,13 @@ ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
 HTTP_LIFETIME_NAMES = ['HTTP client use disposes its owned handler exactly once', 'HTTP borrowed handler survives one client and serves another', 'HTTP disposal requests cancellation and waits for handler acknowledgement', 'HTTP caller cancellation propagates without disposing the handler', 'HTTP completed responses survive disposal and retain request association', 'HTTP pre-cancellation skips custom handlers', 'HTTP socket handler disposal is idempotent through Disposable', 'HTTP delegating handlers run outward and unwind inward', 'HTTP borrowed delegating pipeline remains reusable', 'HTTP borrowed clients cancel only their own pending sends']
 
+MEMORY_LIFETIME_NAMES = [
+    'Pending Memory destinations survive collection and preserve surrounding bytes',
+    'Pending ReadOnlyMemory sources survive repeated suspension and collection',
+    'Cancelled and rejected Memory transfers do not write or resume twice',
+    'Default and end-position Memory windows remain empty after suspension',
+]
+
 HTTP_TEXT_NAMES = [
     'HTTP buffered text preserves scalars beyond the one-shot codec quota',
     'HTTP buffered text rejects malformed and truncated large bodies',
@@ -349,7 +356,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -393,6 +400,7 @@ def main():
         ('collection-iteration', 0, ''.join('PASS ' + n + '\n' for n in ITERATION_NAMES) + f'Tests: {len(ITERATION_NAMES)}, passed: {len(ITERATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('json-dom', 0, ''.join('PASS ' + n + '\n' for n in JSON_NAMES) + f'Tests: {len(JSON_NAMES)}, passed: {len(JSON_NAMES)}, failed: 0, skipped: 0\n'),
         ('json-streams', 0, ''.join('PASS ' + n + '\n' for n in JSON_STREAM_NAMES) + f'Tests: {len(JSON_STREAM_NAMES)}, passed: {len(JSON_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
+        ('memory-lifetimes', 0, ''.join('PASS ' + n + '\n' for n in MEMORY_LIFETIME_NAMES) + f'Tests: {len(MEMORY_LIFETIME_NAMES)}, passed: {len(MEMORY_LIFETIME_NAMES)}, failed: 0, skipped: 0\n'),
         ('memory-stream', 0, ''.join('PASS ' + n + '\n' for n in MEMORY_STREAM_NAMES) + f'Tests: {len(MEMORY_STREAM_NAMES)}, passed: {len(MEMORY_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
         ('string-construction', 0, ''.join('PASS ' + n + '\n' for n in STRING_CONSTRUCTION_NAMES) + f'Tests: {len(STRING_CONSTRUCTION_NAMES)}, passed: {len(STRING_CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding-buffer-limits', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_BUFFER_NAMES) + f'Tests: {len(ENCODING_BUFFER_NAMES)}, passed: {len(ENCODING_BUFFER_NAMES)}, failed: 0, skipped: 0\n'),
@@ -438,13 +446,13 @@ def main():
         for name, exit_code, stdout in selected:
             build = out / (name + '-build')
             environment = dict(os.environ)
-            if name != 'runner-contract':
+            if name not in ('runner-contract', 'memory-lifetimes'):
                 started = time.perf_counter()
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need Task/cancellation lifecycle bindings (including TimerCancel).
-            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'gzip', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
+            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if 'native' in modes:
@@ -480,7 +488,7 @@ def main():
                     raise RuntimeError('Raven did not report a valid project assembly')
                 shutil.copy2(paths[-1], build / 'app.dll')
                 report['phases'][-1].update(command=list(map(str,command)), assemblySha256=sha(build / 'app.dll'))
-            if name != 'runner-contract':
+            if name not in ('runner-contract', 'memory-lifetimes'):
                 started = time.perf_counter()
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='registration-verification', elapsedSeconds=round(time.perf_counter() - started, 6)))

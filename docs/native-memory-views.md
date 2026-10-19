@@ -489,3 +489,28 @@ only the written initialization prefix after provider completion. Empty windows
 return null pointers and zero count; failed validation leaves output unchanged.
 Cryptography uses this to avoid whole-array copies at the native provider boundary.
 This helper is not the future public Native API or a stable host ABI.
+
+### Persistent byte memory across managed suspension (2026-10-19)
+
+The native async entry closure now accepts immutable Memory/ReadOnlyMemory
+parameters through an explicit Raven target capability. Its descriptor is copied;
+the existing native layout traces the shared backing owner. Captured receiver
+access uses a defensive local descriptor without exposing a closure-field address.
+Borrowed Slice/ReadOnlySlice captures remain rejected.
+
+The [pending-transfer fixture](../runtime/raven/tests/memory-lifetimes/README.md)
+qualifies four cases in interpreter, JIT and AOT on macOS ARM64: sole-owner buffers
+after creator return, two pending awaits and explicit collections, readonly reads,
+writable subwindows and sentinels, cancellation/recoverable rejection, and empty
+windows. The tests use async Main and explicit progress promises; a synchronous
+TaskQueue.Drain is not a native scheduler completion barrier.
+[Evidence](validation/memory-views-20261019/async-lifetime-validation.json) includes
+15 compiler regressions and two native borrowed-capture rejections. Five libraries
+were rebuilt with the matching compiler; production public signatures are unchanged.
+
+This follows .NET's persistent Memory/borrowed Span lifetime distinction with
+neoCLR's implicit typed borrowing. It qualifies managed suspension only. Native
+I/O retention/pinning, completion-root release, terminal runtime fault cleanup,
+Task<Memory> results, non-byte native views and Windows remain unqualified here.
+InputStream/OutputStream and socket contracts still require migration and separate
+completion ownership tests. No public Native API or stable host ABI is added.

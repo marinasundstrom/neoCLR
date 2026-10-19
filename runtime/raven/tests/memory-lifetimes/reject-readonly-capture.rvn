@@ -1,0 +1,7 @@
+import System.*
+
+func Capture(source: ReadOnlySlice<byte>) -> () -> int {
+    return () => source.Length
+}
+
+func Main() -> int => 0

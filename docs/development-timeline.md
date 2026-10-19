@@ -60,6 +60,17 @@ borrow contract is still open. Runtime
 metadata and service tests are being implemented first; production APIs remain
 Raven-owned, with native backend integration still open.
 
+**Assistant follow-through, 2026-10-19:** the continuing library integration
+reaches the async ownership prerequisite. Pending-transfer tests expose Raven's
+native capture-admission and captured-value receiver gaps; the assistant fixes
+these behind an explicit native capability and keeps borrowed captures rejected.
+Four managed Memory lifetime cases pass interpreter/JIT/AOT with explicit GC.
+The test harness is corrected to await progress instead of treating a managed
+callback-queue drain as native completion. Production stream/socket migration and
+native I/O completion-root release remain open; this is not a claim that the
+requested class-library integration is complete. See the
+[lifetime evidence](validation/memory-views-20261019/async-lifetime-validation.json).
+
 ## 2026-10-18 — Native slices and persistent memory views
 
 - **Author:** directs implementation of the supplied “Native Slices and Memory

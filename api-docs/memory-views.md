@@ -5,8 +5,9 @@ checked zero-copy storage. Native JIT/AOT supports array-backed byte views of al
 four kinds: conversion from arrays, default values, length and integer/Range
 windows. Borrowed byte slices support indexing, writable updates, readonly
 conversion, borrowing from persistent views and ToArray. Persistent byte memory
-also supports object-field storage. Other element types and UTF-8 string views
-remain interpreter-only; asynchronous native retention is not yet qualified. Array
+also supports object-field storage and managed suspension across pending awaits
+with owner tracing and explicit collection. Native I/O completion ownership is
+not yet qualified. Other element types and UTF-8 string views remain interpreter-only. Array
 range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
 copy. Memory<T> and ReadOnlyMemory<T> retain managed backing storage and may be
 stored in objects and carried across asynchronous operations.

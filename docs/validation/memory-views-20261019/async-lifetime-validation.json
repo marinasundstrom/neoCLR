@@ -1,0 +1,255 @@
+{
+  "passed": true,
+  "date": "2026-10-19",
+  "scope": "Managed byte-memory suspension; production async I/O APIs and completion ownership unchanged",
+  "sourceBaseline": "8c8da6a16601ee375f73cbf1486ae67bdcf50df1",
+  "compilerBranch": "codex/neoclr",
+  "compilerRevision": "dcf7ac41f2e0a00b2fbfc1c766700bf3b323a89e",
+  "libraryBuildRevisionLabel": "c173a723c2c1434d8cf9c41c9ac334c81293bde9+memory-capture-working-tree",
+  "provenance": "Compiler and libraries were built before the compiler commit; the committed implementation is the validated working tree. Final whitespace formatting and documentation do not change behavior.",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "ravenSuite": {
+    "passed": true,
+    "modes": [
+      "native",
+      "jit",
+      "interpreter"
+    ],
+    "jitHostSha256": "8504fae99e6308dc05f8058b1b11953f20708a0be8cdb7fb30798479991a4efa",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "cases": [
+      {
+        "suite": "memory-lifetimes",
+        "mode": "native",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 0.177,
+        "stdout": "PASS Pending Memory destinations survive collection and preserve surrounding bytes\nPASS Pending ReadOnlyMemory sources survive repeated suspension and collection\nPASS Cancelled and rejected Memory transfers do not write or resume twice\nPASS Default and end-position Memory windows remain empty after suspension\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "memory-lifetimes",
+        "mode": "jit",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 25.335,
+        "stdout": "PASS Pending Memory destinations survive collection and preserve surrounding bytes\nPASS Pending ReadOnlyMemory sources survive repeated suspension and collection\nPASS Cancelled and rejected Memory transfers do not write or resume twice\nPASS Default and end-position Memory windows remain empty after suspension\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "memory-lifetimes",
+        "mode": "interpreter",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 3.735,
+        "stdout": "PASS Pending Memory destinations survive collection and preserve surrounding bytes\nPASS Pending ReadOnlyMemory sources survive repeated suspension and collection\nPASS Cancelled and rejected Memory transfers do not write or resume twice\nPASS Default and end-position Memory windows remain empty after suspension\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+        "stderr": ""
+      }
+    ],
+    "phases": [
+      {
+        "suite": "memory-lifetimes",
+        "phase": "native-project-build",
+        "elapsedSeconds": 31.286683,
+        "commands": [
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007823
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007145
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.011219
+          },
+          {
+            "phase": "source-compilation",
+            "elapsedSeconds": 4.744719
+          },
+          {
+            "phase": "native-compilation",
+            "elapsedSeconds": 25.181211
+          },
+          {
+            "phase": "host-compile-link",
+            "elapsedSeconds": 0.857429
+          },
+          {
+            "phase": "dependency-check",
+            "elapsedSeconds": 0.015691
+          }
+        ]
+      }
+    ],
+    "executionRepetitions": 1,
+    "bundleManifestSha256": "da7ab9a529de1432990b4b73a07a36416c3d30fe3c49721da01d4a5468d55e12",
+    "aotSha256": "c18cbea44fb232e3c7b481caa7c1c18c7cef3c40b2cafebeeb6ffee13995fbbd",
+    "interpreterSha256": "5aef544f1794d46dd3950f3a3feb99cfde78774af64b08cd77ea05c01fa63d9e",
+    "suites": [
+      "memory-lifetimes"
+    ],
+    "totalElapsedSeconds": 60.711462
+  },
+  "fixtureInputs": {
+    "scripts/test-runtime-library.py": "58340147404fd2f179f005c5c1b8f58affd25f40d5f32797179686604c62225d",
+    "runtime/raven/tests/memory-lifetimes/Main.rvn": "1115f91214cf3652f41ae47a6b748c61bb0a27ae345e9c12527f7ba35b7ad7a0",
+    "runtime/raven/tests/memory-lifetimes/Tests.rvn": "44aa5d2507a69794c92dbbaadde6f195715f5d239f8866a7592dc8c26674ba67",
+    "runtime/raven/tests/memory-lifetimes/reject-readonly-capture.rvn": "8e4e4edaac9563fa4384bc0291615ae1e1a68f8ec97c17d3e1ff3468eed4686c",
+    "runtime/raven/tests/memory-lifetimes/reject-slice-capture.rvn": "7f579c9142004207cc58152fb481c43ea30f5524a1bd32b3fe20251a6e79de58",
+    "runtime/raven/tests/memory-lifetimes/RejectBorrowedCapture.rvnproj": "6b17be8baf94ff82a7f976cc62262f3fba8226be5d090e6d5d763a47eff6576f",
+    "runtime/raven/tests/memory-lifetimes/Tests.rvnproj": "7c1e411f2321df86ed214e90fbe180bc2415d6adce38be9120f8d2f402807b88"
+  },
+  "compilerSha256": {
+    "rvnc.dll": "0d67be00288667b7026390d628653cfe4866b75a4ab521017c0982ef5c7ebda9",
+    "Raven.CodeAnalysis.NeoClr.dll": "8e555bb5d1a34c1280aa3862e7863c26138a55b3bb2b507785cd921551f02615",
+    "Raven.CodeAnalysis.dll": "d462ffd84169ff090f409e8307d5b6c37fc0156a9d78d98f505bb858cf4edff3"
+  },
+  "negativeCaptures": [
+    {
+      "source": "reject-slice-capture.rvn",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-bundle/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/memory-lifetimes/RejectBorrowedCapture.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/runtime/raven/tests/memory-lifetimes/reject-slice-capture.rvn(3,14): error RAV2205: Ref-like variable 'source' of type 'Slice<byte>' cannot be captured by a function\n"
+    },
+    {
+      "source": "reject-readonly-capture.rvn",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-bundle/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/memory-lifetimes/RejectBorrowedCapture.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/runtime/raven/tests/memory-lifetimes/reject-readonly-capture.rvn(3,14): error RAV2205: Ref-like variable 'source' of type 'ReadOnlySlice<byte>' cannot be captured by a function\n"
+    }
+  ],
+  "compilerTests": {
+    "baselinePassed": 10,
+    "finalPassed": 15,
+    "command": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj --no-restore -p:BuildProjectReferences=false --filter 'FullyQualifiedName~SharedLinearBodyTests&FullyQualifiedName~Capture' -p:WarningLevel=0 -m:1",
+    "output": "/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj]\n  Raven.CodeAnalysis.Tests -> /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll\n  Tool 'dotnet-ilverify' (version '9.0.9') was restored. Available commands: ilverify\n  Tool 'ilspycmd' (version '9.1.0.7988') was restored. Available commands: ilspycmd\n  \n  Restore was successful.\nTest run for /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)\nA total of 1 test files matched the specified pattern.\n\nPassed!  - Failed:     0, Passed:    15, Skipped:     0, Total:    15, Duration: 3 s - Raven.CodeAnalysis.Tests.dll (net11.0)\n"
+  },
+  "apiSnapshotCheck": "Checked RavenDoc reference assembly and source fingerprints\n",
+  "priorAttempts": [
+    "Initial native emission rejected persistent async entry capture. Fixed target admission.",
+    "Next emission rejected captured value parameter receiver address. Fixed with defensive local receiver.",
+    "Initial synchronous harness compiled but AOT failed: Expected a completed memory lifetime fixture. TaskQueue.Drain does not await native scheduler completion. Replaced with async Main, awaited progress promises and awaited completion.",
+    "An intermediate compiler-test failure was a C# conditional-expression implicit Memory-to-ReadOnlyMemory conversion; explicitly boxed the intended parameter.",
+    "The initial broad dependency test build hit an unrelated RavenDoc MSB4018; focused no-build baseline and sequential core rebuild followed by BuildProjectReferences=false passed."
+  ],
+  "limitations": [
+    "macOS ARM64 only",
+    "Byte array-backed views only",
+    "No native I/O completion retention/pinning or root-release qualification",
+    "No terminal runtime fault cleanup qualification",
+    "No Task<Memory> result qualification",
+    "No new public API or stable Native API ABI",
+    "No performance claim or website build"
+  ],
+  "libraryBuild": {
+    "compilerRevision": "c173a723c2c1434d8cf9c41c9ac334c81293bde9+memory-capture-working-tree",
+    "sourceRevision": "8c8da6a16601ee375f73cbf1486ae67bdcf50df1",
+    "output": "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries",
+    "commands": [
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/release/neoclr",
+          "assemble",
+          "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.runtime.neoil",
+          "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.runtime.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "artifactHashes": {
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Runtime.dll": "539cbdc30726d151ef415f5b9a146b54d340c626a3f6d4972916200178746a4d",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Data.dll": "ee756651af57174280eac84522ac25c9deb932d41dabdaf9b80a727a4c32f371",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Networking.dll": "5cd27a46b108e781cb12f3caabdc76586acbcfa68095bb7bcc50abb4eeed1858",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Web.dll": "60aecdca136188df948f845d53dfb01116482986e7c478c6ead1f536ce5f5801",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Data.PostgreSql.dll": "38d9c8bb5195838cf57ea4bd35e3a10a2ca22e33c3ef9288188ccd0cdf52c65f",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/ownership.json": "327afe52fb83486943af79d21b01a92e1a138ad448e68626e0dcd715e293e6c6",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/NeoCLR.ClassLibrary.props": "62bfd4d69dccb03fe380399d781a0fec5e1ce9508b33954035b66fb38ec5e14a",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/RuntimeAwait.rvn": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/RuntimeGenerator.rvn": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Runtime.xml": "1cc6861fd1a67807a4e07422dc4a3b99128ea4fbec81a436d7bbcb8ce5204e3e",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Data.xml": "bf1ba0f7aa624401d39db6b1690919f2435d2bd22322703959cb2d1d31e980e4",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Networking.xml": "7be6be5e4d96f6d28a6ae1a8024eeba76ae8610ebb6edb1065e526577c928b01",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Web.xml": "94909a6bf6656da1ad1f64dbdbb730836bbb928d3bd776b5b2165c274eccabf1",
+      "/Users/robert/Projects/neoclr/target/memory-lifetimes-final-libraries/System.Data.PostgreSql.xml": "1c7d9c5709daedfae2428e13554c17e034f3410b45902c1110143a9ed8265bb6"
+    },
+    "fullEvidenceSha256": "ffa3ad2e0b5f5eac29c45a461269487ac1794c37634ed57c72750f01fe5b11ce"
+  },
+  "commands": [
+    "python3 scripts/build-native-class-library.py --compiler /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll --runtime target/release/neoclr --output target/memory-lifetimes-final-libraries --compiler-revision c173a723c2c1434d8cf9c41c9ac334c81293bde9+memory-capture-working-tree --with-postgresql",
+    "python3 scripts/prepare-jit-bundle.py --bundle target/release-final-inline-bundle-20261014/bundle --runtime target/release/neoclr --jit-compiler target/debug/neoclr-codegen --host-recipe docs/experiments/runtime-async/native-validation.json --libraries target/memory-lifetimes-final-libraries --compiler-directory /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0 --output target/memory-lifetimes-final-bundle",
+    "python3 scripts/test-runtime-library.py --bundle target/memory-lifetimes-final-bundle/bundle --output target/memory-lifetimes-await-tests --suite memory-lifetimes --mode native --mode jit --mode interpreter"
+  ]
+}

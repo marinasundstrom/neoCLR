@@ -36,8 +36,9 @@ without copying and preserve checked bounds and readonly access. The development
 array conversions, persistent Memory/ReadOnlyMemory and an immutable UTF-8 byte
 view. Native execution covers array-backed byte views, including borrowed indexing,
 writable updates, readonly conversion, length and integer/Range windows. Other
-element types, UTF-8 views, native async retention and shared buffer-service
-migration remain pending. Development array range
+element types and UTF-8 views remain interpreter-only. Persistent byte memory
+now survives managed suspension and collection; native I/O completion ownership
+and asynchronous stream/socket API migration remain pending. Development array range
 syntax returns Slice<T>; ToArray requests a copy. String slicing retains its grapheme semantics.
 
 [Design and implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md)

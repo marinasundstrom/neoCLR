@@ -156,3 +156,13 @@ is the next integration step; this change does not qualify HTTP transfer lifetim
 three public Raven tests in all modes, twelve private-service cases in all modes,
 seven interpreter tests, exact native binding checks, sanitized window/provider
 failure checks, installed default-JIT execution and matching API snapshots.
+
+### Managed async lifetime prerequisite (2026-10-19)
+
+The [managed suspension qualification](native-memory-views.md#persistent-byte-memory-across-managed-suspension-2026-10-19)
+now passes four Memory/ReadOnlyMemory cases in interpreter/JIT/AOT (12 executions)
+and preserves both borrowed-capture diagnostics. Raven admits persistent captures
+and local-copy instance receivers for native async entry; explicit progress promises
+separate the two suspension phases. This closes the managed owner-retention gate
+for byte windows, not native I/O retention or completion-root release. Step 3 above
+remains the next API migration; no production stream/socket signature changes here.

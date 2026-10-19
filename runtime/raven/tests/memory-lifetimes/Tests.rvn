@@ -1,0 +1,184 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Runtime.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.Tasks.TaskOutcome.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Test-only pending transfer contract. The production stream migration must
+// qualify native I/O completion ownership separately from managed suspension.
+interface PendingTransfer {
+    func Read(destination: Memory<byte>) -> Task<int>
+    func Write(source: ReadOnlyMemory<byte>) -> Task<int>
+}
+
+func First(source: ReadOnlySlice<byte>) -> int => source[0]
+
+func Put(destination: Slice<byte>, value: byte) {
+    destination[0] = value
+}
+
+class CancellationObserver {
+    private val operation: Task<int>
+    val Done = Promise<bool>()
+    init(operation: Task<int>) { self.operation = operation }
+    func Complete() -> System.Void { _ = Done.Complete(operation.IsCancelled) }
+}
+
+class GatedTransfer : PendingTransfer {
+    val Progress = Promise<bool>()
+    private val first: Task<bool>
+    private val second: Task<bool>
+
+    init(first: Task<bool>, second: Task<bool>) {
+        self.first = first
+        self.second = second
+    }
+
+    async func Read(destination: Memory<byte>) -> Task<int> {
+        if !await first {
+            return -1
+        }
+        GC.Collect()
+        if destination.IsEmpty {
+            return 0
+        }
+        Put(destination, (byte)42)
+        _ = Progress.Complete(true)
+        if !await second {
+            return -2
+        }
+        GC.Collect()
+        Put(destination[1..], (byte)43)
+        return 2
+    }
+
+    async func Write(source: ReadOnlyMemory<byte>) -> Task<int> {
+        if !await first {
+            return -1
+        }
+        GC.Collect()
+        if source.IsEmpty {
+            return 0
+        }
+        let head = First(source)
+        _ = Progress.Complete(true)
+        if !await second {
+            return -2
+        }
+        GC.Collect()
+        return head + First(source[1..])
+    }
+}
+
+async func ReadAndCheck(transfer: PendingTransfer, whole: Memory<byte>) -> Task<int> {
+    let count = await transfer.Read(whole[1..3])
+    GC.Collect()
+    if count != 2 || First(whole) != 165 || First(whole[3..]) != 166 {
+        return -1
+    }
+    if First(whole[1..]) != 42 || First(whole[2..]) != 43 {
+        return -2
+    }
+    return count
+}
+
+func StartRead(transfer: PendingTransfer) -> Task<int> {
+    let bytes: byte[] = [(byte)165, (byte)0, (byte)0, (byte)166]
+    return ReadAndCheck(transfer, bytes)
+}
+
+func StartWrite(transfer: PendingTransfer) -> Task<int> {
+    let bytes: byte[] = [(byte)165, (byte)10, (byte)20, (byte)166]
+    let memory: ReadOnlyMemory<byte> = bytes
+    return transfer.Write(memory[1..3])
+}
+
+[Test("Pending Memory destinations survive collection and preserve surrounding bytes")]
+async func ARead() -> Task<Result<unit, TestFailure>> {
+    let first = Promise<bool>()
+    let second = Promise<bool>()
+    let transfer = GatedTransfer(first.Task, second.Task)
+    // StartRead has returned: the pending async frames are the only buffer owners.
+    let operation = StartRead(transfer)
+    GC.Collect()
+    _ = Assert.True(!operation.IsCompleted, "Destination is pending")?
+    _ = first.Complete(true)
+    GC.Collect()
+    _ = await transfer.Progress.Task
+    _ = Assert.True(!operation.IsCompleted, "Second suspension retains destination")?
+    GC.Collect()
+    _ = second.Complete(true)
+    GC.Collect()
+    return Assert.Equal(2, await operation)
+}
+
+[Test("Pending ReadOnlyMemory sources survive repeated suspension and collection")]
+async func BWrite() -> Task<Result<unit, TestFailure>> {
+    let first = Promise<bool>()
+    let second = Promise<bool>()
+    let transfer = GatedTransfer(first.Task, second.Task)
+    let operation = StartWrite(transfer)
+    GC.Collect()
+    _ = Assert.True(!operation.IsCompleted, "Source is pending")?
+    _ = first.Complete(true)
+    _ = await transfer.Progress.Task
+    _ = Assert.True(!operation.IsCompleted, "Second suspension retains source")?
+    GC.Collect()
+    _ = second.Complete(true)
+    GC.Collect()
+    return Assert.Equal(30, await operation)
+}
+
+[Test("Cancelled and rejected Memory transfers do not write or resume twice")]
+async func CCancel() -> Task<Result<unit, TestFailure>> {
+    let data: byte[] = [(byte)165, (byte)9, (byte)10, (byte)166]
+    let memory: Memory<byte> = data
+    let cancelled = Promise<bool>()
+    let second = Promise<bool>()
+    let transfer = GatedTransfer(cancelled.Task, second.Task)
+    let operation = transfer.Read(memory[1..3])
+    GC.Collect()
+    // Observe cancellation without cancelling this test task.
+    let observer = CancellationObserver(operation)
+    operation.OnCompleted(observer.Complete)
+    _ = cancelled.Cancel()
+    GC.Collect()
+    _ = await observer.Done.Task
+    _ = Assert.True(operation.IsCancelled, "Cancellation propagates through await")?
+    _ = Assert.True(!cancelled.Complete(true), "Cancelled gate cannot complete")?
+    _ = second.Complete(true)
+    TaskQueue.Default.Drain()
+    _ = Assert.Equal(9, First(memory[1..]))?
+    _ = Assert.Equal(10, First(memory[2..]))?
+    let rejected = Promise<bool>()
+    let failing: PendingTransfer = GatedTransfer(rejected.Task, second.Task)
+    let failed = failing.Read(memory[1..3])
+    GC.Collect()
+    _ = rejected.Complete(false)
+    _ = Assert.Equal(-1, await failed)?
+    return Assert.Equal(9, First(memory[1..]))
+}
+
+func StartEmpty(transfer: PendingTransfer) -> Task<int> {
+    let memory: ReadOnlyMemory<byte> = [(byte)99]
+    return transfer.Write(memory[1..])
+}
+
+[Test("Default and end-position Memory windows remain empty after suspension")]
+async func DEmpty() -> Task<Result<unit, TestFailure>> {
+    let first = Promise<bool>()
+    let second = Promise<bool>()
+    let transfer = GatedTransfer(first.Task, second.Task)
+    let read = transfer.Read(default(Memory<byte>))
+    let write = StartEmpty(transfer)
+    GC.Collect()
+    _ = Assert.True(!read.IsCompleted && !write.IsCompleted, "Empty windows can be retained")?
+    _ = first.Complete(true)
+    GC.Collect()
+    _ = Assert.Equal(0, await read)?
+    return Assert.Equal(0, await write)
+}
