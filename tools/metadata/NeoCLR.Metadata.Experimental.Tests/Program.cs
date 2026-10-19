@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--text-overrides"])
+{
+    TextOverrideReferenceChecks.Run();
+    return 0;
+}
+
 if (args is ["--memory-views"]) { MemoryViewChecks.Run(); return 0; }
 
 if (args is ["--core-base-types"]) { CoreBaseTypeChecks.Run(); return 0; }
@@ -666,6 +672,7 @@ var tests = new (string Name, Action Body)[]
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
     ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),
+    ("Text override references", TextOverrideReferenceChecks.Run),
     ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),

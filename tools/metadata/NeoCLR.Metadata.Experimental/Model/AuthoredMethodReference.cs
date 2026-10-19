@@ -71,7 +71,8 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("method requires an owned nominal definition", nameof(declaringType));
         if (nativePrimitive is { } primitive && (!TypeDefinition.IsSupportedNativePrimitive(primitive) ||
             declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
-            declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
+            declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String ||
+            isOverride && (primitive != PrimitiveType.String || isStatic || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
         if ((isVirtual || isAbstract) && (isStatic || declaringType.IsValueType || IsAuthoredInterface(declaringType) ||
             declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" ||
@@ -79,8 +80,9 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("class slot requires an ordinary nongeneric instance method");
         if (isOverride && !isVirtual && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))
             throw new ArgumentException("override reference requires an exact instance Object slot signature");
-        if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || isOverride || nativePrimitive is not null))
-            throw new ArgumentException("grapheme members require ordinary methods without primitive reinterpretation");
+        if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || nativePrimitive is not null ||
+            isOverride && (isStatic || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))))
+            throw new ArgumentException("grapheme members require ordinary methods or exact Object overrides without primitive reinterpretation");
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
         if (isInterface && (constructor || signature.GenericParameterNames.Count != 0))
