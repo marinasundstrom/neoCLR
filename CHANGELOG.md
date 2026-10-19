@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Use ReadOnlySlice<byte> for immediate HTTP request parsing and Memory<byte> for pending HTTP body-read destinations, borrowing writable slices only while draining received data. Clear retained destinations on success, failure and cancellation. Preserve framing, read-ahead ownership and public stream contracts; add interpreter/JIT/AOT coverage for server and client body windows, GC, cancellation and EOF.
+
 - Replace public Socket receive/send array-range signatures with Memory<byte>/ReadOnlyMemory<byte>, including cancellation and deadline forms. Root receive owners until completion and snapshot only selected initialized send bytes in interpreter/JIT/AOT; support default and end-position empty windows. Migrate HTTP's socket adapter, PostgreSQL transport and current samples. Window construction now validates bounds before invocation; retain old internal array bindings solely for historical bootstrap/tests. Refresh the six native API signatures and record the legacy CLI reference exclusion. Shared stream/HTTP body signatures remain a separate migration.
 
 - Integrate ReadOnlyMemory<byte> into the production Raven console output service. Snapshot selected initialized bytes before detached interpreter calls and resolve checked readonly windows for synchronous JIT/AOT providers. Preserve public stream range/cancellation/error behavior while coordinated signature migration remains pending; keep the legacy internal array binding only for bootstrap/tests. Add exact native capability checks and a binary stdout/stderr consumer. No public API, asynchronous OS-I/O guarantee or Native API ABI is added.

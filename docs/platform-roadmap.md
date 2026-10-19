@@ -30,8 +30,9 @@ random fill use borrowed readonly/writable byte windows through interpreter and
 native providers. See the [library audit](memory-view-library-audit.md#cryptography-integration-2026-10-19).
 Managed Memory/ReadOnlyMemory byte windows now survive repeated native suspension
 and collection in the [lifetime qualification](memory-view-library-audit.md#managed-async-lifetime-prerequisite-2026-10-19).
-Memory-based async stream/socket transfers remain the next integration boundary;
-native I/O completion ownership is still unqualified. Gzip internal encoding/CRC
+Socket completion ownership is now qualified for array-backed byte memory.
+[HTTP parser/body windows](memory-view-library-audit.md#http-parser-and-body-windows-2026-10-19)
+use borrowed input and retained output; public shared stream contracts remain the next integration boundary. Gzip internal encoding/CRC
 now borrows readonly slices and retains readonly Memory across writes and in decoder
 state; its shared public stream contracts remain unchanged. Production interpreter
 file-service adapters now retain persistent read windows and snapshot selected

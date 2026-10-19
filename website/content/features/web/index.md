@@ -207,3 +207,13 @@ remains unsupported. See the
 - [SQL databases](/features/sql/) — query and map application data.
 - [TCP networking](/features/networking/) — lower-level socket operations.
 - [HTTP benchmarks](/benchmarks/http/) — workload matrix and measurement status.
+
+
+## Memory-view integration in development
+
+HTTP request parsing now borrows readonly byte slices, and pending body reads retain
+managed memory windows. Fixed-length and chunked server bodies and streaming client
+responses are checked in interpreter, JIT and AOT modes, including collection,
+cancellation and destination boundaries. Public stream signatures still use array
+ranges until the coordinated stream API migration. Socket transfers already use
+Memory/ReadOnlyMemory; no AsSlice adapter is required.

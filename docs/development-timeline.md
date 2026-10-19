@@ -19645,3 +19645,10 @@ open; no native performance improvement is claimed.
   records interpreter/JIT/AOT ownership tests and the matching API reference.
   The next HTTP step concerns synchronous parser borrowing and retained body windows;
   shared public stream signatures remain explicitly unfinished.
+
+- **Further HTTP outcome:** request parsing now borrows readonly slices and body
+  input retains writable memory windows, clearing them on completion/cancellation.
+  The [HTTP consumer evidence](validation/memory-views-20261019/http-integration-validation.json)
+  covers public server and streaming client paths. This implements the proposed
+  internal step; public stream/body signatures remain open, with no additional
+  compatibility overloads or AsSlice layer introduced.

@@ -2457,3 +2457,13 @@ bootstrap-only declarations remain for historical compiler/neoIL fixtures. The
 [native Socket reference and manual contracts](sockets.md#development-memory-window-migration-2026-10-19)
 cover parameters, results, errors, retention and migration. No renderer omission
 is accepted in the native snapshot.
+
+
+### HTTP internal memory windows (2026-10-19 development)
+
+HttpRequestDecoder now borrows ReadOnlySlice<byte> and HttpBodyInput retains
+Memory<byte> destinations across receives. Both types are internal; public HTTP and
+stream signatures are unchanged. Regeneration preserves the reference assembly and
+refreshes the two source fingerprints. Existing native public pages remain applicable.
+See the [HTTP integration audit](../docs/memory-view-library-audit.md#http-parser-and-body-windows-2026-10-19)
+for ownership, validation and the remaining public stream migration.

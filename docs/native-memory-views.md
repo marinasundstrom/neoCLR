@@ -543,3 +543,12 @@ snapshot. The managed descriptor is not exposed as a raw pointer across suspensi
 Default empty values, owner-only receive retention, GC, cancellation and EOF are
 qualified. General Native API access, other element kinds and shared stream/HTTP
 body signatures remain separate work.
+
+
+### HTTP parser/body integration (2026-10-19)
+
+The request decoder borrows ReadOnlySlice<byte> for each received prefix; streaming
+body input retains Memory<byte> across receives and borrows Slice<byte> only in its
+synchronous drain. Read-ahead transport arrays remain owned. See the
+[library audit and validation](memory-view-library-audit.md#http-parser-and-body-windows-2026-10-19).
+Public shared stream signatures and HTTP upload contracts remain pending.

@@ -1,0 +1,123 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-memory-consumer-v4/build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "504153532048545450206d656d6f72792077696e646f77732c206672616d696e672c2047432c2063616e63656c6c6174696f6e20616e6420454f460a",
+      "stderrHex": ""
+    },
+    {
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-memory-consumer-v4/build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/bin/neoclr-codegen"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "504153532048545450206d656d6f72792077696e646f77732c206672616d696e672c2047432c2063616e63656c6c6174696f6e20616e6420454f460a",
+      "stderrHex": ""
+    },
+    {
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-memory-consumer-v4/build/app"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "504153532048545450206d656d6f72792077696e646f77732c206672616d696e672c2047432c2063616e63656c6c6174696f6e20616e6420454f460a",
+      "stderrHex": ""
+    }
+  ],
+  "buildCommand": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+    "--profile",
+    "http",
+    "--project",
+    "/Users/robert/Projects/neoclr/runtime/raven/tests/http-memory/Tests.rvnproj",
+    "--bundle",
+    "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle",
+    "--aot",
+    "/Users/robert/Projects/neoclr/target/http-memory-bundle/bundle/bin/neoclr-codegen",
+    "--output",
+    "/Users/robert/Projects/neoclr/target/http-memory-consumer-v4/build"
+  ],
+  "runtimeSha256": "dd07af03227630aca7f85e683a2adcb519dab24048d6bf2d26c46d6d4b9d6835",
+  "consumerSha256": "21f0c54dea4d839c976520aa70597c3e0b75d6355a2afc1a0ee9eaf6d26ccddc",
+  "compilerSha256": "0d67be00288667b7026390d628653cfe4866b75a4ab521017c0982ef5c7ebda9",
+  "date": "2026-10-19",
+  "platform": "macOS ARM64",
+  "ravenRevision": "dcf7ac41f",
+  "scope": "Internal HTTP readonly parser slices and persistent body-read windows through public server/client consumers",
+  "libraries": {
+    "System.Web": "abb09773aa71b6343e9a659640836f3ebf9e26bfa702240ab60e461976cdfd64",
+    "System.Networking": "7175f410dc3b48adbb448aa5538197a8ad85a4b7a40d079c397708ea8a9bb7f6",
+    "System.Runtime": "4423e9a1d7c21b997eedf92e73788dd0fc506975e30224a1482dd1042691cacf",
+    "System.Data": "384a208743f50c384597b5a50a16ee7a9d9459190a092371d549abd1415948fb",
+    "System.Data.PostgreSql": "12975d549d26787b943007fe30075fc798d4c21893ba63de5cf31ccfe0055520"
+  },
+  "sourceHashes": {
+    "runtime/raven/src/System/Web/Http/HttpBodyInput.rvn": "fc2cec1c962075d853c48bcd2ef6cddac7eb23f84b1a30a3a4d0db807f13171a",
+    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "a92bd5ae2fe1df28ba10162061a6dac22f9e0530a989ea47272c78e299e044b1",
+    "runtime/raven/tests/http-memory/Main.rvn": "a6ef4e92b9ce5dff1366882f9db6d63a17bf29fbab3e0d722a1339a38dbc6e6c"
+  },
+  "checks": [
+    "Five production native libraries rebuilt",
+    "API source fingerprints refreshed and checked; public reference assembly unchanged",
+    "Four native API snapshot tests passed",
+    "git diff --check"
+  ],
+  "limitations": [
+    "Public stream signatures and HTTP upload migration remain pending",
+    "Array-backed byte views only; no public Native API ABI",
+    "No performance claim or Windows execution"
+  ],
+  "priorAttempts": [
+    "Test setup corrected: Sequence has no ToArray; native comprehensions require constant ranges; captured value-parameter ToString requires a synchronous helper. No compiler changes made.",
+    "Interpreter default instruction budget exhausted; reran same consumer with explicit 100000000 instruction budget, matching HTTPS validation. Reused successful JIT/AOT results from the same binaries."
+  ]
+}

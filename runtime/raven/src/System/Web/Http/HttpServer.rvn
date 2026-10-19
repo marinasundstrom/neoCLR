@@ -46,11 +46,11 @@ internal class HttpRequestDecoder {
     }
     internal val Complete: bool => complete && !failed
 
-    internal func Push(buffer: byte[], count: int) -> Result<bool, HttpError> {
+    internal func Push(buffer: ReadOnlySlice<byte>) -> Result<bool, HttpError> {
         if failed {
             return Error(HttpError.Protocol("Decoder already failed"))
         }
-        let result = PushCore(buffer, count)
+        let result = PushCore(buffer)
         if let Error(_) = result {
             failed = true
         }
@@ -59,12 +59,12 @@ internal class HttpRequestDecoder {
 
     // One result per received block; input is borrowed only for this call.
     // Header/body storage owns copied bytes before the receive buffer is reused.
-    private func PushCore(buffer: byte[], count: int) -> Result<bool, HttpError> {
+    private func PushCore(buffer: ReadOnlySlice<byte>) -> Result<bool, HttpError> {
         if complete {
             return Error(HttpError.Protocol("Request already complete"))
         }
         var index = 0
-        while index < count && !complete && !(headersOnly && headersComplete) {
+        while index < buffer.Length && !complete && !(headersOnly && headersComplete) {
             let value = buffer[index]
             index += 1
             if chunks is HttpChunkDecoder decoder {
@@ -1322,7 +1322,7 @@ internal class HttpServerExchange {
                     Fail(HttpError.Protocol("EOF before complete request"))
                     return
                 }
-                if let Error(reason) = decoder.Push(received, count) {
+                if let Error(reason) = decoder.Push(received[0..count]) {
                     Fail(reason)
                     return
                 }

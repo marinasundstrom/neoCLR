@@ -54,8 +54,8 @@ remove a copy or establish native support.
 | `Networking/Security/SslStream.rvn` | Memory for retained plaintext/I/O; slice only inside synchronous packet helpers | Pump crosses await; empty owner-token arrays are resource identity, not byte payloads |
 | `Networking/Security/SslOptions.rvn` | ReadOnlySlice PEM inputs; slices for ReadCount/WriteCount; keep session/config owner tokens and allocated output | PEM factories explicitly do not retain input; resource handles must retain identity |
 | `Web/Http/HttpConnection.rvn` | Memory-based read/write/receive contracts | Adapter inherits underlying I/O lifetime and cancellation rules |
-| `Web/Http/HttpServer.rvn` | ReadOnlySlice for synchronous decoder Push/PushCore; Memory for active transfers; keep rented arrays and encoded response ownership | Parser must copy retained headers/body before receive buffer reuse; returning a rented array is ownership transfer |
-| `Web/Http/{HttpBodyInput,HttpClient}.rvn` | Memory for retained windows and upload/read operations | Body state and callbacks outlive each synchronous call; keep reusable owned buffers |
+| `Web/Http/HttpServer.rvn` | Migrated: ReadOnlySlice decoder Push/PushCore; active transfer signatures pending; keep rented arrays and encoded response ownership | Parser must copy retained headers/body before receive buffer reuse; returning a rented array is ownership transfer |
+| `Web/Http/{HttpBodyInput,HttpClient}.rvn` | Migrated: Memory body-read destination; upload/read signatures pending | Body state and callbacks outlive each synchronous call; keep reusable owned buffers |
 | `Networking/IPAddress.rvn` | Slice for synchronous ReadIPv4 destination; keep owned octets | Address objects must not alias caller-mutable input accidentally |
 | `String.rvn` | ReadOnlySlice<string> Join overload is a candidate; retain String/grapheme semantics | Element text remains immutable; UTF-8 view is separate and byte-relative |
 | `Text/{StringBuilder,Utf8}.rvn` | Keep owned builder/materialized storage; expose borrowed input only at synchronous boundaries | A mutable builder can grow; views need invalidation/ownership rules before exposing backing storage |
@@ -274,3 +274,25 @@ also records interpreter contracts, exact native binding rejection and the nativ
 provider regression. Shared InputStream/OutputStream and higher HTTP body-transfer
 signatures still require coordinated migration; this step does not claim those
 public APIs have changed.
+
+## HTTP parser and body windows (2026-10-19)
+
+Request decoder Push now takes ReadOnlySlice<byte>; the receive callback supplies
+only the returned prefix. The parser copies retained headers/body before buffer reuse
+and keeps no borrowed descriptor. HttpBodyInput retains a single Memory<byte> output
+window across receives instead of separate array/offset/count fields. Drain borrows
+Slice<byte> synchronously; completion, failure and cancellation clear retained memory.
+Owned transport/read-ahead arrays remain owned storage.
+
+This applies the existing .NET Span/Memory lifetime comparison to HTTP internals:
+borrow for immediate parsing, retain an owner for asynchronous output. It adds no
+public compatibility adapters or extra data copies and makes no performance claim.
+Public InputStream/OutputStream and higher HTTP upload contracts still await their
+coordinated migration; existing range-error and cancellation precedence is preserved.
+
+The [public consumer](../runtime/raven/tests/http-memory/README.md) covers fixed and
+chunked request bodies, streaming client responses, selected output windows, GC,
+cancellation and EOF in interpreter/JIT/AOT. See the
+[evidence](validation/memory-views-20261019/http-integration-validation.json).
+Public signatures are unchanged; the source fingerprint is refreshed while the
+native public API rendering remains applicable.

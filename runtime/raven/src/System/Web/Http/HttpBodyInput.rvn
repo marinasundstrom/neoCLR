@@ -9,7 +9,7 @@ import System.Networking.*
 import System.Option.*
 import System.Result.*
 
-// One consumer, one borrowed output range and one transport block. Header read-ahead
+// One consumer, one retained output window and one transport block. Header read-ahead
 // transfers into this object; no further receives happen until Read requests data.
 internal class HttpBodyInput : InputStream {
     private val connection: HttpConnection
@@ -26,9 +26,7 @@ internal class HttpBodyInput : InputStream {
     private var ended = false
     private var closed = false
     private var busy = false
-    private var output: byte[]? = null
-    private var outputOffset = 0
-    private var outputCount = 0
+    private var output: Memory<byte> = default(Memory<byte>)
     private var written = 0
     private var token = CancellationToken.None
     private var source: Promise<Result<int, StreamError>>? = null
@@ -70,9 +68,8 @@ internal class HttpBodyInput : InputStream {
         } else {
             busy = true
             source = result
-            output = buffer
-            outputOffset = offset
-            outputCount = count
+            let destination: Memory<byte> = buffer
+            output = destination.Slice(offset, count)
             written = 0
             token = cancellationToken
             Drain()
@@ -89,7 +86,7 @@ internal class HttpBodyInput : InputStream {
     private func Finish(result: Result<int, StreamError>) {
         let completion = source
         source = null
-        output = null
+        output = default(Memory<byte>)
         busy = false
         if ended && ownsConnection { connection.Close() }
         if completion is Promise<Result<int, StreamError>> pending {
@@ -106,7 +103,7 @@ internal class HttpBodyInput : InputStream {
         Close()
         let completion = source
         source = null
-        output = null
+        output = default(Memory<byte>)
         busy = false
         if completion is Promise<Result<int, StreamError>> pending {
             _ = pending.Cancel()
@@ -119,8 +116,9 @@ internal class HttpBodyInput : InputStream {
         if let Some(until) = deadline {
             if until.IsExpired { Fail(StreamError.IoFailure); return }
         }
-        if output is byte[] destination {
-            while position < extent && written < outputCount && !ended {
+        {
+            let destination: Slice<byte> = output
+            while position < extent && written < output.Length && !ended {
                 let value = buffer[position]
                 position += 1
                 var available = true
@@ -144,7 +142,7 @@ internal class HttpBodyInput : InputStream {
                 if available {
                     if total >= limit { Fail(StreamError.LimitExceeded); return }
                     if emptyOnly { Fail(StreamError.InvalidData); return }
-                    destination[outputOffset + written] = decoded
+                    destination[written] = decoded
                     written += 1
                     total += 1
                 }
@@ -153,7 +151,7 @@ internal class HttpBodyInput : InputStream {
         if written > 0 || ended { Finish(Ok(written)); return }
         var wanted = buffer.Length
         if remaining > 0 && remaining < wanted { wanted = remaining }
-        if chunks is null && outputCount < wanted { wanted = outputCount }
+        if chunks is null && output.Length < wanted { wanted = output.Length }
         if let Some(until) = deadline {
             let pending = connection.ReceiveUntil(buffer, 0, wanted, until, token)
             receiving = pending
@@ -165,7 +163,7 @@ internal class HttpBodyInput : InputStream {
         }
     }
 
-    // Cancellation/outcome adapter releases borrowed output on every completion.
+    // Cancellation/outcome adapter releases retained output on every completion.
     private func OnReceived() {
         if receiving is Task<Result<int, HttpError>> pending {
             receiving = null

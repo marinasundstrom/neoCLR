@@ -1,0 +1,127 @@
+import System.*
+import System.Runtime.*
+import System.Result.*
+import System.Option.*
+import System.IO.*
+import System.Time.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Web.Http.*
+
+class CancellationObserver {
+    private val operation: Task<Result<int, StreamError>>
+    val Done = Promise<bool>()
+    init(operation: Task<Result<int, StreamError>>) { self.operation = operation }
+    // Outcome observation keeps cancellation from cancelling the test entry point.
+    func Complete() { _ = Done.Complete(operation.IsCancelled) }
+}
+
+async func SendText(socket: Socket, text: string) -> Task<bool> {
+    // Send a selected window with sentinel bytes outside the HTTP message.
+    let encoded = HttpContent.FromText("!" + text + "!").Bytes
+    if encoded.Count > 512 { return false }
+    let owned: byte[] = [for index in 0..512 => (byte)0]
+    var index = 0
+    while index < encoded.Count {
+        owned[index] = encoded[index]
+        index += 1
+    }
+    let bytes: ReadOnlyMemory<byte> = owned
+    let source = bytes.Slice(1, encoded.Count - 2)
+    var sent = 0
+    while sent < source.Length {
+        let Ok(count) = await socket.Send(source.Slice(sent)) else { return false }
+        if count == 0 { return false }
+        sent += count
+    }
+    return true
+}
+
+async func CheckBody(server: HttpServer, port: int, chunked: bool, cancel: bool) -> Task<int> {
+    let accepting = server.AcceptHeaders()
+    let Ok(client) = await Socket.Connect("127.0.0.1", port) else { return 10 }
+    if !(await SendText(client, "POST /window HTTP/1.1\r\nHost: localhost\r\n")) { return 11 }
+    let framing = if chunked { "Transfer-Encoding: chunked\r\n\r\n" } else { "Content-Length: 4\r\n\r\n" }
+    if !(await SendText(client, framing)) { return 12 }
+    let Ok(context) = await accepting else { return 13 }
+    let Some(input) = context.Request.Content.TryGetStream() else { return 14 }
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let cancellation = CancellationTokenSource()
+    let pending = input.Read(destination, 1, 2, cancellation.Token)
+    GC.Collect()
+    if cancel {
+        let observer = CancellationObserver(pending)
+        pending.OnCompleted(observer.Complete)
+        cancellation.Cancel()
+        if !(await observer.Done.Task) { return 15 }
+        if destination[1] != 9 || destination[2] != 9 { return 16 }
+    } else {
+        if !(await SendText(client, if chunked { "2\r\nab\r\n" } else { "ab" })) { return 17 }
+        if await pending is not Ok(2) { return 18 }
+        if destination[0] != 9 || destination[1] != 97 || destination[2] != 98 || destination[3] != 9 { return 19 }
+        let next = input.Read(destination, 1, 2)
+        GC.Collect()
+        if !(await SendText(client, if chunked { "2\r\ncd\r\n0\r\n\r\n" } else { "cd" })) { return 20 }
+        if await next is not Ok(2) { return 21 }
+        if destination[0] != 9 || destination[1] != 99 || destination[2] != 100 || destination[3] != 9 { return 22 }
+        if await input.Read(destination, 1, 2) is not Ok(0) { return 23 }
+        if await input.Read(destination, 4, 0) is not Ok(0) { return 24 }
+        if await input.Read(destination, 3, 2) is not Error(StreamError.InvalidRange) { return 25 }
+    }
+    context.Close()
+    client.Close()
+    return 0
+}
+
+func ResponseUrl(port: int) -> string {
+    return "http://127.0.0.1:" + port.ToString() + "/response"
+}
+
+async func CheckClient(server: HttpServer, port: int) -> Task<int> {
+    use client = HttpClient()
+    let Ok(request) = HttpRequest.Get(ResponseUrl(port)) else { return 90 }
+    let accepting = server.Accept()
+    let receiving = client.Send(request, HttpCompletionOption.ResponseHeadersRead)
+    let Ok(context) = await accepting else { return 91 }
+    context.RespondText("abcd")
+    let completing = context.Complete()
+    let Ok(response) = await receiving else { return 92 }
+    let Some(input) = response.Content.TryGetStream() else { return 93 }
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    var count = 0
+    while count < 4 {
+        GC.Collect()
+        let Ok(read) = await input.Read(destination, 1, 2) else { return 94 }
+        if read == 0 || read > 2 { return 95 }
+        if destination[0] != 9 || destination[3] != 9 { return 96 }
+        var index = 0
+        while index < read {
+            if destination[1 + index] != (byte)(97 + count + index) { return 97 }
+            index += 1
+        }
+        count += read
+    }
+    if await input.Read(destination, 1, 2) is not Ok(0) { return 98 }
+    if await completing is not Ok(_) { return 99 }
+    input.Close()
+    return 0
+}
+
+async func Main() -> Task<int> {
+    let options = HttpServerOptions()
+    options.RequestReadTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4, options) else { return 1 }
+    let Ok(port) = server.GetLocalPort() else { return 2 }
+    let fixedResult = await CheckBody(server, port, false, false)
+    if fixedResult != 0 { return fixedResult }
+    let chunkedResult = await CheckBody(server, port, true, false)
+    if chunkedResult != 0 { return chunkedResult + 30 }
+    let cancelledResult = await CheckBody(server, port, false, true)
+    if cancelledResult != 0 { return cancelledResult + 60 }
+    let clientResult = await CheckClient(server, port)
+    if clientResult != 0 { return clientResult }
+    server.Close()
+    Console.WriteLine("PASS HTTP memory windows, framing, GC, cancellation and EOF")
+    return 0
+}
