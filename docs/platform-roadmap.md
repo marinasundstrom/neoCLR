@@ -25,6 +25,13 @@ implicit view conversion and explicit ToArray copying, without compatibility-onl
 array overloads or repeated AsSlice helpers. This direction does not infer a
 permanent reprioritization of unrelated milestones.
 
+**HTTP content streaming (author discussion, 2026-10-19):** follow the
+[stream-capable content proposal](design/http-content-streaming.md) when extending
+HTTP content. The proposed abstract body contract separates memory, stream, UTF-8
+text and JSON producers; current known-length stream uploads do not yet establish
+unknown-length outgoing framing or incremental JSON serialization. This supersedes
+the assistant's proposed buffer-only content hierarchy, not existing byte-input work.
+
 **HTTP collector comparison (author direction, 2026-10-19):** the author subsequently
 requested executing the comparison during integration. The
 [fresh 24-trial cohort](../benchmarks/http-server/serve/memory-gc-20261019/README.md)

@@ -19744,3 +19744,28 @@ open; no native performance improvement is claimed.
 
 - **Follow-up investigation:** the assistant identified that the initial JSON timing used collection at every published boundary, while HTTP load cohorts use opt-in pacing. Reusing identical guest objects under both synchronous modes showed 31.5% more root publications with the initial borrowed parser; pacing reduced absolute collection time but left a 27.5% CPU regression. No collector default or safety check was changed.
 - **Correction and outcome:** reused the first unescaped-string scan, cached immutable view lengths and removed impossible keyword checks/redundant windows. The same workload now uses 29,616 allocations versus the original 46,816, and 1,083,461 root publications versus 1,207,661. Four paired runs per mode use 9.1% less mean CPU with pacing and 10.0% less with every-boundary GC than the original parser. All 90 focused test executions pass. The initial regression evidence is preserved in the [GC/safepoint follow-up](../benchmarks/json-byte-input/20261019/gc-followup/README.md); HTTP capacity and concurrent-GC effects remain unmeasured for this change.
+
+## 2026-10-19 — HTTP content hierarchy and streaming
+
+- **Author:** requested `HttpContent (bytes)` and suggested specialized
+  `HttpStringContent` and `HttpJsonContent` derived types. Subsequently asked how
+  HttpContent should allow streaming and whether it should be based on Stream.
+- **Assistant proposal:** initially suggested a concrete byte base with eager text
+  and JSON specializations. Revised that proposal to an abstract body/header
+  contract that writes to an OutputStream, with memory, stream, string and JSON
+  implementations. A Stream is one possible source, not mandatory storage.
+- **Evidence and limits:** inspected the existing Raven known-length stream upload
+  path and Microsoft's HttpContent/StreamContent contracts. Current JSON stream
+  output buffers the document; a truly incremental producer and unknown-length
+  outgoing framing remain work. No new content types are claimed as implemented.
+- **Record:** [proposed contract and migration](design/http-content-streaming.md).
+  The independent borrowed JSON input implementation continues; the author's
+  streaming question supersedes the assistant's proposed buffer-only hierarchy.
+
+- **Subsequent author clarification:** both HttpClient and HttpServer have producer
+  and consumer roles; “Stream is the interface.” Suggested static string creation
+  plus async string reading, and HttpJsonContent object deserialization.
+- **Assistant response:** proposed factories for outgoing content and async readers
+  accepting arbitrary HttpContent for incoming bodies, without requiring received
+  content to have a specialized runtime type. Recorded consumption, bounded reads
+  and ownership as explicit contracts; implementation remains pending.
