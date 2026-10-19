@@ -12,7 +12,8 @@ not hand-authored class-library implementations. Production APIs belong in Raven
 `.rvn` source; source/compiler integration supplies ref-like types, implicit conversions and
 array range views. Native JIT/AOT now admits a bounded persistent-byte path:
 Memory<byte>/ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty
-and Slice(start, length), with typed argument/return/field storage. Borrowed views,
+and both Slice(start) and Slice(start, length), with typed argument/return/field
+storage. Borrowed views,
 other element types and the remaining operations still reject rather than being
 treated as empty records. See the bounded native storage section below.
 
@@ -270,11 +271,14 @@ private aggregate ABI. The extra slot padding is an implementation cost, not
 an externally stable layout or a performance improvement claim.
 
 With explicit System compilation and reference-arena support, exact InternalCalls
-bind array creation, Length and two-argument Slice. Creation accepts mutable
+bind array creation, Length and both Slice overloads. Creation accepts mutable
 ArrayRef<Byte>, never an immutable byte value snapshot. Default values have a
 null owner and zero bounds. Length reads the validated length lane; Slice packs
 the three lanes into the checked C descriptor with the statically known kind,
-then unpacks the successful result. The C kind word never enters guest storage.
+then unpacks the successful result. For Slice(start), an unsigned bounds check
+rejects negative or past-end starts before subtracting start from length; the
+checked C kernel still validates owner storage and the resulting window. The C
+kind word never enters guest storage.
 The whole-array helper validates storage before deriving its length. Helpers do
 not allocate or collect; ordinary call, field and return lowering preserves the
 owner through published GC frames. This is temporary native IR/codegen, not a
@@ -282,9 +286,9 @@ new CLI encoding or a Raven compiler change.
 
 Borrowed Slice/ReadOnlySlice, other element types, view arrays/unions, boxing, arbitrary
 record construction, persistent-to-borrowed conversion, readonly conversion,
-ToArray and one-argument Slice services remain unsupported in native execution.
+ToArray services remain unsupported in native execution.
 The full interpreter API is unchanged. Range APIs may compose the admitted
-primitive, but only the explicit two-argument window is qualified here. Async
+primitive, but only explicit one- and two-argument windows are qualified here. Async
 view retention and shared buffer-service migration remain later validation work.
 
 Reproduction: build `neoclr-codegen`, then run
@@ -313,3 +317,9 @@ includes commands, hashes, bindings and execution output. Windows execution and
 native asynchronous retention are not qualified here. The public signatures are
 unchanged, so the API snapshot is unchanged; manual API limits and website status
 are updated without a routine website build.
+
+The one-argument native follow-up is retained in
+[short-window validation](validation/memory-views-20261019/short-slice-validation.json).
+It extends the success consumer with default-empty, start=end and nested short
+windows after GC, and isolates past-end and both signed Int32 extremes for each
+persistent byte type. The .NET-compatible start-to-end contract is unchanged.

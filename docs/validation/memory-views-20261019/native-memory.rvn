@@ -20,7 +20,7 @@ func CreateOwner() -> ByteBufferOwner {
 
 func CreateEmpty() -> ReadOnlyMemory<byte> {
     let memory: ReadOnlyMemory<byte> = [(byte)8]
-    return memory.Slice(1, 0)
+    return memory.Slice(1)
 }
 
 func Keep(data: Memory<byte>) -> Memory<byte> => data
@@ -37,8 +37,14 @@ func Main() -> int {
     if Keep(owner.Data).Slice(0, 2).Length != 2 || owner.ReadOnlyData.Slice(1, 0).Length != 0 {
         return 2
     }
-    if retainedEmpty.Slice(0, 0).Length != 0 {
+    if retainedEmpty.Slice(0).Length != 0 {
         return 3
+    }
+    if Keep(owner.Data).Slice(1).Slice(1).Length != 0 || owner.ReadOnlyData.Slice(0).Length != 1 {
+        return 4
+    }
+    if empty.Slice(0).Length != 0 || readonlyEmpty.Slice(0).Length != 0 {
+        return 5
     }
     return 0
 }

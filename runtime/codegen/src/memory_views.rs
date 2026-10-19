@@ -79,8 +79,8 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
                 f.parameters != [Type::ArrayRef(Box::new(Type::Byte))]
             } else {
                 if slicing {
-                    f.parameters.len() != 3
-                        || f.parameters[1..] != [Type::Int32, Type::Int32]
+                    !matches!(f.parameters.len(), 2 | 3)
+                        || f.parameters[1..].iter().any(|t| *t != Type::Int32)
                         || f.parameters.first() != Some(&f.returns)
                 } else {
                     f.parameters.len() != 1 || f.returns != Type::Int32
@@ -200,7 +200,8 @@ mod tests {
     #[test]
     fn byte_memory_length_and_slice_bind_only_exact_view_signatures() {
         for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory] {
-            for slicing in [false, true] {
+            for count in [0, 1, 2] {
+                let slicing = count != 0;
                 let mut input = test_module(kind, Type::Byte);
                 let ty = Type::Named(input.types[0].name.clone());
                 let name = if slicing {
@@ -209,7 +210,9 @@ mod tests {
                     "neoCLR.Runtime.ViewLength"
                 };
                 let parameters = if slicing {
-                    vec![ty.clone(), Type::Int32, Type::Int32]
+                    let mut parameters = vec![ty.clone()];
+                    parameters.extend(vec![Type::Int32; count]);
+                    parameters
                 } else {
                     vec![ty.clone()]
                 };
@@ -224,7 +227,11 @@ mod tests {
                 let original = input.clone();
                 assert_eq!(bind(&mut input, &report).unwrap().len(), 1);
                 let mut bad = original.clone();
-                bad.functions[0].parameters.push(Type::Int32);
+                bad.functions[0].parameters.push(Type::Byte);
+                assert!(bind(&mut bad, &report).is_err());
+                let mut bad = original.clone();
+                bad.functions[0].parameters =
+                    vec![ty.clone(), Type::Int32, Type::Int32, Type::Int32];
                 assert!(bind(&mut bad, &report).is_err());
                 let mut bad = original.clone();
                 bad.functions[0].returns = Type::Byte;

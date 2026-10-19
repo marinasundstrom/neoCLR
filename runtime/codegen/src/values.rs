@@ -1756,13 +1756,35 @@ pub(crate) fn compile_into(
                         b.ins().store(MemFlags::new(), kind, address, 16);
                         let service =
                             module.declare_func_in_func(byte_memory_slice.unwrap(), b.func);
+                        let count = if p.args[i].len() == 2 {
+                            // An unsigned comparison rejects negative starts too.
+                            // Subtract only after proving 0 <= start <= length.
+                            let invalid = b.ins().icmp(
+                                IntCC::UnsignedGreaterThan,
+                                parameters[3],
+                                parameters[2],
+                            );
+                            let status = b.ins().iconst(types::I32, 8);
+                            let mut site = diagnostic_data.as_ref().unwrap().site(
+                                module,
+                                &mut b,
+                                fault_context.unwrap(),
+                                i,
+                                0,
+                            );
+                            site.capture_frame = false;
+                            return_if_detailed(&mut b, invalid, status, Some(&site));
+                            b.ins().isub(parameters[2], parameters[3])
+                        } else {
+                            parameters[4]
+                        };
                         b.ins().call(
                             service,
                             &[
                                 fault_context.unwrap(),
                                 address,
                                 parameters[3],
-                                parameters[4],
+                                count,
                                 address,
                             ],
                         )

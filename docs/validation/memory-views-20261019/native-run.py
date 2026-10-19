@@ -22,7 +22,9 @@ def run(label, command, expected=0):
     log = result.stdout + result.stderr
     (output / (label + '.log')).write_text(log)
     report['commands'].append({'label': label, 'command': list(map(str, command)),
-                               'exitCode': result.returncode})
+                               'exitCode': result.returncode,
+                               'logSha256': hashlib.sha256(log.encode()).hexdigest(),
+                               'output': log[-1000:] if 'execute' in label or label == 'execute-aot' else None})
     (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
     print(label, result.returncode, flush=True)
     if result.returncode != expected:
@@ -72,6 +74,32 @@ bounds_jit = run('bounds-jit', [codegen, '--jit-managed', '--closed-world', boun
                               '@entry', output / 'bounds.dylib', *options])
 report['boundsJit'] = json.loads(bounds_jit.stderr.split('JIT_RESULT ', 1)[1])
 assert report['boundsJit']['guestExitCode'] == 0
+# Compile isolated failures so every invalid start reaches the native boundary.
+for kind in ('Memory', 'ReadOnlyMemory'):
+    for case, start in (('past-end', '1'), ('min', '(-2147483647 - 1)'), ('max', '2147483647')):
+        label = f'short-{kind}-{case}'
+        source = output / (label + '.rvn')
+        source.write_text(f'import System.*\nfunc Main() -> int {{\n'
+                          f'    let memory = default({kind}<byte>)\n'
+                          f'    return memory.Slice({start}).Length\n}}\n')
+        project = output / (label + '.rvnproj')
+        template = (HERE / 'NativeMemoryBounds.rvnproj').read_text()
+        template = template.replace('NativeMemoryBounds', label).replace('native-bounds.rvn', source.name)
+        template = template.replace('../../../runtime/', str(ROOT / 'runtime') + '/')
+        project.write_text(template)
+        run(label + '-raven', ['dotnet', args.compiler, 'neoclr', '--project', project])
+        case_image = output / 'bin/neoclr' / (label + '.dll')
+        failure = run(label + '-interpreter', [runtime, 'run', case_image,
+                      '--execution', 'interpreter', *refs], 1)
+        assert 'IndexOutOfRange' in failure.stdout + failure.stderr
+        case_obj = output / (label + '.o')
+        run(label + '-aot', [codegen, '--closed-world', case_image, '@entry', case_obj, *options])
+        run(label + '-link', [*flags, '-DEXPECT_STATUS=8', '-fsanitize=undefined,bounds',
+                             host, case_obj, *support, '-o', output / label])
+        run(label + '-execute', [output / label])
+        failure_jit = run(label + '-jit', [codegen, '--jit-managed', '--closed-world',
+                         case_image, '@entry', output / 'bounds.dylib', *options])
+        assert json.loads(failure_jit.stderr.split('JIT_RESULT ', 1)[1])['guestExitCode'] == 0
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
                    for p in (image, bounds_image, core, runtime, codegen, args.compiler, host,
                              HERE / 'native-run.py', HERE / 'native-memory.rvn', HERE / 'native-bounds.rvn')}

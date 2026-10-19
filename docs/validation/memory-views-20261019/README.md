@@ -62,7 +62,7 @@ checks pass. The generated reference includes both persistent types and members.
 ## Native persistent-byte follow-up
 
 `NativeMemoryConsumer.rvnproj` exercises Memory<byte> and ReadOnlyMemory<byte>
-with array conversion, default values, Length/IsEmpty, two-argument slicing,
+with array conversion, default values, Length/IsEmpty, one- and two-argument slicing,
 function arguments/returns and object fields. After explicit GC, checked nested
 slicing proves both nonempty owners and an independently owned empty view remain
 live. `NativeMemoryBounds.rvnproj` requires IndexOutOfRange for a nonempty window
@@ -77,3 +77,12 @@ root frames and full reclamation. Native evidence is saved as
 No new Raven API or compiler change is involved. Borrowed views, non-byte
 instantiations, arrays/unions of views, boxing and remaining view operations
 remain gated. Async native retention is not qualified by these synchronous tests.
+
+The native harness also isolates past-end, Int32.MinValue and Int32.MaxValue
+starts for both persistent byte types on interpreter, JIT and AOT. Valid short
+windows cover start=end, default empties and nested views after GC. These cases
+extend the existing Slice contract; no public signature or snapshot changes.
+
+See [short-slice-validation.json](short-slice-validation.json) for the extended
+harness commands, binary/source hashes, fault outputs and log hashes. The prior
+native-validation.json remains the evidence for the initial two-argument step.

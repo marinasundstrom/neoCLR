@@ -35,7 +35,7 @@ without copying and preserve checked bounds and readonly access. The development
 [Raven API](/docs/memory-views.html) provides checked view operations, implicit
 array conversions, persistent Memory/ReadOnlyMemory and an immutable UTF-8 byte
 view. Native execution currently covers only persistent byte-view creation,
-length and explicit two-argument windows. Borrowed native views and shared
+length and explicit one- and two-argument windows. Borrowed native views and shared
 buffer-service migration remain pending. Development array range
 syntax returns Slice<T>; ToArray requests a copy. String slicing retains its grapheme semantics.
 

@@ -2,8 +2,9 @@
 
 Development APIs authored in Raven (`System.Runtime`). The interpreter provides
 checked zero-copy storage. A bounded native JIT/AOT path supports Memory<byte>
-and ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty and
-Slice(start, length), including argument/return copies and object fields. Other
+and ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty,
+Slice(start) and Slice(start, length), including argument/return copies and object
+fields. Other
 view operations and element types remain interpreter-only. Array
 range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
 copy. Memory<T> and ReadOnlyMemory<T> retain managed backing storage and may be
