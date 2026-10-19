@@ -2596,3 +2596,12 @@ overload to both references and the selected String type. The native snapshot is
 string-lines-api-audit-v1 from the matching five-library build. Both summaries and
 the manual guide describe LF defaults, recognized sequences, byte retention,
 allocation limits and the distinction from protocol framing.
+
+
+Development (2026-10-19) adds Contains/StartsWith/EndsWith and explicit
+StringComparison overloads on the already-selected String type. Both reference
+snapshots include all six signatures. The native snapshot uses
+string-search-api-audit-v2 from string-search-libraries-v3, rebuilt after adding
+source parameter/result/remarks documentation; method bodies match the qualified
+v2 library. The manual guide distinguishes canonical grapheme boundaries from
+ordinal byte/simple-fold scalar search. No new RavenDoc exclusion is needed.

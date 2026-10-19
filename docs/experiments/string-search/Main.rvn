@@ -1,0 +1,53 @@
+import System.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("String search contract")
+    }
+}
+
+func Main() {
+    let text = "Aé👩‍💻🇸🇪\u0000Z"
+    Check(text.Contains("é"))
+    Check(text.StartsWith("Aé"))
+    Check(text.EndsWith("🇸🇪\u0000Z"))
+    Check(!text.Contains("e"))
+    Check(!text.Contains("👩"))
+    Check(!text.Contains("🇸"))
+    Check(!"\r\n".Contains("\n"))
+    Check(!"é".StartsWith("e"))
+    Check(!"é".EndsWith("́"))
+    Check("".Contains(""))
+    Check(text.StartsWith(""))
+    Check(text.EndsWith(""))
+    Check(!"".Contains("x"))
+    Check("aaaab".Contains("aaab"))
+    Check(!"a".StartsWith("aa"))
+    Check(!"a".EndsWith("aa"))
+    Check("각".Contains("각"))
+    Check(!"ﬁ".Contains("fi"))
+    Check(!"🇦🇧🇨🇩".Contains("🇧🇨"))
+    Check("🇦🇧🇨".EndsWith("🇨"))
+    let original = "à֮̕᫏b"
+    Check(original.Contains("à֮᫏̕", StringComparison.Canonical))
+    Check(original.StartsWith("à֮᫏̕", StringComparison.Canonical))
+    Check(original.EndsWith("à֮᫏̕b", StringComparison.Canonical))
+    Check(String.CompareOrdinal(original, "à֮̕᫏b") == 0)
+    Check(text.Contains("e", StringComparison.Ordinal))
+    Check(!text.Contains("é", StringComparison.Ordinal))
+    Check("é".StartsWith("e", StringComparison.Ordinal))
+    Check("é".EndsWith("́", StringComparison.Ordinal))
+    Check(text.ContainsOrdinal("e"))
+    Check("é".StartsWithOrdinal("e"))
+    Check("é".EndsWithOrdinal("́"))
+    Check("xΣKẞy".Contains("ςkß", StringComparison.OrdinalIgnoreCase))
+    Check("ΣKẞy".StartsWith("ςkß", StringComparison.OrdinalIgnoreCase))
+    Check("xΣKẞ".EndsWith("ςkß", StringComparison.OrdinalIgnoreCase))
+    Check(!"é".Contains("é", StringComparison.OrdinalIgnoreCase))
+    Check(!"ß".Contains("ss", StringComparison.OrdinalIgnoreCase))
+    Check(!"İ".Contains("i", StringComparison.OrdinalIgnoreCase))
+    Check("é".Contains("E", StringComparison.OrdinalIgnoreCase))
+    Check("".StartsWith("", StringComparison.OrdinalIgnoreCase))
+    Check("".EndsWith("", StringComparison.Ordinal))
+    Console.WriteLine("PASS string search")
+}

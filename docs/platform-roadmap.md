@@ -13,9 +13,10 @@ with unchanged-owner reuse and measured changed-result allocations. The
 [String utilities](experiments/string-utilities/README.md) add nullable predicates
 and explicit/interface comparison; [line-ending replacement](experiments/string-lines/README.md)
 now preserves bytes and uses a single final native allocation when changed. The author defers the String-as-view/value
-representation decision until after utility work. The [canonical search prototype](experiments/string-search/README.md)
-exposed and repaired Unicode version skew: interpreter/native grapheme segmentation
-now uses Unicode 17. Public search methods and native search bindings remain pending. Position-based
+representation decision until after utility work. The [canonical search integration](experiments/string-search/README.md)
+repairs Unicode version skew and qualifies Contains/StartsWith/EndsWith with explicit
+comparison modes across interpreter/JIT/AOT. The six-search allocation workload adds
+no managed allocations; eager collection counts rise, without a throughput claim. Position-based
 search/splitting and the direct-call null String bridge discrepancy remain review
 items; replacement release qualification remains pending.
 

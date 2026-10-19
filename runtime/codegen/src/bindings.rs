@@ -823,6 +823,42 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
                 "string-compare-ordinal-v1",
                 "neoclr_string_compare_ordinal_v1",
             ),
+            "neoCLR.Runtime.StringContainsCanonical" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-contains-canonical-v1",
+                "neoclr_string_contains_canonical_v1",
+            ),
+            "neoCLR.Runtime.StringStartsWithCanonical" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-starts-with-canonical-v1",
+                "neoclr_string_starts_with_canonical_v1",
+            ),
+            "neoCLR.Runtime.StringEndsWithCanonical" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-ends-with-canonical-v1",
+                "neoclr_string_ends_with_canonical_v1",
+            ),
+            "neoCLR.Runtime.StringContainsOrdinalIgnoreCase" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-contains-ignore-case-v1",
+                "neoclr_string_contains_ignore_case_v1",
+            ),
+            "neoCLR.Runtime.StringStartsWithOrdinalIgnoreCase" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-starts-with-ignore-case-v1",
+                "neoclr_string_starts_with_ignore_case_v1",
+            ),
+            "neoCLR.Runtime.StringEndsWithOrdinalIgnoreCase" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-ends-with-ignore-case-v1",
+                "neoclr_string_ends_with_ignore_case_v1",
+            ),
             "neoCLR.Runtime.StringContainsOrdinal" => (
                 vec![Type::String, Type::String],
                 Type::Boolean,

@@ -1,4 +1,4 @@
-//! Experimental canonical whole-grapheme search; no public/runtime binding yet.
+//! Canonical whole-grapheme and ordinal simple-fold search.
 //! Borrow existing UTF-8 and clone iterator state, never normalized text.
 use crate::string_normalization::compare;
 use core::cmp::Ordering;
@@ -37,6 +37,40 @@ pub fn contains(text: &str, pattern: &str) -> bool {
         // Keep the original iterator's context: slicing at arbitrary scalar
         // offsets would change segmentation (for example, regional indicators).
         if matches(candidates.clone(), pattern.clone()) {
+            return true;
+        }
+        if candidates.next().is_none() {
+            return false;
+        }
+    }
+}
+
+fn folded_matches(
+    mut text: impl Iterator<Item = char>,
+    pattern: impl Iterator<Item = char>,
+) -> bool {
+    for expected in pattern {
+        if text.next().map(crate::string_comparison::fold)
+            != Some(crate::string_comparison::fold(expected))
+        {
+            return false;
+        }
+    }
+    true
+}
+
+pub fn starts_with_ignore_case(text: &str, pattern: &str) -> bool {
+    folded_matches(text.chars(), pattern.chars())
+}
+
+pub fn ends_with_ignore_case(text: &str, pattern: &str) -> bool {
+    folded_matches(text.chars().rev(), pattern.chars().rev())
+}
+
+pub fn contains_ignore_case(text: &str, pattern: &str) -> bool {
+    let mut candidates = text.chars();
+    loop {
+        if folded_matches(candidates.clone(), pattern.chars()) {
             return true;
         }
         if candidates.next().is_none() {

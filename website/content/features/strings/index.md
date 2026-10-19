@@ -69,6 +69,27 @@ Case conversion, folding and segmentation have their own versioned Unicode rules
 consult the [String](xref:System.String) and [Char](xref:System.Char) contracts when
 text boundaries or cross-platform comparison must be exact.
 
+## Search text
+
+Development `Contains`, `StartsWith` and `EndsWith` compare complete graphemes by
+canonical equivalence. They also accept an explicit `StringComparison` policy:
+
+```raven
+let text = "Aé👩‍💻🇸🇪\u0000Z"
+let equivalent = text.Contains("é") // true
+let wholeCharacter = text.Contains("e") // false
+let exact = text.Contains("e", StringComparison.Ordinal) // true
+let folded = "xΣKẞy".Contains("ςkß", StringComparison.OrdinalIgnoreCase) // true
+```
+
+These calls come from the tested search consumer. Ordinal matching uses exact bytes;
+OrdinalIgnoreCase uses Unicode simple folding without normalization or expansion.
+Both can match inside a grapheme. Empty patterns match; unknown comparison modes
+fault. The predicates borrow existing bytes and create no temporary strings or
+arrays. Long shared prefixes can require repeated comparisons; fewer allocations
+alone do not establish faster HTTP throughput. See the [String reference](xref:System.String)
+for overloads and contracts.
+
 ## Build text
 
 Use concatenation for small expressions and `StringBuilder` for incremental output.

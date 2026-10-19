@@ -198,3 +198,29 @@ int32_t neoclr_string_hash_canonical_v1(const neoclr_aot_text *text, int32_t *ou
     if (!text || !output) return 3;
     return neoclr_unicode_hash_canonical_v1(text->bytes, text->length, output);
 }
+
+extern int32_t neoclr_unicode_search_v1(const unsigned char *, size_t, const unsigned char *, size_t, int32_t, int32_t, int32_t *);
+int32_t neoclr_string_contains_canonical_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return 3;
+    return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 0, 2, output);
+}
+int32_t neoclr_string_starts_with_canonical_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return 3;
+    return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 1, 2, output);
+}
+int32_t neoclr_string_ends_with_canonical_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return 3;
+    return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 2, 2, output);
+}
+int32_t neoclr_string_contains_ignore_case_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return 3;
+    return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 0, 1, output);
+}
+int32_t neoclr_string_starts_with_ignore_case_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return 3;
+    return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 1, 1, output);
+}
+int32_t neoclr_string_ends_with_ignore_case_v1(const neoclr_aot_text *text, const neoclr_aot_text *pattern, int32_t *output) {
+    if (!text || !pattern || !output) return 3;
+    return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 2, 1, output);
+}

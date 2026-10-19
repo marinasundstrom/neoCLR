@@ -1135,6 +1135,36 @@ pub(crate) fn compile_into(
                 vec![types::I64, types::I64, types::I64],
             ),
             (
+                &d.string_contains_canonical,
+                "neoclr_string_contains_canonical_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
+                &d.string_starts_with_canonical,
+                "neoclr_string_starts_with_canonical_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
+                &d.string_ends_with_canonical,
+                "neoclr_string_ends_with_canonical_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
+                &d.string_contains_ignore_case,
+                "neoclr_string_contains_ignore_case_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
+                &d.string_starts_with_ignore_case,
+                "neoclr_string_starts_with_ignore_case_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
+                &d.string_ends_with_ignore_case,
+                "neoclr_string_ends_with_ignore_case_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
                 &d.string_contains_ordinal,
                 "neoclr_string_contains_ordinal_v1",
                 vec![types::I64, types::I64, types::I64],
@@ -3100,6 +3130,12 @@ pub(crate) fn compile_into(
                     || details.unwrap().string_compare_canonical.contains(&i)
                     || details.unwrap().string_compare_ignore_case.contains(&i)
                     || details.unwrap().string_compare_ordinal.contains(&i)
+                    || details.unwrap().string_contains_canonical.contains(&i)
+                    || details.unwrap().string_starts_with_canonical.contains(&i)
+                    || details.unwrap().string_ends_with_canonical.contains(&i)
+                    || details.unwrap().string_contains_ignore_case.contains(&i)
+                    || details.unwrap().string_starts_with_ignore_case.contains(&i)
+                    || details.unwrap().string_ends_with_ignore_case.contains(&i)
                     || details.unwrap().string_contains_ordinal.contains(&i)
                     || details.unwrap().string_starts_with_ordinal.contains(&i)
                     || details.unwrap().string_ends_with_ordinal.contains(&i)

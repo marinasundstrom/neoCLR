@@ -1,5 +1,10 @@
-#[path = "../docs/experiments/string-search/kernel.rs"]
+#[path = "../src/string_search.rs"]
 mod search;
+#[path = "../src/string_case_folding.rs"]
+mod string_case_folding;
+#[path = "../src/string_comparison.rs"]
+#[allow(dead_code)]
+mod string_comparison;
 #[path = "../src/string_normalization.rs"]
 #[allow(dead_code)]
 mod string_normalization;
@@ -190,4 +195,35 @@ fn long_combining_runs_search_without_heap_allocation() {
     assert_eq!(results, (true, true, true, false));
     assert_eq!(allocations, 0);
     assert_eq!(text.as_bytes(), before.as_bytes());
+}
+
+#[test]
+fn simple_fold_search_matches_comparison_without_normalization() {
+    for &(source, target) in crate::string_case_folding::MAPPINGS {
+        let text = char::from_u32(source).unwrap().to_string();
+        let pattern = char::from_u32(target).unwrap().to_string();
+        assert!(search::contains_ignore_case(&text, &pattern));
+        assert!(search::starts_with_ignore_case(&text, &pattern));
+        assert!(search::ends_with_ignore_case(&text, &pattern));
+    }
+    assert!(search::contains_ignore_case("xΣKẞy", "ςkß"));
+    assert!(search::contains_ignore_case("e\u{301}", "E"));
+    assert!(search::ends_with_ignore_case("e\u{301}", "\u{301}"));
+    assert!(search::contains_ignore_case("aaaAb", "AAB"));
+    assert!(search::contains_ignore_case("", ""));
+    assert!(!search::contains_ignore_case("", "a"));
+    for (text, pattern) in [("é", "e\u{301}"), ("ß", "ss"), ("İ", "i"), ("ﬁ", "fi")] {
+        assert!(!search::contains_ignore_case(text, pattern));
+        assert!(!search::starts_with_ignore_case(text, pattern));
+        assert!(!search::ends_with_ignore_case(text, pattern));
+    }
+    ALLOCATIONS.with(|count| count.set(Some(0)));
+    let text = std::hint::black_box("ΣKẞ");
+    let pattern = std::hint::black_box("ςkß");
+    let result = search::contains_ignore_case(text, pattern)
+        && search::starts_with_ignore_case(text, pattern)
+        && search::ends_with_ignore_case(text, pattern);
+    let allocations = ALLOCATIONS.with(|count| count.replace(None).unwrap());
+    assert!(result);
+    assert_eq!(allocations, 0);
 }

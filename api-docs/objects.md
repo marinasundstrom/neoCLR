@@ -466,3 +466,20 @@ are also recognized; VT is retained. Replacement text is not recursively process
 Other UTF-8 bytes remain exact. Unchanged results reuse the original owner; native
 changed output is written into one final string allocation. Use explicit protocol
 framing rather than this general text operation for HTTP.
+
+
+Development `Contains(string)`, `StartsWith(string)` and `EndsWith(string)` use
+canonical whole-grapheme matching, consistent with String/Char equality. For example,
+`"é".Contains("é")` is true, while `"é".Contains("e")` is false. Each also accepts
+`StringComparison`: Canonical retains those boundaries, Ordinal matches exact UTF-8
+bytes, and OrdinalIgnoreCase matches Unicode 17 simple-folded scalars without
+normalization or multi-scalar expansions. The latter two policies can match inside
+a grapheme. Existing named ordinal methods retain their behavior. All patterns are
+non-null; empty patterns match under every valid policy. Unknown modes fault with
+RuntimeError even for empty patterns. No cultural matching is implied.
+
+These predicates borrow text without allocating temporary strings, arrays or
+normalized copies. Canonical and simple-fold Contains use candidate scans and can
+repeat prefix work for long inputs; no linear-time or HTTP throughput guarantee is
+made. The public overloads have interpreter/JIT/AOT fixtures in the repository's
+`docs/experiments/string-search` directory. Original UTF-8 storage is unchanged.

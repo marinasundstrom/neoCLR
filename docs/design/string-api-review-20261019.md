@@ -442,3 +442,42 @@ and native bindings are pending. A simple candidate scan uses bounded memory but
 can repeat work for long shared prefixes; zero-allocation diagnostics do not imply
 linear-time search or higher server throughput. The deferred storage/view decision
 is unaffected.
+
+
+### Char helper shortlist (2026-10-19; proposed)
+
+The author asks whether helpers belong on Char. Current Raven Char provides
+FromString, typed/boxed canonical equality, matching hashing, CompareTo and
+ToString. Candidate additions are TryFromString returning Option<char>, Utf8Bytes,
+non-eager scalar traversal and explicit-policy Equals, followed by a defined
+whole-grapheme IsWhiteSpace. These are proposals, not implemented API contracts.
+
+Unlike .NET's UTF-16 Char predicates, neoCLR's Char can contain multiple Unicode
+scalars. UnicodeScalar already owns scalar category checks; assigning one category
+to an arbitrary grapheme would require a deliberate rule. If casing is added, its
+result should be string because full mappings may expand beyond one grapheme.
+White-space classification must state whether every scalar must be whitespace;
+a base space plus a combining mark is a useful counterexample. Borrowed byte and
+scalar access must avoid creating an intermediate String/array and retain the
+existing lifetime/immutability rules. The String representation decision remains
+deferred. Public additions require separate source/API/three-engine qualification.
+
+
+### Public search integration (2026-10-19)
+
+The experimental kernel above is now shared by the interpreter and native text
+helper, with public Raven Contains/StartsWith/EndsWith methods and explicit
+StringComparison overloads. Canonical compares complete graphemes; Ordinal compares
+bytes; OrdinalIgnoreCase applies the existing simple-fold scalar policy without
+normalization or expansion. The latter two may match inside a grapheme. Empty
+patterns match for valid policies; unknown modes fault before search. Preserved
+named ordinal methods and Replace retain their existing behavior.
+
+This deliberately follows Swift's canonical prefix/suffix semantics rather than
+.NET's default ordinal Contains. The benefit is consistency with neoCLR Char and
+String identity; costs are segmentation/normalization and potentially repeated
+candidate-prefix scans. No cultural matching or linear-time guarantee is implied.
+[Twelve cross-engine checks and allocation evidence](../experiments/string-search/README.md#public-integration-evidence)
+qualify the additions without claiming HTTP throughput gains. Source methods remain
+Raven; only private string access/search services use shared runtime kernels. No
+public position type or storage/view representation change accompanies this work.

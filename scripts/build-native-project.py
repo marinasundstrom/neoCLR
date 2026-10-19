@@ -21,7 +21,7 @@ def native_text_sources():
     return [ROOT / 'tools/aot-native-text/Cargo.toml', ROOT / 'tools/aot-native-text/Cargo.lock',
             ROOT / 'tools/aot-native-text/src/lib.rs',
             *[ROOT / 'src' / name for name in
-              ('string_normalization.rs', 'string_normalization_data.rs', 'string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs', 'time_zone_rules.rs')]]
+              ('string_search.rs', 'string_normalization.rs', 'string_normalization_data.rs', 'string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs', 'time_zone_rules.rs')]]
 
 
 def native_kernel_archive_name(windows, time_zone_rules=False):
@@ -317,7 +317,10 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                               for binding in selection.get('nativeBindings', []))
         if time_zone_rules:
             adapters.append(base / 'time-zone.c')
-        text_services = {'neoclr_string_compare_canonical_v1', 'neoclr_string_hash_canonical_v1',
+        text_services = {'neoclr_string_contains_canonical_v1', 'neoclr_string_starts_with_canonical_v1',
+                         'neoclr_string_ends_with_canonical_v1', 'neoclr_string_contains_ignore_case_v1',
+                         'neoclr_string_starts_with_ignore_case_v1', 'neoclr_string_ends_with_ignore_case_v1',
+                         'neoclr_string_compare_canonical_v1', 'neoclr_string_hash_canonical_v1',
                          'neoclr_string_compare_ignore_case_v1', 'neoclr_string_hash_ordinal_v1',
                          'neoclr_string_hash_ignore_case_v1', 'neoclr_string_upper_v1',
                          'neoclr_string_lower_v1', 'neoclr_string_grapheme_count_v1',

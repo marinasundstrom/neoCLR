@@ -127,6 +127,12 @@ pub(crate) enum Binding {
     CharHashCanonical,
     StringHashOrdinal,
     StringHashOrdinalIgnoreCase,
+    StringContainsCanonical,
+    StringStartsWithCanonical,
+    StringEndsWithCanonical,
+    StringContainsOrdinalIgnoreCase,
+    StringStartsWithOrdinalIgnoreCase,
+    StringEndsWithOrdinalIgnoreCase,
     StringContainsOrdinal,
     StringStartsWithOrdinal,
     StringEndsWithOrdinal,
@@ -792,6 +798,24 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringHashOrdinalIgnoreCase", [Type::String]) => {
             (Binding::StringHashOrdinalIgnoreCase, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringContainsCanonical", [Type::String, Type::String]) => {
+            (Binding::StringContainsCanonical, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringStartsWithCanonical", [Type::String, Type::String]) => {
+            (Binding::StringStartsWithCanonical, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringEndsWithCanonical", [Type::String, Type::String]) => {
+            (Binding::StringEndsWithCanonical, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringContainsOrdinalIgnoreCase", [Type::String, Type::String]) => {
+            (Binding::StringContainsOrdinalIgnoreCase, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringStartsWithOrdinalIgnoreCase", [Type::String, Type::String]) => {
+            (Binding::StringStartsWithOrdinalIgnoreCase, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringEndsWithOrdinalIgnoreCase", [Type::String, Type::String]) => {
+            (Binding::StringEndsWithOrdinalIgnoreCase, Type::Boolean)
         }
         ("neoCLR.Runtime.StringContainsOrdinal", [Type::String, Type::String]) => {
             (Binding::StringContainsOrdinal, Type::Boolean)
@@ -1959,6 +1983,35 @@ impl Binding {
             (Self::StringHashOrdinalIgnoreCase, [Value::String(value)]) => Ok(Value::Int32(
                 crate::string_comparison::hash_ignore_case(value),
             )),
+            (Self::StringContainsCanonical, [Value::String(value), Value::String(pattern)]) => Ok(
+                Value::Boolean(crate::string_search::contains(value, pattern)),
+            ),
+            (Self::StringStartsWithCanonical, [Value::String(value), Value::String(pattern)]) => {
+                Ok(Value::Boolean(crate::string_search::starts_with(
+                    value, pattern,
+                )))
+            }
+            (Self::StringEndsWithCanonical, [Value::String(value), Value::String(pattern)]) => Ok(
+                Value::Boolean(crate::string_search::ends_with(value, pattern)),
+            ),
+            (
+                Self::StringContainsOrdinalIgnoreCase,
+                [Value::String(value), Value::String(pattern)],
+            ) => Ok(Value::Boolean(crate::string_search::contains_ignore_case(
+                value, pattern,
+            ))),
+            (
+                Self::StringStartsWithOrdinalIgnoreCase,
+                [Value::String(value), Value::String(pattern)],
+            ) => Ok(Value::Boolean(
+                crate::string_search::starts_with_ignore_case(value, pattern),
+            )),
+            (
+                Self::StringEndsWithOrdinalIgnoreCase,
+                [Value::String(value), Value::String(pattern)],
+            ) => Ok(Value::Boolean(crate::string_search::ends_with_ignore_case(
+                value, pattern,
+            ))),
             (Self::StringContainsOrdinal, [Value::String(value), Value::String(pattern)]) => {
                 Ok(Value::Boolean(value.contains(pattern.as_str())))
             }

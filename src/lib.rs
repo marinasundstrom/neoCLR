@@ -236,3 +236,5 @@ pub mod native_metadata;
 mod structural_compositions_probe;
 
 mod string_lines;
+
+mod string_search;

@@ -300,6 +300,99 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         return 0
     }
 
+    /// <summary>Tests whether text contains the supplied text by canonical whole-grapheme matching.</summary>
+    /// <param name="substring">Non-null text to match; empty always matches.</param>
+    /// <returns>True when a match is found.</returns>
+    /// <remarks>Development API. Preserves UTF-8 bytes without temporary strings or arrays.
+    /// Does not match part of a grapheme. Candidate scans can repeat prefix work; no linear-time guarantee.</remarks>
+    func Contains(substring: string) -> bool {
+        return neoCLR.Runtime.StringContainsCanonical(m_value, substring)
+    }
+
+    /// <summary>Tests whether text contains the supplied text using an explicit policy.</summary>
+    /// <param name="substring">Non-null text to match; empty matches for every valid policy.</param>
+    /// <param name="comparison">Canonical matches complete graphemes; Ordinal matches bytes;
+    /// OrdinalIgnoreCase matches simple-folded scalars without normalization or expansion.</param>
+    /// <returns>True when a match is found.</returns>
+    /// <remarks>Development API. Unknown modes fault with RuntimeError, including empty patterns.
+    /// Ordinal modes may match inside graphemes. No cultural matching, temporary strings or arrays.
+    /// Preserves UTF-8 bytes. Candidate scans can repeat prefix work; no linear-time guarantee.</remarks>
+    func Contains(substring: string, comparison: StringComparison) -> bool {
+        if comparison == StringComparison.Canonical {
+            return neoCLR.Runtime.StringContainsCanonical(m_value, substring)
+        }
+        if comparison == StringComparison.Ordinal {
+            return neoCLR.Runtime.StringContainsOrdinal(m_value, substring)
+        }
+        if comparison == StringComparison.OrdinalIgnoreCase {
+            return neoCLR.Runtime.StringContainsOrdinalIgnoreCase(m_value, substring)
+        }
+        System.Fail("Unsupported StringComparison")
+        return false
+    }
+
+    /// <summary>Tests whether text starts with the supplied text by canonical whole-grapheme matching.</summary>
+    /// <param name="prefix">Non-null text to match; empty always matches.</param>
+    /// <returns>True when a match is found.</returns>
+    /// <remarks>Development API. Preserves UTF-8 bytes without temporary strings or arrays.
+    /// Does not match part of a grapheme. Candidate scans can repeat prefix work; no linear-time guarantee.</remarks>
+    func StartsWith(prefix: string) -> bool {
+        return neoCLR.Runtime.StringStartsWithCanonical(m_value, prefix)
+    }
+
+    /// <summary>Tests whether text starts with the supplied text using an explicit policy.</summary>
+    /// <param name="prefix">Non-null text to match; empty matches for every valid policy.</param>
+    /// <param name="comparison">Canonical matches complete graphemes; Ordinal matches bytes;
+    /// OrdinalIgnoreCase matches simple-folded scalars without normalization or expansion.</param>
+    /// <returns>True when a match is found.</returns>
+    /// <remarks>Development API. Unknown modes fault with RuntimeError, including empty patterns.
+    /// Ordinal modes may match inside graphemes. No cultural matching, temporary strings or arrays.
+    /// Preserves UTF-8 bytes. Candidate scans can repeat prefix work; no linear-time guarantee.</remarks>
+    func StartsWith(prefix: string, comparison: StringComparison) -> bool {
+        if comparison == StringComparison.Canonical {
+            return neoCLR.Runtime.StringStartsWithCanonical(m_value, prefix)
+        }
+        if comparison == StringComparison.Ordinal {
+            return neoCLR.Runtime.StringStartsWithOrdinal(m_value, prefix)
+        }
+        if comparison == StringComparison.OrdinalIgnoreCase {
+            return neoCLR.Runtime.StringStartsWithOrdinalIgnoreCase(m_value, prefix)
+        }
+        System.Fail("Unsupported StringComparison")
+        return false
+    }
+
+    /// <summary>Tests whether text ends with the supplied text by canonical whole-grapheme matching.</summary>
+    /// <param name="suffix">Non-null text to match; empty always matches.</param>
+    /// <returns>True when a match is found.</returns>
+    /// <remarks>Development API. Preserves UTF-8 bytes without temporary strings or arrays.
+    /// Does not match part of a grapheme. Candidate scans can repeat prefix work; no linear-time guarantee.</remarks>
+    func EndsWith(suffix: string) -> bool {
+        return neoCLR.Runtime.StringEndsWithCanonical(m_value, suffix)
+    }
+
+    /// <summary>Tests whether text ends with the supplied text using an explicit policy.</summary>
+    /// <param name="suffix">Non-null text to match; empty matches for every valid policy.</param>
+    /// <param name="comparison">Canonical matches complete graphemes; Ordinal matches bytes;
+    /// OrdinalIgnoreCase matches simple-folded scalars without normalization or expansion.</param>
+    /// <returns>True when a match is found.</returns>
+    /// <remarks>Development API. Unknown modes fault with RuntimeError, including empty patterns.
+    /// Ordinal modes may match inside graphemes. No cultural matching, temporary strings or arrays.
+    /// Preserves UTF-8 bytes. Candidate scans can repeat prefix work; no linear-time guarantee.</remarks>
+    func EndsWith(suffix: string, comparison: StringComparison) -> bool {
+        if comparison == StringComparison.Canonical {
+            return neoCLR.Runtime.StringEndsWithCanonical(m_value, suffix)
+        }
+        if comparison == StringComparison.Ordinal {
+            return neoCLR.Runtime.StringEndsWithOrdinal(m_value, suffix)
+        }
+        if comparison == StringComparison.OrdinalIgnoreCase {
+            return neoCLR.Runtime.StringEndsWithOrdinalIgnoreCase(m_value, suffix)
+        }
+        System.Fail("Unsupported StringComparison")
+        return false
+    }
+
     func ContainsOrdinal(substring: string) -> bool {
         return neoCLR.Runtime.StringContainsOrdinal(m_value, substring)
     }

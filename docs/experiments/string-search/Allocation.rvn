@@ -1,0 +1,21 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    let text = "éΣKẞé"
+    var count = 0
+    while count < 128 {
+        var result = true
+        if mode == "check" {
+            result = text.Contains("é") && text.StartsWith("é") && text.EndsWith("é")
+                && text.Contains("ςkß", StringComparison.OrdinalIgnoreCase)
+                && "ΣKẞ".StartsWith("ςkß", StringComparison.OrdinalIgnoreCase)
+                && "ΣKẞ".EndsWith("ςkß", StringComparison.OrdinalIgnoreCase)
+        }
+        if !result {
+            System.Fail("Search allocation fixture")
+        }
+        count += 1
+    }
+    Console.WriteLine("PASS search allocation")
+}

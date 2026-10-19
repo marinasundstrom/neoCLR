@@ -112,3 +112,16 @@ internal extern func CharCompareCanonical(left: char, right: char) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func CharHashCanonical(value: char) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringContainsCanonical(text: string, pattern: string) -> bool;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringStartsWithCanonical(text: string, pattern: string) -> bool;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringEndsWithCanonical(text: string, pattern: string) -> bool;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringContainsOrdinalIgnoreCase(text: string, pattern: string) -> bool;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringStartsWithOrdinalIgnoreCase(text: string, pattern: string) -> bool;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringEndsWithOrdinalIgnoreCase(text: string, pattern: string) -> bool;

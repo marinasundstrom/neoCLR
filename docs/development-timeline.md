@@ -19994,3 +19994,13 @@ Native JSON backend/runtime gaps remain open separately.
   **Action:** continue nullable predicates and comparison utilities; no storage,
   value-type or StringSlice decision is adopted. The separate-type interpretation
   was corrected and must not be treated as the requested direction.
+
+
+- **Author question (2026-10-19):** “Are there any helpers to place on the Char type?”
+  **Assistant proposal:** TryFromString returning Option, borrowed Utf8Bytes, scalar
+  traversal without an eager array, explicit comparison-policy Equals, and a clearly
+  defined whole-grapheme IsWhiteSpace. Keep scalar categories on UnicodeScalar until
+  multi-scalar grapheme classification is specified; casing should return string
+  because mappings can expand. **Action/status:** inspect the current Raven Char
+  and UnicodeScalar APIs and finish String search first. These Char additions are a
+  proposed shortlist, not implemented APIs or an approved representation change.

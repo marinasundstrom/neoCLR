@@ -233,6 +233,12 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::StringCompareOrdinalIgnoreCase
             | crate::native::Binding::StringHashOrdinal
             | crate::native::Binding::StringHashOrdinalIgnoreCase
+            | crate::native::Binding::StringContainsCanonical
+            | crate::native::Binding::StringStartsWithCanonical
+            | crate::native::Binding::StringEndsWithCanonical
+            | crate::native::Binding::StringContainsOrdinalIgnoreCase
+            | crate::native::Binding::StringStartsWithOrdinalIgnoreCase
+            | crate::native::Binding::StringEndsWithOrdinalIgnoreCase
             | crate::native::Binding::StringContainsOrdinal
             | crate::native::Binding::StringStartsWithOrdinal
             | crate::native::Binding::StringEndsWithOrdinal

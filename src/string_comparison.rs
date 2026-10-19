@@ -1,7 +1,7 @@
 //! Locale-independent Unicode 17 default simple case folding for string policies.
 use core::cmp::Ordering;
 
-fn fold(value: char) -> char {
+pub(crate) fn fold(value: char) -> char {
     let mappings = crate::string_case_folding::MAPPINGS;
     match mappings.binary_search_by_key(&(value as u32), |&(source, _)| source) {
         Ok(index) => char::from_u32(mappings[index].1).expect("valid generated case-fold scalar"),

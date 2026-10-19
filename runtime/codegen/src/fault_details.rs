@@ -85,6 +85,12 @@ pub struct Options {
     pub file_output: Vec<usize>,
     pub path_combine: Vec<usize>,
     pub path_file_name: Vec<usize>,
+    pub string_contains_canonical: Vec<usize>,
+    pub string_starts_with_canonical: Vec<usize>,
+    pub string_ends_with_canonical: Vec<usize>,
+    pub string_contains_ignore_case: Vec<usize>,
+    pub string_starts_with_ignore_case: Vec<usize>,
+    pub string_ends_with_ignore_case: Vec<usize>,
     pub string_contains_ordinal: Vec<usize>,
     pub string_starts_with_ordinal: Vec<usize>,
     pub string_ends_with_ordinal: Vec<usize>,
@@ -983,6 +989,48 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "string-compare-ordinal-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_contains_canonical: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-contains-canonical-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_starts_with_canonical: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-starts-with-canonical-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_ends_with_canonical: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-ends-with-canonical-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_contains_ignore_case: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-contains-ignore-case-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_starts_with_ignore_case: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-starts-with-ignore-case-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_ends_with_ignore_case: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-ends-with-ignore-case-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             string_contains_ordinal: report

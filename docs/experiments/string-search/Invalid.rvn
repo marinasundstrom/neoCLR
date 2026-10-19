@@ -1,0 +1,12 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = (StringComparison)99
+    if args[0] == "contains" {
+        Console.WriteLine("".Contains("", mode).ToString())
+    } else if args[0] == "prefix" {
+        Console.WriteLine("".StartsWith("", mode).ToString())
+    } else {
+        Console.WriteLine("".EndsWith("", mode).ToString())
+    }
+}

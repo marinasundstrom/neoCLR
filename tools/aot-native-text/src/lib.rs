@@ -54,6 +54,8 @@ mod string_casing_kernel;
 mod string_case_folding;
 #[path = "../../../src/string_comparison.rs"]
 mod string_comparison;
+#[path = "../../../src/string_search.rs"]
+mod string_search;
 #[path = "../../../src/string_normalization.rs"]
 mod string_normalization;
 #[path = "../../../src/string_normalization_data.rs"]
@@ -373,5 +375,62 @@ mod canonical_tests {
         assert_eq!(left, "é".as_bytes());
         assert_eq!(right, "e\u{301}".as_bytes());
         assert_ne!(left, right);
+    }
+}
+
+/// Borrowed search: operation 0=contains, 1=prefix, 2=suffix;
+/// comparison 1=ordinal simple fold, 2=canonical whole graphemes.
+/// Invalid input leaves output untouched. No allocation or pointer retention.
+/// # Safety
+/// Inputs must be readable for their lengths. Output must be aligned, writable,
+/// and disjoint from both inputs.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_unicode_search_v1(
+    text: *const u8, text_len: usize, pattern: *const u8, pattern_len: usize,
+    operation: i32, comparison: i32, output: *mut i32,
+) -> i32 {
+    let (Some(text), Some(pattern)) = (unsafe { input(text, text_len) }, unsafe { input(pattern, pattern_len) }) else { return 3 };
+    if output.is_null() { return 3; }
+    let result = match (operation, comparison) {
+        (0, 2) => string_search::contains(text, pattern),
+        (1, 2) => string_search::starts_with(text, pattern),
+        (2, 2) => string_search::ends_with(text, pattern),
+        (0, 1) => string_search::contains_ignore_case(text, pattern),
+        (1, 1) => string_search::starts_with_ignore_case(text, pattern),
+        (2, 1) => string_search::ends_with_ignore_case(text, pattern),
+        _ => return 3,
+    };
+    unsafe { *output = i32::from(result); }
+    0
+}
+
+#[cfg(test)]
+mod search_tests {
+    use super::*;
+    #[test]
+    fn search_abi_validates_inputs_before_publishing() {
+        for operation in 0..3 {
+            for (text, pattern, mode, expected) in [
+                ("é", "e\u{301}", 2, 1), ("e\u{301}", "e", 2, 0),
+                ("K", "k", 1, 1), ("ß", "SS", 1, 0), ("", "", 2, 1),
+            ] {
+                let mut output = 42;
+                assert_eq!(unsafe { neoclr_unicode_search_v1(text.as_ptr(), text.len(), pattern.as_ptr(), pattern.len(), operation, mode, &mut output) }, 0);
+                assert_eq!(output, expected);
+            }
+        }
+        let mut output = 42;
+        for (text, pattern, operation, mode) in [
+            (b"\xff".as_slice(), b"a".as_slice(), 0, 2),
+            (b"a", b"\xff", 0, 2), (b"a", b"a", 3, 2), (b"a", b"a", 0, 0),
+        ] {
+            assert_eq!(unsafe { neoclr_unicode_search_v1(text.as_ptr(), text.len(), pattern.as_ptr(), pattern.len(), operation, mode, &mut output) }, 3);
+            assert_eq!(output, 42);
+        }
+        unsafe {
+            assert_eq!(neoclr_unicode_search_v1(core::ptr::null(), 0, b"".as_ptr(), 0, 0, 2, &mut output), 3);
+            assert_eq!(neoclr_unicode_search_v1(b"".as_ptr(), 0, b"".as_ptr(), 0, 0, 2, core::ptr::null_mut()), 3);
+        }
+        assert_eq!(output, 42);
     }
 }
