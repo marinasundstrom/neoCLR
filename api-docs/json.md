@@ -28,8 +28,8 @@ Serialize/SerializeNode still produce owned strings because their caller request
 Development input parsing borrows the source string’s UTF-8 bytes. Unescaped JSON
 strings decode directly into their final owned text; escaped strings use scratch
 storage. Numbers retain their original spelling, and boolean/null tokens need no
-temporary strings. HTTP and stream input still materialize whole-document text
-before invoking this parser. Incremental parsing and Utf8JsonReader/Utf8JsonWriter
+temporary strings. HTTP byte input uses the borrowed overloads below; stream input still materializes
+whole-document text before invoking the parser. Incremental parsing and Utf8JsonReader/Utf8JsonWriter
 contracts remain future work.
 
 Stream APIs validate the complete document before the first write and leave the
@@ -37,6 +37,36 @@ stream open without flushing it. An output I/O failure can follow partial output
 its original StreamError remains wrapped by JsonError.Write. A pending write retains
 its owned byte array until completion. Shared OutputStream currently accepts an
 array and range; the wider Memory signature migration remains separate.
+
+## UTF-8 byte input (development)
+
+The native reference includes these synchronous overloads:
+
+```text
+DeserializeNode(utf8: ReadOnlySlice<byte>) -> Result<JsonValue, JsonError>
+Deserialize<T>(utf8: ReadOnlySlice<byte>) -> Result<T, JsonError>
+Deserialize(utf8: ReadOnlySlice<byte>, type: TypeInfo) -> Result<Object, JsonError>
+```
+
+Only the selected window is read. Input is borrowed for the call and never stored;
+returned nodes, property names, strings and number lexemes own their text.
+Subsequent changes to the input array do not change a completed result. Mapping
+uses the same supported types and errors as the text overloads.
+
+The 1,024-byte cap is checked first, returning
+`JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes")`. Complete strict UTF-8
+validation then runs without creating a document string. Malformed UTF-8 returns
+`JsonError.Read(TextReadError.InvalidUtf8)`, even if a JSON syntax error appears
+earlier in the bytes. JSON parsing and mapping follow validation. Overlong sequences,
+surrogate encodings, truncated sequences and values above U+10FFFF are rejected.
+A BOM remains a JSON syntax/number error; it is not stripped. Empty input fails
+with `Syntax("Missing value")`; raw NUL is valid UTF-8 but invalid inside a JSON string.
+
+String-backed readonly slices and nonzero array windows are supported. Explicit
+byte input does not change String's grapheme indexing or add an incremental JSON
+reader. The legacy CLI documentation scaffold omits these three borrowed signatures;
+its opaque view types cannot safely project them. This section and the native
+JsonSerializer member pages provide their reference.
 
 ## JSON text and indentation
 
@@ -239,7 +269,11 @@ UTF-8 JSON; the caller selects header and status policy. All operations are
 synchronous, preserve the serializer's errors and limits, and leave content reusable.
 Invalid UTF-8 is `JsonError.Read(TextReadError.InvalidUtf8)`. Empty bytes fail JSON
 syntax validation; a `null` document is a JsonNull node, while model mapping
-continues rejecting it. The byte limit is checked before decoding.
+continues rejecting it. The byte limit is checked before UTF-8 validation. Array-backed content is borrowed
+directly; other Sequence implementations retain one contiguous snapshot per read.
+No whole-document string is created. Existing sequence alias behavior is preserved
+between calls. Unbuffered content returns Read(IoFailure) without reading or closing
+its stream.
 
 These methods do not send a request, complete/close a context or add cancellation.
 The [mapped HTTP sample](/cases/http-server/) uses the same helpers on both peers.

@@ -236,4 +236,6 @@ In development, JSON HTTP content and output streams serialize directly into bou
 UTF-8 byte storage. `SerializeToUtf8Bytes` exposes an owned byte result; text-returning
 APIs still return text. InputStream deserialization remains available and currently
 materializes text before parsing. The parser now borrows that text’s UTF-8 storage,
-avoiding repeated encoding and temporary quoted-token strings. See [JSON contracts](/docs/json.html).
+avoiding repeated encoding and temporary quoted-token strings. Buffered HTTP JSON
+now parses byte windows directly, validating UTF-8 without creating a document string.
+Non-array sequences still require one contiguous snapshot. See [JSON contracts](/docs/json.html).

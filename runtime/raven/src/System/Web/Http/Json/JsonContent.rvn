@@ -23,13 +23,13 @@ public class JsonContent {
     }
 
     static func ReadNode(content: HttpContent) -> Result<JsonValue, JsonError> {
-        let text = Decode(content)?
-        return JsonSerializer.DeserializeNode(text)
+        let bytes = BufferedBytes(content)?
+        return JsonSerializer.DeserializeNode(bytes)
     }
 
     static func Read(content: HttpContent, type: TypeInfo) -> Result<Object, JsonError> {
-        let text = Decode(content)?
-        return JsonSerializer.Deserialize(text, type)
+        let bytes = BufferedBytes(content)?
+        return JsonSerializer.Deserialize(bytes, type)
     }
 
     static func Read<T>(content: HttpContent) -> Result<T, JsonError> {
@@ -37,16 +37,13 @@ public class JsonContent {
         return Ok((T)instance)
     }
 
-    private static func Decode(content: HttpContent) -> Result<string, JsonError> {
+    private static func BufferedBytes(content: HttpContent) -> Result<byte[], JsonError> {
         if !content.IsBuffered {
             return Error(JsonError.Read(TextReadError.IoFailure))
         }
         if content.Bytes.Count > 1024 {
             return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
-        return match HttpText.Decode(content.Bytes) {
-            Ok(let text) => Ok(text)
-            Error(_) => Error(JsonError.Read(TextReadError.InvalidUtf8))
-        }
+        return Ok(HttpText.Snapshot(content.Bytes))
     }
 }

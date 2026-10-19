@@ -203,6 +203,10 @@ JSON_NAMES = [
     'JSON sequence snapshots preserve order and shared child contents',
 ]
 JSON_STREAM_NAMES = [
+    'JSON HTTP byte input preserves sequence aliases and rejects unbuffered content',
+    'JSON byte input borrows selected windows and returns owned mapped values',
+    'JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls',
+    'JSON byte input rejects invalid UTF-8 before syntax and preserves quotas',
     'JSON UTF-8 byte output preserves escaping formatting and independent ownership',
     'JSON borrowed token parsing preserves empty Unicode escaped and scalar values',
     'JSON borrowed token parsing rejects malformed escapes controls and numbers',
@@ -459,6 +463,18 @@ def main():
             profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
+            if name == "json-streams":
+                # Scalar ObjectMapper paths select reflection services. Retain only the
+                # runtime's first type identity, without constructors or members.
+                listing = out / 'json-reflection-module.neoil'
+                subprocess.run([str(args.runtime.resolve()), 'disassemble',
+                                str(bundle / 'lib/System.Runtime.dll'), str(listing)], check=True)
+                listing_text = listing.read_text()
+                metadata, _ = json.JSONDecoder().raw_decode(listing_text[listing_text.index('{'):])
+                json_roots = out / 'json-reflection-roots.json'
+                json_roots.write_text(json.dumps(dict(schemaVersion=2, types=[dict(
+                    definition=dict(module=metadata['name'], revision=metadata['revision'], index=0),
+                    construct=False, properties=False, getters=False, setters=False)]), indent=2) + '\n')
             if 'native' in modes:
                 command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
                            profile, '--project', TESTS / name / 'Tests.rvnproj',
@@ -467,6 +483,9 @@ def main():
                     command += ["--byte-array-limit", "131072"]
                 if name == "gzip":
                     command += ["--http-heap-bytes", "33554432"]
+                if name == "json-streams":
+                    # Scalar mapping needs a reflection scope, but no retained model constructors.
+                    command += ["--reflection-roots", json_roots]
                 phase = 'native-project-build'
             else:
                 # Raven emits the same metadata assembly directly. JIT/interpreter
@@ -520,6 +539,8 @@ def main():
                     jit = interpreter[:interpreter.index('--instructions')] + [
                         '--jit-host', args.jit_host.resolve(),
                         '--jit-compiler', args.aot.resolve()]
+                    if name == "json-streams":
+                        jit += ["--reflection-roots", json_roots]
                     executions.append((mode, jit, ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:

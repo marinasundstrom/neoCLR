@@ -51,7 +51,7 @@ internal static class HttpText {
         }
     }
 
-    private static func Snapshot(bytes: Sequence<byte>) -> byte[] {
+    internal static func Snapshot(bytes: Sequence<byte>) -> byte[] {
         if bytes is byte[] array {
             return array
         }

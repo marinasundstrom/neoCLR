@@ -2,7 +2,7 @@
 
 Author direction, 2026-10-19: avoiding unnecessary string materialization is an API
 requirement, including the JSON serializer. This began as a source audit. The byte-output portion is now implemented below;
-byte-input parsing and incremental reader/writer APIs remain planned.
+borrowed byte-input parsing is also implemented; incremental reader/writer APIs remain planned.
 
 The preceding [borrowed decoding change](../../benchmarks/http-server/serve/decode-slice-20261019/README.md)
 removes temporary arrays when text is actually needed. JSON also needs to avoid
@@ -12,12 +12,12 @@ creating text merely to feed the next byte-oriented parser or output operation.
 
 | Path | Current implementation | Avoidable work to measure/remove |
 | --- | --- | --- |
-| Http.Json.JsonContent.Read/ReadNode | HttpText.Decode(content.Bytes), then JsonSerializer.Deserialize | Full document bytes → string → bytes in DocumentReader |
-| JsonSerializer.DeserializeNode(InputStream) | StreamReader.ReadToEnd, then string overload | Whole document materialization and re-encoding before parsing |
-| DocumentReader.ReadString | SliceUtf8 creates a token string; MessageReader re-encodes it and unescapes | Intermediate quoted token string and byte snapshot, separate from the actual returned JSON string |
-| JsonContent.Create/CreateNode | Serialize into string, then HttpText.Encode | Full result string when the consumer wants bytes |
-| JsonSerializer.SerializeNode(OutputStream, ...) | Serialize into string, then StreamWriter.Write | Full result string and encoding buffers before output |
-| DocumentWriter.Append | String.Concat for each fragment | Repeated copies of the accumulated document |
+| Http.Json.JsonContent.Read/ReadNode | Borrow array storage; snapshot other sequences once; deserialize ReadOnlySlice<byte> | No whole-document string; general sequence snapshot remains |
+| JsonSerializer.DeserializeNode(InputStream) | StreamReader.ReadToEnd, then borrowed string overload | Whole document materialization remains |
+| DocumentReader.ReadString | Borrow token bytes; directly decode or unescape into owned result | Returned DOM strings remain necessary |
+| JsonContent.Create/CreateNode | SerializeToUtf8Bytes | Owned output buffer |
+| JsonSerializer.SerializeNode(OutputStream, ...) | Serialize bytes, then write | Bounded staging preserves validation before output |
+| DocumentWriter.Append | Bounded UTF-8 byte storage | Final owned copy for byte-returning API |
 | ObjectMapper.Read | Builds/consumes JsonValue DOM and its property names first | Potential unused DOM/string materialization when mapping directly; separate from the initial byte-path migration |
 
 Source: runtime/raven/src/System/Data/Json/{JsonSerializer,JsonDocument,JsonSyntax,ObjectMapper}.rvn
@@ -141,3 +141,22 @@ in the fixed round-trip probe: 36.7% fewer allocations and 9.1%/10.0% lower mean
 under paced/every-boundary synchronous GC versus the original parser. No policy
 change or HTTP throughput improvement is implied. Whole-document stream/HTTP input
 decoding remains the next integration boundary.
+
+## Borrowed public input and HTTP integration (2026-10-19)
+
+JsonSerializer now accepts ReadOnlySlice<byte> for node, generic and TypeInfo-based
+deserialization. The returned DOM/objects own their text; no source window escapes.
+The 1024-byte limit is checked before strict UTF-8 validation, which precedes JSON
+syntax and mapping. This preserves buffered HTTP's malformed-text precedence,
+including invalid bytes following an earlier syntax error. The validator follows
+[RFC 3629 section 4](https://datatracker.ietf.org/doc/html/rfc3629#section-4),
+rejecting overlong sequences, surrogate encodings and scalars above U+10FFFF.
+
+HTTP reads borrow existing byte arrays and snapshot other Sequence<byte> storage
+once. Unbuffered content is rejected without consuming its stream. Compared with
+.NET's ReadOnlySpan<byte> overload family, the deliberate difference is neoCLR's
+existing typed JsonError and bounded document contract; the borrowed input/owned
+result lifetime model is the same. Stream input still materializes whole text.
+See [the HTTP input probe](../../benchmarks/json-http-input/20261019/README.md)
+for allocation and synchronous-collector measurements, including the cost of full
+UTF-8 validation. This does not establish server throughput or concurrent-GC gains.

@@ -2497,3 +2497,15 @@ for RavenDoc; no type exclusion or compiler projection is needed. The matching
 System.Data native XML and regenerated reference source include both signatures.
 HTTP JsonContent and OutputStream output now use direct bytes; InputStream parsing
 still converts through text. See [JSON API guide](json.md).
+
+
+### 2026-10-19 — Borrowed JSON byte input
+
+Native JsonSerializer reference pages include DeserializeNode(ReadOnlySlice<byte>),
+Deserialize<T>(ReadOnlySlice<byte>) and Deserialize(ReadOnlySlice<byte>, TypeInfo),
+with XML parameter/result contracts and the existing selected JsonSerializer type.
+The legacy CLI scaffold omits precisely these three signatures because borrowed
+views cannot safely be represented by its opaque compatibility types. The
+[manual input reference](json.md#utf-8-byte-input-development) covers signatures,
+ownership, quotas, strict UTF-8 precedence, BOM behavior and mapping limitations.
+HTTP consumes byte windows; InputStream still decodes full text first.

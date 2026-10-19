@@ -320,3 +320,97 @@ func ParserInvalidTokens() -> Result<unit, TestFailure> {
     }
     return Assert.True(JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Error(JsonError.DuplicateField("a")), "Compare decoded names")
 }
+
+[Test("JSON byte input borrows selected windows and returns owned mapped values")]
+func ByteInputOwnership() -> Result<unit, TestFailure> {
+    let bytes = [(byte)255, (byte)34, (byte)195, (byte)169, (byte)34, (byte)255]
+    let window: ReadOnlySlice<byte> = bytes[1..5]
+    let Ok(node) = JsonSerializer.DeserializeNode(window) else {
+        return Assert.True(false, "Parse only the selected window")
+    }
+    bytes[2] = (byte)65
+    if node is JsonString text {
+        _ = Assert.Equal("é", text.Value)?
+    } else {
+        return Assert.True(false, "Return an owned string node")
+    }
+    _ = Assert.Equal(255, (int)bytes[0])?
+    _ = Assert.True(JsonSerializer.Deserialize<string>("\"mapped\"".Utf8Bytes) is Ok("mapped"), "Generic byte mapping")?
+    let Ok(number) = JsonSerializer.Deserialize("42".Utf8Bytes, typeof(int)) else {
+        return Assert.True(false, "Explicit type byte mapping")
+    }
+    return Assert.Equal(42, (int)number)
+}
+
+[Test("JSON byte input rejects invalid UTF-8 before syntax and preserves quotas")]
+func ByteInputValidation() -> Result<unit, TestFailure> {
+    _ = ExpectInvalidJsonUtf8([(byte)128])?
+    _ = ExpectInvalidJsonUtf8([(byte)192, (byte)128])?
+    _ = ExpectInvalidJsonUtf8([(byte)193, (byte)191])?
+    _ = ExpectInvalidJsonUtf8([(byte)224, (byte)159, (byte)191])?
+    _ = ExpectInvalidJsonUtf8([(byte)237, (byte)160, (byte)128])?
+    _ = ExpectInvalidJsonUtf8([(byte)240, (byte)143, (byte)191, (byte)191])?
+    _ = ExpectInvalidJsonUtf8([(byte)244, (byte)144, (byte)128, (byte)128])?
+    _ = ExpectInvalidJsonUtf8([(byte)245, (byte)128, (byte)128, (byte)128])?
+    _ = ExpectInvalidJsonUtf8([(byte)255])?
+    _ = ExpectInvalidJsonUtf8([(byte)194])?
+    _ = ExpectInvalidJsonUtf8([(byte)226, (byte)130])?
+    _ = ExpectInvalidJsonUtf8([(byte)240, (byte)159, (byte)152])?
+    _ = ExpectInvalidJsonUtf8([(byte)194, (byte)32])?
+    _ = ExpectInvalidJsonUtf8([(byte)226, (byte)130, (byte)32])?
+    let syntaxThenUtf8 = [(byte)63, (byte)255]
+    _ = Assert.True(JsonSerializer.DeserializeNode(syntaxThenUtf8) is Error(JsonError.Read(TextReadError.InvalidUtf8)), "Validate the entire input first")?
+    let empty: byte[] = []
+    _ = Assert.True(JsonSerializer.DeserializeNode(empty) is Error(JsonError.Syntax("Missing value")), "Empty window is valid UTF-8 but not JSON")?
+    let oversized = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(1025)
+    var index = 0
+    while index < oversized.Length {
+        oversized[index] = (byte)255
+        index += 1
+    }
+    return Assert.True(JsonSerializer.DeserializeNode(oversized) is Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes")), "Quota precedes UTF-8 validation")
+}
+
+[Test("JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls")]
+func ByteInputUnicodeBoundaries() -> Result<unit, TestFailure> {
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)194, (byte)128, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)223, (byte)191, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)224, (byte)160, (byte)128, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)237, (byte)159, (byte)191, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)238, (byte)128, (byte)128, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)239, (byte)191, (byte)191, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)240, (byte)144, (byte)128, (byte)128, (byte)34])?
+    _ = ExpectValidJsonUtf8([(byte)34, (byte)244, (byte)143, (byte)191, (byte)191, (byte)34])?
+    let bom = [(byte)239, (byte)187, (byte)191, (byte)49]
+    _ = Assert.True(JsonSerializer.DeserializeNode(bom) is Error(JsonError.InvalidNumber), "Keep existing BOM rejection")?
+    let control = [(byte)34, (byte)0, (byte)34]
+    return Assert.True(JsonSerializer.DeserializeNode(control) is Error(JsonError.Syntax("Unescaped control byte")), "UTF-8 NUL is not a raw JSON string character")
+}
+
+[Test("JSON HTTP byte input preserves sequence aliases and rejects unbuffered content")]
+func ByteInputHttp() -> Result<unit, TestFailure> {
+    let bytes = [(byte)49]
+    let content = System.Web.Http.HttpContent(bytes)
+    _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(content) is Ok(1), "Read array-backed content")?
+    bytes[0] = (byte)50
+    _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(content) is Ok(2), "Preserve existing alias semantics")?
+    let list = ArrayList<byte>()
+    list.Add((byte)51)
+    _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(System.Web.Http.HttpContent(list)) is Ok(3), "Snapshot general sequences")?
+    let input = ShortInput(bytes, -1)
+    let Ok(streamed) = System.Web.Http.HttpContent.FromStream(input, 1, true) else {
+        return Assert.True(false, "Create stream content")
+    }
+    _ = Assert.True(System.Web.Http.Json.JsonContent.ReadNode(streamed) is Error(JsonError.Read(TextReadError.IoFailure)), "Reject unbuffered content")?
+    _ = Assert.Equal(0, input.Position)?
+    return Assert.True(!input.Closed, "Do not consume or close stream content")
+}
+
+
+func ExpectInvalidJsonUtf8(bytes: byte[]) -> Result<unit, TestFailure> {
+    return Assert.True(JsonSerializer.DeserializeNode(bytes) is Error(JsonError.Read(TextReadError.InvalidUtf8)), "Reject malformed UTF-8")
+}
+
+func ExpectValidJsonUtf8(bytes: byte[]) -> Result<unit, TestFailure> {
+    return Assert.True(JsonSerializer.DeserializeNode(bytes) is Ok(JsonString), "Accept valid scalar boundaries")
+}

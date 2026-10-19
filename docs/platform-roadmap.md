@@ -61,8 +61,7 @@ borrows string UTF-8 storage and materializes only owned string/number tokens; s
 [JSON parser evidence](../benchmarks/json-byte-input/20261019/README.md). The initial borrowed parser raised CPU 31.6% under every-boundary GC;
 [removing redundant parser work](../benchmarks/json-byte-input/20261019/gc-followup/README.md)
 now lowers allocations 36.7% and mean probe CPU 9.1%/10.0% with paced/every-boundary
-synchronous GC versus the original parser. These are not HTTP throughput results. Direct HTTP/stream
-byte input and incremental token reader/writer contracts remain separate work. Small ASCII allocation
+synchronous GC versus the original parser. These are not HTTP throughput results. [Direct buffered HTTP byte input](../benchmarks/json-http-input/20261019/README.md) now avoids the whole-document string through public borrowed JSON overloads. Stream byte input and incremental token reader/writer contracts remain separate work. Small ASCII allocation
 volume does not establish general string CPU or live-retention costs.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and

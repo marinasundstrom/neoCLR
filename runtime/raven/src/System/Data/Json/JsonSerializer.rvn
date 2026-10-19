@@ -17,6 +17,19 @@ public class JsonSerializer {
         return DocumentReader().Read(text.Utf8Bytes)
     }
 
+    /// <summary>Parses a borrowed UTF-8 byte window into independently owned JSON values.</summary>
+    /// <param name="utf8">The complete document, borrowed only during this call.</param>
+    /// <returns>A JSON node or a quota, UTF-8 or syntax error. The 1024-byte limit is checked before UTF-8; complete UTF-8 validation precedes JSON parsing.</returns>
+    static func DeserializeNode(utf8: ReadOnlySlice<byte>) -> Result<JsonValue, JsonError> {
+        if utf8.Length > 1024 {
+            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+        }
+        if !JsonSyntax.ValidUtf8(utf8) {
+            return Error(JsonError.Read(TextReadError.InvalidUtf8))
+        }
+        return DocumentReader().Read(utf8)
+    }
+
     async static func DeserializeNode(input: InputStream) -> Task<Result<JsonValue, JsonError>> {
         let reader = StreamReader(input, true)
         let result = await reader.ReadToEnd(1024)
@@ -92,6 +105,14 @@ public class JsonSerializer {
         return Ok((T)instance)
     }
 
+    /// <summary>Deserializes a complete borrowed UTF-8 document using the supported object mapping contract.</summary>
+    /// <param name="utf8">The complete document, borrowed only during this call.</param>
+    /// <returns>An independently owned value or a quota, UTF-8, syntax or mapping error.</returns>
+    static func Deserialize<T>(utf8: ReadOnlySlice<byte>) -> Result<T, JsonError> {
+        let instance = Deserialize(utf8, typeof(T))?
+        return Ok((T)instance)
+    }
+
     async static func Deserialize<T>(input: InputStream) -> Task<Result<T, JsonError>> {
         let instance = await Deserialize(input, typeof(T))?
         return Ok((T)instance)
@@ -99,6 +120,15 @@ public class JsonSerializer {
 
     static func Deserialize(text: string, type: TypeInfo) -> Result<Object, JsonError> {
         let document = DeserializeNode(text)?
+        return ObjectMapper.Read(document, type)
+    }
+
+    /// <summary>Deserializes a complete borrowed UTF-8 document into the specified supported type.</summary>
+    /// <param name="utf8">The complete document, borrowed only during this call.</param>
+    /// <param name="type">The supported target type.</param>
+    /// <returns>An independently owned object or a quota, UTF-8, syntax or mapping error.</returns>
+    static func Deserialize(utf8: ReadOnlySlice<byte>, type: TypeInfo) -> Result<Object, JsonError> {
+        let document = DeserializeNode(utf8)?
         return ObjectMapper.Read(document, type)
     }
 

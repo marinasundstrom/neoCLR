@@ -77,6 +77,8 @@ public sealed class JsonSerializer {
     public static Concurrency.Tasks.Task<Result<object, JsonError>> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
     public static Result<string, JsonError> Serialize(object value) => default;
     public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value) => default;
+    // Borrowed DeserializeNode/Deserialize<T>/Deserialize(ReadOnlySlice<byte>, TypeInfo)
+    // are native-only: this CLI scaffold cannot safely project borrowed views. See api-docs/json.md.
     public static Result<JsonValue, JsonError> DeserializeNode(string text) => default;
     public static Concurrency.Tasks.Task<Result<JsonValue, JsonError>> DeserializeNode(IO.InputStream input) => default;
     public static Result<string, JsonError> SerializeNode(JsonValue value) => default;

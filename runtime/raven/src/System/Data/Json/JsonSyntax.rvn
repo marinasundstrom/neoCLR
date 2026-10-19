@@ -33,6 +33,59 @@ internal class JsonSyntax {
         return true
     }
 
+    // Validate the complete byte document before reporting JSON syntax errors.
+    // No decoded text or temporary byte array is needed.
+    static func ValidUtf8(bytes: ReadOnlySlice<byte>) -> bool {
+        let length = bytes.Length
+        var index = 0
+        while index < length {
+            let first = bytes[index]
+            if first <= 127 {
+                index += 1
+            } else {
+                var width = 0
+                var lower = 128
+                var upper = 191
+                if first >= 194 && first <= 223 {
+                    width = 2
+                } else if first >= 224 && first <= 239 {
+                    width = 3
+                    if first == 224 {
+                        lower = 160
+                    } else if first == 237 {
+                        upper = 159
+                    }
+                } else if first >= 240 && first <= 244 {
+                    width = 4
+                    if first == 240 {
+                        lower = 144
+                    } else if first == 244 {
+                        upper = 143
+                    }
+                } else {
+                    return false
+                }
+                if length - index < width {
+                    return false
+                }
+                let second = bytes[index + 1]
+                if second < lower || second > upper {
+                    return false
+                }
+                let end = index + width
+                index += 2
+                while index < end {
+                    let next = bytes[index]
+                    if next < 128 || next > 191 {
+                        return false
+                    }
+                    index += 1
+                }
+            }
+        }
+        return true
+    }
+
     static func Digit(value: byte) -> bool {
         return value >= 48 && value <= 57
     }
