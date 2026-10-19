@@ -1,0 +1,27 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Data.Json.*
+import System.IO.*
+import System.Result.*
+import System.Web.Http.Json.*
+
+async func Main() -> Task<()> {
+    let sources = ["[1,2,3,4,5,6,7,8]", "{\"first\":\"hello\",\"second\":\"hello\"}", "{\"escaped\":\"é😀\\n\\u0000\\\"\"}"]
+    for source in sources {
+        for index in 0..200 {
+            let Ok(node) = JsonSerializer.DeserializeNode(source) else {
+                System.Fail("Probe parse failed")
+            }
+            let Ok(actual) = JsonSerializer.SerializeNode(node) else {
+                System.Fail("Probe serialize failed")
+            }
+            let Ok(reparsed) = JsonSerializer.DeserializeNode(actual) else {
+                System.Fail("Probe reparse failed")
+            }
+            if JsonSerializer.SerializeNode(reparsed) is Error(_) {
+                System.Fail("Round trip failed")
+            }
+        }
+    }
+    Console.WriteLine("PASS JSON byte input probe")
+}

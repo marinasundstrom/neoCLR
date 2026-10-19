@@ -235,4 +235,5 @@ avoid Promise wrappers in HTTP operations is under investigation.
 In development, JSON HTTP content and output streams serialize directly into bounded
 UTF-8 byte storage. `SerializeToUtf8Bytes` exposes an owned byte result; text-returning
 APIs still return text. InputStream deserialization remains available and currently
-materializes text before parsing. See [JSON contracts](/docs/json.html).
+materializes text before parsing. The parser now borrows that text’s UTF-8 storage,
+avoiding repeated encoding and temporary quoted-token strings. See [JSON contracts](/docs/json.html).

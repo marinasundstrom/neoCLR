@@ -25,8 +25,12 @@ Changing a returned array does not change the source node or another result.
 HTTP JsonContent creation and OutputStream serialization use this byte writer.
 They do not construct a whole-document string or quoted-token strings. Text-returning
 Serialize/SerializeNode still produce owned strings because their caller requests text.
-Existing input parsing still materializes/re-encodes text; this output change does not
-add incremental parsing or Utf8JsonReader/Utf8JsonWriter contracts.
+Development input parsing borrows the source string’s UTF-8 bytes. Unescaped JSON
+strings decode directly into their final owned text; escaped strings use scratch
+storage. Numbers retain their original spelling, and boolean/null tokens need no
+temporary strings. HTTP and stream input still materialize whole-document text
+before invoking this parser. Incremental parsing and Utf8JsonReader/Utf8JsonWriter
+contracts remain future work.
 
 Stream APIs validate the complete document before the first write and leave the
 stream open without flushing it. An output I/O failure can follow partial output;

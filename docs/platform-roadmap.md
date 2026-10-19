@@ -56,8 +56,11 @@ requirement to [JSON byte processing](design/json-byte-processing.md): avoid ful
 text intermediates when consuming or producing bytes. The source audit identifies
 HTTP/stream round trips and repeated writer concatenation; JSON-specific allocation
 evidence and the direct byte-output writer are now recorded in
-[JSON byte output](../benchmarks/json-byte-output/20261019/README.md); byte-input parser
-changes and incremental token reader/writer contracts remain separate work. Small ASCII allocation
+[JSON byte output](../benchmarks/json-byte-output/20261019/README.md). The parser now
+borrows string UTF-8 storage and materializes only owned string/number tokens; see
+[JSON parser evidence](../benchmarks/json-byte-input/20261019/README.md). This lowers allocations
+but raises mean probe CPU 31.6%; GC/root and view-access costs remain unresolved. Direct HTTP/stream
+byte input and incremental token reader/writer contracts remain separate work. Small ASCII allocation
 volume does not establish general string CPU or live-retention costs.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and

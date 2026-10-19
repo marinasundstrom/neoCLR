@@ -293,3 +293,30 @@ func OwnedUtf8Output() -> Result<unit, TestFailure> {
     }
     return Assert.Equal("{\"name\":\"é😀\\u000a\\u0000\\\"\\\\\",\"number\":-1.25e+2,\"values\":[true,false,null]}", compactText)
 }
+
+[Test("JSON borrowed token parsing preserves empty Unicode escaped and scalar values")]
+func ParserBorrowedValues() -> Result<unit, TestFailure> {
+    let sources = ["\"\"", "\"Café 😀\"", "\"é\"", "true", "false", "null", "-0.125E+02", "{\"a\":\"plain\",\"b\":\"\\n\\u0000\\uD83D\\uDE00\"}"]
+    let expected = ["\"\"", "\"Café 😀\"", "\"é\"", "true", "false", "null", "-0.125E+02", "{\"a\":\"plain\",\"b\":\"\\u000a\\u0000😀\"}"]
+    var index = 0
+    while index < sources.Length {
+        let Ok(value) = JsonSerializer.DeserializeNode(sources[index]) else {
+            return Assert.True(false, "Parse token fixture")
+        }
+        let Ok(text) = JsonSerializer.SerializeNode(value) else {
+            return Assert.True(false, "Serialize token fixture")
+        }
+        _ = Assert.Equal(expected[index], text)?
+        index += 1
+    }
+    return Ok(())
+}
+
+[Test("JSON borrowed token parsing rejects malformed escapes controls and numbers")]
+func ParserInvalidTokens() -> Result<unit, TestFailure> {
+    let sources = ["\"\\uD800\"", "\"\\uDC00\"", "\"\\uD800\\u0061\"", "\"\\u12\"", "\"\\x\"", "\"line\nfeed\"", "01", "-", "1.", "1e", "truex", "\"ok\" false"]
+    for source in sources {
+        _ = Assert.True(JsonSerializer.DeserializeNode(source) is Error(_), "Reject malformed token")?
+    }
+    return Assert.True(JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Error(JsonError.DuplicateField("a")), "Compare decoded names")
+}

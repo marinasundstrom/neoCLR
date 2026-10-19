@@ -14,7 +14,7 @@ public class JsonSerializer {
         if text.GetUtf8ByteCount() > 1024 {
             return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
-        return DocumentReader(text).Read()
+        return DocumentReader().Read(text.Utf8Bytes)
     }
 
     async static func DeserializeNode(input: InputStream) -> Task<Result<JsonValue, JsonError>> {

@@ -98,3 +98,28 @@ implemented and separately qualified, so the adopted writer uses borrowed string
 bytes; the intermediate fallback retaining token encoding buffers was not adopted.
 See [native bridge contract](../raven-cli-bridge.md#native-stringutf8bytes-lowering-2026-10-19).
 The Raven source compiler and public String.Utf8Bytes signature are unchanged.
+
+
+## Borrowed parser implementation, 2026-10-19
+
+The synchronous document and string-token readers now receive ReadOnlySlice<byte>
+parameters. Their objects retain only cursor/count state; no borrowed descriptor
+is stored on the heap. String input passes Utf8Bytes without encoding the complete
+document again. Property names and string values skip the quoted-token string and
+encoding array; unescaped tokens decode directly into final owned text. Escaped
+tokens retain bounded scratch storage for Unicode escape/surrogate decoding.
+Boolean/null recognition compares bytes, and number grammar borrows its owned
+lexeme rather than encoding it again. DOM results retain owned text.
+
+This follows System.Text.Json's byte-oriented parsing approach without changing
+public signatures or introducing a public incremental reader. The benefit is fewer
+temporary allocations; costs include passing views through parser calls and an
+extra scan before the escaped-token fallback. HTTP and stream entry points still
+decode complete text first. Direct byte input must preserve strict UTF-8 validation,
+stream quota/read consumption and I/O error ordering before that boundary changes.
+See [focused contracts and measurements](../../benchmarks/json-byte-input/20261019/README.md).
+
+The round-trip probe reduces allocations 32.5% but increases mean CPU 31.6%.
+Short stack samples are dominated by GC/root processing in both builds. The
+allocation benefit is not a speedup; investigate root/boundary and checked-view
+costs before expanding performance claims.

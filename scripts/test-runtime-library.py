@@ -204,6 +204,8 @@ JSON_NAMES = [
 ]
 JSON_STREAM_NAMES = [
     'JSON UTF-8 byte output preserves escaping formatting and independent ownership',
+    'JSON borrowed token parsing preserves empty Unicode escaped and scalar values',
+    'JSON borrowed token parsing rejects malformed escapes controls and numbers',
     'JSON stream serialization detects cycles before writing',
     'JSON stream output quota includes escaping and validates before writes',
     'JSON indented stream output matches node text and preflights quotas',

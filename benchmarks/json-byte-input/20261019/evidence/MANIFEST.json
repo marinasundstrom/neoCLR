@@ -1,0 +1,82 @@
+{
+  "baseline-build.json.gz": {
+    "sha256": "15c5f36532b3b03d69c2dfea4c084c96bcee12d1d61a88be316d0dfb9af4cc8e",
+    "bytes": 179163
+  },
+  "baseline-callers.json.gz": {
+    "sha256": "a36cb16217d74d69e6d2f1577568a5e3b4d7f44019ca0b3ae020d65939a111a6",
+    "bytes": 3744
+  },
+  "baseline-capture-build.json.gz": {
+    "sha256": "8ccb9ea084394f20e5dabe926edc8c941892507bcd4267787aa42084afc13cda",
+    "bytes": 1459
+  },
+  "baseline-capture-run.json.gz": {
+    "sha256": "7679e806f0410c19be3c9772263decb3a0ec7e6a4f400de9fb98f1b19fa7dc7e",
+    "bytes": 88
+  },
+  "baseline-final-contracts.json.gz": {
+    "sha256": "2979102d68a7aad448d12b468e5ca0dbacc6c758ffa6cfd9089054d3fae227f2",
+    "bytes": 6324
+  },
+  "baseline-library-build.json.gz": {
+    "sha256": "054c565b0ae08da52a96a6869b4ad1d467f7275d0e505e33bfd595dc33232072",
+    "bytes": 85413
+  },
+  "baseline-sample.json.gz": {
+    "sha256": "904dfb3461abb505feac4bafb08085681a68b804baa2448b397607d2183311cc",
+    "bytes": 254
+  },
+  "baseline-sample.txt.gz": {
+    "sha256": "f3ab469b3ea78e123aac5db1f4ca436ea70ea2ee4128548fc34041eb2f71a708",
+    "bytes": 19998
+  },
+  "candidate-build.json.gz": {
+    "sha256": "46ef0c44f4ad2800c7c00a77fd3690884c5e570ad972858b326423aae99624d6",
+    "bytes": 174164
+  },
+  "candidate-callers.json.gz": {
+    "sha256": "57b5c9e0f64e9ba92d81e69679d6f1b94e01073391ead45f6b1f94bc479f8a0d",
+    "bytes": 3002
+  },
+  "candidate-capture-build.json.gz": {
+    "sha256": "91b8f584c726d29867a5fbd325ec63ab8a6710d729f7ffcf7472cbabc90790ba",
+    "bytes": 1456
+  },
+  "candidate-capture-run.json.gz": {
+    "sha256": "7679e806f0410c19be3c9772263decb3a0ec7e6a4f400de9fb98f1b19fa7dc7e",
+    "bytes": 88
+  },
+  "candidate-library-build.json.gz": {
+    "sha256": "44c804e2bd651cc32bafb78202b6d1b2c08ecd72933fcd22ac70be6a991df036",
+    "bytes": 85301
+  },
+  "candidate-sample.json.gz": {
+    "sha256": "9cc7ea9f99bf8a78eab90c24839afbc37edcf56fff00691ab25c0bda1fd532eb",
+    "bytes": 254
+  },
+  "candidate-sample.txt.gz": {
+    "sha256": "53c7ec42cae16d42ec89c36f05f0a01dbea2f7fb1bdbda3a6c837f48bc04dac2",
+    "bytes": 19191
+  },
+  "dom-contracts.json.gz": {
+    "sha256": "7101f06ce2e072b95008b521a8ac3f3751d97448ffaa355e96f91a6e59afeaad",
+    "bytes": 6527
+  },
+  "final-contracts.json.gz": {
+    "sha256": "e6d23f67c4d2d46f3eac2f1091cde9486b4231598d39afa8f8ccc0cb90fb35bb",
+    "bytes": 6393
+  },
+  "initial-baseline-tests.log.gz": {
+    "sha256": "88e220e3c196c620cff4301bbd642915a85bee14db72de1eb75fe5e2416b27ba",
+    "bytes": 736
+  },
+  "initial-candidate-tests.log.gz": {
+    "sha256": "88e220e3c196c620cff4301bbd642915a85bee14db72de1eb75fe5e2416b27ba",
+    "bytes": 736
+  },
+  "timing.json.gz": {
+    "sha256": "44e2b3c80f88c89984dcdf533baa9ac1fa897608b4637ec7192a6f945f49f40a",
+    "bytes": 667
+  }
+}

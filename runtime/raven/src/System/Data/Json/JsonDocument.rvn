@@ -6,48 +6,44 @@ import System.Result.*
 import System.Text.*
 
 internal class DocumentReader {
-    private var source: string
-    private var bytes: Sequence<byte>
     private var position: int
     private var nodes: int
 
-    init(text: string) {
-        source = text
-        bytes = JsonSyntax.EncodeToken(text)
+    init() {
         position = 0
         nodes = 0
     }
 
-    private func Skip() {
-        while position < bytes.Count && JsonSyntax.Whitespace(bytes[position]) {
+    private func Skip(bytes: ReadOnlySlice<byte>) {
+        while position < bytes.Length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1
         }
     }
 
-    private func Take(value: byte) -> bool {
-        Skip()
-        if position < bytes.Count && bytes[position] == value {
+    private func Take(bytes: ReadOnlySlice<byte>, value: byte) -> bool {
+        Skip(bytes)
+        if position < bytes.Length && bytes[position] == value {
             position += 1
             return true
         }
         return false
     }
 
-    private func Slice(start: int) -> Result<string, JsonError> {
-        match source.SliceUtf8(start, position - start) {
+    private func Slice(bytes: ReadOnlySlice<byte>, start: int) -> Result<string, JsonError> {
+        match Encodings.Utf8.Decode(bytes[start..position]) {
             Ok(let text) => return Ok(text)
             Error(_) => return Error(JsonError.Syntax("Invalid token boundary"))
         }
     }
 
-    private func ReadString() -> Result<string, JsonError> {
-        Skip()
+    private func ReadString(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
+        Skip(bytes)
         let start = position
-        if !Take((byte)34) {
+        if !Take(bytes, (byte)34) {
             return Error(JsonError.Syntax("Expected string"))
         }
         var escaped = false
-        while position < bytes.Count {
+        while position < bytes.Length {
             let value = bytes[position]
             position += 1
             if escaped {
@@ -55,25 +51,24 @@ internal class DocumentReader {
             } else if value == 92 {
                 escaped = true
             } else if value == 34 {
-                let token = Slice(start)?
-                return MessageReader(token).Read()
+                return MessageReader().Read(bytes[start..position])
             }
         }
         return Error(JsonError.Syntax("Unclosed string"))
     }
 
-    private func Value(depth: int) -> Result<JsonValue, JsonError> {
-        Skip()
+    private func Value(bytes: ReadOnlySlice<byte>, depth: int) -> Result<JsonValue, JsonError> {
+        Skip(bytes)
         nodes += 1
         if nodes > 32 {
             return Error(JsonError.LimitExceeded("Document exceeds 32 values"))
         }
-        if position == bytes.Count {
+        if position == bytes.Length {
             return Error(JsonError.Syntax("Missing value"))
         }
         let first = bytes[position]
         if first == 34 {
-            let text = ReadString()?
+            let text = ReadString(bytes)?
             let value: JsonValue = JsonString(text)
             return Ok(value)
         }
@@ -89,23 +84,23 @@ internal class DocumentReader {
                 result = JsonObject()
                 closing = (byte)125
             }
-            var containerClosed = Take(closing)
+            var containerClosed = Take(bytes, closing)
             while !containerClosed {
                 var name = ""
                 if objectValue {
-                    name = ReadString()?
-                    if !Take((byte)58) {
+                    name = ReadString(bytes)?
+                    if !Take(bytes, (byte)58) {
                         return Error(JsonError.Syntax("Expected colon"))
                     }
                 }
-                let child = Value(depth + 1)?
+                let child = Value(bytes, depth + 1)?
                 if objectValue {
                     _ = ((JsonObject)result).Add(name, child)?
                 } else {
                     _ = ((JsonArray)result).Add(child)?
                 }
-                containerClosed = Take(closing)
-                if !containerClosed && !Take((byte)44) {
+                containerClosed = Take(bytes, closing)
+                if !containerClosed && !Take(bytes, (byte)44) {
                     return Error(JsonError.Syntax("Expected comma or container end"))
                 }
             }
@@ -113,35 +108,35 @@ internal class DocumentReader {
         }
         let start = position
         var tokenEnd = false
-        while position < bytes.Count && !tokenEnd {
+        while position < bytes.Length && !tokenEnd {
             let value = bytes[position]
             tokenEnd = (JsonSyntax.Whitespace(value) || value == 44 || value == 93 || value == 125)
             if !tokenEnd {
                 position += 1
             }
         }
-        let token = Slice(start)?
-        if token.Equals("true") {
+        let token = bytes[start..position]
+        if JsonSyntax.TokenEquals(token, "true") {
             let value: JsonValue = JsonBoolean(true)
             return Ok(value)
         }
-        if token.Equals("false") {
+        if JsonSyntax.TokenEquals(token, "false") {
             let value: JsonValue = JsonBoolean(false)
             return Ok(value)
         }
-        if token.Equals("null") {
+        if JsonSyntax.TokenEquals(token, "null") {
             let value: JsonValue = JsonNull()
             return Ok(value)
         }
-        let number = JsonNumber.Parse(token)?
+        let number = JsonNumber.Parse(Slice(bytes, start)?)?
         let numericValue: JsonValue = number
         return Ok(numericValue)
     }
 
-    func Read() -> Result<JsonValue, JsonError> {
-        let result = Value(0)?
-        Skip()
-        if position != bytes.Count {
+    func Read(bytes: ReadOnlySlice<byte>) -> Result<JsonValue, JsonError> {
+        let result = Value(bytes, 0)?
+        Skip(bytes)
+        if position != bytes.Length {
             return Error(JsonError.Syntax("Trailing content"))
         }
         return Ok(result)

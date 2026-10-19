@@ -35,3 +35,9 @@ Development byte output: `SerializeToUtf8Bytes(value[, options])` returns an own
 byte array. HTTP content and stream serialization use the same bounded UTF-8 writer,
 avoiding intermediate document strings. Stream input still parses through text.
 See [byte output and ownership](/docs/json.html#utf-8-byte-output-development).
+
+
+Development parsing borrows the source string's UTF-8 bytes and creates owned text
+only for string values, names and number lexemes. Escaped tokens still need scratch
+storage. HTTP and stream deserialization still decode full text before parsing;
+direct byte input and incremental readers remain future work.
