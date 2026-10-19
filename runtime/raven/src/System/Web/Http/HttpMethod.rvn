@@ -20,6 +20,10 @@ public class HttpMethod : EquatableTo<HttpMethod> {
         text = method
     }
 
+    // The request decoder validates each received ASCII token byte before calling this.
+    // Preserve spelling without encoding the same token again in the constructor.
+    internal static func FromValidatedToken(method: string) -> HttpMethod => HttpMethod(method, true)
+
     /// The validated method spelling, as supplied to the constructor.
     val Method: string => text
 

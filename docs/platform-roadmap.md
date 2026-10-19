@@ -46,7 +46,12 @@ concurrent recovery, and eight passing matched HTTP windows with lower CPU/compl
 A subsequent overload pair delivers 4.8% more plain completions, without establishing a sustainable maximum or general latency gain. The author next directs
 [a runtime completion bridge](design/runtime-task-completion-bridge.md) to avoid
 Promise wrappers in HTTP/native async operations; public ValueTask/Task representation
-and sharing semantics remain design questions.
+and sharing semantics remain design questions. The author subsequently prioritizes
+[initial request/text allocation measurements](../benchmarks/http-server/serve/request-token-20261019/README.md):
+borrowed method validation removes two encoding arrays and two iterators per request;
+actual string counts are unchanged. Next eliminate avoidable decoder snapshots,
+retaining owned result text and strict Unicode semantics. Small ASCII allocation
+volume does not establish general string CPU or live-retention costs.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and
 random fill use borrowed readonly/writable byte windows through interpreter and

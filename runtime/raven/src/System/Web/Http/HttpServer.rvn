@@ -13,6 +13,46 @@ import System.Networking.Security.*
 import System.Networking.Sockets.*
 import System.Runtime.CompilerServices.*
 
+// Parser-owned contiguous header storage. Borrowed prefixes are consumed synchronously;
+// only owned text and request fields escape parsing, never a view of a receive buffer.
+internal class HttpRequestHeaderBuffer : Sequence<byte> {
+    private var bytes: byte[]
+    private var count = 0
+
+    internal init(capacity: int) {
+        bytes = CheckedStorage.Reserve<byte>(capacity)
+    }
+
+    val Count: int => count
+    internal val Written: ReadOnlySlice<byte> => bytes[0..count]
+
+    val self[index: int]: byte {
+        get {
+            if index < 0 || index >= count {
+                System.Fail("HTTP header index out of range")
+            }
+            return bytes[index]
+        }
+    }
+
+    internal func Add(value: byte) {
+        if count == bytes.Length {
+            let capacity = if count == 0 { 4 } else { count * 2 }
+            let grown = CheckedStorage.Reserve<byte>(capacity)
+            var index = 0
+            while index < count {
+                grown[index] = bytes[index]
+                index += 1
+            }
+            bytes = grown
+        }
+        bytes[count] = value
+        count += 1
+    }
+
+    func GetIterator() -> Iterator<byte> => HttpByteWindowIterator(self)
+}
+
 internal class HttpRequestDecoder {
     private var headersOnly = false
     private var headersComplete = false
@@ -25,7 +65,7 @@ internal class HttpRequestDecoder {
         if let Some(parsed) = request { return Ok(parsed) }
         return Error(HttpError.Protocol("Incomplete headers"))
     }
-    private val head: ArrayList<byte>
+    private val head: HttpRequestHeaderBuffer
     private var request: Option<HttpRequest> = None()
     private var complete: bool = false
     private var failed = false
@@ -42,7 +82,7 @@ internal class HttpRequestDecoder {
         self.secure = secure
         // Reserve a small header prefix once; larger requests retain normal growth.
         let capacity = if settings.HeaderBytes < 128 { settings.HeaderBytes } else { 128 }
-        head = ArrayList<byte>(capacity)
+        head = HttpRequestHeaderBuffer(capacity)
     }
     internal val Complete: bool => complete && !failed
 
@@ -118,6 +158,22 @@ internal class HttpRequestDecoder {
             value == 36 || value == 37 || value == 38 || value == 39 ||
             value == 42 || value == 43 || value == 45 || value == 46 ||
             value == 94 || value == 95 || value == 96 || value == 124 || value == 126
+    }
+
+    private func MethodToken(bytes: ReadOnlySlice<byte>) -> Result<string, HttpError> {
+        if bytes.Length == 0 {
+            return Error(HttpError.Protocol("Invalid request method"))
+        }
+        var index = 0
+        while index < bytes.Length {
+            if !Token(bytes[index]) {
+                // Keep malformed UTF-8's existing text error ahead of token errors.
+                let ignored = Text(0, bytes.Length, 0)?
+                return Error(HttpError.Protocol("Invalid request method"))
+            }
+            index += 1
+        }
+        return Text(0, bytes.Length, 0)
     }
 
     private func Text(start: int, end: int, lower: int) -> Result<string, HttpError> {
@@ -301,10 +357,7 @@ internal class HttpRequestDecoder {
                     head[end - 3] == 49 && head[end - 2] == 46 && head[end - 1] == 49) {
                     return Error(HttpError.Unsupported("Unsupported request line"))
                 }
-                method = Text(0, methodEnd, 0)?
-                if !HttpMethod.Valid(method) {
-                    return Error(HttpError.Protocol("Invalid request method"))
-                }
+                method = MethodToken(head.Written[0..methodEnd])?
                 let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
                 var targetIndex = methodEnd + 1
                 while targetIndex < end - 9 {
@@ -331,7 +384,7 @@ internal class HttpRequestDecoder {
                     chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD", settings.BodyBytes)
                 }
                 expected = length
-                return HttpRequest.FromIncoming(method, target, host, headers, body, secure)
+                return HttpRequest.FromIncoming(HttpMethod.FromValidatedToken(method), target, host, headers, body, secure)
             } else {
                 if headers.Count >= settings.HeaderCount {
                     return Error(HttpError.LimitExceeded("Request header count exceeded"))

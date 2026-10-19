@@ -1,0 +1,97 @@
+[
+  {
+    "source": "target/http-method-final-contracts.json",
+    "archive": "target__http-method-final-contracts.json.gz",
+    "sha256": "b348825986bfd437786c223473136e8f1bbb3322abffd44ca354bd5056f22c12"
+  },
+  {
+    "source": "target/http-method-final-header-contracts.json",
+    "archive": "target__http-method-final-header-contracts.json.gz",
+    "sha256": "8abf608b566389443edb0b003940517e29c2c8ec5e6d7c7fa509f6491f754a1a"
+  },
+  {
+    "source": "target/http-method-final-baseline-contracts.json",
+    "archive": "target__http-method-final-baseline-contracts.json.gz",
+    "sha256": "f0ea2d33dfc5dba3b7ff1c57c4ecc3131387399d348c648bb2b1cd9e9e57f629"
+  },
+  {
+    "source": "target/http-method-text-baseline.json",
+    "archive": "target__http-method-text-baseline.json.gz",
+    "sha256": "239b237ae1744b86cc572378791113e270c8ee27163e09c290a8d0c1ffb19755"
+  },
+  {
+    "source": "target/http-method-text-candidate.json",
+    "archive": "target__http-method-text-candidate.json.gz",
+    "sha256": "c0ce4a8e201a5ea8b355006284865956312bdeec4598c4a3eac213566db42ab4"
+  },
+  {
+    "source": "target/http-method-final-libraries/build-evidence.json",
+    "archive": "target__http-method-final-libraries__build-evidence.json.gz",
+    "sha256": "63233fd686753cdf0e0289e2c2ac45520c4cd751243c3eb7b66587670b2b7e70"
+  },
+  {
+    "source": "target/http-method-final-libraries/bundle.json",
+    "archive": "target__http-method-final-libraries__bundle.json.gz",
+    "sha256": "61f93c69a0a58c5f3131a2c254b1ef01e42243656bd7efb98ee685db0bac732c"
+  },
+  {
+    "source": "target/http-method-final-build/build.json",
+    "archive": "target__http-method-final-build__build.json.gz",
+    "sha256": "b6d94a8c2f9f269c651f07d3d538ff0e13511ddd482b9672616998388b7afa13"
+  },
+  {
+    "source": "target/http-method-final-probe/build.json",
+    "archive": "target__http-method-final-probe__build.json.gz",
+    "sha256": "03f2930381eecab5c73a2ba81752417bb8963c2cc7594a8c801f8b3256e9caad"
+  },
+  {
+    "source": "target/http-method-final-header-probe/build.json",
+    "archive": "target__http-method-final-header-probe__build.json.gz",
+    "sha256": "db1a47dfda69c8e292b8dbb852cdaca38e2560da97b1d96a76de48fba9457b1a"
+  },
+  {
+    "source": "target/http-method-final-callers/summary.json",
+    "archive": "target__http-method-final-callers__summary.json.gz",
+    "sha256": "8e2eda61edc21343d5430f68373b5e541538f7b4430ceff034280b0a8df521f7"
+  },
+  {
+    "source": "target/http-method-final-callers/build.json",
+    "archive": "target__http-method-final-callers__build.json.gz",
+    "sha256": "18f70ac02e87149f24924c6cf65c478bdd36b6dee9c4b748042daaabcad029f7"
+  },
+  {
+    "source": "target/http-promise-array-callers/summary.json",
+    "archive": "target__http-promise-array-callers__summary.json.gz",
+    "sha256": "b0a78e3895d8d0718850d437773c526b85ebe0ffbe1f4f5d7ac6a2107a524435"
+  },
+  {
+    "source": "target/http-promise-array-build/build.json",
+    "archive": "target__http-promise-array-build__build.json.gz",
+    "sha256": "41f8d918053ad9ac5e1f14d273a18000590f783eb3019f8ff3e96c4395d8e51b"
+  },
+  {
+    "source": "target/http-method-final-comparison/comparison.json",
+    "archive": "target__http-method-final-comparison__comparison.json.gz",
+    "sha256": "5e6001db67cc0a07d80d96d3b7f797804471976c7f02a735c464fa3c6590805f"
+  },
+  {
+    "source": "target/http-method-final-comparison/baseline-1-400/results.json",
+    "archive": "target__http-method-final-comparison__baseline-1-400__results.json.gz",
+    "sha256": "e7adcea5ae49d8b7de1ee494277d508397716d64556b6b29575fd85e2c74639e"
+  },
+  {
+    "source": "target/http-method-final-comparison/baseline-2-400/results.json",
+    "archive": "target__http-method-final-comparison__baseline-2-400__results.json.gz",
+    "sha256": "12925892af6089dd95fb2b5f02153f2b44b946970f4b99b14c904527975f821d"
+  },
+  {
+    "source": "target/http-method-final-comparison/candidate-1-400/results.json",
+    "archive": "target__http-method-final-comparison__candidate-1-400__results.json.gz",
+    "sha256": "6ac7d5008428c7e4e3a0a60e4c731245e15f22e1167be7485b9a45c19ebbbe54"
+  },
+  {
+    "source": "target/http-method-final-comparison/candidate-2-400/results.json",
+    "archive": "target__http-method-final-comparison__candidate-2-400__results.json.gz",
+    "sha256": "f63036c95333c1fe89cac1e697033c692ed69c85c21c59eb0c88ba24684ad510"
+  }
+]

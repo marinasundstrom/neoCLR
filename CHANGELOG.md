@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Validate incoming HTTP method tokens over borrowed bytes and pass the validated HttpMethod into request construction, removing two encoding arrays and two validation iterators per request. Preserve spelling, strict UTF-8 error precedence and header growth/limits in interpreter/JIT/AOT. Add reconciled string-versus-buffer allocation attribution: 1.71% fewer total allocations, unchanged owned strings; decoder snapshots remain the next measured target. All 48,000 matched load requests validate, but CPU/completion is 0.5–1.4% higher and tail latency varies; no speedup is claimed.
+
 - Retain selected TLS plaintext windows as Memory/ReadOnlyMemory across pump awaits and borrow slices only in synchronous plaintext/control helpers. Preserve stream validation, TLS staging copies and cancellation behavior. Extend the managed TLS consumer with nonzero windows, a transfer across the 16 KiB record boundary, GC and graceful EOF.
 
 - Replace Promise's single-result ArrayList with one owned array slot, preserving initialization markers and completion/cancellation semantics. Three-mode contracts and experimental concurrent-GC recovery pass. Matched synchronous-GC HTTP trials show 5.3% fewer diagnostic allocations and about 8%/3–4% lower plain/bulk CPU per completion; bulk tail latency varies. A paired overload follow-up delivers 4.8% more plain completions, without establishing a sustainable maximum rate. Retain the rejected inline-result experiment with a lossless compressed patch and record the author-directed runtime completion bridge investigation.

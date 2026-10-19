@@ -671,10 +671,10 @@ public class HttpRequest {
         storedTarget = target
     }
 
-    internal static func FromIncoming(method: string, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>, secure: bool) -> Result<HttpRequest, HttpError> {
+    internal static func FromIncoming(method: HttpMethod, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>, secure: bool) -> Result<HttpRequest, HttpError> {
         let request = IncomingRequest(target, host, secure)?
         request.storedHeaders = headers
-        request.storedMethod = HttpMethod(method)
+        request.storedMethod = method
         request.storedContent = HttpContent(body)
         for header in headers {
             if header.Name == "content-type" {
