@@ -2467,3 +2467,12 @@ stream signatures are unchanged. Regeneration preserves the reference assembly a
 refreshes the two source fingerprints. Existing native public pages remain applicable.
 See the [HTTP integration audit](../docs/memory-view-library-audit.md#http-parser-and-body-windows-2026-10-19)
 for ownership, validation and the remaining public stream migration.
+
+
+### TLS internal memory windows (2026-10-19 development)
+
+SslStream retains selected plaintext Memory/ReadOnlyMemory windows across awaits;
+internal SslBuffers copy and control helpers borrow slices. Public stream and PEM
+factory signatures are unchanged. The regenerated reference assembly is unchanged;
+the aggregate snapshot refreshes the two implementation fingerprints. Existing native
+public pages remain applicable. See the [TLS audit](../docs/memory-view-library-audit.md#tls-plaintext-windows-2026-10-19).

@@ -25,6 +25,13 @@ implicit view conversion and explicit ToArray copying, without compatibility-onl
 array overloads or repeated AsSlice helpers. This direction does not infer a
 permanent reprioritization of unrelated milestones.
 
+**Follow-up measurement (author direction, 2026-10-19):** once the memory-based
+stream/TLS/HTTP paths are ready, compare synchronous GC with the experimental
+concurrent collector using a fresh, matched build/workload cohort. Track throughput,
+tail latency, pauses, allocation and peak memory; retain correctness and ownership
+gates before interpreting performance. The [evaluation plan](design/concurrent-gc-evaluation.md#memory-view-integration-follow-up-2026-10-19)
+does not promote the experimental collector or imply a performance win.
+
 Cryptography integration now follows codecs: synchronous hashing, verification and
 random fill use borrowed readonly/writable byte windows through interpreter and
 native providers. See the [library audit](memory-view-library-audit.md#cryptography-integration-2026-10-19).
@@ -32,7 +39,9 @@ Managed Memory/ReadOnlyMemory byte windows now survive repeated native suspensio
 and collection in the [lifetime qualification](memory-view-library-audit.md#managed-async-lifetime-prerequisite-2026-10-19).
 Socket completion ownership is now qualified for array-backed byte memory.
 [HTTP parser/body windows](memory-view-library-audit.md#http-parser-and-body-windows-2026-10-19)
-use borrowed input and retained output; public shared stream contracts remain the next integration boundary. Gzip internal encoding/CRC
+use borrowed input and retained output. TLS plaintext now retains memory across awaits
+and borrows slices for immediate copies/control access; public shared stream contracts
+remain the next integration boundary. Gzip internal encoding/CRC
 now borrows readonly slices and retains readonly Memory across writes and in decoder
 state; its shared public stream contracts remain unchanged. Production interpreter
 file-service adapters now retain persistent read windows and snapshot selected

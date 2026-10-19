@@ -62,6 +62,8 @@ async func Main() -> Task<int> {
     use serverCredentials = credentials
     let Ok(trust) = SslClientAuthenticationOptions.Create(Fixtures.Certificate()) else { return 2 }
     use clientTrust = trust
+    let windows = await CheckMemoryWindows(credentials, trust)
+    if windows != 0 { return windows }
     let options = HttpServerOptions()
     options.SslOptions = credentials
     // Keep the same deadline in every mode; unoptimized interpreter setup is slower.
@@ -80,7 +82,7 @@ async func Main() -> Task<int> {
     let Ok(content) = JsonContent.CreateNode(node) else { return 10 }
     let response = await client.Post(url, content)
     if let Error(error) = response {
-        Console.WriteLine(error.ToString())
+        Console.WriteLine("HTTPS exchange failed")
         server.Close()
         return 11
     }
@@ -91,7 +93,7 @@ async func Main() -> Task<int> {
     let completed = await serving
     server.Close()
     if let Error(error) = completed {
-        Console.WriteLine(error.ToString())
+        Console.WriteLine("HTTPS exchange failed")
         return 16
     }
     Console.WriteLine("Managed HTTPS JSON exchange passed")

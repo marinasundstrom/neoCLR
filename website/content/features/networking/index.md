@@ -64,3 +64,8 @@ including cancellation and shared-deadline forms. Whole arrays convert implicitl
 explicit windows preserve offsets without copying. Receives retain the destination
 until completion; sends preserve the existing snapshot behavior. See the
 [migration and lifetime contracts](/docs/sockets.html#development-memory-window-migration-2026-10-19).
+
+
+TLS plaintext handling now retains selected managed memory windows across awaits
+and borrows slices for synchronous copy/control operations. The TLS staging buffers
+remain owned arrays; public stream signatures still await coordinated migration.

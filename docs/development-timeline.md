@@ -19652,3 +19652,24 @@ open; no native performance improvement is claimed.
   covers public server and streaming client paths. This implements the proposed
   internal step; public stream/body signatures remain open, with no additional
   compatibility overloads or AsSlice layer introduced.
+
+
+## 2026-10-19 — Compare collectors after memory integration
+
+- **Author:** “Once we are ready we should investigate performance with synchronous
+  GC vs experimental concurrent GC”. This steers the ongoing networking/HTTP
+  integration without replacing it.
+- **Assistant proposal/action:** queued a fresh matched-cohort comparison after
+  stream/TLS/HTTP ownership qualification, covering throughput, tail latency, pauses,
+  allocation and memory, with CPU and experimental-cycle diagnostics. Recorded the
+  [measurement plan](design/concurrent-gc-evaluation.md#memory-view-integration-follow-up-2026-10-19)
+  in the roadmap; continued TLS memory-window implementation.
+- **Open:** readiness qualification and the new comparison remain future work. No
+  collector performance result, winner or production promotion is inferred.
+
+- **Subsequent author direction:** “Continue through testing HTTP API performance
+  and throughput, HTTP server and so on, and compare with the two different GCs.”
+- **Assistant action:** expanded the active task to execute the comparison after
+  current correctness checks, using fresh managed libraries and the same Serve
+  guest object for both collectors. The earlier queued plan is now active work;
+  results and limitations will be recorded with the benchmark evidence.

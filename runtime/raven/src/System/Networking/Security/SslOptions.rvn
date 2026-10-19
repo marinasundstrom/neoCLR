@@ -102,13 +102,25 @@ internal static class SslBuffers {
             _ => SslError.InvalidConfiguration
         }
     }
-    internal static func ReadCount(buffer: byte[], offset: int) -> int {
-        return (int)buffer[offset] + (int)buffer[offset + 1] * 256 + (int)buffer[offset + 2] * 65536
+    // Both borrows end before the TLS pump can suspend. The buffers are distinct:
+    // plaintext staging owns storage; the other view selects caller memory.
+    internal static func CopyPlaintext(source: ReadOnlySlice<byte>, destination: Slice<byte>) {
+        if source.Length > destination.Length {
+            System.Fail("Invalid TLS plaintext count")
+        }
+        var index = 0
+        while index < source.Length {
+            destination[index] = source[index]
+            index += 1
+        }
     }
-    internal static func WriteCount(buffer: byte[], offset: int, count: int) {
-        buffer[offset] = (byte)(count % 256)
-        buffer[offset + 1] = (byte)((count / 256) % 256)
-        buffer[offset + 2] = (byte)(count / 65536)
-        buffer[offset + 3] = (byte)0
+    internal static func ReadCount(buffer: ReadOnlySlice<byte>) -> int {
+        return (int)buffer[0] + (int)buffer[1] * 256 + (int)buffer[2] * 65536
+    }
+    internal static func WriteCount(buffer: Slice<byte>, count: int) {
+        buffer[0] = (byte)(count % 256)
+        buffer[1] = (byte)((count / 256) % 256)
+        buffer[2] = (byte)(count / 65536)
+        buffer[3] = (byte)0
     }
 }

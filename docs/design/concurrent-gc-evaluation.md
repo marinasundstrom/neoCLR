@@ -141,3 +141,30 @@ root publication and collection. It also discovers that the retained guest lacks
 already-landed managed queue changes; refresh the full cohort before current-runtime
 claims. Repeated URL parsing is a concrete HTTP candidate. Collector pacing, locality
 and barrier ideas remain separate hypotheses, with their safety/measurement gates.
+
+
+### Memory-view integration follow-up (2026-10-19)
+
+The author requested a synchronous-versus-experimental-concurrent GC performance
+investigation once the current integration is ready. First complete and qualify
+shared stream/TLS/HTTP memory contracts, including suspension, owner rooting,
+cancellation, shutdown and reclaimability. Recheck the experimental collector's
+handling of the current memory-window descriptors and owner publication across
+suspension before admitting its results to the comparison. Keep the production
+collector unchanged.
+
+Build a fresh matched cohort for both collectors: identical compiler/runtime/library
+revisions, application, load generator, payloads, heap limits, warmup, request rates
+and measurement instrumentation. Include HTTP Serve and TLS workloads that exercise
+retained windows. Repeat steady load and bursts; report throughput, p50/p95/p99 request
+latency, pause distribution, CPU/request, allocation rate and peak/resident memory.
+Also record experimental cycle attempts/applies/discards, synchronous fallback and
+reclaimed bytes where available. If a metric lacks instrumentation, record that gap
+rather than infer it. Run comparable instrumented measurements separately from the
+uninstrumented throughput cohort.
+
+Reuse the existing comparison methodology and safety gates above, but do not reuse
+old guest binaries as evidence for the migrated library. Distinguish collector costs
+from changes in parsing, staging copies, transport and allocation. A latency benefit
+may cost throughput, CPU or memory; no outcome or promotion is assumed. This is a
+queued investigation, not a benchmark result.

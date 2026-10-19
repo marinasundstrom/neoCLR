@@ -552,3 +552,11 @@ body input retains Memory<byte> across receives and borrows Slice<byte> only in 
 synchronous drain. Read-ahead transport arrays remain owned. See the
 [library audit and validation](memory-view-library-audit.md#http-parser-and-body-windows-2026-10-19).
 Public shared stream signatures and HTTP upload contracts remain pending.
+
+
+### TLS plaintext integration (2026-10-19)
+
+SslStream retains selected Memory/ReadOnlyMemory plaintext windows through pump
+awaits. Immediate plaintext copies and control-field access now borrow slices.
+Native pump buffers remain owned arrays; neither public stream nor PEM signatures
+change here. See the [qualification and remaining work](memory-view-library-audit.md#tls-plaintext-windows-2026-10-19).

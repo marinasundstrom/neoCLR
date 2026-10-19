@@ -115,10 +115,10 @@ public class SslStream : InputStream, OutputStream, Disposable {
                 return Error(StreamError.Closed)
             }
             control[1] = (byte)(if eof { 1 } else { 0 })
-            SslBuffers.WriteCount(control, 4, inputCount)
+            SslBuffers.WriteCount(control[4..8], inputCount)
             let status = neoCLR.Runtime.TlsPump(owner, encryptedInput, encryptedOutput, plaintext, control)
-            let consumed = SslBuffers.ReadCount(control, 8)
-            let produced = SslBuffers.ReadCount(control, 12)
+            let consumed = SslBuffers.ReadCount(control[8..11])
+            let produced = SslBuffers.ReadCount(control[12..15])
             inputCount -= consumed
             var index = 0
             while index < inputCount {
@@ -180,13 +180,11 @@ public class SslStream : InputStream, OutputStream, Disposable {
         }
         busy = true
         use operation = SslOperation(self, cancellationToken)
-        let plain = SslBuffers.Allocate(if count > 16384 { 16384 } else { count })
+        let memory: Memory<byte> = buffer
+        let destination = memory.Slice(offset, count)
+        let plain = SslBuffers.Allocate(if destination.Length > 16384 { 16384 } else { destination.Length })
         let read = (await Pump(2, plain, operation.Token))?
-        var index = 0
-        while index < read {
-            buffer[offset + index] = plain[index]
-            index += 1
-        }
+        SslBuffers.CopyPlaintext(plain[0..read], destination)
         operation.Complete()
         return Ok(read)
     }
@@ -210,15 +208,14 @@ public class SslStream : InputStream, OutputStream, Disposable {
         }
         busy = true
         use operation = SslOperation(self, cancellationToken)
+        let memory: ReadOnlyMemory<byte> = buffer
+        let source = memory.Slice(offset, count)
         var sent = 0
-        while sent < count {
-            let size = if count - sent > 16384 { 16384 } else { count - sent }
+        while sent < source.Length {
+            let remaining = source.Length - sent
+            let size = if remaining > 16384 { 16384 } else { remaining }
             let plain = SslBuffers.Allocate(size)
-            var index = 0
-            while index < size {
-                plain[index] = buffer[offset + sent + index]
-                index += 1
-            }
+            SslBuffers.CopyPlaintext(source.Slice(sent, size), plain)
             let written = (await Pump(3, plain, operation.Token))?
             if written <= 0 || written > size { System.Fail("Invalid TLS write count") }
             sent += written

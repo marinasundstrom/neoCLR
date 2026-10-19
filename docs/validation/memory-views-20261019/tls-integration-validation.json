@@ -1,0 +1,295 @@
+{
+  "passed": true,
+  "date": "2026-10-19",
+  "platform": "macOS ARM64",
+  "ravenRevision": "dcf7ac41f",
+  "reports": {
+    "tls": {
+      "passed": true,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "commands": [
+        {
+          "command": [
+            "openssl",
+            "req",
+            "-x509",
+            "-newkey",
+            "ec",
+            "-pkeyopt",
+            "ec_paramgen_curve:prime256v1",
+            "-pkeyopt",
+            "ec_param_enc:named_curve",
+            "-nodes",
+            "-sha256",
+            "-days",
+            "1",
+            "-config",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/openssl.cnf",
+            "-addext",
+            "basicConstraints=critical,CA:FALSE",
+            "-addext",
+            "keyUsage=critical,digitalSignature",
+            "-addext",
+            "extendedKeyUsage=serverAuth",
+            "-addext",
+            "subjectAltName=DNS:localhost",
+            "-keyout",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/key.pem",
+            "-out",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/cert.pem"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": "Generating a 2048 bit EC private key\nwriting new private key to '/Users/robert/Projects/neoclr/target/tls-memory-streams-final/key.pem'\n-----\n",
+          "elapsedSeconds": 0.011923
+        },
+        {
+          "command": [
+            "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+            "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+            "--profile",
+            "http",
+            "--project",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/project/App.rvnproj",
+            "--bundle",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle",
+            "--aot",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/bin/neoclr-codegen",
+            "--output",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/native",
+            "--http-heap-bytes",
+            "8388608",
+            "--command-timeout",
+            "600"
+          ],
+          "exitCode": 0,
+          "stdout": "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/native/app\n",
+          "stderr": "",
+          "elapsedSeconds": 119.520466
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/native/app.dll",
+            "--execution",
+            "interpreter",
+            "--instructions",
+            "100000000",
+            "--array-elements",
+            "1048576",
+            "--array-bytes",
+            "67108864",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.runtime.neox",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Web.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Data.PostgreSql.dll"
+          ],
+          "exitCode": 0,
+          "stdout": "Managed HTTPS JSON exchange passed\n",
+          "stderr": "",
+          "elapsedSeconds": 34.890006
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/native/app.dll"
+          ],
+          "exitCode": 0,
+          "stdout": "Managed HTTPS JSON exchange passed\n",
+          "stderr": "",
+          "elapsedSeconds": 112.487134
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/tls-memory-streams-final/native/app"
+          ],
+          "exitCode": 0,
+          "stdout": "Managed HTTPS JSON exchange passed\n",
+          "stderr": "",
+          "elapsedSeconds": 1.387638
+        }
+      ],
+      "modes": [
+        "interpreter",
+        "default-jit",
+        "aot"
+      ],
+      "scope": "Managed lifetime and HTTPS nested-JSON exchange with GC",
+      "timingNote": "Timings include compilation and are not benchmarks.",
+      "sourceHashes": {
+        "runtime/raven/src/System/Networking/Security/SslStream.rvn": "33261c6c08b509cd77f0b28447c078e44df5185236bc70756a8712a08a7cf446",
+        "runtime/raven/src/System/Networking/Security/SslOptions.rvn": "0eb33bfc220b25de31e9b0f3c635c0f4de115d8ae4f0ec95d8fa4ee0eab76d9a",
+        "runtime/raven/src/System/Networking/Security/SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+        "docs/experiments/shared-tls/stream-project/Main.rvn": "a505fe29cac7a634b9e41acca9091737a6482212d65bfd1b0de2908a8e858898",
+        "docs/experiments/shared-tls/stream-project/App.rvnproj": "359d405a94752635f9aaf28f4abf4445ff52ba3f1507cfb0ebb81a90813b7380",
+        "docs/experiments/shared-tls/stream-project/MemoryWindows.rvn": "cd76171e0459a471db4811764dfc737413bf2a08fa22e6ca87bcefa37c7735ab"
+      }
+    },
+    "httpsFailures": {
+      "passed": true,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "commands": [
+        {
+          "command": [
+            "openssl",
+            "req",
+            "-x509",
+            "-newkey",
+            "ec",
+            "-pkeyopt",
+            "ec_paramgen_curve:prime256v1",
+            "-pkeyopt",
+            "ec_param_enc:named_curve",
+            "-nodes",
+            "-sha256",
+            "-days",
+            "1",
+            "-config",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/openssl.cnf",
+            "-addext",
+            "basicConstraints=critical,CA:FALSE",
+            "-addext",
+            "keyUsage=critical,digitalSignature",
+            "-addext",
+            "extendedKeyUsage=serverAuth",
+            "-addext",
+            "subjectAltName=DNS:localhost",
+            "-keyout",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/key.pem",
+            "-out",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/cert.pem"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": "Generating a 2048 bit EC private key\nwriting new private key to '/Users/robert/Projects/neoclr/target/tls-memory-http/key.pem'\n-----\n",
+          "elapsedSeconds": 0.005534
+        },
+        {
+          "command": [
+            "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+            "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+            "--profile",
+            "http",
+            "--project",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/project/App.rvnproj",
+            "--bundle",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle",
+            "--aot",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/bin/neoclr-codegen",
+            "--output",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/native",
+            "--http-heap-bytes",
+            "8388608",
+            "--command-timeout",
+            "600"
+          ],
+          "exitCode": 0,
+          "stdout": "/Users/robert/Projects/neoclr/target/tls-memory-http/native/app\n",
+          "stderr": "",
+          "elapsedSeconds": 103.334075
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/native/app.dll",
+            "--execution",
+            "interpreter",
+            "--instructions",
+            "100000000",
+            "--array-elements",
+            "1048576",
+            "--array-bytes",
+            "67108864",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.runtime.neox",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Web.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/lib/System.Data.PostgreSql.dll"
+          ],
+          "exitCode": 0,
+          "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+          "stderr": "",
+          "elapsedSeconds": 25.180814
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/tls-memory-bundle/bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/native/app.dll"
+          ],
+          "exitCode": 0,
+          "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+          "stderr": "",
+          "elapsedSeconds": 111.291044
+        },
+        {
+          "command": [
+            "/Users/robert/Projects/neoclr/target/tls-memory-http/native/app"
+          ],
+          "exitCode": 0,
+          "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+          "stderr": "",
+          "elapsedSeconds": 6.620702
+        }
+      ],
+      "modes": [
+        "interpreter",
+        "default-jit",
+        "aot"
+      ],
+      "scope": "HTTP TLS rejection/recovery, client timeout/cancellation and server deadline",
+      "timingNote": "Timings include compilation and are not benchmarks.",
+      "sourceHashes": {
+        "runtime/raven/src/System/Networking/Security/SslStream.rvn": "33261c6c08b509cd77f0b28447c078e44df5185236bc70756a8712a08a7cf446",
+        "runtime/raven/src/System/Networking/Security/SslOptions.rvn": "0eb33bfc220b25de31e9b0f3c635c0f4de115d8ae4f0ec95d8fa4ee0eab76d9a",
+        "runtime/raven/src/System/Networking/Security/SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+        "docs/experiments/shared-tls/http-failure-project/Main.rvn": "6ff3dc765be80966def4bbe3ef191a31dbd06ace3afecbf7dc1cb2b0ab4bf8ff",
+        "docs/experiments/shared-tls/http-failure-project/App.rvnproj": "7f4ad0af0f55212f6e461df8b346e1f5a76ee1ae295aa068fa06e1ac1249ba6f"
+      }
+    }
+  },
+  "libraries": {
+    "System.Web.dll": "3830fe009d76dad4b244a2a2c853df8059c77e350999f23e441a06c7392591cb",
+    "System.Networking.dll": "869089c78c6ee951588821f955a7f477c1ca2cd70c26c7382dbd6f6b2ae98647",
+    "System.Runtime.dll": "7d4046408e9fbeaf18a2535b2223ba89627664c168e75e30432a9a16ee7a9743",
+    "System.Data.dll": "13cd2ab4a844b281daa50210f395517ee748d20c2d9d570e17ca8ce1d8d90861",
+    "System.Data.PostgreSql.dll": "1e2f6bf9bc0d83f5df1a384c296608233eb9a0cacde1a025510a39e341a79594"
+  },
+  "checks": [
+    "Five native libraries rebuilt",
+    "API fingerprint check passes; public reference assembly unchanged",
+    "Four native snapshot tests pass"
+  ],
+  "limitations": [
+    "Public shared stream/PEM and native TlsPump array signatures remain pending",
+    "No TLS performance or concurrent-GC qualification inferred",
+    "No Windows execution"
+  ],
+  "priorAttempts": [
+    "Application async CancellationToken parameter capture rejected; test uses an operation-state object.",
+    "Legacy diagnostic HTTP error ToString reached unsupported DnsError native value member; fixture now emits a fixed failure diagnostic.",
+    "Large interpreter fixture exceeded default five-second socket budget. Payload preparation moved before pending read; all modes now use explicit 60-second transfer budgets. Final TLS and HTTPS runs pass."
+  ]
+}

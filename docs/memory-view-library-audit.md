@@ -51,8 +51,8 @@ remove a copy or establish native support.
 | `IO/{StreamReader,StreamWriter}.rvn` | Keep scratch array ownership; pass Memory to I/O and slices to codec calls | Reusable buffers must outlive awaits; decoder state must not borrow scratch after reuse |
 | `IO/Compression/GZipStream.rvn` | Memory-based stream contract; keep decoded/scratch arrays | Stored output and async operation ownership are distinct from local windows |
 | `Networking/Sockets/Socket.rvn` | Migrated: Memory receive / ReadOnlyMemory send | Cancellation, short reads/writes, deadlines and completion-root release must preserve backing owner |
-| `Networking/Security/SslStream.rvn` | Memory for retained plaintext/I/O; slice only inside synchronous packet helpers | Pump crosses await; empty owner-token arrays are resource identity, not byte payloads |
-| `Networking/Security/SslOptions.rvn` | ReadOnlySlice PEM inputs; slices for ReadCount/WriteCount; keep session/config owner tokens and allocated output | PEM factories explicitly do not retain input; resource handles must retain identity |
+| `Networking/Security/SslStream.rvn` | Migrated internal plaintext windows and synchronous copy/control slices; public I/O contracts pending | Pump crosses await; empty owner-token arrays are resource identity, not byte payloads |
+| `Networking/Security/SslOptions.rvn` | ReadOnlySlice PEM inputs; ReadCount/WriteCount slices implemented; keep session/config owner tokens and allocated output | PEM factories explicitly do not retain input; resource handles must retain identity |
 | `Web/Http/HttpConnection.rvn` | Memory-based read/write/receive contracts | Adapter inherits underlying I/O lifetime and cancellation rules |
 | `Web/Http/HttpServer.rvn` | Migrated: ReadOnlySlice decoder Push/PushCore; active transfer signatures pending; keep rented arrays and encoded response ownership | Parser must copy retained headers/body before receive buffer reuse; returning a rented array is ownership transfer |
 | `Web/Http/{HttpBodyInput,HttpClient}.rvn` | Migrated: Memory body-read destination; upload/read signatures pending | Body state and callbacks outlive each synchronous call; keep reusable owned buffers |
@@ -296,3 +296,24 @@ cancellation and EOF in interpreter/JIT/AOT. See the
 [evidence](validation/memory-views-20261019/http-integration-validation.json).
 Public signatures are unchanged; the source fingerprint is refreshed while the
 native public API rendering remains applicable.
+
+## TLS plaintext windows (2026-10-19)
+
+SslStream retains selected Memory<byte> read destinations and ReadOnlyMemory<byte>
+write sources across pump awaits. Plaintext staging copies borrow readonly/writable
+slices synchronously. ReadCount/WriteCount now accept only the selected control-field
+slice instead of the full control array plus an offset. No slice crosses suspension.
+
+This follows the existing .NET Span/Memory lifetime comparison. TLS staging arrays,
+encrypted buffers and native owner tokens remain owned arrays. This change neither
+removes the existing TLS copy nor claims a performance improvement. Public stream
+signatures, PEM factories and the native TlsPump array ABI remain separate migrations.
+Existing range errors and cancellation ordering are preserved.
+
+The [managed TLS consumer](experiments/shared-tls/stream-project/MemoryWindows.rvn)
+exercises nonzero source/destination windows, a 16386-byte write spanning plaintext
+blocks, collection during pending operations, empty windows and graceful EOF.
+The HTTPS consumer also checks JSON exchange and rejection/timeout/cancellation.
+[Evidence](validation/memory-views-20261019/tls-integration-validation.json) records
+execution modes and matching library identities. Public signatures are unchanged;
+only API source fingerprints require refresh.

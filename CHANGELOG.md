@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Retain selected TLS plaintext windows as Memory/ReadOnlyMemory across pump awaits and borrow slices only in synchronous plaintext/control helpers. Preserve stream validation, TLS staging copies and cancellation behavior. Extend the managed TLS consumer with nonzero windows, a transfer across the 16 KiB record boundary, GC and graceful EOF.
+
+- Record the author-directed follow-up to compare synchronous and experimental concurrent GC after memory-based stream integration is ready; this is a measurement plan, not a performance result.
+
 - Use ReadOnlySlice<byte> for immediate HTTP request parsing and Memory<byte> for pending HTTP body-read destinations, borrowing writable slices only while draining received data. Clear retained destinations on success, failure and cancellation. Preserve framing, read-ahead ownership and public stream contracts; add interpreter/JIT/AOT coverage for server and client body windows, GC, cancellation and EOF.
 
 - Replace public Socket receive/send array-range signatures with Memory<byte>/ReadOnlyMemory<byte>, including cancellation and deadline forms. Root receive owners until completion and snapshot only selected initialized send bytes in interpreter/JIT/AOT; support default and end-position empty windows. Migrate HTTP's socket adapter, PostgreSQL transport and current samples. Window construction now validates bounds before invocation; retain old internal array bindings solely for historical bootstrap/tests. Refresh the six native API signatures and record the legacy CLI reference exclusion. Shared stream/HTTP body signatures remain a separate migration.

@@ -146,3 +146,20 @@ consumer source; use a new output directory when either changes.
 peer/protocol/execution-mode combinations on macOS ARM64. The four existing HTTP
 failure scenarios also pass again in the interpreter with the corrected library.
 Windows execution remains pending.
+
+
+### Memory-window regression (2026-10-19)
+
+The managed stream harness now runs `stream-project/MemoryWindows.rvn` before the
+HTTPS JSON exchange. It sends 16386 plaintext bytes from offset one, reads into
+selected destination windows, checks surrounding sentinels and byte order, collects
+while operations are pending, and observes graceful close-notify EOF. It also checks
+end-position empty reads/writes. TLS staging copies remain intentional; this is not
+a throughput measurement. The test transport uses socket Memory/ReadOnlyMemory APIs.
+Application async capture of CancellationToken is currently restricted, so the test
+keeps its operation state in an object rather than changing compiler behavior.
+
+Large plaintext fixture setup precedes the pending read. Its test socket adapter
+uses a 60-second transfer budget in every execution mode; the interpreter exceeded
+the default five-second budget during the first large-transfer attempt. Final
+three-mode TLS and HTTPS failure checks pass with the matching memory-view library.

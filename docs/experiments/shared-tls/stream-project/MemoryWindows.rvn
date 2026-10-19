@@ -1,0 +1,127 @@
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Networking.Security.*
+
+// Public stream adapter for the socket's persistent-memory contract. It owns no
+// extra payload copy; TLS keeps the same transport contract as production HTTP.
+class TlsTestTransport : InputStream, OutputStream {
+    private val socket: Socket
+    init(socket: Socket) { self.socket = socket }
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    func Read(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {
+        let destination: Memory<byte> = buffer
+        return TlsTestTransfer(socket, destination.Slice(offset, count), token).Read()
+    }
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<unit, StreamError>> {
+        let memory: Memory<byte> = buffer
+        return TlsTestTransfer(socket, memory.Slice(offset, count), token).Write()
+    }
+    func Flush() -> Task<Result<unit, StreamError>> { return Flush(CancellationToken.None) }
+    func Flush(token: CancellationToken) -> Task<Result<unit, StreamError>> {
+        let completion = Promise<Result<unit, StreamError>>()
+        if token.IsCancellationRequested { _ = completion.Cancel() }
+        else { _ = completion.Complete(Ok(())) }
+        return completion.Task
+    }
+    func Close() { socket.Close() }
+}
+
+// Application-side async capture currently rejects a CancellationToken parameter.
+// Keep operation state in an object; the production library needs no such adapter.
+class TlsTestTransfer {
+    private val socket: Socket
+    private val memory: Memory<byte>
+    private val token: CancellationToken
+    init(socket: Socket, memory: Memory<byte>, token: CancellationToken) {
+        self.socket = socket
+        self.memory = memory
+        self.token = token
+    }
+    async func Read() -> Task<Result<int, StreamError>> {
+        let result = await socket.ReceiveUntil(memory, NetworkDeadline.AfterMilliseconds(60000), token)
+        let Ok(read) = result else { return Error(StreamError.IoFailure) }
+        return Ok(read)
+    }
+    async func Write() -> Task<Result<unit, StreamError>> {
+        let source: ReadOnlyMemory<byte> = memory
+        var sent = 0
+        while sent < source.Length {
+            let Ok(written) = await socket.SendUntil(source.Slice(sent), NetworkDeadline.AfterMilliseconds(60000), token) else {
+                return Error(StreamError.IoFailure)
+            }
+            if written <= 0 { return Error(StreamError.IoFailure) }
+            sent += written
+        }
+        return Ok(())
+    }
+}
+
+func CreateWindow() -> byte[] {
+    let bytes: byte[] = [for index in 0..16388 => (byte)255]
+    var index = 0
+    while index < 16386 {
+        bytes[index + 1] = (byte)(index % 251)
+        index += 1
+    }
+    return bytes
+}
+
+async func CheckMemoryWindows(credentials: SslServerAuthenticationOptions, trust: SslClientAuthenticationOptions) -> Task<int> {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else { return 40 }
+    let accepting = listener.Accept()
+    let Ok(port) = listener.GetLocalPort() else { return 41 }
+    let Ok(clientSocket) = await Socket.Connect("127.0.0.1", port) else { return 42 }
+    let Ok(serverSocket) = await accepting else { return 43 }
+    listener.Close()
+    let clientTransport = TlsTestTransport(clientSocket)
+    let serverTransport = TlsTestTransport(serverSocket)
+    use client = SslStream(clientTransport, clientTransport)
+    use server = SslStream(serverTransport, serverTransport)
+    let authenticating = server.AuthenticateAsServer(credentials)
+    if await client.AuthenticateAsClient(trust, "localhost") is not Ok(_) { return 44 }
+    if await authenticating is not Ok(_) { return 45 }
+    let destination: byte[] = [for index in 0..4098 => (byte)255]
+    // Start with no plaintext available so this selected destination crosses a wait.
+    let source = CreateWindow()
+    let firstRead = server.Read(destination, 1, 4096)
+    System.Runtime.GC.Collect()
+    let writing = client.Write(source, 1, 16386)
+    System.Runtime.GC.Collect()
+    var pending = firstRead
+    var received = 0
+    while received < 16386 {
+        let result = await pending
+        if result is Error(StreamError.InvalidData) { return 56 }
+        if result is Error(StreamError.IoFailure) { return 57 }
+        if result is Error(StreamError.Closed) { return 58 }
+        if result is Error(StreamError.WrongAccess) { return 59 }
+        let Ok(count) = result else { return 46 }
+        if count <= 0 || count > 4096 || count > 16386 - received { return 47 }
+        if destination[0] != 255 || destination[4097] != 255 { return 48 }
+        var index = 0
+        while index < count {
+            if destination[index + 1] != (byte)((received + index) % 251) { return 49 }
+            index += 1
+        }
+        received += count
+        if received < 16386 { pending = server.Read(destination, 1, 4096) }
+    }
+    if await writing is not Ok(_) { return 50 }
+    if await client.Write(destination, destination.Length, 0) is not Ok(_) { return 51 }
+    if await server.Read(destination, destination.Length, 0) is not Ok(0) { return 52 }
+    let shutdown = client.Shutdown()
+    if await server.Read(destination, 1, 4096) is not Ok(0) { return 53 }
+    if await shutdown is not Ok(_) { return 54 }
+    if destination[0] != 255 || destination[4097] != 255 { return 55 }
+    return 0
+}
