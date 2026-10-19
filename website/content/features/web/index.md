@@ -239,3 +239,10 @@ materializes text before parsing. The parser now borrows that text’s UTF-8 sto
 avoiding repeated encoding and temporary quoted-token strings. Buffered HTTP JSON
 now parses byte windows directly, validating UTF-8 without creating a document string.
 Non-array sequences still require one contiguous snapshot. See [JSON contracts](/docs/json.html).
+
+Development `HttpContent.CopyTo` transfers buffered or streaming bodies into an
+`OutputStream`, awaiting destination writes before reading further. It uses direct
+array writes or bounded staging, propagates cancellation and stream errors, and
+leaves resource disposal explicit. See the [body-stream contract](/docs/http-body-streams).
+The proposed specialized content hierarchy and unknown-length outgoing framing
+remain future work.

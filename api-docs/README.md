@@ -2509,3 +2509,8 @@ views cannot safely be represented by its opaque compatibility types. The
 [manual input reference](json.md#utf-8-byte-input-development) covers signatures,
 ownership, quotas, strict UTF-8 precedence, BOM behavior and mapping limitations.
 HTTP consumes byte windows; InputStream still decodes full text first.
+
+Development HttpContent.CopyTo(OutputStream[, CancellationToken]) is included in
+both native and CLI references. The [HTTP body-stream guide](http-body-streams.md)
+documents bounded transfer, cancellation, one-shot consumption, errors and ownership.
+No public type is added or excluded by this change.

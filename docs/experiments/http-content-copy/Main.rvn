@@ -1,0 +1,39 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Result.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value { System.Fail("HTTP content copy contract failed") }
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let client = HttpClient()
+    for mode in 0..5 {
+        let Ok(request) = HttpRequest.Get(arguments[0]) else { System.Fail("Invalid address") }
+        let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else { System.Fail("Headers failed") }
+        Check(!response.Content.IsBuffered)
+        let destination = MemoryStream()
+        Console.WriteLine("HEADERS")
+        let result = await response.Content.CopyTo(destination)
+        if mode < 3 {
+            Check(result is Ok(_))
+            Check(destination.GetLength() is Ok(2049L))
+            Check(destination.Seek(0) is Ok(0L))
+            let buffer: byte[] = [(byte)77, (byte)0, (byte)99]
+            for index in 0..2049 {
+                Check((await destination.Read(buffer, 1, 1)) is Ok(1))
+                Check(buffer[0] == 77 && buffer[1] == 120 && buffer[2] == 99)
+            }
+        } else {
+            Check(result is Error(HttpError.Content(StreamError.InvalidData)))
+        }
+        Check((await response.Content.CopyTo(destination)) is Error(HttpError.InvalidRequest(_)))
+        destination.Close()
+        response.Dispose()
+        Console.WriteLine("CASE")
+    }
+    client.Dispose()
+    Console.WriteLine("DONE")
+}

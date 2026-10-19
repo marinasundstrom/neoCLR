@@ -1,0 +1,266 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Option.*
+import System.Result.*
+import System.Runtime.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+class CopyInput : InputStream {
+    private val size: int
+    private val mode: int
+    var Reads = 0
+    var Position = 0
+    var Closed = 0
+    var LargestRequest = 0
+
+    init(size: int, mode: int) {
+        self.size = size
+        self.mode = mode
+    }
+
+    func Close() { Closed += 1 }
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    func Read(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {
+        return Task.FromResult(ReadCore(buffer, offset, count))
+    }
+    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        Reads += 1
+        if count > LargestRequest { LargestRequest = count }
+        if mode == 1 { return Error(StreamError.AccessDenied) }
+        if mode == 2 { return Ok(-1) }
+        if mode == 3 { return Ok(count + 1) }
+        var take = size - Position
+        if take > count { take = count }
+        if take > 700 { take = 700 }
+        var index = 0
+        while index < take {
+            buffer[offset + index] = (byte)((Position + index) % 251)
+            index += 1
+        }
+        Position += take
+        return Ok(take)
+    }
+}
+
+class CopyOutput : OutputStream {
+    private val gate: Task<bool>
+    private val fail: bool
+    private var activeToken = CancellationToken.None
+    var Writes = 0
+    var Count = 0
+    var Closed = 0
+    var Flushes = 0
+    var Valid = true
+    var FirstBufferLength = 0
+    var TokenSeen = false
+
+    init(gate: Task<bool>, fail: bool) {
+        self.gate = gate
+        self.fail = fail
+    }
+    func Close() { Closed += 1 }
+    func Flush() -> Task<Result<unit, StreamError>> { return Flush(CancellationToken.None) }
+    func Flush(token: CancellationToken) -> Task<Result<unit, StreamError>> {
+        Flushes += 1
+        let result: Result<unit, StreamError> = Ok(())
+        return Task.FromResult(result)
+    }
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<unit, StreamError>> {
+        // This single-writer fixture retains the token on its owner: the current
+        // application bridge rejects capturing this value parameter across await.
+        activeToken = token
+        return WriteCore(buffer, offset, count)
+    }
+    private async func WriteCore(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        Writes += 1
+        TokenSeen = activeToken.CanBeCancelled
+        if Writes == 1 {
+            FirstBufferLength = buffer.Length
+            _ = await gate
+        }
+        GC.Collect()
+        if activeToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return await cancelled.Task
+        }
+        if fail { return Error(StreamError.AccessDenied) }
+        var index = 0
+        while index < count {
+            if buffer[offset + index] != (byte)((Count + index) % 251) { Valid = false }
+            index += 1
+        }
+        Count += count
+        return Ok(())
+    }
+}
+
+// Outcome observation is deliberate: awaiting the cancelled copy would cancel the test.
+class CopyObserver {
+    val Done = Promise<bool>()
+    private val operation: Task<Result<unit, HttpError>>
+    init(operation: Task<Result<unit, HttpError>>) { self.operation = operation }
+    func Complete() -> System.Void { _ = Done.Complete(operation.IsCancelled) }
+}
+
+func ReadyOutput() -> CopyOutput => CopyOutput(Task.FromResult(true), false)
+
+[Test("HTTP content copy awaits writes before reading more and preserves ownership")]
+async func ABackpressure() -> Task<Result<unit, TestFailure>> {
+    let input = CopyInput(2500, 0)
+    let Ok(content) = HttpContent.FromStream(input, 2500, false) else { return Assert.True(false, "Create content") }
+    let gate = Promise<bool>()
+    let output = CopyOutput(gate.Task, false)
+    let operation = content.CopyTo(output)
+    GC.Collect()
+    _ = Assert.True(!operation.IsCompleted, "Write remains pending")?
+    _ = Assert.Equal(1, input.Reads)?
+    _ = Assert.Equal(700, input.Position)?
+    _ = gate.Complete(true)
+    _ = Assert.True(await operation is Ok(_), "Copy succeeds")?
+    _ = Assert.Equal(2500, output.Count)?
+    _ = Assert.Equal(1024, input.LargestRequest)?
+    _ = Assert.True(output.Valid, "Bytes survive suspension and GC")?
+    _ = Assert.Equal(0, input.Closed)?
+    _ = Assert.Equal(0, output.Closed)?
+    _ = Assert.Equal(0, output.Flushes)?
+    _ = Assert.True(await content.CopyTo(output) is Error(HttpError.InvalidRequest(_)), "Stream cannot replay")?
+    content.Dispose()
+    content.Dispose()
+    return Assert.Equal(1, input.Closed)
+}
+
+[Test("HTTP content copy writes arrays directly and stages other sequences in bounded chunks")]
+async func BBuffered() -> Task<Result<unit, TestFailure>> {
+    let bytes = [for index in 0..2500 => (byte)(index % 251)]
+    let content = HttpContent(bytes)
+    let output = ReadyOutput()
+    _ = Assert.True(await content.CopyTo(output) is Ok(_), "Array copy")?
+    _ = Assert.Equal(1, output.Writes)?
+    _ = Assert.Equal(2500, output.FirstBufferLength)?
+    _ = Assert.True(output.Valid, "Array order")?
+    let second = ReadyOutput()
+    _ = Assert.True(await content.CopyTo(second) is Ok(_), "Buffered content can replay")?
+    let sequence = HttpContent(ArrayList<byte>(bytes))
+    let staged = ReadyOutput()
+    _ = Assert.True(await sequence.CopyTo(staged) is Ok(_), "Sequence copy")?
+    _ = Assert.Equal(3, staged.Writes)?
+    _ = Assert.Equal(1024, staged.FirstBufferLength)?
+    _ = Assert.Equal(2500, staged.Count)?
+    return Assert.True(staged.Valid, "Staged order")
+}
+
+[Test("HTTP content copy preserves stream failures and rejects truncated or invalid reads")]
+async func CFailures() -> Task<Result<unit, TestFailure>> {
+    let truncated = CopyInput(1, 0)
+    let Ok(content) = HttpContent.FromStream(truncated, 2, true) else { return Assert.True(false, "Create truncated source") }
+    let output = ReadyOutput()
+    _ = Assert.True(await content.CopyTo(output) is Error(HttpError.Content(StreamError.IoFailure)), "Early EOF")?
+    _ = Assert.Equal(1, output.Count)?
+    for mode in 1..4 {
+        let invalidInput = CopyInput(2, mode)
+        let Ok(invalid) = HttpContent.FromStream(invalidInput, 2, true) else { return Assert.True(false, "Create invalid source") }
+        let sink = ReadyOutput()
+        let result = await invalid.CopyTo(sink)
+        if mode == 1 {
+            _ = Assert.True(result is Error(HttpError.Content(StreamError.AccessDenied)), "Preserve read error")?
+        } else {
+            _ = Assert.True(result is Error(HttpError.Content(StreamError.IoFailure)), "Reject impossible count")?
+        }
+        _ = Assert.Equal(0, sink.Writes)?
+    }
+    let input = CopyInput(2500, 0)
+    let Ok(failing) = HttpContent.FromStream(input, 2500, true) else { return Assert.True(false, "Create write failure") }
+    let rejected = CopyOutput(Task.FromResult(true), true)
+    _ = Assert.True(await failing.CopyTo(rejected) is Error(HttpError.Content(StreamError.AccessDenied)), "Preserve write error")?
+    _ = Assert.Equal(1, input.Reads)?
+    _ = Assert.True(await failing.CopyTo(rejected) is Error(HttpError.InvalidRequest(_)), "Failure consumes stream")?
+    failing.Dispose()
+    return Assert.Equal(0, input.Closed)
+}
+
+[Test("HTTP content copy respects declared lengths and skips empty I/O")]
+async func DLengths() -> Task<Result<unit, TestFailure>> {
+    let input = CopyInput(10, 0)
+    let Ok(content) = HttpContent.FromStream(input, 3, true) else { return Assert.True(false, "Create bounded source") }
+    let output = ReadyOutput()
+    _ = Assert.True(await content.CopyTo(output) is Ok(_), "Copy selected length")?
+    _ = Assert.Equal(3, input.Position)?
+    _ = Assert.Equal(3, output.Count)?
+    let empty = CopyInput(10, 0)
+    let Ok(zero) = HttpContent.FromStream(empty, 0, true) else { return Assert.True(false, "Create empty source") }
+    let sink = ReadyOutput()
+    _ = Assert.True(await zero.CopyTo(sink) is Ok(_), "Empty stream")?
+    _ = Assert.Equal(0, empty.Reads)?
+    let bytes: byte[] = []
+    _ = Assert.True(await HttpContent(bytes).CopyTo(sink) is Ok(_), "Empty array")?
+    return Assert.Equal(0, sink.Writes)
+}
+
+[Test("HTTP content copy cancellation skips pre-cancelled input and stops pending writes")]
+async func ECancellation() -> Task<Result<unit, TestFailure>> {
+    let input = CopyInput(2500, 0)
+    let Ok(content) = HttpContent.FromStream(input, 2500, true) else { return Assert.True(false, "Create source") }
+    let cancellation = CancellationTokenSource()
+    let token = cancellation.Token
+    cancellation.Cancel()
+    let output = ReadyOutput()
+    let skipped = content.CopyTo(output, token)
+    let observer = CopyObserver(skipped)
+    skipped.OnCompleted(observer.Complete)
+    _ = Assert.True(await observer.Done.Task, "Pre-cancelled task")?
+    _ = Assert.Equal(0, input.Reads)?
+    _ = Assert.Equal(0, output.Writes)?
+    let active = CancellationTokenSource()
+    let gate = Promise<bool>()
+    let pending = CopyOutput(gate.Task, false)
+    let operation = content.CopyTo(pending, active.Token)
+    let completed = CopyObserver(operation)
+    operation.OnCompleted(completed.Complete)
+    _ = Assert.True(!operation.IsCompleted, "Pending destination")?
+    active.Cancel()
+    _ = gate.Complete(true)
+    _ = Assert.True(await completed.Done.Task, "Await propagates cancellation")?
+    _ = Assert.Equal(1, input.Reads)?
+    _ = Assert.Equal(0, pending.Count)?
+    _ = Assert.True(pending.TokenSeen, "Pass cancellation to destination")?
+    _ = Assert.True(await content.CopyTo(output) is Error(HttpError.InvalidRequest(_)), "Cancellation consumes started stream")?
+    content.Dispose()
+    cancellation.Dispose()
+    active.Dispose()
+    return Assert.Equal(0, input.Closed)
+}
+
+[Test("HTTP content copy rejects disposed bodies and stops before the next source read")]
+async func FDisposal() -> Task<Result<unit, TestFailure>> {
+    let bytes: byte[] = [(byte)0]
+    let buffered = HttpContent(bytes)
+    buffered.Dispose()
+    let output = ReadyOutput()
+    _ = Assert.True(await buffered.CopyTo(output) is Error(HttpError.Content(StreamError.Closed)), "Disposed buffered content")?
+    _ = Assert.Equal(0, output.Writes)?
+    let input = CopyInput(2500, 0)
+    let Ok(content) = HttpContent.FromStream(input, 2500, false) else { return Assert.True(false, "Create source") }
+    let gate = Promise<bool>()
+    let pending = CopyOutput(gate.Task, false)
+    let operation = content.CopyTo(pending)
+    _ = Assert.True(!operation.IsCompleted, "Await destination")?
+    content.Dispose()
+    _ = Assert.Equal(1, input.Closed)?
+    _ = gate.Complete(true)
+    _ = Assert.True(await operation is Error(HttpError.Content(StreamError.Closed)), "Stop after pending write settles")?
+    _ = Assert.Equal(1, input.Reads)?
+    _ = Assert.Equal(700, pending.Count)?
+    return Assert.Equal(0, pending.Closed)
+}

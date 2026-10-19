@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Add HttpContent.CopyTo(OutputStream) and cancellation support for buffered and streaming bodies. Write arrays directly and stage other sources in at most 1024 bytes, awaiting destination writes before reading further. Preserve stream errors, exact declared lengths, one-shot consumption and explicit ownership; do not flush, close or add framing. All 18 focused lifecycle executions and ten plain-HTTP receive checks pass, with both API snapshots refreshed. The proposed abstract content hierarchy, shared stream Memory migration and unknown-length outgoing framing remain pending.
+
 - Record the author-directed HTTP content streaming design: client and server both produce and consume bodies through streams, with typed string/JSON factories and async readers. Revise the proposed buffer-only hierarchy to a stream-capable body contract; identify unknown-length framing, incremental JSON, ownership and replay gaps. This is a proposal, not a newly implemented API.
 
 - Add borrowed UTF-8 JSON deserialization overloads for nodes, generic values and TypeInfo mapping. Buffered HTTP JSON reads now borrow array storage or snapshot other sequences once, avoiding a whole-document string while preserving quotas, strict UTF-8 errors, aliases and owned results. The 600-read probe removes 600 string allocations (3.79% of all allocations) and 3.99% of payload bytes; full UTF-8 prevalidation increases root publications 4.13%. All 60 focused interpreter/JIT/AOT executions and API snapshot checks pass. Four paired runs use 3.23% more mean CPU with paced and 1.96% more with every-boundary GC. Stream input remains text-buffered; no HTTP throughput gain is claimed.

@@ -73,3 +73,37 @@ Unknown-length content cannot yet be sent as an upload or server response.
 These are HTTP/1.1 development APIs over the shared cleartext/TLS connection layer.
 Fresh streaming qualification covers local macOS interpreter, JIT and AOT;
 Windows and streaming-over-TLS qualification remain open.
+
+## Copy a body to an output stream (development)
+
+`HttpContent.CopyTo(destination: OutputStream)` and
+`CopyTo(destination: OutputStream, cancellationToken: CancellationToken)` return
+`Task<Result<unit, HttpError>>`. They accept buffered content and incoming or
+known-length source streams. The loopback consumer in
+[the copy experiment](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/http-content-copy)
+copies headers-first responses into a MemoryStream.
+
+Each read is followed by an awaited complete-range destination write before the
+next read. Byte arrays are written directly; other sequences and streams use at
+most 1024 bytes of staging. CopyTo does not flush or close either stream, perform
+text conversion, add HTTP framing or allocate a whole-body snapshot. The caller
+must keep borrowed storage unchanged until completion. Existing OutputStream
+array/range signatures remain in use pending coordinated Memory migration.
+
+Known-length streams stop at the declared length without reading beyond it; early
+EOF or impossible read counts yield `HttpError.Content(StreamError.IoFailure)`.
+Unknown incoming lengths stop at the framing stream's EOF. Underlying read/write
+errors retain their StreamError inside HttpError.Content. A failure may follow
+partial output. Cancellation propagates as a cancelled task; a pre-cancelled call
+performs no I/O and does not consume the source, even for an empty body.
+
+A started streaming copy consumes the one-shot content, including after failure or
+cancellation. Further copies/uploads return InvalidRequest. Buffered bodies remain
+replayable while undisposed. Disposed content returns Content(Closed); disposal
+during a pending write does not revoke the destination's borrowed bytes and stops
+the next read after that write settles. Destination ownership never transfers.
+Do not mix direct TryGetStream reads with copying/uploading, or run them concurrently;
+the base cannot account for reads performed through an independently held stream.
+
+This establishes the transfer operation, not yet the proposed abstract hierarchy,
+custom producers, unknown-length outgoing framing or incremental JSON serialization.

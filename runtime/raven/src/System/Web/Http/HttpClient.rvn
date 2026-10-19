@@ -545,6 +545,115 @@ public class HttpContent : Disposable {
         return None()
     }
 
+    /// <summary>Copies this body to a destination stream with no cancellation request.</summary>
+    /// <param name="destination">Borrowed output; never flushed or closed by this operation.</param>
+    /// <returns>Completion or a content/stream failure. Output may be partial on failure.</returns>
+    func CopyTo(destination: OutputStream) -> Task<Result<unit, HttpError>> {
+        return CopyTo(destination, CancellationToken.None)
+    }
+
+    /// <summary>Copies buffered or streaming content with bounded staging and backpressure.</summary>
+    /// <param name="destination">Borrowed output; keep it open until completion.</param>
+    /// <param name="cancellationToken">Cancellation propagates as a cancelled task, including before empty copies.</param>
+    /// <returns>Success after the body is written, or HttpError.Content preserving the stream error. A reused streaming body returns InvalidRequest.</returns>
+    /// <remarks>Never flushes or closes either stream. Stream content is consumed once, including after failure or cancellation once started. Known lengths stop exactly at that length and reject early EOF; unknown incoming lengths end at EOF. Do not concurrently read, copy, upload or mutate the body. Array bodies are written directly; other sources use at most 1024 staging bytes. This operation does not add HTTP framing.</remarks>
+    async func CopyTo(destination: OutputStream, cancellationToken: CancellationToken) -> Task<Result<unit, HttpError>> {
+        if cancellationToken.IsCancellationRequested {
+            return await CancelledCopy()
+        }
+        if disposed {
+            return Error(HttpError.Content(StreamError.Closed))
+        }
+        _ = BeginUpload()?
+        if IsBuffered {
+            if storedBytes is byte[] bytes {
+                if bytes.Length == 0 {
+                    return Ok(())
+                }
+                return CopyResult(await destination.Write(bytes, 0, bytes.Length, cancellationToken))
+            }
+            let count = storedBytes.Count
+            if count == 0 {
+                return Ok(())
+            }
+            let sequenceBuffer = CheckedStorage.Reserve<byte>(if count < 1024 { count } else { 1024 })
+            var offset = 0
+            while offset < count {
+                if cancellationToken.IsCancellationRequested {
+                    return await CancelledCopy()
+                }
+                if disposed {
+                    return Error(HttpError.Content(StreamError.Closed))
+                }
+                let sequenceRemaining = count - offset
+                let sequenceTake = if sequenceRemaining < sequenceBuffer.Length { sequenceRemaining } else { sequenceBuffer.Length }
+                var index = 0
+                while index < sequenceTake {
+                    sequenceBuffer[index] = storedBytes[offset + index]
+                    index += 1
+                }
+                _ = CopyResult(await destination.Write(sequenceBuffer, 0, sequenceTake, cancellationToken))?
+                offset += sequenceTake
+            }
+            return Ok(())
+        }
+        let Some(stream) = input else {
+            return Error(HttpError.Content(StreamError.IoFailure))
+        }
+        var remaining = inputLength
+        if remaining == 0 {
+            return Ok(())
+        }
+        let buffer = CheckedStorage.Reserve<byte>(if remaining > 0 && remaining < 1024 { remaining } else { 1024 })
+        while remaining != 0 {
+            if cancellationToken.IsCancellationRequested {
+                return await CancelledCopy()
+            }
+            if disposed {
+                return Error(HttpError.Content(StreamError.Closed))
+            }
+            let take = if remaining > 0 && remaining < buffer.Length { remaining } else { buffer.Length }
+            let result = await stream.Read(buffer, 0, take, cancellationToken)
+            let Ok(read) = result else {
+                if result is Error(let reason) {
+                    return Error(HttpError.Content(reason))
+                }
+                return Error(HttpError.Content(StreamError.IoFailure))
+            }
+            if read < 0 || read > take || (read == 0 && remaining > 0) {
+                return Error(HttpError.Content(StreamError.IoFailure))
+            }
+            if cancellationToken.IsCancellationRequested {
+                return await CancelledCopy()
+            }
+            if disposed {
+                return Error(HttpError.Content(StreamError.Closed))
+            }
+            if read == 0 {
+                return Ok(())
+            }
+            _ = CopyResult(await destination.Write(buffer, 0, read, cancellationToken))?
+            if remaining > 0 {
+                remaining -= read
+            }
+        }
+        return Ok(())
+    }
+
+    private static func CopyResult(result: Result<unit, StreamError>) -> Result<unit, HttpError> {
+        return match result {
+            Ok(_) => Ok(())
+            Error(let reason) => Error(HttpError.Content(reason))
+        }
+    }
+
+    private static func CancelledCopy() -> Task<Result<unit, HttpError>> {
+        // Cancellation bridge only; ordinary transfers use await directly.
+        let source = Promise<Result<unit, HttpError>>()
+        _ = source.Cancel()
+        return source.Task
+    }
+
     /// Releases owned stream content; borrowed sources remain open. Idempotent.
     func Dispose() {
         if !disposed {

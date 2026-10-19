@@ -109,3 +109,19 @@ Both require bounded reads and typed decoding/deserialization errors. Ordinary
 read methods consume a one-shot body; explicit buffering can enable repeated reads.
 The current eager JSON factory and full-text stream reader are transitional
 implementations, not the final streaming semantics proposed here.
+
+## Implemented first transfer slice (2026-10-19)
+
+The existing concrete HttpContent now exposes CopyTo(OutputStream) and its
+CancellationToken overload, returning Task<Result<unit, HttpError>>. Buffered
+arrays write directly; general sequences and stream sources use bounded staging.
+Each destination write settles before another source read. Cancellation and
+stream errors propagate, source content remains one-shot, and neither stream is
+flushed or closed by the operation. See [the API contract](../../api-docs/http-body-streams.md).
+
+This is a foundation on the existing base, not completion of the proposed abstract
+hierarchy. Existing socket upload/server response paths still use their current
+pull adapters; CopyTo does not yet replace them or add unknown-length output.
+The InputStream/OutputStream Memory migration and specialized producer/consumer
+types remain separate bounded steps. Cancellation uses the current Task machinery;
+this change does not introduce a new awaitable or claim allocation-free completion.

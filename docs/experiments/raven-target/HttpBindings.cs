@@ -171,6 +171,8 @@ static class HttpBindings
                 public Result<int, HttpError> ReadUpload(byte[] buffer, int count) => default;
                 public Option<string> MediaType => default;
                 public Collections.Sequence<byte> Bytes => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> CopyTo(IO.OutputStream destination) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> CopyTo(IO.OutputStream destination, Concurrency.CancellationToken cancellationToken) => default;
                 public Concurrency.Tasks.Task<Result<string, string>> ReadText() => default;
             }
             public sealed class HttpServerOptions {

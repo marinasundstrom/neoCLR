@@ -31,6 +31,9 @@ HTTP content. The proposed abstract body contract separates memory, stream, UTF-
 text and JSON producers; current known-length stream uploads do not yet establish
 unknown-length outgoing framing or incremental JSON serialization. This supersedes
 the assistant's proposed buffer-only content hierarchy, not existing byte-input work.
+The first transfer slice adds CopyTo with bounded staging, awaited backpressure,
+cancellation and one-shot ownership on the existing base; the abstract hierarchy
+and transport migration remain pending.
 
 **HTTP collector comparison (author direction, 2026-10-19):** the author subsequently
 requested executing the comparison during integration. The

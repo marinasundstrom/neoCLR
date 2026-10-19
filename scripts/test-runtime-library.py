@@ -23,6 +23,8 @@ MEMORY_LIFETIME_NAMES = [
     'Default and end-position Memory windows remain empty after suspension',
 ]
 
+HTTP_CONTENT_COPY_NAMES = ['HTTP content copy awaits writes before reading more and preserves ownership', 'HTTP content copy writes arrays directly and stages other sequences in bounded chunks', 'HTTP content copy preserves stream failures and rejects truncated or invalid reads', 'HTTP content copy respects declared lengths and skips empty I/O', 'HTTP content copy cancellation skips pre-cancelled input and stops pending writes', 'HTTP content copy rejects disposed bodies and stops before the next source read']
+
 HTTP_TEXT_NAMES = [
     'HTTP buffered text preserves scalars beyond the one-shot codec quota',
     'HTTP buffered text rejects malformed and truncated large bodies',
@@ -364,7 +366,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -402,6 +404,7 @@ def main():
     expected = [
         ('type-relations', 0, ''.join('PASS ' + n + '\n' for n in relationship_names) + f'Tests: {len(relationship_names)}, passed: {len(relationship_names)}, failed: 0, skipped: 0\n'),
         ('http-lifetime', 0, ''.join('PASS ' + n + '\n' for n in HTTP_LIFETIME_NAMES) + f'Tests: {len(HTTP_LIFETIME_NAMES)}, passed: {len(HTTP_LIFETIME_NAMES)}, failed: 0, skipped: 0\n'),
+        ('http-content-copy', 0, ''.join('PASS ' + n + '\n' for n in HTTP_CONTENT_COPY_NAMES) + f'Tests: {len(HTTP_CONTENT_COPY_NAMES)}, passed: {len(HTTP_CONTENT_COPY_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-text', 0, ''.join('PASS ' + n + '\n' for n in HTTP_TEXT_NAMES) + f'Tests: {len(HTTP_TEXT_NAMES)}, passed: {len(HTTP_TEXT_NAMES)}, failed: 0, skipped: 0\n'),
         ('collections', 0, ''.join('PASS ' + n + '\n' for n in COLLECTION_NAMES) + f'Tests: {len(COLLECTION_NAMES)}, passed: {len(COLLECTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('collection-construction', 0, ''.join('PASS ' + n + '\n' for n in CONSTRUCTION_NAMES) + f'Tests: {len(CONSTRUCTION_NAMES)}, passed: {len(CONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
@@ -454,13 +457,13 @@ def main():
         for name, exit_code, stdout in selected:
             build = out / (name + '-build')
             environment = dict(os.environ)
-            if name not in ('runner-contract', 'memory-lifetimes'):
+            if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy'):
                 started = time.perf_counter()
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need lifecycle bindings; JSON DOM fixtures also select HTTP content/socket handlers.
-            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
+            profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if name == "json-streams":
@@ -511,7 +514,7 @@ def main():
                     raise RuntimeError('Raven did not report a valid project assembly')
                 shutil.copy2(paths[-1], build / 'app.dll')
                 report['phases'][-1].update(command=list(map(str,command)), assemblySha256=sha(build / 'app.dll'))
-            if name not in ('runner-contract', 'memory-lifetimes'):
+            if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy'):
                 started = time.perf_counter()
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='registration-verification', elapsedSeconds=round(time.perf_counter() - started, 6)))
