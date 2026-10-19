@@ -15,7 +15,7 @@ func HeadersRepeated() -> Result<unit, TestFailure> {
     headers.Add(HttpHeader("set-cookie", "b=2"))
     headers.Add(HttpHeader("X-List", "one, two"))
     headers.Add(HttpHeader("x-list", "three"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let cookies = response.GetHeaderValues("sEt-CoOkIe")
     _ = Assert.Equal(2, cookies.Count)?
     _ = Assert.Equal(headers[0].Value, cookies[0])?
@@ -30,7 +30,7 @@ func HeadersRepeated() -> Result<unit, TestFailure> {
 func HeadersEmpty() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Empty", ""))
-    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let values = response.GetHeaderValues("x-empty")
     _ = Assert.Equal(1, values.Count)?
     _ = Assert.Equal("", values[0])?
@@ -42,7 +42,7 @@ func HeadersInvalid() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-List", "one"))
     headers.Add(HttpHeader("X-İ", "invalid name"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     for name in ["", " X-List", "X-List:", "X-İ", "X-List\r\n"] {
         _ = Assert.Equal(0, response.GetHeaderValues(name).Count)?
     }
@@ -54,7 +54,7 @@ func HeadersSnapshot() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Set-Cookie", "a=1"))
     headers.Add(HttpHeader("set-cookie", "b=2"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let snapshot = response.GetHeaderValues("set-cookie")
     headers.Add(HttpHeader("SET-COOKIE", "c=3"))
     _ = Assert.Equal(2, snapshot.Count)?
@@ -73,4 +73,92 @@ func HeadersRequest() -> Result<unit, TestFailure> {
         return Assert.True(false, "Construct GET request")
     }
     return Assert.Equal(0, get.GetHeaderValues("Host").Count)
+}
+
+[Test("HTTP response constructors retain memory content and replace only content type metadata")]
+func ResponseContent() -> Result<unit, TestFailure> {
+    let data: byte[] = [(byte)255, (byte)65, (byte)66, (byte)255]
+    let memory: ReadOnlyMemory<byte> = data
+    let content = HttpMemoryContent(memory[1..3], "application/octet-stream")
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("content-TYPE", "old"))
+    headers.Add(HttpHeader("X-Preserved", "yes"))
+    headers.Add(HttpHeader("Content-Type", "duplicate"))
+    let response = HttpResponse(HttpStatusCode.OK, headers, content)
+    _ = Assert.True(Object.ReferenceEquals(content, response.Content), "Content identity retained")?
+    _ = Assert.Equal(3, headers.Count)?
+    _ = Assert.Equal("old", headers[0].Value)?
+    _ = Assert.Equal(2, response.Headers.Count)?
+    _ = Assert.Equal("yes", response.GetHeaderValues("X-Preserved")[0])?
+    _ = Assert.Equal(1, response.GetHeaderValues("Content-Type").Count)?
+    _ = Assert.Equal("application/octet-stream", response.GetHeaderValues("Content-Type")[0])?
+    data[1] = (byte)90
+    let retained = (HttpMemoryContent)response.Content
+    let selected: ReadOnlySlice<byte> = retained.Memory
+    _ = Assert.Equal(2, selected.Length)?
+    _ = Assert.Equal((byte)90, selected[0])?
+    let numeric = HttpResponse(201, headers, content)
+    return Assert.True(Object.ReferenceEquals(content, numeric.Content), "Numeric constructor retains producer")
+}
+
+class RangeEndpoints {
+    var Calls = 0
+    func Start() -> int {
+        Calls = Calls * 10 + 1
+        return 2
+    }
+    func End() -> int {
+        Calls = Calls * 10 + 2
+        return 5
+    }
+}
+
+func DynamicBytes(start: int, end: int) -> byte[] => [for index in start..end => (byte)index]
+func InclusiveBytes(start: int, end: int) -> byte[] => [for index in start..=end => (byte)7]
+
+[Test("HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation")]
+func ResponseDynamic() -> Result<unit, TestFailure> {
+    let endpoints = RangeEndpoints()
+    let bytes: byte[] = [for index in endpoints.Start()..endpoints.End() => (byte)index]
+    _ = Assert.Equal(12, endpoints.Calls)?
+    _ = Assert.Equal(3, bytes.Length)?
+    _ = Assert.Equal((byte)2, bytes[0])?
+    _ = Assert.Equal((byte)4, bytes[2])?
+    _ = Assert.Equal(0, DynamicBytes(5, 2).Length)?
+    _ = Assert.Equal(0, DynamicBytes(2, 2).Length)?
+    _ = Assert.Equal(0, InclusiveBytes(5, 2).Length)?
+    _ = Assert.Equal(1, InclusiveBytes(2147483647, 2147483647).Length)?
+    let body = HttpMemoryContent(bytes)
+    let response = HttpResponse(200, ArrayList<HttpHeader>(), body)
+    return Assert.Equal(3, response.Content.Length)
+}
+
+class ResponseInput : System.IO.InputStream {
+    var Reads = 0
+    var Closes = 0
+    func Close() { Closes += 1 }
+    func Read(buffer: byte[], offset: int, count: int) -> System.Concurrency.Tasks.Task<Result<int, System.IO.StreamError>> {
+        return Read(buffer, offset, count, System.Concurrency.CancellationToken.None)
+    }
+    func Read(buffer: byte[], offset: int, count: int, token: System.Concurrency.CancellationToken) -> System.Concurrency.Tasks.Task<Result<int, System.IO.StreamError>> {
+        Reads += 1
+        let result: Result<int, System.IO.StreamError> = Ok(0)
+        return System.Concurrency.Tasks.Task.FromResult(result)
+    }
+}
+
+[Test("HTTP response construction never reads or changes stream ownership")]
+func ResponseStream() -> Result<unit, TestFailure> {
+    let input = ResponseInput()
+    let Ok(content) = HttpStreamContent.Create(input, 7, false) else {
+        return Assert.True(false, "Stream content constructed")
+    }
+    let response = HttpResponse(200, ArrayList<HttpHeader>(), content)
+    _ = Assert.True(Object.ReferenceEquals(content, response.Content), "Stream identity retained")?
+    _ = Assert.Equal(7, response.Content.Length)?
+    _ = Assert.Equal(0, input.Reads)?
+    _ = Assert.Equal(0, input.Closes)?
+    response.Content.Dispose()
+    content.Dispose()
+    return Assert.Equal(1, input.Closes)
 }

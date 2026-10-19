@@ -44,19 +44,18 @@ func CheckImmediate(content: HttpContent) {
     ValidateMessage(content.ReadFromJson<Message>().GetResult())
     Check(content.ReadFromJson(typeof(Message)).GetResult() is Ok(_))
     Check(content.ReadJsonNode().GetResult() is Ok(_))
-    Check(HttpContent.FromText("null").ReadJsonNode().GetResult() is Ok(_))
-    Check(HttpContent.FromText("{").ReadJsonNode().GetResult() is Error(_))
-    Check(HttpContent.FromText("").ReadFromJson<Message>().GetResult() is Error(_))
-    let invalid = ArrayList<byte>()
-    invalid.Add((byte)255)
-    Check(HttpContent(invalid).ReadJsonNode().GetResult() is Error(JsonError.Read(TextReadError.InvalidUtf8)))
+    Check(HttpStringContent("null").ReadJsonNode().GetResult() is Ok(_))
+    Check(HttpStringContent("{").ReadJsonNode().GetResult() is Error(_))
+    Check(HttpStringContent("").ReadFromJson<Message>().GetResult() is Error(_))
+    let invalid: byte[] = [(byte)255]
+    Check(HttpMemoryContent(invalid).ReadJsonNode().GetResult() is Error(JsonError.Read(TextReadError.InvalidUtf8)))
     let source = CancellationTokenSource()
     source.Cancel()
-    Check(HttpContent.FromText("{").ReadFromJson<Message>(source.Token).IsCancelled)
+    Check(HttpStringContent("{").ReadFromJson<Message>(source.Token).IsCancelled)
     Check(content.ReadFromJson(typeof(Message), source.Token).IsCancelled)
     Check(content.ReadJsonNode(source.Token).IsCancelled)
     source.Dispose()
-    let Ok(node) = HttpContent.FromText("[1,null]").ReadJsonNode().GetResult() else {
+    let Ok(node) = HttpStringContent("[1,null]").ReadJsonNode().GetResult() else {
         System.Fail("JSON array content failed")
     }
     if node is JsonArray array {
@@ -71,12 +70,12 @@ func CheckImmediate(content: HttpContent) {
         System.Fail("JSON array node expected")
     }
     let input = MemoryStream()
-    Check(HttpContent.FromStream(input, 1048577, true) is Error(HttpError.LimitExceeded(_)))
-    let Ok(maximum) = HttpContent.FromStream(input, 1048576, true) else {
+    Check(HttpStreamContent.Create(input, 1048577, true) is Error(HttpError.LimitExceeded(_)))
+    let Ok(maximum) = HttpStreamContent.Create(input, 1048576, true) else {
         System.Fail("Stream admission boundary failed")
     }
     maximum.Dispose()
-    let Ok(stream) = HttpContent.FromStream(input, 0, true) else {
+    let Ok(stream) = HttpStreamContent.Create(input, 0, true) else {
         System.Fail("Stream creation failed")
     }
     Check(stream.ReadFromJson<Message>().GetResult() is Error(JsonError.Read(TextReadError.IoFailure)))

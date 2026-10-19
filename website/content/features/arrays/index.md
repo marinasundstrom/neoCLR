@@ -67,9 +67,9 @@ no longer implements Sliceable<T[]>; array-specific and owned-result APIs still
 use arrays. This deliberately replaces the former copy-based range contract.
 See the [slice API](../../docs/memory-views.html). Array-backed byte slices also run in native JIT/AOT, including indexing,
 updates, readonly borrowing and nested windows. Memory/ReadOnlyMemory retain
-windows across asynchronous use in the interpreter; native asynchronous retention
-is not yet qualified. Other element types and immutable UTF-8 views remain
-interpreter-only. Array size and allocation remain constrained by runtime budgets.
+windows across asynchronous use in the interpreter and native JIT/AOT, including
+collection, socket and TLS completion checks. Borrowed readonly UTF-8 byte views
+also run natively. Other native element specializations remain unqualified. Array size and allocation remain constrained by runtime budgets.
 
 Read-only interface views support [reference variance](../collections/#interface-variance); mutable array storage remains invariant.
 
@@ -77,7 +77,7 @@ Read-only interface views support [reference variance](../collections/#interface
 
 ## Buffer experiments and planned work
 
-Socket and HTTP operations already exercise byte buffers, partial transfers and retention through garbage collection. Future buffer views or asynchronous streams need explicit aliasing and lifetime contracts; they are not implied by the current array API.
+Socket, TLS and HTTP operations now use byte memory windows with explicit aliasing, completion and cancellation contracts. The [slices and memory guide](../memory/) explains the distinction between immediate borrowed access and retained asynchronous buffers. Shared stream interfaces remain the next integration boundary.
 
 [Platform roadmap →](../../proposals/#http-poc) · [Collection capabilities →](../collections/)
 
@@ -110,7 +110,7 @@ Raven uses `..` for an exclusive end and `..=` for an inclusive end in slices,
 range patterns and integer iteration. Inclusive Range construction checks endpoint
 conversion before arithmetic; the library Range contract remains half-open.
 String slices use grapheme boundaries. [Sequences and lists](../collections/) also
-support indexing and slicing. Array views are currently interpreter-only.
+support indexing and slicing. Native byte views are qualified; other native element specializations remain unqualified.
 
 Signed int/long range patterns follow the same endpoints. A long subject currently
 requires long literal bounds, such as `1L..=3L`. Signed int/long loops and

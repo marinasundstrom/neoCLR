@@ -22,19 +22,24 @@ Use the [setup guide](/try/) for the matching runtime and compiler.
 ## Start web applications with Serve
 
 Use `HttpServer.Serve(handler)` for application hosting with a matching development
-toolchain after Preview 16. The callback receives an `HttpRequest` and returns
-`Task<Result<HttpResponse, HttpError>>`; return the response for the server to send
-and dispose. The server supervises up to 16 concurrent exchanges. Route selection,
-JSON parsing and acknowledgement logic belong inside that callback.
+toolchain after Preview 16. The canonical callback receives an `HttpContext` and
+returns `Task<Result<unit, HttpError>>`. Configure `context.Response` or use
+`context.Respond` / `context.RespondText`, then return success. The server sends
+the response and owns completion and cleanup; do not call `Complete` inside the
+callback. Route selection, JSON parsing and acknowledgement logic belong there.
 
-The following lifecycle example comes directly from the
-[tested Serve fixture](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/Server.rvn).
-Its `Application.Respond` is a small benchmark handler, and its separate control
-socket lets the verifier request shutdown after responses finish:
+```raven
+{{HTTP_SERVE_CONTEXT_SAMPLE}}
+```
+
+Start the listener and await its lifetime in async Main:
 
 ```raven
 {{HTTP_SERVE_LIFETIME_SAMPLE}}
 ```
+
+[Download the context callback sample](/samples/http-context-serve.zip).
+The server supervises up to 16 concurrent exchanges.
 
 A normal application's shutdown signal can be different. Awaiting `Serve`'s lifetime
 task is correct and does not serialize callbacks; retain the task only when you
@@ -76,8 +81,8 @@ The program's completion callback closes the listener.
 
 `Configure` is where this application chooses its model. The later routing and
 attribute-mapper examples change dispatch inside the handler; they do not require
-a different listening model in these fixtures. With `Serve`, adapt context-based
-configuration to return `HttpResponse` from the callback instead. With manual
+a different listening model in these fixtures. With `Serve`, use a context callback returning `Task<Result<unit, HttpError>>`
+and leave response completion to the server. With manual
 acceptance, await context acquisition, then supervise bounded processing tasks if
 concurrency is needed; simply ignoring them loses error and lifetime observation.
 A long-running application also needs an explicit

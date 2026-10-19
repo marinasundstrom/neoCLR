@@ -30,7 +30,7 @@ class ReplyHandler : HttpHandler {
     private var pending: bool
 
     init(status: int, text: string, pending: bool) {
-        Response = HttpResponse(status, ArrayList<HttpHeader>(), HttpContent.FromText(text).Bytes)
+        Response = HttpResponse(status, ArrayList<HttpHeader>(), HttpStringContent(text))
         self.pending = pending
     }
 

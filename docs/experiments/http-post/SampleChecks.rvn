@@ -18,11 +18,11 @@ class SampleHandler : HttpHandler {
             _ = source.Complete(Error(HttpError.Protocol("peer")))
         } else if mode == 2 {
             let bytes: byte[] = [(byte)255]
-            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), bytes)))
+            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), HttpMemoryContent(bytes))))
         } else if mode == 3 {
             _ = source.Cancel()
         } else {
-            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content.Bytes)))
+            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
         }
         return source.Task
     }

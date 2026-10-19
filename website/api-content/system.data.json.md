@@ -39,7 +39,7 @@ See [byte output and ownership](/docs/json.html#utf-8-byte-output-development).
 
 Development parsing borrows the source string's UTF-8 bytes and creates owned text
 only for string values, names and number lexemes. Escaped tokens still need scratch
-storage. DeserializeNode and typed Deserialize also accept ReadOnlySlice<byte>;
+storage. DeserializeNode and typed Deserialize also accept `ReadOnlySlice<byte>`;
 buffered HTTP content uses these byte overloads without a document string.
 Stream deserialization still decodes full text; incremental readers remain future work.
 See [byte input and errors](/docs/json.html#utf-8-byte-input-development).

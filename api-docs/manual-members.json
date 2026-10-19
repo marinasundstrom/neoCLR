@@ -70,5 +70,49 @@
   "M:System.Attribute.#ctor": {
     "output": "docs/introspection.html#attribute-constructor",
     "reason": "The pinned RavenDoc renderer omits protected constructors from generated member pages."
+  },
+  "M:System.Networking.Sockets.Socket.Receive": {
+    "output": "docs/sockets.html#development-memory-window-migration-2026-10-19",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Networking.Sockets.Socket.ReceiveUntil": {
+    "output": "docs/sockets.html#development-memory-window-migration-2026-10-19",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Networking.Sockets.Socket.Send": {
+    "output": "docs/sockets.html#development-memory-window-migration-2026-10-19",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Networking.Sockets.Socket.SendUntil": {
+    "output": "docs/sockets.html#development-memory-window-migration-2026-10-19",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Security.Cryptography.HMACSHA256.HashData": {
+    "output": "docs/cryptography.html",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Security.Cryptography.HMACSHA256.VerifyData": {
+    "output": "docs/cryptography.html",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Security.Cryptography.SHA256.HashData": {
+    "output": "docs/cryptography.html",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Security.Cryptography.RandomNumberGenerator.Fill": {
+    "output": "docs/cryptography.html",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Text.Decoder.Decode": {
+    "output": "docs/streams.html#incremental-encoding-development",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Text.Encoder.Drain": {
+    "output": "docs/streams.html#incremental-encoding-development",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.Text.Encoding.Decode": {
+    "output": "docs/streams.html#incremental-encoding-development",
+    "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
   }
 }

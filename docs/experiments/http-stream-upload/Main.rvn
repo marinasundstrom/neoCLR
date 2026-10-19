@@ -100,7 +100,7 @@ class UploadCase {
         self.mode = mode
         input = GeneratedInput(mode, cancellation)
         let length = if mode == "empty" { 0 } else { 1025 }
-        let Ok(body) = HttpContent.FromStream(input, length, mode == "borrowed") else {
+        let Ok(body) = HttpStreamContent.Create(input, length, mode == "borrowed") else {
             System.Fail("Content construction failed")
             return
         }
@@ -109,8 +109,7 @@ class UploadCase {
     }
 
     func Run() -> Task<unit> {
-        Check(!content.IsBuffered && content.TryGetBytes() is None)
-        Check(content.ReadText().GetResult() is Error(_))
+        Check(!content.IsBuffered)
         Check(JsonContent.ReadNode(content) is Error(JsonError.Read(TextReadError.IoFailure)))
         if mode == "precancel" {
             cancellation.Cancel()
@@ -176,10 +175,10 @@ class UploadCase {
 async func Main(arguments: string[]) -> Task<unit> {
     let cancellation = CancellationTokenSource()
     let untouched = GeneratedInput("success", cancellation)
-    Check(HttpContent.FromStream(untouched, -1, false) is Error(HttpError.InvalidRequest(_)))
-    Check(HttpContent.FromStream(untouched, 1048577, false) is Error(HttpError.LimitExceeded(_)))
+    Check(HttpStreamContent.Create(untouched, -1, false) is Error(HttpError.InvalidRequest(_)))
+    Check(HttpStreamContent.Create(untouched, 1048577, false) is Error(HttpError.LimitExceeded(_)))
     Check(untouched.Closes == 0 && untouched.Reads == 0)
-    let Ok(maximum) = HttpContent.FromStream(untouched, 1048576, true) else {
+    let Ok(maximum) = HttpStreamContent.Create(untouched, 1048576, true) else {
         System.Fail("Maximum length rejected")
         return ()
     }

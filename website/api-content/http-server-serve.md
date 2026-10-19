@@ -8,6 +8,9 @@ Awaiting this lifetime task in async Main does not serialize requests. Retain an
 observe it when coordinating shutdown separately; dropping a task does not offload
 work to another thread.
 
+The [context callback](/docs/http-server.html#server-managed-callbacks) is the
+canonical application API; this overload returns a separately constructed response.
+
 ## Parameters
 
 `handler`: An asynchronous callback returning `Task<Result<HttpResponse, HttpError>>`.

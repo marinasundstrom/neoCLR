@@ -94,7 +94,7 @@ async func Main() -> Task<()> {
         }
         let input = GeneratedInput(mode)
         let length = if mode == 3 { 0 } else if mode == 1 { 8193 } else { 1025 }
-        let Ok(content) = HttpContent.FromStream(input, length, mode == 1) else {
+        let Ok(content) = HttpStreamContent.Create(input, length, mode == 1) else {
             System.Fail("Content failed")
         }
         if mode == 7 { content.Dispose() }

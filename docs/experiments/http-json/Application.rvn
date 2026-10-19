@@ -1,3 +1,4 @@
+import System.Concurrency.Tasks.*
 import System.*
 import System.Data.Json.*
 import System.Result.*
@@ -29,7 +30,7 @@ extension JsonErrorConversion for JsonError {
 
 func JsonContent(value: JsonValue) -> Result<HttpContent, JsonError> {
     let text = JsonSerializer.SerializeNode(value)?
-    return Ok(HttpContent(HttpContent.FromText(text).Bytes, "application/json; charset=utf-8"))
+    return Ok(HttpStringContent(text, "application/json; charset=utf-8"))
 }
 
 func CreateReport() -> Result<JsonObject, JsonError> {
@@ -58,12 +59,11 @@ func PrepareReport() -> Result<HttpContent, AppError> {
     return Ok(content)
 }
 
-func ReadReply(result: Result<HttpResponse, HttpError>) -> Result<string, AppError> {
-    let response = result?
+async func ReadReply(response: HttpResponse) -> Task<Result<string, AppError>> {
     if response.StatusCode != HttpStatusCode.Created {
         return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }
-    let text = Encodings.Utf8.Decode(response.Content.Bytes).MapError(error => AppError.Body("Invalid UTF-8 response"))?
+    let text = (await HttpStringContent.Read(response.Content)).MapError(error => AppError.Body("Invalid UTF-8 response"))?
     let value = JsonSerializer.DeserializeNode(text)?
     if value is JsonObject reply {
         let accepted = reply.Field("accepted")?

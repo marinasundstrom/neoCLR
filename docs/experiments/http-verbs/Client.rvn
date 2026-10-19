@@ -23,7 +23,7 @@ class InspectHandler : HttpHandler {
     override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Check(request.Target == "/base/item")
         Check(request.Method.Method == "PUT" || request.Method.Method == "PATCH" || request.Method.Method == "DELETE" || request.Method.Method == "HEAD")
-        Check(request.Content.Bytes.Count == (if request.Method.Method == "DELETE" || request.Method.Method == "HEAD" { 0 } else { 5 }))
+        Check(request.Content.Length == (if request.Method.Method == "DELETE" || request.Method.Method == "HEAD" { 0 } else { 5 }))
         Calls += 1
         if request.Method.Method == "PUT" {
             PutCalls += 1
@@ -38,7 +38,7 @@ class InspectHandler : HttpHandler {
             CancellableCalls += 1
         }
         let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.NotFound, ArrayList<HttpHeader>(), ArrayList<byte>())))
+        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.NotFound, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
         return source.Task
     }
 }
@@ -55,8 +55,8 @@ func Contracts() -> Result<unit, HttpError> {
     let handler = InspectHandler()
     let client = HttpClient(handler)
     client.BaseUri = Some("http://example.test/base/")
-    let uri = Uri.Parse("item").MapError(reason => HttpError.InvalidUri(reason))?
-    let content = HttpContent.FromText("Café")
+    let uri = Uri.Parse("item").MapError((reason: UriError) => HttpError.InvalidUri(reason))?
+    let content = HttpStringContent("Café")
     let cancellation = CancellationTokenSource()
     let token = cancellation.Token
     CheckReply(client.Put("item", content))
@@ -93,7 +93,7 @@ func Contracts() -> Result<unit, HttpError> {
     Check(client.Head("invalid URL", token).IsCancelled)
     Check(client.Head(uri, token).IsCancelled)
     Check(handler.Calls == 16)
-    let absolute = Uri.Parse("http://example.test/item").MapError(reason => HttpError.InvalidUri(reason))?
+    let absolute = Uri.Parse("http://example.test/item").MapError((reason: UriError) => HttpError.InvalidUri(reason))?
     let prepared1 = HttpRequest.Put("http://example.test/item", content)?
     Check(prepared1.Method.Method == "PUT")
     let prepared2 = HttpRequest.Put(absolute, content)?
@@ -132,7 +132,7 @@ class ClientProbe {
         let pending = if index == 0 {
             ReplaceText(client, "Café")
         } else if index == 1 {
-            client.Patch("item", HttpContent(bytes, "application/octet-stream"))
+            client.Patch("item", HttpMemoryContent(bytes, "application/octet-stream"))
         } else if index == 2 {
             client.Delete("item")
         } else {
@@ -144,7 +144,7 @@ class ClientProbe {
                 return
             }
             Check(response.StatusCode == (if index == 2 { HttpStatusCode.NoContent } else { HttpStatusCode.OK }))
-            Check(response.Content.Bytes.Count == (if index == 0 { 5 } else if index == 1 { 2 } else { 0 }))
+            Check(response.Content.Length == (if index == 0 { 5 } else if index == 1 { 2 } else { 0 }))
             Advance()
         })
     }

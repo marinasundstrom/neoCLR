@@ -47,14 +47,14 @@ class Application {
             Console.WriteLine("HOLD")
             return gate.Task
         }
-        let response = HttpResponse(if request.Target == "/invalid" { 100 } else { 200 }, ArrayList<HttpHeader>(), [(byte)120])
+        let response = HttpResponse(if request.Target == "/invalid" { 100 } else { 200 }, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
         return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
     }
 
     func ReleaseOne(late: bool) {
-        let response = HttpResponse(200, ArrayList<HttpHeader>(), [(byte)120])
+        let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
         if late {
-            let Ok(content) = HttpContent.FromStream(OwnedInput(self), 1, false) else { System.Fail("Content failed") }
+            let Ok(content) = HttpStreamContent.Create(OwnedInput(self), 1, false) else { System.Fail("Content failed") }
             response.Respond(HttpStatusCode.OK, content)
         }
         _ = Gates[Released].Complete(Ok(response))

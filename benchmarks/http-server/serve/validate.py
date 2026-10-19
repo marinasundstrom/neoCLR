@@ -20,7 +20,10 @@ def connect(port, target):
 def read(peer):
     result = b''
     while True:
-        part = peer.recv(4096)
+        try:
+            part = peer.recv(4096)
+        except ConnectionResetError:
+            return result  # Aborted connection; successful-response assertions still apply.
         if not part:
             return result
         result += part
@@ -79,6 +82,7 @@ def main():
     p.add_argument('--bundle', type=Path, required=True)
     p.add_argument('--build', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--source', type=Path, default=Path(__file__).with_name('Probe.rvn'))
     a = p.parse_args(); b=a.bundle.resolve(); build=a.build.resolve()
     manifest=json.loads((b/'manifest.json').read_text())
     context=['--system',str(b/manifest['runtimeSeed']),'--object-root',str(b/manifest['objectRoot'])]
@@ -86,7 +90,7 @@ def main():
     commands={'aot':[str(build/'app')], 'jit':[str(b/manifest['runtime']),'run',str(build/'app.dll')],
               'interpreter':[str(b/manifest['runtime']),'run',str(build/'app.dll'),'--execution','interpreter','--instructions','2000000000',*context]}
     report=dict(passed=False,commands=commands,cases={},inputs={})
-    for path in [Path(__file__),Path(__file__).with_name('Probe.rvn'),build/'app',build/'app.dll',build/'build.json',b/'manifest.json']:
+    for path in [Path(__file__),a.source,build/'app',build/'app.dll',build/'build.json',b/'manifest.json']:
         report['inputs'][str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
     try:
         for mode,command in commands.items():

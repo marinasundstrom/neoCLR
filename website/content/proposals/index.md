@@ -40,7 +40,7 @@ element types and UTF-8 views remain interpreter-only. Persistent byte memory
 now survives managed suspension and collection. Socket receive/send and deadline
 APIs use persistent byte-memory windows with native completion ownership; shared
 stream and HTTP body API migration remains pending. Development array range
-syntax returns Slice<T>; ToArray requests a copy. String slicing retains its grapheme semantics.
+syntax returns `Slice<T>`; `ToArray` requests a copy. String slicing retains its grapheme semantics.
 
 [Design and implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md)
 

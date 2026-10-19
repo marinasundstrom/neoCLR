@@ -2524,3 +2524,16 @@ and contracts are also documented in [HTTP body streams](http-body-streams.md).
 Removed base byte constructors, FromText/FromStream, Bytes/TryGetBytes and ReadText
 are not compatibility APIs. Historical experiment/benchmark snapshots may target
 those removed development APIs and must use their recorded bundle or be ported.
+
+### Canonical HTTP context and deferred request bodies (2026-10-19)
+
+The context Serve overloads are covered by the native reference, legacy bridge
+scaffold and the manual HTTP server lifetime page. Accept/ServeOne/Serve now hand
+off headers before consuming nonempty bodies. Async HTTP JSON extensions consume
+stream content once; synchronous JsonContent reads remain buffered-only.
+
+Website validation also records manual routes for the legacy scaffold's omitted
+Socket Receive/ReceiveUntil/Send/SendUntil, SHA256.HashData, HMACSHA256.HashData and
+VerifyData, RandomNumberGenerator.Fill, Decoder.Decode, Encoder.Drain and
+Encoding.Decode. These opaque Slice/Memory signatures are present in the native
+snapshot; the routes bridge the intermediate legacy website pass only.

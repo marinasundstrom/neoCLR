@@ -26,10 +26,13 @@ headers handoff does not own the transferred response's connection.
 
 ## Receive a server request
 
-`HttpServer.AcceptHeaders()` and `AcceptHeaders(cancellationToken)` return a context
-after valid request headers. Read `context.Request.Content.TryGetStream()` during
-the context lifetime, then respond and Complete, or dispose the context.
-`Accept` and `ServeOne` retain their existing buffered request behavior.
+`HttpServer.Serve`, `ServeOne`, `Accept` and `AcceptHeaders` all dispatch after
+valid request headers. Read nonempty `Request.Content` asynchronously during the
+exchange lifetime. The canonical Serve context callback configures the response;
+the server sends and cleans up after callback success. Only manual Accept callers
+call Complete or dispose the context themselves. Empty bodies need no stream.
+`await content.ReadFromJson<T>()` and `await content.ReadJsonNode()` accept both
+streaming and buffered bodies; stream reads consume content once.
 
 The acceptance token ends at handoff; body reads take their own token. The server's
 original request read deadline and body-size limit continue to apply. Complete or
@@ -137,11 +140,14 @@ text-model rule. Reader cancellation overloads remain pending. The decoder still
 creates text fragments and concatenates them; this is not allocation-free reading. Creating text content does not retain the original String after encoding.
 
 Memory content stores its window directly without a Sequence wrapper or byte copy.
-Wire code and JSON reads borrow that selected window directly. Existing response
-constructors taking Sequence<byte> now snapshot non-array sources into owned memory;
-array sources retain their backing storage. Do not rely on subsequent mutations of
-an input list being reflected in a response. Request decoding likewise creates
-memory content from its buffered bytes.
+Wire code and JSON reads borrow that selected window directly. Both HttpResponse
+constructors take HttpContent and retain that exact producer without reading or
+copying its body. Memory aliases remain visible, and streams remain unconsumed.
+Content metadata replaces all Content-Type headers without mutating the caller's
+header list; with no content media type, the supplied headers are retained.
+Keep borrowed memory stable until sending completes. Request decoding creates
+memory content from its buffered bytes. Sequence body constructors are removed;
+choose an explicit memory, string or stream producer.
 
 The three ReadOnlyMemory-bearing signatures above are rendered from native metadata.
 The legacy CLI reference exposes the HttpMemoryContent type but omits its two

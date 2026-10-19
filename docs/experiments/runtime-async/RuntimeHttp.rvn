@@ -15,7 +15,7 @@ module RuntimeHttpSample {
         System.Runtime.GC.Collect()
         let headers = ArrayList<HttpHeader>()
         headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-        return Ok(HttpResponse(200, headers, HttpContent.FromText(body).Bytes))
+        return Ok(HttpResponse(200, headers, HttpStringContent(body)))
     }
 
     async func Main() -> Task<int> {

@@ -300,9 +300,10 @@ def main():
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
-        'HTTP_SERVE_LIFETIME_SAMPLE': ('benchmarks/http-server/serve/Server.rvn', 'async func Main()', '\n}', True),
+        'HTTP_SERVE_CONTEXT_SAMPLE': ('docs/experiments/http-context-serve/Sample.rvn', 'async func Handle(', '\n}', True),
+        'HTTP_SERVE_LIFETIME_SAMPLE': ('docs/experiments/http-context-serve/Sample.rvn', 'async func Main()', '\n}', True),
         'HTTP_REPORT_ACCEPT_LOOP': ('docs/experiments/http-json/Server.rvn', '    async func Serve(', '\n    }', True),
-        'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    async func Configure(', '\n    }', True),
         'HTTP_ATTRIBUTED_ROUTES': ('docs/experiments/runtime-route-mapper/Routes.rvn', 'public union AppRoutes {', '\n}', True),
         'HTTP_ATTRIBUTED_STARTUP': ('docs/experiments/runtime-route-mapper/Server.rvn', '    let Ok(routes) = AppRoutesParser.Create()', '\n    let Ok(count)', False),
         'HTTP_ATTRIBUTED_HANDLER': ('docs/experiments/runtime-route-mapper/Server.rvn', '    func Configure(', '\n    }', True),
@@ -310,17 +311,15 @@ def main():
         'HTTP_ROUTE_DIRECT_SAMPLE': ('docs/experiments/http-routing/Direct.rvn', 'func ReadStationId(', '\n}', True),
         'HTTP_ROUTE_UNION_SAMPLE': ('docs/experiments/http-routing/Routes.rvn', 'union StationRoute {', '\n}', True),
         'HTTP_ROUTE_PARSE_SAMPLE': ('docs/experiments/http-routing/Routes.rvn', 'func ParseStationRoute(', '\n}', True),
-        'HTTP_ROUTE_SERVER_SAMPLE': ('docs/experiments/http-routing/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_ROUTE_SERVER_SAMPLE': ('docs/experiments/http-routing/Server.rvn', '    async func Configure(', '\n    }', True),
         'HTTP_ROUTE_CLIENT_SAMPLE': ('docs/experiments/http-routing/Client.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_NESTED_MODELS_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'public class Station {', 'public class Acknowledgement {', False),
         'HTTP_MAPPED_CLIENT_SAMPLE': ('docs/experiments/json-object-mapping/HttpClient.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_NESTED_READ_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'func Acknowledge(', '\n}', True),
         'HTTP_REPORT_CONNECT_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'async func Main(arguments:', '\n}', True),
         'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'class ReportClient {', '\n}', True),
-        'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
         'HTTP_CLIENT_OVERVIEW_SAMPLE': ('docs/experiments/http-client/Overview.rvn', 'class GreetingClient {', '\n}', True),
-        'NATIVE_HTTP_ENTRY_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'async func Main()', '\n}', True),
-        'HTTP_SERVER_AWAIT_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'async func Start(', '\n}', True),
+        'NATIVE_HTTP_ENTRY_SAMPLE': ('docs/experiments/http-context-serve/Sample.rvn', 'async func Main()', '\n}', True),
         'HTTP_CLIENT_MAIN_SAMPLE': ('docs/experiments/http-client/Overview.rvn', 'async func Main()', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
@@ -330,6 +329,7 @@ def main():
         'CONSOLE_PROPAGATION_SAMPLE': ('docs/experiments/console-streams/Propagation.rvn', 'async func ReadInput()', '\nasync func Main()', False),
         'CONSOLE_IF_LET_SAMPLE': ('docs/experiments/console-streams/IfLet.rvn', 'async func ReadInput()', '\nasync func Main()', False),
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'async func Main()', '\n}', True),
+        'MEMORY_WINDOW_SAMPLE': ('docs/validation/memory-views-20261019/native-memory.rvn', '    let data: byte[] = [(byte)10, (byte)20, (byte)30, (byte)40]', '    window[0] = (byte)99', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_AWAIT_SAMPLE': (raven + 'library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),
         'TASK_RUN_SAMPLE': ('docs/experiments/task-run/UnitAwait.rvn', 'import System.*', '\n}', True),
@@ -401,13 +401,13 @@ def main():
     for name in ('Main.rvn', 'Overview.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
         shutil.copyfile(ROOT / 'docs/experiments/http-client' / name, http_downloads / name)
     shutil.make_archive(str(downloads / 'http-client'), 'zip', http_downloads)
-    server_downloads = downloads / 'http-server'
-    server_downloads.mkdir(parents=True, exist_ok=True)
-    for name in ('Server.rvn', 'Server.rvnproj', 'README.md', 'verify.py'):
-        shutil.copyfile(ROOT / 'docs/experiments/http-server' / name, server_downloads / name)
-    for name in ('Main.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs'):
-        shutil.copyfile(ROOT / 'docs/experiments/http-client' / name, server_downloads / name)
-    shutil.make_archive(str(downloads / 'http-server'), 'zip', server_downloads)
+    context_downloads = downloads / 'http-context-serve'
+    context_downloads.mkdir()
+    for name in ('Sample.rvn', 'Sample.rvnproj', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/http-context-serve' / name, context_downloads / name)
+    shutil.make_archive(str(downloads / 'http-context-serve'), 'zip', context_downloads)
+    # Keep the existing download URL pointed at the canonical context example.
+    shutil.make_archive(str(downloads / 'http-server'), 'zip', context_downloads)
     json_downloads = downloads / 'http-json'
     for directory, names in (
         ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'NestedHttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),

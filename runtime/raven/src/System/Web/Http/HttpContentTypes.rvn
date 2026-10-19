@@ -119,6 +119,7 @@ public class HttpStringContent : HttpContent {
 internal class HttpContentTextInput : InputStream {
     private val content: HttpContent
     private val source: InputStream
+    private var readToken = CancellationToken.None
     private var remaining: int
     private var failure: Option<StreamError> = None()
     val Failure: Option<StreamError> {
@@ -136,10 +137,17 @@ internal class HttpContentTextInput : InputStream {
         remaining = content.Length
     }
 
+    init(content: HttpContent, source: InputStream, token: CancellationToken) {
+        self.content = content
+        self.source = source
+        remaining = content.Length
+        readToken = token
+    }
+
     func Close() { }
 
     func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
+        return Read(buffer, offset, count, readToken)
     }
 
     async func Read(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {

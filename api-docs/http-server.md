@@ -15,8 +15,32 @@ Development after Preview 16 adds:
 - `Serve(handler, cancellationToken) -> Task<Result<System.Void, HttpError>>`
 - `CompletedRequests: long`, `FailedRequests: long`, `LastRequestError: Option<HttpError>`
 
-The handler has the same signature as ServeOne:
-`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`. Calling Serve starts the
+Serve accepts either `(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`
+(the same callback as ServeOne) or `(HttpContext) -> Task<Result<unit, HttpError>>`.
+Both have overloads with a CancellationToken. A context handler configures
+`context.Response` or calls `context.Respond(...)`, then returns `Ok(())`.
+Serve sends that configured response after successful callback completion. An Error
+or cancelled task closes the exchange without sending it. Do not call Complete or
+retain the context after returning. The server disposes configured content on
+success, failure and joined shutdown, including content assigned by late handlers.
+All server entry points dispatch after headers. Nonempty Request.Content is a
+one-shot stream; body bytes are read asynchronously on consumer demand. Empty
+bodies remain buffered empty content. Completing or closing the exchange abandons
+an unread body without draining it (connections currently close after each response).
+
+The context variant reuses the response already owned by HttpContext. It observes
+the original callback task directly, without a per-request mapping task or Promise.
+One dispatcher adapter is shared by all Serve lanes. ServeOne's response callback
+uses an adapter per invocation; this is an implementation allocation to measure,
+not an allocation-free claim. Existing Task and exchange allocations remain.
+
+This follows ASP.NET Core's
+[RequestDelegate context/task shape](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.requestdelegate?view=aspnetcore-10.0).
+neoCLR deliberately adds typed Result errors and owns deferred transmission after
+successful configuration. That keeps transport ownership explicit, but does not
+provide ASP.NET's writable response-body pipeline or general middleware contract.
+
+Calling Serve starts the
 server-managed dispatcher. Its returned task represents server lifetime, not one
 request. Awaiting that lifetime task in async Main is normal: the dispatcher still
 advances concurrent requests. If application code needs to coordinate shutdown or
@@ -55,8 +79,8 @@ lifetime task. HTTP/1.1 connection-close behavior and existing read/write limits
 
 ## Lower-level acceptance and single exchanges
 
-Use `Accept` when you need direct context ownership (or `AcceptHeaders` for incoming
-streaming), and `ServeOne` when you need one callback exchange. They remain supported
+Use `Accept` when you need direct context ownership (`AcceptHeaders` has the same
+headers-first behavior), and `ServeOne` when you need one callback exchange. They remain supported
 for adapters, tests and applications with their own dispatch policy.
 
 Awaiting `Accept()` waits for a context; it does not wait for your subsequent handler.
@@ -76,8 +100,8 @@ accepted, before TLS or request parsing finishes on the earlier connection.
 Cancelling a queued call removes it and releases its admission slot immediately.
 This does not promise callback completion order or concurrent access from threads.
 
-`Accept` still completes after buffering the entire valid request. Its cancellation
-token covers waiting and reading; the caller owns the returned `HttpContext` and
+`Accept` completes after valid headers. Its cancellation token covers waiting and
+header reads; subsequent body reads use their own token; the caller owns the returned `HttpContext` and
 must complete or dispose it. `ServeOne` owns that lifetime through its callback and
 response send. Closing the server cancels queued work and closes owned contexts.
 
@@ -119,3 +143,14 @@ Incoming bodies can now be read through [headers-first APIs](http-body-streams.m
 `Serve`, `Accept`, `ServeOne` and default client `Send` buffer incoming bodies; unknown-length output
 is still unsupported. This does not introduce
 connection reuse. See the [stream contract](streams.md) for buffer ownership.
+
+## Deferred body consumption (development after Preview 16)
+
+This follows [ASP.NET Core request-body streams](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/request-response?view=aspnetcore-10.0):
+headers are available independently of asynchronous body consumption. neoCLR uses
+HttpContent/InputStream rather than a PipeReader. Header reads can receive a bounded
+prefix of the body; that read-ahead is retained without copying the whole payload.
+Later framing, EOF, size and read errors surface during consumption. A handler that
+does not read the body does not validate its unread framing. Declared-length and
+header validation still happen before dispatch. Keep-alive draining/reuse is not
+implemented. Lower buffering is an allocation benefit; throughput needs measurement.

@@ -9,8 +9,8 @@ python3 docs/experiments/http-post/verify.py \
 ```
 
 `Sample.rvn` is the application example: configure BaseUri, send UTF-8 text, propagate
-transport errors, require a successful status and read the response. ReadText currently
-returns a string error, adapted explicitly at this boundary. For a larger application's
+transport errors, require a successful status and read the response through
+HttpStringContent.Read, which preserves typed HTTP errors. For a larger application's
 shared error type, use deliberate nearby conversion declarations as described in
 [the Raven conventions](../../raven-conventions.md#propagating-errors-through-conversions).
 `SampleChecks.rvn` keeps explicit success/error/cancellation assertions out of that example.

@@ -19815,3 +19815,35 @@ then initiate a new release. The author additionally requested explicit website
 coverage of the experimental concurrent GC. The assistant accepted that sequence,
 with current behavior, measured tradeoffs and experimental validation limits kept
 clear. These are pending actions, not a published release or website deployment.
+
+### 2026-10-19 — A context callback for server-managed handling
+
+The author asked to reconsider HttpServer.Serve's callback and recalled the proposed
+variant receiving HttpContext. The assistant proposed a context callback returning
+Task<Result<unit, HttpError>>: configure the existing response, let Serve send it on
+success, and retain server ownership of completion and cleanup. The existing
+request-to-response callback remains useful. Implementation and lifecycle validation
+are in progress; this entry does not establish a released API or performance gain.
+The callback observes its original task without a per-request Promise mapping layer.
+
+### 2026-10-19 — Canonical HTTP context examples
+
+- **Author direction:** “The HTTP context callback should be canonical on the website and its samples, unless we demo Accept specifically”.
+- **Assistant action:** the web guide, server walkthrough, native entry-point example and primary downloadable server sample now use the compiled context callback. The explicitly labelled Accept interoperability walkthrough and historical benchmark evidence remain separate. The website build checks 4512 pages and its 23 tests pass; this is local validation, not publication.
+
+### 2026-10-19 — Headers before asynchronous request bodies
+
+- **Author:** requests should reach every HttpServer handler with headers available and content unread until explicitly consumed; directed the implementation gap to be solved.
+- **Assistant finding:** Serve/ServeOne/Accept buffered complete bodies; only AcceptHeaders provided deferred consumption. Structural Function lookup also collapsed the new callback overload.
+- **Work:** switch ordinary acceptance to the existing bounded streaming handoff, preserve empty-body buffer reuse, enable asynchronous JSON content reads, migrate JSON server consumers, and add withheld-body/early-response/shutdown probes for all entry points. Validation is in progress; no throughput improvement has yet been measured.
+
+- **Author follow-up:** expects optional body reads, buffering and Slice/Memory integration to increase request throughput, with continuations when body reads need further data. **Assistant response:** agreed on the mechanism, distinguished read-ahead completion from suspended reads, and retained throughput as a measurement question rather than a demonstrated gain.
+
+- **Assistant validation:** all 60 withheld-body cases and 117 focused contracts
+  pass across interpreter/JIT/AOT; context shutdown/admission checks pass in all
+  three modes. See [retained evidence](experiments/http-headers-first/README.md).
+  No new throughput or release claim is made.
+- **Author follow-up:** “We should fix those known limitations.” The assistant
+  starts with remaining native compiler lowering/definite-assignment failures,
+  then will investigate HTTP admission, JSON quotas/materialization and
+  unknown-length outgoing framing separately. These follow-ups remain open.

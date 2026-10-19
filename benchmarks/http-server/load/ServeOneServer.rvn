@@ -45,11 +45,12 @@ class ServingLoop {
         }
         stopping = request.Target == "/stop"
         let size = if stopping { 0 } else if request.Target == "/bulk" { 8192 } else { 10 }
-        let body = ArrayList<byte>(size)
-        for index in 0..size {
-            body.Add((byte)120)
+        let body: byte[] = if size == 0 { [] } else if size == 8192 {
+            [for index in 0..8192 => (byte)120]
+        } else {
+            [for index in 0..10 => (byte)120]
         }
-        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), body))
+        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(body)))
     }
 
     async func Run() -> Task<()> {

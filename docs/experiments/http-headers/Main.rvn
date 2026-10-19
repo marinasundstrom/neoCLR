@@ -5,7 +5,7 @@ import System.Web.Http.*
 
 // An ordinary caller propagates request errors before inspecting its headers.
 func RequestMediaTypes() -> Result<Sequence<string>, HttpError> {
-    let request = HttpRequest.Post("http://example.test/echo", HttpContent.FromText("Hello"))?
+    let request = HttpRequest.Post("http://example.test/echo", HttpStringContent("Hello"))?
     return Ok(request.GetHeaderValues("content-type"))
 }
 
@@ -17,7 +17,7 @@ func Main() {
     headers.Add(HttpHeader("X-List", "one, two"))
     headers.Add(HttpHeader("x-list", "three"))
     headers.Add(HttpHeader("X-İ", "not an ASCII name"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
+    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let cookies = response.GetHeaderValues("sEt-CoOkIe")
     if cookies.Count != 2 || cookies[0] != headers[0].Value || cookies[1] != "b=2" {
         System.Fail("Repeated cookie values changed")

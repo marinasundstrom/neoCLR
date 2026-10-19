@@ -4,14 +4,17 @@ import System.*
 import System.Concurrency.*
 import System.Data.Json.*
 import System.Introspection.*
+import System.IO.*
+import System.Option.*
+import System.Text.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-/// Explicit JSON reads for buffered request and response content.
+/// Asynchronous JSON reads for buffered or streaming request and response content.
 public extension HttpContentJsonExtensions for HttpContent {
-    /// Deserializes buffered UTF-8 JSON, retaining the original content and JsonError.
-    /// Does not check HTTP status or Content-Type. Stream content remains unsupported.
+    /// Deserializes UTF-8 JSON, retaining the original content and JsonError.
+    /// Does not check HTTP status or Content-Type. Stream content is consumed once.
     func ReadFromJson<T>() -> Task<Result<T, JsonError>> {
         return self.ReadFromJson<T>(CancellationToken.None)
     }
@@ -19,6 +22,14 @@ public extension HttpContentJsonExtensions for HttpContent {
     /// Pre-cancellation skips conversion and returns a cancelled task.
     /// Buffered conversion is synchronous and cannot be interrupted once started.
     func ReadFromJson<T>(cancellationToken: CancellationToken) -> Task<Result<T, JsonError>> {
+        if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
+            if self.IsDisposed || self.BeginUpload() is Error(_) {
+                return Task.FromResult<Result<T, JsonError>>(Result<T, JsonError>.Error(JsonError.Read(TextReadError.IoFailure)))
+            }
+            if let Some(stream) = self.TryGetStream() {
+                return JsonSerializer.Deserialize<T>(HttpContentTextInput(self, stream, cancellationToken))
+            }
+        }
         let source = Promise<Result<T, JsonError>>()
         if cancellationToken.IsCancellationRequested {
             _ = source.Cancel()
@@ -28,13 +39,21 @@ public extension HttpContentJsonExtensions for HttpContent {
         return source.Task
     }
 
-    /// Reads a model using a runtime type, without consuming or closing the content.
+    /// Reads a model using a runtime type; consumes streaming content without closing it.
     func ReadFromJson(type: TypeInfo) -> Task<Result<Object, JsonError>> {
         return self.ReadFromJson(type, CancellationToken.None)
     }
 
-    /// Reads buffered JSON using a runtime type; pre-cancellation skips conversion.
+    /// Reads JSON using a runtime type; cancellation applies to asynchronous stream reads.
     func ReadFromJson(type: TypeInfo, cancellationToken: CancellationToken) -> Task<Result<Object, JsonError>> {
+        if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
+            if self.IsDisposed || self.BeginUpload() is Error(_) {
+                return Task.FromResult<Result<Object, JsonError>>(Result<Object, JsonError>.Error(JsonError.Read(TextReadError.IoFailure)))
+            }
+            if let Some(stream) = self.TryGetStream() {
+                return JsonSerializer.Deserialize(HttpContentTextInput(self, stream, cancellationToken), type)
+            }
+        }
         let source = Promise<Result<Object, JsonError>>()
         if cancellationToken.IsCancellationRequested {
             _ = source.Cancel()
@@ -44,13 +63,21 @@ public extension HttpContentJsonExtensions for HttpContent {
         return source.Task
     }
 
-    /// Parses buffered UTF-8 JSON into a DOM, including a JsonNull root.
+    /// Parses UTF-8 JSON into a DOM, including a JsonNull root.
     func ReadJsonNode() -> Task<Result<JsonValue, JsonError>> {
         return self.ReadJsonNode(CancellationToken.None)
     }
 
-    /// Parses a buffered JSON DOM; pre-cancellation skips conversion.
+    /// Parses a JSON DOM; cancellation applies to asynchronous stream reads.
     func ReadJsonNode(cancellationToken: CancellationToken) -> Task<Result<JsonValue, JsonError>> {
+        if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
+            if self.IsDisposed || self.BeginUpload() is Error(_) {
+                return Task.FromResult<Result<JsonValue, JsonError>>(Result<JsonValue, JsonError>.Error(JsonError.Read(TextReadError.IoFailure)))
+            }
+            if let Some(stream) = self.TryGetStream() {
+                return JsonSerializer.DeserializeNode(HttpContentTextInput(self, stream, cancellationToken))
+            }
+        }
         let source = Promise<Result<JsonValue, JsonError>>()
         if cancellationToken.IsCancellationRequested {
             _ = source.Cancel()

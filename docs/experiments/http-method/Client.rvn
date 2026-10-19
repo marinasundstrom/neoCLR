@@ -4,7 +4,7 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 func Request(url: string) -> HttpRequest {
-    let Ok(request) = HttpRequest.Create(HttpMethod("m-SEARCH"), url, HttpContent.FromText("body")) else {
+    let Ok(request) = HttpRequest.Create(HttpMethod("m-SEARCH"), url, HttpStringContent("body")) else {
         System.Fail("Custom request construction failed")
     }
     return request
@@ -35,7 +35,7 @@ async func Main(arguments: string[]) -> Task<()> {
     let result = await client.Send(Request(arguments[0]))
     client.Dispose()
     let Ok(response) = result else { System.Fail("Custom method request failed") }
-    if (int)response.StatusCode != 200 || response.Content.Bytes.Count != 4 {
+    if (int)response.StatusCode != 200 || response.Content.Length != 4 {
         System.Fail("Custom method response mismatch")
     }
     Console.WriteLine("PASS custom method client")

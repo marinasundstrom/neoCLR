@@ -13349,3 +13349,43 @@ validation uses the Xcode 26.2 SDK. The initial allocating-helper fixture exceed
 its deliberately tiny 256-byte live-heap allowance; its helper scratch allocations
 were reduced to eight bytes while preserving forced collections and root cleanup.
 The final six arena/GC executions and both interpreter cases pass.
+
+### HTTP fixture value capture and runtime array sizes (2026-10-19)
+
+Response/content migration exposed native compiler admission gaps for imported
+CancellationToken parameters captured by runtime-async entry, and for arrays built
+from runtime-sized Int32 ranges. Raven's neoCLR adapter now admits the canonical
+token from the configured async assembly, preserving inline value storage and
+traced source ownership. Ref-like and arbitrary value captures remain restricted.
+The portable range plan evaluates both endpoints once and computes length in Int64,
+with zero length for descending ranges and checked Int32 narrowing before allocation.
+Selectors retain range indices, including inclusive maximum endpoint handling.
+
+There is no new Runtime Contract setting, metadata format or CLI surrogate. This is
+native emission support, not a new language rule or a guarantee that allocation
+budgets permit every representable array length. Raven main remains separate; its
+current tree does not contain this native portable body plan. Compiler admission
+checks pass; HTTP header/lifetime and consumer qualification use the matching
+rebuilt library/compiler cohort. Release packaging must pin the committed producer.
+
+The context callback exposed a structural Function lookup defect: parameter and
+return shapes were absent from lookup keys, so overload de-duplication discarded
+one callback. The compiler now retains those shapes (including ref kinds); native
+metadata and Runtime Contract settings are unchanged. The implementation belongs
+to the already integrated native Function branch; Raven main does not yet contain
+that structural representation. An async base-call capture also now loads the
+original captured receiver instead of the closure object.
+
+The migrated broader sample audit also exposes remaining native lowering gaps:
+await inside a match arm can survive async lowering (`BoundAwaitExpression`),
+and result propagation nested in an argument/boolean expression can reach a
+value block that cannot exit its enclosing expression. Routing uses equivalent
+`if` patterns and serializer probes use explicit intermediate results until those
+compiler gaps are fixed. These are temporary compiler limitations, not Raven
+language restrictions. The focused HTTP/JSON runtime suites exercise supported
+async lowering; compiling these wider fixtures does not qualify their execution.
+
+After those expression rewrites, the larger mapped-JSON `Public.rvn` async fixture
+still reports `NEOMETA003: local loaded before store on some path`. This remains
+unqualified and must be reduced and fixed before using that fixture as release
+evidence. The focused serializer contracts are separate from this larger probe.

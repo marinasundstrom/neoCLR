@@ -36,7 +36,7 @@ func InspectHeaders(request: HttpRequest) -> Task<Result<HttpResponse, HttpError
         text = text + header.Name + "=" + header.Value + "\n"
     }
     return Task.FromResult(Result<HttpResponse, HttpError>.Ok(
-        HttpResponse(200, ArrayList<HttpHeader>(), HttpContent.FromText(text).Bytes)))
+        HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(text))))
 }
 
 async func Main() -> Task<()> {

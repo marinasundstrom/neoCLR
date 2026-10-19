@@ -128,100 +128,45 @@ extent. Sustained and concurrent load remain qualification work.
 ## Development: select the collector
 
 The development CLI accepts `--gc mark-sweep` with interpreter or JIT execution.
-This names the existing collector and preserves the default behavior. It is currently
-the only available choice; unknown collectors are rejected. Explicit JIT selection
-requires the matching development backend.
+This names the existing synchronous collector and preserves the default behavior.
+It is the only public choice; unknown collectors are rejected. Native JIT/AOT
+compilation accepts the same choice with `--native-gc` and `--reference-arena`.
+Collector selection and collection pacing are separate policies.
 
-Native JIT/AOT tooling accepts the same selection with `--native-gc` and
-`--reference-arena`. Standalone AOT selection occurs when compiling the image.
-Concurrent collection and additional memory managers remain under investigation;
-this option does not make collection concurrent or change its pacing policy.
+## Experimental concurrent collection
 
+An isolated AOT HTTP host can trace a private heap snapshot on a background worker.
+The owner thread captures the bounded snapshot, validates the completed trace and
+its invalidation epoch, then reclaims objects. Mutation or stale results can force
+fallback; allocation pressure retains synchronous collection. Shutdown joins the
+worker before releasing its storage. This is not an entirely concurrent collector:
+capture, validation and reclamation still involve the owner thread.
 
-An isolated native **proof of concept** demonstrates background snapshot tracing,
-owner-side reclamation, stale-result rejection and exactly-once resource cleanup.
-It is not selectable in installed runtimes. Audited strong-handle and callback reads
-avoid unnecessary fallbacks; failed/conditional reads and mutations remain protected.
-Frequent invalidation can still eliminate the local pause benefit. Deterministic
-allocation-pressure tests also verify synchronous fallback, temporary-root survival
-and stale-result rejection after reclaimed memory is reused; sustained application
-pressure remains unqualified. Native lifecycle tests cover parked roots, fault
-retention after frame unwinding, invocation completion and exactly-once cleanup.
-A separate AOT experiment now exercises generated allocating and faulting callbacks.
-Its experimental adapter defers eager collections during a pending background cycle
-while preserving synchronous allocation-pressure fallback. Raven async state machines
-and scheduler integration still require validation; this is not production support.
+The experiment now runs real asynchronous HTTP Serve operations. Qualification
+covers live reclamation, suspended requests, allocation pressure, cancellation,
+malformed-input recovery and shutdown. It is **experimental**, not selectable in
+installed runtimes, and does not change the synchronous production default.
+Concurrent HTTPS and JIT coverage remain open.
 
-A native callback fixture now allocates replacements and retires live objects while
-tracing runs, with bounded memory and complete reclamation checks. With eight
-replacements per collection, repeated local tests take about 6–7.5% less elapsed
-time than sync and about 20% less owner interruption, using 21–28% more CPU.
-Allocation-heavy results remain mixed. These are short native experiments, not
-Raven callback/scheduler integration, production availability or HTTP/Go capacity.
-See the [POC performance comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md)
-and [reclamation evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-walker/README.md#live-reclamation-checkpoint).
+A 24-trial macOS ARM64 comparison used the same memory-view guest and libraries,
+a 1 MiB arena, 16 server lanes and 64 load-generator slots. Connections closed after
+each response. The measured outcomes depend on response size and offered load:
 
+| Workload | Paced synchronous GC | Experimental concurrent GC |
+| --- | --- | --- |
+| 10-byte responses, 600 offered requests/s | 483.37 completed/s | 458.40 completed/s, about 5% lower |
+| 8 KiB responses, 200 offered requests/s | 111.48 completed/s | 122.58 completed/s, about 10% higher |
+| 8 KiB responses, 100 offered requests/s | Both sustain the offered rate; p99 22.28–23.65 ms | p99 9.62–9.64 ms, about 58% lower |
 
-A separate generated-AOT callback benchmark now uses identical batch pacing for
-both collectors. Larger-graph repeats take 4.1–5.4% less elapsed time and about 20%
-less owner interruption with concurrent collection, at 15.5–20.1% more CPU. Small
-heaps are slower and batch tail latency is mixed. These remain local POC measurements,
-not sustained HTTP capacity or a reason to replace the synchronous default.
+CPU usage helps diagnose collector work and resource costs; it is not by itself a
+reason to reject this unoptimized experiment. These local AOT plain-HTTP results
+are not production capacity, HTTPS results or evidence of a universal advantage.
+The cohort predates the latest content-constructor migration; its numbers are
+retained as that cohort's evidence, not relabeled as a measurement of current HEAD.
 
+[Methodology, all trials and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/memory-gc-20261019/README.md) ·
+[Ownership and fallback checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-http/README.md)
 
-A short fixed-arrival burst test completes about 5.6% more generated batches during
-overload and drains the queue sooner with concurrent GC. Peak process CPU demand
-is about 1.25 cores versus 1.0, with about 18.7% more CPU overall. This supports
-further throughput work where CPU headroom exists; CPU-constrained and HTTP capacity
-remain unmeasured. See the [burst methodology and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md#fixed-offered-load-burst-cpu-and-recovery-2026-10-18).
-
-
-Controlled CPU contention retains about 6% more burst completions with concurrent
-GC, but extra process CPU ranges from 14% to 31% in the tested cases. Under heavy
-contention both collectors fall behind even the base arrival rate and drain only
-after arrivals stop. This is an overload benefit, not a sustainable capacity claim;
-see the [contention evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/gc-concurrent-poc/README.md#controlled-competing-cpu-work-2026-10-18).
-
-
-Evaluation has returned to actual asynchronous Serve/Go loads. A refreshed paced
-synchronous-GC baseline passes the first 300/400 req/s round but loses arrivals in
-the reverse round; Go passes all tested points. Concurrent GC is not yet integrated
-into Serve. The next step is qualification at real scheduler and root-lifetime
-boundaries; [HTTP evidence and integration scope](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/concurrent-readiness-20261018/README.md)
-keep these results separate from callback microbenchmarks.
-
-
-A tracing-only adapter now runs through real asynchronous Serve requests while
-synchronous GC retains all reclamation responsibility. Diagnostic requests,
-malformed-input recovery, concurrent clients and clean shutdown pass; background
-marks are never applied. About 42% of completed traces keep their invalidation epoch,
-which is a useful observation, not proof that applying them is safe. See the
-[HTTP shadow-tracing evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/concurrent-gc-http/README.md).
-
-The development-only Serve experiment now also applies completed private traces
-on the owner thread after epoch and heap validation. Focused pressure, cancellation,
-suspended-request and shutdown checks demonstrate live reclamation. This remains
-a bounded AOT experiment; production collector selection is unchanged, and these
-checks alone establish no HTTP throughput improvement.
-
-The subsequent fixed-rate HTTP comparison shows about 23–24% more CPU per
-completion for this concurrent policy and no demonstrated throughput gain over
-paced synchronous GC. Both modes vary at 300 requests/sec; all initial and
-confirmation trials, including generator-lag failures, are retained. The next
-step is reducing avoidable collector work, not changing production defaults.
-
-A subsequent whole-path audit found that this comparison's fixed guest predates
-already-landed managed queue improvements. It isolates native GC policy, not the
-latest complete runtime's capacity. Further work must refresh that cohort and
-measure HTTP parsing, Task adapters and transport as well as allocation/collection;
-GC is not assumed to be the primary HTTP bottleneck.
-
-
-A fresh memory-view library cohort now compares paced synchronous and experimental
-concurrent GC over 24 matched HTTP trials. For 8 KiB responses, the concurrent
-prototype delivers about 10% more completed requests under overload and about 58%
-lower p99 at 100 requests/sec. Ten-byte overload delivery is about 5% lower.
-CPU usage is an optimization/resource diagnostic, not a rejection criterion for
-this unoptimized design. These workload-dependent AOT results preserve experimental
-status and the synchronous production default. See the
-[full current-cohort evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/memory-gc-20261019/README.md).
+Further work targets snapshot and validation costs, pacing, and broader workload
+qualification. HTTP parsing, task completion, encoding and transport must also be
+measured: collection is not assumed to be the entire server bottleneck.

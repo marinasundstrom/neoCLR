@@ -10,13 +10,8 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-    let body = ArrayList<byte>(8192)
-    var index = 0
-    while index < 8192 {
-        body.Add((byte)120)
-        index += 1
-    }
-    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, body))
+    let body = (byte[])[for index in 0..8192 => (byte)120]
+    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpMemoryContent(body)))
     return Task.FromResult(result)
 }
 

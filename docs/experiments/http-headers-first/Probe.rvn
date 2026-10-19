@@ -1,0 +1,95 @@
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.*
+import System.Result.*
+import System.Networking.Sockets.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+
+async func Configure(request: HttpRequest, response: HttpResponse) -> Task<Result<unit, HttpError>> {
+    Console.WriteLine("HEADERS")
+    if request.Target == "/text" {
+        let text = await HttpStringContent.Read(request.Content)?
+        response.Respond(HttpStatusCode.OK, HttpStringContent(text))
+    } else if request.Target == "/json" {
+        let parsed = await request.Content.ReadJsonNode()
+        let Ok(value) = parsed else {
+            return Error(HttpError.Handler("JSON failed"))
+        }
+        let Ok(text) = JsonSerializer.SerializeNode(value) else { return Error(HttpError.Handler("JSON output failed")) }
+        response.Respond(HttpStatusCode.OK, HttpStringContent(text))
+    } else {
+        response.Respond(HttpStatusCode.OK, HttpStringContent("unread"))
+    }
+    return Ok(())
+}
+
+async func Handle(context: HttpContext) -> Task<Result<unit, HttpError>> {
+    return await Configure(context.Request, context.Response)
+}
+
+async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    _ = await Configure(request, response)?
+    return Ok(response)
+}
+
+async func AcceptOne(server: HttpServer, headers: bool) -> Task<Result<System.Void, HttpError>> {
+    let accepted = if headers { await server.AcceptHeaders() } else { await server.Accept() }
+    let Ok(context) = accepted else { return Error(HttpError.Handler("Accept failed")) }
+    let result = await Handle(context)
+    if let Error(error) = result {
+        context.Close()
+        return Error(error)
+    }
+    return await context.Complete()
+}
+
+async func CapturedToken(token: CancellationToken, gate: Task<bool>) -> Task<bool> {
+    _ = await gate
+    System.Runtime.GC.Collect()
+    return token.IsCancellationRequested
+}
+
+func StartCapturedToken(gate: Task<bool>) -> Task<bool> {
+    let source = CancellationTokenSource()
+    let pending = CapturedToken(source.Token, gate)
+    source.Cancel()
+    return pending
+}
+
+// Test adapter observes cancellation without awaiting a cancelled task's value.
+func Settled(operation: Task<Result<System.Void, HttpError>>) -> Task<bool> {
+    let completion = Promise<bool>()
+    operation.OnCompleted(() => { _ = completion.Complete(operation.IsCancelled) })
+    return completion.Task
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let gate = Promise<bool>()
+    let captured = StartCapturedToken(gate.Task)
+    System.Runtime.GC.Collect()
+    _ = gate.Complete(true)
+    if !(await captured) { System.Fail("Captured token lost") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port failed") }
+    Console.WriteLine(port)
+    Console.WriteLine(controlPort)
+    let mode = arguments[0]
+    let serving = if mode == "context" { server.Serve(Handle) }
+        else if mode == "response" { server.Serve(Respond) }
+        else if mode == "one" { server.ServeOne(Respond) }
+        else { AcceptOne(server, mode == "headers") }
+    let Ok(signal) = await control.Accept() else { System.Fail("Signal failed") }
+    let bytes: byte[] = [(byte)0]
+    _ = await signal.Receive(bytes)
+    server.Close()
+    _ = await Settled(serving)
+    signal.Close()
+    control.Close()
+    Console.WriteLine("DONE")
+}

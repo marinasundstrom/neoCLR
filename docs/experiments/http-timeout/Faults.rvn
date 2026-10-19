@@ -9,7 +9,7 @@ import System.Web.Http.*
 
 class ImmediateHandler : HttpHandler {
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+        return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     }
 }
 

@@ -91,12 +91,12 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     Check(first.Request.Target == "/first" && second.Request.Target == "/second")
     second.RespondText(HttpStatusCode.OK, "Second: Café")
     Check(second.Response.StatusCode == HttpStatusCode.OK)
-    Check(second.Response.Content.Bytes.Count == 13)
+    Check(second.Response.Content.Length == 13)
     CheckCompleted(await second.Complete(CancellationToken.None))
-    first.Response.Respond(HttpStatusCode.Accepted, HttpContent.FromText("Replacement"))
+    first.Response.Respond(HttpStatusCode.Accepted, HttpStringContent("Replacement"))
     Check(first.Response.StatusCode == HttpStatusCode.Accepted)
     first.Response.Respond(HttpStatusCode.NoContent)
-    Check(first.Response.Content.Bytes.Count == 0)
+    Check(first.Response.Content.Length == 0)
     first.RespondText("First: Café")
     CheckCompleted(await first.Complete())
     first.Close()
@@ -113,7 +113,7 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     let statusOnly = await server.Accept()?
     statusOnly.RespondText("Will be replaced")
     statusOnly.Respond(HttpStatusCode.NoContent)
-    Check(statusOnly.Response.Content.Bytes.Count == 0)
+    Check(statusOnly.Response.Content.Length == 0)
     Check(statusOnly.Response.GetHeaderValues("Content-Type").Count == 0)
     CheckCompleted(await statusOnly.Complete())
 
@@ -128,7 +128,7 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     }
 
     let invalid = await server.Accept()?
-    invalid.Respond(HttpStatusCode.NoContent, HttpContent.FromText("Illegal content"))
+    invalid.Respond(HttpStatusCode.NoContent, HttpStringContent("Illegal content"))
     if let Error(HttpError.InvalidRequest(_)) = await invalid.Complete() {
         Check(true)
     } else {

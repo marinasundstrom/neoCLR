@@ -1,0 +1,247 @@
+{
+  "passed": true,
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-headers-first-probe-v6/app"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-probe-v6/app.dll",
+      "--"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-probe-v6/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Data.PostgreSql.dll",
+      "--"
+    ]
+  },
+  "cases": {
+    "aot-context-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-context-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-context-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-context-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "aot-response-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-response-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-response-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-response-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "aot-one-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-one-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-one-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-one-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "aot-accept-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-accept-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-accept-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-accept-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "aot-headers-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-headers-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-headers-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-headers-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-context-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-context-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-context-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-context-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-response-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-response-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-response-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-response-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-one-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-one-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-one-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-one-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-accept-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-accept-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-accept-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-accept-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-headers-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-headers-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-headers-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-headers-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-headers-first/validate.py": "80f593997a0b8b81b82bd8b1f3c26a9e1678aa6150fa72c1774074cd517bc1a4",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-headers-first/Probe.rvn": "222234463a61d709bf8e118035239af6c56b4b5a30f595801a2f0aa9abe291e3",
+    "/Users/robert/Projects/neoclr/target/http-headers-first-probe-v6/app": "339bae18ccb981635c9b8edbc220f579ab7cc0e14b5b9f7c8dfe0bce74346425",
+    "/Users/robert/Projects/neoclr/target/http-headers-first-probe-v6/app.dll": "a1cf36f3c946f97b0fd4912e230af3ec85259969cba1fc34099bdd5f5cbacaad",
+    "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/manifest.json": "e1011d5188d69ffa0302d86fbeff07c355d54ef30adb18818473d12ed01bea27"
+  }
+}

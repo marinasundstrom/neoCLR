@@ -7,18 +7,18 @@ import System.Web.Http.*
 
 func ErrorContent(message: string) -> HttpContent {
     // Messages passed here are application-owned constants, not unescaped input.
-    return HttpContent(HttpContent.FromText(message).Bytes, "application/json; charset=utf-8")
+    return HttpStringContent(message, "application/json; charset=utf-8")
 }
 
 class ReportServer {
-    func Configure(context: HttpContext) -> Result<unit, AppError> {
+    async func Configure(context: HttpContext) -> Task<Result<unit, AppError>> {
         let request = context.Request
         if request.Method.Method == "GET" && request.Target == "/report" {
             let report = CreateReport()?
             let content = JsonContent(report)?
             context.Respond(HttpStatusCode.OK, content)
         } else if request.Method.Method == "POST" && request.Target == "/reports" {
-            let body = Encodings.Utf8.Decode(request.Content.Bytes)
+            let body = await HttpStringContent.Read(request.Content)
             // This boundary handles invalid input as an HTTP response, rather than propagating it.
             if let Ok(text) = body {
                 if let Ok(reply) = Acknowledge(text) {
@@ -52,7 +52,7 @@ class ReportServer {
                 return Error(AppError.Body("Missing accepted request"))
             }
             // Close the owned exchange before propagating a configuration failure.
-            let configured = Configure(context)
+            let configured = await Configure(context)
             if let Error(error) = configured {
                 context.Close()
                 return Error(error)

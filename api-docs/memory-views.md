@@ -9,11 +9,11 @@ also supports object-field storage and managed suspension across pending awaits
 with owner tracing and explicit collection. Native I/O completion ownership is
 not yet qualified. Other element types remain interpreter-only. UTF-8 string views now also support
 native JIT/AOT readonly access, nested byte windows, copying and decoding. Array
-range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
-copy. Memory<T> and ReadOnlyMemory<T> retain managed backing storage and may be
+range syntax returns `Slice<T>` and shares storage; use ToArray() for an explicit
+copy. `Memory<T>` and `ReadOnlyMemory<T>` retain managed backing storage and may be
 stored in objects and carried across asynchronous operations.
 
-## Slice<T>
+## `Slice<T>`
 
 A borrowed writable contiguous view. `T[]` converts implicitly to `Slice<T>`.
 Copying the view shares its storage; converting does not copy elements.
@@ -25,7 +25,7 @@ Copying the view shares its storage; converting does not copy elements.
   explicit window operations supplied by `System.SliceOperations<T>` extensions.
 - `ToArray(): T[]`: an independent shallow copy. This operation allocates storage.
 
-## ReadOnlySlice<T>
+## `ReadOnlySlice<T>`
 
 A borrowed readonly contiguous view. `T[]` and `Slice<T>` convert implicitly to
 `ReadOnlySlice<T>` without copying. There is no reverse conversion.
@@ -41,7 +41,7 @@ Readonly restricts this access path. Another writable alias may change the
 underlying elements, and those changes remain visible through readonly views.
 Element reads return values, not writable element references.
 
-## Memory<T> and ReadOnlyMemory<T>
+## `Memory<T>` and `ReadOnlyMemory<T>`
 
 Ordinary value types representing an owner, offset and length. They retain the
 actual managed backing owner; copying a window does not copy elements. Unlike

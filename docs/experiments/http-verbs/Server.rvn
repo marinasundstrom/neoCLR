@@ -10,7 +10,7 @@ func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Method", request.Method.Method))
     let source = Promise<Result<HttpResponse, HttpError>>()
-    _ = source.Complete(Ok(HttpResponse(status, headers, if request.Method.Method == "HEAD" { HttpContent.FromText("Café").Bytes } else { request.Content.Bytes })))
+    _ = source.Complete(Ok(HttpResponse(status, headers, if request.Method.Method == "HEAD" { HttpStringContent("Café") } else { request.Content })))
     return source.Task
 }
 

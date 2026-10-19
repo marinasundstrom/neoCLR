@@ -17,5 +17,5 @@ func RespondWithPerson(person: Person) -> Result<HttpResponse, HttpError> {
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "application/json; charset=utf-8"))
-    return Ok(HttpResponse(200, headers, HttpContent.FromText(text).Bytes))
+    return Ok(HttpResponse(200, headers, HttpStringContent(text)))
 }

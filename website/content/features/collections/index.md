@@ -44,8 +44,8 @@ See [member contracts and callback rules](/docs/collection-entries.html).
 
 ## Recoverable slicing
 
-Array ranges now return borrowed Slice<T> values; ToArray requests a copy.
-ArrayList range operations still return owned arrays. The former Sliceable<TSlice>
+Array ranges now return borrowed `Slice<T>` values; `ToArray` requests a copy.
+ArrayList range operations still return owned arrays. The former `Sliceable<TSlice>`
 interface has been removed because its Result-based contract does not fit borrowed
 views. Growable collections need explicit invalidation rules before exposing them.
 See the [view contract](../../docs/memory-views.html).

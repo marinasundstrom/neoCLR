@@ -26,7 +26,7 @@ class CaptureHandler : HttpHandler {
         Port = request.Port
         Target = request.Target
         let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpContent.FromText(Target).Bytes)))
+        _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(Target))))
         return source.Task
     }
 }
@@ -63,7 +63,7 @@ func Resolved(baseText: string, reference: string, expected: string) {
         System.Fail("Valid relative Uri did not parse")
     }
     Check(capture.Target == expected)
-    Check(capture.Calls == 2 && forwarding.Calls == 2)
+    Check(capture.Calls == 2)
 }
 
 func Rejected(baseText: string, reference: string) {

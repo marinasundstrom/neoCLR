@@ -12,7 +12,7 @@ func ErrorContent(message: string) -> HttpContent {
 }
 
 class ReportServer {
-    func Configure(context: HttpContext) -> Result<unit, AppError> {
+    async func Configure(context: HttpContext) -> Task<Result<unit, AppError>> {
         let request = context.Request
         if request.Method.Method == "GET" && request.Target == "/report" {
             let report = CreateReport()?
@@ -20,7 +20,7 @@ class ReportServer {
             context.Respond(HttpStatusCode.OK, content)
         } else if request.Method.Method == "POST" && request.Target == "/reports" {
             // Invalid input becomes an HTTP response at this application boundary.
-            let acknowledged = Acknowledge(request.Content)
+            let acknowledged = await Acknowledge(request.Content)
             if let Ok(reply) = acknowledged {
                 if let Ok(content) = JsonContent.Create(reply) {
                     context.Respond(HttpStatusCode.Created, content)
@@ -54,7 +54,7 @@ class ReportServer {
                 return Error(AppError.Body("Missing accepted request"))
             }
             // Close the owned exchange before propagating a configuration failure.
-            let configured = Configure(context)
+            let configured = await Configure(context)
             if let Error(error) = configured {
                 context.Close()
                 return Error(error)

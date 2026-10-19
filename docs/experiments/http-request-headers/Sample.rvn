@@ -4,7 +4,7 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 async func SendReport(client: HttpClient, url: string, text: string) -> Task<Result<HttpResponse, HttpError>> {
-    let request = HttpRequest.Post(url, HttpContent.FromText(text))?
+    let request = HttpRequest.Post(url, HttpStringContent(text))?
     let acceptsText = request.WithHeader("Accept", "text/plain")?
     let identified = acceptsText.WithHeader("X-Request-Id", "sample-42")?
     return await client.Send(identified)

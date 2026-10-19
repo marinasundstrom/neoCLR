@@ -1,0 +1,82 @@
+{
+  "passed": false,
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-context-serve-probe-v4/app"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-context-serve-probe-v4/app.dll"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-context-serve-probe-v4/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "cases": {
+    "aot-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "aot-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "aot-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    },
+    "jit-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "jit-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "jit-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/validate.py": "4aa14d952e1d550026e1e3466fbc6fa2f9147d8b657cd442ff61ab0c367d429b",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-context-serve/Probe.rvn": "50afe26907e75f7bd28485c5eaca0dbd6f0698746688cfd88e9d514b52ecc4b3",
+    "/Users/robert/Projects/neoclr/target/http-context-serve-probe-v4/app": "1ab613fc0873a1bdeec54bd35ec6fcbe21ee6b5934bca08191bb016cef91b8b0",
+    "/Users/robert/Projects/neoclr/target/http-context-serve-probe-v4/app.dll": "dd692504d3984a9288c489886116d2050cd26d59c9d96b1a30038d29ebdf942d",
+    "/Users/robert/Projects/neoclr/target/http-context-serve-probe-v4/build.json": "0c2fb06c417090516f427c5503fee6535f95dc2daa640e376fb634b29604b709",
+    "/Users/robert/Projects/neoclr/target/http-headers-first-bundle-v4/bundle/manifest.json": "e1011d5188d69ffa0302d86fbeff07c355d54ef30adb18818473d12ed01bea27"
+  }
+}

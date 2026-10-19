@@ -206,6 +206,7 @@ JSON_NAMES = [
 ]
 JSON_STREAM_NAMES = [
     'JSON HTTP byte input preserves memory windows and aliases and rejects unbuffered content',
+    'HTTP JSON async reads consume streams once preserve ownership and honor cancellation',
     'JSON byte input borrows selected windows and returns owned mapped values',
     'JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls',
     'JSON byte input rejects invalid UTF-8 before syntax and preserves quotas',
@@ -317,6 +318,9 @@ HTTP_HEADER_VALUES_NAMES = [
     'HTTP header lookup preserves repeated values without splitting commas',
     'HTTP request lookup exposes content headers without inventing provider headers',
     'HTTP header lookup snapshots remain independent of later additions',
+    'HTTP response constructors retain memory content and replace only content type metadata',
+    'HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation',
+    'HTTP response construction never reads or changes stream ownership',
 ]
 HTTP_ROUTE_MATCHING_NAMES = [
     'Route matching preserves case segment and trailing-slash distinctions',
@@ -488,7 +492,7 @@ def main():
                     command += ["--http-heap-bytes", "33554432"]
                 if name == "json-streams":
                     # Scalar mapping needs a reflection scope, but no retained model constructors.
-                    command += ["--reflection-roots", json_roots]
+                    command += ["--reflection-roots", json_roots, "--command-timeout", "600"]
                 phase = 'native-project-build'
             else:
                 # Raven emits the same metadata assembly directly. JIT/interpreter

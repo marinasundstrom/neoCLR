@@ -7,18 +7,18 @@ import System.Web.Http.*
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let headers = ArrayList<HttpHeader>()
     var status = 200
-    var body = HttpContent.FromText("Café 🌍").Bytes
+    var body = HttpStringContent("Café 🌍")
     if request.Target == "/204" {
         status = 204
-        body = HttpContent.FromText("").Bytes
+        body = HttpStringContent("")
     }
     if request.Target == "/205" {
         status = 205
-        body = HttpContent.FromText("").Bytes
+        body = HttpStringContent("")
     }
     if request.Target == "/304" {
         status = 304
-        body = HttpContent.FromText("").Bytes
+        body = HttpStringContent("")
     }
     if request.Target == "/299" {
         status = 299

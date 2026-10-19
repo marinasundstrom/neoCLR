@@ -12,12 +12,12 @@ func OpenServer() -> HttpServer {
 }
 
 func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    if request.Method.Method != "m-SEARCH" || request.Content.Bytes.Count != 4 {
+    if request.Method.Method != "m-SEARCH" || request.Content.Length != 4 {
         System.Fail("Custom method request mismatch")
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Method", request.Method.Method))
-    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, headers, request.Content.Bytes)))
+    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, headers, request.Content)))
 }
 
 async func Main() -> Task<()> {

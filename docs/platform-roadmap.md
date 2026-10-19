@@ -5,6 +5,15 @@ update website coverage of Slice/Memory design and the experimental concurrent G
 investigate the entire HTTP server stack, then initiate the next release workflow.
 Record measured outcomes and remaining gaps before selecting release scope.
 
+**Headers-first HTTP dispatch (author direction, 2026-10-19):** make the context
+Serve callback canonical in website/application examples, retaining manual Accept
+only when it is the subject of the example. All server entry points now dispatch
+headers before optional asynchronous body consumption; known empty requests reuse
+the receive buffer, and nonempty bodies retain bounded read-ahead. JSON content
+extensions now read streams. [Qualification and limits](experiments/http-headers-first/README.md)
+track execution evidence. Throughput gains remain a hypothesis to measure separately
+for early responses, slow uploads and handlers that consume the complete body.
+
 **Native memory views (author direction, 2026-10-18):** implement Slice/ReadOnlySlice
 as the preferred contiguous-memory abstraction, followed by persistent
 Memory/ReadOnlyMemory and measured buffer integration. The

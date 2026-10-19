@@ -147,8 +147,8 @@ static class HttpBindings
                 public void Dispose() { }
                 public Option<HttpRequest> Request => default;
                 public void Associate(HttpRequest request) { }
-                public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
-                public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
+                public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, HttpContent content) { }
+                public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, HttpContent content) { }
                 public void Respond(HttpStatusCode statusCode) { }
                 public void Respond(HttpStatusCode statusCode, HttpContent content) { }
                 public HttpStatusCode StatusCode => default;
@@ -213,6 +213,8 @@ static class HttpBindings
                 public Option<HttpError> LastRequestError => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpContext, Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>>> handler) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpContext, Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
                 public static Result<Collections.Sequence<byte>, HttpError> EncodeResponse(HttpResponse response, int headOnly) => default;
             }

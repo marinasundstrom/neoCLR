@@ -20,13 +20,13 @@ class InspectHandler : HttpHandler {
         Check(request.GetHeaderValues("X-REQUEST-ID")[0] == "sample-42")
         Check(request.GetHeaderValues("content-type")[0] == "text/plain; charset=utf-8")
         let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content.Bytes)))
+        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
         return source.Task
     }
 }
 
 func CheckContracts() -> Result<unit, HttpError> {
-    let original = HttpRequest.Post("http://not-resolved.invalid/", HttpContent.FromText("Café"))?
+    let original = HttpRequest.Post("http://not-resolved.invalid/", HttpStringContent("Café"))?
     let first = original.WithHeader("X-Tag", "one")?
     let replaced = first.WithHeader("x-TAG", "two")?
     Check(original.GetHeaderValues("x-tag").Count == 0)
@@ -34,7 +34,7 @@ func CheckContracts() -> Result<unit, HttpError> {
     Check(replaced.GetHeaderValues("x-tag").Count == 1)
     Check(replaced.GetHeaderValues("x-tag")[0] == "two")
     Check(replaced.GetHeaderValues("content-type")[0] == "text/plain; charset=utf-8")
-    Check(replaced.Content.Bytes.Count == 5)
+    Check(replaced.Content.Length == 5)
     let empty = replaced.WithHeader("X-Empty", "")?
     Check(empty.GetHeaderValues("x-empty").Count == 1)
     let names: string[] = ["", "Bad Name", "X:Name", "X-İ", "Host", "CONTENT-LENGTH", "Transfer-Encoding", "Connection", "Keep-Alive", "Proxy-Connection", "TE", "Trailer", "Upgrade", "Expect", "Content-Encoding", "Content-Type"]
@@ -79,7 +79,7 @@ func CheckContracts() -> Result<unit, HttpError> {
         }
         System.Fail("Header byte bound did not fail before DNS")
     }
-    let invalidContent = HttpRequest.Post("http://not-resolved.invalid/", HttpContent(ArrayList<byte>(), "text/plain\r\nBad: yes"))?
+    let invalidContent = HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nBad: yes"))?
     if let Error(HttpError.InvalidRequest(_)) = HttpClient().Send(invalidContent).GetResult() {
         Check(true)
     } else {
@@ -88,7 +88,7 @@ func CheckContracts() -> Result<unit, HttpError> {
     let sample = SendReport(HttpClient(InspectHandler()), "http://example.test/", "Café")
     TaskQueue.Default.Drain()
     let response = sample.GetResult()?
-    Check(response.Content.Bytes.Count == 5)
+    Check(response.Content.Length == 5)
     Console.WriteLine("Request header contracts passed")
     return Ok(())
 }

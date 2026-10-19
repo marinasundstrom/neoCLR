@@ -105,19 +105,35 @@ public class HttpResponse : Disposable {
     private var storedContent: HttpContent
     val Content: HttpContent => storedContent
 
-    /// Creates a response using a named or extension status code.
-    init(statusCode: HttpStatusCode, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
+    /// Creates a response retaining its body without reading or copying it.
+    /// Content metadata replaces any Content-Type header; other headers are preserved.
+    init(statusCode: HttpStatusCode, headers: Sequence<HttpHeader>, content: HttpContent) {
         storedStatusCode = (int)statusCode
-        storedHeaders = headers
-        storedContent = HttpMemoryContent(HttpText.Snapshot(body))
+        storedHeaders = ContentHeaders(headers, content)
+        storedContent = content
     }
 
-    init(statusCode: int, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
+    /// Creates a response from a numeric status and an explicit content producer.
+    /// The transport validates framing and length before sending.
+    init(statusCode: int, headers: Sequence<HttpHeader>, content: HttpContent) {
         storedStatusCode = statusCode
-        storedHeaders = headers
-        storedContent = HttpMemoryContent(HttpText.Snapshot(body))
+        storedHeaders = ContentHeaders(headers, content)
+        storedContent = content
     }
 
+    private static func ContentHeaders(headers: Sequence<HttpHeader>, content: HttpContent) -> Sequence<HttpHeader> {
+        let Some(mediaType) = content.MediaType else {
+            return headers
+        }
+        let result = ArrayList<HttpHeader>()
+        for header in headers {
+            if String.CompareOrdinalIgnoreCase(header.Name, "content-type") != 0 {
+                result.Add(header)
+            }
+        }
+        result.Add(HttpHeader("Content-Type", mediaType))
+        return result
+    }
 
     /// Sets the status and empty content. Does not perform network I/O.
     func Respond(statusCode: HttpStatusCode) {
@@ -129,9 +145,7 @@ public class HttpResponse : Disposable {
     func Respond(statusCode: HttpStatusCode, content: HttpContent) {
         let headers = ArrayList<HttpHeader>()
         for header in storedHeaders {
-            let single = ArrayList<HttpHeader>()
-            single.Add(header)
-            if HttpHeader.FindValues(single, "content-type").Count == 0 {
+            if String.CompareOrdinalIgnoreCase(header.Name, "content-type") != 0 {
                 headers.Add(header)
             }
         }
@@ -167,7 +181,7 @@ internal class HttpResponseDecoder {
     internal val BodyLength: int => expected
     internal val EmptyOnly: bool => statusCode == 205
     internal func FinishHeaders() -> HttpResponse {
-        return HttpResponse(statusCode, headers, ArrayList<byte>())
+        return HttpResponse(statusCode, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     }
 
     internal val Complete: bool => (ended || (expected >= 0 && body.Count == expected)) && !failed
@@ -420,7 +434,7 @@ internal class HttpResponseDecoder {
         if !Complete {
             return Error(HttpError.Protocol("Incomplete or invalid response"))
         }
-        return Ok(HttpResponse(statusCode, headers, body))
+        return Ok(HttpResponse(statusCode, headers, HttpMemoryContent(HttpText.Snapshot(body))))
     }
 }
 

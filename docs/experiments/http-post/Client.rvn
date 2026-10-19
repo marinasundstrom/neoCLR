@@ -14,13 +14,13 @@ func Check(condition: bool) {
 
 func ContentFor(index: int) -> HttpContent {
     if index == 0 {
-        return HttpContent.FromText("Café 🌍")
+        return HttpStringContent("Café 🌍")
     }
     if index == 1 {
         let bytes: byte[] = [(byte)0, (byte)255, (byte)13, (byte)10]
-        return HttpContent(bytes)
+        return HttpMemoryContent(bytes)
     }
-    return HttpContent(ArrayList<byte>(), "application/octet-stream")
+    return HttpMemoryContent(default(ReadOnlyMemory<byte>), "application/octet-stream")
 }
 
 class InspectHandler : HttpHandler {
@@ -30,12 +30,12 @@ class InspectHandler : HttpHandler {
         Calls += 1
         Check(request.Method.Method == "POST")
         Check(request.Target == "/base/echo")
-        Check(request.Content.Bytes.Count == 10)
+        Check(request.Content.Length == 10)
         Check(request.Headers.Count == 1)
         Check(request.Headers[0].Value == "text/plain; charset=utf-8")
         Check(cancellationToken.CanBeCancelled)
         let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content.Bytes)))
+        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
         return source.Task
     }
 }
@@ -59,20 +59,10 @@ func CheckContracts() {
     Check(handler.Calls == 2)
     source.Dispose()
 
-    let bytes = ArrayList<byte>()
-    let Ok(request) = HttpRequest.Post("http://not-resolved.invalid/", HttpContent(bytes)) else {
-        System.Fail("Request construction failed")
-        return
-    }
-    while bytes.Count <= 1024 {
-        bytes.Add((byte)1)
-    }
-    if let Error(HttpError.LimitExceeded(_)) = HttpClient().Send(request).GetResult() {
-        Check(true)
-    } else {
-        System.Fail("Mutated oversized body reached transport")
-    }
-    let bad = HttpContent(ArrayList<byte>(), "text/plain\r\nInjected: yes")
+    // Persistent views have a fixed length: reject an oversized body at construction.
+    let bytes = (byte[])[for index in 0..1048577 => (byte)1]
+    Check(HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(bytes)) is Error(HttpError.LimitExceeded(_)))
+    let bad = HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nInjected: yes")
     if let Error(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
         Check(true)
     } else {
@@ -123,11 +113,13 @@ class ClientProbe {
                 return
             }
             Check(response.StatusCode == (if index == 3 { HttpStatusCode.OK } else { HttpStatusCode.Created }))
-            let actual = response.Content.Bytes
-            let expected = content.Bytes
-            Check(actual.Count == expected.Count)
+            let actualContent = (HttpMemoryContent)response.Content
+            let expectedContent = (HttpMemoryContent)content
+            let actual: ReadOnlySlice<byte> = actualContent.Memory
+            let expected: ReadOnlySlice<byte> = expectedContent.Memory
+            Check(actual.Length == expected.Length)
             var cursor = 0
-            while cursor < actual.Count {
+            while cursor < actual.Length {
                 Check(actual[cursor] == expected[cursor])
                 cursor += 1
             }

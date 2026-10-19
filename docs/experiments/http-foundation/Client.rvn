@@ -5,13 +5,8 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 func MakeRequest(url: string, size: int) -> HttpRequest {
-    let bytes = ArrayList<byte>()
-    var index = 0
-    while index < size {
-        bytes.Add((byte)(index % 256))
-        index += 1
-    }
-    let Ok(request) = HttpRequest.Create(HttpMethod.Post, url, HttpContent(bytes)) else {
+    let bytes = (byte[])[for index in 0..size => (byte)(index % 256)]
+    let Ok(request) = HttpRequest.Create(HttpMethod.Post, url, HttpMemoryContent(bytes)) else {
         System.Fail("Request construction failed")
     }
     return request
@@ -19,12 +14,14 @@ func MakeRequest(url: string, size: int) -> HttpRequest {
 
 func Validate(result: Result<HttpResponse, HttpError>, size: int, expected: string) {
     if let Ok(response) = result {
-        if expected != "ok" || (int)response.StatusCode != 200 || response.Content.Bytes.Count != size {
+        if expected != "ok" || (int)response.StatusCode != 200 || response.Content.Length != size {
             System.Fail("Unexpected response")
         }
+        let content = (HttpMemoryContent)response.Content
+        let body: ReadOnlySlice<byte> = content.Memory
         var index = 0
         while index < size {
-            if response.Content.Bytes[index] != (byte)(index % 256) {
+            if body[index] != (byte)(index % 256) {
                 System.Fail("Response byte mismatch")
             }
             index += 1

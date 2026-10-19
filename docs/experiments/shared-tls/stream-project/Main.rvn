@@ -20,7 +20,7 @@ async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let Ok(content) = JsonContent.CreateNode(node) else {
         return Error(HttpError.Handler("Cannot encode JSON"))
     }
-    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), ArrayList<byte>())
+    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     response.Respond(HttpStatusCode.OK, content)
     return Ok(response)
 }

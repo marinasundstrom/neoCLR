@@ -1,0 +1,20 @@
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+async func Handle(context: HttpContext) -> Task<Result<unit, HttpError>> {
+    context.RespondText(HttpStatusCode.OK, "Hello from neoCLR")
+    return Ok(())
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 8080, 64) else {
+        System.Fail("Could not listen")
+    }
+    let result = await server.Serve(Handle)
+    server.Close()
+    if let Error(error) = result {
+        System.Fail(error.ToString())
+    }
+}

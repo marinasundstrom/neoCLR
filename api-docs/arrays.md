@@ -34,13 +34,13 @@ storage, mutation and Object conversion limits.
 ## Nominal slicing
 
 Development (2026-10-19): Array.Slice and array range syntax return
-[Slice<T>](memory-views.md). Writes through the view affect the array. Use
+[`Slice<T>`](memory-views.md). Writes through the view affect the array. Use
 `array[range].ToArray()` for an independent shallow copy. Bounds are checked
 against Length; empty windows at valid endpoints succeed and invalid bounds fault.
 `T[]` range syntax uses RuntimeHelpers.GetSlice. This intentionally changes the
 previous copy contract; callers relying on independent storage must add ToArray.
 
-Sliceable<TSlice> has been removed: its Result-based contract cannot carry a
+`Sliceable<TSlice>` has been removed: its Result-based contract cannot carry a
 borrowed slice under the current generic lifetime rules. ArrayList's existing
 range operation still returns owned copies without that interface; growing
 collections need a separate invalidation/ownership design before exposing borrowed

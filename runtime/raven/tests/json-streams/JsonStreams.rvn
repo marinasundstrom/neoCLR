@@ -8,6 +8,9 @@ import System.Collections.*
 import System.IO.*
 import System.Result.*
 import System.Text.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+import System.Concurrency.*
 import NeoClr.Testing.*
 
 [Test("JSON streams retry single-byte reads and writes without taking ownership")]
@@ -413,4 +416,33 @@ func ExpectInvalidJsonUtf8(bytes: byte[]) -> Result<unit, TestFailure> {
 
 func ExpectValidJsonUtf8(bytes: byte[]) -> Result<unit, TestFailure> {
     return Assert.True(JsonSerializer.DeserializeNode(bytes) is Ok(JsonString), "Accept valid scalar boundaries")
+}
+
+[Test("HTTP JSON async reads consume streams once preserve ownership and honor cancellation")]
+func ByteInputHttpAsync() -> Result<unit, TestFailure> {
+    let input = ShortInput([(byte)49], -1)
+    let Ok(content) = HttpStreamContent.Create(input, 1, true) else {
+        return Assert.True(false, "Create stream content")
+    }
+    _ = Assert.True(CompletedValue(content.ReadFromJson<int>()) is Ok(1), "Read streamed integer")?
+    _ = Assert.Equal(1, input.Position)?
+    _ = Assert.True(!input.Closed, "Borrow stream ownership")?
+    _ = Assert.True(CompletedValue(content.ReadJsonNode()) is Error(JsonError.Read(TextReadError.IoFailure)), "Reject second consumption")?
+    let secondInput = ShortInput([(byte)50], -1)
+    let Ok(second) = HttpStreamContent.Create(secondInput, 1, true) else {
+        return Assert.True(false, "Create second content")
+    }
+    let cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    _ = Assert.True(second.ReadFromJson<int>(cancellation.Token).IsCancelled, "Pre-cancel before consumption")?
+    _ = Assert.Equal(0, secondInput.Position)?
+    let mapped = CompletedValue(second.ReadFromJson(typeof(int)))
+    _ = Assert.True(mapped is Ok(_), "Runtime type stream mapping")?
+    cancellation.Dispose()
+    let badInput = ShortInput([(byte)255], -1)
+    let Ok(bad) = HttpStreamContent.Create(badInput, 1, true) else {
+        return Assert.True(false, "Create invalid content")
+    }
+    _ = Assert.True(CompletedValue(bad.ReadJsonNode()) is Error(JsonError.Read(TextReadError.InvalidUtf8)), "Reject invalid streamed UTF-8")?
+    return Assert.True(!badInput.Closed, "Failed JSON read preserves ownership")
 }

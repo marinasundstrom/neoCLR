@@ -1,4 +1,5 @@
 import System.*
+import System.Concurrency.Tasks.*
 import System.Data.Json.*
 import System.Result.*
 import System.Web.Http.*
@@ -44,8 +45,8 @@ func CreateReport() -> Result<ReportPayload, JsonError> {
     return Ok(report)
 }
 
-func Acknowledge(content: HttpContent) -> Result<Acknowledgement, JsonError> {
-    _ = JsonContent.Read<ReportPayload>(content)?
+async func Acknowledge(content: HttpContent) -> Task<Result<Acknowledgement, JsonError>> {
+    _ = await content.ReadFromJson<ReportPayload>()?
     let reply = Acknowledgement()
     reply.accepted = true
     return Ok(reply)

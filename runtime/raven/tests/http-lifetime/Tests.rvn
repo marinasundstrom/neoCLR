@@ -48,7 +48,7 @@ func BBorrowed() -> Result<unit, TestFailure> {
     first.Dispose()
     _ = Assert.Equal(0, handler.DisposeCount)?
     use second = HttpClient(handler, false)
-    _ = handler.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    _ = handler.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     let result = second.Get("http://example.test/")
     _ = Assert.True(result.IsCompleted && !result.IsCancelled, "Borrowed handler remains usable")?
     return Assert.Equal(1, handler.Calls)
@@ -85,7 +85,7 @@ func DCaller() -> Result<unit, TestFailure> {
 [Test("HTTP completed responses survive disposal and retain request association")]
 func ECompleted() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
-    let response = HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())
+    let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = handler.Completion.Complete(Ok(response))
     let client = HttpClient(handler)
     let result = client.Get("http://example.test/answer")
@@ -131,12 +131,17 @@ class RecordingMiddleware : DelegatingHandler {
         self.events = events
     }
 
-    async override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    // This test adapter exposes TaskQueue completion boundaries synchronously.
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         events.Add(String.Concat(name, " before"))
-        let response = await base.Send(request, cancellationToken)
+        return base.Send(request, cancellationToken).Map(self.After)
+    }
+
+    private func After(response: Result<HttpResponse, HttpError>) -> Result<HttpResponse, HttpError> {
         events.Add(String.Concat(name, " after"))
         return response
     }
+
 }
 
 [Test("HTTP delegating handlers run outward and unwind inward")]
@@ -149,7 +154,7 @@ func HDelegation() -> Result<unit, TestFailure> {
     let client = HttpClient(outer)
     let response = client.Get("http://example.test/")
     _ = Assert.Equal(2, events.Count)?
-    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     TaskQueue.Default.Drain()
     _ = Assert.True(response.IsCompleted && !response.IsCancelled, "Pipeline completes")?
     _ = Assert.Equal("outer before", events[0])?
@@ -171,7 +176,7 @@ func IBorrowedPipeline() -> Result<unit, TestFailure> {
     first.Dispose()
     _ = Assert.Equal(0, terminal.DisposeCount)?
     let second = HttpClient(outer)
-    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())))
+    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     let response = second.Get("http://example.test/")
     TaskQueue.Default.Drain()
     _ = Assert.True(response.IsCompleted && !response.IsCancelled, "Borrowed pipeline remains usable")?

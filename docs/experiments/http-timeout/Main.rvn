@@ -12,7 +12,7 @@ func Check(condition: bool) {
 }
 
 func Response() -> HttpResponse {
-    return HttpResponse(200, ArrayList<HttpHeader>(), ArrayList<byte>())
+    return HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
 }
 
 async func Pause() -> Task<()> {

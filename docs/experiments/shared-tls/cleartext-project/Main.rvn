@@ -8,7 +8,7 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let result: Result<HttpResponse, HttpError> = if request.IsSecure {
         Error(HttpError.Handler("Cleartext request marked secure"))
     } else {
-        Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpContent.FromText("plain").Bytes))
+        Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("plain")))
     }
     return Task.FromResult(result)
 }
@@ -24,7 +24,13 @@ async func Main() -> Task<int> {
     server.Close()
     let Ok(received) = response else { return 3 }
     if let Error(_) = completed { return 4 }
-    if received.Content.Bytes.Count != 5 || received.Content.Bytes[0] != (byte)112 { return 5 }
+    if received.Content.Length != 5 || !HasFirstByte(received.Content) { return 5 }
     Console.WriteLine("Managed cleartext exchange passed")
     return 0
+}
+
+func HasFirstByte(content: HttpContent) -> bool {
+    let memory = (HttpMemoryContent)content
+    let bytes: ReadOnlySlice<byte> = memory.Memory
+    return bytes[0] == (byte)112
 }

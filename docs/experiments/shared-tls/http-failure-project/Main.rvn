@@ -18,7 +18,7 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         let error: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Expected secure request"))
         return Task.FromResult(error)
     }
-    let response: Result<HttpResponse, HttpError> = Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpContent.FromText("recovered").Bytes))
+    let response: Result<HttpResponse, HttpError> = Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("recovered")))
     return Task.FromResult(response)
 }
 
@@ -43,7 +43,7 @@ async func RejectionAndRecovery(credentials: SslServerAuthenticationOptions, tru
     // Reuse both listener and client after rejection; no stale TLS session may leak into this exchange.
     let serving = server.ServeOne(Respond)
     let Ok(response) = await client.Get(Url("localhost", port)) else { return 14 }
-    if response.Content.Bytes.Count != 9 { return 15 }
+    if response.Content.Length != 9 { return 15 }
     let completed = await serving
     server.Close()
     if let Error(_) = completed { return 16 }

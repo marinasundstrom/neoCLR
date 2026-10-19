@@ -330,3 +330,17 @@ implemented. Typed Serialize still recognizes nodes through these interface view
 Converter registration, serializer options and configurable property naming remain
 future work. Their developer experience should follow familiar .NET JSON workflows,
 with justified neoCLR differences rather than exact API duplication.
+
+## Asynchronous HTTP content reads
+
+For incoming request content, use `await content.ReadFromJson<T>()`,
+`await content.ReadFromJson(type)` or `await content.ReadJsonNode()`. These handle
+both buffered and streaming bodies. Streaming reads consume the body once, keep
+content ownership with the exchange and pass the optional CancellationToken to
+transport reads. The 1024-byte JSON quota and strict UTF-8 rules still apply.
+Buffered conversion remains synchronous within the returned task.
+
+The current stream serializer uses a bounded UTF-8 text reader before parsing, so
+it still materializes document text. This is not yet an incremental JSON parser
+or an allocation-free path. Synchronous `JsonContent.Read` remains a buffered-only
+operation and must not be used for incoming streamed requests.

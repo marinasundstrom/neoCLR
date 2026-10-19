@@ -30,6 +30,8 @@
       href: features/functions/index.md
     - name: "Arrays"
       href: features/arrays/index.md
+    - name: "Slices and memory"
+      href: features/memory/index.md
     - name: "Collections and queries"
       href: features/collections/index.md
     - name: "Strings and UTF-8"

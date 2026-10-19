@@ -9,7 +9,7 @@ import System.Web.Http.Json.*
 
 func ErrorContent(message: string) -> HttpContent {
     // Messages passed here are application-owned constants, not unescaped input.
-    return HttpContent(HttpContent.FromText(message).Bytes, "application/json; charset=utf-8")
+    return HttpStringContent(message, "application/json; charset=utf-8")
 }
 
 class ReportServer {
@@ -19,38 +19,34 @@ class ReportServer {
         self.pattern = pattern
     }
 
-    func Configure(context: HttpContext) -> Result<unit, AppError> {
+    async func Configure(context: HttpContext) -> Task<Result<unit, AppError>> {
         let request = context.Request
         let Ok(route) = ParseStationRoute(pattern, request.Method.Method, request.Target) else {
             context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid route parameter\"}"))
             return Ok(())
         }
         // Domain lookup and dispatch remain application-owned.
-        match route {
-            StationRoute.Unmatched(_) => {
-                context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Not found\"}"))
+        if route is StationRoute.Unmatched(_) {
+            context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Not found\"}"))
+        } else if route is StationRoute.ReadReports(let id) {
+            if id != 42 {
+                context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
+                return Ok(())
             }
-            StationRoute.ReadReports(let id) => {
-                if id != 42 {
-                    context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
-                    return Ok(())
-                }
-                let report = CreateReport()?
-                let content = JsonContent.Create(report)?
-                context.Respond(HttpStatusCode.OK, content)
+            let report = CreateReport()?
+            let content = JsonContent.Create(report)?
+            context.Respond(HttpStatusCode.OK, content)
+        } else if route is StationRoute.SubmitReport(let id) {
+            if id != 42 {
+                context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
+                return Ok(())
             }
-            StationRoute.SubmitReport(let id) => {
-                if id != 42 {
-                    context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
-                    return Ok(())
-                }
-                let acknowledged = Acknowledge(request.Content)
-                if let Ok(reply) = acknowledged {
-                    let content = JsonContent.Create(reply)?
-                    context.Respond(HttpStatusCode.Created, content)
-                } else {
-                    context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
-                }
+            let acknowledged = await Acknowledge(request.Content)
+            if let Ok(reply) = acknowledged {
+                let content = JsonContent.Create(reply)?
+                context.Respond(HttpStatusCode.Created, content)
+            } else {
+                context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
             }
         }
         return Ok(())
@@ -61,7 +57,7 @@ class ReportServer {
         while index < count {
             let context = await server.Accept()?
             // Close the owned exchange before propagating a configuration failure.
-            let configured = Configure(context)
+            let configured = await Configure(context)
             if let Error(error) = configured {
                 context.Close()
                 return Error(error)

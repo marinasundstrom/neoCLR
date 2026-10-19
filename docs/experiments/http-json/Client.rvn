@@ -8,8 +8,8 @@ import System.Web.Http.*
 class ReportClient {
     async func SubmitReport(client: HttpClient) -> Task<Result<string, AppError>> {
         let content = PrepareReport()?
-        let response = await client.Post("reports", content)
-        return ReadReply(response)
+        let response = await client.Post("reports", content)?
+        return await ReadReply(response)
     }
 
 }

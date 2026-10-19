@@ -45,7 +45,7 @@ class FakeHandler : HttpHandler {
         if fail {
             _ = source.Complete(Error(HttpError.Handler("Fake failure")))
         } else {
-            _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpContent.FromText("Café 🌍").Bytes)))
+            _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("Café 🌍"))))
         }
         return source.Task
     }
@@ -57,7 +57,7 @@ func CheckHandlers() {
     let fake = FakeHandler(false)
     let client = HttpClient(RecordingHandler("outer", RecordingHandler("inner", fake, events), events))
     if let Ok(response) = client.Get("http://example.test/greeting").GetResult() {
-        Check(response.Content.Bytes.Count == 10)
+        Check(response.Content.Length == 10)
     } else {
         System.Fail("Fake response lost")
     }

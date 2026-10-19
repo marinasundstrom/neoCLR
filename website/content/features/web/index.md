@@ -14,9 +14,23 @@ explains supported hosts and execution modes.
 ## HttpServer: serve concurrent requests
 
 Use `HttpServer.Serve(handler)` as the main API for HTTP web applications. After
-listening, pass an async callback with the signature
-`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`. The server observes each
-handler task and owns its response and connection. Development after Preview 16
+listening, pass a context callback that configures the response:
+
+```raven
+{{HTTP_SERVE_CONTEXT_SAMPLE}}
+```
+
+The callback runs after request headers, before the body is read in full. Read
+`context.Request.Content` asynchronously only when needed; unread bodies are
+abandoned when the exchange closes.
+
+Its signature is `(HttpContext) -> Task<Result<unit, HttpError>>`. Serve sends the
+configured response after the handler succeeds, and owns completion and cleanup.
+The handler must not call Complete or retain the context after returning.
+The response-returning variant,
+`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`, remains available.
+The server observes the original task in both variants; the context callback adds
+no per-request Promise mapping wrapper. Development after Preview 16
 admits up to 16 exchanges; suspended async handlers allow other requests to advance.
 
 Awaiting the task returned by `Serve` in async Main waits for **server lifetime**;
@@ -31,6 +45,7 @@ must manage bounded concurrency and cleanup if they use them to build a server.
 Awaiting context acquisition is fine; awaiting all processing before accepting the
 next context makes a loop sequential.
 
+[Download the context callback sample](/samples/http-context-serve.zip).
 See the [server lifetime reference](/docs/http-server.html) and
 [server application walkthrough](/cases/http-server/) for ownership and examples.
 
@@ -120,7 +135,7 @@ Development after Preview 16 reduces server response copying and uses larger
 bounded transfers; buffered responses still preserve their snapshot semantics.
 
 Both client uploads and server responses accept known-length `HttpStreamContent.Create`
-sources. Default Get/Send and server Serve/Accept/ServeOne buffer incoming bodies, so the JSON showcase
+sources. Default client Get/Send buffer incoming bodies; server Serve/Accept/ServeOne dispatch after headers, so the JSON showcase
 continues to use its existing content helpers. Incoming streaming works with fixed
 and chunked framing, plus close-delimited client responses; unknown-length outgoing
 bodies are still unsupported.
@@ -243,11 +258,11 @@ Non-array sequences still require one contiguous snapshot. See [JSON contracts](
 Development `HttpContent.CopyTo` transfers buffered or streaming bodies into an
 `OutputStream`, awaiting destination writes before reading further. It uses direct
 array writes or bounded staging, propagates cancellation and stream errors, and
-leaves resource disposal explicit. See the [body-stream contract](/docs/http-body-streams).
+leaves resource disposal explicit. See the [body-stream contract](/docs/http-body-streams.html).
 The development content API now has an abstract HttpContent base, memory-backed
 HttpMemoryContent, one-shot HttpStreamContent and UTF-8 HttpStringContent. Arrays
 convert to readonly memory; selected windows retain their owner without copying.
 Use HttpStringContent.Read for generic text consumption; streamed reads decode
 incrementally without first collecting the entire body into a byte array. Base storage getters and
 construction helpers have been removed rather than retained as compatibility layers.
-The [API guide](/docs/http-body-streams) records migration and current streaming limits.
+The [API guide](/docs/http-body-streams.html) records migration and current streaming limits.

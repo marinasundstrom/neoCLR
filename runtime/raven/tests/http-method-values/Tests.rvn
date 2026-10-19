@@ -128,12 +128,12 @@ func CoffeeExtensionValues() -> Result<unit, TestFailure> {
         return Assert.True(false, "BREW request construction")
     }
     _ = Assert.Equal("BREW", request.Method.Method)?
-    let response = HttpResponse(418, ArrayList<HttpHeader>(), ArrayList<byte>())
+    let response = HttpResponse(418, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = Assert.Equal(418, (int)response.StatusCode)?
     _ = Assert.True(!response.IsSuccessStatusCode, "Teapot response is unsuccessful")?
     response.Respond((HttpStatusCode)471, HttpStringContent("Custom failure"))
     _ = Assert.Equal(471, (int)response.StatusCode)?
     _ = Assert.True(!response.IsSuccessStatusCode, "Custom client error is unsuccessful")?
-    let extensionSuccess = HttpResponse((HttpStatusCode)299, ArrayList<HttpHeader>(), ArrayList<byte>())
+    let extensionSuccess = HttpResponse((HttpStatusCode)299, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     return Assert.True(extensionSuccess.IsSuccessStatusCode, "Unnamed success follows its status class")
 }

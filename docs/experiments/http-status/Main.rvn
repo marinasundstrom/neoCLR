@@ -58,9 +58,9 @@ class StatusProbe {
             Check((int)response.StatusCode == code)
             Check(response.IsSuccessStatusCode == (code >= 200 && code <= 299))
             if code == 204 || code == 205 || code == 304 {
-                Check(response.Content.Bytes.Count == 0)
+                Check(response.Content.Length == 0)
             } else {
-                Check(response.Content.Bytes.Count == 4)
+                Check(response.Content.Length == 4)
             }
             Text(url, code)
         })
@@ -105,7 +105,7 @@ class StatusProbe {
                 System.Fail("EOF-delimited response failed")
                 return
             }
-            Check((int)response.StatusCode == 201 && response.Content.Bytes.Count == 4)
+            Check((int)response.StatusCode == 201 && response.Content.Length == 4)
             Console.WriteLine("HTTP status and conversion checks passed")
         })
     }
@@ -146,7 +146,7 @@ func CheckNamedStatus() {
     let extension = (HttpStatusCode)599
     Check((int)extension == 599)
     Check(extension.ToString() == "599")
-    let response = HttpResponse(named, ArrayList<HttpHeader>(), ArrayList<byte>())
+    let response = HttpResponse(named, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let result: Result<HttpResponse, HttpError> = Ok(response)
     if let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers }) = result {
         Check(headers.Count == 0)

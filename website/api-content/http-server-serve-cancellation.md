@@ -3,6 +3,9 @@ uid: M:System.Web.Http.HttpServer.Serve(Function,System.Concurrency.Cancellation
 ---
 Starts server-owned concurrent request dispatch with cancellation of the server lifetime.
 
+The [context callback](/docs/http-server.html#server-managed-callbacks) is the
+canonical application API; this overload returns a separately constructed response.
+
 ## Parameters
 
 `handler`: An asynchronous callback returning `Task<Result<HttpResponse, HttpError>>`.

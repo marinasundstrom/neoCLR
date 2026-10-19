@@ -5,7 +5,7 @@ import System.Web.Http.*
 
 // Configure BaseUri to the service root before calling.
 async func ReplaceText(client: HttpClient, text: string) -> Task<Result<HttpResponse, HttpError>> {
-    let response = await client.Put("item", HttpContent.FromText(text))?
+    let response = await client.Put("item", HttpStringContent(text))?
     if !response.IsSuccessStatusCode {
         return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
     }
