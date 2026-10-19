@@ -13,7 +13,55 @@ use std::{
 static NEXT_HANDLE: AtomicI32 = AtomicI32::new(1);
 
 const MAX_OPEN_FILES: usize = 64;
-const MAX_TRANSFER: usize = 64 * 1024;
+pub(crate) const MAX_TRANSFER: usize = 64 * 1024;
+
+// Persistent descriptors may be retained while heap access is released.
+pub(crate) fn memory_type(readonly: bool) -> Type {
+    Type::Constructed {
+        definition: if readonly {
+            "System.ReadOnlyMemory"
+        } else {
+            "System.Memory"
+        }
+        .into(),
+        arguments: vec![Type::Byte],
+    }
+}
+
+pub(crate) fn memory(value: &Value, readonly: bool) -> Result<&crate::MemoryView, Fault> {
+    let Value::MemoryView(view) = value else {
+        return Err(Fault::new("file transfer requires persistent byte memory"));
+    };
+    if view.ty() != memory_type(readonly) {
+        return Err(Fault::new("file transfer memory capability mismatch"));
+    }
+    view.assigned()?;
+    if !readonly {
+        if let Some(reference) = view.reference() {
+            reference.require_writable()?;
+        }
+    }
+    Ok(view)
+}
+
+pub(crate) fn snapshot(view: &crate::MemoryView) -> Result<Value, Fault> {
+    let slice = view.as_slice();
+    let mut elements = Vec::new();
+    elements
+        .try_reserve_exact(slice.length())
+        .map_err(|_| Fault::new("file transfer allocation failed"))?;
+    for index in 0..slice.length() {
+        let value = slice.get(index)?;
+        if !matches!(value, Value::Byte(_)) {
+            return Err(Fault::new("File write requires initialized bytes"));
+        }
+        elements.push(value);
+    }
+    Ok(Value::Array {
+        element: Type::Byte,
+        elements,
+    })
+}
 
 #[derive(Clone, Copy)]
 pub(crate) enum Operation {
@@ -209,6 +257,40 @@ impl Files {
         limits: &Limits,
     ) -> Result<Value, Fault> {
         let result = match (op, args) {
+            (Operation::ReadInto, [Value::Int32(id), value]) => {
+                let view = memory(value, false)?;
+                if view.length() > MAX_TRANSFER {
+                    Err(Error::LimitExceeded)
+                } else {
+                    match self.read(*id, view.length() as i32) {
+                        Ok(bytes) => {
+                            let destination = view.as_slice();
+                            for (index, byte) in bytes.iter().enumerate() {
+                                destination.set(index, Value::Byte(*byte))?;
+                            }
+                            Ok(Value::Int32(bytes.len() as i32))
+                        }
+                        Err(error) => Err(error),
+                    }
+                }
+            }
+            (Operation::Write, [Value::Int32(id), value]) => {
+                let view = memory(value, true)?;
+                if view.length() > MAX_TRANSFER {
+                    Err(Error::LimitExceeded)
+                } else {
+                    return self.invoke(
+                        op,
+                        &[
+                            Value::Int32(*id),
+                            snapshot(view)?,
+                            Value::Int32(0),
+                            Value::Int32(view.length() as i32),
+                        ],
+                        limits,
+                    );
+                }
+            }
             (
                 mode @ (Operation::OpenRead | Operation::OpenWrite | Operation::CreateNew),
                 [Value::String(name)],

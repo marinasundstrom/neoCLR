@@ -968,6 +968,23 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::FileResource(crate::file_streams::Operation::Read),
             Type::Value,
         ),
+        ("neoCLR.Runtime.FileReadInto", [Type::Int32, memory])
+            if *memory == crate::file_streams::memory_type(false) =>
+        {
+            (
+                Binding::FileResource(crate::file_streams::Operation::ReadInto),
+                Type::Value,
+            )
+        }
+        ("neoCLR.Runtime.FileWriteChunk", [Type::Int32, memory])
+            if *memory == crate::file_streams::memory_type(true) =>
+        {
+            (
+                Binding::FileResource(crate::file_streams::Operation::Write),
+                Type::Value,
+            )
+        }
+        // Four-argument forms remain private legacy bootstrap/test bindings.
         (
             "neoCLR.Runtime.FileReadInto",
             [

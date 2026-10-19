@@ -8,7 +8,7 @@ pub(super) struct HostCall {
     assembly: Option<String>,
     context: String,
     pc: usize,
-    patch: Option<(crate::value::ObjectReference, usize)>,
+    patch: Option<(Value, usize)>,
     immediate: Option<Value>,
     join: Option<crate::workers::PendingJoin>,
 }
@@ -46,6 +46,31 @@ impl HostCall {
         if callee.pinvoke.is_none() {
             use crate::{file_streams::Operation, native::Binding};
             match crate::native::bind(&callee)? {
+                Binding::FileResource(Operation::Write) if args.len() == 2 => {
+                    let view = crate::file_streams::memory(&args[1], true)?;
+                    if view.length() > crate::file_streams::MAX_TRANSFER {
+                        immediate = Some(Value::Erased(Box::new(Value::Byte(8))));
+                    } else {
+                        let count = view.length() as i32;
+                        let snapshot = crate::file_streams::snapshot(view)?;
+                        args = vec![
+                            args[0].clone(),
+                            snapshot,
+                            Value::Int32(0),
+                            Value::Int32(count),
+                        ];
+                    }
+                }
+                Binding::FileResource(Operation::ReadInto) if args.len() == 2 => {
+                    let view = crate::file_streams::memory(&args[1], false)?;
+                    if view.length() > crate::file_streams::MAX_TRANSFER {
+                        immediate = Some(Value::Erased(Box::new(Value::Byte(8))));
+                    } else {
+                        let count = view.length() as i32;
+                        patch = Some((args[1].clone(), 0));
+                        args = vec![args[0].clone(), Value::Int32(count)];
+                    }
+                }
                 Binding::ConsoleWriteBytes | Binding::FileResource(Operation::Write) => {
                     if let Some(Value::ObjectReference(array)) = args.get(1) {
                         args[1] = array.reference.read()?;
@@ -68,7 +93,7 @@ impl HostCall {
                     let length = array.reference.array_length()?;
                     match (usize::try_from(*offset), usize::try_from(*count)) {
                         (Ok(offset), Ok(count)) if offset <= length && count <= length - offset => {
-                            patch = Some((array.clone(), offset));
+                            patch = Some((Value::ObjectReference(array.clone()), offset));
                             args = vec![Value::Int32(*id), Value::Int32(count as i32)];
                         }
                         _ => immediate = Some(Value::Erased(Box::new(Value::Byte(7)))),
@@ -144,7 +169,7 @@ impl HostCall {
 
     pub(super) fn trace_roots(&self, roots: &mut Vec<usize>) {
         if let Some((array, _)) = &self.patch {
-            crate::gc::trace(&Value::ObjectReference(array.clone()), roots);
+            crate::gc::trace(array, roots);
         }
         for arg in &self.args {
             crate::gc::trace(arg, roots);
@@ -159,11 +184,25 @@ impl HostCall {
                 elements,
             } = payload.as_ref()
             {
-                for (index, byte) in elements.iter().enumerate() {
-                    array
-                        .reference
-                        .element(offset + index, &Type::Byte)?
-                        .write(byte.clone())?;
+                match array {
+                    Value::MemoryView(view) => {
+                        if elements.len() > view.length() {
+                            return Err(Fault::new("file read exceeds destination memory"));
+                        }
+                        let destination = view.as_slice();
+                        for (index, byte) in elements.iter().enumerate() {
+                            destination.set(index, byte.clone())?;
+                        }
+                    }
+                    Value::ObjectReference(array) => {
+                        for (index, byte) in elements.iter().enumerate() {
+                            array
+                                .reference
+                                .element(offset + index, &Type::Byte)?
+                                .write(byte.clone())?;
+                        }
+                    }
+                    _ => return Err(Fault::new("Invalid file read destination")),
                 }
                 value = Value::Erased(Box::new(Value::Int32(elements.len() as i32)));
             }
@@ -319,6 +358,184 @@ mod tests {
             .into_iter()
             .find(|f| f.name == name)
             .unwrap()
+    }
+
+    fn memory_service(readonly: bool) -> crate::metadata::Function {
+        let mut function = service(if readonly {
+            "neoCLR.Runtime.FileWriteChunk"
+        } else {
+            "neoCLR.Runtime.FileReadInto"
+        });
+        function.parameters = vec![Type::Int32, crate::file_streams::memory_type(readonly)];
+        function.parameter_names.clear();
+        function
+    }
+
+    #[test]
+    fn persistent_read_roots_only_owner_until_completion_and_preserves_window() {
+        let owner = crate::shared_heap::Owner::new(2);
+        let mut participant = owner.participant().unwrap();
+        let mut other = owner.participant().unwrap();
+        let mut heap = participant.enter();
+        let id = heap
+            .allocate(Value::Array {
+                element: Type::Byte,
+                elements: vec![Value::Byte(9); 4],
+            })
+            .unwrap();
+        let reference = heap.address(id).unwrap();
+        let view = crate::memory_views::Memory::new(&heap, reference.clone(), 1, 2).unwrap();
+        let call = HostCall::new(
+            memory_service(false),
+            vec![
+                Value::Int32(1),
+                Value::MemoryView(crate::MemoryView::persistent(view)),
+            ],
+            None,
+            "Caller".into(),
+            0,
+        )
+        .unwrap();
+        let mut roots = vec![];
+        call.trace_roots(&mut roots);
+        assert_eq!(roots.len(), 1);
+        heap.publish(roots).unwrap();
+        drop(heap);
+        let mut heap = other.enter();
+        heap.collect(vec![], crate::CollectionReason::ExplicitRequest)
+            .unwrap();
+        reference
+            .element(3, &Type::Byte)
+            .unwrap()
+            .write(Value::Byte(99))
+            .unwrap();
+        let caller =
+            crate::assemble(".module Test\n.function Caller() -> Void\nret\n.end").unwrap();
+        let mut frames = vec![Frame::new(caller.functions[0].clone(), vec![]).unwrap()];
+        let oversized = Value::Erased(Box::new(Value::Array {
+            element: Type::Byte,
+            elements: vec![Value::Byte(7); 3],
+        }));
+        assert!(call.resume(oversized, &mut frames).is_err());
+        assert_eq!(
+            reference.element(1, &Type::Byte).unwrap().read().unwrap(),
+            Value::Byte(9)
+        );
+        call.resume(
+            Value::Erased(Box::new(Value::Array {
+                element: Type::Byte,
+                elements: vec![Value::Byte(42)],
+            })),
+            &mut frames,
+        )
+        .unwrap();
+        assert_eq!(
+            reference.read().unwrap(),
+            Value::Array {
+                element: Type::Byte,
+                elements: vec![
+                    Value::Byte(9),
+                    Value::Byte(42),
+                    Value::Byte(9),
+                    Value::Byte(99)
+                ]
+            }
+        );
+        drop(heap);
+        let mut heap = participant.enter();
+        drop(call);
+        heap.publish(vec![]).unwrap();
+        heap.collect(vec![], crate::CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert_eq!(heap.statistics().live_objects, 0);
+    }
+
+    #[test]
+    fn persistent_write_snapshots_only_selected_initialized_bytes() {
+        let mut heap = crate::ManagedHeap::default();
+        let id = heap
+            .allocate(Value::Array {
+                element: Type::Byte,
+                elements: vec![
+                    Value::Uninitialized(Type::Byte),
+                    Value::Byte(42),
+                    Value::Uninitialized(Type::Byte),
+                ],
+            })
+            .unwrap();
+        let reference = heap.address(id).unwrap();
+        let view = crate::memory_views::Memory::new(&heap, reference.clone(), 1, 1)
+            .unwrap()
+            .as_readonly();
+        let call = HostCall::new(
+            memory_service(true),
+            vec![
+                Value::Int32(1),
+                Value::MemoryView(crate::MemoryView::persistent(view)),
+            ],
+            None,
+            "Caller".into(),
+            0,
+        )
+        .unwrap();
+        reference
+            .element(1, &Type::Byte)
+            .unwrap()
+            .write(Value::Byte(99))
+            .unwrap();
+        assert_eq!(
+            call.args,
+            vec![
+                Value::Int32(1),
+                Value::Array {
+                    element: Type::Byte,
+                    elements: vec![Value::Byte(42)]
+                },
+                Value::Int32(0),
+                Value::Int32(1)
+            ]
+        );
+        let mut roots = vec![];
+        call.trace_roots(&mut roots);
+        assert!(roots.is_empty());
+        let mut limits = Limits::default();
+        limits.array_elements = 1;
+        limits.array_bytes = std::mem::size_of::<Value>();
+        call.array_usage(&mut crate::arrays::Usage::default(), &limits)
+            .unwrap();
+        let uninitialized = crate::memory_views::Memory::new(&heap, reference, 0, 1)
+            .unwrap()
+            .as_readonly();
+        assert!(
+            HostCall::new(
+                memory_service(true),
+                vec![
+                    Value::Int32(1),
+                    Value::MemoryView(crate::MemoryView::persistent(uninitialized))
+                ],
+                None,
+                "Caller".into(),
+                0
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn file_memory_bindings_require_exact_persistent_byte_capabilities() {
+        for readonly in [false, true] {
+            let mut function = memory_service(readonly);
+            assert!(crate::native::bind(&function).is_ok());
+            function.parameters[1] = crate::file_streams::memory_type(!readonly);
+            assert!(crate::native::bind(&function).is_err());
+            function.parameters[1] = crate::cryptography::view_type(readonly);
+            assert!(crate::native::bind(&function).is_err());
+            let Type::Constructed { arguments, .. } = &mut function.parameters[1] else {
+                unreachable!()
+            };
+            arguments[0] = Type::Int32;
+            assert!(crate::native::bind(&function).is_err());
+        }
     }
 
     #[test]

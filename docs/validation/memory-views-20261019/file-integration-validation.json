@@ -1,0 +1,112 @@
+{
+  "passed": true,
+  "date": "2026-10-19",
+  "scope": "Interpreter persistent file transfer windows; public stream signatures unchanged",
+  "sourceBaseline": "0932f591cc0defe64bcb354628077e1966047e09",
+  "compilerRevision": "dcf7ac41f2e0a00b2fbfc1c766700bf3b323a89e",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "consumer": {
+    "passed": true,
+    "compileCommand": [
+      "dotnet",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/runtime/raven/tests/file-memory/Tests.rvnproj"
+    ],
+    "command": [
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/runtime/raven/tests/file-memory/bin/neoclr/FileMemoryTests.dll",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.runtime.neox",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.Data.PostgreSql.dll",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/file-memory-bundle/bundle/lib/System.Runtime.dll",
+      "--execution",
+      "interpreter",
+      "--",
+      "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-file-memory-vmjuw_ig/bytes.bin"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS file memory windows, EOF, sentinels, ranges and cancellation\n",
+    "stderr": "",
+    "fileHex": "2802",
+    "runtimeSha256": "f42f171d5c36f3a7b9690128546b0794efb5c1bde4f7de50e343b6039f848581",
+    "compilerSha256": "0d67be00288667b7026390d628653cfe4866b75a4ab521017c0982ef5c7ebda9",
+    "consumerSha256": "a04e5dd5d6d5564144dedd8f2c28614e9456973ec3254f17e557cdcd5c4a0a3c"
+  },
+  "hostTests": {
+    "command": "cargo test --lib host_call::tests",
+    "passed": 5,
+    "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 42.89s\n     Running unittests src/lib.rs (target/debug/deps/neoclr-51b4007795f48d27)\n\nrunning 5 tests\ntest vm::host_call::tests::prepared_write_is_detached_from_subsequent_mutation ... ok\ntest vm::host_call::tests::file_memory_bindings_require_exact_persistent_byte_capabilities ... ok\ntest vm::host_call::tests::persistent_write_snapshots_only_selected_initialized_bytes ... ok\ntest vm::host_call::tests::detached_read_preserves_destination_and_concurrent_tail_changes ... ok\ntest vm::host_call::tests::persistent_read_roots_only_owner_until_completion_and_preserves_window ... ok\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 329 filtered out; finished in 0.29s\n\n"
+  },
+  "legacyTests": {
+    "command": "cargo test --test file_streams",
+    "passed": 12,
+    "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 17s\n     Running tests/file_streams.rs (target/debug/deps/file_streams-c938985b23737bcb)\n\nrunning 12 tests\ntest host_dispatch_requires_exact_signature ... ok\ntest a_managed_function_named_like_a_service_does_not_open_a_file ... ok\ntest invalid_write_slice_does_not_change_the_file ... ok\ntest disk_round_trip_through_vm_resource_services ... ok\ntest closed_handle_cannot_access_later_file ... ok\ntest oversized_read_into_is_rejected_before_advancing ... ok\ntest read_into_preserves_aliases_prefix_tail_and_eof_buffer ... ok\ntest invocations_do_not_share_handle_tables_and_faults_release_files ... ok\ntest metadata_follows_links_and_reports_dangling_targets ... ok\ntest read_into_requires_read_access_and_exact_byte_array_signature ... ok\ntest storage_kind_and_directory_creation_keep_errors_distinct ... ok\ntest invalid_read_ranges_do_not_mutate_buffer_or_advance_file ... ok\n\ntest result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.40s\n\n"
+  },
+  "sourceHashes": {
+    "src/file_streams.rs": "7611117c0c0b31c38240f6f36e375261e58716e4f7e3fb95ba8c85af6aff53ce",
+    "src/native.rs": "c7a5448afe3b2f90ba47faaa606ad200babeb97b8fb5dfed20c250aa1c2a7a4a",
+    "src/vm_host_call.rs": "85f448f6a06526fba6643b4c9f9d6663b4822de7e571c6c60370055b542ca7e4",
+    "runtime/raven/native/RuntimeCoreCalls.rvn": "03972398efab55ff4cb3cfd5f98798ce3b0e7bd7293a0f259d8d3eb37a1f61cb",
+    "runtime/raven/src/System/IO/FileInputStream.rvn": "5a1733685740fc82c0d09f6ef59b944bfacc9bee738a27af5dd1db0e5ffb0071",
+    "runtime/raven/src/System/IO/FileOutputStream.rvn": "b40b04cc21aa382cac06a432f20c6e7612c4d2f3b2ca9839a0b5a04128e459e8",
+    "runtime/raven/tests/file-memory/Main.rvn": "c564494187bcbde0a747674504d88b41557723ab69629c5996ccd504920afb92",
+    "runtime/raven/tests/file-memory/Tests.rvnproj": "ef77b1984134dafc1ad193f0b52bf38b26faf25d541ebc923ac62646f9851e46",
+    "runtime/raven/tests/file-memory/verify.py": "2d39172d27e90fdcba48f72aeb76781b4266792cb0458edc3f226649cc8b420a"
+  },
+  "libraryArtifacts": {
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Runtime.dll": "0efdefcf6c908f51e8f18f6b2b0ea83e4b566a389926fe1537e87f6222cfe7c4",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Data.dll": "8ec11f2d82ffd1ad8ea0f500e1865b7f10d029125f1eb52b58c15618b45632d3",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Networking.dll": "d89a20f02c4ea6782f114dce9cf7e8446ef562312d2f7ffd3450f2515aec5872",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Web.dll": "b99aae90e5fc6954f28740bce9a0aad7000f82ac1afe42a7526aa001d4cf9588",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Data.PostgreSql.dll": "85e9810485cd53f24ba68f463058c95b7163e02c1bbab2c240f40ebf7af81b0f",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/ownership.json": "327afe52fb83486943af79d21b01a92e1a138ad448e68626e0dcd715e293e6c6",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/NeoCLR.ClassLibrary.props": "62bfd4d69dccb03fe380399d781a0fec5e1ce9508b33954035b66fb38ec5e14a",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/RuntimeAwait.rvn": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/RuntimeGenerator.rvn": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Runtime.xml": "1cc6861fd1a67807a4e07422dc4a3b99128ea4fbec81a436d7bbcb8ce5204e3e",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Data.xml": "bf1ba0f7aa624401d39db6b1690919f2435d2bd22322703959cb2d1d31e980e4",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Networking.xml": "7be6be5e4d96f6d28a6ae1a8024eeba76ae8610ebb6edb1065e526577c928b01",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Web.xml": "94909a6bf6656da1ad1f64dbdbb730836bbb928d3bd776b5b2165c274eccabf1",
+    "/Users/robert/Projects/neoclr/target/file-memory-libraries/System.Data.PostgreSql.xml": "1c7d9c5709daedfae2428e13554c17e034f3410b45902c1110143a9ed8265bb6"
+  },
+  "buildEvidenceSha256": "bd664b81c260e7dd9367a0e8b1e373cd99b6ccbd6cb436ef334cd0530adf6eb4",
+  "runtimeBuild": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `release` profile [optimized] target(s) in 37.50s\n",
+  "runtimeProvenance": "Release runtime built from the production implementation here. Subsequent changes to vm_host_call.rs corrected only cfg(test) fixtures; no production logic changed.",
+  "apiCheck": "Checked RavenDoc reference assembly and source fingerprints\n",
+  "apiReference": "Regenerated reference assembly unchanged; source fingerprints refreshed. Public API signatures/comments and native API rendering unchanged.",
+  "limitations": [
+    "Interpreter execution only; native JIT/AOT file services remain a gap",
+    "Blocking file provider; not asynchronous OS file I/O",
+    "Public InputStream/OutputStream array/range signatures remain until coordinated migration",
+    "Legacy four-argument internal bindings retained only for bootstrap/tests",
+    "Write snapshots copy selected bytes; no zero-copy or performance claim",
+    "No public Native API ABI",
+    "macOS ARM64 validation only; no website build"
+  ],
+  "priorAttempts": [
+    "An initial Rust filter vm_host_call::tests selected zero tests. Only the corrected host_call::tests run is counted.",
+    "Two new fixtures initially failed: same-participant collection replaces its published roots, and array byte quotas charge Value-sized elements. Corrected to collect from another participant and use the logical payload budget; final five tests pass.",
+    "Rust test binaries stalled in macOS _dyld_start before entering harnesses. Applied local ad-hoc signatures and retained actual completed results; loader waits are not counted as passes.",
+    "Initial consumer compilation used a library directory instead of a bundle root and failed to find the imported props; the final checked consumer uses a prepared bundle."
+  ],
+  "commands": [
+    "cargo build --release --bin neoclr",
+    "python3 scripts/build-native-class-library.py --compiler /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll --runtime target/release/neoclr --output target/file-memory-libraries --compiler-revision dcf7ac41f --with-postgresql",
+    "python3 scripts/prepare-jit-bundle.py --bundle target/release-final-inline-bundle-20261014/bundle --runtime target/release/neoclr --jit-compiler target/debug/neoclr-codegen --host-recipe docs/experiments/runtime-async/native-validation.json --libraries target/file-memory-libraries --compiler-directory /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0 --output target/file-memory-bundle",
+    "python3 runtime/raven/tests/file-memory/verify.py --bundle target/file-memory-bundle/bundle --output target/file-memory-qualified-consumer"
+  ]
+}

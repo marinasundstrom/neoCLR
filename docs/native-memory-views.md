@@ -514,3 +514,13 @@ I/O retention/pinning, completion-root release, terminal runtime fault cleanup,
 Task<Memory> results, non-byte native views and Windows remain unqualified here.
 InputStream/OutputStream and socket contracts still require migration and separate
 completion ownership tests. No public Native API or stable host ABI is added.
+
+### Interpreter detached file access (2026-10-19)
+
+The [file boundary](memory-view-library-audit.md#interpreter-file-transfer-boundary-2026-10-19)
+uses persistent byte-memory descriptors while the host runs without heap access.
+Reads root their destination until bounded write-back; writes snapshot only the
+selected initialized window. Readonly source capability does not freeze aliases;
+callers must still honor the stream's unchanged-input-until-completion rule.
+No raw managed pointer crosses this boundary. This is private interpreter service
+integration, not a public Native API or native file-I/O implementation.

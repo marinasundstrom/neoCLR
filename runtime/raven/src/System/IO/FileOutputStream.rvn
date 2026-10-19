@@ -68,7 +68,11 @@ public class FileOutputStream : OutputStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = neoCLR.Runtime.FileWriteChunk(handle, buffer, offset, count)
+        if offset < 0 || count < 0 || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        let memory: ReadOnlyMemory<byte> = buffer
+        let payload = neoCLR.Runtime.FileWriteChunk(handle, memory.Slice(offset, count))
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }

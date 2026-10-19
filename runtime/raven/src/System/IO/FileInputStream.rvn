@@ -40,7 +40,11 @@ public class FileInputStream : InputStream, SeekableStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = neoCLR.Runtime.FileReadInto(handle, buffer, offset, count)
+        if offset < 0 || count < 0 || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        let memory: Memory<byte> = buffer
+        let payload = neoCLR.Runtime.FileReadInto(handle, memory.Slice(offset, count))
         if neoCLR.Runtime.IsValue<byte>(payload) {
             return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }

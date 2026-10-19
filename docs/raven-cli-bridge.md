@@ -13220,3 +13220,22 @@ cases). A freshly rebuilt five-library cohort runs four pending-transfer tests i
 interpreter/JIT/AOT on macOS ARM64; both borrowed capture fixtures fail with
 RAV2205. neoCLR records commands, compiler hashes and limitations in
 `docs/validation/memory-views-20261019/async-lifetime-validation.json`.
+
+
+### Persistent file service parameters (2026-10-19)
+
+The Raven-owned native service declarations now use `FileReadInto(int,
+Memory<byte>)` and `FileWriteChunk(int, ReadOnlyMemory<byte>)`. The interpreter
+recognizes these exact constructed byte-view types. File adapters preserve their
+existing public array/range contracts pending the coordinated shared interface
+migration. Compiler behavior and Runtime Contract configuration are unchanged;
+this uses existing native opaque metadata, with no new opcode or CLI encoding.
+
+The four-argument forms remain private legacy bootstrap/test bindings, including
+old CLI scaffolds; they are not the production Raven service shape. Opaque Memory
+parameters cannot be projected as empty ordinary CLI structs. Native metadata is
+the authoritative representation; eventual JIT/AOT file lowering must implement
+the persistent completion ownership contract rather than borrowing across host
+suspension. The interpreter snapshots selected writes and roots reads while heap
+access is released. Validation and remaining limits are recorded in
+[the file integration evidence](validation/memory-views-20261019/file-integration-validation.json).

@@ -21,10 +21,10 @@ internal extern func FilePosition(arg0: int) -> System.Value;
 internal extern func FileSeek(arg0: int, arg1: long) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func FileReadInto(arg0: int, arg1: byte[], arg2: int, arg3: int) -> System.Value;
+internal extern func FileReadInto(handle: int, destination: System.Memory<byte>) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func FileWriteChunk(arg0: int, arg1: byte[], arg2: int, arg3: int) -> System.Value;
+internal extern func FileWriteChunk(handle: int, source: System.ReadOnlyMemory<byte>) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func FileFlush(arg0: int) -> System.Value;

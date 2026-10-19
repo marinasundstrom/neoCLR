@@ -185,3 +185,36 @@ buffering nor claims zero-copy transport or improved throughput.
 seven gzip groups pass in AOT and JIT, and two focused interpreter cases pass.
 The independent output interoperability rerun is blocked by native emission of
 its unchanged async sample; the full interpreter suite retains its earlier timeout.
+
+### Interpreter file transfer boundary (2026-10-19)
+
+Production `RuntimeCoreCalls.rvn` now declares `FileReadInto(int, Memory<byte>)`
+and `FileWriteChunk(int, ReadOnlyMemory<byte>)`. FileInputStream/FileOutputStream
+validate their existing public array/range contracts before constructing windows;
+no new public overload is added. This temporary boundary will disappear when the
+shared InputStream/OutputStream contracts migrate together. Four-argument internal
+bindings remain only for legacy bootstrap/test consumers; their declarations are
+not the current Raven class-library API.
+
+The interpreter releases heap access while blocking file I/O runs. It roots the
+persistent read descriptor until completion and writes back only the returned
+prefix, rejecting an oversized provider result before modifying bytes. Writes
+snapshot only the selected initialized window before releasing heap access; the
+snapshot has no managed roots and uses the existing array-payload budget. This
+preserves the established detached-call concurrency model, rather than retaining
+raw pointers or borrowed slices across it. Copying on writes remains an explicit
+cost; no throughput or zero-copy claim is made.
+
+The .NET comparison remains persistent Memory for potentially retained operations
+and temporary borrowing under controlled heap access. Native JIT/AOT file-service
+execution, asynchronous OS completion and public stream/socket signatures are not
+qualified by this interpreter work. See the
+[consumer](../runtime/raven/tests/file-memory/README.md) and
+[evidence](validation/memory-views-20261019/file-integration-validation.json).
+
+Validation passes five host-adapter tests, twelve legacy file-service tests and
+the production Raven file round trip with exact output bytes. The read-root test
+collects from another heap participant while the caller's roots are published;
+the snapshot test allows uninitialized bytes outside the selected source window.
+Reference regeneration leaves public assembly contents unchanged and refreshes
+source fingerprints. No JIT/AOT or asynchronous OS file-I/O result is inferred.
