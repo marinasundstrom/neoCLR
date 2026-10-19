@@ -25,23 +25,32 @@ pub(crate) fn byte_memory(t: &TypeDef) -> bool {
         && t.declaring_type.is_none()
 }
 
-pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Value>, Error> {
+pub(crate) fn bind(
+    input: &mut neoclr::Module,
+    report: &Value,
+    reference_arena: bool,
+) -> Result<Vec<Value>, Error> {
     let mut result = vec![];
     for row in report["functions"]
         .as_array()
         .ok_or("missing selection inventory")?
     {
         let name = row["name"].as_str().ok_or("missing selected name")?;
+        if !reference_arena && name != "neoCLR.Runtime.ViewBoundsFault" {
+            continue;
+        }
         let expected_kind = match name {
             "neoCLR.Runtime.ViewCreateMemory" => Some(MemoryViewKind::Memory),
             "neoCLR.Runtime.ViewCreateReadOnlyMemory" => Some(MemoryViewKind::ReadOnlyMemory),
             "neoCLR.Runtime.ViewLength"
             | "neoCLR.Runtime.ViewSlice"
-            | "neoCLR.Runtime.ViewAsReadOnly" => None,
+            | "neoCLR.Runtime.ViewAsReadOnly"
+            | "neoCLR.Runtime.ViewBoundsFault" => None,
             _ => continue,
         };
         let slicing = name == "neoCLR.Runtime.ViewSlice";
         let readonly = name == "neoCLR.Runtime.ViewAsReadOnly";
+        let bounds_fault = name == "neoCLR.Runtime.ViewBoundsFault";
         let index = row["compiledIndex"]
             .as_u64()
             .ok_or("missing compiled index")? as usize;
@@ -57,13 +66,13 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
                 byte_memory(t) && expected_kind.is_none_or(|k| t.memory_view == Some(k))
             });
         let compiled_name = row["compiledName"].as_str().unwrap_or(name);
-        if !valid_view
+        if !valid_view && !bounds_fault
             || f.name != compiled_name
             || f.owner.is_some()
             || f.instance
             || f.receiver_byref
             || f.receiver_readonly
-            || f.no_result
+            || f.no_result != bounds_fault
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
             || !f.body.is_empty()
@@ -78,7 +87,9 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
             || !f.out_parameters.is_empty()
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
-            || if expected_kind.is_some() {
+            || if bounds_fault {
+                !f.parameters.is_empty() || f.returns != Type::Void
+            } else if expected_kind.is_some() {
                 f.parameters != [Type::ArrayRef(Box::new(Type::Byte))]
             } else {
                 if readonly {
@@ -100,7 +111,9 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
         {
             return Err("native memory binding requires exact closed persistent Byte create/length/slice/readonly InternalCall contracts".into());
         }
-        let implementation = if expected_kind.is_some() {
+        let implementation = if bounds_fault {
+            "memory-view-bounds-fault-v1"
+        } else if expected_kind.is_some() {
             "byte-memory-create-v1"
         } else if readonly {
             "byte-memory-readonly-v1"
@@ -238,21 +251,48 @@ mod tests {
                 );
                 let report = json!({"functions":[{"name":name, "compiledIndex":0}]});
                 let original = input.clone();
-                assert_eq!(bind(&mut input, &report).unwrap().len(), 1);
+                assert_eq!(bind(&mut input, &report, true).unwrap().len(), 1);
                 let mut bad = original.clone();
                 bad.functions[0].parameters.push(Type::Byte);
-                assert!(bind(&mut bad, &report).is_err());
+                assert!(bind(&mut bad, &report, true).is_err());
                 let mut bad = original.clone();
                 bad.functions[0].parameters =
                     vec![ty.clone(), Type::Int32, Type::Int32, Type::Int32];
-                assert!(bind(&mut bad, &report).is_err());
+                assert!(bind(&mut bad, &report, true).is_err());
                 let mut bad = original.clone();
                 bad.functions[0].returns = Type::Byte;
-                assert!(bind(&mut bad, &report).is_err());
+                assert!(bind(&mut bad, &report, true).is_err());
                 let mut bad = original;
                 bad.functions[0].parameters[0] = Type::ByRef(Box::new(ty));
-                assert!(bind(&mut bad, &report).is_err());
+                assert!(bind(&mut bad, &report, true).is_err());
             }
+        }
+    }
+
+    #[test]
+    fn view_bounds_fault_binds_only_exact_void_contract() {
+        let mut input = neoclr::assemble(".module Test\n").unwrap();
+        let name = "neoCLR.Runtime.ViewBoundsFault";
+        input.functions.push(serde_json::from_value(json!({
+            "name":name, "parameters":[], "returns":Type::Void, "no_result":true, "impl_flags":4096
+        })).unwrap());
+        let report = json!({"functions":[{"name":name,"compiledIndex":0}]});
+        let original = input.clone();
+        assert_eq!(
+            bind(&mut input, &report, true).unwrap()[0]["implementation"],
+            "memory-view-bounds-fault-v1"
+        );
+        let mut without_arena = original.clone();
+        assert_eq!(bind(&mut without_arena, &report, false).unwrap().len(), 1);
+        for variant in 0..4 {
+            let mut bad = original.clone();
+            match variant {
+                0 => bad.functions[0].no_result = false,
+                1 => bad.functions[0].parameters.push(Type::Int32),
+                2 => bad.functions[0].returns = Type::Int32,
+                _ => bad.functions[0].impl_flags = 0,
+            }
+            assert!(bind(&mut bad, &report, true).is_err());
         }
     }
 
@@ -273,7 +313,7 @@ mod tests {
         let report = json!({"functions":[{"name":name, "compiledIndex":0}]});
         let original = input.clone();
         assert_eq!(
-            bind(&mut input, &report).unwrap()[0]["implementation"],
+            bind(&mut input, &report, true).unwrap()[0]["implementation"],
             "byte-memory-readonly-v1"
         );
         for variant in 0..9 {
@@ -298,11 +338,11 @@ mod tests {
                 7 => bad.functions[0].impl_flags = 0,
                 _ => bad.functions[0].parameters.clear(),
             }
-            assert!(bind(&mut bad, &report).is_err(), "variant {variant}");
+            assert!(bind(&mut bad, &report, true).is_err(), "variant {variant}");
         }
         let mut untrusted: neoclr::Module =
             serde_json::from_value(serde_json::to_value(original).unwrap()).unwrap();
-        assert!(bind(&mut untrusted, &report).is_err());
+        assert!(bind(&mut untrusted, &report, true).is_err());
     }
 
     #[test]
@@ -316,7 +356,7 @@ mod tests {
             json!({"functions":[{"name":"neoCLR.Runtime.ViewCreateMemory", "compiledIndex":0}]});
         let original = input.clone();
         assert_eq!(
-            bind(&mut input, &report).unwrap()[0]["implementation"],
+            bind(&mut input, &report, true).unwrap()[0]["implementation"],
             "byte-memory-create-v1"
         );
         for variant in 0..6 {
@@ -331,7 +371,10 @@ mod tests {
                     .push(Some("T".into())),
                 _ => altered.types[0].memory_view = Some(MemoryViewKind::ReadOnlyMemory),
             }
-            assert!(bind(&mut altered, &report).is_err(), "variant {variant}");
+            assert!(
+                bind(&mut altered, &report, true).is_err(),
+                "variant {variant}"
+            );
         }
     }
 }

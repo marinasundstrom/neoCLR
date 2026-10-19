@@ -110,9 +110,20 @@ runtime instruction, intrinsic or public member is required.
 
 Run `native-run.py --consumer-only --range-bounds --compiler <rvnc.dll> --output <directory>`.
 This adds six isolated invalid-range fixtures (reversed, past-end and excessive
-from-end bounds for each type). The existing Raven validator produces UserFault,
-not the integer Slice service's IndexOutOfRange; this difference is an open
-error-classification gap. Expected native code is 4, output remains untouched,
+from-end bounds for each type). At that checkpoint the Raven validator produced UserFault,
+not the integer Slice service's IndexOutOfRange; that difference was an
+error-classification gap, resolved in the follow-up below. Expected native code is 4, output remains untouched,
 root frames balance and the heap is fully reclaimable. See
 [range-validation.json](range-validation.json) for the commands and hashes.
 Earlier integer-boundary and exact-binding evidence remains applicable.
+
+## Consistent range bounds follow-up
+
+The updated harness expects IndexOutOfRange (native code 8) for invalid ranges.
+`--range-bounds` now also compiles interpreter-only failures for Slice<byte> and
+ReadOnlySlice<byte>, and runs a standalone negative-length Range call without
+reference-arena admission in AOT. Managed JIT uses its required GC/context profile. The success consumer verifies that
+TryGetOffsetAndLength still returns Error for reversed bounds and negative length.
+See [consistent-bounds-validation.json](consistent-bounds-validation.json); earlier
+range-validation.json is retained as historical evidence of the corrected behavior.
+The source-owned core and matching documentation bundle are rebuilt for this step.

@@ -106,20 +106,19 @@ if not args.consumer_only:
                              case_image, '@entry', output / 'bounds.dylib', *options])
             assert json.loads(failure_jit.stderr.split('JIT_RESULT ', 1)[1])['guestExitCode'] == 0
 if args.range_bounds:
-    # Range validates in Raven and currently reports UserFault (native code 4),
-    # unlike the integer Slice InternalCall's IndexOutOfRange (native code 8).
-    run('range-jit-link', [*flags, '-DEXPECT_STATUS=4', '-DJIT_HOST', '-dynamiclib',
+    # Raven Range validation shares the integer Slice IndexOutOfRange fault path.
+    run('range-jit-link', [*flags, '-DEXPECT_STATUS=8', '-DJIT_HOST', '-dynamiclib',
                            host, *support, '-o', output / 'range-fault.dylib'])
     report['rangeCases'] = []
-    for kind in ('Memory', 'ReadOnlyMemory'):
-        for case, expression in (('reversed', 'memory[2..1]'),
-                                 ('past-end', 'memory.Slice(0..3)'),
-                                 ('from-end', 'memory[^3..]')):
+    for kind in ('Memory', 'ReadOnlyMemory', 'Slice', 'ReadOnlySlice', 'Range'):
+        cases = [('negative-length', 'Range.All.GetOffsetAndLength(-1).Item2')] if kind == 'Range' else [
+            ('reversed', 'memory[2..1]'), ('past-end', 'memory.Slice(0..3)'), ('from-end', 'memory[^3..]')]
+        for case, expression in cases:
             label = f'range-{kind}-{case}'
             source = output / (label + '.rvn')
-            source.write_text(f'import System.*\nfunc Main() -> int {{\n'
-                              f'    let memory: {kind}<byte> = [(byte)1, (byte)2]\n'
-                              f'    return {expression}.Length\n}}\n')
+            declaration = '' if kind == 'Range' else f'    let memory: {kind}<byte> = [(byte)1, (byte)2]\n'
+            result = expression if kind == 'Range' else expression + '.Length'
+            source.write_text(f'import System.*\nfunc Main() -> int {{\n{declaration}    return {result}\n}}\n')
             project = output / (label + '.rvnproj')
             template = (HERE / 'NativeMemoryBounds.rvnproj').read_text()
             template = template.replace('NativeMemoryBounds', label).replace('native-bounds.rvn', source.name)
@@ -129,18 +128,31 @@ if args.range_bounds:
             case_image = output / 'bin/neoclr' / (label + '.dll')
             failure = run(label + '-interpreter', [runtime, 'run', case_image,
                           '--execution', 'interpreter', *refs], 1)
-            assert 'UserFault' in failure.stdout + failure.stderr
-            assert 'Range is outside the value' in failure.stdout + failure.stderr
+            assert 'IndexOutOfRange' in failure.stdout + failure.stderr
+            if kind in ('Slice', 'ReadOnlySlice'):
+                report['rangeCases'].append({'kind': kind, 'case': case, 'expression': expression,
+                                            'execution': 'interpreter', 'fault': 'IndexOutOfRange',
+                                            'imageSha256': hashlib.sha256(case_image.read_bytes()).hexdigest()})
+                continue
+            case_options = [o for o in options if o not in ('--reference-arena', '--native-gc', '--native-stack-budget')] if kind == 'Range' else options
+            if kind == 'Range':
+                rejected_object = output / 'range-no-diagnostic-context.o'
+                rejected_object.unlink(missing_ok=True)
+                rejection = run(label + '-no-context', [codegen, '--closed-world', case_image,
+                                '@entry', rejected_object, *[o for o in case_options if o != '--bind-user-fault']], 1)
+                assert 'neoCLR.Runtime.ViewBoundsFault: unsupported value member contract' in rejection.stdout + rejection.stderr
+                assert not rejected_object.exists()
             case_obj = output / (label + '.o')
-            run(label + '-aot', [codegen, '--closed-world', case_image, '@entry', case_obj, *options])
-            run(label + '-link', [*flags, '-DEXPECT_STATUS=4', '-fsanitize=undefined,bounds',
+            run(label + '-aot', [codegen, '--closed-world', case_image, '@entry', case_obj, *case_options])
+            case_flags = [*flags, '-DNO_ARENA'] if kind == 'Range' else flags
+            run(label + '-link', [*case_flags, '-DEXPECT_STATUS=8', '-fsanitize=undefined,bounds',
                                  host, case_obj, *support, '-o', output / label])
             run(label + '-execute', [output / label])
             failure_jit = run(label + '-jit', [codegen, '--jit-managed', '--closed-world',
                              case_image, '@entry', output / 'range-fault.dylib', *options])
             assert json.loads(failure_jit.stderr.split('JIT_RESULT ', 1)[1])['guestExitCode'] == 0
             report['rangeCases'].append({'kind': kind, 'case': case, 'expression': expression,
-                                        'nativeStatus': 4, 'fault': 'UserFault',
+                                        'nativeStatus': 8, 'fault': 'IndexOutOfRange',
                                         'imageSha256': hashlib.sha256(case_image.read_bytes()).hexdigest(),
                                         'sourceSha256': hashlib.sha256(source.read_bytes()).hexdigest()})
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest()

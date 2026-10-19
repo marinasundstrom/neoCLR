@@ -2416,3 +2416,14 @@ Consumers must not require distinct provider identities; CreateEncoder/CreateDec
 still create independent mutable sessions. Strict errors, BOM handling and size
 limits are unchanged. Source XML summaries and the matching reference snapshot are
 refreshed; no public signature change. See the [three-mode tests and profiling](../benchmarks/http-server/serve/encoding-cache-20261018/README.md).
+
+
+### Range bounds classification (2026-10-19)
+
+Range.GetOffsetAndLength now reports IndexOutOfRange instead of UserFault for
+negative lengths or invalid resolved ranges. TryGetOffsetAndLength retains its
+Result contract. This aligns all four view types' range and integer slicing;
+other callers of the throwing Range validator receive the same corrected category.
+No public signature changes. The source summary, manual view reference, compiler
+reference fingerprint and native snapshot are refreshed from the rebuilt matching
+five-library bundle; the runtime-only ViewBoundsFault hook is internal.

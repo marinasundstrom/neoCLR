@@ -55,3 +55,7 @@ internal extern func ViewSlice<T>(view: ReadOnlyMemory<T>, start: int) -> ReadOn
 internal extern func ViewAsSlice<T>(view: ReadOnlyMemory<T>) -> ReadOnlySlice<T>;
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ViewAsReadOnly<T>(view: Memory<T>) -> ReadOnlyMemory<T>;
+
+// Shared terminal bounds path for Raven range validation.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ViewBoundsFault() -> System.Void;

@@ -77,9 +77,10 @@ reversed ranges and out-of-bounds windows fault; bounds are never clamped. A
 zero-length window at Length is valid. Null arrays convert to empty views. Default
 views are empty. Reading an uninitialized array element faults.
 
-Current error-classification gap: Range-based slicing uses the Raven Range
-validator's UserFault, while integer Slice bounds use IndexOutOfRange. This is
-an implementation inconsistency to reconcile, not an intended overload distinction.
+Range-based and integer slicing both report IndexOutOfRange for invalid bounds.
+Development compatibility note: Range.GetOffsetAndLength previously reported
+UserFault; its callers now receive the same terminal bounds category as integer
+slicing. TryGetOffsetAndLength continues returning Error(InvalidRangeError).
 
 Slices cannot be stored in ordinary fields, arrays or boxed objects, used as
 ordinary generic arguments, captured by functions, or retained across suspension.

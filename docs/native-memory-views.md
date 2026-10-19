@@ -348,11 +348,45 @@ receiver-relative and half-open, following .NET Range semantics; unlike .NET's
 array-range copy, neoCLR array ranges separately return borrowed Slice views.
 
 Reversed, excessive end and excessive from-end bounds are isolated for both
-persistent types. Range.GetOffsetAndLength currently uses System.Fail, producing
+persistent types. At that qualification checkpoint, Range.GetOffsetAndLength used System.Fail, producing
 UserFault (native code 4), whereas integer Slice faults with IndexOutOfRange
-(native code 8). These checks record the current implementation; the differing
-fault categories are a consistency gap, not a desired compatibility constraint.
+(native code 8). Those historical checks recorded a consistency gap, resolved by the follow-up below.
 No public API or compiler/backend change was needed for this qualification.
-Run native-run.py with `--consumer-only --range-bounds` to reproduce it; earlier
-integer-bounds and exact-binding evidence is reused. Native borrowed views and
+The current native-run.py with `--consumer-only --range-bounds` tests the corrected
+classification below; the old results remain tied to the prior qualification commit. Native borrowed views and
 buffer-service migration remain pending.
+
+### Consistent terminal range bounds
+
+Range.GetOffsetAndLength now calls the private, argument-free ViewBoundsFault
+InternalCall on both invalid length and invalid interval paths. The exact
+System.Void/no-result contract terminates with IndexOutOfRange in the interpreter
+and native status 8 in JIT/AOT. Native binding of this nonallocating fault service
+does not require reference-arena storage; actual byte-view operations still do.
+Outside the arena profile, --bind-user-fault supplies the diagnostic context
+contract. Without either context-enabling flag the InternalCall remains unbound
+and compilation rejects, rather than emitting its verification placeholder.
+TryGetOffsetAndLength retains Result/InvalidRangeError and System.Fail retains
+UserFault. All callers of GetOffsetAndLength receive the corrected category,
+including borrowed views, arrays and other collection/text range consumers;
+text boundaries still use the existing text semantics.
+
+This corrects the earlier UserFault classification and is a development migration
+for hosts inspecting fault codes. It adds no public member or neoIL instruction.
+The source validator remains Raven; the runtime helper supplies only the terminal
+bounds classification and native diagnostic/root-frame unwinding. Native borrowed
+view execution remains unsupported and is tested through the interpreter here.
+
+.NET's [Range implementation](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Range.cs)
+validates resolved boundaries and throws ArgumentOutOfRangeException. neoCLR keeps
+its existing terminal-fault model and maps this failure to the same IndexOutOfRange
+category used by integer slicing. This improves consistency within neoCLR at the
+cost of the above fault-code migration; it does not reproduce CLR exceptions.
+Negative supplied lengths remain explicitly rejected, as before.
+
+[Consistent-bounds evidence](validation/memory-views-20261019/consistent-bounds-validation.json)
+replaces the old expected UserFault results, covers all four view kinds in the
+interpreter and both persistent byte kinds in native execution, and checks a
+standalone negative-length Range call without reference-arena admission in AOT
+(managed JIT uses its required GC/context profile). Public
+signatures remain unchanged; summaries and the matching API snapshots are refreshed.

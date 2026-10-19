@@ -1723,6 +1723,26 @@ pub(crate) fn compile_into(
                     );
                 }
             }
+            if details.is_some_and(|d| d.memory_view_bounds_fault.contains(&i)) {
+                let status = b.ins().iconst(types::I32, 8);
+                let mut site = diagnostic_data.as_ref().unwrap().site(
+                    module,
+                    &mut b,
+                    fault_context.unwrap(),
+                    i,
+                    0,
+                );
+                site.capture_frame = false;
+                site.record(&mut b, status);
+                b.ins().return_(&[status]);
+                b.seal_all_blocks();
+                b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(module, &mut context.func, frame);
+                }
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                continue;
+            }
             if details.is_some_and(|d| {
                 d.byte_memory_create.contains(&i)
                     || d.byte_memory_length.contains(&i)

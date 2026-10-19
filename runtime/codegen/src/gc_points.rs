@@ -29,6 +29,7 @@ pub(super) fn native_body(
                 &d.byte_memory_length,
                 &d.byte_memory_slice,
                 &d.byte_memory_readonly,
+                &d.memory_view_bounds_fault,
                 &d.console_read_byte,
                 &d.console_write_line,
                 &d.console_write_bytes,

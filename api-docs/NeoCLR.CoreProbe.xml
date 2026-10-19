@@ -3193,7 +3193,7 @@
       <summary>Returns a hash consistent with typed equality.</summary>
     </member>
     <member name="M:System.Range.GetOffsetAndLength(System.Int32)">
-      <summary>Resolves a validated offset and count; negative lengths, reversed or out-of-bounds ranges fault.</summary>
+      <summary>Resolves a validated offset and count; negative lengths, reversed or out-of-bounds ranges fault with IndexOutOfRange.</summary>
     </member>
     <member name="M:System.Range.StartAt(System.Index)">
       <summary>Creates a range from start through the end boundary.</summary>

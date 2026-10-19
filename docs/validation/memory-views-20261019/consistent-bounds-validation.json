@@ -1,0 +1,1621 @@
+{
+  "passed": true,
+  "consumerOnly": true,
+  "rangeBounds": true,
+  "commands": [
+    {
+      "label": "raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/NativeMemoryConsumer.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "e0fa69a54f7e22c1c89ad6fade5baed971b598cf8105bb09bffdb3d57d61fffa",
+      "output": null
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/bin/neoclr/NativeMemoryConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/bin/neoclr/NativeMemoryConsumer.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/memory.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "5eddb276e1c1c39f0604bff5cb80b01f70c0d5682a4ce2a58681c88255517c2f",
+      "output": null
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/memory.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/memory"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/memory"
+      ],
+      "exitCode": 0,
+      "logSha256": "7bfd16863aee49f812bcf7c025bb0a25dbe13cf5fb1b3f1cd40969dc8eec5530",
+      "output": "memory: status=0 result=0 cleanup=ok\n"
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/bin/neoclr/NativeMemoryConsumer.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "793ee436016cabd5dbb7bf41afaa61f3c4f89a7d96b17da3d242a8800afc126d",
+      "output": null
+    },
+    {
+      "label": "range-jit-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-Memory-reversed-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-reversed.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "d8409bbcb94054c20a691c1ada96e09502f2d45648253bff8ccf1e6b5a00558c",
+      "output": null
+    },
+    {
+      "label": "range-Memory-reversed-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-reversed.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "2ac52787c03df9ae10e3aa7bed2e43c014ab216437bfdac26a02b38fa0805bcf",
+      "output": null
+    },
+    {
+      "label": "range-Memory-reversed-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-reversed.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-reversed.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "a91d341853e93fcf060491a9173e68edbbeb147a7f05e886f86458e806a5deeb",
+      "output": null
+    },
+    {
+      "label": "range-Memory-reversed-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-reversed.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-reversed"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-Memory-reversed-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-reversed"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-Memory-reversed-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-reversed.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "d02266d9c839dd3f73b1e00266326a86cb5b87cd2233991130b5838815190e90",
+      "output": null
+    },
+    {
+      "label": "range-Memory-past-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-past-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "b793332a722646ad2a59787c38b2f71261b25de3187fd1b6a776833fea9d5f34",
+      "output": null
+    },
+    {
+      "label": "range-Memory-past-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-past-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "ed45865a94d40fd0d9cc011d5beb79830c179762bc4f546943febf84938ece22",
+      "output": null
+    },
+    {
+      "label": "range-Memory-past-end-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-past-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-past-end.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "3904a6142d2bc67e2aab8562c3361d007931bbadbbc67c3ef9982299fcef7f91",
+      "output": null
+    },
+    {
+      "label": "range-Memory-past-end-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-past-end.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-past-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-Memory-past-end-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-past-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-Memory-past-end-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-past-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "69e84ba322d88d8344c0c15e3ce4af277baead1fc691eab1eae4800d5efa97e3",
+      "output": null
+    },
+    {
+      "label": "range-Memory-from-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-from-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "36bd0dc6bbe9f96446e7385cc3ff102dd08af9cfd7b8eab9d598033239c46992",
+      "output": null
+    },
+    {
+      "label": "range-Memory-from-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-from-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "92c27524e4e9d206430178e1364e5744e3d7ed2a4fc02a31f0d3786e439f9c6c",
+      "output": null
+    },
+    {
+      "label": "range-Memory-from-end-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-from-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-from-end.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "5fd0a6fe53cdbed1eb921847b84fadf2551fb28092d6ab99af2677ee4f1c280d",
+      "output": null
+    },
+    {
+      "label": "range-Memory-from-end-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-from-end.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-from-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-Memory-from-end-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Memory-from-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-Memory-from-end-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Memory-from-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "d385bb90e0fac123e2dbe1caa1e5d530cd5fd218ddcfe760867b022947abac37",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-reversed-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-reversed.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "24a33fa1b46612364289903492151bf441fd76414f5b88012f36aafd669122af",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-reversed-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-reversed.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "f7c103ff2954491534211527d82f5aee671022f0ddc9163dccb9120d2995fc98",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-reversed-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-reversed.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-reversed.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "3422c8b5426492002892d2648c2619b0dca46673f15ddddc992e28256ec3778c",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-reversed-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-reversed.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-reversed"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-reversed-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-reversed"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-ReadOnlyMemory-reversed-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-reversed.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "0f325749a11d3a9bdb695f2d310450e189bfe6111cc69eae1fa1ba1f331d39bb",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-past-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-past-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "a0e2819fbb1fd194778d430e2af1d55b9500503b510a1c0c1096ddab530981f0",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-past-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-past-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "a3096392fcd12aa2c1a3a56f429f366f5472dee49ce5bf4c2ec5235c51af4bbc",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-past-end-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-past-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-past-end.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "f1ff000f7712f1ad80c453ab33a9ac1d23699e975bd4f9655667797968737490",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-past-end-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-past-end.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-past-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-past-end-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-past-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-ReadOnlyMemory-past-end-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-past-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "64d8cc23813d4b60a70f4060695d1eb3af73b64a6510ebdcadec881ac87d32f6",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-from-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-from-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "b311c2285154e4defb19a084d39b96810a1700b7279fdb71a871c5b5f222dca5",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-from-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-from-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "d57bfece3ec7b0fbad4da3c530615034ec50a2c3c43921eaef925ae68d37d432",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-from-end-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-from-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-from-end.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "f4edbff67a7aea43eef2804aba87ffa3e71f468c87bb39f0cdc818cb772b47e2",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-from-end-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-from-end.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-from-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlyMemory-from-end-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlyMemory-from-end"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-ReadOnlyMemory-from-end-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlyMemory-from-end.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "f1ba96d5a40fd99dc995efe868342d6b0b16203c9a0185850ae75f59c019d11c",
+      "output": null
+    },
+    {
+      "label": "range-Slice-reversed-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Slice-reversed.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "45377e4ddfb3be0a09eb2a96c60e151bbef21d36cce12813d348198e01e313a1",
+      "output": null
+    },
+    {
+      "label": "range-Slice-reversed-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Slice-reversed.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "5a11e6c9157b54df6773832ab2c45b347a1658f8d82e4b2f2ec75b15e4fa786d",
+      "output": null
+    },
+    {
+      "label": "range-Slice-past-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Slice-past-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "227d26d1d569ee6f8b6b0004cc1100b42cefaaed2c453d22d53a0223eb89b5cb",
+      "output": null
+    },
+    {
+      "label": "range-Slice-past-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Slice-past-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "68a717637e8db2e732863977275e53ed67d9b77515a8c8326a2dd8eb84108625",
+      "output": null
+    },
+    {
+      "label": "range-Slice-from-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Slice-from-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "1a2738717f67005a46a1c2766595e3c8a0bdd3e1ec267ee93785ccbb5c557fcb",
+      "output": null
+    },
+    {
+      "label": "range-Slice-from-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Slice-from-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "13dba203b47c8e646572d9a03216760ef89e41a6a67adaf841301c8ae38c50ba",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlySlice-reversed-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlySlice-reversed.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "7bc0be3c8e82a97050cef5ba1cb5f9fbdc51e3807766de38c561e3cd16272184",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlySlice-reversed-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlySlice-reversed.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "621be09b79312365cb3e69c6e121dbddc74354194dc262bf28022617c7bfb6af",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlySlice-past-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlySlice-past-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "6f2cfa6e2e226205485fe4866016408f2509f94415c98e4d516983d81084fe8a",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlySlice-past-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlySlice-past-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "e296a0c1456f474f840b42a86dee3e2fbe267c0f03fbcf40bb166e0bad133354",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlySlice-from-end-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-ReadOnlySlice-from-end.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "f2ac4a4e78abbb5e41fe6dce99782a2415757452a6350c7f202f726a609941c4",
+      "output": null
+    },
+    {
+      "label": "range-ReadOnlySlice-from-end-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-ReadOnlySlice-from-end.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "4c1236f571437d7dda1591c239a6d22f4ac6a7c6312b56a7682d83b5286e76b4",
+      "output": null
+    },
+    {
+      "label": "range-Range-negative-length-raven",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "29e2a7068463902b88b7193b4d7317827342baca5b54fdd0e5c413160bb2f0db",
+      "output": null
+    },
+    {
+      "label": "range-Range-negative-length-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "logSha256": "5c7455b75ecafc02b632acf63814a3b921d755627b8c761b2d142de8742abbef",
+      "output": null
+    },
+    {
+      "label": "range-Range-negative-length-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "795e01157df4b649750e534a6445f3c58d6dbb11c5e0d16467e182e4db00f2ab",
+      "output": null
+    },
+    {
+      "label": "range-Range-negative-length-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length",
+        "-DNO_ARENA"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-Range-negative-length-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length"
+      ],
+      "exitCode": 0,
+      "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+      "output": "memory: status=8 result=-1 cleanup=ok\n"
+    },
+    {
+      "label": "range-no-arena-jit-link",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DEXPECT_STATUS=8",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-no-arena.dylib",
+        "-DNO_ARENA"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": null
+    },
+    {
+      "label": "range-Range-negative-length-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget",
+        "--bind-user-fault"
+      ],
+      "exitCode": 0,
+      "logSha256": "bc49f2343cd0f9e7f66db50293cc9967e6a4c6f1c9c8da3dfea49cd0b6baadfc",
+      "output": null
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 1.329991958,
+    "guestExitCode": 0,
+    "invocationSeconds": 0.000274459,
+    "metadataLoadSeconds": 0.315936416,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 6.221720958
+  },
+  "rangeCases": [
+    {
+      "kind": "Memory",
+      "case": "reversed",
+      "expression": "memory[2..1]",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "imageSha256": "82f2a347e295a5e4db78c9647c471192dfe2e8c4c6a0b95ce7191865a579dd3b",
+      "sourceSha256": "f239074ac6feb6b1efa481af3c8ff55927e612f351aeb44550a0320d623c6160"
+    },
+    {
+      "kind": "Memory",
+      "case": "past-end",
+      "expression": "memory.Slice(0..3)",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "imageSha256": "4428eed1ef1a89072664131c64ed39fe35acf405f1b76cd1853692a3aabfad65",
+      "sourceSha256": "dfb3221785bb9030db359705ce983597f7bfdec3fed386e40c9200e9bd433e2b"
+    },
+    {
+      "kind": "Memory",
+      "case": "from-end",
+      "expression": "memory[^3..]",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "imageSha256": "12c89bff896fc3f0d23f485417e416ee23a23ebbedd0c22408d9f058bc0bcf2b",
+      "sourceSha256": "f577692df67e9a41d3d0a7c46ca83cb85e97cf0ecebc1b2b5a64aa7f229635c1"
+    },
+    {
+      "kind": "ReadOnlyMemory",
+      "case": "reversed",
+      "expression": "memory[2..1]",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "imageSha256": "5a8313078292b9c3f0d559ee9f2da1c99bb26062ce875352812c7c520111b837",
+      "sourceSha256": "d1b05384a79234b9e545a1cf60b48a4c03b6fd6c6104a5d83250f38f8d26f7a3"
+    },
+    {
+      "kind": "ReadOnlyMemory",
+      "case": "past-end",
+      "expression": "memory.Slice(0..3)",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "imageSha256": "58b56e509b360838b899999d1f42968d4820ca78b61aab9459d75f93c6f8a8f0",
+      "sourceSha256": "085a97af26fd72eefe713f5df847b5caa8de82bc3487e9b05766508119727098"
+    },
+    {
+      "kind": "ReadOnlyMemory",
+      "case": "from-end",
+      "expression": "memory[^3..]",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "imageSha256": "612c4bdaa61356e7a1abe407ca245c5dc71d0032b800c53181be376b9921ba34",
+      "sourceSha256": "e13054a1400096a3a13dff2527468801b42ed1ff5c3423169dcc6259b0f686dd"
+    },
+    {
+      "kind": "Slice",
+      "case": "reversed",
+      "expression": "memory[2..1]",
+      "execution": "interpreter",
+      "fault": "IndexOutOfRange",
+      "imageSha256": "18067f9c7620f80bb3b3c2b72870f41567320de5407ba4a0235cc104dc6e49f5"
+    },
+    {
+      "kind": "Slice",
+      "case": "past-end",
+      "expression": "memory.Slice(0..3)",
+      "execution": "interpreter",
+      "fault": "IndexOutOfRange",
+      "imageSha256": "104da74e22b7d9d4e048396889c39ea81deade8bd48a6ee9bf9db6f584c09e8b"
+    },
+    {
+      "kind": "Slice",
+      "case": "from-end",
+      "expression": "memory[^3..]",
+      "execution": "interpreter",
+      "fault": "IndexOutOfRange",
+      "imageSha256": "1fe98426aeb67d87789775c3d6a8e123f94a08296fc4ac75de35f468fc57ad60"
+    },
+    {
+      "kind": "ReadOnlySlice",
+      "case": "reversed",
+      "expression": "memory[2..1]",
+      "execution": "interpreter",
+      "fault": "IndexOutOfRange",
+      "imageSha256": "fb92c047f126124409e44cc6f34a32003af2661d79a8e97c6036a7272e607efc"
+    },
+    {
+      "kind": "ReadOnlySlice",
+      "case": "past-end",
+      "expression": "memory.Slice(0..3)",
+      "execution": "interpreter",
+      "fault": "IndexOutOfRange",
+      "imageSha256": "5e0dc7bcc2560e4ad111518283562f3682798311d86a1e44d412488f9d6340ef"
+    },
+    {
+      "kind": "ReadOnlySlice",
+      "case": "from-end",
+      "expression": "memory[^3..]",
+      "execution": "interpreter",
+      "fault": "IndexOutOfRange",
+      "imageSha256": "f3444b6a1aa3cd193937c7924c3f8bb20e6d9f572d1f2e883c4927830524a086"
+    },
+    {
+      "kind": "Range",
+      "case": "negative-length",
+      "expression": "Range.All.GetOffsetAndLength(-1).Item2",
+      "nativeStatus": 8,
+      "fault": "IndexOutOfRange",
+      "aotReferenceArena": false,
+      "jitReferenceArena": true,
+      "imageSha256": "50b39b8b81b3a2fadf2bbd4c066ced398080044f3811dd2bd27794a9b80e34ba",
+      "sourceSha256": "c2faacf0e83a87649536774b9ff3fd6fb1354e86ed0fddfaa56736535009f41a"
+    }
+  ],
+  "correctedHarnessAttempt": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+      "--closed-world",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+      "@entry",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length.o",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+      "--compile-system",
+      "--native-gc",
+      "--native-stack-budget",
+      "--bind-user-fault"
+    ],
+    "exitCode": 1,
+    "reason": "No-arena control accidentally retained native-gc/native-stack-budget flags, which require reference-arena. Corrected together; other twelve cases reused."
+  },
+  "correctedHostAttempt": {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "-DEXPECT_STATUS=8",
+      "-fsanitize=undefined,bounds",
+      "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length.o",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length"
+    ],
+    "exitCode": 1,
+    "reason": "No-arena execution exports diagnostic ABI v3, not arena ABI v4. Host now selects the matching declaration and JIT signature with NO_ARENA."
+  },
+  "managedJitProfileAttempt": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+      "--jit-managed",
+      "--closed-world",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+      "@entry",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-no-arena.dylib",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+      "--compile-system",
+      "--bind-user-fault"
+    ],
+    "exitCode": 1,
+    "reason": "Managed JIT requires GC/stack context. The no-arena control is qualified by AOT; JIT uses its supported GC/context profile."
+  },
+  "files": {
+    "docs/validation/memory-views-20261019/native-run.py": "0e81756b821daa4b1896e05cccbad6855d27017d57b7db2bf8ac6b2ff05c2313",
+    "docs/validation/memory-views-20261019/native-host.c": "af0ae46e7a50f407dedd0cb36a0ed5dbfdfd6fbff500d80240d59a0ebaff141f",
+    "docs/validation/memory-views-20261019/native-memory.rvn": "c4e6281b0a481b9f551b279795226c2e3224eaaf9fd3568c14499935b207c3a0",
+    "docs/validation/memory-views-20261019/bin/neoclr/NativeMemoryConsumer.dll": "67f25da8acf192ccba8c618d1fb647bf8fc6834c9d329a083472cf5bd1679046",
+    "target/debug/neoclr": "9b7b432f9d31e231c221c51de2957a265cde2b3c1e9400f61aac8113d55a71f1",
+    "target/debug/neoclr-codegen": "f1fa8d4cf6f57d936cb5f4d62f7cd288644efe3874f431b321ad374f9cb6265d",
+    "runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll": "1baab9696fb313278517a4449ae7abe78c2e6fae607577babd72b7ad3d09ab76",
+    "runtime/raven/src/System/Range.rvn": "6a2b6746df245788e867c0285a2dcea75c9dbb613d41867b5b23e82ecb47fae1",
+    "runtime/raven/native/RuntimeMemoryViewCalls.rvn": "25c39b178e15bda5510e9753b5e95692e32e0f3f60c4647d397ae5ed4eb77a95",
+    "src/memory_view_services.rs": "63a223cf58b31554f489a80cd5dd4c6d81b5e82dbc2e12b577eadb4feebddab1",
+    "runtime/codegen/src/memory_views.rs": "ace89f30379cdbfc4dc09fbc992ecbda8f637d63c9fc93f953b6f7af8406754d",
+    "runtime/codegen/src/values.rs": "3374e2db42c4cd4f1c3010690393c0ca30ddf7312d2c8212792431f7b0d70a85",
+    "target/memory-range-fault-library/build-evidence.json": "3a60a1342a37c89f25f67837df948aadadc78d417d8d98fa094178eee9f794d6",
+    "api-docs/native-reference.json": "3f3df3fecd5d99ebbb9fdb336d08a577bb11e0c6c5ddaa92401f77695cf249a5",
+    "api-docs/native-reference.zip": "32435c08886039611974b1ddfc010784b7956f682aec89c46ac619c31c2f407f",
+    "runtime/codegen/src/linking.rs": "9c32da724a1be20443d2f7d2a72e4fa459ccdf770a480be707e9bd2115a387b9"
+  },
+  "reusedArenaHostSourceSha256": "79318266cc734d00657acfb70e10ab3d9d6a635d1e9f2064896e2f454cb44529",
+  "focusedContracts": [
+    {
+      "command": "cargo test -p neoclr-codegen --lib memory_views",
+      "passed": 7
+    },
+    {
+      "command": "cargo test -p neoclr --lib bounds_tests",
+      "passed": 1
+    }
+  ],
+  "documentation": {
+    "fiveLibraryBuild": "target/memory-range-fault-library/build-evidence.json",
+    "render": "PASS production native metadata rendering with selected explicit core contract",
+    "snapshotTests": 4,
+    "referenceCheck": "passed",
+    "browserReview": "Range page renders IndexOutOfRange summary and TryGetOffsetAndLength Result contract; private service absent",
+    "websiteBuild": "not run (focused API rendering only)"
+  },
+  "validationNotes": [
+    "Existing twelve view cases reused while correcting only no-arena control options/host ABI.",
+    "No-arena AOT uses diagnostic ABI v3; managed JIT uses its required GC/context ABI v4.",
+    "Default arena host preprocessor branch is unchanged; NO_ARENA host branch was linked and executed separately.",
+    "Final context-gating change reuses unaffected thirteen-case engine behavior; final binary separately rejects missing context and passes supported AOT/JIT Range controls."
+  ],
+  "contextGuardValidation": {
+    "passed": true,
+    "commands": [
+      {
+        "label": "context-reject",
+        "command": [
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+          "--closed-world",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+          "@entry",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-no-diagnostic-context.o",
+          "--system",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+          "--object-root",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+          "--compile-system"
+        ],
+        "exitCode": 1,
+        "logSha256": "13f032c463cce37466bb8b5a2f9e5e60338a6ffc2622fbf9bde6ac6409662f62",
+        "output": "neoclr-codegen: neoCLR.Runtime.ViewBoundsFault: unsupported value member contract\n"
+      },
+      {
+        "label": "context-aot",
+        "command": [
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+          "--closed-world",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+          "@entry",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/context-control.o",
+          "--system",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+          "--object-root",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+          "--compile-system",
+          "--bind-user-fault"
+        ],
+        "exitCode": 0,
+        "logSha256": "795e01157df4b649750e534a6445f3c58d6dbb11c5e0d16467e182e4db00f2ab",
+        "output": null
+      },
+      {
+        "label": "context-link",
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "-isysroot",
+          "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "-arch",
+          "arm64",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-DNEOCLR_NATIVE_GC",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+          "-DEXPECT_STATUS=8",
+          "-fsanitize=undefined,bounds",
+          "/Users/robert/Projects/neoclr/docs/validation/memory-views-20261019/native-host.c",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/context-control.o",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+          "-o",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length",
+          "-DNO_ARENA"
+        ],
+        "exitCode": 0,
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "output": null
+      },
+      {
+        "label": "context-execute",
+        "command": [
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-Range-negative-length"
+        ],
+        "exitCode": 0,
+        "logSha256": "361a2039dfc073ffc206fd1b74af65ac94e8e620cccf98555df597cab5457872",
+        "output": "memory: status=8 result=-1 cleanup=ok\n"
+      },
+      {
+        "label": "context-jit",
+        "command": [
+          "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+          "--jit-managed",
+          "--closed-world",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/bin/neoclr/range-Range-negative-length.dll",
+          "@entry",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/range-fault.dylib",
+          "--system",
+          "/Users/robert/Projects/neoclr/target/native-byte-memory-consistent-bounds/System.neoil",
+          "--object-root",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll",
+          "--compile-system",
+          "--reference-arena",
+          "--native-gc",
+          "--native-stack-budget",
+          "--bind-user-fault"
+        ],
+        "exitCode": 0,
+        "logSha256": "a18f4c61095ffc6ec899b31967ff54387ab77f0f2130828acb5c3d0fda4cd13c",
+        "output": null
+      }
+    ],
+    "codegenSha256": "f1fa8d4cf6f57d936cb5f4d62f7cd288644efe3874f431b321ad374f9cb6265d",
+    "linkingSourceSha256": "9c32da724a1be20443d2f7d2a72e4fa459ccdf770a480be707e9bd2115a387b9"
+  },
+  "engineCaseCodegenSha256": "c474620800f0102c1e18379ae1cc395ffca5bedaba1bd8e83050e62f0ce5ea5e"
+}

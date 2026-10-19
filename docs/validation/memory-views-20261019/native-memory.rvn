@@ -1,5 +1,6 @@
 import System.*
 import System.Runtime.*
+import System.Result.*
 
 class ByteBufferOwner {
     val Data: Memory<byte>
@@ -88,6 +89,14 @@ func Main() -> int {
     }
     if empty[..].Length != 0 || readonlyEmpty[^0..^0].Length != 0 {
         return 12
+    }
+    if Range(2, 1).TryGetOffsetAndLength(2) is Error(_) {
+    } else {
+        return 13
+    }
+    if Range.All.TryGetOffsetAndLength(-1) is Error(_) {
+    } else {
+        return 14
     }
     return 0
 }

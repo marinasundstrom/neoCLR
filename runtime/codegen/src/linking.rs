@@ -638,8 +638,14 @@ pub fn prepare(
             .unwrap()
             .extend(rows);
     }
-    if compile_system && context.is_some_and(|c| c.reference_arena) {
-        let rows = super::memory_views::bind(&mut selected, &report)?;
+    // These replacements require diagnostic status propagation. Without either
+    // context-enabling contract, leave InternalCalls unbound and fail closed.
+    if compile_system && context.is_some_and(|c| c.reference_arena || c.bind_user_fault) {
+        let rows = super::memory_views::bind(
+            &mut selected,
+            &report,
+            context.is_some_and(|c| c.reference_arena),
+        )?;
         report["nativeBindings"]
             .as_array_mut()
             .unwrap()

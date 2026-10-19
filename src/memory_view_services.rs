@@ -7,6 +7,7 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub(crate) enum Operation {
+    BoundsFault,
     Create(Kind, Type),
     Length,
     Get,
@@ -39,6 +40,30 @@ pub(crate) fn bind(function: &Function) -> Option<Result<Operation, Fault>> {
     let name = function.name.strip_prefix("neoCLR.Runtime.View")?;
     Some((|| {
         let invalid = || Fault::new("invalid memory-view InternalCall signature");
+        if name == "BoundsFault" {
+            if !function.parameters.is_empty()
+                || function.returns != Type::Void
+                || !function.no_result
+                || !function.generic_parameters.is_empty()
+                || !function.generic_arguments.is_empty()
+                || !function.generic_constraints.is_empty()
+                || function.receiver_byref
+                || function.receiver_readonly
+                || !function.body.is_empty()
+                || !function.locals.is_empty()
+                || function.pinvoke.is_some()
+                || function.is_virtual
+                || function.is_override
+                || function.is_abstract
+                || !function.interface_implementations.is_empty()
+                || !function.out_parameters.is_empty()
+                || !function.out_when_true.is_empty()
+                || !function.readonly_parameters.is_empty()
+            {
+                return Err(invalid());
+            }
+            return Ok(Operation::BoundsFault);
+        }
         if name == "Utf8" {
             if !function.generic_parameters.is_empty()
                 || !function.generic_arguments.is_empty()
@@ -133,6 +158,7 @@ pub(crate) fn bind(function: &Function) -> Option<Result<Operation, Fault>> {
 impl Operation {
     pub(crate) fn invoke(&self, args: Vec<Value>, heap: &ManagedHeap) -> Result<Value, Fault> {
         let result = match (self, args.as_slice()) {
+            (Self::BoundsFault, []) => return Err(out_of_range()),
             (Self::Utf8, [Value::String(text)]) => MemoryView::utf8(Utf8Slice::new(text.clone())),
             (Self::Create(kind, element), [array, bounds @ ..]) => {
                 let reference = match array {
@@ -220,5 +246,29 @@ fn index(value: &Value) -> Result<usize, Fault> {
     match value {
         Value::Int32(value) => usize::try_from(*value).map_err(|_| out_of_range()),
         _ => Err(Fault::new("memory view index requires Int32")),
+    }
+}
+
+#[cfg(test)]
+mod bounds_tests {
+    use super::*;
+    #[test]
+    fn bounds_fault_requires_exact_nonreturning_service_contract() {
+        let f: Function = serde_json::from_value(serde_json::json!({
+            "name":"neoCLR.Runtime.ViewBoundsFault", "parameters":[],
+            "returns":Type::Void, "no_result":true, "impl_flags":4096
+        }))
+        .unwrap();
+        assert!(matches!(bind(&f).unwrap().unwrap(), Operation::BoundsFault));
+        for variant in 0..4 {
+            let mut bad = f.clone();
+            match variant {
+                0 => bad.no_result = false,
+                1 => bad.parameters.push(Type::Int32),
+                2 => bad.returns = Type::Int32,
+                _ => bad.generic_parameters.push(Some("T".into())),
+            }
+            assert!(bind(&bad).unwrap().is_err());
+        }
     }
 }

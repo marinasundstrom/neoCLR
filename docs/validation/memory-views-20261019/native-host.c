@@ -6,12 +6,22 @@
 #define EXPECT_STATUS 0
 #endif
 extern int neoclr_aot_render_fault(FILE *, const neoclr_aot_fault *);
+#ifdef NO_ARENA
+#define MEMORY_ENTRY neoclr_entry_v3
+typedef int32_t (*entry_fn)(int32_t, int32_t *, neoclr_aot_fault *);
+#else
+#define MEMORY_ENTRY neoclr_entry_v4
 typedef int32_t (*entry_fn)(int32_t, int32_t *, neoclr_aot_context *);
+#endif
 static int32_t check(entry_fn entry) {
     uint64_t heap[8192] = {0};
     neoclr_aot_context context = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
     int32_t result = -1;
+    #ifdef NO_ARENA
+    int32_t status = entry(0, &result, &context.fault);
+#else
     int32_t status = entry(0, &result, &context);
+#endif
     int ok = status == EXPECT_STATUS && context.fault.code == EXPECT_STATUS;
     ok = ok && result == (EXPECT_STATUS ? -1 : 0);
     if (!ok) neoclr_aot_render_fault(stderr, &context.fault);
@@ -28,5 +38,5 @@ int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, co
     return check(callable);
 }
 #else
-int main(void) { return check(neoclr_entry_v4); }
+int main(void) { return check(MEMORY_ENTRY); }
 #endif
