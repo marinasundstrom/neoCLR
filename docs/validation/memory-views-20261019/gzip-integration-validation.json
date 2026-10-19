@@ -1,0 +1,234 @@
+{
+  "passed": true,
+  "date": "2026-10-19",
+  "scope": "Internal gzip borrowed inputs and retained readonly memory; no public stream signature migration",
+  "sourceBaseline": "1e19d180f360a87bcfc846c051fc46e792aacae9",
+  "compilerRevision": "dcf7ac41f2e0a00b2fbfc1c766700bf3b323a89e",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "runtimeSuite": {
+    "passed": true,
+    "modes": [
+      "native",
+      "jit"
+    ],
+    "jitHostSha256": "7e916c367005ea15f36576ef9722fbf5e12144579632d8d4f98e67edfae8f34a",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "cases": [
+      {
+        "suite": "gzip",
+        "mode": "native",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 1.637,
+        "stdout": "PASS Gzip decodes independent stored fixed dynamic and optional-header members\nPASS Gzip validates checksums truncation headers and quotas before output\nPASS Gzip incrementally compresses repeated writes and finishes once\nPASS Gzip empty finish ownership ranges modes and cancellation are explicit\nPASS Gzip awaits output and poisons interrupted streams without replay\nPASS Gzip handles pending fragmented input and preserves text-reader errors\nPASS Gzip borrows only the selected source window across compression blocks\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "gzip",
+        "mode": "jit",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 45.949,
+        "stdout": "PASS Gzip decodes independent stored fixed dynamic and optional-header members\nPASS Gzip validates checksums truncation headers and quotas before output\nPASS Gzip incrementally compresses repeated writes and finishes once\nPASS Gzip empty finish ownership ranges modes and cancellation are explicit\nPASS Gzip awaits output and poisons interrupted streams without replay\nPASS Gzip handles pending fragmented input and preserves text-reader errors\nPASS Gzip borrows only the selected source window across compression blocks\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+        "stderr": ""
+      }
+    ],
+    "phases": [
+      {
+        "suite": "gzip",
+        "phase": "discovery",
+        "elapsedSeconds": 12.463961,
+        "details": {
+          "sourceCompilationSeconds": 5.649932,
+          "metadataDiscoveryIncludingToolBuildSeconds": 6.811045
+        }
+      },
+      {
+        "suite": "gzip",
+        "phase": "native-project-build",
+        "elapsedSeconds": 52.824089,
+        "commands": [
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007382
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007132
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.010999
+          },
+          {
+            "phase": "source-compilation",
+            "elapsedSeconds": 5.487004
+          },
+          {
+            "phase": "native-compilation",
+            "elapsedSeconds": 45.973088
+          },
+          {
+            "phase": "host-compile-link",
+            "elapsedSeconds": 0.785806
+          },
+          {
+            "phase": "dependency-check",
+            "elapsedSeconds": 0.017732
+          }
+        ]
+      },
+      {
+        "suite": "gzip",
+        "phase": "registration-verification",
+        "elapsedSeconds": 2.546082
+      }
+    ],
+    "executionRepetitions": 1,
+    "bundleManifestSha256": "23b73b819f8a384ded204518b4dc8735a9e3e017742627b99f1cdacbc8c83e65",
+    "aotSha256": "c18cbea44fb232e3c7b481caa7c1c18c7cef3c40b2cafebeeb6ffee13995fbbd",
+    "interpreterSha256": "5aef544f1794d46dd3950f3a3feb99cfde78774af64b08cd77ea05c01fa63d9e",
+    "suites": [
+      "gzip"
+    ],
+    "gzipBufferBudgets": {
+      "nativeByteArrayElements": 65536,
+      "interpretedLiveArrayElements": 1048576,
+      "interpretedLogicalArrayBytes": 268435456
+    },
+    "totalElapsedSeconds": 115.576406
+  },
+  "interpreterSelected": [
+    {
+      "filter": "pending fragmented",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/gzip-view-final-tests/gzip-build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "268435456",
+        "--execution",
+        "interpreter",
+        "--",
+        "--filter",
+        "pending fragmented"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Gzip handles pending fragmented input and preserves text-reader errors\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": "",
+      "elapsedSeconds": 4.971665375
+    },
+    {
+      "filter": "selected source window",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/gzip-view-final-tests/gzip-build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/gzip-view-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "268435456",
+        "--execution",
+        "interpreter",
+        "--",
+        "--filter",
+        "selected source window"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Gzip borrows only the selected source window across compression blocks\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": "",
+      "elapsedSeconds": 56.569882957999994
+    }
+  ],
+  "sourceHashes": {
+    "runtime/raven/src/System/IO/Compression/GZipDecoder.rvn": "7002da62a465d596763f85f43e56958dbeb35867b26eb528eb01abb1a7fcbce3",
+    "runtime/raven/src/System/IO/Compression/GZipEncoder.rvn": "b388f390f635521349d4990b3b3275dda7b831ae2184a562cd8687abbb3fc1f2",
+    "runtime/raven/src/System/IO/Compression/GZipStream.rvn": "acb6d51660bd006b7104afed53f8d6060e3ebc9c513380d46bb4a904702a9d0d",
+    "runtime/raven/tests/gzip/Tests.rvn": "13a226b358b624875f3abdc12d665111640963bbca91bb4a5bee98a96c071e54",
+    "scripts/test-runtime-library.py": "696a865809eee442efb59bed9b5928c6fb2bc9bb6e7837a817f57fc4b07cfde6"
+  },
+  "libraryArtifacts": {
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Runtime.dll": "80a55d1fb6ceba2522dd49e901ce09fdc4d92ab603f2569d0895262330eb888f",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Data.dll": "5c83d5cca2120e462ba68798d91958cb1695d6f8687a7732a84bfb13f7d8d6b1",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Networking.dll": "b99fede6fbb97a2f098b8d75625e30f8e35b28806c19a36fc2d18107ce65df55",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Web.dll": "5c42668ab2d7b07eb202f8e774cf6c385befc0a1c48069be654d80d58c8f1ae3",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Data.PostgreSql.dll": "0f2037c2e23cec388e790d62d23e57f3dd082c228bd1b2bb5e3605da39bf5525",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/ownership.json": "327afe52fb83486943af79d21b01a92e1a138ad448e68626e0dcd715e293e6c6",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/NeoCLR.ClassLibrary.props": "62bfd4d69dccb03fe380399d781a0fec5e1ce9508b33954035b66fb38ec5e14a",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/RuntimeAwait.rvn": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/RuntimeGenerator.rvn": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Runtime.xml": "1cc6861fd1a67807a4e07422dc4a3b99128ea4fbec81a436d7bbcb8ce5204e3e",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Data.xml": "bf1ba0f7aa624401d39db6b1690919f2435d2bd22322703959cb2d1d31e980e4",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Networking.xml": "7be6be5e4d96f6d28a6ae1a8024eeba76ae8610ebb6edb1065e526577c928b01",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Web.xml": "94909a6bf6656da1ad1f64dbdbb730836bbb928d3bd776b5b2165c274eccabf1",
+    "/Users/robert/Projects/neoclr/target/gzip-view-final-libraries/System.Data.PostgreSql.xml": "1c7d9c5709daedfae2428e13554c17e034f3410b45902c1110143a9ed8265bb6"
+  },
+  "fullBuildEvidenceSha256": "023f185261ff98a541e49a3bc00a27fca4a06410c03b5c8bcac1df2f9c365ed6",
+  "apiReference": {
+    "publicSignaturesChanged": false,
+    "regeneratedLegacyAssemblyChanged": false,
+    "sourceFingerprintsRefreshed": true,
+    "check": "Checked RavenDoc reference assembly and source fingerprints\n",
+    "nativeSnapshot": "Unchanged: public signatures and comments are unchanged; only internal implementations changed."
+  },
+  "interopRerun": {
+    "passed": false,
+    "stage": "native source emission",
+    "command": "python3 docs/experiments/gzip/verify.py --bundle target/gzip-view-bundle/bundle --output target/gzip-view-interop",
+    "diagnostic": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/docs/experiments/gzip/verify.py\", line 22, in <module>\n    run(['python3', 'scripts/build-native-project.py', '--project', Path(__file__).with_name('Interop.rvnproj'), '--bundle', a.bundle.resolve(), '--aot', a.bundle.resolve()/'bin/neoclr-codegen', '--output', out/'native', '--profile', 'http', '--http-heap-bytes', '33554432'])\n  File \"/Users/robert/Projects/neoclr/docs/experiments/gzip/verify.py\", line 20, in run\n    raise RuntimeError(result.stdout + result.stderr)\nRuntimeError: native build: /Users/robert/Projects/neoclr/docs/experiments/gzip/Interop.rvn(44,27): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nerror NEOMETA003: Native metadata encoding failed: GZipInterop.$function$1: evaluation stack type mismatch or underflow at 106 (return): expected BodyValueType { Primitive = Void, Class = , ArrayElement = , NativeLength = False, MethodParameter = , AddressedLocal = , TypeParameter = , GenericInstance = , ImportedType = System.Concurrency.Tasks.TaskOutcome`1<Int32>, ByReferenceElement = , AddressedParameter = , ConstructionReceiver = False, Function = , PointerElement = , Composition = , Tuple =  }, actual BodyValueType { Primitive = Int32, Class = , ArrayElement = , NativeLength = False, MethodParameter = , AddressedLocal = , TypeParameter = , GenericInstance = , ImportedType = , ByReferenceElement = , AddressedParameter = , ConstructionReceiver = False, Function = , PointerElement = , Composition = , Tuple =  }.\n\n\n",
+    "note": "The unchanged async sample failed with NEOMETA003. No new Python/.NET output interoperability claim; prior evidence is historical. Compiler repair remains separate."
+  },
+  "limitations": [
+    "macOS ARM64 only",
+    "Full interpreter suite not rerun: existing documented 600-second timeout; two selected cases pass",
+    "No public stream/socket contract changes",
+    "No native I/O completion ownership qualification",
+    "No performance claim",
+    "No full website build"
+  ],
+  "priorAttempts": [
+    "Initial new test used a comprehension variable named index followed by a lexical index declaration; RAV0174 prevented compilation. Use a distinct sample binding.",
+    "Reference generation initially failed because its output directory did not exist; created directory and regenerated successfully.",
+    "First library build preceded the final header-CRC window edit; discarded for qualification and rebuilt the complete cohort."
+  ],
+  "commands": [
+    "python3 scripts/build-native-class-library.py --compiler /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll --runtime target/release/neoclr --output target/gzip-view-final-libraries --compiler-revision dcf7ac41f --with-postgresql",
+    "python3 scripts/prepare-jit-bundle.py --bundle target/release-final-inline-bundle-20261014/bundle --runtime target/release/neoclr --jit-compiler target/debug/neoclr-codegen --host-recipe docs/experiments/runtime-async/native-validation.json --libraries target/gzip-view-final-libraries --compiler-directory /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0 --output target/gzip-view-bundle",
+    "python3 scripts/test-runtime-library.py --bundle target/gzip-view-bundle/bundle --output target/gzip-view-final-tests --suite gzip --mode native --mode jit"
+  ]
+}

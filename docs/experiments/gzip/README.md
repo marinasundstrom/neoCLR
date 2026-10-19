@@ -32,3 +32,11 @@ Local qualification (2026-10-12): six groups pass in both AOT and JIT. The selec
 interpreter test `--filter "pending fragmented"` passes; the full suite exceeds its
 600-second allowance. `--mode interpreter` is available for continued qualification,
 but full interpreter coverage is not claimed. See the retained contract evidence.
+
+
+2026-10-19 rerun: the unchanged Interop.rvn consumer currently fails native
+emission with NEOMETA003 (an Int32 return where TaskOutcome<Int32> is expected).
+No new external-output interoperability result is claimed. The separate updated
+gzip contract suite passes seven groups in AOT/JIT and two selected interpreter
+cases after the internal memory-view migration. See
+[retained evidence](../../validation/memory-views-20261019/gzip-integration-validation.json).

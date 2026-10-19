@@ -8,24 +8,25 @@ import System.Runtime.CompilerServices.*
 
 // A bounded, strict RFC 1951/1952 decoder. No output is exposed before validation.
 internal class GZipDecoder {
-    private var source: byte[]
+    private val source: ReadOnlyMemory<byte>
     private var position: int = 0
     private var bits: int = 0
     private var bitCount: int = 0
     private var invalid: bool = false
     private var output: List<byte> = ArrayList<byte>()
 
-    init(source: byte[]) {
+    init(source: ReadOnlyMemory<byte>) {
         self.source = source
     }
 
     private func Read(count: int) -> int {
+        let window: ReadOnlySlice<byte> = source
         while bitCount < count {
             if position >= source.Length {
                 invalid = true
                 return 0
             }
-            bits = bits | ((int)source[position] << bitCount)
+            bits = bits | ((int)window[position] << bitCount)
             position += 1
             bitCount += 8
         }
@@ -110,12 +111,7 @@ internal class GZipDecoder {
                 flag = flag * 2
             }
             if (flags & 2) != 0 {
-                var headerCrc = -1
-                var index = headerStart
-                while index < position {
-                    headerCrc = GZipEncoder.UpdateCrc(headerCrc, (int)source[index])
-                    index += 1
-                }
+                let headerCrc = GZipEncoder.AccumulateCrc(-1, source.Slice(headerStart, position - headerStart))
                 if Read(16) != ((headerCrc ^ -1) & 65535) {
                     invalid = true
                 }

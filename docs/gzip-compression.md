@@ -127,3 +127,31 @@ this gap rather than inferring interpreter coverage from native results. See
 [execution evidence](../runtime/raven/tests/gzip-validation.json). Aggregate reference
 fingerprints, native type/member rendering and both native snapshot unit checks pass.
 No full website build or publication was performed.
+
+
+## Memory-view integration (development, 2026-10-19)
+
+The synchronous encoder and CRC accumulation now borrow ReadOnlySlice<byte>.
+The write operation retains a bounded ReadOnlyMemory<byte> across output awaits,
+then passes each block to those helpers. The decoder retains a readonly memory
+descriptor and borrows slices only within synchronous reads. Produced bytes and
+coding tables stay owned. This preserves .NET's distinction between borrowed
+synchronous input and memory retained by async operations; no compatibility-only
+overloads or conversion helpers are added.
+
+The public GZipStream and InputStream/OutputStream signatures remain unchanged
+until their shared service migration. Existing invalid-range precedence, quotas,
+CRC/framing and partial-output semantics still apply. Decoder input buffering is
+unchanged; this is not a transport zero-copy or performance claim.
+
+[Current validation](validation/memory-views-20261019/gzip-integration-validation.json):
+seven contract groups pass in each of AOT/JIT, including a nonzero-offset window
+crossing the 16384-byte compression block boundary with source/destination
+sentinels. Selected interpreter pending-input/cancellation and block-window tests
+also pass. Independent stored/fixed/dynamic/header fixtures remain covered. The
+full interpreter suite is not rerun; its earlier timeout remains open. The unchanged
+external interoperability sample currently fails native emission with NEOMETA003
+(return type mismatch in an async function); its earlier Python/.NET comparison
+is historical evidence, not a new successful rerun. The reference assembly is
+unchanged after regeneration; its source fingerprints are refreshed. Public API
+rendering is unchanged. No website build or publication was performed.

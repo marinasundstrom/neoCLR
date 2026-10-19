@@ -45,7 +45,8 @@ internal class GZipEncoder {
         }
     }
 
-    func Encode(source: byte[], offset: int, count: int) -> byte[] {
+    func Encode(source: ReadOnlySlice<byte>) -> byte[] {
+        let count = source.Length
         let last = CheckedStorage.Reserve<int>(4096)
         var index = 0
         while index < last.Length {
@@ -59,11 +60,11 @@ internal class GZipEncoder {
             var length = 0
             var distance = 0
             if index + 2 < count {
-                let hash = (((int)source[offset + index] * 251 + (int)source[offset + index + 1]) * 251 + (int)source[offset + index + 2]) & 4095
+                let hash = (((int)source[index] * 251 + (int)source[index + 1]) * 251 + (int)source[index + 2]) & 4095
                 let previous = last[hash]
                 last[hash] = index
                 if previous >= 0 && index - previous <= 32768 {
-                    while length < 258 && index + length < count && source[offset + previous + length] == source[offset + index + length] {
+                    while length < 258 && index + length < count && source[previous + length] == source[index + length] {
                         length += 1
                     }
                     distance = index - previous
@@ -96,7 +97,7 @@ internal class GZipEncoder {
                 Put(distance - baseDistance, extra)
                 index += length
             } else {
-                Symbol((int)source[offset + index])
+                Symbol((int)source[index])
                 index += 1
             }
         }
@@ -111,6 +112,16 @@ internal class GZipEncoder {
         index = 0
         while index < bytes.Count {
             result[index] = bytes[index]
+            index += 1
+        }
+        return result
+    }
+
+    static func AccumulateCrc(crc: int, source: ReadOnlySlice<byte>) -> int {
+        var result = crc
+        var index = 0
+        while index < source.Length {
+            result = UpdateCrc(result, (int)source[index])
             index += 1
         }
         return result

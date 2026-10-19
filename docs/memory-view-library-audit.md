@@ -44,8 +44,8 @@ remove a copy or establish native support.
 | `Text/Decoder.rvn`, `Text/Encodings.rvn` | Implemented: Decode(ReadOnlySlice<byte>, final) | Synchronous input borrow; carry bytes must still be copied into owned decoder state |
 | `Text/Encoder.rvn`, `Text/Encodings.rvn` | Implemented: Drain(Slice<byte>) | Writable synchronous destination; retain byte-count/progress and short-output semantics |
 | `Security/Cryptography/{SHA256,HMACSHA256,RandomNumberGenerator}.rvn` | Migrated: ReadOnlySlice inputs/key/tag; Slice hash/random destinations | Inputs not retained; preserve overlapping input/output, unchanged short destination and trailing bytes |
-| `IO/Compression/GZipEncoder.rvn` | ReadOnlySlice input, owned byte[] output | Synchronous encoder consumes input; result and coding tables own storage |
-| `IO/Compression/GZipDecoder.rvn` | Retained source stays array or ReadOnlyMemory; local decode helpers may use slices | Decoder keeps input in a field; tree tables and produced output remain owned |
+| `IO/Compression/GZipEncoder.rvn` | Migrated: ReadOnlySlice input and CRC windows; owned byte[] output | Synchronous encoder consumes input; result and coding tables own storage |
+| `IO/Compression/GZipDecoder.rvn` | Migrated: ReadOnlyMemory source field and synchronous readonly slice access | Decoder keeps input in a field; tree tables and produced output remain owned |
 | `IO/{InputStream,OutputStream}.rvn` | Memory<byte> read destination; ReadOnlyMemory<byte> write source | Methods return Task and can retain input until settlement; slices cannot cross suspension |
 | `IO/{MemoryStream,FileInputStream,FileOutputStream}.rvn`, `Console/Streams.rvn` | Implement Memory-based async contracts; Slice/ReadOnlySlice for synchronous cores where applicable | Even immediately completing implementations must satisfy the asynchronous interface contract |
 | `IO/{StreamReader,StreamWriter}.rvn` | Keep scratch array ownership; pass Memory to I/O and slices to codec calls | Reusable buffers must outlive awaits; decoder state must not borrow scratch after reuse |
@@ -166,3 +166,22 @@ and local-copy instance receivers for native async entry; explicit progress prom
 separate the two suspension phases. This closes the managed owner-retention gate
 for byte windows, not native I/O retention or completion-root release. Step 3 above
 remains the next API migration; no production stream/socket signature changes here.
+
+### Gzip implementation windows (2026-10-19)
+
+The encoder and CRC helper consume ReadOnlySlice<byte>. GZipStream retains a
+ReadOnlyMemory<byte> window across output awaits, then borrows each bounded block
+for synchronous encoding and CRC accumulation. The decoder stores ReadOnlyMemory
+and borrows locally for byte access; header CRC uses a checked window. Compression
+output, decoded output and code tables remain owned storage. This follows the
+same .NET borrowed-versus-retained distinction already documented above.
+
+This is an internal migration, with no new public overloads or AsSlice helpers.
+The shared InputStream/OutputStream range signatures still await migration together
+with file/console/socket services. The change neither removes the decoder's input
+buffering nor claims zero-copy transport or improved throughput.
+
+[Validation](validation/memory-views-20261019/gzip-integration-validation.json):
+seven gzip groups pass in AOT and JIT, and two focused interpreter cases pass.
+The independent output interoperability rerun is blocked by native emission of
+its unchanged async sample; the full interpreter suite retains its earlier timeout.

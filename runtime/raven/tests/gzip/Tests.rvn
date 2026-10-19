@@ -78,9 +78,7 @@ func BInvalid() -> Result<unit, TestFailure> {
     let original = Fixed()
     var length = 0
     while length < original.Length {
-        let Ok(truncated) = original.Slice(Range(0, length)) else {
-            return Error(TestFailure("Fixture slice", "Ok", "Error"))
-        }
+        let truncated = original[..length].ToArray()
         _ = Assert.True(CompletedValue(Reader(truncated).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Every truncation rejected")?
         length += 1
     }
@@ -204,4 +202,30 @@ func FInput() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(validText.ReadToEnd(32)) is Ok("abcabcabcabc"), "Compose gzip and text decoding")?
     let text = StreamReader(Reader(Trailing()))
     return Assert.True(CompletedValue(text.ReadToEnd(32)) is Error(TextReadError.InvalidData), "Preserve binary corruption through text decoding")
+}
+
+[Test("Gzip borrows only the selected source window across compression blocks")]
+func GWindows() -> Result<unit, TestFailure> {
+    let sink = MemoryStream()
+    let writer = GZipStream.CreateCompressor(sink, true)
+    // Cross the 16384-byte block boundary, excluding both source sentinels.
+    let data: byte[] = [for sample in 0..16403 => (byte)(sample % 251)]
+    data[0] = (byte)255
+    data[data.Length - 1] = (byte)254
+    _ = Assert.True(CompletedValue(writer.Write(data, 1, data.Length - 2)) is Ok, "Subwindow write")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Ok, "Finish selected input")?
+    _ = sink.Seek(0)
+    let reader = GZipStream.CreateDecompressor(sink)
+    let output: byte[] = [for unused in 0..16403 => (byte)253]
+    _ = Count(CompletedValue(reader.Read(output, 1, output.Length - 2)), data.Length - 2)?
+    var index = 1
+    while index < data.Length - 1 {
+        _ = Assert.Equal((int)data[index], (int)output[index])?
+        index += 1
+    }
+    _ = Assert.Equal(253, (int)output[0])?
+    _ = Assert.Equal(253, (int)output[output.Length - 1])?
+    _ = Assert.Equal(255, (int)data[0])?
+    _ = Assert.Equal(254, (int)data[data.Length - 1])?
+    return Count(CompletedValue(reader.Read(output, 0, 1)), 0)
 }

@@ -171,6 +171,8 @@ public class GZipStream : InputStream, OutputStream {
         if count == 0 {
             return Ok(())
         }
+        let memory: ReadOnlyMemory<byte> = buffer
+        let source = memory.Slice(offset, count)
         self.failed = true
         _ = (await self.Header(sink, cancellationToken))?
         var consumed = 0
@@ -179,12 +181,8 @@ public class GZipStream : InputStream, OutputStream {
             let length = if remaining > 16384 { 16384 } else {
                 remaining
             }
-            let compressed = GZipEncoder().Encode(buffer, offset + consumed, length)
-            var index = 0
-            while index < length {
-                self.crc = GZipEncoder.UpdateCrc(self.crc, (int)buffer[offset + consumed + index])
-                index += 1
-            }
+            let compressed = GZipEncoder().Encode(source.Slice(consumed, length))
+            self.crc = GZipEncoder.AccumulateCrc(self.crc, source.Slice(consumed, length))
             self.size = (self.size + (long)length) % 4294967296L
             _ = (await sink.Write(compressed, 0, compressed.Length, cancellationToken))?
             if self.closed {
