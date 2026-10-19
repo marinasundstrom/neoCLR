@@ -191,7 +191,9 @@ public class Task<T> : System.Runtime.CompilerServices.TaskAwaiter {
 
 public class Promise<T> {
     private field queue: TaskQueue
-    private field slot: ArrayList<T>
+    // Keep the array initialization marker so pending value results are not traced.
+    private var slot: T[]
+    private var hasResult: bool
     private field callbacks: ArrayList<() -> System.Void>?
     private field task: Task<T>
     private field cancelled: bool
@@ -199,7 +201,8 @@ public class Promise<T> {
     init() {
         queue = TaskQueue.Current
         cancelled = false
-        slot = ArrayList<T>(1)
+        slot = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+        hasResult = false
         callbacks = null
         task = Task<T>(self)
     }
@@ -207,7 +210,8 @@ public class Promise<T> {
     init(queue: TaskQueue) {
         self.queue = queue
         cancelled = false
-        slot = ArrayList<T>(1)
+        slot = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+        hasResult = false
         callbacks = null
         task = Task<T>(self)
     }
@@ -218,7 +222,8 @@ public class Promise<T> {
         if self.Completed() {
             return false
         }
-        slot.Add(value)
+        slot[0] = value
+        hasResult = true
         PostCallbacks()
         return true
     }
@@ -249,7 +254,7 @@ public class Promise<T> {
 
     internal func Cancelled() -> bool => cancelled
 
-    internal func Completed() -> bool => cancelled || slot.Count != 0
+    internal func Completed() -> bool => cancelled || hasResult
 
     internal func Read() -> T {
         if cancelled {

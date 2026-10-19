@@ -225,3 +225,9 @@ latency at 100 requests/sec, while tiny-response overload throughput is lower.
 The [matched workload results](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/memory-gc-20261019/README.md)
 retain misses, CPU/memory diagnostics and all trials. These plain-HTTP AOT results
 do not establish HTTPS or production maximum capacity.
+
+The development [Promise storage follow-up](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/promise-result-20261019/README.md)
+removes one allocation per Promise while retaining array-backed result storage.
+Matched local tests reduce CPU per completion, with variable bulk tail latency;
+this does not establish higher server capacity. A runtime completion bridge to
+avoid Promise wrappers in HTTP operations is under investigation.

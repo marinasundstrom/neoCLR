@@ -1,0 +1,192 @@
+import System.*
+import System.Concurrency.Tasks.*
+
+class Observer {
+    var Count: int = 0
+    var Order: int = 0
+    func First() {
+        Order = Order * 10 + 1
+        TaskQueue.Default.Post(self.Third)
+    }
+    func Second() {
+        Order = Order * 10 + 2
+    }
+    func Third() {
+        Order = Order * 10 + 3
+    }
+    func Hit() {
+        Count = Count + 1
+    }
+}
+
+func Require(condition: bool) {
+    if !condition {
+        System.Fail("Task completion contract failed")
+    }
+}
+
+func CheckSettlement() {
+    let queue = TaskQueue.Default
+    let observer = Observer()
+    // Explicit callbacks test deferred observation before and after settlement.
+    for index in 0..10 {
+        let completed = Promise<int>(queue)
+        let task = completed.Task
+        Require(completed.Complete(index))
+        Require(!completed.Complete(999))
+        Require(!completed.Cancel())
+        Require(task.GetResult() == index)
+        task.OnCompleted(observer.Hit)
+        Require(observer.Count == index * 4)
+        queue.Drain()
+        Require(observer.Count == index * 4 + 1)
+
+        let cancelled = Promise<int>(queue)
+        Require(cancelled.Cancel())
+        Require(!cancelled.Cancel())
+        Require(!cancelled.Complete(999))
+        Require(cancelled.Task.State == TaskState.Cancelled)
+        cancelled.Task.OnCompleted(observer.Hit)
+        Require(observer.Count == index * 4 + 1)
+        queue.Drain()
+
+        let pending = Promise<int>(queue)
+        pending.Task.OnCompleted(observer.Hit)
+        Require(pending.Complete(42))
+        Require(observer.Count == index * 4 + 2)
+        queue.Drain()
+        Require(pending.Task.GetResult() == 42)
+
+        let pendingCancel = Promise<int>(queue)
+        pendingCancel.Task.OnCompleted(observer.Hit)
+        Require(pendingCancel.Cancel())
+        Require(observer.Count == index * 4 + 3)
+        queue.Drain()
+        Require(observer.Count == index * 4 + 4)
+    }
+    let ordered = Promise<int>(queue)
+    ordered.Task.OnCompleted(observer.First)
+    ordered.Task.OnCompleted(observer.Second)
+    Require(ordered.Complete(42))
+    Require(observer.Order == 0)
+    queue.Drain()
+    Require(observer.Order == 123)
+    // Force queue growth, ring wraparound and reuse across empty drains.
+    for round in 0..3 {
+        observer.Order = 0
+        queue.Post(observer.First)
+        queue.Post(observer.Second)
+        for index in 0..7 {
+            queue.Post(observer.Hit)
+        }
+        Require(observer.Order == 0)
+        queue.Drain()
+        Require(observer.Order == 123)
+        Require(observer.Count == 40 + (round + 1) * 7)
+        queue.Drain()
+        Require(observer.Order == 123)
+    }
+    // Grow past the initial callback reservation for completion and cancellation.
+    for mode in 0..2 {
+        let many = Promise<int>(queue)
+        let before = observer.Count
+        for index in 0..9 {
+            many.Task.OnCompleted(observer.Hit)
+        }
+        if mode == 0 {
+            Require(many.Complete(42))
+        } else {
+            Require(many.Cancel())
+        }
+        Require(observer.Count == before)
+        queue.Drain()
+        Require(observer.Count == before + 9)
+        if mode == 0 {
+            Require(many.Task.GetResult() == 42)
+        } else {
+            Require(many.Task.State == TaskState.Cancelled)
+        }
+    }
+
+}
+
+class Payload {
+    var Value: int
+    init(value: int) {
+        Value = value
+    }
+}
+
+struct RetainedValue {
+    var Owner: Payload
+    var Number: int
+    init(owner: Payload, number: int) {
+        Owner = owner
+        Number = number
+    }
+}
+
+union StoredResult {
+    case Empty
+    case Data(Payload, RetainedValue, long, string)
+}
+
+func RetainedTask() -> Task<StoredResult> {
+    let promise = Promise<StoredResult>()
+    let owner = Payload(42)
+    let nested = RetainedValue(owner, 17)
+    Require(promise.Complete(StoredResult.Data(owner, nested, 123456789L, "retained")))
+    return promise.Task
+}
+
+func ValueTask() -> Task<RetainedValue> {
+    let promise = Promise<RetainedValue>()
+    var initial = RetainedValue(Payload(31), 7)
+    Require(promise.Complete(initial))
+    initial.Number = 999
+    return promise.Task
+}
+
+async func Main() -> Task<()> {
+    CheckSettlement()
+    let task = RetainedTask()
+    let valueTask = ValueTask()
+    System.Runtime.GC.Collect()
+    _ = await Task.Run(() => 1)
+    System.Runtime.GC.Collect()
+    for index in 0..3 {
+        let result = await task
+        if result is .Data(let owner, let nested, let number, let text) {
+            Require(owner.Value == 42 && nested.Owner.Value == 42)
+            Require(nested.Number == 17 && number == 123456789L && text == "retained")
+        } else {
+            System.Fail("Promise union payload lost")
+        }
+        var copy = await valueTask
+        Require(copy.Number == 7 && copy.Owner.Value == 31)
+        copy.Number = 99
+        Require(valueTask.GetResult().Number == 7)
+        System.Runtime.GC.Collect()
+    }
+    let pending = Promise<Payload>()
+    System.Runtime.GC.Collect()
+    Require(!pending.Task.IsCompleted)
+    Require(pending.Complete(Payload(53)))
+    System.Runtime.GC.Collect()
+    let pendingValue = await pending.Task
+    Require(pendingValue.Value == 53)
+    let nullable = Promise<Payload?>()
+    Require(nullable.Complete(null))
+    Require(nullable.Task.IsCompleted && nullable.Task.GetResult() == null)
+    let zero = Promise<int>()
+    Require(!zero.Task.IsCompleted)
+    Require(zero.Complete(0))
+    Require(zero.Task.IsCompleted && zero.Task.GetResult() == 0)
+    let unit = Promise<()>()
+    Require(unit.Complete(()))
+    _ = await unit.Task
+    let empty = Promise<StoredResult>()
+    Require(empty.Complete(StoredResult.Empty))
+    Require(empty.Task.GetResult() is .Empty)
+    Console.WriteLine("Promise result contracts passed")
+}

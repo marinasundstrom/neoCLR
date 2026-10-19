@@ -1,0 +1,111 @@
+{
+  "workload": "plain",
+  "cohort": null,
+  "contract": "CPU cores = process CPU seconds / wall seconds. Peak uses adjacent approximately 0.5-second samples inside the window; misses shorter spikes. Successful-response p99 must be read with outcomes. GC totals include warmup and teardown.",
+  "rows": [
+    {
+      "name": "baseline-1-400",
+      "mode": "baseline",
+      "round": 1,
+      "rate": 400,
+      "offered": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedPerSecond": 400.0,
+      "cpuMillisecondsPerCompletion": 2.0149999999999997,
+      "meanCpuCores": 0.8059999999999999,
+      "sampledPeakCpuCores": 0.8917334083710468,
+      "sampledPeakRssKiB": 12976,
+      "p50Milliseconds": 2.3121669999994765,
+      "p95Milliseconds": 3.0458749999997536,
+      "p99Milliseconds": 8.695083999999298,
+      "generatorP99Milliseconds": 0.5719590000019537,
+      "passed": true,
+      "serverTotals": {
+        "completed": 12020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "candidate-1-400",
+      "mode": "candidate",
+      "round": 1,
+      "rate": 400,
+      "offered": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedPerSecond": 400.0,
+      "cpuMillisecondsPerCompletion": 1.853333333333333,
+      "meanCpuCores": 0.7413333333333333,
+      "sampledPeakCpuCores": 0.8122481747114408,
+      "sampledPeakRssKiB": 12576,
+      "p50Milliseconds": 2.1780420000006018,
+      "p95Milliseconds": 2.4521250000013595,
+      "p99Milliseconds": 6.58158300000089,
+      "generatorP99Milliseconds": 0.5675000000007202,
+      "passed": true,
+      "serverTotals": {
+        "completed": 12020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "candidate-2-400",
+      "mode": "candidate",
+      "round": 2,
+      "rate": 400,
+      "offered": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedPerSecond": 400.0,
+      "cpuMillisecondsPerCompletion": 1.8566666666666665,
+      "meanCpuCores": 0.7426666666666666,
+      "sampledPeakCpuCores": 0.7929418925857382,
+      "sampledPeakRssKiB": 12576,
+      "p50Milliseconds": 2.196875000000098,
+      "p95Milliseconds": 2.5467920000004085,
+      "p99Milliseconds": 7.601084000000036,
+      "generatorP99Milliseconds": 0.5753749999994895,
+      "passed": true,
+      "serverTotals": {
+        "completed": 12020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "baseline-2-400",
+      "mode": "baseline",
+      "round": 2,
+      "rate": 400,
+      "offered": 12000,
+      "outcomes": {
+        "ok": 12000
+      },
+      "completedPerSecond": 400.0,
+      "cpuMillisecondsPerCompletion": 2.0133333333333336,
+      "meanCpuCores": 0.8053333333333333,
+      "sampledPeakCpuCores": 0.9514567914501119,
+      "sampledPeakRssKiB": 12992,
+      "p50Milliseconds": 2.3020000000002483,
+      "p95Milliseconds": 5.956749999999289,
+      "p99Milliseconds": 20.00004199999994,
+      "generatorP99Milliseconds": 0.6280000000025154,
+      "passed": true,
+      "serverTotals": {
+        "completed": 12020,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    }
+  ]
+}

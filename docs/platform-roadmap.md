@@ -38,7 +38,15 @@ production defaults are unchanged. The subsequent
 [HTTP investigation](../benchmarks/http-server/serve/investigation-20261019/README.md)
 prioritizes single-result Promise storage and checked bulk response copying before
 larger root-descriptor/heap-index work; concurrent phase instrumentation and pacing
-remain separate measured candidates. Fresh profiles are diagnostic, not speedup evidence.
+remain separate measured candidates. Fresh profiles are diagnostic, not speedup evidence. The
+[Promise storage follow-up](../benchmarks/http-server/serve/promise-result-20261019/README.md)
+rejects inline storage after repeated bulk-latency regression and adopts one array
+slot without a list: 5.3% fewer diagnostic allocations, three-mode correctness,
+concurrent recovery, and eight passing matched HTTP windows with lower CPU/completion.
+A subsequent overload pair delivers 4.8% more plain completions, without establishing a sustainable maximum or general latency gain. The author next directs
+[a runtime completion bridge](design/runtime-task-completion-bridge.md) to avoid
+Promise wrappers in HTTP/native async operations; public ValueTask/Task representation
+and sharing semantics remain design questions.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and
 random fill use borrowed readonly/writable byte windows through interpreter and
