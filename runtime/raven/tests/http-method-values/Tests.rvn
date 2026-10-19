@@ -91,11 +91,11 @@ func RequestMethods() -> Result<unit, TestFailure> {
     }
     _ = Assert.True(get.Method.Equals(HttpMethod.Get), "GET method value")?
     let custom = HttpMethod("FETCH")
-    let Ok(request) = HttpRequest.Create(custom, "http://example.test/", HttpContent.FromText("body")) else {
+    let Ok(request) = HttpRequest.Create(custom, "http://example.test/", HttpStringContent("body")) else {
         return Assert.True(false, "Custom request construction")
     }
     _ = Assert.True(Object.ReferenceEquals(custom, request.Method), "Method retained")?
-    _ = Assert.Equal(4, request.Content.Bytes.Count)?
+    _ = Assert.Equal(4, request.Content.Length)?
     let Ok(copy) = request.WithHeader("X-Test", "value") else {
         return Assert.True(false, "Header copy")
     }
@@ -111,27 +111,27 @@ func UriRequestMethods() -> Result<unit, TestFailure> {
         return Assert.True(false, "URI request construction")
     }
     _ = Assert.Equal("OPTIONS", request.Method.Method)?
-    _ = Assert.Equal(0, request.Content.Bytes.Count)?
-    let Ok(withContent) = HttpRequest.Create(HttpMethod("FETCH"), uri, HttpContent.FromText("body")) else {
+    _ = Assert.Equal(0, request.Content.Length)?
+    let Ok(withContent) = HttpRequest.Create(HttpMethod("FETCH"), uri, HttpStringContent("body")) else {
         return Assert.True(false, "URI content construction")
     }
     let Ok(empty) = HttpRequest.Create(HttpMethod("FETCH"), "http://example.test/") else {
         return Assert.True(false, "URL empty construction")
     }
-    _ = Assert.Equal(0, empty.Content.Bytes.Count)?
-    return Assert.Equal(4, withContent.Content.Bytes.Count)
+    _ = Assert.Equal(0, empty.Content.Length)?
+    return Assert.Equal(4, withContent.Content.Length)
 }
 
 [Test("HTTP coffee requests retain BREW and unnamed status codes")]
 func CoffeeExtensionValues() -> Result<unit, TestFailure> {
-    let Ok(request) = HttpRequest.Create(HttpMethod("BREW"), "http://example.test/pot-1", HttpContent.FromText("start")) else {
+    let Ok(request) = HttpRequest.Create(HttpMethod("BREW"), "http://example.test/pot-1", HttpStringContent("start")) else {
         return Assert.True(false, "BREW request construction")
     }
     _ = Assert.Equal("BREW", request.Method.Method)?
     let response = HttpResponse(418, ArrayList<HttpHeader>(), ArrayList<byte>())
     _ = Assert.Equal(418, (int)response.StatusCode)?
     _ = Assert.True(!response.IsSuccessStatusCode, "Teapot response is unsuccessful")?
-    response.Respond((HttpStatusCode)471, HttpContent.FromText("Custom failure"))
+    response.Respond((HttpStatusCode)471, HttpStringContent("Custom failure"))
     _ = Assert.Equal(471, (int)response.StatusCode)?
     _ = Assert.True(!response.IsSuccessStatusCode, "Custom client error is unsuccessful")?
     let extensionSuccess = HttpResponse((HttpStatusCode)299, ArrayList<HttpHeader>(), ArrayList<byte>())

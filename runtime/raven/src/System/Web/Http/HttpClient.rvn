@@ -109,19 +109,19 @@ public class HttpResponse : Disposable {
     init(statusCode: HttpStatusCode, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
         storedStatusCode = (int)statusCode
         storedHeaders = headers
-        storedContent = HttpContent(body)
+        storedContent = HttpMemoryContent(HttpText.Snapshot(body))
     }
 
     init(statusCode: int, headers: Sequence<HttpHeader>, body: Sequence<byte>) {
         storedStatusCode = statusCode
         storedHeaders = headers
-        storedContent = HttpContent(body)
+        storedContent = HttpMemoryContent(HttpText.Snapshot(body))
     }
 
 
     /// Sets the status and empty content. Does not perform network I/O.
     func Respond(statusCode: HttpStatusCode) {
-        Respond(statusCode, HttpContent(ArrayList<byte>()))
+        Respond(statusCode, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     }
 
     /// Sets status and content, replacing Content-Type from the content metadata.
@@ -488,18 +488,22 @@ public abstract class DelegatingHandler : HttpHandler {
     }
 }
 
-public class HttpContent : Disposable {
+public abstract class HttpContent : Disposable {
     private var input: Option<InputStream> = None()
     private var inputLength: int = 0
     private var leaveOpen: bool = true
     private var started: bool = false
     private var disposed: bool = false
+    internal val IsDisposed: bool => disposed
 
     /// True when content already has a complete byte sequence.
     val IsBuffered: bool => input is None
     /// Declared byte count, or -1 for incoming chunked/close-delimited content.
     val Length: int {
         get {
+            if self is HttpMemoryContent memoryContent {
+                return memoryContent.Memory.Length
+            }
             if IsBuffered {
                 return storedBytes.Count
             }
@@ -507,39 +511,32 @@ public class HttpContent : Disposable {
         }
     }
 
-    /// Creates one-shot, known-length upload content. Ownership transfers on success.
-    static func FromStream(stream: InputStream, length: int, leaveOpen: bool) -> Result<HttpContent, HttpError> {
-        if length < 0 {
-            return Error(HttpError.InvalidRequest("Negative stream content length"))
-        }
-        if length > HttpWireLimits.BodyBytes {
-            return Error(HttpError.LimitExceeded("Stream upload exceeds HTTP body limit"))
-        }
-        let content = HttpContent(ArrayList<byte>())
-        content.input = Some(stream)
-        content.inputLength = length
-        content.leaveOpen = leaveOpen
-        return Ok(content)
+    internal static func Incoming(stream: InputStream, length: int) -> HttpContent {
+        return HttpStreamContent.IncomingBody(stream, length)
     }
 
-    internal static func Incoming(stream: InputStream, length: int) -> HttpContent {
-        let content = HttpContent(ArrayList<byte>())
-        content.input = Some(stream)
-        content.inputLength = length
-        content.leaveOpen = false
-        return content
+    protected init() { }
+
+    protected init(contentType: string) {
+        mediaType = Some(contentType)
+    }
+
+    protected init(stream: InputStream, length: int, leaveOpen: bool) {
+        input = Some(stream)
+        inputLength = length
+        self.leaveOpen = leaveOpen
     }
 
     /// Returns the one-shot input stream, or None for buffered content. Does not read.
-    /// The content owns the stream unless FromStream was passed leaveOpen=true.
+    /// The content owns the stream unless HttpStreamContent.Create was passed leaveOpen=true.
     func TryGetStream() -> Option<InputStream> {
         if let Some(stream) = input { return Some(stream) }
         return None()
     }
 
     /// Returns buffered bytes without reading or consuming an input stream.
-    func TryGetBytes() -> Option<Sequence<byte>> {
-        if IsBuffered {
+    internal func TryGetBytes() -> Option<Sequence<byte>> {
+        if IsBuffered && self is not HttpMemoryContent {
             return Some(storedBytes)
         }
         return None()
@@ -566,13 +563,13 @@ public class HttpContent : Disposable {
         }
         _ = BeginUpload()?
         if IsBuffered {
-            if storedBytes is byte[] bytes {
+            if buffered is byte[] bytes {
                 if bytes.Length == 0 {
                     return Ok(())
                 }
                 return CopyResult(await destination.Write(bytes, 0, bytes.Length, cancellationToken))
             }
-            let count = storedBytes.Count
+            let count = Length
             if count == 0 {
                 return Ok(())
             }
@@ -587,10 +584,14 @@ public class HttpContent : Disposable {
                 }
                 let sequenceRemaining = count - offset
                 let sequenceTake = if sequenceRemaining < sequenceBuffer.Length { sequenceRemaining } else { sequenceBuffer.Length }
-                var index = 0
-                while index < sequenceTake {
-                    sequenceBuffer[index] = storedBytes[offset + index]
-                    index += 1
+                if self is HttpMemoryContent content {
+                    CopyMemoryWindow(content.Memory, offset, sequenceBuffer, sequenceTake)
+                } else {
+                    var index = 0
+                    while index < sequenceTake {
+                        sequenceBuffer[index] = storedBytes[offset + index]
+                        index += 1
+                    }
                 }
                 _ = CopyResult(await destination.Write(sequenceBuffer, 0, sequenceTake, cancellationToken))?
                 offset += sequenceTake
@@ -638,6 +639,15 @@ public class HttpContent : Disposable {
             }
         }
         return Ok(())
+    }
+
+    private static func CopyMemoryWindow(memory: ReadOnlyMemory<byte>, offset: int, destination: byte[], count: int) {
+        let source: ReadOnlySlice<byte> = memory
+        var index = 0
+        while index < count {
+            destination[index] = source[offset + index]
+            index += 1
+        }
     }
 
     private static func CopyResult(result: Result<unit, StreamError>) -> Result<unit, HttpError> {
@@ -704,51 +714,35 @@ public class HttpContent : Disposable {
             return None()
         }
     }
-    private var storedBytes: Sequence<byte>
-    /// Buffered-only compatibility accessor. Use TryGetBytes for arbitrary content.
-    val Bytes: Sequence<byte> {
+    private var buffered: Sequence<byte>? = null
+    private val storedBytes: Sequence<byte> => buffered ?? Array<byte>.Empty
+    // Internal sequence bridge for wire code; not part of the public content API.
+    internal val Bytes: Sequence<byte> {
         get {
-            if !IsBuffered {
-                System.Fail("Stream content has no buffered Bytes; use TryGetBytes")
+            if !IsBuffered || self is HttpMemoryContent {
+                System.Fail("Content has no sequence storage")
             }
             return storedBytes
         }
     }
 
-    init(bytes: Sequence<byte>) {
-        storedBytes = bytes
+    protected init(bytes: Sequence<byte>) {
+        buffered = bytes
     }
 
     /// Wraps bytes and an outbound Content-Type; socket validation occurs before I/O.
-    init(bytes: Sequence<byte>, contentType: string) {
-        storedBytes = bytes
+    protected init(bytes: Sequence<byte>, contentType: string) {
+        buffered = bytes
         mediaType = Some(contentType)
     }
 
-    /// Encodes text as UTF-8 and selects text/plain; charset=utf-8 for outbound requests.
-    static func FromText(text: string) -> HttpContent {
-        return HttpContent(HttpText.Encode(text), "text/plain; charset=utf-8")
-    }
 
-    func ReadText() -> Task<Result<string, string>> {
-        let source = Promise<Result<string, string>>()
-        if !IsBuffered {
-            _ = source.Complete(Error("Stream content is not buffered"))
-            return source.Task
-        }
-        if let Ok(text) = HttpText.Decode(Bytes) {
-            _ = source.Complete(Ok(text))
-        } else {
-            _ = source.Complete(Error("Invalid UTF-8 body"))
-        }
-        return source.Task
-    }
 }
 
 public class HttpRequest {
     internal var HeadersOnly: bool = false
     internal func SetContent(content: HttpContent) { storedContent = content }
-    private var storedContent: HttpContent = HttpContent(ArrayList<byte>())
+    private var storedContent: HttpContent = HttpMemoryContent(default(ReadOnlyMemory<byte>))
     /// Buffered request content; empty for GET requests.
     val Content: HttpContent => storedContent
     private var storedHeaders: Sequence<HttpHeader>
@@ -784,10 +778,10 @@ public class HttpRequest {
         let request = IncomingRequest(target, host, secure)?
         request.storedHeaders = headers
         request.storedMethod = method
-        request.storedContent = HttpContent(body)
+        request.storedContent = HttpMemoryContent(HttpText.Snapshot(body))
         for header in headers {
             if header.Name == "content-type" {
-                request.storedContent = HttpContent(body, header.Value)
+                request.storedContent = HttpMemoryContent(HttpText.Snapshot(body), header.Value)
             }
         }
         return Ok(request)
@@ -925,7 +919,7 @@ public class HttpRequest {
 
     /// Constructs a request using a predefined or custom method, without performing I/O.
     static func Create(method: HttpMethod, url: string) -> Result<HttpRequest, HttpError> {
-        return Create(method, url, HttpContent(ArrayList<byte>()))
+        return Create(method, url, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     }
 
     /// Constructs a request with explicit method and content; transport bounds apply when sent.
@@ -940,7 +934,7 @@ public class HttpRequest {
 
     /// Constructs a URI-based request using a predefined or custom method.
     static func Create(method: HttpMethod, uri: Uri) -> Result<HttpRequest, HttpError> {
-        return Create(method, uri, HttpContent(ArrayList<byte>()))
+        return Create(method, uri, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     }
 
     /// Constructs a URI-based request with explicit method and content.
@@ -1201,7 +1195,14 @@ public class HttpRequest {
             outgoing.Add(encoded[cursor])
             cursor += 1
         }
-        if let Some(body) = storedContent.TryGetBytes() {
+        if storedContent is HttpMemoryContent memoryContent {
+            let body: ReadOnlySlice<byte> = memoryContent.Memory
+            cursor = 0
+            while cursor < count {
+                outgoing.Add(body[cursor])
+                cursor += 1
+            }
+        } else if let Some(body) = storedContent.TryGetBytes() {
             cursor = 0
             while cursor < count {
                 outgoing.Add(body[cursor])
@@ -1793,6 +1794,12 @@ public class HttpClient : Disposable {
         }
         if !response.Content.IsBuffered {
             return Error(HttpError.Unsupported("Response content is not buffered"))
+        }
+        if response.Content is HttpMemoryContent memoryContent {
+            return match HttpText.Decode(memoryContent.Memory) {
+                Ok(let text) => Ok(text)
+                Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+            }
         }
         if let Ok(text) = HttpText.Decode(response.Content.Bytes) {
             return Ok(text)

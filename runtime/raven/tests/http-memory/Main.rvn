@@ -19,7 +19,7 @@ class CancellationObserver {
 
 async func SendText(socket: Socket, text: string) -> Task<bool> {
     // Send a selected window with sentinel bytes outside the HTTP message.
-    let encoded = HttpContent.FromText("!" + text + "!").Bytes
+    let encoded = ("!" + text + "!").Utf8Bytes.ToArray()
     if encoded.Count > 512 { return false }
     let owned: byte[] = [for index in 0..512 => (byte)0]
     var index = 0

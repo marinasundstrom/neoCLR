@@ -1,0 +1,112 @@
+{
+  "passed": true,
+  "contractExecutions": 93,
+  "suiteModes": [
+    {
+      "suite": "http-content-copy",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 1.081
+    },
+    {
+      "suite": "http-content-copy",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 98.999
+    },
+    {
+      "suite": "http-content-copy",
+      "mode": "jit",
+      "exitCode": 0,
+      "elapsedSeconds": 48.246
+    },
+    {
+      "suite": "http-text",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 0.889
+    },
+    {
+      "suite": "http-text",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 30.415
+    },
+    {
+      "suite": "http-text",
+      "mode": "jit",
+      "exitCode": 0,
+      "elapsedSeconds": 38.073
+    },
+    {
+      "suite": "json-streams",
+      "mode": "native",
+      "exitCode": 0,
+      "elapsedSeconds": 1.681
+    },
+    {
+      "suite": "json-streams",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "elapsedSeconds": 57.135
+    },
+    {
+      "suite": "json-streams",
+      "mode": "jit",
+      "exitCode": 0,
+      "elapsedSeconds": 118.057
+    }
+  ],
+  "networkChecks": 10,
+  "note": "Reuse six successful modes from the first report, which stopped on subsequent JSON fixture compilation. The separate final JSON report passes all three modes. Native/legacy API snapshot checks also pass.",
+  "evidence": {
+    "contracts-first.json": {
+      "source": "target/http-content-types-contracts-v4/report.json",
+      "sha256": "d8454aabeba3fdb0cf4a0fada7729f2645426d4abaf152ee09ede4dc632fabe6"
+    },
+    "contracts-json.json": {
+      "source": "target/http-content-types-json-contracts/report.json",
+      "sha256": "e2b29f03f67837f99dda43c4427c67d30a71e28ae8e2a5c3399fa28a9a54d662"
+    },
+    "network.json": {
+      "source": "target/http-content-types-network-validation-v2.json",
+      "sha256": "fcbcc463ec8ec90d247209cf1fe94be5333d837d4bb3d7bc9fdb77b40da087f4"
+    },
+    "network-build.json": {
+      "source": "target/http-content-types-network-v2/build.json",
+      "sha256": "d9b6f17d8513333ccd9d252648022387c68f85042b86f137e4de966e638ac4fb"
+    },
+    "libraries.json": {
+      "source": "target/http-content-types-libraries-v8/build-evidence.json",
+      "sha256": "0845a9a8af8d60e54a5933e6c06123af2ad714096535a5f42e980945f414270f"
+    },
+    "native-docs.log": {
+      "source": "/tmp/http-content-types-native-docs-v2.log",
+      "sha256": "111e8a056f3d479a495c5f3d613390e278ab7ee1cdba651a63f49c97c4aeb9bb"
+    },
+    "showcase-compile.log": {
+      "source": "/tmp/http-content-showcase-compile-v2.log",
+      "sha256": "6daf939990a5a7008b0543d7044c346b37bd24d1a4f32e00a9b1b543281e86c0"
+    },
+    "initial-base-argument.log": {
+      "source": "target/http-content-types-contracts/http-content-copy-build.stderr.log",
+      "sha256": "bec9a4d7602d4d0ca1ab9feffe0e4e2018b74db5f7ec5968aa4a625d38341eaa"
+    },
+    "initial-cast-admission.log": {
+      "source": "target/http-content-types-compiler-contracts/http-content-copy-build.stderr.log",
+      "sha256": "2ff5a0c05941685664574bf4a6af8139ca85fc5d5584cdef67fe59507ca58e49"
+    },
+    "initial-fixture.log": {
+      "source": "target/http-content-types-contracts-v2/http-content-copy-build.stderr.log",
+      "sha256": "c1e16fa56b3961661808fac1032a4dc53dea8ac140c938cbcbf20e8e498f13d2"
+    },
+    "initial-runner-report.json": {
+      "source": "target/http-content-types-contracts-v3/report.json",
+      "sha256": "2909b0188b413114024bb0d0916f967e6ff9eb97f6233512dddcffd3a03b06ab"
+    },
+    "initial-library.log": {
+      "source": "/tmp/http-content-types-build-v7.log",
+      "sha256": "c82368581463b65da973649a1ba2540dc0d4779d6e047f4bd221abd10203e746"
+    }
+  }
+}

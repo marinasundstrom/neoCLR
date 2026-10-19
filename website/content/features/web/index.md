@@ -119,7 +119,7 @@ retains a bounded transport block, including read-ahead from header parsing.
 Development after Preview 16 reduces server response copying and uses larger
 bounded transfers; buffered responses still preserve their snapshot semantics.
 
-Both client uploads and server responses accept known-length `HttpContent.FromStream`
+Both client uploads and server responses accept known-length `HttpStreamContent.Create`
 sources. Default Get/Send and server Serve/Accept/ServeOne buffer incoming bodies, so the JSON showcase
 continues to use its existing content helpers. Incoming streaming works with fixed
 and chunked framing, plus close-delimited client responses; unknown-length outgoing
@@ -244,5 +244,10 @@ Development `HttpContent.CopyTo` transfers buffered or streaming bodies into an
 `OutputStream`, awaiting destination writes before reading further. It uses direct
 array writes or bounded staging, propagates cancellation and stream errors, and
 leaves resource disposal explicit. See the [body-stream contract](/docs/http-body-streams).
-The proposed specialized content hierarchy and unknown-length outgoing framing
-remain future work.
+The development content API now has an abstract HttpContent base, memory-backed
+HttpMemoryContent, one-shot HttpStreamContent and UTF-8 HttpStringContent. Arrays
+convert to readonly memory; selected windows retain their owner without copying.
+Use HttpStringContent.Read for generic text consumption; streamed reads decode
+incrementally without first collecting the entire body into a byte array. Base storage getters and
+construction helpers have been removed rather than retained as compatibility layers.
+The [API guide](/docs/http-body-streams) records migration and current streaming limits.

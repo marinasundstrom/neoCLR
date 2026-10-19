@@ -804,11 +804,20 @@ public class HttpServer {
             index += 1
         }
         if bodyCount > 0 {
-            let body = response.Content.Bytes
-            var offset = 0
-            while offset < bodyCount {
-                bytes[index + offset] = body[offset]
-                offset += 1
+            if response.Content is HttpMemoryContent memoryContent {
+                let body: ReadOnlySlice<byte> = memoryContent.Memory
+                var offset = 0
+                while offset < bodyCount {
+                    bytes[index + offset] = body[offset]
+                    offset += 1
+                }
+            } else {
+                let body = response.Content.Bytes
+                var offset = 0
+                while offset < bodyCount {
+                    bytes[index + offset] = body[offset]
+                    offset += 1
+                }
             }
         }
         return Ok(bytes)
@@ -959,7 +968,7 @@ public class HttpContext : Disposable {
 
     /// Configures a status and UTF-8 text/plain content; call Complete to send it.
     func RespondText(statusCode: HttpStatusCode, text: string) {
-        response.Respond(statusCode, HttpContent.FromText(text))
+        response.Respond(statusCode, HttpStringContent(text))
     }
 
     /// Snapshots response headers and sends buffered bytes or a known-length stream, then closes the exchange.

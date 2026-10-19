@@ -19770,6 +19770,24 @@ open; no native performance improvement is claimed.
   content to have a specialized runtime type. Recorded consumption, bounded reads
   and ownership as explicit contracts; implementation remains pending.
 
+## 2026-10-19 — HTTP redesign without compatibility constraints
+
+- **Author:** “We shouldn't be concerned with backwards compatibility. Re-design
+  the API if needed.” This followed implementation of the bounded CopyTo foundation
+  and the assistant's plan to separate content storage types.
+- **Assistant action:** made HttpContent abstract and introduced memory, stream and
+  string content. Removed base byte constructors, FromText/FromStream and public
+  Bytes/TryGetBytes/ReadText, rather than keeping aliases. Added a generic async text
+  consumer, retained memory ownership and direct JSON byte reads, and migrated
+  maintained runtime fixtures plus the packaged JSON server and current load inputs.
+- **Remaining work:** JSON content specialization, producer dispatch, optional wide
+  lengths, shared stream Memory signatures and unknown-length output. The author's
+  allocation-first clarification prompted removal of the memory Sequence wrapper
+  and replacement of whole-body text byte buffering with the shared incremental
+  reader. Text quota and fragment/concatenation costs remain documented gaps. Historical experiment
+  snapshots retain their original API/bundle evidence rather than being represented
+  as requalified current programs. See [design status](design/http-content-streaming.md).
+
 ### 2026-10-19 — Fix constructor admission rather than shape HTTP APIs around it
 
 The author clarified that the HTTP API should be ergonomic and efficient from
@@ -19787,3 +19805,13 @@ interpreter/native execution and native GC root cleanup. See
 The content hierarchy, removal of the memory wrapper and streaming text decoding
 remain ongoing work; this compiler fix alone does not establish an HTTP allocation
 or throughput improvement.
+
+### 2026-10-19 — Website, whole-stack HTTP review and next release
+
+The author directed the following sequence after the current implementation:
+update the website, including Slice/Memory types and their allocation-conscious
+API philosophy; investigate improvements across the entire HTTP server stack;
+then initiate a new release. The author additionally requested explicit website
+coverage of the experimental concurrent GC. The assistant accepted that sequence,
+with current behavior, measured tradeoffs and experimental validation limits kept
+clear. These are pending actions, not a published release or website deployment.

@@ -20,16 +20,10 @@ async func Main() -> Task<()> {
         let Ok(context) = await server.Accept() else {
             System.Fail("Accept failed")
         }
-        let incoming = context.Request.Content.Bytes
-        if incoming.Count != 4097 {
-            System.Fail("Request length changed")
-        }
-        var offset = 0
-        while offset < incoming.Count {
-            if incoming[offset] != (byte)122 {
-                System.Fail("Request bytes changed")
-            }
-            offset += 1
+        if context.Request.Content is HttpMemoryContent buffered {
+            CheckRequest(buffered.Memory)
+        } else {
+            System.Fail("Buffered acceptance must produce memory content")
         }
         let size = match test {
             0 => 0
@@ -41,13 +35,8 @@ async func Main() -> Task<()> {
             6 => 65536
             _ => 70000
         }
-        let bytes = ArrayList<byte>(size)
-        offset = 0
-        while offset < size {
-            bytes.Add((byte)120)
-            offset += 1
-        }
-        context.Respond(HttpStatusCode.OK, HttpContent(bytes))
+        let bytes = [for index in 0..size => (byte)120]
+        context.Respond(HttpStatusCode.OK, HttpMemoryContent(bytes))
         let pending = context.Complete()
         // Complete must capture bytes before returning, even across many writes.
         if size > 0 {
@@ -62,4 +51,13 @@ async func Main() -> Task<()> {
     }
     server.Close()
     Console.WriteLine("DONE")
+}
+
+func CheckRequest(memory: ReadOnlySlice<byte>) {
+    if memory.Length != 4097 { System.Fail("Request length changed") }
+    var offset = 0
+    while offset < memory.Length {
+        if memory[offset] != (byte)122 { System.Fail("Request bytes changed") }
+        offset += 1
+    }
 }

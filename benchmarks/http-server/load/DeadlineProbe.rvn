@@ -96,7 +96,7 @@ async func Main() -> Task<()> {
             System.Fail("Accept failed")
         }
         let input = GeneratedInput(9)
-        let Ok(content) = HttpContent.FromStream(input, 1, false) else {
+        let Ok(content) = HttpStreamContent.Create(input, 1, false) else {
             System.Fail("Content failed")
         }
         context.Respond(HttpStatusCode.OK, content)

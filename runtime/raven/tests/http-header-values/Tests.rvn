@@ -63,7 +63,7 @@ func HeadersSnapshot() -> Result<unit, TestFailure> {
 
 [Test("HTTP request lookup exposes content headers without inventing provider headers")]
 func HeadersRequest() -> Result<unit, TestFailure> {
-    let Ok(post) = HttpRequest.Post("http://example.test/echo", HttpContent.FromText("Hello")) else {
+    let Ok(post) = HttpRequest.Post("http://example.test/echo", HttpStringContent("Hello")) else {
         return Assert.True(false, "Construct POST request")
     }
     let types = post.GetHeaderValues("content-type")

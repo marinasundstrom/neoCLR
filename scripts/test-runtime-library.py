@@ -23,7 +23,7 @@ MEMORY_LIFETIME_NAMES = [
     'Default and end-position Memory windows remain empty after suspension',
 ]
 
-HTTP_CONTENT_COPY_NAMES = ['HTTP content copy awaits writes before reading more and preserves ownership', 'HTTP content copy writes arrays directly and stages other sequences in bounded chunks', 'HTTP content copy preserves stream failures and rejects truncated or invalid reads', 'HTTP content copy respects declared lengths and skips empty I/O', 'HTTP content copy cancellation skips pre-cancelled input and stops pending writes', 'HTTP content copy rejects disposed bodies and stops before the next source read']
+HTTP_CONTENT_COPY_NAMES = ['HTTP content copy awaits writes before reading more and preserves ownership', 'HTTP memory content preserves selected windows and aliases across copies', 'HTTP content copy preserves stream failures and rejects truncated or invalid reads', 'HTTP content copy respects declared lengths and skips empty I/O', 'HTTP content copy cancellation skips pre-cancelled input and stops pending writes', 'HTTP content copy rejects disposed bodies and stops before the next source read', 'HTTP string reader consumes generic streams and preserves owned text and errors', 'HTTP stream creation validates before taking ownership or reading']
 
 HTTP_TEXT_NAMES = [
     'HTTP buffered text preserves scalars beyond the one-shot codec quota',
@@ -205,7 +205,7 @@ JSON_NAMES = [
     'JSON sequence snapshots preserve order and shared child contents',
 ]
 JSON_STREAM_NAMES = [
-    'JSON HTTP byte input preserves sequence aliases and rejects unbuffered content',
+    'JSON HTTP byte input preserves memory windows and aliases and rejects unbuffered content',
     'JSON byte input borrows selected windows and returns owned mapped values',
     'JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls',
     'JSON byte input rejects invalid UTF-8 before syntax and preserves quotas',

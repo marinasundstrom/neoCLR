@@ -157,23 +157,34 @@ static class HttpBindings
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public HttpContent Content => default;
             }
-            public sealed class HttpContent : Disposable {
-                public HttpContent(Collections.Sequence<byte> bytes) { }
-                public HttpContent(Collections.Sequence<byte> bytes, string contentType) { }
-                public static HttpContent FromText(string text) => default;
-                public static Result<HttpContent, HttpError> FromStream(IO.InputStream stream, int length, bool leaveOpen) => default;
+            public abstract class HttpContent : Disposable {
+                protected HttpContent() { }
+                protected HttpContent(string contentType) { }
+                protected HttpContent(Collections.Sequence<byte> bytes) { }
+                protected HttpContent(Collections.Sequence<byte> bytes, string contentType) { }
+                protected HttpContent(IO.InputStream stream, int length, bool leaveOpen) { }
                 public bool IsBuffered => default;
                 public int Length => default;
-                public Option<Collections.Sequence<byte>> TryGetBytes() => default;
                 public Option<IO.InputStream> TryGetStream() => default;
                 public void Dispose() { }
-                public Result<PropagationUnit, HttpError> BeginUpload() => default;
-                public Result<int, HttpError> ReadUpload(byte[] buffer, int count) => default;
-                public Option<string> MediaType => default;
-                public Collections.Sequence<byte> Bytes => default;
+                internal Result<PropagationUnit, HttpError> BeginUpload() => default;
+                internal Concurrency.Tasks.Task<Result<int, HttpError>> ReadUpload(byte[] buffer, int count, Concurrency.CancellationToken cancellationToken) => default;
+                internal Option<string> MediaType => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> CopyTo(IO.OutputStream destination) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> CopyTo(IO.OutputStream destination, Concurrency.CancellationToken cancellationToken) => default;
-                public Concurrency.Tasks.Task<Result<string, string>> ReadText() => default;
+            }
+            // ReadOnlyMemory constructor/property signatures are native-only; see the manual content guide.
+            public sealed class HttpMemoryContent : HttpContent {
+                private HttpMemoryContent() : base() { }
+            }
+            public sealed class HttpStreamContent : HttpContent {
+                private HttpStreamContent() : base() { }
+                public static Result<HttpStreamContent, HttpError> Create(IO.InputStream stream, int length, bool leaveOpen) => default;
+            }
+            public sealed class HttpStringContent : HttpContent {
+                public static Concurrency.Tasks.Task<Result<string, HttpError>> Read(HttpContent content) => default;
+                public HttpStringContent(string text) : base() { }
+                public HttpStringContent(string text, string contentType) : base() { }
             }
             public sealed class HttpServerOptions {
                 public HttpServerOptions() { }
@@ -325,14 +336,12 @@ static class HttpBindings
             ("HttpResponse", "get_Request") => ("", "System.Option<System.Web.Http.HttpRequest>", false),
             ("HttpResponse", "Associate") when library => (request, "noresult", false),
             ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
-            ("HttpContent", "FromStream") => ("System.IO.InputStream,Int32,Boolean", "System.Result<System.Web.Http.HttpContent,System.Web.Http.HttpError>", true),
             ("HttpContent", "get_IsBuffered") => ("", "Boolean", false),
             ("HttpContent", "get_Length") => ("", "Int32", false),
             ("HttpContent", "TryGetBytes") => ("", "System.Option<System.Collections.Sequence<Byte>>", false),
             ("HttpContent", "Dispose") => ("", "noresult", false),
             ("HttpContent", "BeginUpload") when library => ("", "System.Result<Void,System.Web.Http.HttpError>", false),
             ("HttpContent", "ReadUpload") when library => ("arrayref<Byte>,Int32", "System.Result<Int32,System.Web.Http.HttpError>", false),
-            ("HttpContent", "FromText") => ("String", Prefix + "HttpContent", true),
             ("HttpRequest", "WithDefaults") when library => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpClient", "get_DefaultRequestHeaders") => ("", "System.Collections.Sequence<System.Web.Http.HttpHeader>", false),
             ("HttpClient", "set_DefaultRequestHeaders") => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", "noresult", false),
@@ -364,7 +373,6 @@ static class HttpBindings
             ("HttpResponse", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpContent", ".ctor") => (args.Length == 2 ? "System.Collections.Sequence<Byte>,String" : "System.Collections.Sequence<Byte>", "noresult", false),
             ("HttpContent", "get_Bytes") => ("", "System.Collections.Sequence<Byte>", false),
-            ("HttpContent", "ReadText") => ("", "System.Concurrency.Tasks.Task<System.Result<String,String>>", false),
             ("HttpResponseDecoder", "get_Complete") when library => ("", "Boolean", false),
             ("HttpResponseDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
             ("HttpResponseDecoder", "Finish" or "EndOfInput") when library => ("", outcome, false),

@@ -14,20 +14,26 @@ public class JsonContent {
 
     static func Create(value: Object) -> Result<HttpContent, JsonError> {
         let bytes = JsonSerializer.SerializeToUtf8Bytes(value)?
-        return Ok(HttpContent(bytes, "application/json; charset=utf-8"))
+        return Ok(HttpMemoryContent(bytes, "application/json; charset=utf-8"))
     }
 
     static func CreateNode(value: JsonValue) -> Result<HttpContent, JsonError> {
         let bytes = JsonSerializer.SerializeToUtf8Bytes(value)?
-        return Ok(HttpContent(bytes, "application/json; charset=utf-8"))
+        return Ok(HttpMemoryContent(bytes, "application/json; charset=utf-8"))
     }
 
     static func ReadNode(content: HttpContent) -> Result<JsonValue, JsonError> {
+        if content is HttpMemoryContent buffered {
+            return JsonSerializer.DeserializeNode(buffered.Memory)
+        }
         let bytes = BufferedBytes(content)?
         return JsonSerializer.DeserializeNode(bytes)
     }
 
     static func Read(content: HttpContent, type: TypeInfo) -> Result<Object, JsonError> {
+        if content is HttpMemoryContent buffered {
+            return JsonSerializer.Deserialize(buffered.Memory, type)
+        }
         let bytes = BufferedBytes(content)?
         return JsonSerializer.Deserialize(bytes, type)
     }

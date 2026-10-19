@@ -1,0 +1,176 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Option.*
+
+/// <summary>Buffered HTTP content retaining a readonly memory window without copying.</summary>
+/// <remarks>Readonly is shallow: keep backing bytes unchanged during reads or sends.</remarks>
+public class HttpMemoryContent : HttpContent {
+    private val memory: ReadOnlyMemory<byte>
+
+    /// <summary>Retains the selected bytes without taking exclusive ownership.</summary>
+    /// <param name="memory">Persistent source window, retained until content is released.</param>
+    init(memory: ReadOnlyMemory<byte>) : base() {
+        self.memory = memory
+    }
+
+    /// <summary>Retains bytes and an outbound Content-Type.</summary>
+    /// <param name="memory">Persistent source window; no copy is made.</param>
+    /// <param name="contentType">Media type validated by the transport before sending.</param>
+    init(memory: ReadOnlyMemory<byte>, contentType: string) : base(contentType) {
+        self.memory = memory
+    }
+
+    /// <summary>The retained readonly window. Other aliases may modify its backing storage.</summary>
+    val Memory: ReadOnlyMemory<byte> => memory
+}
+
+/// <summary>One-shot HTTP content backed by an input stream.</summary>
+/// <remarks>Creation transfers ownership only on success when leaveOpen is false. Dispose content if it is never sent; CopyTo never closes the stream.</remarks>
+public class HttpStreamContent : HttpContent {
+    private init(stream: InputStream, length: int, leaveOpen: bool) : base(stream, length, leaveOpen) { }
+
+    /// <summary>Creates known-length streaming content without reading its source.</summary>
+    /// <param name="stream">Source kept open until consumption completes.</param>
+    /// <param name="length">Exact byte count, from zero through the current HTTP body limit.</param>
+    /// <param name="leaveOpen">Whether disposal leaves the source open.</param>
+    /// <returns>Stream content, InvalidRequest for negative length or LimitExceeded for excessive length. Failure leaves ownership with the caller.</returns>
+    static func Create(stream: InputStream, length: int, leaveOpen: bool) -> Result<HttpStreamContent, HttpError> {
+        if length < 0 {
+            return Error(HttpError.InvalidRequest("Negative stream content length"))
+        }
+        if length > HttpWireLimits.BodyBytes {
+            return Error(HttpError.LimitExceeded("Stream upload exceeds HTTP body limit"))
+        }
+        return Ok(HttpStreamContent(stream, length, leaveOpen))
+    }
+
+    internal static func IncomingBody(stream: InputStream, length: int) -> HttpStreamContent {
+        return HttpStreamContent(stream, length, false)
+    }
+}
+
+/// <summary>Buffered UTF-8 text content, using text/plain by default.</summary>
+/// <remarks>Encoding is currently eager. Reading incoming text remains a separate consumer operation; this type does not imply that arbitrary received content is text.</remarks>
+public class HttpStringContent : HttpContent {
+    /// <summary>Encodes text as UTF-8 with text/plain; charset=utf-8.</summary>
+    /// <param name="text">Text to encode into independently owned bytes.</param>
+    init(text: string) : base(HttpText.Encode(text), "text/plain; charset=utf-8") { }
+
+    /// <summary>Reads a buffered or streaming body as strict UTF-8 text.</summary>
+    /// <param name="content">Content to read; a streaming body is consumed once, without closing it.</param>
+    /// <returns>Owned text, a content I/O error, or Protocol for invalid UTF-8. Streaming text materialization currently has a 65536-byte limit.</returns>
+    /// <remarks>No Content-Type negotiation or decompression. Streaming reads use the incremental UTF-8 decoder with bounded byte staging. Memory content is decoded directly from its selected window.</remarks>
+    static async func Read(content: HttpContent) -> Task<Result<string, HttpError>> {
+        if content.IsDisposed {
+            return Error(HttpError.Content(StreamError.Closed))
+        }
+        if content is HttpMemoryContent memoryContent {
+            return Decode(memoryContent.Memory)
+        }
+        if content.IsBuffered {
+            return DecodeBytes(content.Bytes)
+        }
+        _ = content.BeginUpload()?
+        let Some(stream) = content.TryGetStream() else {
+            return Error(HttpError.Content(StreamError.IoFailure))
+        }
+        let input = HttpContentTextInput(content, stream)
+        let reader = StreamReader(input, true)
+        let result = await reader.ReadToEnd(65536)
+        reader.Close()
+        if let Some(error) = input.Failure {
+            return Error(HttpError.Content(error))
+        }
+        return match result {
+            Ok(let text) => Ok(text)
+            Error(TextReadError.LimitExceeded) => Error(HttpError.Content(StreamError.LimitExceeded))
+            Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+        }
+    }
+
+    private static func Decode(memory: ReadOnlySlice<byte>) -> Result<string, HttpError> {
+        return match HttpText.Decode(memory) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+        }
+    }
+
+    private static func DecodeBytes(bytes: Sequence<byte>) -> Result<string, HttpError> {
+        return match HttpText.Decode(bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+        }
+    }
+
+    /// <summary>Encodes text as UTF-8 with an explicit outbound Content-Type.</summary>
+    /// <param name="text">Text to encode into independently owned bytes.</param>
+    /// <param name="contentType">Media type validated by the transport before sending.</param>
+    init(text: string, contentType: string) : base(HttpText.Encode(text), contentType) { }
+}
+
+// Enforce content length and lifetime while the shared text reader decodes chunks.
+// Closing the reader never transfers or releases ownership of the content source.
+internal class HttpContentTextInput : InputStream {
+    private val content: HttpContent
+    private val source: InputStream
+    private var remaining: int
+    private var failure: Option<StreamError> = None()
+    val Failure: Option<StreamError> {
+        get {
+            if let Some(error) = failure {
+                return Some(error)
+            }
+            return None()
+        }
+    }
+
+    init(content: HttpContent, source: InputStream) {
+        self.content = content
+        self.source = source
+        remaining = content.Length
+    }
+
+    func Close() { }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    async func Read(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {
+        if content.IsDisposed {
+            return Fail(StreamError.Closed)
+        }
+        if remaining == 0 || count == 0 {
+            return Ok(0)
+        }
+        let take = if remaining > 0 && remaining < count { remaining } else { count }
+        let result = await source.Read(buffer, offset, take, token)
+        if content.IsDisposed {
+            return Fail(StreamError.Closed)
+        }
+        if let Error(error) = result {
+            return Fail(error)
+        }
+        let Ok(read) = result else {
+            return Fail(StreamError.IoFailure)
+        }
+        if read < 0 || read > take || (read == 0 && remaining > 0) {
+            return Fail(StreamError.IoFailure)
+        }
+        if remaining > 0 {
+            remaining -= read
+        }
+        return Ok(read)
+    }
+
+    private func Fail(error: StreamError) -> Result<int, StreamError> {
+        failure = Some(error)
+        return Error(error)
+    }
+}

@@ -387,18 +387,18 @@ func ByteInputUnicodeBoundaries() -> Result<unit, TestFailure> {
     return Assert.True(JsonSerializer.DeserializeNode(control) is Error(JsonError.Syntax("Unescaped control byte")), "UTF-8 NUL is not a raw JSON string character")
 }
 
-[Test("JSON HTTP byte input preserves sequence aliases and rejects unbuffered content")]
+[Test("JSON HTTP byte input preserves memory windows and aliases and rejects unbuffered content")]
 func ByteInputHttp() -> Result<unit, TestFailure> {
     let bytes = [(byte)49]
-    let content = System.Web.Http.HttpContent(bytes)
+    let content = System.Web.Http.HttpMemoryContent(bytes)
     _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(content) is Ok(1), "Read array-backed content")?
     bytes[0] = (byte)50
     _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(content) is Ok(2), "Preserve existing alias semantics")?
-    let list = ArrayList<byte>()
-    list.Add((byte)51)
-    _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(System.Web.Http.HttpContent(list)) is Ok(3), "Snapshot general sequences")?
+    let surrounded: byte[] = [(byte)255, (byte)51, (byte)255]
+    let window: ReadOnlyMemory<byte> = surrounded
+    _ = Assert.True(System.Web.Http.Json.JsonContent.Read<int>(System.Web.Http.HttpMemoryContent(window[1..2])) is Ok(3), "Read only selected memory window")?
     let input = ShortInput(bytes, -1)
-    let Ok(streamed) = System.Web.Http.HttpContent.FromStream(input, 1, true) else {
+    let Ok(streamed) = System.Web.Http.HttpStreamContent.Create(input, 1, true) else {
         return Assert.True(false, "Create stream content")
     }
     _ = Assert.True(System.Web.Http.Json.JsonContent.ReadNode(streamed) is Error(JsonError.Read(TextReadError.IoFailure)), "Reject unbuffered content")?

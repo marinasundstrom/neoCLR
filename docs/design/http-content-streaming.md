@@ -125,3 +125,29 @@ pull adapters; CopyTo does not yet replace them or add unknown-length output.
 The InputStream/OutputStream Memory migration and specialized producer/consumer
 types remain separate bounded steps. Cancellation uses the current Task machinery;
 this change does not introduce a new awaitable or claim allocation-free completion.
+
+## Concrete types and deliberate API break (2026-10-19)
+
+The author explicitly clarified that backwards compatibility must not constrain
+the redesign. HttpContent is now abstract; HttpMemoryContent, HttpStreamContent
+and HttpStringContent are the creation APIs. Base byte constructors and public
+FromText, FromStream, Bytes, TryGetBytes and ReadText are removed. Text consumption
+is HttpStringContent.Read(HttpContent), accepting buffered or streaming bodies.
+See [exact contracts and remaining gaps](../../api-docs/http-body-streams.md).
+
+Memory construction retains ReadOnlyMemory<byte> and exposes Memory; its local
+synchronous copy helper borrows only during each block fill, never across await.
+Wire code and JSON reads borrow memory directly, without allocating a Sequence
+adapter per content object. Current response
+Sequence constructors snapshot non-array sources; array aliasing remains visible.
+Text creation is still eager. Streamed text uses the shared incremental UTF-8
+reader with 256-byte read staging and an adapter enforcing content length/lifetime.
+It avoids a whole-body byte accumulator but still allocates decoded text fragments
+and concatenations. Its 64 KiB text quota remains an implementation gap. Broader OutputStream Memory signatures, HttpJsonContent, custom
+producer dispatch and unknown-length outgoing framing remain separate steps.
+
+The comparison remains .NET's abstract HttpContent with concrete memory/stream/text
+content. neoCLR uses its existing readonly-memory and UTF-8 contracts, typed factory
+errors and an explicit static text consumer; it does not keep old APIs merely to
+preserve source compatibility. Costs include consumer migration and temporarily
+different buffered/stream text limits; native/CLI documentation states the latter.

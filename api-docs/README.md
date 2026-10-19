@@ -2514,3 +2514,13 @@ Development HttpContent.CopyTo(OutputStream[, CancellationToken]) is included in
 both native and CLI references. The [HTTP body-stream guide](http-body-streams.md)
 documents bounded transfer, cancellation, one-shot consumption, errors and ownership.
 No public type is added or excluded by this change.
+
+Development HTTP content redesign makes HttpContent abstract and adds HttpMemoryContent,
+HttpStreamContent and HttpStringContent to type selection and native rendering.
+The legacy CLI scaffold omits exactly HttpMemoryContent(ReadOnlyMemory<byte>),
+HttpMemoryContent(ReadOnlyMemory<byte>, string), and Memory: ReadOnlyMemory<byte>
+because opaque view layout cannot be projected safely. Their full native signatures
+and contracts are also documented in [HTTP body streams](http-body-streams.md).
+Removed base byte constructors, FromText/FromStream, Bytes/TryGetBytes and ReadText
+are not compatibility APIs. Historical experiment/benchmark snapshots may target
+those removed development APIs and must use their recorded bundle or be ported.

@@ -46,13 +46,8 @@ async func Worker(state: LoadState) -> Task<()> {
                 let target = context.Request.Target
                 let stopping = target == "/stop"
                 let size = if stopping { 0 } else if target == "/bulk" { 8192 } else { 10 }
-                let body = ArrayList<byte>(size)
-                var index = 0
-                while index < size {
-                    body.Add((byte)120)
-                    index += 1
-                }
-                context.Respond(HttpStatusCode.OK, HttpContent(body))
+                let body = [for index in 0..size => (byte)120]
+                context.Respond(HttpStatusCode.OK, HttpMemoryContent(body))
                 if let Error(_) = await context.Complete() {
                     state.Failures += 1
                 } else if !stopping {
