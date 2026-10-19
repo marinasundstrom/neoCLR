@@ -95,7 +95,9 @@ remove a copy or establish native support.
 ## Order and acceptance
 
 1. Raven/compiler APIs and interpreter metadata/GC support now cover all four
-   types. Finish JIT/AOT ABI support before migrating shared buffer services.
+   types. The bounded native persistent-byte path now covers creation, length,
+   explicit two-argument windows and traced field/call storage. Finish borrowed
+   views and remaining JIT/AOT operations before migrating shared buffer services.
    Interpreter-only support is insufficient for native HTTP and crypto providers.
 2. Migrate codec and cryptography synchronous contracts first, without redundant
    compatibility overloads. Test subwindows, empty input, overlapping buffers, readonly

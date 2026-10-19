@@ -1,0 +1,44 @@
+import System.*
+import System.Runtime.*
+
+class ByteBufferOwner {
+    val Data: Memory<byte>
+    val ReadOnlyData: ReadOnlyMemory<byte>
+
+    init(data: Memory<byte>, readonlyData: ReadOnlyMemory<byte>) {
+        Data = data
+        ReadOnlyData = readonlyData
+    }
+}
+
+func CreateOwner() -> ByteBufferOwner {
+    let data: byte[] = [(byte)1, (byte)2, (byte)3, (byte)4]
+    let memory: Memory<byte> = data
+    let readonlyMemory: ReadOnlyMemory<byte> = data
+    return ByteBufferOwner(memory.Slice(1, 2), readonlyMemory.Slice(2, 1))
+}
+
+func CreateEmpty() -> ReadOnlyMemory<byte> {
+    let memory: ReadOnlyMemory<byte> = [(byte)8]
+    return memory.Slice(1, 0)
+}
+
+func Keep(data: Memory<byte>) -> Memory<byte> => data
+
+func Main() -> int {
+    let empty = default(Memory<byte>)
+    let readonlyEmpty = default(ReadOnlyMemory<byte>)
+    if !empty.IsEmpty || !readonlyEmpty.IsEmpty {
+        return 1
+    }
+    let owner = CreateOwner()
+    let retainedEmpty = CreateEmpty()
+    GC.Collect()
+    if Keep(owner.Data).Slice(0, 2).Length != 2 || owner.ReadOnlyData.Slice(1, 0).Length != 0 {
+        return 2
+    }
+    if retainedEmpty.Slice(0, 0).Length != 0 {
+        return 3
+    }
+    return 0
+}

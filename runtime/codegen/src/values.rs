@@ -1376,6 +1376,24 @@ pub(crate) fn compile_into(
     } else {
         None
     };
+    let byte_memory_create = if details.is_some_and(|d| !d.byte_memory_create.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64; 4].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_byte_view_create_all_v1", Linkage::Import, &sig)?)
+    } else {
+        None
+    };
+    let byte_memory_slice = if details.is_some_and(|d| !d.byte_memory_slice.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend(
+            [types::I64, types::I64, types::I32, types::I32, types::I64].map(AbiParam::new),
+        );
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_byte_view_slice_v1", Linkage::Import, &sig)?)
+    } else {
+        None
+    };
     let mut wide_format_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol) in [
@@ -1704,6 +1722,83 @@ pub(crate) fn compile_into(
                         false,
                     );
                 }
+            }
+            if details.is_some_and(|d| {
+                d.byte_memory_create.contains(&i)
+                    || d.byte_memory_length.contains(&i)
+                    || d.byte_memory_slice.contains(&i)
+            }) {
+                if !details.unwrap().byte_memory_length.contains(&i) {
+                    let Ty::ByteMemory(owner) =
+                        p.results[i].as_ref().ok_or("missing memory result")?
+                    else {
+                        return Err("byte-memory factory requires a persistent byte result".into());
+                    };
+                    let kind = match input.types[*owner].memory_view {
+                        Some(neoclr::metadata::MemoryViewKind::Memory) => 2,
+                        Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory) => 3,
+                        _ => return Err("invalid persistent memory kind".into()),
+                    };
+                    let kind = b.ins().iconst(types::I64, kind);
+                    let storage = slot(&mut b, 24);
+                    let address = b.ins().stack_addr(types::I64, storage, 0);
+                    let call = if details.unwrap().byte_memory_create.contains(&i) {
+                        let service =
+                            module.declare_func_in_func(byte_memory_create.unwrap(), b.func);
+                        b.ins().call(
+                            service,
+                            &[fault_context.unwrap(), parameters[0], kind, address],
+                        )
+                    } else {
+                        b.ins().store(MemFlags::new(), parameters[0], address, 0);
+                        b.ins().store(MemFlags::new(), parameters[1], address, 8);
+                        b.ins().store(MemFlags::new(), parameters[2], address, 12);
+                        b.ins().store(MemFlags::new(), kind, address, 16);
+                        let service =
+                            module.declare_func_in_func(byte_memory_slice.unwrap(), b.func);
+                        b.ins().call(
+                            service,
+                            &[
+                                fault_context.unwrap(),
+                                address,
+                                parameters[3],
+                                parameters[4],
+                                address,
+                            ],
+                        )
+                    };
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    // C kernel packs two bounds into one word. Private generated
+                    // storage has one eight-byte slot per logical lane, no kind word.
+                    let owner = b.ins().load(types::I64, MemFlags::new(), address, 0);
+                    let offset = b.ins().load(types::I32, MemFlags::new(), address, 8);
+                    let length = b.ins().load(types::I32, MemFlags::new(), address, 12);
+                    write(&mut b, output, &[owner, offset, length]);
+                } else {
+                    if !matches!(p.args[i].as_slice(), [Ty::ByteMemory(_)]) {
+                        return Err("byte-memory length requires one persistent byte view".into());
+                    }
+                    write(&mut b, output, &[parameters[2]]);
+                }
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(module, &mut context.func, frame);
+                }
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                continue;
             }
             if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
                 let receiver = parameters[0];

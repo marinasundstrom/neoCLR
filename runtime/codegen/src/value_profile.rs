@@ -16,6 +16,7 @@ pub(super) enum Ty {
     Character, // One validated extended grapheme, stored as immutable UTF-8 text.
     Literal,   // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
+    ByteMemory(usize), // owner pointer + offset + length; kind remains in the type.
     Tuple(Vec<Ty>),
     Reference(usize),
     Interface(usize),
@@ -156,9 +157,11 @@ impl<'a> Profile<'a> {
             }
         }
         for t in &input.types {
-            // Selection also rejects these, but direct profile consumers must not
+            // Selection also gates these; direct profile consumers must not
             // interpret opaque fieldless declarations as empty, untraced records.
-            if t.memory_view.is_some() || neoclr::native_metadata::memory_view_element(t).is_some()
+            if (t.memory_view.is_some()
+                || neoclr::native_metadata::memory_view_element(t).is_some())
+                && !(references && crate::memory_views::byte_memory(t))
             {
                 return Err(
                     "memory views require native ABI and GC lowering before value profiling".into(),
@@ -259,6 +262,11 @@ impl<'a> Profile<'a> {
                 return Ok(());
             }
             states[i] = 1;
+            if crate::memory_views::byte_memory(&p.input.types[i]) {
+                p.widths[i] = 3;
+                states[i] = 2;
+                return Ok(());
+            }
             let fields = p.input.types[i].fields.clone();
             let mut width = 0;
             // ValueType supplies nominal ancestry, never inline storage.
@@ -371,7 +379,10 @@ impl<'a> Profile<'a> {
                     // Static owner contributes identity/access only, with no receiver.
                 } else {
                     let ty = p.ty(owner)?;
-                    if !matches!(ty, Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)) {
+                    if !matches!(
+                        ty,
+                        Ty::Record(_) | Ty::ByteMemory(_) | Ty::Reference(_) | Ty::Interface(_)
+                    ) {
                         return Err(format!(
                             "{}: value member requires a local record owner ({owner:?})",
                             f.name
@@ -383,7 +394,9 @@ impl<'a> Profile<'a> {
                             Ty::Reference(_) | Ty::Interface(_) if !f.receiver_byref => {
                                 args.push(ty)
                             }
-                            Ty::Record(_) if f.receiver_byref => args.push(ty.address()),
+                            Ty::Record(_) | Ty::ByteMemory(_) if f.receiver_byref => {
+                                args.push(ty.address())
+                            }
                             _ => {
                                 return Err(
                                     "receiver representation does not match value/reference owner"
@@ -810,7 +823,9 @@ impl<'a> Profile<'a> {
                         "static owners cannot be used as values or instance receivers".into(),
                     );
                 }
-                if self.input.types[i].representation == Representation::Interface
+                if crate::memory_views::byte_memory(&self.input.types[i]) {
+                    Ty::ByteMemory(i)
+                } else if self.input.types[i].representation == Representation::Interface
                     && self.references
                 {
                     Ty::Interface(i)
@@ -864,6 +879,7 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
+            Ty::ByteMemory(_) => vec![true, false, false],
             Ty::Erased | Ty::ScalarUnion(_) => vec![false, true],
             Ty::MixedUnion(_) => vec![false, true, true],
             Ty::ValueUnion(parts) => std::iter::once(false)
@@ -904,6 +920,7 @@ impl<'a> Profile<'a> {
     }
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
+            Ty::ByteMemory(_) => 3,
             Ty::Record(i) => self.widths[*i],
             Ty::PendingUnionScalar(t) => self.lanes(&self.ty(t).expect("admitted union payload")),
             Ty::Tuple(parts) => parts.iter().map(|t| self.lanes(t)).sum(),
@@ -2509,6 +2526,33 @@ fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
 #[cfg(test)]
 mod object_assignment_tests {
     use super::*;
+
+    #[test]
+    fn persistent_byte_memory_has_three_lanes_and_rejects_raw_construction() {
+        use neoclr::metadata::MemoryViewKind;
+        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory] {
+            let mut input = crate::memory_views::test_module(kind, Type::Byte);
+            let ty = Type::Named(input.types[0].name.clone());
+            let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
+            let value = p.ty(&ty).unwrap();
+            assert_eq!(value, Ty::ByteMemory(0));
+            assert_eq!(p.lanes(&value), 3);
+            assert_eq!(p.bytes(&value), 24);
+            assert_eq!(p.pointer_lanes(&value), vec![true, false, false]);
+            assert!(p.ty(&Type::ArrayRef(Box::new(ty.clone()))).is_err());
+            assert!(p.ty(&Type::Union(vec![ty.clone(), Type::Int32])).is_err());
+            assert!(!crate::scalar_unions::record(&input, &ty));
+            assert!(Profile::new(&input, false, None, None, &[], None, None, None, false).is_err());
+            input.functions.push(
+                serde_json::from_value(serde_json::json!({
+                    "name":"Forge", "returns":ty, "body":[Op::New(ty.clone()), Op::Return]
+                }))
+                .unwrap(),
+            );
+            let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
+            assert!(p.analyze(0).is_err());
+        }
+    }
 
     #[test]
     fn memory_views_never_receive_empty_record_layouts() {

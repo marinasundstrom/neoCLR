@@ -638,6 +638,13 @@ pub fn prepare(
             .unwrap()
             .extend(rows);
     }
+    if compile_system && context.is_some_and(|c| c.reference_arena) {
+        let rows = super::memory_views::bind(&mut selected, &report)?;
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
+    }
     let bind_utf8_text = context.is_some_and(|c| c.bind_utf8_text);
     if bind_utf8_text {
         let rows = super::bindings::utf8_text(&mut selected, &report)?;
@@ -1410,7 +1417,7 @@ pub fn prepare(
 
 // Rename only structural nominal types and their owned method spellings. Source
 // strings, origins and definition identities remain intact for diagnostics/access.
-fn rename_nominal(
+pub(crate) fn rename_nominal(
     module: &mut neoclr::Module,
     old: &str,
     new: &str,

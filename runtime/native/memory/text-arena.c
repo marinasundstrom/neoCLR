@@ -886,6 +886,14 @@ int32_t neoclr_byte_view_create_v1(neoclr_aot_context *context, void *owner,
     *output = (neoclr_byte_view){owner, (uint32_t)start, (uint32_t)count, kind};
     return 0;
 }
+int32_t neoclr_byte_view_create_all_v1(neoclr_aot_context *context, void *owner,
+    uint64_t kind, neoclr_byte_view *output) {
+    uint64_t total; int reserved;
+    int32_t status = byte_view_storage(context, owner, &total, &reserved);
+    if (status) return status;
+    if (total > INT32_MAX) return NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE;
+    return neoclr_byte_view_create_v1(context, owner, 0, (int32_t)total, kind, output);
+}
 int32_t neoclr_byte_view_slice_v1(neoclr_aot_context *context, const neoclr_byte_view *view,
     int32_t start, int32_t count, neoclr_byte_view *output) {
     if (!output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;

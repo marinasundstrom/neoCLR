@@ -29,12 +29,14 @@ costs understandable.
 
 ## Contiguous memory views
 
-Work has begun on `Slice<T>` and `ReadOnlySlice<T>` for borrowed memory, followed
-by persistent `Memory<T>` and `ReadOnlyMemory<T>`. The intended views share storage
-without copying and preserve checked bounds and readonly access. An interpreter-only
+Development APIs include `Slice<T>` and `ReadOnlySlice<T>` for borrowed memory,
+and persistent `Memory<T>` and `ReadOnlyMemory<T>`. These views share storage
+without copying and preserve checked bounds and readonly access. The development
 [Raven API](/docs/memory-views.html) provides checked view operations, implicit
-array conversions and an immutable UTF-8 byte view. Native execution and persistent
-Raven views remain pending. Development array range
+array conversions, persistent Memory/ReadOnlyMemory and an immutable UTF-8 byte
+view. Native execution currently covers only persistent byte-view creation,
+length and explicit two-argument windows. Borrowed native views and shared
+buffer-service migration remain pending. Development array range
 syntax returns Slice<T>; ToArray requests a copy. String slicing retains its grapheme semantics.
 
 [Design and implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md)

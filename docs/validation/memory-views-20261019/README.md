@@ -33,8 +33,9 @@ in PortableDefaultReceiverTests.ReadOnlyFieldReceiverUsesDefensiveCopy (expected
 2, observed 3); it remains open and is not counted as a passing check. The focused
 ref-like, value-indexer and ordinary .NET range checks pass: 33 tests, zero failures.
 
-JIT/AOT ABI, native GC maps, optimizations, borrowed generic anti-constraints,
-element byref returns remain unimplemented.
+At this interpreter-only milestone, JIT/AOT ABI, native GC maps, optimizations,
+borrowed generic anti-constraints and element byref returns remained unimplemented.
+See the native follow-up below for subsequent bounded support.
 Array range callers now share storage and must use ToArray to retain copy
 semantics. ArrayList still returns owned range copies pending a separate growth
 and invalidation contract. No native-performance claim follows from these tests.
@@ -51,8 +52,28 @@ Task.Run, shared writable/readonly borrowing, array conversion and explicit copy
 reject-memory-conversions.rvn diagnoses both illegal conversions with RAV1503
 and publishes no artifact. The prior SliceConsumer still returns 0 against the
 extended core. See persistent-validation.json for binary identity and outputs.
-Native JIT/AOT and actual stream/codec/crypto signature migrations remain pending.
+The bounded native follow-up below does not yet enable stream/codec/crypto signature migrations.
 
 Persistent compiler integration: Raven `c173a723c`. All five source libraries and
 the production native API renderer build successfully; four native snapshot
 checks pass. The generated reference includes both persistent types and members.
+
+
+## Native persistent-byte follow-up
+
+`NativeMemoryConsumer.rvnproj` exercises Memory<byte> and ReadOnlyMemory<byte>
+with array conversion, default values, Length/IsEmpty, two-argument slicing,
+function arguments/returns and object fields. After explicit GC, checked nested
+slicing proves both nonempty owners and an independently owned empty view remain
+live. `NativeMemoryBounds.rvnproj` requires IndexOutOfRange for a nonempty window
+of a default readonly memory; it exercises slicing without any factory binding.
+
+Run `native-run.py --compiler <matching rvnc.dll> --output <directory>` after
+building `neoclr-codegen` and the source-owned System.Runtime library. The harness
+runs both fixtures through the interpreter, AOT and JIT; AOT uses UBSan/bounds.
+The native host checks success/fault codes, untouched failure output, balanced
+root frames and full reclamation. Native evidence is saved as
+`native-validation.json`; raw build/admission logs remain in the output directory.
+No new Raven API or compiler change is involved. Borrowed views, non-byte
+instantiations, arrays/unions of views, boxing and remaining view operations
+remain gated. Async native retention is not qualified by these synchronous tests.

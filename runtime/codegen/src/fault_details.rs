@@ -107,6 +107,9 @@ pub struct Options {
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
     pub utf8_encode: Vec<usize>,
+    pub byte_memory_create: Vec<usize>,
+    pub byte_memory_length: Vec<usize>,
+    pub byte_memory_slice: Vec<usize>,
     pub string_slice_graphemes: Vec<usize>,
     pub string_slice_utf8: Vec<usize>,
     pub char_from_string: Vec<usize>,
@@ -808,6 +811,27 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "utf8-decode-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            byte_memory_create: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "byte-memory-create-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            byte_memory_slice: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "byte-memory-slice-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            byte_memory_length: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "byte-memory-length-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             utf8_encode: report

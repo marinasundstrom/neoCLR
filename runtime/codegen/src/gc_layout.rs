@@ -54,7 +54,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
                 trace: Trace::UnionReferencePayload,
             }];
         }
-        Ty::ByteArray => Trace::ByteArray,
+        Ty::ByteArray | Ty::ByteMemory(_) => Trace::ByteArray,
         Ty::StringArray | Ty::CharacterArray | Ty::CharacterValues => Trace::StringArray,
         Ty::ByteValues => Trace::ByteValues,
         // Even a borrow of an integer can keep its owning object/array alive.
@@ -220,6 +220,46 @@ mod tests {
         ))
         .unwrap()
     }
+    #[test]
+    fn persistent_byte_memory_traces_only_owner_in_nested_storage() {
+        use neoclr::metadata::{MemoryViewKind, Type};
+        let module = crate::memory_views::test_module(MemoryViewKind::Memory, Type::Byte);
+        let p = profile(&module);
+        let ty = p.ty(&Type::Named(module.types[0].name.clone())).unwrap();
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 0,
+                trace: Trace::ByteArray
+            }]
+        );
+        assert_eq!(seed_lanes(&p, &ty), vec![0]);
+        assert_eq!(
+            super::super::lanes(&p, &ty),
+            vec![
+                cranelift_codegen::ir::types::I64,
+                cranelift_codegen::ir::types::I32,
+                cranelift_codegen::ir::types::I32
+            ]
+        );
+        let nested = Ty::Tuple(vec![Ty::Wide, ty.clone(), Ty::Int, ty]);
+        assert_eq!(p.bytes(&nested), 64);
+        assert_eq!(seed_lanes(&p, &nested), vec![1, 5]);
+        assert_eq!(
+            slots(&p, &nested),
+            vec![
+                Slot {
+                    lane: 1,
+                    trace: Trace::ByteArray
+                },
+                Slot {
+                    lane: 5,
+                    trace: Trace::ByteArray
+                }
+            ]
+        );
+    }
+
     #[test]
     fn wide_integers_are_not_roots_but_scalar_borrows_keep_owners() {
         let module = module();

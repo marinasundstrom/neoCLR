@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>NativeMemoryBounds</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>
+    <RavenMetadataFormat>NeoCLR</RavenMetadataFormat>
+    <RavenNeoClrNativeCoreReference>../../../runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll</RavenNeoClrNativeCoreReference>
+    <RavenNeoClrRuntimeContracts>../../../runtime/raven/projects/System.Runtime/ownership.json</RavenNeoClrRuntimeContracts>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="native-bounds.rvn" />
+  </ItemGroup>
+</Project>

@@ -102,6 +102,14 @@ int main(void) {
     uint64_t allocations = neoclr_gc_statistics_v1().allocations;
 #endif
     neoclr_byte_view view, nested, readonly, persistent;
+    CHECK(!neoclr_byte_view_create_all_v1(&c, array, NEOCLR_VIEW_MEMORY, &view));
+    CHECK(view.owner == array && !view.offset && view.length == 5 && view.kind == NEOCLR_VIEW_MEMORY);
+    neoclr_byte_view original_view = view;
+    CHECK(neoclr_byte_view_create_all_v1(&c, array, UINT64_MAX, &view) == 3);
+    CHECK(!memcmp(&view, &original_view, sizeof(view)));
+    CHECK(!neoclr_byte_view_create_all_v1(&c, NULL, NEOCLR_VIEW_READONLY_MEMORY, &nested));
+    CHECK(!nested.owner && !nested.length);
+    CHECK(neoclr_byte_view_create_all_v1(&c, array, 0, NULL) == 3);
     CHECK(!neoclr_byte_view_create_v1(&c, array, 1, 3, NEOCLR_VIEW_MEMORY, &persistent));
     CHECK(!neoclr_byte_view_convert_v1(&c, &persistent, NEOCLR_VIEW_SLICE, &view));
     CHECK(!neoclr_byte_view_slice_v1(&c, &view, 1, 1, &nested));

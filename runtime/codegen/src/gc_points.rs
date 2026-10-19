@@ -25,6 +25,9 @@ pub(super) fn native_body(
             || d.boolean_boxes.contains_key(&i)
             || d.empty_record_boxes.contains_key(&i)
             || [
+                &d.byte_memory_create,
+                &d.byte_memory_length,
+                &d.byte_memory_slice,
                 &d.console_read_byte,
                 &d.console_write_line,
                 &d.console_write_bytes,

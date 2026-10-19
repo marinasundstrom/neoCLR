@@ -67,8 +67,9 @@ no longer implements Sliceable<T[]>; array-specific and owned-result APIs still
 use arrays. This deliberately replaces the former copy-based range contract.
 See the [slice API](../../docs/memory-views.html). This view path currently runs
 in the interpreter. Memory/ReadOnlyMemory retain windows across asynchronous use;
-native JIT/AOT lowering remains work
-in progress. Array size and allocation remain constrained by runtime budgets.
+native JIT/AOT currently supports a bounded persistent byte-view path (array
+conversion, length and explicit two-argument windows). Borrowed array ranges
+remain interpreter-only. Array size and allocation remain constrained by runtime budgets.
 
 Read-only interface views support [reference variance](../collections/#interface-variance); mutable array storage remains invariant.
 

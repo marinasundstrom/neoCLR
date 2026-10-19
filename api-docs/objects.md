@@ -379,7 +379,7 @@ Host publication validates the execution heap, and expired owners fault. Immutab
 UTF-8 views share the String owner and are borrowed capabilities for storage checks.
 
 Nominal metadata admission and interpreter suspension rules are implemented.
-Public Raven APIs are implemented; native lowering remains pending. This payload is not a
+Public Raven APIs are implemented; native execution currently covers a bounded persistent-byte subset. This payload is not a
 supported host factory; checked guest factories are documented in the
 [memory-view reference](memory-views.md). See
 the [implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md).
@@ -393,8 +393,9 @@ arity; errors return Fault. Ordinary types are unchanged. Callers supply verifie
 source IR and lowered arguments. The retained element is remapped by
 `restore_interface_proofs` alongside other private type facts. These facts are
 omitted on serialization and rejected if supplied as metadata fields. They grant
-no native ABI or execution rights; both selection and direct value profiling
-still reject memory views pending their storage and tracing implementation.
+no native ABI or execution rights on their own. Selection and value profiling now
+admit exact persistent-byte shapes with a dedicated owner/offset/length layout;
+other view shapes remain rejected.
 
 
 ### Private native byte-window helpers
@@ -403,6 +404,7 @@ still reject memory views pending their storage and tracing implementation.
 carrier (`owner`, `offset`, `length`, `kind`) and these internal C entry points:
 
 - `neoclr_byte_view_create_v1(context, array, start, count, kind, output)`.
+- `neoclr_byte_view_create_all_v1(context, array, kind, output)`: validates the owner and borrows its entire length.
 - `neoclr_byte_view_slice_v1(context, view, start, count, output)`.
 - `neoclr_byte_view_convert_v1(context, view, kind, output)`.
 - `neoclr_byte_view_get_v1(context, view, index, outputByte)`.
@@ -428,4 +430,4 @@ readonly destinations and uninitialized sources return 3. Empty copies still
 validate both descriptors and destination capability. This is a private byte
 kernel, not a public Raven CopyTo member or a generic reference-element copier.
 The [native implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md#native-byte-window-kernel-2026-10-19)
-records layout costs, tests and the still-missing generated-code binding.
+records layout costs, tests and the bounded generated-code binding for persistent byte views.

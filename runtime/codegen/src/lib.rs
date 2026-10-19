@@ -11,6 +11,7 @@ mod inspection;
 mod jit;
 mod limits;
 mod linking;
+mod memory_views;
 mod reflection_arrays;
 mod reflection_collections;
 mod reflection_construction;

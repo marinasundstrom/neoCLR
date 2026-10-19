@@ -28,6 +28,8 @@ _Static_assert(offsetof(neoclr_byte_view, owner) == 0, "window owner root");
  */
 int32_t neoclr_byte_view_create_v1(neoclr_aot_context *, void *, int32_t, int32_t,
     uint64_t kind, neoclr_byte_view *);
+int32_t neoclr_byte_view_create_all_v1(neoclr_aot_context *, void *, uint64_t kind,
+    neoclr_byte_view *);
 int32_t neoclr_byte_view_slice_v1(neoclr_aot_context *, const neoclr_byte_view *,
     int32_t, int32_t, neoclr_byte_view *);
 /* Only access restriction and persistent-to-borrowed conversions are permitted. */

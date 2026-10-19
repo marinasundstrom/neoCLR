@@ -131,6 +131,11 @@ pub(super) fn verify(p: &Profile<'_>, flows: &[Stacks]) -> Result<(), Error> {
             .types
             .push(object);
     }
+    if p.input.types.iter().any(crate::memory_views::byte_memory) {
+        crate::memory_views::project_verification(
+            projected.get_or_insert_with(|| p.input.clone()),
+        )?;
+    }
     // This copy is only a verification artifact. Code generation, GC plans and
     // diagnostic instruction offsets continue to use the original admitted body.
     neoclr::LoadedProgram::new(projected.as_ref().unwrap_or(p.input))

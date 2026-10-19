@@ -903,7 +903,7 @@ fn retained_types(
                     return Err("selected types exceed the value profile limit".into());
                 }
                 let t = &input.types[*i];
-                if t.memory_view.is_some() {
+                if t.memory_view.is_some() && !crate::memory_views::byte_memory(t) {
                     return Err("memory views require interpreter execution; native ABI and GC lowering are not implemented".into());
                 }
                 pending_types.extend(t.fields.iter().map(|f| f.ty.clone()));

@@ -1,0 +1,6 @@
+import System.*
+
+func Main() -> int {
+    let memory = default(ReadOnlyMemory<byte>)
+    return memory.Slice(0, 1).Length
+}

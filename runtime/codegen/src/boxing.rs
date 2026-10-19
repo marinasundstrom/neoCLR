@@ -43,6 +43,13 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
             })
         })
         .collect();
+    if sites.iter().any(|(_, _, ty)| {
+        input
+            .type_definition(ty)
+            .is_some_and(|t| t.memory_view.is_some())
+    }) {
+        return Err("native memory-view boxing is not implemented".into());
+    }
     if sites.is_empty() {
         return Ok(());
     }

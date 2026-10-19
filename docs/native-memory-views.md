@@ -10,8 +10,11 @@ The interpreter recognizes explicit opaque memory-view metadata and checked runt
 services. The four shapes are exercised by [neoIL test fixtures](../tests/fixtures/memory_views.neoil),
 not hand-authored class-library implementations. Production APIs belong in Raven
 `.rvn` source; source/compiler integration supplies ref-like types, implicit conversions and
-array range views. Native JIT/AOT lowering is not implemented and selected
-view types reject instead of being treated as empty records.
+array range views. Native JIT/AOT now admits a bounded persistent-byte path:
+Memory<byte>/ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty
+and Slice(start, length), with typed argument/return/field storage. Borrowed views,
+other element types and the remaining operations still reject rather than being
+treated as empty records. See the bounded native storage section below.
 
 `.memoryview slice|read_only_slice|memory|read_only_memory` serializes as the
 optional `TypeDef.memory_view` enum. Admission requires the corresponding canonical
@@ -180,8 +183,9 @@ compiled only with native-metadata, with no added storage in interpreter-only bu
 
 `runtime/native/memory/memory-views.h` and the existing packaged text-arena
 implementation now provide checked native operations for byte-array windows.
-This is executable C support, not yet bound to Raven InternalCalls or admitted
-by JIT/AOT selection. Other element types and String UTF-8 views remain pending.
+The initial kernel was C-only; the bounded persistent-byte binding below now
+uses its creation and slicing operations from generated Raven code. Other
+element types and String UTF-8 views remain pending.
 
 The provisional private carrier is 24 bytes on the supported 64-bit targets:
 an allocation-base owner pointer, two uint32 element bounds, and a uint64 kind.
@@ -250,3 +254,62 @@ destination initialization, null/empty inputs, invalid windows, foreign contexts
 stale owners and unchanged allocation counts. Both tests pass. Public Raven
 members, the API snapshot and native guest admission are unchanged; the manual
 host reference documents this sixth private helper.
+
+
+## Bounded native persistent-byte storage (2026-10-19)
+
+The shared backend recognizes only closed Memory<byte>/ReadOnlyMemory<byte>
+with retained specialization proof and their exact fieldless opaque shape. It
+uses three logical lanes: owner (I64), offset (I32) and length (I32), occupying
+24 bytes in the existing eight-byte-per-lane private storage format. Only owner
+is a stack root. Nesting in records/tuples retains that root's actual offset;
+heap fields participate in the existing nonmoving collector's object tracing.
+Readonly capability remains in the nominal type, not a guest-writable kind word.
+This follows the owner/offset/length model of .NET Memory while using neoCLR's
+private aggregate ABI. The extra slot padding is an implementation cost, not
+an externally stable layout or a performance improvement claim.
+
+With explicit System compilation and reference-arena support, exact InternalCalls
+bind array creation, Length and two-argument Slice. Creation accepts mutable
+ArrayRef<Byte>, never an immutable byte value snapshot. Default values have a
+null owner and zero bounds. Length reads the validated length lane; Slice packs
+the three lanes into the checked C descriptor with the statically known kind,
+then unpacks the successful result. The C kind word never enters guest storage.
+The whole-array helper validates storage before deriving its length. Helpers do
+not allocate or collect; ordinary call, field and return lowering preserves the
+owner through published GC frames. This is temporary native IR/codegen, not a
+new CLI encoding or a Raven compiler change.
+
+Borrowed Slice/ReadOnlySlice, other element types, view arrays/unions, boxing, arbitrary
+record construction, persistent-to-borrowed conversion, readonly conversion,
+ToArray and one-argument Slice services remain unsupported in native execution.
+The full interpreter API is unchanged. Range APIs may compose the admitted
+primitive, but only the explicit two-argument window is qualified here. Async
+view retention and shared buffer-service migration remain later validation work.
+
+Reproduction: build `neoclr-codegen`, then run
+`python3 docs/validation/memory-views-20261019/native-run.py --compiler <rvnc.dll> --output <directory>`
+with the matching source-owned System.Runtime library. The Raven consumer covers
+both persistent types, default empty values, array conversion, return/argument
+copies, nested windows, object fields and an empty window retaining its own array.
+It performs checked slicing after explicit GC, when each creating function has
+returned. The harness also checks root-frame cleanup and full final reclamation.
+
+The final VM verification pass uses a temporary nominal shell for each admitted
+persistent-byte shape. It still checks type/member identity, definite
+initialization and address lifetimes. The native profile checks the real opaque
+layout and rejects record construction/boxing beforehand; the original load set
+is verified before specialization. Shells are never emitted or executed. A
+regression test checks that uninitialized locals still reject and serialized
+metadata without the private specialization proof cannot request a shell.
+
+Validation passes on macOS ARM64: both Raven consumers compile and run on the
+interpreter, JIT and AOT; AOT is checked with UBSan/bounds. Success returns 0;
+the invalid window returns native status 8 with the output untouched. Both paths
+balance root frames and fully reclaim the heap. The codegen suite passes 98 tests
+with one explicit performance test ignored; the two Python kernel tests pass in
+arena/GC modes. [Retained evidence](validation/memory-views-20261019/native-validation.json)
+includes commands, hashes, bindings and execution output. Windows execution and
+native asynchronous retention are not qualified here. The public signatures are
+unchanged, so the API snapshot is unchanged; manual API limits and website status
+are updated without a routine website build.
