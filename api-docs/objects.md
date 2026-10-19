@@ -483,3 +483,20 @@ normalized copies. Canonical and simple-fold Contains use candidate scans and ca
 repeat prefix work for long inputs; no linear-time or HTTP throughput guarantee is
 made. The public overloads have interpreter/JIT/AOT fixtures in the repository's
 `docs/experiments/string-search` directory. Original UTF-8 storage is unchanged.
+
+
+Development `Char.TryFromString(text)` returns `Some(char)` for exactly one
+Unicode 17 extended grapheme cluster and `None` for empty text or multiple clusters.
+Text is non-null. Original bytes are preserved, including combining marks, CRLF,
+flags, emoji sequences and NUL. The check compares the first cluster's extent with
+the input; it does not build a Char array or normalize text. Successful creation
+uses the existing Char storage and Option carrier, so this is not a zero-allocation
+construction guarantee. FromString remains the faulting alternative.
+
+`Char.Equals(other, comparison)` applies Canonical, Ordinal byte identity or
+OrdinalIgnoreCase simple-fold scalar identity to the entire grapheme. Unknown modes
+fault with RuntimeError. It compares Char storage directly without an intermediate
+String. Canonical remains the default for typed/boxed equality and hashing; callers
+using another equality policy must choose compatible hashing. A general borrowed
+Char.Utf8Bytes view is not implemented: interpreter Char storage still needs an
+ownership solution before that contract can avoid copying.

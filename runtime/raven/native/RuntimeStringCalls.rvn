@@ -125,3 +125,12 @@ internal extern func StringContainsOrdinalIgnoreCase(text: string, pattern: stri
 internal extern func StringStartsWithOrdinalIgnoreCase(text: string, pattern: string) -> bool;
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringEndsWithOrdinalIgnoreCase(text: string, pattern: string) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharIsSingleGrapheme(text: string) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharCompareOrdinal(left: char, right: char) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharCompareOrdinalIgnoreCase(left: char, right: char) -> int;

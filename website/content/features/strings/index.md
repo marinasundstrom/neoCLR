@@ -69,6 +69,18 @@ Case conversion, folding and segmentation have their own versioned Unicode rules
 consult the [String](xref:System.String) and [Char](xref:System.Char) contracts when
 text boundaries or cross-platform comparison must be exact.
 
+## Work with one character
+
+Development `Char.TryFromString(text)` returns `Some(char)` for one complete
+grapheme and `None` for empty text or multiple graphemes. It preserves the original
+UTF-8 spelling. `Char.Equals(other, comparison)` also supports explicit Canonical,
+Ordinal and OrdinalIgnoreCase policies, comparing character storage directly.
+For example, composed and decomposed accents match canonically but differ ordinally.
+
+Char represents a grapheme, while `UnicodeScalar` owns scalar category checks.
+Successful Char/Option construction can allocate under the current representation;
+a borrowed Char byte view remains future work. See the [Char reference](xref:System.Char).
+
 ## Search text
 
 Development `Contains`, `StartsWith` and `EndsWith` compare complete graphemes by

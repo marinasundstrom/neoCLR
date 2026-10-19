@@ -1135,6 +1135,11 @@ pub(crate) fn compile_into(
                 vec![types::I64, types::I64, types::I64],
             ),
             (
+                &d.char_is_single_grapheme,
+                "neoclr_char_is_single_grapheme_v1",
+                vec![types::I64, types::I64],
+            ),
+            (
                 &d.string_contains_canonical,
                 "neoclr_string_contains_canonical_v1",
                 vec![types::I64, types::I64, types::I64],

@@ -17,8 +17,7 @@ fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
 
 fn single_grapheme(bytes: &[u8]) -> bool {
     let Ok(text) = core::str::from_utf8(bytes) else { return false };
-    let mut graphemes = text.graphemes(true);
-    graphemes.next().is_some() && graphemes.next().is_none()
+    text.graphemes(true).next().is_some_and(|first| first.len() == text.len())
 }
 
 /// Returns 1 only for one valid extended grapheme; 0 for empty/invalid/multiple.

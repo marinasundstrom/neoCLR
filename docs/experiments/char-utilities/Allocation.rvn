@@ -1,0 +1,32 @@
+import System.*
+import System.Option.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    let composed = Char.FromString("é")
+    let decomposed = Char.FromString("é")
+    let upper = Char.FromString("Σ")
+    let lower = Char.FromString("ς")
+    var count = 0
+    while count < 128 {
+        var result = true
+        if mode == "check" {
+            result = composed.Equals(decomposed, StringComparison.Canonical)
+                && !composed.Equals(decomposed, StringComparison.Ordinal)
+                && upper.Equals(lower, StringComparison.OrdinalIgnoreCase)
+        } else if mode == "try_valid" {
+            if Char.TryFromString("é") is Some(let value) {
+                result = value.Equals(decomposed)
+            } else {
+                result = false
+            }
+        } else if mode == "try_invalid" {
+            result = Char.TryFromString("ab") is None
+        }
+        if !result {
+            System.Fail("Char allocation fixture")
+        }
+        count += 1
+    }
+    Console.WriteLine("PASS char allocation")
+}

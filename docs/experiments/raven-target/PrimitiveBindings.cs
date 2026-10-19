@@ -14,7 +14,7 @@ static class PrimitiveBindings
             source = source.Replace($"public struct {type} {{ }}", $"public struct {type} {{ public int CompareTo({type} other) => 0; "
                 + (type == "Int64" ? "public static Result<long, NumberParseError> Parse(string value) => default; public string ToString() => default; public static long MinValue => default; public static long MaxValue => default;" : "")
                 + (NumberBindings.HasNewParser(type) ? $"public static Result<{type}, NumberParseError> Parse(string value) => default;" : "")
-                + (type == "Char" ? "public static char FromString(string text) => default; public override string ToString() => default; public bool Equals(char other) => default; public override bool Equals(object? other) => default; public override int GetHashCode() => default;" : "") + " }");
+                + (type == "Char" ? "public static char FromString(string text) => default; public static Option<char> TryFromString(string text) => default; public bool Equals(char other, StringComparison comparison) => default; public override string ToString() => default; public bool Equals(char other) => default; public override bool Equals(object? other) => default; public override int GetHashCode() => default;" : "") + " }");
         return source;
     }
     public static bool IsReceiver(string type) => Types.Contains(type) || type is "Int32" or "Double" or "Boolean";

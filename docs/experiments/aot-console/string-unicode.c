@@ -224,3 +224,9 @@ int32_t neoclr_string_ends_with_ignore_case_v1(const neoclr_aot_text *text, cons
     if (!text || !pattern || !output) return 3;
     return neoclr_unicode_search_v1(text->bytes, text->length, pattern->bytes, pattern->length, 2, 1, output);
 }
+
+int32_t neoclr_char_is_single_grapheme_v1(const neoclr_aot_text *text, int32_t *output) {
+    if (!text || !output) return 3;
+    *output = neoclr_is_single_grapheme_v1(text->bytes, text->length);
+    return 0;
+}

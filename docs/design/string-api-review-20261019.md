@@ -481,3 +481,49 @@ candidate-prefix scans. No cultural matching or linear-time guarantee is implied
 qualify the additions without claiming HTTP throughput gains. Source methods remain
 Raven; only private string access/search services use shared runtime kernels. No
 public position type or storage/view representation change accompanies this work.
+
+
+### Refined shared-storage String proposal (2026-10-19; not implemented)
+
+The author clarifies that String remains an object: callers supply real backing
+storage, while substring and split results allocate descriptors sharing the content.
+This is independent of making String a value type. The assistant recommends a
+prototype after the current helpers: immutable UTF-8 owner plus byte offset/length,
+nested slices flattened onto that owner, distinct String object identity, and an
+explicit independent-copy operation to release retained parent storage.
+
+[Swift's Substring implementation/documentation](https://github.com/swiftlang/swift/blob/main/stdlib/public/core/Substring.swift)
+provides a shipped comparison for storage sharing and retention; using String for
+both full and partial windows would be a deliberate neoCLR choice. The historical
+[Swift String manifesto](https://github.com/swiftlang/swift/blob/main/docs/StringManifesto.md)
+discusses the same-type shared-storage alternative, but is design history rather
+than the current API contract. Compared with copying .NET substrings, the benefit
+is fewer byte copies; the costs include wrapper allocation, retained large buffers,
+owner tracing, offset-aware native services and interop materialization where needed.
+
+A ReadOnlyMemory<byte> is not sufficient proof of immutable storage if mutable
+aliases survive. External buffers need copying, freezing or enforced ownership
+transfer. Literal/interpolation/decoder constructors can still create storage
+without asking ordinary callers to manage buffers. Grapheme slicing, canonical
+comparison and original-byte preservation remain unchanged. Existing interpreter
+StringValue shares whole StringData but has no window; native text layout/GC must
+be coordinated. This remains a proposal, not approval or implementation of a layout
+change, and it does not bypass the author's utility-first sequencing.
+
+
+### First Char utilities implemented (2026-10-19)
+
+The follow-up adds TryFromString with Option<char> and explicit-policy Equals,
+qualified by the [Char utility consumer](../experiments/char-utilities/README.md).
+Validation uses the first grapheme extent rather than constructing an eager Char
+array; equality compares existing Char text without String conversion. Compared
+with .NET Char.TryParse's one-code-unit Boolean/out contract, Option and complete
+graphemes follow neoCLR's current language and text model. Non-null inputs keep
+nullable handling explicit. Native diagnostic workloads add no managed allocations;
+interpreter Char buffer copying remains a representation cost, not a solved issue.
+
+The proposed Utf8Bytes, scalar traversal and whole-grapheme whitespace helpers
+remain separate work. Inspection confirms Value::Char stores an owned Rust String;
+CharText clones it into StringValue, so exposing that path as borrowed would be
+misleading. The shared-storage proposal above could address this ownership issue,
+but no String or Char layout change is adopted in this utility slice.

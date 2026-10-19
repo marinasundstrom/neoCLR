@@ -20004,3 +20004,29 @@ Native JSON backend/runtime gaps remain open separately.
   because mappings can expand. **Action/status:** inspect the current Raven Char
   and UnicodeScalar APIs and finish String search first. These Char additions are a
   proposed shortlist, not implemented APIs or an approved representation change.
+
+
+- **Author clarification (2026-10-19):** proposes String as an object over actual
+  backing storage: substring/split allocate String objects while sharing the original
+  content, and asks whether that is a good fit for the language. This refines the
+  earlier deferred representation discussion; it is not a request for a separate
+  StringSlice or necessarily a value type. **Assistant recommendation:** prototype
+  immutable storage plus byte offset/length after the helpers, with nested views
+  pointing directly to storage, GC-tracked ownership, distinct object identity and
+  an explicit independent copy. Caller-owned mutable bytes require copying, freezing
+  or enforced ownership transfer; read-only access alone does not ensure immutable
+  storage. Ordinary text construction can still allocate storage automatically.
+  **Tradeoffs/open work:** reduced copying versus retained large buffers, descriptor
+  allocations and coordinated interpreter/native GC layout changes. Preserve UTF-8
+  bytes and grapheme/canonical semantics. No storage change is implemented by this
+  discussion; measure retention and GC work before adopting the proposal.
+
+
+- **Assistant follow-through (2026-10-19):** implements Char.TryFromString with
+  Option<char> and explicit-policy Equals, preserving source bytes and comparing
+  Char storage without String conversion. [Six executions](experiments/char-utilities/README.md)
+  pass across interpreter/JIT/AOT, including dynamically allocated text retained by
+  Option<Char> across a later allocation. Native comparison and conversion workloads
+  add no managed allocations; interpreter Char copies remain. Borrowed Char bytes,
+  scalar traversal and grapheme whitespace helpers are still open. The shared-storage
+  String proposal remains separate from the completed utility APIs.

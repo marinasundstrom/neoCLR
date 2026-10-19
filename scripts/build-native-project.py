@@ -317,7 +317,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                               for binding in selection.get('nativeBindings', []))
         if time_zone_rules:
             adapters.append(base / 'time-zone.c')
-        text_services = {'neoclr_string_contains_canonical_v1', 'neoclr_string_starts_with_canonical_v1',
+        text_services = {'neoclr_char_is_single_grapheme_v1',
+                         'neoclr_string_contains_canonical_v1', 'neoclr_string_starts_with_canonical_v1',
                          'neoclr_string_ends_with_canonical_v1', 'neoclr_string_contains_ignore_case_v1',
                          'neoclr_string_starts_with_ignore_case_v1', 'neoclr_string_ends_with_ignore_case_v1',
                          'neoclr_string_compare_canonical_v1', 'neoclr_string_hash_canonical_v1',

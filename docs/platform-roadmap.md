@@ -16,7 +16,8 @@ now preserves bytes and uses a single final native allocation when changed. The 
 representation decision until after utility work. The [canonical search integration](experiments/string-search/README.md)
 repairs Unicode version skew and qualifies Contains/StartsWith/EndsWith with explicit
 comparison modes across interpreter/JIT/AOT. The six-search allocation workload adds
-no managed allocations; eager collection counts rise, without a throughput claim. Position-based
+no managed allocations; eager collection counts rise, without a throughput claim. [Char validation and explicit equality](experiments/char-utilities/README.md)
+are also implemented; borrowed Char bytes remain an ownership gap. Position-based
 search/splitting and the direct-call null String bridge discrepancy remain review
 items; replacement release qualification remains pending.
 

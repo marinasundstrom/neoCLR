@@ -1,0 +1,62 @@
+{
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "-isysroot",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "-arch",
+    "arm64",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DNEOCLR_NATIVE_GC",
+    "-DNEOCLR_HTTP_HEAP_BYTES=1048576",
+    "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+    "-DNEOCLR_ENTRY_ARGUMENTS",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "/Users/robert/Projects/neoclr/docs/experiments/string-building/reuse-20261019/allocation-host.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+    "/Users/robert/Projects/neoclr/target/char-utilities-allocation-v1/app.o",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/char-utilities-allocation-v1/allocation-probe"
+  ],
+  "iterations": 128,
+  "measurements": [
+    {
+      "mode": "baseline",
+      "allocations": 2,
+      "collections": 1552,
+      "reclaimed": 2
+    },
+    {
+      "mode": "check",
+      "allocations": 2,
+      "collections": 1296,
+      "reclaimed": 2
+    },
+    {
+      "mode": "try_valid",
+      "allocations": 2,
+      "collections": 2320,
+      "reclaimed": 2
+    },
+    {
+      "mode": "try_invalid",
+      "allocations": 2,
+      "collections": 2320,
+      "reclaimed": 2
+    }
+  ],
+  "scope": "Whole-process native managed allocations; not CPU, host allocations or throughput"
+}

@@ -32,4 +32,5 @@ int32_t neoclr_string_ends_with_canonical_v1(const neoclr_aot_text *, const neoc
 int32_t neoclr_string_contains_ignore_case_v1(const neoclr_aot_text *, const neoclr_aot_text *, int32_t *);
 int32_t neoclr_string_starts_with_ignore_case_v1(const neoclr_aot_text *, const neoclr_aot_text *, int32_t *);
 int32_t neoclr_string_ends_with_ignore_case_v1(const neoclr_aot_text *, const neoclr_aot_text *, int32_t *);
+int32_t neoclr_char_is_single_grapheme_v1(const neoclr_aot_text *, int32_t *);
 #endif

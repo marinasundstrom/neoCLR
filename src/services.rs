@@ -243,6 +243,9 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::StringStartsWithOrdinal
             | crate::native::Binding::StringEndsWithOrdinal
             | crate::native::Binding::StringGraphemeCount
+            | crate::native::Binding::CharIsSingleGrapheme
+            | crate::native::Binding::CharCompareOrdinal
+            | crate::native::Binding::CharCompareOrdinalIgnoreCase
             | crate::native::Binding::CharFromString
             | crate::native::Binding::CharText
             | crate::native::Binding::StringGraphemes

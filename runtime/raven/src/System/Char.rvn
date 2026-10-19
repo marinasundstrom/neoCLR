@@ -1,5 +1,7 @@
 module System
 
+import System.Option.*
+
 
 public struct Char : ComparableTo<char> {
     // Immutable grapheme storage is supplied by the runtime.
@@ -10,6 +12,19 @@ public struct Char : ComparableTo<char> {
         return neoCLR.Runtime.CharFromString(text)
     }
 
+    /// <summary>Creates a Char when text is exactly one extended grapheme cluster.</summary>
+    /// <param name="text">Non-null UTF-8 text to validate; empty or multiple graphemes return None.</param>
+    /// <returns>Some containing the original grapheme spelling, or None.</returns>
+    /// <remarks>Uses Unicode 17 boundaries and preserves bytes without normalization.
+    /// Checks whether the first grapheme occupies the entire input; no temporary String or Char array is created.
+    /// Successful construction follows the runtime's Char storage and Option allocation rules.</remarks>
+    static func TryFromString(text: string) -> Option<char> {
+        if !neoCLR.Runtime.CharIsSingleGrapheme(text) {
+            return None
+        }
+        return Some(neoCLR.Runtime.CharFromString(text))
+    }
+
     override func ToString() -> string {
         return neoCLR.Runtime.CharText(m_value)
     }
@@ -17,6 +32,26 @@ public struct Char : ComparableTo<char> {
     /// Tests canonical equivalence of graphemes without allocating text.
     func Equals(other: char) -> bool {
         return neoCLR.Runtime.CharCompareCanonical(m_value, other) == 0
+    }
+
+    /// <summary>Compares graphemes using an explicit text policy.</summary>
+    /// <param name="other">The grapheme to compare.</param>
+    /// <param name="comparison">Canonical, Ordinal byte identity, or OrdinalIgnoreCase simple-fold scalar identity.</param>
+    /// <returns>True when the entire graphemes match under the selected policy.</returns>
+    /// <remarks>Unknown modes fault with RuntimeError. Simple folding does not normalize or expand.
+    /// Compares Char storage directly without converting it to String; original bytes are preserved.</remarks>
+    func Equals(other: char, comparison: StringComparison) -> bool {
+        if comparison == StringComparison.Canonical {
+            return neoCLR.Runtime.CharCompareCanonical(m_value, other) == 0
+        }
+        if comparison == StringComparison.Ordinal {
+            return neoCLR.Runtime.CharCompareOrdinal(m_value, other) == 0
+        }
+        if comparison == StringComparison.OrdinalIgnoreCase {
+            return neoCLR.Runtime.CharCompareOrdinalIgnoreCase(m_value, other) == 0
+        }
+        System.Fail("Unsupported StringComparison")
+        return false
     }
 
     override func Equals(other: Object?) -> bool {

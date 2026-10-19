@@ -129,6 +129,7 @@ pub struct Options {
     pub memory_view_bounds_fault: Vec<usize>,
     pub string_slice_graphemes: Vec<usize>,
     pub string_slice_utf8: Vec<usize>,
+    pub char_is_single_grapheme: Vec<usize>,
     pub char_from_string: Vec<usize>,
     pub char_text: Vec<usize>,
     pub int64_to_string: Vec<usize>,
@@ -989,6 +990,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "string-compare-ordinal-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            char_is_single_grapheme: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "char-is-single-grapheme-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             string_contains_canonical: report

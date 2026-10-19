@@ -781,6 +781,24 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
                 "string-hash-canonical-v1",
                 "neoclr_string_hash_canonical_v1",
             ),
+            "neoCLR.Runtime.CharIsSingleGrapheme" => (
+                vec![Type::String],
+                Type::Boolean,
+                "char-is-single-grapheme-v1",
+                "neoclr_char_is_single_grapheme_v1",
+            ),
+            "neoCLR.Runtime.CharCompareOrdinal" => (
+                vec![Type::Char, Type::Char],
+                Type::Int32,
+                "string-compare-ordinal-v1",
+                "neoclr_string_compare_ordinal_v1",
+            ),
+            "neoCLR.Runtime.CharCompareOrdinalIgnoreCase" => (
+                vec![Type::Char, Type::Char],
+                Type::Int32,
+                "string-compare-ignore-case-v1",
+                "neoclr_string_compare_ignore_case_v1",
+            ),
             "neoCLR.Runtime.CharCompareCanonical" => (
                 vec![Type::Char, Type::Char],
                 Type::Int32,

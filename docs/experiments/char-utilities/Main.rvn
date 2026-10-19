@@ -1,0 +1,59 @@
+import System.*
+import System.Option.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("Char utility contract")
+    }
+}
+
+func Expect(text: string, valid: bool) {
+    if Char.TryFromString(text) is Some(let character) {
+        Check(valid)
+        Check(String.CompareOrdinal(character.ToString(), text) == 0)
+    } else {
+        Check(!valid)
+    }
+}
+
+func CreateOwned() -> Option<char> {
+    return Char.TryFromString(String.Concat("e", "́"))
+}
+
+func Main() {
+    Expect("", false)
+    Expect("ab", false)
+    Expect("🇸🇪🇳🇴", false)
+    Expect("éx", false)
+    Expect("é", true)
+    Expect("é", true)
+    Expect("👩‍💻", true)
+    Expect("🇸🇪", true)
+    Expect("\r\n", true)
+    Expect("\u0000", true)
+    Expect("́", true)
+    Expect("a᫏", true)
+    let composed = Char.FromString("é")
+    let decomposed = Char.FromString("é")
+    Check(composed.Equals(decomposed))
+    Check(composed.Equals(decomposed, StringComparison.Canonical))
+    Check(!composed.Equals(decomposed, StringComparison.Ordinal))
+    Check(!composed.Equals(decomposed, StringComparison.OrdinalIgnoreCase))
+    Check(composed.Equals(composed, StringComparison.Ordinal))
+    let sigma = Char.FromString("Σ")
+    let finalSigma = Char.FromString("ς")
+    Check(sigma.Equals(finalSigma, StringComparison.OrdinalIgnoreCase))
+    Check(!sigma.Equals(finalSigma, StringComparison.Canonical))
+    let dotted = Char.FromString("İ")
+    Check(!dotted.Equals(Char.FromString("i"), StringComparison.OrdinalIgnoreCase))
+    Check(String.CompareOrdinal(decomposed.ToString(), "é") == 0)
+    let owned = CreateOwned()
+    let unrelated = String.Concat("fresh", "allocation")
+    Check(unrelated.StartsWithOrdinal("fresh"))
+    if owned is Some(let retained) {
+        Check(String.CompareOrdinal(retained.ToString(), "é") == 0)
+    } else {
+        System.Fail("Retained Char owner")
+    }
+    Console.WriteLine("PASS char utilities")
+}

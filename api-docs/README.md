@@ -2605,3 +2605,11 @@ string-search-api-audit-v2 from string-search-libraries-v3, rebuilt after adding
 source parameter/result/remarks documentation; method bodies match the qualified
 v2 library. The manual guide distinguishes canonical grapheme boundaries from
 ordinal byte/simple-fold scalar search. No new RavenDoc exclusion is needed.
+
+
+Development (2026-10-19) adds Char.TryFromString(string) returning Option<char>
+and Equals(char, StringComparison). Both reference snapshots include the new
+members on the already-selected Char type. The native snapshot comes from
+char-utilities-api-audit-v1 and the matching five-library build. Source and manual
+documentation describe non-null inputs, one-grapheme validation, unchanged UTF-8,
+comparison modes and construction/ownership limitations; no new exclusion is needed.

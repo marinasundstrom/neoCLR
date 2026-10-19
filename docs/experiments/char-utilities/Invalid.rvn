@@ -1,0 +1,6 @@
+import System.*
+
+func Main() {
+    let value = Char.FromString("é")
+    Console.WriteLine(value.Equals(value, (StringComparison)99).ToString())
+}

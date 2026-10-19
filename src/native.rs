@@ -114,6 +114,9 @@ pub(crate) enum Binding {
     StringSliceGraphemes,
     StringGraphemeAt,
     StringGraphemeCount,
+    CharIsSingleGrapheme,
+    CharCompareOrdinal,
+    CharCompareOrdinalIgnoreCase,
     CharFromString,
     CharText,
     StringGraphemes,
@@ -828,6 +831,15 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringGraphemeCount", [Type::String]) => {
             (Binding::StringGraphemeCount, Type::Int32)
+        }
+        ("neoCLR.Runtime.CharIsSingleGrapheme", [Type::String]) => {
+            (Binding::CharIsSingleGrapheme, Type::Boolean)
+        }
+        ("neoCLR.Runtime.CharCompareOrdinal", [Type::Char, Type::Char]) => {
+            (Binding::CharCompareOrdinal, Type::Int32)
+        }
+        ("neoCLR.Runtime.CharCompareOrdinalIgnoreCase", [Type::Char, Type::Char]) => {
+            (Binding::CharCompareOrdinalIgnoreCase, Type::Int32)
         }
         ("neoCLR.Runtime.CharFromString", [Type::String]) => (Binding::CharFromString, Type::Char),
         ("neoCLR.Runtime.CharText", [Type::Char]) => (Binding::CharText, Type::String),
@@ -2026,6 +2038,18 @@ impl Binding {
                     .map_err(|_| Fault::new("String grapheme count exceeds Int32 range"))?;
                 Ok(Value::Int32(count))
             }
+            (Self::CharIsSingleGrapheme, [Value::String(value)]) => Ok(Value::Boolean(
+                value
+                    .graphemes(true)
+                    .next()
+                    .is_some_and(|first| first.len() == value.len()),
+            )),
+            (Self::CharCompareOrdinal, [Value::Char(left), Value::Char(right)]) => {
+                Ok(Value::Int32(left.as_bytes().cmp(right.as_bytes()) as i32))
+            }
+            (Self::CharCompareOrdinalIgnoreCase, [Value::Char(left), Value::Char(right)]) => Ok(
+                Value::Int32(crate::string_comparison::compare_ignore_case(left, right) as i32),
+            ),
             (Self::CharFromString, [Value::String(value)]) => {
                 let character = Value::Char(value.as_str().to_owned());
                 character.initialized()?;
