@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Record primary-source lessons from .NET, Swift and Rust for the UTF-8 string model: explicit comparison policies, grapheme semantics, borrowed views, ownership and measurable costs. Keep recommendations distinct from pending public canonical integration.
+
 - Add a pinned Unicode 17 canonical comparison/hash foundation with bounded scratch and no heap allocation, then connect private String/Char services to the interpreter and native backend. Preserve original UTF-8 storage and avoid CharText intermediates. Six interpreter/kernel tests (including all 20,034 normalization cases), the native ABI test and macOS ARM64 AOT with arena/native GC pass. Keep public text equality unchanged pending coordinated boxed/compiler/hash-policy integration; record the allocating HashCode.Add(string) dependency and 71 unresolved diagnostics from the additional strict backend Clippy check.
 
 - Remove StringBuilder’s intermediate AppendLine string and retain backing capacity across ToString/Clear while releasing old text references. Preserve byte quotas, immutable snapshots and Unicode fragment behavior. Fifteen contract executions pass across interpreter/JIT/AOT; a matched native reuse workload drops from 651 to 137 managed allocations (78.96%). Capacity retention is the explicit memory tradeoff; no throughput improvement is claimed. Refresh API documentation snapshots.

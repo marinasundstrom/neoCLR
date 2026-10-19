@@ -196,3 +196,47 @@ diagnostics (including unused unit expressions, collapsible conditions and
 argument-count limits); it is not a passing release gate. These findings require
 a separate backend cleanup/qualification rather than being hidden with lint
 suppression in the text-service change. Formatting and API fingerprint checks pass.
+
+
+### Lessons from .NET, Swift and Rust (2026-10-19)
+
+The author asks what neoCLR can learn from these three platforms. The following
+is design guidance, not a claim that the public canonical integration is complete.
+
+- **.NET:** retain explicit comparison policies and buffer-oriented APIs.
+  [String comparison guidance](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings)
+  distinguishes linguistic operations from ordinal identifier matching;
+  [memory views](https://learn.microsoft.com/en-us/dotnet/standard/memory-and-spans/)
+  avoid copying underlying buffers. For neoCLR, keep exact protocol comparisons
+  explicit and let parsing/formatting consume or fill slices directly. UTF-8
+  storage deliberately differs from .NET's UTF-16 string representation; ordinal
+  byte ordering must not be described as identical to UTF-16 code-unit ordering.
+- **Swift:** retain grapheme-oriented text and canonical equality with matching
+  hashes, while exposing storage separately. Its
+  [String documentation](https://developer.apple.com/documentation/swift/string)
+  describes canonical comparison and shared substring storage; its
+  [UTF-8 implementation account](https://www.swift.org/blog/utf8-string/)
+  illustrates why native UTF-8 helps interoperability. For neoCLR, preserve
+  original bytes and avoid allocating normalized copies for comparisons. Shared
+  substrings save copies but can retain a large owner; materialization must remain
+  available. Grapheme counting/index traversal has a scanning cost, so checked
+  positions and forward iteration deserve preference over repeated numeric indexing.
+- **Rust:** learn from the distinction between an owned
+  [String and borrowed str](https://doc.rust-lang.org/std/string/struct.String.html),
+  valid UTF-8 invariants and checked scalar boundaries. A byte slice alone is not
+  validated text; a scalar boundary is not necessarily a grapheme boundary.
+  neoCLR should carry ownership through Memory and bound synchronous borrowing
+  through Slice, rather than attempting to copy Rust's ownership system wholesale.
+
+Recommended follow-ups are a consistent position contract for search and slicing,
+explicit text-view materialization, and direct UTF-8 builder/writer formatting.
+A Char remains a grapheme, not a fixed-size storage element: avoid allocating an
+array of Char values simply to traverse text. Canonical equivalence, case folding
+and locale-sensitive collation are separate policies. Exact JSON names, protocol
+fields and metadata identities must keep their specified comparison contracts.
+
+Validate ASCII, composed/decomposed accents, emoji sequences, long combining runs,
+retained small substrings of large inputs, and builder fragments whose join changes
+grapheme boundaries. Measure allocations, retained bytes and CPU separately;
+fewer allocations alone do not establish higher HTTP throughput. Small-string
+inlining or cached metadata remain measurement-driven options, not release scope.

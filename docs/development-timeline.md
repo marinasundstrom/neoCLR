@@ -48,6 +48,14 @@ public-integration requirements. See the
 [String review](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19).
 
 
+The author then asks: “What can we learn from .NET, Swift, and Rust in handling
+strings?” The assistant recommends Swift's grapheme/canonical semantics, Rust's
+owned-versus-borrowed and valid-UTF-8 distinctions, and .NET's explicit comparison
+and buffer APIs. It records costs including traversal, retained substring owners
+and normalization work, and distinguishes recommendations from completed public
+integration. See the [comparison](design/string-api-review-20261019.md#lessons-from-net-swift-and-rust-2026-10-19).
+
+
 ## 2026-10-19 — Raven owns the class library; archive obsolete mirrors deliberately
 
 The author corrects the assistant's Slice implementation direction: “Runtime är i
