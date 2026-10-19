@@ -20091,3 +20091,40 @@ Native JSON backend/runtime gaps remain open separately.
   ownership underneath. Grapheme reads require boundary-aware decoding rather than
   one-byte/scalar reads. These public operations remain pending; the host transport
   slice does not fulfill the complete request.
+
+
+## 2026-10-20 — Shared text reads and peek
+
+- **Author:** continues the implementation and asks, “Should textreader have peek functionality?”
+- **Assistant recommendation:** awaitable PeekChar returns the next grapheme without
+  advancing the logical cursor, may read underlying bytes, and shares retained
+  lookahead with ReadChar, counted Read and ReadLine. Repeated peeks reuse the cached Char.
+- **Implementation:** Raven TextReader/StreamReader receive these operations; Console.In
+  becomes an invocation-owned shared reader. Closing it affects subsequent Console text
+  reads. Busy rejects overlapping operations. Keys, cancellation and nonblocking standard
+  input remain separate integration work; no performance improvement is inferred.
+- **Evidence:** [mixed-read qualification](experiments/console-text-reading/README.md).
+
+  Interpreter, JIT and AOT all pass the mixed-reader consumer, including a pending
+  source that suspends and returns Busy to overlapping readers. Both API snapshots
+  are refreshed. No compiler fix was required; an explicit byte-array field type
+  and valid union-case extraction resolved initial source compilation errors.
+
+
+## 2026-10-20 — Optional synchronous stream capabilities revisited
+
+- **Author question:** proposes SyncInputStream and SyncOutputStream capability
+  interfaces with explicit members to avoid collisions with canonical async interfaces.
+- **Assistant recommendation:** optional capabilities with borrowed Slice/ReadOnlySlice
+  parameters, explicit synchronous implementations, no sync-over-async blocking and
+  shared underlying stream state. Keep complete-write semantics and async defaults.
+- **Status:** recorded as a [recommendation](stream-design.md#optional-synchronous-capabilities-revisited--2026-10-20),
+  not author approval of final signatures or implementation. It revisits the earlier
+  deferral; exact Raven dispatch still needs an executable prototype before public APIs.
+
+- **Subsequent author clarification:** asks whether console I/O is actually async,
+  then states, “We don't want to force APIs into an asynchronous form unless we actually
+  need it.” The assistant adopts capability-based execution, distinguishes current
+  blocking standard-console calls from true pending-source suspension, and recommends
+  shared decoding/cursor logic with direct synchronous operations. The author confirms
+  the principle, while exact capability signatures still require implementation testing.

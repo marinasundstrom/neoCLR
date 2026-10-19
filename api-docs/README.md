@@ -2630,3 +2630,13 @@ covers ConsoleCapabilities, TerminalOptions, TerminalRead and TerminalInput plus
 the Rust Console methods. These are Rust embedding APIs, not Raven metadata types,
 so they are not added to RavenDoc type selection or either managed assembly snapshot.
 No guest terminal/key API is implemented by this first host transport slice.
+
+
+### Shared text reads and peek (2026-10-20)
+
+TextReader, StreamReader and Console now include PeekChar, ReadChar and counted Read
+in both snapshots. TextReadError.Busy is explicitly selected and documented. The
+Console guide explains the shared Console.In lifetime change, Unicode lookahead,
+source-read versus logical-cursor distinction, byte bounds, blocking standard-console
+provider and remaining terminal-key/cancellation work. These are Raven APIs, unlike
+the separately documented Rust terminal transport foundation.

@@ -74,11 +74,19 @@ static class ReaderBindings
                 public void Close() { }
             }
             public interface TextReader {
+                Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar();
+                Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar();
+                Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count);
+                Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count, int maxUtf8Bytes);
                 Concurrency.Tasks.Task<Result<Option<string>, TextReadError>> ReadLine(int maxUtf8Bytes);
                 Concurrency.Tasks.Task<Result<string, TextReadError>> ReadToEnd(int maxUtf8Bytes);
                 void Close();
             }
             public sealed class StreamReader : TextReader {
+                public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar() => default;
+                public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar() => default;
+                public Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count) => default;
+                public Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count, int maxUtf8Bytes) => default;
                 public StreamReader(InputStream input) { }
                 public StreamReader(InputStream input, bool leaveOpen) { }
                 public StreamReader(InputStream input, Text.Encoding encoding) { }
@@ -107,6 +115,8 @@ static class ReaderBindings
             "Finish" when owner == StreamWriter => ("", "System.Result<Int32,System.IO.StreamError>"),
             "CreateEncoder" when owner == "System.Text.Encoding" => ("", "System.Text.Encoder"),
             "CreateDecoder" when owner == "System.Text.Encoding" => ("", "System.Text.Decoder"),
+            "PeekChar" or "ReadChar" when owner is Reader or Stream => ("", "System.Result<System.Option<Char>,System.IO.TextReadError>"),
+            "Read" when owner is Reader or Stream => (args.Length == 1 ? "Int32" : "Int32,Int32", "System.Result<String,System.IO.TextReadError>"),
             "ReadLine" when owner is Reader or Stream => ("Int32", "System.Result<System.Option<String>,System.IO.TextReadError>"),
             "ReadToEnd" when owner is Reader or Stream => ("Int32", "System.Result<String,System.IO.TextReadError>"),
             "Close" when owner is Reader or Stream or Writer or StreamWriter => ("", "noresult"),

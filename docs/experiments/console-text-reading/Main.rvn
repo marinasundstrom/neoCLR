@@ -1,0 +1,150 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.IO.*
+import System.Text.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+
+class FragmentedInput : InputStream {
+    private val text: string
+    private val chunk: int
+    private var offset: int = 0
+    private var reads: int = 0
+
+    init(text: string, chunk: int) {
+        self.text = text
+        self.chunk = chunk
+    }
+
+    val Reads: int => reads
+
+    func Read(buffer: byte[], start: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, start, count, CancellationToken.None)
+    }
+
+    func Read(buffer: byte[], start: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {
+        reads += 1
+        var copied = 0
+        while copied < count && copied < chunk && offset < text.Utf8Bytes.Length {
+            buffer[start + copied] = text.Utf8Bytes[offset]
+            copied += 1
+            offset += 1
+        }
+        let result: Result<int, StreamError> = Ok(copied)
+        return Task.FromResult(result)
+    }
+
+    func Close() { }
+}
+
+// Deliberately controlled pending-source adapter to test overlapping read rejection.
+class PendingInput : InputStream {
+    val Source: Promise<Result<int, StreamError>> = Promise<Result<int, StreamError>>()
+
+    func Read(buffer: byte[], start: int, count: int) -> Task<Result<int, StreamError>> => Source.Task
+    func Read(buffer: byte[], start: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> => Source.Task
+    func Close() { }
+}
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func Text(result: Result<string, TextReadError>, expected: string) {
+    match result {
+        Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
+        Error(let error) => System.Fail("Unexpected text error: " + error.ToString())
+    }
+}
+
+func Character(result: Result<Option<char>, TextReadError>, expected: string) {
+    match result {
+        Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
+        _ => System.Fail("Expected character")
+    }
+}
+
+func End(result: Result<Option<char>, TextReadError>) {
+    match result {
+        Ok(None) => { }
+        _ => System.Fail("Expected character EOF")
+    }
+}
+
+async func Main() -> Task<unit> {
+    for chunk in [1, 2, 7, 256] {
+        let input = FragmentedInput("é👩‍💻🇸🇪\r\nnext\nlast", chunk)
+        let reader: TextReader = StreamReader(input)
+        Character(await reader.PeekChar(), "é")
+        let reads = input.Reads
+        Character(await reader.PeekChar(), "é")
+        Check(input.Reads == reads, "Repeated peek performed input")
+        Character(await reader.ReadChar(), "é")
+        Text(await reader.Read(2), "👩‍💻🇸🇪")
+        Character(await reader.PeekChar(), "\r\n")
+        match await reader.ReadLine(100) {
+            Ok(Some(let line)) => Check(line.IsEmpty, "Peek before empty line")
+            _ => System.Fail("Expected empty line")
+        }
+        Character(await reader.ReadChar(), "n")
+        match await reader.ReadLine(100) {
+            Ok(Some(let line)) => Check(line == "ext", "Mixed character and line cursor")
+            _ => System.Fail("Expected remaining line")
+        }
+        Text(await reader.Read(20), "last")
+        End(await reader.PeekChar())
+        End(await reader.ReadChar())
+        Text(await reader.Read(4), "")
+        Text(await reader.ReadToEnd(100), "")
+        reader.Close()
+        match await reader.PeekChar() {
+            Error(TextReadError.Closed) => { }
+            _ => System.Fail("Closed peek")
+        }
+    }
+
+    let limitedInput = FragmentedInput("éx", 256)
+    let limited = StreamReader(limitedInput)
+    Text(await limited.Read(0, 0), "")
+    Check(limitedInput.Reads == 0, "Zero read consumed input")
+    match await limited.Read(-1) {
+        Error(TextReadError.InvalidRange) => { }
+        _ => System.Fail("Invalid count")
+    }
+    Check(limitedInput.Reads == 0, "Invalid read consumed input")
+    match await limited.Read(1, 1) {
+        Error(TextReadError.LimitExceeded) => { }
+        _ => System.Fail("Expected byte limit")
+    }
+    Character(await limited.PeekChar(), "é")
+    Text(await limited.Read(1, 2), "é")
+    Text(await limited.ReadToEnd(2), "x")
+
+    let pendingInput = PendingInput()
+    let pendingReader = StreamReader(pendingInput)
+    let first = pendingReader.PeekChar()
+    Check(!first.IsCompleted, "Peek did not suspend")
+    match await pendingReader.ReadChar() {
+        Error(TextReadError.Busy) => { }
+        _ => System.Fail("Overlapping read accepted")
+    }
+    pendingInput.Source.Complete(Ok(0))
+    End(await first)
+
+    // Standard input is supplied by the runner; all convenience methods share one cursor.
+    Character(await Console.PeekChar(), "é")
+    Character(await Console.PeekChar(), "é")
+    Character(await Console.ReadChar(), "é")
+    Text(await Console.Read(2), "ab")
+    match await Console.ReadLine() {
+        Ok(Some(let line)) => Check(line == "c", "Console mixed cursor")
+        _ => System.Fail("Console line")
+    }
+    Text(await Console.In.Read(10), "tail")
+    End(await Console.ReadChar())
+    Console.WriteLine("PASS console text reads")
+}

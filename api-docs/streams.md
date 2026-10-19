@@ -87,7 +87,9 @@ invocation. Native host buffers may copy bytes; this is not a zero-copy API.
 
 [TextReader](xref:System.IO.TextReader), [StreamReader](xref:System.IO.StreamReader),
 [TextWriter](xref:System.IO.TextWriter) and [StreamWriter](xref:System.IO.StreamWriter)
-return Task results from I/O. Await ReadLine, ReadToEnd, Write, WriteLine, Flush and
+return Task results from I/O. TextReader/StreamReader now also provide PeekChar, ReadChar
+and counted Read with shared grapheme-aware lookahead; see the [text read contract](console.md#grapheme-peek-and-counted-reads-development).
+Await ReadLine, ReadToEnd, Write, WriteLine, Flush and
 StreamWriter.Finish. Text writes still report encoded byte counts. Finish finalizes
 the encoder; Flush only flushes the underlying output. Close follows leaveOpen and
 never implicitly finalizes conversion. Encoding operations on memory remain immediate.

@@ -153,3 +153,22 @@ Proposed integration contracts (not yet implemented):
 The assistant identifies the host transport as a prerequisite, not the canonical
 application surface. Async readiness/cancellation, framing/key decoding and shared
 Raven text-reader state still need implementation and cross-engine validation.
+
+
+### Peek clarification and text reader implementation
+
+The author asks whether TextReader should have peek functionality. The assistant
+recommends awaitable PeekChar: the same next grapheme as ReadChar, without advancing
+the logical cursor. It can consume and retain underlying bytes to establish a boundary.
+Repeated peeks should reuse retained text, and line/count reads must consume that text.
+The current implementation adds these Raven operations and a shared Console.In reader;
+[qualification](../experiments/console-text-reading/README.md) distinguishes them from
+pending terminal keys, cancellation and nonblocking standard-input integration.
+
+.NET's [TextReader.Peek](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.peek?view=net-10.0)
+provides the non-consuming cursor baseline; neoCLR uses asynchronous Option<Char>
+instead of a synchronous integer sentinel. Counted reads use the fill-or-EOF rule
+of [ReadBlockAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.readblockasync?view=net-10.0).
+UTF-8 String output and grapheme counting preserve the platform's existing text model;
+they cost owned result storage, boundary lookahead and possible waiting on live input.
+Buffer-target and cancellation overloads remain explicit gaps, not permanent exclusions.

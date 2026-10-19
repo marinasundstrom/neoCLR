@@ -10,6 +10,10 @@ static class ProcessBindings
         ("System.Console", "OpenStandardInput", [], "System.IO.InputStream"),
         ("System.Console", "OpenStandardOutput", [], "System.IO.OutputStream"),
         ("System.Console", "OpenStandardError", [], "System.IO.OutputStream"),
+        ("System.Console", "PeekChar", [], "System.Result<System.Option<Char>,System.IO.TextReadError>"),
+        ("System.Console", "ReadChar", [], "System.Result<System.Option<Char>,System.IO.TextReadError>"),
+        ("System.Console", "Read", ["Int32"], "System.Result<String,System.IO.TextReadError>"),
+        ("System.Console", "Read", ["Int32", "Int32"], "System.Result<String,System.IO.TextReadError>"),
         ("System.Console", "ReadLine", [], "System.Result<System.Option<String>,System.IO.TextReadError>"),
         ("System.Console", "ReadLine", ["Int32"], "System.Result<System.Option<String>,System.IO.TextReadError>"),
         ("System.Console", "Write", ["String"], "noresult"),
@@ -44,6 +48,10 @@ static class ProcessBindings
         public static void WriteLine(string format, object? arg0, object? arg1, object? arg2) { }
         public static void WriteLine(string format, params object?[] arguments) { }
         public static Result<Option<byte>, ConsoleReadError> ReadByte() => default;
+        public static Concurrency.Tasks.Task<Result<Option<char>, IO.TextReadError>> PeekChar() => default;
+        public static Concurrency.Tasks.Task<Result<Option<char>, IO.TextReadError>> ReadChar() => default;
+        public static Concurrency.Tasks.Task<Result<string, IO.TextReadError>> Read(int count) => default;
+        public static Concurrency.Tasks.Task<Result<string, IO.TextReadError>> Read(int count, int maxUtf8Bytes) => default;
         public static IO.TextReader In => default;
         public static IO.TextWriter Out => default;
         public static IO.TextWriter Error => default;

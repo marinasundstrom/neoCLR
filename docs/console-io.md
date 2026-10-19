@@ -209,3 +209,17 @@ cancellation, the matching JIT/AOT provider, Windows Unicode input, and Raven ke
 modifier and text events. Do not expose a Task that merely wraps a blocking read or
 advertise guest support before those paths are qualified. See the
 [design comparison](design/console-input-review-20261020.md).
+
+
+## Development shared text reads — 2026-10-20
+
+Console.In now caches one invocation-owned StreamReader. PeekChar, ReadChar, counted
+Read and existing line reads share its cursor and lookahead; this supersedes fresh
+input-wrapper behavior. Out/Error and raw stream factories remain fresh wrappers.
+Close closes the shared text reader, not process stdin. Raw reads bypass text
+lookahead and must not be mixed with buffered text reads. The
+[three-engine consumer](experiments/console-text-reading/README.md) validates mixed
+reads, byte bounds, fragmented graphemes and pending-source suspension. The
+[API guide](../api-docs/console.md#grapheme-peek-and-counted-reads-development) documents
+the complete text contract. Existing console host reads still block; the POSIX
+terminal transport is not yet an async guest provider.

@@ -1,5 +1,40 @@
 # Stream API design
 
+## Optional synchronous capabilities revisited — 2026-10-20
+
+**Author direction; capability shape not yet implemented:** the author proposes SyncInputStream and
+SyncOutputStream expose same-named members implemented explicitly, preserving the
+ordinary async interfaces? The assistant recommends this optional capability shape.
+It revisits the earlier decision to defer synchronous interfaces without changing
+InputStream/OutputStream's canonical asynchronous role. The author then clarifies:
+“We don't want to force APIs into an asynchronous form unless we actually need it.”
+Treat execution model as an explicit supported capability; synchronous APIs must not
+require callers to construct or await Tasks.
+
+Use borrowed Slice<byte> for synchronous input and ReadOnlySlice<byte> for synchronous
+output. Async buffer contracts require persistent Memory/ReadOnlyMemory until completion.
+Explicit synchronous implementation makes the interface view select the execution model;
+it should not introduce return-type overload inference or make ordinary concrete calls
+silently synchronous. If public concrete sync methods are also needed, retain the
+existing ReadSync/WriteSync/FlushSync naming policy.
+
+A supported sync capability must perform synchronous I/O directly, never block on a
+Task. It need not exist on network/HTTP streams or every async provider. Inline async
+completion remains valid for memory streams, but wrapping blocking file/console I/O in
+a completed Task does not provide nonblocking execution. Both views share resource,
+position and close state, with cross-view concurrent access coordinated or rejected.
+
+Preserve the current contracts when defining these members: short reads and zero at
+EOF, complete-range write success (unit), partial effects on failure, and Flush without
+a durability/peer-receipt guarantee. Adding synchronous partial-write behavior under
+the same Write name would be an unrelated semantic divergence. Capability detection
+should use interface conformance rather than mandatory CanReadSync/CanWriteSync flags.
+
+The prior [.NET explicit-interface comparison](#interface-views-and-return-type-overloading-discussion)
+remains relevant. Raven explicit implementations of borrowed-view members and the
+same-named async/sync combination still need an executable interpreter/JIT/AOT fixture
+before public APIs are added. No such interface is shipped by the text-reader change.
+
 ## Canonical asynchronous stream contracts — 2026-10-12
 
 **Author decision; implemented and locally validated:** InputStream and OutputStream are the
@@ -405,3 +440,20 @@ memory, archive and a non-seekable/network-like backend. Handwritten IL must be 
 to call capabilities it does not implement. Compare observable behavior with .NET
 Stream on a pinned toolchain; measure buffering/allocation costs instead of assuming
 the smaller hierarchy is faster.
+
+
+### Console feasibility and provider honesty
+
+The author asks whether a console can actually perform asynchronous operations.
+The assistant distinguishes readiness-driven waiting from a Task-shaped blocking
+call. The current neoCLR standard-console provider is blocking; the new TextReader
+operations only suspend when their underlying provider does. The POSIX transport
+foundation has nonblocking reads but is not yet wired into the scheduler.
+
+.NET is not a reason to copy fake asynchrony: its current
+[SyncTextReader source](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Console/src/System/IO/SyncTextReader.cs)
+implements async methods by invoking synchronous reads and returning settled tasks.
+A synchronous console capability is useful on its own; a genuinely async console
+provider needs platform waiting, cancellation and runtime wakeup/cleanup integration.
+Synchronous and asynchronous text drivers should share decoding/cursor state, rather
+than synchronous calls waiting on Tasks or separate readers losing buffered input.

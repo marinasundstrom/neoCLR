@@ -161,6 +161,7 @@
   "System.IO.TextReadError",
   "System.IO.TextReadError.AccessDenied",
   "System.IO.TextReadError.AlreadyExists",
+  "System.IO.TextReadError.Busy",
   "System.IO.TextReadError.Closed",
   "System.IO.TextReadError.InvalidData",
   "System.IO.TextReadError.InvalidEncoding",

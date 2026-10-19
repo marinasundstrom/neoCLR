@@ -1,38 +1,84 @@
 # Console and standard streams
 
 System.Console reads standard input and writes standard output and error. Use
-Write or WriteLine for output, ReadLine for bounded UTF-8 text input, and the
+Write or WriteLine for output, PeekChar/ReadChar, counted Read or ReadLine for UTF-8 text input, and the
 standard stream accessors when code needs an InputStream, OutputStream, TextReader
 or TextWriter.
 
-Console is a static class. Terminal key handling, colors, cursor movement,
-character-at-a-time text input and nonblocking console host I/O are not implemented.
-Stream operations and Console.ReadLine/Write return Tasks, which currently settle inline.
+Console is a static class. Development text reads operate on Unicode graphemes.
+Terminal key handling, colors, cursor movement and nonblocking guest console host I/O
+remain unimplemented. Console text reads and Write return Tasks, but the current
+standard-console provider still makes blocking host calls and settles inline.
 Legacy Console.WriteLine diagnostics and ReadByte retain their immediate host paths.
 
 | Member | Type or result | Purpose |
 | --- | --- | --- |
-| `Console.In` | `TextReader` | Read UTF-8 standard input |
+| `Console.In` | `TextReader` | Shared invocation-owned UTF-8 input cursor |
 | `Console.Out` | `TextWriter` | Write UTF-8 standard output |
 | `Console.Error` | `TextWriter` | Write UTF-8 standard error |
 | `OpenStandardInput()` | `InputStream` | Read raw bytes |
 | `OpenStandardOutput()` / `OpenStandardError()` | `OutputStream` | Write raw bytes without text conversion |
+| `PeekChar()` / `ReadChar()` | `Task<Result<Option<char>, TextReadError>>` | Peek/read one grapheme; None at EOF |
+| `Read(count)` / `Read(count, maxUtf8Bytes)` | `Task<Result<string, TextReadError>>` | Requested grapheme count, shorter at EOF |
 | `ReadLine()` | `Task<Result<Option<string>, TextReadError>>` | Read a line with a 65536-byte content bound |
 | `ReadLine(maxUtf8Bytes)` | `Task<Result<Option<string>, TextReadError>>` | Read a line with an explicit content bound |
 
-Each property/factory call creates a fresh wrapper. Wrappers share the underlying
-channel and its position, but their closed state is independent. Cache a wrapper
-locally for repeated use. `Close` never closes process stdin/stdout/stderr. No
+Console.In returns the same reader throughout one invocation. All Console text
+methods share its decoder, buffered lookahead and closed state. Closing it makes
+later Console text reads return Closed; it never closes process stdin. Out/Error
+and the raw stream factories still create fresh non-owning wrappers. Do not mix
+raw input access with buffered text reads: raw access bypasses retained lookahead.
+Output wrappers have independent closed state; Close never closes process stdout/stderr. No
 `SetIn`, `SetOut` or `SetError` redirection API is provided yet; consumers can accept
 TextReader/TextWriter or InputStream/OutputStream directly for custom destinations.
+
+
+## Grapheme peek and counted reads (development)
+
+TextReader and StreamReader also expose `PeekChar()`, `ReadChar()`, `Read(count)`
+and `Read(count, maxUtf8Bytes)`, matching the Console convenience methods.
+Peek does not advance the **logical text cursor**, but may read and buffer underlying
+bytes. Repeated peeks reuse the cached Char. The next read sees the same original
+UTF-8 spelling, including combining marks and emoji sequences.
+
+Counted Read waits for the requested number of complete graphemes, or returns a
+shorter remainder at EOF. Zero count returns empty without input. Counts and result
+byte bounds range from 0 through 65536; default result bound is 65536 bytes. Character
+reads also cap a grapheme at 65536 bytes. EOF is None for character reads and empty
+text for counted reads. A result-size error retains buffered text for retry; decoding
+and I/O failures do not roll back the underlying stream. Invalid bounds consume nothing.
+
+A grapheme ending in an ordinary letter can still acquire a later combining mark.
+The reader retains its final cluster until a subsequent boundary, EOF or a definite
+LF boundary establishes completion. This can require lookahead and can wait on live
+input. It does not split an incomplete UTF-8 sequence or substitute an idle timeout
+for Unicode segmentation. Key events are a separate, still-pending terminal API.
+
+Overlapping read operations return `TextReadError.Busy`. Await each operation before
+starting another. StreamReader genuinely suspends when its input provider does; the
+standard-console adapter is still blocking. Cancellation overloads and the POSIX
+terminal transport's scheduler integration remain gaps. Task/Result and decoder
+allocations remain; this is not an allocation-free console API.
+
+.NET's [Peek](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.peek?view=net-10.0)
+is synchronous and uses an integer sentinel. neoCLR makes peek awaitable and uses
+Option with its grapheme Char model. Counted reads follow the fill-or-EOF behavior
+of [.NET ReadBlockAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.readblockasync?view=net-10.0),
+returning UTF-8 String rather than filling a UTF-16 character buffer. This preserves
+neoCLR text semantics, at the cost of owned result storage and potentially more
+lookahead. Character-memory output overloads remain unimplemented.
+
+The [executable mixed-read consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-text-reading/Main.rvn)
+covers fragmented UTF-8, repeated peek, mixed reads, byte bounds, EOF and pending input.
 
 ## Line input
 
 `ReadLine` returns `Some("")` for an empty line and `None` for EOF before any data.
 An unterminated final line is returned once. LF and CRLF terminate a line; **a lone
 CR is data** in this first implementation. UTF-8 decoding is strict and preserves
-a BOM. A malformed line returns InvalidUtf8. No input is read past LF, so repeated
-Console.In access does not lose buffered input.
+a BOM. A malformed line returns InvalidUtf8. ReadLine itself requests no bytes
+past LF; it first consumes any lookahead retained by character/count reads.
+Repeated Console.In access now preserves that same buffered cursor.
 
 StreamReader implements the same bounded `ReadLine` method for any InputStream.
 Bounds range from 0 through 65536 bytes, excluding the terminator. Invalid bounds
@@ -136,10 +182,11 @@ channels are empty. Neither channel is implicitly redirected to the other.
 .NET also exposes Console.In as TextReader and Console.Out/Error as TextWriter,
 with separate OpenStandard methods for byte streams. Its ReadLine recognizes CR,
 LF and CRLF and uses null for EOF. This development API instead uses Result/Option,
-strict bounded UTF-8 and fresh non-owning wrappers; it does not yet offer .NET's
+strict bounded UTF-8, a shared input reader and fresh non-owning output wrappers; it does not yet offer .NET's
 redirection, encoding selection or synchronization facilities. The bounds make
-resource use explicit but require callers to handle limit failures. Fresh wrappers
-avoid shared closed-state management but allocate on each access. These are
+resource use explicit but require callers to handle limit failures. Fresh output wrappers
+avoid shared closed-state management but allocate on each access. Shared input
+retains lookahead and avoids recreating the reader; closing it affects later text reads. These are
 provisional tradeoffs, not claims of superiority. Sources reviewed 2026-09-23:
 [Console.In](https://learn.microsoft.com/en-us/dotnet/api/system.console.in?view=net-10.0),
 [Console.ReadLine](https://learn.microsoft.com/en-us/dotnet/api/system.console.readline?view=net-10.0).
@@ -168,7 +215,7 @@ formatting. No culture, format-string or IFormatProvider support is introduced.
 
 The Rust host API now offers a scoped POSIX input transport. This does not add
 Raven Console key-reading members; Windows, scheduler integration and managed
-key/text events remain pending. The host types are documented here manually because
+key events remain pending. The grapheme text reads above use the existing stream provider. The host types are documented here manually because
 RavenDoc renders class-library metadata, not the Rust embedding crate.
 
 | Rust API | Contract |

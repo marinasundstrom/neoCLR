@@ -6,6 +6,8 @@ public union TextReadError {
     case AccessDenied
     case WrongKind
     case AlreadyExists
+    /// Another read operation is pending on this reader.
+    case Busy
     case Closed
     case InvalidRange
     case LimitExceeded
@@ -23,6 +25,7 @@ public union TextReadError {
             AccessDenied => "AccessDenied"
             WrongKind => "WrongKind"
             AlreadyExists => "AlreadyExists"
+            Busy => "Busy"
             Closed => "Closed"
             InvalidRange => "InvalidRange"
             LimitExceeded => "LimitExceeded"
