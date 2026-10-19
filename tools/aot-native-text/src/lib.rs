@@ -3,6 +3,10 @@
 #![cfg_attr(not(test), no_std)]
 use unicode_segmentation::UnicodeSegmentation;
 
+#[cfg(test)]
+#[path = "../../../tests/grapheme_segmentation.rs"]
+mod grapheme_conformance;
+
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
@@ -33,7 +37,7 @@ mod tests {
     use super::*;
     #[test]
     fn validates_extended_graphemes_without_normalizing() {
-        for text in ["\0", "A", "å", "e\u{301}", "👨‍👩‍👧‍👦", "🇸🇪", "\r\n"] {
+        for text in ["\0", "A", "å", "e\u{301}", "👨‍👩‍👧‍👦", "🇸🇪", "\r\n", "a\u{1acf}"] {
             assert!(single_grapheme(text.as_bytes()), "{text:?}");
         }
         for bytes in [b"".as_slice(), b"ab", b"\xff", "🇸🇪🇳🇴".as_bytes()] {

@@ -15,7 +15,7 @@ default = []
 time-zone-rules = ["dep:chrono", "dep:chrono-tz"]
 
 [dependencies]
-unicode-segmentation = "=1.12.0"
+unicode-segmentation = "=1.13.2"
 chrono = { version = "=0.4.45", default-features = false, optional = true }
 chrono-tz = { version = "=0.10.4", default-features = false, optional = true }
 

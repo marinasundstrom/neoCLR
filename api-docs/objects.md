@@ -166,6 +166,11 @@ remain unequal. These rules allow explicit Object comparer callbacks to find NaN
 and signed-zero map keys reliably. Hashes are not persistent identifiers. Floating
 boxed ToString and source-declared typed Equals/GetHashCode remain outside this slice.
 
+Development String boundaries and Char validation use Unicode 17 extended grapheme
+segmentation in both the interpreter and native helper. Newly recognized combining
+marks can change counts and valid Char constructions compared with the prior Unicode
+16 rules. This does not change UTF-8 storage or the separate scalar category table.
+
 [Char](xref:System.Char) compares canonical Unicode 17 grapheme identity, rejects other
 concrete types and null, and hashes the same canonical sequence. Canonically equivalent
 composed and decomposed spellings compare equal while preserving their bytes. Object ToString returns

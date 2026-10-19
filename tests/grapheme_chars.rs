@@ -21,9 +21,18 @@ fn invoke(signature: &str, args: Vec<Value>) -> Result<Value, neoclr::Fault> {
 }
 #[test]
 fn grapheme_construction_preserves_text_and_validates_host_values() {
-    assert_eq!(unicode_segmentation::UNICODE_VERSION, (16, 0, 0));
-    for text in ["A", "e\u{301}", "é", "👨‍👩‍👧‍👦", "🇸🇪", "👍🏽", "\r\n", "\0"]
-    {
+    assert_eq!(unicode_segmentation::UNICODE_VERSION, (17, 0, 0));
+    for text in [
+        "A",
+        "e\u{301}",
+        "é",
+        "👨‍👩‍👧‍👦",
+        "🇸🇪",
+        "👍🏽",
+        "\r\n",
+        "\0",
+        "a\u{1acf}",
+    ] {
         let value = Value::Char(text.into());
         assert_eq!(
             invoke(

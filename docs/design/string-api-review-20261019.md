@@ -424,3 +424,21 @@ backend binding is exact and must be used with a matching rebuilt library/bundle
 [Fixtures and allocation evidence](../experiments/string-lines/README.md) distinguish
 managed native allocations from host Rust allocations and CPU/GC costs. No HTTP
 throughput claim follows from avoiding intermediate strings.
+
+
+### Canonical search prerequisite (2026-10-19)
+
+The [search experiment](../experiments/string-search/README.md) applies Swift-like
+whole-grapheme canonical matching to prefix, suffix and membership checks without
+normalizing stored text or allocating substrings. It exposed an actual inconsistency:
+Unicode 17 normalization could reorder newer marks across boundaries supplied by
+the old Unicode 16 segmenter. Both interpreter and native helper now pin Unicode 17
+segmentation; all 766 boundary cases and 20,034 normalization rows pass. This changes
+counts/indexing/Char admission for affected text, while preserving original bytes.
+Scalar category classification remains on its separate Unicode 16 table.
+
+The search kernel remains experimental: public methods, explicit comparison modes
+and native bindings are pending. A simple candidate scan uses bounded memory but
+can repeat work for long shared prefixes; zero-allocation diagnostics do not imply
+linear-time search or higher server throughput. The deferred storage/view decision
+is unaffected.

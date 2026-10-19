@@ -94,9 +94,12 @@ from the start; it does not promise constant-time random access. Repeated indexe
 traversal can therefore take quadratic work. This is a source-level complexity
 observation, not a benchmark or a reason to optimize before selecting contracts.
 
-Segmentation uses unicode-segmentation **1.12.0**, pinned to **Unicode 16**, matching
-the classification data version. The later simple-fold table uses Unicode 17; the
-versions are currently mixed, as reviewed below. Upgrading the rules can change boundaries and
+Development segmentation now uses unicode-segmentation **1.13.2**, pinned to
+**Unicode 17**, matching canonical normalization and simple folding. The previous
+Unicode 16 segmenter split newer combining marks, breaking canonical whole-grapheme
+search; see the [search prerequisite evidence](../experiments/string-search/README.md).
+Scalar category classification still uses Unicode 16; this change does not upgrade
+that separate table. Upgrading the rules can change boundaries and
 counts. Raven diagnoses literals using the host .NET StringInfo rules; the target
 runtime revalidates every constructed character with its pinned rules. Host Unicode
 versions may differ; matching literal diagnostics to the pinned target rules remains

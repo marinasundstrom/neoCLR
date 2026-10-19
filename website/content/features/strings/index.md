@@ -62,6 +62,9 @@ grapheme boundary. Traverse graphemes sequentially when possible: repeatedly
 locating the nth grapheme can require repeated scans.
 
 These are deliberate differences from .NET's UTF-16 Char and string indexing model.
+Development grapheme segmentation now uses Unicode 17 alongside canonical
+comparison. This changes boundaries for some newer combining marks; stored bytes
+remain unchanged. Scalar category classification still uses Unicode 16.
 Case conversion, folding and segmentation have their own versioned Unicode rules;
 consult the [String](xref:System.String) and [Char](xref:System.Char) contracts when
 text boundaries or cross-platform comparison must be exact.
