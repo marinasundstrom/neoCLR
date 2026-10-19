@@ -20050,3 +20050,23 @@ Native JSON backend/runtime gaps remain open separately.
   neoCLR backend without Raven compiler source changes; boxed empty and
   reference-bearing Formattable structs now pass AOT, and 109 backend unit tests pass.
   Final three-engine and allocation evidence is retained with the experiment.
+
+## 2026-10-20 — Console keys, combinations and encoding
+
+- **Author:** requests an API to detect key presses, keys and combinations such as
+  Ctrl+C, asks for terminology and .NET library inspiration, and asks about console
+  encoding/character sets.
+- **Assistant proposal:** distinguish logical keys/modifiers/chords, Unicode text and
+  host interrupts; retain UTF-8 text boundaries and grapheme Char semantics. Consider
+  a scoped terminal session with cancellable input, capability reporting and restored
+  modes, using .NET Console, Terminal.Gui, Spectre.Console and terminal protocols as
+  references. Ctrl+C should preserve normal interrupt behavior unless explicitly
+  captured as input. These are proposals, not accepted public API signatures.
+- **Action:** inspected current byte/UTF-8 wrappers and blocking host limitations;
+  recorded [research, alternatives and required validation](design/console-input-review-20261020.md).
+  No runtime/API implementation or permanent roadmap reprioritization is implied.
+
+- **Author clarification:** “We want a modern Console APi.” The assistant frames the
+  proposal around coherent async input, structured events, scoped state and explicit
+  capabilities, with .NET as a reference rather than an API-shape requirement. No
+  concrete public signatures or terminal provider were approved by this clarification.

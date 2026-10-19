@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Record a researched console-input proposal covering keys/modifiers/chords, text versus interrupts, scoped terminal ownership, UTF-8/native transport boundaries, capability limits and async/provider validation. No new Console API is implemented.
+
 - Add Raven String.Format and Console.Write/WriteLine fixed-arity and params overloads with escaped braces, grapheme alignment, null handling and System.Formattable dispatch. Fixed arities avoid argument arrays; boxing, fragments and output still allocate. Preserve current console execution contracts and document the 65536-byte formatting limit, provider/primitive-specifier gaps and deferred String views. Repair boxed nominal value interface conformance, specialization, selection, type tests and dispatch in the native backend; reuse rooted byref payload calls. All 39 public/fault executions, 109 backend unit tests and the native boxed-record regression pass. Fixed arities save exactly one managed allocation per call in the 128-iteration diagnostic; remaining formatting allocations are documented. Refresh both API snapshots and the 4572-page website.
 
 ### 2026-10-19
