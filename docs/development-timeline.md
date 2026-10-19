@@ -19880,3 +19880,10 @@ codex/neoclr bab04d508 passes the reduced three-engine regression and 79 compile
 tests. The larger JSON fixture passes metadata emission but exposes separate
 native specialization and interpreter execution failures, retained in
 [the evidence](experiments/runtime-async/expressions-20261019/README.md).
+
+Follow-through after the author's “Continue”: Raven main f9e2cb5d2 adds five
+ordinary .NET regression cases. Six baseline tests and all fourteen focused tests
+pass without an emitter change. The assistant concludes that these reproduced
+portable-planner failures require no main production fix; main now retains
+regression coverage. No full merge or compiler implementation transfer occurred.
+Native JSON backend/runtime gaps remain open separately.

@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
-- Qualify Raven bab04d508 logical-value pattern assignment and overloaded-operator early exits with 79 compiler tests and an async expression regression in interpreter/JIT/AOT. Improve unassigned-local diagnostics with the local and instruction index. The larger JSON fixture now emits metadata but exposes a separate nested-array native specialization limit and an interpreter failure during reflective construction; numeric nested-operand early exits remain restricted.
+- Qualify Raven bab04d508 logical-value pattern assignment and overloaded-operator early exits with 79 compiler tests and an async expression regression in interpreter/JIT/AOT. Independently qualify Raven main (f9e2cb5d2): all 14 focused .NET tests pass, including five new regressions, without an emitter change or branch merge. Improve unassigned-local diagnostics with the local and instruction index. The larger JSON fixture now emits metadata but exposes a separate nested-array native specialization limit and an interpreter failure during reflective construction; numeric nested-operand early exits remain restricted.
 
 - Complete HttpResponse client metadata with ReasonPhrase alongside StatusCode, IsSuccessStatusCode and Version. Preserve exact incoming HTTP/1.1 reason text, decode custom phrases lazily and cache empty/OK phrases without decoding. Metadata remains available after disposal and before body reads; custom unread phrases retain the bounded header buffer. All 21 loopback response cases pass across interpreter/JIT/AOT; API snapshots pass.
 

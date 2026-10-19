@@ -13414,3 +13414,10 @@ JIT and AOT pass. See [evidence and limits](experiments/runtime-async/expression
 Numeric nested-operand early exits remain restricted. The larger JSON public
 fixture now emits metadata, but native specialization rejects nested array locals;
 that backend limitation remains open. No new throughput claim is made.
+
+Independent Raven main qualification (`f9e2cb5d2`) passes all fourteen focused
+.NET 11 tests, including five new pattern/awaited-propagation cases, against
+main's unchanged ExpressionGenerator. No main emitter fix was needed. The
+portable-planner patch remains on codex/neoclr; no full branch merge was made.
+[Retained logs](experiments/runtime-async/expressions-20261019/README.md) distinguish
+main coverage from native three-engine execution and unresolved JSON failures.

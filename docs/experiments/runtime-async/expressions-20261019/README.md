@@ -23,6 +23,12 @@ called by a reflectively constructed PostalAddress inside an async JSON read.
 The recorded stack is evidence of an unresolved runtime failure, not a diagnosis
 of its root cause. The reduced expression regression remains green.
 
-Raven main uses ExpressionGenerator and has no portable LinearMethodBody. These
-regression cases are candidates for separate main qualification; no main failure
-or implementation fix is claimed, and no full branch merge was performed.
+Raven main uses ExpressionGenerator and has no portable LinearMethodBody. Main is now independently qualified by `f9e2cb5d2`: six baseline tests and
+fourteen focused tests (including five new cases) pass on .NET 11, without an
+emitter change. Tests cover positive/negative pattern variables, short-circuit
+evaluation and success/error propagation inside string equality after both
+completed and pending awaits. The enclosing call runs once on success and is
+skipped on error. See main-baseline.log and main-tests.log. No main failure was
+reproduced; no production fix or full branch merge was carried between branches.
+Older .NET targets were not execution-qualified. The existing neoCLR three-engine
+regression and 79 planner tests remain the native-line evidence.

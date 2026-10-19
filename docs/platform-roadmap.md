@@ -13,6 +13,10 @@ the receive buffer, and nonempty bodies retain bounded read-ahead. JSON content
 extensions now read streams. [Qualification and limits](experiments/http-headers-first/README.md)
 track execution evidence. Throughput gains remain a hypothesis to measure separately
 for early responses, slow uploads and handlers that consume the complete body.
+The related async expression lowering regression is fixed on the neoCLR compiler
+line and independently qualified on Raven main, where no emitter fix was needed.
+[Expression evidence](experiments/runtime-async/expressions-20261019/README.md)
+retains the remaining larger-JSON specialization and interpreter failures.
 
 **Native memory views (author direction, 2026-10-18):** implement Slice/ReadOnlySlice
 as the preferred contiguous-memory abstraction, followed by persistent
