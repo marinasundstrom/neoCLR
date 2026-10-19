@@ -218,13 +218,17 @@ pub fn bind(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error>
             let Type::ArrayRef(element) = array else {
                 unreachable!()
             };
-            let reference = matches!(**element, Type::String)
+            let reference = matches!(**element, Type::String | Type::ArrayRef(_))
                 || input.type_definition(element).is_some_and(|t| {
                     t.is_reference_type
                         || t.representation == neoclr::metadata::Representation::Interface
                 });
             if (get || create) && !reference && !matches!(**element, Type::Int32 | Type::Boolean) {
-                return Err("native array reflection currently requires Int32, Boolean, String or reference elements".into());
+                // Retaining metadata for an unsupported element (for example a
+                // JSON property that validation rejects) must not reject unrelated
+                // supported arrays. Unsupported access reaches the runtime fault
+                // below, matching the interpreter adapter's capability check.
+                continue;
             }
             let branch = body.len() + 3;
             if create {

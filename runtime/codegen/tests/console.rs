@@ -10155,6 +10155,36 @@ fn native_reflection_arrays_preserve_creation_values_and_checked_faults() {
     );
 }
 
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_reflection_arrays_retain_unsupported_metadata_without_blocking_supported_access() {
+    let source = include_str!("../../../docs/experiments/aot-console/reflection-arrays.neoil")
+        .replace(
+            ".local Info missing",
+            ".local Info missing\nldtoken arrayref<Int64>\npop",
+        );
+    check_reflection_arrays(&source, 8, b"");
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_reflection_nested_arrays_preserve_inner_identity_and_values() {
+    let mut source = include_str!("../../../docs/experiments/aot-console/reflection-arrays.neoil")
+        .replace(
+            "ldtoken arrayref<Int32>",
+            "ldtoken arrayref<arrayref<Int32>>",
+        )
+        .replace(
+            "unbox.any Int32",
+            "castclass arrayref<Int32>\nldc.i4 0\nldelem Int32",
+        );
+    for value in [40, 2] {
+        source = source.replace(&format!("ldc.i4 {value}\nbox Int32"),
+            &format!("ldc.i4 1\nnewarr Int32\ndup\nldc.i4 0\nldc.i4 {value}\nstelem Int32\ncastclass System.Object"));
+    }
+    check_reflection_arrays(&source, 1, b"");
+}
+
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn check_reflection_arrays(source: &str, modes: i32, expected_stdout: &[u8]) {
     check_reference_execution(source, modes, expected_stdout, &[0]);
@@ -10167,7 +10197,7 @@ fn check_reference_execution(
     expected_stdout: &[u8],
     success_modes: &[i32],
 ) {
-    let seed = neoclr::assemble(".module System\n.references ()\n.type System.Int32\n.end\n.type System.Boolean\n.end\n.type System.String\n.end\n").unwrap();
+    let seed = neoclr::assemble(".module System\n.references ()\n.type System.Int32\n.end\n.type System.Int64\n.end\n.type System.Boolean\n.end\n.type System.String\n.end\n").unwrap();
     let app =
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed)
             .unwrap()
@@ -12500,6 +12530,66 @@ fn structural_reserved_arrays_copy_initialized_tuple_and_scalar_elements() {
         );
         verify_structural_union_gc(&[(&source, 0)], 648);
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn nested_arrays_retain_initialized_inner_arrays_across_collection() {
+    let source = r#"
+.module NestedArrays
+.type class abstract System.Object
+.end
+.function Calculate() -> Int32
+.local arrayref<arrayref<Int32>> outer
+.local Int32 remaining
+ldc.i4 1
+array.reserve arrayref<Int32>
+stloc outer
+ldloc outer
+ldc.i4 0
+ldc.i4 1
+newarr Int32
+dup
+ldc.i4 0
+ldc.i4 42
+stelem Int32
+stelem arrayref<Int32>
+ldc.i4 80
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldloc outer
+ldc.i4 0
+ldelem arrayref<Int32>
+ldc.i4 0
+ldelem Int32
+ret
+.end
+"#;
+    let defaults = source.replace("array.reserve arrayref<Int32>", "newarr arrayref<Int32>")
+        .replace("stloc outer", "stloc outer\nldloc outer\nldc.i4 0\nldelem arrayref<Int32>\nref.isnull\nbrtrue Empty\nfault \"non-null default\"\nEmpty:");
+    let uninitialized = source.replace("stelem arrayref<Int32>", "pop\npop\npop");
+    let outside = source.replace(
+        "ldloc outer\nldc.i4 0\nldelem",
+        "ldloc outer\nldc.i4 1\nldelem",
+    );
+    verify_structural_union_gc(
+        &[
+            (source, 0),
+            (&defaults, 0),
+            (&uninitialized, 3),
+            (&outside, 8),
+        ],
+        656,
+    );
 }
 
 #[test]

@@ -943,6 +943,7 @@ fn retained_types(
                 if matches!(
                     *t,
                     Type::Function(_)
+                        | Type::ArrayRef(_)
                         | Type::Named(_)
                         | Type::Tuple(_)
                         | Type::Union(_)

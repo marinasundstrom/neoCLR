@@ -1234,7 +1234,11 @@ pub fn prepare(
                     .is_some_and(|t| {
                         !t.is_reference_type
                             && t.representation == neoclr::metadata::Representation::Record
-                            && t.base.is_none()
+                            && (t.base.is_none()
+                                || neoclr::native_metadata::has_value_type_base(
+                                    &selected,
+                                    &neoclr::metadata::Type::Named(t.name.clone()),
+                                ))
                             && t.generic_parameters.is_empty()
                     })
         })

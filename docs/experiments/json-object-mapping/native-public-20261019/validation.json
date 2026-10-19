@@ -1,0 +1,52 @@
+{
+  "aot": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-public-jagged-v6/app"
+    ],
+    "exitCode": 0,
+    "stdout": "Nested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nInvalid nested input begins\nInvalid nested input ends\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nPublic JSON mapping checks passed\n",
+    "stderr": ""
+  },
+  "interpreter": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-public-jagged-v6/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "100000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "exitCode": 0,
+    "stdout": "Nested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nInvalid nested input begins\nInvalid nested input ends\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nPublic JSON mapping checks passed\n",
+    "stderr": ""
+  },
+  "jit": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-nullable-coherent-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-public-jagged-v6/app.dll",
+      "--jit-compiler",
+      "/Users/robert/Projects/neoclr/target/release/neoclr-codegen",
+      "--reflection-roots",
+      "/Users/robert/Projects/neoclr/target/http-public-jagged-v6/app.reflection.json"
+    ],
+    "exitCode": 0,
+    "stdout": "Nested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nInvalid nested input begins\nInvalid nested input ends\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nNested constructor executed\nNested setter executed\nPublic JSON mapping checks passed\n",
+    "stderr": ""
+  }
+}

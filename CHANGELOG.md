@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Complete native nested-array specialization, traced storage and reflective access, preserving null defaults, initialization and bounds faults. Retaining unsupported reflection element metadata no longer rejects supported accesses. Admit verified direct value ToString overrides with the System.ValueType foundation. Five reflection tests, four forced/paced-GC array variants and the complete public JSON mapping fixture pass; the latter passes interpreter/JIT/AOT with coherently rebuilt libraries. This closes the previously recorded full-JSON failures; release-package qualification remains pending.
+
 - Qualify Raven native compiler 2d22055dc nullable extracted-payload binding: `Ok(null)` now binds without an incorrect type-test rejection, while narrowed string patterns still reject null. The reduced consumer passes interpreter/JIT/AOT and 82 compiler tests; Raven main independently passes three comparison cases without a production change. Record the requested String API/allocation audit: IndexOf and Format remain absent; no new text API is claimed.
 
 - Preserve borrowed slices across synchronous interpreter host I/O: keep managed frames and published owner roots alive while the host call runs, rather than treating host detachment as an async suspension. All ten memory-view tests pass, including console output with a live slice and continued rejection of borrowed async yield/heap escape. This repairs the lifetime check exposed by JSON user constructors; full JSON release qualification is ongoing.

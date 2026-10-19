@@ -225,6 +225,7 @@ impl Specializer<'_> {
                 if matches!(
                     **t,
                     Type::Function(_)
+                        | Type::ArrayRef(_)
                         | Type::Named(_)
                         | Type::Constructed { .. }
                         | Type::Tuple(_)
@@ -233,11 +234,13 @@ impl Specializer<'_> {
                 ) =>
             {
                 let lowered = self.lower(t)?;
-                if self.source.type_definition(t).is_some_and(|t| {
-                    (t.is_reference_type
-                        && t.representation == neoclr::metadata::Representation::Record)
-                        || t.representation == neoclr::metadata::Representation::Interface
-                }) {
+                if matches!(**t, Type::ArrayRef(_))
+                    || self.source.type_definition(t).is_some_and(|t| {
+                        (t.is_reference_type
+                            && t.representation == neoclr::metadata::Representation::Record)
+                            || t.representation == neoclr::metadata::Representation::Interface
+                    })
+                {
                     if let Some(owner) = super::selection::array_owner(self.source, t) {
                         self.lower(&owner)?;
                     }

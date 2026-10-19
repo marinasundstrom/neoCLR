@@ -1,0 +1,13 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `release` profile [optimized] target(s) in 1m 16s
+     Running tests/console.rs (target/release/deps/console-b652869621a53711)
+
+running 5 tests
+test native_reflection_roots_separate_metadata_and_invocation_and_reject_stale_identity ... ok
+test native_reflection_nested_arrays_preserve_inner_identity_and_values ... ok
+test native_reflection_arrays_retain_unsupported_metadata_without_blocking_supported_access ... ok
+test native_reflection_arrays_preserve_creation_values_and_checked_faults ... ok
+test native_reflection_arrays_preserve_boolean_string_and_reference_elements ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 2.20s

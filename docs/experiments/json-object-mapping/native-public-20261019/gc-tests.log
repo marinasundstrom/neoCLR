@@ -1,0 +1,9 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `release` profile [optimized] target(s) in 1m 05s
+     Running tests/console.rs (target/release/deps/console-b652869621a53711)
+
+running 1 test
+test nested_arrays_retain_initialized_inner_arrays_across_collection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 4.32s

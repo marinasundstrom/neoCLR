@@ -32,3 +32,8 @@ skipped on error. See main-baseline.log and main-tests.log. No main failure was
 reproduced; no production fix or full branch merge was carried between branches.
 Older .NET targets were not execution-qualified. The existing neoCLR three-engine
 regression and 79 planner tests remain the native-line evidence.
+
+Follow-through: the [full public JSON consumer](../../json-object-mapping/native-public-20261019/README.md)
+now passes all three engines with coherently rebuilt libraries. The original
+failures above remain historical evidence; their identified runtime/compiler and
+native-backend causes are repaired. This does not qualify unrelated expression forms.

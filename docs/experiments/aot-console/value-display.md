@@ -7,7 +7,8 @@ now removes the slot flags from closed value-record ToString overrides. It retai
 the original CIL body, borrowed receiver, branch behavior and returned text.
 
 Admission is restricted to the verified instance/byref String-returning no-argument
-ToString override on a closed value record without a base. Abstract, generic,
+ToString override on a closed value record with no base or the recognized
+System.ValueType foundation. Abstract, generic,
 readonly-receiver and reference-class methods do not use this projection. Existing
 class dispatch/projections remain separate. Callvirt admission is not broadened,
 and general boxed-value display or interface dispatch is not implied. Inspection
@@ -47,3 +48,6 @@ records interpreter/native parity and standalone linkage. Nine root-layout/selec
 unit checks and the negative arbitrary-borrow consumer pass. The full server now
 reaches the unbound asynchronous SocketConnectResult service; HTTP execution still
 requires task/host-root/socket completion integration.
+
+The 2026-10-19 [public JSON qualification](../json-object-mapping/native-public-20261019/README.md)
+also covers diagnostic overrides on current System.ValueType-based values.

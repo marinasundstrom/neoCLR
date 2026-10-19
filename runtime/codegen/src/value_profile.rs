@@ -151,7 +151,7 @@ impl<'a> Profile<'a> {
             let valid = input.types.get(i).is_some_and(|t| t.is_reference_type
                 && t.representation == Representation::Record && t.fields.len() == 1
                 && t.generic_parameters.is_empty()
-                && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| (e.is_reference_type && e.representation == Representation::Record) || e.representation == Representation::Interface)));
+                && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char | Type::ArrayRef(_)) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| (e.is_reference_type && e.representation == Representation::Record) || e.representation == Representation::Interface)));
             if !references || !valid {
                 return Err("invalid private reference-array backing projection".into());
             }
@@ -237,7 +237,7 @@ impl<'a> Profile<'a> {
                     f.deferred
                         || !(matches!(f.ty, Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_) | Type::Tuple(_))
                             || (references && matches!(&f.ty, Type::Function(_) | Type::Union(_) | Type::Intersection(_)))
-                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t))))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_) | Type::ArrayRef(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
                 return Err(format!("{}: value profile requires supported closed records (inline values have at most sixteen fields)", t.name).into());
@@ -794,7 +794,10 @@ impl<'a> Profile<'a> {
             }
             Type::ArrayRef(t)
                 if self.references
-                    && matches!(**t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                    && matches!(
+                        **t,
+                        Type::Tuple(_) | Type::Union(_) | Type::Intersection(_) | Type::ArrayRef(_)
+                    ) =>
             {
                 let element = self.ty(t)?;
                 if self.lanes(&element) > crate::limits::INLINE_LANES {
@@ -1014,6 +1017,7 @@ impl<'a> Profile<'a> {
             (
                 Ty::ByteArray
                 | Ty::ReferenceArray(_)
+                | Ty::StructuralArray(_)
                 | Ty::ScalarArray(_)
                 | Ty::StringArray
                 | Ty::CharacterArray,
@@ -1022,6 +1026,7 @@ impl<'a> Profile<'a> {
             (
                 Ty::ByteArray
                 | Ty::ReferenceArray(_)
+                | Ty::StructuralArray(_)
                 | Ty::ScalarArray(_)
                 | Ty::StringArray
                 | Ty::CharacterArray,
@@ -1079,6 +1084,7 @@ impl<'a> Profile<'a> {
                 .collect(),
             Ty::ByteArray
             | Ty::ReferenceArray(_)
+            | Ty::StructuralArray(_)
             | Ty::ScalarArray(_)
             | Ty::StringArray
             | Ty::CharacterArray => self.backing_for_array(target).into_iter().collect(),
@@ -1658,6 +1664,9 @@ impl<'a> Profile<'a> {
                 {
                     ()
                 }
+                Op::NewArray(t) if self.references && matches!(t, Type::ArrayRef(_)) => {
+                    self.ty(t)?;
+                }
                 Op::NewArray(t)
                     if self.references
                         && matches!(t, Type::Named(_))
@@ -1677,7 +1686,13 @@ impl<'a> Profile<'a> {
                 }
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references
-                        && matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                        && matches!(
+                            t,
+                            Type::Tuple(_)
+                                | Type::Union(_)
+                                | Type::Intersection(_)
+                                | Type::ArrayRef(_)
+                        ) =>
                 {
                     self.ty(&Type::ArrayRef(Box::new(t.clone())))?;
                 }
@@ -1985,6 +2000,7 @@ impl<'a> Profile<'a> {
                                     | Ty::ReferenceUnion(_)
                                     | Ty::ByteArray
                                     | Ty::ReferenceArray(_)
+                                    | Ty::StructuralArray(_)
                                     | Ty::ScalarArray(_)
                                     | Ty::StringArray
                                     | Ty::CharacterArray
@@ -2092,6 +2108,7 @@ impl<'a> Profile<'a> {
                             ty,
                             Ty::ScalarArray(_)
                                 | Ty::ReferenceArray(_)
+                                | Ty::StructuralArray(_)
                                 | Ty::Reference(_)
                                 | Ty::Interface(_)
                                 | Ty::Intersection(_)
@@ -2116,19 +2133,28 @@ impl<'a> Profile<'a> {
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
                 Op::ReserveArray(t)
-                    if matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                    if matches!(
+                        t,
+                        Type::Tuple(_) | Type::Union(_) | Type::Intersection(_) | Type::ArrayRef(_)
+                    ) =>
                 {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
-                Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, Type::Named(_)) => {
+                Op::NewArray(t) | Op::ReserveArray(t)
+                    if matches!(t, Type::Named(_) | Type::ArrayRef(_)) =>
+                {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
                 Op::ArrayElement(t)
                     if matches!(
                         t,
-                        Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
+                        Type::Named(_)
+                            | Type::Tuple(_)
+                            | Type::Union(_)
+                            | Type::Intersection(_)
+                            | Type::ArrayRef(_)
                     ) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &Ty::Int)?;
@@ -2138,7 +2164,11 @@ impl<'a> Profile<'a> {
                 Op::StoreArrayElement(t)
                     if matches!(
                         t,
-                        Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
+                        Type::Named(_)
+                            | Type::Tuple(_)
+                            | Type::Union(_)
+                            | Type::Intersection(_)
+                            | Type::ArrayRef(_)
                     ) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &self.ty(t)?)?;
@@ -2483,9 +2513,12 @@ fn leading_base_initializer(
     for (pc, op) in body.iter().enumerate().skip(1) {
         match op {
             Op::Arg(n) if *n != 0 => arguments += 1,
-            Op::Int(_) | Op::Int64(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::Bool(_) | Op::String(_) => {
-                arguments += 1
-            }
+            Op::Int(_)
+            | Op::Int64(_)
+            | Op::Float32 { .. }
+            | Op::Float64 { .. }
+            | Op::Bool(_)
+            | Op::String(_) => arguments += 1,
             Op::Add
             | Op::Sub
             | Op::Mul
@@ -2562,7 +2595,12 @@ mod object_assignment_tests {
     #[test]
     fn persistent_byte_memory_has_three_lanes_and_rejects_raw_construction() {
         use neoclr::metadata::MemoryViewKind;
-        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory, MemoryViewKind::Slice, MemoryViewKind::ReadOnlySlice] {
+        for kind in [
+            MemoryViewKind::Memory,
+            MemoryViewKind::ReadOnlyMemory,
+            MemoryViewKind::Slice,
+            MemoryViewKind::ReadOnlySlice,
+        ] {
             let mut input = crate::memory_views::test_module(kind, Type::Byte);
             let ty = Type::Named(input.types[0].name.clone());
             let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
@@ -2689,8 +2727,16 @@ mod object_assignment_tests {
         ];
         assert_eq!(leading_base_initializer(&nested, &base, &|target| Some(target.name.ends_with("..ctor"))), Some(5));
         // A no-result helper does not manufacture an argument for the base call.
-        let body = [Op::Arg(0), Op::Int(42), Op::Call(target("Consume(Int32)")), finish];
-        assert_eq!(leading_base_initializer(&body, &base, &|_| Some(true)), None);
+        let body = [
+            Op::Arg(0),
+            Op::Int(42),
+            Op::Call(target("Consume(Int32)")),
+            finish,
+        ];
+        assert_eq!(
+            leading_base_initializer(&body, &base, &|_| Some(true)),
+            None
+        );
     }
 
     #[test]

@@ -16,7 +16,10 @@ for early responses, slow uploads and handlers that consume the complete body.
 The related async expression lowering regression is fixed on the neoCLR compiler
 line and independently qualified on Raven main, where no emitter fix was needed.
 [Expression evidence](experiments/runtime-async/expressions-20261019/README.md)
-retains the remaining larger-JSON specialization and interpreter failures.
+retains the original larger-JSON failures. These are now closed by the
+[full three-engine JSON qualification](experiments/json-object-mapping/native-public-20261019/README.md):
+synchronous host-call lifetimes, nullable extracted payloads, native nested arrays
+and value diagnostic members. Extracted-package release qualification remains pending.
 
 **Native memory views (author direction, 2026-10-18):** implement Slice/ReadOnlySlice
 as the preferred contiguous-memory abstraction, followed by persistent

@@ -1597,9 +1597,14 @@ pub(crate) fn compile_into(
     } else { None };
     let default_reference_array_service = if references
         && input.functions.iter().any(|f| {
-            f.body
-                .iter()
-                .any(|op| matches!(op, Op::NewArray(neoclr::metadata::Type::Named(_))))
+            f.body.iter().any(|op| {
+                matches!(
+                    op,
+                    Op::NewArray(
+                        neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::ArrayRef(_)
+                    )
+                )
+            })
         }) {
         let mut sig = module.make_signature();
         sig.params
@@ -1627,6 +1632,7 @@ pub(crate) fn compile_into(
                             | neoclr::metadata::Type::Tuple(_)
                             | neoclr::metadata::Type::Union(_)
                             | neoclr::metadata::Type::Intersection(_)
+                            | neoclr::metadata::Type::ArrayRef(_)
                     )
                 )
             })
@@ -3898,7 +3904,12 @@ pub(crate) fn compile_into(
                         );
                         stack.push(array);
                     }
-                    Op::NewArray(t) if matches!(t, neoclr::metadata::Type::Named(_)) => {
+                    Op::NewArray(t)
+                        if matches!(
+                            t,
+                            neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::ArrayRef(_)
+                        ) =>
+                    {
                         let count = pop(&mut stack);
                         let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                         let output = b.ins().stack_addr(types::I64, call_result, 0);
@@ -3927,6 +3938,7 @@ pub(crate) fn compile_into(
                                 | neoclr::metadata::Type::Tuple(_)
                                 | neoclr::metadata::Type::Union(_)
                                 | neoclr::metadata::Type::Intersection(_)
+                                | neoclr::metadata::Type::ArrayRef(_)
                         ) =>
                     {
                         let count = pop(&mut stack);
@@ -4033,6 +4045,7 @@ pub(crate) fn compile_into(
                                 | neoclr::metadata::Type::Tuple(_)
                                 | neoclr::metadata::Type::Union(_)
                                 | neoclr::metadata::Type::Intersection(_)
+                                | neoclr::metadata::Type::ArrayRef(_)
                         ) || crate::selection::scalar_array_element(t) =>
                     {
                         let ty = p.ty(t)?;
