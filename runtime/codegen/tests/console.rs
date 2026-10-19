@@ -11975,6 +11975,12 @@ int main(void) {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn rooted_object_construction_preserves_arguments_and_receiver() {
+    check_rooted_object_construction(false);
+    check_rooted_object_construction(true);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_rooted_object_construction(base_arguments: bool) {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let source = r#"
 .module Construction
@@ -12018,6 +12024,51 @@ callvirt instance fn<Int32>::Invoke()
 ret
 .end
 "#;
+    let source = if base_arguments {
+        source.replace("newobj.ctor instance Cell::.ctor(arrayref<Byte>)", "newobj.ctor instance Derived::.ctor(arrayref<Byte>)") + r#"
+.type class Argument
+.field Data arrayref<Byte>
+.method instance .ctor(arrayref<Byte> data) -> noresult
+ldarg 0
+ldarg data
+stfld Argument::Data
+ret
+.end
+.method instance Read() -> arrayref<Byte>
+ldc.i4 8
+newarr Byte
+pop
+ldarg 0
+ldfld Argument::Data
+ret
+.end
+.end
+.type class Derived
+.extends Cell
+.method instance .ctor(arrayref<Byte> data) -> noresult
+ldarg 0
+ldarg data
+newobj.ctor instance Argument::.ctor(arrayref<Byte>)
+castclass Argument
+call instance Argument::Read()
+ldstr "body"
+call Identity(arrayref<Byte>,String)
+call instance Cell::.ctor(arrayref<Byte>)
+ret
+.end
+.end
+.function Identity(arrayref<Byte> data, String label) -> arrayref<Byte>
+ldc.i4 8
+newarr Byte
+pop
+ldarg data
+ret
+.end
+"#
+    } else {
+        source.to_owned()
+    };
+    let source = source.as_str();
     for (gc, paced) in [(false, false), (true, false), (true, true)] {
         let dir = Temp::new();
         let mut flags = vec!["--compile-system", "--reference-arena"];

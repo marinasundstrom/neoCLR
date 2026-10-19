@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Admit receiver-independent helper calls, nested construction and string constants in native base-constructor arguments. Preserve uninitialized-receiver isolation and reject re-entry; validate allocating helpers and base constructors with interpreter and ARM64 native GC/sanitizer coverage. This closes a backend gap exposed by HTTP content design without changing Raven syntax or Runtime Contract settings.
+
 - Add HttpContent.CopyTo(OutputStream) and cancellation support for buffered and streaming bodies. Write arrays directly and stage other sources in at most 1024 bytes, awaiting destination writes before reading further. Preserve stream errors, exact declared lengths, one-shot consumption and explicit ownership; do not flush, close or add framing. All 18 focused lifecycle executions and ten plain-HTTP receive checks pass, with both API snapshots refreshed. The proposed abstract content hierarchy, shared stream Memory migration and unknown-length outgoing framing remain pending.
 
 - Record the author-directed HTTP content streaming design: client and server both produce and consume bodies through streams, with typed string/JSON factories and async readers. Revise the proposed buffer-only hierarchy to a stream-capable body contract; identify unknown-length framing, incremental JSON, ownership and replay gaps. This is a proposal, not a newly implemented API.

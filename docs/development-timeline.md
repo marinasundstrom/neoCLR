@@ -19769,3 +19769,21 @@ open; no native performance improvement is claimed.
   accepting arbitrary HttpContent for incoming bodies, without requiring received
   content to have a specialized runtime type. Recorded consumption, bounded reads
   and ownership as explicit contracts; implementation remains pending.
+
+### 2026-10-19 — Fix constructor admission rather than shape HTTP APIs around it
+
+The author clarified that the HTTP API should be ergonomic and efficient from
+its design, avoiding unnecessary allocations, and asked: “Is the are compiler
+gap? Then it should be fixed”. The assistant traced the reported base-initializer
+diagnostic to neoCLR native admission, rather than Raven emission. A temporary
+parameterless-base/Initialize-method workaround in the uncommitted HTTP redesign
+had hidden that limitation; it is not an accepted API constraint.
+
+The resulting backend change admits independently evaluated calls, nested
+construction and string constants while protecting the uninitialized receiver.
+The focused regression covers allocating argument helpers and base constructors,
+interpreter/native execution and native GC root cleanup. See
+[the backend contract](raven-cli-bridge.md#native-base-constructor-argument-calls-2026-10-19).
+The content hierarchy, removal of the memory wrapper and streaming text decoding
+remain ongoing work; this compiler fix alone does not establish an HTTP allocation
+or throughput improvement.

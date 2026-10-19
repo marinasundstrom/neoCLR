@@ -466,8 +466,10 @@ impl<'a> Profile<'a> {
             // Keep the uninitialized receiver below independently evaluated arguments.
             // The ordinary typed-stack verifier still checks operand and call types.
             let base_initializer = if reference_constructor && owner.unwrap().base.is_some() {
-                Some(leading_base_initializer(&f.body, owner.unwrap().base.as_ref().unwrap())
-                    .ok_or("reference constructor requires an unconditional leading base initializer with receiver-independent scalar arguments")?)
+                Some(leading_base_initializer(&f.body, owner.unwrap().base.as_ref().unwrap(), &|target| {
+                        p.callee(target).ok().map(|index| input.functions[index].no_result)
+                    })
+                    .ok_or("reference constructor requires an unconditional leading base initializer with receiver-independent arguments")?)
             } else {
                 None
             };
@@ -2461,9 +2463,14 @@ impl<'a> Profile<'a> {
     }
 }
 
-// Recognize only a straight-line, side-effect-free argument prefix. Counting
-// values above this protects the receiver from arithmetic, duplication or escape.
-fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
+// Recognize a straight-line argument prefix. Calls may allocate or have effects,
+// but can only consume independently evaluated values above the receiver. The
+// ordinary typed verifier and GC stack maps still validate/root these values.
+fn leading_base_initializer(
+    body: &[Op],
+    base: &Type,
+    no_result: &dyn Fn(&FunctionRef) -> Option<bool>,
+) -> Option<usize> {
     if !matches!(body.first(), Some(Op::Arg(0))) {
         return None;
     }
@@ -2471,7 +2478,7 @@ fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
     for (pc, op) in body.iter().enumerate().skip(1) {
         match op {
             Op::Arg(n) if *n != 0 => arguments += 1,
-            Op::Int(_) | Op::Int64(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::Bool(_) => {
+            Op::Int(_) | Op::Int64(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::Bool(_) | Op::String(_) => {
                 arguments += 1
             }
             Op::Add
@@ -2497,7 +2504,8 @@ fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
             {
                 arguments -= 1
             }
-            Op::Negate
+            Op::CastClass(_)
+            | Op::Negate
             | Op::BitNot
             | Op::ConvertInt32
             | Op::ConvertUInt32
@@ -2521,6 +2529,20 @@ fn leading_base_initializer(body: &[Op], base: &Type) -> Option<usize> {
                     return None;
                 }
                 return Some(pc);
+            }
+            Op::Call(target) | Op::CallVirtual(target) if !target.name.ends_with("..ctor") => {
+                let consumed = target.parameters.len() + usize::from(target.instance);
+                if consumed > arguments {
+                    return None;
+                }
+                arguments = arguments - consumed + usize::from(!no_result(target)?);
+            }
+            Op::Construct(target) if arguments >= target.parameters.len() => {
+                // Construct supplies its own receiver; it cannot consume ours.
+                if !target.instance || !target.name.ends_with("..ctor") || !no_result(target)? {
+                    return None;
+                }
+                arguments = arguments - target.parameters.len() + 1;
             }
             _ => return None,
         }
@@ -2608,18 +2630,18 @@ mod object_assignment_tests {
     }
 
     #[test]
-    fn base_initializer_accepts_independent_scalar_expressions_only() {
+    fn base_initializer_accepts_independent_expressions_without_exposing_receiver() {
         let base = Type::Named("Base".into());
         let call =
             Op::Call(neoclr::assembler::parse_function_ref("instance Base::.ctor(Int32)").unwrap());
         assert_eq!(
-            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call.clone()], &base),
+            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call.clone()], &base, &|_| Some(false)),
             Some(2)
         );
         assert_eq!(
             leading_base_initializer(
                 &[Op::Arg(0), Op::Arg(1), Op::Int(1), Op::Add, call.clone()],
-                &base
+                &base, &|_| Some(false)
             ),
             Some(4)
         );
@@ -2628,17 +2650,42 @@ mod object_assignment_tests {
             vec![Op::Arg(0), Op::Int(1), Op::Add],
             vec![Op::Arg(0), Op::Dup],
             vec![Op::Arg(0), Op::Field(0)],
+            vec![Op::Arg(0), Op::CastClass(base.clone())],
             vec![Op::Arg(0), Op::Int(1), Op::Store(0)],
             vec![Op::Arg(0), Op::Branch(2), Op::Int(1)],
         ] {
             let mut body = prefix;
             body.push(call.clone());
-            assert_eq!(leading_base_initializer(&body, &base), None, "{body:?}");
+            assert_eq!(leading_base_initializer(&body, &base, &|_| Some(false)), None, "{body:?}");
         }
         assert_eq!(
-            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call, Op::Branch(0)], &base),
+            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call, Op::Branch(0)], &base, &|_| Some(false)),
             None
         );
+    }
+
+    #[test]
+    fn base_arguments_cannot_pass_uninitialized_receiver_to_helpers() {
+        let base = Type::Named("Base".into());
+        let target = |name| neoclr::assembler::parse_function_ref(name).unwrap();
+        let finish = Op::Call(target("instance Base::.ctor(Int32)"));
+        for helper in [
+            Op::Call(target("Escape(Base)")),
+            Op::CallVirtual(target("instance Base::Read()")),
+            Op::Construct(target("instance Box::.ctor(Base)")),
+        ] {
+            assert_eq!(leading_base_initializer(&[Op::Arg(0), helper, finish.clone()], &base, &|_| Some(false)), None);
+        }
+        let nested = [
+            Op::Arg(0), Op::Int(42),
+            Op::Construct(target("instance Box::.ctor(Int32)")),
+            Op::CastClass(Type::Named("Box".into())),
+            Op::Call(target("Read(Box)")), finish.clone(),
+        ];
+        assert_eq!(leading_base_initializer(&nested, &base, &|target| Some(target.name.ends_with("..ctor"))), Some(5));
+        // A no-result helper does not manufacture an argument for the base call.
+        let body = [Op::Arg(0), Op::Int(42), Op::Call(target("Consume(Int32)")), finish];
+        assert_eq!(leading_base_initializer(&body, &base, &|_| Some(true)), None);
     }
 
     #[test]
