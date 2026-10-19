@@ -940,3 +940,30 @@ int32_t neoclr_byte_view_set_v1(neoclr_aot_context *context, const neoclr_byte_v
     if (reserved) data[total + position] = 1;
     return 0;
 }
+int32_t neoclr_byte_view_copy_v1(neoclr_aot_context *context,
+    const neoclr_byte_view *source, const neoclr_byte_view *destination) {
+    uint64_t source_total, destination_total;
+    int source_reserved, destination_reserved;
+    int32_t status = byte_view_validate(context, source, &source_total, &source_reserved);
+    if (status) return status;
+    status = byte_view_validate(context, destination, &destination_total, &destination_reserved);
+    if (status) return status;
+    if (destination->kind & 1) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (source->length > destination->length) return NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE;
+    /* Avoid pointer arithmetic on the null owner of a valid empty view. */
+    if (!source->length) return 0;
+    const unsigned char *input = (const unsigned char *)source->owner + 16;
+    unsigned char *output = (unsigned char *)destination->owner + 16;
+    if (source_reserved) {
+        for (uint32_t i = 0; i < source->length; i++) {
+            if (!input[source_total + source->offset + i])
+                return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+        }
+    }
+    /* Snapshot semantics without a temporary allocation, in either direction.
+     * Publish initialization only after the full source has been checked. */
+    memmove(output + destination->offset, input + source->offset, source->length);
+    if (destination_reserved)
+        memset(output + destination_total + destination->offset, 1, source->length);
+    return 0;
+}

@@ -6,7 +6,93 @@
 #include <limits.h>
 #include <stdio.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "failed at %d: %s\n", __LINE__, #x); return 1; } } while (0)
+static int copy_tests(void) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
+    void *arrays[2];
+    CHECK(!neoclr_allocate_bytes_v1(&c.text, 6, &arrays[0]));
+    CHECK(!neoclr_reserve_bytes_v1(&c.text, 6, &arrays[1]));
+    uint64_t used = c.text.used;
+#ifdef NEOCLR_NATIVE_GC
+    uint64_t allocations = neoclr_gc_statistics_v1().allocations;
+#endif
+    /* All windows of six bytes, both overlap directions, separate owners,
+     * initialized/reserved storage and every source/destination capability. */
+    for (int src_array = 0; src_array < 2; src_array++) {
+        for (int dst_array = 0; dst_array < 2; dst_array++) {
+            for (uint64_t src_kind = 0; src_kind < 4; src_kind++) {
+                for (uint64_t dst_kind = 0; dst_kind < 4; dst_kind++) {
+                    for (int start = 0; start <= 6; start++) {
+                        for (int count = 0; count <= 6 - start; count++) {
+                            for (int target = 0; target <= 6; target++) {
+                                for (int capacity = 0; capacity <= 6 - target; capacity++) {
+                                    unsigned char before[2][12], expected[2][12];
+                                    for (int a = 0; a < 2; a++) {
+                                        unsigned char *data = (unsigned char *)arrays[a] + 16;
+                                        for (int i = 0; i < 6; i++) data[i] = (unsigned char)(10 * a + i + 1);
+                                        if (a) memset(data + 6, 1, 6);
+                                        memcpy(before[a], data, a ? 12 : 6);
+                                        memcpy(expected[a], before[a], a ? 12 : 6);
+                                    }
+                                    neoclr_byte_view source, destination;
+                                    CHECK(!neoclr_byte_view_create_v1(&c, arrays[src_array], start, count, src_kind, &source));
+                                    CHECK(!neoclr_byte_view_create_v1(&c, arrays[dst_array], target, capacity, dst_kind, &destination));
+                                    neoclr_byte_view source_before = source, destination_before = destination;
+                                    int32_t status = (dst_kind & 1) ? 3 : count > capacity ? 8 : 0;
+                                    if (!status) {
+                                        /* Independent snapshot oracle, not an in-place copy. */
+                                        for (int i = 0; i < count; i++)
+                                            expected[dst_array][target + i] = before[src_array][start + i];
+                                    }
+                                    CHECK(neoclr_byte_view_copy_v1(&c, &source, &destination) == status);
+                                    CHECK(!memcmp(&source, &source_before, sizeof(source)));
+                                    CHECK(!memcmp(&destination, &destination_before, sizeof(destination)));
+                                    for (int a = 0; a < 2; a++)
+                                        CHECK(!memcmp((unsigned char *)arrays[a] + 16, expected[a], a ? 12 : 6));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    unsigned char *pending = (unsigned char *)arrays[1] + 16;
+    neoclr_byte_view source, destination;
+    CHECK(!neoclr_byte_view_create_v1(&c, arrays[1], 0, 3, 1, &source));
+    CHECK(!neoclr_byte_view_create_v1(&c, arrays[1], 2, 4, 2, &destination));
+    /* An overlapping write must not initialize a later unread source slot. */
+    memset(pending + 6, 0, 6);
+    pending[6] = pending[7] = 1;
+    unsigned char before[12]; memcpy(before, pending, sizeof(before));
+    CHECK(neoclr_byte_view_copy_v1(&c, &source, &destination) == 3);
+    CHECK(!memcmp(before, pending, sizeof(before)));
+    pending[8] = 1;
+    CHECK(!neoclr_byte_view_copy_v1(&c, &source, &destination));
+    CHECK(pending[8] && pending[9] && pending[10] && !pending[11]);
+    CHECK(pending[2] == before[0] && pending[3] == before[1] && pending[4] == before[2]);
+    CHECK(!neoclr_byte_view_copy_v1(&c, &source, &destination));
+    CHECK(!neoclr_byte_view_create_v1(&c, NULL, 0, 0, 0, &destination));
+    CHECK(!neoclr_byte_view_copy_v1(&c, &destination, &destination));
+    CHECK(neoclr_byte_view_copy_v1(&c, &destination, &source) == 3); /* readonly target */
+    CHECK(neoclr_byte_view_copy_v1(&c, NULL, &destination) == 3);
+    CHECK(neoclr_byte_view_copy_v1(&c, &source, NULL) == 3);
+    CHECK(neoclr_byte_view_copy_v1(NULL, &source, &destination) == 3);
+    neoclr_byte_view bad = source; bad.offset = UINT32_MAX;
+    CHECK(neoclr_byte_view_copy_v1(&c, &bad, &destination) == 8);
+    CHECK(neoclr_byte_view_copy_v1(&c, &destination, &bad) == 8);
+    CHECK(c.text.used == used);
+#ifdef NEOCLR_NATIVE_GC
+    CHECK(neoclr_gc_statistics_v1().allocations == allocations);
+    neoclr_aot_context foreign = {0};
+    CHECK(neoclr_byte_view_copy_v1(&foreign, &source, &destination) == 3);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(neoclr_byte_view_copy_v1(&c, &source, &destination) == 3);
+#endif
+    return 0;
+}
 int main(void) {
+    CHECK(!copy_tests());
     uint64_t heap[512] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
     void *array;

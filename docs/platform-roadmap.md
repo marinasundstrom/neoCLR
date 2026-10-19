@@ -10,7 +10,7 @@ work in the interpreter, including object-field ownership and awaited retention.
 The [library audit](memory-view-library-audit.md) records buffer candidates and
 the native-backend gate for shared service migration. Native specialization
 retains exact view element identities. A checked byte-window C kernel now passes
-owner-retention and access tests in arena/GC modes; generated layout, roots and
+owner-retention, access and overlap-safe copy tests in arena/GC modes; generated layout, roots and
 InternalCall bindings remain gated. The author also
 directs a whole-class-library audit of array APIs after the slice types work. Index/Range already exist; the author selects array ranges returning Slice<T>,
 implicit view conversion and explicit ToArray copying, without compatibility-only

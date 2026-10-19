@@ -221,7 +221,7 @@ by the [host value reference](objects.md#rust-host-memory-view-payloads). Its
 constructors remain internal. Private Rust native-specialization element retention
 and rename/serialization limits are documented in the same host reference; these
 compiler helpers are not guest types and do not change the RavenDoc snapshot.
-The same host reference covers the private native byte-window carrier and five
+The same host reference covers the private native byte-window carrier and six
 checked C helpers, which are not yet callable from generated Raven code.
 Public Raven Slice/ReadOnlySlice and Memory/ReadOnlyMemory APIs and
 String.Utf8Bytes have a [manual member reference](memory-views.md). The native

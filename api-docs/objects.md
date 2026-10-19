@@ -407,6 +407,7 @@ carrier (`owner`, `offset`, `length`, `kind`) and these internal C entry points:
 - `neoclr_byte_view_convert_v1(context, view, kind, output)`.
 - `neoclr_byte_view_get_v1(context, view, index, outputByte)`.
 - `neoclr_byte_view_set_v1(context, view, index, byte)`.
+- `neoclr_byte_view_copy_v1(context, source, destination)`.
 
 They return Int32 native fault codes: zero on success, IndexOutOfRange (8) for
 invalid windows/indexes, RuntimeError (3) for invalid storage/capabilities or
@@ -418,5 +419,13 @@ These are trusted compiler/runtime helpers, not a stable host ABI or public gues
 factory. They do not root values, allocate, collect or authorize borrowed escapes.
 Callers publish the owner across GC boundaries; empty nonnull windows also retain
 it. Arena mode trusts allocation-base provenance; GC mode validates live ownership.
+Copy transfers the entire source into the destination prefix with overlap-safe
+snapshot semantics and no temporary allocation. It preserves the destination
+suffix and both descriptors. Both views must be valid, the destination writable
+and long enough, and every source byte initialized before any write occurs.
+Only copied destination bytes become initialized. Short destinations return 8;
+readonly destinations and uninitialized sources return 3. Empty copies still
+validate both descriptors and destination capability. This is a private byte
+kernel, not a public Raven CopyTo member or a generic reference-element copier.
 The [native implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md#native-byte-window-kernel-2026-10-19)
 records layout costs, tests and the still-missing generated-code binding.

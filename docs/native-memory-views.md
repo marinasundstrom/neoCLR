@@ -221,3 +221,32 @@ a sampled stack confirms this, so no ASan pass is claimed.
 Existing static-storage consumers also pass in arena and GC modes through the
 compatibility include wrappers, with UBSan/bounds and warnings-as-errors. The
 packaging check confirms the new header is included in native support bundles.
+
+The byte kernel also supplies `neoclr_byte_view_copy_v1(context, source,
+destination)`. It copies the source into the destination prefix with the
+overlap semantics of [.NET ReadOnlySpan.CopyTo](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1.copyto?view=net-10.0):
+the result reflects the original source even when the windows overlap. Native
+`memmove` avoids a temporary allocation. Both descriptors and the destination
+suffix remain unchanged. Readonly sources are accepted; readonly destinations
+are rejected, including empty copies. A short destination returns the private
+kernel's bounds fault (8), not .NET's ArgumentException; mapping to a future guest
+copy API remains open and this helper does not establish that API's error contract.
+
+neoCLR reserved storage additionally requires validating every source
+initialization bit before moving any bytes. Otherwise an overlapping write could
+initialize a later unread source slot, or leave a partial copy on failure. Only
+the destination prefix becomes initialized after success. This adds a linear
+validation pass for reserved sources; ordinary initialized arrays need no such
+pass. No throughput improvement is claimed. Empty copies avoid null-owner
+pointer arithmetic but still validate storage and capability. Ownership/rooting
+rules remain the same as the other helpers; no allocation or collection occurs.
+
+Focused validation uses the same Python command above, with warnings-as-errors
+and UBSan/bounds in arena and GC modes. An independent snapshot oracle checks
+50,176 combinations per mode: every window in six-byte storage, all four source
+and destination kinds, shared/distinct owners and initialized/reserved arrays.
+Additional cases cover partially initialized overlapping sources, precise
+destination initialization, null/empty inputs, invalid windows, foreign contexts,
+stale owners and unchanged allocation counts. Both tests pass. Public Raven
+members, the API snapshot and native guest admission are unchanged; the manual
+host reference documents this sixth private helper.

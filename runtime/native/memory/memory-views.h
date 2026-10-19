@@ -37,4 +37,13 @@ int32_t neoclr_byte_view_get_v1(neoclr_aot_context *, const neoclr_byte_view *,
     int32_t, uint8_t *);
 int32_t neoclr_byte_view_set_v1(neoclr_aot_context *, const neoclr_byte_view *,
     int32_t, uint8_t);
+/* Copies the entire source into the destination prefix, including overlapping
+ * windows. Validates both descriptors, writable destination, capacity and every
+ * source initialization bit before changing bytes or initialization state.
+ * The destination suffix and both descriptors are preserved. A short destination
+ * returns IndexOutOfRange; readonly destinations/uninitialized sources return
+ * RuntimeError. Even empty copies validate storage and destination capability.
+ */
+int32_t neoclr_byte_view_copy_v1(neoclr_aot_context *, const neoclr_byte_view *,
+    const neoclr_byte_view *);
 #endif
