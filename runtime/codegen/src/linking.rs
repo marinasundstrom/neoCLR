@@ -849,6 +849,31 @@ pub fn prepare(
     // Static primitive wrappers have no receiver/storage. Preserve their verified
     // source identity in the report, then use private free-function bodies: the
     // backend's bundled primitive declarations belong to a different verification module.
+    // Original-scope verification above has already enforced private access.
+    // Removing an instance caller's intrinsic owner must not invalidate its calls
+    // to private static helpers. Widen only selected String helpers in this closed private
+    // projection; never change source metadata or authorize an original caller.
+    let private_string_members: std::collections::BTreeSet<_> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| {
+            f.owner == Some(neoclr::metadata::Type::String)
+                && !f.instance
+                && f.visibility == neoclr::metadata::Visibility::Private
+        })
+        .map(|(i, _)| i)
+        .collect();
+    for &i in &private_string_members {
+        let f = &mut selected.functions[i];
+        f.visibility = neoclr::metadata::Visibility::Internal;
+        if let Some(origin) = &mut f.origin {
+            origin.member_access = Some(neoclr::metadata_origin::SourceAccess::Assembly);
+        }
+    }
+    report["privateStringHelperProjections"] = json!(private_string_members.iter()
+        .map(|i| json!({"compiledIndex": i, "policy": "original private access verified before closed projection"}))
+        .collect::<Vec<_>>());
     let primitive_static: std::collections::BTreeSet<_> = selected
         .functions
         .iter()

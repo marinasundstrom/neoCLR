@@ -2592,6 +2592,22 @@ fn string_instance_projection_preserves_receiver_arguments_and_null_faults() {
     method.name = "System.String.AotAnswer".into();
     method.owner = Some(neoclr::metadata::Type::String);
     method.definition = None;
+    method.body = vec![
+        neoclr::metadata::Instruction::Arg(1),
+        neoclr::metadata::Instruction::Call(
+            neoclr::assembler::parse_function_ref("System.String::PrivateAnswer(Int32)").unwrap(),
+        ),
+        neoclr::metadata::Instruction::Return,
+    ];
+    let mut helper = method.clone();
+    helper.name = "System.String.PrivateAnswer".into();
+    helper.instance = false;
+    helper.visibility = neoclr::metadata::Visibility::Private;
+    helper.body = vec![
+        neoclr::metadata::Instruction::Arg(0),
+        neoclr::metadata::Instruction::Return,
+    ];
+    seed.functions.push(helper);
     seed.functions.push(method.clone());
     method.name = "System.String.AotCount".into();
     method.parameters.clear();
@@ -2601,6 +2617,9 @@ fn string_instance_projection_preserves_receiver_arguments_and_null_faults() {
         neoclr::metadata::Instruction::Call(
             neoclr::assembler::parse_function_ref("neoCLR.Runtime.StringByteCount(String)")
                 .unwrap(),
+        ),
+        neoclr::metadata::Instruction::Call(
+            neoclr::assembler::parse_function_ref("System.String::PrivateAnswer(Int32)").unwrap(),
         ),
         neoclr::metadata::Instruction::Return,
     ];
@@ -2625,17 +2644,24 @@ ldarg mode
 ldc.i4 2
 ceq
 brtrue Direct
-call instance System.String::AotCount()
+callvirt instance System.String::AotCount()
 ret
 Direct:
 ldc.i4 42
-call instance System.String::AotAnswer(Int32)
+callvirt instance System.String::AotAnswer(Int32)
 ret
 .end
 "#;
     let modules =
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed)
             .unwrap();
+    let error = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(".module Denied\n.function Calculate(Int32 arg) -> Int32\nldarg arg\ncall System.String::PrivateAnswer(Int32)\nret\n.end\n")], &seed,
+    ).unwrap_err();
+    assert!(
+        error.to_string().contains("method access denied"),
+        "{error}"
+    );
     let app = &modules[0];
     fs::write(
         dir.0.join("app.neox"),
@@ -2668,6 +2694,13 @@ ret
             .unwrap()
             .len(),
         2
+    );
+    assert_eq!(
+        report["privateStringHelperProjections"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
     );
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
     fs::write(
