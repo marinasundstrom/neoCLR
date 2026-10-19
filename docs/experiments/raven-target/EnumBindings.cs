@@ -5,7 +5,7 @@ using System.Text;
 static class EnumBindings
 {
     public const string StringComparison = "System.StringComparison";
-    static readonly (string Name, int Value)[] StringLiterals = [("Ordinal", 0), ("OrdinalIgnoreCase", 1)];
+    static readonly (string Name, int Value)[] StringLiterals = [("Ordinal", 0), ("OrdinalIgnoreCase", 1), ("Canonical", 2)];
     public const string Flags = "System.Introspection.BindingFlags";
     public const string TaskState = "System.Concurrency.Tasks.TaskState";
     public const string EntryKind = "System.Storage.EntryKind";

@@ -258,7 +258,7 @@ public class Uri : EquatableTo<Uri> {
         return Parse(String.Concat(String.Concat(resolvedPrefix, resolvedPath), suffix))
     }
 
-    func Equals(other: Uri) -> bool => text.Equals(other.Text)
+    func Equals(other: Uri) -> bool => String.CompareOrdinal(text, other.Text) == 0
 
     override func Equals(other: Object?) -> bool {
         if other is Uri uri {
@@ -269,7 +269,7 @@ public class Uri : EquatableTo<Uri> {
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(text)
+        hash.Add(neoCLR.Runtime.StringHashOrdinal(text))
         return hash.ToHashCode()
     }
 

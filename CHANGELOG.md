@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Integrate canonical String/Char equality, ordering and matching hashes across public APIs, boxed Object dispatch, compiler patterns and collection policies while preserving original UTF-8 bytes. Add StringComparer.Default and explicit Canonical comparison; keep JSON/SQL names, paths, URI and metadata identities ordinal. HashCode.Add(string) avoids a temporary encoded array. Fix native text override projection, boxed Char receivers, String null guards and canonical-only Unicode helper linking. Six public/fault executions pass across interpreter/JIT/AOT, with 37 boxed-object and two override regressions; refresh API snapshots and website guidance. Canonical dictionary keys now collapse equivalent spellings, a deliberate compatibility change. Native record-generated equality/hash remains unsupported and is separately reproduced; release qualification remains pending.
+
 - Admit intrinsic String/Char implementations of selected Object slots in runtime inheritance validation and preserve String's by-value receiver through verification and interpreter dispatch. Both focused override regressions pass, checking null receivers and rejecting unrelated intrinsic override slots. Public canonical semantics and native primitive-wrapper/boxed dispatch remain pending coordinated qualification.
 
 - Admit exact selected-Object override references on native String and Char in the metadata adapter. Preserve primitive/grapheme identity and reject static, malformed and numeric-primitive overrides. Focused metadata checks pass; consumer emission succeeds, while coordinated public semantics and native dispatch qualification remain pending.

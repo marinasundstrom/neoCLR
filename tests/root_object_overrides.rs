@@ -154,6 +154,20 @@ ret
             ),
         }
     }
+    let source = ".module BoxedText\n.entry Main\n.function Main() -> Int32\nldstr \"text\"\ncastclass System.Object\ncallvirt instance System.Object::GetHashCode()\nret\n.end";
+    let app = neoclr::assembler::read_modules_with_object_root(
+        &[neoclr::assembler::ModuleInput::Source(source)],
+        &seed,
+        &root,
+    )
+    .unwrap()
+    .remove(0);
+    let program = LoadedProgram::with_modules_and_object_root(&app, &seed, &[], &root).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
     let app = neoclr::assemble(".module Empty").unwrap();
     let method = seed
         .functions

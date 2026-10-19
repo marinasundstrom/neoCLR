@@ -2391,7 +2391,13 @@ pub(crate) fn compile_into(
                     b.ins().brif(equal, matched, &[], next, &[]);
                     b.switch_to_block(matched);
                     let mut adapted = parameters.clone();
-                    if input.functions[target].receiver_byref {
+                    if input.functions[target].receiver_byref
+                        || (details.is_some_and(|d| d.primitive_receivers.contains(&target))
+                            && input.functions[target].parameters.first()
+                                == Some(&neoclr::metadata::Type::ByRef(Box::new(
+                                    neoclr::metadata::Type::Char,
+                                ))))
+                    {
                         // A value override borrows the payload of the rooted box.
                         adapted[0] = b.ins().iadd_imm(parameters[0], 8);
                     }
@@ -3277,6 +3283,22 @@ pub(crate) fn compile_into(
                     true,
                 );
             }
+            // Every early return must follow GC frame registration: finish()
+            // inserts frame cleanup on all return edges, including null faults.
+            if details.is_some_and(|d| d.string_receivers.contains(&i)) {
+                let null = b.ins().icmp_imm(IntCC::Equal, parameters[0], 0);
+                let status = b.ins().iconst(types::I32, 6);
+                let mut site = diagnostic_data.as_ref().unwrap().site(
+                    module,
+                    &mut b,
+                    fault_context.unwrap(),
+                    i,
+                    0,
+                );
+                site.capture_frame = false;
+                return_if_detailed(&mut b, null, status, Some(&site));
+            }
+
             if let Some(guard) = crate::type_initialization::entry_owner(input, f)
                 .and_then(|owner| owner.definition_name())
                 .and_then(|name| initialization_guards.get(name))

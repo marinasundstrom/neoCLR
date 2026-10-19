@@ -1,0 +1,107 @@
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Data.Sql.*
+import System.Storage.Path
+import System.Result.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func IsAccent(text: string) -> bool {
+    return text match {
+        "é" => true
+        _ => false
+    }
+}
+
+func IsAccentCharacter(value: char) -> bool {
+    return value match {
+        'é' => true
+        _ => false
+    }
+}
+
+func Main() {
+    let composed = "é"
+    let decomposed = "é"
+    Check(composed == decomposed, "String operator")
+    Check(!(composed != decomposed), "String inequality")
+    Check(composed.Equals(decomposed), "String Equals")
+    Check(composed.GetHashCode() == decomposed.GetHashCode(), "String hash")
+    Check(String.Compare(composed, decomposed) == 0, "String ordering")
+    Check(String.Compare(composed, decomposed, StringComparison.Canonical) == 0, "Explicit canonical ordering")
+    Check(String.CompareOrdinal(composed, decomposed) != 0, "Ordinal ordering")
+    Check(!StringComparer.Ordinal.Equals(composed, decomposed), "Ordinal policy")
+    Check(!StringComparer.OrdinalIgnoreCase.Equals(composed, decomposed), "Fold policy")
+    Check(StringComparer.Default.Equals(composed, decomposed), "Default policy")
+    Check(IsAccent(decomposed), "String constant pattern")
+    let left = Char.FromString(composed)
+    let right = Char.FromString(decomposed)
+    Check(left == right && left.Equals(right), "Char equality")
+    Check(left.CompareTo(right) == 0, "Char ordering")
+    Check(left.GetHashCode() == right.GetHashCode(), "Char hash")
+    Check(IsAccentCharacter(right), "Char constant pattern")
+    let boxedLeft: Object = composed
+    let boxedRight: Object = decomposed
+    Check(boxedLeft.Equals(boxedRight), "Boxed String equality")
+    Check(boxedLeft.GetHashCode() == boxedRight.GetHashCode(), "Boxed String hash")
+    Check(!Object.ReferenceEquals(boxedLeft, boxedRight), "String reference identity")
+    let boxedCharLeft: Object = left
+    let boxedCharRight: Object = right
+    Check(boxedCharLeft.Equals(boxedCharRight), "Boxed Char equality")
+    Check(boxedCharLeft.GetHashCode() == boxedCharRight.GetHashCode(), "Boxed Char hash")
+    Check(!boxedCharLeft.Equals(boxedLeft), "Char and String identities stay distinct")
+    Check(String.CompareOrdinal(boxedRight.ToString(), decomposed) == 0, "Boxed String display preserves bytes")
+    Check(String.CompareOrdinal(boxedCharRight.ToString(), decomposed) == 0, "Boxed Char display preserves bytes")
+    Check(Object.ReferenceEquals(decomposed, decomposed.ToString()), "String display preserves owner")
+    Check(!boxedLeft.Equals(null), "Null equality")
+    var firstHash = HashCode()
+    var secondHash = HashCode()
+    firstHash.Add(composed)
+    secondHash.Add(decomposed)
+    Check(firstHash.ToHashCode() == secondHash.ToHashCode(), "Containing value hash")
+    let canonical = HashMap<string, int>(StringComparer.Default)
+    canonical.Set(composed, 1)
+    canonical.Set(decomposed, 2)
+    Check(canonical.Count == 1, "Canonical keys")
+    let ordinal = HashMap<string, int>(StringComparer.Ordinal)
+    ordinal.Set(composed, 1)
+    ordinal.Set(decomposed, 2)
+    Check(ordinal.Count == 2, "Ordinal keys")
+    let bytes = composed.Utf8Bytes
+    let otherBytes = decomposed.Utf8Bytes
+    Check(bytes.Length == 2 && otherBytes.Length == 3, "Original UTF-8 lengths")
+    Check(bytes[0] == 195 && bytes[1] == 169, "Original composed bytes")
+    Check(otherBytes[0] == 101 && otherBytes[1] == 204 && otherBytes[2] == 129, "Original decomposed bytes")
+    Check("ﬁ" != "fi" && "A" != "a", "No compatibility or case folding")
+    let fields = JsonObject()
+    Check(fields.Add(composed, JsonString("first")) is Ok(_), "First JSON name")
+    Check(fields.Add(decomposed, JsonString("second")) is Ok(_), "Distinct JSON name")
+    Check(fields.Count == 2, "JSON names remain ordinal")
+    Check(fields[composed] is JsonString firstField && firstField.Value == "first", "JSON composed lookup")
+    Check(fields[decomposed] is JsonString secondField && secondField.Value == "second", "JSON decomposed lookup")
+    let columns = ArrayList<string>()
+    columns.Add(composed)
+    columns.Add(decomposed)
+    let cells = ArrayList<Option<string>>()
+    cells.Add(Option<string>.Some("first"))
+    cells.Add(Option<string>.Some("second"))
+    let row = SqlRow(columns, cells)
+    Check(row.RequiredText(composed) is Ok("first"), "SQL composed name")
+    Check(row.RequiredText(decomposed) is Ok("second"), "SQL decomposed name")
+    if Path.Parse(composed) is Ok(let firstPath) && Path.Parse(decomposed) is Ok(let secondPath) {
+        Check(!firstPath.Equals(secondPath), "Path identity remains ordinal")
+    } else {
+        System.Fail("Path fixture")
+    }
+    if Uri.Parse("https://example.com/%C3%A9") is Ok(let firstUri) && Uri.Parse("https://example.com/e%CC%81") is Ok(let secondUri) {
+        Check(!firstUri.Equals(secondUri), "URI identity remains ordinal")
+    } else {
+        System.Fail("URI fixture")
+    }
+    Console.WriteLine("PASS canonical text")
+}

@@ -49,7 +49,7 @@ public class Path : EquatableTo<Path> {
     }
 
     func Equals(other: Path) -> bool {
-        return text.Equals(other.Text)
+        return String.CompareOrdinal(text, other.Text) == 0
     }
 
     override func Equals(other: Object?) -> bool {
@@ -61,7 +61,7 @@ public class Path : EquatableTo<Path> {
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(text)
+        hash.Add(neoCLR.Runtime.StringHashOrdinal(text))
         return hash.ToHashCode()
     }
 

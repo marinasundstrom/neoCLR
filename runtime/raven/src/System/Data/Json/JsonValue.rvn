@@ -41,7 +41,7 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
     val self[name: string]: JsonValue {
         get {
             for index in 0..names.Count {
-                if names[index].Equals(name) {
+                if String.CompareOrdinal(names[index], name) == 0 {
                     return values[index]
                 }
             }
@@ -76,7 +76,7 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
 
     func Field(name: string) -> Result<JsonValue, JsonError> {
         for index in 0..names.Count {
-            if names[index].Equals(name) {
+            if String.CompareOrdinal(names[index], name) == 0 {
                 return Ok(values[index])
             }
         }
@@ -100,7 +100,7 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
     // Add only: duplicate names never silently replace earlier values.
     func Add(name: string, value: JsonValue) -> Result<unit, JsonError> {
         for previous in names {
-            if previous.Equals(name) {
+            if String.CompareOrdinal(previous, name) == 0 {
                 return Error(JsonError.DuplicateField(name))
             }
         }

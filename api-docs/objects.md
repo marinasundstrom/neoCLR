@@ -80,8 +80,9 @@ are unchanged.
 String identity follows the shared immutable text owner. Object/interface wrappers
 may be separate allocations while still referring to the same String. ReferenceEquals
 and explicit Object base Equals/GetHashCode use that owner; virtual String equality
-and hashing continue to compare contents. Separate constructions can have equal
-contents without sharing identity. Explicit String.Intern canonicalizes text within one execution; literals are not automatically interned. Virtual
+and hashing use canonical Unicode 17 text identity. Separate constructions can be
+canonically equal without sharing bytes or reference identity. Explicit String.Intern
+shares exact stored spellings within one execution; literals are not automatically interned. Virtual
 boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char and explicit named-struct overrides, described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
@@ -110,8 +111,8 @@ the current importer/runtime profile. Use matching reference/library artifacts.
 
 [System.HashCode](xref:System.HashCode) is a mutable value accumulator. Add(int),
 Add(string), ToHashCode() and Combine(int, int) are available. Copies retain independent
-state. String hashing uses non-null UTF-8 contents without Unicode normalization and
-allocates a temporary byte snapshot. Generic values and custom comparers are not
+state. String hashing uses canonical Unicode 17 identity without allocating a
+normalized string or a temporary byte snapshot. Original UTF-8 bytes are unchanged. Generic values and custom comparers are not
 supported. Hashes can collide and must not be persisted; this implementation has no
 randomized seed and does not reproduce .NET's hash values.
 
@@ -165,14 +166,16 @@ remain unequal. These rules allow explicit Object comparer callbacks to find NaN
 and signed-zero map keys reliably. Hashes are not persistent identifiers. Floating
 boxed ToString and source-declared typed Equals/GetHashCode remain outside this slice.
 
-[Char](xref:System.Char) compares its complete grapheme text exactly, rejects other
-concrete types and null, and hashes the same UTF-8 text. Composed and decomposed
-spellings remain distinct: no normalization is implicit. Object ToString returns
+[Char](xref:System.Char) compares canonical Unicode 17 grapheme identity, rejects other
+concrete types and null, and hashes the same canonical sequence. Canonically equivalent
+composed and decomposed spellings compare equal while preserving their bytes. Object ToString returns
 all stored text, including combining marks and emoji joiners. Unlike .NET Char,
 neoCLR Char is not a UTF-16 code unit and does not use .NET's code-unit hash.
 
-These are bounded interpreter intrinsics for the System library's exact Object slots.
-It does not add typed primitive GetHashCode members, general struct equality, nullable
+String and Char expose matching typed and Object overrides in the development
+library. Their native dispatch preserves the same source bodies. The remaining
+primitive policies use bounded intrinsics for the selected Object slots. This does
+not add typed GetHashCode members for other primitives, general struct equality, nullable
 boxing, or general primitive formatting. Int32, Int64 and Boolean boxed ToString
 use the bounded display contract above. Other primitive types still require
 explicit implementation. Named structs dispatch their explicit overrides. System.Value is not involved in this dispatch.

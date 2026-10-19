@@ -3,12 +3,13 @@
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are
 implemented; the [String normalization foundation](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19)
-passes Unicode conformance without allocations and now has private interpreter/native
-services; public text semantics are not yet switched. Coordinated
-equality/hash/compiler integration remains open. Exact text Object reference
-admission is fixed; the development public consumer passes interpreter execution,
-while native receiver/boxed dispatch and API qualification remain pending. See the
-[public integration investigation](design/string-api-review-20261019.md#public-integration-investigation-2026-10-19).
+passes Unicode conformance without allocations. Public canonical String/Char
+comparison and hashing now pass interpreter/JIT/AOT qualification, including
+boxed dispatch, explicit ordinal policies and preserved UTF-8 storage. See the
+[canonical text evidence](experiments/canonical-text/README.md).
+Native record-generated equality/hash remains an existing compiler gap, separately
+reproduced. Useful string manipulation methods are the next author-directed task,
+starting with a trimming design; replacement release qualification remains pending.
 
 **Author-directed follow-up (2026-10-19):** after the HTTP content integration,
 update website coverage of Slice/Memory design and the experimental concurrent GC,

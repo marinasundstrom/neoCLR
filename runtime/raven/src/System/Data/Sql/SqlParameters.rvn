@@ -35,7 +35,7 @@ internal class SqlParameters {
                     return Error(SqlError.Mapping("Indexed SQL parameter property: " + property.Name))
                 }
                 for existing in values {
-                    if existing.Key == property.Name {
+                    if String.CompareOrdinal(existing.Key, property.Name) == 0 {
                         return Error(SqlError.Mapping("Ambiguous SQL parameter: " + property.Name))
                     }
                 }

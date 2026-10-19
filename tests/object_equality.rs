@@ -664,14 +664,14 @@ fn floating_object_equality_and_hash_follow_exact_type_value_contracts() {
 }
 
 #[test]
-fn boxed_char_uses_exact_grapheme_text_without_normalization() {
+fn boxed_char_uses_canonical_equality_without_normalizing_storage() {
     let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
     for text in ["A", "é", "e\u{301}", "👩‍💻"] {
         let character =
             format!("ldstr \"{text}\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char");
         body.push_str(&format!("{character}\n{character}\n{EQUALS}\nbrfalse failed\n{character}\n{character}\n{IDENTITY}\nbrtrue failed\n{character}\n{HASH}\n{character}\n{HASH}\nceq\nbrfalse failed\n{character}\ncallvirt instance System.Object::ToString()\nldstr \"{text}\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n"));
     }
-    body.push_str(&format!("ldstr \"é\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\nldstr \"é\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\n{EQUALS}\nbrtrue failed\n"));
+    body.push_str(&format!("ldstr \"é\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\nldstr \"é\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\n{EQUALS}\nbrfalse failed\n"));
     for other in ["ldc.i4 65\nbox Int32", "ldloc empty"] {
         body.push_str(&format!("ldstr \"A\"\ncall neoCLR.Runtime.CharFromString(String)\nbox Char\n{other}\n{EQUALS}\nbrtrue failed\n"));
     }
@@ -683,7 +683,7 @@ fn boxed_char_uses_exact_grapheme_text_without_normalization() {
 }
 
 #[test]
-fn string_object_contracts_use_exact_content_and_preserve_casts() {
+fn string_object_contracts_use_canonical_content_and_preserve_casts() {
     let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
     for text in ["", "A", "a\\u0000b", "hello 👩‍💻", "é"] {
         let object = format!("ldstr \"{text}\"\ncastclass System.Object");
@@ -699,7 +699,7 @@ fn string_object_contracts_use_exact_content_and_preserve_casts() {
             "ldstr \"A\"\ncastclass System.Object\n{other}\n{EQUALS}\nbrtrue failed\n"
         ));
     }
-    body.push_str(&format!("ldstr \"é\"\ncastclass System.Object\nldstr \"é\"\ncastclass System.Object\n{EQUALS}\nbrtrue failed\n"));
+    body.push_str(&format!("ldstr \"é\"\ncastclass System.Object\nldstr \"é\"\ncastclass System.Object\n{EQUALS}\nbrfalse failed\n"));
     // Ordinary identity-based classes must reject String in either direction.
     body.push_str(&format!("newobj Plain\nldstr \"text\"\ncastclass System.Object\n{EQUALS}\nbrtrue failed\nldstr \"text\"\ncastclass System.Object\nnewobj Plain\n{EQUALS}\nbrtrue failed\nldc.bool true\nret\nfailed:\nldc.bool false"));
     let result = run(&body, ".type class Plain\n.end", "Boolean", 12).unwrap();
@@ -804,4 +804,23 @@ fn boxed_enum_equality_retains_nominal_identity_and_hashes_underlying_bits() {
         run(&body, &declarations, "Int32", 4).unwrap().value,
         Value::Int32(42)
     );
+}
+
+#[test]
+fn canonical_boxed_text_hashes_agree_but_identity_and_storage_remain_distinct() {
+    for convert in [
+        "castclass System.Object",
+        "call neoCLR.Runtime.CharFromString(String)\nbox Char",
+    ] {
+        let body = format!("ldstr \"é\"\n{convert}\n{HASH}\nldstr \"é\"\n{convert}\n{HASH}\nceq");
+        assert_eq!(
+            run(&body, "", "Boolean", 4).unwrap().value,
+            Value::Boolean(true)
+        );
+        let body = format!("ldstr \"é\"\n{convert}\nldstr \"é\"\n{convert}\n{IDENTITY}");
+        assert_eq!(
+            run(&body, "", "Boolean", 4).unwrap().value,
+            Value::Boolean(false)
+        );
+    }
 }

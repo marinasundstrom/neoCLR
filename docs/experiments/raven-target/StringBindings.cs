@@ -11,10 +11,14 @@ static class StringBindings
         new("Concat", ["System.Object", "System.Object"], "String"),
         new("op_Equality", ["String", "String"], "Boolean"),
         new("op_Inequality", ["String", "String"], "Boolean"),
+        new("Compare", ["String", "String"], "Int32"),
         new("Compare", ["String", "String", "System.StringComparison"], "Int32"),
         new("CompareOrdinalIgnoreCase", ["String", "String"], "Int32"),
         new("CompareOrdinal", ["String", "String"], "Int32"),
         new("Equals", ["String"], "Boolean", true, true),
+        new("Equals", ["System.Object"], "Boolean", true),
+        new("GetHashCode", [], "Int32", true),
+        new("ToString", [], "String", true),
         new("Replace", ["String", "String"], "String", true),
         new("ContainsOrdinal", ["String"], "Boolean", true, true),
         new("StartsWithOrdinal", ["String"], "Boolean", true, true),
@@ -49,7 +53,7 @@ static class StringBindings
         m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
-            : (collections && m.Name == "GetUtf8ByteCount" ? "[System.Obsolete(\"Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\")] " : collections && m.Name == "SliceUtf8" ? "[System.Obsolete(\"Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\")] " : "") + $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " " + ParameterName(m, i)))}) => default;")) + (collections ? " public char this[Index index] => default; public string this[Range range] => default; public Option<char> Get(int index) => default; public Option<char> Get(Index index) => default; public Result<string, InvalidRangeError> Slice(Range range) => default; int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> characters) {} public static string CreateFromCharacters(Collections.Sequence<char> characters) => default;" : "") + " }";
+            : (collections && m.Name == "GetUtf8ByteCount" ? "[System.Obsolete(\"Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\")] " : collections && m.Name == "SliceUtf8" ? "[System.Obsolete(\"Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\")] " : "") + $"public {(m.Name is "GetHashCode" or "ToString" || m.Name == "Equals" && m.Parameters.SequenceEqual(new[] { "System.Object" }) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " " + ParameterName(m, i)))}) => default;")) + (collections ? " public char this[Index index] => default; public string this[Range range] => default; public Option<char> Get(int index) => default; public Option<char> Get(Index index) => default; public Result<string, InvalidRangeError> Slice(Range range) => default; int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> characters) {} public static string CreateFromCharacters(Collections.Sequence<char> characters) => default;" : "") + " }";
     public static bool IsSequenceConstructor(MethodDefinition method) => IsSequenceConstructor(method, true);
     public static bool IsSequenceConstructor(MethodDefinition method, bool requireCore) =>
         method.DeclaringType.FullName == "System.String" && (!requireCore || RuntimeSignatures.IsCore(method.DeclaringType.Scope))

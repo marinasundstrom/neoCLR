@@ -69,7 +69,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     override func Equals(other: Object?) -> bool {
         if other is RuntimeParameterInfo implementation {
-            return StoredMemberIdentity == implementation.StoredMemberIdentity
+            return String.CompareOrdinal(StoredMemberIdentity, implementation.StoredMemberIdentity) == 0
                 && Position == implementation.Position
         }
         return false
@@ -77,7 +77,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(StoredMemberIdentity)
+        hash.Add(neoCLR.Runtime.StringHashOrdinal(StoredMemberIdentity))
         hash.Add(Position)
         return hash.ToHashCode()
     }

@@ -1,0 +1,6 @@
+import System.*
+
+func Main() {
+    let text = default(string)
+    Console.WriteLine(text!.GetHashCode().ToString())
+}

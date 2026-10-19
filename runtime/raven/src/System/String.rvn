@@ -117,12 +117,33 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
 
     static func !=(left: string, right: string) -> bool => !neoCLR.Runtime.StringEquals(left, right)
 
+    /// Tests Unicode canonical equivalence without changing either string.
     func Equals(other: string) -> bool {
         return neoCLR.Runtime.StringEquals(m_value, other)
     }
 
+    /// Compares text by Unicode canonical equivalence, preserving original UTF-8 bytes.
+    override func Equals(other: Object?) -> bool {
+        if other is string text {
+            return Equals(text)
+        }
+        return false
+    }
+
+    /// Returns this string without copying or changing its UTF-8 storage.
+    override func ToString() -> string => m_value
+
+    /// Hashes canonical text identity without normalizing stored bytes.
+    override func GetHashCode() -> int => neoCLR.Runtime.StringHashCanonical(m_value)
+
+    /// Orders canonical NFD scalar sequences; this is not linguistic collation.
+    static func Compare(left: string, right: string) -> int => neoCLR.Runtime.StringCompareCanonical(left, right)
+
     /// Compares non-null strings using an explicit policy; unknown modes fault.
     static func Compare(left: string, right: string, comparison: StringComparison) -> int {
+        if comparison == StringComparison.Canonical {
+            return Compare(left, right)
+        }
         if comparison == StringComparison.Ordinal {
             return CompareOrdinal(left, right)
         }

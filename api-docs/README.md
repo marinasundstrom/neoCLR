@@ -2555,3 +2555,20 @@ reference is regenerated from string-builder-libraries-v2 / string-builder-api-a
 with Raven 2d22055dc, and the legacy snapshot refreshes its implementation
 fingerprint using the unchanged reference assembly. Memory retention is documented
 in the source summary and [design](../docs/design/string-building.md).
+
+
+## Canonical text integration (2026-10-19)
+
+The development String/Char API now uses canonical Unicode 17 equality and hashes,
+while preserving original UTF-8 bytes. Native Object overrides, String.Compare's
+two-argument overload, StringComparison.Canonical and StringComparer.Default are
+included in the native reference. HashCode.Add(string) no longer encodes an
+intermediate array. Exact JSON, SQL, URI/path and metadata identity policies remain
+explicitly ordinal. See the canonical-text executable fixture and String review.
+
+The native snapshot uses canonical-text-libraries-v9 and canonical-text-api-audit-v10
+with Raven renderer b7d54e946 (documentation-only successor of compiler 2d22055dc).
+The aggregate CoreProbe reference is regenerated from the updated bridge declarations;
+it documents the surface, not legacy mirror execution of native canonical semantics.
+Existing typed nullability, retained-owner costs and nonpersistent hash limitations
+remain. Website publication is still a separate operation.

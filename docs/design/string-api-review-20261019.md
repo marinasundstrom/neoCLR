@@ -259,3 +259,28 @@ under an explicitly selected Object root. With the receiver check repaired, nati
 wrapper gate, which rejects Char Object overrides. Native boxed Char adapters,
 complete JIT/AOT consumers and API snapshots remain gates;
 the interpreter result must not be presented as cross-engine completion.
+
+
+### Qualified public canonical integration (2026-10-19)
+
+The [canonical text fixture](../experiments/canonical-text/README.md) now passes
+interpreter, JIT and AOT, including original-byte retention, typed/boxed equality
+and hashes, constant patterns, canonical/ordinal dictionary policies and ordinal
+JSON/SQL/path identities. Null String receivers fault normally in all three modes.
+Native source override dispatch and GC registration precede projected null checks.
+String ToString preserves its owner; Char ToString preserves original spelling.
+HashCode.Add(string) no longer allocates an encoded array. These results supersede
+the pending public/backend status above, without claiming an HTTP throughput gain.
+
+This deliberately differs from .NET's default ordinal String equality, following
+the author-selected Swift model. Equivalent spellings now identify the same key
+under StringComparer.Default; ordinal identity remains explicit. Canonical order
+is NFD scalar order, not linguistic collation. Stored bytes are never normalized.
+Comparison still incurs Unicode traversal work; hashes are not persistent IDs.
+
+A further record consumer exposes the existing native positional-record boundary:
+generated equality/hash/format helpers are not exported. RecordGap.rvn preserves
+that reproducer; this integration does not qualify generated record semantics.
+The author next requests useful supported string manipulation methods. Trimming is
+the proposed first slice, with explicit Unicode and grapheme-boundary semantics;
+search positions, splitting and writer-oriented formatting remain follow-ups.

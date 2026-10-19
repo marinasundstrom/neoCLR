@@ -246,12 +246,12 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
 
     override func Equals(other: Object?) -> bool {
         if other is RuntimeMethodInfo implementation {
-            return StoredIdentity == implementation.StoredIdentity
+            return String.CompareOrdinal(StoredIdentity, implementation.StoredIdentity) == 0
         }
         return false
     }
 
-    override func GetHashCode() -> int => StoredIdentity.GetHashCode()
+    override func GetHashCode() -> int => neoCLR.Runtime.StringHashOrdinal(StoredIdentity)
 
 }
 

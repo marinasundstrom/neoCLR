@@ -19,7 +19,7 @@ public class RouteMatch {
     /// Gets a named parameter; names are case-sensitive.
     func Get(name: string) -> Result<string, string> {
         for index in 0..storedNames.Count {
-            if storedNames[index] == name {
+            if String.CompareOrdinal(storedNames[index], name) == 0 {
                 return Ok(storedValues[index])
             }
         }
@@ -145,7 +145,7 @@ public class RoutePattern {
                 }
                 let name = Part(segment, 1, bytes.Count - 2)
                 for existing in names {
-                    if existing == name {
+                    if String.CompareOrdinal(existing, name) == 0 {
                         return Error("Duplicate route parameter: " + name)
                     }
                 }
@@ -184,7 +184,7 @@ public class RoutePattern {
         for index in 0..storedParts.Count {
             let leftParameter = storedNames[index] != ""
             let rightParameter = other.storedNames[index] != ""
-            if !leftParameter && !rightParameter && storedParts[index] != other.storedParts[index] {
+            if !leftParameter && !rightParameter && String.CompareOrdinal(storedParts[index], other.storedParts[index]) != 0 {
                 return false
             }
             if leftParameter && !rightParameter && other.storedParts[index] == "" {
@@ -224,7 +224,7 @@ public class RoutePattern {
         let capturedValues = ArrayList<string>()
         for index in 0..storedParts.Count {
             if storedNames[index] == "" {
-                if decoded[index] != storedParts[index] {
+                if String.CompareOrdinal(decoded[index], storedParts[index]) != 0 {
                     return Ok(None())
                 }
             } else {

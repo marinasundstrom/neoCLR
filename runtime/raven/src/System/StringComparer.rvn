@@ -1,15 +1,18 @@
 module System
 
 
-/// Consistent string equality, hashing and ordering under an explicit ordinal policy.
+/// Consistent string equality, hashing and ordering under a consistent Unicode text policy.
 public class StringComparer : Collections.EqualityComparer<string>, Collections.Comparer<string> {
     // Explicit field: the current compiler cannot constructor-assign an uninitialized private val.
-    private field ignoreCase: bool
+    private field policy: int
 
     // A CLI integer avoids a top-level Boolean adapter crossing private constructor access.
     private init(mode: int) {
-        ignoreCase = mode == 1
+        policy = mode
     }
+
+    /// Canonical Unicode 17 text identity and NFD scalar ordering, preserving stored bytes.
+    static val Default: StringComparer => StringComparer(2)
 
     /// Returns a stateless ordinal policy. Instance identity is not guaranteed.
     static val Ordinal: StringComparer => StringComparer(0)
@@ -18,21 +21,27 @@ public class StringComparer : Collections.EqualityComparer<string>, Collections.
     static val OrdinalIgnoreCase: StringComparer => StringComparer(1)
 
     func Equals(left: string, right: string) -> bool {
-        if ignoreCase {
+        if policy == 1 {
             return String.CompareOrdinalIgnoreCase(left, right) == 0
         }
-        return left.Equals(right)
+        return Compare(left, right) == 0
     }
 
     func GetHashCode(value: string) -> int {
-        if ignoreCase {
+        if policy == 2 {
+            return neoCLR.Runtime.StringHashCanonical(value)
+        }
+        if policy == 1 {
             return neoCLR.Runtime.StringHashOrdinalIgnoreCase(value)
         }
         return neoCLR.Runtime.StringHashOrdinal(value)
     }
 
     func Compare(left: string, right: string) -> int {
-        if ignoreCase {
+        if policy == 2 {
+            return String.Compare(left, right)
+        }
+        if policy == 1 {
             return String.CompareOrdinalIgnoreCase(left, right)
         }
         return String.CompareOrdinal(left, right)

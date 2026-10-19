@@ -1,0 +1,9 @@
+import System.*
+
+record struct TextKey(Text: string, Character: char)
+
+func Main() {
+    let first = TextKey("é", 'é')
+    let second = TextKey("é", 'é')
+    Console.WriteLine((first == second).ToString())
+}

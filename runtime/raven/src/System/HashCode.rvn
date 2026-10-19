@@ -13,15 +13,9 @@ public struct HashCode {
         State = (State ^ value) * 16777619 + -1640531527
     }
 
+    /// Adds canonical text identity without encoding an intermediate byte array.
     func Add(value: string) {
-        let bytes = neoCLR.Runtime.Utf8Encode(value)
-        var hash = -2128831035
-        var index = 0
-        while index < bytes.Length {
-            hash = (hash ^ bytes[index]) * 16777619
-            index += 1
-        }
-        Add(hash)
+        Add(neoCLR.Runtime.StringHashCanonical(value))
     }
 
     func ToHashCode() -> int {

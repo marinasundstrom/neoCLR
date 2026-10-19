@@ -20,9 +20,10 @@ static class ComparerBindings
                 public int GetHashCode(T value) => default;
             }
         }
-        public enum StringComparison { Ordinal = 0, OrdinalIgnoreCase = 1 }
+        public enum StringComparison { Ordinal = 0, OrdinalIgnoreCase = 1, Canonical = 2 }
         public sealed class StringComparer : Collections.EqualityComparer<string>, Collections.Comparer<string> {
             private StringComparer() { }
+            public static StringComparer Default => default;
             public static StringComparer Ordinal => default;
             public static StringComparer OrdinalIgnoreCase => default;
             public bool Equals(string left, string right) => default;

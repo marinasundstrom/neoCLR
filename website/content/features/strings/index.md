@@ -45,10 +45,21 @@ String indexing addresses graphemes. Bracket access with Index or Range is a
 convenience that can fault on invalid bounds; validate inputs or use the checked
 operations described in the [sequence-access guide](/docs/sequence-access.html).
 
-Equality is ordinal and does not normalize Unicode: precomposed é and an e followed
-by a combining accent remain different values. `StringComparer.Ordinal` supplies
-consistent comparison, equality and hashing for maps and sets. OrdinalIgnoreCase
-uses Unicode simple folding without language-specific rules or normalization.
+In the development API, String and Char equality recognizes canonical Unicode 17
+equivalence: precomposed é and e followed by a combining accent compare equal and
+have matching hashes. Their original UTF-8 bytes remain unchanged. Comparisons
+and hashing do not allocate normalized copies.
+
+`StringComparer.Default` follows this text policy. `StringComparer.Ordinal`
+compares exact UTF-8 and remains appropriate for exact identifiers and protocol
+fields. `OrdinalIgnoreCase` applies Unicode simple folding without normalization
+or language-specific rules. Canonical equivalence, case folding and linguistic
+collation are separate operations.
+
+Borrow `Utf8Bytes` to process storage without an encoding array. A byte window is
+not automatically valid text, and a Unicode scalar boundary is not necessarily a
+grapheme boundary. Traverse graphemes sequentially when possible: repeatedly
+locating the nth grapheme can require repeated scans.
 
 These are deliberate differences from .NET's UTF-16 Char and string indexing model.
 Case conversion, folding and segmentation have their own versioned Unicode rules;

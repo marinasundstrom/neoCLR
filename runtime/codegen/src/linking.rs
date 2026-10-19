@@ -896,6 +896,20 @@ pub fn prepare(
             }
         }
     }
+    // Original verification has checked exact Object slot identity. Text has
+    // no derived storage representation; retain the body and receiver convention.
+    let text_overrides: Vec<_> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| super::selection::text_object_override(f))
+        .map(|(i, _)| i)
+        .collect();
+    for &i in &text_overrides {
+        selected.functions[i].is_virtual = false;
+        selected.functions[i].is_override = false;
+    }
+    report["textObjectOverrideProjections"] = json!(text_overrides);
     // Preserve borrowed intrinsic storage when moving verified instance wrappers
     // to private free functions. No receiver copy or replacement CIL body.
     let primitive_members: std::collections::BTreeMap<_, _> = selected
@@ -1048,7 +1062,7 @@ pub fn prepare(
             }
         }
         for op in &mut f.body {
-            if let Op::Call(target) = op {
+            if let Op::Call(target) | Op::CallVirtual(target) = op {
                 if target
                     .definition
                     .as_ref()
@@ -1057,6 +1071,7 @@ pub fn prepare(
                     target.owner = None;
                     target.instance = false;
                     target.parameters.insert(0, neoclr::metadata::Type::String);
+                    *op = Op::Call(target.clone());
                 }
             }
         }

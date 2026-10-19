@@ -3752,7 +3752,9 @@ fn interpret_instructions_with_dispatch(
                             } else {
                                 contract
                             };
-                            if contract.receiver_byref {
+                            if contract.owner.as_ref() == Some(&Type::String) {
+                                args.insert(0, object.reference.read()?);
+                            } else if contract.receiver_byref {
                                 let mut receiver = object.reference;
                                 if contract.receiver_readonly {
                                     receiver.restrict_readonly();

@@ -36,15 +36,15 @@ internal class RuntimeModuleInfo : ModuleInfo {
 
     override func Equals(other: Object?) -> bool {
         if other is RuntimeModuleInfo implementation {
-            return StoredIdentity == implementation.StoredIdentity && StoredName == implementation.StoredName
+            return String.CompareOrdinal(StoredIdentity, implementation.StoredIdentity) == 0 && String.CompareOrdinal(StoredName, implementation.StoredName) == 0
         }
         return false
     }
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(StoredIdentity)
-        hash.Add(StoredName)
+        hash.Add(neoCLR.Runtime.StringHashOrdinal(StoredIdentity))
+        hash.Add(neoCLR.Runtime.StringHashOrdinal(StoredName))
         return hash.ToHashCode()
     }
 

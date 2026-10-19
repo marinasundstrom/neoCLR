@@ -49,6 +49,16 @@ pub(crate) fn dispatch(
     if !equality && !hashing && !display {
         return Ok(None);
     }
+    // Authored text overrides use the same body for typed and boxed calls.
+    // Retain intrinsic defaults for libraries without those declarations.
+    if matches!(object.concrete_type(), Type::String | Type::Char) {
+        if let Ok(target) = crate::inheritance::dispatch(module, &object.concrete_type(), contract)
+        {
+            if target.owner == Some(object.concrete_type()) && target.is_override {
+                return Ok(None);
+            }
+        }
+    }
     let value = intrinsic_value(module, object)?;
     if display {
         if let Some(info) = module
@@ -106,8 +116,10 @@ impl IntrinsicValue {
             (Self::Int32(a), Self::Int32(b)) => a == b,
             (Self::Int64(a), Self::Int64(b)) => a == b,
             (Self::Boolean(a), Self::Boolean(b)) => a == b,
-            (Self::Char(a), Self::Char(b)) => a == b,
-            (Self::String(a), Self::String(b)) => a == b,
+            (Self::Char(a), Self::Char(b)) => crate::string_normalization::compare(a, b).is_eq(),
+            (Self::String(a), Self::String(b)) => {
+                crate::string_normalization::compare(a, b).is_eq()
+            }
             (Self::Single(a), Self::Single(b)) => a == b || (a.is_nan() && b.is_nan()),
             (Self::Double(a), Self::Double(b)) => a == b || (a.is_nan() && b.is_nan()),
             _ => false,
@@ -130,13 +142,8 @@ impl IntrinsicValue {
             Self::Int32(value) => value,
             Self::Int64(value) => (value as i32) ^ ((value >> 32) as i32),
             Self::Boolean(value) => i32::from(value),
-            // Same UTF-8 FNV-1a component hash used by HashCode.Add(string).
-            Self::Char(ref value) => value.as_bytes().iter().fold(2166136261u32, |hash, byte| {
-                (hash ^ u32::from(*byte)).wrapping_mul(16777619)
-            }) as i32,
-            Self::String(ref value) => value.as_bytes().iter().fold(2166136261u32, |hash, byte| {
-                (hash ^ u32::from(*byte)).wrapping_mul(16777619)
-            }) as i32,
+            Self::Char(ref value) => crate::string_normalization::hash(value),
+            Self::String(ref value) => crate::string_normalization::hash(value),
             Self::Single(value) => {
                 let bits = if value == 0.0 {
                     0

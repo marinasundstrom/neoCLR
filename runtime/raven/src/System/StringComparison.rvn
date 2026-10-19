@@ -2,6 +2,8 @@ module System
 
 /// Explicit, locale-independent string comparison policies.
 public enum StringComparison {
+    /// Unicode 17 canonical equivalence and NFD scalar ordering; case-sensitive.
+    Canonical = 2
     /// Exact UTF-8 byte ordering, equivalent to Unicode scalar ordering.
     Ordinal = 0
     /// Unicode 17 default simple case folding followed by scalar ordering.

@@ -10,15 +10,27 @@ public struct Char : ComparableTo<char> {
         return neoCLR.Runtime.CharFromString(text)
     }
 
-    func ToString() -> string {
+    override func ToString() -> string {
         return neoCLR.Runtime.CharText(m_value)
     }
 
+    /// Tests canonical equivalence of graphemes without allocating text.
     func Equals(other: char) -> bool {
-        return neoCLR.Runtime.StringEquals(neoCLR.Runtime.CharText(m_value), neoCLR.Runtime.CharText(other))
+        return neoCLR.Runtime.CharCompareCanonical(m_value, other) == 0
     }
 
+    override func Equals(other: Object?) -> bool {
+        if other is char character {
+            return Equals(character)
+        }
+        return false
+    }
+
+    /// Hashes canonical grapheme identity without changing stored bytes.
+    override func GetHashCode() -> int => neoCLR.Runtime.CharHashCanonical(m_value)
+
+    /// Orders canonical NFD scalar sequences, without linguistic collation.
     func CompareTo(other: char) -> int {
-        return neoCLR.Runtime.StringCompareOrdinal(neoCLR.Runtime.CharText(m_value), neoCLR.Runtime.CharText(other))
+        return neoCLR.Runtime.CharCompareCanonical(m_value, other)
     }
 }

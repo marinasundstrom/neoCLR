@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "fixture": "public",
+      "engine": "interpreter",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS canonical text\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "public",
+      "engine": "jit",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS canonical text\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "public",
+      "engine": "aot",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS canonical text\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "null_receiver",
+      "engine": "interpreter",
+      "exitCode": 1,
+      "passed": true,
+      "stdout": "",
+      "stderr": "NullReference: Null reference\n   at NeoMetadata_BC6FC8B76783B76C7A0F1A6B496BC4048C158640BD6CAA32936C5E5C9113F195.F_4D61696E [instruction 5]\n"
+    },
+    {
+      "fixture": "null_receiver",
+      "engine": "jit",
+      "exitCode": 1,
+      "passed": true,
+      "stdout": "",
+      "stderr": "NullReference: Null reference\n   at Main [instruction 5]\n"
+    },
+    {
+      "fixture": "null_receiver",
+      "engine": "aot",
+      "exitCode": 1,
+      "passed": true,
+      "stdout": "",
+      "stderr": "NullReference: Null reference\n   at Main [instruction 5]\n"
+    }
+  ],
+  "date": "2026-10-19",
+  "platform": "macOS ARM64",
+  "runtimeBase": "f3ba4f0d4 plus canonical integration working tree",
+  "compilerCode": "2d22055dc",
+  "compilerDocumentation": "b7d54e946",
+  "metadata": "e4709c451",
+  "gc": "native eager boundary GC; no throughput comparison",
+  "sha256": {
+    "docs/experiments/canonical-text/Public.rvn": "2ffe8fce53123062091d08d86bbea5c58605c2c94bcb931387a30837f3207da2",
+    "docs/experiments/canonical-text/NullReceiver.rvn": "888a91df044438134d5c11ee6a7ee38718fe3e07f16800ca81ef8787c52e9af4",
+    "target/canonical-text-compiler-v1/rvnc.dll": "db3bd68ee9e107fd13bc3bb5c89fc1760bbf8812389aad7efb7929e237bc4d84",
+    "target/canonical-text-bundle-v10/bundle/bin/neoclr": "1826e92b76195a22891b6fed47d2fd5c9b9855e09b0d39f5a68c37be12d5b7fe",
+    "target/canonical-text-bundle-v10/bundle/bin/neoclr-codegen": "b635d599560990a928b3064fcb77880baedaf752df0cd1f8110cfe46a2b5ae98"
+  }
+}

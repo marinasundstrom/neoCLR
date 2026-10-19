@@ -253,14 +253,31 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         };
         sites.push(json!({"functionCompiledIndex":caller,"instruction":pc,"helperCompiledIndex":helper,"typeCompiledIndex":index}));
     }
-    if !extra_scalars.is_empty()
-        && report["objectDisplayDispatch"]
-            .as_array()
-            .is_some_and(|rows| !rows.is_empty())
+    if report["objectDisplayDispatch"]
+        .as_array()
+        .is_some_and(|rows| !rows.is_empty())
+        && extra_scalars.values().any(|(_, ty)| *ty != Type::Char)
     {
-        return Err(
-            "Object display for additional primitive box kinds is not yet supported".into(),
-        );
+        return Err("Object dispatch for this primitive box kind is not yet supported".into());
+    }
+    let char_targets = report["charObjectDispatch"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    if let Some((index, _)) = extra_scalars.values().find(|(_, ty)| *ty == Type::Char) {
+        for row in report["objectDisplayDispatch"]
+            .as_array_mut()
+            .into_iter()
+            .flatten()
+        {
+            let target = char_targets
+                .iter()
+                .find(|t| t["contractCompiledIndex"] == row["contractCompiledIndex"])
+                .ok_or("boxed Char Object slot has no selected source override")?;
+            row["targets"].as_array_mut().ok_or("invalid Object dispatch inventory")?.push(json!({
+                "typeCompiledIndex":index,"functionCompiledIndex":target["functionCompiledIndex"],"primitiveReceiver":"Char"
+            }));
+        }
     }
     report["stringBoxSites"] = json!(string_rows);
     report["referenceBoxSites"] = json!(reference_rows);

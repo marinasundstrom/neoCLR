@@ -209,7 +209,7 @@ pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Functi
             .as_ref()
             .and_then(|t| input.type_definition(t))
             .is_some_and(|t| {
-                t.is_reference_type
+                (t.is_reference_type || f.owner.as_ref() == Some(&Type::String))
                     && t.is_sealed
                     && t.representation != neoclr::metadata::Representation::Interface
                     && !input.types.iter().any(|candidate| {
@@ -631,9 +631,46 @@ pub(super) fn array_owner(input: &neoclr::Module, element: &Type) -> Option<Type
     }
 }
 
+/// Exact intrinsic Object overrides, after original-load-set validation.
+pub(super) fn text_object_override(f: &neoclr::metadata::Function) -> bool {
+    matches!(f.owner, Some(Type::String | Type::Char))
+        && f.instance
+        && f.is_override
+        && f.is_virtual
+        && !f.is_abstract
+        && !f.no_result
+        && object_slot_shape(f)
+}
+
+fn char_dispatch_target(input: &neoclr::Module, contract: usize) -> Option<usize> {
+    let f = &input.functions[contract];
+    if !object_dispatch_contract(f) {
+        return None;
+    }
+    input.functions.iter().position(|method| {
+        method.owner == Some(Type::Char)
+            && text_object_override(method)
+            && method.name.rsplit('.').next() == f.name.rsplit('.').next()
+            && method.parameters == f.parameters
+            && method.returns == f.returns
+    })
+}
+
 /// Intrinsic String dispatch uses verified conformance, not a nominal object tag.
 fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Option<usize>, Error> {
     let f = &input.functions[contract];
+    if object_dispatch_contract(f) {
+        let target = input.functions.iter().enumerate().find(|(_, method)| {
+            method.owner.as_ref() == Some(&Type::String)
+                && method.is_override
+                && !method.is_abstract
+                && method.name.rsplit('.').next() == f.name.rsplit('.').next()
+                && method.parameters == f.parameters
+                && method.returns == f.returns
+                && method.no_result == f.no_result
+        });
+        return Ok(target.map(|(index, _)| index));
+    }
     if !interface_contract(input, f)
         || !implements_interface(input, &Type::String, f.owner.as_ref().unwrap())
     {
@@ -1087,6 +1124,18 @@ pub(super) fn select_inventory_with_host_roots(
                     pending.push(target);
                 }
             }
+            if functions.iter().any(|i| {
+                input.functions[*i]
+                    .body
+                    .iter()
+                    .any(|op| matches!(op, Op::BoxValue(Type::Char)))
+            }) {
+                if let Some(target) = char_dispatch_target(input, contract) {
+                    if !functions.contains(&target) {
+                        pending.push(target);
+                    }
+                }
+            }
             for (_, target) in dispatch_targets_with_array(
                 input,
                 contract,
@@ -1206,9 +1255,16 @@ pub(super) fn select_inventory_with_host_roots(
     let mut object_dispatch = vec![];
     let mut class_dispatch = vec![];
     let mut string_dispatch = vec![];
+    let mut char_dispatch = vec![];
     for (compiled, source) in rows.iter().enumerate() {
         if let Some(target) = string_dispatch_target(input, *source)? {
             string_dispatch.push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":rows.binary_search(&target).unwrap()}));
+        }
+        if let Some(target) = char_dispatch_target(input, *source) {
+            if let Ok(target) = rows.binary_search(&target) {
+                char_dispatch
+                    .push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":target}));
+            }
         }
         let display = object_dispatch_contract(&input.functions[*source]);
         let class = class_contract(input, &input.functions[*source]);
@@ -1239,7 +1295,7 @@ pub(super) fn select_inventory_with_host_roots(
         "entryArguments": matches!(input.functions[*root_index].parameters.as_slice(), [Type::ArrayRef(t)] if **t == Type::String),
         "hostRoots": host_roots.iter().map(|i| json!({"sourceIndex":i,"compiledIndex":rows.binary_search(i).unwrap(),"name":input.functions[*i].name,"reason":"explicit runtime adapter"})).collect::<Vec<_>>(),
         "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object-slot dispatch replaces private slot bodies; bounded class virtual dispatch; no dynamic loading",
-        "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "classVirtualDispatch":class_dispatch, "arrayBackingProjection":array_backing,
+        "charObjectDispatch":char_dispatch, "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "classVirtualDispatch":class_dispatch, "arrayBackingProjection":array_backing,
         "referenceArrayBackingProjections": reference_backings.iter().filter_map(|source| type_rows.binary_search(source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled}))).collect::<Vec<_>>(),
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),

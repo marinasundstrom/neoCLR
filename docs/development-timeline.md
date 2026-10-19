@@ -19956,3 +19956,14 @@ Native JSON backend/runtime gaps remain open separately.
   original UTF-8 storage and explicit ordinal operations. Describes comparison cost
   and the need to align collection keys and compiler behavior; this is a recommendation,
   not a reported implementation or explicit subsequent author decision.
+
+- **Author follow-up:** confirms that strings should preserve their UTF-8 encoded
+  byte array, asks for lessons from .NET, Swift and Rust, and subsequently requests
+  “After this we should add the useful string manipulation methods that we can support”.
+- **Assistant action:** integrates canonical public text comparison and matching
+  hashes while retaining original bytes and explicit ordinal identity for protocol
+  and metadata names. [Six cross-engine executions](experiments/canonical-text/README.md)
+  pass; native generated record equality/hash remains an explicitly recorded gap.
+  **Assistant proposal:** trimming first, then grapheme-consistent search positions
+  and splitting with measured allocation costs. These manipulation APIs and the
+  replacement release are not yet implemented or published.

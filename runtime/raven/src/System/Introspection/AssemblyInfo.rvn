@@ -38,14 +38,14 @@ internal class RuntimeAssemblyInfo : AssemblyInfo {
 
     override func Equals(other: Object?) -> bool {
         if other is RuntimeAssemblyInfo implementation {
-            return StoredIdentity == implementation.StoredIdentity
+            return String.CompareOrdinal(StoredIdentity, implementation.StoredIdentity) == 0
         }
         return false
     }
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(StoredIdentity)
+        hash.Add(neoCLR.Runtime.StringHashOrdinal(StoredIdentity))
         return hash.ToHashCode()
     }
 
