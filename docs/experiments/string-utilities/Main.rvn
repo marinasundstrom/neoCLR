@@ -1,0 +1,62 @@
+import System.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("String utility contract")
+    }
+}
+
+func Main() {
+    Check(String.IsNullOrEmpty(null))
+    Check(String.IsNullOrEmpty(""))
+    Check(!String.IsNullOrEmpty(" "))
+    Check(!String.IsNullOrEmpty("\u0000"))
+    Check(String.IsNullOrWhiteSpace(null))
+    Check(String.IsNullOrWhiteSpace(""))
+    Check(String.IsNullOrWhiteSpace("\u0009"))
+    Check(String.IsNullOrWhiteSpace("\u000a"))
+    Check(String.IsNullOrWhiteSpace("\u000b"))
+    Check(String.IsNullOrWhiteSpace("\u000c"))
+    Check(String.IsNullOrWhiteSpace("\u000d"))
+    Check(String.IsNullOrWhiteSpace("\u0020"))
+    Check(String.IsNullOrWhiteSpace("\u0085"))
+    Check(String.IsNullOrWhiteSpace("\u00a0"))
+    Check(String.IsNullOrWhiteSpace("\u1680"))
+    Check(String.IsNullOrWhiteSpace("\u2000"))
+    Check(String.IsNullOrWhiteSpace("\u2001"))
+    Check(String.IsNullOrWhiteSpace("\u2002"))
+    Check(String.IsNullOrWhiteSpace("\u2003"))
+    Check(String.IsNullOrWhiteSpace("\u2004"))
+    Check(String.IsNullOrWhiteSpace("\u2005"))
+    Check(String.IsNullOrWhiteSpace("\u2006"))
+    Check(String.IsNullOrWhiteSpace("\u2007"))
+    Check(String.IsNullOrWhiteSpace("\u2008"))
+    Check(String.IsNullOrWhiteSpace("\u2009"))
+    Check(String.IsNullOrWhiteSpace("\u200a"))
+    Check(String.IsNullOrWhiteSpace("\u2028"))
+    Check(String.IsNullOrWhiteSpace("\u2029"))
+    Check(String.IsNullOrWhiteSpace("\u202f"))
+    Check(String.IsNullOrWhiteSpace("\u205f"))
+    Check(String.IsNullOrWhiteSpace("\u3000"))
+    Check(String.IsNullOrWhiteSpace(" \t\r\n\u00a0\u3000"))
+    Check(!String.IsNullOrWhiteSpace(" \u0301"))
+    Check(!String.IsNullOrWhiteSpace("\u200b"))
+    Check(!String.IsNullOrWhiteSpace("\ufeff"))
+    Check(!String.IsNullOrWhiteSpace("\u180e"))
+    Check(!String.IsNullOrWhiteSpace("\u0000"))
+    Check(!String.IsNullOrWhiteSpace(" x "))
+    Check(!String.IsNullOrWhiteSpace("👨‍👩‍👧‍👦"))
+    let text = "é"
+    Check(text.Equals("é", StringComparison.Canonical))
+    Check(!text.Equals("é", StringComparison.Ordinal))
+    Check(!text.Equals("é", StringComparison.OrdinalIgnoreCase))
+    Check("ABC".Equals("abc", StringComparison.OrdinalIgnoreCase))
+    Check(!"ABC".Equals("abc", StringComparison.Canonical))
+    Check(text.CompareTo("é") == 0)
+    Check("a".CompareTo("b") < 0)
+    Check("b".CompareTo("a") > 0)
+    let comparable: ComparableTo<string> = text
+    Check(comparable.CompareTo("é") == 0)
+    Check(text.Utf8Bytes.Length == 3)
+    Console.WriteLine("PASS string utilities")
+}

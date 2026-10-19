@@ -1,0 +1,6 @@
+import System.*
+
+func Main() {
+    let mode = (StringComparison)99
+    Console.WriteLine("a".Equals("a", mode).ToString())
+}

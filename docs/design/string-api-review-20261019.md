@@ -370,3 +370,31 @@ not contiguous text storage. Prefer existing Utf8Bytes and encoding/writer APIs.
 Fix eager grapheme/scalar array traversal alongside these additions. Qualify
 cross-engine semantics, original-byte preservation and allocations per operation;
 keep cultural collation and unmeasured performance claims out of the initial scope.
+
+
+### Deferred string-as-view discussion (2026-10-19)
+
+The author explores String itself as a view over byte storage, rather than adding
+an analogue named StringSlice, and explicitly defers the decision until after the
+utility methods. No representation change is adopted. A possible model is an
+immutable UTF-8 owner plus byte offset/length; shared slicing can avoid byte copies
+but retain a large owner. Mutable byte-array aliases must be excluded, and explicit
+compaction would be needed. Whether that handle is a value type is a separate ABI,
+boxing and GC question, not a consequence of sharing storage.
+[Swift's UTF-8 implementation](https://www.swift.org/blog/utf8-string/) provides
+precedent for a struct with shared backing storage; [Rust String](https://doc.rust-lang.org/std/string/struct.String.html)
+separates owned text and borrowed str. These are alternatives to investigate,
+not evidence that neoCLR has either representation. Existing String utilities
+remain usable without changing their current ownership or null contracts.
+
+
+### First utility additions (2026-10-19)
+
+IsNullOrEmpty and IsNullOrWhiteSpace accept nullable text at an explicit validation
+boundary. They inspect existing UTF-8 bytes without allocating a trimmed string.
+Equals(other, comparison) reuses String.Compare's canonical, ordinal and simple-fold
+policies, including unknown-mode rejection. CompareTo implements ComparableTo<string>
+with canonical NFD ordering. Comparison arguments remain non-null, consistent with
+neoCLR's explicit nullable-boundary conventions; no culture-sensitive order is implied.
+These additions are independent of the deferred String representation decision.
+See [the executable fixtures](../experiments/string-utilities/README.md).

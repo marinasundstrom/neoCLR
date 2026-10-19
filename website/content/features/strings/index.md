@@ -119,3 +119,10 @@ copy retained text only when needed. Original spelling and interior spaces remai
 unchanged. Combining marks are retained: removing a leading space can leave its
 following mark at the start. Indexing still uses graphemes. Protocol parsers should
 keep their own whitespace rules instead of using general Unicode trimming.
+
+
+Development null checks include `String.IsNullOrEmpty(text)` and
+`String.IsNullOrWhiteSpace(text)`, which inspect text without materializing trimmed
+copies. `Equals(other, comparison)` provides explicit equality policies;
+`CompareTo(other)` and `ComparableTo<string>` use the same canonical order as
+`String.Compare`. Use the matching StringComparer when choosing dictionary identity.

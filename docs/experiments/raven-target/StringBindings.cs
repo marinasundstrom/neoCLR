@@ -6,6 +6,10 @@ static class StringBindings
     sealed record Member(string Name, string[] Parameters, string Result, bool Instance = false, bool ByRefReceiver = false);
     static readonly Member[] Members = [
         new("Join", ["String", "arrayref<String>"], "String"),
+        new("IsNullOrEmpty", ["String"], "Boolean"),
+        new("IsNullOrWhiteSpace", ["String"], "Boolean"),
+        new("CompareTo", ["String"], "Int32", true),
+        new("Equals", ["String", "System.StringComparison"], "Boolean", true),
         new("Intern", ["String"], "String"),
         new("Concat", ["String", "String"], "String"),
         new("Concat", ["System.Object", "System.Object"], "String"),
@@ -40,8 +44,9 @@ static class StringBindings
         "Compare" => index == 0 ? "left" : index == 1 ? "right" : "comparison",
         "Concat" or "CompareOrdinal" or "CompareOrdinalIgnoreCase" => index == 0 ? "left" : "right",
         "Join" => index == 0 ? "separator" : "values",
-        "Intern" => "text",
-        "Equals" => "other",
+        "Intern" or "IsNullOrEmpty" or "IsNullOrWhiteSpace" => "text",
+        "Equals" => index == 0 ? "other" : "comparison",
+        "CompareTo" => "other",
         "Replace" => index == 0 ? "oldValue" : "newValue",
         "ContainsOrdinal" => "substring",
         "StartsWithOrdinal" => "prefix",
@@ -56,7 +61,7 @@ static class StringBindings
         m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
-            : (collections && m.Name == "GetUtf8ByteCount" ? "[System.Obsolete(\"Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\")] " : collections && m.Name == "SliceUtf8" ? "[System.Obsolete(\"Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\")] " : "") + $"public {(m.Name is "GetHashCode" or "ToString" || m.Name == "Equals" && m.Parameters.SequenceEqual(new[] { "System.Object" }) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " " + ParameterName(m, i)))}) => default;")) + (collections ? " public char this[Index index] => default; public string this[Range range] => default; public Option<char> Get(int index) => default; public Option<char> Get(Index index) => default; public Result<string, InvalidRangeError> Slice(Range range) => default; int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> characters) {} public static string CreateFromCharacters(Collections.Sequence<char> characters) => default;" : "") + " }";
+            : (collections && m.Name == "GetUtf8ByteCount" ? "[System.Obsolete(\"Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\")] " : collections && m.Name == "SliceUtf8" ? "[System.Obsolete(\"Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\")] " : "") + $"public {(m.Name is "GetHashCode" or "ToString" || m.Name == "Equals" && m.Parameters.SequenceEqual(new[] { "System.Object" }) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => (m.Name is "IsNullOrEmpty" or "IsNullOrWhiteSpace" ? "string?" : CSharp(p)) + " " + ParameterName(m, i)))}) => default;")) + (collections ? " public char this[Index index] => default; public string this[Range range] => default; public Option<char> Get(int index) => default; public Option<char> Get(Index index) => default; public Result<string, InvalidRangeError> Slice(Range range) => default; int Collections.Collection<char>.Count => default; public String() {} public String(Collections.Sequence<char> characters) {} public static string CreateFromCharacters(Collections.Sequence<char> characters) => default;" : "") + " }";
     public static bool IsSequenceConstructor(MethodDefinition method) => IsSequenceConstructor(method, true);
     public static bool IsSequenceConstructor(MethodDefinition method, bool requireCore) =>
         method.DeclaringType.FullName == "System.String" && (!requireCore || RuntimeSignatures.IsCore(method.DeclaringType.Scope))

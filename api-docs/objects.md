@@ -443,3 +443,12 @@ removed; trimming is scalar classification, while indexing remains grapheme-base
 Unchanged results reuse the original owner. Changed nonempty results copy only the
 retained text through the checked runtime service, without temporary byte or Char
 arrays. These methods must not replace protocol-specific whitespace validation.
+
+
+Development String provides `IsNullOrEmpty(string?)` and
+`IsNullOrWhiteSpace(string?)` for nullable boundaries. The latter uses Unicode 17
+White_Space scalars, including empty text, and does not allocate a trimmed string.
+`Equals(other, comparison)` selects Canonical, Ordinal or OrdinalIgnoreCase;
+unknown modes fault. Hash-based collections must use the matching StringComparer.
+`CompareTo(other)` implements `ComparableTo<string>` with canonical NFD ordering,
+matching String.Compare; it is not cultural collation. Its argument is non-null.

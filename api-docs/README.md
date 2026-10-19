@@ -2581,3 +2581,11 @@ legacy reference remains documentation scaffolding, not the runtime implementati
 Summaries and the manual object guide distinguish Unicode scalar trimming from
 grapheme indexing and describe original-byte retention and allocation behavior.
 API fingerprints, four native snapshot tests and the 4,550-page website check pass.
+
+
+Development (2026-10-19) adds String.IsNullOrEmpty, IsNullOrWhiteSpace,
+Equals(string, StringComparison) and CompareTo, with ComparableTo<string>
+conformance. Source nullability is represented in the native snapshot and the
+legacy declarations. The native snapshot comes from string-utilities-api-audit-v1
+and the matching five-library build; both nullable predicates and comparison
+contracts are documented on the existing selected String type and manual guide.

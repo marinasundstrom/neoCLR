@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Add String.IsNullOrEmpty/IsNullOrWhiteSpace, explicit-policy Equals and canonical CompareTo with ComparableTo<string>. Predicates inspect borrowed UTF-8 without materializing trimmed copies. Six public/fault executions pass across interpreter/JIT/AOT, including all Unicode whitespace scalars, interface ordering and invalid comparison modes. A 128-iteration native workload adds no managed allocations over baseline; increased eager GC boundary collections are recorded without a throughput claim. Refresh API references and website guidance. Record the author's decision to defer String-as-view/value representation work until after the utilities.
+
 - Record a proposed String API shortlist against .NET 10, covering nullable predicates, comparison consistency, typed search ranges, edits, lazy splitting, joining and shared formatting. Document Unicode boundary, ownership and allocation tradeoffs; no new APIs or performance results are implemented by this review.
 
 - Add Raven String.Trim/TrimStart/TrimEnd using Unicode 17 White_Space scalars and borrowed UTF-8 scans. Preserve retained bytes, reuse unchanged strings and avoid temporary byte/Char arrays. Document scalar trimming versus grapheme indexing, including retained combining marks. All 25 whitespace scalars and edge/identity cases pass interpreter/JIT/AOT. A 128-iteration native diagnostic measures zero extra allocations for unchanged trimming and one allocation per changed result; increased eager GC boundary collections preclude a throughput claim. Refresh public API snapshots and website guidance; the 4,550-page website check passes.

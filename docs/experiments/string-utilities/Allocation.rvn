@@ -1,0 +1,18 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    let text = " \t\r\n\u00a0\u3000"
+    var count = 0
+    while count < 128 {
+        var result = true
+        if mode == "check" {
+            result = String.IsNullOrWhiteSpace(text) && !String.IsNullOrEmpty(text) && String.IsNullOrEmpty(null)
+        }
+        if !result {
+            System.Fail("Predicate allocation fixture")
+        }
+        count += 1
+    }
+    Console.WriteLine("PASS utility allocation")
+}

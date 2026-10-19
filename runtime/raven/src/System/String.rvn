@@ -4,7 +4,7 @@ import System.Result.*
 import System.Option.*
 import System.Text.Utf8SliceError
 
-public class String : EquatableTo<string>, Collections.Sequence<char> {
+public class String : EquatableTo<string>, ComparableTo<string>, Collections.Sequence<char> {
     /// Borrows immutable UTF-8 bytes. Byte offsets are independent of grapheme indexes.
     val Utf8Bytes: ReadOnlySlice<byte> => neoCLR.Runtime.ViewUtf8(self)
 
@@ -74,6 +74,31 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return Error(InvalidRangeError())
     }
 
+    /// Returns true for null or empty text without creating a string.
+    static func IsNullOrEmpty(text: string?) -> bool {
+        if text is string value {
+            return value.Utf8Bytes.Length == 0
+        }
+        return true
+    }
+
+    /// Returns true for null, empty or entirely Unicode 17 White_Space text.
+    /// Scans borrowed UTF-8 without trimming or creating temporary arrays.
+    static func IsNullOrWhiteSpace(text: string?) -> bool {
+        if text is string value {
+            let bytes = value.Utf8Bytes
+            var index = 0
+            while index < bytes.Length {
+                let width = WhitespaceWidth(bytes, index)
+                if width == 0 {
+                    return false
+                }
+                index += width
+            }
+        }
+        return true
+    }
+
     static func Intern(text: string) -> string {
         return neoCLR.Runtime.StringIntern(text)
     }
@@ -121,6 +146,14 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
     func Equals(other: string) -> bool {
         return neoCLR.Runtime.StringEquals(m_value, other)
     }
+
+    /// Compares non-null text using the specified policy; unknown modes fault.
+    func Equals(other: string, comparison: StringComparison) -> bool {
+        return Compare(m_value, other, comparison) == 0
+    }
+
+    /// Orders canonical NFD scalar sequences, consistently with String.Compare.
+    func CompareTo(other: string) -> int => Compare(m_value, other)
 
     /// Compares text by Unicode canonical equivalence, preserving original UTF-8 bytes.
     override func Equals(other: Object?) -> bool {

@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "fixture": "utilities",
+      "engine": "interpreter",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string utilities\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "utilities",
+      "engine": "jit",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string utilities\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "utilities",
+      "engine": "aot",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string utilities\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "invalid_comparison",
+      "engine": "interpreter",
+      "exitCode": 1,
+      "passed": true,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported StringComparison\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at System.String.Compare [instruction 34]\n   at System.String.Equals [instruction 3]\n   at NeoMetadata_D831A5E762E482DF98D2144BE6D95970A1D9C4A76F1F1774039B928D88B3F932.F_4D61696E [instruction 6]\n"
+    },
+    {
+      "fixture": "invalid_comparison",
+      "engine": "jit",
+      "exitCode": 1,
+      "passed": true,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported StringComparison\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.String.Compare [instruction 34]\n   at System.String.Equals [instruction 3]\n   at Main [instruction 6]\n"
+    },
+    {
+      "fixture": "invalid_comparison",
+      "engine": "aot",
+      "exitCode": 1,
+      "passed": true,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported StringComparison\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.String.Compare [instruction 34]\n   at System.String.Equals [instruction 3]\n   at Main [instruction 6]\n"
+    }
+  ],
+  "compiler": "2d22055dc with e4709c451 metadata",
+  "backend": "6e7bf1d9a",
+  "platform": "macOS ARM64",
+  "library": "900e75455 plus utility working tree"
+}

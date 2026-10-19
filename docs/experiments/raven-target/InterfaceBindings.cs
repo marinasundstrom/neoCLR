@@ -106,7 +106,7 @@ static class InterfaceBindings
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : ComparableTo<" + name + ">" + (name == "Int32" ? ", EquatableTo<Int32>" : "") + " {");
         foreach (var name in new[]{"Date","TimeOfDay","Instant","Duration","TimeOffset"})
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : ComparableTo<" + name + ">, EquatableTo<" + name + "> {");
-        source = source.Replace("public sealed class String {", "public sealed class String : EquatableTo<String>, Collections.Sequence<char> {");
+        source = source.Replace("public sealed class String {", "public sealed class String : EquatableTo<String>, ComparableTo<String>, Collections.Sequence<char> {");
         source = source.Replace("public class Type {", "public class Type : EquatableTo<Type> {");
         return source;
     }

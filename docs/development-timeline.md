@@ -19983,3 +19983,14 @@ Native JSON backend/runtime gaps remain open separately.
   Records canonical-search, ordinal Replace naming, grapheme boundary and allocation
   tradeoffs in the [String review](design/string-api-review-20261019.md#corresponding-net-string-operations-proposed-priorities-2026-10-19).
   This is a proposed shortlist, not implementation or author approval of its contracts.
+
+- **Author direction:** asks to add the most useful String methods and explores
+  strings as views/value types. After the assistant interprets this as a separate
+  StringSlice analogue, the author clarifies: “the string type itself could be seen
+  as a view on top of a byte array”. **Assistant proposal:** String could retain
+  immutable storage plus offset/length, enabling shared substrings; mutable aliases,
+  parent-buffer retention, value layout, GC and native ABI need review. The author
+  then directs: “Continue with the utility methods and defer this decision until after”.
+  **Action:** continue nullable predicates and comparison utilities; no storage,
+  value-type or StringSlice decision is adopted. The separate-type interpretation
+  was corrected and must not be treated as the requested direction.

@@ -9,7 +9,10 @@ boxed dispatch, explicit ordinal policies and preserved UTF-8 storage. See the
 [canonical text evidence](experiments/canonical-text/README.md).
 Native record-generated equality/hash remains an existing compiler gap, separately
 reproduced. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
-with unchanged-owner reuse and measured changed-result allocations. Position-based
+with unchanged-owner reuse and measured changed-result allocations. The
+[String utilities](experiments/string-utilities/README.md) add nullable predicates
+and explicit/interface comparison. The author defers the String-as-view/value
+representation decision until after utility work. Position-based
 search/splitting and the direct-call null String bridge discrepancy remain review
 items; replacement release qualification remains pending.
 
