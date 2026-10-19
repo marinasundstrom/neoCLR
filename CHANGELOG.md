@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Qualify Raven native compiler 2d22055dc nullable extracted-payload binding: `Ok(null)` now binds without an incorrect type-test rejection, while narrowed string patterns still reject null. The reduced consumer passes interpreter/JIT/AOT and 82 compiler tests; Raven main independently passes three comparison cases without a production change. Record the requested String API/allocation audit: IndexOf and Format remain absent; no new text API is claimed.
+
 - Preserve borrowed slices across synchronous interpreter host I/O: keep managed frames and published owner roots alive while the host call runs, rather than treating host detachment as an async suspension. All ten memory-view tests pass, including console output with a live slice and continued rejection of borrowed async yield/heap escape. This repairs the lifetime check exposed by JSON user constructors; full JSON release qualification is ongoing.
 
 - Qualify Raven bab04d508 logical-value pattern assignment and overloaded-operator early exits with 79 compiler tests and an async expression regression in interpreter/JIT/AOT. Independently qualify Raven main (f9e2cb5d2): all 14 focused .NET tests pass, including five new regressions, without an emitter change or branch merge. Improve unassigned-local diagnostics with the local and instruction index. The larger JSON fixture now emits metadata but exposes a separate nested-array native specialization limit and an interpreter failure during reflective construction; numeric nested-operand early exits remain restricted.

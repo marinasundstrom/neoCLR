@@ -1,0 +1,10 @@
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven-checked-conversions/test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj]
+  Raven.CodeAnalysis.Tests -> /Users/robert/Projects/Raven-checked-conversions/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll
+  Tool 'dotnet-ilverify' (version '9.0.9') was restored. Available commands: ilverify
+  Tool 'ilspycmd' (version '9.1.0.7988') was restored. Available commands: ilspycmd
+
+  Restore was successful.
+Test run for /Users/robert/Projects/Raven-checked-conversions/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 6 s - Raven.CodeAnalysis.Tests.dll (net11.0)

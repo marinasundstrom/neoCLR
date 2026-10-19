@@ -19887,3 +19887,18 @@ pass without an emitter change. The assistant concludes that these reproduced
 portable-planner failures require no main production fix; main now retains
 regression coverage. No full merge or compiler implementation transfer occurred.
 Native JSON backend/runtime gaps remain open separately.
+
+### 2026-10-19 — String API coverage and allocation design
+
+- **Author:** asks whether String supplies IndexOf, Replace and Format, notes
+  StringBuilder, and directs that useful APIs should not be copied wholesale or
+  inherit .NET implementation choices.
+- **Assistant inspection:** the Raven String implements Replace, ordinal Boolean
+  searches, Join/Concat, invariant casing and grapheme indexing/slicing. IndexOf
+  and Format are absent. StringBuilder retains string fragments, caches its final
+  snapshot and currently concatenates an intermediate string in AppendLine(text).
+- **Assistant proposal:** audit text API coverage and allocation behavior, define
+  search-result positions consistently with grapheme indexing (including matches
+  within graphemes), and investigate shared writer-oriented formatting for String
+  and StringBuilder. These are proposed follow-ups, not implemented APIs or
+  performance improvements. Ongoing JSON/compiler release fixes retain priority.

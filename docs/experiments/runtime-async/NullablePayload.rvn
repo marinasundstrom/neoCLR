@@ -1,0 +1,40 @@
+import System.*
+import System.Result.*
+func NullResult() -> Result<Object?, string> {
+    let value: Object? = null
+    return Ok(value)
+}
+func Extract() -> Result<Object?, string> {
+    let value: Object? = match NullResult() {
+        Ok(let content) => content
+        Error(let error) => return Error(error)
+    }
+    return Ok(value)
+}
+func Narrow(input: Object?) -> string {
+    let result: Result<Object?, string> = Ok(input)
+    return match result {
+        Ok(string text) => text
+        Ok(_) => "other"
+        Error(_) => "error"
+    }
+}
+func Main() {
+    let empty: Object? = null
+    if Narrow(empty) != "other" {
+        System.Fail("Null must not match a string pattern")
+    }
+    if Narrow("payload") != "payload" {
+        System.Fail("String pattern did not match")
+    }
+
+    if let Ok(value) = Extract() {
+        if value is null {
+            Console.WriteLine("PASS nullable Result payload")
+        } else {
+            System.Fail("Expected null")
+        }
+    } else {
+        System.Fail("Expected Ok")
+    }
+}
