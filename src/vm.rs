@@ -5179,7 +5179,7 @@ fn interpret_instructions_with_dispatch(
                         ) {
                             scheduler.workers.request_cancellation(args)?
                         } else if let crate::native::Binding::MemoryView(operation) = &binding {
-                            operation.invoke(args, &heap)?
+                            operation.invoke(args, heap)?
                         } else {
                             binding.invoke(
                                 args,

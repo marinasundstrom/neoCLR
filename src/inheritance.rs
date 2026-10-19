@@ -489,12 +489,11 @@ pub(crate) fn dispatch(
                 }
             }
         }
-        if !module.is_reference_type(concrete)
-            && !(contract.name == "System.Object.ToString"
-                && contract.parameters.is_empty()
-                && contract.returns == Type::String
-                && !contract.is_abstract)
-        {
+        let value_display = contract.name == "System.Object.ToString"
+            && contract.parameters.is_empty()
+            && contract.returns == Type::String
+            && !contract.is_abstract;
+        if !(module.is_reference_type(concrete) || value_display) {
             return Err(Fault::new("boxed value has no explicit Object override"));
         }
         return Ok(contract.clone());

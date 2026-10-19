@@ -509,9 +509,11 @@ mod tests {
             let mut roots = vec![];
             call.trace_roots(&mut roots);
             assert!(roots.is_empty());
-            let mut limits = Limits::default();
-            limits.array_elements = 1;
-            limits.array_bytes = std::mem::size_of::<Value>();
+            let limits = Limits {
+                array_elements: 1,
+                array_bytes: std::mem::size_of::<Value>(),
+                ..Limits::default()
+            };
             call.array_usage(&mut crate::arrays::Usage::default(), &limits)
                 .unwrap();
             let uninitialized = crate::memory_views::Memory::new(&heap, reference, 0, 1)

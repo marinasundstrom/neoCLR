@@ -672,7 +672,7 @@ fn enum_ancestry_requires_the_selected_fieldless_foundations() {
         let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
         let core = format!(
             "{}\n{foundation}",
-            format!(
+            format_args!(
                 "{}\n.type class abstract System.ValueType\n.extends System.Object\n.end",
                 ROOT.replace(".module System", ".module Core")
             )
