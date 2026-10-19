@@ -60,7 +60,7 @@ async func ClientTimeout(trust: SslClientAuthenticationOptions) -> Task<int> {
     let Ok(peer) = await accepting else { return 22 }
     // Observe TLS bytes before waiting: this is a handshake timeout, not a DNS/connect timeout.
     let hello: byte[] = [(byte)0]
-    let Ok(read) = await peer.Receive(hello, 0, 1) else { return 24 }
+    let Ok(read) = await peer.Receive(((Memory<byte>)hello).Slice(0, 1)) else { return 24 }
     if read != 1 || hello[0] != (byte)22 { return 25 }
     let result = await pending
     peer.Close()
@@ -78,7 +78,7 @@ async func ClientCancellation(trust: SslClientAuthenticationOptions) -> Task<int
     let pending = client.Get(Url("localhost", port), cancellation.Token)
     let Ok(peer) = await accepting else { return 32 }
     let hello: byte[] = [(byte)0]
-    let Ok(read) = await peer.Receive(hello, 0, 1) else { return 34 }
+    let Ok(read) = await peer.Receive(((Memory<byte>)hello).Slice(0, 1)) else { return 34 }
     if read != 1 || hello[0] != (byte)22 { return 35 }
     let observed = Promise<bool>()
     // This adapter inspects cancellation as data instead of propagating it out of the test.

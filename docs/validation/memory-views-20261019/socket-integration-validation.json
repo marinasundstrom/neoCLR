@@ -1,0 +1,294 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/socket-memory-qualified-consumer/build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "5041535320736f636b6574206d656d6f72792077696e646f77732c20736e617073686f74732c2047432c2063616e63656c6c6174696f6e20616e6420454f460a",
+      "stderrHex": ""
+    },
+    {
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/socket-memory-qualified-consumer/build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr-codegen"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "5041535320736f636b6574206d656d6f72792077696e646f77732c20736e617073686f74732c2047432c2063616e63656c6c6174696f6e20616e6420454f460a",
+      "stderrHex": ""
+    },
+    {
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/socket-memory-qualified-consumer/build/app"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "5041535320736f636b6574206d656d6f72792077696e646f77732c20736e617073686f74732c2047432c2063616e63656c6c6174696f6e20616e6420454f460a",
+      "stderrHex": ""
+    }
+  ],
+  "buildCommand": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+    "--profile",
+    "http",
+    "--project",
+    "/Users/robert/Projects/neoclr/runtime/raven/tests/socket-memory/Tests.rvnproj",
+    "--bundle",
+    "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle",
+    "--aot",
+    "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr-codegen",
+    "--output",
+    "/Users/robert/Projects/neoclr/target/socket-memory-qualified-consumer/build"
+  ],
+  "runtimeSha256": "dd07af03227630aca7f85e683a2adcb519dab24048d6bf2d26c46d6d4b9d6835",
+  "consumerSha256": "aac67783e80e43212e2ce92cbc8efef758befa7180bec632f3173e23ebadd32b",
+  "compilerSha256": "0d67be00288667b7026390d628653cfe4866b75a4ab521017c0982ef5c7ebda9",
+  "date": "2026-10-19",
+  "platform": "macOS ARM64",
+  "ravenRevision": "dcf7ac41f",
+  "scope": "Public persistent-memory socket transfer APIs and HTTP/PostgreSQL socket consumers",
+  "libraries": {
+    "System.Runtime": "e1a37cbf9690086c3c9140334c73335b00ec73e2f9e19b6854888f501e94ba62",
+    "System.Data": "d7327631ada97aa11ba1643fbd9e16ab1dffa5dc3aadde223c48690645d256e1",
+    "System.Networking": "87cbfb57d0c4aa58b248d3e1861511e49ee5d8ad950ddba1da153b68dbc0d331",
+    "System.Web": "233133f67dcdde3a9ba9674e84b5620bffbbe912cee5161bf8af41bbdd081deb",
+    "System.Data.PostgreSql": "20b93a2688251fd328f0dea88c5d7c3f15f5ad97008df60d954ffde576491b89"
+  },
+  "focusedTests": [
+    {
+      "command": "cargo test --lib socket_io::tests",
+      "passed": 36
+    },
+    {
+      "command": "cargo test -p neoclr-codegen --lib socket_memory_tests",
+      "passed": 1,
+      "capabilityCombinations": 32
+    },
+    {
+      "contract": "socket-transfer-test.c",
+      "passed": true,
+      "compiler": "Xcode 26.2 clang",
+      "sanitizers": [
+        "undefined",
+        "bounds"
+      ]
+    },
+    {
+      "command": "python3 docs/experiments/socket-client/verify.py --bundle target/socket-memory-bundle-v2/bundle",
+      "passed": true,
+      "checks": [
+        "loopback snapshots and short transfers",
+        "exact output",
+        "peer-observed close",
+        "three private-construction/compiler rejections"
+      ]
+    }
+  ],
+  "apiReference": {
+    "audit": "target/socket-memory-final-api",
+    "nativeSnapshot": "api-docs/native-reference.json",
+    "cliSnapshot": "api-docs/snapshot.json",
+    "publicSignatures": 6,
+    "checks": [
+      "Native signature pages inspected for all six overloads",
+      "CLI snapshot refreshed and checked",
+      "Four native snapshot tests pass"
+    ],
+    "legacyExclusion": "Six public opaque-memory transfer signatures omitted from CLI reference; retained only in historical bootstrap declarations. Native reference and manual sockets page cover each contract."
+  },
+  "limitations": [
+    "Shared InputStream/OutputStream and HTTP body signatures remain a separate migration",
+    "Native byte-memory support is array-backed; broader elements and immutable UTF-8 views remain separate",
+    "Send snapshots copy; no performance claim",
+    "No public Native API ABI",
+    "macOS ARM64 only; Windows not executed",
+    "Legacy CLI experiments keep their historical array services; current native consumers and exported socket sample migrate"
+  ],
+  "priorAttempts": [
+    "Initial library rebuild identified PostgreSQL socket callers; migrated them and rebuilt all five libraries.",
+    "Initial consumer was missing System.Runtime import for GC; corrected.",
+    "Initial Rust fixture tried writing Uninitialized through an assigned slot; changed the fixture to allocate uninitialized surrounding bytes. Final 36 tests pass.",
+    "A bundle attempt before library generation finished found no catalog; final qualified bundle uses the completed build.",
+    "Direct HTTP TLS failure-project compilation lacked its generated certificate Fixtures; use the maintained validate-streams.py harness to generate those inputs."
+  ],
+  "compiledConsumers": [
+    "Exported SocketEchoServer source",
+    "HTTP Serve benchmark control source (compile only; no performance run)"
+  ],
+  "httpsRegression": {
+    "passed": true,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "commands": [
+      {
+        "command": [
+          "openssl",
+          "req",
+          "-x509",
+          "-newkey",
+          "ec",
+          "-pkeyopt",
+          "ec_paramgen_curve:prime256v1",
+          "-pkeyopt",
+          "ec_param_enc:named_curve",
+          "-nodes",
+          "-sha256",
+          "-days",
+          "1",
+          "-config",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/openssl.cnf",
+          "-addext",
+          "basicConstraints=critical,CA:FALSE",
+          "-addext",
+          "keyUsage=critical,digitalSignature",
+          "-addext",
+          "extendedKeyUsage=serverAuth",
+          "-addext",
+          "subjectAltName=DNS:localhost",
+          "-keyout",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/key.pem",
+          "-out",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/cert.pem"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "Generating a 2048 bit EC private key\nwriting new private key to '/Users/robert/Projects/neoclr/target/socket-memory-http-tls/key.pem'\n-----\n",
+        "elapsedSeconds": 0.012997
+      },
+      {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+          "--profile",
+          "http",
+          "--project",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/project/App.rvnproj",
+          "--bundle",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle",
+          "--aot",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr-codegen",
+          "--output",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/native",
+          "--http-heap-bytes",
+          "8388608",
+          "--command-timeout",
+          "600"
+        ],
+        "exitCode": 0,
+        "stdout": "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/native/app\n",
+        "stderr": "",
+        "elapsedSeconds": 99.350882
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr",
+          "run",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/native/app.dll",
+          "--execution",
+          "interpreter",
+          "--instructions",
+          "100000000",
+          "--array-elements",
+          "1048576",
+          "--array-bytes",
+          "67108864",
+          "--system",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.runtime.neox",
+          "--object-root",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Runtime.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Runtime.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Data.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Networking.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Web.dll",
+          "--module",
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/lib/System.Data.PostgreSql.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+        "stderr": "",
+        "elapsedSeconds": 24.482484
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/socket-memory-final-bundle/bundle/bin/neoclr",
+          "run",
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/native/app.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+        "stderr": "",
+        "elapsedSeconds": 99.158574
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/socket-memory-http-tls/native/app"
+        ],
+        "exitCode": 0,
+        "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+        "stderr": "",
+        "elapsedSeconds": 6.650218
+      }
+    ],
+    "modes": [
+      "interpreter",
+      "default-jit",
+      "aot"
+    ],
+    "scope": "HTTP TLS rejection/recovery, client timeout/cancellation and server deadline",
+    "timingNote": "Timings include compilation and are not benchmarks.",
+    "sourceHashes": {
+      "runtime/raven/src/System/Networking/Security/SslStream.rvn": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea",
+      "runtime/raven/src/System/Networking/Security/SslOptions.rvn": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3",
+      "runtime/raven/src/System/Networking/Security/SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+      "docs/experiments/shared-tls/http-failure-project/Main.rvn": "6ff3dc765be80966def4bbe3ef191a31dbd06ace3afecbf7dc1cb2b0ab4bf8ff",
+      "docs/experiments/shared-tls/http-failure-project/App.rvnproj": "7f4ad0af0f55212f6e461df8b346e1f5a76ee1ae295aa068fa06e1ac1249ba6f"
+    }
+  }
+}

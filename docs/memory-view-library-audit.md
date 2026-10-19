@@ -50,7 +50,7 @@ remove a copy or establish native support.
 | `IO/{MemoryStream,FileInputStream,FileOutputStream}.rvn`, `Console/Streams.rvn` | Implement Memory-based async contracts; Slice/ReadOnlySlice for synchronous cores where applicable | Even immediately completing implementations must satisfy the asynchronous interface contract |
 | `IO/{StreamReader,StreamWriter}.rvn` | Keep scratch array ownership; pass Memory to I/O and slices to codec calls | Reusable buffers must outlive awaits; decoder state must not borrow scratch after reuse |
 | `IO/Compression/GZipStream.rvn` | Memory-based stream contract; keep decoded/scratch arrays | Stored output and async operation ownership are distinct from local windows |
-| `Networking/Sockets/Socket.rvn` | Memory receive / ReadOnlyMemory send | Cancellation, short reads/writes, deadlines and completion-root release must preserve backing owner |
+| `Networking/Sockets/Socket.rvn` | Migrated: Memory receive / ReadOnlyMemory send | Cancellation, short reads/writes, deadlines and completion-root release must preserve backing owner |
 | `Networking/Security/SslStream.rvn` | Memory for retained plaintext/I/O; slice only inside synchronous packet helpers | Pump crosses await; empty owner-token arrays are resource identity, not byte payloads |
 | `Networking/Security/SslOptions.rvn` | ReadOnlySlice PEM inputs; slices for ReadCount/WriteCount; keep session/config owner tokens and allocated output | PEM factories explicitly do not retain input; resource handles must retain identity |
 | `Web/Http/HttpConnection.rvn` | Memory-based read/write/receive contracts | Adapter inherits underlying I/O lifetime and cancellation rules |
@@ -241,3 +241,36 @@ remain a copying cost; native access makes no performance claim. Legacy four-arg
 internal bindings remain bootstrap/test-only. See the
 [consumer](../runtime/raven/tests/console-memory/README.md) and
 [evidence](validation/memory-views-20261019/console-integration-validation.json).
+
+## Socket memory contracts (2026-10-19)
+
+The production public Socket Receive/ReceiveUntil methods now take Memory<byte>;
+Send/SendUntil take ReadOnlyMemory<byte>. Their array/offset/count overloads are
+removed, including token-taking forms. Whole arrays convert implicitly; callers
+construct bounded memory windows before invoking the operation. Invalid window
+construction is a bounds fault, not a SocketError that pre-cancellation can hide.
+HTTP's socket adapter, PostgreSQL transport and current native consumers use the
+new signatures. Historical CLI/neoIL fixtures retain their private array services.
+
+The interpreter retains the receive descriptor and traces its owner until settlement,
+then patches only the received prefix. The native provider retains the checked array
+owner plus offset/count in its operation table, with an explicit host root for every
+non-null receive owner, including end-position empty windows. Default empty memory
+does not invent a backing allocation. Both backends snapshot selected initialized
+send bytes after admission; source aliases may change after submission without
+changing that operation. Existing operation budgets, per-direction Busy state,
+deadlines, EOF, cancellation acknowledgement and cleanup remain intact.
+
+This follows .NET's persistent Memory/ReadOnlyMemory distinction for socket operations,
+while deliberately keeping neoCLR's existing send snapshots and Task/Result contract.
+Removing compatibility-only array forms makes buffer contracts consistent at a source
+compatibility cost. Copying remains part of send semantics; no speedup or zero-copy
+claim is made. No public Native API or asynchronous raw-pointer lifetime is introduced.
+
+The [three-mode consumer](../runtime/raven/tests/socket-memory/README.md) exercises
+owner-only retention, selected windows, snapshots, GC, empty operations, cancellation
+and EOF. [Evidence](validation/memory-views-20261019/socket-integration-validation.json)
+also records interpreter contracts, exact native binding rejection and the native
+provider regression. Shared InputStream/OutputStream and higher HTTP body-transfer
+signatures still require coordinated migration; this step does not claim those
+public APIs have changed.

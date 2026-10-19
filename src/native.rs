@@ -932,6 +932,42 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 Type::Value,
             )
         }
+        ("neoCLR.Runtime.SocketReceive", [Type::Int64, buffer, callback])
+            if *buffer == crate::file_streams::memory_type(false)
+                && *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (
+                Binding::Socket(crate::socket_io::Operation::Receive),
+                Type::Value,
+            )
+        }
+        ("neoCLR.Runtime.SocketReceiveUntil", [Type::Int64, buffer, Type::Int64, callback])
+            if *buffer == crate::file_streams::memory_type(false)
+                && *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (
+                Binding::Socket(crate::socket_io::Operation::ReceiveUntil),
+                Type::Value,
+            )
+        }
+        ("neoCLR.Runtime.SocketSend", [Type::Int64, buffer, callback])
+            if *buffer == crate::file_streams::memory_type(true)
+                && *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (
+                Binding::Socket(crate::socket_io::Operation::Send),
+                Type::Value,
+            )
+        }
+        ("neoCLR.Runtime.SocketSendUntil", [Type::Int64, buffer, Type::Int64, callback])
+            if *buffer == crate::file_streams::memory_type(true)
+                && *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (
+                Binding::Socket(crate::socket_io::Operation::SendUntil),
+                Type::Value,
+            )
+        }
         ("neoCLR.Runtime.SocketConnectResult", [Type::Int64]) => (
             Binding::Socket(crate::socket_io::Operation::ConnectResult),
             Type::Value,

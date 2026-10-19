@@ -13,14 +13,14 @@ async func Echo(socket: Socket) -> Task<Result<int, SocketError>> {
     let buffer: byte[] = [(byte)0, (byte)0]
     var received = 0
     while received < 2 {
-        let count = await socket.Receive(buffer, received, 2 - received)?
+        let count = await socket.Receive(((Memory<byte>)buffer).Slice(received, 2 - received))?
         Check(count > 0)
         received += count
     }
     Check(buffer[0] == 72 && buffer[1] == 105)
     var sent = 0
     while sent < received {
-        let count = await socket.Send(buffer, sent, received - sent)?
+        let count = await socket.Send(((ReadOnlyMemory<byte>)buffer).Slice(sent, received - sent))?
         Check(count > 0)
         sent += count
     }

@@ -1,4 +1,5 @@
 #include "socket-listener.h"
+#include "../../../runtime/native/memory/memory-views.h"
 #ifdef NEOCLR_NATIVE_GC
 #include "native-gc.h"
 #endif
@@ -383,10 +384,10 @@ int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *
 int32_t neoclr_socket_transfer_result_v1(uint64_t operation, neoclr_aot_context *context, void *output) {
     return take_result(operation, context, output, 0);
 }
-static int32_t transfer(int sending, uint64_t until, uint64_t socket, void *array, int32_t offset, int32_t count,
+static int32_t transfer(int memory, int sending, uint64_t until, uint64_t socket, void *array, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output) {
     neoclr_socket_scope *scope = find_scope(context);
-    if (!scope || !array || !callback || !output) return 3;
+    if (!scope || (!array && !memory) || !callback || !output) return 3;
     unsigned slot = 0, op = 0;
     while (slot < 64 && scope->slots[slot].id != socket) slot++;
     if (!socket || slot == 64) return publish(output, 2, 1);
@@ -395,23 +396,35 @@ static int32_t transfer(int sending, uint64_t until, uint64_t socket, void *arra
     for (unsigned i = 0; i < 64; i++)
         if (scope->operations[i].state == 1 && scope->operations[i].kind == kind && scope->operations[i].listener == socket)
             return publish(output, 2, 2);
-    /* Verified CIL supplies the array; range/header checks precede payload access. */
-    uint64_t header, length;
-    memcpy(&header, array, 8); memcpy(&length, (unsigned char *)array + 8, 8);
-    if ((header != UINT64_C(0x80000001) && header != UINT64_C(0x80000002)) || length > 65536) return 3;
-    if (offset < 0 || count < 0 || (uint64_t)offset > length || (uint64_t)count > length - (uint64_t)offset)
-        return publish(output, 2, 3);
+    neoclr_byte_view view = {0};
+    if (memory) {
+        int32_t status = neoclr_byte_view_create_v1(context, array, offset, count,
+            sending ? NEOCLR_VIEW_READONLY_MEMORY : NEOCLR_VIEW_MEMORY, &view);
+        if (status) return status;
+        if (count > 65536) return publish(output, 2, 4);
+    } else {
+        /* Legacy bootstrap array contract. */
+        uint64_t header, length;
+        memcpy(&header, array, 8); memcpy(&length, (unsigned char *)array + 8, 8);
+        if ((header != UINT64_C(0x80000001) && header != UINT64_C(0x80000002)) || length > 65536) return 3;
+        if (offset < 0 || count < 0 || (uint64_t)offset > length || (uint64_t)count > length - (uint64_t)offset)
+            return publish(output, 2, 3);
+    }
     while (op < 64 && scope->operations[op].state) op++;
     if (op == 64 || (uint64_t)count > UINT64_C(262144) - scope->transfer_bytes) return publish(output, 2, 4);
     uint64_t now = monotonic_ns(), id = new_operation_id(), root = 0, destination = 0;
     if (!now) return 3;
     if (until && now >= until) return publish(output, 2, 10);
-    if (sending && neoclr_check_bytes_initialized_v1(array, offset, count)) return 3;
+    if (memory) {
+        neoclr_byte_access access;
+        int32_t status = neoclr_byte_view_access_v1(context, &view, !sending, &access);
+        if (status) return status;
+    } else if (sending && neoclr_check_bytes_initialized_v1(array, offset, count)) return 3;
     if (!id) return publish(output, 2, 4);
     unsigned char *copy = count ? malloc((size_t)count) : NULL;
     if (count && !copy) return publish(output, 2, 4);
     int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
-    if (!status && !sending) status = neoclr_gc_host_root_create_v1(context, array, &destination);
+    if (!status && !sending && array) status = neoclr_gc_host_root_create_v1(context, array, &destination);
     if (status) {
         if (root) neoclr_gc_host_root_release_v1(context, root);
         free(copy); return status;
@@ -428,23 +441,45 @@ static int32_t transfer(int sending, uint64_t until, uint64_t socket, void *arra
 }
 int32_t neoclr_socket_receive_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output) {
-    return transfer(0, 0, socket, array, offset, count, callback, context, output);
+    return transfer(0, 0, 0, socket, array, offset, count, callback, context, output);
 }
 int32_t neoclr_socket_send_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     void *callback, neoclr_aot_context *context, void *output) {
-    return transfer(1, 0, socket, array, offset, count, callback, context, output);
+    return transfer(0, 1, 0, socket, array, offset, count, callback, context, output);
 }
 int32_t neoclr_socket_receive_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     int64_t stamp, void *callback, neoclr_aot_context *context, void *output) {
     uint64_t deadline;
     if (deadline_ns(stamp, &deadline)) return 3;
-    return transfer(0, deadline, socket, array, offset, count, callback, context, output);
+    return transfer(0, 0, deadline, socket, array, offset, count, callback, context, output);
 }
 int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     int64_t stamp, void *callback, neoclr_aot_context *context, void *output) {
     uint64_t deadline;
     if (deadline_ns(stamp, &deadline)) return 3;
-    return transfer(1, deadline, socket, array, offset, count, callback, context, output);
+    return transfer(0, 1, deadline, socket, array, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_receive_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output) {
+    uint64_t deadline = 0;
+    return transfer(1, 0, deadline, socket, owner, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_receive_until_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output) {
+    uint64_t deadline;
+    if (deadline_ns(stamp, &deadline)) return 3;
+    return transfer(1, 0, deadline, socket, owner, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_send_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output) {
+    uint64_t deadline = 0;
+    return transfer(1, 1, deadline, socket, owner, offset, count, callback, context, output);
+}
+int32_t neoclr_socket_send_until_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output) {
+    uint64_t deadline;
+    if (deadline_ns(stamp, &deadline)) return 3;
+    return transfer(1, 1, deadline, socket, owner, offset, count, callback, context, output);
 }
 /* Owner-thread wait only: no completion, root transfer, collection or guest call.
  * Readiness is a hint; the ordinary poll remains the authority for outcomes. */

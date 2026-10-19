@@ -76,6 +76,15 @@ int32_t neoclr_socket_receive_until_v1(uint64_t socket, void *array, int32_t off
     int64_t stamp, void *callback, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset, int32_t count,
     int64_t stamp, void *callback, neoclr_aot_context *context, void *output);
+/* Persistent byte-memory windows: reads root the owner, sends snapshot selected bytes. */
+int32_t neoclr_socket_receive_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output);
+int32_t neoclr_socket_receive_until_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output);
+int32_t neoclr_socket_send_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    void *callback, neoclr_aot_context *context, void *output);
+int32_t neoclr_socket_send_until_memory_v1(uint64_t socket, void *owner, int32_t offset, int32_t count,
+    int64_t stamp, void *callback, neoclr_aot_context *context, void *output);
 /* Client services share the owner-thread operation table. DNS workers never own
  * managed pointers; result snapshots use private erased tag 7 (traced String[]). */
 int32_t neoclr_dns_lookup_v1(const neoclr_aot_text *, void *, neoclr_aot_context *, void *);

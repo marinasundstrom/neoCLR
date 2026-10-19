@@ -56,3 +56,11 @@ its negotiation; HTTPS support does not enable PostgreSQL TLS automatically.
 - [HTTP applications](/features/web/) and [SQL databases](/features/sql/).
 
 <a id="shared-budgets-development"></a>
+
+### Development memory windows
+
+Socket receives take `Memory<byte>` and sends take `ReadOnlyMemory<byte>`,
+including cancellation and shared-deadline forms. Whole arrays convert implicitly;
+explicit windows preserve offsets without copying. Receives retain the destination
+until completion; sends preserve the existing snapshot behavior. See the
+[migration and lifetime contracts](/docs/sockets.html#development-memory-window-migration-2026-10-19).

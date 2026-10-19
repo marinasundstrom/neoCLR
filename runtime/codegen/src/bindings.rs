@@ -1183,7 +1183,7 @@ pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<
         .as_array()
         .ok_or("missing selection inventory")?
     {
-        let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+        let (mut parameters, result, mut implementation, mut symbol) = match row["name"].as_str() {
             Some("neoCLR.Runtime.SocketReceive") => (
                 vec![
                     Type::Int64,
@@ -1254,6 +1254,49 @@ pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<
             ),
             _ => continue,
         };
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize;
+        let actual = &input.functions[index].parameters;
+        let name = row["name"].as_str().unwrap();
+        let transfer = matches!(
+            name,
+            "neoCLR.Runtime.SocketReceive"
+                | "neoCLR.Runtime.SocketSend"
+                | "neoCLR.Runtime.SocketReceiveUntil"
+                | "neoCLR.Runtime.SocketSendUntil"
+        );
+        if transfer && actual.len() + 2 == parameters.len() {
+            let kind = if name.contains("Receive") {
+                neoclr::metadata::MemoryViewKind::Memory
+            } else {
+                neoclr::metadata::MemoryViewKind::ReadOnlyMemory
+            };
+            if actual
+                .get(1)
+                .and_then(|ty| input.type_definition(ty))
+                .is_some_and(|t| crate::memory_views::byte_memory(t) && t.memory_view == Some(kind))
+            {
+                parameters.splice(1..4, [actual[1].clone()]);
+                (implementation, symbol) = match name {
+                    "neoCLR.Runtime.SocketReceive" => (
+                        "socket-receive-memory-v1",
+                        "neoclr_socket_receive_memory_v1",
+                    ),
+                    "neoCLR.Runtime.SocketSend" => {
+                        ("socket-send-memory-v1", "neoclr_socket_send_memory_v1")
+                    }
+                    "neoCLR.Runtime.SocketReceiveUntil" => (
+                        "socket-receive-until-memory-v1",
+                        "neoclr_socket_receive_until_memory_v1",
+                    ),
+                    _ => (
+                        "socket-send-until-memory-v1",
+                        "neoclr_socket_send_until_memory_v1",
+                    ),
+                };
+            }
+        }
         let f = &mut input.functions[row["compiledIndex"]
             .as_u64()
             .ok_or("missing compiled index")? as usize];
@@ -2664,6 +2707,53 @@ mod console_memory_tests {
                     );
                     m.types[0].memory_view = None;
                     assert!(console_stream_output(&mut m, &selection).is_err());
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod socket_memory_tests {
+    use super::*;
+    #[test]
+    fn socket_transfer_requires_exact_persistent_byte_capabilities() {
+        use neoclr::metadata::MemoryViewKind;
+        for name in [
+            "SocketReceive",
+            "SocketSend",
+            "SocketReceiveUntil",
+            "SocketSendUntil",
+        ] {
+            let kind = if name.contains("Receive") {
+                MemoryViewKind::Memory
+            } else {
+                MemoryViewKind::ReadOnlyMemory
+            };
+            for candidate in [
+                MemoryViewKind::Memory,
+                MemoryViewKind::ReadOnlyMemory,
+                MemoryViewKind::Slice,
+                MemoryViewKind::ReadOnlySlice,
+            ] {
+                for element in [Type::Byte, Type::Int32] {
+                    let mut m = crate::memory_views::test_module(candidate, element.clone());
+                    let mut f = neoclr::assemble(".module Test\n.function P() -> Value\nldc.i4 0\nvalue.pack Int32\nret\n.end").unwrap().functions.remove(0);
+                    f.name = format!("neoCLR.Runtime.{name}");
+                    f.parameters = vec![Type::Int64, Type::Named(m.types[0].name.clone())];
+                    if name.ends_with("Until") {
+                        f.parameters.push(Type::Int64);
+                    }
+                    f.parameters
+                        .push(neoclr::assembler::parse_type("fn<Void>").unwrap());
+                    f.body.clear();
+                    f.impl_flags = 0x1000;
+                    let selection = json!({"functions":[{"name":f.name,"compiledIndex":0}]});
+                    m.functions = vec![f];
+                    assert_eq!(
+                        socket_transfer(&mut m, &selection).is_ok(),
+                        candidate == kind && element == Type::Byte
+                    );
                 }
             }
         }

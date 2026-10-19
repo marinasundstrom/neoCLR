@@ -13256,3 +13256,23 @@ carries a pointer only during synchronous native access and does not encode
 asynchronous ownership. Runtime-owned descriptors and explicit host lifetime
 contracts must replace that restriction when native completion/host APIs arrive.
 See the [console integration evidence](validation/memory-views-20261019/console-integration-validation.json).
+
+### Socket persistent byte-memory services (2026-10-19)
+
+The Raven service declarations take (socket, Memory<byte>, callback) for receives
+and (socket, ReadOnlyMemory<byte>, callback) for sends, with an additional deadline
+in Until variants. Runtime Contract configuration and Raven compiler semantics are
+unchanged: existing native view metadata retains exact element/lifetime/access facts.
+The shared backend admits only writable persistent Byte memory for receives and
+readonly persistent Byte memory for sends. Flattened owner/offset/length lanes feed
+new private native memory entry points; the operation table roots receive owners
+until settlement and owns send snapshots. The interpreter keeps equivalent checked
+MemoryView values and roots. No borrowed view or raw pointer may cross completion.
+
+The legacy four-/five-payload array bindings remain for historical bootstrap tests.
+The public CLI documentation scaffold omits the six new opaque-view overloads;
+native reference rendering and the linked socket manual cover every signature.
+This is an explicit temporary reference limitation, not an alternate public API.
+Future Native API access must preserve owner/bounds/capability and completion
+ownership rather than exposing these private flattened entry points as a stable ABI.
+See [qualification](validation/memory-views-20261019/socket-integration-validation.json).

@@ -1,0 +1,74 @@
+import System.*
+import System.Runtime.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.*
+import System.Networking.Sockets.*
+
+class CancellationObserver {
+    private val operation: Task<Result<int, SocketError>>
+    val Done = Promise<bool>()
+    init(operation: Task<Result<int, SocketError>>) { self.operation = operation }
+    // Observe cancellation without cancelling the test's own async entry.
+    func Complete() { _ = Done.Complete(operation.IsCancelled) }
+}
+
+func StartOwnedReceive(socket: Socket) -> Task<Result<int, SocketError>> {
+    let destination: Memory<byte> = [(byte)9, (byte)9, (byte)9, (byte)9]
+    return socket.Receive(destination.Slice(1, 2))
+}
+
+func StartOwnedSend(socket: Socket) -> Task<Result<int, SocketError>> {
+    let source: ReadOnlyMemory<byte> = [(byte)165, (byte)31, (byte)32, (byte)166]
+    return socket.Send(source.Slice(1, 2))
+}
+
+async func Main() -> Task<int> {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else { return 1 }
+    let Ok(port) = listener.GetLocalPort() else { return 2 }
+    let accepting = listener.Accept()
+    let Ok(client) = await Socket.Connect("127.0.0.1", port) else { return 3 }
+    let Ok(peer) = await accepting else { return 4 }
+    listener.Close()
+    let bytes: byte[] = [(byte)165, (byte)40, (byte)255, (byte)166]
+    let source: ReadOnlyMemory<byte> = bytes
+    let result: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let destination: Memory<byte> = result
+    let receiving = peer.Receive(destination.Slice(1, 2))
+    GC.Collect()
+    let sending = client.Send(source.Slice(1, 2))
+    bytes[1] = (byte)99
+    GC.Collect()
+    if await sending is not Ok(2) { return 5 }
+    if await receiving is not Ok(2) { return 6 }
+    if result[0] != 9 || result[1] != 40 || result[2] != 255 || result[3] != 9 { return 7 }
+    if await client.Send(default(ReadOnlyMemory<byte>)) is not Ok(0) { return 8 }
+    if await peer.Receive(default(Memory<byte>)) is not Ok(0) { return 9 }
+    if await client.Send(source.Slice(4)) is not Ok(0) { return 10 }
+    if await peer.Receive(destination.Slice(4)) is not Ok(0) { return 11 }
+    let expired = NetworkDeadline.Expired
+    if await peer.ReceiveUntil(destination, expired, CancellationToken.None) is not Error(SocketError.TimedOut) { return 12 }
+    let cancellation = CancellationTokenSource()
+    let cancelled = peer.Receive(destination.Slice(1, 2), cancellation.Token)
+    let observer = CancellationObserver(cancelled)
+    cancelled.OnCompleted(observer.Complete)
+    GC.Collect()
+    cancellation.Cancel()
+    if !(await observer.Done.Task) { return 13 }
+    if result[1] != 40 || result[2] != 255 { return 14 }
+    if !peer.Receive(default(Memory<byte>), cancellation.Token).IsCancelled { return 15 }
+    let retainedReceive = StartOwnedReceive(peer)
+    GC.Collect()
+    let detachedSend = StartOwnedSend(client)
+    GC.Collect()
+    if await detachedSend is not Ok(2) { return 18 }
+    GC.Collect()
+    if await retainedReceive is not Ok(2) { return 19 }
+    client.Close()
+    if await peer.Receive(destination) is not Ok(0) { return 16 }
+    peer.Close()
+    if await peer.Receive(destination) is not Error(SocketError.Closed) { return 17 }
+    Console.WriteLine("PASS socket memory windows, snapshots, GC, cancellation and EOF")
+    return 0
+}

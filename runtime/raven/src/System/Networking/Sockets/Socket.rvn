@@ -170,65 +170,71 @@ public class Socket {
         return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
-    func Receive(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
-        return Receive(buffer, offset, count, CancellationToken.None)
+    /// <summary>Receives into a persistent byte window; only the returned prefix is changed.</summary>
+    /// <param name="buffer">Destination retained until completion. Keep its storage unchanged while pending.</param>
+    /// <returns>A possibly short count, zero at EOF or for an empty window, or a socket error.</returns>
+    func Receive(buffer: Memory<byte>) -> Task<Result<int, SocketError>> {
+        return Receive(buffer, CancellationToken.None)
     }
 
     /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
-    func Receive(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
-        return ReceiveUntil(buffer, offset, count, 0, cancellationToken)
+    func Receive(buffer: Memory<byte>, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+        return ReceiveUntil(buffer, 0, cancellationToken)
     }
 
     /// <summary>Performs the operation within a shared deadline without renewing its budget.</summary>
     /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
-    func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+    func ReceiveUntil(buffer: Memory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<int, SocketError>>()
             _ = source.Complete(Error(SocketError.TimedOut))
             return source.Task
         }
-        return ReceiveUntil(buffer, offset, count, deadline.Stamp, cancellationToken)
+        return ReceiveUntil(buffer, deadline.Stamp, cancellationToken)
     }
 
-    internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
-        return ReceiveUntil(buffer, offset, count, deadline, CancellationToken.None)
+    internal func ReceiveUntil(buffer: Memory<byte>, deadline: long) -> Task<Result<int, SocketError>> {
+        return ReceiveUntil(buffer, deadline, CancellationToken.None)
     }
 
-    internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+    internal func ReceiveUntil(buffer: Memory<byte>, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
         let completion = SocketTransferCompletion(source, cancellationToken)
-        completion.StartReceiveUntil(handle, buffer, offset, count, deadline)
+        completion.StartReceiveUntil(handle, buffer, deadline)
         return source.Task
     }
 
-    func Send(buffer: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
-        return Send(buffer, offset, count, CancellationToken.None)
+    /// <summary>Snapshots and sends a persistent byte window. Loop to complete short sends.</summary>
+    /// <param name="buffer">Selected initialized bytes, copied before the returned task can suspend.</param>
+    /// <returns>The accepted prefix count, zero for an empty window, or a socket error.</returns>
+    func Send(buffer: ReadOnlyMemory<byte>) -> Task<Result<int, SocketError>> {
+        return Send(buffer, CancellationToken.None)
     }
 
     /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
-    func Send(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
-        return SendUntil(buffer, offset, count, 0, cancellationToken)
+    func Send(buffer: ReadOnlyMemory<byte>, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+        return SendUntil(buffer, 0, cancellationToken)
     }
 
     /// <summary>Performs the operation within a shared deadline without renewing its budget.</summary>
     /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
-    func SendUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+    func SendUntil(buffer: ReadOnlyMemory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<int, SocketError>>()
             _ = source.Complete(Error(SocketError.TimedOut))
             return source.Task
         }
-        return SendUntil(buffer, offset, count, deadline.Stamp, cancellationToken)
+        return SendUntil(buffer, deadline.Stamp, cancellationToken)
     }
 
-    internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long) -> Task<Result<int, SocketError>> {
-        return SendUntil(buffer, offset, count, deadline, CancellationToken.None)
+    internal func SendUntil(buffer: ReadOnlyMemory<byte>, deadline: long) -> Task<Result<int, SocketError>> {
+        return SendUntil(buffer, deadline, CancellationToken.None)
     }
 
-    internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
+    internal func SendUntil(buffer: ReadOnlyMemory<byte>, deadline: long, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         let source = Promise<Result<int, SocketError>>()
         let completion = SocketTransferCompletion(source, cancellationToken)
-        completion.StartSendUntil(handle, buffer, offset, count, deadline)
+        completion.StartSendUntil(handle, buffer, deadline)
         return source.Task
     }
 
@@ -409,20 +415,20 @@ internal class SocketTransferCompletion {
         cancellationWon = false
     }
 
-    internal func StartReceive(handle: long, buffer: byte[], offset: int, count: int) {
-        StartReceiveUntil(handle, buffer, offset, count, 0)
+    internal func StartReceive(handle: long, buffer: Memory<byte>) {
+        StartReceiveUntil(handle, buffer, 0)
     }
 
-    internal func StartReceiveUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
+    internal func StartReceiveUntil(handle: long, buffer: Memory<byte>, deadline: long) {
         if token.IsCancellationRequested {
             _ = source.Cancel()
             return
         }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
-            neoCLR.Runtime.SocketReceive(handle, buffer, offset, count, self.Complete)
+            neoCLR.Runtime.SocketReceive(handle, buffer, self.Complete)
         } else {
-            neoCLR.Runtime.SocketReceiveUntil(handle, buffer, offset, count, deadline, self.Complete)
+            neoCLR.Runtime.SocketReceiveUntil(handle, buffer, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
@@ -434,20 +440,20 @@ internal class SocketTransferCompletion {
         }
     }
 
-    internal func StartSend(handle: long, buffer: byte[], offset: int, count: int) {
-        StartSendUntil(handle, buffer, offset, count, 0)
+    internal func StartSend(handle: long, buffer: ReadOnlyMemory<byte>) {
+        StartSendUntil(handle, buffer, 0)
     }
 
-    internal func StartSendUntil(handle: long, buffer: byte[], offset: int, count: int, deadline: long) {
+    internal func StartSendUntil(handle: long, buffer: ReadOnlyMemory<byte>, deadline: long) {
         if token.IsCancellationRequested {
             _ = source.Cancel()
             return
         }
         _ = TaskQueue.Default
         let payload = if deadline == 0 {
-            neoCLR.Runtime.SocketSend(handle, buffer, offset, count, self.Complete)
+            neoCLR.Runtime.SocketSend(handle, buffer, self.Complete)
         } else {
-            neoCLR.Runtime.SocketSendUntil(handle, buffer, offset, count, deadline, self.Complete)
+            neoCLR.Runtime.SocketSendUntil(handle, buffer, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
             _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))

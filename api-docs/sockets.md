@@ -11,8 +11,8 @@ and client processes on loopback.
 | --- | --- | --- |
 | `Socket.Connect(address, port)` | `Task<Result<Socket, SocketError>>` | Connect to a numeric IPv4 address and port 1–65535. Resolve hostnames separately with Dns.GetHostAddresses. |
 | `Socket.Connect(addresses, port)` | `Task<Result<Socket, SocketError>>` | Snapshot 1–16 numeric IPv4 addresses from `Sequence<string>` and try distinct addresses in order under one five-second deadline. |
-| `socket.Receive(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Receive up to count bytes; short reads are normal. |
-| `socket.Send(buffer, offset, count)` | `Task<Result<int, SocketError>>` | Send from a snapshot of the range; loop on short writes. |
+| `socket.Receive(buffer: Memory<byte>)` | `Task<Result<int, SocketError>>` | Receive up to buffer.Length bytes; short reads are normal. |
+| `socket.Send(buffer: ReadOnlyMemory<byte>)` | `Task<Result<int, SocketError>>` | Send from a snapshot of the range; loop on short writes. |
 | `Socket.Listen(address, port, backlog)` | `Result<Socket, SocketError>` | Bind and listen; port zero selects an available local port. |
 | `listener.Accept()` | `Task<Result<Socket, SocketError>>` | Accept one connection; close accepted sockets separately. |
 | `socket.GetLocalPort()` | `Result<int, SocketError>` | Query a live listener or connection port. |
@@ -39,7 +39,7 @@ sending. A zero-size request returns zero without checking EOF. Close is separat
 from EOF: close your connection even when the peer has finished. This slice does not
 yet provide a send-half shutdown operation.
 
-Keep the destination array unchanged while its receive is pending, including through
+Keep the destination window unchanged while its receive is pending, including through
 other aliases. Do not start overlapping operations on that storage. These are caller
 obligations. One send and one receive may be pending at the same time; a second
 operation in the same direction returns Busy.
@@ -193,3 +193,32 @@ HTTP uses this boundary across separate Networking/Web assemblies and retains it
 The aggregate CLI reference includes declarations for documentation only. Execution of
 this contract is supported through native metadata; legacy CLI-to-neoIL translation
 has no typed-deadline mapping. Existing duration/default overloads remain available.
+
+## Development memory-window migration (2026-10-19)
+
+Receive now takes `Memory<byte>`; Send takes `ReadOnlyMemory<byte>`. Each has
+an overload with `CancellationToken`. The deadline forms are
+`ReceiveUntil(buffer: Memory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken)`
+and `SendUntil(buffer: ReadOnlyMemory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken)`;
+both return `Task<Result<int, SocketError>>`. Array/range overloads are removed.
+Pass a whole array directly through implicit conversion, or select a persistent
+window before calling. No AsSlice/AsMemory adapter is required.
+
+Window construction validates bounds and can fault before the socket call.
+Cancellation cannot suppress an invalid expression used to construct an argument.
+Pre-cancellation still wins over socket state/deadline admission for a valid window.
+Default empty memory and end-position empty windows succeed with zero on a live
+socket. Existing Busy, Closed, short-transfer, deadline, and cancellation rules apply.
+
+Receive retains its owner until settlement and only patches the returned prefix.
+Send keeps the existing snapshot guarantee: mutation after submission cannot change
+the submitted bytes. Readonly memory does not freeze aliases. Both interpreter and
+native backends copy send bytes; this migration makes no zero-copy claim.
+
+Compared with .NET Socket's Memory/ReadOnlyMemory asynchronous forms, neoCLR uses
+the same persistent-owner distinction but makes these the primary buffer signatures,
+keeps Task/Result and the established send-snapshot policy, and uses no legacy array
+overloads. This simplifies the contract at a source compatibility cost. Persistent
+windows currently execute natively only for array-backed bytes. The legacy CLI
+reference omits these six opaque-view overloads; their complete signatures are in
+the native Socket reference and this page.

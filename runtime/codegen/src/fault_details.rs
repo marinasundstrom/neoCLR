@@ -46,6 +46,7 @@ pub struct Options {
     pub socket_connect_result: Vec<usize>,
     pub socket_cancel: Vec<usize>,
     pub socket_receive: Vec<usize>,
+    pub socket_memory: HashSet<usize>,
     pub socket_send: Vec<usize>,
     pub scheduler_submit: Vec<usize>,
     pub task_schedule: Vec<usize>,
@@ -673,21 +674,53 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
                 .flatten()
-                .filter(|r| r["implementation"] == "socket-receive-until-v1")
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some("socket-receive-until-v1" | "socket-receive-until-memory-v1")
+                    )
+                })
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             socket_send_until: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
                 .flatten()
-                .filter(|r| r["implementation"] == "socket-send-until-v1")
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some("socket-send-until-v1" | "socket-send-until-memory-v1")
+                    )
+                })
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_memory: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some(
+                            "socket-receive-memory-v1"
+                                | "socket-send-memory-v1"
+                                | "socket-receive-until-memory-v1"
+                                | "socket-send-until-memory-v1"
+                        )
+                    )
+                })
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             socket_receive: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
                 .flatten()
-                .filter(|r| r["implementation"] == "socket-receive-v1")
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some("socket-receive-v1" | "socket-receive-memory-v1")
+                    )
+                })
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             socket_transfer_result: report
@@ -701,7 +734,12 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
                 .flatten()
-                .filter(|r| r["implementation"] == "socket-send-v1")
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some("socket-send-v1" | "socket-send-memory-v1")
+                    )
+                })
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             entry_host_io: report
@@ -830,12 +868,20 @@ impl Options {
                 .filter(|r| r["implementation"] == "utf8-decode-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            byte_view_set: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            byte_view_set: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "byte-view-set-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            byte_view_get: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            byte_view_get: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "byte-view-get-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             byte_memory_create: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()

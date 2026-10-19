@@ -2446,3 +2446,14 @@ opaque runtime borrowed views safely; it retains the types and error union.
 The [manual reference](cryptography.md) links the migration and all four contracts.
 No array compatibility declarations remain. Native snapshot and CLI fingerprint
 are refreshed from the matching source; no full website build or publication.
+
+### Socket persistent-memory migration (2026-10-19)
+
+Native Socket reference members now use Memory<byte> for Receive/ReceiveUntil and
+ReadOnlyMemory<byte> for Send/SendUntil, with token-taking overloads and source XML
+contracts. Six public transfer signatures replace their array/offset/count forms.
+The legacy CLI reference intentionally omits these six opaque-view members; its
+bootstrap-only declarations remain for historical compiler/neoIL fixtures. The
+[native Socket reference and manual contracts](sockets.md#development-memory-window-migration-2026-10-19)
+cover parameters, results, errors, retention and migration. No renderer omission
+is accepted in the native snapshot.

@@ -9,6 +9,12 @@ static class SocketBindings
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
+    // Current public transfer APIs use opaque persistent views and are rendered
+    // from native metadata. Preserve array signatures only for legacy bootstrap tests.
+    public static string ForReference(bool legacy) => legacy ? Declarations :
+        string.Join("\n", Declarations.Split('\n').Where(line =>
+            !System.Text.RegularExpressions.Regex.IsMatch(line, @"\b(?:Receive|Send)(?:Until)?\(")));
+
     public const string Declarations = """
         namespace Networking {
             public struct NetworkDeadline {

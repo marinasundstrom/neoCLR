@@ -7,18 +7,17 @@ churn forces collection during pending lookup, connect, send and receive, while 
 owns callbacks, native send snapshots and the receive destination. The source array
 is modified after each Send to verify that only the submitted snapshot reaches the peer.
 
-The Python verifier starts a host server on an ephemeral port, substitutes that port
-in the sample, compiles with the matching development reference/importer, and runs
-with a 256-object heap. It checks exact output, multiple collections, zero retained
-managed objects, peer-observed close, and compile-time rejection of the private
-constructor/completion types. All network access is loopback; waits have watchdogs.
+The Python verifier starts a host server on an ephemeral port, substitutes that
+port in the sample, compiles against a matching native class-library bundle, and
+checks exact output, peer-observed close, send snapshots and compile-time rejection
+of private constructor/completion types. All network access is loopback with
+watchdogs. The earlier 256-object-heap/zero-retained-object measurements used the
+historical CLI runner; the current verifier does not claim those measurements.
+Pending memory ownership is qualified separately by runtime/raven/tests/socket-memory.
 
-```sh
-python3 docs/experiments/socket-client/verify.py \
-  --toolchain-root /path/to/matching-development-bundle \
-  --runner target/debug/examples/measure_async
-cargo test --lib socket_io::tests
-```
+Run `python3 docs/experiments/socket-client/verify.py --bundle /path/to/current/bundle`.
+The current source uses Memory/ReadOnlyMemory socket signatures and requires a
+matching development bundle. No AsSlice adapter or public array/range overload remains.
 
 The published Preview 9 SDK does not contain these APIs. Connect accepts only numeric
 IPv4 and a port 1–65535. Send and Receive can return fewer bytes than requested; both loops advance by the

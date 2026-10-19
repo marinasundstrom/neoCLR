@@ -468,6 +468,47 @@ impl Sockets {
         }
         let result = match (operation, args) {
             (
+                Operation::Receive | Operation::Send,
+                [Value::Int64(socket), Value::MemoryView(view), callback],
+            ) => {
+                let count = i32::try_from(view.length())
+                    .map_err(|_| Fault::new("socket window too large"))?;
+                self.transfer(
+                    matches!(operation, Operation::Send),
+                    SocketId(*socket as u64),
+                    heap,
+                    Value::MemoryView(view.clone()),
+                    0,
+                    count,
+                    callback.clone(),
+                )
+                .map(|id| Value::Int64(id.0 as i64))
+            }
+            (
+                Operation::ReceiveUntil | Operation::SendUntil,
+                [
+                    Value::Int64(socket),
+                    Value::MemoryView(view),
+                    Value::Int64(stamp),
+                    callback,
+                ],
+            ) => {
+                let until = crate::clock::network_deadline(*stamp)?;
+                let count = i32::try_from(view.length())
+                    .map_err(|_| Fault::new("socket window too large"))?;
+                self.transfer_until(
+                    matches!(operation, Operation::SendUntil),
+                    SocketId(*socket as u64),
+                    heap,
+                    Value::MemoryView(view.clone()),
+                    0,
+                    count,
+                    callback.clone(),
+                    Some(until),
+                )
+                .map(|id| Value::Int64(id.0 as i64))
+            }
+            (
                 Operation::ConnectAddressesUntil,
                 [addresses, Value::Int32(port), Value::Int64(stamp), callback],
             ) => {
@@ -650,23 +691,34 @@ impl Sockets {
         {
             return Err(Error::Busy);
         }
-        let Value::ObjectReference(object) = &destination else {
-            return Err(Error::InvalidBuffer);
-        };
-        let Value::Array {
-            element: Type::Byte,
-            elements,
-        } = heap
-            .read_reference(&object.reference)
-            .map_err(|_| Error::InvalidBuffer)?
-        else {
-            return Err(Error::InvalidBuffer);
-        };
         let offset = usize::try_from(offset).map_err(|_| Error::InvalidRange)?;
         let count = usize::try_from(count).map_err(|_| Error::InvalidRange)?;
-        if offset > elements.len() || count > elements.len() - offset {
-            return Err(Error::InvalidRange);
-        }
+        let elements = match &destination {
+            Value::MemoryView(_) => {
+                let view = crate::file_streams::memory(&destination, sending)
+                    .map_err(|_| Error::InvalidBuffer)?;
+                if offset > view.length() || count > view.length() - offset {
+                    return Err(Error::InvalidRange);
+                }
+                None
+            }
+            Value::ObjectReference(object) => {
+                let Value::Array {
+                    element: Type::Byte,
+                    elements,
+                } = heap
+                    .read_reference(&object.reference)
+                    .map_err(|_| Error::InvalidBuffer)?
+                else {
+                    return Err(Error::InvalidBuffer);
+                };
+                if offset > elements.len() || count > elements.len() - offset {
+                    return Err(Error::InvalidRange);
+                }
+                Some(elements)
+            }
+            _ => return Err(Error::InvalidBuffer),
+        };
         if !matches!(&callback, Value::Function(_))
             || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
@@ -695,11 +747,18 @@ impl Sockets {
         if sending {
             // Snapshot only after admission checks. No borrowed guest storage crosses
             // a pending send; later mutations cannot change this operation's bytes.
-            for value in &elements[offset..offset + count] {
+            for index in offset..offset + count {
+                let value = match &destination {
+                    Value::MemoryView(view) => view
+                        .as_slice()
+                        .get(index)
+                        .map_err(|_| Error::InvalidBuffer)?,
+                    _ => elements.as_ref().unwrap()[index].clone(),
+                };
                 let Value::Byte(byte) = value else {
                     return Err(Error::InvalidBuffer);
                 };
-                buffer.push(*byte);
+                buffer.push(byte);
             }
         } else {
             buffer.resize(count, 0);
@@ -954,20 +1013,27 @@ impl Sockets {
                     Ok(0) if op.sending && !op.buffer.is_empty() => Err(Error::Io),
                     Ok(count) if op.sending => Ok(count),
                     Ok(count) => {
-                        let Some(Value::ObjectReference(object)) = &op.destination else {
-                            unreachable!()
-                        };
-                        let mut replacement = heap.read_reference(&object.reference)?;
-                        let Value::Array { elements, .. } = &mut replacement else {
-                            unreachable!()
-                        };
-                        for (slot, byte) in elements[op.offset..op.offset + count]
-                            .iter_mut()
-                            .zip(&op.buffer)
-                        {
-                            *slot = Value::Byte(*byte);
+                        if let Some(Value::MemoryView(view)) = &op.destination {
+                            let slice = view.as_slice();
+                            for (index, byte) in op.buffer.iter().take(count).enumerate() {
+                                slice.set(op.offset + index, Value::Byte(*byte))?;
+                            }
+                        } else {
+                            let Some(Value::ObjectReference(object)) = &op.destination else {
+                                unreachable!()
+                            };
+                            let mut replacement = heap.read_reference(&object.reference)?;
+                            let Value::Array { elements, .. } = &mut replacement else {
+                                unreachable!()
+                            };
+                            for (slot, byte) in elements[op.offset..op.offset + count]
+                                .iter_mut()
+                                .zip(&op.buffer)
+                            {
+                                *slot = Value::Byte(*byte);
+                            }
+                            object.reference.write(replacement)?;
                         }
-                        object.reference.write(replacement)?;
                         Ok(count)
                     }
                 };
@@ -1034,6 +1100,111 @@ mod tests {
         }
     }
 
+    #[test]
+    fn memory_receive_retains_owner_and_releases_it_after_completion() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let array = array(&mut heap);
+        let Value::ObjectReference(object) = &array else {
+            panic!()
+        };
+        let view = crate::memory_views::Memory::new(&heap, object.reference.clone(), 1, 2).unwrap();
+        let memory = Value::MemoryView(crate::MemoryView::persistent(view));
+        let id = sockets
+            .receive(socket, &heap, memory, 0, 2, callback())
+            .unwrap();
+        let mut roots = vec![];
+        sockets.trace_roots(&mut roots);
+        heap.collect(roots, crate::CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert_eq!(heap.statistics().live_objects, 1);
+        peer.write_all(&[40]).unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(id), Ok(Some(Ok(1))));
+        assert_eq!(
+            bytes(&heap, &array),
+            vec![
+                Value::Byte(9),
+                Value::Byte(40),
+                Value::Byte(9),
+                Value::Byte(9)
+            ]
+        );
+        let mut roots = vec![];
+        sockets.trace_roots(&mut roots);
+        heap.collect(roots, crate::CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert_eq!(heap.statistics().live_objects, 0);
+    }
+
+    #[test]
+    fn memory_send_snapshots_window_and_default_empty_transfers_complete() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let id = heap
+            .allocate(Value::Array {
+                element: Type::Byte,
+                elements: vec![
+                    Value::Uninitialized(Type::Byte),
+                    Value::Byte(9),
+                    Value::Byte(9),
+                    Value::Uninitialized(Type::Byte),
+                ],
+            })
+            .unwrap();
+        let reference = heap.address(id).unwrap();
+        let array = Value::ObjectReference(crate::value::ObjectReference {
+            reference,
+            view: None,
+        });
+        let Value::ObjectReference(object) = &array else {
+            panic!()
+        };
+        let view = crate::memory_views::Memory::new(&heap, object.reference.clone(), 1, 2)
+            .unwrap()
+            .as_readonly();
+        let memory = Value::MemoryView(crate::MemoryView::persistent(view));
+        assert_eq!(
+            sockets.receive(socket, &heap, memory.clone(), 0, 2, callback()),
+            Err(Error::InvalidBuffer)
+        );
+        let id = sockets
+            .send(socket, &heap, memory, 0, 2, callback())
+            .unwrap();
+        object
+            .reference
+            .element(1, &Type::Byte)
+            .unwrap()
+            .write(Value::Byte(99))
+            .unwrap();
+        let mut roots = vec![];
+        sockets.trace_roots(&mut roots);
+        heap.collect(roots, crate::CollectionReason::ExplicitRequest)
+            .unwrap();
+        assert_eq!(heap.statistics().live_objects, 0);
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(id), Ok(Some(Ok(2))));
+        let mut result = [0; 2];
+        peer.read_exact(&mut result).unwrap();
+        assert_eq!(result, [9, 9]);
+        for sending in [false, true] {
+            let kind = if sending {
+                crate::metadata::MemoryViewKind::ReadOnlyMemory
+            } else {
+                crate::metadata::MemoryViewKind::Memory
+            };
+            let empty = Value::MemoryView(crate::MemoryView::empty(kind, Type::Byte));
+            let id = sockets
+                .transfer(sending, socket, &heap, empty, 0, 0, callback())
+                .unwrap();
+            deliver(&mut sockets, &heap);
+            assert_eq!(sockets.take_result(id), Ok(Some(Ok(0))));
+        }
+    }
     #[test]
     fn transfer_expiry_releases_storage_without_transferring_or_closing_socket() {
         for sending in [false, true] {

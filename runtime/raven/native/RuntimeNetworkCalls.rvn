@@ -24,7 +24,7 @@ internal extern func SocketConnect(address: string, port: int, callback: () -> S
 internal extern func SocketConnectResult(operation: long) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func SocketReceive(socket: long, buffer: byte[], offset: int, count: int, callback: () -> System.Void) -> System.Value;
+internal extern func SocketReceive(socket: long, buffer: System.Memory<byte>, callback: () -> System.Void) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func SocketTransferResult(operation: long) -> System.Value;
@@ -33,7 +33,7 @@ internal extern func SocketTransferResult(operation: long) -> System.Value;
 internal extern func SocketClose(socket: long) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func SocketSend(socket: long, buffer: byte[], offset: int, count: int, callback: () -> System.Void) -> System.Value;
+internal extern func SocketSend(socket: long, buffer: System.ReadOnlyMemory<byte>, callback: () -> System.Void) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func SocketListen(address: string, port: int, backlog: int) -> System.Value;
@@ -57,10 +57,10 @@ internal extern func SocketDeadlineExpired(deadline: long) -> bool;
 internal extern func SocketConnectAddressesUntil(addresses: string[], port: int, deadline: long, callback: () -> System.Void) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func SocketReceiveUntil(socket: long, buffer: byte[], offset: int, count: int, deadline: long, callback: () -> System.Void) -> System.Value;
+internal extern func SocketReceiveUntil(socket: long, buffer: System.Memory<byte>, deadline: long, callback: () -> System.Void) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func SocketSendUntil(socket: long, buffer: byte[], offset: int, count: int, deadline: long, callback: () -> System.Void) -> System.Value;
+internal extern func SocketSendUntil(socket: long, buffer: System.ReadOnlyMemory<byte>, deadline: long, callback: () -> System.Void) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func SocketCancel(operation: long) -> bool;

@@ -37,10 +37,10 @@ internal class PostgresConnection : SqlConnection {
             socket.Close()
         }
     }
-    internal async func Send(bytes: byte[], deadline: Budget) -> Task<Result<unit, SqlError>> {
+    internal async func Send(bytes: ReadOnlyMemory<byte>, deadline: Budget) -> Task<Result<unit, SqlError>> {
         var offset = 0
         while offset < bytes.Length {
-            let sent = await socket.SendUntil(bytes, offset, bytes.Length - offset, deadline.Value, CancellationToken.None)
+            let sent = await socket.SendUntil(bytes.Slice(offset), deadline.Value, CancellationToken.None)
             if let Error(error) = sent { return Error(SqlError.Transport(error.ToString())) }
             let Ok(count) = sent else { System.Fail("Expected send count") }
             if count <= 0 { return Error(SqlError.Transport("Connection closed while sending")) }
@@ -49,7 +49,7 @@ internal class PostgresConnection : SqlConnection {
         return Ok(())
     }
     private async func Fill(deadline: Budget) -> Task<Result<unit, SqlError>> {
-        let incoming = await socket.ReceiveUntil(receiveBuffer, 0, receiveBuffer.Length, deadline.Value, CancellationToken.None)
+        let incoming = await socket.ReceiveUntil(receiveBuffer, deadline.Value, CancellationToken.None)
         if let Error(error) = incoming { return Error(SqlError.Transport(error.ToString())) }
         let Ok(length) = incoming else { System.Fail("Expected receive count") }
         if length <= 0 { return Error(SqlError.Transport("Unexpected PostgreSQL EOF")) }

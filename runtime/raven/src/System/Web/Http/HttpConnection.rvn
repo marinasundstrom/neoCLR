@@ -20,9 +20,11 @@ internal class HttpSocketStream : InputStream, OutputStream {
         return Read(buffer, offset, count, CancellationToken.None)
     }
     async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        let destination: Memory<byte> = buffer
+        let window = destination.Slice(offset, count)
         let pending = if let Some(deadline) = Deadline {
-            socket.ReceiveUntil(buffer, offset, count, deadline, cancellationToken)
-        } else { socket.Receive(buffer, offset, count, cancellationToken) }
+            socket.ReceiveUntil(window, deadline, cancellationToken)
+        } else { socket.Receive(window, cancellationToken) }
         if let Ok(read) = await pending {
             return Ok(read)
         }
@@ -33,11 +35,13 @@ internal class HttpSocketStream : InputStream, OutputStream {
         return Write(buffer, offset, count, CancellationToken.None)
     }
     async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        let source: ReadOnlyMemory<byte> = buffer
+        let window = source.Slice(offset, count)
         var sent = 0
-        while sent < count {
+        while sent < window.Length {
             let pending = if let Some(deadline) = Deadline {
-                socket.SendUntil(buffer, offset + sent, count - sent, deadline, cancellationToken)
-            } else { socket.Send(buffer, offset + sent, count - sent, cancellationToken) }
+                socket.SendUntil(window.Slice(sent), deadline, cancellationToken)
+            } else { socket.Send(window.Slice(sent), cancellationToken) }
             let result = await pending
             if let Error(error) = result {
                 LastError = Some(error)

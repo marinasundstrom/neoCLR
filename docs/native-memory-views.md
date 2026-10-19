@@ -533,3 +533,13 @@ snapshots the selected initialized bytes under heap access. Native lowering borr
 a checked window only for the synchronous console provider call; it neither pins
 nor retains a raw pointer across suspension. Public stream signature migration and
 native asynchronous I/O ownership remain separate work.
+
+### Socket lifetime qualification (2026-10-19)
+
+[Socket transfer APIs](memory-view-library-audit.md#socket-memory-contracts-2026-10-19)
+now use persistent byte memory in interpreter/JIT/AOT. Native receive completion roots
+the backing owner and retains checked bounds; sends retain an owned selected-byte
+snapshot. The managed descriptor is not exposed as a raw pointer across suspension.
+Default empty values, owner-only receive retention, GC, cancellation and EOF are
+qualified. General Native API access, other element kinds and shared stream/HTTP
+body signatures remain separate work.

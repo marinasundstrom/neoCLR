@@ -93,7 +93,7 @@ async func Main() -> Task<()> {
     let Ok(signal) = await control.Accept() else { System.Fail("Control failed") }
     let buffer: byte[] = [(byte)0]
     while true {
-        Check((await signal.Receive(buffer, 0, 1)) is Ok(1))
+        Check((await signal.Receive(((Memory<byte>)buffer).Slice(0, 1))) is Ok(1))
         if buffer[0] == 1 {
             application.ReleaseOne(false)
         } else if buffer[0] == 2 || buffer[0] == 3 {

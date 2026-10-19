@@ -1061,8 +1061,13 @@ pub(crate) fn compile_into(
             let mut sig = module.make_signature();
             sig.params.extend(parameters.into_iter().map(AbiParam::new));
             sig.returns.push(AbiParam::new(types::I32));
-            let service = module.declare_function(symbol, Linkage::Import, &sig)?;
             for index in indices {
+                let symbol = if d.socket_memory.contains(index) {
+                    symbol.replace("_v1", "_memory_v1")
+                } else {
+                    symbol.to_owned()
+                };
+                let service = module.declare_function(&symbol, Linkage::Import, &sig)?;
                 socket_services.insert(*index, service);
             }
         }
