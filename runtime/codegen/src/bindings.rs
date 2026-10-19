@@ -373,7 +373,20 @@ pub fn console_stream_output(
         .ok_or("missing selection inventory")?
     {
         let name = row["name"].as_str().unwrap();
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize;
+        let memory_parameters = &input.functions[index].parameters;
+        let readonly_memory = matches!(memory_parameters.as_slice(), [Type::Boolean, ty]
+            if input.type_definition(ty).is_some_and(|t|
+                crate::memory_views::byte_memory(t) &&
+                t.memory_view == Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory)));
         let (parameters, implementation, symbol) = match name {
+            "neoCLR.Runtime.ConsoleWriteBytes" if readonly_memory => (
+                memory_parameters.clone(),
+                "console-write-memory-v1",
+                "neoclr_console_write_bytes_v1",
+            ),
             "neoCLR.Runtime.ConsoleWriteBytes" => (
                 vec![
                     Type::Boolean,
@@ -417,7 +430,7 @@ pub fn console_stream_output(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native stream output binding requires exact ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32) or ConsoleFlush(Boolean) -> Value InternalCall contract".into());
+            return Err("native stream output binding requires exact ConsoleWriteBytes(Boolean, ReadOnlyMemory<Byte>) (legacy array/range accepted for bootstrap) or ConsoleFlush(Boolean) -> Value InternalCall contract".into());
         }
         f.impl_flags = 0;
         f.body = vec![Op::Int(0), Op::PackValue(Type::Int32), Op::Return];
@@ -2609,6 +2622,48 @@ mod native_text_array_tests {
                         _ => invalid.functions[0].body = vec![Op::Branch(0)],
                     }
                     assert!(utf8_text(&mut invalid, &inventory).is_err());
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod console_memory_tests {
+    use super::*;
+    #[test]
+    fn console_memory_requires_retained_readonly_byte_identity() {
+        use neoclr::metadata::MemoryViewKind;
+        for kind in [
+            MemoryViewKind::Slice,
+            MemoryViewKind::ReadOnlySlice,
+            MemoryViewKind::Memory,
+            MemoryViewKind::ReadOnlyMemory,
+        ] {
+            for element in [Type::Byte, Type::Int32] {
+                let mut m = crate::memory_views::test_module(kind, element.clone());
+                let mut f = neoclr::assemble(
+                    ".module Test\n.function P() -> Value\nldc.i4 0\nvalue.pack Int32\nret\n.end",
+                )
+                .unwrap()
+                .functions
+                .remove(0);
+                f.name = "neoCLR.Runtime.ConsoleWriteBytes".into();
+                f.parameters = vec![Type::Boolean, Type::Named(m.types[0].name.clone())];
+                f.body.clear();
+                f.impl_flags = 0x1000;
+                m.functions = vec![f];
+                let selection = json!({"functions":[{"name":"neoCLR.Runtime.ConsoleWriteBytes","compiledIndex":0}]});
+                let expected = kind == MemoryViewKind::ReadOnlyMemory && element == Type::Byte;
+                let result = console_stream_output(&mut m.clone(), &selection);
+                assert_eq!(result.is_ok(), expected);
+                if expected {
+                    assert_eq!(
+                        result.unwrap()[0]["implementation"],
+                        "console-write-memory-v1"
+                    );
+                    m.types[0].memory_view = None;
+                    assert!(console_stream_output(&mut m, &selection).is_err());
                 }
             }
         }

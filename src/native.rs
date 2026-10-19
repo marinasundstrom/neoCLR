@@ -1056,6 +1056,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 Type::Int32,
             ],
         ) if **element == Type::Byte => (Binding::ConsoleWriteBytes, Type::Value),
+        ("neoCLR.Runtime.ConsoleWriteBytes", [Type::Boolean, source])
+            if *source == crate::file_streams::memory_type(true) =>
+        {
+            (Binding::ConsoleWriteBytes, Type::Value)
+        }
         ("neoCLR.Runtime.ConsoleFlush", [Type::Boolean]) => (Binding::ConsoleFlush, Type::Value),
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
         ("neoCLR.Runtime.StartWorker", [callback, Type::String])
@@ -1252,6 +1257,22 @@ impl Binding {
         console_bytes: &mut [Vec<u8>; 2],
         options: &crate::ExecutionOptions,
     ) -> Result<Value, Fault> {
+        // HostCall normally snapshots under heap access. Keep direct invocation
+        // consistent for embedders/tests that already hold graph access.
+        let args = if matches!(self, Self::ConsoleWriteBytes) && args.len() == 2 {
+            let view = crate::file_streams::memory(&args[1], true)?;
+            if view.length() > crate::file_streams::MAX_TRANSFER {
+                return Ok(Value::Erased(Box::new(Value::Byte(8))));
+            }
+            vec![
+                args[0].clone(),
+                crate::file_streams::snapshot(view)?,
+                Value::Int32(0),
+                Value::Int32(view.length() as i32),
+            ]
+        } else {
+            args
+        };
         let console = options.console.as_deref();
         if let Self::Cryptography(operation) = self {
             return operation.invoke(&args);

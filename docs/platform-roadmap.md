@@ -19,7 +19,7 @@ for indexing, writable updates, nested windows, readonly conversion and persiste
 borrowing. Other element types, immutable UTF-8 views and native I/O retention
 remain unqualified. Incremental codecs now use ReadOnlySlice input and Slice output,
 with StreamReader/StreamWriter forwarding windows to immediate codec calls;
-asynchronous transfer contracts remain pending. The author also
+asynchronous transfer contracts remain pending. The [console output boundary](memory-view-library-audit.md#console-output-memory-boundary-2026-10-19) now consumes readonly memory internally, with selected-byte interpreter snapshots and checked synchronous native access. The author also
 directs a whole-class-library audit of array APIs after the slice types work. Index/Range already exist; the author selects array ranges returning Slice<T>,
 implicit view conversion and explicit ToArray copying, without compatibility-only
 array overloads or repeated AsSlice helpers. This direction does not infer a

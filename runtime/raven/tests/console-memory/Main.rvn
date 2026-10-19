@@ -1,0 +1,25 @@
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+
+async func Main() -> Task<int> {
+    let output = Console.OpenStandardOutput()
+    let error = Console.OpenStandardError()
+    let bytes: byte[] = [(byte)165, (byte)40, (byte)0, (byte)255, (byte)166]
+    if await output.Write(bytes, 1, 3) is Error(_) { return 1 }
+    if await error.Write(bytes, 2, 2) is Error(_) { return 2 }
+    if await output.Write(bytes, 5, 0) is Error(_) { return 3 }
+    if await output.Write(bytes, -1, 1) is not Error(StreamError.InvalidRange) { return 4 }
+    if await output.Write(bytes, 4, 2) is not Error(StreamError.InvalidRange) { return 5 }
+    if await output.Write(bytes, 6, 0) is not Error(StreamError.InvalidRange) { return 6 }
+    if await output.Flush() is Error(_) { return 7 }
+    if await error.Flush() is Error(_) { return 8 }
+    output.Close()
+    if await output.Write(bytes, -1, 1) is not Error(StreamError.Closed) { return 9 }
+    let cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    if !output.Write(bytes, -1, 1, cancellation.Token).IsCancelled { return 10 }
+    return 0
+}

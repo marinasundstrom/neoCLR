@@ -218,3 +218,26 @@ collects from another heap participant while the caller's roots are published;
 the snapshot test allows uninitialized bytes outside the selected source window.
 Reference regeneration leaves public assembly contents unchanged and refreshes
 source fingerprints. No JIT/AOT or asynchronous OS file-I/O result is inferred.
+
+## Console output memory boundary (2026-10-19)
+
+Production Raven console output now passes `ReadOnlyMemory<byte>` to its private
+runtime service. Public OutputStream signatures remain unchanged for the atomic
+shared stream/socket migration. The facade preserves cancellation, closed, range
+and transfer-limit precedence before creating the selected window.
+
+The interpreter uses the same bounded selected-byte snapshot as file output before
+releasing graph access. Native JIT/AOT lowering recognizes retained readonly
+byte-memory metadata and calls the checked byte-window kernel before the existing
+synchronous console provider. The provider cannot retain the pointer, allocate
+managed objects or re-enter the guest during that access. Default empty descriptors
+are valid at the kernel boundary; end-position empty windows are exercised through
+the production library. This does not establish asynchronous OS completion.
+
+As in the existing .NET comparison, potentially retained stream work uses persistent
+Memory while immediate native access borrows under runtime control. No public
+AsSlice adapter or array compatibility overload is added. Interpreter snapshots
+remain a copying cost; native access makes no performance claim. Legacy four-argument
+internal bindings remain bootstrap/test-only. See the
+[consumer](../runtime/raven/tests/console-memory/README.md) and
+[evidence](validation/memory-views-20261019/console-integration-validation.json).

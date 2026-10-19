@@ -704,6 +704,15 @@ pub(crate) fn compile_into(
     } else {
         None
     };
+    let console_memory_access = if details.is_some_and(|d| !d.console_write_memory.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params
+            .extend([types::I64, types::I64, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_byte_view_access_v1", Linkage::Import, &sig)?)
+    } else {
+        None
+    };
     let mut stream_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
@@ -2669,7 +2678,40 @@ pub(crate) fn compile_into(
             if let Some(service) = stream_services.get(&i) {
                 let service = module.declare_func_in_func(*service, b.func);
                 let mut call_args = vec![parameters[0]];
-                if details.unwrap().console_write_bytes.contains(&i) {
+                if details.unwrap().console_write_memory.contains(&i) {
+                    // Resolve a checked synchronous window. The provider neither
+                    // retains this pointer nor calls back into managed code.
+                    let storage = slot(&mut b, 24);
+                    let view = b.ins().stack_addr(types::I64, storage, 0);
+                    b.ins().store(MemFlags::new(), parameters[1], view, 0);
+                    b.ins().store(MemFlags::new(), parameters[2], view, 8);
+                    b.ins().store(MemFlags::new(), parameters[3], view, 12);
+                    let kind = b.ins().iconst(types::I64, 3);
+                    b.ins().store(MemFlags::new(), kind, view, 16);
+                    let storage = slot(&mut b, 24);
+                    let access = b.ins().stack_addr(types::I64, storage, 0);
+                    let readonly = b.ins().iconst(types::I32, 0);
+                    let check = module.declare_func_in_func(console_memory_access.unwrap(), b.func);
+                    let call = b
+                        .ins()
+                        .call(check, &[fault_context.unwrap(), view, readonly, access]);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    let bytes = b.ins().load(types::I64, MemFlags::new(), access, 0);
+                    let count = b.ins().load(types::I32, MemFlags::new(), access, 16);
+                    let length = b.ins().uextend(types::I64, count);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    call_args.extend([bytes, length, zero, count]);
+                } else if details.unwrap().console_write_bytes.contains(&i) {
                     let array = parameters[1];
                     let null = b.ins().icmp_imm(IntCC::Equal, array, 0);
                     let status = b.ins().iconst(types::I32, 3);

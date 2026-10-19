@@ -13239,3 +13239,20 @@ the persistent completion ownership contract rather than borrowing across host
 suspension. The interpreter snapshots selected writes and roots reads while heap
 access is released. Validation and remaining limits are recorded in
 [the file integration evidence](validation/memory-views-20261019/file-integration-validation.json).
+
+### Console memory service parameter (2026-10-19)
+
+Production `RuntimeConsoleCalls.rvn` declares
+`ConsoleWriteBytes(bool, ReadOnlyMemory<byte>) -> Value`. Native compilation retains
+the exact byte element and readonly persistent kind through specialization; the
+shared backend lowers owner/offset/length through the existing checked byte-window
+kernel and synchronous console provider. The interpreter snapshots the selected
+window before releasing graph access. Compiler Runtime Contract configuration and
+public reference signatures are unchanged; no Raven compiler modification is needed.
+
+The old array/offset/count internal binding remains only for bootstrap/test
+fixtures. This private provider ABI is not a future Native API commitment. It
+carries a pointer only during synchronous native access and does not encode
+asynchronous ownership. Runtime-owned descriptors and explicit host lifetime
+contracts must replace that restriction when native completion/host APIs arrive.
+See the [console integration evidence](validation/memory-views-20261019/console-integration-validation.json).

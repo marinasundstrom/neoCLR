@@ -1,0 +1,134 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/console-memory-consumer/build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "2800ff",
+      "stderrHex": "00ff"
+    },
+    {
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/console-memory-consumer/build/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/bin/neoclr-codegen"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "2800ff",
+      "stderrHex": "00ff"
+    },
+    {
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/console-memory-consumer/build/app"
+      ],
+      "exitCode": 0,
+      "stdoutHex": "2800ff",
+      "stderrHex": "00ff"
+    }
+  ],
+  "buildCommand": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+    "--profile",
+    "http",
+    "--project",
+    "/Users/robert/Projects/neoclr/runtime/raven/tests/console-memory/Tests.rvnproj",
+    "--bundle",
+    "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle",
+    "--aot",
+    "/Users/robert/Projects/neoclr/target/console-memory-qualified-bundle/bundle/bin/neoclr-codegen",
+    "--output",
+    "/Users/robert/Projects/neoclr/target/console-memory-consumer/build"
+  ],
+  "runtimeSha256": "87b0034e0f986f178f6c7ec8e10e91e96d4a1cb710cad0ee03d8161c7faf2bbe",
+  "consumerSha256": "5e2c98d499ada39d24d1cbec0196376244b3ff1795aabf3afa1701c53a67ec55",
+  "compilerSha256": "0d67be00288667b7026390d628653cfe4866b75a4ab521017c0982ef5c7ebda9",
+  "date": "2026-10-19",
+  "scope": "Production Raven console ReadOnlyMemory<byte> service; existing public stream signatures preserved",
+  "platform": "macOS ARM64",
+  "ravenRevision": "dcf7ac41f",
+  "codegenSha256": "f2925082d0f688c631163aef202b3f0c8f25b4cecd1e6fb1dd83cb62081f9428",
+  "libraries": {
+    "System.Runtime": "79a7955649c044cd5277aef311035492bc18ac94c85dcddc295f64afcb842ec7",
+    "System.Data": "3b27855a3b5cce9fa7b9a46ca1377bd891a072d7898682267ffaa1202794f0ae",
+    "System.Networking": "9a6dbc5f0a666297a00fd6456fc9f2f80909c587d30e9323d6a41ff0e59a7150",
+    "System.Web": "4b46849029788fd708c68f0a928823e4948d8386760cb9fcc55ef3602a143e66",
+    "System.Data.PostgreSql": "c903343db4842e77c8f6496e47ec2781856cce6a8a8bfead56c5d8767ed9be92"
+  },
+  "limitations": [
+    "Public shared InputStream/OutputStream and socket signatures remain array/range pending coordinated migration",
+    "Synchronous console provider only; no native asynchronous I/O lifetime qualification",
+    "Interpreter snapshots selected bytes; no zero-copy or performance claim",
+    "Legacy array internal service retained for bootstrap/tests only",
+    "Private native provider ABI; no public Native API",
+    "macOS ARM64 only; no Windows execution qualification"
+  ],
+  "documentation": "Public API reference assembly unchanged; source fingerprints refreshed and checked. Existing website development memory-view status reviewed and remains accurate; no website build.",
+  "loaderNote": "Rust test processes stalled before their test harness in macOS _dyld_start; local ad-hoc signing used. Only completed results count.",
+  "focusedTests": [
+    {
+      "command": "cargo test --lib host_call::tests",
+      "passed": 5
+    },
+    {
+      "command": "cargo test -p neoclr-codegen --lib console_memory_tests",
+      "passed": 1
+    },
+    {
+      "command": "cargo test --test console_streams",
+      "passed": 3
+    },
+    {
+      "command": "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH target/debug/deps/console-46afe24ec85d58ed stream_output_",
+      "passed": 2
+    }
+  ],
+  "priorAttempts": [
+    "Initial native legacy transport test could not link with the default CommandLineTools macOS 27 SDK (unknown arm64e.x1 architecture in libSystem.tbd). Both focused tests pass with the same Xcode 26.2 SDK/toolchain used by the production native consumer."
+  ],
+  "nativeConsoleBinding": "console-write-memory-v1 (confirmed in native build report)"
+}

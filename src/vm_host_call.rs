@@ -46,7 +46,9 @@ impl HostCall {
         if callee.pinvoke.is_none() {
             use crate::{file_streams::Operation, native::Binding};
             match crate::native::bind(&callee)? {
-                Binding::FileResource(Operation::Write) if args.len() == 2 => {
+                Binding::ConsoleWriteBytes | Binding::FileResource(Operation::Write)
+                    if args.len() == 2 =>
+                {
                     let view = crate::file_streams::memory(&args[1], true)?;
                     if view.length() > crate::file_streams::MAX_TRANSFER {
                         immediate = Some(Value::Erased(Box::new(Value::Byte(8))));
@@ -452,73 +454,83 @@ mod tests {
 
     #[test]
     fn persistent_write_snapshots_only_selected_initialized_bytes() {
-        let mut heap = crate::ManagedHeap::default();
-        let id = heap
-            .allocate(Value::Array {
-                element: Type::Byte,
-                elements: vec![
-                    Value::Uninitialized(Type::Byte),
-                    Value::Byte(42),
-                    Value::Uninitialized(Type::Byte),
-                ],
-            })
-            .unwrap();
-        let reference = heap.address(id).unwrap();
-        let view = crate::memory_views::Memory::new(&heap, reference.clone(), 1, 1)
-            .unwrap()
-            .as_readonly();
-        let call = HostCall::new(
-            memory_service(true),
-            vec![
-                Value::Int32(1),
-                Value::MemoryView(crate::MemoryView::persistent(view)),
-            ],
-            None,
-            "Caller".into(),
-            0,
-        )
-        .unwrap();
-        reference
-            .element(1, &Type::Byte)
-            .unwrap()
-            .write(Value::Byte(99))
-            .unwrap();
-        assert_eq!(
-            call.args,
-            vec![
-                Value::Int32(1),
-                Value::Array {
-                    element: Type::Byte,
-                    elements: vec![Value::Byte(42)]
-                },
-                Value::Int32(0),
+        for console in [false, true] {
+            let mut function = memory_service(true);
+            let first = if console {
+                function.name = "neoCLR.Runtime.ConsoleWriteBytes".into();
+                function.parameters[0] = Type::Boolean;
+                Value::Boolean(true)
+            } else {
                 Value::Int32(1)
-            ]
-        );
-        let mut roots = vec![];
-        call.trace_roots(&mut roots);
-        assert!(roots.is_empty());
-        let mut limits = Limits::default();
-        limits.array_elements = 1;
-        limits.array_bytes = std::mem::size_of::<Value>();
-        call.array_usage(&mut crate::arrays::Usage::default(), &limits)
-            .unwrap();
-        let uninitialized = crate::memory_views::Memory::new(&heap, reference, 0, 1)
-            .unwrap()
-            .as_readonly();
-        assert!(
-            HostCall::new(
-                memory_service(true),
+            };
+            let mut heap = crate::ManagedHeap::default();
+            let id = heap
+                .allocate(Value::Array {
+                    element: Type::Byte,
+                    elements: vec![
+                        Value::Uninitialized(Type::Byte),
+                        Value::Byte(42),
+                        Value::Uninitialized(Type::Byte),
+                    ],
+                })
+                .unwrap();
+            let reference = heap.address(id).unwrap();
+            let view = crate::memory_views::Memory::new(&heap, reference.clone(), 1, 1)
+                .unwrap()
+                .as_readonly();
+            let call = HostCall::new(
+                function.clone(),
                 vec![
-                    Value::Int32(1),
-                    Value::MemoryView(crate::MemoryView::persistent(uninitialized))
+                    first.clone(),
+                    Value::MemoryView(crate::MemoryView::persistent(view)),
                 ],
                 None,
                 "Caller".into(),
-                0
+                0,
             )
-            .is_err()
-        );
+            .unwrap();
+            reference
+                .element(1, &Type::Byte)
+                .unwrap()
+                .write(Value::Byte(99))
+                .unwrap();
+            assert_eq!(
+                call.args,
+                vec![
+                    first.clone(),
+                    Value::Array {
+                        element: Type::Byte,
+                        elements: vec![Value::Byte(42)]
+                    },
+                    Value::Int32(0),
+                    Value::Int32(1)
+                ]
+            );
+            let mut roots = vec![];
+            call.trace_roots(&mut roots);
+            assert!(roots.is_empty());
+            let mut limits = Limits::default();
+            limits.array_elements = 1;
+            limits.array_bytes = std::mem::size_of::<Value>();
+            call.array_usage(&mut crate::arrays::Usage::default(), &limits)
+                .unwrap();
+            let uninitialized = crate::memory_views::Memory::new(&heap, reference, 0, 1)
+                .unwrap()
+                .as_readonly();
+            assert!(
+                HostCall::new(
+                    function.clone(),
+                    vec![
+                        first.clone(),
+                        Value::MemoryView(crate::MemoryView::persistent(uninitialized))
+                    ],
+                    None,
+                    "Caller".into(),
+                    0
+                )
+                .is_err()
+            );
+        }
     }
 
     #[test]

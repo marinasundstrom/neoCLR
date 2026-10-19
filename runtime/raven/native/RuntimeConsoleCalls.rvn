@@ -6,7 +6,7 @@ module neoCLR.Runtime
 internal extern func ConsoleReadByte() -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func ConsoleWriteBytes(error: bool, buffer: byte[], offset: int, count: int) -> System.Value;
+internal extern func ConsoleWriteBytes(error: bool, source: System.ReadOnlyMemory<byte>) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ConsoleFlush(error: bool) -> System.Value;

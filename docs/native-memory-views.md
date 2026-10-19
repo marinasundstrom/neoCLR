@@ -524,3 +524,12 @@ selected initialized window. Readonly source capability does not freeze aliases;
 callers must still honor the stream's unchanged-input-until-completion rule.
 No raw managed pointer crosses this boundary. This is private interpreter service
 integration, not a public Native API or native file-I/O implementation.
+
+### Console output integration (2026-10-19)
+
+The [console boundary](memory-view-library-audit.md#console-output-memory-boundary-2026-10-19)
+uses ReadOnlyMemory<byte> in the production Raven service. Interpreter output
+snapshots the selected initialized bytes under heap access. Native lowering borrows
+a checked window only for the synchronous console provider call; it neither pins
+nor retains a raw pointer across suspension. Public stream signature migration and
+native asynchronous I/O ownership remain separate work.

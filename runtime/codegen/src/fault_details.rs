@@ -20,6 +20,7 @@ pub struct Options {
     pub console_read_byte: Vec<usize>,
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
+    pub console_write_memory: Vec<usize>,
     pub console_flush: Vec<usize>,
     pub cryptography: HashMap<usize, i32>,
     pub tls: HashMap<usize, i32>,
@@ -776,7 +777,19 @@ impl Options {
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
                 .flatten()
-                .filter(|r| r["implementation"] == "console-write-bytes-v1")
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some("console-write-bytes-v1" | "console-write-memory-v1")
+                    )
+                })
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            console_write_memory: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "console-write-memory-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             cryptography: report

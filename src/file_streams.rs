@@ -30,10 +30,10 @@ pub(crate) fn memory_type(readonly: bool) -> Type {
 
 pub(crate) fn memory(value: &Value, readonly: bool) -> Result<&crate::MemoryView, Fault> {
     let Value::MemoryView(view) = value else {
-        return Err(Fault::new("file transfer requires persistent byte memory"));
+        return Err(Fault::new("transfer requires persistent byte memory"));
     };
     if view.ty() != memory_type(readonly) {
-        return Err(Fault::new("file transfer memory capability mismatch"));
+        return Err(Fault::new("transfer memory capability mismatch"));
     }
     view.assigned()?;
     if !readonly {

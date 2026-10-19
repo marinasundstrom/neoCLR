@@ -119,7 +119,14 @@ internal class ConsoleOutputStream : OutputStream {
         if closed {
             return Error(StreamError.Closed())
         }
-        let payload = neoCLR.Runtime.ConsoleWriteBytes(error, buffer, offset, count)
+        if offset < 0 || count < 0 || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        if count > 65536 {
+            return Error(StreamError.LimitExceeded)
+        }
+        let memory: ReadOnlyMemory<byte> = buffer
+        let payload = neoCLR.Runtime.ConsoleWriteBytes(error, memory.Slice(offset, count))
         if neoCLR.Runtime.IsValue<byte>(payload) {
             let status = neoCLR.Runtime.UnpackValue<byte>(payload)
             if status == 7 {
