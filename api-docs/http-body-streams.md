@@ -180,3 +180,14 @@ neoCLR deliberately uses a compact protocol value instead of a `System.Version`
 reference and does not expose a version setter while only HTTP/1.1 is supported.
 The cost is a distinct value API and no version-selection policy yet; it avoids
 per-message version allocations without claiming support for other protocols.
+
+`HttpResponse` exposes `StatusCode`, `IsSuccessStatusCode`, `Version` and
+`ReasonPhrase`. Incoming HTTP/1.1 reason text is preserved exactly within the
+current ASCII-header contract, including tabs, trailing spaces and an empty
+phrase. Informational phrases do not replace final-response metadata. Custom
+phrases are decoded and cached only on first access, without reading the body;
+until then they retain the bounded header buffer. Empty phrases and `OK` use
+constant text. Metadata remains readable after disposal. Locally constructed
+responses use `OK` for 200 and an empty phrase otherwise, matching the current
+writer; `Respond` resets the phrase with the new status. The phrase is descriptive
+only: `IsSuccessStatusCode` checks the numeric 200–299 range.

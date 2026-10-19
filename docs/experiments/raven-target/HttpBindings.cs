@@ -155,6 +155,7 @@ static class HttpBindings
             }
             public sealed class HttpResponse : Disposable {
                 public HttpVersion Version => default;
+                public string ReasonPhrase => default;
                 public void Dispose() { }
                 public Option<HttpRequest> Request => default;
                 public void Associate(HttpRequest request) { }

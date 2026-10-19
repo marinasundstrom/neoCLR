@@ -17,3 +17,19 @@ request Version is available before the peer sends its body: all 24 context/Acce
 
 Four API snapshot checks and the full 4532-page local website build pass.
 Publication and a new release remain separate operations.
+
+## Client response reason phrases
+
+`ReasonPhrase.rvn` and the independent Python peer verify all four client response
+metadata properties in AOT, JIT and interpreter (21 response cases). Coverage
+includes exact tabs/trailing spaces, empty and cached OK phrases, informational
+responses followed by final status, error statuses, access after disposal and a
+withheld body released only after metadata is observed. Local responses use OK
+for 200 and an empty phrase otherwise, matching the current writer.
+
+Custom incoming phrases decode once on first access, releasing their retained
+bounded header buffer. Until access or collection that buffer remains alive;
+this is an allocation/retention tradeoff, not a measured throughput improvement.
+The current parser accepts ASCII reason text and tabs, not extended bytes.
+Native documentation audit, reference fingerprints and all four native snapshot
+checks pass. See `evidence/reason-phrase.json` for inputs and three-mode results.

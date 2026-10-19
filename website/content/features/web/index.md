@@ -274,3 +274,7 @@ version strings. The current transport supports HTTP/1.1 only. Both messages are
 disposable: client callers own their messages, while the server context owns its
 request and response. Disposal does not read an unread body; borrowed streams
 honor `leaveOpen`. See [content ownership](/docs/http-body-streams.html).
+
+Client responses expose `StatusCode`, `IsSuccessStatusCode`, `Version` and
+`ReasonPhrase`. The reason text is descriptive; success uses the numeric status.
+Custom HTTP/1.1 phrases are decoded only when read, without consuming body data.

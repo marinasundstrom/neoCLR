@@ -19865,3 +19865,9 @@ across interpreter/JIT/AOT. The website/reference update passes locally. The aut
 then requests IsSuccessStatusCode, ReasonPhrase, StatusCode and Version on client
 responses. The assistant identifies ReasonPhrase as the remaining property and
 plans exact, lazy HTTP/1.1 reason-text preservation; the other three are available.
+
+Assistant follow-through: all four client response metadata properties are now
+available. ReasonPhrase preserves final HTTP/1.1 status text lazily, with explicit
+bounded-header retention costs. Twenty-one independent loopback response cases
+pass across the three engines, including metadata before a withheld body.
+Compiler expression lowering remains the next follow-up.

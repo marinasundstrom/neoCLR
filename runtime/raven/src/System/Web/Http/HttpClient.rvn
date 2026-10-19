@@ -73,6 +73,39 @@ public class HttpHeader {
 public class HttpResponse : Disposable {
     /// The response protocol version. Current transport accepts and emits HTTP/1.1 only.
     val Version: HttpVersion => HttpVersion.Http11
+    private var reasonPhrase: string? = null
+    private var reasonSource: ArrayList<byte>? = null
+    private var reasonEnd: int = 0
+
+    /// The exact HTTP/1.1 reason text, including an empty phrase. Success depends only on StatusCode.
+    /// Custom incoming text is decoded on first access and cached; no body read is performed.
+    val ReasonPhrase: string {
+        get {
+            if reasonPhrase is string cached { return cached }
+            if reasonSource is ArrayList<byte> source {
+                let bytes: ReadOnlySlice<byte> = source[13..reasonEnd]
+                if let Ok(text) = HttpText.Decode(bytes) {
+                    reasonPhrase = text
+                    reasonSource = null
+                    return text
+                }
+                System.Fail("Validated HTTP reason text could not be decoded")
+            }
+            return if storedStatusCode == 200 { "OK" } else { "" }
+        }
+    }
+
+    internal func SetReason(source: ArrayList<byte>, end: int) {
+        reasonEnd = end
+        if end == 13 {
+            reasonPhrase = ""
+        } else if end == 15 && source[13] == 79 && source[14] == 75 {
+            reasonPhrase = "OK"
+        } else {
+            reasonSource = source
+        }
+    }
+
     /// Closes owned response content, including an unread streaming connection.
     func Dispose() { storedContent.Dispose() }
 
@@ -155,6 +188,8 @@ public class HttpResponse : Disposable {
             headers.Add(HttpHeader("Content-Type", mediaType))
         }
         storedStatusCode = (int)statusCode
+        reasonPhrase = null
+        reasonSource = null
         storedContent = content
         storedHeaders = headers
     }
@@ -177,13 +212,16 @@ internal class HttpResponseDecoder {
     private var headers: ArrayList<HttpHeader> = ArrayList<HttpHeader>()
     private var expected: int = -1
     private var statusCode: int = 0
+    private var reasonEnd: int = 13
     private var failed: bool = false
 
     internal val HeadersComplete: bool => expected != -1 && !failed
     internal val BodyLength: int => expected
     internal val EmptyOnly: bool => statusCode == 205
     internal func FinishHeaders() -> HttpResponse {
-        return HttpResponse(statusCode, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+        let response = HttpResponse(statusCode, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+        response.SetReason(head, reasonEnd)
+        return response
     }
 
     internal val Complete: bool => (ended || (expected >= 0 && body.Count == expected)) && !failed
@@ -327,6 +365,7 @@ internal class HttpResponseDecoder {
                     return Error(HttpError.Unsupported("Protocol upgrades are not implemented"))
                 }
                 statusCode = code
+                reasonEnd = end
             } else if end == start {
                 if chunked && length >= 0 {
                     return Error(HttpError.Protocol("Ambiguous response framing"))
@@ -436,7 +475,9 @@ internal class HttpResponseDecoder {
         if !Complete {
             return Error(HttpError.Protocol("Incomplete or invalid response"))
         }
-        return Ok(HttpResponse(statusCode, headers, HttpMemoryContent(HttpText.Snapshot(body))))
+        let response = HttpResponse(statusCode, headers, HttpMemoryContent(HttpText.Snapshot(body)))
+        response.SetReason(head, reasonEnd)
+        return Ok(response)
     }
 }
 

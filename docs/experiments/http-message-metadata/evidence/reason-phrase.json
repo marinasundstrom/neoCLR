@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "cases": {
+    "aot": {
+      "passed": true,
+      "responses": 7,
+      "metadataBeforeBody": true
+    },
+    "jit": {
+      "passed": true,
+      "responses": 7,
+      "metadataBeforeBody": true
+    },
+    "interpreter": {
+      "passed": true,
+      "responses": 7,
+      "metadataBeforeBody": true
+    }
+  },
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-reason-probe/app"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-reason-probe/app.dll",
+      "--"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-reason-probe/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "1000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/lib/System.Data.PostgreSql.dll",
+      "--"
+    ]
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-message-metadata/validate_reason.py": "c81a84927b4e62da46f4f577a5bd83e314d751afa6f8720ed0ff66766ea3ea8a",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-message-metadata/ReasonPhrase.rvn": "4115c4407b4ec7bb7d3528d6bd97bb69aa60b61fb97c6a95e1f26ee5d0cd41c0",
+    "/Users/robert/Projects/neoclr/target/http-reason-probe/app": "cfebf6902019b7ee5ec04076987deb112684dc6e6dfd136eec833840c0c015a6",
+    "/Users/robert/Projects/neoclr/target/http-reason-probe/app.dll": "9c5136320ede90939980f3d00f8d15215c2e53b86c05265b0124d6e52bc2c24e",
+    "/Users/robert/Projects/neoclr/target/http-reason-bundle-v1/bundle/manifest.json": "b1b256bc68b39ecf5714fa0b552d34b9a1c80aa67559a611282f6716b857bf83"
+  }
+}

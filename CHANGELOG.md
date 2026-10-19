@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Complete HttpResponse client metadata with ReasonPhrase alongside StatusCode, IsSuccessStatusCode and Version. Preserve exact incoming HTTP/1.1 reason text, decode custom phrases lazily and cache empty/OK phrases without decoding. Metadata remains available after disposal and before body reads; custom unread phrases retain the bounded header buffer. All 21 loopback response cases pass across interpreter/JIT/AOT; API snapshots pass.
+
 - Expose read-only HttpRequest.Version and HttpResponse.Version through an immutable HttpVersion value, without allocating version strings. The transport remains HTTP/1.1-only. HttpRequest now implements Disposable; contexts dispose both messages, shared-content aliases share disposal, borrowed streams honor leaveOpen, and disposed requests are rejected before custom handler dispatch. Update API references and ownership guidance. All 60 message/lifetime contract executions, 24 withheld-body cases and nine context lifecycle cases pass across interpreter/JIT/AOT; API checks and the 4532-page local website build pass.
 
 - Qualify Raven native async match-arm suspension and cleanup (f61cffbfd): interpreter/JIT/AOT pass pending waits, forced GC, return and cancellation with nested disposal. Restore match dispatch in the routed HTTP sample. Broader expression/definite-assignment fixes remain in progress.
