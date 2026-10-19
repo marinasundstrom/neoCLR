@@ -174,3 +174,50 @@ the Rust compiler bridge is covered in the host memory-view reference.
 Final configuration checks pass with `cargo check -p neoclr-codegen` and
 `cargo check -p neoclr --no-default-features`. The retained element field is
 compiled only with native-metadata, with no added storage in interpreter-only builds.
+
+
+## Native byte-window kernel (2026-10-19)
+
+`runtime/native/memory/memory-views.h` and the existing packaged text-arena
+implementation now provide checked native operations for byte-array windows.
+This is executable C support, not yet bound to Raven InternalCalls or admitted
+by JIT/AOT selection. Other element types and String UTF-8 views remain pending.
+
+The provisional private carrier is 24 bytes on the supported 64-bit targets:
+an allocation-base owner pointer, two uint32 element bounds, and a uint64 kind.
+Only the owner is a root; bounds/kind are numeric. Compared with .NET's typed
+Span/Memory contracts, this kernel keeps an explicit dynamic kind to check both
+readonly restrictions and borrowed-to-persistent promotion. That costs an extra
+word and validation on access; it is not the final guest ABI or a performance
+claim. Future typed lowering may remove redundant state after validation.
+
+Factories accept mutable byte-array storage, not immutable value snapshots. The
+future binder must enforce the exact typed source contract and supply the kind;
+C callers are trusted and cannot manufacture guest lifetime authority. Every
+operation validates its window before reading/writing storage. Reserved arrays
+retain initialization checks; a successful write publishes only that byte.
+Conversions may restrict access or borrow persistent memory, never grant write
+access or promote a borrow. Failure leaves outputs and backing bytes unchanged.
+Null arrays create empty windows; nonnull empty windows retain their owner.
+
+Operations allocate nothing, collect nothing and register no roots. Callers must
+publish owners across collecting boundaries and preserve the context lifetime.
+GC builds check the exact live allocation base and context before dereferencing.
+Arena builds check bounds within used storage but rely on the trusted allocation
+base because that mode has no allocation registry. No native borrowed suspension
+or frame-escape rule is implied by these helpers; those remain codegen work.
+
+Validation: `python3 -m unittest discover -s scripts -p test_native_memory_views.py`
+passes the support-package header check and both arena/GC C variants with
+warnings-as-errors, UBSan and bounds checking on macOS ARM64. Cases include
+subwindow aliasing, all 16 kind conversions, readonly writes, partial initialization,
+null/empty/extreme bounds, failure atomicity, malformed extents, zero allocations,
+empty-view rooting, persistent storage inside a managed object, foreign contexts
+and stale owners after collection. The native GC validation runner includes the
+same fixture for both modes; Windows/Linux execution is not qualified locally.
+ASan attempts timed out in sanitizer initialization before main on macOS 27;
+a sampled stack confirms this, so no ASan pass is claimed.
+
+Existing static-storage consumers also pass in arena and GC modes through the
+compatibility include wrappers, with UBSan/bounds and warnings-as-errors. The
+packaging check confirms the new header is included in native support bundles.

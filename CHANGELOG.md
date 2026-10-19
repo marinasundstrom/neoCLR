@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
-- Preserve exact memory-view element identities through native specialization and nominal renaming using private, nonserialized compiler facts. Reject opaque views at the direct value-profile boundary as well as selection, preventing empty-record layout before native ABI/GC lowering exists. This is compiler preparation, not JIT/AOT execution support.
+- Preserve exact memory-view element identities through native specialization and nominal renaming using private, nonserialized compiler facts. Reject opaque views at the direct value-profile boundary as well as selection, preventing empty-record layout before native ABI/GC lowering exists. Add a private checked native byte-window kernel with readonly/lifetime-kind conversions, initialization checks and owner-preserving slicing; qualify arena/GC modes, including empty-view rooting and persistent fields. These are native building blocks, not yet Raven JIT/AOT execution support.
 
 - Implement Slice<T>/ReadOnlySlice<T> and persistent Memory<T>/ReadOnlyMemory<T> in Raven with checked indexing/windows, implicit array/readonly/borrowed conversions and explicit ToArray copies. Array ranges and Slice(range) now return shared Slice<T> views; remove Sliceable and expose immutable String.Utf8Bytes. No public AsSlice helpers. Qualify native-library/interpreter consumers and rejection fixtures, including persistent fields across await and explicit GC; refresh API snapshots and inventory further buffer migrations. Native JIT/AOT lowering and shared buffer-service migrations remain pending; array callers relying on copies must use ToArray.
 

@@ -1,4 +1,5 @@
 #include "text-arena.h"
+#include "memory-views.h"
 #include <inttypes.h>
 #include <string.h>
 
@@ -832,5 +833,110 @@ int32_t neoclr_text_allocate_rooted_values_v1(neoclr_aot_text_arena *arena,
     neoclr_aot_text *text = storage;
     text->length = length;
     *output = text;
+    return 0;
+}
+
+/* Byte-window kernel. Keep the allocation base rather than an interior pointer:
+ * GC can trace exactly one owner while bounds stay relative to the current view. */
+static int32_t byte_view_storage(neoclr_aot_context *context, const void *owner,
+    uint64_t *length, int *reserved) {
+    if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!owner) { *length = 0; *reserved = 0; return 0; }
+    uint64_t extent;
+#ifdef NEOCLR_NATIVE_GC
+    uint32_t allocation_kind;
+    int32_t status = neoclr_gc_allocation_info_v1(context, owner, &extent, &allocation_kind);
+    if (status || allocation_kind != NEOCLR_GC_BYTES) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+#else
+    const neoclr_aot_text_arena *arena = &context->text;
+    uintptr_t base = (uintptr_t)arena->data, address = (uintptr_t)owner;
+    if (!base || arena->used > arena->capacity || address < base || (address & 7) ||
+        address - base > arena->used) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    extent = arena->used - (address - base);
+#endif
+    if (extent < 16) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t tag, count;
+    memcpy(&tag, owner, 8);
+    memcpy(&count, (const unsigned char *)owner + 8, 8);
+    tag &= UINT64_C(0xffffffff);
+    if ((tag != UINT64_C(0x80000001) && tag != UINT64_C(0x80000002)) ||
+        count > NEOCLR_NATIVE_BYTE_ARRAY_LIMIT) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    int pending = tag == UINT64_C(0x80000002);
+    if (count > (extent - 16) / (pending ? 2 : 1)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    *length = count; *reserved = pending;
+    return 0;
+}
+static int32_t byte_view_validate(neoclr_aot_context *context, const neoclr_byte_view *view,
+    uint64_t *total, int *reserved) {
+    if (!view || view->kind > NEOCLR_VIEW_READONLY_MEMORY) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    int32_t status = byte_view_storage(context, view->owner, total, reserved);
+    if (status) return status;
+    if (view->offset > *total || view->length > *total - view->offset)
+        return NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE;
+    return 0;
+}
+int32_t neoclr_byte_view_create_v1(neoclr_aot_context *context, void *owner,
+    int32_t start, int32_t count, uint64_t kind, neoclr_byte_view *output) {
+    if (!output || kind > NEOCLR_VIEW_READONLY_MEMORY) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t total; int reserved;
+    int32_t status = byte_view_storage(context, owner, &total, &reserved);
+    if (status) return status;
+    if (start < 0 || count < 0 || (uint64_t)start > total || (uint64_t)count > total - (uint64_t)start)
+        return NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE;
+    *output = (neoclr_byte_view){owner, (uint32_t)start, (uint32_t)count, kind};
+    return 0;
+}
+int32_t neoclr_byte_view_slice_v1(neoclr_aot_context *context, const neoclr_byte_view *view,
+    int32_t start, int32_t count, neoclr_byte_view *output) {
+    if (!output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t total; int reserved;
+    int32_t status = byte_view_validate(context, view, &total, &reserved);
+    if (status) return status;
+    if (start < 0 || count < 0 || (uint32_t)start > view->length || (uint32_t)count > view->length - (uint32_t)start)
+        return NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE;
+    neoclr_byte_view result = *view;
+    result.offset += (uint32_t)start; result.length = (uint32_t)count;
+    *output = result;
+    return 0;
+}
+int32_t neoclr_byte_view_convert_v1(neoclr_aot_context *context, const neoclr_byte_view *view,
+    uint64_t kind, neoclr_byte_view *output) {
+    if (!output || kind > NEOCLR_VIEW_READONLY_MEMORY) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t total; int reserved;
+    int32_t status = byte_view_validate(context, view, &total, &reserved);
+    if (status) return status;
+    if (((view->kind & 1) && !(kind & 1)) || (view->kind < NEOCLR_VIEW_MEMORY && kind >= NEOCLR_VIEW_MEMORY))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    neoclr_byte_view result = *view; result.kind = kind; *output = result;
+    return 0;
+}
+static int32_t byte_view_position(neoclr_aot_context *context, const neoclr_byte_view *view,
+    int32_t index, uint64_t *position, uint64_t *total, int *reserved) {
+    int32_t status = byte_view_validate(context, view, total, reserved);
+    if (status) return status;
+    if (index < 0 || (uint32_t)index >= view->length) return NEOCLR_AOT_FAULT_INDEX_OUT_OF_RANGE;
+    *position = (uint64_t)view->offset + (uint32_t)index;
+    return 0;
+}
+int32_t neoclr_byte_view_get_v1(neoclr_aot_context *context, const neoclr_byte_view *view,
+    int32_t index, uint8_t *output) {
+    if (!output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t position, total; int reserved;
+    int32_t status = byte_view_position(context, view, index, &position, &total, &reserved);
+    if (status) return status;
+    const unsigned char *data = (const unsigned char *)view->owner + 16;
+    if (reserved && !data[total + position]) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    *output = data[position];
+    return 0;
+}
+int32_t neoclr_byte_view_set_v1(neoclr_aot_context *context, const neoclr_byte_view *view,
+    int32_t index, uint8_t value) {
+    uint64_t position, total; int reserved;
+    int32_t status = byte_view_position(context, view, index, &position, &total, &reserved);
+    if (status) return status;
+    if (view->kind & 1) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    unsigned char *data = (unsigned char *)view->owner + 16;
+    data[position] = value;
+    if (reserved) data[total + position] = 1;
     return 0;
 }

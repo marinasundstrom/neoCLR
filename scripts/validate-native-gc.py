@@ -94,15 +94,16 @@ def main():
             run(name, [binary])
             if windows and name == 'native-owned-body-test':
                 run(name + '-host-fiber', [binary, '--host-fiber'])
-        for gc in [False, True]:
-            name = 'static-storage-' + ('gc' if gc else 'arena')
-            binary = out / (name + ('.exe' if windows else ''))
-            flags = (['/DNEOCLR_NATIVE_GC'] if windows else ['-DNEOCLR_NATIVE_GC']) if gc else []
-            sources = [ROOT / 'runtime/native/memory/static-storage-test.c', BASE / 'text-arena.c']
-            if gc:
-                sources += [BASE / 'native-gc.c', BASE / 'root-probe.c']
-            run(name + '-build', [*cc, *flags, *sources, *(['/Fe:' + str(binary)] if windows else ['-o', binary])])
-            run(name, [binary])
+        for fixture in ['static-storage', 'memory-views']:
+            for gc in [False, True]:
+                name = fixture + '-' + ('gc' if gc else 'arena')
+                binary = out / (name + ('.exe' if windows else ''))
+                flags = (['/DNEOCLR_NATIVE_GC'] if windows else ['-DNEOCLR_NATIVE_GC']) if gc else []
+                sources = [ROOT / 'runtime/native/memory' / (fixture + '-test.c'), BASE / 'text-arena.c']
+                if gc:
+                    sources += [BASE / 'native-gc.c', BASE / 'root-probe.c']
+                run(name + '-build', [*cc, *flags, *sources, *(['/Fe:' + str(binary)] if windows else ['-o', binary])])
+                run(name, [binary])
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

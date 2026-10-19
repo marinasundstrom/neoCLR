@@ -395,3 +395,28 @@ source IR and lowered arguments. The retained element is remapped by
 omitted on serialization and rejected if supplied as metadata fields. They grant
 no native ABI or execution rights; both selection and direct value profiling
 still reject memory views pending their storage and tracing implementation.
+
+
+### Private native byte-window helpers
+
+`runtime/native/memory/memory-views.h` declares the provisional `neoclr_byte_view`
+carrier (`owner`, `offset`, `length`, `kind`) and these internal C entry points:
+
+- `neoclr_byte_view_create_v1(context, array, start, count, kind, output)`.
+- `neoclr_byte_view_slice_v1(context, view, start, count, output)`.
+- `neoclr_byte_view_convert_v1(context, view, kind, output)`.
+- `neoclr_byte_view_get_v1(context, view, index, outputByte)`.
+- `neoclr_byte_view_set_v1(context, view, index, byte)`.
+
+They return Int32 native fault codes: zero on success, IndexOutOfRange (8) for
+invalid windows/indexes, RuntimeError (3) for invalid storage/capabilities or
+uninitialized reads. Outputs and data remain unchanged on failure. Kinds are
+Slice, ReadOnlySlice, Memory and ReadOnlyMemory; conversion only restricts access
+or borrows a persistent view. Start/count/index use signed 32-bit inputs.
+The owner is a mutable byte-array allocation base from the live supplied context.
+These are trusted compiler/runtime helpers, not a stable host ABI or public guest
+factory. They do not root values, allocate, collect or authorize borrowed escapes.
+Callers publish the owner across GC boundaries; empty nonnull windows also retain
+it. Arena mode trusts allocation-base provenance; GC mode validates live ownership.
+The [native implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md#native-byte-window-kernel-2026-10-19)
+records layout costs, tests and the still-missing generated-code binding.
