@@ -1384,6 +1384,24 @@ pub(crate) fn compile_into(
     } else {
         None
     };
+    let byte_view_create_window = if details.is_some_and(|d| !d.byte_memory_create.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I64, types::I32, types::I32, types::I64, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_byte_view_create_v1", Linkage::Import, &sig)?)
+    } else { None };
+    let mut byte_view_access = [None, None];
+    for (index, symbol, enabled) in [
+        (0, "neoclr_byte_view_get_v1", details.is_some_and(|d| !d.byte_view_get.is_empty())),
+        (1, "neoclr_byte_view_set_v1", details.is_some_and(|d| !d.byte_view_set.is_empty())),
+    ] {
+        if enabled {
+            let mut sig = module.make_signature();
+            sig.params.extend([types::I64, types::I64, types::I32, if index == 0 { types::I64 } else { types::I8 }].map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            byte_view_access[index] = Some(module.declare_function(symbol, Linkage::Import, &sig)?);
+        }
+    }
     let byte_memory_slice = if details.is_some_and(|d| !d.byte_memory_slice.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend(
@@ -1744,7 +1762,9 @@ pub(crate) fn compile_into(
                 continue;
             }
             if details.is_some_and(|d| {
-                d.byte_memory_create.contains(&i)
+                d.byte_view_get.contains(&i)
+                    || d.byte_view_set.contains(&i)
+                    || d.byte_memory_create.contains(&i)
                     || d.byte_memory_length.contains(&i)
                     || d.byte_memory_slice.contains(&i)
                     || d.byte_memory_readonly.contains(&i)
@@ -1758,18 +1778,47 @@ pub(crate) fn compile_into(
                                 .into(),
                         );
                     };
-                    if input.types[*source].memory_view
-                        != Some(neoclr::metadata::MemoryViewKind::Memory)
-                        || input.types[*target].memory_view
-                            != Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory)
-                    {
-                        return Err(
-                            "byte-memory readonly conversion cannot grant writable access".into(),
-                        );
+                    let source_type = neoclr::metadata::Type::Named(input.types[*source].name.clone());
+                    let target_type = neoclr::metadata::Type::Named(input.types[*target].name.clone());
+                    if !crate::memory_views::conversion(input, &source_type, &target_type, false)
+                        && !crate::memory_views::conversion(input, &source_type, &target_type, true) {
+                        return Err("byte-view conversion cannot grant writable access or extend lifetime".into());
                     }
                     // Exact binding restricts the nominal capability; owner and
                     // bounds retain the same representation and GC root lane.
                     write(&mut b, output, &parameters[..3]);
+                } else if details.unwrap().byte_view_get.contains(&i) || details.unwrap().byte_view_set.contains(&i) {
+                    let Ty::ByteMemory(view) = p.args[i][0] else {
+                        return Err("byte-view access requires a byte view".into());
+                    };
+                    let set = details.unwrap().byte_view_set.contains(&i);
+                    let kind = match input.types[view].memory_view {
+                        Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
+                        Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) if !set => 1,
+                        _ => return Err("byte-view access requires the matching borrowed capability".into()),
+                    };
+                    let storage = slot(&mut b, 24);
+                    let address = b.ins().stack_addr(types::I64, storage, 0);
+                    b.ins().store(MemFlags::new(), parameters[0], address, 0);
+                    b.ins().store(MemFlags::new(), parameters[1], address, 8);
+                    b.ins().store(MemFlags::new(), parameters[2], address, 12);
+                    let kind = b.ins().iconst(types::I64, kind);
+                    b.ins().store(MemFlags::new(), kind, address, 16);
+                    let result_slot = slot(&mut b, 8);
+                    let result_address = b.ins().stack_addr(types::I64, result_slot, 0);
+                    let last = if set { b.ins().ireduce(types::I8, parameters[4]) } else { result_address };
+                    let service = module.declare_func_in_func(byte_view_access[usize::from(set)].unwrap(), b.func);
+                    let call = b.ins().call(service, &[fault_context.unwrap(), address, parameters[3], last]);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    if !set {
+                        let byte = b.ins().load(types::I8, MemFlags::new(), result_address, 0);
+                        let result = b.ins().uextend(types::I32, byte);
+                        write(&mut b, output, &[result]);
+                    }
                 } else if !details.unwrap().byte_memory_length.contains(&i) {
                     let Ty::ByteMemory(owner) =
                         p.results[i].as_ref().ok_or("missing memory result")?
@@ -1777,6 +1826,8 @@ pub(crate) fn compile_into(
                         return Err("byte-memory factory requires a persistent byte result".into());
                     };
                     let kind = match input.types[*owner].memory_view {
+                        Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
+                        Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) => 1,
                         Some(neoclr::metadata::MemoryViewKind::Memory) => 2,
                         Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory) => 3,
                         _ => return Err("invalid persistent memory kind".into()),
@@ -1785,12 +1836,13 @@ pub(crate) fn compile_into(
                     let storage = slot(&mut b, 24);
                     let address = b.ins().stack_addr(types::I64, storage, 0);
                     let call = if details.unwrap().byte_memory_create.contains(&i) {
-                        let service =
-                            module.declare_func_in_func(byte_memory_create.unwrap(), b.func);
-                        b.ins().call(
-                            service,
-                            &[fault_context.unwrap(), parameters[0], kind, address],
-                        )
+                        if p.args[i].len() == 3 {
+                            let service = module.declare_func_in_func(byte_view_create_window.unwrap(), b.func);
+                            b.ins().call(service, &[fault_context.unwrap(), parameters[0], parameters[1], parameters[2], kind, address])
+                        } else {
+                            let service = module.declare_func_in_func(byte_memory_create.unwrap(), b.func);
+                            b.ins().call(service, &[fault_context.unwrap(), parameters[0], kind, address])
+                        }
                     } else {
                         b.ins().store(MemFlags::new(), parameters[0], address, 0);
                         b.ins().store(MemFlags::new(), parameters[1], address, 8);

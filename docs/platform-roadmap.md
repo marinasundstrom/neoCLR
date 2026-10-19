@@ -13,8 +13,11 @@ retains exact view element identities. A checked byte-window C kernel now passes
 owner-retention, access and overlap-safe copy tests in arena/GC modes. The shared
 backend now lowers persistent byte-view array creation, readonly conversion, length and explicit
 integer and Range windows with traced owner/offset/length storage. Invalid range
-and integer slicing now share IndexOutOfRange; recoverable Range validation remains Result-based. Borrowed views,
-other element types and remaining native operations are still gated. The author also
+and integer slicing now share IndexOutOfRange; recoverable Range validation remains Result-based.
+Array-backed borrowed byte views now use the same owner tracing and checked kernel
+for indexing, writable updates, nested windows, readonly conversion and persistent
+borrowing. Other element types, immutable UTF-8 views and native async retention
+remain unqualified. The author also
 directs a whole-class-library audit of array APIs after the slice types work. Index/Range already exist; the author selects array ranges returning Slice<T>,
 implicit view conversion and explicit ToArray copying, without compatibility-only
 array overloads or repeated AsSlice helpers. This direction does not infer a

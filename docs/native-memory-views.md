@@ -10,12 +10,14 @@ The interpreter recognizes explicit opaque memory-view metadata and checked runt
 services. The four shapes are exercised by [neoIL test fixtures](../tests/fixtures/memory_views.neoil),
 not hand-authored class-library implementations. Production APIs belong in Raven
 `.rvn` source; source/compiler integration supplies ref-like types, implicit conversions and
-array range views. Native JIT/AOT now admits a bounded persistent-byte path:
-Memory<byte>/ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty,
-Slice(start), Slice(start, length), range indexing/Slice(Range), and implicit Memory<byte>-to-ReadOnlyMemory<byte>
-conversion, with typed argument/return/field storage. Borrowed views,
-other element types and the remaining operations still reject rather than being
-treated as empty records. See the bounded native storage section below.
+array range views. Native JIT/AOT supports a bounded array-backed byte-view path:
+all four kinds support array conversion, default values, Length/IsEmpty and
+integer/Range windows. Borrowed byte views support element reads, writable element
+updates, readonly conversion, borrowing from persistent byte views and the Raven
+ToArray loop. Persistent byte views retain typed argument/return/field storage.
+Other element types and String.Utf8Bytes remain gated. See the native borrowed
+byte-view qualification below; this does not qualify asynchronous view retention.
+
 
 `.memoryview slice|read_only_slice|memory|read_only_memory` serializes as the
 optional `TypeDef.memory_view` enum. Admission requires the corresponding canonical
@@ -37,6 +39,29 @@ Readonly references restrict access rather than define a separate overload ident
 Getter results are values, not element byrefs. Null arrays and `initobj` create empty
 views; empty windows over arrays retain their owner. Bounds use the ordinary
 IndexOutOfRange fault category. No native ABI or performance claim is made.
+
+## Runtime concepts and future host access
+
+Author discussion, 2026-10-19: slices and memory are managed runtime concepts
+projected through the library types. The runtime owns element identity, owner
+tracing, bounds, access capability and lifetime enforcement; the Raven types make
+those operations available to programs. They are not independent library wrappers
+whose semantics an embedding host would need to reconstruct.
+
+A future Native API can expose the same concepts through checked runtime
+operations. The proposed host model is a rooted persistent view handle plus a
+scoped borrow for element access. Rooting an owner and stabilizing its address are
+separate obligations: a future moving collector would need pinning or another
+explicit access protocol. Managed-reference writes also require type,
+initialization and GC-barrier checks. Externally owned storage would need a
+separate ownership/release contract.
+
+This is design direction, not a published Native API or ABI commitment. The Rust
+MemoryView payload has no public access methods, and the private C byte-window
+kernel neither roots owners nor grants host borrow lifetimes. Neither descriptor
+layout is promised as the future embedding representation. This preserves the
+.NET-inspired ownership distinction while allowing an explicit neoCLR hosting
+contract; its cost is designing and validating another lifetime boundary.
 
 ## Contract and comparison with .NET
 
@@ -390,3 +415,35 @@ interpreter and both persistent byte kinds in native execution, and checks a
 standalone negative-length Range call without reference-arena admission in AOT
 (managed JIT uses its required GC/context profile). Public
 signatures remain unchanged; summaries and the matching API snapshots are refreshed.
+
+## Native array-backed byte slices — 2026-10-19
+
+The native admission profile now accepts all four exact byte-view kinds. Borrowed
+views use the existing owner/offset/length lanes and owner-only roots. This is a
+private array-backed representation of a logical interior reference; it does not
+admit stack-backed or arbitrary-pointer slices. Source verification runs before
+specialization and rejects borrowed heap/compound/erased storage. Direct native
+profiling also rejects borrowed fields before verification shells are created.
+
+Exact runtime bindings cover whole-array and bounded array creation, length,
+integer/Range slicing, readonly restriction, Memory-to-Slice borrowing, element
+reads and writable element updates. Borrowing and readonly conversion copy the
+three lanes without allocation; the nominal contract continues to distinguish
+all four capabilities. Get/set use the checked C kernel and propagate bounds or
+storage faults through native diagnostics. The no-result setter does not write a
+caller result. The existing Raven ToArray loop works through these operations.
+
+Qualification uses the [Raven consumer](validation/memory-views-20261019/native-memory.rvn)
+and [driver](validation/memory-views-20261019/native-run.py): shared mutation,
+readonly aliases, integer/from-end/nested windows, independent ToArray copies,
+implicit array and persistent borrowing, default/empty views and collection with
+a returned slice as sole owner. Invalid ranges and element access use terminal
+IndexOutOfRange; native hosts check untouched failure results, balanced roots and
+complete reclamation. AOT runs use UBSan/bounds instrumentation. Focused Rust tests
+cover capability conversion, exact service signatures, field rejection and layout.
+See [retained results](validation/memory-views-20261019/borrowed-byte-validation.json).
+
+No native String.Utf8Bytes, non-byte elements, stack-backed borrows or asynchronous
+retention qualification is claimed. Codec consumers are the next adoption step;
+stream/socket/HTTP Memory-based contracts still need their own completion-lifetime
+validation. No speedup or stable host ABI is inferred from these checks.

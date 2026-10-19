@@ -223,7 +223,8 @@ and rename/serialization limits are documented in the same host reference; these
 compiler helpers are not guest types and do not change the RavenDoc snapshot.
 The same host reference covers the private native byte-window carrier and seven
 checked C helpers. Generated Raven code now uses whole-array creation and checked
-windows for the bounded persistent-byte path; other view operations remain gated.
+windows and element access for array-backed byte views, including persistent-to-borrowed
+conversion. Other element types and immutable UTF-8 views remain gated.
 Public Raven Slice/ReadOnlySlice and Memory/ReadOnlyMemory APIs and
 String.Utf8Bytes have a [manual member reference](memory-views.md). The native
 metadata contract is explicit; the CLI reference projection rejects these types

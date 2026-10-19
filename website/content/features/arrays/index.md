@@ -65,11 +65,11 @@ array. Request an independent shallow copy with `array[range].ToArray()`.
 Valid empty windows succeed and invalid bounds fault without clamping. Array
 no longer implements Sliceable<T[]>; array-specific and owned-result APIs still
 use arrays. This deliberately replaces the former copy-based range contract.
-See the [slice API](../../docs/memory-views.html). This view path currently runs
-in the interpreter. Memory/ReadOnlyMemory retain windows across asynchronous use;
-native JIT/AOT currently supports a bounded persistent byte-view path (array
-conversion, readonly conversion, length and explicit integer and Range windows). Borrowed array ranges
-remain interpreter-only. Array size and allocation remain constrained by runtime budgets.
+See the [slice API](../../docs/memory-views.html). Array-backed byte slices also run in native JIT/AOT, including indexing,
+updates, readonly borrowing and nested windows. Memory/ReadOnlyMemory retain
+windows across asynchronous use in the interpreter; native asynchronous retention
+is not yet qualified. Other element types and immutable UTF-8 views remain
+interpreter-only. Array size and allocation remain constrained by runtime budgets.
 
 Read-only interface views support [reference variance](../collections/#interface-variance); mutable array storage remains invariant.
 

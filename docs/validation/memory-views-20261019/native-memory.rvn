@@ -43,7 +43,60 @@ func CreateRanged() -> ByteBufferOwner {
     return ByteBufferOwner(memory[1..^1], readonlyMemory.Slice(1..^1))
 }
 
+func ReadByte(source: ReadOnlySlice<byte>) -> byte => source[0]
+
+func CreateBorrowed() -> Slice<byte> {
+    let data: byte[] = [(byte)51, (byte)52, (byte)53]
+    return data[1..]
+}
+
+func CreateBorrowedEmpty() -> ReadOnlySlice<byte> {
+    let data: byte[] = [(byte)54]
+    return data[1..]
+}
+
+func BorrowedWindows() -> int {
+    let soleOwner = CreateBorrowed()
+    let emptyOwner = CreateBorrowedEmpty()
+    GC.Collect()
+    if soleOwner[0] != 52 || !emptyOwner.IsEmpty {
+        return 20
+    }
+    let data: byte[] = [(byte)10, (byte)20, (byte)30, (byte)40]
+    let memory: Memory<byte> = data
+    let readonlyMemory: ReadOnlyMemory<byte> = memory[1..3]
+    let window = data[1..^1]
+    let readonlyWindow: ReadOnlySlice<byte> = window
+    window[0] = (byte)99
+    GC.Collect()
+    if data[1] != 99 || ReadByte(readonlyWindow) != 99 || ReadByte(readonlyMemory) != 99 {
+        return 21
+    }
+    let borrowed: Slice<byte> = memory[2..]
+    borrowed[1] = (byte)77
+    if data[3] != 77 || ReadByte(memory) != 10 || ReadByte(data) != 10 {
+        return 22
+    }
+    let nested = window.Slice(1)[..1]
+    if nested[0] != 30 || window[^1] != 30 || window[^0..].Length != 0 {
+        return 23
+    }
+    let copy = readonlyWindow.ToArray()
+    window[1] = (byte)88
+    if copy[1] != 30 || readonlyWindow[1] != 88 {
+        return 24
+    }
+    if !default(Slice<byte>).IsEmpty || !default(ReadOnlySlice<byte>).Slice(0).IsEmpty {
+        return 25
+    }
+    return 0
+}
+
 func Main() -> int {
+    let borrowedResult = BorrowedWindows()
+    if borrowedResult != 0 {
+        return borrowedResult
+    }
     let empty = default(Memory<byte>)
     let readonlyEmpty = default(ReadOnlyMemory<byte>)
     if !empty.IsEmpty || !readonlyEmpty.IsEmpty {

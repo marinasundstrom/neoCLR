@@ -34,9 +34,10 @@ and persistent `Memory<T>` and `ReadOnlyMemory<T>`. These views share storage
 without copying and preserve checked bounds and readonly access. The development
 [Raven API](/docs/memory-views.html) provides checked view operations, implicit
 array conversions, persistent Memory/ReadOnlyMemory and an immutable UTF-8 byte
-view. Native execution currently covers only persistent byte-view creation,
-readonly conversion, length and explicit integer and Range windows. Borrowed native views and shared
-buffer-service migration remain pending. Development array range
+view. Native execution covers array-backed byte views, including borrowed indexing,
+writable updates, readonly conversion, length and integer/Range windows. Other
+element types, UTF-8 views, native async retention and shared buffer-service
+migration remain pending. Development array range
 syntax returns Slice<T>; ToArray requests a copy. String slicing retains its grapheme semantics.
 
 [Design and implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md)

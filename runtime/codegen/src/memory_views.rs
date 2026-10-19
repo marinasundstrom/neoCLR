@@ -1,4 +1,4 @@
-//! Bounded persistent byte-memory lowering. Borrowed views remain inadmissible.
+//! Bounded array-backed byte-view lowering. Source verification enforces borrowing.
 use neoclr::metadata::{MemoryViewKind, Representation, Type, TypeDef};
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
@@ -6,7 +6,7 @@ type Error = Box<dyn std::error::Error>;
 pub(crate) fn byte_memory(t: &TypeDef) -> bool {
     matches!(
         t.memory_view,
-        Some(MemoryViewKind::Memory | MemoryViewKind::ReadOnlyMemory)
+        Some(MemoryViewKind::Memory | MemoryViewKind::ReadOnlyMemory | MemoryViewKind::Slice | MemoryViewKind::ReadOnlySlice)
     ) && neoclr::native_metadata::memory_view_element(t) == Some(&Type::Byte)
         && t.representation == Representation::Record
         && !t.is_reference_type
@@ -25,6 +25,20 @@ pub(crate) fn byte_memory(t: &TypeDef) -> bool {
         && t.declaring_type.is_none()
 }
 
+/// Only access restriction or persistent-to-borrowed projection is admitted.
+pub(crate) fn conversion(input: &neoclr::Module, source: &Type, target: &Type, borrowing: bool) -> bool {
+    let (Some(source), Some(target)) = (input.type_definition(source), input.type_definition(target)) else {
+        return false;
+    };
+    byte_memory(source) && byte_memory(target) && matches!(
+        (source.memory_view, target.memory_view, borrowing),
+        (Some(MemoryViewKind::Memory), Some(MemoryViewKind::ReadOnlyMemory), false)
+        | (Some(MemoryViewKind::Slice), Some(MemoryViewKind::ReadOnlySlice), false)
+        | (Some(MemoryViewKind::Memory), Some(MemoryViewKind::Slice), true)
+        | (Some(MemoryViewKind::ReadOnlyMemory), Some(MemoryViewKind::ReadOnlySlice), true)
+    )
+}
+
 pub(crate) fn bind(
     input: &mut neoclr::Module,
     report: &Value,
@@ -40,16 +54,24 @@ pub(crate) fn bind(
             continue;
         }
         let expected_kind = match name {
+            "neoCLR.Runtime.ViewCreateSlice" => Some(MemoryViewKind::Slice),
+            "neoCLR.Runtime.ViewCreateReadOnlySlice" => Some(MemoryViewKind::ReadOnlySlice),
             "neoCLR.Runtime.ViewCreateMemory" => Some(MemoryViewKind::Memory),
             "neoCLR.Runtime.ViewCreateReadOnlyMemory" => Some(MemoryViewKind::ReadOnlyMemory),
             "neoCLR.Runtime.ViewLength"
             | "neoCLR.Runtime.ViewSlice"
+            | "neoCLR.Runtime.ViewAsSlice"
+            | "neoCLR.Runtime.ViewGet"
+            | "neoCLR.Runtime.ViewSet"
             | "neoCLR.Runtime.ViewAsReadOnly"
             | "neoCLR.Runtime.ViewBoundsFault" => None,
             _ => continue,
         };
         let slicing = name == "neoCLR.Runtime.ViewSlice";
         let readonly = name == "neoCLR.Runtime.ViewAsReadOnly";
+        let borrowing = name == "neoCLR.Runtime.ViewAsSlice";
+        let get = name == "neoCLR.Runtime.ViewGet";
+        let set = name == "neoCLR.Runtime.ViewSet";
         let bounds_fault = name == "neoCLR.Runtime.ViewBoundsFault";
         let index = row["compiledIndex"]
             .as_u64()
@@ -72,7 +94,7 @@ pub(crate) fn bind(
             || f.instance
             || f.receiver_byref
             || f.receiver_readonly
-            || f.no_result != bounds_fault
+            || f.no_result != (bounds_fault || set)
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
             || !f.body.is_empty()
@@ -90,16 +112,23 @@ pub(crate) fn bind(
             || if bounds_fault {
                 !f.parameters.is_empty() || f.returns != Type::Void
             } else if expected_kind.is_some() {
-                f.parameters != [Type::ArrayRef(Box::new(Type::Byte))]
+                !(f.parameters == [Type::ArrayRef(Box::new(Type::Byte))]
+                    || expected_kind.is_some_and(|k| k.is_borrowed())
+                        && f.parameters == [Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32])
             } else {
-                if readonly {
-                    f.parameters.len() != 1
-                        || !input.type_definition(&f.parameters[0]).is_some_and(|t| {
-                            byte_memory(t) && t.memory_view == Some(MemoryViewKind::Memory)
-                        })
-                        || !input.type_definition(&f.returns).is_some_and(|t| {
-                            byte_memory(t) && t.memory_view == Some(MemoryViewKind::ReadOnlyMemory)
-                        })
+                if readonly || borrowing {
+                    f.parameters.len() != 1 || !conversion(input, &f.parameters[0], &f.returns, borrowing)
+                } else if get || set {
+                    !input.type_definition(&f.parameters[0]).is_some_and(|t| {
+                        t.memory_view.is_some_and(|k| k.is_borrowed())
+                            && (!set || t.memory_view == Some(MemoryViewKind::Slice))
+                    }) || if set {
+                        f.parameters != [f.parameters[0].clone(), Type::Int32, Type::Byte]
+                            || f.returns != Type::Void
+                    } else {
+                        f.parameters != [f.parameters[0].clone(), Type::Int32]
+                            || f.returns != Type::Byte
+                    }
                 } else if slicing {
                     !matches!(f.parameters.len(), 2 | 3)
                         || f.parameters[1..].iter().any(|t| *t != Type::Int32)
@@ -109,13 +138,17 @@ pub(crate) fn bind(
                 }
             }
         {
-            return Err("native memory binding requires exact closed persistent Byte create/length/slice/readonly InternalCall contracts".into());
+            return Err(format!("{name}: native memory binding requires exact closed Byte view InternalCall contracts").into());
         }
         let implementation = if bounds_fault {
             "memory-view-bounds-fault-v1"
         } else if expected_kind.is_some() {
             "byte-memory-create-v1"
-        } else if readonly {
+        } else if get {
+            "byte-view-get-v1"
+        } else if set {
+            "byte-view-set-v1"
+        } else if readonly || borrowing {
             "byte-memory-readonly-v1"
         } else if slicing {
             "byte-memory-slice-v1"
@@ -157,10 +190,11 @@ pub(crate) fn project_verification(input: &mut neoclr::Module) -> Result<(), Err
 
 #[cfg(test)]
 pub(crate) fn test_module(kind: MemoryViewKind, element: Type) -> neoclr::Module {
-    let spelling = if kind == MemoryViewKind::Memory {
-        "memory"
-    } else {
-        "read_only_memory"
+    let spelling = match kind {
+        MemoryViewKind::Memory => "memory",
+        MemoryViewKind::ReadOnlyMemory => "read_only_memory",
+        MemoryViewKind::Slice => "slice",
+        MemoryViewKind::ReadOnlySlice => "read_only_slice",
     };
     let source = neoclr::assemble(&format!(
         ".module System\n.type {}<T>\n.memoryview {spelling}\n.end\n",
@@ -207,7 +241,7 @@ mod tests {
 
     #[test]
     fn persistent_byte_memory_requires_retained_exact_shape() {
-        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory] {
+        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory, MemoryViewKind::Slice, MemoryViewKind::ReadOnlySlice] {
             let module = test_module(kind, Type::Byte);
             assert!(byte_memory(&module.types[0]));
             let roundtrip: neoclr::Module =
@@ -215,9 +249,6 @@ mod tests {
             assert!(!byte_memory(&roundtrip.types[0]));
             assert!(!byte_memory(&test_module(kind, Type::Int32).types[0]));
             let mut bad = module.types[0].clone();
-            bad.memory_view = Some(MemoryViewKind::Slice);
-            assert!(!byte_memory(&bad));
-            bad = module.types[0].clone();
             bad.is_reference_type = true;
             assert!(!byte_memory(&bad));
         }
@@ -225,7 +256,7 @@ mod tests {
 
     #[test]
     fn byte_memory_length_and_slice_bind_only_exact_view_signatures() {
-        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory] {
+        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory, MemoryViewKind::Slice, MemoryViewKind::ReadOnlySlice] {
             for count in [0, 1, 2] {
                 let slicing = count != 0;
                 let mut input = test_module(kind, Type::Byte);
@@ -265,6 +296,44 @@ mod tests {
                 let mut bad = original;
                 bad.functions[0].parameters[0] = Type::ByRef(Box::new(ty));
                 assert!(bind(&mut bad, &report, true).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn byte_view_conversions_follow_capabilities_not_layout() {
+        use MemoryViewKind::*;
+        for source in [Slice, ReadOnlySlice, Memory, ReadOnlyMemory] {
+            for target in [Slice, ReadOnlySlice, Memory, ReadOnlyMemory] {
+                let mut input = test_module(source, Type::Byte);
+                let mut dest = test_module(target, Type::Byte).types.remove(0);
+                dest.name = "$target".into();
+                input.types.push(dest);
+                for borrowing in [false, true] {
+                    let expected = matches!((source, target, borrowing),
+                        (Slice, ReadOnlySlice, false) | (Memory, ReadOnlyMemory, false)
+                        | (Memory, Slice, true) | (ReadOnlyMemory, ReadOnlySlice, true));
+                    assert_eq!(conversion(&input, &Type::Named(input.types[0].name.clone()),
+                        &Type::Named("$target".into()), borrowing), expected);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn byte_view_access_requires_borrowed_and_writable_setter() {
+        use MemoryViewKind::*;
+        for kind in [Slice, ReadOnlySlice, Memory, ReadOnlyMemory] {
+            for set in [false, true] {
+                let mut input = test_module(kind, Type::Byte);
+                let name = if set { "neoCLR.Runtime.ViewSet" } else { "neoCLR.Runtime.ViewGet" };
+                let mut parameters = vec![Type::Named(input.types[0].name.clone()), Type::Int32];
+                if set { parameters.push(Type::Byte); }
+                input.functions.push(serde_json::from_value(json!({
+                    "name":name, "parameters":parameters, "returns":if set {Type::Void} else {Type::Byte}, "no_result":set, "impl_flags":4096
+                })).unwrap());
+                let report = json!({"functions":[{"name":name, "compiledIndex":0}]});
+                assert_eq!(bind(&mut input, &report, true).is_ok(), kind.is_borrowed() && (!set || kind == Slice));
             }
         }
     }

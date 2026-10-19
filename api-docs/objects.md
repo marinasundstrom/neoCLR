@@ -379,7 +379,7 @@ Host publication validates the execution heap, and expired owners fault. Immutab
 UTF-8 views share the String owner and are borrowed capabilities for storage checks.
 
 Nominal metadata admission and interpreter suspension rules are implemented.
-Public Raven APIs are implemented; native execution currently covers a bounded persistent-byte subset. This payload is not a
+Public Raven APIs are implemented; native execution currently covers a bounded array-backed byte-view subset. This payload is not a
 supported host factory; checked guest factories are documented in the
 [memory-view reference](memory-views.md). See
 the [implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md).
@@ -394,7 +394,7 @@ source IR and lowered arguments. The retained element is remapped by
 `restore_interface_proofs` alongside other private type facts. These facts are
 omitted on serialization and rejected if supplied as metadata fields. They grant
 no native ABI or execution rights on their own. Selection and value profiling now
-admit exact persistent-byte shapes with a dedicated owner/offset/length layout;
+admit exact array-backed byte-view shapes with a dedicated owner/offset/length layout;
 other view shapes remain rejected.
 
 

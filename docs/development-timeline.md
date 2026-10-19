@@ -19589,3 +19589,21 @@ lifetime/mutability conversions are rejected. The [library audit](memory-view-li
 separates synchronous codec/crypto borrowing, asynchronous I/O ownership and owned
 array results. JIT/AOT view lowering and those shared-service migrations remain
 open; no native performance improvement is claimed.
+
+### 2026-10-19 — Runtime views, host access and direct library adoption
+
+- **Author:** suggested that span/memory types project managed runtime concepts,
+  which a future Native API could also expose to runtime hosts. Then directed
+  continued class-library adoption without .NET legacy AsSpan-style adapters,
+  and expressed the expectation that standardized views should later reach HTTP
+  Server and Client APIs.
+- **Assistant:** agreed with runtime-owned semantics and proposed checked host
+  operations with rooted persistent handles and scoped borrows. This is a future
+  hosting design, not a completed Native API or frozen physical layout. The current
+  Rust payload and private C kernel remain implementation foundations.
+- **Action:** continued native borrowed-byte support as the prerequisite for shared
+  synchronous buffer APIs. The [library audit](memory-view-library-audit.md) retains
+  the distinction between synchronous slices, retained memory and owned arrays.
+  Per-step validation and implementation status belong in the
+  [memory-view contract](native-memory-views.md); broader native element support,
+  asynchronous service adoption and the public host API remain open.

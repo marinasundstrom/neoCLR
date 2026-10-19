@@ -1,11 +1,12 @@
 # Slices and persistent memory
 
 Development APIs authored in Raven (`System.Runtime`). The interpreter provides
-checked zero-copy storage. A bounded native JIT/AOT path supports Memory<byte>
-and ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty,
-Slice(start), Slice(start, length), range indexers/Slice(Range), and implicit Memory<byte>-to-ReadOnlyMemory<byte>
-conversion, including argument/return copies and object fields. Other
-view operations and element types remain interpreter-only. Array
+checked zero-copy storage. Native JIT/AOT supports array-backed byte views of all
+four kinds: conversion from arrays, default values, length and integer/Range
+windows. Borrowed byte slices support indexing, writable updates, readonly
+conversion, borrowing from persistent views and ToArray. Persistent byte memory
+also supports object-field storage. Other element types and UTF-8 string views
+remain interpreter-only; asynchronous native retention is not yet qualified. Array
 range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
 copy. Memory<T> and ReadOnlyMemory<T> retain managed backing storage and may be
 stored in objects and carried across asynchronous operations.

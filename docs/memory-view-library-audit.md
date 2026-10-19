@@ -22,7 +22,12 @@ covers hand-authored adapters absent from Raven source. The inventories are
 Author clarification, 2026-10-19: do not reproduce compatibility-only .NET layers.
 Choose the correct primary parameter/result types; avoid public AsSlice plumbing
 and duplicate array overloads solely for compatibility. Explicitly owned or
-array-specific contracts remain arrays.
+array-specific contracts remain arrays. The author also expects this consistent
+usage to reach HTTP Server and Client APIs. Follow the stream/socket dependencies
+below: active transfers retain Memory owners until completion, synchronous parsing
+borrows slices, and parser-owned or returned materialized bodies keep ownership.
+This does not imply automatic pooling, concurrent mutation safety or zero-copy
+transport.
 
 Review calls by retention, mutation, contiguity and ownership. A returned owned
 array and an array retained in a field have different contracts from a borrowed
@@ -96,8 +101,10 @@ remove a copy or establish native support.
 
 1. Raven/compiler APIs and interpreter metadata/GC support now cover all four
    types. The bounded native persistent-byte path now covers creation, length,
-   explicit integer and Range windows, readonly conversion and traced field/call storage. Finish borrowed
-   views and remaining JIT/AOT operations before migrating shared buffer services.
+   explicit integer and Range windows, readonly conversion and traced field/call storage.
+   Array-backed borrowed byte views now have native indexing, updates, windows,
+   readonly conversion and persistent borrowing. Qualify each migrated consumer
+   and its service contracts; native asynchronous retention remains a separate gate.
    Interpreter-only support is insufficient for native HTTP and crypto providers.
 2. Migrate codec and cryptography synchronous contracts first, without redundant
    compatibility overloads. Test subwindows, empty input, overlapping buffers, readonly

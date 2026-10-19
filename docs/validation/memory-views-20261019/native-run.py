@@ -13,6 +13,7 @@ parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--consumer-only', action='store_true',
                     help='Reuse earlier bounds evidence and run only the success consumer')
+parser.add_argument('--access-bounds', action='store_true', help='Qualify borrowed byte access failures')
 parser.add_argument('--range-bounds', action='store_true',
                     help='Also qualify invalid Range windows through the Raven library')
 args = parser.parse_args()
@@ -129,11 +130,6 @@ if args.range_bounds:
             failure = run(label + '-interpreter', [runtime, 'run', case_image,
                           '--execution', 'interpreter', *refs], 1)
             assert 'IndexOutOfRange' in failure.stdout + failure.stderr
-            if kind in ('Slice', 'ReadOnlySlice'):
-                report['rangeCases'].append({'kind': kind, 'case': case, 'expression': expression,
-                                            'execution': 'interpreter', 'fault': 'IndexOutOfRange',
-                                            'imageSha256': hashlib.sha256(case_image.read_bytes()).hexdigest()})
-                continue
             case_options = [o for o in options if o not in ('--reference-arena', '--native-gc', '--native-stack-budget')] if kind == 'Range' else options
             if kind == 'Range':
                 rejected_object = output / 'range-no-diagnostic-context.o'
@@ -155,6 +151,36 @@ if args.range_bounds:
                                         'nativeStatus': 8, 'fault': 'IndexOutOfRange',
                                         'imageSha256': hashlib.sha256(case_image.read_bytes()).hexdigest(),
                                         'sourceSha256': hashlib.sha256(source.read_bytes()).hexdigest()})
+if args.access_bounds:
+    report['accessCases'] = []
+    run('access-jit-link', [*flags, '-DEXPECT_STATUS=8', '-DJIT_HOST', '-dynamiclib', host,
+                            *support, '-o', output / 'access-fault.dylib'])
+    for case, kind, operation in [
+        ('read-negative', 'ReadOnlySlice', 'return (int)memory[-1]'),
+        ('write-past-end', 'Slice', 'memory[2] = (byte)99\n    return 0'),
+    ]:
+        source = output / (case + '.rvn')
+        source.write_text(f'import System.*\nfunc Main() -> int {{\n'
+                          f'    let memory: {kind}<byte> = [(byte)1, (byte)2]\n    {operation}\n}}\n')
+        project = output / (case + '.rvnproj')
+        template = (HERE / 'NativeMemoryBounds.rvnproj').read_text()
+        template = template.replace('NativeMemoryBounds', case).replace('native-bounds.rvn', source.name)
+        project.write_text(template.replace('../../../runtime/', str(ROOT / 'runtime') + '/'))
+        run(case + '-raven', ['dotnet', args.compiler, 'neoclr', '--project', project])
+        case_image = output / 'bin/neoclr' / (case + '.dll')
+        failure = run(case + '-interpreter', [runtime, 'run', case_image, '--execution', 'interpreter', *refs], 1)
+        assert 'IndexOutOfRange' in failure.stdout + failure.stderr
+        case_obj = output / (case + '.o')
+        run(case + '-aot', [codegen, '--closed-world', case_image, '@entry', case_obj, *options])
+        run(case + '-link', [*flags, '-DEXPECT_STATUS=8', '-fsanitize=undefined,bounds', host,
+                             case_obj, *support, '-o', output / case])
+        run(case + '-execute', [output / case])
+        failure_jit = run(case + '-jit', [codegen, '--jit-managed', '--closed-world', case_image,
+                                         '@entry', output / 'access-fault.dylib', *options])
+        assert json.loads(failure_jit.stderr.split('JIT_RESULT ', 1)[1])['guestExitCode'] == 0
+        report['accessCases'].append({'case': case, 'kind': kind, 'nativeStatus': 8,
+            'sourceSha256': hashlib.sha256(source.read_bytes()).hexdigest(),
+            'imageSha256': hashlib.sha256(case_image.read_bytes()).hexdigest()})
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
                    for p in (image, core, runtime, codegen, args.compiler, host,
                              HERE / 'native-run.py', HERE / 'native-memory.rvn', HERE / 'native-bounds.rvn')}

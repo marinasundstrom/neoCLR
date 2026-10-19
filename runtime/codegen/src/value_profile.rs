@@ -157,6 +157,11 @@ impl<'a> Profile<'a> {
             }
         }
         for t in &input.types {
+            if t.fields.iter().map(|f| &f.ty).chain(t.static_fields.iter().map(|f| &f.ty)).any(|ty| {
+                input.type_definition(ty).is_some_and(|t| t.memory_view.is_some_and(|k| k.is_borrowed()))
+            }) {
+                return Err("borrowed byte views cannot be stored in fields".into());
+            }
             // Selection also gates these; direct profile consumers must not
             // interpret opaque fieldless declarations as empty, untraced records.
             if (t.memory_view.is_some()
@@ -2530,7 +2535,7 @@ mod object_assignment_tests {
     #[test]
     fn persistent_byte_memory_has_three_lanes_and_rejects_raw_construction() {
         use neoclr::metadata::MemoryViewKind;
-        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory] {
+        for kind in [MemoryViewKind::Memory, MemoryViewKind::ReadOnlyMemory, MemoryViewKind::Slice, MemoryViewKind::ReadOnlySlice] {
             let mut input = crate::memory_views::test_module(kind, Type::Byte);
             let ty = Type::Named(input.types[0].name.clone());
             let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
@@ -2551,6 +2556,20 @@ mod object_assignment_tests {
             );
             let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
             assert!(p.analyze(0).is_err());
+        }
+    }
+
+    #[test]
+    fn borrowed_byte_views_cannot_enter_native_fields() {
+        use neoclr::metadata::MemoryViewKind;
+        for kind in [MemoryViewKind::Slice, MemoryViewKind::ReadOnlySlice] {
+            let mut input = crate::memory_views::test_module(kind, Type::Byte);
+            let ty = Type::Named(input.types[0].name.clone());
+            let mut holder = neoclr::assemble(".module Test\n.type Holder\n.field Data Int32\n.end\n").unwrap().types.remove(0);
+            holder.fields[0].ty = ty;
+            input.types.push(holder);
+            let error = Profile::new(&input, true, None, None, &[], None, None, None, false).err().unwrap();
+            assert!(error.to_string().contains("cannot be stored in fields"));
         }
     }
 
