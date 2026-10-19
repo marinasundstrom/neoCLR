@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Text release prerequisite (2026-10-19):** fix String and StringBuilder before
+selecting the replacement release candidate. Builder reuse improvements are
+implemented; the [String normalization foundation](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19)
+passes Unicode conformance without allocations but is not yet wired into public
+text semantics. Coordinated equality/hash/compiler integration remains open.
+
 **Author-directed follow-up (2026-10-19):** after the HTTP content integration,
 update website coverage of Slice/Memory design and the experimental concurrent GC,
 investigate the entire HTTP server stack, then initiate the next release workflow.

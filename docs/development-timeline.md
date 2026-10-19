@@ -26,6 +26,24 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-19 — Consistent canonical text semantics
+
+The author asks what the assistant recommends for canonical String/Char equality,
+then directs continuation and adds: “Feel free to come with suggestions to make
+the string model more consistent”. The assistant recommends canonical equality
+with matching hashes, preserved original UTF-8 storage and explicit ordinal
+protocol operations. Further assistant proposals cover matching search semantics,
+checked positions shared with slicing, and grapheme boundaries that can change
+across builder fragments. These proposals are distinguished from implemented APIs.
+
+The assistant implements an unwired, allocation-free Unicode 17 normalization
+kernel. Conformance testing catches and repairs a decomposition cursor bug before
+public integration. All 20,034 conformance rows and long-run allocation checks
+pass. Public equality, boxed dispatch and compiler integration remain open;
+release qualification remains pending. See the
+[String review](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19).
+
+
 ## 2026-10-19 — Raven owns the class library; archive obsolete mirrors deliberately
 
 The author corrects the assistant's Slice implementation direction: “Runtime är i

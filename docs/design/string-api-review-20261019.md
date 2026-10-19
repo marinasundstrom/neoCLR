@@ -75,3 +75,63 @@ Measure traversal allocations and repeated search/slicing separately from HTTP
 throughput. Qualify interpreter/JIT/AOT and compiler folding with matching Unicode
 data. Existing tests and source inspection support this audit; no new benchmark or
 new API execution is claimed.
+
+
+## Consistency recommendations and normalization foundation (2026-10-19)
+
+The author invited suggestions to make the string model more consistent after
+asking for the assistant's recommendation on canonical equality. The assistant
+recommends the following coordinated contract; these recommendations are not yet
+public API behavior:
+
+- String and Char equality and hashes should recognize canonical equivalence.
+  Boxed equality, compiler constants/patterns and collection policies must agree.
+  Keep original UTF-8 bytes, with explicitly ordinal operations for protocols.
+- Default text search and replacement should eventually follow the same canonical
+  policy, while respecting grapheme boundaries. Do not silently give search a
+  different equality relation. Exact byte search belongs to byte views or named
+  ordinal APIs; case folding remains a separate policy.
+- Search should return a position/range accepted directly by slicing. Prefer
+  checked text positions over unlabelled byte offsets; specify owner validation
+  and end positions before introducing this API. Existing grapheme integer indices
+  remain a separate convenience with scanning costs.
+- Construction joins text fragments, not independently fixed characters. A
+  combining accent appended to `e` can change the last grapheme; builders must
+  preserve this behavior and invalidate any cached boundaries accordingly.
+- Explicit copies and borrowed/owned views should retain the Slice/Memory
+  philosophy. A future substring view must state owner retention and lifetime
+  costs; it is not implemented by this foundation.
+
+Unlike .NET's ordinal String equality, the proposed default follows Swift's
+canonical text identity. This improves consistency with neoCLR's grapheme Char,
+while changing dictionary key identity and adding Unicode processing costs.
+NFD scalar ordering is deterministic, but is not linguistic collation.
+[Swift equality semantics](https://docs.swift.org/swift-book/LanguageGuide/StringsAndCharacters.html)
+and [Unicode normalization](https://www.unicode.org/reports/tr15/)
+provide the semantic basis. Compatibility normalization and visual similarity
+are deliberately excluded.
+
+The first implemented slice is a private, unwired Rust normalization kernel
+(`src/string_normalization.rs`). It streams canonical decomposition and ordering,
+including algorithmic Hangul, without a normalized String or heap scratch.
+Short nonstarter runs use 32 fixed slots; longer runs rescan once per occupied
+combining class (at most 255 passes). Scratch space is independent of input size;
+long runs trade CPU for bounded memory. Eager normalized storage was rejected
+because it changes observable bytes, and allocating normalization iterators do
+not fit the current allocator-free native text helper. No runtime privileges
+are needed by this pure UTF-8 kernel; service integration remains separate work.
+
+Generation uses SHA-256-pinned Unicode 17 UnicodeData and NormalizationTest inputs:
+`python3 scripts/generate-string-normalization.py target/unicode-17`. Normal
+builds use checked-in outputs and do not fetch Unicode data. The existing Unicode
+license covers both tables and the compact conformance fixture. Regeneration is
+byte-identical after rustfmt.
+
+Validation: `cargo test --release --test string_normalization` passes four tests,
+including all 20,034 official conformance rows, short/long run boundaries,
+canonical versus compatibility/case distinctions, and zero measured allocations
+for comparison and hashing of long combining runs. An isolated `#![no_std]`
+wrapper compiles both functions without an allocator. This establishes algorithm
+and memory behavior, not runtime/HTTP throughput or public API integration.
+Canonical public services, explicit ordinal preservation, boxed equality,
+compiler behavior and three-engine consumers remain release prerequisites.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Add an unwired Unicode 17 canonical comparison/hash foundation with pinned generated data, bounded scratch and no heap allocation. Four focused tests cover all 20,034 normalization cases and long combining runs; an isolated no_std build passes. Record consistent text-policy suggestions and remaining public/runtime/compiler integration. Existing String/Char behavior is unchanged.
+
 - Remove StringBuilder’s intermediate AppendLine string and retain backing capacity across ToString/Clear while releasing old text references. Preserve byte quotas, immutable snapshots and Unicode fragment behavior. Fifteen contract executions pass across interpreter/JIT/AOT; a matched native reuse workload drops from 651 to 137 managed allocations (78.96%). Capacity retention is the explicit memory tradeoff; no throughput improvement is claimed. Refresh API documentation snapshots.
 
 - Fix strict-Clippy preflight findings in borrowed-view dispatch and test setup, plus equivalent Boolean/formatting cleanup under the local stable toolchain. All-target release Clippy passes; the earlier candidate’s failed hosted preflight remains historical evidence, not release qualification.
