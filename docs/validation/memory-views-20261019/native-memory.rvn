@@ -24,6 +24,17 @@ func CreateEmpty() -> ReadOnlyMemory<byte> {
 }
 
 func Keep(data: Memory<byte>) -> Memory<byte> => data
+func KeepReadOnly(data: ReadOnlyMemory<byte>) -> ReadOnlyMemory<byte> => data
+
+func CreateConverted() -> ReadOnlyMemory<byte> {
+    let memory: Memory<byte> = [(byte)5, (byte)6, (byte)7, (byte)8]
+    return memory.Slice(1, 2)
+}
+
+func CreateConvertedEmpty() -> ReadOnlyMemory<byte> {
+    let memory: Memory<byte> = [(byte)9]
+    return memory.Slice(1)
+}
 
 func Main() -> int {
     let empty = default(Memory<byte>)
@@ -33,6 +44,10 @@ func Main() -> int {
     }
     let owner = CreateOwner()
     let retainedEmpty = CreateEmpty()
+    let converted = CreateConverted()
+    let convertedEmpty = CreateConvertedEmpty()
+    let convertedDefault: ReadOnlyMemory<byte> = empty
+    let convertedOwner = ByteBufferOwner(empty, CreateConverted())
     GC.Collect()
     if Keep(owner.Data).Slice(0, 2).Length != 2 || owner.ReadOnlyData.Slice(1, 0).Length != 0 {
         return 2
@@ -45,6 +60,15 @@ func Main() -> int {
     }
     if empty.Slice(0).Length != 0 || readonlyEmpty.Slice(0).Length != 0 {
         return 5
+    }
+    if converted.Length != 2 || converted.Slice(1).Length != 1 {
+        return 6
+    }
+    if convertedEmpty.Slice(0).Length != 0 || convertedDefault.Slice(0).Length != 0 {
+        return 7
+    }
+    if KeepReadOnly(owner.Data).Slice(1).Length != 1 || convertedOwner.ReadOnlyData.Slice(1).Length != 1 {
+        return 8
     }
     return 0
 }

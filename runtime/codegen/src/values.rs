@@ -1727,8 +1727,30 @@ pub(crate) fn compile_into(
                 d.byte_memory_create.contains(&i)
                     || d.byte_memory_length.contains(&i)
                     || d.byte_memory_slice.contains(&i)
+                    || d.byte_memory_readonly.contains(&i)
             }) {
-                if !details.unwrap().byte_memory_length.contains(&i) {
+                if details.unwrap().byte_memory_readonly.contains(&i) {
+                    let ([Ty::ByteMemory(source)], Some(Ty::ByteMemory(target))) =
+                        (p.args[i].as_slice(), p.results[i].as_ref())
+                    else {
+                        return Err(
+                            "byte-memory readonly conversion requires exact persistent views"
+                                .into(),
+                        );
+                    };
+                    if input.types[*source].memory_view
+                        != Some(neoclr::metadata::MemoryViewKind::Memory)
+                        || input.types[*target].memory_view
+                            != Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory)
+                    {
+                        return Err(
+                            "byte-memory readonly conversion cannot grant writable access".into(),
+                        );
+                    }
+                    // Exact binding restricts the nominal capability; owner and
+                    // bounds retain the same representation and GC root lane.
+                    write(&mut b, output, &parameters[..3]);
+                } else if !details.unwrap().byte_memory_length.contains(&i) {
                     let Ty::ByteMemory(owner) =
                         p.results[i].as_ref().ok_or("missing memory result")?
                     else {

@@ -35,10 +35,13 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
         let expected_kind = match name {
             "neoCLR.Runtime.ViewCreateMemory" => Some(MemoryViewKind::Memory),
             "neoCLR.Runtime.ViewCreateReadOnlyMemory" => Some(MemoryViewKind::ReadOnlyMemory),
-            "neoCLR.Runtime.ViewLength" | "neoCLR.Runtime.ViewSlice" => None,
+            "neoCLR.Runtime.ViewLength"
+            | "neoCLR.Runtime.ViewSlice"
+            | "neoCLR.Runtime.ViewAsReadOnly" => None,
             _ => continue,
         };
         let slicing = name == "neoCLR.Runtime.ViewSlice";
+        let readonly = name == "neoCLR.Runtime.ViewAsReadOnly";
         let index = row["compiledIndex"]
             .as_u64()
             .ok_or("missing compiled index")? as usize;
@@ -78,7 +81,15 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
             || if expected_kind.is_some() {
                 f.parameters != [Type::ArrayRef(Box::new(Type::Byte))]
             } else {
-                if slicing {
+                if readonly {
+                    f.parameters.len() != 1
+                        || !input.type_definition(&f.parameters[0]).is_some_and(|t| {
+                            byte_memory(t) && t.memory_view == Some(MemoryViewKind::Memory)
+                        })
+                        || !input.type_definition(&f.returns).is_some_and(|t| {
+                            byte_memory(t) && t.memory_view == Some(MemoryViewKind::ReadOnlyMemory)
+                        })
+                } else if slicing {
                     !matches!(f.parameters.len(), 2 | 3)
                         || f.parameters[1..].iter().any(|t| *t != Type::Int32)
                         || f.parameters.first() != Some(&f.returns)
@@ -87,10 +98,12 @@ pub(crate) fn bind(input: &mut neoclr::Module, report: &Value) -> Result<Vec<Val
                 }
             }
         {
-            return Err("native memory binding requires exact closed persistent Byte create/length/slice InternalCall contracts".into());
+            return Err("native memory binding requires exact closed persistent Byte create/length/slice/readonly InternalCall contracts".into());
         }
         let implementation = if expected_kind.is_some() {
             "byte-memory-create-v1"
+        } else if readonly {
+            "byte-memory-readonly-v1"
         } else if slicing {
             "byte-memory-slice-v1"
         } else {
@@ -241,6 +254,55 @@ mod tests {
                 assert!(bind(&mut bad, &report).is_err());
             }
         }
+    }
+
+    #[test]
+    fn byte_memory_readonly_binding_only_restricts_exact_persistent_byte_views() {
+        let mut input = test_module(MemoryViewKind::Memory, Type::Byte);
+        let mut readonly = test_module(MemoryViewKind::ReadOnlyMemory, Type::Byte)
+            .types
+            .remove(0);
+        readonly.name = "$closed_readonly_memory".into();
+        input.types.push(readonly);
+        let source = Type::Named(input.types[0].name.clone());
+        let target = Type::Named(input.types[1].name.clone());
+        let name = "neoCLR.Runtime.ViewAsReadOnly";
+        input.functions.push(serde_json::from_value(json!({
+            "name":name, "parameters":[source.clone()], "returns":target.clone(), "impl_flags":4096
+        })).unwrap());
+        let report = json!({"functions":[{"name":name, "compiledIndex":0}]});
+        let original = input.clone();
+        assert_eq!(
+            bind(&mut input, &report).unwrap()[0]["implementation"],
+            "byte-memory-readonly-v1"
+        );
+        for variant in 0..9 {
+            let mut bad = original.clone();
+            match variant {
+                0 => {
+                    bad.functions[0].parameters[0] = target.clone();
+                    bad.functions[0].returns = source.clone();
+                }
+                1 => bad.functions[0].returns = source.clone(),
+                2 => bad.functions[0].parameters[0] = Type::ByRef(Box::new(source.clone())),
+                3 => bad.functions[0].parameters.push(Type::Int32),
+                4 => bad.types[0].memory_view = Some(MemoryViewKind::Slice),
+                5 => bad.types[1].memory_view = Some(MemoryViewKind::ReadOnlySlice),
+                6 => {
+                    let mut wrong = test_module(MemoryViewKind::ReadOnlyMemory, Type::Int32)
+                        .types
+                        .remove(0);
+                    wrong.name = bad.types[1].name.clone();
+                    bad.types[1] = wrong;
+                }
+                7 => bad.functions[0].impl_flags = 0,
+                _ => bad.functions[0].parameters.clear(),
+            }
+            assert!(bind(&mut bad, &report).is_err(), "variant {variant}");
+        }
+        let mut untrusted: neoclr::Module =
+            serde_json::from_value(serde_json::to_value(original).unwrap()).unwrap();
+        assert!(bind(&mut untrusted, &report).is_err());
     }
 
     #[test]

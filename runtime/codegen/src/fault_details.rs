@@ -110,6 +110,7 @@ pub struct Options {
     pub byte_memory_create: Vec<usize>,
     pub byte_memory_length: Vec<usize>,
     pub byte_memory_slice: Vec<usize>,
+    pub byte_memory_readonly: Vec<usize>,
     pub string_slice_graphemes: Vec<usize>,
     pub string_slice_utf8: Vec<usize>,
     pub char_from_string: Vec<usize>,
@@ -825,6 +826,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "byte-memory-slice-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            byte_memory_readonly: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "byte-memory-readonly-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             byte_memory_length: report

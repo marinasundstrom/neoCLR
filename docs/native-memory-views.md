@@ -11,9 +11,9 @@ services. The four shapes are exercised by [neoIL test fixtures](../tests/fixtur
 not hand-authored class-library implementations. Production APIs belong in Raven
 `.rvn` source; source/compiler integration supplies ref-like types, implicit conversions and
 array range views. Native JIT/AOT now admits a bounded persistent-byte path:
-Memory<byte>/ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty
-and both Slice(start) and Slice(start, length), with typed argument/return/field
-storage. Borrowed views,
+Memory<byte>/ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty,
+both Slice(start) and Slice(start, length), and implicit Memory<byte>-to-ReadOnlyMemory<byte>
+conversion, with typed argument/return/field storage. Borrowed views,
 other element types and the remaining operations still reject rather than being
 treated as empty records. See the bounded native storage section below.
 
@@ -271,7 +271,7 @@ private aggregate ABI. The extra slot padding is an implementation cost, not
 an externally stable layout or a performance improvement claim.
 
 With explicit System compilation and reference-arena support, exact InternalCalls
-bind array creation, Length and both Slice overloads. Creation accepts mutable
+bind array creation, Length, both Slice overloads and writable-to-readonly conversion. Creation accepts mutable
 ArrayRef<Byte>, never an immutable byte value snapshot. Default values have a
 null owner and zero bounds. Length reads the validated length lane; Slice packs
 the three lanes into the checked C descriptor with the statically known kind,
@@ -285,7 +285,7 @@ owner through published GC frames. This is temporary native IR/codegen, not a
 new CLI encoding or a Raven compiler change.
 
 Borrowed Slice/ReadOnlySlice, other element types, view arrays/unions, boxing, arbitrary
-record construction, persistent-to-borrowed conversion, readonly conversion,
+record construction, persistent-to-borrowed conversion and
 ToArray services remain unsupported in native execution.
 The full interpreter API is unchanged. Range APIs may compose the admitted
 primitive, but only explicit one- and two-argument windows are qualified here. Async
@@ -323,3 +323,18 @@ The one-argument native follow-up is retained in
 It extends the success consumer with default-empty, start=end and nested short
 windows after GC, and isolates past-end and both signed Int32 extremes for each
 persistent byte type. The .NET-compatible start-to-end contract is unchanged.
+
+The readonly native follow-up binds only Memory<byte> to ReadOnlyMemory<byte>.
+It copies the three validated representation lanes directly, preserving owner,
+offset and length without allocating or calling a C helper. Readonly capability
+remains nominal; reverse conversion, borrowed inputs/results, byref parameters,
+other elements and unproven serialized shapes reject. This implements the same
+capability restriction as .NET's implicit Memory<T>-to-ReadOnlyMemory<T> operator;
+there is no new API or conversion from borrowed to persistent storage.
+
+[Readonly conversion evidence](validation/memory-views-20261019/readonly-validation.json)
+covers default, nonempty and owner-retaining empty conversions, implicit argument
+and return conversion, fields and slicing after explicit GC on interpreter/JIT/AOT.
+Use `native-run.py --consumer-only` with the other documented arguments to repeat
+this focused consumer; prior bounds evidence is reused. Borrowed native support
+and shared buffer-service migrations remain pending.

@@ -86,3 +86,17 @@ extend the existing Slice contract; no public signature or snapshot changes.
 See [short-slice-validation.json](short-slice-validation.json) for the extended
 harness commands, binary/source hashes, fault outputs and log hashes. The prior
 native-validation.json remains the evidence for the initial two-argument step.
+
+## Native readonly conversion follow-up
+
+The success consumer now also exercises implicit Memory<byte>-to-ReadOnlyMemory<byte>
+conversion at typed locals, arguments and returns. Separately created nonempty
+and empty converted windows retain their sole array owners after creator return
+and explicit GC, including a converted view stored in an object field. Default
+conversion remains empty. Post-GC checked slicing validates live owner storage.
+Run `native-run.py --consumer-only --compiler <rvnc.dll> --output <directory>`;
+the earlier bounds matrix is unchanged and its evidence is reused. See
+[readonly-validation.json](readonly-validation.json) for commands and hashes.
+The exact binding tests reject reversed access, wrong element or lifetime kind,
+byref/extra/missing arguments and serialization without trusted shape proof.
+Public signatures and their generated API snapshot are unchanged.
