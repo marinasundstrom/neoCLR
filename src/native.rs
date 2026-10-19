@@ -120,6 +120,10 @@ pub(crate) enum Binding {
     StringByteCount,
     StringCompareOrdinal,
     StringCompareOrdinalIgnoreCase,
+    StringCompareCanonical,
+    StringHashCanonical,
+    CharCompareCanonical,
+    CharHashCanonical,
     StringHashOrdinal,
     StringHashOrdinalIgnoreCase,
     StringContainsOrdinal,
@@ -763,6 +767,18 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringCompareOrdinal", [Type::String, Type::String]) => {
             (Binding::StringCompareOrdinal, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringCompareCanonical", [Type::String, Type::String]) => {
+            (Binding::StringCompareCanonical, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringHashCanonical", [Type::String]) => {
+            (Binding::StringHashCanonical, Type::Int32)
+        }
+        ("neoCLR.Runtime.CharCompareCanonical", [Type::Char, Type::Char]) => {
+            (Binding::CharCompareCanonical, Type::Int32)
+        }
+        ("neoCLR.Runtime.CharHashCanonical", [Type::Char]) => {
+            (Binding::CharHashCanonical, Type::Int32)
         }
         ("neoCLR.Runtime.StringCompareOrdinalIgnoreCase", [Type::String, Type::String]) => {
             (Binding::StringCompareOrdinalIgnoreCase, Type::Int32)
@@ -1870,6 +1886,18 @@ impl Binding {
                     std::cmp::Ordering::Equal => 0,
                     std::cmp::Ordering::Greater => 1,
                 }))
+            }
+            (Self::StringCompareCanonical, [Value::String(left), Value::String(right)]) => Ok(
+                Value::Int32(crate::string_normalization::compare(left, right) as i32),
+            ),
+            (Self::CharCompareCanonical, [Value::Char(left), Value::Char(right)]) => Ok(
+                Value::Int32(crate::string_normalization::compare(left, right) as i32),
+            ),
+            (Self::StringHashCanonical, [Value::String(value)]) => {
+                Ok(Value::Int32(crate::string_normalization::hash(value)))
+            }
+            (Self::CharHashCanonical, [Value::Char(value)]) => {
+                Ok(Value::Int32(crate::string_normalization::hash(value)))
             }
             (Self::StringCompareOrdinalIgnoreCase, [Value::String(left), Value::String(right)]) => {
                 Ok(Value::Int32(

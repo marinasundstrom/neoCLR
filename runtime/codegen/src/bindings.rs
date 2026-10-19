@@ -769,6 +769,30 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
                 "string-lower-v1",
                 "neoclr_string_lower_v1",
             ),
+            "neoCLR.Runtime.StringCompareCanonical" => (
+                vec![Type::String, Type::String],
+                Type::Int32,
+                "string-compare-canonical-v1",
+                "neoclr_string_compare_canonical_v1",
+            ),
+            "neoCLR.Runtime.StringHashCanonical" => (
+                vec![Type::String],
+                Type::Int32,
+                "string-hash-canonical-v1",
+                "neoclr_string_hash_canonical_v1",
+            ),
+            "neoCLR.Runtime.CharCompareCanonical" => (
+                vec![Type::Char, Type::Char],
+                Type::Int32,
+                "string-compare-canonical-v1",
+                "neoclr_string_compare_canonical_v1",
+            ),
+            "neoCLR.Runtime.CharHashCanonical" => (
+                vec![Type::Char],
+                Type::Int32,
+                "string-hash-canonical-v1",
+                "neoclr_string_hash_canonical_v1",
+            ),
             "neoCLR.Runtime.StringCompareOrdinalIgnoreCase" => (
                 vec![Type::String, Type::String],
                 Type::Int32,

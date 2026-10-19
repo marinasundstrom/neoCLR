@@ -94,3 +94,18 @@ internal func StringEquals(left: string, right: string) -> bool {
     }
     return StringCompareOrdinal(left, right) == 0
 }
+
+
+// Canonical services preserve stored UTF-8 bytes. Char operations consume the
+// grapheme directly, avoiding intermediate CharText string allocations.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringCompareCanonical(left: string, right: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringHashCanonical(text: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharCompareCanonical(left: char, right: char) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func CharHashCanonical(value: char) -> int;

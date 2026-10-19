@@ -50,6 +50,10 @@ mod string_casing_kernel;
 mod string_case_folding;
 #[path = "../../../src/string_comparison.rs"]
 mod string_comparison;
+#[path = "../../../src/string_normalization.rs"]
+mod string_normalization;
+#[path = "../../../src/string_normalization_data.rs"]
+mod string_normalization_data;
 
 unsafe fn input<'a>(bytes: *const u8, length: usize) -> Option<&'a str> {
     if bytes.is_null() || length > isize::MAX as usize { return None; }
@@ -311,5 +315,59 @@ mod time_zone_tests {
             let version = neoclr_tz_version_v1(&mut len);
             assert_eq!(core::slice::from_raw_parts(version, len), b"2025b");
         }
+    }
+}
+
+
+/// Canonical Unicode comparison, preserving both UTF-8 inputs.
+/// # Safety
+/// Inputs must be readable for their lengths. Output must be aligned, writable,
+/// and disjoint from both inputs. No pointer is retained.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_unicode_compare_canonical_v1(left: *const u8, left_len: usize,
+    right: *const u8, right_len: usize, output: *mut i32) -> i32 {
+    let (Some(left), Some(right)) = (unsafe { input(left, left_len) }, unsafe { input(right, right_len) }) else { return 3 };
+    if output.is_null() { return 3; }
+    unsafe { *output = string_normalization::compare(left, right) as i32; }
+    0
+}
+
+/// Canonical Unicode content hash, preserving the original UTF-8 input.
+/// # Safety
+/// Input must be readable for length bytes. Output must be aligned, writable,
+/// and disjoint from input. No pointer is retained.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_unicode_hash_canonical_v1(bytes: *const u8, length: usize,
+    output: *mut i32) -> i32 {
+    let Some(text) = (unsafe { input(bytes, length) }) else { return 3 };
+    if output.is_null() { return 3; }
+    unsafe { *output = string_normalization::hash(text); }
+    0
+}
+
+
+#[cfg(test)]
+mod canonical_tests {
+    use super::*;
+    #[test]
+    fn canonical_abi_preserves_storage_and_rejects_invalid_utf8() {
+        let left = "é".as_bytes().to_vec();
+        let right = "e\u{301}".as_bytes().to_vec();
+        let mut comparison = 42;
+        let mut a = 0;
+        let mut b = 1;
+        unsafe {
+            assert_eq!(neoclr_unicode_compare_canonical_v1(left.as_ptr(), left.len(), right.as_ptr(), right.len(), &mut comparison), 0);
+            assert_eq!(neoclr_unicode_hash_canonical_v1(left.as_ptr(), left.len(), &mut a), 0);
+            assert_eq!(neoclr_unicode_hash_canonical_v1(right.as_ptr(), right.len(), &mut b), 0);
+            assert_eq!(neoclr_unicode_hash_canonical_v1([255].as_ptr(), 1, &mut comparison), 3);
+            assert_eq!(neoclr_unicode_compare_canonical_v1(left.as_ptr(), left.len(), [255].as_ptr(), 1, &mut comparison), 3);
+            assert_eq!(neoclr_unicode_hash_canonical_v1(left.as_ptr(), left.len(), core::ptr::null_mut()), 3);
+        }
+        assert_eq!(comparison, 0);
+        assert_eq!(a, b);
+        assert_eq!(left, "é".as_bytes());
+        assert_eq!(right, "e\u{301}".as_bytes());
+        assert_ne!(left, right);
     }
 }

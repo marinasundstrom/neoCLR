@@ -12754,3 +12754,124 @@ ret
     let wrong = scalar.replace("unbox.any Int32", "castclass String\npop\nldc.i4 42");
     verify_structural_union_gc(&[(&wrong, 11)], 640);
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn canonical_text_services_match_interpreter_without_normalizing_storage() {
+    let mut seed_source = String::from(".module System\n.references ()\n");
+    for kind in ["String", "Char"] {
+        for (op, args) in [("Compare", format!("{kind},{kind}")), ("Hash", kind.into())] {
+            seed_source += &format!(
+                ".function neoCLR.Runtime.{kind}{op}Canonical({args}) -> Int32\n.methodimpl InternalCall\n.end\n"
+            );
+        }
+    }
+    seed_source += ".function neoCLR.Runtime.CharFromString(String) -> Char\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.StringCompareOrdinal(String,String) -> Int32\n.methodimpl InternalCall\n.end\n";
+    let seed = neoclr::assemble(&seed_source).unwrap();
+    let mut source =
+        String::from(".module Canonical\n.function Calculate(Int32 unused) -> Int32\n");
+    for (left, right) in [("é", "e\u{301}"), ("각", "각")] {
+        for kind in ["String", "Char"] {
+            let literal = |text: &str| {
+                format!(
+                    "ldstr {}\n{}",
+                    serde_json::to_string(text).unwrap(),
+                    if kind == "Char" {
+                        "call neoCLR.Runtime.CharFromString(String)\n"
+                    } else {
+                        ""
+                    }
+                )
+            };
+            source += &format!(
+                "{}{}call neoCLR.Runtime.{kind}CompareCanonical({kind},{kind})\nbrtrue Failed\n",
+                literal(left),
+                literal(right)
+            );
+            source += &format!(
+                "{}call neoCLR.Runtime.{kind}HashCanonical({kind})\n{}call neoCLR.Runtime.{kind}HashCanonical({kind})\nsub\nbrtrue Failed\n",
+                literal(left),
+                literal(right)
+            );
+        }
+        source += &format!(
+            "ldstr {}\nldstr {}\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrfalse Failed\n",
+            serde_json::to_string(left).unwrap(),
+            serde_json::to_string(right).unwrap()
+        );
+    }
+    source += "ldc.i4 0\nret\nFailed:\nldc.i4 42\nret\n.end";
+    let app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed)
+            .unwrap()
+            .remove(0);
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    assert_eq!(
+        method
+            .invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default())
+            .unwrap()
+            .value,
+        neoclr::Value::Int32(0)
+    );
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let build = Command::new("cargo")
+        .args(["build", "--locked", "--release", "--manifest-path"])
+        .arg(root.join("tools/aot-native-text/Cargo.toml"))
+        .output()
+        .unwrap();
+    assert!(
+        build.status.success(),
+        "{}",
+        String::from_utf8_lossy(&build.stderr)
+    );
+    for gc in [false, true] {
+        let dir = Temp::new();
+        let mut flags = vec![
+            "--compile-system",
+            "--reference-arena",
+            "--bind-utf8-text",
+            "--bind-character-text",
+        ];
+        if gc {
+            flags.push("--native-gc");
+        }
+        let compiled = compile_linked_module(&dir, &seed, &app, &flags);
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        let base = root.join("docs/experiments/aot-console");
+        let mut link = Command::new("clang");
+        if gc {
+            link.arg("-DNEOCLR_NATIVE_GC")
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"));
+        }
+        let linked = link
+            .args([
+                "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+            ])
+            .arg(&base)
+            .arg(base.join("text-host.c"))
+            .arg(base.join("text-arena.c"))
+            .arg(base.join("string-unicode.c"))
+            .arg(root.join("docs/experiments/aot-fault-details/render.c"))
+            .arg(dir.0.join("app.o"))
+            .arg(root.join("tools/aot-native-text/target/release/libneoclr_aot_native_text.a"))
+            .arg("-o")
+            .arg(dir.0.join("app"))
+            .output()
+            .unwrap();
+        assert!(
+            linked.status.success(),
+            "{}",
+            String::from_utf8_lossy(&linked.stderr)
+        );
+        let result = Command::new(dir.0.join("app")).output().unwrap();
+        assert_eq!(result.status.code(), Some(0), "{result:?}");
+    }
+}

@@ -72,6 +72,8 @@ mod string_casing;
 mod string_casing_data;
 mod string_casing_kernel;
 mod string_comparison;
+mod string_normalization;
+mod string_normalization_data;
 mod tls;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;

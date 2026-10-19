@@ -40,7 +40,11 @@ The assistant implements an unwired, allocation-free Unicode 17 normalization
 kernel. Conformance testing catches and repairs a decomposition cursor bug before
 public integration. All 20,034 conformance rows and long-run allocation checks
 pass. Public equality, boxed dispatch and compiler integration remain open;
-release qualification remains pending. See the
+release qualification remains pending. The author then explicitly confirms that
+strings must preserve their UTF-8 encoded byte array. The assistant connects
+private canonical String/Char services without replacing storage, and identifies
+HashCode.Add(string), boxed dispatch and ordinal-policy callers as coordinated
+public-integration requirements. See the
 [String review](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19).
 
 

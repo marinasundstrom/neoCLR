@@ -3,8 +3,9 @@
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are
 implemented; the [String normalization foundation](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19)
-passes Unicode conformance without allocations but is not yet wired into public
-text semantics. Coordinated equality/hash/compiler integration remains open.
+passes Unicode conformance without allocations and now has private interpreter/native
+services; public text semantics are not yet switched. Coordinated
+equality/hash/compiler integration remains open.
 
 **Author-directed follow-up (2026-10-19):** after the HTTP content integration,
 update website coverage of Slice/Memory design and the experimental concurrent GC,

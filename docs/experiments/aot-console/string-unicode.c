@@ -186,3 +186,15 @@ int32_t neoclr_string_upper_rooted_v1(const neoclr_aot_text *t, neoclr_aot_text_
 int32_t neoclr_string_lower_rooted_v1(const neoclr_aot_text *t, neoclr_aot_text_arena *a, const neoclr_aot_text **o) { return casing(t,a,o,0,1); }
 int32_t neoclr_string_graphemes_rooted_v1(const neoclr_aot_text *t, neoclr_aot_text_arena *a, const void **o) { return vector(t,a,o,0,1); }
 int32_t neoclr_string_scalars_rooted_v1(const neoclr_aot_text *t, neoclr_aot_text_arena *a, const void **o) { return vector(t,a,o,1,1); }
+
+
+extern int32_t neoclr_unicode_compare_canonical_v1(const unsigned char *, size_t, const unsigned char *, size_t, int32_t *);
+extern int32_t neoclr_unicode_hash_canonical_v1(const unsigned char *, size_t, int32_t *);
+int32_t neoclr_string_compare_canonical_v1(const neoclr_aot_text *left, const neoclr_aot_text *right, int32_t *output) {
+    if (!left || !right || !output) return 3;
+    return neoclr_unicode_compare_canonical_v1(left->bytes, left->length, right->bytes, right->length, output);
+}
+int32_t neoclr_string_hash_canonical_v1(const neoclr_aot_text *text, int32_t *output) {
+    if (!text || !output) return 3;
+    return neoclr_unicode_hash_canonical_v1(text->bytes, text->length, output);
+}

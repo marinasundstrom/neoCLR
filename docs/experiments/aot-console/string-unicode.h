@@ -7,6 +7,8 @@
  * Unicode data and segmentation are shared with the interpreter. */
 int32_t neoclr_string_upper_v1(const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_string_lower_v1(const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_string_compare_canonical_v1(const neoclr_aot_text *, const neoclr_aot_text *, int32_t *);
+int32_t neoclr_string_hash_canonical_v1(const neoclr_aot_text *, int32_t *);
 int32_t neoclr_string_compare_ignore_case_v1(const neoclr_aot_text *, const neoclr_aot_text *, int32_t *);
 int32_t neoclr_string_grapheme_count_v1(const neoclr_aot_text *, int32_t *);
 int32_t neoclr_string_slice_graphemes_v1(const neoclr_aot_text *, int32_t, int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);

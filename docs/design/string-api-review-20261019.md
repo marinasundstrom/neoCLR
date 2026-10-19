@@ -135,3 +135,64 @@ wrapper compiles both functions without an allocator. This establishes algorithm
 and memory behavior, not runtime/HTTP throughput or public API integration.
 Canonical public services, explicit ordinal preservation, boxed equality,
 compiler behavior and three-engine consumers remain release prerequisites.
+
+
+### Runtime service integration (2026-10-19)
+
+The kernel is now connected to private `StringCompareCanonical`,
+`StringHashCanonical`, `CharCompareCanonical` and `CharHashCanonical` services.
+The interpreter and native backend use the same Unicode implementation. Char
+services consume grapheme storage directly rather than allocating CharText
+strings. Neither service changes or normalizes the original UTF-8 storage.
+Native adapters validate UTF-8 and leave result slots untouched on failure;
+comparison and hashing require no allocator and retain no pointers.
+
+Raven declarations remain internal. Exact InternalCall signatures are admitted
+under the existing StringOperations service and native `--bind-utf8-text`
+capability. The native representation remains a borrowed immutable text descriptor
+and an Int32 output, with checked status codes. String and Char share the native
+kernel because their storage is UTF-8; their guest type identities remain distinct.
+This private matched ABI is not the proposed future public hosting API. The native
+metadata path uses the existing call contract, with no Raven compiler changes,
+new Runtime Contract settings or changes to ordinary .NET behavior.
+
+Public equality is deliberately still unchanged in this integration slice.
+Before switching it, update the following together:
+
+- String and Char direct equality/operators and content hashes, boxed overrides,
+  compiler constant/pattern behavior and dictionary policies.
+- StringComparer.Ordinal currently calls String.Equals; make it explicitly
+  ordinal so that its equality continues matching its ordinal hash.
+- HashCode.Add(string) currently allocates Utf8Encode output and hashes raw bytes;
+  use the canonical hash service so containing value objects have matching hashes
+  without that temporary array.
+- Protocol/value types that depend on exact spelling must select ordinal equality
+  and matching hashing explicitly. Audit these before changing defaults.
+
+The website/API reference still describes existing public semantics. Private
+services do not introduce a new public API to document or a shipped canonical
+String contract. Release qualification remains pending public integration.
+
+
+Service validation: six interpreter/kernel tests pass, including the complete
+Unicode corpus and wrong-return-signature rejection. The native ABI test checks
+unchanged original bytes, matching hashes and malformed-input/output validation.
+The macOS ARM64 codegen consumer invokes all four services and preserves ordinal
+inequality in both arena and native-GC AOT configurations. Commands:
+
+```sh
+cargo test --release --test canonical_text_services --test string_normalization
+cargo test --release --manifest-path tools/aot-native-text/Cargo.toml canonical_tests
+cargo test --release -p neoclr-codegen --test console canonical_text_services_match_interpreter_without_normalizing_storage
+```
+
+Native compilation used Xcode's clang and MacOSX26.2.sdk. Public Raven consumers,
+JIT execution and release package qualification are not established by these
+private service tests. The API reference fingerprint check passes unchanged.
+
+Focused runtime Clippy (`--features native-metadata --test canonical_text_services
+-- -D warnings`) passes. The additional strict codegen lint run reports 71 backend
+diagnostics (including unused unit expressions, collapsible conditions and
+argument-count limits); it is not a passing release gate. These findings require
+a separate backend cleanup/qualification rather than being hidden with lint
+suppression in the text-service change. Formatting and API fingerprint checks pass.

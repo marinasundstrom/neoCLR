@@ -1313,6 +1313,11 @@ pub(crate) fn compile_into(
                 vec![types::I64, types::I64, types::I64],
             ),
             (
+                &d.string_compare_canonical,
+                "neoclr_string_compare_canonical_v1",
+                vec![types::I64, types::I64, types::I64],
+            ),
+            (
                 &d.string_hash_ordinal,
                 "neoclr_string_hash_ordinal_v1",
                 vec![types::I64, types::I64],
@@ -1320,6 +1325,11 @@ pub(crate) fn compile_into(
             (
                 &d.string_hash_ignore_case,
                 "neoclr_string_hash_ignore_case_v1",
+                vec![types::I64, types::I64],
+            ),
+            (
+                &d.string_hash_canonical,
+                "neoclr_string_hash_canonical_v1",
                 vec![types::I64, types::I64],
             ),
             (
@@ -3071,6 +3081,7 @@ pub(crate) fn compile_into(
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], arena, output]
                 } else if details.unwrap().time_zone_offset.contains(&i)
+                    || details.unwrap().string_compare_canonical.contains(&i)
                     || details.unwrap().string_compare_ignore_case.contains(&i)
                     || details.unwrap().string_compare_ordinal.contains(&i)
                     || details.unwrap().string_contains_ordinal.contains(&i)

@@ -3,7 +3,7 @@ mod string_normalization;
 #[path = "../src/string_normalization_data.rs"]
 mod string_normalization_data;
 use std::cmp::Ordering;
-use string_normalization::{compare, hash, Canonical};
+use string_normalization::{Canonical, compare, hash};
 
 fn text(column: &str) -> String {
     column

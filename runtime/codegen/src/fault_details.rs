@@ -103,8 +103,10 @@ pub struct Options {
     pub string_upper: Vec<usize>,
     pub string_lower: Vec<usize>,
     pub string_compare_ignore_case: Vec<usize>,
+    pub string_compare_canonical: Vec<usize>,
     pub string_hash_ordinal: Vec<usize>,
     pub string_hash_ignore_case: Vec<usize>,
+    pub string_hash_canonical: Vec<usize>,
     pub string_intern: Vec<usize>,
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
@@ -1101,6 +1103,13 @@ impl Options {
                 .filter(|r| r["implementation"] == "string-compare-ignore-case-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            string_compare_canonical: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-compare-canonical-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             string_hash_ordinal: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()
@@ -1113,6 +1122,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "string-hash-ignore-case-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_hash_canonical: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-hash-canonical-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             string_intern: report
