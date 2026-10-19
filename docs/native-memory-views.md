@@ -30,7 +30,7 @@ conversion and immutable String UTF-8 bytes.
 
 Slices reject heap storage, erasure, arrays, fields, ordinary generic arguments and
 Function signatures regardless of owner. Returns recursively check frame references.
-At suspension boundaries every resident borrowed value in the active stack, locals
+At asynchronous suspension boundaries every resident borrowed value in the active stack, locals
 and arguments rejects suspension. This conservative rule may reject a dead local;
 compiler liveness relaxation needs separate validation. Persistent views require
 heap ownership, trace owners through fields and survive collection and suspension.
@@ -39,6 +39,14 @@ Readonly references restrict access rather than define a separate overload ident
 Getter results are values, not element byrefs. Null arrays and `initobj` create empty
 views; empty windows over arrays retain their owner. Bounds use the ordinary
 IndexOutOfRange fault category. No native ABI or performance claim is made.
+
+Synchronous host I/O keeps managed frames resident and publishes their roots while
+the host thread is outside graph access. Borrowed views may remain in those frames,
+as they may across an ordinary .NET synchronous call; host detachment is not an
+await boundary. A regression covers using a slice after console output, alongside
+the existing rejection of slices across async yield. This corrects JSON mapping
+constructors/setters that perform synchronous console I/O while the parser borrows
+its input. It does not permit borrowed captures or asynchronous retention.
 
 ## Runtime concepts and future host access
 

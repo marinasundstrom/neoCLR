@@ -215,6 +215,37 @@ fn empty_null_and_default_views_are_usable() {
 }
 
 #[test]
+fn borrowed_views_remain_usable_across_synchronous_host_calls() {
+    let library = library();
+    let module = app(
+        ".function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end",
+        r#"
+.local System.Slice<Int32> view
+ldc.i4 1
+newarr Int32
+call System.MemoryViews.AsSlice<Int32>(arrayref<Int32>)
+stloc view
+ldloc view
+ldc.i4 0
+ldc.i4 42
+call instance System.Slice<Int32>::set_Item(Int32,Int32)
+pop
+ldstr "borrow retained"
+call neoCLR.Runtime.WriteLine(String)
+pop
+ldloc view
+ldc.i4 0
+call instance System.Slice<Int32>::get_Item(Int32)
+"#,
+        "Int32",
+    );
+    verify_with_library(&module, &library).unwrap();
+    let result = run_with_library(&module, &library, Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert_eq!(result.output, ["borrow retained"]);
+}
+
+#[test]
 fn borrowed_views_cannot_cross_yield_or_escape_through_boxing() {
     let library = library();
     let extra =

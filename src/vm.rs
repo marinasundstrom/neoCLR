@@ -6005,9 +6005,11 @@ fn interpret_instructions_with_dispatch(
             }
             Ok(None)
         })();
-        // This interpreter conservatively treats every resident borrowed value as
-        // live; compiler liveness-based relaxation requires a separate contract.
-        if suspension || host_call.is_some() {
+        // Async suspension cannot retain borrowed values. A synchronous host call
+        // keeps these frames resident and publishes their roots below; detaching
+        // the host thread from graph access does not end a managed borrow.
+        // Conservatively treat every resident borrowed value as live at awaits.
+        if suspension {
             for frame in frames.iter() {
                 for slot in frame.args.iter().chain(&frame.locals) {
                     if let Some(value) = slot.borrow().inspect() {
