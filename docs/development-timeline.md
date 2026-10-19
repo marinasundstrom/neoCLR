@@ -19967,3 +19967,11 @@ Native JSON backend/runtime gaps remain open separately.
   **Assistant proposal:** trimming first, then grapheme-consistent search positions
   and splitting with measured allocation costs. These manipulation APIs and the
   replacement release are not yet implemented or published.
+
+- **Assistant follow-through:** implements Trim/TrimStart/TrimEnd in Raven over
+  borrowed UTF-8, selecting Unicode White_Space scalar removal as in .NET/Rust;
+  documents that a combining mark remains when its leading space is removed.
+  [Three-engine checks and allocation evidence](experiments/string-trimming/README.md)
+  pass. Repairs private String helper access in native projection while retaining
+  source privacy. Unchanged trimming adds no managed allocations in the measured
+  workload; eager GC collections increase, so no throughput improvement is claimed.

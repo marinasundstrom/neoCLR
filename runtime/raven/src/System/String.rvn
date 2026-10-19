@@ -180,6 +180,84 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return neoCLR.Runtime.StringReplaceOrdinal(m_value, oldValue, newValue)
     }
 
+    /// Removes leading and trailing Unicode 17 White_Space scalars.
+    /// Preserves retained UTF-8 bytes; combining marks are not whitespace.
+    func Trim() -> string => TrimWhitespace(m_value, true, true)
+
+    /// Removes leading Unicode 17 White_Space scalars, preserving retained bytes.
+    func TrimStart() -> string => TrimWhitespace(m_value, true, false)
+
+    /// Removes trailing Unicode 17 White_Space scalars, preserving retained bytes.
+    func TrimEnd() -> string => TrimWhitespace(m_value, false, true)
+
+    private static func TrimWhitespace(text: string, start: bool, end: bool) -> string {
+        let bytes = text.Utf8Bytes
+        var first = 0
+        var limit = bytes.Length
+        if start {
+            while first < limit {
+                let width = WhitespaceWidth(bytes, first)
+                if width == 0 {
+                    break
+                }
+                first += width
+            }
+        }
+        if end {
+            while limit > first {
+                var scalar = limit - 1
+                while scalar > first && bytes[scalar] >= 128 && bytes[scalar] < 192 {
+                    scalar -= 1
+                }
+                if WhitespaceWidth(bytes, scalar) == 0 {
+                    break
+                }
+                limit = scalar
+            }
+        }
+        if first == 0 && limit == bytes.Length {
+            return text
+        }
+        if first == limit {
+            return ""
+        }
+        // Both offsets are scalar boundaries in runtime-validated immutable UTF-8.
+        // Use the existing checked runtime service, without a Result or array copy.
+        return neoCLR.Runtime.UnpackValue<string>(neoCLR.Runtime.StringSliceUtf8(text, first, limit - first))
+    }
+
+    // Unicode 17 PropList White_Space: 25 scalars, all encoded in 1–3 bytes.
+    // Input is a String view and index is a scalar boundary; never arbitrary bytes.
+    private static func WhitespaceWidth(bytes: ReadOnlySlice<byte>, index: int) -> int {
+        let first = bytes[index]
+        if first == 32 || first >= 9 && first <= 13 {
+            return 1
+        }
+        if first == 194 {
+            let second = bytes[index + 1]
+            if second == 133 || second == 160 {
+                return 2
+            }
+        }
+        if first == 225 && bytes[index + 1] == 154 && bytes[index + 2] == 128 {
+            return 3
+        }
+        if first == 226 {
+            let second = bytes[index + 1]
+            let third = bytes[index + 2]
+            if second == 128 && (third >= 128 && third <= 138 || third == 168 || third == 169 || third == 175) {
+                return 3
+            }
+            if second == 129 && third == 159 {
+                return 3
+            }
+        }
+        if first == 227 && bytes[index + 1] == 128 && bytes[index + 2] == 128 {
+            return 3
+        }
+        return 0
+    }
+
     func ContainsOrdinal(substring: string) -> bool {
         return neoCLR.Runtime.StringContainsOrdinal(m_value, substring)
     }

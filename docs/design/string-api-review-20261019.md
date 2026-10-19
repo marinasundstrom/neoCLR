@@ -284,3 +284,32 @@ that reproducer; this integration does not qualify generated record semantics.
 The author next requests useful supported string manipulation methods. Trimming is
 the proposed first slice, with explicit Unicode and grapheme-boundary semantics;
 search positions, splitting and writer-oriented formatting remain follow-ups.
+
+
+### Whitespace trimming (2026-10-19)
+
+Add the familiar parameterless Trim, TrimStart and TrimEnd family. The policy is
+Unicode 17 [White_Space](https://www.unicode.org/Public/17.0.0/ucd/PropList.txt),
+all 25 scalars, including newlines and nonbreaking spaces. This follows the
+[.NET whitespace contract](https://learn.microsoft.com/en-us/dotnet/api/system.string.trim)
+and [Rust scalar-based trimming](https://doc.rust-lang.org/std/primitive.str.html#method.trim).
+It is not protocol-specific ASCII whitespace validation. U+200B, U+FEFF and U+180E
+are not whitespace under this pinned Unicode version.
+
+Trimming classifies scalars, unlike grapheme indexing. In particular, a leading
+space followed by a combining mark loses the space and keeps the mark. Choosing
+to retain that entire grapheme would preserve a visual cluster but diverge from
+whitespace removal in .NET/Rust. The scalar contract is explicit and tested; it
+does not imply that arbitrary numeric byte offsets become text positions.
+Char remains a grapheme. Retained bytes are neither normalized nor case folded.
+
+Managed Raven code scans a borrowed ReadOnlySlice<byte> from either edge and uses
+the existing checked UTF-8 slice service for materialization. No new InternalCall
+or FFI provider is needed: the library owns classification, while existing runtime
+code owns string allocation and scalar-boundary validation. The no-change path
+returns the original owner, and all-whitespace input returns empty text. Changed
+nonempty text copies retained bytes; the existing Value result transport may have
+runtime overhead. No temporary byte/Char arrays or per-grapheme strings are built.
+This retains compact independent results instead of keeping a potentially large
+original owner alive. Custom trim sets, substring views and protocol whitespace
+APIs remain separate decisions. See [qualification](../experiments/string-trimming/README.md).

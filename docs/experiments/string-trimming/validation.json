@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "fixture": "trimming",
+      "engine": "interpreter",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string trimming\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "trimming",
+      "engine": "jit",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string trimming\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "trimming",
+      "engine": "aot",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string trimming\n",
+      "stderr": ""
+    }
+  ],
+  "date": "2026-10-19",
+  "platform": "macOS ARM64",
+  "backendCommit": "6e7bf1d9a",
+  "library": "01a5082c7 plus trimming working tree",
+  "compilerCode": "2d22055dc",
+  "metadataAdapter": "e4709c451",
+  "sha256": {
+    "docs/experiments/string-trimming/Main.rvn": "45836ede735ccb46d64d6c58949cc73acb1d048166f78323e0a9718cd4ee6966",
+    "docs/experiments/string-trimming/Allocation.rvn": "8f2ec9a09be12cd80852050b3bedb8ba32eaa4c8c08dd5aec77e58d6f8f93587",
+    "target/string-trim-bundle-v4/bundle/bin/neoclr-codegen": "f5ee2f186811478a70cc223742a40cade281fe3d949f37521e343c6b3c349a78",
+    "target/string-trim-libraries-v2/System.Runtime.dll": "f75a6c182c9a516294d8d4c677a48cf4885351412ba9735c020c38f7036e58e4"
+  }
+}

@@ -109,3 +109,13 @@ In development, `String.Utf8Bytes` also works in native JIT/AOT: it borrows immu
 UTF-8 storage without an encoding array and retains managed text through collection.
 Its indices count bytes; Char and ordinary string indexing remain grapheme-based.
 Use `ToArray()` only when an independent mutable byte array is needed.
+
+
+### Whitespace trimming (development)
+
+`Trim()`, `TrimStart()` and `TrimEnd()` remove Unicode 17 whitespace scalars from
+the requested edges. They scan borrowed UTF-8 bytes, reuse unchanged strings and
+copy retained text only when needed. Original spelling and interior spaces remain
+unchanged. Combining marks are retained: removing a leading space can leave its
+following mark at the start. Indexing still uses graphemes. Protocol parsers should
+keep their own whitespace rules instead of using general Unicode trimming.

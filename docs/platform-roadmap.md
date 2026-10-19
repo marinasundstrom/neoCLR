@@ -8,8 +8,10 @@ comparison and hashing now pass interpreter/JIT/AOT qualification, including
 boxed dispatch, explicit ordinal policies and preserved UTF-8 storage. See the
 [canonical text evidence](experiments/canonical-text/README.md).
 Native record-generated equality/hash remains an existing compiler gap, separately
-reproduced. Useful string manipulation methods are the next author-directed task,
-starting with a trimming design; replacement release qualification remains pending.
+reproduced. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
+with unchanged-owner reuse and measured changed-result allocations. Position-based
+search/splitting and the direct-call null String bridge discrepancy remain review
+items; replacement release qualification remains pending.
 
 **Author-directed follow-up (2026-10-19):** after the HTTP content integration,
 update website coverage of Slice/Memory design and the experimental concurrent GC,

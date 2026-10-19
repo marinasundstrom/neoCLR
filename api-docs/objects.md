@@ -434,3 +434,12 @@ validate both descriptors and destination capability. This is a private byte
 kernel, not a public Raven CopyTo member or a generic reference-element copier.
 The [native implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-memory-views.md#native-byte-window-kernel-2026-10-19)
 records layout costs, tests and the bounded generated-code binding for persistent byte views.
+
+
+Development String also exposes `Trim()`, `TrimStart()` and `TrimEnd()`. They remove
+Unicode 17 White_Space scalars at the requested edges, preserving all retained
+UTF-8 bytes. A combining mark is retained even when its preceding leading space is
+removed; trimming is scalar classification, while indexing remains grapheme-based.
+Unchanged results reuse the original owner. Changed nonempty results copy only the
+retained text through the checked runtime service, without temporary byte or Char
+arrays. These methods must not replace protocol-specific whitespace validation.

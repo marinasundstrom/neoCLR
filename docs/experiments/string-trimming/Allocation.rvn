@@ -1,0 +1,23 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    let plain = "é👨‍👩‍👧‍👦"
+    let padded = "  é👨‍👩‍👧‍👦  "
+    var result = plain
+    var count = 0
+    while count < 128 {
+        if mode == "unchanged" {
+            result = plain.Trim()
+        } else if mode == "changed" {
+            result = padded.Trim()
+        } else {
+            result = plain
+        }
+        if String.CompareOrdinal(result, plain) != 0 {
+            System.Fail("Allocation fixture output")
+        }
+        count += 1
+    }
+    Console.WriteLine("PASS trim allocation")
+}

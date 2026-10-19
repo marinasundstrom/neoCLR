@@ -2572,3 +2572,12 @@ The aggregate CoreProbe reference is regenerated from the updated bridge declara
 it documents the surface, not legacy mirror execution of native canonical semantics.
 Existing typed nullability, retained-owner costs and nonpersistent hash limitations
 remain. Website publication is still a separate operation.
+
+
+Development (2026-10-19) adds String.Trim/TrimStart/TrimEnd to both reference
+snapshots and the existing selected String type. The native snapshot uses
+`target/string-trim-api-audit-v2` from the matching five-library rebuild; the
+legacy reference remains documentation scaffolding, not the runtime implementation.
+Summaries and the manual object guide distinguish Unicode scalar trimming from
+grapheme indexing and describe original-byte retention and allocation behavior.
+API fingerprints, four native snapshot tests and the 4,550-page website check pass.
