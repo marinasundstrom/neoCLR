@@ -1,6 +1,8 @@
 # Console key input and encoding review — 2026-10-20
 
-Status: researched proposal, not implemented APIs or a release commitment. The author
+Status: researched public API proposal; a first POSIX host-transport foundation is now
+implemented, while Raven keys, async reads and native-backend integration remain open.
+See [implementation and focused evidence](../console-io.md#development-terminal-host-transport--2026-10-20). The author
 requests console key/combinations/Ctrl+C support and asks about encoding. The current
 console supplies byte streams and strict UTF-8 line/text wrappers; host I/O is blocking,
 even where managed methods return inline-settled Tasks. There is no terminal key API.
@@ -123,3 +125,31 @@ Ctrl+C interrupt/input modes, cancellation while idle, EOF versus no-ready-event
 redirected input, simultaneous-reader rejection, terminal restoration, bounded paste,
 GC-safe event payloads and interpreter/JIT/AOT parity. Add allocation/latency evidence
 for sustained input and pending-read cancellation before claiming efficiency.
+
+
+## Author clarification: read-oriented public API
+
+The author subsequently clarifies the objective: read a key, a character, a line,
+or a requested number of characters. The primary public experience should therefore
+be these read operations, with terminal ownership underneath them. A session/provider
+API alone does not fulfill that objective.
+
+Proposed integration contracts (not yet implemented):
+
+- `ReadKey` returns logical key/modifier information and any reported text, without
+  confusing keys with Char or inferring unreported modifiers.
+- `ReadChar` returns one neoCLR grapheme, or EOF. A UTF-8 byte or a Unicode scalar is
+  not sufficient. Streaming graphemes may need lookahead: an arriving combining mark
+  can extend the previous scalar. Input-idle timeout must not silently redefine Char.
+- `ReadLine` returns text with the line terminator consumed, or EOF; an empty line
+  remains distinct from EOF.
+- A counted character read returns text containing the requested number of graphemes,
+  or the shorter remainder at EOF. A zero count returns empty without consuming input;
+  negative counts are invalid. Independent byte limits bound potentially large graphemes.
+- These methods share one input cursor, decoder and retained lookahead, preserving
+  unread data when switching methods. Concurrent reads must be coordinated or rejected.
+  Separate transient Console.In wrappers cannot own independent buffered lookahead.
+
+The assistant identifies the host transport as a prerequisite, not the canonical
+application surface. Async readiness/cancellation, framing/key decoding and shared
+Raven text-reader state still need implementation and cross-engine validation.

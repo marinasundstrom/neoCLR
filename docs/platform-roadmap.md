@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Author-directed console work (2026-10-20):** implement a modern console input API.
+The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
+adds scoped nonblocking bytes, capabilities and input ownership. Raven key/text events,
+async readiness/cancellation, native backend parity and Windows Unicode input remain
+open; this is not guest API completion or replacement release qualification.
+
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are
 implemented; the [String normalization foundation](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19)

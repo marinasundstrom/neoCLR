@@ -20070,3 +20070,24 @@ Native JSON backend/runtime gaps remain open separately.
   proposal around coherent async input, structured events, scoped state and explicit
   capabilities, with .NET as a reference rather than an API-shape requirement. No
   concrete public signatures or terminal provider were approved by this clarification.
+
+
+## 2026-10-20 — Modern console implementation begins at the host boundary
+
+- **Author:** “Implement”, following the modern Console design discussion.
+- **Assistant action:** adds typed Rust host capabilities, exclusive scoped terminal
+  transport and a POSIX adapter with caller-owned read buffers, explicit signal-character
+  capture and restoration. Existing blocking readers participate in ownership; POSIX
+  input avoids standard-library read-ahead when switching modes.
+- **Scope:** OS transport is host code; public key/text types and parsing remain Raven
+  work. No Raven API, compiler bridge or JIT/AOT terminal binding is claimed. Signal
+  cleanup, scheduler wakeups/cancellation and Windows Unicode input remain open.
+- **Evidence:** real-PTY tests and a runnable Rust diagnostic are described in
+  [console I/O](console-io.md#development-terminal-host-transport--2026-10-20).
+
+- **Author clarification during implementation:** the objective is to read a key,
+  character, line or requested number of characters. The assistant agrees to make
+  those operations primary and share buffered input/lookahead, keeping terminal
+  ownership underneath. Grapheme reads require boundary-aware decoding rather than
+  one-byte/scalar reads. These public operations remain pending; the host transport
+  slice does not fulfill the complete request.

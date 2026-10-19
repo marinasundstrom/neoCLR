@@ -162,3 +162,28 @@ string and Int32 overloads remain preferred over object.
 The object overload preserves the type's current ToString contract. Floating-point
 formatting is still deferred: Single/Double do not yet provide numeric Object
 formatting. No culture, format-string or IFormatProvider support is introduced.
+
+
+## Terminal input host foundation (development)
+
+The Rust host API now offers a scoped POSIX input transport. This does not add
+Raven Console key-reading members; Windows, scheduler integration and managed
+key/text events remain pending. The host types are documented here manually because
+RavenDoc renders class-library metadata, not the Rust embedding crate.
+
+| Rust API | Contract |
+| --- | --- |
+| `Console::capabilities() -> ConsoleCapabilities` | Non-mutating discovery; custom hosts default to no capabilities. |
+| `ConsoleCapabilities` | Boolean `input_is_terminal`, `output_is_terminal`, `error_is_terminal`, `terminal_input`; no encoding or protocol inference. |
+| `Console::open_terminal(TerminalOptions) -> io::Result<Box<dyn TerminalInput>>` | Exclusive scoped input; unsupported by default and on redirected Stdio input. |
+| `TerminalOptions { capture_interrupts: bool }` | Defaults to false; POSIX true captures all ISIG characters, including Ctrl+C/quit/suspend. |
+| `TerminalInput::try_read(&mut self, &mut [u8]) -> io::Result<TerminalRead>` | Nonblocking bytes into caller storage; `Pending`, `Data(usize)` or `End`. Empty buffers fail. |
+| `TerminalInput::close(&mut self) -> io::Result<()>` | Restores modes and releases input; retryable on restoration failure, idempotent after success. Drop makes a best-effort attempt. |
+
+`StdioConsole` shares ownership across instances, rejecting concurrent terminal or
+legacy byte readers with `WouldBlock`. Raw bytes retain their native encoding.
+No String or Promise is created per read. Mode restoration requires orderly cleanup;
+process signals/forced exit do not run Drop, and interrupt cancellation remains open.
+The [host implementation and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/console-io.md#development-terminal-host-transport--2026-10-20)
+cover errors, platform limits and a runnable byte diagnostic. Managed signatures and
+reference snapshots are unchanged by this host-only foundation.

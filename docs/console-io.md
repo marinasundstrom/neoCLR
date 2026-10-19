@@ -150,3 +150,62 @@ text rather than a UTF-16 code unit. There is no formatting-provider contract.
 The cost avoided is temporary boxed scalar allocation; output still creates text.
 Floating-point formatting remains deferred; its current Object fallback does not
 promise numeric output. This does not broaden ToString semantics for other types.
+
+
+## Development terminal host transport — 2026-10-20
+
+The Rust embedding boundary now provides `Console::capabilities()` and
+`Console::open_terminal(TerminalOptions)`. This is a host foundation, not a Raven
+key-input API or an asynchronous console implementation. Existing custom hosts
+retain unsupported defaults and can supply a synthetic `TerminalInput` implementation.
+The class-library API remains Raven-owned; OS mode changes belong at the host boundary.
+
+`ConsoleCapabilities` reports stdin/stdout/stderr terminal detection separately;
+`terminal_input` reports whether an adapter can attempt acquisition. Acquisition
+can still fail. No field asserts UTF-8, ANSI, a keyboard protocol or font coverage.
+`StdioConsole` currently implements terminal acquisition on POSIX systems; Windows
+reports no terminal-input adapter until native Unicode integration is implemented.
+Redirected stdin is rejected, without opening a different controlling terminal.
+
+An acquired `TerminalInput` owns input exclusively across all `StdioConsole`
+instances. Legacy byte reads and a second session fail with `WouldBlock` while
+ownership is held. A blocking legacy read also holds this lease. Other libraries
+and external code reading process stdin are outside this coordination contract.
+On POSIX, legacy reads now use the same unbuffered descriptor, avoiding hidden
+standard-library read-ahead when switching between line/byte and terminal input.
+
+`try_read(&mut [u8])` fills caller-owned storage, returning `Data(count)`, `Pending`
+or `End`. Empty destinations fail with `InvalidInput`; reads after successful close
+fail with `NotConnected`. No key decoding, Unicode normalization or String/Promise
+construction occurs at this boundary. The caller must supply an encoding-aware
+layer: POSIX terminal bytes are not guaranteed to be UTF-8. VMIN/VTIME zero plus a
+zero-time readiness check avoid waiting for input; no file-description flags change.
+
+Sessions disable canonical input, echo, extended input processing, byte stripping,
+newline translation and software output-flow control. Output processing is retained.
+By default ISIG remains enabled; `capture_interrupts: true` disables POSIX signal
+characters, including Ctrl+C, Ctrl+\ and Ctrl+Z, so they arrive as input bytes.
+This option is broader than .NET's TreatControlCAsInput; the explicit name and scoped
+ownership expose the actual host behavior instead of promising unsupported fidelity.
+
+`close()` restores the saved terminal settings without flushing queued input and
+releases ownership. BSD may set the kernel-managed PENDIN queue-state flag when
+canonical mode resumes; the restoration tests exclude that flag. It is idempotent after success; restoration errors retain ownership
+for an explicit retry. Drop attempts restoration and releases the lease even if the
+host refuses restoration (for example after hangup). A duplicated close-on-exec
+file descriptor keeps restoration attached to the acquired device if stdin is replaced.
+There is no process signal/exit handler yet: abort, default signal termination and
+forced process exit do not run Rust Drop. Embedders must arrange orderly session
+cleanup; default Ctrl+C interruption is not yet an orderly cancellation facility.
+
+Focused evidence: `cargo test --lib console::` exercises a real pseudo-terminal,
+nonblocking idle reads, preserved UTF-8/control/escape bytes, capture/default ISIG,
+close/drop restoration, closed/empty-buffer errors, redirected input, input ownership
+and hangup. `cargo run --example terminal_input` is an interactive byte diagnostic;
+its explicit 10 ms polling is not a production async implementation.
+
+Next integration requirements are invocation-owned cleanup, scheduler readiness and
+cancellation, the matching JIT/AOT provider, Windows Unicode input, and Raven key,
+modifier and text events. Do not expose a Task that merely wraps a blocking read or
+advertise guest support before those paths are qualified. See the
+[design comparison](design/console-input-review-20261020.md).

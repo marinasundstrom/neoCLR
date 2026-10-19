@@ -2621,3 +2621,12 @@ snapshot comes from composite-format-api-audit-v1 and composite-format-libraries
 with compiler code 2d22055dc and renderer 03bcc23d6. No new rendering exclusion is
 needed. Documentation states grapheme alignment, null/fallback behavior, output
 limits, allocation costs and missing provider/primitive-specifier integration.
+
+
+### Rust terminal host foundation (2026-10-20)
+
+The [Console guide](console.md#terminal-input-host-foundation-development) manually
+covers ConsoleCapabilities, TerminalOptions, TerminalRead and TerminalInput plus
+the Rust Console methods. These are Rust embedding APIs, not Raven metadata types,
+so they are not added to RavenDoc type selection or either managed assembly snapshot.
+No guest terminal/key API is implemented by this first host transport slice.

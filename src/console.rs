@@ -1,10 +1,25 @@
 //! Minimal embedding boundary; not a guest stream or text-decoding API.
-use std::io::{self, Read, Write};
+use std::io::{self, Write};
+
+mod terminal;
+pub use terminal::{ConsoleCapabilities, TerminalInput, TerminalOptions, TerminalRead};
 
 /// Host console shared explicitly by executions. Implementations own synchronization.
 /// Calls are synchronous; cancellation cannot interrupt an in-progress host call.
 /// Errors must not panic. A write may have produced partial output before failing.
 pub trait Console: std::fmt::Debug + Send + Sync {
+    /// Discover transport capabilities without acquiring input or changing terminal modes.
+    fn capabilities(&self) -> ConsoleCapabilities {
+        ConsoleCapabilities::default()
+    }
+    /// Acquire exclusive, nonblocking terminal input. Drop attempts mode restoration.
+    /// Unsupported by default; redirected byte streams are not terminal input.
+    fn open_terminal(&self, _options: TerminalOptions) -> io::Result<Box<dyn TerminalInput>> {
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "terminal input unavailable",
+        ))
+    }
     /// One raw byte, or None for EOF. No text decoding or newline conversion.
     fn read_byte(&self) -> io::Result<Option<u8>>;
     /// Write text followed by a line ending and make it visible before returning.
@@ -30,17 +45,18 @@ pub trait Console: std::fmt::Debug + Send + Sync {
 pub struct StdioConsole;
 
 impl Console for StdioConsole {
+    fn capabilities(&self) -> ConsoleCapabilities {
+        terminal::capabilities()
+    }
+
+    fn open_terminal(&self, options: TerminalOptions) -> io::Result<Box<dyn TerminalInput>> {
+        terminal::open(options)
+    }
+
     fn read_byte(&self) -> io::Result<Option<u8>> {
-        let mut byte = [0u8];
-        let mut input = io::stdin().lock();
-        loop {
-            match input.read(&mut byte) {
-                Ok(0) => return Ok(None),
-                Ok(_) => return Ok(Some(byte[0])),
-                Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
-                Err(error) => return Err(error),
-            }
-        }
+        // Coordinate all StdioConsole instances, including blocking legacy reads.
+        let _input = terminal::acquire_standard_input()?;
+        terminal::read_standard_byte()
     }
 
     fn write_bytes(&self, error: bool, bytes: &[u8]) -> io::Result<usize> {

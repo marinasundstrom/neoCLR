@@ -25,7 +25,9 @@ mod friend_access;
 mod path;
 mod time_zone_rules;
 mod time_zones;
-pub use console::{Console, StdioConsole};
+pub use console::{
+    Console, ConsoleCapabilities, StdioConsole, TerminalInput, TerminalOptions, TerminalRead,
+};
 pub mod frontend;
 pub mod function_invocation;
 mod function_objects;
