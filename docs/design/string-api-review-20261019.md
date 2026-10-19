@@ -398,3 +398,29 @@ with canonical NFD ordering. Comparison arguments remain non-null, consistent wi
 neoCLR's explicit nullable-boundary conventions; no culture-sensitive order is implied.
 These additions are independent of the deferred String representation decision.
 See [the executable fixtures](../experiments/string-utilities/README.md).
+
+
+### ReplaceLineEndings implementation (2026-10-19)
+
+Follow [.NET's recognized newline set](https://learn.microsoft.com/en-us/dotnet/api/system.string.replacelineendings?view=net-10.0):
+CRLF (one match), CR, LF, FF, NEL, LS and PS. VT is not included. Empty replacement
+deletes matches; replacement text is never rescanned. Preserve every other UTF-8
+byte, including decomposed spelling and embedded NUL. The parameterless overload
+uses LF on all platforms, deliberately matching neoCLR StringBuilder.AppendLine
+rather than .NET's host-specific newline. Costs: callers wanting CRLF must request
+it explicitly; benefit: reproducible text independent of deployment OS. Protocol
+parsers must retain their own framing rules.
+
+The Raven surface calls a private runtime service because final immutable-string
+allocation and source/replacement GC retention need runtime privileges. A two-pass
+scan computes checked output size, returns the original owner when unchanged and
+writes directly to the final result. Ordinary Raven chains of Replace would create
+intermediate strings; byte-array staging would add an intermediate buffer. A separate
+FFI allocator would still need a runtime-owned publication/GC adapter and add an ABI
+boundary. Reconsider placement if a safe managed string-construction facility is
+introduced. Interpreter and native kernels share the same documented match set;
+backend binding is exact and must be used with a matching rebuilt library/bundle.
+
+[Fixtures and allocation evidence](../experiments/string-lines/README.md) distinguish
+managed native allocations from host Rust allocations and CPU/GC costs. No HTTP
+throughput claim follows from avoiding intermediate strings.

@@ -852,6 +852,12 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
                 "string-join-parts-v1",
                 "neoclr_string_join_parts_v1",
             ),
+            "neoCLR.Runtime.StringReplaceLineEndings" => (
+                vec![Type::String, Type::String],
+                Type::String,
+                "string-replace-line-endings-v1",
+                "neoclr_string_replace_line_endings_v1",
+            ),
             "neoCLR.Runtime.StringReplaceOrdinal" => (
                 vec![Type::String, Type::String, Type::String],
                 Type::String,

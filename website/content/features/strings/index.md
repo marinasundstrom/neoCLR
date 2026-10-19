@@ -126,3 +126,10 @@ Development null checks include `String.IsNullOrEmpty(text)` and
 copies. `Equals(other, comparison)` provides explicit equality policies;
 `CompareTo(other)` and `ComparableTo<string>` use the same canonical order as
 `String.Compare`. Use the matching StringComparer when choosing dictionary identity.
+
+
+Development `ReplaceLineEndings()` produces LF consistently across platforms;
+pass a replacement explicitly for another convention. CRLF is treated as one
+newline. The implementation preserves all other bytes, reuses unchanged strings
+and writes changed native output directly into its final allocation. This is a
+text utility, not an HTTP framing operation.

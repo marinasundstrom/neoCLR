@@ -11,7 +11,8 @@ Native record-generated equality/hash remains an existing compiler gap, separate
 reproduced. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
 with unchanged-owner reuse and measured changed-result allocations. The
 [String utilities](experiments/string-utilities/README.md) add nullable predicates
-and explicit/interface comparison. The author defers the String-as-view/value
+and explicit/interface comparison; [line-ending replacement](experiments/string-lines/README.md)
+now preserves bytes and uses a single final native allocation when changed. The author defers the String-as-view/value
 representation decision until after utility work. Position-based
 search/splitting and the direct-call null String bridge discrepancy remain review
 items; replacement release qualification remains pending.

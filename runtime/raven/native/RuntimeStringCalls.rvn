@@ -30,6 +30,9 @@ internal extern func StringCompareOrdinal(arg0: string, arg1: string) -> int;
 internal extern func StringCompareOrdinalIgnoreCase(arg0: string, arg1: string) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringReplaceLineEndings(text: string, replacement: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringReplaceOrdinal(arg0: string, arg1: string, arg2: string) -> string;
 
 [MethodImpl(MethodImplOptions.InternalCall)]

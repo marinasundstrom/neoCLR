@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "fixture": "lines",
+      "engine": "interpreter",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string lines\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "lines",
+      "engine": "jit",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string lines\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "lines",
+      "engine": "aot",
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS string lines\n",
+      "stderr": ""
+    }
+  ],
+  "platform": "macOS ARM64",
+  "compiler": "2d22055dc with metadata e4709c451",
+  "source": "dc3dae6d1 plus line-ending working tree",
+  "nativeKernelFaultChecks": "passed",
+  "registrySignatureTest": "passed",
+  "sha256": {
+    "docs/experiments/string-lines/Main.rvn": "34fbb6691e577b60944e6e90ef8b3221d9338cea27415ce64836feb1c1c524d0",
+    "docs/experiments/string-lines/Allocation.rvn": "25639b0262ac3320c09d45a71eb85f2f9631855be8fe55b6b16a4c0dff737db4",
+    "target/string-lines-bundle-v1/bundle/bin/neoclr": "5ed48830700fb042e66d714427a60bfb775276ba0012e7d8a36d1dbddc7abb66",
+    "target/string-lines-bundle-v1/bundle/bin/neoclr-codegen": "9b0b57b96825f0ed35e2685d93ad57fe02943e969a277efbebfd1d35f74223f5",
+    "target/string-lines-libraries-v1/System.Runtime.dll": "ed248ca0189075ad503b22da403d4646875ce5a5121f59fa945f53996208af3e"
+  }
+}

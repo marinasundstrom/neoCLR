@@ -234,3 +234,5 @@ pub mod native_metadata;
 #[cfg(test)]
 #[path = "../docs/experiments/structural-compositions/runtime_probe.rs"]
 mod structural_compositions_probe;
+
+mod string_lines;

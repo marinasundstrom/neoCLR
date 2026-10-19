@@ -107,6 +107,7 @@ pub(crate) enum Binding {
     Utf8DecodeSlice,
     StringConcat,
     StringReplaceOrdinal,
+    StringReplaceLineEndings,
     StringJoinParts,
     StringIntern,
     StringFromChars,
@@ -759,6 +760,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 Type::Int32,
             ],
         ) if **element == Type::String => (Binding::StringJoinParts, Type::String),
+        ("neoCLR.Runtime.StringReplaceLineEndings", [Type::String, Type::String]) => {
+            (Binding::StringReplaceLineEndings, Type::String)
+        }
         ("neoCLR.Runtime.StringReplaceOrdinal", [Type::String, Type::String, Type::String]) => {
             (Binding::StringReplaceOrdinal, Type::String)
         }
@@ -1836,6 +1840,47 @@ impl Binding {
                     text.push_str(part);
                 }
                 Ok(Value::String(text.into()))
+            }
+            (Self::StringReplaceLineEndings, [Value::String(text), Value::String(replacement)]) => {
+                let invalid =
+                    || Fault::coded(crate::FaultCode::RuntimeError, "String size overflow");
+                let bytes = text.as_bytes();
+                let mut length = bytes.len();
+                let mut changed = false;
+                let mut at = 0;
+                while at < bytes.len() {
+                    let width = crate::string_lines::newline_width(&bytes[at..]);
+                    if width == 0 {
+                        at += 1;
+                        continue;
+                    }
+                    changed |= &bytes[at..at + width] != replacement.as_bytes();
+                    length = length
+                        .checked_sub(width)
+                        .and_then(|n| n.checked_add(replacement.len()))
+                        .ok_or_else(invalid)?;
+                    at += width;
+                }
+                if !changed {
+                    return Ok(Value::String(text.clone()));
+                }
+                let mut result = String::new();
+                result.try_reserve_exact(length).map_err(|_| invalid())?;
+                let mut start = 0;
+                at = 0;
+                while at < bytes.len() {
+                    let width = crate::string_lines::newline_width(&bytes[at..]);
+                    if width == 0 {
+                        at += 1;
+                        continue;
+                    }
+                    result.push_str(&text[start..at]);
+                    result.push_str(replacement);
+                    at += width;
+                    start = at;
+                }
+                result.push_str(&text[start..]);
+                Ok(Value::String(result.into()))
             }
             (
                 Self::StringReplaceOrdinal,

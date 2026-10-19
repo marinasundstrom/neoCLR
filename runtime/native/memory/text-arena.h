@@ -162,6 +162,8 @@ int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
 /* Private ordinal UTF-8 replacement. Inputs are validated immutable UTF-8 descriptors.
  * Empty search faults; empty replacement deletes. Left-to-right nonoverlapping matches.
  * No-match/equal replacement preserves identity; failures publish no output or cursor. */
+int32_t neoclr_string_replace_line_endings_v1(const neoclr_aot_text *, const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_string_replace_line_endings_rooted_v1(const neoclr_aot_text *, const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text,
     const neoclr_aot_text *old_value, const neoclr_aot_text *new_value,
     neoclr_aot_text_arena *arena, const neoclr_aot_text **output);

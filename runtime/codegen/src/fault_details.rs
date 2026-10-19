@@ -91,6 +91,7 @@ pub struct Options {
     pub string_join_parts: Vec<usize>,
     pub string_replace_ordinal: Vec<usize>,
     pub string_concat: Vec<usize>,
+    pub string_replace_line_endings: Vec<usize>,
     pub string_grapheme_count: Vec<usize>,
     pub string_grapheme_at: Vec<usize>,
     pub string_graphemes: Vec<usize>,
@@ -1017,6 +1018,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "string-replace-ordinal-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_replace_line_endings: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "string-replace-line-endings-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             string_concat: report

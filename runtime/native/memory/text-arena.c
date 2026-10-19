@@ -759,6 +759,67 @@ static int32_t path_file_name_unix(const neoclr_aot_text *path,
 }
 
 
+/* Unicode newline set: CRLF is one match; VT is deliberately not a newline. */
+static uint64_t newline_width(const unsigned char *bytes, uint64_t length) {
+    if (!length) return 0;
+    if (bytes[0] == 13) return length > 1 && bytes[1] == 10 ? 2 : 1;
+    if (bytes[0] == 10 || bytes[0] == 12) return 1;
+    if (length >= 2 && bytes[0] == 0xc2 && bytes[1] == 0x85) return 2;
+    if (length >= 3 && bytes[0] == 0xe2 && bytes[1] == 0x80 &&
+        (bytes[2] == 0xa8 || bytes[2] == 0xa9)) return 3;
+    return 0;
+}
+static int32_t string_replace_line_endings(const neoclr_aot_text *text,
+    const neoclr_aot_text *replacement, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output, int rooted) {
+    if (!text || !replacement || !arena || !output || arena->used > arena->capacity ||
+        (arena->capacity && !arena->data) || ((uintptr_t)arena->data & 7))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t length = text->length;
+    int changed = 0;
+    for (uint64_t at = 0; at < text->length;) {
+        uint64_t width = newline_width(text->bytes + at, text->length - at);
+        if (!width) { ++at; continue; }
+        if (width != replacement->length || memcmp(text->bytes + at, replacement->bytes, (size_t)width)) changed = 1;
+        if (replacement->length >= width) {
+            uint64_t growth = replacement->length - width;
+            if (growth > UINT64_MAX - length) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+            length += growth;
+        } else { length -= width - replacement->length; }
+        at += width;
+    }
+    if (!changed) { *output = text; return 0; }
+    if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    void *storage;
+    const void *values[] = {text, replacement};
+    int32_t status = reserve_values(arena, 8 + length, TEXT_STORAGE, &storage, rooted, values, 2);
+    if (status) return status;
+    neoclr_aot_text *result = storage;
+    result->length = length;
+    uint64_t start = 0, written = 0;
+    for (uint64_t at = 0; at < text->length;) {
+        uint64_t width = newline_width(text->bytes + at, text->length - at);
+        if (!width) { ++at; continue; }
+        memcpy(result->bytes + written, text->bytes + start, (size_t)(at - start));
+        written += at - start;
+        memcpy(result->bytes + written, replacement->bytes, (size_t)replacement->length);
+        written += replacement->length;
+        at += width;
+        start = at;
+    }
+    memcpy(result->bytes + written, text->bytes + start, (size_t)(text->length - start));
+    *output = result;
+    return 0;
+}
+int32_t neoclr_string_replace_line_endings_v1(const neoclr_aot_text *text,
+    const neoclr_aot_text *replacement, neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_replace_line_endings(text, replacement, arena, output, 0);
+}
+int32_t neoclr_string_replace_line_endings_rooted_v1(const neoclr_aot_text *text,
+    const neoclr_aot_text *replacement, neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_replace_line_endings(text, replacement, arena, output, 1);
+}
+
 static int32_t string_replace_ordinal(const neoclr_aot_text *text,
     const neoclr_aot_text *old_value, const neoclr_aot_text *new_value,
     neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {

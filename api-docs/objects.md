@@ -452,3 +452,12 @@ White_Space scalars, including empty text, and does not allocate a trimmed strin
 unknown modes fault. Hash-based collections must use the matching StringComparer.
 `CompareTo(other)` implements `ComparableTo<string>` with canonical NFD ordering,
 matching String.Compare; it is not cultural collation. Its argument is non-null.
+
+
+Development `ReplaceLineEndings()` normalizes recognized Unicode newline sequences
+to LF on every platform. `ReplaceLineEndings(replacementText)` accepts non-null text,
+including empty to delete newlines. CRLF is one match; CR, LF, FF, NEL, LS and PS
+are also recognized; VT is retained. Replacement text is not recursively processed.
+Other UTF-8 bytes remain exact. Unchanged results reuse the original owner; native
+changed output is written into one final string allocation. Use explicit protocol
+framing rather than this general text operation for HTTP.

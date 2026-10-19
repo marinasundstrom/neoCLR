@@ -213,6 +213,15 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         return neoCLR.Runtime.StringReplaceOrdinal(m_value, oldValue, newValue)
     }
 
+    /// Replaces Unicode newline sequences with LF, independently of the host OS.
+    func ReplaceLineEndings() -> string => ReplaceLineEndings("\n")
+
+    /// Replaces CRLF, CR, LF, FF, NEL, LS and PS; empty replacement deletes them.
+    /// Unchanged text reuses its owner. Not for protocol framing or validation.
+    func ReplaceLineEndings(replacementText: string) -> string {
+        return neoCLR.Runtime.StringReplaceLineEndings(m_value, replacementText)
+    }
+
     /// Removes leading and trailing Unicode 17 White_Space scalars.
     /// Preserves retained UTF-8 bytes; combining marks are not whitespace.
     func Trim() -> string => TrimWhitespace(m_value, true, true)

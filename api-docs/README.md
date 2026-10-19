@@ -2589,3 +2589,10 @@ conformance. Source nullability is represented in the native snapshot and the
 legacy declarations. The native snapshot comes from string-utilities-api-audit-v1
 and the matching five-library build; both nullable predicates and comparison
 contracts are documented on the existing selected String type and manual guide.
+
+
+Development (2026-10-19) adds String.ReplaceLineEndings() and its explicit replacement
+overload to both references and the selected String type. The native snapshot is
+string-lines-api-audit-v1 from the matching five-library build. Both summaries and
+the manual guide describe LF defaults, recognized sequences, byte retention,
+allocation limits and the distinction from protocol framing.

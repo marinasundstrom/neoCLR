@@ -1,0 +1,23 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    let plain = "é\n👨‍👩‍👧‍👦"
+    let padded = "é\r\n👨‍👩‍👧‍👦"
+    var result = plain
+    var count = 0
+    while count < 128 {
+        if mode == "unchanged" {
+            result = plain.ReplaceLineEndings()
+        } else if mode == "changed" {
+            result = padded.ReplaceLineEndings()
+        } else {
+            result = plain
+        }
+        if String.CompareOrdinal(result, plain) != 0 {
+            System.Fail("Allocation fixture output")
+        }
+        count += 1
+    }
+    Console.WriteLine("PASS lines allocation")
+}

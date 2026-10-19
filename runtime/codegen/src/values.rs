@@ -1212,6 +1212,15 @@ pub(crate) fn compile_into(
                 vec![types::I64, types::I64, types::I64, types::I64, types::I64],
             ),
             (
+                &d.string_replace_line_endings,
+                if d.native_gc {
+                    "neoclr_string_replace_line_endings_rooted_v1"
+                } else {
+                    "neoclr_string_replace_line_endings_v1"
+                },
+                vec![types::I64, types::I64, types::I64, types::I64],
+            ),
+            (
                 &d.string_concat,
                 if d.native_gc {
                     "neoclr_string_concat_rooted_v1"
@@ -3069,7 +3078,8 @@ pub(crate) fn compile_into(
                 } else if details.unwrap().string_grapheme_at.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], arena, output]
-                } else if details.unwrap().string_concat.contains(&i)
+                } else if details.unwrap().string_replace_line_endings.contains(&i)
+                    || details.unwrap().string_concat.contains(&i)
                     || details.unwrap().path_combine.contains(&i)
                 {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);

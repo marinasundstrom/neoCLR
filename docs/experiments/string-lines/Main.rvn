@@ -1,0 +1,27 @@
+import System.*
+
+func Check(actual: string, expected: string) {
+    if String.CompareOrdinal(actual, expected) != 0 {
+        System.Fail("Line ending bytes")
+    }
+}
+
+func Main() {
+    let mixed = "a\r\nb\rc\nd\u000ce\u0085f\u2028g\u2029h"
+    Check(mixed.ReplaceLineEndings(), "a\nb\nc\nd\ne\nf\ng\nh")
+    Check(mixed.ReplaceLineEndings("|"), "a|b|c|d|e|f|g|h")
+    Check(mixed.ReplaceLineEndings(""), "abcdefgh")
+    Check("\r\n".ReplaceLineEndings("\r\n\n"), "\r\n\n")
+    Check("\r\r\n\n".ReplaceLineEndings("|"), "|||")
+    Check("é\ré👨‍👩‍👧‍👦\u2028".ReplaceLineEndings("🌿"), "é🌿é👨‍👩‍👧‍👦🌿")
+    Check("\u000b\u0000\u00a0".ReplaceLineEndings(), "\u000b\u0000\u00a0")
+    let plain = "é👨‍👩‍👧‍👦"
+    let lf = "a\nb\n"
+    let crlf = "a\r\nb\r\n"
+    if !Object.ReferenceEquals(plain, plain.ReplaceLineEndings()) || !Object.ReferenceEquals(lf, lf.ReplaceLineEndings()) || !Object.ReferenceEquals(crlf, crlf.ReplaceLineEndings("\r\n")) {
+        System.Fail("Unchanged line ending owner")
+    }
+    Check("".ReplaceLineEndings(), "")
+    Check("\r\n".ReplaceLineEndings(""), "")
+    Console.WriteLine("PASS string lines")
+}
