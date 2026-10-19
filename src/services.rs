@@ -215,6 +215,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::ConsoleFlush => RuntimeService::ConsoleOutput,
             crate::native::Binding::CharCategory => RuntimeService::CharacterClassification,
             crate::native::Binding::Utf8Encode
+            | crate::native::Binding::Utf8DecodeSlice
             | crate::native::Binding::Utf8Decode
             | crate::native::Binding::StringJoinParts
             | crate::native::Binding::StringFromChars
@@ -302,6 +303,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                 | crate::native::Binding::TimeZoneMapLocal
                 | crate::native::Binding::EnvironmentArguments
                 | crate::native::Binding::Utf8Encode
+                | crate::native::Binding::Utf8DecodeSlice
                 | crate::native::Binding::Utf8Decode
                 | crate::native::Binding::StringJoinParts
                 | crate::native::Binding::StringFromChars

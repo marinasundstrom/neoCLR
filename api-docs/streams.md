@@ -92,6 +92,22 @@ StreamWriter.Finish. Text writes still report encoded byte counts. Finish finali
 the encoder; Flush only flushes the underlying output. Close follows leaveOpen and
 never implicitly finalizes conversion. Encoding operations on memory remain immediate.
 
+One-shot [Encoding.Decode](xref:System.Text.Encoding) takes `ReadOnlySlice<byte>`
+and returns `Result<string, EncodingError>`. It borrows only for the synchronous
+call and returns owned text; later source mutation cannot change that text.
+UTF-8 decoding reads the selected window directly in native execution, without a
+managed input snapshot. The interpreter builds owned UTF-8 storage from its value
+slots; this is not a claim of zero host allocation. Empty input is valid; BOM and
+NUL are preserved. Built-ins retain their 65,536-byte quota, strict malformed or
+truncated UTF-8 errors, ASCII rejection and independent subsequent calls.
+
+This development signature replaces `Decode(Sequence<byte>)`. Array callers
+convert implicitly; custom encodings must implement the borrowed signature. A
+noncontiguous sequence must materialize storage explicitly when decoding it as one
+window. No legacy sequence overload or AsSlice adapter is added. Native metadata
+renders the complete member; the legacy CLI scaffold cannot represent its borrowed
+parameter and deliberately omits it.
+
 Incremental codecs take views directly: `Decoder.Decode(ReadOnlySlice<byte>, final)`
 and `Encoder.Drain(Slice<byte>)`. Arrays convert implicitly; pass `buffer[start..end]`
 for a subwindow. These replace the former array/offset/count signatures without

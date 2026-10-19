@@ -72,6 +72,9 @@ internal extern func StringHashOrdinalIgnoreCase(arg0: string) -> int;
 internal extern func Utf8Decode(arg0: byte[]) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func Utf8DecodeSlice(bytes: System.ReadOnlySlice<byte>) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringGraphemes(text: string) -> char[];
 
 [MethodImpl(MethodImplOptions.InternalCall)]

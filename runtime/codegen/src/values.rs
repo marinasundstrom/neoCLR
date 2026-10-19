@@ -1161,6 +1161,12 @@ pub(crate) fn compile_into(
                 vec![types::I64, types::I64, types::I64],
             ),
             (
+                &d.utf8_decode_slice,
+                if d.native_gc { "neoclr_utf8_decode_slice_rooted_v1" }
+                else { "neoclr_utf8_decode_slice_v1" },
+                vec![types::I64, types::I64, types::I32, types::I32, types::I64],
+            ),
+            (
                 &d.utf8_decode,
                 if d.native_gc {
                     "neoclr_utf8_decode_rooted_v1"
@@ -2907,7 +2913,9 @@ pub(crate) fn compile_into(
             }
             if let Some(service) = utf8_services.get(&i) {
                 let service = module.declare_func_in_func(*service, b.func);
-                let args = if details.unwrap().file_input.contains(&i) {
+                let args = if details.unwrap().utf8_decode_slice.contains(&i) {
+                    vec![fault_context.unwrap(), parameters[0], parameters[1], parameters[2], output]
+                } else if details.unwrap().file_input.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], arena, output]
                 } else if details.unwrap().file_output.contains(&i) {

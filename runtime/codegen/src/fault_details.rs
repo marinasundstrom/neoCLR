@@ -108,6 +108,7 @@ pub struct Options {
     pub string_intern: Vec<usize>,
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
+    pub utf8_decode_slice: Vec<usize>,
     pub utf8_encode: Vec<usize>,
     pub byte_view_get: Vec<usize>,
     pub byte_view_set: Vec<usize>,
@@ -859,6 +860,12 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "console-flush-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            utf8_decode_slice: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter().flatten()
+                .filter(|r| r["implementation"] == "utf8-decode-slice-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             utf8_decode: report

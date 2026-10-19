@@ -49,8 +49,13 @@ Promise wrappers in HTTP/native async operations; public ValueTask/Task represen
 and sharing semantics remain design questions. The author subsequently prioritizes
 [initial request/text allocation measurements](../benchmarks/http-server/serve/request-token-20261019/README.md):
 borrowed method validation removes two encoding arrays and two iterators per request;
-actual string counts are unchanged. Next eliminate avoidable decoder snapshots,
-retaining owned result text and strict Unicode semantics. Small ASCII allocation
+actual string counts are unchanged. [Borrowed one-shot decoding](../benchmarks/http-server/serve/decode-slice-20261019/README.md)
+now removes four decoder arrays and four window wrappers per exchange, retaining
+owned result text and strict Unicode semantics. The author extends this
+requirement to [JSON byte processing](design/json-byte-processing.md): avoid full-document
+text intermediates when consuming or producing bytes. The source audit identifies
+HTTP/stream round trips and repeated writer concatenation; JSON-specific allocation
+measurement and byte-output/parser changes remain separate work. Small ASCII allocation
 volume does not establish general string CPU or live-retention costs.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and

@@ -115,7 +115,7 @@ internal class JsonSyntax {
             }
         }
         output.Add((byte)34)
-        match Encodings.Utf8.Decode(output) {
+        match Encodings.Utf8.Decode(output[..]) {
             Ok(let payload) => return Ok(payload)
             Error(_) => return Error(JsonError.Syntax("Invalid UTF-8"))
         }
@@ -234,7 +234,7 @@ internal class MessageReader {
         if position != bytes.Count {
             return Error(JsonError.Syntax("Trailing content"))
         }
-        match Encodings.Utf8.Decode(output) {
+        match Encodings.Utf8.Decode(output[..]) {
             Ok(let text) => return Ok(text)
             Error(_) => return Error(JsonError.Syntax("Invalid UTF-8"))
         }

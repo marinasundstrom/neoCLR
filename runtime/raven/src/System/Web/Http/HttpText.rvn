@@ -51,8 +51,22 @@ internal static class HttpText {
         }
     }
 
-    static func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
-        let size = bytes.Count
+    private static func Snapshot(bytes: Sequence<byte>) -> byte[] {
+        if bytes is byte[] array {
+            return array
+        }
+        let count = bytes.Count
+        let copy = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(count)
+        var index = 0
+        while index < count {
+            copy[index] = bytes[index]
+            index += 1
+        }
+        return copy
+    }
+
+    static func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, EncodingError> {
+        let size = bytes.Length
         if size <= 65536 {
             return Encodings.Utf8.Decode(bytes)
         }
@@ -73,8 +87,53 @@ internal static class HttpText {
                     backedUp += 1
                 }
             }
-            let chunk = HttpByteWindow(bytes, offset, count)
+            let chunk = bytes.Slice(offset, count)
             parts.Add(Encodings.Utf8.Decode(chunk)?)
+            offset += count
+        }
+        // Pairwise joining avoids repeatedly copying an ever-growing prefix.
+        var partCount = parts.Count
+        while partCount > 1 {
+            var source = 0
+            var destination = 0
+            while source < partCount {
+                var part = parts[source]
+                if source + 1 < partCount {
+                    part = String.Concat(part, parts[source + 1])
+                }
+                parts[destination] = part
+                destination += 1
+                source += 2
+            }
+            partCount = destination
+        }
+        return Ok(parts[0])
+    }
+
+    static func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+        let size = bytes.Count
+        if size <= 65536 {
+            return Encodings.Utf8.Decode(Snapshot(bytes))
+        }
+        let parts = ArrayList<string>()
+        var offset = 0
+        while offset < size {
+            var count = size - offset
+            if count > 65536 {
+                count = 65536
+                // Keep a scalar wholly within one codec call. At most three
+                // continuation bytes can precede the next scalar boundary.
+                var backedUp = 0
+                while bytes[offset + count] >= 128 && bytes[offset + count] <= 191 {
+                    if backedUp == 3 {
+                        return Error(EncodingError.InvalidUtf8)
+                    }
+                    count -= 1
+                    backedUp += 1
+                }
+            }
+            let chunk = HttpByteWindow(bytes, offset, count)
+            parts.Add(Encodings.Utf8.Decode(Snapshot(chunk))?)
             offset += count
         }
         // Pairwise joining avoids repeatedly copying an ever-growing prefix.

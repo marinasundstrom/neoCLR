@@ -61,7 +61,7 @@ internal class Packet {
         }
         let bytes = ArrayList<byte>()
         for index in 0..length { bytes.Add((byte)Byte()) }
-        return match Encodings.Utf8.Decode(bytes) {
+        return match Encodings.Utf8.Decode(bytes[..]) {
             Ok(let text) => text
             Error(_) => {
                 Valid = false

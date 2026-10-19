@@ -5,11 +5,11 @@ import System.Collections.*
 
 public interface Encoding {
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError>
-    /// Decodes one complete byte sequence with strict error reporting and no retained session state.
+    /// Decodes one complete borrowed byte window with strict error reporting and no retained session state.
     /// Built-in providers accept at most 65536 bytes, preserve BOM data and reject truncated input.
-    /// <param name="bytes">The complete encoded input.</param>
+    /// <param name="bytes">The complete encoded input, borrowed only for this call.</param>
     /// <returns>Decoded text, InvalidUtf8, InvalidData, or LimitExceeded for the built-in providers.</returns>
-    func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError>
+    func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, EncodingError>
     func CreateEncoder() -> Encoder
     func CreateDecoder() -> Decoder
 }

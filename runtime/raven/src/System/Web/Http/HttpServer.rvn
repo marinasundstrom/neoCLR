@@ -178,7 +178,7 @@ internal class HttpRequestDecoder {
 
     private func Text(start: int, end: int, lower: int) -> Result<string, HttpError> {
         if lower == 0 {
-            if let Ok(text) = HttpText.Decode(HttpByteWindow(head, start, end - start)) {
+            if let Ok(text) = HttpText.Decode(head.Written[start..end]) {
                 return Ok(text)
             }
             return Error(HttpError.Protocol("Invalid header text"))

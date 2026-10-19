@@ -10,7 +10,7 @@ import System.Result.*
 import System.Text.*
 
 class TrailerEncoding : Encoding {
-    func Decode(bytes: Sequence<byte>) -> Result<string, EncodingError> {
+    func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, EncodingError> {
         return Encodings.Utf8.Decode(bytes)
     }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {

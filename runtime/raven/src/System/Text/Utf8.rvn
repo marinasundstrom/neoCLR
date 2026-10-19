@@ -10,6 +10,14 @@ internal static class Utf8 {
         return neoCLR.Runtime.Utf8Encode(text)
     }
 
+    static func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, InvalidUtf8Error> {
+        let payload = neoCLR.Runtime.Utf8DecodeSlice(bytes)
+        if neoCLR.Runtime.IsValue<string>(payload) {
+            return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
+        }
+        return Error(InvalidUtf8Error())
+    }
+
     static func Decode(bytes: Sequence<byte>) -> Result<string, InvalidUtf8Error> {
         let count = bytes.Count
         let snapshot = CheckedStorage.Reserve<byte>(count)
@@ -18,10 +26,6 @@ internal static class Utf8 {
             snapshot[index] = bytes[index]
             index += 1
         }
-        let payload = neoCLR.Runtime.Utf8Decode(snapshot)
-        if neoCLR.Runtime.IsValue<string>(payload) {
-            return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
-        }
-        return Result<string, InvalidUtf8Error>.Error(InvalidUtf8Error())
+        return Decode(snapshot[..])
     }
 }

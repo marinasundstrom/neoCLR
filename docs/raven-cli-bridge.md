@@ -13276,3 +13276,20 @@ This is an explicit temporary reference limitation, not an alternate public API.
 Future Native API access must preserve owner/bounds/capability and completion
 ownership rather than exposing these private flattened entry points as a stable ABI.
 See [qualification](validation/memory-views-20261019/socket-integration-validation.json).
+
+## One-shot decoder borrowed input (2026-10-19)
+
+Native System.Text.Encoding.Decode now takes ReadOnlySlice<byte>. Its source-owned
+InternalCall Utf8DecodeSlice is bound by exact readonly-byte metadata in interpreter
+and native codegen; there is no new Runtime Contract setting or Raven compiler
+change. Native execution uses owner/offset/length lanes, checked initialization and
+rooted allocation of owned text. Ordinary Raven .NET compilation is unchanged.
+The old array decoder remains a low-level fixture binding, not a public compatibility
+overload.
+
+The aggregate CLI documentation scaffold cannot represent a borrowed runtime view.
+It now omits this member instead of retaining the retired Sequence<byte> signature;
+the matching native metadata reference and [manual codec contract](../api-docs/streams.md#incremental-encoding-development)
+provide the full API. No ordinary fieldless-record projection is introduced. Native
+metadata/codegen already carry this particular view contract; broader generic/
+immutable-view lowering remains tracked independently.

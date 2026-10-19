@@ -25,7 +25,7 @@ func AProviders() -> Result<unit, TestFailure> {
     let Ok(bytes) = Encodings.Utf8.Encode(source) else {
         return Error(TestFailure("UTF-8 encode", "Ok", "Error"))
     }
-    let Ok(text) = Encodings.Utf8.Decode(bytes) else {
+    let Ok(text) = Encodings.Utf8.Decode(ArrayList<byte>(bytes)[..]) else {
         return Error(TestFailure("UTF-8 round trip", "Ok", "Error"))
     }
     _ = Assert.Equal(source, text)?
@@ -116,7 +116,7 @@ func FProgress() -> Result<unit, TestFailure> {
             _ = Assert.True(step.State is EncoderState.NeedsOutput, "More bytes pending")?
         }
     }
-    let Ok(text) = Encodings.Utf8.Decode(output) else {
+    let Ok(text) = Encodings.Utf8.Decode(output[..]) else {
         return Error(TestFailure("Drained bytes", "UTF-8", "Error"))
     }
     _ = Assert.Equal("é😀é", text)?
@@ -156,7 +156,7 @@ func GChunkBoundary() -> Result<unit, TestFailure> {
         }
     }
     _ = Assert.True(finished, "Bounded drain must complete")?
-    let Ok(text) = Encodings.Utf8.Decode(output) else {
+    let Ok(text) = Encodings.Utf8.Decode(output[..]) else {
         return Error(TestFailure("Boundary bytes", "UTF-8", "Error"))
     }
     return Assert.Equal(source, text)
@@ -187,8 +187,8 @@ func IOneShotRoundTrip() -> Result<unit, TestFailure> {
     let Ok(bytes) = Encodings.Utf8.Encode(text) else {
         return Error(TestFailure("One-shot encode", "Ok", "Error"))
     }
-    _ = Decoded(Encodings.Utf8.Decode(bytes), text)?
-    let empty = ArrayList<byte>()
+    _ = Decoded(Encodings.Utf8.Decode(ArrayList<byte>(bytes)[..]), text)?
+    let empty = Array<byte>.Empty
     _ = Decoded(Encodings.Utf8.Decode(empty), "")?
     _ = Decoded(Encodings.Ascii.Decode(empty), "")?
     let ascii: byte[] = [(byte)0, (byte)65, (byte)127]
@@ -209,4 +209,17 @@ func JOneShotErrors() -> Result<unit, TestFailure> {
     good[0] = (byte)66
     _ = Assert.Equal("A", text)?
     return Decoded(Encodings.Ascii.Decode(good), "B")
+}
+
+[Test("One-shot decoding borrows only its window and owns its result")]
+func KOneShotWindows() -> Result<unit, TestFailure> {
+    let bytes: byte[] = [(byte)255, (byte)195, (byte)169, (byte)0, (byte)65, (byte)255]
+    let Ok(text) = Encodings.Utf8.Decode(bytes[1..5]) else {
+        return Error(TestFailure("Borrowed window", "Ok", "Error"))
+    }
+    bytes[1] = (byte)66
+    _ = Assert.Equal("é\u0000A", text)?
+    _ = Decoded(Encodings.Utf8.Decode(bytes[6..]), "")?
+    _ = Decoded(Encodings.Ascii.Decode(bytes[3..5]), "\u0000A")?
+    return Assert.True(Encodings.Utf8.Decode(bytes[..1]) is Error(EncodingError.InvalidUtf8), "Invalid window")
 }

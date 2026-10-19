@@ -86,8 +86,8 @@ remove a copy or establish native support.
 - Runtime `Dns` results are owned address snapshots retained across async work.
   Runtime `StringScalars`/`StringGraphemes` materialize semantic text elements:
   keep results; `StringFromChars` and `StringJoinParts` can accept synchronous
-  readonly views after their runtime contracts support them. `Utf8Decode` is a
-  readonly-byte-view candidate; keep Utf8Encode's owned-result semantics and use
+  readonly views after their runtime contracts support them. `Utf8DecodeSlice` now supplies the
+  readonly-byte-view path for one-shot decoding; keep Utf8Encode's owned-result semantics and use
   the separate shared String.Utf8Bytes only where an immutable borrowed result fits.
 - Runtime `ConsoleStreams`, `FileStreams`, `Sockets` and `Tls`
   declarations must migrate with the source contracts and native implementation.
@@ -317,3 +317,21 @@ The HTTPS consumer also checks JSON exchange and rejection/timeout/cancellation.
 [Evidence](validation/memory-views-20261019/tls-integration-validation.json) records
 execution modes and matching library identities. Public signatures are unchanged;
 only API source fingerprints require refresh.
+
+## One-shot UTF-8 decoding (2026-10-19)
+
+Encoding.Decode now accepts ReadOnlySlice<byte>. HTTP header parsing borrows its
+contiguous storage directly; native Utf8DecodeSlice validates bounds and initialized
+bytes and allocates only owned text. Its owner is explicitly retained through the
+rooted allocation, including an empty window. The current collector is nonmoving;
+a moving collector must revise the privileged input-pointer lifetime. This is a
+private runtime binding, not the provider access API or future host Native API.
+Interpreter arrays contain Value slots, so decoding assembles the owned string's
+host buffer; it allocates no managed byte-array snapshot.
+
+The internal Sequence path remains for genuinely noncontiguous data and explicitly
+materializes its input. JSON token builders and PostgreSQL C-string builders now
+request their existing owned range copies at the boundary. Public Encode still
+returns its existing owned Sequence contract; revising that contract is separate.
+Incremental carry storage, lowercase transformations and owned outputs can require
+allocation; no blanket zero-allocation text claim is made.

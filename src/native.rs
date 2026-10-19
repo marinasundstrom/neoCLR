@@ -104,6 +104,7 @@ pub(crate) enum Binding {
     CharCategory,
     Utf8Encode,
     Utf8Decode,
+    Utf8DecodeSlice,
     StringConcat,
     StringReplaceOrdinal,
     StringJoinParts,
@@ -724,6 +725,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
             (Binding::Utf8Encode, Type::Array(Box::new(Type::Byte)))
+        }
+        ("neoCLR.Runtime.Utf8DecodeSlice", [input])
+            if *input == crate::cryptography::view_type(true) =>
+        {
+            (Binding::Utf8DecodeSlice, Type::Value)
         }
         ("neoCLR.Runtime.Utf8Decode", [Type::ArrayRef(element)]) if **element == Type::Byte => {
             (Binding::Utf8Decode, Type::Value)
@@ -1627,6 +1633,28 @@ impl Binding {
             }
             (Self::Utf8Encode, [Value::String(text)]) => {
                 crate::reflection::array("Byte", text.bytes().map(|b| Ok(Value::Byte(b))), limits)
+            }
+            (Self::Utf8DecodeSlice, [Value::MemoryView(view)]) => {
+                if view.ty() != crate::cryptography::view_type(true) {
+                    return Err(Fault::new("UTF-8 decoding requires a readonly byte slice"));
+                }
+                view.assigned()?;
+                // Interpreter arrays store Values, not contiguous native bytes. Build
+                // the owned string buffer directly; no managed temporary byte array.
+                let mut buffer = Vec::new();
+                buffer.try_reserve_exact(view.length())
+                    .map_err(|_| Fault::new("UTF-8 decoding allocation failed"))?;
+                for index in 0..view.length() {
+                    let Value::Byte(byte) = view.get(index)? else {
+                        return Err(Fault::new("UTF-8 decoding requires initialized bytes"));
+                    };
+                    buffer.push(byte);
+                }
+                let payload = match String::from_utf8(buffer) {
+                    Ok(text) => Value::String(text.into()),
+                    Err(_) => Value::Byte(1),
+                };
+                Ok(Value::Erased(Box::new(payload)))
             }
             (Self::Utf8Decode, [Value::ObjectReference(bytes)]) => {
                 let Value::Array {

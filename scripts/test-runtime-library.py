@@ -73,6 +73,7 @@ ENCODING_NAMES = [
     'ASCII encoder preflight is retryable and factories are independent',
     'One-shot decoding preserves Unicode BOM NUL and empty sequences',
     'One-shot errors do not poison providers and results are snapshots',
+    'One-shot decoding borrows only its window and owns its result',
 ]
 
 ZONED_TIME_PARSING_NAMES = [
@@ -451,8 +452,8 @@ def main():
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
-            # Async memory tests need Task/cancellation lifecycle bindings (including TimerCancel).
-            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
+            # Async memory tests need lifecycle bindings; JSON DOM fixtures also select HTTP content/socket handlers.
+            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if 'native' in modes:

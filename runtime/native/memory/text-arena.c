@@ -392,6 +392,30 @@ static int32_t text_decode_utf8_bytes(const unsigned char *bytes, uint64_t lengt
     return NEOCLR_AOT_FAULT_NONE;
 }
 
+static int32_t utf8_decode_slice(neoclr_aot_context *context, void *owner,
+    int32_t offset, int32_t length, void *output, int rooted) {
+    if (!context || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    neoclr_byte_view view;
+    int32_t status = neoclr_byte_view_create_v1(context, owner, offset, length,
+        NEOCLR_VIEW_READONLY_SLICE, &view);
+    if (status) return status;
+    neoclr_byte_access access;
+    status = neoclr_byte_view_access_v1(context, &view, 0, &access);
+    if (status) return status;
+    // This runtime-owned copy uses the same rooted input allocation as array
+    // decoding. The current collector does not move live input storage.
+    return text_decode_utf8_bytes(access.bytes, access.count, &context->text,
+        output, rooted, owner);
+}
+int32_t neoclr_utf8_decode_slice_v1(neoclr_aot_context *context, void *owner,
+    int32_t offset, int32_t length, void *output) {
+    return utf8_decode_slice(context, owner, offset, length, output, 0);
+}
+int32_t neoclr_utf8_decode_slice_rooted_v1(neoclr_aot_context *context, void *owner,
+    int32_t offset, int32_t length, void *output) {
+    return utf8_decode_slice(context, owner, offset, length, output, 1);
+}
+
 int32_t neoclr_utf8_decode_v1(const void *array, neoclr_aot_text_arena *arena, void *output) {
     return utf8_decode(array, arena, output, 0);
 }

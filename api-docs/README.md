@@ -1693,7 +1693,7 @@ in this slice: Utf8 remains public pending migration of public conversion consum
 
 ### One-shot decoding (2026-10-10)
 
-Encoding.Decode(Sequence<byte>) is included in both development reference snapshots,
+The then-current Encoding.Decode(Sequence<byte>) was included in both development reference snapshots (superseded by the 2026-10-19 borrowed decoding migration below),
 with strict errors, the built-in 65536-byte bound, BOM preservation and stateless
 retry behavior. Custom Encoding providers must implement the new method. The
 aggregate bridge adds its declaration; native libraries implement UTF-8 and ASCII.
@@ -2476,3 +2476,14 @@ internal SslBuffers copy and control helpers borrow slices. Public stream and PE
 factory signatures are unchanged. The regenerated reference assembly is unchanged;
 the aggregate snapshot refreshes the two implementation fingerprints. Existing native
 public pages remain applicable. See the [TLS audit](../docs/memory-view-library-audit.md#tls-plaintext-windows-2026-10-19).
+
+### One-shot borrowed decoding (2026-10-19)
+
+Encoding.Decode now takes ReadOnlySlice<byte>, with strict errors, owned result
+text, BOM/NUL preservation and the existing quota. Custom implementations migrate
+their parameter; arbitrary sequences explicitly materialize contiguous storage.
+The native signature, XML contract, navigation and type links are regenerated from
+the matching five-library bundle. The legacy CLI scaffold omits precisely
+Encoding.Decode(ReadOnlySlice<byte>), since opaque borrowed views cannot safely be
+projected; its old Sequence overload is removed. The [manual codec reference](streams.md#incremental-encoding-development)
+covers the limitation and migration. No public native API or stable host ABI is added.

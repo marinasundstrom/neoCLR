@@ -17,7 +17,7 @@ func Wrote(result: Result<int, StreamError>, expected: int) -> Result<unit, Test
 }
 
 func Content(bytes: Sequence<byte>, expected: string) -> Result<unit, TestFailure> {
-    let Ok(text) = Encodings.Utf8.Decode(bytes) else {
+    let Ok(text) = Encodings.Utf8.Decode(ArrayList<byte>(bytes)[..]) else {
         return Error(TestFailure("Encoded output", "UTF-8", "Error"))
     }
     return Assert.Equal(expected, text)

@@ -24,7 +24,7 @@ static class ReaderBindings
         namespace Text {
             public interface Encoding {
                 Result<Collections.Sequence<byte>, EncodingError> Encode(string text);
-                Result<string, EncodingError> Decode(Collections.Sequence<byte> bytes);
+                // Decode(ReadOnlySlice<byte>) is documented from native metadata.
                 Decoder CreateDecoder();
                 Encoder CreateEncoder();
             }

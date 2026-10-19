@@ -131,7 +131,70 @@ static int access_tests(void) {
     CHECK(!access.bytes && !access.initialized && !access.count);
     return 0;
 }
+static int decode_tests(void) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
+    void *array;
+    CHECK(!neoclr_reserve_bytes_v1(&c.text, 8, &array));
+    neoclr_byte_view view;
+    CHECK(!neoclr_byte_view_create_all_v1(&c, array, NEOCLR_VIEW_SLICE, &view));
+    const uint8_t bytes[] = {65, 0, 195, 169, 240, 159, 152, 128};
+    for (int i = 0; i < 8; i++) CHECK(!neoclr_byte_view_set_v1(&c, &view, i, bytes[i]));
+    uint64_t result[2] = {0};
+#ifdef NEOCLR_NATIVE_GC
+    uint64_t allocations = neoclr_gc_statistics_v1().allocations;
+    neoclr_probe_frame active = {0};
+    neoclr_probe_storage unused = {0};
+    neoclr_probe_enter_v3(&active, &c, 0, &unused, 0, "", 0);
+#endif
+    CHECK(!neoclr_utf8_decode_slice_rooted_v1(&c, array, 1, 7, result));
+    CHECK(result[0] == 4);
+    const neoclr_aot_text *text = (const void *)(uintptr_t)result[1];
+    CHECK(text->length == 7 && !memcmp(text->bytes, bytes + 1, 7));
+#ifdef NEOCLR_NATIVE_GC
+    CHECK(neoclr_gc_statistics_v1().allocations == allocations + 1);
+    neoclr_probe_leave_v1(&active);
+#endif
+    CHECK(!neoclr_byte_view_set_v1(&c, &view, 2, 65));
+    CHECK(text->bytes[1] == 195); /* Owned output survives source mutation. */
+    CHECK(!neoclr_utf8_decode_slice_v1(&c, array, 3, 1, result));
+    CHECK(result[0] == 2 && result[1] == 1); /* Isolated continuation. */
+    result[0] = 123; result[1] = 456;
+    CHECK(neoclr_utf8_decode_slice_v1(&c, array, 7, 2, result) != 0);
+    CHECK(result[0] == 123 && result[1] == 456);
+    CHECK(!neoclr_utf8_decode_slice_v1(&c, NULL, 0, 0, result));
+    text = (const void *)(uintptr_t)result[1];
+    CHECK(result[0] == 4 && text->length == 0);
+    void *partial;
+    CHECK(!neoclr_reserve_bytes_v1(&c.text, 2, &partial));
+    CHECK(!neoclr_byte_view_create_all_v1(&c, partial, NEOCLR_VIEW_SLICE, &view));
+    CHECK(!neoclr_byte_view_set_v1(&c, &view, 0, 255));
+    result[0] = 123; result[1] = 456;
+    CHECK(neoclr_utf8_decode_slice_v1(&c, partial, 0, 2, result) == 3);
+    CHECK(result[0] == 123 && result[1] == 456); /* Initialization before UTF-8. */
+    CHECK(!neoclr_utf8_decode_slice_v1(&c, partial, 0, 1, result));
+    CHECK(result[0] == 2 && result[1] == 1); /* Outside initialization is irrelevant. */
+#ifdef NEOCLR_NATIVE_GC
+    neoclr_probe_frame frame = {.context = &c};
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+    CHECK(!neoclr_allocate_bytes_v1(&c.text, 64, &array));
+    void *garbage;
+    while (!neoclr_allocate_bytes_v1(&c.text, 1, &garbage)) { }
+    uint64_t collections = neoclr_gc_statistics_v1().collections;
+    neoclr_probe_enter_v3(&active, &c, 0, &unused, 0, "", 0);
+    CHECK(!neoclr_utf8_decode_slice_rooted_v1(&c, array, 0, 64, result));
+    neoclr_probe_leave_v1(&active);
+    CHECK(neoclr_gc_statistics_v1().collections > collections);
+    text = (const void *)(uintptr_t)result[1];
+    CHECK(result[0] == 4 && text->length == 64);
+    for (int i = 0; i < 64; i++) CHECK(text->bytes[i] == 0);
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+#endif
+    return 0;
+}
+
 int main(void) {
+    CHECK(!decode_tests());
     CHECK(!copy_tests());
     CHECK(!access_tests());
     uint64_t heap[512] = {0};

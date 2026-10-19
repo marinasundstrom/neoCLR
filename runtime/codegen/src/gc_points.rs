@@ -105,6 +105,7 @@ pub(super) fn native_body(
                 &d.string_intern,
                 &d.string_byte_count,
                 &d.utf8_decode,
+                &d.utf8_decode_slice,
                 &d.utf8_encode,
                 &d.string_slice_graphemes,
                 &d.string_slice_utf8,
