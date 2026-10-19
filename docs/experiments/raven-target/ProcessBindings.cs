@@ -35,6 +35,14 @@ static class ProcessBindings
         ("System.Environment", "GetEnvironmentVariable", ["String"], "System.Result<System.Option<String>,System.EnvironmentError>")
     ];
     public const string ConsoleDeclaration = """
+        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, object? arg0) => default;
+        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, object? arg0, object? arg1) => default;
+        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, object? arg0, object? arg1, object? arg2) => default;
+        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, params object?[] arguments) => default;
+        public static void WriteLine(string format, object? arg0) { }
+        public static void WriteLine(string format, object? arg0, object? arg1) { }
+        public static void WriteLine(string format, object? arg0, object? arg1, object? arg2) { }
+        public static void WriteLine(string format, params object?[] arguments) { }
         public static Result<Option<byte>, ConsoleReadError> ReadByte() => default;
         public static IO.TextReader In => default;
         public static IO.TextWriter Out => default;

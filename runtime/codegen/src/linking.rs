@@ -290,15 +290,26 @@ pub fn prepare(
         reflection_retention = Some(retention);
     }
     let source_conformance = joined.clone();
+    let boxed_nominal_types: std::collections::BTreeSet<_> = joined
+        .functions
+        .iter()
+        .flat_map(|f| &f.body)
+        .filter_map(|op| match op {
+            neoclr::metadata::Instruction::BoxValue(ty) => ty.definition_name().map(str::to_owned),
+            _ => None,
+        })
+        .collect();
     let relationships: Vec<_> = joined
         .types
         .iter_mut()
         .map(|ty| {
             let relationships = ty.implements.clone();
             // Reference objects need their verified interface views at runtime.
-            // Value-only conformance remains metadata-only in this profile.
+            // Boxed nominal values also need their verified interface views.
+            // Unboxed value-only conformance remains metadata-only.
             if !context.is_some_and(|c| c.reference_arena)
                 || (!ty.is_reference_type
+                    && !boxed_nominal_types.contains(&ty.name)
                     && ty.name != "System.String"
                     && ty.representation != neoclr::metadata::Representation::Interface)
             {
@@ -558,7 +569,7 @@ pub fn prepare(
     }
     report["verifiedInterfaceRelationships"] = json!(verified_relationships);
     report["interfacePolicy"] = json!(
-        "original load-set conformance verified; value relationships omitted from private projection; reference-arena class interface views and constructed-class implicit dispatch retained; explicit implementations unsupported"
+        "original load-set conformance verified; unboxed value relationships omitted from private projection; reference-arena class and boxed nominal value interface views and verified dispatch retained; explicit implementations unsupported"
     );
     let bind_user_fault = context.is_some_and(|c| c.bind_user_fault);
     report["nativeBindings"] = if bind_user_fault {

@@ -1,0 +1,148 @@
+module System.Text
+
+import System.*
+
+// Shared composite formatting engine. Scan ASCII syntax in borrowed UTF-8;
+// never enumerate graphemes merely to find braces or decimal indexes.
+internal static class CompositeFormatting {
+    static func Format(format: string, count: int, arg0: object?, arg1: object?, arg2: object?, arguments: object?[]?) -> string {
+        let bytes = format.Utf8Bytes
+        let builder = StringBuilder()
+        var position = 0
+        var literal = 0
+        var changed = false
+        while position < bytes.Length {
+            let current = bytes[position]
+            if current != 123 && current != 125 {
+                position += 1
+                continue
+            }
+            changed = true
+            AppendLiteral(builder, format, literal, position - literal)
+            position += 1
+            if position < bytes.Length && bytes[position] == current {
+                builder.Append(if current == 123 { "{" } else { "}" })
+                position += 1
+                literal = position
+                continue
+            }
+            if current == 125 {
+                System.Fail("Invalid composite format")
+            }
+            var index = 0
+            let digitStart = position
+            while position < bytes.Length && bytes[position] >= 48 && bytes[position] <= 57 {
+                if index > 214748363 {
+                    System.Fail("Invalid composite format")
+                }
+                index = index * 10 + bytes[position] - 48
+                position += 1
+            }
+            if position == digitStart || index >= count {
+                System.Fail("Invalid composite format argument index")
+            }
+            while position < bytes.Length && bytes[position] == 32 {
+                position += 1
+            }
+            var width = 0
+            var left = false
+            if position < bytes.Length && bytes[position] == 44 {
+                position += 1
+                while position < bytes.Length && bytes[position] == 32 {
+                    position += 1
+                }
+                if position < bytes.Length && bytes[position] == 45 {
+                    left = true
+                    position += 1
+                }
+                let widthStart = position
+                while position < bytes.Length && bytes[position] >= 48 && bytes[position] <= 57 {
+                    width = width * 10 + bytes[position] - 48
+                    if width > 65536 {
+                        System.Fail("Composite format alignment exceeds UTF-8 limit")
+                    }
+                    position += 1
+                }
+                if position == widthStart {
+                    System.Fail("Invalid composite format alignment")
+                }
+                while position < bytes.Length && bytes[position] == 32 {
+                    position += 1
+                }
+            }
+            var itemFormat = ""
+            if position < bytes.Length && bytes[position] == 58 {
+                position += 1
+                let formatStart = position
+                while position < bytes.Length && bytes[position] != 125 {
+                    if bytes[position] == 123 {
+                        System.Fail("Invalid composite format")
+                    }
+                    position += 1
+                }
+                if position > formatStart {
+                    let payload = neoCLR.Runtime.StringSliceUtf8(format, formatStart, position - formatStart)
+                    itemFormat = neoCLR.Runtime.UnpackValue<string>(payload)
+                }
+            }
+            if position >= bytes.Length || bytes[position] != 125 {
+                System.Fail("Invalid composite format")
+            }
+            position += 1
+            var argument: object? = null
+            if arguments is object?[] supplied {
+                argument = supplied[index]
+            } else if index == 0 {
+                argument = arg0
+            } else if index == 1 {
+                argument = arg1
+            } else {
+                argument = arg2
+            }
+            var text = ""
+            if argument is Formattable formattable {
+                text = formattable.ToString(itemFormat)
+            } else if argument is object present {
+                // Match composite formatting fallback for types without Formattable.
+                text = present.ToString()
+            }
+            var padding = 0
+            if width > 0 {
+                padding = width - text.Length
+            }
+            if !left {
+                AppendPadding(builder, padding)
+            }
+            builder.Append(text)
+            if left {
+                AppendPadding(builder, padding)
+            }
+            literal = position
+        }
+        if !changed {
+            return format
+        }
+        AppendLiteral(builder, format, literal, position - literal)
+        return builder.ToString()
+    }
+
+    private static func AppendLiteral(builder: StringBuilder, format: string, start: int, length: int) {
+        if length > 0 {
+            // ASCII syntax boundaries are always valid UTF-8 boundaries.
+            let payload = neoCLR.Runtime.StringSliceUtf8(format, start, length)
+            builder.Append(neoCLR.Runtime.UnpackValue<string>(payload))
+        }
+    }
+
+    private static func AppendPadding(builder: StringBuilder, count: int) {
+        var remaining = count
+        while remaining >= 32 {
+            builder.Append("                                ")
+            remaining -= 32
+        }
+        while remaining > 0 {
+            builder.Append(" ")
+            remaining -= 1
+        }
+    }
+}

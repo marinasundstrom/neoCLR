@@ -123,6 +123,7 @@
   "System.EnvironmentError",
   "System.EquatableTo`1",
   "System.FlagsAttribute",
+  "System.Formattable",
   "System.Func`1",
   "System.Func`2",
   "System.Func`3",

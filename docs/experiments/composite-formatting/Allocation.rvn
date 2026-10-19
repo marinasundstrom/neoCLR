@@ -1,0 +1,20 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    var count = 0
+    while count < 128 {
+        var text = "a:b:c"
+        if mode == "fixed" {
+            text = String.Format("{0}:{1}:{2}", "a", "b", "c")
+        } else if mode == "array" {
+            let arguments: object?[] = ["a", "b", "c"]
+            text = String.Format("{0}:{1}:{2}", arguments)
+        }
+        if String.CompareOrdinal(text, "a:b:c") != 0 {
+            System.Fail("Formatting allocation contract")
+        }
+        count += 1
+    }
+    Console.WriteLine("PASS format allocation")
+}

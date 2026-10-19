@@ -160,6 +160,7 @@ pub struct Options {
     pub string_interfaces: Option<Vec<usize>>,
     pub object_value_kinds: HashMap<usize, String>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
+    pub interface_dispatch: HashMap<usize, Vec<(usize, usize)>>,
     pub frame_names: HashMap<usize, String>,
     pub class_dispatch_thunks: HashSet<usize>,
 }
@@ -224,6 +225,26 @@ impl Options {
                 .collect(),
             object_display: report
                 .and_then(|r| r["objectDisplayDispatch"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["contractCompiledIndex"].as_u64()? as usize,
+                        r["targets"]
+                            .as_array()?
+                            .iter()
+                            .filter_map(|t| {
+                                Some((
+                                    t["typeCompiledIndex"].as_u64()? as usize,
+                                    t["functionCompiledIndex"].as_u64()? as usize,
+                                ))
+                            })
+                            .collect(),
+                    ))
+                })
+                .collect(),
+            interface_dispatch: report
+                .and_then(|r| r["interfaceDispatch"].as_array())
                 .into_iter()
                 .flatten()
                 .filter_map(|r| {

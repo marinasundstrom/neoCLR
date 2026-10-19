@@ -500,3 +500,21 @@ String. Canonical remains the default for typed/boxed equality and hashing; call
 using another equality policy must choose compatible hashing. A general borrowed
 Char.Utf8Bytes view is not implemented: interpreter Char storage still needs an
 ownership solution before that contract can avoid copying.
+
+### Composite formatting (development)
+
+`String.Format(format: string, arg0: object?) -> string`, corresponding two/three
+argument overloads, and `Format(format: string, params arguments: object?[])` share
+`{index[,alignment][:format]}` parsing. Double opening or closing braces escape literal braces. Null arguments
+produce empty text; `System.Formattable.ToString(format: string) -> string` receives
+the exact specifier (empty for default); other objects use parameterless ToString.
+Alignment counts graphemes, not terminal columns. Invalid syntax/indexes or formatted
+output above 65536 UTF-8 bytes fault. Literal-only input is reused. Culture-provider
+support remains a gap. Existing primitives do not automatically acquire numeric
+specifier support by defining the interface.
+
+`Console.Write` and `WriteLine` expose the same four format overloads. Write returns
+`Task<unit>` and flushes; WriteLine is synchronous. Both format before output, so a
+format failure writes no prefix. Fixed arities avoid an argument array, but values
+may box and formatting allocates fragments/results. See the
+[contract and tested sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/composite-formatting/README.md).

@@ -8,6 +8,80 @@ import System.Result.*
 import System.Option.*
 
 public static class Console {
+    /// <summary>Writes composite text.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arg0">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    /// <returns>Completion of output and flush.</returns>
+    static func Write(format: string, arg0: object?) -> Task<unit> {
+        return Write(String.Format(format, arg0))
+    }
+
+    /// <summary>Writes composite text.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arg0">Format arguments; null values produce empty text.</param>
+    /// <param name="arg1">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    /// <returns>Completion of output and flush.</returns>
+    static func Write(format: string, arg0: object?, arg1: object?) -> Task<unit> {
+        return Write(String.Format(format, arg0, arg1))
+    }
+
+    /// <summary>Writes composite text.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arg0">Format arguments; null values produce empty text.</param>
+    /// <param name="arg1">Format arguments; null values produce empty text.</param>
+    /// <param name="arg2">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    /// <returns>Completion of output and flush.</returns>
+    static func Write(format: string, arg0: object?, arg1: object?, arg2: object?) -> Task<unit> {
+        return Write(String.Format(format, arg0, arg1, arg2))
+    }
+
+    /// <summary>Writes composite text.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arguments">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    /// <returns>Completion of output and flush.</returns>
+    static func Write(format: string, params arguments: object?[]) -> Task<unit> {
+        return Write(String.Format(format, arguments))
+    }
+
+    /// <summary>Writes composite text followed by a newline.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arg0">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    static func WriteLine(format: string, arg0: object?) {
+        WriteLine(String.Format(format, arg0))
+    }
+
+    /// <summary>Writes composite text followed by a newline.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arg0">Format arguments; null values produce empty text.</param>
+    /// <param name="arg1">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    static func WriteLine(format: string, arg0: object?, arg1: object?) {
+        WriteLine(String.Format(format, arg0, arg1))
+    }
+
+    /// <summary>Writes composite text followed by a newline.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arg0">Format arguments; null values produce empty text.</param>
+    /// <param name="arg1">Format arguments; null values produce empty text.</param>
+    /// <param name="arg2">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    static func WriteLine(format: string, arg0: object?, arg1: object?, arg2: object?) {
+        WriteLine(String.Format(format, arg0, arg1, arg2))
+    }
+
+    /// <summary>Writes composite text followed by a newline.</summary>
+    /// <param name="format">Composite format text; see String.Format.</param>
+    /// <param name="arguments">Format arguments; null values produce empty text.</param>
+    /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
+    static func WriteLine(format: string, params arguments: object?[]) {
+        WriteLine(String.Format(format, arguments))
+    }
+
     static func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
         let payload = neoCLR.Runtime.ConsoleReadByte()
         if neoCLR.Runtime.IsValue<int>(payload) {

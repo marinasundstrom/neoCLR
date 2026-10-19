@@ -23,6 +23,7 @@ pub(super) fn trace_layout(
         details.map_or(&[], |d| d.reference_array_backings.as_slice()),
         details.map(|d| &d.object_display),
         details.map(|d| &d.string_dispatch),
+        details.map(|d| &d.interface_dispatch),
         details.map(|d| d.primitive_receivers.as_slice()),
         details.is_some_and(|d| d.native_stack_budget),
     )?;
@@ -478,6 +479,7 @@ pub(crate) fn compile_into(
         details.map_or(&[], |d| d.reference_array_backings.as_slice()),
         details.map(|d| &d.object_display),
         details.map(|d| &d.string_dispatch),
+        details.map(|d| &d.interface_dispatch),
         details.map(|d| d.primitive_receivers.as_slice()),
         details.is_some_and(|d| d.native_stack_budget),
     )?;

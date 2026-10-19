@@ -1,0 +1,10 @@
+module System
+
+/// Formats a value with a type-defined format string, independent of ambient culture.
+public interface Formattable {
+    /// <summary>Formats this value using the requested type-specific format.</summary>
+    /// <param name="format">Non-null format; empty requests the default representation.</param>
+    /// <returns>The formatted immutable UTF-8 text.</returns>
+    /// <remarks>Used by String.Format and Console composite overloads. Implementations validate their own specifiers. No ambient culture or provider dispatch is implied.</remarks>
+    func ToString(format: string) -> string
+}

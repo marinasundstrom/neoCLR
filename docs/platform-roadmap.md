@@ -17,7 +17,12 @@ representation decision until after utility work. The [canonical search integrat
 repairs Unicode version skew and qualifies Contains/StartsWith/EndsWith with explicit
 comparison modes across interpreter/JIT/AOT. The six-search allocation workload adds
 no managed allocations; eager collection counts rise, without a throughput claim. [Char validation and explicit equality](experiments/char-utilities/README.md)
-are also implemented; borrowed Char bytes remain an ownership gap. Position-based
+are also implemented; borrowed Char bytes remain an ownership gap. The author
+explicitly defers String storage/view work and requests composite formatting.
+[String.Format, Console overloads and Formattable](experiments/composite-formatting/README.md)
+provide the shared Raven formatter; boxed nominal interface dispatch is repaired in
+the native backend. Provider/primitive-specifier integration and direct writer
+formatting remain gaps. Position-based
 search/splitting and the direct-call null String bridge discrepancy remain review
 items; replacement release qualification remains pending.
 

@@ -5,6 +5,45 @@ import System.Option.*
 import System.Text.Utf8SliceError
 
 public class String : EquatableTo<string>, ComparableTo<string>, Collections.Sequence<char> {
+    /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
+    /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
+    /// <param name="arg0">Values formatted through ToString; null produces empty text.</param>
+    /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    static func Format(format: string, arg0: object?) -> string {
+        return Text.CompositeFormatting.Format(format, 1, arg0, null, null, null)
+    }
+
+    /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
+    /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
+    /// <param name="arg0">Values formatted through ToString; null produces empty text.</param>
+    /// <param name="arg1">Values formatted through ToString; null produces empty text.</param>
+    /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    static func Format(format: string, arg0: object?, arg1: object?) -> string {
+        return Text.CompositeFormatting.Format(format, 2, arg0, arg1, null, null)
+    }
+
+    /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
+    /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
+    /// <param name="arg0">Values formatted through ToString; null produces empty text.</param>
+    /// <param name="arg1">Values formatted through ToString; null produces empty text.</param>
+    /// <param name="arg2">Values formatted through ToString; null produces empty text.</param>
+    /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    static func Format(format: string, arg0: object?, arg1: object?, arg2: object?) -> string {
+        return Text.CompositeFormatting.Format(format, 3, arg0, arg1, arg2, null)
+    }
+
+    /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
+    /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
+    /// <param name="arguments">Values formatted through ToString; null produces empty text.</param>
+    /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    static func Format(format: string, params arguments: object?[]) -> string {
+        return Text.CompositeFormatting.Format(format, arguments.Length, null, null, null, arguments)
+    }
+
     /// Borrows immutable UTF-8 bytes. Byte offsets are independent of grapheme indexes.
     val Utf8Bytes: ReadOnlySlice<byte> => neoCLR.Runtime.ViewUtf8(self)
 

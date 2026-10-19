@@ -169,3 +169,17 @@ pass a replacement explicitly for another convention. CRLF is treated as one
 newline. The implementation preserves all other bytes, reuses unchanged strings
 and writes changed native output directly into its final allocation. This is a
 text utility, not an HTTP framing operation.
+
+## Composite formatting (development)
+
+`String.Format` and the matching `Console.Write`/`WriteLine` overloads accept indexed
+placeholders, alignment and escaped braces. `System.Formattable` lets a type interpret
+its own format string through `ToString(format: string)`. Alignment counts graphemes;
+null arguments produce empty text. Types without Formattable use ordinary ToString.
+
+One-, two- and three-argument overloads avoid an argument array; a params overload
+handles larger lists. This is not allocation-free: boxing, text fragments and final
+output can allocate. Formatted output currently has the builder's 65536-byte limit;
+culture-provider and primitive numeric-format integration remain gaps. Write is
+awaitable and flushes; WriteLine keeps its synchronous behavior. String storage/view
+changes remain deferred.

@@ -105,6 +105,7 @@ impl<'a> Profile<'a> {
         reference_backings: &[usize],
         object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>,
         string_dispatch: Option<&HashMap<usize, usize>>,
+        interface_dispatch: Option<&HashMap<usize, Vec<(usize, usize)>>>,
         primitive_receivers: Option<&[usize]>,
         native_stack_budget: bool,
     ) -> Result<Self, Error> {
@@ -201,7 +202,6 @@ impl<'a> Profile<'a> {
             }
             if !t.implements.is_empty()
                 && (!references
-                    || !t.is_reference_type
                     || t.implements.iter().any(|interface| {
                         !matches!(interface, Type::Named(_))
                             || input.type_definition(interface).is_none_or(|t| {
@@ -344,7 +344,10 @@ impl<'a> Profile<'a> {
         for (i, f) in input.functions.iter().enumerate() {
             p.names.entry(&f.name).or_default().push(i);
             let interface = references && crate::selection::interface_contract(input, f);
-            if interface {
+            if interface && interface_dispatch.is_some_and(|targets| targets.contains_key(&i)) {
+                p.dispatch
+                    .insert(i, interface_dispatch.unwrap()[&i].clone());
+            } else if interface {
                 let reached = (0..input.functions.len()).collect();
                 p.dispatch.insert(
                     i,
@@ -1122,8 +1125,8 @@ impl<'a> Profile<'a> {
                     .iter()
                     .enumerate()
                     .filter(|(_, t)| {
-                        t.is_reference_type
-                            && t.representation == Representation::Record
+                        t.representation == Representation::Record
+                            && !t.is_abstract
                             && crate::selection::implements_interface(
                                 self.input,
                                 &Type::Named(t.name.clone()),
@@ -2610,7 +2613,8 @@ mod object_assignment_tests {
         ] {
             let mut input = crate::memory_views::test_module(kind, Type::Byte);
             let ty = Type::Named(input.types[0].name.clone());
-            let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
+            let p =
+                Profile::new(&input, true, None, None, &[], None, None, None, None, false).unwrap();
             let value = p.ty(&ty).unwrap();
             assert_eq!(value, Ty::ByteMemory(0));
             assert_eq!(p.lanes(&value), 3);
@@ -2619,14 +2623,29 @@ mod object_assignment_tests {
             assert!(p.ty(&Type::ArrayRef(Box::new(ty.clone()))).is_err());
             assert!(p.ty(&Type::Union(vec![ty.clone(), Type::Int32])).is_err());
             assert!(!crate::scalar_unions::record(&input, &ty));
-            assert!(Profile::new(&input, false, None, None, &[], None, None, None, false).is_err());
+            assert!(
+                Profile::new(
+                    &input,
+                    false,
+                    None,
+                    None,
+                    &[],
+                    None,
+                    None,
+                    None,
+                    None,
+                    false
+                )
+                .is_err()
+            );
             input.functions.push(
                 serde_json::from_value(serde_json::json!({
                     "name":"Forge", "returns":ty, "body":[Op::New(ty.clone()), Op::Return]
                 }))
                 .unwrap(),
             );
-            let p = Profile::new(&input, true, None, None, &[], None, None, None, false).unwrap();
+            let p =
+                Profile::new(&input, true, None, None, &[], None, None, None, None, false).unwrap();
             assert!(p.analyze(0).is_err());
         }
     }
@@ -2644,7 +2663,7 @@ mod object_assignment_tests {
                     .remove(0);
             holder.fields[0].ty = ty;
             input.types.push(holder);
-            let error = Profile::new(&input, true, None, None, &[], None, None, None, false)
+            let error = Profile::new(&input, true, None, None, &[], None, None, None, None, false)
                 .err()
                 .unwrap();
             assert!(error.to_string().contains("cannot be stored in fields"));
@@ -2677,9 +2696,20 @@ mod object_assignment_tests {
                 if clear_kind {
                     closed.types[0].memory_view = None;
                 }
-                let error = Profile::new(&closed, true, None, None, &[], None, None, None, false)
-                    .err()
-                    .expect("opaque shapes cannot become empty records");
+                let error = Profile::new(
+                    &closed,
+                    true,
+                    None,
+                    None,
+                    &[],
+                    None,
+                    None,
+                    None,
+                    None,
+                    false,
+                )
+                .err()
+                .expect("opaque shapes cannot become empty records");
                 assert!(error.to_string().contains("native ABI and GC"));
             }
         }
@@ -2788,6 +2818,7 @@ mod object_assignment_tests {
                 object_base,
                 None,
                 &[],
+                None,
                 None,
                 None,
                 None,

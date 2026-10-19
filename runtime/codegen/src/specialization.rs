@@ -1151,8 +1151,9 @@ pub(crate) fn expand_with_conformance(
                 let definition = input
                     .type_definition(owner)
                     .ok_or("constructed interface implementor requires local definition")?;
-                // Discover boxed value display before erasing closed generic arguments.
-                let value_display = super::selection::object_display_contract(&contract)
+                // Discover boxed value dispatch before erasing closed generic arguments.
+                let value_display = (super::selection::object_display_contract(&contract)
+                    || super::selection::interface_contract(input, &contract))
                     && boxed_values.contains(owner);
                 if super::selection::object_dispatch_contract(&contract)
                     && !definition.is_reference_type

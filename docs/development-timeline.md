@@ -20030,3 +20030,23 @@ Native JSON backend/runtime gaps remain open separately.
   add no managed allocations; interpreter Char copies remain. Borrowed Char bytes,
   scalar traversal and grapheme whitespace helpers are still open. The shared-storage
   String proposal remains separate from the completed utility APIs.
+
+## 2026-10-19 — Composite formatting after deferring String views
+
+- **Author:** “We defer string view improvements. Let’s fix the last useful helpers.
+  string.Format is on the list. We will have to add format overloads for Console.WriteLine
+  and Write”.
+- **Assistant:** proposed shared Raven parsing, fixed arities avoiding an argument
+  array, grapheme alignment, and preserving existing console execution contracts;
+  identified missing Formattable/provider support and existing builder limits.
+- **Author correction:** “Add a formattable interface then”.
+- **Action:** added System.Formattable and dispatch of type-defined format strings,
+  alongside String/Console overloads. No String layout work. Provider/culture and
+  primitive format-specifier integration remain explicit gaps; see the
+  [implementation and qualification](experiments/composite-formatting/README.md).
+
+- **Implementation follow-through (2026-10-20):** native tests exposed stripped
+  value-interface conformance and class-only dispatch/profile guards. Repaired the
+  neoCLR backend without Raven compiler source changes; boxed empty and
+  reference-bearing Formattable structs now pass AOT, and 109 backend unit tests pass.
+  Final three-engine and allocation evidence is retained with the experiment.

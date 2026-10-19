@@ -527,3 +527,14 @@ remain separate work. Inspection confirms Value::Char stores an owned Rust Strin
 CharText clones it into StringValue, so exposing that path as borrowed would be
 misleading. The shared-storage proposal above could address this ownership issue,
 but no String or Char layout change is adopted in this utility slice.
+
+## Composite formatting and Formattable — 2026-10-19
+
+The author explicitly defers shared-storage String views and directs the remaining
+useful helpers, naming String.Format and Console Write/WriteLine format overloads.
+After the assistant identified missing type-specific formatting, the author directed:
+“Add a formattable interface then.” The implementation uses a shared Raven parser
+and System.Formattable.ToString(string), with fixed-arity overloads avoiding argument
+arrays. [Contracts, .NET comparison and validation](../experiments/composite-formatting/README.md)
+record grapheme alignment, current limits and remaining allocation/provider gaps.
+This does not change String storage or infer approval of culture-provider design.

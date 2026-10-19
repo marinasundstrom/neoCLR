@@ -735,8 +735,12 @@ pub(super) fn dispatch_targets_with_array(
             }
         }
         for (pc, op) in input.functions[i].body.iter().enumerate() {
-            if object_display_contract(f) {
-                if let Op::BoxValue(ty) = op {
+            if let Op::BoxValue(ty) = op {
+                // Nominal value boxes retain interface identity as well as Object
+                // overrides. Scalar boxes still use their explicit projections.
+                if object_display_contract(f)
+                    || matches!(ty, Type::Named(_) | Type::Constructed { .. })
+                {
                     if let Some(t) = input.type_definition(ty) {
                         if !t.is_reference_type
                             && t.representation == neoclr::metadata::Representation::Record
@@ -790,7 +794,7 @@ pub(super) fn dispatch_targets_with_array(
             continue;
         }
         // A value constructor alone cannot contribute a reference dispatch target.
-        // Unsupported boxes still reject above; interface dispatch is unchanged.
+        // Only reachable boxes contribute value-type interface dispatch targets.
         if display && !t.is_reference_type && !boxed_values.contains(t.name.as_str()) {
             continue;
         }
@@ -1318,6 +1322,48 @@ pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
 #[cfg(test)]
 mod composition_admission_tests {
     use super::*;
+
+    #[test]
+    fn boxed_value_interface_targets_are_retained_without_a_constructor() {
+        let module = neoclr::assemble(
+            ".module BoxedInterface\n.type class System.Object\n.end\n.interface Format\n.method instance Render() -> Int32\n.end\n.end\n.type Payload\n.implements Format\n.method instance byref Render() -> Int32\nldc.i4 42\nret\n.end\n.end\n.function Main() -> Int32\n.local Payload value\nldloca value\ninitobj Payload\nldloc value\nbox Payload\npop\nldc.i4 0\nret\n.end",
+        ).unwrap();
+        let contract = module
+            .functions
+            .iter()
+            .position(|f| f.name == "Format.Render")
+            .unwrap();
+        let main = module
+            .functions
+            .iter()
+            .position(|f| f.name == "Main")
+            .unwrap();
+        let method = module
+            .functions
+            .iter()
+            .position(|f| f.name == "Payload.Render")
+            .unwrap();
+        let value = module
+            .types
+            .iter()
+            .position(|t| t.name == "Payload")
+            .unwrap();
+        let targets = dispatch_targets_with_array(
+            &module,
+            contract,
+            &BTreeSet::from([main]),
+            None,
+            &[],
+            None,
+        )
+        .unwrap();
+        assert_eq!(targets, vec![(value, method)]);
+        assert!(
+            dispatch_targets_with_array(&module, contract, &BTreeSet::new(), None, &[], None)
+                .unwrap()
+                .is_empty()
+        );
+    }
 
     #[test]
     fn structural_tuple_storage_is_selected_without_nominal_carriers() {

@@ -1,0 +1,68 @@
+import System.*
+import System.Concurrency.Tasks.*
+
+class Label {
+    override func ToString() -> string => "label"
+}
+
+class CustomFormat : Formattable {
+    func ToString(format: string) -> string {
+        return if format.IsEmpty { "default" } else { "custom:" + format }
+    }
+}
+
+struct FormattedValue : Formattable {
+    func ToString(format: string) -> string => "value:" + format
+}
+
+struct FormattedPayload : Formattable {
+    private val text: string
+    init(text: string) {
+        self.text = text
+    }
+    func ToString(format: string) -> string => text + format
+}
+
+func Check(actual: string, expected: string) {
+    if String.CompareOrdinal(actual, expected) != 0 {
+        Console.WriteLine(actual)
+        System.Fail("Composite formatting contract")
+    }
+}
+
+async func Main() -> Task<unit> {
+    Check(String.Format("{{}}"), "{}")
+    Check(String.Format("plain 👩‍💻", 42), "plain 👩‍💻")
+    Check(String.Format("{0} {0}", 42), "42 42")
+    Check(String.Format("{1}/{0}", "a", "b"), "b/a")
+    Check(String.Format("{2}/{0}/{1}", "a", true, 17), "17/a/True")
+    Check(String.Format("{{{0}}}", "é"), "{é}")
+    Check(String.Format("{{}}", null), "{}")
+    Check(String.Format("[{0,3}][{1,-3}]", "é", "👩‍💻"), "[  é][👩‍💻  ]")
+    Check(String.Format("{0,1}|{1}", "long", null), "long|")
+    Check(String.Format("{0:}", Label()), "label")
+    Check(String.Format("{0, 0 }", "x"), "x")
+    Check(String.Format("{3}:{0}", "a", "b", "c", "d"), "d:a")
+    let arguments: object?[] = ["a", 2, null, "d"]
+    Check(String.Format("{3}:{1}:{2}", arguments), "d:2:")
+    Check(String.Format("{0}", Char.FromString("🇸🇪")), "🇸🇪")
+    Check(String.Format("a\u0000{0}z", "é"), "a\u0000éz")
+    Check(String.Format("{0}|{0:é}|{0,12:tag}", CustomFormat()), "default|custom:é|  custom:tag")
+    Check(String.Format("{0:token}", FormattedValue()), "value:token")
+    let payload: object = FormattedPayload(String.Concat("retained", ":"))
+    let unrelated = String.Concat("other", " allocation")
+    Check(unrelated, "other allocation")
+    Check(String.Format("{0:tag}", payload), "retained:tag")
+    Check(String.Format("{0:ignored}", Label()), "label")
+    Check(String.Format("{0:anything}", null), "")
+    Console.WriteLine("line:{0}", 1)
+    Console.WriteLine("line:{0}:{1}", 1, 2)
+    Console.WriteLine("line:{0}:{1}:{2}", 1, 2, 3)
+    Console.WriteLine("line:{3}", 1, 2, 3, 4)
+    await Console.Write("write:{0}", 1)
+    await Console.Write(":{0}:{1}", 2, 3)
+    await Console.Write(":{0}:{1}:{2}", 4, 5, 6)
+    await Console.Write(":{3}", 7, 8, 9, 10)
+    Console.WriteLine()
+    Console.WriteLine("PASS composite formatting")
+}

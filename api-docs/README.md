@@ -2613,3 +2613,11 @@ members on the already-selected Char type. The native snapshot comes from
 char-utilities-api-audit-v1 and the matching five-library build. Source and manual
 documentation describe non-null inputs, one-grapheme validation, unchanged UTF-8,
 comparison modes and construction/ownership limitations; no new exclusion is needed.
+
+Development (2026-10-19) adds String.Format and Console.Write/WriteLine fixed-arity
+and params overloads, plus System.Formattable.ToString(string). Formattable is in
+the RavenDoc type selection; both snapshots include it and all overloads. The native
+snapshot comes from composite-format-api-audit-v1 and composite-format-libraries-v3
+with compiler code 2d22055dc and renderer 03bcc23d6. No new rendering exclusion is
+needed. Documentation states grapheme alignment, null/fallback behavior, output
+limits, allocation costs and missing provider/primitive-specifier integration.

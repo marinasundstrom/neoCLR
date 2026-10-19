@@ -212,7 +212,7 @@ pub(super) fn report(p: &Profile<'_>) -> Value {
 mod tests {
     use super::*;
     fn profile(module: &neoclr::Module) -> Profile<'_> {
-        Profile::new(module, true, None, None, &[], None, None, None, false).unwrap()
+        Profile::new(module, true, None, None, &[], None, None, None, None, false).unwrap()
     }
     fn module() -> neoclr::Module {
         neoclr::metadata_container::decode(include_bytes!(
@@ -420,7 +420,19 @@ mod tests {
             neoclr::metadata::Type::ArrayRef(Box::new(neoclr::metadata::Type::Byte));
         module.types = vec![backing];
         module.functions.clear();
-        let p = Profile::new(&module, true, None, Some(0), &[], None, None, None, false).unwrap();
+        let p = Profile::new(
+            &module,
+            true,
+            None,
+            Some(0),
+            &[],
+            None,
+            None,
+            None,
+            None,
+            false,
+        )
+        .unwrap();
         assert_eq!(slots(&p, &Ty::Reference(0)), slots(&p, &Ty::ByteArray));
         assert!(report(&p)["objects"].as_array().unwrap().is_empty());
         let mut element = module.types[0].clone();
@@ -430,7 +442,19 @@ mod tests {
             neoclr::metadata::Type::Named(element.name.clone()),
         ));
         module.types.push(element);
-        let p = Profile::new(&module, true, None, None, &[0], None, None, None, false).unwrap();
+        let p = Profile::new(
+            &module,
+            true,
+            None,
+            None,
+            &[0],
+            None,
+            None,
+            None,
+            None,
+            false,
+        )
+        .unwrap();
         assert_eq!(
             slots(&p, &Ty::Reference(0)),
             slots(&p, &Ty::ReferenceArray(1))

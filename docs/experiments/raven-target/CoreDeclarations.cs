@@ -206,6 +206,7 @@ static class CoreDeclarations
                 public bool AllowMultiple { get; set; }
                 public bool Inherited { get; set; }
             }
+            public interface Formattable { string ToString(string format); }
             public static class Console { public static void WriteLine(string value) { } }
         }
         namespace System.Runtime.CompilerServices {
