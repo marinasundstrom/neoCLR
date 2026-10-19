@@ -41,8 +41,8 @@ remove a copy or establish native support.
 | Source files (under System/) | Recommended direction | Reason / compatibility boundary |
 | --- | --- | --- |
 | `Array.rvn` | Use view results for range syntax, implicit array-to-view conversion and explicit copying; migrate syntax with compiler validation | Fixed contiguous ownership can be borrowed; implemented: Slice and range results share storage; ToArray copies |
-| `Text/Decoder.rvn`, `Text/Encodings.rvn` | Decode(ReadOnlySlice<byte>, final) | Synchronous input borrow; carry bytes must still be copied into owned decoder state |
-| `Text/Encoder.rvn`, `Text/Encodings.rvn` | Drain(Slice<byte>) | Writable synchronous destination; retain byte-count/progress and short-output semantics |
+| `Text/Decoder.rvn`, `Text/Encodings.rvn` | Implemented: Decode(ReadOnlySlice<byte>, final) | Synchronous input borrow; carry bytes must still be copied into owned decoder state |
+| `Text/Encoder.rvn`, `Text/Encodings.rvn` | Implemented: Drain(Slice<byte>) | Writable synchronous destination; retain byte-count/progress and short-output semantics |
 | `Security/Cryptography/{SHA256,HMACSHA256,RandomNumberGenerator}.rvn` | ReadOnlySlice for inputs/key/tag; Slice for hash/random destinations | Inputs not retained; preserve overlapping input/output, unchanged short destination and trailing bytes |
 | `IO/Compression/GZipEncoder.rvn` | ReadOnlySlice input, owned byte[] output | Synchronous encoder consumes input; result and coding tables own storage |
 | `IO/Compression/GZipDecoder.rvn` | Retained source stays array or ReadOnlyMemory; local decode helpers may use slices | Decoder keeps input in a field; tree tables and produced output remain owned |
@@ -106,7 +106,8 @@ remove a copy or establish native support.
    readonly conversion and persistent borrowing. Qualify each migrated consumer
    and its service contracts; native asynchronous retention remains a separate gate.
    Interpreter-only support is insufficient for native HTTP and crypto providers.
-2. Migrate codec and cryptography synchronous contracts first, without redundant
+2. Incremental codec signatures and their stream-adapter calls now use slices.
+   Continue with cryptography synchronous contracts, without redundant
    compatibility overloads. Test subwindows, empty input, overlapping buffers, readonly
    aliasing, destination sentinels, bounds and no mutation on documented failures.
 3. Migrate InputStream/OutputStream and implementations together to Memory. Test

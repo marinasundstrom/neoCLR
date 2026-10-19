@@ -15,8 +15,8 @@ func Decoded(result: Result<string, EncodingError>, expected: string) -> Result<
 
 func Invalid(bytes: byte[]) -> Result<unit, TestFailure> {
     let decoder = Encodings.Utf8.CreateDecoder()
-    _ = Assert.True(decoder.Decode(bytes, 0, bytes.Length, true) is Error(EncodingError.InvalidUtf8), "Malformed UTF-8 rejected")?
-    return Assert.True(decoder.Decode(bytes, 0, 0, false) is Error(EncodingError.Finished), "Malformed decoder is terminal")
+    _ = Assert.True(decoder.Decode(bytes, true) is Error(EncodingError.InvalidUtf8), "Malformed UTF-8 rejected")?
+    return Assert.True(decoder.Decode(bytes[..0], false) is Error(EncodingError.Finished), "Malformed decoder is terminal")
 }
 
 [Test("Encoding providers preserve UTF-8 and reject non-ASCII text")]
@@ -42,10 +42,10 @@ func BSplitPoints() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128]
     for split in 0..=(bytes.Length) {
         let decoder = Encodings.Utf8.CreateDecoder()
-        let Ok(first) = decoder.Decode(bytes, 0, split, false) else {
+        let Ok(first) = decoder.Decode(bytes[..split], false) else {
             return Error(TestFailure("First fragment", "Ok", "Error"))
         }
-        let Ok(last) = decoder.Decode(bytes, split, bytes.Length - split, true) else {
+        let Ok(last) = decoder.Decode(bytes[split..], true) else {
             return Error(TestFailure("Last fragment", "Ok", "Error"))
         }
         _ = Assert.Equal("Aé€😀", first + last)?
@@ -70,28 +70,25 @@ func DOwnership() -> Result<unit, TestFailure> {
     let second = Encodings.Utf8.CreateDecoder()
     let head: byte[] = [(byte)195]
     let tail: byte[] = [(byte)169]
-    _ = Decoded(first.Decode(head, 0, 1, false), "")?
+    _ = Decoded(first.Decode(head[..1], false), "")?
     head[0] = (byte)65
-    _ = Decoded(second.Decode(head, 0, 1, true), "A")?
-    _ = Decoded(first.Decode(tail, 0, 1, true), "é")?
-    _ = Assert.True(first.Decode(tail, 0, 0, false) is Error(EncodingError.Finished), "Final decode is terminal")?
+    _ = Decoded(second.Decode(head[..1], true), "A")?
+    _ = Decoded(first.Decode(tail[..1], true), "é")?
+    _ = Assert.True(first.Decode(tail[..0], false) is Error(EncodingError.Finished), "Final decode is terminal")?
     let bom: byte[] = [(byte)239, (byte)187, (byte)191, (byte)65]
-    return Decoded(Encodings.Utf8.CreateDecoder().Decode(bom, 0, 4, true), "\ufeffA")
+    return Decoded(Encodings.Utf8.CreateDecoder().Decode(bom[..4], true), "\ufeffA")
 }
 
-[Test("Decoder range errors are retryable and ASCII errors are terminal")]
+[Test("Decoder windows preserve text and ASCII errors are terminal")]
 func ERanges() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)0, (byte)65, (byte)127]
     let decoder = Encodings.Ascii.CreateDecoder()
-    _ = Assert.True(decoder.Decode(bytes, -1, 1, true) is Error(EncodingError.InvalidRange), "Negative offset")?
-    _ = Assert.True(decoder.Decode(bytes, 0, -1, true) is Error(EncodingError.InvalidRange), "Negative count")?
-    _ = Assert.True(decoder.Decode(bytes, 1, 2147483647, true) is Error(EncodingError.InvalidRange), "Overflow-safe range")?
-    _ = Decoded(decoder.Decode(bytes, 0, 3, false), "\u0000A\u007f")?
-    _ = Decoded(decoder.Decode(bytes, 3, 0, true), "")?
+    _ = Decoded(decoder.Decode(bytes[..3], false), "\u0000A\u007f")?
+    _ = Decoded(decoder.Decode(bytes[3..3], true), "")?
     let strict = Encodings.Ascii.CreateDecoder()
     let invalid: byte[] = [(byte)65, (byte)128]
-    _ = Assert.True(strict.Decode(invalid, 0, 2, false) is Error(EncodingError.InvalidData), "Strict ASCII bytes")?
-    return Assert.True(strict.Decode(bytes, 0, 1, false) is Error(EncodingError.Finished), "Invalid ASCII is terminal")
+    _ = Assert.True(strict.Decode(invalid[..2], false) is Error(EncodingError.InvalidData), "Strict ASCII bytes")?
+    return Assert.True(strict.Decode(bytes[..1], false) is Error(EncodingError.Finished), "Invalid ASCII is terminal")
 }
 
 [Test("Encoders preserve accepted input through one-byte drains")]
@@ -102,14 +99,13 @@ func FProgress() -> Result<unit, TestFailure> {
     source = "changed"
     _ = Assert.True(encoder.Accept("other", false) is Error(EncodingError.Busy), "Pending input cannot be overwritten")?
     let buffer: byte[] = [(byte)99, (byte)99, (byte)99]
-    _ = Assert.True(encoder.Drain(buffer, 3, 1) is Error(EncodingError.InvalidRange), "Destination range")?
-    let Ok(zero) = encoder.Drain(buffer, 1, 0) else {
+    let Ok(zero) = encoder.Drain(buffer[1..1]) else {
         return Error(TestFailure("Zero drain", "Ok", "Error"))
     }
     _ = Assert.True(zero.BytesWritten == 0 && zero.State is EncoderState.NeedsOutput, "Explicit zero progress")?
     let output = ArrayList<byte>()
     for index in 0..9 {
-        let Ok(step) = encoder.Drain(buffer, 1, 1) else {
+        let Ok(step) = encoder.Drain(buffer[1..2]) else {
             return Error(TestFailure("Drain", "Ok", "Error"))
         }
         _ = Assert.True(step.BytesWritten == 1 && buffer[0] == 99 && buffer[2] == 99, "Only offered byte changed")?
@@ -125,12 +121,12 @@ func FProgress() -> Result<unit, TestFailure> {
     }
     _ = Assert.Equal("é😀é", text)?
     _ = Assert.True(encoder.Accept("", true) is Ok(_), "Empty final input")?
-    let Ok(final) = encoder.Drain(buffer, 0, 0) else {
+    let Ok(final) = encoder.Drain(buffer[..0]) else {
         return Error(TestFailure("Final drain", "Ok", "Error"))
     }
     _ = Assert.True(final.State is EncoderState.Finished && final.BytesWritten == 0, "Empty final completion")?
     _ = Assert.True(encoder.Accept("", false) is Error(EncodingError.Finished), "Accept after finish")?
-    return Assert.True(encoder.Drain(buffer, 0, 1) is Error(EncodingError.Finished), "Drain after finish")
+    return Assert.True(encoder.Drain(buffer[..1]) is Error(EncodingError.Finished), "Drain after finish")
 }
 
 [Test("Encoder chunks preserve scalars across the internal byte boundary")]
@@ -150,7 +146,7 @@ func GChunkBoundary() -> Result<unit, TestFailure> {
     var finished = false
     for attempt in 0..88 {
         if !finished {
-            let Ok(step) = encoder.Drain(buffer, 0, 3) else {
+            let Ok(step) = encoder.Drain(buffer[..3]) else {
                 return Error(TestFailure("Boundary drain", "Ok", "Error"))
             }
             for index in 0..step.BytesWritten {
@@ -175,11 +171,11 @@ func HAsciiSessions() -> Result<unit, TestFailure> {
     _ = Assert.True(first.Accept("A", true) is Ok(_), "Retry after preflight")?
     _ = Assert.True(second.Accept("B", true) is Ok(_), "Independent acceptance")?
     let buffer: byte[] = [(byte)0]
-    let Ok(a) = first.Drain(buffer, 0, 1) else {
+    let Ok(a) = first.Drain(buffer) else {
         return Error(TestFailure("First drain", "Ok", "Error"))
     }
     _ = Assert.True(a.BytesWritten == 1 && a.State is EncoderState.Finished && buffer[0] == 65, "First session")?
-    let Ok(b) = second.Drain(buffer, 0, 1) else {
+    let Ok(b) = second.Drain(buffer) else {
         return Error(TestFailure("Second drain", "Ok", "Error"))
     }
     return Assert.True(b.BytesWritten == 1 && b.State is EncoderState.Finished && buffer[0] == 66, "Second session")

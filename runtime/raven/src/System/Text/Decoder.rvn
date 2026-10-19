@@ -3,5 +3,12 @@ module System.Text
 import System.*
 
 public interface Decoder {
-    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError>
+    /// <summary>Decodes a borrowed byte window, copying incomplete scalars into owned state.</summary>
+    /// <param name="source">Readonly input view, reusable after return; built-ins accept at most 65536 bytes.</param>
+    /// <param name="final">Whether this is the last input; incomplete trailing sequences are rejected.</param>
+    /// <returns>Completed text, possibly empty, or LimitExceeded, InvalidUtf8, InvalidData or Finished.</returns>
+    /// <remarks>The source is not retained. A successful call accepts the entire view. Quota failures
+    /// leave decoder state unchanged. Malformed input and finalization end the session. Invalid window
+    /// construction faults before this call. Built-ins preserve BOMs and never replace invalid bytes.</remarks>
+    func Decode(source: ReadOnlySlice<byte>, final: bool) -> Result<string, EncodingError>
 }

@@ -111,7 +111,7 @@ func FEncodingQuota() -> Result<unit, TestFailure> {
     _ = Assert.True(encoder.Accept(excessive, true) is Error(EncodingError.LimitExceeded), "Encoder input quota")?
     _ = Assert.True(encoder.Accept("ok", true) is Ok(_), "Quota rejection is retryable")?
     let buffer: byte[] = [(byte)0, (byte)0]
-    let Ok(step) = encoder.Drain(buffer, 0, 2) else {
+    let Ok(step) = encoder.Drain(buffer[..2]) else {
         return Error(TestFailure("Quota retry", "Ok", "Error"))
     }
     return Assert.True(step.BytesWritten == 2 && step.State is EncoderState.Finished && buffer[0] == 111 && buffer[1] == 107, "Retry output")

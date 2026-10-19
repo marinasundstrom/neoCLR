@@ -19607,3 +19607,11 @@ open; no native performance improvement is claimed.
   Per-step validation and implementation status belong in the
   [memory-view contract](native-memory-views.md); broader native element support,
   asynchronous service adoption and the public host API remain open.
+
+- **Subsequent outcome:** committed native array-backed byte-slice execution as
+  `0a81a1557`, then migrated incremental Decoder/Encoder signatures and immediate
+  StreamReader/StreamWriter codec calls. Removed the unused EncodingError.InvalidRange
+  case and retired CLI scaffold members. The [codec evidence](validation/memory-views-20261019/codec-integration-validation.json)
+  records 35 tests in all three execution modes, including pending I/O and
+  cancellation, with matching API documentation. Crypto, Memory-based asynchronous
+  stream/socket contracts and broader HTTP adoption remain next integration work.

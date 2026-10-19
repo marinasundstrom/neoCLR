@@ -101,20 +101,18 @@ internal class Utf8Decoder : Decoder {
     private var width: int = 0
     private var stopped: bool = false
 
-    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+    func Decode(source: ReadOnlySlice<byte>, final: bool) -> Result<string, EncodingError> {
         if stopped {
             return Error(EncodingError.Finished)
         }
-        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset {
-            return Error(EncodingError.InvalidRange)
-        }
+        let count = source.Length
         if count > 65536 {
             return Error(EncodingError.LimitExceeded)
         }
         let output = ArrayList<byte>(count + 3)
         var index = 0
         while index < count {
-            let value = source[offset + index]
+            let value = source[index]
             if pending == 0 {
                 if value <= 127 {
                     width = 1
@@ -161,20 +159,18 @@ internal class Utf8Decoder : Decoder {
 internal class AsciiDecoder : Decoder {
     private var stopped: bool = false
 
-    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+    func Decode(source: ReadOnlySlice<byte>, final: bool) -> Result<string, EncodingError> {
         if stopped {
             return Error(EncodingError.Finished)
         }
-        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset {
-            return Error(EncodingError.InvalidRange)
-        }
+        let count = source.Length
         if count > 65536 {
             return Error(EncodingError.LimitExceeded)
         }
         let bytes = ArrayList<byte>(count)
         var index = 0
         while index < count {
-            let value = source[offset + index]
+            let value = source[index]
             if value > 127 {
                 stopped = true
                 return Error(EncodingError.InvalidData)
@@ -241,13 +237,11 @@ internal class TextEncoder : Encoder {
         return Ok(())
     }
 
-    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+    func Drain(output: Slice<byte>) -> Result<EncoderProgress, EncodingError> {
         if finished {
             return Error(EncodingError.Finished)
         }
-        if !(offset >= 0) || !(count >= 0) || offset > output.Length || count > output.Length - offset {
-            return Error(EncodingError.InvalidRange)
-        }
+        let count = output.Length
         if count > 65536 {
             return Error(EncodingError.LimitExceeded)
         }
@@ -271,7 +265,7 @@ internal class TextEncoder : Encoder {
                 sourceOffset += part.GetUtf8ByteCount()
                 byteOffset = 0
             }
-            output[offset + written] = bytes[byteOffset]
+            output[written] = bytes[byteOffset]
             byteOffset += 1
             written += 1
         }

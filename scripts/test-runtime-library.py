@@ -60,7 +60,7 @@ ENCODING_NAMES = [
     'UTF-8 decoding preserves text at every byte split',
     'UTF-8 decoders reject malformed scalars and truncated final input',
     'Decoder sessions copy pending input and preserve BOM data',
-    'Decoder range errors are retryable and ASCII errors are terminal',
+    'Decoder windows preserve text and ASCII errors are terminal',
     'Encoders preserve accepted input through one-byte drains',
     'Encoder chunks preserve scalars across the internal byte boundary',
     'ASCII encoder preflight is retryable and factories are independent',

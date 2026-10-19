@@ -382,7 +382,6 @@
   "System.Text.EncodingError.Busy",
   "System.Text.EncodingError.Finished",
   "System.Text.EncodingError.InvalidData",
-  "System.Text.EncodingError.InvalidRange",
   "System.Text.EncodingError.InvalidUtf8",
   "System.Text.EncodingError.LimitExceeded",
   "System.Text.EncodingError.UnrepresentableText",

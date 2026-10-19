@@ -14,7 +14,7 @@ static class ErrorBindings
         ["System.Storage.InvalidPathError"] = [],
         ["System.Storage.StorageLookupError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "IoFailure", "InvalidRange", "LimitExceeded"],
         ["System.Text.EncoderState"] = ["NeedsOutput", "Ready", "Finished"],
-        ["System.Text.EncodingError"] = ["InvalidRange", "LimitExceeded", "Finished", "InvalidUtf8", "InvalidData", "UnrepresentableText", "Busy"],
+        ["System.Text.EncodingError"] = [ "LimitExceeded", "Finished", "InvalidUtf8", "InvalidData", "UnrepresentableText", "Busy"],
         ["System.IO.TextReadError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidUtf8", "InvalidEncoding", "InvalidData"],
         ["System.IO.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidEncoding", "InvalidData"],
         ["System.Storage.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],

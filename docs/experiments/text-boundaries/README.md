@@ -5,6 +5,17 @@ These names/signatures are not proposed as a package to ship. The immediate scop
 is basic encoding/decoding and possibly text construction, with Swift as the closer
 text API model. No System API, compiler, metadata format or runtime was changed.
 
+## Historical codec integration fixtures
+
+The later public-encoder and encoding probes in this directory preserve their
+2026-09-27 array/offset/count contracts and matching bridge evidence. Since
+2026-10-19, the production incremental codecs take Slice/ReadOnlySlice and the
+legacy CLI scaffold no longer exposes those old members. Run the maintained
+`runtime/raven/tests/encoding*` suites with a matching native bundle for current
+codec and stream-adapter qualification. These historical probes are not current
+class-library examples; the independent application-only experiments remain
+separate from that API migration.
+
 ## Findings
 
 - A validated scalar can be an ordinary Raven value. NUL is a valid default;

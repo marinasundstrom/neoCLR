@@ -10,13 +10,13 @@ func AUtf8Quota() -> Result<unit, TestFailure> {
     let bytes: byte[] = [for index in 0..65537 => (byte)120]
     let decoder = Encodings.Utf8.CreateDecoder()
     let head: byte[] = [(byte)195]
-    let Ok(prefix) = decoder.Decode(head, 0, 1, false) else {
+    let Ok(prefix) = decoder.Decode(head[..1], false) else {
         return Error(TestFailure("Pending scalar", "Ok", "Error"))
     }
     _ = Assert.Equal("", prefix)?
-    _ = Assert.True(decoder.Decode(bytes, 0, 65537, true) is Error(EncodingError.LimitExceeded), "Oversized final input rejected")?
+    _ = Assert.True(decoder.Decode(bytes[..65537], true) is Error(EncodingError.LimitExceeded), "Oversized final input rejected")?
     bytes[0] = (byte)169
-    let Ok(text) = decoder.Decode(bytes, 0, 1, true) else {
+    let Ok(text) = decoder.Decode(bytes[..1], true) else {
         return Error(TestFailure("Retry scalar", "Ok", "Error"))
     }
     return Assert.Equal("é", text)
@@ -26,8 +26,8 @@ func AUtf8Quota() -> Result<unit, TestFailure> {
 func BAsciiQuota() -> Result<unit, TestFailure> {
     let bytes: byte[] = [for index in 0..65537 => (byte)120]
     let decoder = Encodings.Ascii.CreateDecoder()
-    _ = Assert.True(decoder.Decode(bytes, 0, bytes.Length, true) is Error(EncodingError.LimitExceeded), "Oversized ASCII input rejected")?
-    let Ok(text) = decoder.Decode(bytes, 1, 65536, true) else {
+    _ = Assert.True(decoder.Decode(bytes, true) is Error(EncodingError.LimitExceeded), "Oversized ASCII input rejected")?
+    let Ok(text) = decoder.Decode(bytes[1..65537], true) else {
         return Error(TestFailure("Maximum ASCII input", "Ok", "Error"))
     }
     _ = Assert.Equal(65536, text.GetUtf8ByteCount())?
@@ -39,14 +39,14 @@ func CDrainQuota() -> Result<unit, TestFailure> {
     let bytes: byte[] = [for index in 0..65538 => (byte)99]
     let encoder = Encodings.Utf8.CreateEncoder()
     _ = Assert.True(encoder.Accept("é😀", true) is Ok(_), "Accept final text")?
-    _ = Assert.True(encoder.Drain(bytes, 1, 65537) is Error(EncodingError.LimitExceeded), "Oversized drain rejected")?
+    _ = Assert.True(encoder.Drain(bytes[1..65538]) is Error(EncodingError.LimitExceeded), "Oversized drain rejected")?
     _ = Assert.True(bytes[0] == 99 && bytes[1] == 99 && bytes[65537] == 99, "Rejected drain leaves destination")?
-    let Ok(step) = encoder.Drain(bytes, 1, 65536) else {
+    let Ok(step) = encoder.Drain(bytes[1..65537]) else {
         return Error(TestFailure("Maximum drain capacity", "Ok", "Error"))
     }
     _ = Assert.True(step.State is EncoderState.Finished && step.BytesWritten == 6, "Maximum capacity drains only pending bytes")?
     _ = Assert.True(bytes[0] == 99 && bytes[7] == 99 && bytes[65537] == 99, "Outside output remains untouched")?
-    let Ok(text) = Encodings.Utf8.CreateDecoder().Decode(bytes, 1, 6, true) else {
+    let Ok(text) = Encodings.Utf8.CreateDecoder().Decode(bytes[1..7], true) else {
         return Error(TestFailure("Drained bytes", "UTF-8", "Error"))
     }
     return Assert.Equal("é😀", text)
@@ -57,9 +57,9 @@ func DCarryAtLimit() -> Result<unit, TestFailure> {
     let bytes: byte[] = [for index in 0..65536 => (byte)120]
     let head: byte[] = [(byte)240, (byte)159, (byte)152]
     let decoder = Encodings.Utf8.CreateDecoder()
-    _ = Assert.True(decoder.Decode(head, 0, 3, false) is Ok(""), "Carry three bytes")?
+    _ = Assert.True(decoder.Decode(head[..3], false) is Ok(""), "Carry three bytes")?
     bytes[0] = (byte)128
-    let Ok(text) = decoder.Decode(bytes, 0, 65536, true) else {
+    let Ok(text) = decoder.Decode(bytes[..65536], true) else {
         return Error(TestFailure("Maximum chunk with carry", "Ok", "Error"))
     }
     _ = Assert.Equal(65539, text.GetUtf8ByteCount())?

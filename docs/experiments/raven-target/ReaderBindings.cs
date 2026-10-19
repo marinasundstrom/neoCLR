@@ -30,7 +30,7 @@ static class ReaderBindings
             }
             public interface Encoder {
                 Result<PropagationUnit, EncodingError> Accept(string text, bool final);
-                Result<EncoderProgress, EncodingError> Drain(byte[] output, int offset, int count);
+                // Drain(Slice<byte>) is documented from native metadata; no CLI view projection.
             }
             public sealed class EncoderProgress {
                 public EncoderProgress(int bytesWritten, EncoderState state) { }
@@ -38,7 +38,7 @@ static class ReaderBindings
                 public EncoderState State => default;
             }
             public interface Decoder {
-                Result<string, EncodingError> Decode(byte[] source, int offset, int count, bool final);
+                // Decode(ReadOnlySlice<byte>, bool) is documented from native metadata.
             }
         }
         namespace IO {
@@ -104,11 +104,9 @@ static class ReaderBindings
             "get_BytesWritten" when owner == "System.Text.EncoderProgress" => ("", "Int32"),
             "get_State" when owner == "System.Text.EncoderProgress" => ("", "System.Text.EncoderState"),
             "Accept" when owner == "System.Text.Encoder" => ("String,Boolean", "System.Result<Void,System.Text.EncodingError>"),
-            "Drain" when owner == "System.Text.Encoder" => ("arrayref<Byte>,Int32,Int32", "System.Result<System.Text.EncoderProgress,System.Text.EncodingError>"),
             "Finish" when owner == StreamWriter => ("", "System.Result<Int32,System.IO.StreamError>"),
             "CreateEncoder" when owner == "System.Text.Encoding" => ("", "System.Text.Encoder"),
             "CreateDecoder" when owner == "System.Text.Encoding" => ("", "System.Text.Decoder"),
-            "Decode" when owner == "System.Text.Decoder" => ("arrayref<Byte>,Int32,Int32,Boolean", "System.Result<String,System.Text.EncodingError>"),
             "ReadLine" when owner is Reader or Stream => ("Int32", "System.Result<System.Option<String>,System.IO.TextReadError>"),
             "ReadToEnd" when owner is Reader or Stream => ("Int32", "System.Result<String,System.IO.TextReadError>"),
             "Close" when owner is Reader or Stream or Writer or StreamWriter => ("", "noresult"),

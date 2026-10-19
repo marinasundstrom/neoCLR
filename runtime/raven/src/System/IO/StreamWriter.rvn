@@ -81,7 +81,7 @@ public class StreamWriter : TextWriter {
         let buffer = CheckedStorage.Reserve<byte>(256)
         var total = 0
         while true {
-            let step = match encoder.Drain(buffer, 0, buffer.Length) {
+            let step = match encoder.Drain(buffer) {
                 Ok(let value) => value
                 Error(_) => {
                     failed = true

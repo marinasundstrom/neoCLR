@@ -39,14 +39,14 @@ class ExpandedEncoder : Encoder {
         }
         return inner.Accept("Z", final)
     }
-    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
-        return inner.Drain(output, offset, count)
+    func Drain(output: Slice<byte>) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output)
     }
 }
 
 class ExpandedDecoder : Decoder {
-    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
-        if count == 0 {
+    func Decode(source: ReadOnlySlice<byte>, final: bool) -> Result<string, EncodingError> {
+        if source.IsEmpty {
             return Ok("")
         }
         return Ok("A\nB")

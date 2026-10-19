@@ -1,7 +1,6 @@
 module System.Text
 
 public union EncodingError {
-    case InvalidRange
     case LimitExceeded
     case Finished
     case InvalidUtf8
@@ -11,7 +10,6 @@ public union EncodingError {
 
     override func ToString() -> string {
         return match self {
-            InvalidRange => "InvalidRange"
             LimitExceeded => "LimitExceeded"
             Finished => "Finished"
             InvalidUtf8 => "InvalidUtf8"

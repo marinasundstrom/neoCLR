@@ -169,7 +169,7 @@ public class StreamReader : TextReader {
         if count == 0 {
             eof = true
         }
-        let decoded = match decoder.Decode(buffer, 0, count, eof) {
+        let decoded = match decoder.Decode(buffer[..count], eof) {
             Ok(let text) => text
             Error(EncodingError.InvalidUtf8) => return Error(TextReadError.InvalidUtf8)
             Error(EncodingError.LimitExceeded) => return Error(TextReadError.LimitExceeded)

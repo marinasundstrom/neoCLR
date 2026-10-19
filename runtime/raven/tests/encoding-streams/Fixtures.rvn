@@ -32,8 +32,8 @@ class TrailerEncoder : Encoder {
         }
         return inner.Accept(text, false)
     }
-    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
-        return inner.Drain(output, offset, count)
+    func Drain(output: Slice<byte>) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output)
     }
 }
 

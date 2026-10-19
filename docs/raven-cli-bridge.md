@@ -13158,3 +13158,22 @@ Validation: neoCLR's MemoryConsumer returns 0 with object fields holding both
 persistent types, awaited Task.Run, two explicit GC collections, nested windows,
 borrowed mutation/read aliases and independent copies. Illegal Slice-to-Memory
 and ReadOnlyMemory-to-Slice conversions produce RAV1503 with no output artifact.
+
+### Incremental codec view signatures — 2026-10-19
+
+The production Raven library now uses Decoder.Decode(ReadOnlySlice<byte>, final)
+and Encoder.Drain(Slice<byte>) through the existing native source-core memory-view
+contract. This requires no new compiler capability, bridge encoding or Raven
+compiler change. StreamReader/StreamWriter use immediate borrowed codec calls;
+owned scratch arrays and asynchronous transfer contracts remain distinct.
+
+The old diagnostic CLI scaffold cannot safely project these borrowed parameter
+types. Its array/offset/count declarations and ReaderBindings import mappings have
+therefore been removed; no compatibility overload is part of the native library.
+The legacy reference retains the codec type identities and other representable
+members, while the native RavenDoc snapshot renders the complete current methods.
+The [API maintenance record](../api-docs/README.md) tracks these exact exclusions.
+The removed EncodingError.InvalidRange case is rebuilt consistently in native and
+legacy reference metadata. Historical public-codec experiment fixtures require
+their pinned older artifacts; maintained Raven codec suites exercise the current
+library across execution modes. See the [current contract](native-memory-views.md#first-shared-class-library-adoption-incremental-codecs--2026-10-19).

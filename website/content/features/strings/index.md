@@ -34,7 +34,10 @@ truncated input; ASCII rejects values it cannot represent rather than substituti
 
 `RoundTrip("café 🌍")` prints `Round trip`. StreamReader and StreamWriter accept
 encoding policies and default to UTF-8. Incremental Decoder and Encoder instances
-support bounded progress across buffers. See [stream and encoding contracts](/docs/streams.html).
+support bounded progress across buffers. In development, `Decoder.Decode` accepts
+`ReadOnlySlice<byte>` and `Encoder.Drain` accepts `Slice<byte>` directly. Pass an
+array or an array window; codecs do not retain borrowed input or destinations.
+Incomplete decoded bytes are copied into owned state. See [stream and encoding contracts](/docs/streams.html).
 
 ## Index, slice and compare
 

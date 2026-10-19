@@ -99,12 +99,12 @@ func FFinalDrain() -> Result<unit, TestFailure> {
     let encoder: Encoder = TrailerEncoder()
     _ = Assert.True(encoder.Accept("", true) is Ok(_), "Accept final input")?
     let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
-    let Ok(first) = encoder.Drain(buffer, 0, 3) else {
+    let Ok(first) = encoder.Drain(buffer[..3]) else {
         return Error(TestFailure("First final drain", "Ok", "Error"))
     }
     _ = Assert.True(first.BytesWritten == 3 && first.State is EncoderState.NeedsOutput, "Trailer still pending")?
     _ = Assert.True(buffer[0] == 60 && buffer[1] == 101 && buffer[2] == 110, "Trailer prefix")?
-    let Ok(last) = encoder.Drain(buffer, 0, 3) else {
+    let Ok(last) = encoder.Drain(buffer[..3]) else {
         return Error(TestFailure("Last final drain", "Ok", "Error"))
     }
     return Assert.True(last.BytesWritten == 2 && last.State is EncoderState.Finished && buffer[0] == 100 && buffer[1] == 62, "Completion includes trailer suffix")

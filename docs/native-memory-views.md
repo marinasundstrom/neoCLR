@@ -447,3 +447,33 @@ No native String.Utf8Bytes, non-byte elements, stack-backed borrows or asynchron
 retention qualification is claimed. Codec consumers are the next adoption step;
 stream/socket/HTTP Memory-based contracts still need their own completion-lifetime
 validation. No speedup or stable host ABI is inferred from these checks.
+
+## First shared class-library adoption: incremental codecs — 2026-10-19
+
+The Raven Decoder contract now accepts ReadOnlySlice<byte> plus final, and Encoder
+Drain accepts Slice<byte>. Built-in UTF-8/ASCII sessions, StreamReader/StreamWriter
+and maintained codec tests use the new contracts. Source arrays convert implicitly;
+subwindows use normal range syntax. There are no compatibility overloads or public
+AsSlice adapters. Encoding's one-shot Sequence-based methods are unchanged.
+
+The decoder continues to copy incomplete scalar bytes into its private carry array,
+and the encoder retains immutable accepted text rather than its output view. Quotas,
+zero-capacity progress, finalization and output suffix/surrounding sentinels retain
+their contracts. Bounds now belong to view construction; the unused
+EncodingError.InvalidRange case is removed. Callers and custom codec implementations
+must migrate signatures, and error-case metadata must be rebuilt together.
+
+This first migration reaches immediate codec calls within stream adapters. It does
+not change the asynchronous InputStream/OutputStream buffer contract yet. HTTP
+Server/Client transfer integration still depends on that migration and completion
+ownership validation. The [codec API reference](../api-docs/streams.md#incremental-encoding-development)
+and native-generated signatures describe the development API; old CLI scaffold
+members are removed rather than retained as misleading overloads.
+
+[Codec integration evidence](validation/memory-views-20261019/codec-integration-validation.json)
+records 35 tests in each of interpreter/JIT/AOT (105 passing executions), including
+quota preflight, sentinel preservation, every UTF-8 split, carry ownership, pending
+reads/writes and cancellation. The final run uses a freshly built release interpreter;
+an earlier debug-interpreter quota run hit its 180-second limit and is retained as
+an unsuccessful attempt. Both API snapshots are refreshed and their focused checks
+pass. No benchmark or full website build was performed.

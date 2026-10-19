@@ -6,6 +6,18 @@ or approve additional codecs. It revisits the
 [2026-09-27 text/encoder decisions](text-abstraction.md#public-encoder-integration-development--2026-09-27)
 under the author's current .NET-first design rule.
 
+## Implementation update — 2026-10-19
+
+The author-directed memory-view integration replaces the incremental array/range
+signatures with Decode(ReadOnlySlice<byte>, final) and Drain(Slice<byte>), including
+the StreamReader/StreamWriter callers. See the current [codec contract](../../api-docs/streams.md#incremental-encoding-development).
+The review below records the earlier API and proposals. The ownership distinction
+follows the .NET span guidance already cited in the [memory-view audit](../memory-view-library-audit.md);
+neoCLR intentionally omits compatibility array overloads. Benefit: one checked
+window contract at every synchronous call. Costs: source migration and invalid
+window faults occurring before invocation instead of codec InvalidRange results.
+Encoding's one-shot Sequence-based methods remain separate future work.
+
 ## Assessment
 
 Keep the three roles: encoding provider, stateful encoder and stateful decoder.

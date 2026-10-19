@@ -92,6 +92,18 @@ StreamWriter.Finish. Text writes still report encoded byte counts. Finish finali
 the encoder; Flush only flushes the underlying output. Close follows leaveOpen and
 never implicitly finalizes conversion. Encoding operations on memory remain immediate.
 
+Incremental codecs take views directly: `Decoder.Decode(ReadOnlySlice<byte>, final)`
+and `Encoder.Drain(Slice<byte>)`. Arrays convert implicitly; pass `buffer[start..end]`
+for a subwindow. These replace the former array/offset/count signatures without
+compatibility overloads. Decoders copy incomplete UTF-8 bytes into owned state;
+encoders retain accepted text but never retain a destination view. Built-ins accept
+at most 65536 bytes per call. Drain modifies only the reported prefix of its view,
+leaving the suffix and surrounding array untouched. Zero-capacity progress and
+retryable quota errors are unchanged. Invalid window construction faults before
+the codec call, rather than returning a codec error; EncodingError.InvalidRange has been removed.
+StreamReader/StreamWriter use these borrowed views only for immediate codec calls;
+their underlying asynchronous stream transfers still use the existing array API.
+
 JsonSerializer overloads accepting InputStream/OutputStream return Task results;
 string/JSON-node/object conversion overloads remain immediate. The serializer borrows
 streams and preserves existing document quotas and errors. HTTP stream uploads await

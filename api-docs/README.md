@@ -232,6 +232,12 @@ rather than emitting unsafe fieldless ordinary records. The legacy aggregate
 reference cannot represent these additions. The exact manual coverage is
 System.Slice`1, System.ReadOnlySlice`1, System.SliceOperations`1,
 System.Memory`1, System.ReadOnlyMemory`1 and System.String.Utf8Bytes.
+The legacy CLI scaffold also omits Decoder.Decode(ReadOnlySlice<byte>, bool)
+and Encoder.Drain(Slice<byte>): their borrowed parameters have no safe CLI
+projection. Their complete native signatures render in the same on-site type pages;
+[the codec contract](streams.md#incremental-encoding-development) documents the
+migration and lifetime rules. The retired array/offset/count scaffold members and
+import mappings have been removed rather than presented as current overloads.
 The native snapshot is regenerated from the matching source-owned five-library
 bundle, including all four view types, their members, SliceOperations, Array ranges
 and String.Utf8Bytes. No new public type is omitted from native selection.

@@ -4,5 +4,13 @@ import System.*
 
 public interface Encoder {
     func Accept(text: string, final: bool) -> Result<unit, EncodingError>
-    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError>
+
+    /// <summary>Drains pending bytes into a borrowed writable destination.</summary>
+    /// <param name="output">Destination view, reusable after return; built-ins accept at most 65536 bytes.</param>
+    /// <returns>BytesWritten and Ready, NeedsOutput or Finished, or a LimitExceeded/Finished error.</returns>
+    /// <remarks>The destination is not retained. Only BytesWritten bytes change; the remaining view
+    /// and surrounding storage are untouched. Excessive capacity leaves output and encoder state
+    /// unchanged. Empty output can report NeedsOutput with zero progress. Fragments can split a
+    /// Unicode scalar. Invalid window construction faults before this call.</remarks>
+    func Drain(output: Slice<byte>) -> Result<EncoderProgress, EncodingError>
 }

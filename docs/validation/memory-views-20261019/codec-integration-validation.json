@@ -1,0 +1,855 @@
+{
+  "passed": true,
+  "scope": "Incremental codec slice APIs and immediate calls from stream adapters; asynchronous transfer APIs unchanged",
+  "compilerRevision": "c173a723c2c1434d8cf9c41c9ac334c81293bde9",
+  "sourceBaseline": "0a81a15577f2492496a936420e3cdfd0a8e51b06",
+  "tests": {
+    "passed": true,
+    "modes": [
+      "native",
+      "jit",
+      "interpreter"
+    ],
+    "jitHostSha256": "d5a39d90f476854687453d5ad7b899ca06acceb0e94efc26a40bc8e1daf04b01",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "cases": [
+      {
+        "suite": "encoding-buffer-limits",
+        "mode": "native",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 1.257,
+        "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-buffer-limits",
+        "mode": "jit",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 28.506,
+        "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-buffer-limits",
+        "mode": "interpreter",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 67.444,
+        "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-boundaries",
+        "mode": "native",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 0.796,
+        "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-boundaries",
+        "mode": "jit",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 41.244,
+        "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-boundaries",
+        "mode": "interpreter",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 28.684,
+        "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-streams",
+        "mode": "native",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 0.225,
+        "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-streams",
+        "mode": "jit",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 42.094,
+        "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding-streams",
+        "mode": "interpreter",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 4.644,
+        "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding",
+        "mode": "native",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 0.406,
+        "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder windows preserve text and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding",
+        "mode": "jit",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 28.334,
+        "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder windows preserve text and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+        "stderr": ""
+      },
+      {
+        "suite": "encoding",
+        "mode": "interpreter",
+        "repetition": 1,
+        "exitCode": 0,
+        "elapsedSeconds": 4.504,
+        "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder windows preserve text and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+        "stderr": ""
+      }
+    ],
+    "phases": [
+      {
+        "suite": "encoding-buffer-limits",
+        "phase": "discovery",
+        "elapsedSeconds": 7.917473,
+        "details": {
+          "sourceCompilationSeconds": 4.355237,
+          "metadataDiscoveryIncludingToolBuildSeconds": 3.559823
+        }
+      },
+      {
+        "suite": "encoding-buffer-limits",
+        "phase": "native-project-build",
+        "elapsedSeconds": 31.879821,
+        "commands": [
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007731
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.006378
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.017248
+          },
+          {
+            "phase": "source-compilation",
+            "elapsedSeconds": 4.141281
+          },
+          {
+            "phase": "native-compilation",
+            "elapsedSeconds": 26.72049
+          },
+          {
+            "phase": "host-compile-link",
+            "elapsedSeconds": 0.538621
+          },
+          {
+            "phase": "dependency-check",
+            "elapsedSeconds": 0.022696
+          }
+        ]
+      },
+      {
+        "suite": "encoding-buffer-limits",
+        "phase": "registration-verification",
+        "elapsedSeconds": 2.119157
+      },
+      {
+        "suite": "encoding-boundaries",
+        "phase": "discovery",
+        "elapsedSeconds": 8.485262,
+        "details": {
+          "sourceCompilationSeconds": 5.364208,
+          "metadataDiscoveryIncludingToolBuildSeconds": 3.116786
+        }
+      },
+      {
+        "suite": "encoding-boundaries",
+        "phase": "native-project-build",
+        "elapsedSeconds": 47.376476,
+        "commands": [
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.009255
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.006618
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.010722
+          },
+          {
+            "phase": "source-compilation",
+            "elapsedSeconds": 5.052083
+          },
+          {
+            "phase": "native-compilation",
+            "elapsedSeconds": 40.821032
+          },
+          {
+            "phase": "host-compile-link",
+            "elapsedSeconds": 0.754449
+          },
+          {
+            "phase": "dependency-check",
+            "elapsedSeconds": 0.021452
+          }
+        ]
+      },
+      {
+        "suite": "encoding-boundaries",
+        "phase": "registration-verification",
+        "elapsedSeconds": 2.128312
+      },
+      {
+        "suite": "encoding-streams",
+        "phase": "discovery",
+        "elapsedSeconds": 7.720564,
+        "details": {
+          "sourceCompilationSeconds": 4.818522,
+          "metadataDiscoveryIncludingToolBuildSeconds": 2.899268
+        }
+      },
+      {
+        "suite": "encoding-streams",
+        "phase": "native-project-build",
+        "elapsedSeconds": 48.483875,
+        "commands": [
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.00778
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007223
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.011273
+          },
+          {
+            "phase": "source-compilation",
+            "elapsedSeconds": 4.903245
+          },
+          {
+            "phase": "native-compilation",
+            "elapsedSeconds": 42.235023
+          },
+          {
+            "phase": "host-compile-link",
+            "elapsedSeconds": 0.769213
+          },
+          {
+            "phase": "dependency-check",
+            "elapsedSeconds": 0.018959
+          }
+        ]
+      },
+      {
+        "suite": "encoding-streams",
+        "phase": "registration-verification",
+        "elapsedSeconds": 2.459677
+      },
+      {
+        "suite": "encoding",
+        "phase": "discovery",
+        "elapsedSeconds": 7.291249,
+        "details": {
+          "sourceCompilationSeconds": 4.475862,
+          "metadataDiscoveryIncludingToolBuildSeconds": 2.81248
+        }
+      },
+      {
+        "suite": "encoding",
+        "phase": "native-project-build",
+        "elapsedSeconds": 33.807805,
+        "commands": [
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.007217
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.006565
+          },
+          {
+            "phase": "toolchain",
+            "elapsedSeconds": 0.010569
+          },
+          {
+            "phase": "source-compilation",
+            "elapsedSeconds": 4.465494
+          },
+          {
+            "phase": "native-compilation",
+            "elapsedSeconds": 28.355288
+          },
+          {
+            "phase": "host-compile-link",
+            "elapsedSeconds": 0.513564
+          },
+          {
+            "phase": "dependency-check",
+            "elapsedSeconds": 0.01878
+          }
+        ]
+      },
+      {
+        "suite": "encoding",
+        "phase": "registration-verification",
+        "elapsedSeconds": 2.38839
+      }
+    ],
+    "executionRepetitions": 1,
+    "inputs": {
+      "scripts/test-runtime-library.py": "71d988e6152994da992cc5e54d94579b958571e387e534cfcf45a0b2a40f414f",
+      "scripts/build-native-project.py": "bf4f51b778c13b0ed2ac40493216075593e1a4001af9a438aad978f39e5c8ad1",
+      "scripts/discover-runtime-tests.py": "455595ff98a3d9f8df9018caad453ef0f244eedf69e6ab220d54934535ed428e",
+      "scripts/validate-test-discovery.py": "b9a0a6063453f5567d1186d6825fc7b39b58ea9afc15fd0a310296a408d22e1a",
+      "tools/testing/NeoCLR.TestDiscovery/DataAdapters.cs": "6d9484b668f8898fbf4dd9712c0c2e3c8b1b879a346d963d6538ed81e842d561",
+      "tools/testing/NeoCLR.TestDiscovery/Program.cs": "54202b4fc5bbfbc94ee7e8dcddb4cf7315d5596a4b42f9de7b49ce4cb998c8ab",
+      "tools/testing/NeoCLR.TestDiscovery/NeoCLR.TestDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+      "runtime/raven/tests/collection-construction/Construction.rvn": "ddd2af5dcce0720e86c43ca20ee6fdb4f4e0ac4b89d49211fe70b8d0082cb1ca",
+      "runtime/raven/tests/collection-construction/MapIndexers.rvn": "9504fc1582e99fff38542c214ee46be4d68aee9cae8ffe3768790c5efdfc188b",
+      "runtime/raven/tests/collection-construction/Sets.rvn": "67968e7a90b91e93b54681f8507a07815abd13f5e0f4a93525708e616bc49558",
+      "runtime/raven/tests/collection-iteration/ForCleanup.rvn": "49d938e6b0886ddef91d0eee932f98170f597d676c2e90a1de93e434d9c719c4",
+      "runtime/raven/tests/collection-iteration/QueryCleanup.rvn": "7e6d9e27d73af1448ad79019c69ac46541c092490972d36c93f3648cbd9414d7",
+      "runtime/raven/tests/collections/Collections.rvn": "2793973c50d8501998f3de17ac6d1be149e6f1a3b34229372c90c0897d280c2b",
+      "runtime/raven/tests/collections/Main.rvn": "e0d4d6b296788027744cc6f4e5db76e85d99381c5cbd7f14c64727bc48ff0c8d",
+      "runtime/raven/tests/collections/MapMaterialization.rvn": "363ee1bc09ec13e638cd7abbad69b2f96c15597fea44d9a2b137ce110124cc8e",
+      "runtime/raven/tests/collections/ObservedNumbers.rvn": "c42f57095c9d357cec05baaa3a17f127a7b6fff23385b95f5a4a9157b32729b4",
+      "runtime/raven/tests/collections/QueueStack.rvn": "36f9b8623731832ef8599273bb9307d03ccce62f1cd1e912c5edb7fca7612f75",
+      "runtime/raven/tests/cryptography/Tests.rvn": "946ab81f5cca34ccd77b13712a3aa15194ac8312931d8694b9db7f90077aafac",
+      "runtime/raven/tests/discovery-contract/OtherAttribute.rvn": "78d87fb89024c33a52dc817347bd983c9f389da46d135571f711618b744c880a",
+      "runtime/raven/tests/discovery-contract/Tests.rvn": "e5800f40e8c8052b98b9b18859cf0ca1df6896d8635c0439410cfa6dc894aeb9",
+      "runtime/raven/tests/duration-offset-parsing/Tests.rvn": "133f78c28389a426bf504f57b39d088c87040951b7126467159165d8aec567a2",
+      "runtime/raven/tests/encoding/Tests.rvn": "e4881a42765b62ffbf785eb252d6d7f0ff665930086768d11650bf6d986db4d9",
+      "runtime/raven/tests/encoding-boundaries/Fixtures.rvn": "601b6f246a7a6c3fcc7c51959c1748820845c5cbddc1a62e31079ba108deb965",
+      "runtime/raven/tests/encoding-boundaries/Tests.rvn": "4ec72673a56f0ebf1d4c950349a040ade9689b16ab0647187d78f1d7b47ece3b",
+      "runtime/raven/tests/encoding-buffer-limits/Tests.rvn": "c500b00f54f9c4e822588e806db34bf9a047e535dc83a65e1805eb68fc38aa5a",
+      "runtime/raven/tests/encoding-streams/Fixtures.rvn": "dc27d36dffa8373678111fe9e2e06755f407fd256cc2ae9079b8d0b77e93eb9e",
+      "runtime/raven/tests/encoding-streams/Tests.rvn": "3d36f8725dfb218f0278d4e82de2859dc85415f93ff48b008486ac056dac78a8",
+      "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+      "runtime/raven/tests/framework/TestAttribute.rvn": "435a93e9247a6c7f1c94b1a81296e35449f7b4ba735b835c18a816726a56435c",
+      "runtime/raven/tests/framework/TestSuite.rvn": "bf444948246b2296e16de620e21459bbc4d6a1cbc01be41f0139b20e6bd42c67",
+      "runtime/raven/tests/gzip/Fixtures.rvn": "623867ec5871460b31178bb0a450228ed9b895c255c4b262e05a7b8da382cdf9",
+      "runtime/raven/tests/gzip/Streams.rvn": "e43354105f0d4186fbc90f6f0a0b9edc180b3d0dedf1d6e4b79ae2b28262c26f",
+      "runtime/raven/tests/gzip/Tests.rvn": "864d45cb7db17da62ec943c56a97c9716268fe32b330aacf3e38f916a28f2b1a",
+      "runtime/raven/tests/http-header-values/Tests.rvn": "fc0bc92f4bbd80b90550f3e734b15e681c76bf9eb6d675cf9c24114f620ef012",
+      "runtime/raven/tests/http-lifetime/Tests.rvn": "8cbc163fa5f9908aca019f76bd214ff55e62f7fb25fc0974e2eb667d643efb9d",
+      "runtime/raven/tests/http-method-values/Tests.rvn": "b7ea78ddb7988d89ad1fa40d77718b186eb7145918d08a87890b8af6f7117e29",
+      "runtime/raven/tests/http-route-matching/Tests.rvn": "e597b64fb4297491af075579dd8984568e5718df4b3e79f5a6ed031a0361f86d",
+      "runtime/raven/tests/http-text/Tests.rvn": "b80d50cff3d8d55bd43a571d7f42d35045f01229e2a5463a05aedddf78612fe7",
+      "runtime/raven/tests/index-range/Main.rvn": "06184aaf9a91ece09fbd1ed6ab23f5faf41c2237c970c8ff33390c34c9911c70",
+      "runtime/raven/tests/index-range/Tests.rvn": "1fbba1db13dc04c336d34752aa23b11add69cff0eb2729b0758572f0f24b6ca5",
+      "runtime/raven/tests/instant-parsing/Tests.rvn": "250a3c293388f1d94f7e3eb58ce64d5bf42496a2f88405d03e756521a69975d5",
+      "runtime/raven/tests/int64-parsing/Tests.rvn": "03ecbfd540200cfe0e17bdda5a542b658dd01541e63228dfe090ed652d96c270",
+      "runtime/raven/tests/ip-address-values/Tests.rvn": "f5c8fd7e24132e984991cabe2b28f65afab00b938c2b0ee37c084c2834a9d3e6",
+      "runtime/raven/tests/json-dom/JsonDom.rvn": "8fde17e996d01e6ea2de05e4755b049454770cbd36ad9eaad8323e9158edf1aa",
+      "runtime/raven/tests/json-streams/JsonStreams.rvn": "45852df9e24caf020c044355567918f51667994c901ec8976871d67567edc91a",
+      "runtime/raven/tests/json-streams/ShortStreams.rvn": "020333bd8b5471c2c34e328a2e794c27dba8eba18d91b7abe94b5518d697c8d1",
+      "runtime/raven/tests/memory-stream/Tests.rvn": "278fe468c8cf94ce5d868e8ff1b8f1bc1da00b04f8a959bd1e0cd1c8d4e9fdc0",
+      "runtime/raven/tests/path-values/Tests.rvn": "8bffa5ed04a581f21864b68d9231c0587d9c6a518c507d9a533bd900d9a8b85b",
+      "runtime/raven/tests/primitive-parsing/Tests.rvn": "d67dd84ca10671406338e67ad9e3aa4d9b9748da18710d33fc987c9b56edaa47",
+      "runtime/raven/tests/runner-contract/Main.rvn": "6aa7515a6b2bd4eaccbd296e80348c869fab9f8f74e89e067f72530f3ce55d0f",
+      "runtime/raven/tests/string-construction/Tests.rvn": "8861a8e01ee38bb33be583b7e5b614de8882ead5f77ecbc25a957bd5d57ce716",
+      "runtime/raven/tests/time-parsing/Tests.rvn": "d777d19ae583984676bcceb96f68134f9cf6eeea14473d0c6d8212e8a7e3359c",
+      "runtime/raven/tests/type-relations/Tests.rvn": "caf90378468874825cc65dccdc0180295382b120ef7d2f89a7a55f90c1da2631",
+      "runtime/raven/tests/unicode-casing/Tests.rvn": "b19bebaf414ca5a722e9c2cabf7c7e26b3fed611b54532f4a244e30b051ebd24",
+      "runtime/raven/tests/uri-resolution/Tests.rvn": "b1f17cc26c1512d6cb3dc8762499ef09dee1638176262f0add1426beeb1a4e79",
+      "runtime/raven/tests/zoned-time-parsing/Tests.rvn": "58d1a39edc70dff92e3ea17e6c10eaadd3548d4fdf39e3c0f04d5ea8a5393154",
+      "runtime/raven/tests/collection-construction/Tests.rvnproj": "9c0830711edc329a14a4eb23eb1b393f437a7abae8448ceb2b5e1110c15ad9e1",
+      "runtime/raven/tests/collection-iteration/Tests.rvnproj": "9c5fcf509fcc91b3ad3f696a189135f2df1d895709a4b5a8accc27028a42e1b4",
+      "runtime/raven/tests/collections/Tests.rvnproj": "c1374380a7d0c8a586f6a99a98e2530d17ffdc3f0a82cf8cea33f121ba6fffb1",
+      "runtime/raven/tests/cryptography/Tests.rvnproj": "f3fb63664d446832c711972ca7f7150df7e964889fd5a5098b6908df59af0178",
+      "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+      "runtime/raven/tests/duration-offset-parsing/Tests.rvnproj": "3375a57b3a2ead02c04d5a8d8dcaf6a449d2bcd5560669624d34c44a6f788702",
+      "runtime/raven/tests/encoding/Tests.rvnproj": "76a9551bab7ddefc98291a4ccbfccba1df20e1bf066245b2e891b6c87f9d4673",
+      "runtime/raven/tests/encoding-boundaries/Tests.rvnproj": "856ba10ba0dad773eca9d4f896f8f023362ac99478b4185c33571b7d37b30157",
+      "runtime/raven/tests/encoding-buffer-limits/Tests.rvnproj": "3753b7dfbfb917363cbb08a843a599cfa36700d4d3dd6a4a5fa3849077c48244",
+      "runtime/raven/tests/encoding-streams/Tests.rvnproj": "04c4dc37b436fb98aef5cf89982fb1059c7de4e3d3af2fd57d39e8b3b77ac5e3",
+      "runtime/raven/tests/gzip/Tests.rvnproj": "a4838acbc69cfdaa509a2a273e28c4b9ca6edaad8d054cece856da94ed397e27",
+      "runtime/raven/tests/http-header-values/Tests.rvnproj": "f0d2c1f9c5370068f37ef551d5eab40712a6742e6b4681e897f563209f2367ac",
+      "runtime/raven/tests/http-lifetime/Tests.rvnproj": "bf4046e777ac8d2cbc704c14bf77e99bc0a389b0b9ee088d69e5fe3584071b3f",
+      "runtime/raven/tests/http-method-values/Tests.rvnproj": "7e5a37fcff99002331b520722d561e4849dbbd57ce25d24e38829fad2e7c7e2b",
+      "runtime/raven/tests/http-route-matching/Tests.rvnproj": "e02e34b150ad6458e35678ec26d5cdf93e363562bfcfbb2a8e39806c1f9da199",
+      "runtime/raven/tests/http-text/Tests.rvnproj": "672944d3aafaecf7a846c689b34a3ec62beef32b9b4e4c28a3df847afcf5a2d3",
+      "runtime/raven/tests/index-range/Tests.rvnproj": "df96c52b96a1903608406d6ebe73dd1cb9ff96f9bae85d1277446ab3b11e1f51",
+      "runtime/raven/tests/instant-parsing/Tests.rvnproj": "1336d2c80a6a883fd5dbc4da100be4ea589df294df1c71c32ec457f542c0ab43",
+      "runtime/raven/tests/int64-parsing/Tests.rvnproj": "338266a559ffe4d67c1775fc2e4b5b91330e95d4c0c7336e6c5a8fa2202c1b34",
+      "runtime/raven/tests/ip-address-values/Tests.rvnproj": "b5d6d6b969706cf1b74c408ad27060d26946ee766f04e04ebbf440d25e85765e",
+      "runtime/raven/tests/json-dom/Tests.rvnproj": "2a384379580867b0886ac4eedda4c0f269db9eefca2ad251531c9b88030d062f",
+      "runtime/raven/tests/json-streams/Tests.rvnproj": "e430d27261d4f3c26d7c8f638ad4e54c983872e0a1e774de56887c86db7da1c5",
+      "runtime/raven/tests/memory-stream/Tests.rvnproj": "163fe46d9dc76c149bf6d757f0bfaab1d0d4950017bdcd6be9a8033def9ebf4f",
+      "runtime/raven/tests/path-values/Tests.rvnproj": "109e8179b5c1f498bb73c87a62ade1bab4d943621d4c2f1e038a255cee32bf58",
+      "runtime/raven/tests/primitive-parsing/Tests.rvnproj": "cf259491b67421b4b906f8a47c62995f2428bec98bcdd64e7f9a0efbfade950a",
+      "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e",
+      "runtime/raven/tests/string-construction/Tests.rvnproj": "91e2574c582f0f70a2a1ed811d4645c1cc161783af26b848b3c7df8c9b3a9409",
+      "runtime/raven/tests/time-parsing/Tests.rvnproj": "042f8e0280c165b02ec21e40d180e15706de2d4c4b2964a6391d4ec801cd21cc",
+      "runtime/raven/tests/type-relations/Tests.rvnproj": "3cf6da9a81d966d761a64be99b2c2029dc6436843389c163fb618f955b8b27f5",
+      "runtime/raven/tests/unicode-casing/Tests.rvnproj": "4bb50d2937be0265c0cec5af3fd658c1b6f745569d33ae403f0a275383916596",
+      "runtime/raven/tests/uri-resolution/Tests.rvnproj": "81f7a1667be14cdad3342698eb6685b5b1caaf1ff4e5d69aaa9eb1843126a899",
+      "runtime/raven/tests/zoned-time-parsing/Tests.rvnproj": "ad502dc19ae2915887362d34b17492fe510b612046d6c14c53ce0983ce67c97d"
+    },
+    "bundleManifestSha256": "779b7a98217b8cee7c99508a804918e227046bbf2f7bfeea53bf410d8f27736b",
+    "aotSha256": "e3d2314bc4671256388c84c3e1ae63bc49cae4f4dd95941a21775c881c7b75a7",
+    "interpreterSha256": "c3df023c2ce7e9c9048a256d85053a51b10c02898a1054e0153c795803a8abf4",
+    "suites": [
+      "encoding-buffer-limits",
+      "encoding-boundaries",
+      "encoding-streams",
+      "encoding"
+    ],
+    "encodingBufferBudgets": {
+      "nativeByteArrayElements": 131072,
+      "interpretedLiveArrayElements": 1048576,
+      "interpretedLogicalArrayBytes": 268435456
+    },
+    "totalElapsedSeconds": 450.426838
+  },
+  "validationCount": {
+    "testsPerMode": 35,
+    "modes": [
+      "AOT",
+      "JIT",
+      "interpreter"
+    ],
+    "executions": 105
+  },
+  "artifacts": {
+    "target/release/neoclr": "c3df023c2ce7e9c9048a256d85053a51b10c02898a1054e0153c795803a8abf4",
+    "target/debug/neoclr-codegen": "e3d2314bc4671256388c84c3e1ae63bc49cae4f4dd95941a21775c881c7b75a7",
+    "target/codec-slice-final-bundle/host.dylib": "d5a39d90f476854687453d5ad7b899ca06acceb0e94efc26a40bc8e1daf04b01",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "be09a3b7d2e83b1ec964e790067f0259a96ed91349e7277f73366b876a21fabb",
+    "docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "51271498fb4083221d4cce4b3b35ba9547502ea42530c5b4b84f4a47e45766d6",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/Audit.dll": "52c71248f0dabc0c553142278dc47dfb88039fbcf7d9c9cacf53823d048f2bc1",
+    "api-docs/native-reference.zip": "6bcd85e94c8f33a76dcb1d31c7d4779e7c6f55b393e58ccecce6783ae58e260a",
+    "api-docs/reference/NeoCLR.CoreProbe.dll": "75a3faba17a55cbe1dd8fe9990ded7c398408405c761188fd814d881bfcc670a",
+    "target/codec-slice-final-libraries/System.Web.dll": "d77c06a7ba2d9a22cd6b321aec8b98cbd0eca42642ffb6b3b952ae7a17a64633",
+    "target/codec-slice-final-libraries/System.Networking.dll": "e0bfd92247a19cb9b559799e203aa736084ace9fe8a8c46994c49f553e9af303",
+    "target/codec-slice-final-libraries/System.Runtime.dll": "ca938f2bf35a60924c95adc8e67b987fb80021a9474092823b9cb6b7f9a63752",
+    "target/codec-slice-final-libraries/System.Data.dll": "91f9802d2061d5924c98456a3e55fcd1d1277c92be2ce168254fffdb804193b6",
+    "target/codec-slice-final-libraries/System.Data.PostgreSql.dll": "b9a4ce6a6230d4e9128accc9782fc9f0eafe9c291a925b47f40f474608e9259b",
+    "runtime/raven/src/System/Text/Decoder.rvn": "d53f01cc198983272f3993819fa517e85820e7610d2ca0184ce5a94d6a18af90",
+    "runtime/raven/src/System/Text/Encoder.rvn": "29d93197be2dc3d3d425c5c54e772b069fa9f882750c529e08ea44bff522b21f",
+    "runtime/raven/src/System/Text/Encodings.rvn": "0e1d2e1d70d18f24e1b26db10f8ffdfe27714205a92a285e2e4c16a0aa259a69",
+    "runtime/raven/src/System/Text/EncodingError.rvn": "9228fdaf52c81ec2c0f41507059533ea078524ef5c61baf189879fa4c325da52",
+    "runtime/raven/src/System/IO/StreamReader.rvn": "8dc6d46ff748650793012ee7fcf02f4f0d3787d8567f30405bd8fad14cc086c0",
+    "runtime/raven/src/System/IO/StreamWriter.rvn": "0c53e127d2cd24e1f7a29b0f1d325ef9254b981dd5ffb40758a30f7904b08a53",
+    "runtime/raven/tests/encoding-buffer-limits/Tests.rvn": "c500b00f54f9c4e822588e806db34bf9a047e535dc83a65e1805eb68fc38aa5a",
+    "runtime/raven/tests/encoding/Tests.rvn": "e4881a42765b62ffbf785eb252d6d7f0ff665930086768d11650bf6d986db4d9",
+    "runtime/raven/tests/encoding-streams/Fixtures.rvn": "dc27d36dffa8373678111fe9e2e06755f407fd256cc2ae9079b8d0b77e93eb9e",
+    "runtime/raven/tests/encoding-streams/Tests.rvn": "3d36f8725dfb218f0278d4e82de2859dc85415f93ff48b008486ac056dac78a8",
+    "runtime/raven/tests/encoding-boundaries/Fixtures.rvn": "601b6f246a7a6c3fcc7c51959c1748820845c5cbddc1a62e31079ba108deb965",
+    "runtime/raven/tests/encoding-boundaries/Tests.rvn": "4ec72673a56f0ebf1d4c950349a040ade9689b16ab0647187d78f1d7b47ece3b"
+  },
+  "libraryBuild": {
+    "commands": [
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll\n",
+        "stderr": "/Users/robert/Projects/neoclr/runtime/raven/src/System/Boolean.rvn(21,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Byte.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Char.rvn(13,10): warning RAV0331: Member 'char.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/ArrayList.rvn(67,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn(271,17): warning RAV0168: 'pending' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn(326,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Console/Console.rvn(22,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Console/Streams.rvn(102,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/ConsoleReadError.rvn(11,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(10,32): info RAV1508: Explicit cast from 'int' to 'double' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(11,31): info RAV1508: Explicit cast from 'int' to 'double' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(13,61): info RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(14,61): info RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(15,61): info RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(16,61): info RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/EnvironmentError.rvn(4,10): warning RAV0331: Member 'EnvironmentError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Index.rvn(46,10): warning RAV0331: Member 'Index.GetHashCode' hides inherited member 'object.GetHashCode'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Index.rvn(48,10): warning RAV0331: Member 'Index.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int16.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(23,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(40,10): warning RAV0331: Member 'int.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(44,29): info RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(45,28): info RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(47,52): info RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(48,52): info RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(49,52): info RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn(50,52): info RAV1508: Explicit cast from 'int' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(26,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(29,10): warning RAV0331: Member 'long.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(33,30): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(34,29): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(36,55): info RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(37,55): info RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(38,55): info RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn(39,55): info RAV1508: Explicit cast from 'long' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IntegerDivisionError.rvn(11,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/InvalidRangeError.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/InvalidRangeError.rvn(6,10): warning RAV0331: Member 'InvalidRangeError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipDecoder.rvn(28,28): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipDecoder.rvn(116,66): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipDecoder.rvn(272,50): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipEncoder.rvn(62,30): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipEncoder.rvn(62,66): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipEncoder.rvn(62,107): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipEncoder.rvn(99,24): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipStream.rvn(185,60): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipStream.rvn(188,38): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/FileInputStream.rvn(111,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/FileOutputStream.rvn(51,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/FileOutputStream.rvn(128,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/MemoryStream.rvn(23,19): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/MemoryStream.rvn(30,19): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamError.rvn(32,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamReader.rvn(66,27): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamReader.rvn(101,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamReader.rvn(135,16): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamReader.rvn(154,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamReader.rvn(178,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamWriter.rvn(49,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamWriter.rvn(127,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamWriter.rvn(137,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/TextReadError.rvn(34,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Linq/Operators.rvn(308,32): warning RAV0403: The '!' operator treats the operand as non-null\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Linq/Operators.rvn(690,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Linq/SingleError.rvn(11,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/OverflowError.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/OverflowError.rvn(6,10): warning RAV0331: Member 'OverflowError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Range.rvn(65,10): warning RAV0331: Member 'Range.GetHashCode' hides inherited member 'object.GetHashCode'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Range.rvn(71,10): warning RAV0331: Member 'Range.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/SByte.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn(14,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(10,31): info RAV1508: Explicit cast from 'int' to 'float' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(11,30): info RAV1508: Explicit cast from 'int' to 'float' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(13,58): info RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(14,58): info RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(15,58): info RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(16,58): info RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileReadError.rvn(23,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileSystem.rvn(24,19): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileSystem.rvn(24,37): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileText.rvn(34,5): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileText.rvn(68,5): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileWriteError.rvn(21,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/InvalidPathError.rvn(4,10): warning RAV0331: Member 'InvalidPathError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/Metadata.rvn(37,5): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/StorageLookupError.rvn(21,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/String.rvn(89,30): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/String.rvn(99,25): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/String.rvn(133,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/String.rvn(209,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/EncoderProgress.rvn(14,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/EncoderState.rvn(13,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/EncodingError.rvn(19,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(52,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(82,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(216,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(222,30): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(228,29): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(254,36): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(262,25): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(265,33): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(272,28): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(287,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(292,19): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn(298,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/InvalidUtf8Error.rvn(4,10): warning RAV0331: Member 'InvalidUtf8Error.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/StringBuilder.rvn(33,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/StringBuilder.rvn(66,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Utf8SliceError.rvn(11,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(15,25): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(73,16): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(94,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(105,22): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(120,22): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(135,12): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(144,22): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(203,22): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(240,22): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(252,29): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(255,30): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn(278,30): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Date.rvn(143,22): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Date.rvn(155,22): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/InvalidDateError.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/InvalidDateError.rvn(8,10): warning RAV0331: Member 'InvalidDateError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/InvalidTimeError.rvn(6,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/InvalidTimeError.rvn(8,10): warning RAV0331: Member 'InvalidTimeError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/SystemClock.rvn(7,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/TimeZoneError.rvn(16,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/ZonedDateTime.rvn(33,13): warning RAV0168: 'offset' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt16.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt32.rvn(13,55): info RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt32.rvn(14,55): info RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt32.rvn(15,55): info RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt32.rvn(16,55): info RAV1508: Explicit cast from 'uint' to 'uint' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt32.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt64.rvn(13,58): info RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt64.rvn(14,58): info RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt64.rvn(15,58): info RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt64.rvn(16,58): info RAV1508: Explicit cast from 'ulong' to 'ulong' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt64.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(28,27): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(32,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(37,28): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(56,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(59,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(169,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(184,25): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn(241,27): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/UriError.rvn(15,13): warning RAV2103: This catch-all never matches.\n"
+      },
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/debug/neoclr",
+          "assemble",
+          "/Users/robert/Projects/neoclr/target/codec-slice-final-libraries/System.runtime.neoil",
+          "/Users/robert/Projects/neoclr/target/codec-slice-final-libraries/System.runtime.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /Users/robert/Projects/neoclr/target/codec-slice-final-libraries/System.runtime.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/bin/neoclr/System.Data.dll\n",
+        "stderr": "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonDocument.rvn(37,15): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonDocument.rvn(163,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonDocument.rvn(163,45): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonError.rvn(35,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonSerializer.rvn(14,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonSyntax.rvn(15,17): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonSyntax.rvn(26,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonSyntax.rvn(92,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/bin/neoclr/System.Networking.dll\n",
+        "stderr": "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Dns.rvn(64,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/DnsError.rvn(19,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(57,42): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(76,59): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(77,28): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(78,42): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(78,86): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(86,28): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(93,28): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(116,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn(209,21): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddressError.rvn(14,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Security/SslOptions.rvn(106,16): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Security/SslOptions.rvn(106,38): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Security/SslOptions.rvn(106,70): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Sockets/Socket.rvn(280,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Sockets/SocketError.rvn(36,13): warning RAV2103: This catch-all never matches.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/bin/neoclr/System.Web.dll\n",
+        "stderr": "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpBodyInput.rvn(157,21): warning RAV0168: 'until' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(53,32): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(54,33): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(272,32): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(300,33): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(393,37): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(727,37): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(727,68): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(794,29): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1009,62): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1128,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1137,13): warning RAV0168: 'secure' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1171,29): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1381,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1403,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1425,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1447,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1473,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1495,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1521,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1543,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1569,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1591,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1617,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1639,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1725,13): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1825,22): warning RAV0168: 'reason' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn(1893,25): warning RAV0168: 'pending' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpError.rvn(54,13): warning RAV2103: This catch-all never matches.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(82,17): warning RAV0168: 'count' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(135,32): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(153,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(153,48): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(154,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(154,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(159,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(159,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(160,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(160,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(161,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(161,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(162,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(162,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(163,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(163,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(168,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(168,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(169,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(169,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(170,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(170,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(171,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(172,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(172,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(173,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(173,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(174,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(174,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(179,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(179,48): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(180,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(180,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(181,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(181,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(182,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(182,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(183,39): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(184,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(184,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(185,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(185,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(186,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(186,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(187,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(192,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(192,48): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(193,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(193,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(194,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(194,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(199,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(199,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(200,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(200,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(201,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(201,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(202,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(203,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(203,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(204,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(204,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(205,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(205,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(206,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(206,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(211,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(211,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(212,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(212,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(213,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(213,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(214,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(215,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(215,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(216,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(216,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(221,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(221,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(222,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(222,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(223,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(223,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(228,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(228,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(229,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(229,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(230,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(230,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(231,39): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(232,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(232,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(233,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(233,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(234,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(234,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(235,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(240,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(240,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(241,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(241,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(242,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(242,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(243,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(243,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(244,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(244,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(245,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(245,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(246,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(251,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(251,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(252,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(252,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(253,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(253,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(258,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(258,48): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(259,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(259,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(260,39): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(261,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(261,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(262,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(262,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(267,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(267,47): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(268,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(268,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(269,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(270,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(270,51): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(271,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(271,52): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(272,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(272,53): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(273,14): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(390,37): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(556,13): warning RAV0168: 'settings' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(701,16): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(701,83): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(966,62): info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(1208,49): warning RAV0168: 'active' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(1415,49): warning RAV0168: 'active' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn(1418,21): warning RAV0168: 'active' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpText.rvn(12,20): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpText.rvn(27,35): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpText.rvn(49,17): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpWire.rvn(58,25): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpWire.rvn(61,25): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpWire.rvn(64,25): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(50,28): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(54,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(59,20): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(62,20): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(65,20): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(75,25): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(127,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn(202,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/bin/neoclr/System.Data.PostgreSql.dll\n",
+        "stderr": "/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(87,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(162,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(189,33): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(234,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(276,29): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(330,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn(349,13): warning RAV0168: 'expected' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(36,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(37,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(38,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(39,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(40,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(46,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn(50,22): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresNamedParameters.rvn(25,41): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresNamedParameters.rvn(37,22): warning RAV0505: The method 'SliceUtf8(byteStart: int, byteLength: int) -> Result<string, Utf8SliceError>' is obsolete: Byte slicing will move to explicit encoding and buffer APIs. This string member is scheduled for removal.\n/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/Wire.rvn(23,16): info RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\n"
+      }
+    ],
+    "evidenceSha256": "914b8be2eafd05701e1f616aa02795b55b5fc1fbfc1b8b99efd3ec22fb3a3904"
+  },
+  "hostPreparation": {
+    "passed": true,
+    "commands": [
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release",
+          "--target",
+          "aarch64-apple-darwin",
+          "--target-dir",
+          "/Users/robert/Projects/neoclr/tools/aot-native-text/target/time-zone-rules",
+          "--manifest-path",
+          "/Users/robert/Projects/neoclr/tools/aot-native-text/Cargo.toml",
+          "--features",
+          "time-zone-rules"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "    Finished `release` profile [optimized] target(s) in 0.10s\n"
+      },
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release",
+          "--target",
+          "aarch64-apple-darwin",
+          "--target-dir",
+          "/Users/robert/Projects/neoclr/tools/native-crypto/target",
+          "--manifest-path",
+          "/Users/robert/Projects/neoclr/tools/native-crypto/Cargo.toml"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "    Finished `release` profile [optimized] target(s) in 0.03s\n"
+      },
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--profile",
+          "native-ffi",
+          "--target",
+          "aarch64-apple-darwin",
+          "--target-dir",
+          "/Users/robert/Projects/neoclr/tools/native-tls/target",
+          "--manifest-path",
+          "/Users/robert/Projects/neoclr/tools/native-tls/Cargo.toml"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "    Finished `native-ffi` profile [optimized] target(s) in 0.07s\n"
+      },
+      {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+          "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+          "-I/Users/robert/Projects/neoclr/runtime/native/async",
+          "-DNEOCLR_MANAGED_TLS",
+          "-isysroot",
+          "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+          "-arch",
+          "arm64",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-DNEOCLR_NATIVE_GC",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+          "/Users/robert/Projects/neoclr/docs/experiments/jit-managed/host.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+          "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+          "-o",
+          "/Users/robert/Projects/neoclr/target/codec-slice-final-bundle/host.dylib",
+          "-DNEOCLR_RUNTIME_ASYNC",
+          "-I",
+          "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+          "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+          "-Wno-deprecated-declarations",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+          "-dynamiclib",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/system-culture.c",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/time-zone.c",
+          "/Users/robert/Projects/neoclr/tools/aot-native-text/target/time-zone-rules/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/cryptography.c",
+          "/Users/robert/Projects/neoclr/tools/native-crypto/target/aarch64-apple-darwin/release/libneoclr_native_crypto.a",
+          "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+          "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/native-ffi/libneoclr_native_tls.a",
+          "-framework",
+          "CoreFoundation"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "evidenceSha256": "39ce070cd34fa99258422115db64759bf8a7f013ea1958080b4d432903f433f9"
+  },
+  "documentation": {
+    "referenceCheck": "passed",
+    "nativeRendering": "passed",
+    "snapshotTests": 4,
+    "renderedReview": [
+      "Decoder.Decode uses ReadOnlySlice<byte> plus final, with parameters, results and lifetime/error remarks.",
+      "Encoder.Drain uses Slice<byte>, with bounded writes, quota and progress remarks.",
+      "EncodingError.InvalidRange and obsolete array/offset/count codec scaffold members removed."
+    ],
+    "websiteBuild": "not run; focused API snapshot checks used"
+  },
+  "earlierAttempts": [
+    {
+      "scope": "pre-final codec bundle under debug interpreter",
+      "outcome": "encoding-buffer-limits interpreter timed out after 180 seconds; no pass claimed",
+      "report": {
+        "passed": false,
+        "modes": [
+          "interpreter",
+          "jit",
+          "native"
+        ],
+        "jitHostSha256": "9fbf4cb2a8edbfaf8ee5c8751727373f4dd00ea1e45381c63756977610ec784e",
+        "platform": "macOS-27.0-arm64-arm-64bit",
+        "cases": [],
+        "phases": [
+          {
+            "suite": "encoding-buffer-limits",
+            "phase": "discovery",
+            "elapsedSeconds": 10.392056,
+            "details": {
+              "sourceCompilationSeconds": 4.260341,
+              "metadataDiscoveryIncludingToolBuildSeconds": 6.129015
+            }
+          },
+          {
+            "suite": "encoding-buffer-limits",
+            "phase": "native-project-build",
+            "elapsedSeconds": 30.128123,
+            "commands": [
+              {
+                "phase": "toolchain",
+                "elapsedSeconds": 0.006862
+              },
+              {
+                "phase": "toolchain",
+                "elapsedSeconds": 0.00652
+              },
+              {
+                "phase": "toolchain",
+                "elapsedSeconds": 0.008994
+              },
+              {
+                "phase": "source-compilation",
+                "elapsedSeconds": 3.70747
+              },
+              {
+                "phase": "native-compilation",
+                "elapsedSeconds": 25.421296
+              },
+              {
+                "phase": "host-compile-link",
+                "elapsedSeconds": 0.495885
+              },
+              {
+                "phase": "dependency-check",
+                "elapsedSeconds": 0.016982
+              }
+            ]
+          },
+          {
+            "suite": "encoding-buffer-limits",
+            "phase": "registration-verification",
+            "elapsedSeconds": 2.28379
+          }
+        ],
+        "executionRepetitions": 1,
+        "inputs": {
+          "scripts/test-runtime-library.py": "71d988e6152994da992cc5e54d94579b958571e387e534cfcf45a0b2a40f414f",
+          "scripts/build-native-project.py": "bf4f51b778c13b0ed2ac40493216075593e1a4001af9a438aad978f39e5c8ad1",
+          "scripts/discover-runtime-tests.py": "455595ff98a3d9f8df9018caad453ef0f244eedf69e6ab220d54934535ed428e",
+          "scripts/validate-test-discovery.py": "b9a0a6063453f5567d1186d6825fc7b39b58ea9afc15fd0a310296a408d22e1a",
+          "tools/testing/NeoCLR.TestDiscovery/DataAdapters.cs": "6d9484b668f8898fbf4dd9712c0c2e3c8b1b879a346d963d6538ed81e842d561",
+          "tools/testing/NeoCLR.TestDiscovery/Program.cs": "54202b4fc5bbfbc94ee7e8dcddb4cf7315d5596a4b42f9de7b49ce4cb998c8ab",
+          "tools/testing/NeoCLR.TestDiscovery/NeoCLR.TestDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+          "runtime/raven/tests/collection-construction/Construction.rvn": "ddd2af5dcce0720e86c43ca20ee6fdb4f4e0ac4b89d49211fe70b8d0082cb1ca",
+          "runtime/raven/tests/collection-construction/MapIndexers.rvn": "9504fc1582e99fff38542c214ee46be4d68aee9cae8ffe3768790c5efdfc188b",
+          "runtime/raven/tests/collection-construction/Sets.rvn": "67968e7a90b91e93b54681f8507a07815abd13f5e0f4a93525708e616bc49558",
+          "runtime/raven/tests/collection-iteration/ForCleanup.rvn": "49d938e6b0886ddef91d0eee932f98170f597d676c2e90a1de93e434d9c719c4",
+          "runtime/raven/tests/collection-iteration/QueryCleanup.rvn": "7e6d9e27d73af1448ad79019c69ac46541c092490972d36c93f3648cbd9414d7",
+          "runtime/raven/tests/collections/Collections.rvn": "2793973c50d8501998f3de17ac6d1be149e6f1a3b34229372c90c0897d280c2b",
+          "runtime/raven/tests/collections/Main.rvn": "e0d4d6b296788027744cc6f4e5db76e85d99381c5cbd7f14c64727bc48ff0c8d",
+          "runtime/raven/tests/collections/MapMaterialization.rvn": "363ee1bc09ec13e638cd7abbad69b2f96c15597fea44d9a2b137ce110124cc8e",
+          "runtime/raven/tests/collections/ObservedNumbers.rvn": "c42f57095c9d357cec05baaa3a17f127a7b6fff23385b95f5a4a9157b32729b4",
+          "runtime/raven/tests/collections/QueueStack.rvn": "36f9b8623731832ef8599273bb9307d03ccce62f1cd1e912c5edb7fca7612f75",
+          "runtime/raven/tests/cryptography/Tests.rvn": "946ab81f5cca34ccd77b13712a3aa15194ac8312931d8694b9db7f90077aafac",
+          "runtime/raven/tests/discovery-contract/OtherAttribute.rvn": "78d87fb89024c33a52dc817347bd983c9f389da46d135571f711618b744c880a",
+          "runtime/raven/tests/discovery-contract/Tests.rvn": "e5800f40e8c8052b98b9b18859cf0ca1df6896d8635c0439410cfa6dc894aeb9",
+          "runtime/raven/tests/duration-offset-parsing/Tests.rvn": "133f78c28389a426bf504f57b39d088c87040951b7126467159165d8aec567a2",
+          "runtime/raven/tests/encoding/Tests.rvn": "e4881a42765b62ffbf785eb252d6d7f0ff665930086768d11650bf6d986db4d9",
+          "runtime/raven/tests/encoding-boundaries/Fixtures.rvn": "601b6f246a7a6c3fcc7c51959c1748820845c5cbddc1a62e31079ba108deb965",
+          "runtime/raven/tests/encoding-boundaries/Tests.rvn": "4ec72673a56f0ebf1d4c950349a040ade9689b16ab0647187d78f1d7b47ece3b",
+          "runtime/raven/tests/encoding-buffer-limits/Tests.rvn": "c500b00f54f9c4e822588e806db34bf9a047e535dc83a65e1805eb68fc38aa5a",
+          "runtime/raven/tests/encoding-streams/Fixtures.rvn": "dc27d36dffa8373678111fe9e2e06755f407fd256cc2ae9079b8d0b77e93eb9e",
+          "runtime/raven/tests/encoding-streams/Tests.rvn": "3d36f8725dfb218f0278d4e82de2859dc85415f93ff48b008486ac056dac78a8",
+          "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+          "runtime/raven/tests/framework/TestAttribute.rvn": "435a93e9247a6c7f1c94b1a81296e35449f7b4ba735b835c18a816726a56435c",
+          "runtime/raven/tests/framework/TestSuite.rvn": "bf444948246b2296e16de620e21459bbc4d6a1cbc01be41f0139b20e6bd42c67",
+          "runtime/raven/tests/gzip/Fixtures.rvn": "623867ec5871460b31178bb0a450228ed9b895c255c4b262e05a7b8da382cdf9",
+          "runtime/raven/tests/gzip/Streams.rvn": "e43354105f0d4186fbc90f6f0a0b9edc180b3d0dedf1d6e4b79ae2b28262c26f",
+          "runtime/raven/tests/gzip/Tests.rvn": "864d45cb7db17da62ec943c56a97c9716268fe32b330aacf3e38f916a28f2b1a",
+          "runtime/raven/tests/http-header-values/Tests.rvn": "fc0bc92f4bbd80b90550f3e734b15e681c76bf9eb6d675cf9c24114f620ef012",
+          "runtime/raven/tests/http-lifetime/Tests.rvn": "8cbc163fa5f9908aca019f76bd214ff55e62f7fb25fc0974e2eb667d643efb9d",
+          "runtime/raven/tests/http-method-values/Tests.rvn": "b7ea78ddb7988d89ad1fa40d77718b186eb7145918d08a87890b8af6f7117e29",
+          "runtime/raven/tests/http-route-matching/Tests.rvn": "e597b64fb4297491af075579dd8984568e5718df4b3e79f5a6ed031a0361f86d",
+          "runtime/raven/tests/http-text/Tests.rvn": "b80d50cff3d8d55bd43a571d7f42d35045f01229e2a5463a05aedddf78612fe7",
+          "runtime/raven/tests/index-range/Main.rvn": "06184aaf9a91ece09fbd1ed6ab23f5faf41c2237c970c8ff33390c34c9911c70",
+          "runtime/raven/tests/index-range/Tests.rvn": "1fbba1db13dc04c336d34752aa23b11add69cff0eb2729b0758572f0f24b6ca5",
+          "runtime/raven/tests/instant-parsing/Tests.rvn": "250a3c293388f1d94f7e3eb58ce64d5bf42496a2f88405d03e756521a69975d5",
+          "runtime/raven/tests/int64-parsing/Tests.rvn": "03ecbfd540200cfe0e17bdda5a542b658dd01541e63228dfe090ed652d96c270",
+          "runtime/raven/tests/ip-address-values/Tests.rvn": "f5c8fd7e24132e984991cabe2b28f65afab00b938c2b0ee37c084c2834a9d3e6",
+          "runtime/raven/tests/json-dom/JsonDom.rvn": "8fde17e996d01e6ea2de05e4755b049454770cbd36ad9eaad8323e9158edf1aa",
+          "runtime/raven/tests/json-streams/JsonStreams.rvn": "45852df9e24caf020c044355567918f51667994c901ec8976871d67567edc91a",
+          "runtime/raven/tests/json-streams/ShortStreams.rvn": "020333bd8b5471c2c34e328a2e794c27dba8eba18d91b7abe94b5518d697c8d1",
+          "runtime/raven/tests/memory-stream/Tests.rvn": "278fe468c8cf94ce5d868e8ff1b8f1bc1da00b04f8a959bd1e0cd1c8d4e9fdc0",
+          "runtime/raven/tests/path-values/Tests.rvn": "8bffa5ed04a581f21864b68d9231c0587d9c6a518c507d9a533bd900d9a8b85b",
+          "runtime/raven/tests/primitive-parsing/Tests.rvn": "d67dd84ca10671406338e67ad9e3aa4d9b9748da18710d33fc987c9b56edaa47",
+          "runtime/raven/tests/runner-contract/Main.rvn": "6aa7515a6b2bd4eaccbd296e80348c869fab9f8f74e89e067f72530f3ce55d0f",
+          "runtime/raven/tests/string-construction/Tests.rvn": "8861a8e01ee38bb33be583b7e5b614de8882ead5f77ecbc25a957bd5d57ce716",
+          "runtime/raven/tests/time-parsing/Tests.rvn": "d777d19ae583984676bcceb96f68134f9cf6eeea14473d0c6d8212e8a7e3359c",
+          "runtime/raven/tests/type-relations/Tests.rvn": "caf90378468874825cc65dccdc0180295382b120ef7d2f89a7a55f90c1da2631",
+          "runtime/raven/tests/unicode-casing/Tests.rvn": "b19bebaf414ca5a722e9c2cabf7c7e26b3fed611b54532f4a244e30b051ebd24",
+          "runtime/raven/tests/uri-resolution/Tests.rvn": "b1f17cc26c1512d6cb3dc8762499ef09dee1638176262f0add1426beeb1a4e79",
+          "runtime/raven/tests/zoned-time-parsing/Tests.rvn": "58d1a39edc70dff92e3ea17e6c10eaadd3548d4fdf39e3c0f04d5ea8a5393154",
+          "runtime/raven/tests/collection-construction/Tests.rvnproj": "9c0830711edc329a14a4eb23eb1b393f437a7abae8448ceb2b5e1110c15ad9e1",
+          "runtime/raven/tests/collection-iteration/Tests.rvnproj": "9c5fcf509fcc91b3ad3f696a189135f2df1d895709a4b5a8accc27028a42e1b4",
+          "runtime/raven/tests/collections/Tests.rvnproj": "c1374380a7d0c8a586f6a99a98e2530d17ffdc3f0a82cf8cea33f121ba6fffb1",
+          "runtime/raven/tests/cryptography/Tests.rvnproj": "f3fb63664d446832c711972ca7f7150df7e964889fd5a5098b6908df59af0178",
+          "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+          "runtime/raven/tests/duration-offset-parsing/Tests.rvnproj": "3375a57b3a2ead02c04d5a8d8dcaf6a449d2bcd5560669624d34c44a6f788702",
+          "runtime/raven/tests/encoding/Tests.rvnproj": "76a9551bab7ddefc98291a4ccbfccba1df20e1bf066245b2e891b6c87f9d4673",
+          "runtime/raven/tests/encoding-boundaries/Tests.rvnproj": "856ba10ba0dad773eca9d4f896f8f023362ac99478b4185c33571b7d37b30157",
+          "runtime/raven/tests/encoding-buffer-limits/Tests.rvnproj": "3753b7dfbfb917363cbb08a843a599cfa36700d4d3dd6a4a5fa3849077c48244",
+          "runtime/raven/tests/encoding-streams/Tests.rvnproj": "04c4dc37b436fb98aef5cf89982fb1059c7de4e3d3af2fd57d39e8b3b77ac5e3",
+          "runtime/raven/tests/gzip/Tests.rvnproj": "a4838acbc69cfdaa509a2a273e28c4b9ca6edaad8d054cece856da94ed397e27",
+          "runtime/raven/tests/http-header-values/Tests.rvnproj": "f0d2c1f9c5370068f37ef551d5eab40712a6742e6b4681e897f563209f2367ac",
+          "runtime/raven/tests/http-lifetime/Tests.rvnproj": "bf4046e777ac8d2cbc704c14bf77e99bc0a389b0b9ee088d69e5fe3584071b3f",
+          "runtime/raven/tests/http-method-values/Tests.rvnproj": "7e5a37fcff99002331b520722d561e4849dbbd57ce25d24e38829fad2e7c7e2b",
+          "runtime/raven/tests/http-route-matching/Tests.rvnproj": "e02e34b150ad6458e35678ec26d5cdf93e363562bfcfbb2a8e39806c1f9da199",
+          "runtime/raven/tests/http-text/Tests.rvnproj": "672944d3aafaecf7a846c689b34a3ec62beef32b9b4e4c28a3df847afcf5a2d3",
+          "runtime/raven/tests/index-range/Tests.rvnproj": "df96c52b96a1903608406d6ebe73dd1cb9ff96f9bae85d1277446ab3b11e1f51",
+          "runtime/raven/tests/instant-parsing/Tests.rvnproj": "1336d2c80a6a883fd5dbc4da100be4ea589df294df1c71c32ec457f542c0ab43",
+          "runtime/raven/tests/int64-parsing/Tests.rvnproj": "338266a559ffe4d67c1775fc2e4b5b91330e95d4c0c7336e6c5a8fa2202c1b34",
+          "runtime/raven/tests/ip-address-values/Tests.rvnproj": "b5d6d6b969706cf1b74c408ad27060d26946ee766f04e04ebbf440d25e85765e",
+          "runtime/raven/tests/json-dom/Tests.rvnproj": "2a384379580867b0886ac4eedda4c0f269db9eefca2ad251531c9b88030d062f",
+          "runtime/raven/tests/json-streams/Tests.rvnproj": "e430d27261d4f3c26d7c8f638ad4e54c983872e0a1e774de56887c86db7da1c5",
+          "runtime/raven/tests/memory-stream/Tests.rvnproj": "163fe46d9dc76c149bf6d757f0bfaab1d0d4950017bdcd6be9a8033def9ebf4f",
+          "runtime/raven/tests/path-values/Tests.rvnproj": "109e8179b5c1f498bb73c87a62ade1bab4d943621d4c2f1e038a255cee32bf58",
+          "runtime/raven/tests/primitive-parsing/Tests.rvnproj": "cf259491b67421b4b906f8a47c62995f2428bec98bcdd64e7f9a0efbfade950a",
+          "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e",
+          "runtime/raven/tests/string-construction/Tests.rvnproj": "91e2574c582f0f70a2a1ed811d4645c1cc161783af26b848b3c7df8c9b3a9409",
+          "runtime/raven/tests/time-parsing/Tests.rvnproj": "042f8e0280c165b02ec21e40d180e15706de2d4c4b2964a6391d4ec801cd21cc",
+          "runtime/raven/tests/type-relations/Tests.rvnproj": "3cf6da9a81d966d761a64be99b2c2029dc6436843389c163fb618f955b8b27f5",
+          "runtime/raven/tests/unicode-casing/Tests.rvnproj": "4bb50d2937be0265c0cec5af3fd658c1b6f745569d33ae403f0a275383916596",
+          "runtime/raven/tests/uri-resolution/Tests.rvnproj": "81f7a1667be14cdad3342698eb6685b5b1caaf1ff4e5d69aaa9eb1843126a899",
+          "runtime/raven/tests/zoned-time-parsing/Tests.rvnproj": "ad502dc19ae2915887362d34b17492fe510b612046d6c14c53ce0983ce67c97d"
+        },
+        "bundleManifestSha256": "35d3bcec654132782be40673732e635aa9a21d81a05500c098882aea831bbafe",
+        "aotSha256": "e3d2314bc4671256388c84c3e1ae63bc49cae4f4dd95941a21775c881c7b75a7",
+        "interpreterSha256": "9b7b432f9d31e231c221c51de2957a265cde2b3c1e9400f61aac8113d55a71f1",
+        "suites": [
+          "encoding-buffer-limits",
+          "encoding-boundaries",
+          "encoding-streams",
+          "encoding"
+        ],
+        "encodingBufferBudgets": {
+          "nativeByteArrayElements": 131072,
+          "interpretedLiveArrayElements": 1048576,
+          "interpretedLogicalArrayBytes": 268435456
+        },
+        "totalElapsedSeconds": 222.977787
+      }
+    },
+    {
+      "scope": "legacy reference scaffold build",
+      "outcome": "One build exited 1 without diagnostic; identical-source retry succeeded.",
+      "retryLogSha256": "2d671488392408fbffc1178eddee833db7e532d05693fa8edffd865b50341ada"
+    }
+  ],
+  "notes": [
+    "Final validation used a newly built release interpreter and freshly prepared native/JIT helper with the final six-case EncodingError union.",
+    "No throughput or performance improvement is claimed. Historical array/offset/count probes retain their pinned earlier contracts; maintained encoding suites are migrated."
+  ]
+}
