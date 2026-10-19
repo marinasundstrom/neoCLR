@@ -19915,3 +19915,14 @@ Native JSON backend/runtime gaps remain open separately.
   typed formatting/view ingestion. Reuses the historical slower-builder evidence
   rather than claiming a speedup, and proposes measured fragment-versus-UTF-8
   storage comparisons. No String or StringBuilder API behavior changes in either review.
+
+- **Author release correction:** “We should fix the String and StringBuilder before
+  release.” **Assistant action:** cancels initial Windows package qualification
+  (39307305148), marks that candidate superseded, and begins the builder allocation
+  fixes. Existing source checks can finish as baseline evidence, not qualification
+  of the subsequent text changes.
+- **Author on canonical equality:** asks “What do you think?” **Assistant
+  recommendation:** canonical String/Char equality and consistent hashing, keeping
+  original UTF-8 storage and explicit ordinal operations. Describes comparison cost
+  and the need to align collection keys and compiler behavior; this is a recommendation,
+  not a reported implementation or explicit subsequent author decision.

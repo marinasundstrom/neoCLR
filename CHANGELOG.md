@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Supersede the initial Preview 17 candidate at the author’s direction: String and StringBuilder fixes are now release prerequisites. Cancel its Windows package qualification; earlier checks remain baseline evidence only. Publication stays pending a fresh candidate after text changes.
+
 - Select Preview 17 qualification scope and candidate SDK/editor build 0.1.17-neoclr.20261019.1 with Raven native 2d22055dc. Update the full Windows qualification workflow pin and draft migration/limitation notes. Release and website publication remain pending the recorded gates.
 
 - Apply the repository Rust formatter to accumulated memory-view and HTTP integration changes before release qualification. This maintenance change does not alter runtime contracts.

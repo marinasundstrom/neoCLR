@@ -7,7 +7,9 @@ maintain a second HTTP completion checklist here.
 
 ## Preview 17 candidate — 2026-10-19
 
-The author directs continuation through release after closing the HTTP/JSON gaps.
+The author directs continuation through release after closing the HTTP/JSON gaps,
+then explicitly adds String and StringBuilder fixes as release prerequisites. The
+initial candidate is superseded; Windows package run 39307305148 was canceled.
 The [candidate notes](../next-preview-release-notes.md) select SDK/editor build
 0.1.17-neoclr.20261019.1 and Raven native 2d22055dca58dcf991c6001dfe5d93657577d9d6.
 The full public JSON fixture now passes interpreter/JIT/AOT. Source/package,

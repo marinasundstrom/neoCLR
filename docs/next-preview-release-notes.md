@@ -1,6 +1,9 @@
 # Next preview — Preview 17 candidate
 
-Selected for qualification on 2026-10-19; **not published**. The candidate SDK/editor
+Initial candidate selected on 2026-10-19; **superseded before publication**.
+The author now requires String and StringBuilder fixes before release. The initial
+Windows package run was canceled; existing source checks remain baseline evidence.
+A new package identity and qualification run are required after text changes. The candidate SDK/editor
 version is `0.1.17-neoclr.20261019.1`, using Raven native compiler
 `2d22055dca58dcf991c6001dfe5d93657577d9d6`. Publication date remains unset.
 [Preview 16](preview-16-release-notes.md) and its assets remain unchanged.
