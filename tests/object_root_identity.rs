@@ -672,7 +672,10 @@ fn enum_ancestry_requires_the_selected_fieldless_foundations() {
         let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
         let core = format!(
             "{}\n{foundation}",
-            format!("{}\n.type class abstract System.ValueType\n.extends System.Object\n.end", ROOT.replace(".module System", ".module Core"))
+            format!(
+                "{}\n.type class abstract System.ValueType\n.extends System.Object\n.end",
+                ROOT.replace(".module System", ".module Core")
+            )
         );
         let app = ".module App\n.references (Core)\n.entry Main\n.type ValueRecord\n.extends [Core]System.Enum\n.enum Int32\n.field private Number Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end";
         let loaded = neoclr::assembler::read_modules_with_object_root(

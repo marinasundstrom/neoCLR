@@ -157,9 +157,16 @@ impl<'a> Profile<'a> {
             }
         }
         for t in &input.types {
-            if t.fields.iter().map(|f| &f.ty).chain(t.static_fields.iter().map(|f| &f.ty)).any(|ty| {
-                input.type_definition(ty).is_some_and(|t| t.memory_view.is_some_and(|k| k.is_borrowed()))
-            }) {
+            if t.fields
+                .iter()
+                .map(|f| &f.ty)
+                .chain(t.static_fields.iter().map(|f| &f.ty))
+                .any(|ty| {
+                    input
+                        .type_definition(ty)
+                        .is_some_and(|t| t.memory_view.is_some_and(|k| k.is_borrowed()))
+                })
+            {
                 return Err("borrowed byte views cannot be stored in fields".into());
             }
             // Selection also gates these; direct profile consumers must not
@@ -2630,10 +2637,16 @@ mod object_assignment_tests {
         for kind in [MemoryViewKind::Slice, MemoryViewKind::ReadOnlySlice] {
             let mut input = crate::memory_views::test_module(kind, Type::Byte);
             let ty = Type::Named(input.types[0].name.clone());
-            let mut holder = neoclr::assemble(".module Test\n.type Holder\n.field Data Int32\n.end\n").unwrap().types.remove(0);
+            let mut holder =
+                neoclr::assemble(".module Test\n.type Holder\n.field Data Int32\n.end\n")
+                    .unwrap()
+                    .types
+                    .remove(0);
             holder.fields[0].ty = ty;
             input.types.push(holder);
-            let error = Profile::new(&input, true, None, None, &[], None, None, None, false).err().unwrap();
+            let error = Profile::new(&input, true, None, None, &[], None, None, None, false)
+                .err()
+                .unwrap();
             assert!(error.to_string().contains("cannot be stored in fields"));
         }
     }
@@ -2678,13 +2691,16 @@ mod object_assignment_tests {
         let call =
             Op::Call(neoclr::assembler::parse_function_ref("instance Base::.ctor(Int32)").unwrap());
         assert_eq!(
-            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call.clone()], &base, &|_| Some(false)),
+            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call.clone()], &base, &|_| Some(
+                false
+            )),
             Some(2)
         );
         assert_eq!(
             leading_base_initializer(
                 &[Op::Arg(0), Op::Arg(1), Op::Int(1), Op::Add, call.clone()],
-                &base, &|_| Some(false)
+                &base,
+                &|_| Some(false)
             ),
             Some(4)
         );
@@ -2699,10 +2715,18 @@ mod object_assignment_tests {
         ] {
             let mut body = prefix;
             body.push(call.clone());
-            assert_eq!(leading_base_initializer(&body, &base, &|_| Some(false)), None, "{body:?}");
+            assert_eq!(
+                leading_base_initializer(&body, &base, &|_| Some(false)),
+                None,
+                "{body:?}"
+            );
         }
         assert_eq!(
-            leading_base_initializer(&[Op::Arg(0), Op::Int(2), call, Op::Branch(0)], &base, &|_| Some(false)),
+            leading_base_initializer(
+                &[Op::Arg(0), Op::Int(2), call, Op::Branch(0)],
+                &base,
+                &|_| Some(false)
+            ),
             None
         );
     }
@@ -2717,15 +2741,27 @@ mod object_assignment_tests {
             Op::CallVirtual(target("instance Base::Read()")),
             Op::Construct(target("instance Box::.ctor(Base)")),
         ] {
-            assert_eq!(leading_base_initializer(&[Op::Arg(0), helper, finish.clone()], &base, &|_| Some(false)), None);
+            assert_eq!(
+                leading_base_initializer(&[Op::Arg(0), helper, finish.clone()], &base, &|_| Some(
+                    false
+                )),
+                None
+            );
         }
         let nested = [
-            Op::Arg(0), Op::Int(42),
+            Op::Arg(0),
+            Op::Int(42),
             Op::Construct(target("instance Box::.ctor(Int32)")),
             Op::CastClass(Type::Named("Box".into())),
-            Op::Call(target("Read(Box)")), finish.clone(),
+            Op::Call(target("Read(Box)")),
+            finish.clone(),
         ];
-        assert_eq!(leading_base_initializer(&nested, &base, &|target| Some(target.name.ends_with("..ctor"))), Some(5));
+        assert_eq!(
+            leading_base_initializer(&nested, &base, &|target| Some(
+                target.name.ends_with("..ctor")
+            )),
+            Some(5)
+        );
         // A no-result helper does not manufacture an argument for the base call.
         let body = [
             Op::Arg(0),

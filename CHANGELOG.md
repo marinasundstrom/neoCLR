@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Apply the repository Rust formatter to accumulated memory-view and HTTP integration changes before release qualification. This maintenance change does not alter runtime contracts.
+
 - Review StringBuilder separately: document intermediate line strings, snapshot/Clear capacity churn, missing typed formatting and owned-versus-borrowed buffer constraints. Compare retained fragments with UTF-8 staging and define focused validation; retain historical performance limitations without claiming a new optimization.
 
 - Audit String separately against the author-reaffirmed Swift semantic model. Inventory existing operations and missing search/format APIs; record position units, eager traversal allocations and exact-versus-canonical equality as coordinated follow-ups. No text behavior or public signature changes.

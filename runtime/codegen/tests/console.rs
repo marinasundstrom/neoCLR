@@ -12055,7 +12055,10 @@ ret
 .end
 "#;
     let source = if base_arguments {
-        source.replace("newobj.ctor instance Cell::.ctor(arrayref<Byte>)", "newobj.ctor instance Derived::.ctor(arrayref<Byte>)") + r#"
+        source.replace(
+            "newobj.ctor instance Cell::.ctor(arrayref<Byte>)",
+            "newobj.ctor instance Derived::.ctor(arrayref<Byte>)",
+        ) + r#"
 .type class Argument
 .field Data arrayref<Byte>
 .method instance .ctor(arrayref<Byte> data) -> noresult

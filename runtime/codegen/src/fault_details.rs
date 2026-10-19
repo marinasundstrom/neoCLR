@@ -865,7 +865,8 @@ impl Options {
                 .collect(),
             utf8_decode_slice: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "utf8-decode-slice-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
@@ -892,7 +893,8 @@ impl Options {
                 .collect(),
             byte_view_utf8: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "byte-view-utf8-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),

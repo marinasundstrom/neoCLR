@@ -677,7 +677,15 @@ pub(crate) fn compile_into(
     let cryptography_service = if details.is_some_and(|d| !d.cryptography.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend(
-            [types::I32, types::I64, types::I64, types::I64, types::I64, types::I64].map(AbiParam::new),
+            [
+                types::I32,
+                types::I64,
+                types::I64,
+                types::I64,
+                types::I64,
+                types::I64,
+            ]
+            .map(AbiParam::new),
         );
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_cryptography_slices_v1", Linkage::Import, &sig)?)
@@ -1162,8 +1170,11 @@ pub(crate) fn compile_into(
             ),
             (
                 &d.utf8_decode_slice,
-                if d.native_gc { "neoclr_utf8_decode_slice_rooted_v1" }
-                else { "neoclr_utf8_decode_slice_v1" },
+                if d.native_gc {
+                    "neoclr_utf8_decode_slice_rooted_v1"
+                } else {
+                    "neoclr_utf8_decode_slice_v1"
+                },
                 vec![types::I64, types::I64, types::I32, types::I32, types::I64],
             ),
             (
@@ -1401,7 +1412,9 @@ pub(crate) fn compile_into(
         sig.params.extend([types::I64; 3].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_byte_view_utf8_v1", Linkage::Import, &sig)?)
-    } else { None };
+    } else {
+        None
+    };
     let byte_memory_create = if details.is_some_and(|d| !d.byte_memory_create.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64; 4].map(AbiParam::new));
@@ -1412,20 +1425,49 @@ pub(crate) fn compile_into(
     };
     let byte_view_create_window = if details.is_some_and(|d| !d.byte_memory_create.is_empty()) {
         let mut sig = module.make_signature();
-        sig.params.extend([types::I64, types::I64, types::I32, types::I32, types::I64, types::I64].map(AbiParam::new));
+        sig.params.extend(
+            [
+                types::I64,
+                types::I64,
+                types::I32,
+                types::I32,
+                types::I64,
+                types::I64,
+            ]
+            .map(AbiParam::new),
+        );
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_byte_view_create_v1", Linkage::Import, &sig)?)
-    } else { None };
+    } else {
+        None
+    };
     let mut byte_view_access = [None, None];
     for (index, symbol, enabled) in [
-        (0, "neoclr_byte_view_get_v1", details.is_some_and(|d| !d.byte_view_get.is_empty())),
-        (1, "neoclr_byte_view_set_v1", details.is_some_and(|d| !d.byte_view_set.is_empty())),
+        (
+            0,
+            "neoclr_byte_view_get_v1",
+            details.is_some_and(|d| !d.byte_view_get.is_empty()),
+        ),
+        (
+            1,
+            "neoclr_byte_view_set_v1",
+            details.is_some_and(|d| !d.byte_view_set.is_empty()),
+        ),
     ] {
         if enabled {
             let mut sig = module.make_signature();
-            sig.params.extend([types::I64, types::I64, types::I32, if index == 0 { types::I64 } else { types::I8 }].map(AbiParam::new));
+            sig.params.extend(
+                [
+                    types::I64,
+                    types::I64,
+                    types::I32,
+                    if index == 0 { types::I64 } else { types::I8 },
+                ]
+                .map(AbiParam::new),
+            );
             sig.returns.push(AbiParam::new(types::I32));
-            byte_view_access[index] = Some(module.declare_function(symbol, Linkage::Import, &sig)?);
+            byte_view_access[index] =
+                Some(module.declare_function(symbol, Linkage::Import, &sig)?);
         }
     }
     let byte_memory_slice = if details.is_some_and(|d| !d.byte_memory_slice.is_empty()) {
@@ -1811,16 +1853,24 @@ pub(crate) fn compile_into(
                                 .into(),
                         );
                     };
-                    let source_type = neoclr::metadata::Type::Named(input.types[*source].name.clone());
-                    let target_type = neoclr::metadata::Type::Named(input.types[*target].name.clone());
+                    let source_type =
+                        neoclr::metadata::Type::Named(input.types[*source].name.clone());
+                    let target_type =
+                        neoclr::metadata::Type::Named(input.types[*target].name.clone());
                     if !crate::memory_views::conversion(input, &source_type, &target_type, false)
-                        && !crate::memory_views::conversion(input, &source_type, &target_type, true) {
-                        return Err("byte-view conversion cannot grant writable access or extend lifetime".into());
+                        && !crate::memory_views::conversion(input, &source_type, &target_type, true)
+                    {
+                        return Err(
+                            "byte-view conversion cannot grant writable access or extend lifetime"
+                                .into(),
+                        );
                     }
                     // Exact binding restricts the nominal capability; owner and
                     // bounds retain the same representation and GC root lane.
                     write(&mut b, output, &parameters[..3]);
-                } else if details.unwrap().byte_view_get.contains(&i) || details.unwrap().byte_view_set.contains(&i) {
+                } else if details.unwrap().byte_view_get.contains(&i)
+                    || details.unwrap().byte_view_set.contains(&i)
+                {
                     let Ty::ByteMemory(view) = p.args[i][0] else {
                         return Err("byte-view access requires a byte view".into());
                     };
@@ -1828,7 +1878,11 @@ pub(crate) fn compile_into(
                     let kind = match input.types[view].memory_view {
                         Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
                         Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) if !set => 1,
-                        _ => return Err("byte-view access requires the matching borrowed capability".into()),
+                        _ => {
+                            return Err(
+                                "byte-view access requires the matching borrowed capability".into(),
+                            );
+                        }
                     };
                     let storage = slot(&mut b, 24);
                     let address = b.ins().stack_addr(types::I64, storage, 0);
@@ -1839,12 +1893,26 @@ pub(crate) fn compile_into(
                     b.ins().store(MemFlags::new(), kind, address, 16);
                     let result_slot = slot(&mut b, 8);
                     let result_address = b.ins().stack_addr(types::I64, result_slot, 0);
-                    let last = if set { b.ins().ireduce(types::I8, parameters[4]) } else { result_address };
-                    let service = module.declare_func_in_func(byte_view_access[usize::from(set)].unwrap(), b.func);
-                    let call = b.ins().call(service, &[fault_context.unwrap(), address, parameters[3], last]);
+                    let last = if set {
+                        b.ins().ireduce(types::I8, parameters[4])
+                    } else {
+                        result_address
+                    };
+                    let service = module
+                        .declare_func_in_func(byte_view_access[usize::from(set)].unwrap(), b.func);
+                    let call = b.ins().call(
+                        service,
+                        &[fault_context.unwrap(), address, parameters[3], last],
+                    );
                     let status = b.inst_results(call)[0];
                     let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                    let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
                     site.capture_frame = false;
                     return_if_detailed(&mut b, failed, status, Some(&site));
                     if !set {
@@ -1870,14 +1938,30 @@ pub(crate) fn compile_into(
                     let address = b.ins().stack_addr(types::I64, storage, 0);
                     let call = if details.unwrap().byte_view_utf8.contains(&i) {
                         let service = module.declare_func_in_func(byte_view_utf8.unwrap(), b.func);
-                        b.ins().call(service, &[fault_context.unwrap(), parameters[0], address])
+                        b.ins()
+                            .call(service, &[fault_context.unwrap(), parameters[0], address])
                     } else if details.unwrap().byte_memory_create.contains(&i) {
                         if p.args[i].len() == 3 {
-                            let service = module.declare_func_in_func(byte_view_create_window.unwrap(), b.func);
-                            b.ins().call(service, &[fault_context.unwrap(), parameters[0], parameters[1], parameters[2], kind, address])
+                            let service = module
+                                .declare_func_in_func(byte_view_create_window.unwrap(), b.func);
+                            b.ins().call(
+                                service,
+                                &[
+                                    fault_context.unwrap(),
+                                    parameters[0],
+                                    parameters[1],
+                                    parameters[2],
+                                    kind,
+                                    address,
+                                ],
+                            )
                         } else {
-                            let service = module.declare_func_in_func(byte_memory_create.unwrap(), b.func);
-                            b.ins().call(service, &[fault_context.unwrap(), parameters[0], kind, address])
+                            let service =
+                                module.declare_func_in_func(byte_memory_create.unwrap(), b.func);
+                            b.ins().call(
+                                service,
+                                &[fault_context.unwrap(), parameters[0], kind, address],
+                            )
                         }
                     } else {
                         b.ins().store(MemFlags::new(), parameters[0], address, 0);
@@ -2630,9 +2714,12 @@ pub(crate) fn compile_into(
                     let storage = slot(&mut b, 24);
                     let address = b.ins().stack_addr(types::I64, storage, 0);
                     let start = position * 3;
-                    b.ins().store(MemFlags::new(), parameters[start], address, 0);
-                    b.ins().store(MemFlags::new(), parameters[start + 1], address, 8);
-                    b.ins().store(MemFlags::new(), parameters[start + 2], address, 12);
+                    b.ins()
+                        .store(MemFlags::new(), parameters[start], address, 0);
+                    b.ins()
+                        .store(MemFlags::new(), parameters[start + 1], address, 8);
+                    b.ins()
+                        .store(MemFlags::new(), parameters[start + 2], address, 12);
                     let writable = *operation == 4 || *operation != 3 && position == arity - 1;
                     let kind = b.ins().iconst(types::I64, if writable { 0 } else { 1 });
                     b.ins().store(MemFlags::new(), kind, address, 16);
@@ -2930,7 +3017,13 @@ pub(crate) fn compile_into(
             if let Some(service) = utf8_services.get(&i) {
                 let service = module.declare_func_in_func(*service, b.func);
                 let args = if details.unwrap().utf8_decode_slice.contains(&i) {
-                    vec![fault_context.unwrap(), parameters[0], parameters[1], parameters[2], output]
+                    vec![
+                        fault_context.unwrap(),
+                        parameters[0],
+                        parameters[1],
+                        parameters[2],
+                        output,
+                    ]
                 } else if details.unwrap().file_input.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], arena, output]

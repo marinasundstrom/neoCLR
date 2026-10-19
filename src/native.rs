@@ -1642,7 +1642,8 @@ impl Binding {
                 // Interpreter arrays store Values, not contiguous native bytes. Build
                 // the owned string buffer directly; no managed temporary byte array.
                 let mut buffer = Vec::new();
-                buffer.try_reserve_exact(view.length())
+                buffer
+                    .try_reserve_exact(view.length())
                     .map_err(|_| Fault::new("UTF-8 decoding allocation failed"))?;
                 for index in 0..view.length() {
                     let Value::Byte(byte) = view.get(index)? else {

@@ -841,15 +841,25 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
                 "neoclr_string_concat_v1",
             ),
             "neoCLR.Runtime.Utf8DecodeSlice" => {
-                let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+                let index = row["compiledIndex"]
+                    .as_u64()
+                    .ok_or("missing compiled index")? as usize;
                 let parameters = &input.functions[index].parameters;
-                if parameters.len() != 1 || !input.type_definition(&parameters[0]).is_some_and(|t| {
-                    crate::memory_views::byte_memory(t)
-                        && t.memory_view == Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice)
-                }) {
+                if parameters.len() != 1
+                    || !input.type_definition(&parameters[0]).is_some_and(|t| {
+                        crate::memory_views::byte_memory(t)
+                            && t.memory_view
+                                == Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice)
+                    })
+                {
                     return Err("UTF-8 decoding requires exactly ReadOnlySlice<Byte>".into());
                 }
-                (parameters.clone(), Type::Value, "utf8-decode-slice-v1", "neoclr_utf8_decode_slice_v1")
+                (
+                    parameters.clone(),
+                    Type::Value,
+                    "utf8-decode-slice-v1",
+                    "neoclr_utf8_decode_slice_v1",
+                )
             }
             "neoCLR.Runtime.Utf8Decode" => (
                 vec![Type::ArrayRef(Box::new(Type::Byte))],
@@ -2777,22 +2787,31 @@ mod utf8_slice_tests {
     #[test]
     fn utf8_slice_requires_exact_readonly_byte_internalcall() {
         let mut original = crate::memory_views::test_module(
-            neoclr::metadata::MemoryViewKind::ReadOnlySlice, Type::Byte);
+            neoclr::metadata::MemoryViewKind::ReadOnlySlice,
+            Type::Byte,
+        );
         let mut f = neoclr::assemble(".module Probe\n.function Placeholder() -> Value\nldc.i4 0\nvalue.pack Int32\nret\n.end").unwrap().functions.remove(0);
         f.name = "neoCLR.Runtime.Utf8DecodeSlice".into();
         f.parameters = vec![Type::Named(original.types[0].name.clone())];
         f.body.clear();
         f.impl_flags = 0x1000;
         original.functions = vec![f];
-        let selection = json!({"functions":[{"name":"neoCLR.Runtime.Utf8DecodeSlice","compiledIndex":0}]});
-        assert_eq!(utf8_text(&mut original.clone(), &selection).unwrap()[0]["implementation"], "utf8-decode-slice-v1");
+        let selection =
+            json!({"functions":[{"name":"neoCLR.Runtime.Utf8DecodeSlice","compiledIndex":0}]});
+        assert_eq!(
+            utf8_text(&mut original.clone(), &selection).unwrap()[0]["implementation"],
+            "utf8-decode-slice-v1"
+        );
         for change in 0..6 {
             let mut bad = original.clone();
             match change {
                 0 => bad.functions[0].impl_flags = 0,
                 1 => bad.functions[0].returns = Type::String,
                 2 => bad.types[0].memory_view = Some(neoclr::metadata::MemoryViewKind::Slice),
-                3 => bad.types[0].memory_view = Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory),
+                3 => {
+                    bad.types[0].memory_view =
+                        Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory)
+                }
                 4 => bad.functions[0].parameters = vec![Type::ArrayRef(Box::new(Type::Byte))],
                 _ => bad.functions[0].body = vec![Op::Branch(0)],
             }

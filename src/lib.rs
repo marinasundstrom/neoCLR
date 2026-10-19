@@ -1,9 +1,9 @@
 mod arrays;
 // Checked opaque memory views; native backend lowering remains separate.
-#[allow(dead_code)]
-mod memory_views;
 mod memory_view_contract;
 mod memory_view_services;
+#[allow(dead_code)]
+mod memory_views;
 pub use memory_views::MemoryView;
 pub mod assembler;
 pub mod cil;
