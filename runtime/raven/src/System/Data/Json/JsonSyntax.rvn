@@ -19,11 +19,12 @@ internal class JsonSyntax {
 
     static func TokenEquals(bytes: ReadOnlySlice<byte>, text: string) -> bool {
         let expected = text.Utf8Bytes
-        if bytes.Length != expected.Length {
+        let length = bytes.Length
+        if length != expected.Length {
             return false
         }
         var index = 0
-        while index < bytes.Length {
+        while index < length {
             if bytes[index] != expected[index] {
                 return false
             }
@@ -161,44 +162,26 @@ internal class MessageReader {
     }
 
     func Read(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
-        if bytes.Length > 1024 {
+        let length = bytes.Length
+        if length > 1024 {
             return Error(JsonError.LimitExceeded("Payload exceeds 1024 UTF-8 bytes"))
         }
-        while position < bytes.Length && JsonSyntax.Whitespace(bytes[position]) {
+        while position < length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1
         }
-        if position == bytes.Length || bytes[position] != 34 {
+        if position == length || bytes[position] != 34 {
             return Error(JsonError.Syntax("Expected a JSON string"))
         }
         position += 1
-        // Unescaped tokens need only the final owned string, not a scratch array.
-        let start = position
-        var end = start
-        while end < bytes.Length && bytes[end] != 34 && bytes[end] != 92 && bytes[end] > 31 {
-            end += 1
-        }
-        if end < bytes.Length && bytes[end] == 34 {
-            position = end + 1
-            while position < bytes.Length && JsonSyntax.Whitespace(bytes[position]) {
-                position += 1
-            }
-            if position != bytes.Length {
-                return Error(JsonError.Syntax("Trailing content"))
-            }
-            return match Encodings.Utf8.Decode(bytes[start..end]) {
-                Ok(let text) => Ok(text)
-                Error(_) => Error(JsonError.Syntax("Invalid UTF-8"))
-            }
-        }
-        let output = ArrayList<byte>(bytes.Length)
+        let output = ArrayList<byte>(length)
         var closed = false
-        while position < bytes.Length && !closed {
+        while position < length && !closed {
             let value = bytes[position]
             position += 1
             if value == 34 {
                 closed = true
             } else if value == 92 {
-                if position == bytes.Length {
+                if position == length {
                     return Error(JsonError.Syntax("Truncated escape"))
                 }
                 let escape = bytes[position]
@@ -218,7 +201,7 @@ internal class MessageReader {
                 } else if escape == 117 {
                     var scalar = HexQuad(bytes)?
                     if scalar >= 55296 && scalar <= 56319 {
-                        if bytes.Length - position < 6 {
+                        if length - position < 6 {
                             return Error(JsonError.Syntax("Missing low surrogate"))
                         }
                         if bytes[position] != 92 || bytes[position + 1] != 117 {
@@ -260,10 +243,10 @@ internal class MessageReader {
         if !closed {
             return Error(JsonError.Syntax("Unclosed string"))
         }
-        while position < bytes.Length && JsonSyntax.Whitespace(bytes[position]) {
+        while position < length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1
         }
-        if position != bytes.Length {
+        if position != length {
             return Error(JsonError.Syntax("Trailing content"))
         }
         match Encodings.Utf8.Decode(output[..]) {

@@ -123,3 +123,21 @@ The round-trip probe reduces allocations 32.5% but increases mean CPU 31.6%.
 Short stack samples are dominated by GC/root processing in both builds. The
 allocation benefit is not a speedup; investigate root/boundary and checked-view
 costs before expanding performance claims.
+
+
+### Safepoint follow-up
+
+The first timing used every-boundary synchronous collection. Explicit policy
+comparison confirms 31.5% more root publications/collections with the initial
+borrowed parser, and a remaining CPU regression under pacing. The next bounded
+correction reuses the first unescaped-token scan, caches view lengths, rejects
+impossible keyword lengths before comparison and reuses explicit token windows.
+Escape/control validation and native safety checks stay intact. See
+[policy-separated evidence](../../benchmarks/json-byte-input/20261019/gc-followup/README.md).
+
+
+The corrected parser passes all 90 focused executions and resolves the regression
+in the fixed round-trip probe: 36.7% fewer allocations and 9.1%/10.0% lower mean CPU
+under paced/every-boundary synchronous GC versus the original parser. No policy
+change or HTTP throughput improvement is implied. Whole-document stream/HTTP input
+decoding remains the next integration boundary.

@@ -15,7 +15,8 @@ internal class DocumentReader {
     }
 
     private func Skip(bytes: ReadOnlySlice<byte>) {
-        while position < bytes.Length && JsonSyntax.Whitespace(bytes[position]) {
+        let length = bytes.Length
+        while position < length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1
         }
     }
@@ -29,41 +30,50 @@ internal class DocumentReader {
         return false
     }
 
-    private func Slice(bytes: ReadOnlySlice<byte>, start: int) -> Result<string, JsonError> {
-        match Encodings.Utf8.Decode(bytes[start..position]) {
+    private func DecodeToken(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
+        match Encodings.Utf8.Decode(bytes) {
             Ok(let text) => return Ok(text)
             Error(_) => return Error(JsonError.Syntax("Invalid token boundary"))
         }
     }
 
     private func ReadString(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
+        let length = bytes.Length
         Skip(bytes)
         let start = position
         if !Take(bytes, (byte)34) {
             return Error(JsonError.Syntax("Expected string"))
         }
         var escaped = false
-        while position < bytes.Length {
+        var needsDecoding = false
+        while position < length {
             let value = bytes[position]
             position += 1
             if escaped {
                 escaped = false
             } else if value == 92 {
                 escaped = true
+                needsDecoding = true
             } else if value == 34 {
-                return MessageReader().Read(bytes[start..position])
+                if !needsDecoding {
+                    return DecodeToken(bytes.Slice(start + 1, position - start - 2))
+                }
+                return MessageReader().Read(bytes.Slice(start, position - start))
+            } else if value <= 31 {
+                needsDecoding = true
             }
         }
         return Error(JsonError.Syntax("Unclosed string"))
     }
 
     private func Value(bytes: ReadOnlySlice<byte>, depth: int) -> Result<JsonValue, JsonError> {
+        let length = bytes.Length
         Skip(bytes)
         nodes += 1
         if nodes > 32 {
             return Error(JsonError.LimitExceeded("Document exceeds 32 values"))
         }
-        if position == bytes.Length {
+        if position == length {
             return Error(JsonError.Syntax("Missing value"))
         }
         let first = bytes[position]
@@ -108,27 +118,28 @@ internal class DocumentReader {
         }
         let start = position
         var tokenEnd = false
-        while position < bytes.Length && !tokenEnd {
+        while position < length && !tokenEnd {
             let value = bytes[position]
             tokenEnd = (JsonSyntax.Whitespace(value) || value == 44 || value == 93 || value == 125)
             if !tokenEnd {
                 position += 1
             }
         }
-        let token = bytes[start..position]
-        if JsonSyntax.TokenEquals(token, "true") {
+        let tokenLength = position - start
+        let token = bytes.Slice(start, tokenLength)
+        if tokenLength == 4 && JsonSyntax.TokenEquals(token, "true") {
             let value: JsonValue = JsonBoolean(true)
             return Ok(value)
         }
-        if JsonSyntax.TokenEquals(token, "false") {
+        if tokenLength == 5 && JsonSyntax.TokenEquals(token, "false") {
             let value: JsonValue = JsonBoolean(false)
             return Ok(value)
         }
-        if JsonSyntax.TokenEquals(token, "null") {
+        if tokenLength == 4 && JsonSyntax.TokenEquals(token, "null") {
             let value: JsonValue = JsonNull()
             return Ok(value)
         }
-        let number = JsonNumber.Parse(Slice(bytes, start)?)?
+        let number = JsonNumber.Parse(DecodeToken(token)?)?
         let numericValue: JsonValue = number
         return Ok(numericValue)
     }

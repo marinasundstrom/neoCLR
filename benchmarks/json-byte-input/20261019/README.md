@@ -101,3 +101,11 @@ targets before claiming that fewer arrays make HTTP faster. No checks were remov
 Final validation: 16 stream cases pass in AOT, interpreter and JIT (48 executions),
 and 21 DOM cases pass in interpreter and JIT (42 executions). The baseline also
 passes the corrected 16-case native suite.
+
+
+## Follow-up
+
+The original timing above uses every-boundary synchronous GC. The
+[GC/safepoint follow-up](gc-followup/README.md) separates that mode from paced
+synchronous GC, records collection counts and removes redundant parser scans,
+length calls and keyword checks. The initial regression evidence remains intact.

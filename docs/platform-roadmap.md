@@ -58,8 +58,10 @@ HTTP/stream round trips and repeated writer concatenation; JSON-specific allocat
 evidence and the direct byte-output writer are now recorded in
 [JSON byte output](../benchmarks/json-byte-output/20261019/README.md). The parser now
 borrows string UTF-8 storage and materializes only owned string/number tokens; see
-[JSON parser evidence](../benchmarks/json-byte-input/20261019/README.md). This lowers allocations
-but raises mean probe CPU 31.6%; GC/root and view-access costs remain unresolved. Direct HTTP/stream
+[JSON parser evidence](../benchmarks/json-byte-input/20261019/README.md). The initial borrowed parser raised CPU 31.6% under every-boundary GC;
+[removing redundant parser work](../benchmarks/json-byte-input/20261019/gc-followup/README.md)
+now lowers allocations 36.7% and mean probe CPU 9.1%/10.0% with paced/every-boundary
+synchronous GC versus the original parser. These are not HTTP throughput results. Direct HTTP/stream
 byte input and incremental token reader/writer contracts remain separate work. Small ASCII allocation
 volume does not establish general string CPU or live-retention costs.
 
