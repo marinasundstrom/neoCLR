@@ -31,7 +31,16 @@ static class StreamBindings
                 Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Flush(Concurrency.CancellationToken cancellationToken);
                 void Close();
             }
-            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream {
+            // Borrowed Read/Write members are covered by the native/manual reference.
+            public interface SyncInputStream {
+                void Close();
+            }
+            public interface SyncOutputStream {
+                Result<PropagationUnit, StreamError> Flush();
+                void Close();
+            }
+            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInputStream, SyncOutputStream {
+                Result<PropagationUnit, StreamError> SyncOutputStream.Flush() => default;
                 public MemoryStream() { }
                 public Result<long, StreamError> GetLength() => default;
                 public Result<long, StreamError> GetPosition() => default;

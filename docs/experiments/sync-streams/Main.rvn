@@ -1,0 +1,83 @@
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("Sync stream contract")
+    }
+}
+
+func Count(result: Result<int, StreamError>, expected: int) {
+    match result {
+        Ok(let count) => Check(count == expected)
+        Error(_) => System.Fail("Unexpected read error")
+    }
+}
+
+func Success(result: Result<unit, StreamError>) {
+    match result {
+        Ok(_) => { }
+        Error(_) => System.Fail("Unexpected write/flush error")
+    }
+}
+
+// A synchronous-only provider demonstrates that no async interface is required.
+class EmptyInput : SyncInputStream {
+    func Read(buffer: Slice<byte>) -> Result<int, StreamError> => Ok(0)
+    func Close() { }
+}
+
+func Borrowed(input: SyncInputStream, output: SyncOutputStream) {
+    let source: byte[] = [(byte)1, (byte)2, (byte)3, (byte)4]
+    let view: ReadOnlySlice<byte> = source
+    Success(output.Write(view.Slice(1, 2)))
+    Success(output.Flush())
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let writable: Slice<byte> = destination
+    Count(input.Read(writable.Slice(1, 0)), 0)
+}
+
+async func Main() -> Task<unit> {
+    let stream = MemoryStream()
+    let input: SyncInputStream = stream
+    let output: SyncOutputStream = stream
+    Borrowed(input, output)
+    _ = stream.Seek(0)
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    Count(await stream.Read(destination, 1, 1), 1)
+    Check(destination[0] == 9 && destination[1] == 2 && destination[2] == 9)
+    ReadRemaining(input, destination)
+    Success(await stream.Flush())
+    _ = stream.Seek(65536)
+    CheckLimit(output)
+    input.Close()
+    CheckClosed(output)
+    stream.Close()
+    let empty: SyncInputStream = EmptyInput()
+    Count(empty.Read(destination), 0)
+    Console.WriteLine("PASS sync streams")
+}
+
+func ReadRemaining(input: SyncInputStream, destination: byte[]) {
+    let view: Slice<byte> = destination
+    Count(input.Read(view.Slice(2, 2)), 1)
+    Check(destination[2] == 3 && destination[3] == 9)
+    Count(input.Read(view), 0)
+}
+
+func CheckLimit(output: SyncOutputStream) {
+    let bytes: byte[] = [(byte)1]
+    match output.Write(bytes) {
+        Error(StreamError.LimitExceeded) => { }
+        _ => System.Fail("Quota must reject")
+    }
+}
+
+func CheckClosed(output: SyncOutputStream) {
+    match output.Flush() {
+        Error(StreamError.Closed) => { }
+        _ => System.Fail("Shared close state")
+    }
+}

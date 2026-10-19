@@ -2640,3 +2640,15 @@ Console guide explains the shared Console.In lifetime change, Unicode lookahead,
 source-read versus logical-cursor distinction, byte bounds, blocking standard-console
 provider and remaining terminal-key/cancellation work. These are Raven APIs, unlike
 the separately documented Rust terminal transport foundation.
+
+
+### Optional synchronous streams (2026-10-20)
+
+SyncInputStream and SyncOutputStream are selected public types in the native and
+legacy references. Native signatures include borrowed Read and Write, and MemoryStream
+implements both capabilities explicitly. The legacy scaffold excludes precisely
+`SyncInputStream.Read(Slice<byte>)` and SyncOutputStream.Write(ReadOnlySlice<byte>)
+because its opaque views cannot safely represent them; the [manual member reference](streams.md#optional-synchronous-byte-streams-development)
+covers both. Flush and Close remain in both references. No other provider or text-reader
+synchronous support is implied. Snapshots use sync-stream-libraries-v6 and
+sync-stream-api-audit-v1; native compiler explicit-method admission is required.

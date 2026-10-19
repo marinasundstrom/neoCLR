@@ -142,3 +142,35 @@ and requires awaited Finish before Close. The initial decoder reads to EOF with
 is preserved through StreamReader as TextReadError.InvalidData.
 
 [Development SslStream](ssl-streams.md) supplies authenticated encrypted input/output over these stream capabilities.
+
+
+## Optional synchronous byte streams (development)
+
+`SyncInputStream` and `SyncOutputStream` are independent capabilities. A provider
+may implement either, both, or only asynchronous InputStream/OutputStream. Calls
+may block the current thread and do not create Tasks through these interfaces.
+
+| Capability member | Contract |
+| --- | --- |
+| `SyncInputStream.Read(buffer: Slice<byte>) -> Result<int, StreamError>` | Reads up to the borrowed destination length. Short reads succeed; zero means EOF for nonempty buffers. Empty reads consume nothing. Unwritten bytes are preserved. |
+| `SyncOutputStream.Write(buffer: ReadOnlySlice<byte>) -> Result<unit, StreamError>` | Success means the entire range was accepted. Failure can follow partial output; the provider must document stronger guarantees. |
+| `SyncOutputStream.Flush() -> Result<unit, StreamError>` | Flushes implementation buffers; does not promise disk durability or peer receipt. |
+| `Close()` on either capability | Idempotent closure, without an implicit flush. |
+
+Borrowed views last only for the call and must not be retained. These contracts
+introduce neither cancellation nor an obligation to offer synchronous I/O on network
+or HTTP providers. Use interface conformance to discover support.
+
+MemoryStream explicitly implements Read, Write and Flush through these interfaces.
+Its existing concrete methods remain asynchronous. Both paths share storage, cursor,
+65536-byte quota and closure; serialize access. Closed operations report Closed,
+and writes exceeding the quota report LimitExceeded without changing storage or
+position. Synchronous calls use the shared direct core, never wait on a Task and
+never materialize a temporary array for the view. Storage growth and Result handling
+may still allocate; this is not a zero-allocation stream guarantee.
+
+The native API reference includes both borrowed members. The legacy CLI scaffold
+omits precisely `SyncInputStream.Read(Slice<byte>)` and
+`SyncOutputStream.Write(ReadOnlySlice<byte>)`, whose opaque view representations it
+cannot safely project. This manual entry covers that interim reference gap.
+Console and text-reader synchronous integration remains separate work.

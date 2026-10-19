@@ -1194,6 +1194,21 @@ pub(super) fn select_inventory_with_host_roots(
             revision: input.revision.clone(),
             index: i as u32,
         });
+        // Mapping references use the same selected identity space as call targets.
+        // Unreached contracts have no executable dispatch in this closed world.
+        let mut mappings = vec![];
+        for mut target in std::mem::take(&mut f.interface_implementations) {
+            let old = resolve(input, &target)?;
+            if let Ok(new) = rows.binary_search(&old) {
+                target.definition = Some(MemberId {
+                    module: input.name.clone(),
+                    revision: input.revision.clone(),
+                    index: new as u32,
+                });
+                mappings.push(target);
+            }
+        }
+        f.interface_implementations = mappings;
         for op in &mut f.body {
             if let Op::Call(target)
             | Op::CallVirtual(target)
@@ -1322,6 +1337,63 @@ pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
 #[cfg(test)]
 mod composition_admission_tests {
     use super::*;
+
+    #[test]
+    fn explicit_mapping_identity_follows_selected_rows() {
+        let module = neoclr::assemble(
+            r#"
+.module SelectedExplicit
+.function Unused() -> Int32
+ldc.i4 0
+ret
+.end
+.interface Readable
+.method instance Read() -> Int32
+.end
+.end
+.type class Cell
+.implements Readable
+.method instance .ctor() -> noresult
+ret
+.end
+.method private instance Hidden() -> Int32
+.override instance Readable::Read()
+ldc.i4 42
+ret
+.end
+.end
+.function Main() -> Int32
+newobj instance Cell::.ctor()
+callvirt instance Readable::Read()
+ret
+.end
+"#,
+        )
+        .unwrap();
+        let (selected, _) = select(&module, "Main").unwrap();
+        let contract = selected
+            .functions
+            .iter()
+            .position(|f| f.name == "Readable.Read")
+            .unwrap();
+        let method = selected
+            .functions
+            .iter()
+            .find(|f| f.name == "Cell.Hidden")
+            .unwrap();
+        assert_eq!(
+            method.interface_implementations[0]
+                .definition
+                .as_ref()
+                .unwrap()
+                .index as usize,
+            contract
+        );
+        neoclr::LoadedProgram::new(&selected)
+            .unwrap()
+            .verify()
+            .unwrap();
+    }
 
     #[test]
     fn boxed_value_interface_targets_are_retained_without_a_constructor() {

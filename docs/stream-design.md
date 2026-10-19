@@ -2,9 +2,9 @@
 
 ## Optional synchronous capabilities revisited — 2026-10-20
 
-**Author direction; capability shape not yet implemented:** the author proposes SyncInputStream and
+**Author direction, now implemented for MemoryStream:** SyncInputStream and
 SyncOutputStream expose same-named members implemented explicitly, preserving the
-ordinary async interfaces? The assistant recommends this optional capability shape.
+ordinary async interfaces. The assistant recommends this optional capability shape.
 It revisits the earlier decision to defer synchronous interfaces without changing
 InputStream/OutputStream's canonical asynchronous role. The author then clarifies:
 “We don't want to force APIs into an asynchronous form unless we actually need it.”
@@ -32,8 +32,9 @@ should use interface conformance rather than mandatory CanReadSync/CanWriteSync 
 
 The prior [.NET explicit-interface comparison](#interface-views-and-return-type-overloading-discussion)
 remains relevant. Raven explicit implementations of borrowed-view members and the
-same-named async/sync combination still need an executable interpreter/JIT/AOT fixture
-before public APIs are added. No such interface is shipped by the text-reader change.
+same-named async/sync combination are exercised by the
+[synchronous stream fixture](experiments/sync-streams/README.md). The earlier text-reader
+change did not add these capabilities; synchronous text/console integration remains open.
 
 ## Canonical asynchronous stream contracts — 2026-10-12
 
@@ -457,3 +458,26 @@ A synchronous console capability is useful on its own; a genuinely async console
 provider needs platform waiting, cancellation and runtime wakeup/cleanup integration.
 Synchronous and asynchronous text drivers should share decoding/cursor state, rather
 than synchronous calls waiting on Tasks or separate readers losing buffered input.
+
+
+## Text capabilities and provider-dependent modes — 2026-10-20 proposal
+
+The author additionally requires SyncTextReader and SyncTextWriter, and points out
+that StreamReader/StreamWriter must signal which modes their underlying stream
+supports. The assistant proposes a SupportedModes flags property (Sync, Async or
+both). This remains design work, not an implemented property or interface.
+
+Keep the text interfaces independent, with direct Result returns on synchronous
+members. A dual-mode wrapper needs one decoder/encoder, one cursor, shared lookahead
+and shared close state. Interface presence alone cannot express per-instance
+availability when the wrapper accepts different providers. Capability reporting must
+be honest about the provider; a settled Task around blocking I/O is insufficient
+evidence of nonblocking async support. Memory and already-buffered operations may
+complete inline in async mode.
+
+Before implementation, define the unsupported-mode error and how wrapper construction
+accepts sync-only, async-only and dual-capability providers without introducing
+ambiguous overloads for MemoryStream. Validate that unsupported calls do not consume
+input or mutate encoder state, that pending async operations exclude sync access,
+and that ownership/closure remains shared. Current Console InputStream reads block
+before returning a settled Task; it must not be relabeled genuinely async.

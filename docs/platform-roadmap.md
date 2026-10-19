@@ -6,6 +6,9 @@ adds scoped nonblocking bytes, capabilities and input ownership. The [Raven text
 peek/character/count/line cursors and pass interpreter/JIT/AOT. Terminal keys,
 async console readiness/cancellation, native terminal-provider parity and Windows
 Unicode input remain open; this is not guest API completion or replacement release qualification.
+Optional [synchronous byte capabilities](experiments/sync-streams/README.md) now have a
+MemoryStream implementation; synchronous text/console integration is the next bounded
+author-directed step, without forcing async providers to implement synchronous I/O.
 
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are

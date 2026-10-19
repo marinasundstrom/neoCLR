@@ -1,0 +1,17 @@
+module System.IO
+
+import System.*
+
+/// <summary>Optional synchronous byte output; independent of OutputStream.</summary>
+/// <remarks>May block the calling thread. Source memory is borrowed only for the call.
+/// Implementations document ownership and concurrency; no Task or cancellation contract is implied.</remarks>
+public interface SyncOutputStream {
+    /// <summary>Writes the entire borrowed source range.</summary>
+    /// <param name="buffer">Bytes to write; the implementation must not retain this view.</param>
+    /// <returns>Success after the full range is accepted, or a stream error. Failure may follow partial output.</returns>
+    func Write(buffer: ReadOnlySlice<byte>) -> Result<unit, StreamError>
+    /// <summary>Flushes implementation buffers, without implying durable storage or peer receipt.</summary>
+    func Flush() -> Result<unit, StreamError>
+    /// <summary>Closes this stream; repeated closure has no additional effect. Closure does not imply flushing.</summary>
+    func Close()
+}

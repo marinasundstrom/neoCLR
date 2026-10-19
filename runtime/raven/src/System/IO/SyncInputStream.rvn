@@ -1,0 +1,15 @@
+module System.IO
+
+import System.*
+
+/// <summary>Optional synchronous byte input; independent of InputStream.</summary>
+/// <remarks>May block the calling thread. The destination is borrowed only for the call.
+/// Implementations document ownership and concurrency; no Task or cancellation contract is implied.</remarks>
+public interface SyncInputStream {
+    /// <summary>Reads up to buffer.Length bytes; short reads are successful.</summary>
+    /// <param name="buffer">Borrowed writable destination. Bytes beyond the returned count are preserved.</param>
+    /// <returns>A byte count or stream error. Zero means EOF for a nonempty destination; empty reads consume nothing.</returns>
+    func Read(buffer: Slice<byte>) -> Result<int, StreamError>
+    /// <summary>Closes this stream; repeated closure has no additional effect.</summary>
+    func Close()
+}

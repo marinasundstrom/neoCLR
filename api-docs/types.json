@@ -158,6 +158,8 @@
   "System.IO.StreamError.WrongKind",
   "System.IO.StreamReader",
   "System.IO.StreamWriter",
+  "System.IO.SyncInputStream",
+  "System.IO.SyncOutputStream",
   "System.IO.TextReadError",
   "System.IO.TextReadError.AccessDenied",
   "System.IO.TextReadError.AlreadyExists",

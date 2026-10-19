@@ -20128,3 +20128,30 @@ Native JSON backend/runtime gaps remain open separately.
   blocking standard-console calls from true pending-source suspension, and recommends
   shared decoding/cursor logic with direct synchronous operations. The author confirms
   the principle, while exact capability signatures still require implementation testing.
+
+
+## 2026-10-20 — Execution model as an optional stream capability
+
+The author clarified: “We don't want to force APIs into an asynchronous form unless
+we actually need it.” This follows the proposal for SyncInputStream/SyncOutputStream
+and explicit members where synchronous and asynchronous names overlap. The assistant
+agreed to independent capabilities with borrowed Slice/ReadOnlySlice buffers, direct
+execution rather than waiting on Tasks, and shared text cursor/decoder state in later
+console integration.
+
+The first implementation adds both capabilities to MemoryStream, sharing storage,
+cursor, quota and closed state with its existing asynchronous surface. Native Raven
+emission rejected explicit method declarations despite already supporting interface
+mapping metadata; a bounded nongeneric-class admission fix is developed on the neoCLR
+compiler line. This is target-specific and does not change ordinary .NET emission.
+See [validation and remaining work](experiments/sync-streams/README.md). No console
+synchronous API, scheduling improvement or throughput gain is claimed by this slice.
+
+
+During that implementation the author further requested synchronous text-reader and
+text-writer interfaces, then identified provider-dependent mode support: a stream
+wrapper should expose a property indicating synchronous, asynchronous or both modes.
+The assistant proposed SupportedModes flags and shared encoding/decoding state, with
+explicit errors for unavailable modes. These text contracts and the property remain
+proposed; the byte-capability implementation does not claim to deliver them. See
+[the mode design questions](stream-design.md#text-capabilities-and-provider-dependent-modes--2026-10-20-proposal).

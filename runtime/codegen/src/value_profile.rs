@@ -362,6 +362,23 @@ impl<'a> Profile<'a> {
                 );
             }
             let class = references && crate::selection::class_contract(input, f);
+            // Original metadata verification owns mapping/access validity. Selection
+            // has already resolved explicit interface targets; these remain private
+            // ordinary reference receivers, not class virtual slots.
+            let explicit_reference = references
+                && f.instance
+                && !f.receiver_byref
+                && f.visibility == neoclr::metadata::Visibility::Private
+                && f.owner
+                    .as_ref()
+                    .and_then(Type::definition_name)
+                    .is_some_and(|name| {
+                        input.types.iter().any(|ty| {
+                            ty.name == name
+                                && ty.is_reference_type
+                                && ty.representation == Representation::Record
+                        })
+                    });
             if ((f.is_virtual || f.is_abstract) && !interface && !class)
                 || f.is_override && !class
                 || f.impl_flags != 0
@@ -372,7 +389,7 @@ impl<'a> Profile<'a> {
                 || !f.out_when_true.is_empty()
                 || !f.readonly_parameters.is_empty()
                 || f.receiver_readonly
-                || !f.interface_implementations.is_empty()
+                || (!f.interface_implementations.is_empty() && !explicit_reference)
                 || f.body.len() > 8192
                 || f.locals.len() > 1024
                 || f.parameters.len() > 32
@@ -2601,6 +2618,61 @@ fn leading_base_initializer(
 #[cfg(test)]
 mod object_assignment_tests {
     use super::*;
+
+    #[test]
+    fn explicit_reference_methods_preserve_private_dispatch() {
+        let input = neoclr::assemble(
+            r#"
+.module ExplicitReference
+.interface Readable
+.method instance Read() -> Int32
+.end
+.end
+.type class Cell
+.implements Readable
+.method instance .ctor() -> noresult
+ret
+.end
+.method private instance Hidden() -> Int32
+.override instance Readable::Read()
+ldc.i4 42
+ret
+.end
+.method instance Read() -> Int32
+ldc.i4 7
+ret
+.end
+.end
+.function Main() -> Int32
+newobj instance Cell::.ctor()
+callvirt instance Readable::Read()
+ret
+.end
+"#,
+        )
+        .unwrap();
+        let profile =
+            Profile::new(&input, true, None, None, &[], None, None, None, None, false).unwrap();
+        let contract = input
+            .functions
+            .iter()
+            .position(|f| f.name == "Readable.Read")
+            .unwrap();
+        let hidden = input
+            .functions
+            .iter()
+            .position(|f| f.name == "Cell.Hidden")
+            .unwrap();
+        assert_eq!(profile.dispatch[&contract][0].1, hidden);
+        assert_eq!(
+            input.functions[hidden].visibility,
+            neoclr::metadata::Visibility::Private
+        );
+        // Admission does not loosen metadata verification for public mappings.
+        let mut invalid = input.clone();
+        invalid.functions[hidden].visibility = neoclr::metadata::Visibility::Public;
+        assert!(neoclr::LoadedProgram::new(&invalid).is_err());
+    }
 
     #[test]
     fn persistent_byte_memory_has_three_lanes_and_rejects_raw_construction() {

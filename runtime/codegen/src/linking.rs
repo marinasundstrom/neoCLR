@@ -1451,6 +1451,11 @@ pub fn prepare(
         .collect();
     for (i, f) in selected.functions.iter_mut().enumerate() {
         f.name = private_names[i].clone();
+        for target in &mut f.interface_implementations {
+            if let Some(id) = &target.definition {
+                target.name = private_names[id.index as usize].clone();
+            }
+        }
         for op in &mut f.body {
             if let Op::Call(target)
             | Op::CallVirtual(target)
