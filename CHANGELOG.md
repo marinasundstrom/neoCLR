@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Select Preview 17 qualification scope and candidate SDK/editor build 0.1.17-neoclr.20261019.1 with Raven native 2d22055dc. Update the full Windows qualification workflow pin and draft migration/limitation notes. Release and website publication remain pending the recorded gates.
+
 - Apply the repository Rust formatter to accumulated memory-view and HTTP integration changes before release qualification. This maintenance change does not alter runtime contracts.
 
 - Review StringBuilder separately: document intermediate line strings, snapshot/Clear capacity churn, missing typed formatting and owned-versus-borrowed buffer constraints. Compare retained fragments with UTF-8 staging and define focused validation; retain historical performance limitations without claiming a new optimization.

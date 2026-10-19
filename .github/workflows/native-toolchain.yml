@@ -10,7 +10,7 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: c0854cdda4115c9ec3153a26e73375db14011bd8
+        default: 2d22055dca58dcf991c6001dfe5d93657577d9d6
       delta_only:
         description: Reuse qualified SDK/runtime and check only JSON/editor release deltas
         type: boolean
@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 90
     env:
       PYTHONUTF8: '1'
-      PACKAGE_VERSION: 0.1.16-neoclr.20261017.1
+      PACKAGE_VERSION: 0.1.17-neoclr.20261019.1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -42,7 +42,7 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || 'c0854cdda4115c9ec3153a26e73375db14011bd8' }}
+          ref: ${{ inputs.raven_revision || '2d22055dca58dcf991c6001dfe5d93657577d9d6' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
         if: ${{ !inputs.bundle_run }}

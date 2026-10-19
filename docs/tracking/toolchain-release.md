@@ -5,6 +5,15 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Preview 17 candidate — 2026-10-19
+
+The author directs continuation through release after closing the HTTP/JSON gaps.
+The [candidate notes](../next-preview-release-notes.md) select SDK/editor build
+0.1.17-neoclr.20261019.1 and Raven native 2d22055dca58dcf991c6001dfe5d93657577d9d6.
+The full public JSON fixture now passes interpreter/JIT/AOT. Source/package,
+Windows/macOS, editor, website and performance release gates remain pending;
+no tag, assets or website publication is claimed.
+
 ## Preview 16 publication — 2026-10-18
 
 The [release readiness work order](../release-readiness.md) and
