@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Admit intrinsic String/Char implementations of selected Object slots in runtime inheritance validation and preserve String's by-value receiver through verification and interpreter dispatch. Both focused override regressions pass, checking null receivers and rejecting unrelated intrinsic override slots. Public canonical semantics and native primitive-wrapper/boxed dispatch remain pending coordinated qualification.
+
 - Admit exact selected-Object override references on native String and Char in the metadata adapter. Preserve primitive/grapheme identity and reject static, malformed and numeric-primitive overrides. Focused metadata checks pass; consumer emission succeeds, while coordinated public semantics and native dispatch qualification remain pending.
 
 - Record primary-source lessons from .NET, Swift and Rust for the UTF-8 string model: explicit comparison policies, grapheme semantics, borrowed views, ownership and measurable costs. Keep recommendations distinct from pending public canonical integration.

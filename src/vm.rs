@@ -1203,10 +1203,9 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                         && !crate::interfaces::is_helper(&callee);
                     let ordinary_class_instance = callee.instance
                         && !callee.receiver_byref
-                        && callee
-                            .owner
-                            .as_ref()
-                            .is_some_and(|owner| module.is_reference_type(owner));
+                        && callee.owner.as_ref().is_some_and(|owner| {
+                            module.is_reference_type(owner) || owner == &Type::String
+                        });
                     let supports_virtual_call = (interface_call
                         || callee.is_virtual
                         || ordinary_class_instance
@@ -3664,6 +3663,34 @@ fn interpret_instructions_with_dispatch(
                     crate::access::check_call(module, Some(&function), &contract)?;
                     let mut args = frame.args(module, &contract.argument_types()[1..])?;
                     if !crate::interfaces::is_contract(module, &contract) {
+                        // Intrinsic strings have managed storage but do not use the
+                        // ObjectReference representation of ordinary classes.
+                        if contract.instance
+                            && !contract.receiver_byref
+                            && contract.owner.as_ref() == Some(&Type::String)
+                        {
+                            let receiver = frame.pop()?.for_storage_in(module, &Type::String)?;
+                            if !matches!(receiver, Value::String(_)) {
+                                return Err(Fault::coded(
+                                    crate::FaultCode::NullReference,
+                                    "null string receiver",
+                                ));
+                            }
+                            let callee = if contract.is_virtual {
+                                crate::inheritance::dispatch(module, &Type::String, &contract)?
+                            } else {
+                                contract
+                            };
+                            args.insert(0, receiver);
+                            if frames.len() >= limits.frames {
+                                return Err(Fault::coded(
+                                    crate::FaultCode::StackOverflow,
+                                    "frame limit exceeded",
+                                ));
+                            }
+                            frames.push(Frame::new(callee, args)?);
+                            return Ok(None);
+                        }
                         if contract.instance
                             && !contract.receiver_byref
                             && contract

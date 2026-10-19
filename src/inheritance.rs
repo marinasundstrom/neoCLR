@@ -23,6 +23,14 @@ pub(crate) fn has_intrinsic_string_root(
         })
 }
 
+// Text keeps intrinsic storage while implementing the selected Object slots.
+fn has_text_object_root(module: &Module, definition: &crate::metadata::TypeDef) -> bool {
+    has_intrinsic_string_root(module, definition)
+        || (definition.name == "System.Char"
+            && definition.representation == Representation::Runtime
+            && has_value_type_root(module, definition))
+}
+
 /// A value record may name the selected runtime's fieldless ValueType foundation.
 /// This is nominal ancestry only; arbitrary reference-storage inheritance stays invalid.
 pub(crate) fn has_value_type_root(module: &Module, definition: &crate::metadata::TypeDef) -> bool {
@@ -342,10 +350,9 @@ fn implicit_object_contract(
     owner: &Type,
     method: &crate::metadata::Function,
 ) -> Result<Option<crate::metadata::Function>, Fault> {
-    if module
-        .type_definition(owner)
-        .is_none_or(|d| d.representation != Representation::Record)
-    {
+    if module.type_definition(owner).is_none_or(|d| {
+        d.representation != Representation::Record && !has_text_object_root(module, d)
+    }) {
         return Ok(None);
     }
     let object = Type::from_name("System.Object");
@@ -384,10 +391,19 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
                 "abstract methods require an abstract record and no body or locals",
             ));
         }
+        let text_override = method.is_override
+            && !method.is_abstract
+            && method
+                .owner
+                .as_ref()
+                .and_then(|owner| module.type_definition(owner))
+                .is_some_and(|definition| has_text_object_root(module, definition))
+            && implicit_object_contract(module, method.owner.as_ref().unwrap(), method)?.is_some();
         if (method.is_virtual || method.is_override)
             && (!method.is_virtual
                 || !method.instance
                 || (!method.receiver_byref
+                    && !(text_override && method.owner.as_ref() == Some(&Type::String))
                     && !method
                         .owner
                         .as_ref()
@@ -400,7 +416,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
                     .owner
                     .as_ref()
                     .and_then(|t| module.type_definition(t))
-                    .is_none_or(|d| d.representation != Representation::Record))
+                    .is_none_or(|d| d.representation != Representation::Record && !text_override))
         {
             return Err(Fault::new(
                 "virtual and override require public IL record methods with managed receivers",
@@ -413,7 +429,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
             || !method.interface_implementations.is_empty()
             || module
                 .type_definition(owner)
-                .is_none_or(|d| d.representation != Representation::Record)
+                .is_none_or(|d| d.representation != Representation::Record && !text_override)
         {
             continue;
         }
@@ -541,7 +557,10 @@ pub(crate) fn dispatch_targets(
         Vec::new()
     };
     for definition in &module.types {
-        if definition.representation != Representation::Record || definition.is_abstract {
+        if (definition.representation != Representation::Record
+            && !has_text_object_root(module, definition))
+            || definition.is_abstract
+        {
             continue;
         }
         let owner = definition.open_type();

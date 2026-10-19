@@ -5,7 +5,10 @@ selecting the replacement release candidate. Builder reuse improvements are
 implemented; the [String normalization foundation](design/string-api-review-20261019.md#consistency-recommendations-and-normalization-foundation-2026-10-19)
 passes Unicode conformance without allocations and now has private interpreter/native
 services; public text semantics are not yet switched. Coordinated
-equality/hash/compiler integration remains open.
+equality/hash/compiler integration remains open. Exact text Object reference
+admission is fixed; the development public consumer passes interpreter execution,
+while native receiver/boxed dispatch and API qualification remain pending. See the
+[public integration investigation](design/string-api-review-20261019.md#public-integration-investigation-2026-10-19).
 
 **Author-directed follow-up (2026-10-19):** after the HTTP content integration,
 update website coverage of Slice/Memory design and the experimental concurrent GC,

@@ -1170,6 +1170,8 @@ fn typed_effect(
                 )
             })?;
             match exact(&values[0])? {
+                T::String
+                    if interface == T::String && callee.instance && !callee.receiver_byref => {}
                 actual
                     if callee.instance
                         && !callee.receiver_byref

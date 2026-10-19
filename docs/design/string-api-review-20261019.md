@@ -240,3 +240,22 @@ retained small substrings of large inputs, and builder fragments whose join chan
 grapheme boundaries. Measure allocations, retained bytes and CPU separately;
 fewer allocations alone do not establish higher HTTP throughput. Small-string
 inlining or cached metadata remain measurement-driven options, not release scope.
+
+
+### Public integration investigation (2026-10-19)
+
+Metadata adapter commit `e4709c451` admits exact text Object override references;
+Raven native documentation commit `b7d54e946` records the target-specific contract.
+The in-progress Raven public consumer passes interpreter execution with canonical
+String/Char equality, matching hashes, constant patterns, boxed values, explicit
+ordinal policy, dictionary policies and preserved original UTF-8 bytes. All 37
+updated boxed-object regressions pass. These results use development artifacts,
+not a qualified release bundle; public library/backend edits remain in progress.
+
+Native compilation then exposes a receiver-mode verification gap for String's
+intrinsic by-value receiver. Both focused override regressions pass; the intrinsic String case covers the
+dedicated receiver path, null checks and rejection of an unrelated override slot
+under an explicitly selected Object root. With the receiver check repaired, native compilation reaches the primitive
+wrapper gate, which rejects Char Object overrides. Native boxed Char adapters,
+complete JIT/AOT consumers and API snapshots remain gates;
+the interpreter result must not be presented as cross-engine completion.
