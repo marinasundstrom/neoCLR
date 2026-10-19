@@ -1,0 +1,56 @@
+{
+  "aot": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/runtime-match/app"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS runtime async match suspension and cleanup\n",
+    "stderr": ""
+  },
+  "interpreter": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/runtime-match/app.dll",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/lib/System.Data.PostgreSql.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "100000000"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS runtime async match suspension and cleanup\n",
+    "stderr": ""
+  },
+  "jit": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/http-match-bundle/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/runtime-match/app.dll",
+      "--jit-compiler",
+      "/Users/robert/Projects/neoclr/target/release/neoclr-codegen"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS runtime async match suspension and cleanup\n",
+    "stderr": ""
+  },
+  "inputs": {
+    "docs/experiments/runtime-async/RuntimeMatch.rvn": "c539d4de17e52d06482e42b9d2396f80dd99a93180307673106c9a9ac37ce37a",
+    "target/runtime-match/app.dll": "e2f46c34bb0ee69fc9eaa5628c95a3c78f9fae8083af253a1847108c2fb88edd",
+    "target/http-match-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "fc71b1eee35c9f0f96ef967466ccb04daf79e8fa4e2966cadcfdf8225eac7df8"
+  },
+  "compilerRevision": "f61cffbfd"
+}

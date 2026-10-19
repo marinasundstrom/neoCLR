@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Qualify Raven native async match-arm suspension and cleanup (f61cffbfd): interpreter/JIT/AOT pass pending waits, forced GC, return and cancellation with nested disposal. Restore match dispatch in the routed HTTP sample. Broader expression/definite-assignment fixes remain in progress.
+
 - Make the HttpContext Serve callback canonical in web examples and downloadable server samples. Dispatch Serve, ServeOne and Accept after headers; read nonempty bodies asynchronously on demand, preserve bounded read-ahead and reuse empty-request receive buffers. Async JSON content extensions now consume streamed bodies with cancellation; synchronous JsonContent reads remain buffered-only. HttpResponse constructors retain HttpContent directly and reconcile its media type. Migrate fixtures and JSON server consumers, refresh references, and document ownership/error timing and remaining JSON text materialization. This changes body-consumption semantics; it does not establish a throughput improvement. All 60 withheld-body cases, 117 three-mode contracts and nine callback lifecycle cases pass. Improve unsupported value-member diagnostics. Wider mapped-JSON compiler qualification remains open.
 
 - Explain Slice/Memory ownership and API design and the experimental concurrent GC on the website. Repair opaque-view routes in the legacy reference pass and escaped generic names; retain historical benchmark qualifications and separate website publication from local validation.

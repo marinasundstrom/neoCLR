@@ -1,0 +1,92 @@
+module RuntimeMatchSample {
+    import System.*
+    import System.Concurrency.Tasks.*
+
+    class Log {
+        var Order = 0
+        var Count = 0
+    }
+
+    class Resource : Disposable {
+        private val log: Log
+        private val id: int
+        init(log: Log, id: int) {
+            self.log = log
+            self.id = id
+        }
+        func Dispose() {
+            log.Order = log.Order * 10 + id
+            log.Count = log.Count + 1
+        }
+    }
+
+    async func Read(gate: Task<int>, log: Log) -> Task<int> {
+        use first = Resource(log, 1)
+        match log.Count {
+            0 => {
+                use second = Resource(log, 2)
+                let value = await gate
+                System.Runtime.GC.Collect()
+                return value + 25
+            }
+            _ => { return -1 }
+        }
+        return -2
+    }
+
+    async func Unit(gate: Task<()>, log: Log) -> Task<()> {
+        use resource = Resource(log, 3)
+        _ = match log.Count {
+            0 => { await gate; 42 }
+            _ => 0
+        }
+    }
+
+    class Observer {
+        private val task: Task<int>
+        private val source = Promise<bool>()
+        init(task: Task<int>) {
+            self.task = task
+        }
+        val Task: Task<bool> => source.Task
+        // Cancellation observation deliberately does not propagate it into Main.
+        func Complete() -> System.Void {
+            _ = source.Complete(task.IsCancelled)
+        }
+    }
+
+    async func Main() -> Task<int> {
+        let normalLog = Log()
+        let gate = Promise<int>()
+        let pending = Read(gate.Task, normalLog)
+        if normalLog.Count != 0 || pending.IsCompleted {
+            System.Fail("Resource disposed before suspension ended")
+        }
+        System.Runtime.GC.Collect()
+        _ = gate.Complete(17)
+        let value = await pending
+        if value != 42 || normalLog.Count != 2 || normalLog.Order != 21 {
+            System.Fail("Return cleanup did not dispose in reverse order")
+        }
+        let cancelLog = Log()
+        let cancelled = Promise<int>()
+        let cancelling = Read(cancelled.Task, cancelLog)
+        let observer = Observer(cancelling)
+        cancelling.OnCompleted(observer.Complete)
+        _ = cancelled.Cancel()
+        let observed = await observer.Task
+        if !observed || cancelLog.Count != 2 || cancelLog.Order != 21 {
+            System.Fail("Cancellation bypassed scoped cleanup")
+        }
+        let unitLog = Log()
+        let unitGate = Promise<()>()
+        let unit = Unit(unitGate.Task, unitLog)
+        _ = unitGate.Complete(())
+        await unit
+        if unitLog.Count != 1 || unitLog.Order != 3 {
+            System.Fail("Implicit unit return bypassed cleanup")
+        }
+        Console.WriteLine("PASS runtime async match suspension and cleanup")
+        return 0
+    }
+}

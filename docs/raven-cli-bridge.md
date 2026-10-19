@@ -13389,3 +13389,11 @@ After those expression rewrites, the larger mapped-JSON `Public.rvn` async fixtu
 still reports `NEOMETA003: local loaded before store on some path`. This remains
 unqualified and must be reduced and fixed before using that fixture as release
 evidence. The focused serializer contracts are separate from this larger probe.
+
+The match-arm gap is fixed by Raven `f61cffbfd`: both cleanup discovery and wait/
+return rewriting traverse arm guards and bodies. The temporary CLI helper contract
+and Runtime Contract settings are unchanged. The native adapter is absent from
+Raven main; this target-specific fix is not a main merge. The
+[three-mode regression](experiments/runtime-async/match-20261019/README.md) covers
+pending waits, collection and reverse-order disposal on return and cancellation.
+Routing now uses its original match dispatch. Other expression gaps remain open.

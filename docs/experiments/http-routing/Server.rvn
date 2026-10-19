@@ -26,27 +26,31 @@ class ReportServer {
             return Ok(())
         }
         // Domain lookup and dispatch remain application-owned.
-        if route is StationRoute.Unmatched(_) {
-            context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Not found\"}"))
-        } else if route is StationRoute.ReadReports(let id) {
-            if id != 42 {
-                context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
-                return Ok(())
+        match route {
+            StationRoute.Unmatched(_) => {
+                context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Not found\"}"))
             }
-            let report = CreateReport()?
-            let content = JsonContent.Create(report)?
-            context.Respond(HttpStatusCode.OK, content)
-        } else if route is StationRoute.SubmitReport(let id) {
-            if id != 42 {
-                context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
-                return Ok(())
+            StationRoute.ReadReports(let id) => {
+                if id != 42 {
+                    context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
+                    return Ok(())
+                }
+                let report = CreateReport()?
+                let content = JsonContent.Create(report)?
+                context.Respond(HttpStatusCode.OK, content)
             }
-            let acknowledged = await Acknowledge(request.Content)
-            if let Ok(reply) = acknowledged {
-                let content = JsonContent.Create(reply)?
-                context.Respond(HttpStatusCode.Created, content)
-            } else {
-                context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
+            StationRoute.SubmitReport(let id) => {
+                if id != 42 {
+                    context.Respond(HttpStatusCode.NotFound, ErrorContent("{\"error\":\"Unknown station\"}"))
+                    return Ok(())
+                }
+                let acknowledged = await Acknowledge(request.Content)
+                if let Ok(reply) = acknowledged {
+                    let content = JsonContent.Create(reply)?
+                    context.Respond(HttpStatusCode.Created, content)
+                } else {
+                    context.Respond(HttpStatusCode.BadRequest, ErrorContent("{\"error\":\"Invalid report\"}"))
+                }
             }
         }
         return Ok(())
