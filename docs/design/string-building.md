@@ -21,8 +21,8 @@ Append(string), AppendLine(string), AppendLine(), and Clear() return the same
 builder. Overflow raises System.Fail's user fault before content mutation. AppendLine
 preflights both the text and the LF byte, so it cannot leave half a line. Its newline
 is always LF; protocol code must append CRLF explicitly. ToString caches an immutable
-snapshot until the next nonempty append. Clear releases fragments and preserves the
-limit; retaining buffer capacity is not promised. Instances are not thread-safe.
+snapshot until the next nonempty append. Clear releases retained text and preserves the
+limit and allocated reference capacity for reuse. Instances are not thread-safe.
 
 The author considered Result<StringBuilder, Error> with propagation. The retained
 choice is fluent Append, keeping ordinary construction concise. A future TryAppend
@@ -51,7 +51,9 @@ ownership contract here; immutable neoCLR String remains unchanged in this slice
 StringBuilder is ordinary Raven CIL with a geometrically grown checked string array.
 Append retains immutable fragments. Materialization performs one result allocation
 and copies each fragment once through the private StringJoinParts service; then the
-builder compacts its retained fragments to that snapshot. The original prototype's
+builder replaces its first fragment with that snapshot and clears the other used
+slots while retaining capacity. AppendLine preflights size and capacity before
+storing text and LF separately, avoiding an intermediate concatenated string. The original prototype's
 balanced repeated concatenations are not promoted. Repeated ToString after every
 append still copies the growing text, so applications should materialize at useful
 boundaries. Small fixed concatenations can remain cheaper.

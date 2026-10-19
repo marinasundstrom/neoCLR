@@ -1,0 +1,51 @@
+{
+  "aot": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/string-builder-reuse-after/app"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS StringBuilder reuse\n",
+    "stderr": ""
+  },
+  "interpreter": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/string-builder-reuse-after/app.dll",
+      "--execution",
+      "interpreter",
+      "--gc-stats",
+      "--instructions",
+      "100000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS StringBuilder reuse\n",
+    "stderr": "GC: allocated=8 live=0 peak=8 collections=1 reclaimed=8\n"
+  },
+  "jit": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/string-builder-reuse-after/app.dll",
+      "--jit-compiler",
+      "/Users/robert/Projects/neoclr/target/release/neoclr-codegen"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS StringBuilder reuse\n",
+    "stderr": ""
+  }
+}

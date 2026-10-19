@@ -37,24 +37,8 @@ public class StringBuilder {
         if bytes == 0 {
             return self
         }
-        var buffer = parts
-        if count == buffer.Length {
-            var capacity = 4
-            if count != 0 {
-                capacity = count * 2
-            }
-            if capacity > limit {
-                capacity = limit
-            }
-            buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(capacity)
-            var index = 0
-            while index < count {
-                buffer[index] = parts[index]
-                index += 1
-            }
-        }
-        buffer[count] = text
-        parts = buffer
+        EnsureCapacity(count + 1)
+        parts[count] = text
         count += 1
         size += bytes
         dirty = true
@@ -63,10 +47,20 @@ public class StringBuilder {
 
     /// Appends text and LF atomically. HTTP framing must use explicit CRLF instead.
     func AppendLine(text: string) -> StringBuilder {
-        if text.GetUtf8ByteCount() >= limit - size {
+        let bytes = text.GetUtf8ByteCount()
+        if bytes >= limit - size {
             System.Fail("StringBuilder UTF-8 byte limit exceeded")
         }
-        return Append(String.Concat(text, "\n"))
+        if bytes == 0 {
+            return Append("\n")
+        }
+        EnsureCapacity(count + 2)
+        parts[count] = text
+        parts[count + 1] = "\n"
+        count += 2
+        size += bytes + 1
+        dirty = true
+        return self
     }
 
     /// Appends LF and returns this builder.
@@ -74,10 +68,9 @@ public class StringBuilder {
         return Append("\n")
     }
 
-    /// Releases retained fragments and resets content, preserving the byte limit.
+    /// Releases retained text and resets content, preserving capacity and the byte limit.
     func Clear() -> StringBuilder {
-        let empty = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(0)
-        parts = empty
+        ClearParts(0)
         count = 0
         size = 0
         snapshot = ""
@@ -89,13 +82,44 @@ public class StringBuilder {
     override func ToString() -> string {
         if dirty {
             let text = neoCLR.Runtime.StringJoinParts(parts, count, "", size)
-            let compact = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(1)
-            compact[0] = text
-            parts = compact
+            parts[0] = text
+            ClearParts(1)
             count = 1
             snapshot = text
             dirty = false
         }
         return snapshot
     }
+
+    private func EnsureCapacity(required: int) {
+        if required <= parts.Length {
+            return
+        }
+        var capacity = 4
+        if parts.Length != 0 {
+            capacity = parts.Length * 2
+        }
+        if capacity < required {
+            capacity = required
+        }
+        if capacity > limit {
+            capacity = limit
+        }
+        let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<string>(capacity)
+        var index = 0
+        while index < count {
+            buffer[index] = parts[index]
+            index += 1
+        }
+        parts = buffer
+    }
+
+    private func ClearParts(start: int) {
+        var index = start
+        while index < count {
+            parts[index] = ""
+            index += 1
+        }
+    }
+
 }

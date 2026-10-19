@@ -80,3 +80,11 @@ small headers, numeric output and large multibyte reports. Record allocations,
 bytes copied, retained roots and elapsed time separately in interpreter/JIT/AOT.
 Only then use a selected implementation in HTTP or claim a performance benefit.
 No new benchmark or implementation is part of this source review.
+
+## First implementation follow-up
+
+The initial allocation slice removes AppendLine's concatenated temporary, retains
+reference capacity across snapshots and Clear, and clears used slots to release
+previous text. It preserves byte quotas and immutable snapshots. The [reuse evidence](../experiments/string-building/reuse-20261019/README.md)
+records three-engine execution and 651 versus 137 native managed allocations; this
+does not implement typed formatting, view ingestion or a UTF-8 staging rewrite.

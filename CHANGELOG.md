@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Remove StringBuilder’s intermediate AppendLine string and retain backing capacity across ToString/Clear while releasing old text references. Preserve byte quotas, immutable snapshots and Unicode fragment behavior. Fifteen contract executions pass across interpreter/JIT/AOT; a matched native reuse workload drops from 651 to 137 managed allocations (78.96%). Capacity retention is the explicit memory tradeoff; no throughput improvement is claimed. Refresh API documentation snapshots.
+
 - Fix strict-Clippy preflight findings in borrowed-view dispatch and test setup, plus equivalent Boolean/formatting cleanup under the local stable toolchain. All-target release Clippy passes; the earlier candidate’s failed hosted preflight remains historical evidence, not release qualification.
 
 - Supersede the initial Preview 17 candidate at the author’s direction: String and StringBuilder fixes are now release prerequisites. Cancel its Windows package qualification; earlier checks remain baseline evidence only. Publication stays pending a fresh candidate after text changes.

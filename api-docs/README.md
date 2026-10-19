@@ -2545,3 +2545,13 @@ Version properties and HttpRequest.Dispose. Version is an immutable major/minor
 value; message properties expose the current HTTP/1.1-only contract. Request
 disposal shares content lifetime across header-derived aliases. See the
 [message ownership contract](http-body-streams.md#message-ownership-and-version-development-2026-10-19).
+
+### StringBuilder retained capacity — 2026-10-19
+
+Clear now releases retained text while preserving its reference-array capacity,
+and ToString retains that capacity for subsequent appends. AppendLine avoids a
+concatenated intermediate string. Public signatures are unchanged; the native
+reference is regenerated from string-builder-libraries-v2 / string-builder-api-audit-v2
+with Raven 2d22055dc, and the legacy snapshot refreshes its implementation
+fingerprint using the unchanged reference assembly. Memory retention is documented
+in the source summary and [design](../docs/design/string-building.md).

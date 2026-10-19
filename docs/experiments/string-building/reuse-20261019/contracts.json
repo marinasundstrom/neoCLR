@@ -1,0 +1,222 @@
+{
+  "Build": {
+    "build": {
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Build/app\n",
+      "stderr": ""
+    },
+    "aot": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Build/app"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "interpreter": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Build/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "jit": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Build/app.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "Limit": {
+    "build": {
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Limit/app\n",
+      "stderr": ""
+    },
+    "aot": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Limit/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Text.StringBuilder.Append [instruction 12]\n   at Main [instruction 5]\n"
+    },
+    "interpreter": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Limit/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E64 [instruction 12]\n   at NeoMetadata_B1708BBB7642272CFBCA2416C837B964A08CE33571F6F4CC7C833DFCE8C49889.F_4D61696E [instruction 5]\n"
+    },
+    "jit": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/Limit/app.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Text.StringBuilder.Append [instruction 12]\n   at Main [instruction 5]\n"
+    }
+  },
+  "LineLimit": {
+    "build": {
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/LineLimit/app\n",
+      "stderr": ""
+    },
+    "aot": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/LineLimit/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Text.StringBuilder.AppendLine [instruction 14]\n   at Main [instruction 5]\n"
+    },
+    "interpreter": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/LineLimit/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572.M_417070656E644C696E65 [instruction 14]\n   at NeoMetadata_214AB1106597A9CB163A242699E945969FA0FEC37C06A95A23F568FD3C646E1F.F_4D61696E [instruction 5]\n"
+    },
+    "jit": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/LineLimit/app.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder UTF-8 byte limit exceeded\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Text.StringBuilder.AppendLine [instruction 14]\n   at Main [instruction 5]\n"
+    }
+  },
+  "InvalidLimit": {
+    "build": {
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/InvalidLimit/app\n",
+      "stderr": ""
+    },
+    "aot": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/InvalidLimit/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Text.StringBuilder..ctor [instruction 56]\n   at Main [instruction 1]\n"
+    },
+    "interpreter": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/InvalidLimit/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54657874_537472696E674275696C646572..ctor [instruction 56]\n   at NeoMetadata_834065C04C9C237528F07704D219AAEC400795227D64E2C10874AB362C529469.F_4D61696E [instruction 1]\n"
+    },
+    "jit": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/string-builder-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/string-builder-contracts-v2/InvalidLimit/app.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: StringBuilder limit must be between 0 and 65536 UTF-8 bytes\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Text.StringBuilder..ctor [instruction 56]\n   at Main [instruction 1]\n"
+    }
+  }
+}

@@ -82,3 +82,10 @@ and imports the consumer, builds the checked-in legacy library projection and ru
 it in the interpreter. Its [validation](cli-validation.json) passes. The bridge's
 signature checks additionally reject changed Join element types and changed fluent
 return types. The API snapshot check and website build pass (1825 rendered pages).
+
+## Retained-capacity follow-up — 2026-10-19
+
+[Reuse validation](reuse-20261019/README.md) checks the current builder in all three
+engines and records 651 versus 137 native managed allocations in its matched reuse
+workload. This does not replace the historical timing results above or establish
+HTTP throughput. Clear now retains capacity while clearing previous text references.
