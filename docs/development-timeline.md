@@ -19847,3 +19847,21 @@ The callback observes its original task without a per-request Promise mapping la
   starts with remaining native compiler lowering/definite-assignment failures,
   then will investigate HTTP admission, JSON quotas/materialization and
   unknown-length outgoing framing separately. These follow-ups remain open.
+
+### 2026-10-19 — HTTP protocol versions and message disposal
+
+The author asks whether HttpRequest should expose Version, then whether both
+HttpRequest and HttpResponse should implement Disposable. The assistant confirms
+the missing request APIs and proposes allocation-free version values and content
+ownership aligned between client messages and server contexts. The author directs
+“Fix Version property and Disposable. Then continue with the lowering issue”,
+subsequently allowing implementation order at the assistant's discretion.
+Implementation starts with the message APIs; compiler lowering work is retained
+as the next follow-up. No HTTP/2/3 or automatic body-drain support is implied.
+
+Assistant follow-through: Version and Disposable are implemented and qualified by
+60 contract executions, 24 header/body cases and nine context lifecycle cases
+across interpreter/JIT/AOT. The website/reference update passes locally. The author
+then requests IsSuccessStatusCode, ReasonPhrase, StatusCode and Version on client
+responses. The assistant identifies ReasonPhrase as the remaining property and
+plans exact, lazy HTTP/1.1 reason-text preservation; the other three are available.

@@ -266,3 +266,11 @@ Use HttpStringContent.Read for generic text consumption; streamed reads decode
 incrementally without first collecting the entire body into a byte array. Base storage getters and
 construction helpers have been removed rather than retained as compatibility layers.
 The [API guide](/docs/http-body-streams.html) records migration and current streaming limits.
+
+### Message version and ownership (development)
+
+Requests and responses expose `Version.Major` and `Version.Minor` without creating
+version strings. The current transport supports HTTP/1.1 only. Both messages are
+disposable: client callers own their messages, while the server context owns its
+request and response. Disposal does not read an unread body; borrowed streams
+honor `leaveOpen`. See [content ownership](/docs/http-body-streams.html).

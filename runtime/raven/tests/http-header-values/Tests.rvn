@@ -162,3 +162,31 @@ func ResponseStream() -> Result<unit, TestFailure> {
     content.Dispose()
     return Assert.Equal(1, input.Closes)
 }
+
+[Test("HTTP messages expose HTTP 1.1 and dispose owned content without reading")]
+func MessageLifetime() -> Result<unit, TestFailure> {
+    let input = ResponseInput()
+    let Ok(content) = HttpStreamContent.Create(input, 3, false) else { return Assert.True(false, "Create stream content") }
+    let Ok(request) = HttpRequest.Post("http://example.test/", content) else { return Assert.True(false, "Create request") }
+    _ = Assert.Equal(1, request.Version.Major)?
+    _ = Assert.Equal(1, request.Version.Minor)?
+    _ = Assert.True(request.Version.Equals(HttpVersion.Http11), "Version value equality")?
+    _ = Assert.Equal("1.1", request.Version.ToString())?
+    let Ok(alias) = request.WithHeader("X-Test", "value") else { return Assert.True(false, "Create alias") }
+    let resource: Disposable = request
+    resource.Dispose()
+    request.Dispose()
+    alias.Dispose()
+    _ = Assert.Equal(0, input.Reads)?
+    _ = Assert.Equal(1, input.Closes)?
+    _ = Assert.True(request.WithHeader("X-Test", "other") is Error(_), "Disposed request rejects derivation")?
+    let borrowed = ResponseInput()
+    let Ok(body) = HttpStreamContent.Create(borrowed, 3, true) else { return Assert.True(false, "Create borrowed stream") }
+    let response = HttpResponse(200, ArrayList<HttpHeader>(), body)
+    _ = Assert.True(response.Version.Equals(request.Version), "Response protocol version")?
+    let responseResource: Disposable = response
+    responseResource.Dispose()
+    response.Dispose()
+    _ = Assert.Equal(0, borrowed.Reads)?
+    return Assert.Equal(0, borrowed.Closes)
+}

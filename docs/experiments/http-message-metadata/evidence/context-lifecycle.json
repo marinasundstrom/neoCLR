@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-message-context/app"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-message-context/app.dll"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-message-context/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "cases": {
+    "aot-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "aot-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "aot-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    },
+    "jit-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "jit-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "jit-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    },
+    "interpreter-close": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "interpreter-cancel": {
+      "passed": true,
+      "completed": 3,
+      "failed": 4,
+      "lateSourcesDisposed": 15
+    },
+    "interpreter-inline": {
+      "passed": true,
+      "completed": 0,
+      "failed": 0,
+      "lateSourcesDisposed": 1
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/serve/validate.py": "1a01f7c33b7bb27472d5763fd92ccb61e482ab5cbde59dd2948025eee51f9f3d",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-context-serve/Probe.rvn": "50afe26907e75f7bd28485c5eaca0dbd6f0698746688cfd88e9d514b52ecc4b3",
+    "/Users/robert/Projects/neoclr/target/http-message-context/app": "acfc79919b28c58b7e891b480e4cf98845d4ea36e71ec72088a1477f0dbbb08c",
+    "/Users/robert/Projects/neoclr/target/http-message-context/app.dll": "105f9c31836b97f8d73065b0ebbc503ad7b7115d0d5d264262cc4ea0cac89942",
+    "/Users/robert/Projects/neoclr/target/http-message-context/build.json": "9bb8c7e7b6dcc428788a80a9243da131a58eb146a0ce3e505b2c046ef6c51869",
+    "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/manifest.json": "ed61b869b5fc47a8a148ba0255ccf7dac939bd0588cbe9bca3b0c616e49d5788"
+  }
+}

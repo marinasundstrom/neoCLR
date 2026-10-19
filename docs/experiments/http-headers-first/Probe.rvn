@@ -9,6 +9,9 @@ import System.Web.Http.*
 import System.Web.Http.Json.*
 
 async func Configure(request: HttpRequest, response: HttpResponse) -> Task<Result<unit, HttpError>> {
+    if request.Version.Major != 1 || request.Version.Minor != 1 {
+        System.Fail("Incoming HTTP version unavailable")
+    }
     Console.WriteLine("HEADERS")
     if request.Target == "/text" {
         let text = await HttpStringContent.Read(request.Content)?

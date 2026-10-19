@@ -4,7 +4,7 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpMethod", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
+    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpMethod", "HttpVersion", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
@@ -112,7 +112,17 @@ static class HttpBindings
                 public override int GetHashCode() => default;
                 public override string ToString() => default;
             }
-            public sealed class HttpRequest {
+            public readonly struct HttpVersion {
+                public HttpVersion(int major, int minor) { }
+                public int Major => default;
+                public int Minor => default;
+                public static HttpVersion Http11 => default;
+                public bool Equals(HttpVersion other) => default;
+                public override string ToString() => default;
+            }
+            public sealed class HttpRequest : Disposable {
+                public void Dispose() { }
+                public HttpVersion Version => default;
                 public bool IsSecure => false;
                 public static Result<HttpRequest, HttpError> Create(HttpMethod method, string url) => default;
                 public static Result<HttpRequest, HttpError> Create(HttpMethod method, string url, HttpContent content) => default;
@@ -144,6 +154,7 @@ static class HttpBindings
                 public string Target => default;
             }
             public sealed class HttpResponse : Disposable {
+                public HttpVersion Version => default;
                 public void Dispose() { }
                 public Option<HttpRequest> Request => default;
                 public void Associate(HttpRequest request) { }

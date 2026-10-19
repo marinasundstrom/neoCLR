@@ -470,6 +470,7 @@
   "System.Web.Http.HttpStatusCode",
   "System.Web.Http.HttpStreamContent",
   "System.Web.Http.HttpStringContent",
+  "System.Web.Http.HttpVersion",
   "System.Web.Http.Json.HttpClientJsonExtensions",
   "System.Web.Http.Json.HttpContentJsonExtensions",
   "System.Web.Http.Json.HttpContextJsonExtensions",

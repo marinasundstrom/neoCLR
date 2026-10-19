@@ -155,3 +155,28 @@ constructors and Memory property because it cannot safely project opaque views.
 This manual entry supplies their exact signatures; no replacement array overload
 is introduced. HttpJsonContent and a general custom-producer extension point remain
 pending, as do optional wide lengths and unknown-length outgoing framing.
+
+## Message ownership and version (development, 2026-10-19)
+
+`HttpRequest` and `HttpResponse` implement `Disposable`. Disposal releases their
+content without reading or draining it and is safe to repeat. Client callers own
+requests and returned responses; sending does not dispose a caller-owned request.
+`HttpContext` owns incoming requests and outgoing responses. Serve manages the
+context; explicit Accept callers must close/dispose it. A stream content producer
+with `leaveOpen: true` retains external stream ownership. Header-derived request
+copies share content, so disposing an alias affects the others. A disposed request
+is rejected before dispatch to a custom handler.
+
+Both messages expose `val Version: HttpVersion`. The value has `Major`, `Minor`,
+`Http11`, `Equals` and explicit `ToString`; reading it allocates no version object
+or string. Current parsers and writers accept/emit HTTP/1.1 only, so the property
+is read-only and equals `HttpVersion.Http11`. It is available with incoming
+headers, before any body read. Representing another version does not enable its
+transport or negotiation.
+
+The ownership and version concepts follow [.NET HttpRequestMessage](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage?view=net-10.0)
+and [HttpResponseMessage](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage?view=net-10.0).
+neoCLR deliberately uses a compact protocol value instead of a `System.Version`
+reference and does not expose a version setter while only HTTP/1.1 is supported.
+The cost is a distinct value API and no version-selection policy yet; it avoids
+per-message version allocations without claiming support for other protocols.

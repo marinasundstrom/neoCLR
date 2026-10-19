@@ -2537,3 +2537,11 @@ Socket Receive/ReceiveUntil/Send/SendUntil, SHA256.HashData, HMACSHA256.HashData
 VerifyData, RandomNumberGenerator.Fill, Decoder.Decode, Encoder.Drain and
 Encoding.Decode. These opaque Slice/Memory signatures are present in the native
 snapshot; the routes bridge the intermediate legacy website pass only.
+
+## HTTP message version and disposal (2026-10-19)
+
+The development native/reference inventories include HttpVersion, both message
+Version properties and HttpRequest.Dispose. Version is an immutable major/minor
+value; message properties expose the current HTTP/1.1-only contract. Request
+disposal shares content lifetime across header-derived aliases. See the
+[message ownership contract](http-body-streams.md#message-ownership-and-version-development-2026-10-19).

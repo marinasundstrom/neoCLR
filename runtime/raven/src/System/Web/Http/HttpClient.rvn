@@ -71,6 +71,8 @@ public class HttpHeader {
 }
 
 public class HttpResponse : Disposable {
+    /// The response protocol version. Current transport accepts and emits HTTP/1.1 only.
+    val Version: HttpVersion => HttpVersion.Http11
     /// Closes owned response content, including an unread streaming connection.
     func Dispose() { storedContent.Dispose() }
 
@@ -753,11 +755,16 @@ public abstract class HttpContent : Disposable {
 
 }
 
-public class HttpRequest {
+public class HttpRequest : Disposable {
+    /// The request protocol version, available after headers. Current transport supports HTTP/1.1 only.
+    val Version: HttpVersion => HttpVersion.Http11
+    /// Releases owned content without reading or draining it. Safe to repeat.
+    /// Header-derived copies share content; disposal affects every alias.
+    func Dispose() { storedContent.Dispose() }
     internal var HeadersOnly: bool = false
     internal func SetContent(content: HttpContent) { storedContent = content }
     private var storedContent: HttpContent = HttpMemoryContent(default(ReadOnlyMemory<byte>))
-    /// Buffered request content; empty for GET requests.
+    /// Request body content. Incoming nonempty bodies are consumed asynchronously on demand.
     val Content: HttpContent => storedContent
     private var storedHeaders: Sequence<HttpHeader>
     val Headers: Sequence<HttpHeader> => storedHeaders
@@ -1046,6 +1053,7 @@ public class HttpRequest {
     /// Returns a new request with one application header replaced case-insensitively.
     /// The original request is unchanged; content is shared and framing stays provider-owned.
     func WithHeader(name: string, value: string) -> Result<HttpRequest, HttpError> {
+        if storedContent.IsDisposed { return Error(HttpError.InvalidRequest("Request is disposed")) }
         let key = HeaderName(name)?
         if ReservedHeader(key) || key == "content-type" {
             return Error(HttpError.InvalidRequest("Header is controlled by transport or content"))
@@ -1072,6 +1080,7 @@ public class HttpRequest {
     }
 
     internal func WithDefaults(defaults: Sequence<HttpHeader>) -> Result<HttpRequest, HttpError> {
+        if storedContent.IsDisposed { return Error(HttpError.InvalidRequest("Request is disposed")) }
         if defaults.Count == 0 {
             return Ok(self)
         }

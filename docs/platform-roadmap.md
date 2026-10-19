@@ -5562,3 +5562,8 @@ Readiness lowers p50 25–29% and p99 12–19% versus URI-only, with mixed CPU r
 Unchanged controls also pass, so historical admission recovery is not solely a
 code-fix claim. Next establish a higher-rate boundary with matched controls and
 profile its CPU bottleneck; Windows execution of the new pump call remains open.
+
+Author-directed HTTP API follow-up (2026-10-19): expose message Version and request
+disposal before continuing native expression lowering. The current version value
+reports HTTP/1.1 only; it does not establish negotiation or additional protocols.
+ReasonPhrase preservation for client responses is the next bounded metadata slice.

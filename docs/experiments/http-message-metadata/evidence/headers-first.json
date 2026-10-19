@@ -1,0 +1,167 @@
+{
+  "passed": true,
+  "commands": {
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-message-headers/app"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-message-headers/app.dll",
+      "--"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-message-headers/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/lib/System.Data.PostgreSql.dll",
+      "--"
+    ]
+  },
+  "cases": {
+    "aot-context-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-context-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-context-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-context-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "aot-accept-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "aot-accept-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "aot-accept-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "aot-accept-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "jit-context-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "jit-context-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "jit-context-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "jit-context-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "jit-accept-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "jit-accept-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "jit-accept-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "jit-accept-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-context-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-context-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-context-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-context-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    },
+    "interpreter-accept-ignore": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 104
+    },
+    "interpreter-accept-text": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 103
+    },
+    "interpreter-accept-json": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 101
+    },
+    "interpreter-accept-cancel": {
+      "passed": true,
+      "headersBeforeBody": true,
+      "responseBytes": 0
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-headers-first/validate.py": "a75dca19db4ba6e4bddcf9f729b5bf0def972746973a01f3bc8fa90f5ed45d3d",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-headers-first/Probe.rvn": "6507d3b7e31856bc6b916d7d6d8bd066d8c4657b18802f303444d9e82e50f750",
+    "/Users/robert/Projects/neoclr/target/http-message-headers/app": "fcfe905396e921490759bdcd40339feeb97f32f73b97b315ca5693d16e0c3820",
+    "/Users/robert/Projects/neoclr/target/http-message-headers/app.dll": "9d55615248eb06b7f4d388fff591240b2d13ac44a53d18c566871ee6eebbbdaf",
+    "/Users/robert/Projects/neoclr/target/http-message-bundle-v1/bundle/manifest.json": "ed61b869b5fc47a8a148ba0255ccf7dac939bd0588cbe9bca3b0c616e49d5788"
+  }
+}

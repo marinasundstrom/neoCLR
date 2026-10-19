@@ -1055,7 +1055,8 @@ public class HttpContext : Disposable {
             return
         }
         closed = true
-        request.Content.Dispose()
+        request.Dispose()
+        response.Dispose()
         connection.Close()
         let caller = writeCaller
         writeCaller = null

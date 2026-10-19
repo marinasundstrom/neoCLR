@@ -14,7 +14,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / 'runtime/raven/tests'
-HTTP_LIFETIME_NAMES = ['HTTP client use disposes its owned handler exactly once', 'HTTP borrowed handler survives one client and serves another', 'HTTP disposal requests cancellation and waits for handler acknowledgement', 'HTTP caller cancellation propagates without disposing the handler', 'HTTP completed responses survive disposal and retain request association', 'HTTP pre-cancellation skips custom handlers', 'HTTP socket handler disposal is idempotent through Disposable', 'HTTP delegating handlers run outward and unwind inward', 'HTTP borrowed delegating pipeline remains reusable', 'HTTP borrowed clients cancel only their own pending sends']
+HTTP_LIFETIME_NAMES = ['HTTP client use disposes its owned handler exactly once', 'HTTP borrowed handler survives one client and serves another', 'HTTP disposal requests cancellation and waits for handler acknowledgement', 'HTTP caller cancellation propagates without disposing the handler', 'HTTP completed responses survive disposal and retain request association', 'HTTP pre-cancellation skips custom handlers', 'HTTP socket handler disposal is idempotent through Disposable', 'HTTP delegating handlers run outward and unwind inward', 'HTTP borrowed delegating pipeline remains reusable', 'HTTP borrowed clients cancel only their own pending sends', "HTTP disposed requests are rejected before invoking a custom handler"]
 
 MEMORY_LIFETIME_NAMES = [
     'Pending Memory destinations survive collection and preserve surrounding bytes',
@@ -318,6 +318,7 @@ HTTP_HEADER_VALUES_NAMES = [
     'HTTP header lookup preserves repeated values without splitting commas',
     'HTTP request lookup exposes content headers without inventing provider headers',
     'HTTP header lookup snapshots remain independent of later additions',
+    'HTTP messages expose HTTP 1.1 and dispose owned content without reading',
     'HTTP response constructors retain memory content and replace only content type metadata',
     'HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation',
     'HTTP response construction never reads or changes stream ownership',

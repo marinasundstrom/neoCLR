@@ -1,0 +1,27 @@
+module System.Web.Http
+
+import System.*
+
+/// An immutable protocol version value. Representing a version does not enable transport support.
+public struct HttpVersion {
+    private val major: int
+    private val minor: int
+
+    /// Creates a version with nonnegative major and minor components; negatives fault.
+    init(major: int, minor: int) {
+        if major < 0 || minor < 0 { System.Fail("HTTP version components must be nonnegative") }
+        self.major = major
+        self.minor = minor
+    }
+
+    /// The major protocol version.
+    val Major: int => major
+    /// The minor protocol version.
+    val Minor: int => minor
+    /// HTTP/1.1, the currently supported transport version.
+    static val Http11: HttpVersion => HttpVersion(1, 1)
+    /// Compares both protocol components without allocating.
+    func Equals(other: HttpVersion) -> bool => major == other.major && minor == other.minor
+    /// Formats the version as major.minor; only explicit formatting creates text.
+    func ToString() -> string => String.Concat(major.ToString(), String.Concat(".", minor.ToString()))
+}

@@ -212,3 +212,15 @@ func JIndependentOwners() -> Result<unit, TestFailure> {
     _ = Assert.True(cancelled.IsCancelled, "First send acknowledges cancellation")?
     return Assert.True(survivor.GetResult() is Error(HttpError.Handler("expected")), "Independent failure preserved")
 }
+
+[Test("HTTP disposed requests are rejected before invoking a custom handler")]
+func ZDisposedRequest() -> Result<unit, TestFailure> {
+    let handler = LifetimeHandler()
+    use client = HttpClient(handler)
+    let Ok(request) = HttpRequest.Get("http://example.test/") else { return Assert.True(false, "Create request") }
+    request.Dispose()
+    let operation = client.Send(request)
+    _ = Assert.True(operation.IsCompleted, "Disposed request fails immediately")?
+    _ = Assert.True(operation.GetResult() is Error(HttpError.InvalidRequest(_)), "Disposed request error")?
+    return Assert.Equal(0, handler.Calls)
+}
