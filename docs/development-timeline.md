@@ -19686,3 +19686,10 @@ open; no native performance improvement is claimed.
   pass, and all misses and raw samples are retained. Exact GC pauses, a matched
   allocation-rate profile, production promotion and broader concurrent TLS/JIT
   qualification remain open. Public shared stream signatures are still pending.
+
+## 2026-10-19 — Investigate HTTP performance opportunities
+
+- **Author:** asked to investigate what can make the HTTP server faster, following the clarification that current unoptimized GC CPU cost should not decide the design's value.
+- **Assistant action:** sampled the retained synchronous and experimental concurrent binaries with plain and bulk HTTP, then collected fresh allocation caller attribution. Recorded all misses and sampling disturbance separately from the earlier uninstrumented throughput comparison.
+- **Outcome:** Promise result backing arrays account for 35.8% of diagnostic payload bytes; root publication/validation and collection remain prominent, and bulk response encoding includes substantial runtime work. Added bulk diagnostic support and retained the [investigation and evidence](../benchmarks/http-server/serve/investigation-20261019/README.md).
+- **Assistant proposal, not implementation:** first simplify Promise result storage and qualify checked bulk copying, then investigate immutable root descriptors, heap indexes and collector pacing. Public API, production collector and HTTP behavior remain unchanged. No author approval of individual design choices is inferred.

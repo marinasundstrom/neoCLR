@@ -16,15 +16,19 @@ spec.loader.exec_module(load)
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--executable', type=Path)
 p.add_argument('--sample', action='store_true')
+p.add_argument('--workload', choices=['plain', 'bulk'], default='plain')
 p.add_argument('--rate', type=float, default=300)
 p.add_argument('--duration', type=float, default=20)
 p.add_argument('--concurrency', type=int, default=64)
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 a.output.mkdir(parents=True, exist_ok=False)
+request_path, response_size = ('/bulk', 8192) if a.workload == 'bulk' else ('/plain', 10)
+if a.workload == 'bulk' and not a.executable:
+    p.error('bulk requires a Serve executable')
 peer = Path(__file__).with_name('generator-control.py')
 command = [str(a.executable.resolve()), '16'] if a.executable else [sys.executable, str(peer)]
-report = dict(command=command, rate=a.rate, duration=a.duration, concurrency=a.concurrency,
+report = dict(command=command, workload=a.workload, rate=a.rate, duration=a.duration, concurrency=a.concurrency,
               purpose='Diagnostic only; sampling changes timing. Trivial Python peer tests generator headroom, not comparative server performance.',
               inputs={str(f.resolve()): hashlib.sha256(f.read_bytes()).hexdigest() for f in
                       [Path(__file__), Path(load.__file__), a.executable or peer]},
@@ -32,7 +36,7 @@ report = dict(command=command, rate=a.rate, duration=a.duration, concurrency=a.c
 guest = load.Guest(command)
 try:
     port = int(guest.line()[0]); control = int(guest.line()[0])
-    report['warmup'] = asyncio.run(load.window(port, '/plain', 10, 10, 2, a.concurrency, 3))
+    report['warmup'] = asyncio.run(load.window(port, request_path, response_size, 10, 2, a.concurrency, 3))
     before = load.resource_sample(guest.process.pid)
 
     async def measure():
@@ -41,7 +45,7 @@ try:
             command = ['sample', str(guest.process.pid), '5', '1', '-file', str(a.output/'sample.txt')]
             result = await asyncio.to_thread(subprocess.run, command, capture_output=True, text=True)
             report['sample'] = dict(command=command, exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)
-        tasks = [load.window(port, '/plain', 10, a.rate, a.duration, a.concurrency, 3,
+        tasks = [load.window(port, request_path, response_size, a.rate, a.duration, a.concurrency, 3,
                              guest.process.pid, diagnostics=True)]
         if a.sample: tasks.append(sample())
         return (await asyncio.gather(*tasks))[0]

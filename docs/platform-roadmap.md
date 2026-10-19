@@ -34,7 +34,11 @@ tiny-response overload delivery is about 5% lower. Treat CPU as a resource/optim
 diagnostic, not a rejection criterion for this unoptimized prototype. Next: separate
 phase-cost instrumentation and pacing hypotheses, preserving ownership/fallback
 checks. Public stream migration and broader concurrent TLS/JIT coverage remain open;
-production defaults are unchanged.
+production defaults are unchanged. The subsequent
+[HTTP investigation](../benchmarks/http-server/serve/investigation-20261019/README.md)
+prioritizes single-result Promise storage and checked bulk response copying before
+larger root-descriptor/heap-index work; concurrent phase instrumentation and pacing
+remain separate measured candidates. Fresh profiles are diagnostic, not speedup evidence.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and
 random fill use borrowed readonly/writable byte windows through interpreter and
