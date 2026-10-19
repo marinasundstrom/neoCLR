@@ -64,6 +64,8 @@ public sealed class JsonSerializerOptions {
     public bool WriteIndented { get; set; }
 }
 public sealed class JsonSerializer {
+    public static Result<byte[], JsonError> SerializeToUtf8Bytes(object value) => default;
+    public static Result<byte[], JsonError> SerializeToUtf8Bytes(object value, JsonSerializerOptions options) => default;
     private JsonSerializer() { }
     public static Result<string, JsonError> Serialize(object value, JsonSerializerOptions options) => default;
     public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value, JsonSerializerOptions options) => default;

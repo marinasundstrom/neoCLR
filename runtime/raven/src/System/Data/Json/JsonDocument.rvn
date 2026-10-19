@@ -150,28 +150,120 @@ internal class DocumentReader {
 
 internal class DocumentWriter {
     private var nodes: int
-    private var output: string
+    private var output: byte[] = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(0)
+    private var size: int = 0
     private val indented: bool
 
     init(indented: bool) {
         self.indented = indented
         nodes = 0
-        output = ""
+    }
+
+    private func Reserve(count: int) {
+        if count <= output.Length - size {
+            return
+        }
+        var capacity = 32
+        if output.Length > 0 {
+            capacity = output.Length * 2
+        }
+        if capacity < size + count {
+            capacity = size + count
+        }
+        if capacity > 1024 {
+            capacity = 1024
+        }
+        let grown = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(capacity)
+        var index = 0
+        while index < size {
+            grown[index] = output[index]
+            index += 1
+        }
+        output = grown
     }
 
     private func Append(text: string) -> Result<unit, JsonError> {
-        if text.GetUtf8ByteCount() > 1024 - output.GetUtf8ByteCount() {
+        if text.GetUtf8ByteCount() > 1024 - size {
             return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
-        output = String.Concat(output, text)
+        let bytes = text.Utf8Bytes
+        Reserve(bytes.Length)
+        var index = 0
+        while index < bytes.Length {
+            output[size] = bytes[index]
+            size += 1
+            index += 1
+        }
+        return Ok(())
+    }
+
+    private func Hex(value: int) -> byte {
+        return (byte)(if value < 10 { 48 + value } else { 87 + value })
+    }
+
+    private func AppendMessage(text: string) -> Result<unit, JsonError> {
+        if text.GetUtf8ByteCount() > 1022 {
+            return Error(JsonError.LimitExceeded("Message exceeds payload limit"))
+        }
+        let bytes = text.Utf8Bytes
+        var count = 2
+        var index = 0
+        while index < bytes.Length {
+            let value = bytes[index]
+            count += if value <= 31 { 6 } else if value == 34 || value == 92 { 2 } else { 1 }
+            if count > 1024 {
+                return Error(JsonError.LimitExceeded("Escaped message exceeds payload limit"))
+            }
+            index += 1
+        }
+        if count > 1024 - size {
+            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+        }
+        Reserve(count)
+        output[size] = (byte)34
+        size += 1
+        index = 0
+        while index < bytes.Length {
+            let value = bytes[index]
+            if value == 34 || value == 92 {
+                output[size] = (byte)92
+                output[size + 1] = value
+                size += 2
+            } else if value <= 31 {
+                output[size] = (byte)92
+                output[size + 1] = (byte)117
+                output[size + 2] = (byte)48
+                output[size + 3] = (byte)48
+                output[size + 4] = Hex(value / 16)
+                output[size + 5] = Hex(value % 16)
+                size += 6
+            } else {
+                output[size] = value
+                size += 1
+            }
+            index += 1
+        }
+        output[size] = (byte)34
+        size += 1
+        return Ok(())
+    }
+
+    private func AppendByte(value: byte) -> Result<unit, JsonError> {
+        if size == 1024 {
+            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+        }
+        Reserve(1)
+        output[size] = value
+        size += 1
         return Ok(())
     }
 
     private func Line(depth: int) -> Result<unit, JsonError> {
         if indented {
-            _ = Append("\n")?
+            _ = AppendByte((byte)10)?
             for index in 0..depth {
-                _ = Append("  ")?
+                _ = AppendByte((byte)32)?
+                _ = AppendByte((byte)32)?
             }
         }
         return Ok(())
@@ -184,8 +276,7 @@ internal class DocumentWriter {
         }
         if value is JsonString {
             let text = ((JsonString)value).Value
-            let quoted = JsonSyntax.WriteMessage(text)?
-            return Append(quoted)
+            return AppendMessage(text)
         }
         if value is JsonNumber {
             let text = ((JsonNumber)value).Text
@@ -206,9 +297,9 @@ internal class DocumentWriter {
         }
         let objectValue = value is JsonObject
         if objectValue {
-            _ = Append("{")?
+            _ = AppendByte((byte)123)?
         } else {
-            _ = Append("[")?
+            _ = AppendByte((byte)91)?
         }
         var count = 0
         if objectValue {
@@ -218,14 +309,16 @@ internal class DocumentWriter {
         }
         for index in 0..count {
             if index > 0 {
-                _ = Append(",")?
+                _ = AppendByte((byte)44)?
             }
             _ = Line(depth + 1)?
             if objectValue {
                 let name = ((JsonObject)value).Name(index)?
-                let quoted = JsonSyntax.WriteMessage(name)?
-                _ = Append(quoted)?
-                _ = Append(if indented { ": " } else { ":" })?
+                _ = AppendMessage(name)?
+                _ = AppendByte((byte)58)?
+                if indented {
+                    _ = AppendByte((byte)32)?
+                }
             }
             let child = if objectValue {
                 ((JsonObject)value).Item(index)?
@@ -238,13 +331,21 @@ internal class DocumentWriter {
             _ = Line(depth)?
         }
         if objectValue {
-            return Append("}")
+            return AppendByte((byte)125)
         }
-        return Append("]")
+        return AppendByte((byte)93)
     }
 
     func Write(value: JsonValue) -> Result<string, JsonError> {
         _ = Value(value, 0)?
-        return Ok(output)
+        return match Encodings.Utf8.Decode(output[..size]) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(JsonError.Syntax("Invalid UTF-8"))
+        }
+    }
+
+    func WriteBytes(value: JsonValue) -> Result<byte[], JsonError> {
+        _ = Value(value, 0)?
+        return Ok(output[..size].ToArray())
     }
 }

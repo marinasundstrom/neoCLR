@@ -203,6 +203,7 @@ JSON_NAMES = [
     'JSON sequence snapshots preserve order and shared child contents',
 ]
 JSON_STREAM_NAMES = [
+    'JSON UTF-8 byte output preserves escaping formatting and independent ownership',
     'JSON stream serialization detects cycles before writing',
     'JSON stream output quota includes escaping and validates before writes',
     'JSON indented stream output matches node text and preflights quotas',

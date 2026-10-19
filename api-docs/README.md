@@ -2487,3 +2487,13 @@ the matching five-library bundle. The legacy CLI scaffold omits precisely
 Encoding.Decode(ReadOnlySlice<byte>), since opaque borrowed views cannot safely be
 projected; its old Sequence overload is removed. The [manual codec reference](streams.md#incremental-encoding-development)
 covers the limitation and migration. No public native API or stable host ABI is added.
+
+### 2026-10-19 — JSON owned UTF-8 output
+
+Both SerializeToUtf8Bytes(Object[, JsonSerializerOptions]) overloads are included in
+the native and legacy CLI reference snapshots, with byte-array result ownership,
+quotas, formatting and mapping errors documented. JsonSerializer was already selected
+for RavenDoc; no type exclusion or compiler projection is needed. The matching
+System.Data native XML and regenerated reference source include both signatures.
+HTTP JsonContent and OutputStream output now use direct bytes; InputStream parsing
+still converts through text. See [JSON API guide](json.md).

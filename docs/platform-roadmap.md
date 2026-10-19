@@ -55,7 +55,9 @@ owned result text and strict Unicode semantics. The author extends this
 requirement to [JSON byte processing](design/json-byte-processing.md): avoid full-document
 text intermediates when consuming or producing bytes. The source audit identifies
 HTTP/stream round trips and repeated writer concatenation; JSON-specific allocation
-measurement and byte-output/parser changes remain separate work. Small ASCII allocation
+evidence and the direct byte-output writer are now recorded in
+[JSON byte output](../benchmarks/json-byte-output/20261019/README.md); byte-input parser
+changes and incremental token reader/writer contracts remain separate work. Small ASCII allocation
 volume does not establish general string CPU or live-retention costs.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and

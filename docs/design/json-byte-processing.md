@@ -1,8 +1,8 @@
 # Avoid temporary text in JSON processing
 
 Author direction, 2026-10-19: avoiding unnecessary string materialization is an API
-requirement, including the JSON serializer. This is a source audit and next-work
-plan, not an implemented JSON byte API or a measured JSON speedup.
+requirement, including the JSON serializer. This began as a source audit. The byte-output portion is now implemented below;
+byte-input parsing and incremental reader/writer APIs remain planned.
 
 The preceding [borrowed decoding change](../../benchmarks/http-server/serve/decode-slice-20261019/README.md)
 removes temporary arrays when text is actually needed. JSON also needs to avoid
@@ -68,3 +68,33 @@ HTTP/stream serialization through it. Qualify exact compact/indented output and
 validation-before-write before comparing allocation traces. Migrate byte-input parsing
 next, including fragmented stream input and selective token materialization. Keep each
 slice independently committed and documented; no new API here is marked shipped.
+
+## Byte-output implementation, 2026-10-19
+
+DocumentWriter now copies borrowed String.Utf8Bytes into bounded byte storage and
+escapes directly into that buffer. It preflights each token before appending, keeping
+existing quota precedence and lowercase control escapes. Public SerializeToUtf8Bytes
+returns independent owned arrays; HTTP and OutputStream serialization use byte output.
+Text-returning calls decode the completed buffer once. Byte-input parsing is unchanged.
+
+The author considered TextReader/TextWriter overloads, then clarified that the API is
+based on System.Text.Json and should allow streams. Existing InputStream/OutputStream
+overloads provide that entry point. System.Text.Json's dedicated Utf8JsonReader and
+Utf8JsonWriter are distinct from general text readers/writers; those incremental
+contracts are future work. Newtonsoft.Json's TextReader/TextWriter overloads were
+researched as a comparison, not adopted in this change.
+
+Benefit: no accumulated-prefix or quoted-token strings on byte output. Costs: bounded
+scratch storage, growth copies and a final owned array; text-returning serialization
+now requires byte accumulation and one decode. This is not zero allocation. OutputStream
+still requires array/range; no borrowed descriptor is retained across await. See
+[allocation and correctness evidence](../../benchmarks/json-byte-output/20261019/README.md).
+
+### Native string-view prerequisite
+
+The first native attempt rejected ViewUtf8 despite interpreter support. The author
+explicitly directed fixing that gap. Native string-backed readonly views are now
+implemented and separately qualified, so the adopted writer uses borrowed string
+bytes; the intermediate fallback retaining token encoding buffers was not adopted.
+See [native bridge contract](../raven-cli-bridge.md#native-stringutf8bytes-lowering-2026-10-19).
+The Raven source compiler and public String.Utf8Bytes signature are unchanged.

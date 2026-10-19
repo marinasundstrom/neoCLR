@@ -13,6 +13,27 @@ In-memory operations return Result with
 below define the supported subset. Stream operations return Tasks; use `await`.
 
 
+## UTF-8 byte output (development)
+
+`JsonSerializer.SerializeToUtf8Bytes(value)` and
+`SerializeToUtf8Bytes(value, options)` return `Result<byte[], JsonError>` containing
+newly owned UTF-8 storage. They accept the same supported objects and JsonValue
+nodes as Serialize, with the same mapping errors, 1024-byte output limit, 32-value
+limit and maximum container depth of four. Formatting counts toward the byte limit.
+Changing a returned array does not change the source node or another result.
+
+HTTP JsonContent creation and OutputStream serialization use this byte writer.
+They do not construct a whole-document string or quoted-token strings. Text-returning
+Serialize/SerializeNode still produce owned strings because their caller requests text.
+Existing input parsing still materializes/re-encodes text; this output change does not
+add incremental parsing or Utf8JsonReader/Utf8JsonWriter contracts.
+
+Stream APIs validate the complete document before the first write and leave the
+stream open without flushing it. An output I/O failure can follow partial output;
+its original StreamError remains wrapped by JsonError.Write. A pending write retains
+its owned byte array until completion. Shared OutputStream currently accepts an
+array and range; the wider Memory signature migration remains separate.
+
 ## JSON text and indentation
 
 `JsonValue.ToJsonString()` returns compact JSON, including quotes and escaping for

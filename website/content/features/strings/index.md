@@ -93,3 +93,8 @@ Both builder and conversion APIs enforce explicit size limits.
 <a id="encoding-foundations-development"></a>
 
 <a id="unicode-casing-and-decimal-reports-development"></a>
+
+In development, `String.Utf8Bytes` also works in native JIT/AOT: it borrows immutable
+UTF-8 storage without an encoding array and retains managed text through collection.
+Its indices count bytes; Char and ordinary string indexing remain grapheme-based.
+Use `ToArray()` only when an independent mutable byte array is needed.

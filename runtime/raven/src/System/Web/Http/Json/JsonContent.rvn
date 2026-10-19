@@ -13,13 +13,13 @@ public class JsonContent {
     private init() { }
 
     static func Create(value: Object) -> Result<HttpContent, JsonError> {
-        let text = JsonSerializer.Serialize(value)?
-        return Ok(HttpContent(HttpText.Encode(text), "application/json; charset=utf-8"))
+        let bytes = JsonSerializer.SerializeToUtf8Bytes(value)?
+        return Ok(HttpContent(bytes, "application/json; charset=utf-8"))
     }
 
     static func CreateNode(value: JsonValue) -> Result<HttpContent, JsonError> {
-        let text = JsonSerializer.SerializeNode(value)?
-        return Ok(HttpContent(HttpText.Encode(text), "application/json; charset=utf-8"))
+        let bytes = JsonSerializer.SerializeToUtf8Bytes(value)?
+        return Ok(HttpContent(bytes, "application/json; charset=utf-8"))
     }
 
     static func ReadNode(content: HttpContent) -> Result<JsonValue, JsonError> {

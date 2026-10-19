@@ -3692,5 +3692,20 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
 <member name="P:System.Web.Http.HttpServer.CompletedRequests"><summary>Successful responses sent by Serve; excludes explicit Accept and ServeOne calls.</summary></member>
 <member name="P:System.Web.Http.HttpServer.FailedRequests"><summary>Failed Serve exchanges, excluding shutdown-driven cancellations.</summary></member>
 <member name="P:System.Web.Http.HttpServer.LastRequestError"><summary>Most recent Serve request failure, or None before the first failure. Only one error is retained; counts are cumulative.</summary></member>
+<member name="M:System.Data.Json.JsonSerializer.SerializeToUtf8Bytes(System.Object)">
+      <summary>&lt;summary&gt;Serializes an object or JSON node directly into owned UTF-8 bytes.&lt;/summary&gt;
+&lt;param name="value"&gt;The supported object or JSON node.&lt;/param&gt;
+&lt;returns&gt;A newly owned compact JSON array or a mapping, validation or quota error.&lt;/returns&gt;
+&lt;remarks&gt;The 1024-byte document, 32-value and four-level depth limits apply. No document string is created.&lt;/remarks&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonSerializer.SerializeToUtf8Bytes(System.Object,System.Data.Json.JsonSerializerOptions)">
+      <summary>&lt;summary&gt;Serializes an object or JSON node directly into owned UTF-8 bytes with selected formatting.&lt;/summary&gt;
+&lt;param name="value"&gt;The supported object or JSON node.&lt;/param&gt;
+&lt;param name="options"&gt;Output formatting, included in the document byte limit.&lt;/param&gt;
+&lt;returns&gt;A newly owned JSON array or a mapping, validation or quota error.&lt;/returns&gt;
+&lt;remarks&gt;All validation completes before returning. The caller owns the returned bytes.&lt;/remarks&gt;</summary>
+    </member>
+
 </members>
 </doc>

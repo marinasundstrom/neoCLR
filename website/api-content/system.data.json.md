@@ -30,3 +30,8 @@ Use `node.ToJsonString()` for compact JSON text. For readable output, pass a
 `JsonSerializerOptions` with `WriteIndented = true`. The same option is available
 on `JsonSerializer.SerializeNode` and `Serialize`, including stream overloads.
 [Formatting and limits](/docs/json.html#json-text-and-indentation).
+
+Development byte output: `SerializeToUtf8Bytes(value[, options])` returns an owned
+byte array. HTTP content and stream serialization use the same bounded UTF-8 writer,
+avoiding intermediate document strings. Stream input still parses through text.
+See [byte output and ownership](/docs/json.html#utf-8-byte-output-development).

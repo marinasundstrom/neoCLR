@@ -1,0 +1,38 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Data.Json.*
+import System.IO.*
+import System.Result.*
+import System.Web.Http.Json.*
+
+async func Main() -> Task<()> {
+    let sources = ["[1,2,3,4,5,6,7,8]", "{\"first\":\"hello\",\"second\":\"hello\"}", "{\"escaped\":\"é😀\\n\\u0000\\\"\"}"]
+    for source in sources {
+        let Ok(node) = JsonSerializer.DeserializeNode(source) else {
+            System.Fail("Probe parse failed")
+        }
+        let Ok(expected) = JsonSerializer.SerializeNode(node) else {
+            System.Fail("Probe serialize failed")
+        }
+        for index in 0..100 {
+            let Ok(content) = JsonContent.CreateNode(node) else {
+                System.Fail("Content failed")
+            }
+            if content.Bytes.Count != expected.GetUtf8ByteCount() {
+                System.Fail("Content length mismatch")
+            }
+            let stream = MemoryStream()
+            if (await JsonSerializer.SerializeNode(stream, node)) is Error(_) {
+                System.Fail("Stream failed")
+            }
+            let Ok(length) = stream.GetLength() else {
+                System.Fail("Length failed")
+            }
+            if length != (long)expected.GetUtf8ByteCount() {
+                System.Fail("Stream length mismatch")
+            }
+            stream.Close()
+        }
+    }
+    Console.WriteLine("PASS JSON byte output probe")
+}

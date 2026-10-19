@@ -231,3 +231,8 @@ removes one allocation per Promise while retaining array-backed result storage.
 Matched local tests reduce CPU per completion, with variable bulk tail latency;
 this does not establish higher server capacity. A runtime completion bridge to
 avoid Promise wrappers in HTTP operations is under investigation.
+
+In development, JSON HTTP content and output streams serialize directly into bounded
+UTF-8 byte storage. `SerializeToUtf8Bytes` exposes an owned byte result; text-returning
+APIs still return text. InputStream deserialization remains available and currently
+materializes text before parsing. See [JSON contracts](/docs/json.html).

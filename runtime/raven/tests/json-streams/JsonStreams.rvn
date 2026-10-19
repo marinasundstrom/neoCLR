@@ -242,7 +242,7 @@ func StreamIndented() -> Result<unit, TestFailure> {
     let expected = "{\n  \"items\": [\n    1,\n    null\n  ]\n}"
     let output = ShortOutput(-1, false)
     _ = Assert.True(CompletedValue(JsonSerializer.SerializeNode(output, node, options)) is Ok(_), "Write indented node")?
-    let Ok(actual) = Encodings.Utf8.Decode(output.Bytes) else {
+    let Ok(actual) = Encodings.Utf8.Decode(ArrayList<byte>(output.Bytes)[..]) else {
         return Assert.True(false, "Decode output")
     }
     _ = Assert.Equal(expected, actual)?
@@ -260,4 +260,36 @@ func StreamIndented() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(JsonSerializer.SerializeNode(rejected, large, options)) is Error(JsonError.LimitExceeded(_)), "Reject formatted output quota")?
     _ = Assert.Equal(0, rejected.Count)?
     return Assert.True(!rejected.Closed, "Rejected output remains open")
+}
+
+[Test("JSON UTF-8 byte output preserves escaping formatting and independent ownership")]
+func OwnedUtf8Output() -> Result<unit, TestFailure> {
+    let source = "{\"name\":\"é😀\\n\\u0000\\\"\\\\\",\"number\":-1.25e+2,\"values\":[true,false,null]}"
+    let Ok(node) = JsonSerializer.DeserializeNode(source) else {
+        return Assert.True(false, "Parse byte-output fixture")
+    }
+    let options = JsonSerializerOptions()
+    options.WriteIndented = true
+    let Ok(expected) = JsonSerializer.SerializeNode(node, options) else {
+        return Assert.True(false, "Serialize formatted text")
+    }
+    let Ok(bytes) = JsonSerializer.SerializeToUtf8Bytes(node, options) else {
+        return Assert.True(false, "Serialize formatted bytes")
+    }
+    let Ok(actual) = Encodings.Utf8.Decode(bytes) else {
+        return Assert.True(false, "Decode result")
+    }
+    _ = Assert.Equal(expected, actual)?
+    let Ok(second) = JsonSerializer.SerializeToUtf8Bytes(node, options) else {
+        return Assert.True(false, "Serialize independent bytes")
+    }
+    bytes[0] = (byte)0
+    _ = Assert.Equal(123, (int)second[0])?
+    let Ok(compact) = JsonSerializer.SerializeToUtf8Bytes(node) else {
+        return Assert.True(false, "Serialize compact bytes")
+    }
+    let Ok(compactText) = Encodings.Utf8.Decode(compact) else {
+        return Assert.True(false, "Decode compact result")
+    }
+    return Assert.Equal("{\"name\":\"é😀\\u000a\\u0000\\\"\\\\\",\"number\":-1.25e+2,\"values\":[true,false,null]}", compactText)
 }
