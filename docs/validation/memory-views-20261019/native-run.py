@@ -13,10 +13,12 @@ parser.add_argument('--compiler', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--consumer-only', action='store_true',
                     help='Reuse earlier bounds evidence and run only the success consumer')
+parser.add_argument('--range-bounds', action='store_true',
+                    help='Also qualify invalid Range windows through the Raven library')
 args = parser.parse_args()
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
-report = {'passed': False, 'consumerOnly': args.consumer_only, 'commands': []}
+report = {'passed': False, 'consumerOnly': args.consumer_only, 'rangeBounds': args.range_bounds, 'commands': []}
 
 
 def run(label, command, expected=0):
@@ -103,6 +105,44 @@ if not args.consumer_only:
             failure_jit = run(label + '-jit', [codegen, '--jit-managed', '--closed-world',
                              case_image, '@entry', output / 'bounds.dylib', *options])
             assert json.loads(failure_jit.stderr.split('JIT_RESULT ', 1)[1])['guestExitCode'] == 0
+if args.range_bounds:
+    # Range validates in Raven and currently reports UserFault (native code 4),
+    # unlike the integer Slice InternalCall's IndexOutOfRange (native code 8).
+    run('range-jit-link', [*flags, '-DEXPECT_STATUS=4', '-DJIT_HOST', '-dynamiclib',
+                           host, *support, '-o', output / 'range-fault.dylib'])
+    report['rangeCases'] = []
+    for kind in ('Memory', 'ReadOnlyMemory'):
+        for case, expression in (('reversed', 'memory[2..1]'),
+                                 ('past-end', 'memory.Slice(0..3)'),
+                                 ('from-end', 'memory[^3..]')):
+            label = f'range-{kind}-{case}'
+            source = output / (label + '.rvn')
+            source.write_text(f'import System.*\nfunc Main() -> int {{\n'
+                              f'    let memory: {kind}<byte> = [(byte)1, (byte)2]\n'
+                              f'    return {expression}.Length\n}}\n')
+            project = output / (label + '.rvnproj')
+            template = (HERE / 'NativeMemoryBounds.rvnproj').read_text()
+            template = template.replace('NativeMemoryBounds', label).replace('native-bounds.rvn', source.name)
+            template = template.replace('../../../runtime/', str(ROOT / 'runtime') + '/')
+            project.write_text(template)
+            run(label + '-raven', ['dotnet', args.compiler, 'neoclr', '--project', project])
+            case_image = output / 'bin/neoclr' / (label + '.dll')
+            failure = run(label + '-interpreter', [runtime, 'run', case_image,
+                          '--execution', 'interpreter', *refs], 1)
+            assert 'UserFault' in failure.stdout + failure.stderr
+            assert 'Range is outside the value' in failure.stdout + failure.stderr
+            case_obj = output / (label + '.o')
+            run(label + '-aot', [codegen, '--closed-world', case_image, '@entry', case_obj, *options])
+            run(label + '-link', [*flags, '-DEXPECT_STATUS=4', '-fsanitize=undefined,bounds',
+                                 host, case_obj, *support, '-o', output / label])
+            run(label + '-execute', [output / label])
+            failure_jit = run(label + '-jit', [codegen, '--jit-managed', '--closed-world',
+                             case_image, '@entry', output / 'range-fault.dylib', *options])
+            assert json.loads(failure_jit.stderr.split('JIT_RESULT ', 1)[1])['guestExitCode'] == 0
+            report['rangeCases'].append({'kind': kind, 'case': case, 'expression': expression,
+                                        'nativeStatus': 4, 'fault': 'UserFault',
+                                        'imageSha256': hashlib.sha256(case_image.read_bytes()).hexdigest(),
+                                        'sourceSha256': hashlib.sha256(source.read_bytes()).hexdigest()})
 report['files'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
                    for p in (image, core, runtime, codegen, args.compiler, host,
                              HERE / 'native-run.py', HERE / 'native-memory.rvn', HERE / 'native-bounds.rvn')}

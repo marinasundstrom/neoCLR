@@ -100,3 +100,19 @@ the earlier bounds matrix is unchanged and its evidence is reused. See
 The exact binding tests reject reversed access, wrong element or lifetime kind,
 byref/extra/missing arguments and serialization without trusted shape proof.
 Public signatures and their generated API snapshot are unchanged.
+
+## Native Range qualification
+
+The consumer now exercises existing Raven range APIs on both persistent byte
+views: open ranges, from-end boundaries, nested ranges, Range.All, default-empty
+and end-empty windows, and range-created views held in fields through GC. No new
+runtime instruction, intrinsic or public member is required.
+
+Run `native-run.py --consumer-only --range-bounds --compiler <rvnc.dll> --output <directory>`.
+This adds six isolated invalid-range fixtures (reversed, past-end and excessive
+from-end bounds for each type). The existing Raven validator produces UserFault,
+not the integer Slice service's IndexOutOfRange; this difference is an open
+error-classification gap. Expected native code is 4, output remains untouched,
+root frames balance and the heap is fully reclaimable. See
+[range-validation.json](range-validation.json) for the commands and hashes.
+Earlier integer-boundary and exact-binding evidence remains applicable.

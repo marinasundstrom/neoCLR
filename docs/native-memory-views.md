@@ -12,7 +12,7 @@ not hand-authored class-library implementations. Production APIs belong in Raven
 `.rvn` source; source/compiler integration supplies ref-like types, implicit conversions and
 array range views. Native JIT/AOT now admits a bounded persistent-byte path:
 Memory<byte>/ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty,
-both Slice(start) and Slice(start, length), and implicit Memory<byte>-to-ReadOnlyMemory<byte>
+Slice(start), Slice(start, length), range indexing/Slice(Range), and implicit Memory<byte>-to-ReadOnlyMemory<byte>
 conversion, with typed argument/return/field storage. Borrowed views,
 other element types and the remaining operations still reject rather than being
 treated as empty records. See the bounded native storage section below.
@@ -271,7 +271,7 @@ private aggregate ABI. The extra slot padding is an implementation cost, not
 an externally stable layout or a performance improvement claim.
 
 With explicit System compilation and reference-arena support, exact InternalCalls
-bind array creation, Length, both Slice overloads and writable-to-readonly conversion. Creation accepts mutable
+bind array creation, Length, both integer Slice overloads and writable-to-readonly conversion. Creation accepts mutable
 ArrayRef<Byte>, never an immutable byte value snapshot. Default values have a
 null owner and zero bounds. Length reads the validated length lane; Slice packs
 the three lanes into the checked C descriptor with the statically known kind,
@@ -287,8 +287,8 @@ new CLI encoding or a Raven compiler change.
 Borrowed Slice/ReadOnlySlice, other element types, view arrays/unions, boxing, arbitrary
 record construction, persistent-to-borrowed conversion and
 ToArray services remain unsupported in native execution.
-The full interpreter API is unchanged. Range APIs may compose the admitted
-primitive, but only explicit one- and two-argument windows are qualified here. Async
+The full interpreter API is unchanged. Range APIs compose the admitted integer
+primitive through the existing Raven Range.GetOffsetAndLength implementation. Async
 view retention and shared buffer-service migration remain later validation work.
 
 Reproduction: build `neoclr-codegen`, then run
@@ -338,3 +338,21 @@ and return conversion, fields and slicing after explicit GC on interpreter/JIT/A
 Use `native-run.py --consumer-only` with the other documented arguments to repeat
 this focused consumer; prior bounds evidence is reused. Borrowed native support
 and shared buffer-service migrations remain pending.
+
+The [range qualification](validation/memory-views-20261019/range-validation.json)
+executes existing Raven Memory<byte>/ReadOnlyMemory<byte> range indexers and
+Slice(Range) without a new intrinsic. Open/from-end ranges, nested windows,
+Range.All, end-empty/default-empty views and range-created fields survive explicit
+GC in the interpreter, JIT and AOT. AOT runs with UBSan/bounds. The syntax remains
+receiver-relative and half-open, following .NET Range semantics; unlike .NET's
+array-range copy, neoCLR array ranges separately return borrowed Slice views.
+
+Reversed, excessive end and excessive from-end bounds are isolated for both
+persistent types. Range.GetOffsetAndLength currently uses System.Fail, producing
+UserFault (native code 4), whereas integer Slice faults with IndexOutOfRange
+(native code 8). These checks record the current implementation; the differing
+fault categories are a consistency gap, not a desired compatibility constraint.
+No public API or compiler/backend change was needed for this qualification.
+Run native-run.py with `--consumer-only --range-bounds` to reproduce it; earlier
+integer-bounds and exact-binding evidence is reused. Native borrowed views and
+buffer-service migration remain pending.

@@ -36,6 +36,12 @@ func CreateConvertedEmpty() -> ReadOnlyMemory<byte> {
     return memory.Slice(1)
 }
 
+func CreateRanged() -> ByteBufferOwner {
+    let memory: Memory<byte> = [(byte)10, (byte)11, (byte)12, (byte)13]
+    let readonlyMemory: ReadOnlyMemory<byte> = memory
+    return ByteBufferOwner(memory[1..^1], readonlyMemory.Slice(1..^1))
+}
+
 func Main() -> int {
     let empty = default(Memory<byte>)
     let readonlyEmpty = default(ReadOnlyMemory<byte>)
@@ -48,6 +54,7 @@ func Main() -> int {
     let convertedEmpty = CreateConvertedEmpty()
     let convertedDefault: ReadOnlyMemory<byte> = empty
     let convertedOwner = ByteBufferOwner(empty, CreateConverted())
+    let ranged = CreateRanged()
     GC.Collect()
     if Keep(owner.Data).Slice(0, 2).Length != 2 || owner.ReadOnlyData.Slice(1, 0).Length != 0 {
         return 2
@@ -69,6 +76,18 @@ func Main() -> int {
     }
     if KeepReadOnly(owner.Data).Slice(1).Length != 1 || convertedOwner.ReadOnlyData.Slice(1).Length != 1 {
         return 8
+    }
+    if ranged.Data[..].Length != 2 || ranged.ReadOnlyData[..].Length != 2 {
+        return 9
+    }
+    if ranged.Data[1..][..1].Length != 1 || ranged.ReadOnlyData[..^1][^1..].Length != 1 {
+        return 10
+    }
+    if ranged.Data[^0..].Length != 0 || ranged.ReadOnlyData.Slice(Range.All).Length != 2 {
+        return 11
+    }
+    if empty[..].Length != 0 || readonlyEmpty[^0..^0].Length != 0 {
+        return 12
     }
     return 0
 }

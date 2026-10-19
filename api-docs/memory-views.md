@@ -3,7 +3,7 @@
 Development APIs authored in Raven (`System.Runtime`). The interpreter provides
 checked zero-copy storage. A bounded native JIT/AOT path supports Memory<byte>
 and ReadOnlyMemory<byte> array conversion, default values, Length/IsEmpty,
-Slice(start), Slice(start, length) and implicit Memory<byte>-to-ReadOnlyMemory<byte>
+Slice(start), Slice(start, length), range indexers/Slice(Range), and implicit Memory<byte>-to-ReadOnlyMemory<byte>
 conversion, including argument/return copies and object fields. Other
 view operations and element types remain interpreter-only. Array
 range syntax returns Slice<T> and shares storage; use ToArray() for an explicit
@@ -76,6 +76,10 @@ Start/count arguments are relative to the view. Negative or excessive indexes,
 reversed ranges and out-of-bounds windows fault; bounds are never clamped. A
 zero-length window at Length is valid. Null arrays convert to empty views. Default
 views are empty. Reading an uninitialized array element faults.
+
+Current error-classification gap: Range-based slicing uses the Raven Range
+validator's UserFault, while integer Slice bounds use IndexOutOfRange. This is
+an implementation inconsistency to reconcile, not an intended overload distinction.
 
 Slices cannot be stored in ordinary fields, arrays or boxed objects, used as
 ordinary generic arguments, captured by functions, or retained across suspension.
