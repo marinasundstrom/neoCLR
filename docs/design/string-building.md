@@ -95,3 +95,10 @@ is not an isolated append benchmark, HTTP throughput, or a .NET comparison.
 Do not replace HTTP header construction or response streaming based on this result
 alone. Insertion, replacement, numeric formatting, pooling, general collection
 joining and larger builder quotas remain separate consumer-driven work.
+
+## Separate API review — 2026-10-19
+
+The [StringBuilder review](string-builder-api-review-20261019.md) inventories
+current allocation paths and compares fragment retention with UTF-8 staging.
+It retains existing contracts and benchmark limitations; proposed changes are
+not implemented by the review.

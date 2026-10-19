@@ -19909,3 +19909,9 @@ Native JSON backend/runtime gaps remain open separately.
   in the [String review](design/string-api-review-20261019.md), records current
   exact equality as a difference requiring coordinated review, and keeps proposed
   positions/search/formatting distinct from implemented behavior.
+
+- **Assistant follow-through:** completes a separate [StringBuilder review](design/string-builder-api-review-20261019.md),
+  identifying AppendLine's temporary text, snapshot/Clear array churn and absent
+  typed formatting/view ingestion. Reuses the historical slower-builder evidence
+  rather than claiming a speedup, and proposes measured fragment-versus-UTF-8
+  storage comparisons. No String or StringBuilder API behavior changes in either review.

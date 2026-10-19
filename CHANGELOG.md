@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-19
 
+- Review StringBuilder separately: document intermediate line strings, snapshot/Clear capacity churn, missing typed formatting and owned-versus-borrowed buffer constraints. Compare retained fragments with UTF-8 staging and define focused validation; retain historical performance limitations without claiming a new optimization.
+
 - Audit String separately against the author-reaffirmed Swift semantic model. Inventory existing operations and missing search/format APIs; record position units, eager traversal allocations and exact-versus-canonical equality as coordinated follow-ups. No text behavior or public signature changes.
 
 - Complete native nested-array specialization, traced storage and reflective access, preserving null defaults, initialization and bounds faults. Retaining unsupported reflection element metadata no longer rejects supported accesses. Admit verified direct value ToString overrides with the System.ValueType foundation. Five reflection tests, four forced/paced-GC array variants and the complete public JSON mapping fixture pass; the latter passes interpreter/JIT/AOT with coherently rebuilt libraries. This closes the previously recorded full-JSON failures; release-package qualification remains pending.
