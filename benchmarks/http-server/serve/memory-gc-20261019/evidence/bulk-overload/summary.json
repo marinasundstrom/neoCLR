@@ -1,0 +1,140 @@
+{
+  "workload": "bulk",
+  "cohort": {
+    "objectSha256": "d9682299c25b595bb761d6dbb748e62d248b7382d84b73e1dccad579533d4740",
+    "heapFlag": "-DNEOCLR_HTTP_HEAP_BYTES=1048576"
+  },
+  "contract": "CPU cores = process CPU seconds / wall seconds. Peak uses adjacent approximately 0.5-second samples inside the window; misses shorter spikes. Successful-response p99 must be read with outcomes. GC totals include warmup and teardown.",
+  "rows": [
+    {
+      "name": "sync-1-200",
+      "mode": "sync",
+      "round": 1,
+      "rate": 200,
+      "offered": 6000,
+      "outcomes": {
+        "ok": 3390,
+        "generator_inflight_limit": 2610
+      },
+      "completedPerSecond": 110.86666666666666,
+      "cpuMillisecondsPerCompletion": 8.983764281419122,
+      "meanCpuCores": 0.9960000000000001,
+      "sampledPeakCpuCores": 1.0114960994181685,
+      "sampledPeakRssKiB": 13152,
+      "p50Milliseconds": 567.1345830000005,
+      "p95Milliseconds": 612.1478749999981,
+      "p99Milliseconds": 628.5282919999986,
+      "generatorP99Milliseconds": 1.2238750000008736,
+      "passed": false,
+      "serverTotals": {
+        "completed": 3410,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    },
+    {
+      "name": "apply-1-200",
+      "mode": "apply",
+      "round": 1,
+      "rate": 200,
+      "offered": 6000,
+      "outcomes": {
+        "ok": 3734,
+        "generator_inflight_limit": 2266
+      },
+      "completedPerSecond": 122.36666666666666,
+      "cpuMillisecondsPerCompletion": 10.754562789430674,
+      "meanCpuCores": 1.316,
+      "sampledPeakCpuCores": 1.3289520890457398,
+      "sampledPeakRssKiB": 14480,
+      "p50Milliseconds": 517.9858330000009,
+      "p95Milliseconds": 539.5649999999996,
+      "p99Milliseconds": 546.6911249999988,
+      "generatorP99Milliseconds": 1.2130829999996706,
+      "passed": false,
+      "serverTotals": {
+        "completed": 3754,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": {
+        "started": 533365,
+        "applied": 458388,
+        "discarded": 74977,
+        "concurrentReclaimedBytes": 144396387,
+        "traceErrors": 0,
+        "captureRejected": 0,
+        "deferred": 41666678,
+        "fallbacks": 178596,
+        "allocations": 1183325,
+        "reclaimedAllocations": 1183325
+      }
+    },
+    {
+      "name": "apply-2-200",
+      "mode": "apply",
+      "round": 2,
+      "rate": 200,
+      "offered": 6000,
+      "outcomes": {
+        "ok": 3747,
+        "generator_inflight_limit": 2253
+      },
+      "completedPerSecond": 122.8,
+      "cpuMillisecondsPerCompletion": 10.724755700325732,
+      "meanCpuCores": 1.317,
+      "sampledPeakCpuCores": 1.3451312553857826,
+      "sampledPeakRssKiB": 14480,
+      "p50Milliseconds": 517.111958000001,
+      "p95Milliseconds": 537.848499999999,
+      "p99Milliseconds": 548.7019579999996,
+      "generatorP99Milliseconds": 1.2087909999998203,
+      "passed": false,
+      "serverTotals": {
+        "completed": 3767,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": {
+        "started": 537118,
+        "applied": 462120,
+        "discarded": 74998,
+        "concurrentReclaimedBytes": 145570052,
+        "traceErrors": 0,
+        "captureRejected": 0,
+        "deferred": 41681637,
+        "fallbacks": 181699,
+        "allocations": 1187420,
+        "reclaimedAllocations": 1187420
+      }
+    },
+    {
+      "name": "sync-2-200",
+      "mode": "sync",
+      "round": 2,
+      "rate": 200,
+      "offered": 6000,
+      "outcomes": {
+        "ok": 3426,
+        "generator_inflight_limit": 2574
+      },
+      "completedPerSecond": 112.1,
+      "cpuMillisecondsPerCompletion": 8.911685994647637,
+      "meanCpuCores": 0.9990000000000001,
+      "sampledPeakCpuCores": 1.0113455801043156,
+      "sampledPeakRssKiB": 13152,
+      "p50Milliseconds": 566.3173329999988,
+      "p95Milliseconds": 579.8798749999996,
+      "p99Milliseconds": 591.2581669999995,
+      "generatorP99Milliseconds": 1.2139579999992378,
+      "passed": false,
+      "serverTotals": {
+        "completed": 3446,
+        "limitErrors": 0,
+        "otherErrors": 0
+      },
+      "gc": null
+    }
+  ]
+}

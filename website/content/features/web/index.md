@@ -217,3 +217,11 @@ responses are checked in interpreter, JIT and AOT modes, including collection,
 cancellation and destination boundaries. Public stream signatures still use array
 ranges until the coordinated stream API migration. Socket transfers already use
 Memory/ReadOnlyMemory; no AsSlice adapter is required.
+
+
+The current memory-view cohort has a local two-collector HTTP comparison: the
+experimental concurrent collector improves 8 KiB overload throughput and tail
+latency at 100 requests/sec, while tiny-response overload throughput is lower.
+The [matched workload results](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/memory-gc-20261019/README.md)
+retain misses, CPU/memory diagnostics and all trials. These plain-HTTP AOT results
+do not establish HTTPS or production maximum capacity.

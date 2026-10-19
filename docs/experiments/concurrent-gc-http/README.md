@@ -105,3 +105,14 @@ faults and cancellation with suspended handlers remain unqualified for this adap
 adapter. The shadow mode and the historical results above remain tracing-only.
 The current recovery script additionally holds a partial request across other
 clients and checks 18 ordinary successes.
+
+
+### Fresh source cohorts and two-collector comparisons
+
+`build.py` also accepts a fresh source build's successful `host-compile-link` command,
+retaining source-hash validation and explicit paced GC. `compare.py` checks identical
+guest assemblies, objects and heap limits, supports `--workload plain|bulk`, and makes
+`--go-build` optional. Omitting Go compares the two collectors in reverse order on
+round two. Summaries retain p50/p95/p99 and cohort identity. See the
+[2026-10-19 results](../../../benchmarks/http-server/serve/memory-gc-20261019/README.md)
+for fresh-library qualification, reproduction and complete evidence.

@@ -10,7 +10,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Retain selected TLS plaintext windows as Memory/ReadOnlyMemory across pump awaits and borrow slices only in synchronous plaintext/control helpers. Preserve stream validation, TLS staging copies and cancellation behavior. Extend the managed TLS consumer with nonzero windows, a transfer across the 16 KiB record boundary, GC and graceful EOF.
 
-- Record the author-directed follow-up to compare synchronous and experimental concurrent GC after memory-based stream integration is ready; this is a measurement plan, not a performance result.
+- Compare a fresh memory-view HTTP Serve cohort with paced synchronous and experimental concurrent GC in 24 matched 30-second trials. The concurrent prototype improves 8 KiB overload throughput by about 10% and p99 at 100 req/s by about 58%, while tiny-response overload throughput is about 5% lower. Retain all outcomes, latency/resource diagnostics and qualification evidence; CPU cost is an optimization diagnostic, not an acceptance veto. Extend comparison tooling for fresh build manifests, identical guest/heap checks, optional Go and bulk workloads. Production collector selection and public stream signatures are unchanged.
 
 - Use ReadOnlySlice<byte> for immediate HTTP request parsing and Memory<byte> for pending HTTP body-read destinations, borrowing writable slices only while draining received data. Clear retained destinations on success, failure and cancellation. Preserve framing, read-ahead ownership and public stream contracts; add interpreter/JIT/AOT coverage for server and client body windows, GC, cancellation and EOF.
 

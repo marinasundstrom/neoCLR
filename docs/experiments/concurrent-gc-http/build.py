@@ -26,7 +26,14 @@ def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 inputs = {**native['inputs'], **qualification['inputs']}
 for name, digest in inputs.items(): assert sha(Path(name)) == digest, name
 for path in [Path(__file__).resolve(), adapter, HERE / 'safety.c']: inputs[str(path)] = sha(path)
-command = native['command'][:]
+# Accept both the original relink manifest and a freshly compiled source cohort.
+if 'command' in native:
+    command = native['command'][:]
+else:
+    command = next(c['command'][:] for c in reversed(native['commands'])
+                   if c.get('phase') == 'host-compile-link' and c.get('exitCode') == 0)
+if '-DNEOCLR_GC_PACED' not in command:
+    command.append('-DNEOCLR_GC_PACED')
 if a.heap_bytes is not None:
     assert a.heap_bytes > 0 and a.heap_bytes % 8 == 0
     flags = [v for v in command if v.startswith('-DNEOCLR_HTTP_HEAP_BYTES=')]

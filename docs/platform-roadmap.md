@@ -25,12 +25,16 @@ implicit view conversion and explicit ToArray copying, without compatibility-onl
 array overloads or repeated AsSlice helpers. This direction does not infer a
 permanent reprioritization of unrelated milestones.
 
-**Follow-up measurement (author direction, 2026-10-19):** once the memory-based
-stream/TLS/HTTP paths are ready, compare synchronous GC with the experimental
-concurrent collector using a fresh, matched build/workload cohort. Track throughput,
-tail latency, pauses, allocation and peak memory; retain correctness and ownership
-gates before interpreting performance. The [evaluation plan](design/concurrent-gc-evaluation.md#memory-view-integration-follow-up-2026-10-19)
-does not promote the experimental collector or imply a performance win.
+**HTTP collector comparison (author direction, 2026-10-19):** the author subsequently
+requested executing the comparison during integration. The
+[fresh 24-trial cohort](../benchmarks/http-server/serve/memory-gc-20261019/README.md)
+qualifies current plain-HTTP memory paths under both collectors. Concurrent GC
+improves bulk overload delivery by about 10% and bulk p99 at 100 req/s by about 58%;
+tiny-response overload delivery is about 5% lower. Treat CPU as a resource/optimization
+diagnostic, not a rejection criterion for this unoptimized prototype. Next: separate
+phase-cost instrumentation and pacing hypotheses, preserving ownership/fallback
+checks. Public stream migration and broader concurrent TLS/JIT coverage remain open;
+production defaults are unchanged.
 
 Cryptography integration now follows codecs: synchronous hashing, verification and
 random fill use borrowed readonly/writable byte windows through interpreter and

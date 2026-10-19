@@ -168,3 +168,23 @@ old guest binaries as evidence for the migrated library. Distinguish collector c
 from changes in parsing, staging copies, transport and allocation. A latency benefit
 may cost throughput, CPU or memory; no outcome or promotion is assumed. This is a
 queued investigation, not a benchmark result.
+
+
+### Executed current-library comparison and CPU interpretation (2026-10-19)
+
+The author subsequently requested carrying the active work through HTTP performance
+and throughput testing. The [fresh matched cohort](../../benchmarks/http-server/serve/memory-gc-20261019/README.md)
+executes 24 thirty-second AOT trials with 10-byte and 8 KiB responses, retaining
+misses, per-request samples, collector diagnostics, recovery and shutdown evidence.
+Both modes use the same new guest object, libraries and 1 MiB heap. This supersedes
+the old fixed-guest measurements for claims about this cohort, without erasing them.
+
+The concurrent prototype improves 8 KiB overload delivery by about 10% and p99 at
+100 req/s by about 58%; it delivers about 5% fewer tiny responses under overload.
+CPU is higher, but the author explicitly cautioned: “CPU is not necessarily an
+issue if the GC already is optimized - which it is not”. We interpret this as a
+request to evaluate throughput/latency benefit and CPU headroom, and use present
+CPU figures to guide optimization rather than reject the unoptimized design.
+No eventual optimized cost is assumed. Phase-cost profiling and pacing experiments
+are the next measurement work; precise GC pauses and matched allocation-rate
+profiles are still missing from this uninstrumented comparison.

@@ -19673,3 +19673,16 @@ open; no native performance improvement is claimed.
   current correctness checks, using fresh managed libraries and the same Serve
   guest object for both collectors. The earlier queued plan is now active work;
   results and limitations will be recorded with the benchmark evidence.
+
+- **Author interpretation correction during measurement:** “CPU is not necessarily
+  an issue if the GC already is optimized - which it is not”.
+- **Assistant response:** treated CPU as a resource-cost and optimization diagnostic,
+  with throughput and latency as primary observed benefits; did not assume future
+  optimization will remove current costs.
+- **Outcome:** [24 fresh matched HTTP trials](../benchmarks/http-server/serve/memory-gc-20261019/README.md)
+  compare ten-byte and 8 KiB responses. Concurrent GC improves bulk overload delivery
+  by about 10% and bulk p99 at 100 req/s by about 58%, while tiny-response overload
+  delivery is about 5% lower. All admitted responses validate, shutdown/cleanup checks
+  pass, and all misses and raw samples are retained. Exact GC pauses, a matched
+  allocation-rate profile, production promotion and broader concurrent TLS/JIT
+  qualification remain open. Public shared stream signatures are still pending.

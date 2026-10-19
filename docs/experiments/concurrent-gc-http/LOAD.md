@@ -125,3 +125,14 @@ python3 docs/experiments/concurrent-gc-http/summarize.py target/http-gc-comparis
 
 Repeat with only `--rates 300` in another fresh directory for the targeted control.
 Production source, APIs and collector selection remain unchanged.
+
+
+## Fresh memory-view cohort (2026-10-19)
+
+The [new source-built comparison](../../../benchmarks/http-server/serve/memory-gc-20261019/README.md)
+refreshes the guest and all managed libraries and compares only the two collectors.
+It adds an 8 KiB workload and records a bulk throughput/tail-latency benefit alongside
+a tiny-response overload regression. Current CPU cost is an optimization diagnostic;
+the author does not treat it alone as a reason to reject the unoptimized prototype.
+The new 1 MiB cohort is internally matched; its results must not be combined with
+this older 32 MiB fixed guest to infer a memory-view speedup.

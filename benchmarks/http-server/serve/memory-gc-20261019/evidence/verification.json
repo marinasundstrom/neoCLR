@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "trials": 24,
+  "offered": 186000,
+  "admittedValidated": 161056,
+  "generatorMisses": 24944,
+  "checks": [
+    "All archived file hashes match",
+    "Lossless request reports match compact links",
+    "All clean shutdowns and completion counts match",
+    "Only validated success or unsent slot-limit outcomes",
+    "All generator p99 lags below 5 ms",
+    "Experimental runs apply/reclaim with zero trace errors and full final cleanup",
+    "Walker, sanitized and release recovery qualified"
+  ]
+}

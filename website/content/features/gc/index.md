@@ -215,3 +215,13 @@ already-landed managed queue improvements. It isolates native GC policy, not the
 latest complete runtime's capacity. Further work must refresh that cohort and
 measure HTTP parsing, Task adapters and transport as well as allocation/collection;
 GC is not assumed to be the primary HTTP bottleneck.
+
+
+A fresh memory-view library cohort now compares paced synchronous and experimental
+concurrent GC over 24 matched HTTP trials. For 8 KiB responses, the concurrent
+prototype delivers about 10% more completed requests under overload and about 58%
+lower p99 at 100 requests/sec. Ten-byte overload delivery is about 5% lower.
+CPU usage is an optimization/resource diagnostic, not a rejection criterion for
+this unoptimized design. These workload-dependent AOT results preserve experimental
+status and the synchronous production default. See the
+[full current-cohort evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/serve/memory-gc-20261019/README.md).

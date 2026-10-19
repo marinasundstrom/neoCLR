@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "commands": [
+    [
+      "/Users/robert/Projects/neoclr/target/http-memory-gc-apply/app-paced"
+    ]
+  ],
+  "serverTotals": [
+    18,
+    0,
+    1
+  ],
+  "shadow": {
+    "started": 777,
+    "applied": 484,
+    "discarded": 293,
+    "concurrentReclaimedBytes": 258286,
+    "traceErrors": 0,
+    "captureRejected": 0,
+    "deferred": 17049,
+    "fallbacks": 536,
+    "allocations": 5360,
+    "reclaimedAllocations": 5360
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/concurrent-gc-http/validate.py": "03dc8c46b61896d023cdc3e139b994a45e719aaa6b11bb892a6cf66a60b326a4",
+    "/Users/robert/Projects/neoclr/target/http-memory-gc-apply/app-paced": "6862558d0a55ce54edb4c4d232953ff32d7f798114dcec42b63400cc355f0b38",
+    "/Users/robert/Projects/neoclr/target/http-memory-gc-apply/build.json": "c5cb2fd0dc2cec66c93c1ee289af745397764efa830fccc1ec6dc2dcef71d240"
+  }
+}

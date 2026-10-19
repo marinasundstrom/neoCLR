@@ -24,7 +24,9 @@ for run in manifest['runs']:
         cpuMillisecondsPerCompletion=m['serverCpuSecondsPerCompletion'] * 1000,
         meanCpuCores=m['serverCpuSecondsInWindow'] / m['durationSeconds'],
         sampledPeakCpuCores=max(peaks), sampledPeakRssKiB=m['sampledPeakRssKiB'],
+        p50Milliseconds=m['offeredLatencySeconds']['p50'] * 1000,
+        p95Milliseconds=m['offeredLatencySeconds']['p95'] * 1000,
         p99Milliseconds=m['offeredLatencySeconds']['p99'] * 1000,
         generatorP99Milliseconds=m['dispatchLagSeconds']['p99'] * 1000,
         passed=m['meetsProvisionalTarget'], serverTotals=trial['serverTotals'], gc=run.get('gc')))
-print(json.dumps(dict(contract='CPU cores = process CPU seconds / wall seconds. Peak uses adjacent approximately 0.5-second samples inside the window; misses shorter spikes. Successful-response p99 must be read with outcomes. GC totals include warmup and teardown.', rows=rows), indent=2))
+print(json.dumps(dict(workload=manifest.get('workload', 'plain'), cohort=manifest.get('cohort'), contract='CPU cores = process CPU seconds / wall seconds. Peak uses adjacent approximately 0.5-second samples inside the window; misses shorter spikes. Successful-response p99 must be read with outcomes. GC totals include warmup and teardown.', rows=rows), indent=2))
