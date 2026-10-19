@@ -313,3 +313,60 @@ runtime overhead. No temporary byte/Char arrays or per-grapheme strings are buil
 This retains compact independent results instead of keeping a potentially large
 original owner alive. Custom trim sets, substring views and protocol whitespace
 APIs remain separate decisions. See [qualification](../experiments/string-trimming/README.md).
+
+
+### Corresponding .NET String operations: proposed priorities (2026-10-19)
+
+The author asks which corresponding methods neoCLR can and should add, referencing
+[.NET 10 String](https://learn.microsoft.com/en-us/dotnet/api/system.string?view=net-10.0).
+This is a proposed sequence, not approval or implementation of every method.
+Current String already has grapheme slicing, canonical equality/hash/order, ordinal
+predicates/replacement, invariant casing, Join/Concat and whitespace trimming.
+
+1. Add IsNullOrEmpty and IsNullOrWhiteSpace as intentional nullable-boundary
+   conveniences; inspect bytes directly rather than materializing Trim results.
+   Add Equals(other, comparison) and CompareTo for consistent explicit policy and
+   ordering. CompareTo should accompany ComparableTo<string>, not just a name.
+2. Unify Contains/StartsWith/EndsWith and eventual Replace around a documented
+   comparison policy. Recommend canonical defaults consistent with text identity,
+   plus explicit ordinal and simple-fold modes. Current Replace is ordinal despite
+   its unqualified name; resolve this inconsistency deliberately, without quietly
+   changing protocol callers. Canonical substring matching needs its own kernel
+   and boundary rules; whole-string canonical comparison is insufficient.
+3. Define typed text positions/match ranges before IndexOf/LastIndexOf or a
+   Find/FindLast alternative. Prefer Option for absence and a range preserving the
+   original matched spelling. Numeric grapheme indices must not receive byte offsets.
+   Define whole-grapheme text matching versus explicit lower-level scalar/byte
+   matching, foreign-owner positions and empty matches before implementation.
+4. Add Insert, Remove and range replacement on the same position contract.
+   Reuse current Range slicing instead of adding a duplicate Substring overload
+   family. Result text can have different grapheme boundaries at concatenation joins.
+5. Add lazy Split and line traversal over validated text views/ranges, with explicit
+   materialization. Unlike [.NET String.Split](https://learn.microsoft.com/en-us/dotnet/api/system.string.split?view=net-10.0),
+   avoid requiring a substring array. Define empty fields, limits, delimiter policy,
+   CRLF handling and parent-storage retention. Do not promise zero total allocation
+   while the iterator representation remains unspecified.
+6. Add ReplaceLineEndings with an explicit replacement; if a default is offered,
+   consider LF to match neoCLR StringBuilder.AppendLine. That is a deliberate
+   divergence from .NET's environment newline default. Do not use it for HTTP framing.
+7. Extend Join/Concat to suitable read-only views and sequences. Reference-element
+   view support needs qualification before ReadOnlySlice<string> is advertised.
+   Single-pass sources need a builder strategy; count/byte sizing must not enumerate
+   a one-shot sequence twice. Share typed formatting with StringBuilder/writers
+   before adding Format or TryFormat, avoiding mandatory object arrays and boxing.
+
+Useful later: IndexOfAny/LastIndexOfAny with a deliberate grapheme/scalar set model;
+custom-grapheme trimming; explicit Normalize/IsNormalized; PadLeft/PadRight.
+Normalization returns new requested storage and never silently changes the source;
+canonical comparison's NFD stream does not by itself implement NFC/NFKC output.
+[Padding](https://learn.microsoft.com/en-us/dotnet/api/system.string.padleft?view=net-10.0)
+needs a defined unit and boundary-merging behavior: grapheme counts are not terminal
+columns, and repeating a grapheme can change segmentation at joins.
+
+Do not prioritize Clone/Copy, redundant Parse/TryParse identity helpers, UTF-16
+CopyTo/ToCharArray as the core transfer abstraction, pinning helpers or implicit
+current-culture overloads. Explicit Char snapshots may still be useful; they are
+not contiguous text storage. Prefer existing Utf8Bytes and encoding/writer APIs.
+Fix eager grapheme/scalar array traversal alongside these additions. Qualify
+cross-engine semantics, original-byte preservation and allocations per operation;
+keep cultural collation and unmeasured performance claims out of the initial scope.

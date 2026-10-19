@@ -19975,3 +19975,11 @@ Native JSON backend/runtime gaps remain open separately.
   pass. Repairs private String helper access in native projection while retaining
   source privacy. Unchanged trimming adds no managed allocations in the measured
   workload; eager GC collections increase, so no throughput improvement is claimed.
+
+- **Author question:** links the .NET 10 String reference and asks which corresponding
+  methods neoCLR can and should add. **Assistant recommendation:** nullable predicates
+  and comparison consistency first; typed search ranges before position-based edits;
+  lazy split/line views and view-based joining next; shared writer formatting later.
+  Records canonical-search, ordinal Replace naming, grapheme boundary and allocation
+  tradeoffs in the [String review](design/string-api-review-20261019.md#corresponding-net-string-operations-proposed-priorities-2026-10-19).
+  This is a proposed shortlist, not implementation or author approval of its contracts.
