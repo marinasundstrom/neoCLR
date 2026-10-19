@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import platform
 import subprocess
@@ -26,7 +27,7 @@ def check(name, data):
     return text
 
 
-def cases():
+def array_cases():
     sha = 'call neoCLR.Runtime.CryptoSha256(arrayref<Byte>,arrayref<Byte>)\n'
     mac = 'call neoCLR.Runtime.CryptoHmacSha256(arrayref<Byte>,arrayref<Byte>,arrayref<Byte>)\n'
     verify = 'call neoCLR.Runtime.CryptoHmacSha256Verify(arrayref<Byte>,arrayref<Byte>,arrayref<Byte>)\n'
@@ -46,6 +47,47 @@ def cases():
     for count in [1, 65537]:
         data = f'.local arrayref<Byte> data\nldc.i4 {count}\narray.reserve Byte\nstloc data\n'
         yield f'uninitialized-{count}', data + literal('output', [0] * 32) + 'ldloc data\nldloc output\n' + sha + 'pop\n', True
+
+
+def cases():
+    # Low-level regression fixtures explicitly construct borrowed views. These
+    # helper names are test-only; production Raven uses implicit projections.
+    def project(match):
+        loads = match[1].splitlines()
+        operation = match[2]
+        parameters, instructions = [], []
+        for i, load in enumerate(loads):
+            writable = operation == 'CryptoRandomFill' or operation != 'CryptoHmacSha256Verify' and i == len(loads) - 1
+            kind = 'Slice' if writable else 'ReadOnlySlice'
+            instructions.append(load)
+            if writable:
+                instructions += ['ldc.i4 0', load, 'ldlen', 'conv.i4', 'call System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)']
+            else:
+                instructions.append('call System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)')
+            parameters.append('System.' + kind + '<Byte>')
+        return '\n'.join(instructions) + '\ncall neoCLR.Runtime.' + operation + '(' + ','.join(parameters) + ')'
+    for name, body, fault in array_cases():
+        yield name, re.sub(r'((?:ldloc \w+\n)+)call neoCLR.Runtime.(Crypto\w+)\((arrayref<Byte>(?:,arrayref<Byte>)*)\)', project, body), fault
+
+
+def services():
+    # Explicit synthetic source identities keep the canonical view names through
+    # native load-set relocation, just as native Raven metadata does. Plain
+    # interpreter-only System fixture identities are relocated by that linker.
+    views = (ROOT / 'tests/fixtures/memory_views.neoil').read_text()
+    declarations = list(re.finditer(r'^\.type (System\.\w+)<T>$', views, re.M))
+    property_row = 1
+    for i, match in reversed(list(enumerate(declarations))):
+        end = declarations[i + 1].start() if i + 1 < len(declarations) else len(views)
+        count = len(re.findall(r'^\.property ', views[match.end():end], re.M))
+        origin = dict(assembly='CryptoViewFixtures', module='CryptoViewFixtures.dll',
+                      name=match[1] + '`1', token=0x02000001 + i,
+                      property_tokens=[0x17000000 + property_row + n for n in range(count)])
+        property_row += count
+        views = views[:match.end()] + '\n.origin ' + json.dumps(origin) + views[match.end():]
+    assembly = dict(name='CryptoViewFixtures', full_name='CryptoViewFixtures',
+                    modules=['CryptoViewFixtures.dll'], references=[])
+    return '.assembly ' + json.dumps(assembly) + '\n' + views + '\n' + (ROOT / 'tests/fixtures/cryptography.neoil').read_text()
 
 
 def main():
@@ -85,13 +127,13 @@ def main():
         if windows:
             cc = ['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT', '/DNEOCLR_NATIVE_GC', '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=131072', '/I'+str(base), '/Fo'+str(out)+'/', *sources]
             libs = [archive, '/link', 'Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib', 'Ws2_32.lib']
-            run([*cc, '/LD', '/Fe:'+str(host), *libs, '/EXPORT:neoclr_gc_callback_read_v1', '/EXPORT:neoclr_gc_enter_v1', '/EXPORT:neoclr_gc_entry_check_v1', '/EXPORT:neoclr_gc_complete_invocation_v1', '/EXPORT:neoclr_gc_leave_v1', '/EXPORT:neoclr_gc_stack_roots_v1', '/EXPORT:neoclr_gc_transient_v1', '/EXPORT:neoclr_native_stack_check_v1', '/EXPORT:neoclr_jit_run_v1', '/EXPORT:neoclr_cryptography_v1', '/EXPORT:neoclr_allocate_bytes_v1', '/EXPORT:neoclr_reserve_bytes_v1', '/EXPORT:neoclr_allocate_bytes_rooted_v1', '/EXPORT:neoclr_reserve_bytes_rooted_v1', '/EXPORT:neoclr_check_bytes_initialized_v1'])
+            run([*cc, '/LD', '/Fe:'+str(host), *libs, '/EXPORT:neoclr_gc_callback_read_v1', '/EXPORT:neoclr_gc_enter_v1', '/EXPORT:neoclr_gc_entry_check_v1', '/EXPORT:neoclr_gc_complete_invocation_v1', '/EXPORT:neoclr_gc_leave_v1', '/EXPORT:neoclr_gc_stack_roots_v1', '/EXPORT:neoclr_gc_transient_v1', '/EXPORT:neoclr_native_stack_check_v1', '/EXPORT:neoclr_jit_run_v1', '/EXPORT:neoclr_cryptography_slices_v1', '/EXPORT:neoclr_byte_view_create_v1', '/EXPORT:neoclr_byte_view_create_all_v1', '/EXPORT:neoclr_allocate_bytes_v1', '/EXPORT:neoclr_reserve_bytes_v1', '/EXPORT:neoclr_allocate_bytes_rooted_v1', '/EXPORT:neoclr_reserve_bytes_rooted_v1', '/EXPORT:neoclr_check_bytes_initialized_v1'])
         else:
-            cc = [os.environ.get('CC', 'clang'), '-isysroot', os.environ.get('SDKROOT') or run(['xcrun','--show-sdk-path']).strip(), '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=131072', '-I', base, *sources]
+            cc = [os.environ.get('CC') or run(['xcrun', '--sdk', 'macosx', '--find', 'clang']).strip(), '-isysroot', os.environ.get('SDKROOT') or run(['xcrun', '--sdk', 'macosx', '--show-sdk-path']).strip(), '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=131072', '-I', base, *sources]
             libs = [archive]
             run([*cc, '-dynamiclib', *libs, '-o', host])
             run(['codesign', '--force', '--sign', '-', host])
-        seed = out / 'System.neoil'; seed.write_text('.module System\n.references ()\n' + (ROOT / 'runtime/neoCLR/Runtime/Cryptography.neoil').read_text())
+        seed = out / 'System.neoil'; seed.write_text('.module System\n.references ()\n' + services())
         seed_binary = out / 'System.neox'
         seed_binary.unlink(missing_ok=True)
         run([runtime, 'assemble', seed, seed_binary, '--format', 'neox'])

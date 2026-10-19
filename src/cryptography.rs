@@ -9,45 +9,53 @@ pub(crate) enum Operation {
     RandomFill,
 }
 
+pub(crate) fn view_type(readonly: bool) -> Type {
+    Type::Constructed {
+        definition: if readonly {
+            "System.ReadOnlySlice"
+        } else {
+            "System.Slice"
+        }
+        .into(),
+        arguments: vec![Type::Byte],
+    }
+}
+fn view(value: &Value, readonly: bool) -> Result<&crate::MemoryView, Fault> {
+    let Value::MemoryView(view) = value else {
+        return Err(Fault::new("cryptography requires a byte slice"));
+    };
+    if view.ty() != view_type(readonly) {
+        return Err(Fault::new(
+            "cryptography requires the matching byte slice capability",
+        ));
+    }
+    view.assigned()?;
+    Ok(view)
+}
 fn bytes(value: &Value) -> Result<Vec<u8>, Fault> {
-    let Value::ObjectReference(array) = value else {
-        return Err(Fault::new("cryptography requires a byte array reference"));
-    };
-    let Value::Array {
-        element: Type::Byte,
-        elements,
-    } = array.reference.read()?
-    else {
-        return Err(Fault::new("cryptography requires a byte array"));
-    };
+    let view = view(value, true)?;
     let mut bytes = Vec::new();
     bytes
-        .try_reserve_exact(elements.len())
+        .try_reserve_exact(view.length())
         .map_err(|_| Fault::new("cryptography buffer allocation failed"))?;
-    for value in elements {
-        let Value::Byte(byte) = value else {
+    for index in 0..view.length() {
+        let Value::Byte(byte) = view.get(index)? else {
             return Err(Fault::new("cryptography requires initialized input bytes"));
         };
         bytes.push(byte);
     }
     Ok(bytes)
 }
-fn destination(value: &Value) -> Result<&crate::value::ObjectReference, Fault> {
-    let Value::ObjectReference(array) = value else {
-        return Err(Fault::new("cryptography requires a byte array reference"));
-    };
-    if array.reference.target() != &Type::Array(Box::new(Type::Byte)) {
-        return Err(Fault::new("cryptography requires a byte array"));
+fn destination(value: &Value) -> Result<&crate::MemoryView, Fault> {
+    let view = view(value, false)?;
+    if let Some(reference) = view.reference() {
+        reference.require_writable()?;
     }
-    array.reference.require_writable()?;
-    Ok(array)
+    Ok(view)
 }
-fn write(array: &crate::value::ObjectReference, data: &[u8]) -> Result<(), Fault> {
+fn write(view: &crate::MemoryView, data: &[u8]) -> Result<(), Fault> {
     for (index, byte) in data.iter().enumerate() {
-        array
-            .reference
-            .element(index, &Type::Byte)?
-            .write(Value::Byte(*byte))?;
+        view.set(index, Value::Byte(*byte))?;
     }
     Ok(())
 }
@@ -56,7 +64,7 @@ impl Operation {
         match (self, args) {
             (Self::Sha256, [data, output]) => {
                 let output = destination(output)?;
-                if output.reference.array_length()? < 32 {
+                if output.length() < 32 {
                     return Ok(Value::Int32(-1));
                 }
                 let hash = provider::sha256(&bytes(data)?);
@@ -65,7 +73,7 @@ impl Operation {
             }
             (Self::HmacSha256, [key, data, output]) => {
                 let output = destination(output)?;
-                if output.reference.array_length()? < 32 {
+                if output.length() < 32 {
                     return Ok(Value::Int32(-1));
                 }
                 let hash = provider::hmac_sha256(&bytes(key)?, &bytes(data)?);
@@ -77,9 +85,9 @@ impl Operation {
             )),
             (Self::RandomFill, [output]) => {
                 let output = destination(output)?;
-                // Existing guest array quotas bound this temporary buffer. Allocate
+                // Existing guest view/array quotas bound this temporary buffer. Allocate
                 // fallibly, and publish only after the provider has returned.
-                let count = output.reference.array_length()?;
+                let count = output.length();
                 let mut data = Vec::new();
                 data.try_reserve_exact(count)
                     .map_err(|_| Fault::new("cryptography buffer allocation failed"))?;

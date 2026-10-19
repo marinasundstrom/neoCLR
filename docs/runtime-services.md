@@ -177,7 +177,7 @@ link the provider when a verified cryptography service is selected. Development 
 preparation now includes the adapter and standalone provider for default CLI execution. See the
 [native qualification](experiments/native-cryptography/README.md).
 
-Inputs must be initialized byte arrays. Destination arrays must be writable and
+Inputs must be initialized ReadOnlySlice<byte> windows. Slice<byte> destinations must be writable and
 remain guest-owned. Hash/MAC compute from snapshots before writing exactly 32 bytes,
 so destination aliasing is supported and trailing bytes remain untouched. A short
 destination returns -1 unchanged. Invalid storage or uninitialized input is a

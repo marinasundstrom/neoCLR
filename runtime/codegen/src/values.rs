@@ -677,10 +677,10 @@ pub(crate) fn compile_into(
     let cryptography_service = if details.is_some_and(|d| !d.cryptography.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend(
-            [types::I32, types::I64, types::I64, types::I64, types::I64].map(AbiParam::new),
+            [types::I32, types::I64, types::I64, types::I64, types::I64, types::I64].map(AbiParam::new),
         );
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_cryptography_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function("neoclr_cryptography_slices_v1", Linkage::Import, &sig)?)
     } else {
         None
     };
@@ -2584,14 +2584,25 @@ pub(crate) fn compile_into(
                 let service = module.declare_func_in_func(cryptography_service.unwrap(), b.func);
                 let op = b.ins().iconst(types::I32, i64::from(*operation));
                 let null = b.ins().iconst(types::I64, 0);
-                let mut args = vec![op];
+                let mut args = vec![op, fault_context.unwrap()];
                 let arity = match operation {
                     1 => 2,
                     4 => 1,
                     _ => 3,
                 };
-                args.extend(parameters.iter().take(arity).copied());
-                while args.len() < 4 {
+                for position in 0..arity {
+                    let storage = slot(&mut b, 24);
+                    let address = b.ins().stack_addr(types::I64, storage, 0);
+                    let start = position * 3;
+                    b.ins().store(MemFlags::new(), parameters[start], address, 0);
+                    b.ins().store(MemFlags::new(), parameters[start + 1], address, 8);
+                    b.ins().store(MemFlags::new(), parameters[start + 2], address, 12);
+                    let writable = *operation == 4 || *operation != 3 && position == arity - 1;
+                    let kind = b.ins().iconst(types::I64, if writable { 0 } else { 1 });
+                    b.ins().store(MemFlags::new(), kind, address, 16);
+                    args.push(address);
+                }
+                while args.len() < 5 {
                     args.push(null);
                 }
                 args.push(output);

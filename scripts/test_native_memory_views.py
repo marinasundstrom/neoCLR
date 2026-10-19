@@ -29,11 +29,11 @@ class NativeMemoryViewTests(unittest.TestCase):
             # The repository's macOS native harness uses UBSan/bounds.
             sanitizer = 'undefined,bounds'
         with tempfile.TemporaryDirectory() as directory:
-            for gc in (False, True):
-                with self.subTest(gc=gc):
+            for gc, crypto in ((False, False), (True, False), (False, True), (True, True)):
+                with self.subTest(gc=gc, crypto=crypto):
                     binary = Path(directory) / ('views-gc' if gc else 'views-arena')
                     memory = ROOT / 'runtime/native/memory'
-                    sources = [memory / 'memory-views-test.c', memory / 'text-arena.c']
+                    sources = [(ROOT / 'docs/experiments/native-cryptography/slice-adapter-test.c' if crypto else memory / 'memory-views-test.c'), memory / 'text-arena.c']
                     flags = []
                     if gc:
                         flags = ['-DNEOCLR_NATIVE_GC']

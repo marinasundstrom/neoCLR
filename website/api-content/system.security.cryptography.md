@@ -9,3 +9,6 @@ use CryptographyError and Result; invalid storage remains a terminal fault.
 
 See [cryptography contracts](/docs/cryptography.html) for buffer ownership, error
 behavior, .NET differences and the bounded initial API surface.
+
+Development buffer contracts use `ReadOnlySlice<byte>` inputs and `Slice<byte>`
+destinations. Arrays convert implicitly; range slicing selects a zero-copy window.

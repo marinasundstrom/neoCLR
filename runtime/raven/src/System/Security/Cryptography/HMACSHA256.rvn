@@ -8,10 +8,10 @@ public static class HMACSHA256 {
     /// <summary>Writes a 32-byte digest. Short destinations remain unchanged; trailing bytes are preserved. Inputs may overlap destination and are never retained.</summary>
     /// <param name="key">Fully initialized key bytes; empty keys are accepted.</param>
     /// <param name="data">Fully initialized input bytes; empty data is accepted.</param>
-    /// <param name="destination">Writable byte array of at least 32 bytes.</param>
+    /// <param name="destination">Writable byte slice of at least 32 bytes.</param>
     /// <returns>Ok(32), or Error(DestinationTooSmall) without mutation.</returns>
     /// <remarks>Invalid storage or uninitialized inputs are terminal faults.</remarks>
-    static func HashData(key: byte[], data: byte[], destination: byte[]) -> Result<int, CryptographyError> {
+    static func HashData(key: ReadOnlySlice<byte>, data: ReadOnlySlice<byte>, destination: Slice<byte>) -> Result<int, CryptographyError> {
         let status = neoCLR.Runtime.CryptoHmacSha256(key, data, destination)
         if status == 0 {
             return Ok(32)
@@ -28,7 +28,7 @@ public static class HMACSHA256 {
     /// <param name="tag">Fully initialized tag; altered or truncated tags return false.</param>
     /// <returns>True only for a matching complete 32-byte tag.</returns>
     /// <remarks>Invalid storage remains a terminal fault.</remarks>
-    static func VerifyData(key: byte[], data: byte[], tag: byte[]) -> bool {
+    static func VerifyData(key: ReadOnlySlice<byte>, data: ReadOnlySlice<byte>, tag: ReadOnlySlice<byte>) -> bool {
         return neoCLR.Runtime.CryptoHmacSha256Verify(key, data, tag)
     }
 }

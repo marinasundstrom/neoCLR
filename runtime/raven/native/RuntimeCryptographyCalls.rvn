@@ -1,16 +1,17 @@
 module neoCLR.Runtime
 
+import System.*
 import System.Runtime.CompilerServices.*
 
 // Private runtime services. Managed cryptography owns the public API.
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CryptoSha256(data: byte[], output: byte[]) -> int;
+internal extern func CryptoSha256(data: ReadOnlySlice<byte>, output: Slice<byte>) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CryptoHmacSha256(key: byte[], data: byte[], output: byte[]) -> int;
+internal extern func CryptoHmacSha256(key: ReadOnlySlice<byte>, data: ReadOnlySlice<byte>, output: Slice<byte>) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CryptoHmacSha256Verify(key: byte[], data: byte[], tag: byte[]) -> bool;
+internal extern func CryptoHmacSha256Verify(key: ReadOnlySlice<byte>, data: ReadOnlySlice<byte>, tag: ReadOnlySlice<byte>) -> bool;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CryptoRandomFill(output: byte[]) -> int;
+internal extern func CryptoRandomFill(output: Slice<byte>) -> int;

@@ -3,13 +3,14 @@
 Development, 2026-10-12. The explicit `--bind-cryptography` compiler option lowers
 four exact byte-array InternalCall contracts through the same host adapter in JIT
 and AOT. It requires `--compile-system`, `--reference-arena` and a host exporting
-`neoclr_cryptography_v1`. Ordinary managed method bodies are never replaced. Missing
+`neoclr_cryptography_slices_v1`. Ordinary managed method bodies are never replaced. Missing
 binding permission fails compilation; missing JIT host exports fail before execution.
 
-The contracts are in `runtime/neoCLR/Runtime/Cryptography.neoil`: SHA-256,
+Production contracts are in `runtime/raven/native/RuntimeCryptographyCalls.rvn`;
+low-level regression declarations live in `tests/fixtures/cryptography.neoil`: SHA-256,
 HMAC-SHA-256, verification and secure random fill. The adapter does not collect,
 call guest code, retain buffers or run a separate scheduler. It passes byte payloads
-to the existing ring-backed provider after checking array headers and complete input
+to the existing ring-backed provider after checking allocator ownership, slice bounds/capabilities and complete window
 initialization, and publishes reserved output slots only after provider completion.
 A short digest destination returns -1 unchanged; uninitialized input is a terminal
 RuntimeError, not an operation error. Successful hash/MAC writes affect exactly 32
@@ -19,7 +20,7 @@ terminal faults; operation results use a separate output slot.
 
 This follows the synchronous computation layer behind .NET's HashData and
 RandomNumberGenerator APIs, while using neoCLR's explicit runtime-service and Fault
-contracts. The byte-array/header ABI is private and experimental; it is not a public
+contracts. The byte-slice/provider ABI is private and experimental; it is not a public
 Span/Memory substitute. See [comparison and provider limits](../../shared-security-provider.md).
 
 ## Reproduce
@@ -112,3 +113,19 @@ unchanged short destinations and zero/nonzero random fill in interpreter, defaul
 JIT and AOT. AOT runs from a directory containing only the executable. A second
 project build proves unused declarations do not pull in the provider. Windows runs
 this consumer in its JIT workflow; execution of this checkpoint remains pending CI.
+
+The retained earlier validation JSON records the old whole-array boundary. Current
+validation constructs explicit borrowed windows using test-only factories. The
+Raven suite uses implicit array conversions and range slicing, including overlapping
+subwindows and sentinels. The old bootstrap neoIL mirror remains historical.
+
+As of the slice migration, `validate-bundle.py` builds the current Raven cryptography
+suite against the installed library and checks both configured JIT execution and
+bare `neoclr run` default-JIT dispatch. It no longer injects private array/view type
+fixtures into an installed library load set. `validate.py` separately retains all
+12 lower-level interpreter/JIT/AOT cases, with explicitly synthetic source origins
+for its canonical view types. Those origins preserve identity through native
+load-set relocation; unannotated interpreter-only System fixtures do not currently
+survive that relocation. This is a fixture/backend integration limitation, not a
+new public Slice semantic restriction. Packaged-library primitive and nominal-array
+contracts must come from the matched native producer.

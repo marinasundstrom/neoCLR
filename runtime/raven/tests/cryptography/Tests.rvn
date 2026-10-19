@@ -49,6 +49,21 @@ func AHash() -> Result<unit, TestFailure> {
         _ = Assert.Equal((int)aliasExpected[index], (int)aliased[index])?
         index = index + 1
     }
+    // Hash an overlapping subwindow; both surrounding sentinels survive.
+    output[0] = (byte)165
+    output[1] = (byte)97
+    output[2] = (byte)98
+    output[3] = (byte)99
+    let read: ReadOnlySlice<byte> = output[1..4]
+    _ = Assert.True(SHA256.HashData(read, output[1..]) is Ok(32), "Window alias")?
+    _ = Assert.Equal(165, (int)output[0])?
+    index = 0
+    while index < expected.Length {
+        _ = Assert.Equal((int)expected[index], (int)output[index + 1])?
+        index = index + 1
+    }
+    _ = Assert.True(SHA256.HashData(data, output[1..32]) is Error(CryptographyError.DestinationTooSmall), "Short window")?
+    _ = Assert.Equal((int)expected[0], (int)output[1])?
     return Ok(())
 }
 
@@ -75,6 +90,20 @@ func BMac() -> Result<unit, TestFailure> {
         index = index + 1
     }
     _ = Assert.True(HMACSHA256.VerifyData(key, data, tag), "Verify")?
+    let paddedKey: byte[] = [(byte)165, (byte)107, (byte)101, (byte)121, (byte)166]
+    let paddedData: byte[] = [(byte)165, (byte)97, (byte)98, (byte)99, (byte)166]
+    let paddedTag: byte[] = [for index in 0..34 => (byte)0]
+    paddedTag[0] = (byte)165
+    paddedTag[33] = (byte)166
+    _ = Assert.True(HMACSHA256.HashData(paddedKey[1..4], paddedData[1..4], paddedTag[1..33]) is Ok(32), "MAC windows")?
+    _ = Assert.True(HMACSHA256.VerifyData(paddedKey[1..4], paddedData[1..4], paddedTag[1..33]), "Verify window")?
+    _ = Assert.Equal(165, (int)paddedTag[0])?
+    _ = Assert.Equal(166, (int)paddedTag[33])?
+    index = 0
+    while index < expected.Length {
+        _ = Assert.Equal((int)expected[index], (int)paddedTag[index + 1])?
+        index = index + 1
+    }
     tag[0] = (byte)0
     _ = Assert.True(!HMACSHA256.VerifyData(key, data, tag), "Reject altered tag")?
     let small: byte[] = [(byte)165]
@@ -85,6 +114,7 @@ func BMac() -> Result<unit, TestFailure> {
 
 [Test("RandomNumberGenerator accepts empty and writable buffers")]
 func CRandom() -> Result<unit, TestFailure> {
+    _ = Assert.True(RandomNumberGenerator.Fill(default(Slice<byte>)) is Ok, "Default empty fill")?
     let empty: byte[] = []
     let output: byte[] = [
         (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
@@ -94,5 +124,11 @@ func CRandom() -> Result<unit, TestFailure> {
     ]
     _ = Assert.True(RandomNumberGenerator.Fill(empty) is Ok, "Empty fill")?
     _ = Assert.True(RandomNumberGenerator.Fill(output) is Ok, "Nonempty fill")?
+    output[0] = (byte)165
+    output[31] = (byte)166
+    _ = Assert.True(RandomNumberGenerator.Fill(output[1..31]) is Ok, "Fill window")?
+    _ = Assert.Equal(165, (int)output[0])?
+    _ = Assert.Equal(166, (int)output[31])?
+    _ = Assert.True(RandomNumberGenerator.Fill(output[32..]) is Ok, "Empty end window")?
     return Assert.Equal(32, output.Length)
 }

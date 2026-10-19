@@ -19615,3 +19615,12 @@ open; no native performance improvement is claimed.
   records 35 tests in all three execution modes, including pending I/O and
   cancellation, with matching API documentation. Crypto, Memory-based asynchronous
   stream/socket contracts and broader HTTP adoption remain next integration work.
+
+- **Further outcome:** migrated the four synchronous cryptography operations to
+  readonly input/key/tag slices and writable destination slices, including exact
+  interpreter/native services. Native adapters validate and borrow only the selected
+  byte window; interpreter inputs retain their provider-copy implementation.
+  [Cryptography evidence](validation/memory-views-20261019/crypto-integration-validation.json)
+  records public Raven consumers, low-level initialization/alias cases and native
+  failure-window checks. No public AsSlice adapter or array compatibility overload
+  was added. Memory-based asynchronous transfers and HTTP adoption remain open.

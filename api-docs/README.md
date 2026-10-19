@@ -2434,3 +2434,15 @@ other callers of the throwing Range validator receive the same corrected categor
 No public signature changes. The source summary, manual view reference, compiler
 reference fingerprint and native snapshot are refreshed from the rebuilt matching
 five-library bundle; the runtime-only ViewBoundsFault hook is internal.
+
+### Cryptography byte-slice migration (2026-10-19)
+
+The native reference includes SHA256.HashData(ReadOnlySlice<byte>, Slice<byte>),
+HMACSHA256.HashData(ReadOnlySlice<byte>, ReadOnlySlice<byte>, Slice<byte>),
+HMACSHA256.VerifyData(ReadOnlySlice<byte>, ReadOnlySlice<byte>, ReadOnlySlice<byte>)
+and RandomNumberGenerator.Fill(Slice<byte>), with source XML contracts. The legacy
+CLI scaffold explicitly excludes these four methods because it cannot represent
+opaque runtime borrowed views safely; it retains the types and error union.
+The [manual reference](cryptography.md) links the migration and all four contracts.
+No array compatibility declarations remain. Native snapshot and CLI fingerprint
+are refreshed from the matching source; no full website build or publication.

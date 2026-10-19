@@ -685,37 +685,38 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::Tls(crate::tls::Operation::Abort), Type::Int32)
         }
-        ("neoCLR.Runtime.CryptoSha256", [Type::ArrayRef(data), Type::ArrayRef(output)])
-            if **data == Type::Byte && **output == Type::Byte =>
+        ("neoCLR.Runtime.CryptoSha256", [data, output])
+            if *data == crate::cryptography::view_type(true)
+                && *output == crate::cryptography::view_type(false) =>
         {
             (
                 Binding::Cryptography(crate::cryptography::Operation::Sha256),
                 Type::Int32,
             )
         }
-        (
-            "neoCLR.Runtime.CryptoHmacSha256",
-            [
-                Type::ArrayRef(key),
-                Type::ArrayRef(data),
-                Type::ArrayRef(output),
-            ],
-        ) if **key == Type::Byte && **data == Type::Byte && **output == Type::Byte => (
-            Binding::Cryptography(crate::cryptography::Operation::HmacSha256),
-            Type::Int32,
-        ),
-        (
-            "neoCLR.Runtime.CryptoHmacSha256Verify",
-            [
-                Type::ArrayRef(key),
-                Type::ArrayRef(data),
-                Type::ArrayRef(tag),
-            ],
-        ) if **key == Type::Byte && **data == Type::Byte && **tag == Type::Byte => (
-            Binding::Cryptography(crate::cryptography::Operation::VerifyHmacSha256),
-            Type::Boolean,
-        ),
-        ("neoCLR.Runtime.CryptoRandomFill", [Type::ArrayRef(output)]) if **output == Type::Byte => {
+        ("neoCLR.Runtime.CryptoHmacSha256", [key, data, output])
+            if *key == crate::cryptography::view_type(true)
+                && *data == crate::cryptography::view_type(true)
+                && *output == crate::cryptography::view_type(false) =>
+        {
+            (
+                Binding::Cryptography(crate::cryptography::Operation::HmacSha256),
+                Type::Int32,
+            )
+        }
+        ("neoCLR.Runtime.CryptoHmacSha256Verify", [key, data, tag])
+            if [key, data, tag]
+                .iter()
+                .all(|ty| **ty == crate::cryptography::view_type(true)) =>
+        {
+            (
+                Binding::Cryptography(crate::cryptography::Operation::VerifyHmacSha256),
+                Type::Boolean,
+            )
+        }
+        ("neoCLR.Runtime.CryptoRandomFill", [output])
+            if *output == crate::cryptography::view_type(false) =>
+        {
             (
                 Binding::Cryptography(crate::cryptography::Operation::RandomFill),
                 Type::Int32,

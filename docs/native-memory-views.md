@@ -477,3 +477,15 @@ reads/writes and cancellation. The final run uses a freshly built release interp
 an earlier debug-interpreter quota run hit its 180-second limit and is retained as
 an unsuccessful attempt. Both API snapshots are refreshed and their focused checks
 pass. No benchmark or full website build was performed.
+
+### Synchronous provider access (2026-10-19)
+
+The private `neoclr_byte_view_access_v1` helper validates allocator ownership,
+window bounds, writable capability and (for reads) every initialization bit in
+the selected window. It yields temporary data/initialization pointers to trusted
+synchronous adapters only. It does not allocate, collect, root, pin or extend a
+borrow. Adapters cannot retain pointers, call guest code or suspend, and publish
+only the written initialization prefix after provider completion. Empty windows
+return null pointers and zero count; failed validation leaves output unchanged.
+Cryptography uses this to avoid whole-array copies at the native provider boundary.
+This helper is not the future public Native API or a stable host ABI.

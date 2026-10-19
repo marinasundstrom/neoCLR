@@ -7,10 +7,10 @@ import System.Result.*
 public static class SHA256 {
     /// <summary>Writes a 32-byte digest. Short destinations remain unchanged; trailing bytes are preserved. Inputs may overlap destination and are never retained.</summary>
     /// <param name="data">Fully initialized input bytes; empty data is accepted.</param>
-    /// <param name="destination">Writable byte array of at least 32 bytes.</param>
+    /// <param name="destination">Writable byte slice of at least 32 bytes.</param>
     /// <returns>Ok(32), or Error(DestinationTooSmall) without mutation.</returns>
     /// <remarks>Invalid storage or uninitialized inputs are terminal faults.</remarks>
-    static func HashData(data: byte[], destination: byte[]) -> Result<int, CryptographyError> {
+    static func HashData(data: ReadOnlySlice<byte>, destination: Slice<byte>) -> Result<int, CryptographyError> {
         let status = neoCLR.Runtime.CryptoSha256(data, destination)
         if status == 0 {
             return Ok(32)

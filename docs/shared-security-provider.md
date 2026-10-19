@@ -111,8 +111,8 @@ cryptography crates. HTTPS build manifests now include only their TLS dependenci
 
 ## Typed interpreter boundary
 
-`runtime/neoCLR/Runtime/Cryptography.neoil` declares the private SHA-256, HMAC,
-verification and random-fill operations. Their `arrayref<Byte>` arguments and exact
+`runtime/raven/native/RuntimeCryptographyCalls.rvn` declares the private SHA-256, HMAC,
+verification and random-fill operations. Their readonly/writable byte-slice arguments and exact
 result signatures are checked before dispatch. The interpreter uses the same safe
 provider crate as the native wrappers, copies initialized inputs and writes into
 caller-owned destinations. It requires the Cryptography and ManagedArrays runtime

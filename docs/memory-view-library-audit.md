@@ -43,7 +43,7 @@ remove a copy or establish native support.
 | `Array.rvn` | Use view results for range syntax, implicit array-to-view conversion and explicit copying; migrate syntax with compiler validation | Fixed contiguous ownership can be borrowed; implemented: Slice and range results share storage; ToArray copies |
 | `Text/Decoder.rvn`, `Text/Encodings.rvn` | Implemented: Decode(ReadOnlySlice<byte>, final) | Synchronous input borrow; carry bytes must still be copied into owned decoder state |
 | `Text/Encoder.rvn`, `Text/Encodings.rvn` | Implemented: Drain(Slice<byte>) | Writable synchronous destination; retain byte-count/progress and short-output semantics |
-| `Security/Cryptography/{SHA256,HMACSHA256,RandomNumberGenerator}.rvn` | ReadOnlySlice for inputs/key/tag; Slice for hash/random destinations | Inputs not retained; preserve overlapping input/output, unchanged short destination and trailing bytes |
+| `Security/Cryptography/{SHA256,HMACSHA256,RandomNumberGenerator}.rvn` | Migrated: ReadOnlySlice inputs/key/tag; Slice hash/random destinations | Inputs not retained; preserve overlapping input/output, unchanged short destination and trailing bytes |
 | `IO/Compression/GZipEncoder.rvn` | ReadOnlySlice input, owned byte[] output | Synchronous encoder consumes input; result and coding tables own storage |
 | `IO/Compression/GZipDecoder.rvn` | Retained source stays array or ReadOnlyMemory; local decode helpers may use slices | Decoder keeps input in a field; tree tables and produced output remain owned |
 | `IO/{InputStream,OutputStream}.rvn` | Memory<byte> read destination; ReadOnlyMemory<byte> write source | Methods return Task and can retain input until settlement; slices cannot cross suspension |
@@ -89,8 +89,9 @@ remove a copy or establish native support.
   readonly views after their runtime contracts support them. `Utf8Decode` is a
   readonly-byte-view candidate; keep Utf8Encode's owned-result semantics and use
   the separate shared String.Utf8Bytes only where an immutable borrowed result fits.
-- Runtime `ConsoleStreams`, `FileStreams`, `Sockets`, `Tls` and `Cryptography`
+- Runtime `ConsoleStreams`, `FileStreams`, `Sockets` and `Tls`
   declarations must migrate with the source contracts and native implementation.
+  Cryptography now uses checked slices through the interpreter/native boundary.
   Async completion must trace the actual Memory owner, not a temporary slice.
 - Bootstrap ArrayList wrappers retain the same growth/iterator invalidation gate
   as Raven collections. Internal view factories intentionally retain their array
@@ -107,7 +108,8 @@ remove a copy or establish native support.
    and its service contracts; native asynchronous retention remains a separate gate.
    Interpreter-only support is insufficient for native HTTP and crypto providers.
 2. Incremental codec signatures and their stream-adapter calls now use slices.
-   Continue with cryptography synchronous contracts, without redundant
+   Cryptography synchronous contracts now use readonly input/key/tag slices and
+   writable hash/random destination slices in interpreter/JIT/AOT, without redundant
    compatibility overloads. Test subwindows, empty input, overlapping buffers, readonly
    aliasing, destination sentinels, bounds and no mutation on documented failures.
 3. Migrate InputStream/OutputStream and implementations together to Memory. Test
@@ -137,3 +139,20 @@ uses writable Memory for async input. neoCLR retains its separate InputStream /
 OutputStream and Task<Result<...>> contracts; adopting views does not silently
 adopt .NET exception/ValueTask or combined Stream semantics. String remains UTF-8
 with grapheme indexing; a byte view is not a text slice. Sources checked 2026-10-18.
+
+### Cryptography integration (2026-10-19)
+
+SHA256.HashData, HMACSHA256.HashData/VerifyData and RandomNumberGenerator.Fill
+now use borrowed byte slices end to end, including exact runtime service binding.
+Native providers access checked array-backed windows without copying; interpreter
+inputs retain their existing provider-copy implementation. Alias-safe hash/MAC
+publication, short-destination results, untouched tails and random-failure clearing
+apply to the selected window. Whole arrays still convert implicitly. There are no
+array overloads or public AsSlice adapters. Native string-backed UTF-8 views and
+non-byte views remain separate backend gaps. Async streams/socket Memory retention
+is the next integration step; this change does not qualify HTTP transfer lifetimes.
+
+[Validation](validation/memory-views-20261019/crypto-integration-validation.json):
+three public Raven tests in all modes, twelve private-service cases in all modes,
+seven interpreter tests, exact native binding checks, sanitized window/provider
+failure checks, installed default-JIT execution and matching API snapshots.

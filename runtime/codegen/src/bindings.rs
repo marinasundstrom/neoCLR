@@ -2364,7 +2364,7 @@ mod type_identity_tests {
     }
 }
 
-/// Private byte-array cryptography contracts; explicit host binding, no foreign lookup.
+/// Private byte-slice cryptography contracts; explicit host binding, no foreign lookup.
 pub fn cryptography(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"]
@@ -2381,11 +2381,25 @@ pub fn cryptography(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
         let index = row["compiledIndex"]
             .as_u64()
             .ok_or("missing compiled index")? as usize;
+        let parameters = &input.functions[index].parameters;
+        let valid_parameters = parameters.len() == arity
+            && parameters.iter().enumerate().all(|(position, ty)| {
+                let writable = operation == 4 || operation != 3 && position == arity - 1;
+                input.type_definition(ty).is_some_and(|t| {
+                    crate::memory_views::byte_memory(t)
+                        && t.memory_view
+                            == Some(if writable {
+                                neoclr::metadata::MemoryViewKind::Slice
+                            } else {
+                                neoclr::metadata::MemoryViewKind::ReadOnlySlice
+                            })
+                })
+            });
         let f = &mut input.functions[index];
         if f.name != row["name"].as_str().unwrap()
             || f.owner.is_some()
             || f.instance
-            || f.parameters != vec![Type::ArrayRef(Box::new(Type::Byte)); arity]
+            || !valid_parameters
             || f.returns != result
             || f.no_result
             || f.impl_flags != 0x1000
@@ -2405,7 +2419,7 @@ pub fn cryptography(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native cryptography binding requires exact nongeneric byte-array InternalCall contracts".into());
+            return Err("native cryptography binding requires exact nongeneric byte-slice InternalCall contracts".into());
         }
         f.impl_flags = 0;
         f.body = vec![
@@ -2417,7 +2431,7 @@ pub fn cryptography(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             Op::Return,
         ];
         bindings.push(json!({"definition":row["definition"], "name":row["name"], "compiledIndex":index,
-            "implementation":"cryptography-v1", "operation":operation, "symbol":"neoclr_cryptography_v1"}));
+            "implementation":"cryptography-v1", "operation":operation, "symbol":"neoclr_cryptography_slices_v1"}));
     }
     Ok(bindings)
 }
@@ -2427,15 +2441,30 @@ mod cryptography_tests {
     use super::*;
     #[test]
     fn crypto_binding_does_not_replace_managed_bodies_or_accept_changed_contracts() {
-        let source = ".module Probe\n.function neoCLR.Runtime.CryptoSha256(arrayref<Byte> data,arrayref<Byte> output) -> Int32\n.methodimpl InternalCall\n.end";
-        let original = neoclr::assemble(source).unwrap();
+        let source = ".module Probe\n.function Placeholder(arrayref<Byte> data,arrayref<Byte> output) -> Int32\nldc.i4 0\nret\n.end";
+        let mut original = neoclr::assemble(source).unwrap();
+        for (name, kind) in [
+            ("Read", neoclr::metadata::MemoryViewKind::ReadOnlySlice),
+            ("Write", neoclr::metadata::MemoryViewKind::Slice),
+        ] {
+            let mut t = crate::memory_views::test_module(kind, Type::Byte)
+                .types
+                .remove(0);
+            t.name = name.into();
+            original.types.push(t);
+        }
+        original.functions[0].name = "neoCLR.Runtime.CryptoSha256".into();
+        original.functions[0].body.clear();
+        original.functions[0].impl_flags = 0x1000;
+        original.functions[0].parameters =
+            vec![Type::Named("Read".into()), Type::Named("Write".into())];
         let selection =
             json!({"functions":[{"name":"neoCLR.Runtime.CryptoSha256","compiledIndex":0}]});
         let mut valid = original.clone();
         let rows = cryptography(&mut valid, &selection).unwrap();
         assert_eq!(rows[0]["operation"], 1);
-        assert_eq!(rows[0]["symbol"], "neoclr_cryptography_v1");
-        for change in 0..5 {
+        assert_eq!(rows[0]["symbol"], "neoclr_cryptography_slices_v1");
+        for change in 0..8 {
             let mut bad = original.clone();
             let f = &mut bad.functions[0];
             match change {
@@ -2446,7 +2475,10 @@ mod cryptography_tests {
                 1 => f.parameters[0] = Type::ArrayRef(Box::new(Type::Int32)),
                 2 => f.returns = Type::Boolean,
                 3 => f.generic_parameters.push(Some("T".into())),
-                _ => f.no_result = true,
+                4 => f.no_result = true,
+                5 => f.parameters.swap(0, 1),
+                6 => f.parameters[0] = Type::ArrayRef(Box::new(Type::Byte)),
+                _ => f.parameters[1] = Type::Named("Read".into()),
             }
             assert!(cryptography(&mut bad, &selection).is_err());
         }

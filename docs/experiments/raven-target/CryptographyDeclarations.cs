@@ -8,14 +8,13 @@ namespace Security.Cryptography {
         public struct ProviderFailure { }
     }
     public static class SHA256 {
-        public static Result<int, CryptographyError> HashData(byte[] data, byte[] destination) => default;
+        // Borrowed view methods are documented by the native Raven reference.
     }
     public static class HMACSHA256 {
-        public static Result<int, CryptographyError> HashData(byte[] key, byte[] data, byte[] destination) => default;
-        public static bool VerifyData(byte[] key, byte[] data, byte[] tag) => default;
+        // HashData and VerifyData are documented by the native Raven reference.
     }
     public static class RandomNumberGenerator {
-        public static Result<PropagationUnit, CryptographyError> Fill(byte[] destination) => default;
+        // Borrowed view methods are documented by the native Raven reference.
     }
 }
 """;

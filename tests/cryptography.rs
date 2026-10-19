@@ -2,13 +2,14 @@
 use neoclr::{
     Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
 };
-const SERVICES: &str = include_str!("../runtime/neoCLR/Runtime/Cryptography.neoil");
+const SERVICES: &str = include_str!("fixtures/cryptography.neoil");
+const VIEWS: &str = include_str!("fixtures/memory_views.neoil");
 fn module(body: &str, returns: &str) -> neoclr::Module {
     let (locals, instructions): (Vec<_>, Vec<_>) =
         body.lines().partition(|line| line.starts_with(".local "));
     let body = locals.join("\n") + "\n" + &instructions.join("\n");
     assemble(&format!(
-        ".module CryptoTests\n{SERVICES}\n.function Run() -> {returns}\n{body}\nret\n.end"
+        ".module System\n{VIEWS}\n{SERVICES}\n.function Run() -> {returns}\n{body}\nret\n.end"
     ))
     .unwrap()
 }
@@ -51,7 +52,7 @@ fn sha256_known_answer_preserves_tail_and_supports_aliasing() {
     ];
     let code = array("input", b"abc")
         + &array("output", &[0xa5; 33])
-        + "ldloc input\nldloc output\ncall neoCLR.Runtime.CryptoSha256(arrayref<Byte>,arrayref<Byte>)\npop\n"
+        + "ldloc input\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc output\nldc.i4 0\nldloc output\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoSha256(System.ReadOnlySlice<Byte>,System.Slice<Byte>)\npop\n"
         + &check_bytes("output", &expected)
         + "ldc.i4 1\n";
     assert_eq!(run(&code, "Int32"), Value::Int32(1));
@@ -62,7 +63,7 @@ fn sha256_known_answer_preserves_tail_and_supports_aliasing() {
         0x29, 0x25,
     ];
     let code = array("output", &[0; 32])
-        + "ldloc output\nldloc output\ncall neoCLR.Runtime.CryptoSha256(arrayref<Byte>,arrayref<Byte>)\npop\n"
+        + "ldloc output\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc output\nldc.i4 0\nldloc output\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoSha256(System.ReadOnlySlice<Byte>,System.Slice<Byte>)\npop\n"
         + &check_bytes("output", &expected)
         + "ldc.i4 1\n";
     assert_eq!(run(&code, "Int32"), Value::Int32(1));
@@ -72,14 +73,14 @@ fn hmac_round_trip_rejects_modified_tag() {
     let base = array("key", &[0x0b; 20])
         + &array("input", b"Hi There")
         + &array("tag", &[0; 32])
-        + "ldloc key\nldloc input\nldloc tag\ncall neoCLR.Runtime.CryptoHmacSha256(arrayref<Byte>,arrayref<Byte>,arrayref<Byte>)\npop\n";
+        + "ldloc key\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc input\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc tag\nldc.i4 0\nldloc tag\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoHmacSha256(System.ReadOnlySlice<Byte>,System.ReadOnlySlice<Byte>,System.Slice<Byte>)\npop\n";
     let expected: Vec<u8> = "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7"
         .as_bytes()
         .chunks_exact(2)
         .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
         .collect();
     let base = base + &check_bytes("tag", &expected);
-    let verify = "ldloc key\nldloc input\nldloc tag\ncall neoCLR.Runtime.CryptoHmacSha256Verify(arrayref<Byte>,arrayref<Byte>,arrayref<Byte>)\n";
+    let verify = "ldloc key\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc input\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc tag\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\ncall neoCLR.Runtime.CryptoHmacSha256Verify(System.ReadOnlySlice<Byte>,System.ReadOnlySlice<Byte>,System.ReadOnlySlice<Byte>)\n";
     assert_eq!(
         run(&(base.clone() + verify), "Boolean"),
         Value::Boolean(true)
@@ -96,7 +97,7 @@ fn hmac_round_trip_rejects_modified_tag() {
 fn short_destination_is_recoverable_and_unchanged() {
     let code = array("input", b"abc")
         + &array("output", &[0xa5; 31])
-        + ".local Int32 status\nldloc input\nldloc output\ncall neoCLR.Runtime.CryptoSha256(arrayref<Byte>,arrayref<Byte>)\nstloc status\n"
+        + ".local Int32 status\nldloc input\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc output\nldc.i4 0\nldloc output\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoSha256(System.ReadOnlySlice<Byte>,System.Slice<Byte>)\nstloc status\n"
         + &check_bytes("output", &[0xa5; 31])
         + "ldloc status\n";
     assert_eq!(run(&code, "Int32"), Value::Int32(-1));
@@ -105,7 +106,7 @@ fn short_destination_is_recoverable_and_unchanged() {
 fn random_fill_accepts_empty_and_allocated_buffers() {
     for size in [0, 32] {
         let code = array("output", &vec![0; size])
-            + "ldloc output\ncall neoCLR.Runtime.CryptoRandomFill(arrayref<Byte>)\n";
+            + "ldloc output\nldc.i4 0\nldloc output\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoRandomFill(System.Slice<Byte>)\n";
         assert_eq!(run(&code, "Int32"), Value::Int32(0));
     }
 }
@@ -127,7 +128,7 @@ fn exact_signature_is_required() {
 fn reachability_reports_cryptography_and_array_capabilities() {
     let module = module(
         &(array("output", &[0; 32])
-            + "ldloc output\ncall neoCLR.Runtime.CryptoRandomFill(arrayref<Byte>)\n"),
+            + "ldloc output\nldc.i4 0\nldloc output\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoRandomFill(System.Slice<Byte>)\n"),
         "Int32",
     );
     let program = LoadedProgram::new(&module).unwrap();
@@ -148,7 +149,7 @@ fn reachability_reports_cryptography_and_array_capabilities() {
 
 #[test]
 fn reserved_output_is_initialized_but_uninitialized_input_faults() {
-    let code = ".local arrayref<Byte> input\n.local arrayref<Byte> output\nldc.i4 0\nnewarr Byte\nstloc input\nldc.i4 32\narray.reserve Byte\nstloc output\nldloc input\nldloc output\ncall neoCLR.Runtime.CryptoSha256(arrayref<Byte>,arrayref<Byte>)\npop\nldloc output\nldc.i4 0\nldelem Byte\n";
+    let code = ".local arrayref<Byte> input\n.local arrayref<Byte> output\nldc.i4 0\nnewarr Byte\nstloc input\nldc.i4 32\narray.reserve Byte\nstloc output\nldloc input\ncall System.MemoryViews.AsReadOnlySlice<Byte>(arrayref<Byte>)\nldloc output\nldc.i4 0\nldloc output\nldlen\nconv.i4\ncall System.MemoryViews.AsSlice<Byte>(arrayref<Byte>,Int32,Int32)\ncall neoCLR.Runtime.CryptoSha256(System.ReadOnlySlice<Byte>,System.Slice<Byte>)\npop\nldloc output\nldc.i4 0\nldelem Byte\n";
     assert_eq!(run(code, "Byte"), Value::Byte(0xe3));
     let code = code.replace("ldc.i4 0\nnewarr Byte", "ldc.i4 1\narray.reserve Byte");
     let module = module(&code, "Byte");

@@ -13177,3 +13177,14 @@ The removed EncodingError.InvalidRange case is rebuilt consistently in native an
 legacy reference metadata. Historical public-codec experiment fixtures require
 their pinned older artifacts; maintained Raven codec suites exercise the current
 library across execution modes. See the [current contract](native-memory-views.md#first-shared-class-library-adoption-incremental-codecs--2026-10-19).
+
+### Cryptography borrowing (2026-10-19)
+
+The production Raven cryptography methods and private InternalCalls now take
+ReadOnlySlice<byte> inputs and Slice<byte> destinations. Existing native view
+metadata and implicit conversions carry the contract; no compiler encoding or
+Runtime Contract configuration change is introduced. The CLI documentation scaffold
+omits the four borrowed methods explicitly instead of projecting unsafe empty
+records or retaining array signatures. Native RavenDoc and the manual cryptography
+reference provide their contracts. This is the existing temporary documentation
+bridge limitation; native metadata/backend own view representation and lifetimes.

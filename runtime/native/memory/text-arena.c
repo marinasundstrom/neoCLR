@@ -975,3 +975,25 @@ int32_t neoclr_byte_view_copy_v1(neoclr_aot_context *context,
         memset(output + destination_total + destination->offset, 1, source->length);
     return 0;
 }
+
+int32_t neoclr_byte_view_access_v1(neoclr_aot_context *context,
+    const neoclr_byte_view *view, int32_t writable, neoclr_byte_access *output) {
+    if (!output || (writable != 0 && writable != 1)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    uint64_t total; int reserved;
+    int32_t status = byte_view_validate(context, view, &total, &reserved);
+    if (status) return status;
+    if (writable && (view->kind & 1)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    neoclr_byte_access access = {0};
+    access.count = view->length;
+    if (view->length) {
+        access.bytes = (unsigned char *)view->owner + 16 + view->offset;
+        access.initialized = reserved ? access.bytes + total : NULL;
+        if (!writable && access.initialized) {
+            for (uint32_t i = 0; i < access.count; i++) {
+                if (!access.initialized[i]) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+            }
+        }
+    }
+    *output = access;
+    return 0;
+}

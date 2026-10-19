@@ -1,3 +1,5 @@
+; OBSOLETE whole-array bootstrap mirror; production is RuntimeCryptographyCalls.rvn.
+; Current low-level tests own tests/fixtures/cryptography.neoil (borrowed slices).
 ; Private typed runtime services, not the public managed cryptography API.
 ; Outputs are caller-owned byte arrays; digest/MAC write exactly 32 bytes.
 ; 0 success, -1 insufficient destination, -2 random provider failure (output cleared).

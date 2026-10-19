@@ -48,4 +48,18 @@ int32_t neoclr_byte_view_set_v1(neoclr_aot_context *, const neoclr_byte_view *,
  */
 int32_t neoclr_byte_view_copy_v1(neoclr_aot_context *, const neoclr_byte_view *,
     const neoclr_byte_view *);
+/* Private synchronous provider access. The checked pointers are valid only until
+ * the caller returns, with no collection, suspension, callback or retention.
+ * Read access checks every initialization bit in this window. Write access
+ * requires a writable capability and does not initialize storage itself: after
+ * a successful provider write the adapter marks exactly the written prefix.
+ * Empty windows yield null pointers. Failure leaves output unchanged.
+ * This is not a host Native API, pinning operation or stable ABI.
+ */
+typedef struct {
+    unsigned char *bytes, *initialized;
+    uint32_t count;
+} neoclr_byte_access;
+int32_t neoclr_byte_view_access_v1(neoclr_aot_context *, const neoclr_byte_view *,
+    int32_t writable, neoclr_byte_access *);
 #endif

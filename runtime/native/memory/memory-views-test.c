@@ -91,8 +91,49 @@ static int copy_tests(void) {
 #endif
     return 0;
 }
+static int access_tests(void) {
+    uint64_t heap[512] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
+    void *array;
+    CHECK(!neoclr_reserve_bytes_v1(&c.text, 5, &array));
+    neoclr_byte_view view;
+    CHECK(!neoclr_byte_view_create_v1(&c, array, 1, 3, NEOCLR_VIEW_SLICE, &view));
+    neoclr_byte_access access = {0}, before = {0};
+    CHECK(neoclr_byte_view_access_v1(&c, &view, 0, &access) == 3);
+    CHECK(!memcmp(&access, &before, sizeof(access)));
+    CHECK(!neoclr_byte_view_access_v1(&c, &view, 1, &access));
+    CHECK(access.bytes == (unsigned char *)array + 17 && access.count == 3);
+    CHECK(access.initialized == (unsigned char *)array + 22);
+    memset(access.bytes, 42, 3);
+    memset(access.initialized, 1, 3);
+    before = access;
+    CHECK(!neoclr_byte_view_access_v1(&c, &view, 0, &access));
+    CHECK(!memcmp(&access, &before, sizeof(access)));
+    CHECK(!((unsigned char *)array)[21] && !((unsigned char *)array)[25]);
+    view.kind = NEOCLR_VIEW_READONLY_SLICE;
+    CHECK(neoclr_byte_view_access_v1(&c, &view, 1, &access) == 3);
+    CHECK(neoclr_byte_view_access_v1(&c, &view, 2, &access) == 3);
+    CHECK(neoclr_byte_view_access_v1(NULL, &view, 0, &access) == 3);
+    CHECK(!memcmp(&access, &before, sizeof(access)));
+    view.length = 5;
+    CHECK(neoclr_byte_view_access_v1(&c, &view, 0, &access) == 8);
+    CHECK(!memcmp(&access, &before, sizeof(access)));
+#ifdef NEOCLR_NATIVE_GC
+    view.length = 3;
+    neoclr_aot_context foreign = {0};
+    CHECK(neoclr_byte_view_access_v1(&foreign, &view, 0, &access) == 3);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL));
+    CHECK(neoclr_byte_view_access_v1(&c, &view, 0, &access) == 3);
+    CHECK(!memcmp(&access, &before, sizeof(access)));
+#endif
+    view = (neoclr_byte_view){0};
+    CHECK(!neoclr_byte_view_access_v1(&c, &view, 1, &access));
+    CHECK(!access.bytes && !access.initialized && !access.count);
+    return 0;
+}
 int main(void) {
     CHECK(!copy_tests());
+    CHECK(!access_tests());
     uint64_t heap[512] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
     void *array;
