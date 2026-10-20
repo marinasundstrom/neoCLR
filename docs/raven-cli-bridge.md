@@ -14012,3 +14012,19 @@ Native-width static members exposed a backend admission gap during built-in test
 IntPtr/UIntPtr static methods now use the existing verified primitive-owner projection,
 with the shared scalar classification replacing a separate list. This changes neoCLR
 codegen admission only; Raven source semantics and CLI encoding are unchanged.
+
+## Enum parsing services (2026-10-20)
+
+Source-owned Enum Parse/TryParse uses private exact-signature EnumCount/EnumName/
+EnumBits/EnumBox InternalCalls. Native lowering reads retained enum metadata and uses
+ordinary value construction and boxing; the interpreter uses the same Int32 enum
+contract. No additional native ABI or Runtime Contract option is introduced. Legacy
+CLI reference methods are documentation fixtures only; native Raven bodies remain
+authoritative. Compiler bundle: 4c051e332-dirty-record-policy-metadata-function-bound.
+
+Native method metadata currently cannot express struct/Enum generic constraints.
+These methods validate concrete type arguments at runtime pending a general metadata
+and compiler constraint extension. Unicode enum names and backing widths beyond Int32
+are also existing gaps. Owners: Raven semantic/native emission and neoCLR metadata
+producer/reader/runtime validation. Do not implement a name-based compiler exception
+for Parse. See [contract and focused qualification](experiments/enum-parsing/README.md).

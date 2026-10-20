@@ -7,6 +7,10 @@ static class EnumHelpersBindings
 {
     public const string Declaration = """
         public abstract class Enum : ValueType {
+            public static Result<TEnum, NumberParseError> Parse<TEnum>(string text) => default;
+            public static Result<TEnum, NumberParseError> Parse<TEnum>(string text, bool ignoreCase) => default;
+            public static bool TryParse<TEnum>(string text, out TEnum result) { result = default; return false; }
+            public static bool TryParse<TEnum>(string text, bool ignoreCase, out TEnum result) { result = default; return false; }
             public static System.Collections.Sequence<string> GetNames(System.Introspection.TypeInfo enumType) => default;
             public static System.Collections.Sequence<object> GetValues(System.Introspection.TypeInfo enumType) => default;
             public static System.Collections.Sequence<string> GetNames<TEnum>() where TEnum : struct, System.Enum => default;

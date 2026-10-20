@@ -5,6 +5,7 @@ mod boxing;
 mod checked_conversion;
 mod class_dispatch;
 mod compiler;
+mod enum_queries;
 mod fault_details;
 mod function_invocation;
 mod inspection;

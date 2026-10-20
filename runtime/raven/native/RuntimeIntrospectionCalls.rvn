@@ -146,3 +146,13 @@ internal extern func InvokeFunction(function: Object?, arguments: Object?[]) -> 
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func InvokeFunctionCheck(function: Object?, arguments: Object?[]) -> int;
+
+// Private enum metadata operations preserve the concrete enum identity.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func EnumCount(handle: RuntimeTypeHandle) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func EnumName(handle: RuntimeTypeHandle, index: int) -> string;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func EnumBits(handle: RuntimeTypeHandle, index: int) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func EnumBox(handle: RuntimeTypeHandle, value: int) -> Object;

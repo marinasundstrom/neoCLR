@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "565e6174b445c999f262f7fc4361c74e13910134d20082ba44c498aa9d2bd848",
+  "assemblySha256": "5ae8488630ea51c2d62e167485f4a96f28c8bb80c1d8ed5a6fd24c255fb18ab0",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "7dab11d7c1676059a6defc486071e46354dec6f22efd4fda8095d34fb3c782ee",
+    "api-docs/NeoCLR.CoreProbe.xml": "ac39837d2dd0fc554dc8adee2ee92a108edb8fa96a886b74e4eb0e40616f5cce",
     "api-docs/exclusions.json": "16413aaa43acdfc76196658c46a76e64cf77b67fe1645a9ec0e5a39c57e8f38a",
     "api-docs/manual-members.json": "082d4590c30749b661a4fe6e0a0778c85aa0d4042ccd05044fd053b61f01b0f5",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -39,7 +39,7 @@
     "docs/experiments/raven-target/EmptyLibrary.cs": "94063d95f47320072221ad3f2564018544e20f063b6849e31f0003dd68757fc0",
     "docs/experiments/raven-target/EntryPointBindings.cs": "8ac06ec1b61b489bcbe276dd951ddf66374052d43f703c4d3ce5b1c4a5443522",
     "docs/experiments/raven-target/EnumBindings.cs": "0e7d3081303ca7a957469702870149d7a353435635b62edebd549d2120ad515c",
-    "docs/experiments/raven-target/EnumHelpersBindings.cs": "f23d6a2a8903b606e3878587ed07d2ce61cab5dfa2f0a484ee311293a34c078b",
+    "docs/experiments/raven-target/EnumHelpersBindings.cs": "c73eb93de1df97c137017de0c0b55a3b372b5120c9fb66f5719e4c75a2c294cc",
     "docs/experiments/raven-target/ErrorBindings.cs": "d606c64a89f25abab548f099002a7f267e1510a4f43a5a41e39f66db7ef3e4b6",
     "docs/experiments/raven-target/ErrorCarrierLibrary.cs": "1ce40411b87e70ce90d5f03c97c9ae16b205c25c44825398485370954da46171",
     "docs/experiments/raven-target/FaultBindings.cs": "52444680c9d0a0b74ab97ab13c07e881bd4628aaf382bf237547fc366bb73e54",
@@ -217,6 +217,7 @@
     "runtime/raven/src/System/Diagnostics/StackTrace.rvn": "4f6a25436c6f772e0e8c20607160ec7493d7a0d7ca96cb23a9d58dd2f73f89ac",
     "runtime/raven/src/System/Disposable.rvn": "c25420ff01885d43e81c874bc6bb9e908a1ce8d03071ceb2e51073e236702bbb",
     "runtime/raven/src/System/Double.rvn": "982f5c523f98466b27342878c0407d50bb1a5ad6324a8e4264d181dd7778de38",
+    "runtime/raven/src/System/EnumParsing.rvn": "0a2acba8ce8e25402b7a574e062c7d77be8e14a6dab959a4835ee3bc11cf603f",
     "runtime/raven/src/System/Environment/Functions.rvn": "1fca752047d763ba283cbbe548b21aa647c334b68a3f49971e690fbcbee72858",
     "runtime/raven/src/System/EnvironmentError.rvn": "c854a8118f2ffebc03f583ad93f23e812cd6f904a439fc2387485e91b31459f9",
     "runtime/raven/src/System/EquatableTo.rvn": "f271aa10c7d71633641b7f95153ad2b18a74583cd97aaa9e8bece3d12ee6379f",

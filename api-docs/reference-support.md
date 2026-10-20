@@ -15,6 +15,10 @@ the [collections](/features/collections/), [outcomes](/features/outcomes/) and
 [Enum](xref:System.Enum) additionally exposes executable development helpers for
 names and values, with TypeInfo and constrained generic overloads. Its class remains
 non-constructible; its presence does not imply every .NET Enum method is supported.
+Development Parse/TryParse generic overloads now support Int32 enum names, signed
+numbers and comma-separated names. Parse returns Result with NumberParseError;
+TryParse resets its out parameter on failure. Enum type arguments are runtime-checked
+until native method constraints can represent struct/Enum bounds.
 
 <a id="metadata-scaffolds"></a>
 

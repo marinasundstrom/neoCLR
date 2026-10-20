@@ -183,7 +183,8 @@
         "runtime/raven/src/System/Slice.rvn",
         "runtime/raven/src/System/Memory.rvn",
         "runtime/raven/src/System/ReadOnlyMemory.rvn",
-        "runtime/raven/src/System/ReadOnlySlice.rvn"
+        "runtime/raven/src/System/ReadOnlySlice.rvn",
+        "runtime/raven/src/System/EnumParsing.rvn"
       ],
       "types": [
         "System.AttributeTargets",

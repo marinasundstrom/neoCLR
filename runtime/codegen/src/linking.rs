@@ -1345,6 +1345,7 @@ pub fn prepare(
         super::reflection_arrays::bind(&mut selected, &mut report)?;
         super::function_invocation::bind(&mut selected, &mut report)?;
     }
+    super::enum_queries::bind(&mut selected, &source_metadata, &mut report)?;
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_scalar_queries(&mut selected, &mut report)?;
     super::boxing::project_char_tests(&mut selected, &mut report)?;

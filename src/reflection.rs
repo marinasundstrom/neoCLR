@@ -39,6 +39,10 @@ pub(crate) enum Query {
     EnumValues,
     EnumFormat,
     EnumUnderlying,
+    EnumCount,
+    EnumName,
+    EnumBits,
+    EnumBox,
 }
 
 impl Query {
@@ -81,6 +85,10 @@ impl Query {
             "neoCLR.Runtime.TypeElementType" => {
                 (Self::ElementType, false, "System.Option<System.Type>")
             }
+            "neoCLR.Runtime.EnumCount" => (Self::EnumCount, false, "Int32"),
+            "neoCLR.Runtime.EnumName" => (Self::EnumName, true, "String"),
+            "neoCLR.Runtime.EnumBits" => (Self::EnumBits, true, "Int32"),
+            "neoCLR.Runtime.EnumBox" => (Self::EnumBox, true, "System.Object"),
             "neoCLR.Runtime.TypeEnumNames" => (Self::EnumNames, false, "String[]"),
             "neoCLR.Runtime.TypeEnumValues" => (Self::EnumValues, false, "System.Object[]"),
             "neoCLR.Runtime.EnumFormat" => (Self::EnumFormat, true, "String"),
@@ -353,6 +361,34 @@ impl Query {
                 })
                 .into(),
             )),
+            Self::EnumCount | Self::EnumName | Self::EnumBits | Self::EnumBox => {
+                let info = definition
+                    .and_then(|d| d.enum_info.as_ref())
+                    .ok_or_else(|| Fault::new("enum parsing requires an enum type"))?;
+                if info.underlying != Type::Int32 {
+                    return Err(Fault::new(
+                        "enum parsing requires the supported Int32 representation",
+                    ));
+                }
+                match self {
+                    Self::EnumCount => Ok(Value::Int32(info.members.len() as i32)),
+                    Self::EnumBox => Ok(Value::Erased(Box::new(Value::Object {
+                        ty: ty.clone(),
+                        fields: vec![Value::Int32(argument)],
+                    }))),
+                    _ => {
+                        let member = info
+                            .members
+                            .get(argument as usize)
+                            .ok_or_else(|| Fault::new("enum member index out of range"))?;
+                        Ok(if matches!(self, Self::EnumName) {
+                            Value::String(member.name.clone().into())
+                        } else {
+                            Value::Int32(member.value)
+                        })
+                    }
+                }
+            }
             Self::EnumNames | Self::EnumValues | Self::EnumFormat | Self::EnumUnderlying => {
                 let info = definition
                     .and_then(|d| d.enum_info.as_ref())

@@ -3,8 +3,10 @@
 **Bounded completion and return to main work (author direction, 2026-10-20):** The globalization/formatting/parsing increment now meets its bounded exit criterion: the five profiles, supported
 numeric formats and explicit-culture parsers pass focused built-in tests in the
 interpreter, JIT and native backend (23 tests, 69 executions), with matching API documentation. Defer custom
-patterns, arbitrary providers and additional locales. Next implement enum Parse and
-TryParse, then resume the release-readiness work below; this does not permanently
+patterns, arbitrary providers and additional locales. [Enum Parse/TryParse](experiments/enum-parsing/README.md)
+now passes 12 built-in executions across all three engines; runtime type validation
+is implemented while native generic-method enum constraints remain a gap. Resume
+the release-readiness work below; this does not permanently
 reprioritize the platform roadmap.
 
 **Foundational globalization (author direction, 2026-10-20):** [Culture formatting data](experiments/culture-formats/README.md) extends the existing date/time policy with numeric conventions, selectable calendars and UK/US profiles alongside invariant, Swedish and Hebrew-Israel. Formatting belongs to globalization; complete locale patterns and custom policies remain gaps. The [bounded integer formatting follow-up](experiments/integer-formats/README.md) connects Int32/Int64 D/F/N to these policies. A [primitive interface correction](experiments/primitive-interfaces/README.md) preserves verified scalar conformance through native boxing and borrowed dispatch. The author asks for good-enough coverage, not exhaustive globalization; [Remaining numeric Formattable and culture parsing](experiments/numeric-formats/README.md) extend that foundation; custom patterns and providers remain deferred.

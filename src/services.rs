@@ -210,9 +210,9 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::ParseNumber(_) => RuntimeService::ParseNumber,
             crate::native::Binding::NativeIntegerTo64 => return Ok(vec![]),
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
-            crate::native::Binding::FloatingFormat(_) | crate::native::Binding::IntegerToString | crate::native::Binding::StringCasing(_) => {
-                RuntimeService::StringOperations
-            }
+            crate::native::Binding::FloatingFormat(_)
+            | crate::native::Binding::IntegerToString
+            | crate::native::Binding::StringCasing(_) => RuntimeService::StringOperations,
             crate::native::Binding::WriteLine
             | crate::native::Binding::ConsoleWriteBytes
             | crate::native::Binding::ConsoleFlush => RuntimeService::ConsoleOutput,
@@ -356,6 +356,10 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                     | Query::MetadataToken
                     | Query::Module
                     | Query::DeclaringType
+                    | Query::EnumCount
+                    | Query::EnumName
+                    | Query::EnumBits
+                    | Query::EnumBox
             ) {
                 uses.push(ServiceUse {
                     service: RuntimeService::ManagedArrays,

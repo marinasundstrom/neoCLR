@@ -1,0 +1,51 @@
+module System
+
+import System.Result.*
+
+// Metadata stays runtime-owned. No names/values snapshot is needed for parsing.
+internal static class EnumParsing {
+    static func Parse(handle: RuntimeTypeHandle, text: string?, ignoreCase: bool) -> Result<int, NumberParseError> {
+        let count = neoCLR.Runtime.EnumCount(handle)
+        let input = (text ?? "").Trim()
+        let bytes = input.Utf8Bytes
+        if bytes.Length == 0 {
+            return Error(NumberParseError.InvalidFormat())
+        }
+        let first = (int)bytes[0]
+        if (first >= 48 && first <= 57) || first == 43 || first == 45 {
+            return Int32.Parse(input)
+        }
+        var result = 0
+        var start = 0
+        var end = 0
+        while end <= bytes.Length {
+            if end == bytes.Length || bytes[end] == (byte)44 {
+                // UTF-8 commas cannot split a scalar. Reuse the original string for one name.
+                var name = input
+                if start != 0 || end != bytes.Length {
+                    let Ok(decoded) = Text.Utf8.Decode(bytes.Slice(start, end - start)) else {
+                        return Error(NumberParseError.InvalidFormat())
+                    }
+                    name = decoded.Trim()
+                }
+                var index = 0
+                var found = false
+                while index < count && !found {
+                    let candidate = neoCLR.Runtime.EnumName(handle, index)
+                    let comparison = if ignoreCase { StringComparison.OrdinalIgnoreCase } else { StringComparison.Ordinal }
+                    if name.Equals(candidate, comparison) {
+                        result = result | neoCLR.Runtime.EnumBits(handle, index)
+                        found = true
+                    }
+                    index += 1
+                }
+                if !found {
+                    return Error(NumberParseError.InvalidFormat())
+                }
+                start = end + 1
+            }
+            end += 1
+        }
+        return Ok(result)
+    }
+}

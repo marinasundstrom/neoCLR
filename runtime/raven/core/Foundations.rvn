@@ -1,10 +1,41 @@
 module System
 
+import System.Result.*
+
 /// Nominal base for value-type declarations; the base itself is a reference class.
 public abstract class ValueType {}
 
 /// Nominal base for enum declarations; the base itself is a reference class.
-public abstract class Enum : ValueType {}
+public abstract class Enum : ValueType {
+    /// Parses an enum name, comma-separated names, or an invariant signed number.
+    static func Parse<TEnum>(text: string?) -> Result<TEnum, NumberParseError> {
+        return Parse<TEnum>(text, false)
+    }
+
+    /// Parses enum text with explicit ordinal case handling; numeric values need not be named.
+    static func Parse<TEnum>(text: string?, ignoreCase: bool) -> Result<TEnum, NumberParseError> {
+        let handle = neoCLR.Runtime.TypeHandle<TEnum>()
+        let bits = EnumParsing.Parse(handle, text, ignoreCase)?
+        return Ok((TEnum)neoCLR.Runtime.EnumBox(handle, bits))
+    }
+
+    /// Attempts case-sensitive parsing; failure leaves result at its default value.
+    static func TryParse<TEnum>(text: string?, out result: TEnum) -> bool {
+        result = default
+        return TryParse<TEnum>(text, false, out result)
+    }
+
+    /// Attempts parsing with explicit ordinal case handling; failure resets result.
+    static func TryParse<TEnum>(text: string?, ignoreCase: bool, out result: TEnum) -> bool {
+        result = default
+        let parsed = Parse<TEnum>(text, ignoreCase)
+        if parsed is Ok(let value) {
+            result = value
+            return true
+        }
+        return false
+    }
+}
 
 /// Nongeneric array base. Typed array members are supplied by the generic Array type.
 public abstract class Array {}

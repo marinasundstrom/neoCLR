@@ -274,6 +274,13 @@ NUMERIC_FORMATTING_NAMES = [
     'Integral formatting preserves widths culture and interface dispatch',
 ]
 
+ENUM_PARSING_NAMES = [
+    'Enum lists combine names independently of Flags metadata',
+    'Enum names preserve aliases ordinal case and imported types',
+    'Enum numbers preserve signed bounds and unnamed values',
+    'Enum TryParse resets output and rejects malformed input',
+]
+
 PRIMITIVE_PARSING_NAMES = [
     'Boolean parsing accepts mixed case and rejects numeric aliases',
     'Byte parsing preserves values and reports overflow',
@@ -387,7 +394,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -443,6 +450,7 @@ def main():
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('enum-parsing', 0, ''.join('PASS ' + n + '\n' for n in ENUM_PARSING_NAMES) + f'Tests: {len(ENUM_PARSING_NAMES)}, passed: {len(ENUM_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('globalization', 0, ''.join('PASS ' + n + '\n' for n in GLOBALIZATION_NAMES) + f'Tests: {len(GLOBALIZATION_NAMES)}, passed: {len(GLOBALIZATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('numeric-formatting', 0, ''.join('PASS ' + n + '\n' for n in NUMERIC_FORMATTING_NAMES) + f'Tests: {len(NUMERIC_FORMATTING_NAMES)}, passed: {len(NUMERIC_FORMATTING_NAMES)}, failed: 0, skipped: 0\n'),
         ('primitive-parsing', 0, ''.join('PASS ' + n + '\n' for n in PRIMITIVE_PARSING_NAMES) + f'Tests: {len(PRIMITIVE_PARSING_NAMES)}, passed: {len(PRIMITIVE_PARSING_NAMES)}, failed: 0, skipped: 0\n'),

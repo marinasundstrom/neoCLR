@@ -2772,3 +2772,8 @@ format/parsing helpers and InternalCalls are not public APIs. The matching libra
 snapshot uses the rebuilt metadata producer with the module function bound repair;
 Raven compiler semantics are unchanged. [Contracts and validation](../docs/experiments/numeric-formats/README.md)
 record format/precision bounds, strict culture parsing and allocation limitations.
+
+2026-10-20: Enum Parse/TryParse overloads are included in the native and legacy
+reference snapshots, with nullable input, out result, Result errors and runtime-only
+enum validation documented. No type selection exclusion is introduced. The native
+snapshot uses the matched enum-parsing source libraries and renderer 6bd12a225.

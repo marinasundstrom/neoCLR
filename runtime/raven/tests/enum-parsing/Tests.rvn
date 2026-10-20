@@ -1,0 +1,58 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+public enum State { Zero = 0, Ready = 1, Alias = 1, Failed = -1 }
+[Flags]
+public enum Access { None = 0, Read = 1, Alias = 1, Write = 2, Both = 3, Execute = 4, High = -2147483648 }
+public enum Empty {}
+
+[Test("Enum names preserve aliases ordinal case and imported types")]
+func Names() -> Result<unit, TestFailure> {
+    let Ok(ready) = Enum.Parse<State>("Ready") else { return Assert.True(false, "Named value") }
+    let Ok(alias) = Enum.Parse<State>(" Alias ") else { return Assert.True(false, "Alias and whitespace") }
+    _ = Assert.True(ready == State.Ready && alias == ready, "Aliases preserve value")?
+    let Ok(folded) = Enum.Parse<State>("rEaDy", true) else { return Assert.True(false, "Ignore case") }
+    _ = Assert.True(folded == ready && Enum.Parse<State>("ready") is Error(_), "Case is explicit")?
+    let Ok(imported) = Enum.Parse<StringComparison>("Ordinal") else { return Assert.True(false, "Imported enum") }
+    _ = Assert.True(imported == StringComparison.Ordinal, "Imported identity")?
+    System.Runtime.GC.Collect()
+    return Assert.True(ready.ToString() == "Ready", "Parsed value retains normal enum display")
+}
+
+[Test("Enum numbers preserve signed bounds and unnamed values")]
+func Numbers() -> Result<unit, TestFailure> {
+    let Ok(positive) = Enum.Parse<State>(" +42 ") else { return Assert.True(false, "Unnamed positive") }
+    let Ok(negative) = Enum.Parse<State>("-2147483648") else { return Assert.True(false, "Minimum") }
+    let Ok(maximum) = Enum.Parse<State>("2147483647") else { return Assert.True(false, "Maximum") }
+    _ = Assert.True((int)positive == 42 && (int)negative == -2147483648 && (int)maximum == 2147483647, "Numeric bits")?
+    _ = Assert.True(Enum.Parse<State>("2147483648") is Error(NumberParseError.Overflow()), "Positive overflow")?
+    _ = Assert.True(Enum.Parse<State>("-2147483649") is Error(NumberParseError.Overflow()), "Negative overflow")?
+    let Ok(empty) = Enum.Parse<Empty>("0") else { return Assert.True(false, "Empty enum numeric value") }
+    return Assert.True((int)empty == 0, "Empty enum bits")
+}
+
+[Test("Enum lists combine names independently of Flags metadata")]
+func Lists() -> Result<unit, TestFailure> {
+    let Ok(access) = Enum.Parse<Access>(" Read, Write , Execute ") else { return Assert.True(false, "Flag names") }
+    _ = Assert.True((int)access == 7, "Combined flags")?
+    let Ok(ordinary) = Enum.Parse<State>("Ready, Failed") else { return Assert.True(false, "Ordinary enum list") }
+    _ = Assert.True((int)ordinary == -1, "Lists also work without Flags")?
+    let Ok(duplicate) = Enum.Parse<Access>("Read, Alias, Read") else { return Assert.True(false, "Repeated names") }
+    return Assert.True(duplicate == Access.Read, "Duplicate names are idempotent")
+}
+
+[Test("Enum TryParse resets output and rejects malformed input")]
+func TryResults() -> Result<unit, TestFailure> {
+    var value = State.Failed
+    _ = Assert.True(Enum.TryParse<State>("Ready", out value) && value == State.Ready, "Try success")?
+    _ = Assert.True(Enum.TryParse<State>("READY", true, out value) && value == State.Ready, "Try case")?
+    let invalid: string?[] = [null, "", " ", "Missing", "Ready,", ",Ready", "Ready,,Alias", "1,2", "Ready,1", "0x1", "1.0", "2147483648"]
+    for text in invalid {
+        value = State.Failed
+        _ = Assert.True(!Enum.TryParse<State>(text, out value) && value == State.Zero, "Failure resets output")?
+    }
+    return Ok(())
+}

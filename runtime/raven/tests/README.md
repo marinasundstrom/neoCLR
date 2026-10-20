@@ -726,3 +726,10 @@ discovered `[Test]` functions and Result assertions. Run these focused suites wi
 `--suite globalization --suite numeric-formatting --suite primitive-parsing` and
 `--mode interpreter --mode jit --mode native`, supplying a matching bundle and
 its runtime/codegen/JIT host. See [contracts and evidence](../../../docs/experiments/numeric-formats/README.md).
+
+## Enum parsing
+
+`--suite enum-parsing` discovers four built-in tests for names, imported types,
+case selection, aliases, lists, signed boundaries, malformed input and TryParse
+output reset. It uses the same interpreter/JIT/native runner as numeric/globalization
+tests. Current metadata supports ASCII member names and Int32 storage.
