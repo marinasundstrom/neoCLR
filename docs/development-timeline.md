@@ -38,6 +38,14 @@ but converting a struct into an interface value can still box.
 
 The assistant identifies the missing general struct fallback as the underlying
 runtime gap; individual library overrides are useful contracts but do not close it.
+The author then directs “We should fix. Continue” and asks whether the result will
+align with .NET CLR behavior. The assistant proposes fieldwise runtime defaults with
+explicit overrides preserved, independent of typed interfaces and generated operators.
+The author confirms consistency by default and says “EquatableTo remains a user
+implemented contract”; divergence requires value. The author also requests an on-site
+explanation of reference versus value types. Implementation and validation are tracked
+in the [struct default work](experiments/struct-defaults/README.md).
+
 This clarification does not approve automatic operator synthesis for all ordinary
 Raven structs. See the [review record](design/class-library-soundness-20261020.md).
 

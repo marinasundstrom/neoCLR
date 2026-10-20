@@ -123,6 +123,16 @@ pub(crate) fn check_field(
             .map(|_| ())
             .ok_or_else(|| Fault::new("tuple element index out of range"));
     }
+    // Runtime-owned defaults may inspect their own instance fields, including
+    // private source fields. The marker is nonserialized and cannot be supplied
+    // by a caller; ordinary source/member checks below remain unchanged.
+    if caller.value_default_slot.is_some() && caller.owner.as_ref() == Some(owner) {
+        return record_definition(module, owner)?
+            .fields
+            .get(index)
+            .map(|_| ())
+            .ok_or_else(|| Fault::new("field index out of range"));
+    }
     check_owner(module, scope(caller), owner)?;
     let (declaring_owner, index) = crate::inheritance::field_owner(module, owner, index)?;
     let definition = record_definition(module, &declaring_owner)?;

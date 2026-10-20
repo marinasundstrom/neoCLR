@@ -77,6 +77,7 @@ pub(crate) fn structural_contract(ty: &Type) -> Result<Function, Fault> {
         shape.validate()?;
         return Ok(Function {
             native_interface_slot: None,
+            value_default_slot: None,
             origin: None,
             sequence_points: vec![],
             visibility: crate::metadata::Visibility::Public,

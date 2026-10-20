@@ -58,6 +58,8 @@ pub mod metadata;
 mod native;
 mod numeric_parse;
 mod object_identity;
+#[doc(hidden)]
+pub mod value_defaults;
 mod object_root;
 mod program;
 mod reachability;

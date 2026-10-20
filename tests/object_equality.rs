@@ -172,21 +172,26 @@ fn string_identity_follows_text_owner_not_wrapper_or_contents() {
 }
 
 #[test]
-fn other_boxed_virtual_value_equality_remains_explicitly_unsupported() {
-    for (tail, returns) in [
-        (format!("ldc.i4 42\nbox Int32\n{EQUALS}"), "Boolean"),
-        (HASH.into(), "Int32"),
+fn ordinary_boxed_structs_have_fieldwise_defaults() {
+    let declarations = ".type Plain\n.field Number Int32\n.end";
+    for (right, expected) in [
+        ("ldc.i4 42\nnewobj Plain\nbox Plain", true),
+        ("ldc.i4 43\nnewobj Plain\nbox Plain", false),
+        ("ldc.i4 42\nbox Int32", false),
     ] {
-        assert!(
+        assert_eq!(
             run(
-                &format!("ldc.i4 42\nnewobj Unimplemented\nbox Unimplemented\n{tail}"),
-                ".type Unimplemented\n.field Number Int32\n.end",
-                returns,
-                8
+                &format!("ldc.i4 42\nnewobj Plain\nbox Plain\n{right}\n{EQUALS}"),
+                declarations,
+                "Boolean",
+                16
             )
-            .is_err()
+            .unwrap()
+            .value,
+            Value::Boolean(expected)
         );
     }
+    assert_eq!(run(&format!("ldc.i4 42\nnewobj Plain\nbox Plain\n{HASH}\nldc.i4 42\nnewobj Plain\nbox Plain\n{HASH}\nceq"), declarations, "Boolean", 16).unwrap().value, Value::Boolean(true));
 }
 
 #[test]
@@ -311,14 +316,17 @@ fn named_struct_box_dispatch_reads_copied_payload() {
 #[test]
 fn named_struct_same_name_is_not_an_object_override() {
     let declarations = STRUCT_KEY.replace("override ", "");
-    assert!(
+    // A hiding method does not replace the slot: use the fieldwise default.
+    assert_eq!(
         run(
             &format!("ldc.i4 42\nnewobj Key\nbox Key\n{HASH}"),
             &declarations,
             "Int32",
             8
         )
-        .is_err()
+        .unwrap()
+        .value,
+        Value::Int32((17 * 31) ^ 42)
     );
 }
 

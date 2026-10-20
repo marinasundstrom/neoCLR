@@ -510,7 +510,10 @@ pub(crate) fn dispatch(
             && contract.returns == Type::String
             && !contract.is_abstract;
         if !(module.is_reference_type(concrete) || value_display) {
-            return Err(Fault::new("boxed value has no explicit Object override"));
+            if let Some(default) = crate::value_defaults::body(module, concrete, contract)? {
+                return Ok(default);
+            }
+            return Err(Fault::new("boxed value has no supported Object default"));
         }
         return Ok(contract.clone());
     }

@@ -15,7 +15,9 @@ but their references and boxing still count. The first follow-up
 now connect explicit culture to composite formatting. The [time-value contracts](experiments/time-values/README.md)
 complete boxed equality/hash and LocalDateTime equality/ordering.
 [HttpVersion value contracts](experiments/http-version-values/README.md) also align
-typed/boxed equality, hashes and display. Primitive numeric formats and
+typed/boxed equality, hashes and display. [Ordinary struct defaults](experiments/struct-defaults/README.md)
+add runtime fieldwise equality/hash while preserving explicit EquatableTo contracts.
+Native boxed field-shape coverage remains bounded. Primitive numeric formats and
 general providers remain gaps. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
 this does not certify all types.
 

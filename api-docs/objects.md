@@ -83,10 +83,38 @@ and explicit Object base Equals/GetHashCode use that owner; virtual String equal
 and hashing use canonical Unicode 17 text identity. Separate constructions can be
 canonically equal without sharing bytes or reference identity. Explicit String.Intern
 shares exact stored spellings within one execution; literals are not automatically interned. Virtual
-boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char and explicit named-struct overrides, described below.
+boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char,
+explicit named-struct overrides and ordinary struct defaults, with engine limits
+described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
 Null instance receivers raise NullReference; default Equals accepts a null argument
 and returns false. Static two-argument Object.Equals is not yet available.
+
+## Ordinary struct defaults
+
+A nominal struct without an Object override uses fieldwise Equals and GetHashCode.
+Equals requires the same closed runtime type and equal instance fields; null and a
+different type compare false. Empty values of the same type compare equal. Static
+fields do not participate. Field comparisons respect their own Object overrides,
+including content equality for String and custom reference classes. Private fields
+participate without becoming accessible to ordinary callers or reflected as new methods.
+
+A struct's explicit override takes precedence. A same-name method without override
+hides a method but does not replace the Object slot. Equal values have equal hashes;
+exact hash numbers are not a CLR compatibility or persistence contract. Overriding
+Equals still requires a compatible GetHashCode implementation.
+
+EquatableTo remains explicitly implemented by the author of a type. Default equality
+neither adds that interface nor synthesizes ordinary struct equality operators.
+Boxing copies a value and retains separate allocation identity. Integer and Boolean
+field defaults avoid extra field boxes; nested/default Object calls can still allocate.
+
+The [development consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)
+covers direct and boxed calls, integer fields, nested and generic structs, nulls,
+canonical String fields and custom reference equality. Native floating-point and enum
+boxed adapters remain gaps; interpreter floating field equality handles NaN and signed
+zero. Borrowed views and enum/primitive definitions do not receive ordinary struct
+fallback bodies. This is bounded support rather than every .NET value shape.
 
 ## Direction under review
 

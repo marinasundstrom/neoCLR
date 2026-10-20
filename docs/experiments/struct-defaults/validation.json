@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS struct defaults\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS struct defaults\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/struct-default-matched-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS struct defaults\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-app/app": "61cb712893c9cda889263c20f4916983dbf0fd3c7451a2a8e340185b162decee",
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-app/app.dll": "a75ff7ee6a632f7d24c5985ac3d4bbed5e86ab5cd74339b5106c8f6fc41e05ef",
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/bin/neoclr": "a1d74bc3306486f569bb52856b08140b2119fb001a69ed1b0873c4a6ff7bc022",
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/bin/neoclr-codegen": "4d60ab0a81520ad9f07922450b13e5e8793f671e637f34033e9bb5ccfefe9b46",
+    "/Users/robert/Projects/neoclr/target/struct-default-matched-bundle/bundle/lib/System.Runtime.dll": "330d92c1374d652a7f96369835afb25d8c75088504ed4e013adb3deaea6b0d4f"
+  }
+}

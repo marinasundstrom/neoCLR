@@ -1,0 +1,54 @@
+## value-default-focused-qualified.log
+
+running 6 tests
+test execution_helpers_are_unique_and_do_not_add_typed_contracts ... ok
+test defaults_can_read_private_fields_without_exposing_them_to_callers ... ok
+test default_values_compare_nested_fields_and_preserve_field_overrides ... ok
+test empty_defaults_require_exact_type_and_null_fields_are_values ... ok
+test defaults_preserve_float_field_contracts ... ok
+test defaults_use_all_integral_bits_without_field_boxes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+## value-default-field-access.log
+
+running 6 tests
+test direct_aggregate_construction_requires_access_to_every_initialized_field ... ok
+test host_record_import_remains_an_explicit_trusted_data_boundary ... ok
+test omitted_field_visibility_is_public_and_unknown_json_flags_are_rejected ... ok
+test generic_private_fields_round_trip_and_explicit_value_updates_preserve_copies ... ok
+test internal_fields_allow_same_module_functions_but_reject_foreign_access ... ok
+test reads_writes_and_addresses_are_checked_by_verifier_and_unverified_execution ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.11s
+
+
+## value-default-native-qualified.log
+
+running 1 test
+test ordinary_struct_defaults_execute_in_native_code ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 181 filtered out; finished in 1.60s
+
+
+## value-default-native-regression.log
+
+running 1 test
+test object_value_dispatch_preserves_identity_overrides_and_null_faults ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 181 filtered out; finished in 1.07s
+
+
+## value-default-hiding-final.log
+
+running 1 test
+test named_struct_same_name_is_not_an_object_override ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 36 filtered out; finished in 20.79s
+
+
+## value-default-consumer-matched.log
+interpreter: PASS
+jit: PASS
+aot: PASS

@@ -310,6 +310,18 @@ pub fn prepare(
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         reflection_retention = Some(retention);
     }
+    // Source metadata was verified and captured above. Default value bodies are
+    // private execution helpers and must not become reflected declared members.
+    let default_start = joined.functions.len();
+    neoclr::value_defaults::materialize(&mut joined).map_err(|e| e.to_string())?;
+    for index in default_start..joined.functions.len() {
+        joined.functions[index].definition = Some(method_id(index));
+        methods.push(MemberId {
+            module: "$runtime.value-defaults".into(),
+            revision: app.revision.clone(),
+            index: (index - default_start) as u32,
+        });
+    }
     let source_conformance = joined.clone();
     let boxed_nominal_types: std::collections::BTreeSet<_> = joined
         .functions

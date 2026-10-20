@@ -51,6 +51,9 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
             .and_then(|p| p.verify())
             .map_err(|e| e.to_string())?;
     }
+    let mut execution = input.clone();
+    neoclr::value_defaults::materialize(&mut execution).map_err(|e| e.to_string())?;
+    let input = &execution;
     if input.types.iter().any(|t| !t.generic_parameters.is_empty())
         || input
             .functions
@@ -351,8 +354,9 @@ pub(super) fn object_value_override(
         for (index, method) in input.functions.iter().enumerate() {
             if method.owner.as_ref().and_then(Type::definition_name) != current.definition_name()
                 || !method.instance
-                || !method.is_override
-                || method.name.rsplit('.').next() != contract.name.rsplit('.').next()
+                || !(neoclr::value_defaults::implements_contract(method, contract)
+                    || (method.is_override
+                        && method.name.rsplit('.').next() == contract.name.rsplit('.').next()))
             {
                 continue;
             }
@@ -362,7 +366,9 @@ pub(super) fn object_value_override(
                 continue;
             }
             // New-slot and ordinary hiding members do not replace the Object slot.
-            if !method.is_override {
+            if !method.is_override
+                && !neoclr::value_defaults::implements_contract(&method, contract)
+            {
                 continue;
             }
             if method.is_abstract

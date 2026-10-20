@@ -2395,9 +2395,15 @@ impl<'a> Profile<'a> {
                     stack.push(value);
                 }
                 Op::BitAnd | Op::BitOr | Op::BitXor => {
-                    take(&mut stack, &Ty::Int)?;
-                    take(&mut stack, &Ty::Int)?;
-                    stack.push(Ty::Int);
+                    let value = pop(&mut stack)?;
+                    if !matches!(value, Ty::Int | Ty::Wide | Ty::Size) {
+                        return Err(fail(
+                            pc,
+                            "bitwise operation requires matching integer operands",
+                        ));
+                    }
+                    take(&mut stack, &value)?;
+                    stack.push(value);
                 }
                 Op::AddChecked
                 | Op::SubChecked

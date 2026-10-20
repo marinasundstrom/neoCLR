@@ -15,6 +15,16 @@ There is no CLI semantic reference in this path. Legacy bridge tools remain for
 historical fixtures and the aggregate documentation reference only. The native API
 snapshot renders the actual native libraries. See [validation and configuration](validation/native-core-removal/README.md).
 
+## Ordinary struct fallback execution (2026-10-20)
+
+Default nominal-struct Object equality/hash now belongs to runtime execution, not
+Raven record synthesis or temporary CLI member encoding. The compiler contract,
+metadata layout and native ABI are unchanged. Native preparation verifies source
+metadata first, adds runtime-only fallback bodies to the execution projection and
+keeps the original source catalogue for reflection. A nonserialized marker identifies
+those bodies; source metadata cannot declare one. EquatableTo remains explicit.
+See [contracts, limitations and qualification](experiments/struct-defaults/README.md).
+
 ## Standard structural compiler contract (2026-10-15)
 
 The paired Raven neoCLR branch now binds and emits structural unions, intersections

@@ -502,6 +502,9 @@ pub struct StaticField {
 pub struct Function {
     #[serde(skip)]
     pub(crate) native_interface_slot: Option<MemberId>,
+    /// Trusted execution-only fallback slot; never accepted from source metadata.
+    #[serde(skip)]
+    pub(crate) value_default_slot: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<crate::metadata_origin::MetadataOrigin>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]

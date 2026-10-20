@@ -13011,3 +13011,108 @@ fn canonical_text_services_match_interpreter_without_normalizing_storage() {
         assert_eq!(result.status.code(), Some(0), "{result:?}");
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn ordinary_struct_defaults_execute_in_native_code() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
+    let source = r#"
+.module ValueDefaults
+.type Plain
+.field Number Int32
+.field Stamp Int64
+.end
+.function Calculate(Int32 unused) -> Int32
+.local System.Object first
+.local System.Object second
+ldc.i4 42
+ldc.i8 4294967297
+newobj Plain
+box Plain
+stloc first
+ldc.i4 42
+ldc.i8 4294967297
+newobj Plain
+box Plain
+stloc second
+ldloc first
+ldloc second
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc first
+callvirt instance System.Object::GetHashCode()
+ldloc second
+callvirt instance System.Object::GetHashCode()
+ceq
+brfalse Fail
+ldloc first
+ldc.i4 42
+ldc.i8 4294967298
+newobj Plain
+box Plain
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldc.i4 42
+ret
+Fail:
+ldc.i4 -1
+ret
+.end
+"#;
+    let app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed)
+            .unwrap()
+            .remove(0);
+    let result = compile_linked_module(
+        &dir,
+        &seed,
+        &app,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(
+        dir.0.join("host.c"),
+        r#"
+#include "text-arena.h"
+int main(void) {
+    uint64_t storage[1024];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t value=-99;
+    int status=neoclr_entry_v4(0,&value,&ctx);
+    if (status) { neoclr_aot_render_fault(stderr,&ctx.fault); return status; }
+    return value == 42 ? 0 : 99;
+}
+"#,
+    )
+    .unwrap();
+    let result = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let result = Command::new(dir.0.join("app")).output().unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+}

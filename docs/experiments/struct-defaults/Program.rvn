@@ -1,0 +1,65 @@
+import System.*
+
+struct Plain {
+    val Number: int
+    val Stamp: long
+    init(number: int, stamp: long) {
+        Number = number
+        Stamp = stamp
+    }
+}
+struct Empty {}
+struct OtherEmpty {}
+struct Pair<T> {
+    val First: T
+    val Second: int
+    init(first: T, second: int) {
+        First = first
+        Second = second
+    }
+}
+class Key {
+    override func Equals(other: Object?) -> bool {
+        return other is Key
+    }
+    override func GetHashCode() -> int => 42
+}
+struct Mixed {
+    val Value: Plain
+    val Text: string
+    val Reference: Object?
+    init(value: Plain, text: string, reference: Object?) {
+        Value = value
+        Text = text
+        Reference = reference
+    }
+}
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+func Main() {
+    let first = Plain(42, 4294967297L)
+    let second = Plain(42, 4294967297L)
+    let boxed: Object = first
+    let another: Object = second
+    Check(first.Equals(second), "direct inherited equality")
+    Check(first.GetHashCode() == second.GetHashCode(), "direct inherited hash")
+    Check(boxed.Equals(another) && another.Equals(boxed), "default boxed equality")
+    Check(boxed.GetHashCode() == another.GetHashCode(), "default boxed hash")
+    Check(!boxed.Equals(null) && !boxed.Equals(42) && !boxed.Equals(Plain(43, 4294967297L)) && !boxed.Equals(Plain(42, 4294967298L)), "type and fields")
+    Check(!Object.ReferenceEquals(boxed, another), "identity unchanged")
+    let empty: Object = Empty()
+    Check(empty.Equals(Empty()) && !empty.Equals(OtherEmpty()), "empty nominal identity")
+    let left: Object = Mixed(first, "é", Key())
+    let right: Object = Mixed(second, "é", Key())
+    Check(left.Equals(right) && left.GetHashCode() == right.GetHashCode(), "nested field contracts")
+    let absent: Object = Mixed(first, "x", null)
+    Check(absent.Equals(Mixed(second, "x", null)) && !absent.Equals(Mixed(second, "x", Key())), "null fields")
+    let generic: Object = Pair<Plain>(first, 7)
+    let genericOther: Object = Pair<Plain>(second, 7)
+    Check(generic.Equals(genericOther) && generic.GetHashCode() == genericOther.GetHashCode(), "generic default")
+    Check(!generic.Equals(Pair<Plain>(second, 8)), "generic different field")
+    Console.WriteLine("PASS struct defaults")
+}

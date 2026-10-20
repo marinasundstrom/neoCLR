@@ -30,10 +30,10 @@ should be reused when its assumptions are unchanged.
 - Index/Range and several ordinary error structs declare ToString without override.
   Check direct versus Object/interface dispatch before changing declarations; do
   not conflate display repair with default structural value equality.
-- Ordinary structs without overrides still lack complete .NET-style default
-  ValueType equality/hash behavior. This is a runtime/backend gap, not an intentional
-  object-identity policy. Reuse the record-generation evidence and inspect each
-  engine before choosing a general implementation.
+- Ordinary structs now have runtime-owned fieldwise defaults; see the
+  [qualification](../experiments/struct-defaults/README.md). Extend supported native
+  field shapes as their boxed adapters become available; this is not full .NET
+  ValueType coverage and does not synthesize EquatableTo or ordinary operators.
 - Generic record display, enum/floating-point boxed adapters and primitive
   self-equality/formatting coverage remain incomplete. Floating-point equality must
   handle NaN and signed zero consistently with hashing; do not replace it casually

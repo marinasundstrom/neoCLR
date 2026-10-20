@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
-- Clarify the class-library review distinction between ordinary struct default equality/hash, record operator synthesis and typed/constrained comparison paths. Record interface-conversion boxing and the general struct fallback as separate runtime work; no ordinary-struct operator policy changes.
+- Implement runtime-owned fieldwise Equals/GetHashCode defaults for ordinary nominal structs, preserving explicit overrides, exact closed types, private fields and source reflection. Keep EquatableTo user-implemented and ordinary operators unchanged. Share helper construction between interpreter and native preparation; compare/hash integer and Boolean fields without extra field boxes and admit matching wide native bitwise operands. Qualify direct/boxed, nested/generic, empty/null and reference-field contracts; native floating/enum boxed adapters remain gaps. Update the class-library review and Object API guide.
 
 - Complete HttpVersion's EquatableTo and Object equality/hash contracts and make its existing ToString an override, aligning source and reference metadata. Compare both protocol components, retain default 0.0 and nonnegative Int32 components, and preserve HTTP/1.1 transport scope. Qualify typed/interface/boxed calls, direct/generic/imported records, component boundaries and request/response versions across interpreter/JIT/AOT. Four native API snapshot checks and the website build pass; update API references and class-library review evidence.
 
