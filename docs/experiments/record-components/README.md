@@ -34,8 +34,9 @@ The original cohort did not synthesize ConsoleKeyInfo's self-equality interface.
 [Automatic record interfaces](../record-auto-interfaces/README.md) now close that
 gap. The current missing-contract regression uses OverflowError, an ordinary
 struct with no self-equality contract. Historical results below retain their
-original cohort scope. Duration lacks a declared hash
-method. Neither is silently accepted using Object identity or a guessed contract.
+original cohort scope. The [Duration follow-up](../duration-values/README.md) now supplies
+its Object equality/hash contract; the missing-hash fixture uses Date until its own
+contract is completed. Missing contracts are not accepted using guessed identity.
 Generic record owners, constructed generic components, imported record discovery,
 explicit value-interface implementation resolution and generated formatting remain
 separate work. Source-defined ordinary structs are not newly admitted by this slice.

@@ -20356,3 +20356,24 @@ for the test results and artifact identities. No release publication is claimed.
   unsupported-component checks pass. This does not establish throughput parity.
 - **Open:** Four value boxes remain, alongside broader component/formatting gaps and
   replacement-release qualification. See [evidence](experiments/record-generics/README.md#descriptor-free-policy-and-corrected-allocation-control).
+
+
+### Class-library soundness as release objective — 2026-10-20
+
+- **Author clarification:** Allocations are acceptable when they serve a purpose;
+  removing allocations for their own sake should not dominate the work.
+- **Assistant response:** Proposed treating the remaining generic boxes as a measured
+  candidate, preserving behavior and maintainability. Selected Duration's missing
+  Object/hash contract as the next concrete correctness issue.
+- **Author direction:** “The objective for this release is to review our classes and
+  structs and make sure they are sound. Allocations. Behavior. Interface implementations.
+  Fix it if possible. Make everything in one go.”
+- **Action:** Broaden the ongoing review to a class-library inventory with explicit
+  findings and evidence, while committing coherent fixes. Complete Duration's value
+  contract first. The broader audit and matched release qualification remain open;
+  no claim that every class/struct is already sound follows from this fix.
+
+- **Author scope clarification:** Equality, hash code and ToString are included;
+  Formattable support should also be considered. The review will distinguish value
+  and reference identity, diagnostic display and serialization, and verify Object
+  and interface dispatch alongside typed calls.

@@ -1,0 +1,55 @@
+import System.*
+import System.Time.*
+import System.Collections.*
+
+record struct Elapsed(Value: Duration)
+record struct Generic<T>(Value: T)
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func CheckTicks(ticks: long, different: long) {
+    let value = Duration.FromTicks(ticks)
+    let same = Duration.FromTicks(ticks)
+    let other = Duration.FromTicks(different)
+    Check(value.Equals(same) && !value.Equals(other), "typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "equal hashes")
+    let contract: EquatableTo<Duration> = value
+    Check(contract.Equals(same) && !contract.Equals(other), "interface equality")
+    let boxed: Object = value
+    let secondBox: Object = same
+    Check(boxed.Equals(secondBox) && secondBox.Equals(boxed), "distinct boxes")
+    Check(!boxed.Equals(other) && !boxed.Equals(null) && !boxed.Equals(ticks), "Object type and null checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "boxed hash")
+    let direct = Elapsed(value)
+    Check(direct == Elapsed(same) && direct != Elapsed(other), "imported record component")
+    Check(direct.GetHashCode() == Elapsed(same).GetHashCode(), "record hash")
+    let generic = Generic<Duration>(value)
+    Check(generic == Generic<Duration>(same) && generic != Generic<Duration>(other), "generic record component")
+    Check(generic.GetHashCode() == Generic<Duration>(same).GetHashCode(), "generic record hash")
+    let erased = Generic<Object>(boxed)
+    Check(erased == Generic<Object>(secondBox) && erased != Generic<Object>(other), "Object generic component")
+    Check(erased.GetHashCode() == Generic<Object>(secondBox).GetHashCode(), "Object generic hash")
+    let pair = KeyValuePair<Duration, int>(value, 3)
+    Check(pair == KeyValuePair<Duration, int>(same, 3) && pair != KeyValuePair<Duration, int>(other, 3), "imported generic pair")
+    Check(pair.GetHashCode() == KeyValuePair<Duration, int>(same, 3).GetHashCode(), "pair hash")
+}
+
+func Main() {
+    CheckTicks(0, 1)
+    CheckTicks(-1, 1)
+    CheckTicks(4294967297, 8589934593)
+    CheckTicks(-9223372036854775807L - 1L, 9223372036854775807L)
+    CheckTicks(9223372036854775807L, -9223372036854775807L - 1L)
+    let zero: Duration = default
+    Check(zero.Equals(Duration.FromTicks(0)), "default ticks")
+    // Collisions are valid: equality must still compare all 64 bits.
+    let first = Duration.FromTicks(0)
+    let collision = Duration.FromTicks(4294967297)
+    Check(first.GetHashCode() == collision.GetHashCode() && !first.Equals(collision), "hash collision")
+    Check(Duration.FromTicks(1).GetHashCode() != Duration.FromTicks(4294967297).GetHashCode(), "high hash bits")
+    Console.WriteLine("PASS duration values")
+}

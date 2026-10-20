@@ -23,8 +23,19 @@ public struct Duration : ComparableTo<Duration>, EquatableTo<Duration> {
 
     val Ticks: long => StoredTicks
 
+    /// Compares the complete signed tick count.
     func Equals(other: Duration) -> bool {
         return StoredTicks == other.StoredTicks
+    }
+
+    /// Compares another boxed Duration by tick count; null and other types are unequal.
+    override func Equals(other: Object?) -> bool {
+        return other is Duration value && Equals(value)
+    }
+
+    /// Returns an execution-local value hash consistent with tick equality; not a persistent identifier.
+    override func GetHashCode() -> int {
+        return (int)StoredTicks ^ (int)(StoredTicks >> 32)
     }
 
     func CompareTo(other: Duration) -> int {

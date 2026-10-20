@@ -4,6 +4,13 @@
 
 **Record formatting follow-up (2026-10-20):** [Scalar and nested positional record formatting](experiments/record-formatting/README.md) now has native bodies, including [closed declared union components](experiments/record-union-formatting/README.md); enum and broader component/generic formatting remain gaps. [Automatic equality-interface synthesis](experiments/record-auto-interfaces/README.md) now connects native nongeneric records to the core contract, including imported ConsoleKeyInfo components. [Bounded generic equality/hash](experiments/record-generics/README.md) now extends this to generic owners and imported pairs. The generic path now selects declared-type policy without allocating descriptors through a core compiler service; value boxes, broader component adapters and formatting remain open. Keep the replacement matched-package gates open.
 
+**Class-library release review (author direction, 2026-10-20):** review classes and
+structs for behavior, interface implementation and justified allocation, fixing concrete
+issues together before release qualification. Allocation count alone is not a defect;
+ownership, retained state and useful results justify allocation. The first follow-up
+[completes Duration value equality/hash](experiments/duration-values/README.md).
+The broader inventory review remains in progress; this does not certify all types.
+
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
 adds scoped caller-buffer bytes, nonblocking and timed/blocking reads, capabilities and input ownership. The [Raven text reads](experiments/console-text-reading/README.md) now add shared

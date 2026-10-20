@@ -1565,6 +1565,8 @@
     <member name="T:System.Time.Duration"><summary>A signed elapsed duration represented by 100-nanosecond ticks.</summary></member>
     <member name="M:System.Time.Duration.FromTicks(System.Int64)"><summary>Creates a value from 100-nanosecond ticks; TimeOfDay rejects ticks outside a single day.</summary><param name="ticks">The number of 100-nanosecond ticks.</param></member>
 
+    <member name="M:System.Time.Duration.Equals(System.Object)"><summary>Compares a boxed Duration using its complete signed tick count.</summary><param name="other">The value to compare, or null.</param><returns>True only for a Duration with the same tick count. Null and other types are unequal.</returns></member>
+    <member name="M:System.Time.Duration.GetHashCode"><summary>Returns a hash consistent with tick-count equality.</summary><returns>An execution-local 32-bit hash. Collisions are possible; do not persist it or use it as an identifier.</returns></member>
     <member name="M:System.Time.Duration.Equals(System.Time.Duration)"><summary>Tests value equality with the other value.</summary><param name="other">The other value to compare.</param></member>
 
     <member name="M:System.Time.Duration.CompareTo(System.Time.Duration)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>

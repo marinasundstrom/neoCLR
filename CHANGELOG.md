@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Complete Duration's Object equality and hash contract using all signed tick bits, preserving typed equality and default zero. Qualify typed/interface/boxed calls, null/wrong types, signed boundaries, hash collisions and direct/generic record and pair components across interpreter/JIT/AOT. Refresh API documentation. Record the author's broader class-library soundness review as the release objective; allocations are evaluated by purpose and impact, not count alone.
+
 - Record the author’s .NET/CLR default for runtime execution and ABI design, including review of existing neoCLR-specific conventions. Clarify that records remain ordinary classes/structs with compiler-generated members/interfaces, not a separate runtime representation. Record the missing IEquatable/EquatableTo synthesis mapping as a compiler/core gap. This is design policy, not a completed ABI migration or binary-compatibility claim.
 
 - Preserve the call/callvirt distinction in native String wrapper projection: retain null checks at original callvirt sites instead of rejecting all null receivers at wrapper entry. Keep ordinary Raven instance null faults and original private-access validation; no public API or compiler contract changes. Raw direct calls retain interpreter behavior without claiming portable CLR support for null instance references. The five-mode interpreter/JIT/AOT regression passes, including JIT GC root cleanup, along with String-interface and Object-display fault regressions.

@@ -1,0 +1,71 @@
+{
+  "expectedFault": false,
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/duration-value-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS duration values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/duration-value-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS duration values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/duration-value-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS duration values\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/duration-value-app/app": "21c2bec39488d5bc6a8541e783d73cd115d6bab42a45c50389535b980fd9f8db",
+    "/Users/robert/Projects/neoclr/target/duration-value-app/app.dll": "59897ce79a7a1bbcd77a7c7b75130ed56e7c3c8840928016fc76e95ca422ad60",
+    "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/bin/neoclr-codegen": "36b9cf3059de373ea96981a7ee83bbc0bc95a06998f4cca7d12eedf6e1f4e4e5",
+    "/Users/robert/Projects/neoclr/target/duration-value-bundle/bundle/lib/System.Runtime.dll": "2ed058fe8595823285faca6d5bcefcf58774c8dd2122b7a698bdc167a23653f8"
+  }
+}

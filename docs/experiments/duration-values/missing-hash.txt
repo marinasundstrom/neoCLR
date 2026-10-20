@@ -1,0 +1,1 @@
+/Users/robert/Projects/neoclr/docs/experiments/record-components/MissingHash.rvn(3,1): error NEOMETA001: Native emission does not support record equality interface requires supported component equality and hashing: struct Unsupported.

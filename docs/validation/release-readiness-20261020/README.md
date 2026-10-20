@@ -46,8 +46,7 @@ now admit nongeneric Index/Range components using their public typed methods.
 [Automatic equality interfaces](../../experiments/record-auto-interfaces/README.md)
 now close ConsoleKeyInfo's missing self-equality interface and imported component
 use. Nongeneric records with unsupported components reject at declaration; generic
-equality/hash now has bounded support with allocation overhead, as recorded below. Duration still lacks a declared hash
-method. The earlier explicit-interface qualification is retained as historical
+equality/hash now has bounded support with allocation overhead, as recorded below. [Duration now has typed and boxed value equality with consistent hashing](../../experiments/duration-values/README.md). The earlier explicit-interface qualification is retained as historical
 regression evidence, not the solution to automatic synthesis.
 Native Int32/Int64/Boolean Object-dispatch adapters are now qualified; other primitive
 adapters remain incomplete. The

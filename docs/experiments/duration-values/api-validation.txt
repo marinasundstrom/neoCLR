@@ -1,0 +1,4 @@
+Checked RavenDoc reference assembly and source fingerprints
+
+Integrated native preview; checked 4909 neoCLR website pages; 124 legacy pages retained
+Built and checked 4909 RavenDoc pages: /Users/robert/Projects/neoclr/target/website

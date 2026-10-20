@@ -16,6 +16,14 @@ when a value must retain its Instant, Zone, LocalDateTime and Offset.
 TimeOffset is a fixed whole-second displacement from UTC; TimeZone contains rules
 that can change that displacement over time. No OffsetDateTime type is included.
 
+## Duration value equality (development)
+
+Duration compares its complete signed tick count through typed, interface and Object
+calls. Equal values have equal hashes; null and unrelated types are unequal. It can
+be used in supported record fields and generic pairs. Hashes are not persistent IDs.
+See the [API reference](/docs/api/System/Time/Duration/index.html) and
+[validated consumer](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/duration-values).
+
 ## Mapping a local time
 
 A local clock reading can occur once, twice or not at all. TimeZone.MapLocal returns

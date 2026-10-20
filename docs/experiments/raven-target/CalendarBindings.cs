@@ -37,6 +37,8 @@ static class CalendarBindings
         new("Duration", "FromTicks", ["Int64"], "System.Time.Duration"),
         new("Duration", "get_Ticks", [], "Int64", true),
         new("Duration", "Equals", ["System.Time.Duration"], "Boolean", true),
+        new("Duration", "Equals", ["System.Object"], "Boolean", true),
+        new("Duration", "GetHashCode", [], "Int32", true),
         new("Duration", "CompareTo", ["System.Time.Duration"], "Int32", true),
         new("Date", "Create", ["Int32", "Int32", "Int32"], DateResult),
         new("Date", "ToString", [], "String", true),
@@ -90,7 +92,7 @@ static class CalendarBindings
     public static string Declarations => "namespace Time { public interface Clock { Instant Now { get; } } public class SystemClock : Clock { public SystemClock() { } public Instant Now => default; }\n" + string.Join("\n", Members.GroupBy(m => m.Owner).Select(group =>
         $"public struct {group.Key} {{ " + string.Join(" ", group.Select(m =>
             m.Name.StartsWith("get_") ? $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name[4..]} => default;"
-            : $"public {(m.Name == "ToString" && m.Args.Length == 0 ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }")) + " }";
+            : $"public {((m.Name == "ToString" && m.Args.Length == 0 || m.Owner == "Duration" && (m.Name == "GetHashCode" || m.Name == "Equals" && m.Args.SequenceEqual(["System.Object"]))) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }")) + " }";
     public static void ProjectLayout(ModuleDefinition module)
     {
         var attribute = new TypeDefinition("System.Runtime.CompilerServices", "IsReadOnlyAttribute",
