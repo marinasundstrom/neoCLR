@@ -1,0 +1,5 @@
+Native API audit: PASS production native metadata rendering with selected explicit core contract
+Native API snapshot tests: 4 passed
+Checked RavenDoc reference assembly and source fingerprints
+Integrated native preview; checked 4907 neoCLR website pages; 124 legacy pages retained
+Built and checked 4907 RavenDoc pages: /Users/robert/Projects/neoclr/target/website

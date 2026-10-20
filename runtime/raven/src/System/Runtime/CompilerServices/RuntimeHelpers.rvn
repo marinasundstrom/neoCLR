@@ -8,6 +8,12 @@ public static class RuntimeHelpers {
         neoCLR.Runtime.DrainEntryTasks()
     }
 
+    /// Tests assignment from TSource to TTarget using declared types, without creating type descriptors.
+    /// Used by generated generic value semantics; does not inspect an object's runtime type.
+    static func IsAssignable<TSource, TTarget>() -> bool {
+        return neoCLR.Runtime.ReflectionAssignable(neoCLR.Runtime.TypeHandle<TSource>(), neoCLR.Runtime.TypeHandle<TTarget>())
+    }
+
     /// Borrows a range without copying; invalid ranges fault.
     static func GetSlice<T>(array: T[], range: System.Range) -> System.Slice<T> {
         let bounds = range.GetOffsetAndLength(array.Length)

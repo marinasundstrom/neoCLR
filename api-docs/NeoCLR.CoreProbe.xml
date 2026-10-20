@@ -4,6 +4,7 @@
     <name>NeoCLR.CoreProbe</name>
   </assembly>
   <members>
+    <member name="M:System.Runtime.CompilerServices.RuntimeHelpers.IsAssignable``2"><summary>Tests assignment from a declared source type to a declared target type without creating type descriptors.</summary><typeparam name="TSource">The declared source type.</typeparam><typeparam name="TTarget">The declared target type.</typeparam><returns>True when the runtime permits the type assignment; otherwise false.</returns><remarks>Development compiler service, equivalent to typeof(TSource).AssignableTo(typeof(TTarget)). This tests types, not an object instance, and creates neither TypeInfo objects nor value boxes. Uses the runtime's existing relationship rules and limitations. It does not perform a value conversion.</remarks></member>
     <member name="T:System.Collections.AsyncIterable`1"><summary>A source of asynchronous iterators, covariant in reference-type elements.</summary><typeparam name="T">The element type; value-type arguments remain exact.</typeparam></member>
     <member name="T:System.Collections.AsyncIterator`1"><summary>An asynchronous cursor, covariant in reference-type elements.</summary><typeparam name="T">The element type; value-type arguments remain exact.</typeparam></member>
     <member name="T:System.Introspection.GenericVariance"><summary>The declared variance of an interface type parameter.</summary></member>

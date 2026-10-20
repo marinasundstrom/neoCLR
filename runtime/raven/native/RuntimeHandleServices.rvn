@@ -27,3 +27,6 @@ internal extern func TypeEquals(left: System.RuntimeTypeHandle, right: System.Ru
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func TypeName(handle: System.RuntimeTypeHandle) -> string;
+
+// The selected handle owner supplies a managed ldtoken body, without a host call.
+internal extern func TypeHandle<T>() -> System.RuntimeTypeHandle;

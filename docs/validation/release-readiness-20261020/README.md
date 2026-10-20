@@ -112,3 +112,10 @@ hashing is corrected. The generic path adds seven managed allocations per tested
 integer equality plus two hashes. Keep optimization, unsupported value adapters,
 generic formatting and the exact matched-package gates open; this does not authorize
 or claim a replacement release.
+
+
+The [generic record allocation follow-up](../../experiments/record-generics/README.md#descriptor-free-policy-and-corrected-allocation-control)
+now removes policy descriptor allocations. A corrected matched harness measures eight
+versus four additional allocations per integer comparison and two hashes. Value boxing
+and broader record gaps remain; this focused development evidence does not close the
+matched-package release gates above.

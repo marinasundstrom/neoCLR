@@ -1,0 +1,66 @@
+{
+  "iterations": 128,
+  "measurements": [
+    {
+      "mode": "baseline",
+      "allocations": 5,
+      "collections": 12,
+      "reclaimed": 5
+    },
+    {
+      "mode": "direct",
+      "allocations": 5,
+      "collections": 1932,
+      "reclaimed": 5
+    },
+    {
+      "mode": "generic",
+      "allocations": 517,
+      "collections": 4364,
+      "reclaimed": 517
+    }
+  ],
+  "extraAllocationsPerIteration": 4.0,
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-policy-allocation-after-final/app.dll": "ddcb7a5c5cb9f62760a9e54c56d445b033ea7bb9b33823fc47672aa781799ea3",
+    "/Users/robert/Projects/neoclr/target/record-policy-allocation-after-final/app.o": "d373cb6a2d8faf8ac6ffcee1e708fd4051cda6b3d355a69150138b84d6c7b1ee",
+    "/Users/robert/Projects/neoclr/target/record-policy-allocation-after-final/allocation-probe": "5b609095a9bd92fd4bc5122caac7b1c4db5d424eacdf7741fcb674bb15cedc99",
+    "/Users/robert/Projects/neoclr/target/record-policy-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/record-policy-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/record-policy-bundle/bundle/lib/System.Runtime.dll": "1a177d2c3db19bc7d89d1ab56e32d47db3f83cc3832664b111afe0308010e05e",
+    "/Users/robert/Projects/neoclr/docs/experiments/record-generics/Allocation.rvn": "520db34f17b9075f41c345d160df23c3dd7fc3f595d4f38ff3375efabed9602b"
+  },
+  "scope": "Native managed allocations for 128 generic or nongeneric Int32 record typed Equals and two hashes; includes any generic boxes and type descriptors; argument and mode-string materialization is outside the loop; excludes host allocator counts and throughput",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "-isysroot",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "-arch",
+    "arm64",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DNEOCLR_NATIVE_GC",
+    "-DNEOCLR_HTTP_HEAP_BYTES=1048576",
+    "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+    "-DNEOCLR_ENTRY_ARGUMENTS",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "/Users/robert/Projects/neoclr/docs/experiments/console-read-key/allocation-host.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+    "/Users/robert/Projects/neoclr/target/record-policy-allocation-after-final/app.o",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/record-policy-allocation-after-final/allocation-probe"
+  ]
+}

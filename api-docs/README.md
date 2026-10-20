@@ -2717,3 +2717,16 @@ descriptors. `/docs/key-value-pair.html` covers full signatures, errors and limi
 `manual-members.json` records both pair operator IDs because pinned RavenDoc gives
 them the same generated route. The native type page links the manual entry; no pair
 type or other pair member is omitted. See record-generics for three-engine evidence.
+
+
+### Declared-type compiler service — 2026-10-20
+
+`System.Runtime.CompilerServices.RuntimeHelpers.IsAssignable<TSource,TTarget>()`
+is a development API for allocation-free declared-type relationship selection. Its
+source Markdown summary, legacy XML type-parameter/result documentation, legacy
+reference and native snapshot are refreshed together. It is included through the
+existing RuntimeHelpers type selection; no exclusion is added. Unlike an instance
+check it does not inspect a value or adopt its runtime type. It uses the same runtime
+relationship limits as TypeInfo.AssignableTo. This is an explicit neoCLR compiler
+service addition, not a .NET RuntimeHelpers compatibility claim. See the
+[design and matched allocation evidence](../docs/experiments/record-generics/README.md#descriptor-free-policy-and-corrected-allocation-control).

@@ -20338,3 +20338,21 @@ for the test results and artifact identities. No release publication is claimed.
   value adapters and generic formatting, and qualify the replacement release. The
   author has not separately approved a release version or publication in this exchange.
   See [implementation and evidence](experiments/record-generics/README.md).
+
+
+### Generic-record policy allocation follow-up — 2026-10-20
+
+- **Author:** Asked to continue generic record support, within ordinary class/struct
+  semantics and .NET runtime conventions established above.
+- **Assistant action:** Added a core compiler-service entry point backed by existing
+  type tokens and assignability rules, avoiding reflection descriptor construction
+  during generated generic equality. Preserved declared Object policy and the old-core
+  fallback; no record ABI or host callback was introduced.
+- **Measured outcome:** Corrected the allocation harness to remove argument-string
+  materialization from its loop and equalize setup. Matched old/new builds measure
+  eight versus four additional allocations for one generic integer comparison and two
+  hashes, with zero additional nongeneric allocations. This corrects the earlier seven
+  attribution; historical evidence remains retained. Interpreter/JIT/AOT consumers and
+  unsupported-component checks pass. This does not establish throughput parity.
+- **Open:** Four value boxes remain, alongside broader component/formatting gaps and
+  replacement-release qualification. See [evidence](experiments/record-generics/README.md#descriptor-free-policy-and-corrected-allocation-control).

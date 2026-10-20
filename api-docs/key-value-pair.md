@@ -26,8 +26,9 @@ Object equality. Merely storing a typed-equatable object as Object does not chan
 Object's equality policy. Reference types without overrides retain identity equality.
 Hashes are neither stable serialized IDs nor collision-free identifiers.
 
-The development generic path currently boxes value components and resolves type
-relationships. These operations can allocate. The tested native scope includes
+The development generic path currently boxes value components. Declared-type
+relationship selection now uses handles without allocating reflection descriptors;
+value boxing still allocates. The tested native scope includes
 Int32, Int64, Boolean, String, nullable references, authored equality contracts,
 Index/Range and nested generic records. Floating-point/enum generic Object adapters,
 ordinary structs without value overrides and generic record formatting remain gaps;

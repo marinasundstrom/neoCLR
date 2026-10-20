@@ -196,8 +196,9 @@ guards. Ordinary Raven/.NET behavior remains unchanged.
 Generic positional record structs and classes now have generated equality, hashing
 and `EquatableTo<Self>`, including imported KeyValuePair values. Component equality
 follows the declared type: null and canonical text retain their existing semantics,
-and Object-typed components keep Object policy. The current generic path allocates
-boxes and type descriptors; it is a correctness foundation with optimization pending.
+and Object-typed components keep Object policy. Generic equality now selects its
+policy through type handles without allocating reflection descriptors. Value boxing
+remains a measured optimization target.
 Generic formatting, enum/floating-point Object adapters and ordinary struct default
 value methods remain gaps. See the [pair API reference](/docs/key-value-pair.html) and
 [validated consumer](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-generics).

@@ -4,15 +4,25 @@ record struct Key<T>(Value: T)
 record struct IntKey(Value: int)
 
 func Main(args: string[]) {
+    // Read the argument once so the measured loop excludes argument-string materialization.
+    let mode = args[0]
+    let generic = mode == "generic"
+    let direct = mode == "direct"
+    var operation = 0
+    if generic {
+        operation = 1
+    } else if direct {
+        operation = 2
+    }
     var i = 0
     while i < 128 {
-        if args[0] == "generic" {
+        if operation == 1 {
             let left = Key<int>(i)
             let right = Key<int>(i)
             if !left.Equals(right) || left.GetHashCode() != right.GetHashCode() {
                 System.Fail("generic value semantics")
             }
-        } else if args[0] == "direct" {
+        } else if operation == 2 {
             let left = IntKey(i)
             let right = IntKey(i)
             if !left.Equals(right) || left.GetHashCode() != right.GetHashCode() {
