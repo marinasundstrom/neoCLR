@@ -2086,7 +2086,7 @@ fn interpret_frames(
         &mut state,
     );
     // Stop/join shared jobs before releasing services or exporting either heap.
-    let stopped = state.invocation.work.shutdown();
+    let stopped = state.invocation.shutdown();
     state
         .invocation
         .work

@@ -37,7 +37,9 @@ The next implemented host step adds OS-backed blocking/timed reads into caller s
 and removes sleep polling from the terminal diagnostic. A subsequent internal Raven
 decoder step qualifies borrowed input and value/text-window results across the three
 engines; its native allocation diagnostic matches baseline. This does not complete
-the public key-read or terminal-provider integration. Key decoding, invocation cleanup
+the public key-read or terminal-provider integration. A later internal runtime step
+adds invocation-owned sessions and root cleanup, including bounded cancellation
+waits and retryable restoration; guest acquisition remains pending. Key decoding, invocation cleanup
 and matching native providers remain open. See [transport evidence](console-io.md#development-terminal-host-transport--2026-10-20).
 
 

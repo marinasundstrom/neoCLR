@@ -250,3 +250,37 @@ input and strict UTF-8 errors. This is internal groundwork; Console still has no
 public key-read API. Invocation cleanup, shared cursor ownership and matching
 native providers remain required. The 384-call native diagnostic adds no managed
 allocations over baseline; CPU/throughput and interpreter allocations are unmeasured.
+
+## Invocation terminal ownership foundation — 2026-10-20
+
+The Rust invocation now owns a private terminal service. Its root shutdown path
+first requests terminal reads to stop, then joins managed/native jobs, then closes
+the terminal session. The root scope also performs cleanup on unwinding, even when
+other references keep the invocation alive. Explicit restoration errors are reported;
+failed close retains the session for retry, with a final best-effort close at drop.
+This is **internal integration**: no guest binding currently opens this service,
+and the standalone JIT/AOT host still requires a matching provider.
+
+The service admits one session, with process-unique, non-reused private handles.
+Foreign/stale handles reject; overlapping reads or close during an active read
+return WouldBlock. Reads take the session out of the mutex while waiting and return
+it through a scope guard, including on a host read panic. Shutdown waits for that
+guard without holding the lock. All these operations must run outside managed graph
+access. Successful reads fill caller-owned storage directly; no buffer snapshots
+or per-read managed objects are introduced by this service.
+
+For cancellation, the service bounds host waits to 20 ms and checks the invocation
+cancellation token between waits. It preserves the caller's overall timeout rather
+than restarting it per fragment. This is synchronous blocking OS readiness with
+periodic cancellation checks, not scheduler-backed async input. It can wake roughly
+50 times per second while idle. A future native wake handle could remove that cost;
+there is no throughput or end-to-end allocation claim for this checkpoint. Hosts
+must honor timeout contracts; arbitrary blocking foreign code cannot be interrupted.
+Bytes already transferred remain a successful read if cancellation races completion.
+
+Validation: `cargo test --release -p neoclr --lib invocation` covers root-scope
+cleanup, retained invocations, unwind, cancellation while idle, shutdown during a
+read, overlap, stale handles, retryable close failures, finite deadlines, host read
+panic cleanup and real POSIX pseudo-terminal mode restoration, alongside existing
+invocation/worker regressions. Existing decoder and transport allocation evidence
+is unchanged and does not establish a complete Console.ReadKey path.

@@ -318,3 +318,8 @@ legacy key-sequence profile. It creates no Strings for decoded text. This does
 **not** add Console.ReadKey or terminal acquisition to the public library API.
 The [kernel contract and allocation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-key-decoder/README.md)
 identify remaining ownership, native provider and protocol limitations.
+
+The runtime also has a tested internal invocation-owned terminal cleanup service,
+including bounded synchronous cancellation waits. It is not yet connected to guest
+Console acquisition, and does not establish JIT/AOT provider parity or a public
+cancellable ReadKey contract. Public signatures remain unchanged.

@@ -191,3 +191,21 @@ are admitted; Meta and other protocol extensions remain unsupported. Escape-pref
 Alt is a profile convention, not reliable physical-key identification. Unknown
 sequences are not silently promoted to known keys. This profile is provisional
 until the public session/provider contract selects supported terminal protocols.
+
+## Invocation lifetime integration — 2026-10-20
+
+The next internal step chooses invocation ownership for terminal resources, reusing
+the root runtime shutdown path. A separate FFI provider could own the OS descriptor,
+but would still need runtime registration to release it on root failure or stop
+idle workers before joining them. The private Rust service supplies that lifecycle
+contract now; it does not define a native ABI or add guest InternalCalls yet. OS
+transport remains replaceable through the existing Console/TerminalInput host traits.
+The tradeoff is a runtime service and future cross-engine provider work rather than
+an independently usable foreign terminal library. No compiler mapping changes occur.
+
+Compared with .NET's process Console key APIs, ownership is invocation-scoped, with
+one active session and caller-buffer reads. This fits embedding and isolates session
+lifetimes, but requires deliberate coordination with buffered Console.In before a
+public key API can be added. Interim cancellation uses bounded 20 ms OS waits; this
+limits normal cancellation delay at the cost of periodic idle wakeups. A wakeable
+native wait is a future optimization, not shipped asynchronous console support.

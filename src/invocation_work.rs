@@ -140,7 +140,7 @@ impl Service {
 pub(crate) struct Scope(pub(crate) Arc<crate::invocation::Invocation>);
 impl Drop for Scope {
     fn drop(&mut self) {
-        let _ = self.0.work.shutdown();
+        let _ = self.0.shutdown();
     }
 }
 

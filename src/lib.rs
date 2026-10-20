@@ -93,6 +93,7 @@ pub use string_value::StringValue;
 mod invocation;
 mod invocation_budget;
 mod invocation_work;
+mod invocation_terminal;
 mod tuple_signature;
 mod type_identity;
 mod type_relationships;

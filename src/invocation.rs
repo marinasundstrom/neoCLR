@@ -13,6 +13,7 @@ pub(crate) struct Invocation {
     pub(crate) native_libraries: Arc<Mutex<Option<crate::interop::NativeLibraries>>>,
     pub(crate) limits: Limits,
     pub(crate) budget: Arc<Budget>,
+    pub(crate) terminal: crate::invocation_terminal::Service,
     pub(crate) files: Mutex<crate::file_streams::Files>,
     pub(crate) interned: Mutex<crate::string_interning::Pool>,
     pub(crate) statics: Mutex<crate::static_storage::Storage>,
@@ -67,6 +68,17 @@ impl Dispatch {
 }
 
 impl Invocation {
+    /// Root-only teardown, outside graph access. Stop terminal waits before joining jobs.
+    pub(crate) fn shutdown(&self) -> Result<(), crate::Fault> {
+        self.terminal.request_stop();
+        let work = self.work.shutdown();
+        let terminal = self
+            .terminal
+            .shutdown()
+            .map_err(|error| crate::Fault::new(format!("terminal restoration failed: {error}")));
+        work.and(terminal)
+    }
+
     pub(crate) fn park_dispatch(&self, context: &Arc<()>) {
         // Read scheduling state briefly; never hold dispatch or graph access while
         // parking. The durable wake latch still covers publication before parking.
@@ -95,6 +107,7 @@ impl Invocation {
         let scheduler = crate::scheduler::Scheduler::default();
         let wake = scheduler.wake();
         Arc::new(Self {
+            terminal: crate::invocation_terminal::Service::new(cancellation.clone()),
             work: super::invocation_work::Service::new(limits, cancellation, wake.clone()),
             dispatch: Mutex::new(Dispatch {
                 scheduler,

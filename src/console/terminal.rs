@@ -512,6 +512,48 @@ mod posix {
             assert_eq!(session.read(&mut [0; 1], None).unwrap(), TerminalRead::End);
         }
         #[test]
+        fn invocation_scope_restores_real_terminal_modes() {
+            #[derive(Debug)]
+            struct Host(OwnedFd);
+            impl crate::Console for Host {
+                fn open_terminal(
+                    &self,
+                    options: TerminalOptions,
+                ) -> io::Result<Box<dyn TerminalInput>> {
+                    Ok(Box::new(Session::open(
+                        self.0.as_raw_fd(),
+                        options,
+                        lease(),
+                    )?))
+                }
+                fn read_byte(&self) -> io::Result<Option<u8>> {
+                    unreachable!()
+                }
+                fn write_line(&self, _: &str) -> io::Result<()> {
+                    unreachable!()
+                }
+            }
+            let (_master, slave) = pty();
+            let original = mode(&slave);
+            let host = Host(slave);
+            let invocation = crate::invocation::Invocation::new(crate::Limits::default());
+            invocation
+                .terminal
+                .open(
+                    &host,
+                    TerminalOptions {
+                        capture_interrupts: true,
+                    },
+                )
+                .unwrap();
+            assert_eq!(
+                mode(&host.0).c_lflag & (libc::ISIG | libc::ICANON | libc::ECHO),
+                0
+            );
+            drop(crate::invocation_work::Scope(invocation.clone()));
+            assert_mode(original, mode(&host.0));
+        }
+        #[test]
         fn default_signal_mode_and_drop_restore() {
             let (_master, slave) = pty();
             let original = mode(&slave);
