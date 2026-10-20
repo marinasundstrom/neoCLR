@@ -4,6 +4,7 @@
 /* Private retained-state HTTP consumer: three sequential dispatches on one
  * listener/object graph. Not a general scheduler or public hosting ABI. */
 #include "native-session.h"
+#include "console.h"
 #ifdef NEOCLR_RUNTIME_ASYNC
 #include "native-runtime.h"
 #endif
@@ -31,6 +32,13 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
     if (neoclr_socket_scope_enter_v1(&sockets, context)) { *failed = 1; return 2; }
     if (neoclr_task_scope_enter_v1(&tasks, context)) {
         neoclr_socket_scope_leave_v1(&sockets); *failed = 1; return 2;
+    }
+    neoclr_terminal_scope_v1 terminal = {0};
+    if (neoclr_terminal_scope_enter_v1(&terminal, context)) {
+        neoclr_socket_scope_leave_v1(&sockets);
+        neoclr_task_scope_leave_v1(&tasks);
+        *failed = 1;
+        return 2;
     }
     status = neoclr_bootstrap_callback_v1(0, &callback, context);
     if (!status && neoclr_session_adopt_v1(&session, context, callback)) host_error = 1;
@@ -66,6 +74,7 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
 #ifdef NEOCLR_RUNTIME_ASYNC
     if (neoclr_runtime_async_shutdown_v1(context)) host_error = 1;
 #endif
+    if (neoclr_terminal_scope_leave_v1(&terminal)) host_error = 1;
     if (neoclr_root_probe_head_v1()) host_error = 1;
     if (status && neoclr_aot_render_fault(stderr, &context->fault)) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;

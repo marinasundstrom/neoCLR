@@ -3,6 +3,7 @@
 #endif
 /* Private JIT entry host. Managed awaits drain within this call; no state escapes. */
 #include "native-gc.h"
+#include "console.h"
 #ifdef NEOCLR_RUNTIME_ASYNC
 #include "native-runtime.h"
 #endif
@@ -52,6 +53,12 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
     }
     tasks.poll = poll_entry;
     tasks.complete = neoclr_scheduler_complete_v1;
+    neoclr_terminal_scope_v1 terminal = {0};
+    if (neoclr_terminal_scope_enter_v1(&terminal, &context)) {
+        if (neoclr_socket_scope_leave_v1(&operations) || neoclr_task_scope_leave_v1(&tasks)) abort();
+        free(heap);
+        return 2;
+    }
     int32_t result = 0;
     entry_args args_function;
     entry_v4 plain_function;
@@ -65,6 +72,7 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
 #ifdef NEOCLR_RUNTIME_ASYNC
     if (neoclr_runtime_async_shutdown_v1(&context)) abort();
 #endif
+    int terminal_error = neoclr_terminal_scope_leave_v1(&terminal) != 0;
     int render_error = status && neoclr_aot_render_fault(stderr, &context.fault);
     /* Cleanup must not return to a caller about to unload JIT code while any
        frame/handle still owns its descriptors. Treat a broken invariant as fatal. */
@@ -81,7 +89,7 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
     if (neoclr_gc_collect_v1(&context, NULL) || context.text.used) abort();
 #endif
     free(heap);
-    return render_error ? 2 : status ? 1 : result;
+    return render_error || terminal_error ? 2 : status ? 1 : result;
 }
 
 /* Windows CRT translation must not change the platform's UTF-8 byte contract.

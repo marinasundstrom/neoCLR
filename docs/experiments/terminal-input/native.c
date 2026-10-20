@@ -5,12 +5,54 @@
 #if !defined(_WIN32)
 #include <unistd.h>
 #include <fcntl.h>
+#include <pthread.h>
 #endif
+
+struct worker_args { const void *context; int32_t handle; };
+static void *unattached_worker(void *state) {
+    struct worker_args *args = state;
+    unsigned char byte;
+    assert(neoclr_terminal_scope_open_v1(args->context, 1) == -5);
+    assert(neoclr_terminal_scope_read_v1(args->context, args->handle, &byte, 1, 0) == -5);
+    return NULL;
+}
 
 int main(int argc, char **argv) {
     assert(argc == 2);
     neoclr_terminal_input_v1 input = {0}, other = {0};
     unsigned char bytes[32] = {0};
+    if (strcmp(argv[1], "scope") == 0) {
+        int context, nested_context;
+        neoclr_terminal_scope_v1 scope = {0}, nested = {0}, duplicate = {0};
+        assert(neoclr_terminal_scope_open_v1(&context, 1) == -5);
+        assert(neoclr_terminal_scope_enter_v1(&scope, &context) == 0);
+        assert(neoclr_terminal_scope_enter_v1(&duplicate, &context) == -4);
+        int32_t handle = neoclr_terminal_scope_open_v1(&context, 1);
+        assert(handle > 0);
+        pthread_t worker;
+        struct worker_args worker_args = { &context, handle };
+        assert(pthread_create(&worker, NULL, unattached_worker, &worker_args) == 0);
+        assert(pthread_join(worker, NULL) == 0);
+        assert(neoclr_terminal_scope_read_v1(&nested_context, handle, bytes, 32, 0) == -5);
+        assert(neoclr_terminal_scope_read_v1(&context, handle + 1, bytes, 32, 0) == -5);
+        assert(neoclr_terminal_scope_read_v1(&context, handle, bytes, 32, 0) == -1);
+        assert(neoclr_terminal_scope_enter_v1(&nested, &nested_context) == 0);
+        assert(neoclr_terminal_scope_leave_v1(&scope) == -5);
+        assert(neoclr_terminal_scope_open_v1(&nested_context, 1) == -4);
+        assert(neoclr_terminal_scope_leave_v1(&nested) == 0);
+        /* Deliberately abandon the open session. Scope exit must restore it. */
+        assert(neoclr_terminal_scope_leave_v1(&scope) == 0);
+        assert(neoclr_terminal_scope_close_v1(&context, handle) == -5);
+        assert(neoclr_terminal_scope_enter_v1(&scope, &context) == 0);
+        int32_t replacement = neoclr_terminal_scope_open_v1(&context, 1);
+        assert(replacement > handle);
+        assert(neoclr_terminal_scope_close_v1(&context, handle) == -5);
+        assert(neoclr_terminal_scope_close_v1(&context, replacement) == 0);
+        assert(neoclr_terminal_scope_close_v1(&context, replacement) == 0);
+        assert(neoclr_terminal_scope_leave_v1(&scope) == 0);
+        puts("PASS native scope");
+        return 0;
+    }
     if (strcmp(argv[1], "bytes") == 0) {
         for (int n = 0; n < 256; n++) assert(neoclr_console_read_byte_v1() == n);
         assert(neoclr_console_read_byte_v1() == -1);

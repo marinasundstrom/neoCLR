@@ -11,7 +11,8 @@ MemoryStream implementation. Separate synchronous text wrappers and direct Conso
 contracts are implemented under [qualification](experiments/sync-text/README.md),
 without forcing async providers to implement synchronous I/O. The matching C
 POSIX byte transport now passes direct native tests and removes legacy FILE
-read-ahead; guest binding and native invocation registration remain open.
+read-ahead; native root-thread invocation scopes now restore modes on success/fault return.
+Guest binding, shared input-cursor coordination and native worker attachment remain open.
 
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are

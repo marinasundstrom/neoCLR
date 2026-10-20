@@ -317,3 +317,32 @@ as keys.
 qualify transport behavior and restoration on macOS arm64. The existing output
 adapter regression also passes. Decoder-to-provider guest bindings and native
 invocation cleanup remain pending; this is not public Console.ReadKey support.
+
+## Native root-thread invocation scopes — 2026-10-20
+
+Native console, JIT, HTTP and retained-session entry hosts now register a private
+terminal scope around guest execution and dispose it after normal or fault return.
+Restoration occurs before fault rendering and heap release. The scope is separate
+from GC resource callbacks, whose contract prohibits I/O. It uses caller-owned
+storage and thread-local scope lookup, with no managed roots or per-read result
+allocation. This does not change the native context or guest metadata layout.
+
+`neoclr_terminal_scope_enter_v1`/`leave_v1` require zero-initialized stable storage,
+non-null context identity, and nested LIFO teardown. Open returns a positive private
+handle; read/close require the same context and handle. Handles do not reuse during
+the loaded provider's lifetime. Scope leave performs final disposal and removes
+registration even when restoration reports an error. Explicit close remains
+retryable; normal host failure results report cleanup errors. Abort, forced exit
+and external nonlocal jumps are not orderly guest fault returns and do not acquire
+an automatic restoration guarantee.
+
+This initial native scope belongs to its entry thread. Unattached worker threads
+reject rather than borrowing another invocation's input; native worker attachment
+and cancellation remain gaps. Rust's invocation service has broader shared-worker
+ownership, so end-to-end parity is not yet established. There are still no guest
+terminal acquisition or key-read bindings. The scope is a private native ownership
+contract, not a public hosting API or a permanent thread restriction on Console.
+
+[Eleven native checks and the existing Raven text consumer](experiments/terminal-input/README.md#native-invocation-scope-checkpoint)
+qualify macOS host cleanup and regression behavior. Windows terminal acquisition
+remains unsupported, and the changed Windows host has not been tested in this slice.

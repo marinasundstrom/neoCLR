@@ -4,6 +4,7 @@
 #include "entry-arguments.h"
 /* One-request HTTP correctness host, not a production scheduler or load benchmark. */
 #include "native-gc.h"
+#include "console.h"
 #ifdef NEOCLR_RUNTIME_ASYNC
 #include "native-runtime.h"
 #endif
@@ -47,6 +48,13 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
     if (neoclr_task_scope_enter_v1(&tasks, context)) {
         neoclr_socket_scope_leave_v1(&sockets); *failed = 1; return 2;
     }
+    neoclr_terminal_scope_v1 terminal = {0};
+    if (neoclr_terminal_scope_enter_v1(&terminal, context)) {
+        neoclr_socket_scope_leave_v1(&sockets);
+        neoclr_task_scope_leave_v1(&tasks);
+        *failed = 1;
+        return 2;
+    }
     tasks.poll = poll_entry;
     tasks.complete = neoclr_scheduler_complete_v1;
     status = neoclr_process_entry(argc, argv, &result, context);
@@ -66,6 +74,7 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
 #ifdef NEOCLR_RUNTIME_ASYNC
     if (neoclr_runtime_async_shutdown_v1(context)) host_error = 1;
 #endif
+    if (neoclr_terminal_scope_leave_v1(&terminal)) host_error = 1;
     if (neoclr_root_probe_head_v1()) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;
     if (neoclr_task_scope_leave_v1(&tasks)) host_error = 1;

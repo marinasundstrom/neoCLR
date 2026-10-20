@@ -328,3 +328,11 @@ A matching private POSIX byte transport is now tested in the native C host, incl
 mode restoration and input ownership. Native legacy reads no longer use FILE
 read-ahead. This does not yet connect Console key reads to that transport or register
 it with native invocation cleanup. See the [native transport checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/terminal-input/README.md#native-posix-transport-checkpoint).
+
+### Native invocation cleanup checkpoint (development)
+
+Native entry hosts now own a terminal scope and restore it after ordinary or fault
+return, before diagnostics and heap release. Tests cover real JIT host cleanup and
+serial reuse. The scope currently belongs to the entry thread; worker attachment
+and guest key-read bindings remain gaps. This adds no public Console signatures.
+See the [scope contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/terminal-input/README.md#native-invocation-scope-checkpoint).

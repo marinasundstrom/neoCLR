@@ -228,3 +228,19 @@ leave Unicode and key interpretation in Raven. Costs include a private native AB
 explicit caller cleanup, platform-specific termios storage, and currently unsupported
 Windows terminal acquisition. The Rust/C transports are tested separately; concurrent
 mixed-provider process-stdin ownership is not yet coordinated.
+
+## Native ownership decision — 2026-10-20
+
+Inspection of the existing collector resource contract rules out restoring terminal
+modes in a GC cleanup callback: those callbacks explicitly prohibit I/O and failure.
+Native entry hosts instead own a separate terminal scope and leave it after guest
+success/fault return. This follows the existing native task/socket scope pattern
+without extending the native context layout or adding managed roots. Its benefit is
+predictable terminal restoration before diagnostics and heap disposal; its costs
+are explicit host entry integration and an interim entry-thread-only lookup.
+
+Worker attachment remains an implementation gap compared with the shared Rust
+invocation service, not a deliberate new public Console rule. No guest API or
+compiler bridge is enabled until that contract and input cursor ownership are
+qualified. The provider lifetime bounds handle uniqueness; reloading a private
+native provider is not a promise that old host-held integer handles remain usable.

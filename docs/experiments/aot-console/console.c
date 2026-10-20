@@ -178,3 +178,65 @@ int32_t neoclr_console_write_bytes_v1(int32_t error, const unsigned char *bytes,
 int32_t neoclr_console_flush_v1(int32_t error) {
     return fflush(error ? stderr : stdout) == 0 ? 0 : -10;
 }
+
+
+static _Thread_local neoclr_terminal_scope_v1 *terminal_scopes;
+static _Atomic int32_t next_terminal_handle = 1;
+
+static neoclr_terminal_scope_v1 *terminal_scope(const void *context) {
+    if (!context) return NULL;
+    for (neoclr_terminal_scope_v1 *scope = terminal_scopes; scope; scope = scope->previous) {
+        if (scope->context == context) return scope;
+    }
+    return NULL;
+}
+
+int32_t neoclr_terminal_scope_enter_v1(neoclr_terminal_scope_v1 *scope, const void *context) {
+    if (!scope || !context) return -6;
+    if (scope->context || scope->input.active || terminal_scope(context)) return -4;
+    scope->context = context;
+    scope->handle = 0;
+    scope->previous = terminal_scopes;
+    terminal_scopes = scope;
+    return 0;
+}
+
+int32_t neoclr_terminal_scope_leave_v1(neoclr_terminal_scope_v1 *scope) {
+    if (!scope || !scope->context || terminal_scopes != scope) return -5;
+    int32_t result = neoclr_terminal_dispose_v1(&scope->input);
+    terminal_scopes = scope->previous;
+    scope->previous = NULL;
+    scope->context = NULL;
+    scope->handle = 0;
+    return result;
+}
+
+int32_t neoclr_terminal_scope_open_v1(const void *context, int32_t capture_interrupts) {
+    neoclr_terminal_scope_v1 *scope = terminal_scope(context);
+    if (!scope) return -5;
+    if (scope->input.active) return -4;
+    int32_t handle = atomic_load_explicit(&next_terminal_handle, memory_order_relaxed);
+    do {
+        if (handle == INT32_MAX) return -7;
+    } while (!atomic_compare_exchange_weak_explicit(&next_terminal_handle, &handle,
+        handle + 1, memory_order_relaxed, memory_order_relaxed));
+    scope->handle = 0;
+    int32_t result = neoclr_terminal_open_v1(&scope->input, capture_interrupts);
+    /* Even a failed acquisition can retain a retryable restoration; leave owns it. */
+    if (result) return result;
+    scope->handle = handle;
+    return handle;
+}
+
+int32_t neoclr_terminal_scope_read_v1(const void *context, int32_t handle,
+    unsigned char *bytes, uint64_t length, int32_t timeout_ms) {
+    neoclr_terminal_scope_v1 *scope = terminal_scope(context);
+    if (!scope || handle <= 0 || scope->handle != handle) return -5;
+    return neoclr_terminal_read_v1(&scope->input, bytes, length, timeout_ms);
+}
+
+int32_t neoclr_terminal_scope_close_v1(const void *context, int32_t handle) {
+    neoclr_terminal_scope_v1 *scope = terminal_scope(context);
+    if (!scope || handle <= 0 || scope->handle != handle) return -5;
+    return neoclr_terminal_close_v1(&scope->input);
+}

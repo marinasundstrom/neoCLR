@@ -1,5 +1,5 @@
-#ifndef NEOCLR_AOT_CONSOLE_H
-#define NEOCLR_AOT_CONSOLE_H
+#ifndef NEOCLR_AOT_BYTE_CONSOLE_H
+#define NEOCLR_AOT_BYTE_CONSOLE_H
 #include <stdint.h>
 /* Experimental linked service ABI, independent of private System.Value layout.
  * 0..255: byte, -1: EOF, -2: unavailable, -3: read failed.
@@ -40,4 +40,25 @@ int32_t neoclr_terminal_read_v1(neoclr_terminal_input_v1 *input, unsigned char *
 int32_t neoclr_terminal_close_v1(neoclr_terminal_input_v1 *input);
 /* Final best-effort restoration: always releases ownership, even on I/O failure. */
 int32_t neoclr_terminal_dispose_v1(neoclr_terminal_input_v1 *input);
+#endif
+
+#ifndef NEOCLR_TERMINAL_SCOPE_H
+#define NEOCLR_TERMINAL_SCOPE_H
+/* Root-thread invocation ownership. Zero-initialize, enter before guest entry,
+ * leave after it unwinds (including fault). Nested scopes leave in LIFO order.
+ * Worker-thread access is not attached and rejects; this is not a hosting API. */
+typedef struct neoclr_terminal_scope_v1 {
+    const void *context;
+    struct neoclr_terminal_scope_v1 *previous;
+    neoclr_terminal_input_v1 input;
+    int32_t handle;
+} neoclr_terminal_scope_v1;
+int32_t neoclr_terminal_scope_enter_v1(neoclr_terminal_scope_v1 *, const void *context);
+int32_t neoclr_terminal_scope_leave_v1(neoclr_terminal_scope_v1 *);
+/* open: positive private handle or negative transport status. Handles never reuse while this provider remains loaded.
+ * read/close require the exact context and handle; unknown ownership returns -5. */
+int32_t neoclr_terminal_scope_open_v1(const void *context, int32_t capture_interrupts);
+int32_t neoclr_terminal_scope_read_v1(const void *context, int32_t handle,
+    unsigned char *, uint64_t length, int32_t timeout_ms);
+int32_t neoclr_terminal_scope_close_v1(const void *context, int32_t handle);
 #endif

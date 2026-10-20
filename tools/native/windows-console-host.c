@@ -5,6 +5,7 @@
 /* Experimental synchronous Windows console host; private collector ABI. */
 #include "windows-gc-host.h"
 #include "../../docs/experiments/aot-scalar/console.h"
+#include "../../docs/experiments/aot-console/console.h"
 #include <fcntl.h>
 #include <io.h>
 #include <stdio.h>
@@ -32,9 +33,15 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
         _setmode(_fileno(stderr), _O_BINARY) == -1) return 2;
     neoclr_windows_gc_host host = {0};
     if (neoclr_windows_gc_host_open(&host, 1024 * 1024)) return 2;
+    neoclr_terminal_scope_v1 terminal = {0};
+    if (neoclr_terminal_scope_enter_v1(&terminal, &host.context)) {
+        (void)neoclr_windows_gc_host_close(&host);
+        return 2;
+    }
     int32_t result = 0;
     int32_t status = neoclr_process_entry(argc, argv, &result, &host.context);
-    int host_error = neoclr_root_probe_head_v1() != NULL;
+    int host_error = neoclr_terminal_scope_leave_v1(&terminal) != 0;
+    if (neoclr_root_probe_head_v1() != NULL) host_error = 1;
     if (status && neoclr_aot_render_fault(stderr, &host.context.fault)) host_error = 1;
     if (!host_error && neoclr_gc_collect_v1(&host.context, NULL)) host_error = 1;
     if (fflush(stdout) || ferror(stdout)) host_error = 1;
