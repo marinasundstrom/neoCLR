@@ -600,6 +600,43 @@ pub(crate) fn compile_into(
         }
     }
     let enum_display = enum_display::Display::prepare(input, details, module)?;
+    // Extra integral boxes use the existing signed/unsigned wide text services.
+    // Width changes are register conversions; nominal tags and box storage stay intact.
+    let integral_display = if details.is_some_and(|d| {
+        !d.integral_boxes.is_empty()
+            && d.object_display
+                .keys()
+                .any(|i| !d.object_value_kinds.contains_key(i))
+    }) {
+        let rooted = details.unwrap().native_gc;
+        let mut sig = module.make_signature();
+        sig.params
+            .extend([types::I64, types::I64, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some((
+            module.declare_function(
+                if rooted {
+                    "neoclr_int64_to_string_rooted_v1"
+                } else {
+                    "neoclr_int64_to_string_v1"
+                },
+                Linkage::Import,
+                &sig,
+            )?,
+            module.declare_function(
+                if rooted {
+                    "neoclr_uint64_to_string_rooted_v1"
+                } else {
+                    "neoclr_uint64_to_string_v1"
+                },
+                Linkage::Import,
+                &sig,
+            )?,
+        ))
+    } else {
+        None
+    };
+
     let mut default_display_literals = vec![];
     if let Some(details) = details {
         for (index, text) in &details.object_default_display {
@@ -2505,6 +2542,48 @@ pub(crate) fn compile_into(
                     b.switch_to_block(next);
                 }
                 if display {
+                    if let Some((signed_service, unsigned_service)) = integral_display {
+                        for &(index, wide, signed) in &details.unwrap().integral_boxes {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = matches_type(&mut b, &p, tag, index);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let payload = b.ins().iadd_imm(parameters[0], 8);
+                            let scalar = p.ty(&input.types[index].fields[0].ty)?;
+                            let value = read(&mut b, &p, &scalar, payload)[0];
+                            let value = if wide {
+                                value
+                            } else if signed {
+                                b.ins().sextend(types::I64, value)
+                            } else {
+                                b.ins().uextend(types::I64, value)
+                            };
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let service = module.declare_func_in_func(
+                                if signed {
+                                    signed_service
+                                } else {
+                                    unsigned_service
+                                },
+                                b.func,
+                            );
+                            let call = b.ins().call(service, &[value, arena, output]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            let mut site = diagnostic_data.as_ref().unwrap().site(
+                                module,
+                                &mut b,
+                                fault_context.unwrap(),
+                                i,
+                                0,
+                            );
+                            site.capture_frame = false;
+                            return_if_detailed(&mut b, failed, status, Some(&site));
+                            b.ins().return_(&[status]);
+                            b.switch_to_block(next);
+                        }
+                    }
                     if let Some(enums) = &enum_display {
                         for &index in enums.types() {
                             let matched = b.create_block();
@@ -2559,6 +2638,11 @@ pub(crate) fn compile_into(
                         .map(|index| (*index, false, false))
                         .chain(d.int64_boxes.values().map(|index| (*index, true, false)))
                         .chain(
+                            d.integral_boxes
+                                .iter()
+                                .map(|(index, wide, _)| (*index, *wide, false)),
+                        )
+                        .chain(
                             d.floating_boxes
                                 .iter()
                                 .map(|(index, wide)| (*index, *wide, true)),
@@ -2575,9 +2659,19 @@ pub(crate) fn compile_into(
                             (false, true) => types::I64,
                             (false, false) => types::I32,
                         };
-                        let left = b
-                            .ins()
-                            .load(payload_type, MemFlags::new(), parameters[0], 8);
+                        let integral_ty = d
+                            .integral_boxes
+                            .iter()
+                            .any(|(i, _, _)| *i == index)
+                            .then(|| p.ty(&input.types[index].fields[0].ty))
+                            .transpose()?;
+                        let left = if let Some(scalar) = &integral_ty {
+                            let payload = b.ins().iadd_imm(parameters[0], 8);
+                            read(&mut b, &p, scalar, payload)[0]
+                        } else {
+                            b.ins()
+                                .load(payload_type, MemFlags::new(), parameters[0], 8)
+                        };
                         let result = if kind == "Equals" {
                             let compare = b.create_block();
                             let different = b.create_block();
@@ -2596,9 +2690,13 @@ pub(crate) fn compile_into(
                             let same = matches_type(&mut b, &p, right_tag, index);
                             b.ins().brif(same, same_type, &[], different, &[]);
                             b.switch_to_block(same_type);
-                            let right =
+                            let right = if let Some(scalar) = &integral_ty {
+                                let payload = b.ins().iadd_imm(parameters[1], 8);
+                                read(&mut b, &p, scalar, payload)[0]
+                            } else {
                                 b.ins()
-                                    .load(payload_type, MemFlags::new(), parameters[1], 8);
+                                    .load(payload_type, MemFlags::new(), parameters[1], 8)
+                            };
                             let equal = if floating {
                                 let equal = b.ins().fcmp(FloatCC::Equal, left, right);
                                 let left_nan = b.ins().fcmp(FloatCC::Unordered, left, left);

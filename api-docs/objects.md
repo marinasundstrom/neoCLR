@@ -26,8 +26,8 @@ Named instance and Named. The last line comes from an explicit base call, showin
 that bypassing the override still describes the concrete object.
 
 Virtual ToString dispatch supports named structs with explicit overrides and boxed
-Int32, Int64 and Boolean values. Integers produce culture-independent decimal text;
-Boolean produces True or False, matching .NET spelling. Char returns its full grapheme text. String through Object returns its unchanged text. Other primitive boxes remain unsupported; use typed formatting where available. It does
+all signed/unsigned integer and native-width integer values, plus Boolean. Integers produce culture-independent decimal text;
+Boolean produces True or False, matching .NET spelling. Char returns its full grapheme text. String through Object returns its unchanged text. Floating boxed display remains unsupported; use typed formatting where available. It does
 not add Console.WriteLine(Object), serialization, culture/format overloads or string
 identity. GetType's existing string/boxed paths remain supported.
 
@@ -84,7 +84,7 @@ and explicit Object base Equals/GetHashCode use that owner; virtual String equal
 and hashing use canonical Unicode 17 text identity. Separate constructions can be
 canonically equal without sharing bytes or reference identity. Explicit String.Intern
 shares exact stored spellings within one execution; literals are not automatically interned. Virtual
-boxed-value Equals/GetHashCode support Int32, Int64, Boolean, Single, Double, Char,
+boxed-value Equals/GetHashCode support signed/unsigned and native-width integers, Boolean, Single, Double, Char,
 explicit named-struct overrides and ordinary struct defaults, with engine limits
 described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
@@ -222,8 +222,8 @@ String and Char expose matching typed and Object overrides in the development
 library. Their native dispatch preserves the same source bodies. The remaining
 primitive policies use bounded intrinsics for the selected Object slots. This does
 not add typed GetHashCode members for other primitives, general struct equality, nullable
-boxing, or general primitive formatting. Int32, Int64 and Boolean boxed ToString
-use the bounded display contract above. Other primitive types still require
+boxing, or general primitive formatting. Integral and Boolean boxed ToString
+use the bounded display contract above. Remaining primitive types still require
 explicit implementation. Named structs dispatch their explicit overrides. System.Value is not involved in this dispatch.
 The [Object equality sample](/samples/object-equality.zip) demonstrates the behavior.
 
@@ -559,3 +559,5 @@ specifier support by defining the interface.
 format failure writes no prefix. Fixed arities avoid an argument array, but values
 may box and formatting allocates fragments/results. See the
 [contract and tested sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/composite-formatting/README.md).
+
+The [integral Object qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/integer-object/README.md) extends the shared scalar path to SByte, Byte, Int16, UInt16, UInt32, UInt64, IntPtr and UIntPtr. Typed payload reads preserve sign/zero extension. Direct inherited calls and boxed/composite formatting pass interpreter/JIT/AOT on macOS ARM64; existing scalar box allocations remain.

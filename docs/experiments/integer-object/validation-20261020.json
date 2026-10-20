@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Integral Object contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Integral Object contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-object-fixed-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Integral Object contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-app/app": "0f1273e86bc282e3660b3edc81028f6a690e1d5d50266664ccc164212795674c",
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-app/app.dll": "4fcefb3c4a2acda1d66cfd30474e3d0e7987139f334d1fc2a32c8f69ddee39b6",
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/bin/neoclr": "d6476da35054cccfaba70256d8168170d1632e1b2a69893a2512f1ed4a221210",
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/bin/neoclr-codegen": "d96c707cfd33e0bb8eba65a34da346e4f2730e57ce691fbcea7a525392247d16",
+    "/Users/robert/Projects/neoclr/target/integer-object-fixed-bundle/bundle/lib/System.Runtime.dll": "2761ca15b13a569633fbf4f6483c13996277ca9dc02b356bc754fb6397640290"
+  }
+}

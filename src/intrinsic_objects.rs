@@ -16,6 +16,14 @@ pub(crate) fn dispatch(
     if !matches!(
         object.concrete_type(),
         Type::Int32
+            | Type::SByte
+            | Type::Byte
+            | Type::Int16
+            | Type::UInt16
+            | Type::UInt32
+            | Type::UInt64
+            | Type::IntPtr
+            | Type::UIntPtr
             | Type::Int64
             | Type::Boolean
             | Type::Single
@@ -103,6 +111,8 @@ pub(crate) fn dispatch(
 enum IntrinsicValue {
     Int32(i32),
     Int64(i64),
+    UInt32(u32),
+    UInt64(u64),
     Boolean(bool),
     Single(f32),
     Double(f64),
@@ -115,6 +125,8 @@ impl IntrinsicValue {
         match (self, other) {
             (Self::Int32(a), Self::Int32(b)) => a == b,
             (Self::Int64(a), Self::Int64(b)) => a == b,
+            (Self::UInt32(a), Self::UInt32(b)) => a == b,
+            (Self::UInt64(a), Self::UInt64(b)) => a == b,
             (Self::Boolean(a), Self::Boolean(b)) => a == b,
             (Self::Char(a), Self::Char(b)) => crate::string_normalization::compare(a, b).is_eq(),
             (Self::String(a), Self::String(b)) => {
@@ -130,6 +142,8 @@ impl IntrinsicValue {
         Some(match *self {
             Self::Int32(value) => value.to_string().into(),
             Self::Int64(value) => value.to_string().into(),
+            Self::UInt32(value) => value.to_string().into(),
+            Self::UInt64(value) => value.to_string().into(),
             Self::Boolean(value) => if value { "True" } else { "False" }.into(),
             Self::Char(ref value) => value.clone().into(),
             Self::String(ref value) => value.clone(),
@@ -141,6 +155,8 @@ impl IntrinsicValue {
         match *self {
             Self::Int32(value) => value,
             Self::Int64(value) => (value as i32) ^ ((value >> 32) as i32),
+            Self::UInt32(value) => value as i32,
+            Self::UInt64(value) => (value as i32) ^ ((value >> 32) as i32),
             Self::Boolean(value) => i32::from(value),
             Self::Char(ref value) => crate::string_normalization::hash(value),
             Self::String(ref value) => crate::string_normalization::hash(value),
@@ -182,6 +198,14 @@ fn intrinsic_value(module: &Module, object: &ObjectReference) -> Result<Intrinsi
     }
     match (object.concrete_type(), object.reference.read()?) {
         (Type::Int32, Value::Int32(value)) => Ok(IntrinsicValue::Int32(value)),
+        (Type::SByte, Value::SByte(value)) => Ok(IntrinsicValue::Int32(value as i32)),
+        (Type::Byte, Value::Byte(value)) => Ok(IntrinsicValue::Int32(value as i32)),
+        (Type::Int16, Value::Int16(value)) => Ok(IntrinsicValue::Int32(value as i32)),
+        (Type::UInt16, Value::UInt16(value)) => Ok(IntrinsicValue::Int32(value as i32)),
+        (Type::UInt32, Value::UInt32(value)) => Ok(IntrinsicValue::UInt32(value as u32)),
+        (Type::UInt64, Value::UInt64(value)) => Ok(IntrinsicValue::UInt64(value as u64)),
+        (Type::IntPtr, Value::IntPtr(value)) => Ok(IntrinsicValue::Int64(value as i64)),
+        (Type::UIntPtr, Value::UIntPtr(value)) => Ok(IntrinsicValue::UInt64(value as u64)),
         (Type::Int64, Value::Int64(value)) => Ok(IntrinsicValue::Int64(value)),
         (Type::Boolean, Value::Boolean(value)) => Ok(IntrinsicValue::Boolean(value)),
         (Type::Single, Value::Single(value)) => Ok(IntrinsicValue::Single(value)),

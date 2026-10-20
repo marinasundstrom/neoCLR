@@ -92,3 +92,5 @@ tracks execution-mode validation.
 
 [Object API](../../docs/objects.html) · [Garbage collection](../gc/) ·
 [.NET comparison](../../comparison/)
+
+Development qualification now covers signed, unsigned and native-width integer equality, hashes and decimal display through Object, including narrow sign/zero extension and UInt64 boundaries. These use existing scalar boxes and formatting services; Object conversion still allocates a box. Floating boxed display and broader numeric formats remain gaps.

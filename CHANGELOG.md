@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Complete narrow, unsigned and native-width integer Object equality/hash and invariant decimal display using existing scalar boxes, typed payload reads and numeric text services. Qualify signed/unsigned boundaries, exact types, direct/boxed/composite calls, dictionary keys and GC in interpreter/JIT/AOT on macOS ARM64; no new EquatableTo declarations or ABI.
+
 - Inventory all 260 authored public class-library type declarations and record equality/hash/display, inheritance and allocation findings with explicit execution limits. Add reference/value family qualification across interpreter/JIT/AOT; fix native console host selection for synchronous code retaining timer services, without requiring a generated default task queue.
 
 - Correct Index, Range and seven error value ToString declarations to override Object. Preserve existing text and shared equality/hash defaults; qualify direct, boxed and composite display in interpreter/JIT/AOT. Refresh the matching compiler reference and native API documentation snapshots.

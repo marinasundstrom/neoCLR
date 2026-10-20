@@ -145,6 +145,7 @@ pub struct Options {
     pub object_function_queries: HashMap<usize, Vec<neoclr::metadata::Type>>,
     pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
     pub floating_boxes: Vec<(usize, bool)>,
+    pub integral_boxes: Vec<(usize, bool, bool)>,
     pub boolean_boxes: HashMap<usize, usize>,
     pub int64_boxes: HashMap<usize, usize>,
     pub int32_boxes: HashMap<usize, usize>,
@@ -409,6 +410,21 @@ impl Options {
                             r["unbox"].as_bool()?,
                         ),
                     ))
+                })
+                .collect(),
+            integral_boxes: report
+                .and_then(|r| r["emptyRecordBoxes"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    let (wide, signed) = match r["primitive"].as_str()? {
+                        "SByte" | "Int16" => (false, true),
+                        "Byte" | "UInt16" | "UInt32" => (false, false),
+                        "IntPtr" => (true, true),
+                        "UInt64" | "UIntPtr" => (true, false),
+                        _ => return None,
+                    };
+                    Some((r["typeCompiledIndex"].as_u64()? as usize, wide, signed))
                 })
                 .collect(),
             floating_boxes: report

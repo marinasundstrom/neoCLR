@@ -1,0 +1,51 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Value(left: Object, right: Object, different: Object, text: string, hash: int) {
+    Check(left.Equals(right) && right.Equals(left), "Integral value equality")
+    Check(!left.Equals(different) && !left.Equals(null) && !left.Equals("text"), "Different values and types")
+    Check(!Object.ReferenceEquals(left, right), "Distinct boxes")
+    Check(left.GetHashCode() == hash && right.GetHashCode() == hash, "Integral hash")
+    Check(left.ToString() == text && String.Format("{0}", left) == text, "Integral decimal display")
+    System.Runtime.GC.Collect()
+    Check(left.Equals(right) && left.ToString() == text, "Retained integer box")
+}
+
+func Main() {
+    Value((sbyte)-128, (sbyte)-128, (sbyte)127, "-128", -128)
+    Value((sbyte)127, (sbyte)127, 127, "127", 127)
+    Value(255b, 255b, (sbyte)-1, "255", 255)
+    Value((short)-32768, (short)-32768, (short)32767, "-32768", -32768)
+    Value((short)32767, (short)32767, 32767, "32767", 32767)
+    Value((ushort)65535, (ushort)65535, (short)-1, "65535", 65535)
+    let max32: uint = 4294967295
+    Value(max32, max32, -1, "4294967295", -1)
+    let Ok(max64) = UInt64.Parse("18446744073709551615") else {
+        System.Fail("UInt64 parse")
+        return
+    }
+    Value(max64, max64, -1L, "18446744073709551615", 0)
+    Value((ulong)4294967296L, (ulong)4294967296L, 4294967296L, "4294967296", 1)
+    Value((nint)-1, (nint)-1, -1L, "-1", 0)
+    Value((nuint)max64, (nuint)max64, max64, "18446744073709551615", 0)
+    Value(default(nint), default(nint), default(nuint), "0", 0)
+    Value(default(nuint), default(nuint), default(nint), "0", 0)
+    Value(default(byte), default(byte), default(sbyte), "0", 0)
+    let narrow = (sbyte)-128
+    Check(narrow.ToString() == "-128" && narrow.Equals((sbyte)-128), "Direct narrow calls")
+    Check(max32.ToString() == "4294967295" && max32.GetHashCode() == -1, "Direct UInt32 calls")
+    Check(max64.ToString() == "18446744073709551615" && max64.Equals(max64), "Direct UInt64 calls")
+    let map = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(map.TryAdd(255b, 1), "Byte key")
+    Check(!map.TryAdd(255b, 2), "Duplicate byte key")
+    Check(map.TryAdd((ushort)255, 3), "Same bits different nominal key")
+    Check(map.TryAdd(max64, 4) && !map.TryAdd(max64, 5), "UInt64 key")
+    Console.WriteLine("Integral Object contracts: passed")
+}
