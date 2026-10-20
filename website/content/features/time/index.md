@@ -123,3 +123,21 @@ and supported record components as well. Hashes are execution-local, not persist
 identifiers. Ordinary struct default value semantics remain a separate runtime gap.
 
 Development `TimeZone` values compare by their case-sensitive IANA identifier within the fixed bundled rule database; aliases stay distinct. `ZonedDateTime` compares the same instant in the same named zone, with matching hashes through typed, Object and equality-interface calls. Compare its `Instant` when zone identity should be ignored. Zone display returns the identifier; zoned display remains diagnostic type text. See the [API reference](/docs/api/system/time/TimeZone/) and [qualified cases](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/zoned-values/README.md).
+
+## Development: culture formatting foundation
+
+`Culture` now exposes immutable `DateTimeFormat` and `NumberFormat` policies and
+`OptionalCalendars`. Invariant, Swedish (`sv-SE`), Hebrew-Israel (`he-IL`), UK English
+(`en-GB`) and US English (`en-US`) have bounded built-in profiles. UK and US dates
+use day/month/year and month/day/year respectively. UK time uses a 24-hour clock;
+US time uses a twelve-hour clock with AM/PM, including midnight and noon. The time policy exposes its
+separators and supported short/long patterns; duration and time fractions share
+the numeric decimal convention.
+
+Both Gregorian and Hebrew calendars can be selected independently of language.
+Returned calendar and grouping arrays are independent snapshots. These are foundational
+APIs: full locale patterns, custom providers, currency
+formatting and primitive numeric format specifiers remain gaps. See the API references
+for [Culture](/docs/api/system/globalization/Culture/),
+[DateTimeFormat](/docs/api/system/globalization/DateTimeFormat/) and
+[NumberFormat](/docs/api/system/globalization/NumberFormat/).

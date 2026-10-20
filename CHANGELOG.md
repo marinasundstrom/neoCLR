@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Add immutable NumberFormat data, DateTimeFormat metadata and Culture.OptionalCalendars for the bounded globalization foundation. Add en-GB/en-US cultures and explicit region preference resolution, with UK/US numeric dates and US twelve-hour AM/PM time. Duration/time fractions share numeric decimal policy; returned arrays cannot mutate culture conventions. Full locale patterns, localized signs and primitive numeric formats remain gaps.
+
 - Give TimeZone and ZonedDateTime explicit typed/Object equality and matching hashes. Zones compare case-sensitive IANA identifiers within the fixed bundled rule database; zoned values compare instant plus named zone. Equal reconstructed values now share dictionary-key identity; aliases and different zones remain distinct. TimeZone display reuses its identifier. Refresh API references and reconcile all 260 public declarations with native type pages.
 
 - Give persistent Memory/ReadOnlyMemory Object equality matching owner/offset/length semantics across access restrictions, with mutation-stable region hashes. Reuse native byte-view payloads and ordinary boxes/unboxing; preserve borrowed Slice rejection. Qualify defaults, distinct empty windows, dictionary keys and sole-owner retention across GC in interpreter/JIT/AOT. Native element support remains byte-only and inherited Object calls still box.

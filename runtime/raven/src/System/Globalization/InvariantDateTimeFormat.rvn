@@ -11,7 +11,4 @@ internal class InvariantDateTimeFormat : DateTimeFormatRules {
         return digits.Pad(year, 4) + "-" + digits.Pad(month, 2) + "-" + digits.Pad(day, 2)
     }
 
-    func FormatTime(time: System.Time.TimeOfDay) -> string {
-        return digits.FormatTime(time, ".")
-    }
 }

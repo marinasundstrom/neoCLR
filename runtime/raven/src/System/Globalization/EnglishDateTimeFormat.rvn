@@ -1,0 +1,20 @@
+module System.Globalization
+
+// Bounded numeric date conventions. General locale pattern expansion remains separate.
+internal class EnglishDateTimeFormat : DateTimeFormatRules {
+    private var unitedStates: bool
+    private var digits: DateTimeFormatDigits = DateTimeFormatDigits()
+
+    init(unitedStates: bool) {
+        self.unitedStates = unitedStates
+    }
+
+    val DateTimeSeparator: string => " "
+
+    func FormatDate(year: int, month: int, day: int) -> string {
+        if unitedStates {
+            return month.ToString() + "/" + day.ToString() + "/" + digits.Pad(year, 4)
+        }
+        return digits.Pad(day, 2) + "/" + digits.Pad(month, 2) + "/" + digits.Pad(year, 4)
+    }
+}

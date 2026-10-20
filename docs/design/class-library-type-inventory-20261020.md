@@ -8,7 +8,7 @@ Compiler-generated carriers, module functions and internal helpers are not count
 See the [review and findings](class-library-soundness-20261020.md#whole-library-contract-pass) for manual interpretation,
 inherited/runtime contracts, execution evidence, allocation concerns and remaining gaps.
 
-**260 declarations**: Borrowed view: 2; Contract: 66; Enum: 12; Intrinsic: 17; Owned view: 2; Record: 2; Reference: 89; Reference value: 7; Static: 11; Union: 33; Value: 19.
+**261 declarations**: Borrowed view: 2; Contract: 66; Enum: 12; Intrinsic: 17; Owned view: 2; Record: 2; Reference: 90; Reference value: 7; Static: 11; Union: 33; Value: 19.
 
 `Et` = typed Equals; `Eo` = Object Equals; `H` = parameterless GetHashCode;
 `T` = parameterless ToString; `Tf` = formatted ToString overload; `*` = authored override.
@@ -105,6 +105,7 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.Globalization.DateTimeFormat](../../runtime/raven/src/System/Globalization/DateTimeFormat.rvn#L8) | Reference | — |
 | [System.Globalization.FixedCultureProvider](../../runtime/raven/src/System/Globalization/FixedCultureProvider.rvn#L3) | Reference | — |
 | [System.Globalization.Language](../../runtime/raven/src/System/Globalization/Language.rvn#L4) | Reference | — |
+| [System.Globalization.NumberFormat](../../runtime/raven/src/System/Globalization/NumberFormat.rvn#L5) | Reference | — |
 | [System.Globalization.SystemCultureProvider](../../runtime/raven/src/System/Globalization/SystemCultureProvider.rvn#L5) | Reference | — |
 | [System.HashCode](../../runtime/raven/src/System/HashCode.rvn#L5) | Value | — |
 | [System.IO.Compression.GZipStream](../../runtime/raven/src/System/IO/Compression/GZipStream.rvn#L14) | Reference | — |

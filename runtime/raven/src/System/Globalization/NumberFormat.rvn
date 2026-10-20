@@ -1,0 +1,30 @@
+module System.Globalization
+
+/// Immutable numeric conventions for the bounded built-in cultures.
+/// This describes formatting data; primitive numeric format specifiers remain separate APIs.
+public class NumberFormat {
+    private var swedish: bool
+
+    private init(culture: Culture) {
+        swedish = culture.Name == "sv-SE"
+    }
+
+    internal static func DecimalSeparator(culture: Culture) -> string => if culture.Name == "sv-SE" { "," } else { "." }
+
+    /// Selects the built-in numeric conventions without resolving ambient preferences.
+    static func Create(culture: Culture) -> NumberFormat => NumberFormat(culture)
+    /// Returns invariant numeric conventions.
+    static val Invariant: NumberFormat => NumberFormat(Culture.Invariant)
+    /// Decimal separator for ordinary numbers and culture-sensitive durations.
+    val NumberDecimalSeparator: string => if swedish { "," } else { "." }
+    /// Thousands separator; Swedish uses U+00A0, not an ASCII space.
+    val NumberGroupSeparator: string => if swedish { " " } else { "," }
+    /// A fresh array of grouping sizes, from the least significant group.
+    val NumberGroupSizes: int[] => [3]
+    /// Default fractional precision for fixed-point numeric formatting.
+    val NumberDecimalDigits: int => 2
+    /// Positive sign used by the bounded numeric conventions.
+    val PositiveSign: string => "+"
+    /// Negative sign used by the bounded numeric conventions; no bidi marks are inserted.
+    val NegativeSign: string => "-"
+}

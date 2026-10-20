@@ -71,7 +71,4 @@ internal class HebrewDateTimeFormat : DateTimeFormatRules {
         return digits.Pad(day, 2) + "." + digits.Pad(month, 2) + "." + digits.Pad(year, 4)
     }
 
-    func FormatTime(time: System.Time.TimeOfDay) -> string {
-        return digits.FormatTime(time, ".")
-    }
 }

@@ -1,0 +1,77 @@
+import System.*
+import System.Globalization.*
+import System.Time.*
+import System.Result.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Profile(culture: Culture, dateText: string, decimalSeparator: string, groupSeparator: string) {
+    let format = culture.DateTimeFormat
+    let Ok(date) = Date.Create(2024, 3, 9) else {
+        System.Fail("Date")
+    }
+    let Ok(text) = format.FormatDate(date) else {
+        System.Fail("Date format")
+    }
+    Check(text == dateText, "Date convention")
+    Check(format.TimeSeparator == ":" && format.ShortTimePattern == (if culture.Name == "en-US" { "h:mm tt" } else { "HH:mm" }) && format.LongTimePattern == (if culture.Name == "en-US" { "h:mm:ss tt" } else { "HH:mm:ss" }), "Time metadata")
+    let numbers = culture.NumberFormat
+    Check(numbers.NumberDecimalSeparator == decimalSeparator && numbers.NumberGroupSeparator == groupSeparator, "Number separators")
+    Check(numbers.NumberDecimalDigits == 2 && numbers.PositiveSign == "+" && numbers.NegativeSign == "-", "Number signs and precision")
+    let groups = numbers.NumberGroupSizes
+    Check(groups.Length == 1 && groups[0] == 3, "Group sizes")
+    groups[0] = 9
+    Check(numbers.NumberGroupSizes[0] == 3, "No shared mutable grouping")
+    let calendars = culture.OptionalCalendars
+    Check(calendars.Length == 2 && calendars[0].Id == culture.DefaultCalendar.Id && calendars[1].Id == "hebrew", "Optional calendars")
+    let hebrew = format.WithCalendar(calendars[1])
+    let Ok(projected) = hebrew.FormatDate(date) else {
+        System.Fail("Hebrew calendar projection")
+    }
+    Check(projected.Length > 0 && format.Calendar.Id == "gregory", "Independent immutable calendar choice")
+    calendars[0] = Calendar.Hebrew
+    Check(culture.OptionalCalendars[0].Id == "gregory", "No shared mutable calendar array")
+    Check(format.FractionalSecondSeparator == decimalSeparator, "Time decimal metadata")
+    Check(Duration.FromTicks(15000000L).ToString("g", culture) == "0:00:01" + decimalSeparator + "5", "Duration data integration")
+    Check(Duration.FromTicks(15000000L).ToString("c", culture) == "00:00:01.5000000", "Invariant duration unchanged")
+    Check(date.ToString("O", culture) == "2024-03-09", "Invariant roundtrip unchanged")
+}
+
+func Main() {
+    Profile(Culture.Invariant, "2024-03-09", ".", ",")
+    Profile(Culture.SwedishSweden, "2024-03-09", ",", " ")
+    Profile(Culture.HebrewIsrael, "09.03.2024", ".", ",")
+    Profile(Culture.EnglishUnitedKingdom, "09/03/2024", ".", ",")
+    Profile(Culture.EnglishUnitedStates, "3/9/2024", ".", ",")
+    Check(Culture.EnglishUnitedKingdom.Language.Code == "en" && Culture.EnglishUnitedStates.Language.Code == Language.English.Code, "English language")
+    Check(SystemCultureProvider.FromPreference("en_GB.UTF-8").Current.Name == "en-GB", "UK resolver")
+    Check(SystemCultureProvider.FromPreference("EN-us").Current.Name == "en-US", "US resolver")
+    Check(SystemCultureProvider.FromPreference("en-CA").Current.Name == "", "Unsupported English region")
+    Check(!SystemCultureProvider.FromPreference("en-US").IsFallback, "Exact culture preference")
+    Check(SystemCultureProvider.FromPreference("en").IsFallback, "Neutral English fallback")
+    Check(NumberFormat.Invariant.NumberDecimalSeparator == ".", "Invariant number factory")
+    let us = Culture.EnglishUnitedStates.DateTimeFormat
+    let uk = Culture.EnglishUnitedKingdom.DateTimeFormat
+    Check(us.AMDesignator == "AM" && us.PMDesignator == "PM" && uk.AMDesignator == "", "Clock designators")
+    let Ok(midnight) = TimeOfDay.Parse("00:00:00") else {
+        System.Fail("Midnight")
+    }
+    let Ok(noon) = TimeOfDay.Parse("12:00:00") else {
+        System.Fail("Noon")
+    }
+    let Ok(afternoon) = TimeOfDay.Parse("14:30:05.1234567") else {
+        System.Fail("Afternoon")
+    }
+    Check(us.FormatTime(midnight, "t") == "12:00 AM", "US midnight")
+    Check(us.FormatTime(noon, "T") == "12:00:00 PM", "US noon")
+    Check(us.FormatTime(afternoon, "t") == "2:30 PM", "US short time")
+    Check(us.FormatTime(afternoon) == "2:30:05.1234567 PM", "US fractional time")
+    Check(uk.FormatTime(afternoon, "t") == "14:30", "UK short time")
+    Check(us.FormatTime(afternoon, "O") == "14:30:05.1234567", "US invariant roundtrip")
+    System.Runtime.GC.Collect()
+    Console.WriteLine("Culture formatting data: passed")
+}

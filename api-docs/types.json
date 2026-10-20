@@ -144,6 +144,7 @@
   "System.Globalization.DateTimeFormat",
   "System.Globalization.FixedCultureProvider",
   "System.Globalization.Language",
+  "System.Globalization.NumberFormat",
   "System.Globalization.SystemCultureProvider",
   "System.HashCode",
   "System.IO.Compression.GZipStream",

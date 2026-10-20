@@ -38,6 +38,27 @@ public class SystemCultureProvider : CultureProvider {
             if System.String.CompareOrdinalIgnoreCase(primary, "he") == 0 || System.String.CompareOrdinalIgnoreCase(primary, "iw") == 0 {
                 return Culture.HebrewIsrael
             }
+            if System.String.CompareOrdinalIgnoreCase(primary, "en") == 0 {
+                // Region is explicit: an unsupported English region must not silently become US.
+                var region = ""
+                if index < preference.Length && (preference[index].ToString() == "-" || preference[index].ToString() == "_") {
+                    index += 1
+                    while index < preference.Length {
+                        let part = preference[index].ToString()
+                        if part == "." || part == "@" || part == "-" || part == "_" {
+                            break
+                        }
+                        region = region + part
+                        index += 1
+                    }
+                }
+                if System.String.CompareOrdinalIgnoreCase(region, "GB") == 0 {
+                    return Culture.EnglishUnitedKingdom
+                }
+                if System.String.CompareOrdinalIgnoreCase(region, "US") == 0 {
+                    return Culture.EnglishUnitedStates
+                }
+            }
             return Culture.Invariant
         }
     }

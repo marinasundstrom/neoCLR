@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Culture formatting data: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Culture formatting data: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/culture-formats-clock-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Culture formatting data: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-app/app": "37cfa15542c56897b6e069415e1b904b9164879554f35d63ca06140a8c6c577d",
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-app/app.dll": "dbb81829d8bfac05bc2384ccb29a8999be2bc6669ee71676f37e659d39e60709",
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/bin/neoclr-codegen": "614b78b75d0338d729be4519fb57071da3338eba1ddbad6747ea4999206d8fb4",
+    "/Users/robert/Projects/neoclr/target/culture-formats-clock-bundle/bundle/lib/System.Runtime.dll": "35924b9a0bbb44ec980877b65b894e95601ba44523ac448aa11c8e8db0d81af7"
+  }
+}

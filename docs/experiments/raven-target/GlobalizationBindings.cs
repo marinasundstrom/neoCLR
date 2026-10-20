@@ -8,13 +8,14 @@ static class GlobalizationBindings
     public const string Calendar = "System.Time.Calendar";
     public const string Culture = "System.Globalization.Culture";
     public const string Format = "System.Globalization.DateTimeFormat";
+    public const string NumberFormat = "System.Globalization.NumberFormat";
     public const string Language = "System.Globalization.Language";
     public const string Provider = "System.Globalization.CultureProvider";
     public const string FixedProvider = "System.Globalization.FixedCultureProvider";
     public const string SystemProvider = "System.Globalization.SystemCultureProvider";
     public static bool IsProvider(string name) => name is Provider or FixedProvider or SystemProvider;
     public static bool Converts(string source, string target) => source is FixedProvider or SystemProvider && target == Provider;
-    public static bool IsName(string name) => name is Zoned or Zone or Calendar or Culture or Format or Language or Provider or FixedProvider or SystemProvider;
+    public static bool IsName(string name) => name is Zoned or Zone or Calendar or Culture or Format or NumberFormat or Language or Provider or FixedProvider or SystemProvider;
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
     public const string Declarations = """
         namespace Time {
@@ -75,6 +76,7 @@ static class GlobalizationBindings
                 public static Language Undetermined => default;
                 public static Language Swedish => default;
                 public static Language Hebrew => default;
+                public static Language English => default;
                 public string Code => default;
             }
             public interface CultureProvider { Culture Current { get; } }
@@ -94,11 +96,26 @@ static class GlobalizationBindings
                 public static Culture Invariant => default;
                 public static Culture SwedishSweden => default;
                 public static Culture HebrewIsrael => default;
+                public static Culture EnglishUnitedKingdom => default;
+                public static Culture EnglishUnitedStates => default;
                 public string Name => default;
                 public Language Language => default;
                 public static Culture Current => default;
                 public System.Time.Calendar DefaultCalendar => default;
+                public System.Time.Calendar[] OptionalCalendars => default;
+                public NumberFormat NumberFormat => default;
                 public DateTimeFormat DateTimeFormat => default;
+            }
+            public sealed class NumberFormat {
+                private NumberFormat() { }
+                public static NumberFormat Create(Culture culture) => default;
+                public static NumberFormat Invariant => default;
+                public string NumberDecimalSeparator => default;
+                public string NumberGroupSeparator => default;
+                public int[] NumberGroupSizes => default;
+                public int NumberDecimalDigits => default;
+                public string PositiveSign => default;
+                public string NegativeSign => default;
             }
             public sealed class DateTimeFormat {
                 private DateTimeFormat() { }
@@ -106,6 +123,14 @@ static class GlobalizationBindings
                 public System.Time.Calendar Calendar => default;
                 public Culture Culture => default;
                 public static DateTimeFormat Create(Culture culture, System.Time.Calendar calendar) => default;
+                public string DateSeparator => default;
+                public string TimeSeparator => default;
+                public string FractionalSecondSeparator => default;
+                public string DateTimeSeparator => default;
+                public string AMDesignator => default;
+                public string PMDesignator => default;
+                public string ShortTimePattern => default;
+                public string LongTimePattern => default;
                 public DateTimeFormat WithCalendar(System.Time.Calendar calendar) => default;
                 public Result<string,InvalidDateError> FormatDate(Date date) => default;
                 public Result<string,InvalidDateError> FormatDate(Date date, string format) => default;
@@ -128,7 +153,7 @@ static class GlobalizationBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         (string Args, string Result, bool Static) expected = (owner, reference.Name) switch {
-            (Language, "get_Undetermined" or "get_Swedish" or "get_Hebrew") => ("", Language, true),
+            (Language, "get_Undetermined" or "get_Swedish" or "get_Hebrew" or "get_English") => ("", Language, true),
             (Language, "get_Code") => ("", "String", false),
             (Culture, "get_Language") => ("", Language, false),
             (Culture, "get_Current") => ("", Culture, true),
@@ -162,9 +187,17 @@ static class GlobalizationBindings
             (Calendar, "IsLeapYear") => ("Int32", "System.Result<Boolean,System.Time.InvalidDateError>", false),
             (Calendar, "GetDaysInMonth") => ("Int32,Int32", "System.Result<Int32,System.Time.InvalidDateError>", false),
             (Calendar, "AddDays" or "AddMonths" or "AddYears") => ("System.Time.Date,Int32", CalendarBindings.DateResult, false),
-            (Culture, "get_Invariant" or "get_SwedishSweden" or "get_HebrewIsrael") => ("", Culture, true),
+            (Culture, "get_Invariant" or "get_SwedishSweden" or "get_HebrewIsrael" or "get_EnglishUnitedKingdom" or "get_EnglishUnitedStates") => ("", Culture, true),
             (Culture, "get_DefaultCalendar") or (Format, "get_Calendar") => ("", Calendar, false),
             (Culture, "get_DateTimeFormat") => ("", Format, false),
+            (Culture, "get_OptionalCalendars") => ("", "arrayref<" + Calendar + ">", false),
+            (Culture, "get_NumberFormat") => ("", NumberFormat, false),
+            (NumberFormat, "Create") => (Culture, NumberFormat, true),
+            (NumberFormat, "get_Invariant") => ("", NumberFormat, true),
+            (NumberFormat, "get_NumberDecimalSeparator" or "get_NumberGroupSeparator" or "get_PositiveSign" or "get_NegativeSign") => ("", "String", false),
+            (NumberFormat, "get_NumberGroupSizes") => ("", "arrayref<Int32>", false),
+            (NumberFormat, "get_NumberDecimalDigits") => ("", "Int32", false),
+            (Format, "get_DateSeparator" or "get_TimeSeparator" or "get_FractionalSecondSeparator" or "get_DateTimeSeparator" or "get_ShortTimePattern" or "get_LongTimePattern" or "get_AMDesignator" or "get_PMDesignator") => ("", "String", false),
             (Format, "get_Invariant") => ("", Format, true),
             (Format, "get_Culture") => ("", Culture, false),
             (Format, "Create") => ($"{Culture},{Calendar}", Format, true),

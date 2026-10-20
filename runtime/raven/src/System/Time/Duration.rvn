@@ -57,7 +57,7 @@ public struct Duration : ComparableTo<Duration>, EquatableTo<Duration>, Formatta
     /// G (day and seven fractional digits always present). Swedish g/G uses a comma.
     /// Unsupported specifiers fault. All signed Int64 tick values are supported.
     func ToString(format: string, culture: Globalization.Culture) -> string {
-        let separator = if culture.Name == "sv-SE" { "," } else { "." }
+        let separator = Globalization.NumberFormat.DecimalSeparator(culture)
         return FormatDuration(format, separator)
     }
 

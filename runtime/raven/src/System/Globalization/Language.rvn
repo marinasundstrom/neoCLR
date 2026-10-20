@@ -11,5 +11,7 @@ public class Language {
     static val Undetermined: Language => Language("und")
     static val Swedish: Language => Language("sv")
     static val Hebrew: Language => Language("he")
+    /// English language identity shared by the UK and US cultures.
+    static val English: Language => Language("en")
     val Code: string => code
 }

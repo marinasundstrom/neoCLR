@@ -83,7 +83,7 @@ a measured limitation, not a required semantic allocation.
 
 Author direction, 2026-10-20: extend the check to most/all types, continue through
 issues, and make consistency an explicit objective. The [reproducible inventory](class-library-type-inventory-20261020.md)
-covers **all 260 authored top-level public declarations**, including the optional
+covers **all 261 authored top-level public declarations**, including the optional
 PostgreSQL provider: 66 interfaces, 11 static classes, 12 enums, 33 unions, two
 records, two borrowed views, two persistent views, 17 intrinsic types, 19 ordinary
 structs and 96 reference classes. This is a declaration/inheritance and implementation
@@ -120,4 +120,6 @@ This is a host dependency fix, not a new asynchronous API or a forced allocation
 ordinary equality. Source and metadata/API snapshot checks complement these execution
 checks; none is a substitute for a replacement release's platform gates.
 
-All 260 source declarations also map to type pages in the matching native API render (`scripts/audit-type-contracts.py --check --native-site <rendered-site>`). This checks type-page coverage, not every member signature or executable behavior.
+All 261 source declarations also map to type pages in the matching native API render (`scripts/audit-type-contracts.py --check --native-site <rendered-site>`). This checks type-page coverage, not every member signature or executable behavior.
+
+The [globalization foundation](../experiments/culture-formats/README.md) adds NumberFormat as an ordinary immutable policy with inherited reference identity, taking the inventory to 261 public declarations. Culture calendar/group arrays are independent snapshots; numeric/time decimal data is shared without constructing a numeric policy for each Duration format.

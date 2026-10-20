@@ -2,7 +2,7 @@ module System.Globalization
 
 import System.Time.*
 
-/// Immutable, bounded date/time conventions; no ambient culture or locale resolver.
+/// Immutable, bounded formatting conventions; no ambient culture or locale resolver.
 public class Culture {
     private var kind: int
 
@@ -14,6 +14,11 @@ public class Culture {
     static val SwedishSweden: Culture => Culture(1)
     static val HebrewIsrael: Culture => Culture(2)
 
+    /// English formatting conventions for the United Kingdom.
+    static val EnglishUnitedKingdom: Culture => Culture(3)
+    /// English formatting conventions for the United States.
+    static val EnglishUnitedStates: Culture => Culture(4)
+
     val Name: string {
         get {
             if kind == 1 {
@@ -21,6 +26,12 @@ public class Culture {
             }
             if kind == 2 {
                 return "he-IL"
+            }
+            if kind == 3 {
+                return "en-GB"
+            }
+            if kind == 4 {
+                return "en-US"
             }
             return ""
         }
@@ -33,6 +44,9 @@ public class Culture {
             if kind == 2 {
                 return System.Globalization.Language.Hebrew
             }
+            if kind == 3 || kind == 4 {
+                return System.Globalization.Language.English
+            }
             return System.Globalization.Language.Undetermined
         }
     }
@@ -40,5 +54,10 @@ public class Culture {
     static val Current: Culture => SystemCultureProvider().Current
 
     val DefaultCalendar: System.Time.Calendar => System.Time.Calendar.Gregorian
+    /// Fresh calendar selections supported by the explicit formatting policy, default first.
+    /// Both calendars are available independently of language; this is not an OS locale inventory.
+    val OptionalCalendars: System.Time.Calendar[] => [System.Time.Calendar.Gregorian, System.Time.Calendar.Hebrew]
+    /// Immutable numeric conventions; retain the returned policy for repeated formatting.
+    val NumberFormat: NumberFormat => System.Globalization.NumberFormat.Create(self)
     val DateTimeFormat: DateTimeFormat => System.Globalization.DateTimeFormat.Create(self, DefaultCalendar)
 }

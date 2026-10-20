@@ -17,6 +17,8 @@ public class DateTimeFormat {
             rules = HebrewDateTimeFormat(calendar)
         } else if culture.Name.Equals("sv-SE") {
             rules = SwedishDateTimeFormat()
+        } else if culture.Name == "en-GB" || culture.Name == "en-US" {
+            rules = EnglishDateTimeFormat(culture.Name == "en-US")
         } else {
             rules = InvariantDateTimeFormat()
         }
@@ -31,6 +33,31 @@ public class DateTimeFormat {
     }
     val Culture: Culture => culture
     val Calendar: System.Time.Calendar => calendar
+
+    /// Separator used between numeric date fields. Hebrew-letter dates use spaces instead.
+    val DateSeparator: string {
+        get {
+            if culture.Name == "he-IL" {
+                return if calendar.Id == "hebrew" { " " } else { "." }
+            }
+            return if culture.Name == "en-GB" || culture.Name == "en-US" { "/" } else { "-" }
+        }
+    }
+    /// Separator between hour, minute and second fields.
+    val TimeSeparator: string => ":"
+    /// Separator before fractional seconds in the default time representation.
+    val FractionalSecondSeparator: string => NumberFormat.DecimalSeparator(culture)
+    /// Separator between date and time in the default civil representation.
+    val DateTimeSeparator: string => rules.DateTimeSeparator
+    /// Supported short-time pattern. Custom pattern interpretation is not yet provided.
+    val ShortTimePattern: string => if culture.Name == "en-US" { "h:mm tt" } else { "HH:mm" }
+    /// Supported long-time pattern for the T specifier, without fractions.
+    val LongTimePattern: string => if culture.Name == "en-US" { "h:mm:ss tt" } else { "HH:mm:ss" }
+
+    /// Morning designator used by the US twelve-hour profile; empty for 24-hour profiles.
+    val AMDesignator: string => if culture.Name == "en-US" { "AM" } else { "" }
+    /// Afternoon designator used by the US twelve-hour profile; empty for 24-hour profiles.
+    val PMDesignator: string => if culture.Name == "en-US" { "PM" } else { "" }
 
     /// Selects culture and calendar independently. Both supported calendars are accepted.
     static func Create(culture: Culture, calendar: System.Time.Calendar) -> DateTimeFormat {
@@ -49,15 +76,16 @@ public class DateTimeFormat {
         return Ok(rules.FormatDate(year, month, day))
     }
 
-    /// Formats HH:mm:ss.fffffff; Swedish uses a comma before fractional seconds.
+    /// Formats seven fractional digits; US uses a twelve-hour clock and AM/PM.
+    /// Other profiles use a 24-hour clock; Swedish uses a decimal comma.
     func FormatTime(time: System.Time.TimeOfDay) -> string {
-        return rules.FormatTime(time)
+        return FormatClock(time, true, true)
     }
 
     /// Invariant uses T; named cultures use a space. No offset or timezone is implied.
     func FormatLocalDateTime(value: System.Time.LocalDateTime) -> System.Result<string, System.Time.InvalidDateError> {
         let date = FormatDate(value.Date)?
-        return Ok(date + rules.DateTimeSeparator + FormatTime(value.Time))
+        return Ok(date + DateTimeSeparator + FormatTime(value.Time))
     }
 
     /// Supports empty/G/d for the selected numeric date, and O/o for invariant Gregorian yyyy-MM-dd.
@@ -74,7 +102,7 @@ public class DateTimeFormat {
     }
 
     /// Supports empty/G for existing culture precision, O/o for invariant seven-digit precision,
-    /// T for HH:mm:ss and t for HH:mm. Other specifiers fault.
+    /// T/t use LongTimePattern/ShortTimePattern (US twelve-hour, otherwise 24-hour). Other specifiers fault.
     func FormatTime(time: System.Time.TimeOfDay, format: string) -> string {
         if format == "" || format == "G" {
             return FormatTime(time)
@@ -83,12 +111,33 @@ public class DateTimeFormat {
             return Invariant.FormatTime(time)
         }
         if format == "T" || format == "t" {
-            let digits = DateTimeFormatDigits()
-            let text = digits.Pad(time.Hour, 2) + ":" + digits.Pad(time.Minute, 2)
-            return if format == "T" { text + ":" + digits.Pad(time.Second, 2) } else { text }
+            return FormatClock(time, format == "T", false)
         }
         System.Fail("Unsupported TimeOfDay format")
         return ""
+    }
+
+    private func FormatClock(time: System.Time.TimeOfDay, seconds: bool, fraction: bool) -> string {
+        let digits = DateTimeFormatDigits()
+        let twelveHour = culture.Name == "en-US"
+        var hour = time.Hour
+        if twelveHour {
+            hour = hour % 12
+            if hour == 0 {
+                hour = 12
+            }
+        }
+        var text = digits.Pad(hour, if twelveHour { 1 } else { 2 }) + TimeSeparator + digits.Pad(time.Minute, 2)
+        if seconds {
+            text = text + TimeSeparator + digits.Pad(time.Second, 2)
+        }
+        if fraction {
+            text = text + FractionalSecondSeparator + digits.Pad(time.FractionTicks, 7)
+        }
+        if twelveHour {
+            text = text + " " + if time.Hour < 12 { AMDesignator } else { PMDesignator }
+        }
+        return text
     }
 
     /// Supports empty/G for the selected civil conventions, O/o for invariant seven-digit precision,
@@ -115,5 +164,4 @@ public class DateTimeFormat {
 internal interface DateTimeFormatRules {
     val DateTimeSeparator: string { get; }
     func FormatDate(year: int, month: int, day: int) -> string
-    func FormatTime(time: System.Time.TimeOfDay) -> string
 }
