@@ -37,6 +37,27 @@ pub struct RuntimeContext {
     pub reference_arena: bool,
 }
 
+// This bounds full input metadata, before reachability selection. The current
+// class-library set alone contains more than 4,000 methods.
+const MAX_LOAD_SET_FUNCTIONS: usize = 8192;
+const MAX_LOAD_SET_TYPES: usize = 1024;
+
+fn check_inventory_size(
+    functions: usize,
+    types: usize,
+    includes_system: bool,
+) -> Result<(), Error> {
+    if functions > MAX_LOAD_SET_FUNCTIONS || types > MAX_LOAD_SET_TYPES {
+        let scope = if includes_system {
+            " including System"
+        } else {
+            ""
+        };
+        return Err(format!("load-set inventory{scope} exceeds AOT bounds: {functions}/{MAX_LOAD_SET_FUNCTIONS} methods, {types}/{MAX_LOAD_SET_TYPES} types").into());
+    }
+    Ok(())
+}
+
 pub fn prepare(
     app: &neoclr::Module,
     dependencies: &[neoclr::Module],
@@ -50,11 +71,11 @@ pub fn prepare(
         return Err("load-set root must resolve uniquely inside the application".into());
     }
     let mut inputs: Vec<_> = std::iter::once(app).chain(dependencies).collect();
-    if inputs.iter().map(|m| m.functions.len()).sum::<usize>() > 4096
-        || inputs.iter().map(|m| m.types.len()).sum::<usize>() > 1024
-    {
-        return Err("load-set inventory exceeds AOT bounds".into());
-    }
+    check_inventory_size(
+        inputs.iter().map(|m| m.functions.len()).sum(),
+        inputs.iter().map(|m| m.types.len()).sum(),
+        false,
+    )?;
     for input in &inputs {
         super::selection::validate_source(input, true)?;
     }
@@ -69,11 +90,11 @@ pub fn prepare(
     let compile_system = context.is_some_and(|c| c.compile_system);
     if compile_system {
         inputs.push(system);
-        if inputs.iter().map(|m| m.functions.len()).sum::<usize>() > 4096
-            || inputs.iter().map(|m| m.types.len()).sum::<usize>() > 1024
-        {
-            return Err("load-set inventory including System exceeds AOT bounds".into());
-        }
+        check_inventory_size(
+            inputs.iter().map(|m| m.functions.len()).sum(),
+            inputs.iter().map(|m| m.types.len()).sum(),
+            true,
+        )?;
     }
     let program = if let Some(object_root) = context.and_then(|c| c.object_root.as_ref()) {
         neoclr::LoadedProgram::with_modules_and_object_root(app, system, dependencies, object_root)
@@ -1852,5 +1873,26 @@ pub(crate) mod descriptor_token_tests {
         let mut value = 0;
         assert_eq!(unsafe { entry(0, &mut value) }, 0);
         assert_eq!(value, expected);
+    }
+}
+
+#[cfg(test)]
+mod inventory_bounds_tests {
+    use super::*;
+
+    #[test]
+    fn library_growth_keeps_explicit_load_set_limits() {
+        // Five current libraries plus the async delimiter consumer: 4112/666.
+        assert!(check_inventory_size(4112, 666, false).is_ok());
+        assert!(check_inventory_size(8192, 1024, true).is_ok());
+        let methods = check_inventory_size(8193, 666, false)
+            .unwrap_err()
+            .to_string();
+        assert!(methods.contains("8193/8192 methods"));
+        let types = check_inventory_size(4112, 1025, true)
+            .unwrap_err()
+            .to_string();
+        assert!(types.contains("including System"));
+        assert!(types.contains("1025/1024 types"));
     }
 }

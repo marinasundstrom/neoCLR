@@ -13637,3 +13637,13 @@ forms remain admitted for old artifacts. Mutable/wrong-element views remain
 rejected. Sync console providers no longer fabricate Task/Promise completion.
 The native semantic owner is System.Runtime; the CLI reference is documentation
 scaffolding and borrowed members remain covered by the native API snapshot.
+
+### Full native load-set inventory (2026-10-20)
+
+The backend's pre-selection method cap is now 8192 (formerly 4096); type count
+remains 1024 and dependency count eight. The five source libraries contain 4046
+methods and the async delimiter consumer brings the supplied total to 4112. This
+is a metadata resource bound, not a reachable-code or runtime allocation limit.
+Diagnostics report actual counts and caps. Original-scope verification, borrow
+checks and reachability selection remain in force. No Raven/CLI representation or
+public semantic change is involved.
