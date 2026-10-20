@@ -80,14 +80,14 @@ with an explicit `EquatableTo<Self>` contract and public typed equality/hash met
 such as `Index` and `Range`, are also supported without boxing their components.
 [Imported component validation](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-components)
 records the limits and allocation measurements. Typed and boxed record comparisons
-are tested across interpreter, JIT and AOT. Generic record owners, unsupported union
-payloads, floating-point components, imported value-record discovery and broader generated formatting remain gaps;
+are tested across interpreter, JIT and AOT. Unsupported union payloads, floating-point components and broader generated formatting remain gaps;
 this is development support, not full record parity in a published release.
 Supported nongeneric records automatically implement `EquatableTo<Self>` through
 their generated equality method and ordinary interface dispatch. This includes
 imported ConsoleKeyInfo values and records containing them. Unsupported nongeneric
-component contracts are rejected at declaration. Native generic record equality
-remains a gap; .NET generic records retain their ordinary interface semantics.
+component contracts are rejected at declaration. Generic native equality is covered
+below, including its allocation costs and component limits; .NET generic records
+retain their ordinary interface semantics.
 
 Development native record formatting now covers scalar and nested positional record
 structs, with named members, quoted text and boxed `ToString()` dispatch. It uses
@@ -190,3 +190,14 @@ Source and imported consumers run in interpreter, JIT and AOT, including closed 
 owners. The [reflection APIs](/features/reflection/) describe readonly/literal fields and
 type initializers, and execute public static field access through the same initialization
 guards. Ordinary Raven/.NET behavior remains unchanged.
+
+### Generic record equality (development)
+
+Generic positional record structs and classes now have generated equality, hashing
+and `EquatableTo<Self>`, including imported KeyValuePair values. Component equality
+follows the declared type: null and canonical text retain their existing semantics,
+and Object-typed components keep Object policy. The current generic path allocates
+boxes and type descriptors; it is a correctness foundation with optimization pending.
+Generic formatting, enum/floating-point Object adapters and ordinary struct default
+value methods remain gaps. See the [pair API reference](/docs/key-value-pair.html) and
+[validated consumer](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-generics).

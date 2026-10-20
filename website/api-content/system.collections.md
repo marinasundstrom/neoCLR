@@ -24,3 +24,7 @@ Fluent helpers extend MutableMap with `Entry(key)` and MutableSet with
 OrInsert, OrInsertWith and AndModify. MutableSet.Find returns the stored equivalent
 value. See [the full contracts](/docs/collection-entries.html), including callback
 reentry, failures, allocation and the lack of atomicity.
+
+Development KeyValuePair records now have generated equality and hashing. See the
+[pair reference](/docs/key-value-pair.html) for the supported component contracts
+and current generic allocation costs. HashMap still uses its explicit comparer.

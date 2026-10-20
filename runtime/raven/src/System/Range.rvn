@@ -61,8 +61,12 @@ public struct Range : EquatableTo<Range> {
         let last = end
         return first.Equals(other.start) && last.Equals(other.end)
     }
+    /// Compares a boxed value using the same distance and direction semantics.
+    override func Equals(other: Object?) -> bool {
+        return other is Range value && Equals(value)
+    }
     /// Returns a hash consistent with typed equality.
-    func GetHashCode() -> int {
+    override func GetHashCode() -> int {
         let first = start
         let last = end
         return HashCode.Combine(first.GetHashCode(), last.GetHashCode())

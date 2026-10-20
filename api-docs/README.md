@@ -2705,3 +2705,15 @@ interface conversion and use as an imported record component. Existing operator
 route exclusions are unchanged. The pinned audit renderer remains 03bcc23d6.
 Generic native record interface/body synthesis is still incomplete and is not
 advertised for KeyValuePair. This update does not publish the website.
+
+### Generic record value members — 2026-10-20
+
+KeyValuePair<K,V> now exposes EquatableTo<Self>, typed/Object Equals, GetHashCode,
+== and !=. Index and Range now expose Object.Equals overrides and override their
+existing hashes. The reference declarations, XML summaries and native snapshot are
+refreshed from generic-record-libraries-final. Generic formatting and unsupported
+component adapters remain gaps; current generic comparisons allocate boxes and type
+descriptors. `/docs/key-value-pair.html` covers full signatures, errors and limits.
+`manual-members.json` records both pair operator IDs because pinned RavenDoc gives
+them the same generated route. The native type page links the manual entry; no pair
+type or other pair member is omitted. See record-generics for three-engine evidence.

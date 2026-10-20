@@ -2,7 +2,7 @@
 
 **Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) tracks the bounded native record equality/hash fix and remaining component/formatting gaps, the [String call-projection repair](validation/string-direct-call-20261020/README.md), and a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
 
-**Record formatting follow-up (2026-10-20):** [Scalar and nested positional record formatting](experiments/record-formatting/README.md) now has native bodies, including [closed declared union components](experiments/record-union-formatting/README.md); enum and broader component/generic formatting remain gaps. [Automatic equality-interface synthesis](experiments/record-auto-interfaces/README.md) now connects native nongeneric records to the core contract, including imported ConsoleKeyInfo components. Generic record equality bodies remain open. Keep the replacement matched-package gates open.
+**Record formatting follow-up (2026-10-20):** [Scalar and nested positional record formatting](experiments/record-formatting/README.md) now has native bodies, including [closed declared union components](experiments/record-union-formatting/README.md); enum and broader component/generic formatting remain gaps. [Automatic equality-interface synthesis](experiments/record-auto-interfaces/README.md) now connects native nongeneric records to the core contract, including imported ConsoleKeyInfo components. [Bounded generic equality/hash](experiments/record-generics/README.md) now extends this to generic owners and imported pairs. The generic path still allocates boxes/type descriptors; broader component adapters and formatting remain open. Keep the replacement matched-package gates open.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
@@ -29,8 +29,7 @@ comparison and hashing now pass interpreter/JIT/AOT qualification, including
 boxed dispatch, explicit ordinal policies and preserved UTF-8 storage. See the
 [canonical text evidence](experiments/canonical-text/README.md).
 Native generated equality/hash now has a [bounded positional-record fix](experiments/record-values/README.md).
-[Closed tagged-union components](experiments/record-unions/README.md), including ConsoleKeyInfo, now have typed and boxed equality/hash qualification. Generic record owners, unsupported union payloads, floating-point components,
-automatic imported record discovery and formatting remain release review gaps.
+[Closed tagged-union components](experiments/record-unions/README.md), including ConsoleKeyInfo, now have typed and boxed equality/hash qualification. [Generic record equality/hash](experiments/record-generics/README.md) now has bounded three-engine support. Generic allocation overhead, unsupported union payloads, floating-point components and broader formatting remain release review gaps.
 [Explicit imported value contracts](experiments/record-components/README.md) now allow
 Index/Range components without boxing; missing equality/hash contracts remain rejected. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
 with unchanged-owner reuse and measured changed-result allocations. The

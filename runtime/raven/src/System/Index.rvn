@@ -42,8 +42,12 @@ public struct Index : EquatableTo<Index> {
     func GetOffset(length: int) -> int => if fromEnd { length - offset } else { offset }
     /// Compares distance and direction, independently of any collection length.
     func Equals(other: Index) -> bool => offset == other.offset && fromEnd == other.fromEnd
+    /// Compares a boxed value using the same distance and direction semantics.
+    override func Equals(other: Object?) -> bool {
+        return other is Index value && Equals(value)
+    }
     /// Returns a hash consistent with typed equality.
-    func GetHashCode() -> int => if fromEnd { -offset - 1 } else { offset }
+    override func GetHashCode() -> int => if fromEnd { -offset - 1 } else { offset }
     /// Formats the value, prefixing end-relative indexes with ^.
     func ToString() -> string => if fromEnd { String.Concat("^", offset.ToString()) } else { offset.ToString() }
 }

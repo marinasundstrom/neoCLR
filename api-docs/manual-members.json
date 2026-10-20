@@ -122,5 +122,13 @@
   "M:System.ConsoleKeyInfo.op_Inequality(System.ConsoleKeyInfo,System.ConsoleKeyInfo)": {
     "output": "docs/console.html#key-value-equality",
     "reason": "Pinned RavenDoc maps == and != to the same operator_operator___.html route; the inequality page overwrites equality. The linked manual entry documents both signatures and behavior."
+  },
+  "M:System.Collections.KeyValuePair`2.op_Equality(System.Collections.KeyValuePair{`0,`1},System.Collections.KeyValuePair{`0,`1})": {
+    "output": "docs/key-value-pair.html#equality",
+    "reason": "Pinned RavenDoc maps == and != to the same operator route. The linked manual entry documents both signatures and behavior."
+  },
+  "M:System.Collections.KeyValuePair`2.op_Inequality(System.Collections.KeyValuePair{`0,`1},System.Collections.KeyValuePair{`0,`1})": {
+    "output": "docs/key-value-pair.html#equality",
+    "reason": "Pinned RavenDoc maps == and != to the same operator route. The linked manual entry documents both signatures and behavior."
   }
 }

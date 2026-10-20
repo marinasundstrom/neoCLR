@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/generic-record-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS generic records\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/generic-record-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS generic records\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-record-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS generic records\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/generic-record-app/app": "20dfddc4831cf72827773efe1a50f244c1acc856b8f0def1e4b26030b14bdc62",
+    "/Users/robert/Projects/neoclr/target/generic-record-app/app.dll": "948e7a887c9b778539c20356e482bdf2829a257db1e3f7b8860628abb3823231",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "258ae31b9eacbae797e87a325bb47a8ddeb6947e999ba6fbb49b936cf1229c75",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "414e488ee503544b398c2dad1ef38282560a9f7d2688cc62c9378cd1f0182405",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr-codegen": "36b9cf3059de373ea96981a7ee83bbc0bc95a06998f4cca7d12eedf6e1f4e4e5",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll": "0a9e520173a606d7e33a4e85ddcea76e43b88c0500181eaba6cd0c910f82b01a"
+  }
+}

@@ -37,6 +37,10 @@ ret
 ldloca absent
 initobj System.Object
 ldarg mode
+ldc.i4 6
+ceq
+brtrue Primitives
+ldarg mode
 ldc.i4 3
 ceq
 brtrue InterfaceIdentity
@@ -144,7 +148,109 @@ ldloc absent
 ldloc absent
 callvirt instance System.Object::Equals(System.Object)
 pop
+Primitives:
+call PrimitiveValues()
+ret
+
 Fail:
 ldc.i4 0
+ret
+.end
+
+.function PrimitiveValues() -> Int32
+.local System.Object left
+.local System.Object right
+.local System.Object absent
+ldloca absent
+initobj System.Object
+ldc.i4 -1234567
+box Int32
+stloc left
+ldc.i4 -1234567
+box Int32
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc left
+callvirt instance System.Object::GetHashCode()
+ldc.i4 -1234567
+ceq
+brfalse Fail
+ldc.i4 1234567
+box Int32
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldloc left
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldc.i8 4294967297
+box Int64
+stloc left
+ldc.i8 4294967297
+box Int64
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc left
+callvirt instance System.Object::GetHashCode()
+ldc.i4 0
+ceq
+brfalse Fail
+ldc.i8 8589934593
+box Int64
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldloc left
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldc.bool true
+box Boolean
+stloc left
+ldc.bool true
+box Boolean
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc left
+callvirt instance System.Object::GetHashCode()
+ldc.i4 1
+ceq
+brfalse Fail
+ldc.bool false
+box Boolean
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldloc left
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldc.i4 1
+box Int32
+stloc right
+ldloc left
+ldloc right
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldc.i4 42
+ret
+Fail:
+ldc.i4 -1
 ret
 .end

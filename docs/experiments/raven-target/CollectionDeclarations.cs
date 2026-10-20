@@ -74,11 +74,16 @@ static class CollectionDeclarations
                 public void Clear() { }
                 public Iterator<T> GetIterator() => default;
             }
-            public readonly struct KeyValuePair<K, V> {
+            public readonly struct KeyValuePair<K, V> : EquatableTo<KeyValuePair<K, V>> {
                 public KeyValuePair(K Key, V Value) { this.Key = Key; this.Value = Value; }
                 public K Key { get; init; }
                 public V Value { get; init; }
                 public void Deconstruct(out K Key, out V Value) { Key = this.Key; Value = this.Value; }
+                public bool Equals(KeyValuePair<K, V> other) => default;
+                public override bool Equals(object other) => default;
+                public override int GetHashCode() => default;
+                public static bool operator ==(KeyValuePair<K, V> left, KeyValuePair<K, V> right) => default;
+                public static bool operator !=(KeyValuePair<K, V> left, KeyValuePair<K, V> right) => default;
             }
             public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
                 V this[K key] { get; }

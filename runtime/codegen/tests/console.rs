@@ -11232,7 +11232,7 @@ int main(int argc, char **argv) {
     let method = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
-    for mode in 0..6 {
+    for mode in 0..7 {
         let reference = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
         let r = Command::new(dir.0.join("app"))
             .arg(mode.to_string())
@@ -11245,6 +11245,9 @@ int main(int argc, char **argv) {
                 let neoclr::Value::Int32(value) = result.value else {
                     panic!("expected Int32")
                 };
+                if mode == 6 {
+                    assert_eq!(value, 42);
+                }
                 assert_eq!(r.stdout, format!("{value}\n").as_bytes());
                 assert!(r.stderr.is_empty());
             }

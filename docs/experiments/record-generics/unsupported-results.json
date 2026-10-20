@@ -1,0 +1,71 @@
+{
+  "expectedFault": true,
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/generic-record-unsupported-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_02C8F5120BFCA910D43AFFD41A0DB2EDFC68192F110B9F5D99226A02606845B0.T__4B65796031.M_457175616C73 [instruction 54]\n   at NeoMetadata_02C8F5120BFCA910D43AFFD41A0DB2EDFC68192F110B9F5D99226A02606845B0.F_4D61696E [instruction 10]\n",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/generic-record-unsupported-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at Key`1.Equals [instruction 54]\n   at Main [instruction 10]\n",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-record-unsupported-app/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at Key`1.Equals [instruction 54]\n   at Main [instruction 10]\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/generic-record-unsupported-app/app": "f4507a01b0eabd5e6b59cb054387b1d6f505e6800092b1a6e1dbaeca1602e226",
+    "/Users/robert/Projects/neoclr/target/generic-record-unsupported-app/app.dll": "9df94d850f48c9ecb0926358be416cfce21184f8b804d1327e2a41dfb1c24241",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "258ae31b9eacbae797e87a325bb47a8ddeb6947e999ba6fbb49b936cf1229c75",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "414e488ee503544b398c2dad1ef38282560a9f7d2688cc62c9378cd1f0182405",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/bin/neoclr-codegen": "36b9cf3059de373ea96981a7ee83bbc0bc95a06998f4cca7d12eedf6e1f4e4e5",
+    "/Users/robert/Projects/neoclr/target/generic-record-bundle/bundle/lib/System.Runtime.dll": "0a9e520173a606d7e33a4e85ddcea76e43b88c0500181eaba6cd0c910f82b01a"
+  }
+}

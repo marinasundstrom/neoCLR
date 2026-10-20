@@ -1,0 +1,5 @@
+Legacy API source fingerprint and reference snapshot: PASS
+Native metadata documentation audit: PASS
+Native snapshot tests: 4 passed
+Website: 4,905 pages checked; 124 legacy pages retained.
+Existing missing-description warnings remain; publication was not performed.

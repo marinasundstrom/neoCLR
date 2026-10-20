@@ -15,7 +15,8 @@ static class IndexRangeDeclarations
             public static implicit operator Index(int value) => default;
             public int GetOffset(int length) => default;
             public bool Equals(Index other) => default;
-            public new int GetHashCode() => default;
+            public override bool Equals(object other) => default;
+            public override int GetHashCode() => default;
             public new string ToString() => default;
         }
         public struct Range : EquatableTo<Range> {
@@ -28,7 +29,8 @@ static class IndexRangeDeclarations
             public Tuple<int, int> GetOffsetAndLength(int length) => default;
             public Result<Tuple<int, int>, InvalidRangeError> TryGetOffsetAndLength(int length) => default;
             public bool Equals(Range other) => default;
-            public new int GetHashCode() => default;
+            public override bool Equals(object other) => default;
+            public override int GetHashCode() => default;
             public new string ToString() => default;
         }
         namespace Runtime.CompilerServices {

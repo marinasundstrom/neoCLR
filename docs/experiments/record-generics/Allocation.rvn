@@ -1,0 +1,25 @@
+import System.*
+
+record struct Key<T>(Value: T)
+record struct IntKey(Value: int)
+
+func Main(args: string[]) {
+    var i = 0
+    while i < 128 {
+        if args[0] == "generic" {
+            let left = Key<int>(i)
+            let right = Key<int>(i)
+            if !left.Equals(right) || left.GetHashCode() != right.GetHashCode() {
+                System.Fail("generic value semantics")
+            }
+        } else if args[0] == "direct" {
+            let left = IntKey(i)
+            let right = IntKey(i)
+            if !left.Equals(right) || left.GetHashCode() != right.GetHashCode() {
+                System.Fail("direct value semantics")
+            }
+        }
+        i += 1
+    }
+    Console.WriteLine("PASS")
+}

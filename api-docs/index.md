@@ -85,3 +85,5 @@ with nullable migration messages and compiler warning/error severity.
 Index/Range extension and list contracts, copy semantics and safe alternatives.
 
 Development: [TLS stream APIs and HTTP integration](ssl-streams.md).
+
+- [Key/value pair equality and hashing](key-value-pair.md): development generic record contracts and current limits.

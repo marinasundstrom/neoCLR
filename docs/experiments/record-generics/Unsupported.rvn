@@ -1,0 +1,14 @@
+import System.*
+
+struct Storage {
+    val Value: int
+    init(value: int) { Value = value }
+}
+record struct Key<T>(Value: T)
+
+func Main() {
+    let left = Key<Storage>(Storage(1))
+    let right = Key<Storage>(Storage(1))
+    let equal = left.Equals(right)
+    Console.WriteLine(equal)
+}

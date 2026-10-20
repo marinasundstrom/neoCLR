@@ -1,0 +1,68 @@
+import System.*
+import System.Collections.*
+
+record struct Key<T>(Value: T)
+record class ReferenceKey<T>(Value: T)
+record struct Nested<T>(Value: Key<T>)
+record struct PairWrapper(Value: KeyValuePair<int, string>)
+
+class TypedValue : EquatableTo<TypedValue> {
+    val Value: int
+    init(value: int) { Value = value }
+    func Equals(other: TypedValue) -> bool => Value == other.Value
+    override func GetHashCode() -> int => Value
+}
+
+class ObjectPolicy : EquatableTo<Object> {
+    func EquatableTo<Object>.Equals(other: Object) -> bool => true
+    override func GetHashCode() -> int => 7
+}
+
+func Check<T>(first: T, same: T, other: T) {
+    let left = Key<T>(first)
+    let right = Key<T>(same)
+    let different = Key<T>(other)
+    if !left.Equals(right) || left.Equals(different) || left != right || left == different {
+        System.Fail("generic record equality")
+    }
+    if left.GetHashCode() != right.GetHashCode() {
+        System.Fail("generic record hash")
+    }
+    let view: EquatableTo<Key<T>> = left
+    if !view.Equals(right) || view.Equals(different) {
+        System.Fail("generic record interface")
+    }
+    let boxed: Object = left
+    if !boxed.Equals(right) || boxed.Equals(different) || boxed.GetHashCode() != left.GetHashCode() {
+        System.Fail("generic record Object overrides")
+    }
+}
+
+func Main() {
+    Check<int>(42, 42, 43)
+    Check<long>(4294967297, 4294967297, 8589934593)
+    Check<bool>(true, true, false)
+    Check<Object>(42, 42, "text")
+    Check<string>("é", "e\u0301", "different")
+    Check<string?>(null, null, "present")
+    Check<TypedValue>(TypedValue(7), TypedValue(7), TypedValue(8))
+    let same = ObjectPolicy()
+    Check<Object>(same, same, ObjectPolicy())
+    Check<Index>(Index(2), Index(2), Index(3))
+    Check<Object>(Index(2), Index(2), Index(3))
+    Check<Range>(Range(Index(1), Index(3)), Range(Index(1), Index(3)), Range(Index(1), Index(4)))
+    Check<Nested<int>>(Nested<int>(Key<int>(4)), Nested<int>(Key<int>(4)), Nested<int>(Key<int>(5)))
+    Check<Key<int>>(Key<int>(4), Key<int>(4), Key<int>(5))
+    Check<KeyValuePair<int, string>>(KeyValuePair<int, string>(1, "é"),
+        KeyValuePair<int, string>(1, "e\u0301"), KeyValuePair<int, string>(2, "é"))
+    let pair = KeyValuePair<int, string>(1, "é")
+    let pairSame = KeyValuePair<int, string>(1, "e\u0301")
+    if PairWrapper(pair) != PairWrapper(pairSame) || PairWrapper(pair).GetHashCode() != PairWrapper(pairSame).GetHashCode() {
+        System.Fail("imported generic record component")
+    }
+    let reference: EquatableTo<ReferenceKey<string>> = ReferenceKey<string>("é")
+    if !reference.Equals(ReferenceKey<string>("e\u0301")) || reference.Equals(ReferenceKey<string>("other")) {
+        System.Fail("generic reference record")
+    }
+    Console.WriteLine("PASS generic records")
+}

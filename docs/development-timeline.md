@@ -20318,3 +20318,23 @@ assistant validated source structs/classes and imported ConsoleKeyInfo interface
 calls and wrapper equality/hash, retained .NET generic interface tests, and refreshed
 API/website inputs. See [the qualification](experiments/record-auto-interfaces/README.md)
 for the test results and artifact identities. No release publication is claimed.
+
+### 2026-10-20 — Generic records after automatic interfaces
+
+- **Author:** Asked whether generic records were the next step, then directed:
+  “Continue through the generic record support.” The prior direction keeps records
+  ordinary classes/structs with generated semantics, rather than a separate runtime ABI.
+- **Assistant actions:** Committed the automatic nongeneric interface fix, then added
+  generic bodies and self-interfaces together. Removed the temporary generic gate;
+  reused substituted source/imported methods and selected component policy from the
+  declared type. Corrected integer/Boolean boxed Object dispatch and Index/Range
+  Object overrides instead of adding record-specific runtime workarounds.
+- **Observed outcome:** The generic consumer passes interpreter/JIT/AOT, including
+  custom typed equality, declared Object policy, null/canonical text, nesting and
+  imported KeyValuePair. Allocation measurement finds seven extra managed objects
+  per integer comparison plus two hashes in this bounded generic path. All tracked
+  allocations were reclaimed; this is not a throughput result or zero-allocation claim.
+- **Still open:** Remove generic boxes/type-descriptor overhead, extend unsupported
+  value adapters and generic formatting, and qualify the replacement release. The
+  author has not separately approved a release version or publication in this exchange.
+  See [implementation and evidence](experiments/record-generics/README.md).

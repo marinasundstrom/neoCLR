@@ -80,6 +80,8 @@
       href: docs/reference-support.md
     - name: "Mutable collection helpers"
       href: docs/collection-entries.md
+    - name: "Key/value pair equality"
+      href: docs/key-value-pair.md
     - name: "Interface variance"
       href: docs/interface-variance.md
     - name: "JSON serialization"

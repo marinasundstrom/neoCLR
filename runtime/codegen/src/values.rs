@@ -2517,9 +2517,68 @@ pub(crate) fn compile_into(
                     }
                 }
                 if let Some(kind) = value_kind {
-                    // Do not silently apply reference identity to value boxes.
-                    // Their Object-slot value semantics need explicit adapters.
                     let d = details.unwrap();
+                    // Primitive boxes preserve value semantics through the ordinary
+                    // Object slots, including calls made from generic code.
+                    for (index, wide) in d
+                        .int32_boxes
+                        .values()
+                        .chain(d.boolean_boxes.values())
+                        .map(|index| (*index, false))
+                        .chain(d.int64_boxes.values().map(|index| (*index, true)))
+                    {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let equal = matches_type(&mut b, &p, tag, index);
+                        b.ins().brif(equal, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let payload_type = if wide { types::I64 } else { types::I32 };
+                        let left = b
+                            .ins()
+                            .load(payload_type, MemFlags::new(), parameters[0], 8);
+                        let result = if kind == "Equals" {
+                            let compare = b.create_block();
+                            let different = b.create_block();
+                            let same_type = b.create_block();
+                            let result = b.create_block();
+                            b.append_block_param(result, types::I32);
+                            // Null and tagged String views have no box header.
+                            let nonnull = b.ins().icmp_imm(IntCC::NotEqual, parameters[1], 0);
+                            let tagged = b.ins().band_imm(parameters[1], 1);
+                            let untagged = b.ins().icmp_imm(IntCC::Equal, tagged, 0);
+                            let boxed = b.ins().band(nonnull, untagged);
+                            b.ins().brif(boxed, compare, &[], different, &[]);
+                            b.switch_to_block(compare);
+                            let right_tag =
+                                b.ins().load(types::I64, MemFlags::new(), parameters[1], 0);
+                            let same = matches_type(&mut b, &p, right_tag, index);
+                            b.ins().brif(same, same_type, &[], different, &[]);
+                            b.switch_to_block(same_type);
+                            let right =
+                                b.ins()
+                                    .load(payload_type, MemFlags::new(), parameters[1], 8);
+                            let equal = b.ins().icmp(IntCC::Equal, left, right);
+                            let equal = b.ins().uextend(types::I32, equal);
+                            b.ins().jump(result, &[equal.into()]);
+                            b.switch_to_block(different);
+                            let no = b.ins().iconst(types::I32, 0);
+                            b.ins().jump(result, &[no.into()]);
+                            b.switch_to_block(result);
+                            b.block_params(result)[0]
+                        } else if wide {
+                            let high = b.ins().ushr_imm(left, 32);
+                            let mixed = b.ins().bxor(left, high);
+                            b.ins().ireduce(types::I32, mixed)
+                        } else {
+                            left
+                        };
+                        write(&mut b, output, &[result]);
+                        let status = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[status]);
+                        b.switch_to_block(next);
+                    }
+                    // Other value boxes still need a verified override; never
+                    // silently apply reference identity to them.
                     let mut boxes: Vec<_> = d
                         .int32_boxes
                         .values()

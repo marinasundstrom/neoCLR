@@ -39,18 +39,18 @@ the original canonical-text record rejection for supported positional records an
 adds verified native boxed value equality/hash dispatch. This does not close item 1
 in full. The subsequent [record-unions experiment](../../experiments/record-unions/README.md)
 qualifies closed tagged-union components, including ConsoleKeyInfo's Option<int>,
-across all three engines. Generic record owners, unsupported/floating-point
+across all three engines. Generic allocation overhead, unsupported/floating-point
 components, automatic imported record discovery and formatting remain.
 [Explicit imported value contracts](../../experiments/record-components/README.md)
 now admit nongeneric Index/Range components using their public typed methods.
 [Automatic equality interfaces](../../experiments/record-auto-interfaces/README.md)
 now close ConsoleKeyInfo's missing self-equality interface and imported component
 use. Nongeneric records with unsupported components reject at declaration; generic
-native equality bodies remain unsupported. Duration still lacks a declared hash
+equality/hash now has bounded support with allocation overhead, as recorded below. Duration still lacks a declared hash
 method. The earlier explicit-interface qualification is retained as historical
 regression evidence, not the solution to automatic synthesis.
-Native primitive Object-dispatch adapters are also incomplete; direct record component
-operations avoid that path without asserting those boxed APIs are qualified. The
+Native Int32/Int64/Boolean Object-dispatch adapters are now qualified; other primitive
+adapters remain incomplete. The
 original failure JSON above remains historical evidence. No new release identity or
 platform/package gate is established by this fix.
 
@@ -105,3 +105,10 @@ improvements. Prioritize ordinary value semantics and runtime consistency, then
 freeze and validate the matched package. No new memory-safety or GC corruption bug
 was established by this documentation review; that is not a whole-runtime safety
 certification.
+
+Generic-record follow-up: [bounded equality/hash support](../../experiments/record-generics/README.md)
+now passes interpreter/JIT/AOT, including imported pairs, and Index/Range Object
+hashing is corrected. The generic path adds seven managed allocations per tested
+integer equality plus two hashes. Keep optimization, unsupported value adapters,
+generic formatting and the exact matched-package gates open; this does not authorize
+or claim a replacement release.

@@ -1,0 +1,1 @@
+/Users/robert/Projects/neoclr/target/generic-record-repro/Program.rvn(3,20): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct Key<T>.
