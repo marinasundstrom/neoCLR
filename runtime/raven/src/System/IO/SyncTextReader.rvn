@@ -1,0 +1,25 @@
+module System.IO
+
+import System.*
+
+/// <summary>Synchronous decoded text reads sharing one logical cursor.</summary>
+public interface SyncTextReader {
+    /// <summary>Peeks at the next grapheme without consuming it; None denotes EOF.</summary>
+    /// <returns>Char or a text read error. May buffer underlying input to find a boundary.</returns>
+    func PeekChar() -> Result<Option<char>, TextReadError>
+    /// <summary>Reads one grapheme; None denotes EOF.</summary>
+    /// <returns>Char or a text read error.</returns>
+    func ReadChar() -> Result<Option<char>, TextReadError>
+    /// <summary>Reads the requested grapheme count, or the shorter remainder at EOF.</summary>
+    /// <param name="count">Nonnegative grapheme count; zero consumes nothing.</param>
+    /// <returns>text or a text read error.</returns>
+    func Read(count: int) -> Result<string, TextReadError>
+    /// <summary>Reads the requested grapheme count with a separate result byte bound.</summary>
+    /// <param name="count">Nonnegative grapheme count; zero consumes nothing.</param>
+    /// <param name="maxUtf8Bytes">Maximum UTF-8 bytes in the returned text.</param>
+    /// <returns>text, shorter at EOF, or a text read error.</returns>
+    func Read(count: int, maxUtf8Bytes: int) -> Result<string, TextReadError>
+    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError>
+    func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError>
+    func Close()
+}

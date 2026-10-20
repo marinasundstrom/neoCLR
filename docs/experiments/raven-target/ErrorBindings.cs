@@ -16,7 +16,7 @@ static class ErrorBindings
         ["System.Text.EncoderState"] = ["NeedsOutput", "Ready", "Finished"],
         ["System.Text.EncodingError"] = [ "LimitExceeded", "Finished", "InvalidUtf8", "InvalidData", "UnrepresentableText", "Busy"],
         ["System.IO.TextReadError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Busy", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidUtf8", "InvalidEncoding", "InvalidData"],
-        ["System.IO.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidEncoding", "InvalidData"],
+        ["System.IO.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidEncoding", "InvalidData", "Busy"],
         ["System.Storage.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         ["System.Storage.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
         ["System.ConsoleReadError"] = ["Unavailable", "ReadFailed"],

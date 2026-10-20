@@ -18,6 +18,7 @@ public union TextReadError {
     /// The underlying byte stream rejected malformed binary content.
     case InvalidData
 
+
     override func ToString() -> string {
         return match self {
             InvalidPath => "InvalidPath"

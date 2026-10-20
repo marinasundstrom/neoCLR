@@ -2862,7 +2862,12 @@ pub(crate) fn compile_into(
                     b.ins().store(MemFlags::new(), parameters[1], view, 0);
                     b.ins().store(MemFlags::new(), parameters[2], view, 8);
                     b.ins().store(MemFlags::new(), parameters[3], view, 12);
-                    let kind = b.ins().iconst(types::I64, 3);
+                    let borrowed = input
+                        .type_definition(&input.functions[i].parameters[1])
+                        .is_some_and(|t| {
+                            t.memory_view == Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice)
+                        });
+                    let kind = b.ins().iconst(types::I64, if borrowed { 1 } else { 3 });
                     b.ins().store(MemFlags::new(), kind, view, 16);
                     let storage = slot(&mut b, 24);
                     let access = b.ins().stack_addr(types::I64, storage, 0);

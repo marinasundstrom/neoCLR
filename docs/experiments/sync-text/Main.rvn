@@ -1,0 +1,149 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.IO.*
+import System.Text.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+
+class FragmentedInput : SyncInputStream {
+    private val text: string
+    private val chunk: int
+    private var offset: int = 0
+    private var reads: int = 0
+
+    init(text: string, chunk: int) {
+        self.text = text
+        self.chunk = chunk
+    }
+
+    val Reads: int => reads
+
+    func Read(buffer: Slice<byte>) -> Result<int, StreamError> {
+        let count = buffer.Length
+        reads += 1
+        var copied = 0
+        while copied < count && copied < chunk && offset < text.Utf8Bytes.Length {
+            buffer[copied] = text.Utf8Bytes[offset]
+            copied += 1
+            offset += 1
+        }
+        let result: Result<int, StreamError> = Ok(copied)
+        return result
+    }
+
+    func Close() { }
+}
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func Text(result: Result<string, TextReadError>, expected: string) {
+    match result {
+        Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
+        Error(let error) => System.Fail("Unexpected text error: " + error.ToString())
+    }
+}
+
+func Character(result: Result<Option<char>, TextReadError>, expected: string) {
+    match result {
+        Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
+        _ => System.Fail("Expected character")
+    }
+}
+
+func End(result: Result<Option<char>, TextReadError>) {
+    match result {
+        Ok(None) => { }
+        _ => System.Fail("Expected character EOF")
+    }
+}
+
+func Main() {
+    for chunk in [1, 2, 7, 256] {
+        let input = FragmentedInput("é👩‍💻🇸🇪\r\nnext\nlast", chunk)
+        let Ok(reader) = SyncStreamReader.Create(input) else {
+            System.Fail("Unable to create text wrapper")
+        }
+        Character(reader.PeekChar(), "é")
+        let reads = input.Reads
+        Character(reader.PeekChar(), "é")
+        Check(input.Reads == reads, "Repeated peek performed input")
+        Character(reader.ReadChar(), "é")
+        Text(reader.Read(2), "👩‍💻🇸🇪")
+        Character(reader.PeekChar(), "\r\n")
+        match reader.ReadLine(100) {
+            Ok(Some(let line)) => Check(line.IsEmpty, "Peek before empty line")
+            _ => System.Fail("Expected empty line")
+        }
+        Character(reader.ReadChar(), "n")
+        match reader.ReadLine(100) {
+            Ok(Some(let line)) => Check(line == "ext", "Mixed character and line cursor")
+            _ => System.Fail("Expected remaining line")
+        }
+        Text(reader.Read(20), "last")
+        End(reader.PeekChar())
+        End(reader.ReadChar())
+        Text(reader.Read(4), "")
+        Text(reader.ReadToEnd(100), "")
+        reader.Close()
+        match reader.PeekChar() {
+            Error(TextReadError.Closed) => { }
+            _ => System.Fail("Closed peek")
+        }
+    }
+
+    let limitedInput = FragmentedInput("éx", 256)
+    let Ok(limited) = SyncStreamReader.Create(limitedInput) else {
+        System.Fail("Unable to create text wrapper")
+    }
+    Text(limited.Read(0, 0), "")
+    Check(limitedInput.Reads == 0, "Zero read consumed input")
+    match limited.Read(-1) {
+        Error(TextReadError.InvalidRange) => { }
+        _ => System.Fail("Invalid count")
+    }
+    Check(limitedInput.Reads == 0, "Invalid read consumed input")
+    match limited.Read(1, 1) {
+        Error(TextReadError.LimitExceeded) => { }
+        _ => System.Fail("Expected byte limit")
+    }
+    Character(limited.PeekChar(), "é")
+    Text(limited.Read(1, 2), "é")
+    Text(limited.ReadToEnd(2), "x")
+
+    let memory = MemoryStream()
+    let Ok(writer) = SyncStreamWriter.Create(memory, true) else {
+        System.Fail("Writer creation")
+    }
+    Check(writer.Write("é") is Ok(2), "UTF-8 write count")
+    Check(writer.WriteLine("x") is Ok(2), "WriteLine count")
+    Check(writer.Flush() is Ok(_), "Flush")
+    Check(writer.Write("tail") is Ok(4), "Flush finalized encoder")
+    Check(writer.Finish() is Ok(0), "Finish")
+    Check(writer.Finish() is Ok(0), "Repeat finish")
+    Check(writer.Write("bad") is Error(StreamError.InvalidEncoding), "Write after finish")
+    writer.Close()
+    Check(writer.Flush() is Error(StreamError.Closed), "Closed writer")
+    Check(memory.Seek(0) is Ok(0), "leaveOpen")
+    let Ok(roundtrip) = SyncStreamReader.Create(memory) else {
+        System.Fail("Roundtrip reader creation")
+    }
+    Text(roundtrip.ReadToEnd(100), "éx\ntail")
+    roundtrip.Close()
+    Check(memory.GetLength() is Error(StreamError.Closed), "Reader owns input")
+
+    let ascii = MemoryStream()
+    let Ok(asciiWriter) = SyncStreamWriter.Create(ascii, Encodings.Ascii) else {
+        System.Fail("ASCII writer creation")
+    }
+    Check(ascii.GetLength() is Ok(0), "Creation wrote bytes")
+    Check(asciiWriter.Write("é") is Error(StreamError.InvalidEncoding), "ASCII rejection")
+    asciiWriter.Close()
+    Check(ascii.GetLength() is Error(StreamError.Closed), "Writer owns output")
+    Console.WriteLine("PASS sync text wrappers")
+}

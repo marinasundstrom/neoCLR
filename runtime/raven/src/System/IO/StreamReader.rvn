@@ -8,42 +8,47 @@ import System.Option.*
 import System.Text.*
 import System.Runtime.CompilerServices.*
 
+/// <summary>Asynchronous buffered text input with explicit stream ownership.</summary>
 public class StreamReader : TextReader {
-    private var input: InputStream
+    private init(input: InputStream, encoding: Encoding, leaveOpen: bool) {
+        self.input = input
+        decoder = encoding.CreateDecoder()
+        self.leaveOpen = leaveOpen
+    }
+
+    /// <summary>Creates a reader with asynchronous operations text wrapper using UTF-8, without transferring bytes.</summary>
+    static func Create(input: InputStream) -> Result<StreamReader, TextReadError> {
+        return Create(input, Encodings.Utf8, false)
+    }
+
+    /// <summary>Creates a UTF-8 wrapper with explicit ownership of the underlying stream.</summary>
+    static func Create(input: InputStream, leaveOpen: bool) -> Result<StreamReader, TextReadError> {
+        return Create(input, Encodings.Utf8, leaveOpen)
+    }
+
+    /// <summary>Creates a wrapper using the supplied encoding without transferring bytes.</summary>
+    static func Create(input: InputStream, encoding: Encoding) -> Result<StreamReader, TextReadError> {
+        return Create(input, encoding, false)
+    }
+
+    /// <summary>Creates a wrapper with the supplied encoding and ownership policy.</summary>
+    /// <remarks>Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+    /// No input is read or output written. Use one buffering wrapper per stream direction.</remarks>
+    static func Create(input: InputStream, encoding: Encoding, leaveOpen: bool) -> Result<StreamReader, TextReadError> {
+        return Ok(StreamReader(input, encoding, leaveOpen))
+    }
+
+    private val input: InputStream
     private var decoder: Decoder
     private var leaveOpen: bool
     private var closed: bool = false
     private var eof: bool = false
     private var pendingText: string = ""
     private var lastRead: int = 0
-    private var reading: bool = false
+    private val operation: TextIOOperation = TextIOOperation(false)
     private var pendingOffset: int = 0
     private var peeked: Option<char> = None
     private val readBuffer: byte[] = CheckedStorage.Reserve<byte>(256)
-
-    init(input: InputStream) {
-        self.input = input
-        decoder = Encodings.Utf8.CreateDecoder()
-        leaveOpen = false
-    }
-
-    init(input: InputStream, leaveOpen: bool) {
-        self.input = input
-        decoder = Encodings.Utf8.CreateDecoder()
-        self.leaveOpen = leaveOpen
-    }
-
-    init(input: InputStream, encoding: Encoding) {
-        self.input = input
-        decoder = encoding.CreateDecoder()
-        leaveOpen = false
-    }
-
-    init(input: InputStream, encoding: Encoding, leaveOpen: bool) {
-        self.input = input
-        decoder = encoding.CreateDecoder()
-        self.leaveOpen = leaveOpen
-    }
 
     /// <summary>Peeks at the next Unicode grapheme without advancing the text cursor.</summary>
     /// <returns>Some Char, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
@@ -53,12 +58,13 @@ public class StreamReader : TextReader {
         if closed {
             return Error(TextReadError.Closed)
         }
-        if reading {
+        if operation.Active {
             return Error(TextReadError.Busy)
         }
-        reading = true
+        operation.Begin()
+        use lease = operation
         let result = await PeekCharCore()
-        reading = false
+        operation.Complete()
         return result
     }
 
@@ -70,23 +76,26 @@ public class StreamReader : TextReader {
         if closed {
             return Error(TextReadError.Closed)
         }
-        if reading {
+        if operation.Active {
             return Error(TextReadError.Busy)
         }
-        reading = true
+        operation.Begin()
+        use lease = operation
         let result = await PeekCharCore()
         if result is Ok(Some(_)) {
             pendingOffset += 1
             peeked = None
         }
-        reading = false
+        operation.Complete()
         return result
     }
 
-    /// <summary>Reads a requested number of graphemes, or the shorter remainder at EOF.</summary>
+    /// <summary>Reads a requested number of graphemes with a separate UTF-8 byte bound.</summary>
     /// <param name="count">Grapheme count, from zero through 65536.</param>
-    /// <returns>Text, empty at EOF or for zero count, or TextReadError.</returns>
-    /// <remarks>Uses the default 65536-byte result limit. May read ahead; unread text remains buffered.</remarks>
+    /// <param name="maxUtf8Bytes">Maximum returned UTF-8 bytes, from zero through 65536.</param>
+    /// <returns>The requested text, a shorter remainder at EOF, or TextReadError.</returns>
+    /// <remarks>Zero count consumes nothing. Invalid bounds consume nothing. A result-limit error
+    /// retains buffered text for retry; decoding/I/O errors do not rewind the source. Concurrent reads return Busy.</remarks>
     func Read(count: int) -> Task<Result<string, TextReadError>> {
         return Read(count, 65536)
     }
@@ -101,7 +110,7 @@ public class StreamReader : TextReader {
         if closed {
             return Error(TextReadError.Closed)
         }
-        if reading {
+        if operation.Active {
             return Error(TextReadError.Busy)
         }
         if count < 0 || maxUtf8Bytes < 0 {
@@ -113,9 +122,10 @@ public class StreamReader : TextReader {
         if count == 0 {
             return Ok("")
         }
-        reading = true
+        operation.Begin()
+        use lease = operation
         let result = await ReadCore(count, maxUtf8Bytes)
-        reading = false
+        operation.Complete()
         return result
     }
 
@@ -199,17 +209,17 @@ public class StreamReader : TextReader {
         return result
     }
 
-    // Delimit decoded text. Built-in codecs do not read ahead across lines.
     async func ReadLine(maxUtf8Bytes: int) -> Task<Result<Option<string>, TextReadError>> {
         if closed {
             return Error(TextReadError.Closed)
         }
-        if reading {
+        if operation.Active {
             return Error(TextReadError.Busy)
         }
-        reading = true
+        operation.Begin()
+        use lease = operation
         let result = await ReadLineCore(maxUtf8Bytes)
-        reading = false
+        operation.Complete()
         return result
     }
 
@@ -228,12 +238,12 @@ public class StreamReader : TextReader {
         var accepted = 0
         while true {
             let part = DrainPending()
-            let bytes = Utf8.Encode(part)
+            let byteCount = part.Utf8Bytes.Length
             var index = 0
-            while index < bytes.Count {
-                let value = bytes[index]
+            while index < byteCount {
+                let value = part.Utf8Bytes[index]
                 if value == 10 {
-                    match part.SliceUtf8(index + 1, bytes.Count - index - 1) {
+                    match part.SliceUtf8(index + 1, byteCount - index - 1) {
                         Ok(let suffix) => pendingText = suffix
                         Error(_) => System.Fail("Invalid decoded line suffix")
                     }
@@ -241,7 +251,7 @@ public class StreamReader : TextReader {
                     if lineLength > 0 && line[lineLength - 1] == 13 {
                         lineLength -= 1
                     }
-                    return DecodeLine(line, lineLength)
+                    return TextReadSupport.DecodeLine(line, lineLength)
                 }
                 if line.Count >= maxUtf8Bytes && (line.Count > maxUtf8Bytes || value != 13) {
                     return Error(TextReadError.LimitExceeded)
@@ -257,7 +267,7 @@ public class StreamReader : TextReader {
                     let absent: Option<string> = None()
                     return Ok(absent)
                 }
-                return DecodeLine(line, line.Count)
+                return TextReadSupport.DecodeLine(line, line.Count)
             }
             if accepted > maxUtf8Bytes + 1 {
                 return Error(TextReadError.LimitExceeded)
@@ -271,32 +281,17 @@ public class StreamReader : TextReader {
         return Error(TextReadError.IoFailure)
     }
 
-    private static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Option<string>, TextReadError> {
-        let line = CheckedStorage.Reserve<byte>(length)
-        var index = 0
-        while index < length {
-            line[index] = bytes[index]
-            index += 1
-        }
-        return match Utf8.Decode(line) {
-            Ok(let text) => {
-                let present: Option<string> = Some(text)
-                Ok(present)
-            }
-            Error(_) => Error(TextReadError.InvalidEncoding)
-        }
-    }
-
     async func ReadToEnd(maxUtf8Bytes: int) -> Task<Result<string, TextReadError>> {
         if closed {
             return Error(TextReadError.Closed)
         }
-        if reading {
+        if operation.Active {
             return Error(TextReadError.Busy)
         }
-        reading = true
+        operation.Begin()
+        use lease = operation
         let result = await ReadToEndCore(maxUtf8Bytes)
-        reading = false
+        operation.Complete()
         return result
     }
 
@@ -337,10 +332,20 @@ public class StreamReader : TextReader {
     }
 
     private async func ReadPart(buffer: byte[], request: int, remaining: int) -> Task<Result<string, TextReadError>> {
-        let count = match await input.Read(buffer, 0, request) {
-            Ok(let value) => value
-            Error(let error) => return Error(FromStream(error))
+        if input is InputStream source {
+            let count = match await source.Read(buffer, 0, request) {
+                Ok(let value) => value
+                Error(let error) => return Error(TextReadSupport.FromStream(error))
+            }
+            if closed {
+                return Error(TextReadError.Closed)
+            }
+            return DecodePart(buffer, count, request, remaining)
         }
+        return Error(TextReadError.WrongAccess)
+    }
+
+    private func DecodePart(buffer: byte[], count: int, request: int, remaining: int) -> Result<string, TextReadError> {
         if !(count >= 0) || count > request {
             System.Fail("Invalid input read count")
         }
@@ -375,20 +380,4 @@ public class StreamReader : TextReader {
         }
     }
 
-    private static func FromStream(error: StreamError) -> TextReadError {
-        return match error {
-            StreamError.InvalidPath => TextReadError.InvalidPath
-            StreamError.NotFound => TextReadError.NotFound
-            StreamError.AccessDenied => TextReadError.AccessDenied
-            StreamError.WrongKind => TextReadError.WrongKind
-            StreamError.AlreadyExists => TextReadError.AlreadyExists
-            StreamError.Closed => TextReadError.Closed
-            StreamError.InvalidRange => TextReadError.InvalidRange
-            StreamError.LimitExceeded => TextReadError.LimitExceeded
-            StreamError.WrongAccess => TextReadError.WrongAccess
-            StreamError.InvalidData => TextReadError.InvalidData
-            StreamError.InvalidEncoding => TextReadError.InvalidEncoding
-            _ => TextReadError.IoFailure
-        }
-    }
 }

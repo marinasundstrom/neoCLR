@@ -380,7 +380,7 @@ pub fn console_stream_output(
         let readonly_memory = matches!(memory_parameters.as_slice(), [Type::Boolean, ty]
             if input.type_definition(ty).is_some_and(|t|
                 crate::memory_views::byte_memory(t) &&
-                t.memory_view == Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory)));
+                matches!(t.memory_view, Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory | neoclr::metadata::MemoryViewKind::ReadOnlySlice))));
         let (parameters, implementation, symbol) = match name {
             "neoCLR.Runtime.ConsoleWriteBytes" if readonly_memory => (
                 memory_parameters.clone(),
@@ -430,7 +430,7 @@ pub fn console_stream_output(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native stream output binding requires exact ConsoleWriteBytes(Boolean, ReadOnlyMemory<Byte>) (legacy array/range accepted for bootstrap) or ConsoleFlush(Boolean) -> Value InternalCall contract".into());
+            return Err("native stream output binding requires exact ConsoleWriteBytes(Boolean, ReadOnlySlice<Byte> or ReadOnlyMemory<Byte>) (legacy array/range accepted for bootstrap) or ConsoleFlush(Boolean) -> Value InternalCall contract".into());
         }
         f.impl_flags = 0;
         f.body = vec![Op::Int(0), Op::PackValue(Type::Int32), Op::Return];
@@ -2802,7 +2802,10 @@ mod console_memory_tests {
                 f.impl_flags = 0x1000;
                 m.functions = vec![f];
                 let selection = json!({"functions":[{"name":"neoCLR.Runtime.ConsoleWriteBytes","compiledIndex":0}]});
-                let expected = kind == MemoryViewKind::ReadOnlyMemory && element == Type::Byte;
+                let expected = matches!(
+                    kind,
+                    MemoryViewKind::ReadOnlyMemory | MemoryViewKind::ReadOnlySlice
+                ) && element == Type::Byte;
                 let result = console_stream_output(&mut m.clone(), &selection);
                 assert_eq!(result.is_ok(), expected);
                 if expected {

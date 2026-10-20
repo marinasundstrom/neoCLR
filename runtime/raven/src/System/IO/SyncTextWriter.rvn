@@ -1,0 +1,17 @@
+module System.IO
+
+import System.*
+
+/// <summary>Synchronous text output without Task wrapping or retaining caller state across suspension.</summary>
+public interface SyncTextWriter {
+    /// <summary>Writes encoded text and returns the encoded byte count.</summary>
+    func Write(text: string) -> Result<int, StreamError>
+    /// <summary>Writes text followed by LF and returns the encoded byte count.</summary>
+    func WriteLine(text: string) -> Result<int, StreamError>
+    /// <summary>Flushes output without finalizing encoding.</summary>
+    func Flush() -> Result<unit, StreamError>
+    /// <summary>Finalizes text encoding; Flush does not finalize conversion.</summary>
+    func Finish() -> Result<int, StreamError>
+    /// <summary>Closes the text writer according to its ownership policy.</summary>
+    func Close()
+}

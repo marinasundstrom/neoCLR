@@ -1,0 +1,30 @@
+module System.IO
+
+import System.*
+
+// One reusable scope per text wrapper. use releases on normal completion and cancellation; host faults terminate execution.
+// A writer whose output was abandoned cannot safely reuse its drained encoder state.
+internal class TextIOOperation : Disposable {
+    private var active: bool = false
+    private var abandoned: bool = false
+    private val poisonOnAbandon: bool
+
+    init(poisonOnAbandon: bool) {
+        self.poisonOnAbandon = poisonOnAbandon
+    }
+
+    val Active: bool => active
+    val WasAbandoned: bool => abandoned
+    func Begin() {
+        active = true
+    }
+    func Complete() {
+        active = false
+    }
+    func Dispose() {
+        if active && poisonOnAbandon {
+            abandoned = true
+        }
+        active = false
+    }
+}

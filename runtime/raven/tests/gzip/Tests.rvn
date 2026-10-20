@@ -198,9 +198,13 @@ func FInput() -> Result<unit, TestFailure> {
     TaskQueue.Default.Drain()
     _ = Assert.True(cancelled.IsCancelled, "Input cancellation propagates")?
     _ = Assert.True(CompletedValue(cancelledReader.Read(buffer, 0, 1)) is Error(StreamError.IoFailure), "Interrupted source cannot replay")?
-    let validText = StreamReader(Reader(Fixed()))
+    let Ok(validText) = StreamReader.Create(Reader(Fixed())) else {
+        System.Fail("Unable to create text wrapper")
+    }
     _ = Assert.True(CompletedValue(validText.ReadToEnd(32)) is Ok("abcabcabcabc"), "Compose gzip and text decoding")?
-    let text = StreamReader(Reader(Trailing()))
+    let Ok(text) = StreamReader.Create(Reader(Trailing())) else {
+        System.Fail("Unable to create text wrapper")
+    }
     return Assert.True(CompletedValue(text.ReadToEnd(32)) is Error(TextReadError.InvalidData), "Preserve binary corruption through text decoding")
 }
 

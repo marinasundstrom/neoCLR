@@ -48,6 +48,31 @@ class PendingInput : InputStream {
     func Close() { }
 }
 
+// Controlled output and outcome observer are test adapters, not production scheduling.
+class PendingOutput : OutputStream {
+    val Source: Promise<Result<unit, StreamError>> = Promise<Result<unit, StreamError>>()
+    func Write(buffer: byte[], start: int, count: int) -> Task<Result<unit, StreamError>> => Source.Task
+    func Write(buffer: byte[], start: int, count: int, token: CancellationToken) -> Task<Result<unit, StreamError>> => Source.Task
+    func Flush() -> Task<Result<unit, StreamError>> {
+        let result: Result<unit, StreamError> = Ok(())
+        return Task.FromResult(result)
+    }
+    func Flush(token: CancellationToken) -> Task<Result<unit, StreamError>> => Flush()
+    func Close() { }
+}
+
+func ObserveWrite(task: Task<Result<int, StreamError>>) -> Task<unit> {
+    let observed = Promise<unit>()
+    task.OnCompleted(() => { _ = observed.Complete(()) })
+    return observed.Task
+}
+
+func ObserveRead(task: Task<Result<Option<char>, TextReadError>>) -> Task<unit> {
+    let observed = Promise<unit>()
+    task.OnCompleted(() => { _ = observed.Complete(()) })
+    return observed.Task
+}
+
 func Check(condition: bool, message: string) {
     if !condition {
         System.Fail(message)
@@ -78,7 +103,9 @@ func End(result: Result<Option<char>, TextReadError>) {
 async func Main() -> Task<unit> {
     for chunk in [1, 2, 7, 256] {
         let input = FragmentedInput("é👩‍💻🇸🇪\r\nnext\nlast", chunk)
-        let reader: TextReader = StreamReader(input)
+        let Ok(reader) = StreamReader.Create(input) else {
+            System.Fail("Unable to create text wrapper")
+        }
         Character(await reader.PeekChar(), "é")
         let reads = input.Reads
         Character(await reader.PeekChar(), "é")
@@ -108,7 +135,9 @@ async func Main() -> Task<unit> {
     }
 
     let limitedInput = FragmentedInput("éx", 256)
-    let limited = StreamReader(limitedInput)
+    let Ok(limited) = StreamReader.Create(limitedInput) else {
+        System.Fail("Unable to create text wrapper")
+    }
     Text(await limited.Read(0, 0), "")
     Check(limitedInput.Reads == 0, "Zero read consumed input")
     match await limited.Read(-1) {
@@ -125,7 +154,9 @@ async func Main() -> Task<unit> {
     Text(await limited.ReadToEnd(2), "x")
 
     let pendingInput = PendingInput()
-    let pendingReader = StreamReader(pendingInput)
+    let Ok(pendingReader) = StreamReader.Create(pendingInput) else {
+        System.Fail("Unable to create text wrapper")
+    }
     let first = pendingReader.PeekChar()
     Check(!first.IsCompleted, "Peek did not suspend")
     match await pendingReader.ReadChar() {
@@ -135,16 +166,44 @@ async func Main() -> Task<unit> {
     pendingInput.Source.Complete(Ok(0))
     End(await first)
 
+    let cancelledInput = PendingInput()
+    let Ok(cancelledReader) = StreamReader.Create(cancelledInput) else {
+        System.Fail("Cancelled reader creation")
+    }
+    let cancelledRead = cancelledReader.ReadChar()
+    let readObserved = ObserveRead(cancelledRead)
+    _ = cancelledInput.Source.Cancel()
+    await readObserved
+    Check(cancelledRead.IsCancelled, "Read cancellation")
+    // A second call reaches the cancelled provider instead of retaining Busy.
+    let retryRead = cancelledReader.ReadChar()
+    await ObserveRead(retryRead)
+    Check(retryRead.IsCancelled, "Cancelled reader retained Busy")
+
+    let pendingOutput = PendingOutput()
+    let Ok(pendingWriter) = StreamWriter.Create(pendingOutput) else {
+        System.Fail("Pending writer creation")
+    }
+    let pendingWrite = pendingWriter.Write("abc")
+    Check(!pendingWrite.IsCompleted, "Write did not suspend")
+    Check(await pendingWriter.Write("overlap") is Error(StreamError.Busy), "Overlapping write")
+    Check(await pendingWriter.Flush() is Error(StreamError.Busy), "Overlapping flush")
+    let writeObserved = ObserveWrite(pendingWrite)
+    _ = pendingOutput.Source.Cancel()
+    await writeObserved
+    Check(pendingWrite.IsCancelled, "Write cancellation")
+    Check(await pendingWriter.Write("retry") is Error(StreamError.InvalidEncoding), "Abandoned writer reused")
+
     // Standard input is supplied by the runner; all convenience methods share one cursor.
-    Character(await Console.PeekChar(), "é")
-    Character(await Console.PeekChar(), "é")
-    Character(await Console.ReadChar(), "é")
-    Text(await Console.Read(2), "ab")
-    match await Console.ReadLine() {
+    Character(Console.PeekChar(), "é")
+    Character(Console.PeekChar(), "é")
+    Character(Console.ReadChar(), "é")
+    Text(Console.Read(2), "ab")
+    match Console.ReadLine() {
         Ok(Some(let line)) => Check(line == "c", "Console mixed cursor")
         _ => System.Fail("Console line")
     }
-    Text(await Console.In.Read(10), "tail")
-    End(await Console.ReadChar())
+    Text(Console.In.Read(10), "tail")
+    End(Console.ReadChar())
     Console.WriteLine("PASS console text reads")
 }

@@ -33,7 +33,9 @@ func StoragePath(text: string) -> Result<System.Storage.Path, string> {
 func ReadReport(file: System.Storage.File) -> Result<string, string> {
     return match file.OpenRead() {
         Ok(let input) => {
-            let reader: System.IO.TextReader = System.IO.StreamReader(input)
+            let System.Result.Ok(reader) = System.IO.StreamReader.Create(input) else {
+                System.Fail("Unable to create reader")
+            }
             let result = reader.ReadToEnd(128)
             reader.Close()
             return match result {

@@ -1,0 +1,44 @@
+module System.IO
+
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Collections.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+internal class TextReadSupport {
+    static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Option<string>, TextReadError> {
+        let line = CheckedStorage.Reserve<byte>(length)
+        var index = 0
+        while index < length {
+            line[index] = bytes[index]
+            index += 1
+        }
+        return match Utf8.Decode(line) {
+            Ok(let text) => {
+                let present: Option<string> = Some(text)
+                Ok(present)
+            }
+            Error(_) => Error(TextReadError.InvalidEncoding)
+        }
+    }
+
+    static func FromStream(error: StreamError) -> TextReadError {
+        return match error {
+            StreamError.InvalidPath => TextReadError.InvalidPath
+            StreamError.NotFound => TextReadError.NotFound
+            StreamError.AccessDenied => TextReadError.AccessDenied
+            StreamError.WrongKind => TextReadError.WrongKind
+            StreamError.AlreadyExists => TextReadError.AlreadyExists
+            StreamError.Busy => TextReadError.Busy
+            StreamError.Closed => TextReadError.Closed
+            StreamError.InvalidRange => TextReadError.InvalidRange
+            StreamError.LimitExceeded => TextReadError.LimitExceeded
+            StreamError.WrongAccess => TextReadError.WrongAccess
+            StreamError.InvalidData => TextReadError.InvalidData
+            StreamError.InvalidEncoding => TextReadError.InvalidEncoding
+            _ => TextReadError.IoFailure
+        }
+    }
+}

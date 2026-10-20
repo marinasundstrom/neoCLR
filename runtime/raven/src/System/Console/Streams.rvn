@@ -1,62 +1,32 @@
 module System.IO
 
 import System.*
-import System.Concurrency.*
-import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Option.*
-import System.Runtime.CompilerServices.*
 
-internal class ConsoleInputStream : InputStream {
-    private field closed: bool = false
+// The current host console is blocking. Expose its actual capabilities directly.
+internal class ConsoleInputStream : SyncInputStream {
+    private var closed: bool = false
 
     internal init() { }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
-    }
-
-    /// Returns an inline-completed operation over the current blocking provider.
-    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
-        if cancellationToken.IsCancellationRequested {
-            let source = Promise<Result<int, StreamError>>()
-            _ = source.Cancel()
-            return source.Task
-        }
-        return Task.FromResult(ReadCore(buffer, offset, count))
-    }
-
-    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    func Read(buffer: Slice<byte>) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
+            return Error(StreamError.Closed)
         }
-        if offset < 0 {
-            return Error(StreamError.InvalidRange())
+        if buffer.Length > 65536 {
+            return Error(StreamError.LimitExceeded)
         }
-        if count < 0 {
-            return Error(StreamError.InvalidRange())
-        }
-        if offset > buffer.Length {
-            return Error(StreamError.InvalidRange())
-        }
-        if count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange())
-        }
-        if count > 65536 {
-            return Error(StreamError.LimitExceeded())
-        }
-        if count == 0 {
+        if buffer.IsEmpty {
             return Ok(0)
         }
         return match System.Console.ReadByte() {
-            Ok(let item) => match item {
-                Some(let value) => {
-                    buffer[offset] = value
-                    Ok(1)
-                }
-                None => Ok(0)
+            Ok(Some(let value)) => {
+                buffer[0] = value
+                Ok(1)
             }
-            Error(_) => Error(StreamError.IoFailure())
+            Ok(None) => Ok(0)
+            Error(_) => Error(StreamError.IoFailure)
         }
     }
 
@@ -65,88 +35,49 @@ internal class ConsoleInputStream : InputStream {
     }
 }
 
-internal class ConsoleOutputStream : OutputStream {
-    private field error: bool
-    private field closed: bool = false
+internal class ConsoleOutputStream : SyncOutputStream {
+    private val error: bool
+    private var closed: bool = false
 
     internal init(error: bool) {
         self.error = error
     }
 
-    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
-        return Write(buffer, offset, count, CancellationToken.None)
-    }
-
-    /// Completes the range inline with the current blocking provider; partial failures are not rolled back.
-    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
-        if cancellationToken.IsCancellationRequested {
-            let source = Promise<Result<unit, StreamError>>()
-            _ = source.Cancel()
-            return source.Task
+    func Write(buffer: ReadOnlySlice<byte>) -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
         }
-        return Task.FromResult(WriteAll(buffer, offset, count))
-    }
-
-    private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
-        // The provider validates the full range even when count is zero.
+        if buffer.Length > 65536 {
+            return Error(StreamError.LimitExceeded)
+        }
         var sent = 0
         while true {
-            let written = WriteCore(buffer, offset + sent, count - sent)?
-            if !(written >= 0) || written > count - sent {
-                System.Fail("Invalid output count")
+            let payload = neoCLR.Runtime.ConsoleWriteBytes(error, buffer[sent..])
+            if neoCLR.Runtime.IsValue<byte>(payload) {
+                return Error(StreamError.IoFailure)
+            }
+            let written = neoCLR.Runtime.UnpackValue<int>(payload)
+            if written < 0 || written > buffer.Length - sent {
+                System.Fail("Invalid console output count")
             }
             sent += written
-            if sent == count { return Ok(()) }
-            if written == 0 { return Error(StreamError.IoFailure) }
+            if sent == buffer.Length {
+                return Ok(())
+            }
+            if written == 0 {
+                return Error(StreamError.IoFailure)
+            }
         }
         return Error(StreamError.IoFailure)
     }
 
-    func Flush() -> Task<Result<unit, StreamError>> {
-        return Flush(CancellationToken.None)
-    }
-
-    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
-        if cancellationToken.IsCancellationRequested {
-            let source = Promise<Result<unit, StreamError>>()
-            _ = source.Cancel()
-            return source.Task
-        }
-        return Task.FromResult(FlushCore())
-    }
-
-    private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    func Flush() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
-        }
-        if offset < 0 || count < 0 || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
-        }
-        if count > 65536 {
-            return Error(StreamError.LimitExceeded)
-        }
-        let memory: ReadOnlyMemory<byte> = buffer
-        let payload = neoCLR.Runtime.ConsoleWriteBytes(error, memory.Slice(offset, count))
-        if neoCLR.Runtime.IsValue<byte>(payload) {
-            let status = neoCLR.Runtime.UnpackValue<byte>(payload)
-            if status == 7 {
-                return Error(StreamError.InvalidRange())
-            }
-            if status == 8 {
-                return Error(StreamError.LimitExceeded())
-            }
-            return Error(StreamError.IoFailure())
-        }
-        return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
-    }
-
-    private func FlushCore() -> Result<unit, StreamError> {
-        if closed {
-            return Error(StreamError.Closed())
+            return Error(StreamError.Closed)
         }
         let payload = neoCLR.Runtime.ConsoleFlush(error)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(StreamError.IoFailure())
+            return Error(StreamError.IoFailure)
         }
         return Ok(())
     }

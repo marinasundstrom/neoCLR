@@ -44,6 +44,26 @@ pub(crate) fn memory(value: &Value, readonly: bool) -> Result<&crate::MemoryView
     Ok(view)
 }
 
+// Console output consumes a readonly borrowed window synchronously. The host-call
+// preparation snapshots it before releasing graph access; it never retains the borrow.
+pub(crate) fn console_bytes(value: &Value) -> Result<&crate::MemoryView, Fault> {
+    let Value::MemoryView(view) = value else {
+        return Err(Fault::new("console output requires a readonly byte view"));
+    };
+    if view.ty() != memory_type(true) && view.ty() != console_slice_type() {
+        return Err(Fault::new("console output view capability mismatch"));
+    }
+    view.assigned()?;
+    Ok(view)
+}
+
+pub(crate) fn console_slice_type() -> Type {
+    Type::Constructed {
+        definition: "System.ReadOnlySlice".into(),
+        arguments: vec![Type::Byte],
+    }
+}
+
 pub(crate) fn snapshot(view: &crate::MemoryView) -> Result<Value, Fault> {
     let slice = view.as_slice();
     let mut elements = Vec::new();

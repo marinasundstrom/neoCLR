@@ -1,0 +1,33 @@
+module System.IO
+
+import System.*
+import System.Text.*
+
+internal class TextWriteSupport {
+    static func CompleteStep(step: EncoderProgress, finishing: bool) -> bool {
+        return match step.State {
+            EncoderState.NeedsOutput => {
+                if step.BytesWritten == 0 {
+                    System.Fail("Encoder made no progress with positive capacity")
+                }
+                false
+            }
+            EncoderState.Ready => {
+                if finishing {
+                    System.Fail("Final input did not finalize encoder")
+                }
+                true
+            }
+            EncoderState.Finished => {
+                if !finishing {
+                    System.Fail("Encoder finalized nonfinal input")
+                }
+                true
+            }
+            _ => {
+                System.Fail("Invalid encoder state")
+                false
+            }
+        }
+    }
+}

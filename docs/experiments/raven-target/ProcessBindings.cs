@@ -39,29 +39,29 @@ static class ProcessBindings
         ("System.Environment", "GetEnvironmentVariable", ["String"], "System.Result<System.Option<String>,System.EnvironmentError>")
     ];
     public const string ConsoleDeclaration = """
-        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, object? arg0) => default;
-        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, object? arg0, object? arg1) => default;
-        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, object? arg0, object? arg1, object? arg2) => default;
-        public static Concurrency.Tasks.Task<PropagationUnit> Write(string format, params object?[] arguments) => default;
+        public static void Write(string format, object? arg0) { }
+        public static void Write(string format, object? arg0, object? arg1) { }
+        public static void Write(string format, object? arg0, object? arg1, object? arg2) { }
+        public static void Write(string format, params object?[] arguments) { }
         public static void WriteLine(string format, object? arg0) { }
         public static void WriteLine(string format, object? arg0, object? arg1) { }
         public static void WriteLine(string format, object? arg0, object? arg1, object? arg2) { }
         public static void WriteLine(string format, params object?[] arguments) { }
         public static Result<Option<byte>, ConsoleReadError> ReadByte() => default;
-        public static Concurrency.Tasks.Task<Result<Option<char>, IO.TextReadError>> PeekChar() => default;
-        public static Concurrency.Tasks.Task<Result<Option<char>, IO.TextReadError>> ReadChar() => default;
-        public static Concurrency.Tasks.Task<Result<string, IO.TextReadError>> Read(int count) => default;
-        public static Concurrency.Tasks.Task<Result<string, IO.TextReadError>> Read(int count, int maxUtf8Bytes) => default;
-        public static IO.TextReader In => default;
-        public static IO.TextWriter Out => default;
-        public static IO.TextWriter Error => default;
-        public static IO.InputStream OpenStandardInput() => default;
-        public static IO.OutputStream OpenStandardOutput() => default;
-        public static IO.OutputStream OpenStandardError() => default;
-        public static Concurrency.Tasks.Task<Result<Option<string>, IO.TextReadError>> ReadLine() => default;
-        public static Concurrency.Tasks.Task<Result<Option<string>, IO.TextReadError>> ReadLine(int maxUtf8Bytes) => default;
-        public static Concurrency.Tasks.Task<PropagationUnit> Write(string value0) => default;
-        public static Concurrency.Tasks.Task<PropagationUnit> Write(int value0) => default;
+        public static Result<Option<char>, IO.TextReadError> PeekChar() => default;
+        public static Result<Option<char>, IO.TextReadError> ReadChar() => default;
+        public static Result<string, IO.TextReadError> Read(int count) => default;
+        public static Result<string, IO.TextReadError> Read(int count, int maxUtf8Bytes) => default;
+        public static IO.SyncTextReader In => default;
+        public static IO.SyncTextWriter Out => default;
+        public static IO.SyncTextWriter Error => default;
+        public static IO.SyncInputStream OpenStandardInput() => default;
+        public static IO.SyncOutputStream OpenStandardOutput() => default;
+        public static IO.SyncOutputStream OpenStandardError() => default;
+        public static Result<Option<string>, IO.TextReadError> ReadLine() => default;
+        public static Result<Option<string>, IO.TextReadError> ReadLine(int maxUtf8Bytes) => default;
+        public static void Write(string value0) { }
+        public static void Write(int value0) { }
         public static void WriteLine() { }
         public static void WriteLine(object? value) { }
         public static void WriteLine(bool value) { }

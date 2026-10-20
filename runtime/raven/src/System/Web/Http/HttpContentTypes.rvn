@@ -81,7 +81,9 @@ public class HttpStringContent : HttpContent {
             return Error(HttpError.Content(StreamError.IoFailure))
         }
         let input = HttpContentTextInput(content, stream)
-        let reader = StreamReader(input, true)
+        let Ok(reader) = StreamReader.Create(input, true) else {
+            return Error(HttpError.Content(StreamError.InvalidEncoding))
+        }
         let result = await reader.ReadToEnd(65536)
         reader.Close()
         if let Some(error) = input.Failure {

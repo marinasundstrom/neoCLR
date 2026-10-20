@@ -43,34 +43,29 @@ static class ReaderBindings
         }
         namespace IO {
             public interface TextWriter {
+                Concurrency.Tasks.Task<Result<int, StreamError>> Finish();
                 Concurrency.Tasks.Task<Result<int, StreamError>> Write(string text);
                 Concurrency.Tasks.Task<Result<int, StreamError>> WriteLine(string text);
                 Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Flush();
                 void Close();
             }
             public sealed class StreamWriter : TextWriter {
+                private StreamWriter() { }
                 public Concurrency.Tasks.Task<Result<int, StreamError>> Finish() => default;
-                public StreamWriter(OutputStream output) { }
-                public StreamWriter(OutputStream output, bool leaveOpen) { }
-                public StreamWriter(OutputStream output, Text.Encoding encoding) { }
-                public StreamWriter(OutputStream output, Text.Encoding encoding, bool leaveOpen) { }
+                public static Result<StreamWriter, StreamError> Create(OutputStream output) => default;
+                public static Result<StreamWriter, StreamError> Create(OutputStream output, bool leaveOpen) => default;
+                public static Result<StreamWriter, StreamError> Create(OutputStream output, Text.Encoding encoding) => default;
+                public static Result<StreamWriter, StreamError> Create(OutputStream output, Text.Encoding encoding, bool leaveOpen) => default;
                 public Concurrency.Tasks.Task<Result<int, StreamError>> Write(string text) => default;
                 public Concurrency.Tasks.Task<Result<int, StreamError>> WriteLine(string text) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Flush() => default;
                 public void Close() { }
             }
-            public sealed class ConsoleInputStream : InputStream {
-                public ConsoleInputStream() { }
-                public Concurrency.Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count) => default;
-                public Concurrency.Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
+            public sealed class ConsoleInputStream : SyncInputStream {
                 public void Close() { }
             }
-            public sealed class ConsoleOutputStream : OutputStream {
-                public ConsoleOutputStream(bool error) { }
-                public Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count) => default;
-                public Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
-                public Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Flush() => default;
-                public Concurrency.Tasks.Task<Result<PropagationUnit, StreamError>> Flush(Concurrency.CancellationToken cancellationToken) => default;
+            public sealed class ConsoleOutputStream : SyncOutputStream {
+                public Result<PropagationUnit, StreamError> Flush() => default;
                 public void Close() { }
             }
             public interface TextReader {
@@ -83,16 +78,59 @@ static class ReaderBindings
                 void Close();
             }
             public sealed class StreamReader : TextReader {
+                private StreamReader() { }
                 public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar() => default;
                 public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar() => default;
                 public Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count) => default;
                 public Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count, int maxUtf8Bytes) => default;
-                public StreamReader(InputStream input) { }
-                public StreamReader(InputStream input, bool leaveOpen) { }
-                public StreamReader(InputStream input, Text.Encoding encoding) { }
-                public StreamReader(InputStream input, Text.Encoding encoding, bool leaveOpen) { }
+                public static Result<StreamReader, TextReadError> Create(InputStream input) => default;
+                public static Result<StreamReader, TextReadError> Create(InputStream input, bool leaveOpen) => default;
+                public static Result<StreamReader, TextReadError> Create(InputStream input, Text.Encoding encoding) => default;
+                public static Result<StreamReader, TextReadError> Create(InputStream input, Text.Encoding encoding, bool leaveOpen) => default;
                 public Concurrency.Tasks.Task<Result<Option<string>, TextReadError>> ReadLine(int maxUtf8Bytes) => default;
                 public Concurrency.Tasks.Task<Result<string, TextReadError>> ReadToEnd(int maxUtf8Bytes) => default;
+                public void Close() { }
+            }
+            public interface SyncTextReader {
+                Result<Option<char>, TextReadError> PeekChar();
+                Result<Option<char>, TextReadError> ReadChar();
+                Result<string, TextReadError> Read(int count);
+                Result<string, TextReadError> Read(int count, int maxUtf8Bytes);
+                Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes);
+                Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes);
+                void Close();
+            }
+            public sealed class SyncStreamReader : SyncTextReader {
+                private SyncStreamReader() { }
+                public Result<Option<char>, TextReadError> PeekChar() => default;
+                public Result<Option<char>, TextReadError> ReadChar() => default;
+                public Result<string, TextReadError> Read(int count) => default;
+                public Result<string, TextReadError> Read(int count, int maxUtf8Bytes) => default;
+                public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input) => default;
+                public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input, bool leaveOpen) => default;
+                public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input, Text.Encoding encoding) => default;
+                public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input, Text.Encoding encoding, bool leaveOpen) => default;
+                public Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes) => default;
+                public Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes) => default;
+                public void Close() { }
+            }
+            public interface SyncTextWriter {
+                Result<int, StreamError> Finish();
+                Result<int, StreamError> Write(string text);
+                Result<int, StreamError> WriteLine(string text);
+                Result<PropagationUnit, StreamError> Flush();
+                void Close();
+            }
+            public sealed class SyncStreamWriter : SyncTextWriter {
+                private SyncStreamWriter() { }
+                public Result<int, StreamError> Finish() => default;
+                public static Result<SyncStreamWriter, StreamError> Create(SyncOutputStream output) => default;
+                public static Result<SyncStreamWriter, StreamError> Create(SyncOutputStream output, bool leaveOpen) => default;
+                public static Result<SyncStreamWriter, StreamError> Create(SyncOutputStream output, Text.Encoding encoding) => default;
+                public static Result<SyncStreamWriter, StreamError> Create(SyncOutputStream output, Text.Encoding encoding, bool leaveOpen) => default;
+                public Result<int, StreamError> Write(string text) => default;
+                public Result<int, StreamError> WriteLine(string text) => default;
+                public Result<PropagationUnit, StreamError> Flush() => default;
                 public void Close() { }
             }
         }

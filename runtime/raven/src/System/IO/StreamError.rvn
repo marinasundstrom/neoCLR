@@ -15,6 +15,9 @@ public union StreamError {
     /// Malformed or truncated binary content, including gzip checksum and format failures.
     case InvalidData
 
+    /// Another text write, flush or finalization is pending.
+    case Busy
+
     override func ToString() -> string {
         return match self {
             InvalidPath => "InvalidPath"
@@ -29,6 +32,7 @@ public union StreamError {
             InvalidData => "InvalidData"
             InvalidEncoding => "InvalidEncoding"
             IoFailure => "IoFailure"
+            Busy => "Busy"
             _ => "Empty"
         }
     }

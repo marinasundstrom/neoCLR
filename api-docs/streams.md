@@ -173,4 +173,6 @@ The native API reference includes both borrowed members. The legacy CLI scaffold
 omits precisely `SyncInputStream.Read(Slice<byte>)` and
 `SyncOutputStream.Write(ReadOnlySlice<byte>)`, whose opaque view representations it
 cannot safely project. This manual entry covers that interim reference gap.
-Console and text-reader synchronous integration remains separate work.
+Console now exposes these synchronous byte capabilities. Separate SyncStreamReader
+and SyncStreamWriter wrappers adapt them to direct text results; see the
+[factory and capability reference](console.md#separate-text-capabilities-and-factories-development).

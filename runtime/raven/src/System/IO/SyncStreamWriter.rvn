@@ -1,0 +1,188 @@
+module System.IO
+
+import System.*
+import System.Result.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+/// <summary>Synchronous buffered text output with explicit stream ownership.</summary>
+public class SyncStreamWriter : SyncTextWriter {
+    private init(output: SyncOutputStream, encoding: Encoding, leaveOpen: bool) {
+        self.output = output
+        encoder = encoding.CreateEncoder()
+        self.leaveOpen = leaveOpen
+    }
+
+    /// <summary>Creates a synchronous text wrapper using UTF-8, without transferring bytes.</summary>
+    static func Create(output: SyncOutputStream) -> Result<SyncStreamWriter, StreamError> {
+        return Create(output, Encodings.Utf8, false)
+    }
+
+    /// <summary>Creates a UTF-8 wrapper with explicit ownership of the underlying stream.</summary>
+    static func Create(output: SyncOutputStream, leaveOpen: bool) -> Result<SyncStreamWriter, StreamError> {
+        return Create(output, Encodings.Utf8, leaveOpen)
+    }
+
+    /// <summary>Creates a wrapper using the supplied encoding without transferring bytes.</summary>
+    static func Create(output: SyncOutputStream, encoding: Encoding) -> Result<SyncStreamWriter, StreamError> {
+        return Create(output, encoding, false)
+    }
+
+    /// <summary>Creates a wrapper with the supplied encoding and ownership policy.</summary>
+    /// <remarks>Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+    /// No input is read or output written. Use one buffering wrapper per stream direction.</remarks>
+    static func Create(output: SyncOutputStream, encoding: Encoding, leaveOpen: bool) -> Result<SyncStreamWriter, StreamError> {
+        return Ok(SyncStreamWriter(output, encoding, leaveOpen))
+    }
+
+    /// <summary>Encodes and writes text; returns the number of encoded bytes.</summary>
+    func Write(text: string) -> Result<int, StreamError> => Run(text, false, false)
+
+    /// <summary>Encodes and writes text followed by LF; returns the encoded byte count.</summary>
+    func WriteLine(text: string) -> Result<int, StreamError> => Run(text, true, false)
+
+    /// <summary>Finalizes encoding. Repeated successful finalization returns zero.</summary>
+    func Finish() -> Result<int, StreamError> => Run("", false, true)
+
+    private val output: SyncOutputStream
+    private var leaveOpen: bool
+    private var encoder: Encoder
+    private var closed: bool = false
+    private var finished: bool = false
+    private var failed: bool = false
+    private var finishing: bool = false
+    private val operation: TextIOOperation = TextIOOperation(true)
+    private val buffer: byte[] = CheckedStorage.Reserve<byte>(256)
+
+    private func Begin() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if operation.Active {
+            return Error(StreamError.Busy)
+        }
+        operation.Begin()
+        return Ok(())
+    }
+
+    private func Prepare(text: string, line: bool, final: bool) -> Result<unit, StreamError> {
+        if failed || operation.WasAbandoned || finished {
+            return Error(StreamError.InvalidEncoding)
+        }
+        let limit = if line { 65535 } else { 65536 }
+        if text.Utf8Bytes.Length > limit {
+            return Error(StreamError.LimitExceeded)
+        }
+        let content = if line { text + "\n" } else { text }
+        match encoder.Accept(content, final) {
+            Ok(_) => { }
+            Error(EncodingError.LimitExceeded) => return Error(StreamError.LimitExceeded)
+            Error(_) => return Error(StreamError.InvalidEncoding)
+        }
+        finishing = final
+        return Ok(())
+    }
+
+    private func Drain(total: int) -> Result<EncoderProgress, StreamError> {
+        let step = match encoder.Drain(buffer) {
+            Ok(let value) => value
+            Error(_) => {
+                failed = true
+                return Error(StreamError.InvalidEncoding)
+            }
+        }
+        if !(step.BytesWritten >= 0) || step.BytesWritten > buffer.Length {
+            System.Fail("Invalid encoder byte count")
+        }
+        if step.BytesWritten > 65536 - total {
+            failed = true
+            return Error(StreamError.LimitExceeded)
+        }
+        return Ok(step)
+    }
+
+    private func Run(text: string, line: bool, final: bool) -> Result<int, StreamError> {
+        match Begin() {
+            Ok(_) => { }
+            Error(let error) => return Error(error)
+        }
+        use lease = operation
+        let result = WriteCore(text, line, final)
+        operation.Complete()
+        return result
+    }
+
+    private func WriteCore(text: string, line: bool, final: bool) -> Result<int, StreamError> {
+        if final && finished && !failed && !operation.WasAbandoned {
+            return Ok(0)
+        }
+        match Prepare(text, line, final) {
+            Ok(_) => { }
+            Error(let error) => return Error(error)
+        }
+        return Pump()
+    }
+
+    private func Pump() -> Result<int, StreamError> {
+        if output is SyncOutputStream destination {
+            var total = 0
+            while true {
+                let step = match Drain(total) {
+                    Ok(let value) => value
+                    Error(let error) => return Error(error)
+                }
+                let result = destination.Write(buffer[..step.BytesWritten])
+                if closed {
+                    failed = true
+                    return Error(StreamError.Closed)
+                }
+                match result {
+                    Ok(_) => total += step.BytesWritten
+                    Error(let error) => {
+                        failed = true
+                        return Error(error)
+                    }
+                }
+                if TextWriteSupport.CompleteStep(step, finishing) {
+                    match step.State {
+                        EncoderState.Finished => { finished = true }
+                        _ => { }
+                    }
+                    return Ok(total)
+                }
+            }
+            return Error(StreamError.IoFailure)
+
+        }
+        return Error(StreamError.WrongAccess)
+    }
+
+    /// <summary>Flushes the underlying output without finalizing the encoder.</summary>
+    func Flush() -> Result<unit, StreamError> {
+        match Begin() {
+            Ok(_) => { }
+            Error(let error) => return Error(error)
+        }
+        use lease = operation
+        if output is SyncOutputStream destination {
+            let result = destination.Flush()
+            operation.Complete()
+            if closed {
+                return Error(StreamError.Closed)
+            }
+            return result
+        }
+        operation.Complete()
+        return Error(StreamError.WrongAccess)
+    }
+
+    /// <summary>Closes this wrapper and its output unless leaveOpen was selected. Does not flush or finish.</summary>
+    func Close() {
+        if !closed {
+            closed = true
+            if !leaveOpen {
+                output.Close()
+            }
+        }
+    }
+}

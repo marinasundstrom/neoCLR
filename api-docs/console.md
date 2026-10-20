@@ -2,26 +2,28 @@
 
 System.Console reads standard input and writes standard output and error. Use
 Write or WriteLine for output, PeekChar/ReadChar, counted Read or ReadLine for UTF-8 text input, and the
-standard stream accessors when code needs an InputStream, OutputStream, TextReader
-or TextWriter.
+standard stream accessors when code needs a SyncInputStream, SyncOutputStream, SyncTextReader
+or SyncTextWriter.
 
 Console is a static class. Development text reads operate on Unicode graphemes.
 Terminal key handling, colors, cursor movement and nonblocking guest console host I/O
-remain unimplemented. Console text reads and Write return Tasks, but the current
-standard-console provider still makes blocking host calls and settles inline.
+remain unimplemented. Development Console text reads and Write are synchronous because the current
+standard-console provider makes blocking host calls. No completed Task disguises
+that behavior. Async stream wrappers remain the default outside this explicit
+synchronous escape hatch.
 Legacy Console.WriteLine diagnostics and ReadByte retain their immediate host paths.
 
 | Member | Type or result | Purpose |
 | --- | --- | --- |
-| `Console.In` | `TextReader` | Shared invocation-owned UTF-8 input cursor |
-| `Console.Out` | `TextWriter` | Write UTF-8 standard output |
-| `Console.Error` | `TextWriter` | Write UTF-8 standard error |
-| `OpenStandardInput()` | `InputStream` | Read raw bytes |
-| `OpenStandardOutput()` / `OpenStandardError()` | `OutputStream` | Write raw bytes without text conversion |
-| `PeekChar()` / `ReadChar()` | `Task<Result<Option<char>, TextReadError>>` | Peek/read one grapheme; None at EOF |
-| `Read(count)` / `Read(count, maxUtf8Bytes)` | `Task<Result<string, TextReadError>>` | Requested grapheme count, shorter at EOF |
-| `ReadLine()` | `Task<Result<Option<string>, TextReadError>>` | Read a line with a 65536-byte content bound |
-| `ReadLine(maxUtf8Bytes)` | `Task<Result<Option<string>, TextReadError>>` | Read a line with an explicit content bound |
+| `Console.In` | `SyncTextReader` | Shared invocation-owned UTF-8 input cursor |
+| `Console.Out` | `SyncTextWriter` | Write UTF-8 standard output |
+| `Console.Error` | `SyncTextWriter` | Write UTF-8 standard error |
+| `OpenStandardInput()` | `SyncInputStream` | Read raw bytes |
+| `OpenStandardOutput()` / `OpenStandardError()` | `SyncOutputStream` | Write raw bytes without text conversion |
+| `PeekChar()` / `ReadChar()` | `Result<Option<char>, TextReadError>` | Peek/read one grapheme; None at EOF |
+| `Read(count)` / `Read(count, maxUtf8Bytes)` | `Result<string, TextReadError>` | Requested grapheme count, shorter at EOF |
+| `ReadLine()` | `Result<Option<string>, TextReadError>` | Read a line with a 65536-byte content bound |
+| `ReadLine(maxUtf8Bytes)` | `Result<Option<string>, TextReadError>` | Read a line with an explicit content bound |
 
 Console.In returns the same reader throughout one invocation. All Console text
 methods share its decoder, buffered lookahead and closed state. Closing it makes
@@ -54,15 +56,15 @@ LF boundary establishes completion. This can require lookahead and can wait on l
 input. It does not split an incomplete UTF-8 sequence or substitute an idle timeout
 for Unicode segmentation. Key events are a separate, still-pending terminal API.
 
-Overlapping read operations return `TextReadError.Busy`. Await each operation before
-starting another. StreamReader genuinely suspends when its input provider does; the
-standard-console adapter is still blocking. Cancellation overloads and the POSIX
-terminal transport's scheduler integration remain gaps. Task/Result and decoder
-allocations remain; this is not an allocation-free console API.
+Async StreamReader operations reject overlap with TextReadError.Busy; await them
+before starting another. Console uses SyncStreamReader directly and can block.
+Reentrant reads are rejected as Busy. Genuine async terminal readiness and
+cancellation remain separate work. Result, String and decoder allocations remain;
+this is not an allocation-free console API.
 
 .NET's [Peek](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.peek?view=net-10.0)
-is synchronous and uses an integer sentinel. neoCLR makes peek awaitable and uses
-Option with its grapheme Char model. Counted reads follow the fill-or-EOF behavior
+is synchronous and uses an integer sentinel. neoCLR uses Option with its grapheme Char model; StreamReader offers async peek
+and SyncStreamReader/Console offer direct peek. Counted reads follow the fill-or-EOF behavior
 of [.NET ReadBlockAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.readblockasync?view=net-10.0),
 returning UTF-8 String rather than filling a UTF-16 character buffer. This preserves
 neoCLR text semantics, at the cost of owned result storage and potentially more
@@ -119,8 +121,8 @@ This guide complements the OutputStream/FileOutputStream Flush entries
 in the [stream guide](streams.md). Flush returns unit or a typed error, including
 Closed after Close. It does not close the destination. StreamWriter is unbuffered;
 Close releases owned output without implicitly flushing. Call Flush explicitly to
-observe errors. `StreamWriter(output, true)` leaves its output open; the one-argument
-constructor closes it. StreamReader has the matching input ownership options.
+observe errors. `StreamWriter.Create(output, true)` leaves its output open; the default factory
+creates an owning wrapper. StreamReader has the matching input ownership options.
 
 ## Propagation and optional input
 
@@ -129,8 +131,8 @@ compatible Result, `?` propagates a read error. Pattern binding then handles the
 optional value:
 
 ```raven
-async func ReadInput() -> Task<Result<unit, TextReadError>> {
-    let result = await Console.ReadLine()
+func ReadInput() -> Result<unit, TextReadError> {
+    let result = Console.ReadLine()
     return DescribeInput(result)
 }
 
@@ -234,3 +236,37 @@ process signals/forced exit do not run Drop, and interrupt cancellation remains 
 The [host implementation and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/console-io.md#development-terminal-host-transport--2026-10-20)
 cover errors, platform limits and a runnable byte diagnostic. Managed signatures and
 reference snapshots are unchanged by this host-only foundation.
+
+## Separate text capabilities and factories (development)
+
+| Wrapper | Required stream | Text interface | Operation result |
+| --- | --- | --- | --- |
+| StreamReader | InputStream | TextReader | Task of Result |
+| StreamWriter | OutputStream | TextWriter | Task of Result |
+| SyncStreamReader | SyncInputStream | SyncTextReader | Result |
+| SyncStreamWriter | SyncOutputStream | SyncTextWriter | Result |
+
+All four expose static Create(stream), Create(stream, leaveOpen),
+Create(stream, encoding), and Create(stream, encoding, leaveOpen). The result is
+Result of the concrete wrapper and TextReadError (readers) or StreamError (writers).
+Constructors are private. UTF-8 and leaveOpen=false are defaults. Creation performs
+no reads, writes or asynchronous work; valid providers currently initialize
+successfully. Codec and transfer errors are reported by subsequent operations.
+A failed creation does not transfer stream ownership.
+
+Both reader interfaces expose PeekChar, ReadChar, Read(count),
+Read(count, maxUtf8Bytes), ReadLine(maxUtf8Bytes), ReadToEnd(maxUtf8Bytes), and Close.
+Both writer interfaces expose Write, WriteLine, Flush, Finish, and Close. Sync
+versions return the same Result payloads directly. Flush does not finalize the
+encoder; Finish does. Close does neither. Writers reuse their byte buffer.
+Use one buffering wrapper per stream direction: two wrappers do not share lookahead.
+
+There is no SupportedModes property, Task-blocking adapter, or mode-selected
+constructor. The capability supplied to Create determines the contract statically.
+This differs deliberately from .NET's unified sync/async reader/writer classes:
+more types make unsupported execution modes unrepresentable at the wrapper boundary.
+
+Migration: replace constructor calls with Create and handle the Result. Remove
+await from Console reads, Write and calls through Console.In/Out/Error. Raw console
+reads/writes take borrowed Slice/ReadOnlySlice windows, not array/offset/count.
+Async console host integration is not implemented by this change.

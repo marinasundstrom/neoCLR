@@ -1,0 +1,382 @@
+module System.IO
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+/// <summary>Synchronous buffered text input with explicit stream ownership.</summary>
+public class SyncStreamReader : SyncTextReader {
+    private init(input: SyncInputStream, encoding: Encoding, leaveOpen: bool) {
+        self.input = input
+        decoder = encoding.CreateDecoder()
+        self.leaveOpen = leaveOpen
+    }
+
+    /// <summary>Creates a synchronous text wrapper using UTF-8, without transferring bytes.</summary>
+    static func Create(input: SyncInputStream) -> Result<SyncStreamReader, TextReadError> {
+        return Create(input, Encodings.Utf8, false)
+    }
+
+    /// <summary>Creates a UTF-8 wrapper with explicit ownership of the underlying stream.</summary>
+    static func Create(input: SyncInputStream, leaveOpen: bool) -> Result<SyncStreamReader, TextReadError> {
+        return Create(input, Encodings.Utf8, leaveOpen)
+    }
+
+    /// <summary>Creates a wrapper using the supplied encoding without transferring bytes.</summary>
+    static func Create(input: SyncInputStream, encoding: Encoding) -> Result<SyncStreamReader, TextReadError> {
+        return Create(input, encoding, false)
+    }
+
+    /// <summary>Creates a wrapper with the supplied encoding and ownership policy.</summary>
+    /// <remarks>Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+    /// No input is read or output written. Use one buffering wrapper per stream direction.</remarks>
+    static func Create(input: SyncInputStream, encoding: Encoding, leaveOpen: bool) -> Result<SyncStreamReader, TextReadError> {
+        return Ok(SyncStreamReader(input, encoding, leaveOpen))
+    }
+
+    private val input: SyncInputStream
+    private var decoder: Decoder
+    private var leaveOpen: bool
+    private var closed: bool = false
+    private var eof: bool = false
+    private var pendingText: string = ""
+    private var lastRead: int = 0
+    private val operation: TextIOOperation = TextIOOperation(false)
+    private var pendingOffset: int = 0
+    private var peeked: Option<char> = None
+    private val readBuffer: byte[] = CheckedStorage.Reserve<byte>(256)
+
+    private func DrainPending() -> string {
+        let result = if pendingOffset == 0 {
+            pendingText
+        } else {
+            pendingText[pendingOffset..]
+        }
+        pendingText = ""
+        pendingOffset = 0
+        peeked = None
+        return result
+    }
+
+    private func DecodePart(buffer: byte[], count: int, request: int, remaining: int) -> Result<string, TextReadError> {
+        if !(count >= 0) || count > request {
+            System.Fail("Invalid input read count")
+        }
+        lastRead = count
+        if count > remaining {
+            return Error(TextReadError.LimitExceeded)
+        }
+        if count == 0 {
+            eof = true
+        }
+        let decoded = match decoder.Decode(buffer[..count], eof) {
+            Ok(let text) => text
+            Error(EncodingError.InvalidUtf8) => return Error(TextReadError.InvalidUtf8)
+            Error(EncodingError.LimitExceeded) => return Error(TextReadError.LimitExceeded)
+            Error(_) => return Error(TextReadError.InvalidEncoding)
+        }
+        if decoded.Utf8Bytes.Length > 65536 {
+            return Error(TextReadError.LimitExceeded)
+        }
+        return Ok(decoded)
+    }
+
+    /// <summary>Peeks at the next Unicode grapheme without advancing the text cursor.</summary>
+    /// <returns>Some Char, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
+    /// <remarks>May read underlying input and retain lookahead. Repeated peeks reuse the cached Char.
+    /// A grapheme may require a subsequent boundary or EOF. The maximum grapheme size is 65536 UTF-8 bytes.</remarks>
+    func PeekChar() -> Result<Option<char>, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if operation.Active {
+            return Error(TextReadError.Busy)
+        }
+        operation.Begin()
+        use lease = operation
+        let result = PeekCharCore()
+        operation.Complete()
+        return result
+    }
+
+    /// <summary>Reads one Unicode grapheme and advances the shared text cursor.</summary>
+    /// <returns>Some Char, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
+    /// <remarks>Shares buffered lookahead with PeekChar, counted reads and line reads.
+    /// Counts graphemes rather than UTF-8 bytes or Unicode scalars; maximum 65536 UTF-8 bytes.</remarks>
+    func ReadChar() -> Result<Option<char>, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if operation.Active {
+            return Error(TextReadError.Busy)
+        }
+        operation.Begin()
+        use lease = operation
+        let result = PeekCharCore()
+        if result is Ok(Some(_)) {
+            pendingOffset += 1
+            peeked = None
+        }
+        operation.Complete()
+        return result
+    }
+
+    /// <summary>Reads a requested number of graphemes with a separate UTF-8 byte bound.</summary>
+    /// <param name="count">Grapheme count, from zero through 65536.</param>
+    /// <param name="maxUtf8Bytes">Maximum returned UTF-8 bytes, from zero through 65536.</param>
+    /// <returns>The requested text, a shorter remainder at EOF, or TextReadError.</returns>
+    /// <remarks>Zero count consumes nothing. Invalid bounds consume nothing. A result-limit error
+    /// retains buffered text for retry; decoding/I/O errors do not rewind the source. Concurrent reads return Busy.</remarks>
+    func Read(count: int) -> Result<string, TextReadError> {
+        return Read(count, 65536)
+    }
+
+    /// <summary>Reads a requested number of graphemes with a separate UTF-8 byte bound.</summary>
+    /// <param name="count">Grapheme count, from zero through 65536.</param>
+    /// <param name="maxUtf8Bytes">Maximum returned UTF-8 bytes, from zero through 65536.</param>
+    /// <returns>The requested text, a shorter remainder at EOF, or TextReadError.</returns>
+    /// <remarks>Zero count consumes nothing. Invalid bounds consume nothing. A result-limit error
+    /// retains buffered text for retry; decoding/I/O errors do not rewind the source. Concurrent reads return Busy.</remarks>
+    func Read(count: int, maxUtf8Bytes: int) -> Result<string, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if operation.Active {
+            return Error(TextReadError.Busy)
+        }
+        if count < 0 || maxUtf8Bytes < 0 {
+            return Error(TextReadError.InvalidRange)
+        }
+        if count > 65536 || maxUtf8Bytes > 65536 {
+            return Error(TextReadError.LimitExceeded)
+        }
+        if count == 0 {
+            return Ok("")
+        }
+        operation.Begin()
+        use lease = operation
+        let result = ReadCore(count, maxUtf8Bytes)
+        operation.Complete()
+        return result
+    }
+
+    private func PeekCharCore() -> Result<Option<char>, TextReadError> {
+        if peeked is Some(let cached) {
+            return Ok(Some(cached))
+        }
+        let available = match EnsureCharacters(1) {
+            Ok(let value) => value
+            Error(let error) => return Error(error)
+        }
+        if available == 0 {
+            return Ok(None)
+        }
+        let character = pendingText[pendingOffset]
+        // Ordinary buffered input needs no intermediate String. Only the oversized
+        // boundary case needs a per-grapheme size check after lookahead completed it.
+        if pendingText.Utf8Bytes.Length > 65536 {
+            if character.ToString().Utf8Bytes.Length > 65536 {
+                return Error(TextReadError.LimitExceeded)
+            }
+        }
+        peeked = Some(character)
+        return Ok(Some(character))
+    }
+
+    private func ReadCore(count: int, maxUtf8Bytes: int) -> Result<string, TextReadError> {
+        let available = match EnsureCharacters(count) {
+            Ok(let value) => value
+            Error(let error) => return Error(error)
+        }
+        if available == 0 {
+            return Ok("")
+        }
+        let end = pendingOffset + available
+        let result = if pendingOffset == 0 && end == pendingText.Length {
+            pendingText
+        } else {
+            pendingText[pendingOffset..end]
+        }
+        if result.Utf8Bytes.Length > maxUtf8Bytes {
+            return Error(TextReadError.LimitExceeded)
+        }
+        pendingOffset = end
+        peeked = None
+        return Ok(result)
+    }
+
+    private func EnsureCharacters(count: int) -> Result<int, TextReadError> {
+        while true {
+            let available = pendingText.Length - pendingOffset
+            // Retain the last unfinished grapheme until another boundary or EOF.
+            // LF has an unconditional boundary after it, so interactive line input
+            // need not wait for a second line just to consume its final newline.
+            let complete = pendingText.EndsWithOrdinal("\n")
+            if available > count || eof || (available >= count && complete) {
+                return Ok(if available < count { available } else { count })
+            }
+            pendingText = DrainPending()
+            if pendingText.Utf8Bytes.Length > 65536 {
+                return Error(TextReadError.LimitExceeded)
+            }
+            let part = match ReadPart(readBuffer, 256, 256) {
+                Ok(let text) => text
+                Error(let error) => return Error(error)
+            }
+            pendingText = String.Concat(pendingText, part)
+        }
+        return Error(TextReadError.IoFailure)
+    }
+
+    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if operation.Active {
+            return Error(TextReadError.Busy)
+        }
+        operation.Begin()
+        use lease = operation
+        let result = ReadLineCore(maxUtf8Bytes)
+        operation.Complete()
+        return result
+    }
+
+    private func ReadLineCore(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if maxUtf8Bytes < 0 {
+            return Error(TextReadError.InvalidRange)
+        }
+        if maxUtf8Bytes > 65536 {
+            return Error(TextReadError.LimitExceeded)
+        }
+        let buffer = readBuffer
+        let line = ArrayList<byte>()
+        var accepted = 0
+        while true {
+            let part = DrainPending()
+            let byteCount = part.Utf8Bytes.Length
+            var index = 0
+            while index < byteCount {
+                let value = part.Utf8Bytes[index]
+                if value == 10 {
+                    match part.SliceUtf8(index + 1, byteCount - index - 1) {
+                        Ok(let suffix) => pendingText = suffix
+                        Error(_) => System.Fail("Invalid decoded line suffix")
+                    }
+                    var lineLength = line.Count
+                    if lineLength > 0 && line[lineLength - 1] == 13 {
+                        lineLength -= 1
+                    }
+                    return TextReadSupport.DecodeLine(line, lineLength)
+                }
+                if line.Count >= maxUtf8Bytes && (line.Count > maxUtf8Bytes || value != 13) {
+                    return Error(TextReadError.LimitExceeded)
+                }
+                line.Add(value)
+                index += 1
+            }
+            if eof {
+                if line.Count > maxUtf8Bytes {
+                    return Error(TextReadError.LimitExceeded)
+                }
+                if line.Count == 0 {
+                    let absent: Option<string> = None()
+                    return Ok(absent)
+                }
+                return TextReadSupport.DecodeLine(line, line.Count)
+            }
+            if accepted > maxUtf8Bytes + 1 {
+                return Error(TextReadError.LimitExceeded)
+            }
+            match ReadPart(buffer, 1, 1) {
+                Ok(let decoded) => pendingText = decoded
+                Error(let error) => return Error(error)
+            }
+            accepted += lastRead
+        }
+        return Error(TextReadError.IoFailure)
+    }
+
+    func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if operation.Active {
+            return Error(TextReadError.Busy)
+        }
+        operation.Begin()
+        use lease = operation
+        let result = ReadToEndCore(maxUtf8Bytes)
+        operation.Complete()
+        return result
+    }
+
+    private func ReadToEndCore(maxUtf8Bytes: int) -> Result<string, TextReadError> {
+        if closed {
+            return Error(TextReadError.Closed)
+        }
+        if maxUtf8Bytes < 0 {
+            return Error(TextReadError.InvalidRange)
+        }
+        if maxUtf8Bytes > 65536 {
+            return Error(TextReadError.LimitExceeded)
+        }
+        let buffer = readBuffer
+        var text = DrainPending()
+        var accepted = 0
+        while true {
+            if text.Utf8Bytes.Length > maxUtf8Bytes {
+                return Error(TextReadError.LimitExceeded)
+            }
+            if eof {
+                return Ok(text)
+            }
+            var request = maxUtf8Bytes - accepted + 1
+            if request > buffer.Length {
+                request = buffer.Length
+            }
+            match ReadPart(buffer, request, maxUtf8Bytes - accepted) {
+                Ok(let part) => text = String.Concat(text, part)
+                Error(let error) => return Error(error)
+            }
+            accepted += lastRead
+            if accepted > maxUtf8Bytes {
+                return Error(TextReadError.LimitExceeded)
+            }
+        }
+        return Error(TextReadError.IoFailure)
+    }
+
+    private func ReadPart(buffer: byte[], request: int, remaining: int) -> Result<string, TextReadError> {
+        if input is SyncInputStream source {
+            let count = match source.Read(buffer[..request]) {
+                Ok(let value) => value
+                Error(let error) => return Error(TextReadSupport.FromStream(error))
+            }
+            if closed {
+                return Error(TextReadError.Closed)
+            }
+            return DecodePart(buffer, count, request, remaining)
+        }
+        return Error(TextReadError.WrongAccess)
+    }
+
+    func Close() {
+        if !closed {
+            closed = true
+            pendingText = ""
+            pendingOffset = 0
+            peeked = None
+            if !leaveOpen {
+                input.Close()
+            }
+        }
+    }
+
+}

@@ -1,11 +1,10 @@
 import System.*
-import System.Concurrency.Tasks.*
 import System.IO.*
 import System.Result.*
 import System.Option.*
 
-async func ReadInput() -> Task<Result<unit, TextReadError>> {
-    let result = await Console.ReadLine()
+func ReadInput() -> Result<unit, TextReadError> {
+    let result = Console.ReadLine()
     return DescribeInput(result)
 }
 
@@ -18,17 +17,17 @@ func DescribeInput(result1: Result<Option<string>, TextReadError>) -> Result<uni
     return Ok(())
 }
 
-async func Main() -> Task<()> {
-    match await ReadInput() {
+func Main() {
+    match ReadInput() {
         Ok(_) => { }
         Error(_) => {
             let diagnostics = Console.Error
-            let result2 = await diagnostics.WriteLine("Could not read input")
+            let result2 = diagnostics.WriteLine("Could not read input")
             let Ok(_) = result2 else {
                 System.Fail("Could not write diagnostic")
                 return ()
             }
-            let result3 = await diagnostics.Flush()
+            let result3 = diagnostics.Flush()
             let Ok(_) = result3 else {
                 System.Fail("Could not write diagnostic")
                 return ()

@@ -1,19 +1,18 @@
 import System.*
-import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Option.*
 
-async func Main() -> Task<()> {
-    await Console.Write("Name: ")
+func Main() {
+    Console.Write("Name: ")
     let diagnostics = Console.Error
-    let result1 = await Console.ReadLine(128)
+    let result1 = Console.ReadLine(128)
     let Ok(line) = result1 else {
-        let result2 = await diagnostics.WriteLine("Could not read a UTF-8 line (maximum 128 bytes)")
+        let result2 = diagnostics.WriteLine("Could not read a UTF-8 line (maximum 128 bytes)")
         let Ok(_) = result2 else {
             System.Fail("Could not write diagnostic")
             return ()
         }
-        let result3 = await diagnostics.Flush()
+        let result3 = diagnostics.Flush()
         let Ok(_) = result3 else {
             System.Fail("Could not write diagnostic")
             return ()
@@ -25,22 +24,22 @@ async func Main() -> Task<()> {
         return ()
     }
     let output = Console.Out
-    let result4 = await output.WriteLine("Hello, $name")
+    let result4 = output.WriteLine("Hello, $name")
     let Ok(_) = result4 else {
         System.Fail("Could not write greeting")
         return ()
     }
-    let result5 = await output.Flush()
+    let result5 = output.Flush()
     let Ok(_) = result5 else {
         System.Fail("Could not flush greeting")
         return ()
     }
-    let result6 = await diagnostics.WriteLine("Read one line")
+    let result6 = diagnostics.WriteLine("Read one line")
     let Ok(_) = result6 else {
         System.Fail("Could not write diagnostic")
         return ()
     }
-    let result7 = await diagnostics.Flush()
+    let result7 = diagnostics.Flush()
     let Ok(_) = result7 else {
         System.Fail("Could not write diagnostic")
         return ()

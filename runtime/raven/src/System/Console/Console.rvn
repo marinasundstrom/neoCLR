@@ -1,21 +1,20 @@
 module System
 
 import System.*
-import System.Concurrency.Tasks.*
 import System.IO.*
 import System.ConsoleReadError
 import System.Result.*
 import System.Option.*
 
 public static class Console {
-    private static var inputReader: TextReader?
+    private static var inputReader: SyncTextReader?
 
     /// <summary>Writes composite text.</summary>
     /// <param name="format">Composite format text; see String.Format.</param>
     /// <param name="arg0">Format arguments; null values produce empty text.</param>
     /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
     /// <returns>Completion of output and flush.</returns>
-    static func Write(format: string, arg0: object?) -> Task<unit> {
+    static func Write(format: string, arg0: object?) {
         return Write(String.Format(format, arg0))
     }
 
@@ -25,7 +24,7 @@ public static class Console {
     /// <param name="arg1">Format arguments; null values produce empty text.</param>
     /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
     /// <returns>Completion of output and flush.</returns>
-    static func Write(format: string, arg0: object?, arg1: object?) -> Task<unit> {
+    static func Write(format: string, arg0: object?, arg1: object?) {
         return Write(String.Format(format, arg0, arg1))
     }
 
@@ -36,7 +35,7 @@ public static class Console {
     /// <param name="arg2">Format arguments; null values produce empty text.</param>
     /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
     /// <returns>Completion of output and flush.</returns>
-    static func Write(format: string, arg0: object?, arg1: object?, arg2: object?) -> Task<unit> {
+    static func Write(format: string, arg0: object?, arg1: object?, arg2: object?) {
         return Write(String.Format(format, arg0, arg1, arg2))
     }
 
@@ -45,7 +44,7 @@ public static class Console {
     /// <param name="arguments">Format arguments; null values produce empty text.</param>
     /// <remarks>Uses String.Format syntax, grapheme alignment and limits. Formats before writing, so format errors emit no partial output.</remarks>
     /// <returns>Completion of output and flush.</returns>
-    static func Write(format: string, params arguments: object?[]) -> Task<unit> {
+    static func Write(format: string, params arguments: object?[]) {
         return Write(String.Format(format, arguments))
     }
 
@@ -166,73 +165,81 @@ public static class Console {
     }
 
     // Fresh non-owning wrappers share the host's channels; closing one closes only it.
-    static val In: TextReader {
+    static val In: SyncTextReader {
         get {
-            if inputReader is TextReader reader {
+            if inputReader is SyncTextReader reader {
                 return reader
             }
-            let created = StreamReader(OpenStandardInput(), true)
+            let Ok(created) = SyncStreamReader.Create(OpenStandardInput(), true) else {
+                System.Fail("Unable to create text wrapper")
+            }
             inputReader = created
             return created
         }
     }
-    static val Out: TextWriter {
+    static val Out: SyncTextWriter {
         get {
-            return StreamWriter(OpenStandardOutput())
+            let Ok(writer) = SyncStreamWriter.Create(OpenStandardOutput()) else {
+                System.Fail("Unable to create console writer")
+            }
+            return writer
         }
     }
-    static val Error: TextWriter {
+    static val Error: SyncTextWriter {
         get {
-            return StreamWriter(OpenStandardError())
+            let Ok(writer) = SyncStreamWriter.Create(OpenStandardError()) else {
+                System.Fail("Unable to create console writer")
+            }
+            return writer
         }
     }
 
-    static func OpenStandardInput() -> InputStream => ConsoleInputStream()
-    static func OpenStandardOutput() -> OutputStream => ConsoleOutputStream(false)
-    static func OpenStandardError() -> OutputStream => ConsoleOutputStream(true)
+    static func OpenStandardInput() -> SyncInputStream => ConsoleInputStream()
+    static func OpenStandardOutput() -> SyncOutputStream => ConsoleOutputStream(false)
+    static func OpenStandardError() -> SyncOutputStream => ConsoleOutputStream(true)
 
     /// <summary>Peeks at the next UTF-8 grapheme without advancing Console.In.</summary>
-    /// <returns>Awaited Char, None at EOF, or a text read error.</returns>
+    /// <returns>Returned Char, None at EOF, or a text read error.</returns>
     /// <remarks>May read ahead to find a grapheme boundary. Shares the invocation-owned text reader.</remarks>
-    static func PeekChar() -> Task<Result<Option<char>, TextReadError>> => In.PeekChar()
+    static func PeekChar() -> Result<Option<char>, TextReadError> => In.PeekChar()
 
     /// <summary>Reads one UTF-8 grapheme from the shared Console.In cursor.</summary>
-    /// <returns>Awaited Char, None at EOF, or a text read error.</returns>
-    static func ReadChar() -> Task<Result<Option<char>, TextReadError>> => In.ReadChar()
+    /// <returns>Returned Char, None at EOF, or a text read error.</returns>
+    static func ReadChar() -> Result<Option<char>, TextReadError> => In.ReadChar()
 
     /// <summary>Reads a requested grapheme count, or the shorter remainder at EOF.</summary>
     /// <param name="count">Count from zero through 65536; zero consumes nothing.</param>
-    /// <returns>Awaited text or a text read error, with a 65536-byte result limit.</returns>
-    static func Read(count: int) -> Task<Result<string, TextReadError>> => In.Read(count)
+    /// <returns>Returned text or a text read error, with a 65536-byte result limit.</returns>
+    static func Read(count: int) -> Result<string, TextReadError> => In.Read(count)
 
     /// <summary>Reads a requested grapheme count with a separate UTF-8 byte bound.</summary>
     /// <param name="count">Count from zero through 65536.</param>
     /// <param name="maxUtf8Bytes">Maximum result bytes, from zero through 65536.</param>
-    /// <returns>Awaited text, shorter at EOF, or a text read error.</returns>
-    static func Read(count: int, maxUtf8Bytes: int) -> Task<Result<string, TextReadError>> => In.Read(count, maxUtf8Bytes)
+    /// <returns>Returned text, shorter at EOF, or a text read error.</returns>
+    static func Read(count: int, maxUtf8Bytes: int) -> Result<string, TextReadError> => In.Read(count, maxUtf8Bytes)
 
-    static func ReadLine() -> Task<System.Result<System.Option<string>, TextReadError>> {
+    static func ReadLine() -> System.Result<System.Option<string>, TextReadError> {
         return In.ReadLine(65536)
     }
 
-    static func ReadLine(maxUtf8Bytes: int) -> Task<System.Result<System.Option<string>, TextReadError>> {
+    static func ReadLine(maxUtf8Bytes: int) -> System.Result<System.Option<string>, TextReadError> {
         return In.ReadLine(maxUtf8Bytes)
     }
 
-    async static func Write(value0: string) -> Task<unit> {
+    static func Write(value0: string) {
         let writer = Out
-        match await writer.Write(value0) {
+        match writer.Write(value0) {
             Ok(_) => { }
             Error(_) => System.Fail("console output failed")
         }
-        match await writer.Flush() {
+        match writer.Flush() {
             Ok(_) => { }
             Error(_) => System.Fail("console output failed")
         }
         return ()
     }
 
-    static func Write(value0: int) -> Task<unit> {
+    static func Write(value0: int) {
         return Write(neoCLR.Runtime.Int32ToString(value0))
     }
 

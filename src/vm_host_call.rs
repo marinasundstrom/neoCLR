@@ -49,7 +49,12 @@ impl HostCall {
                 Binding::ConsoleWriteBytes | Binding::FileResource(Operation::Write)
                     if args.len() == 2 =>
                 {
-                    let view = crate::file_streams::memory(&args[1], true)?;
+                    let view =
+                        if matches!(crate::native::bind(&callee)?, Binding::ConsoleWriteBytes) {
+                            crate::file_streams::console_bytes(&args[1])?
+                        } else {
+                            crate::file_streams::memory(&args[1], true)?
+                        };
                     if view.length() > crate::file_streams::MAX_TRANSFER {
                         immediate = Some(Value::Erased(Box::new(Value::Byte(8))));
                     } else {
@@ -454,11 +459,16 @@ mod tests {
 
     #[test]
     fn persistent_write_snapshots_only_selected_initialized_bytes() {
-        for console in [false, true] {
+        for mode in 0..3 {
+            let console = mode != 0;
+            let borrowed = mode == 2;
             let mut function = memory_service(true);
             let first = if console {
                 function.name = "neoCLR.Runtime.ConsoleWriteBytes".into();
                 function.parameters[0] = Type::Boolean;
+                if borrowed {
+                    function.parameters[1] = crate::file_streams::console_slice_type();
+                }
                 Value::Boolean(true)
             } else {
                 Value::Int32(1)
@@ -482,7 +492,11 @@ mod tests {
                 function.clone(),
                 vec![
                     first.clone(),
-                    Value::MemoryView(crate::MemoryView::persistent(view)),
+                    Value::MemoryView(if borrowed {
+                        crate::MemoryView::persistent(view).as_slice()
+                    } else {
+                        crate::MemoryView::persistent(view)
+                    }),
                 ],
                 None,
                 "Caller".into(),
@@ -524,7 +538,11 @@ mod tests {
                     function.clone(),
                     vec![
                         first.clone(),
-                        Value::MemoryView(crate::MemoryView::persistent(uninitialized))
+                        Value::MemoryView(if borrowed {
+                            crate::MemoryView::persistent(uninitialized).as_slice()
+                        } else {
+                            crate::MemoryView::persistent(uninitialized)
+                        })
                     ],
                     None,
                     "Caller".into(),

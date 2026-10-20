@@ -31,7 +31,10 @@ public class JsonSerializer {
     }
 
     async static func DeserializeNode(input: InputStream) -> Task<Result<JsonValue, JsonError>> {
-        let reader = StreamReader(input, true)
+        let reader = match StreamReader.Create(input, true) {
+            Ok(let value) => value
+            Error(let error) => return Error(JsonError.Read(error))
+        }
         let result = await reader.ReadToEnd(1024)
         reader.Close()
         return match result {

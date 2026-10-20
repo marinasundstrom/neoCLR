@@ -2652,3 +2652,14 @@ because its opaque views cannot safely represent them; the [manual member refere
 covers both. Flush and Close remain in both references. No other provider or text-reader
 synchronous support is implied. Snapshots use sync-stream-libraries-v6 and
 sync-stream-api-audit-v1; native compiler explicit-method admission is required.
+
+### Separate synchronous text contracts (2026-10-20)
+
+SyncTextReader/SyncTextWriter and SyncStreamReader/SyncStreamWriter are included in
+both reference snapshots. All four stream text wrappers now use Create factories;
+public constructors are removed. TextWriter includes Finish. StreamError adds Busy.
+Console text and byte contracts are synchronous, matching the blocking host.
+The native snapshot covers borrowed console transfers; the legacy CLI scaffold
+continues to omit opaque Slice/ReadOnlySlice members, documented in streams.md.
+The historical CLI execution bridge is not a current execution target for the
+new factory and sync contracts. Native compiler/library bundles are authoritative.

@@ -1155,7 +1155,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             ],
         ) if **element == Type::Byte => (Binding::ConsoleWriteBytes, Type::Value),
         ("neoCLR.Runtime.ConsoleWriteBytes", [Type::Boolean, source])
-            if *source == crate::file_streams::memory_type(true) =>
+            if *source == crate::file_streams::memory_type(true)
+                || *source == crate::file_streams::console_slice_type() =>
         {
             (Binding::ConsoleWriteBytes, Type::Value)
         }
@@ -1358,7 +1359,7 @@ impl Binding {
         // HostCall normally snapshots under heap access. Keep direct invocation
         // consistent for embedders/tests that already hold graph access.
         let args = if matches!(self, Self::ConsoleWriteBytes) && args.len() == 2 {
-            let view = crate::file_streams::memory(&args[1], true)?;
+            let view = crate::file_streams::console_bytes(&args[1])?;
             if view.length() > crate::file_streams::MAX_TRANSFER {
                 return Ok(Value::Erased(Box::new(Value::Byte(8))));
             }

@@ -6,7 +6,7 @@ import System.Concurrency.*
 import System.Web.Http.*
 
 async func ReadInput(limit: int) -> Task<string> {
-    if let Ok(Some(text)) = await Console.ReadLine(limit) {
+    if let Ok(Some(text)) = Console.ReadLine(limit) {
         return text
     }
     System.Fail("Expected input on stdin")

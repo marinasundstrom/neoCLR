@@ -58,8 +58,6 @@
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidUtf8)"><summary>Creates an error containing InvalidUtf8.</summary><param name="value">The error case.</param></member>
     <member name="T:System.IO.TextReader"><summary>A sequential text-reading contract independent of its backing source.</summary><remarks>Development API: grapheme peek/read, counted, bounded line and whole-text reading with explicit Close. Does not require byte streams or seekability. Read operations return Tasks that may complete inline.</remarks></member>
     <member name="T:System.IO.StreamReader"><summary>An asynchronous TextReader over InputStream, with strict UTF-8 by default.</summary><remarks>Preserves a UTF-8 BOM as text. Reads from the current byte position. In development after Preview 10, ReadToEnd decodes bounded chunks and carries incomplete UTF-8 sequences between reads; it still accumulates the returned text. ReadLine retains its bounded line buffer. Supports partial reads and split UTF-8 scalars. Development constructors accept Encoding; Encodings.Ascii selects strict ASCII. ReadLine delimits decoded text and retains any decoded suffix. See the [reader guide](/docs/streams.html#text-and-json-adapters). Close owns the input unless leaveOpen was selected. The reader has no seek API.</remarks></member>
-    <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream)"><summary>Creates a reader that closes its input when closed.</summary><param name="input">Input at its current position; construction performs no read.</param></member>
-    <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream,System.Boolean)"><summary>Creates a reader with explicit ownership of its input.</summary><param name="input">Input at its current position; construction performs no read.</param><param name="leaveOpen">True leaves the input open when the reader closes.</param></member>
     <member name="M:System.IO.TextReader.ReadToEnd(System.Int32)"><summary>Returns a Task; await completion. Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF. Source reads are separately bounded by the same number plus one overflow byte.</param><returns>The completed task contains: The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Development ReadToEnd rejects malformed completed input during chunk processing, without waiting for EOF; an underlying chunk can already have advanced the cursor beyond the malformed byte. An over-limit read is reported before decoding that read. Truncated final sequences return InvalidUtf8. Failure returns no partial text and does not roll back input. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
     <member name="M:System.IO.TextReader.Close"><summary>Closes the reader idempotently.</summary><remarks>Later reads return Closed. StreamReader closes owned input, or leaves it open if requested. Does not rewind or report underlying close errors.</remarks></member>
     <member name="M:System.IO.StreamReader.ReadToEnd(System.Int32)"><summary>Returns a Task; await completion. Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF. Source reads are separately bounded by the same number plus one overflow byte.</param><returns>The completed task contains: The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Development ReadToEnd rejects malformed completed input during chunk processing, without waiting for EOF; an underlying chunk can already have advanced the cursor beyond the malformed byte. An over-limit read is reported before decoding that read. Truncated final sequences return InvalidUtf8. Failure returns no partial text and does not roll back input. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
@@ -992,8 +990,6 @@
     <member name="M:System.IO.StreamReader.ReadLine(System.Int32)"><summary>Returns a Task; await completion. Reads a decoded line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>The completed task contains: Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback is promised. Concurrent reads return Busy. Character reads may retain lookahead shared with line and whole-text reads.</remarks></member>
     <member name="T:System.IO.TextWriter"><summary>An asynchronous text output contract independent of its destination.</summary></member>
     <member name="T:System.IO.StreamWriter"><summary>An asynchronous TextWriter with bounded encoding output over OutputStream, with UTF-8 by default.</summary><remarks>Built-ins write no BOM and use LF for WriteLine. Development constructors accept Encoding; Encodings.Ascii selects strict ASCII. Awaits complete output writes; provider errors remain observable. No concurrent-write serialization is provided. Errors can follow partial output. Finish reports final conversion output/errors; Flush reports stream flush errors. Close releases owned output without implicitly finishing or flushing. After a drain or output failure, later writes and Finish return InvalidEncoding.</remarks></member>
-    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream)"><summary>Creates an asynchronous UTF-8 writer with bounded conversion output.</summary><param name="output">Destination stream.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
-    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream,System.Boolean)"><summary>Creates an asynchronous UTF-8 writer with bounded conversion output.</summary><param name="output">Destination stream.</param><param name="leaveOpen">True leaves the destination open when this writer closes.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
     <member name="M:System.IO.TextWriter.Write(System.String)"><summary>Returns a Task; await completion. Writes text.</summary><param name="text">Text to encode using the selected policy.</param><returns>The completed task contains: Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
     <member name="M:System.IO.TextWriter.WriteLine(System.String)"><summary>Returns a Task; await completion. Writes text followed by LF.</summary><param name="text">Text to encode using the selected policy.</param><returns>The completed task contains: Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
     <member name="M:System.IO.TextWriter.Flush"><summary>Returns a Task; await completion. Flushes the output.</summary><returns>The completed task contains: Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
@@ -2767,10 +2763,6 @@
     <member name="M:System.IO.TextReadError.InvalidEncoding.#ctor"><summary>Creates the InvalidEncoding case.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidEncoding)"><summary>Creates a union with the InvalidEncoding case.</summary><param name="value">The case value.</param></member>
     <member name="M:System.IO.TextReadError.TryGetValue(System.IO.TextReadError.InvalidEncoding@)"><summary>Extracts the InvalidEncoding case if active.</summary><param name="value">Receives the case when true is returned.</param><returns>Whether the case is active.</returns><remarks>Prefer Raven case patterns.</remarks></member>
-    <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream,System.Text.Encoding)"><summary>Creates a text adapter with the selected encoding.</summary><param name="input">Stream at its current position.</param><param name="encoding">Shared conversion policy; the reader creates independent decoder state.</param><remarks>Development overload. Construction performs no stream I/O. Without leaveOpen the adapter owns the stream. See [selected encoding contracts](/docs/streams.html#selected-encodings-development).</remarks></member>
-    <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream,System.Text.Encoding,System.Boolean)"><summary>Creates a text adapter with the selected encoding.</summary><param name="input">Stream at its current position.</param><param name="encoding">Shared conversion policy; the reader creates independent decoder state.</param><param name="leaveOpen">True leaves the stream open when the adapter closes.</param><remarks>Development overload. Construction performs no stream I/O. Without leaveOpen the adapter owns the stream. See [selected encoding contracts](/docs/streams.html#selected-encodings-development).</remarks></member>
-    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream,System.Text.Encoding)"><summary>Creates a text adapter with the selected encoding.</summary><param name="output">Stream at its current position.</param><param name="encoding">Shared conversion policy; the reader creates independent decoder state.</param><remarks>Development overload. Construction performs no stream I/O. Without leaveOpen the adapter owns the stream. See [selected encoding contracts](/docs/streams.html#selected-encodings-development).</remarks></member>
-    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream,System.Text.Encoding,System.Boolean)"><summary>Creates a text adapter with the selected encoding.</summary><param name="output">Stream at its current position.</param><param name="encoding">Shared conversion policy; the reader creates independent decoder state.</param><param name="leaveOpen">True leaves the stream open when the adapter closes.</param><remarks>Development overload. Construction performs no stream I/O. Without leaveOpen the adapter owns the stream. See [selected encoding contracts](/docs/streams.html#selected-encodings-development).</remarks></member>
     <member name="M:System.Text.Encoding.CreateEncoder"><summary>Creates an independent incremental text-to-byte encoder.</summary><returns>A fresh Encoder ready to accept valid text.</returns><remarks>Development addition. Custom Encoding implementations must implement this factory; do not reuse mutable conversion state between writers or assume arbitrary whole-value Encode calls are composable.</remarks></member>
     <member name="T:System.Text.Encoder"><summary>Accepts valid text and drains encoded bytes into bounded caller buffers.</summary><remarks>Development API. Whole-text acceptance avoids character-consumption offsets. The encoder retains accepted immutable text until drained. Single-consumer mutable state: not concurrent or reentrant. See [encoder contracts](/docs/streams.html#incremental-encoding-development).</remarks></member>
     <member name="M:System.Text.Encoder.Accept(System.String,System.Boolean)"><summary>Accepts one complete text chunk for conversion.</summary><param name="text">Valid Unicode text, at most 65536 UTF-8 bytes for built-in providers.</param><param name="final">True ends input; final bytes still need draining.</param><returns>Unit on acceptance, Busy for undrained nonfinal input, Finished after final input, LimitExceeded, or UnrepresentableText.</returns><remarks>Success retains the immutable text value. Strict ASCII preflights the complete input before state changes or output. Preflight errors are retryable. Empty input is valid. Once final input is accepted, no further input is allowed. A caller must Drain even after accepting empty final input.</remarks></member>
@@ -3766,5 +3758,156 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
   <member name="T:System.IO.SyncOutputStream"><summary>Optional synchronous byte output, independent of asynchronous OutputStream. Borrowed Write is documented in the native and manual stream reference.</summary></member>
   <member name="M:System.IO.SyncOutputStream.Flush"><summary>Flushes implementation buffers without promising durability or peer receipt.</summary></member>
   <member name="M:System.IO.SyncOutputStream.Close"><summary>Closes the stream idempotently without implying flush.</summary></member>
+  <member name="M:System.IO.StreamError.Busy.#ctor">
+      <summary>Another text write, flush or finalization is pending.</summary>
+    </member>
+  <member name="M:System.IO.StreamReader.Create(System.IO.InputStream)">
+      <summary>&lt;summary&gt;Creates a reader with asynchronous operations text wrapper using UTF-8, without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamReader.Create(System.IO.InputStream,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a UTF-8 wrapper with explicit ownership of the underlying stream.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamReader.Create(System.IO.InputStream,System.Text.Encoding)">
+      <summary>&lt;summary&gt;Creates a wrapper using the supplied encoding without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamReader.Create(System.IO.InputStream,System.Text.Encoding,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a wrapper with the supplied encoding and ownership policy.&lt;/summary&gt;
+&lt;remarks&gt;Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+No input is read or output written. Use one buffering wrapper per stream direction.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamWriter.Create(System.IO.OutputStream)">
+      <summary>&lt;summary&gt;Creates a writer with asynchronous operations text wrapper using UTF-8, without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamWriter.Create(System.IO.OutputStream,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a UTF-8 wrapper with explicit ownership of the underlying stream.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamWriter.Create(System.IO.OutputStream,System.Text.Encoding)">
+      <summary>&lt;summary&gt;Creates a wrapper using the supplied encoding without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.StreamWriter.Create(System.IO.OutputStream,System.Text.Encoding,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a wrapper with the supplied encoding and ownership policy.&lt;/summary&gt;
+&lt;remarks&gt;Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+No input is read or output written. Use one buffering wrapper per stream direction.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.Create(System.IO.SyncInputStream)">
+      <summary>&lt;summary&gt;Creates a synchronous text wrapper using UTF-8, without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.Create(System.IO.SyncInputStream,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a UTF-8 wrapper with explicit ownership of the underlying stream.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.Create(System.IO.SyncInputStream,System.Text.Encoding)">
+      <summary>&lt;summary&gt;Creates a wrapper using the supplied encoding without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.Create(System.IO.SyncInputStream,System.Text.Encoding,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a wrapper with the supplied encoding and ownership policy.&lt;/summary&gt;
+&lt;remarks&gt;Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+No input is read or output written. Use one buffering wrapper per stream direction.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.PeekChar">
+      <summary>&lt;summary&gt;Peeks at the next Unicode grapheme without advancing the text cursor.&lt;/summary&gt;
+&lt;returns&gt;Some Char, None at EOF, or a decoding, I/O, Busy or limit error.&lt;/returns&gt;
+&lt;remarks&gt;May read underlying input and retain lookahead. Repeated peeks reuse the cached Char.
+A grapheme may require a subsequent boundary or EOF. The maximum grapheme size is 65536 UTF-8 bytes.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.Read(System.Int32)">
+      <summary>&lt;summary&gt;Reads a requested number of graphemes with a separate UTF-8 byte bound.&lt;/summary&gt;
+&lt;param name=&quot;count&quot;&gt;Grapheme count, from zero through 65536.&lt;/param&gt;
+&lt;param name=&quot;maxUtf8Bytes&quot;&gt;Maximum returned UTF-8 bytes, from zero through 65536.&lt;/param&gt;
+&lt;returns&gt;The requested text, a shorter remainder at EOF, or TextReadError.&lt;/returns&gt;
+&lt;remarks&gt;Zero count consumes nothing. Invalid bounds consume nothing. A result-limit error
+retains buffered text for retry; decoding/I/O errors do not rewind the source. Concurrent reads return Busy.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.Read(System.Int32,System.Int32)">
+      <summary>&lt;summary&gt;Reads a requested number of graphemes with a separate UTF-8 byte bound.&lt;/summary&gt;
+&lt;param name=&quot;count&quot;&gt;Grapheme count, from zero through 65536.&lt;/param&gt;
+&lt;param name=&quot;maxUtf8Bytes&quot;&gt;Maximum returned UTF-8 bytes, from zero through 65536.&lt;/param&gt;
+&lt;returns&gt;The requested text, a shorter remainder at EOF, or TextReadError.&lt;/returns&gt;
+&lt;remarks&gt;Zero count consumes nothing. Invalid bounds consume nothing. A result-limit error
+retains buffered text for retry; decoding/I/O errors do not rewind the source. Concurrent reads return Busy.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamReader.ReadChar">
+      <summary>&lt;summary&gt;Reads one Unicode grapheme and advances the shared text cursor.&lt;/summary&gt;
+&lt;returns&gt;Some Char, None at EOF, or a decoding, I/O, Busy or limit error.&lt;/returns&gt;
+&lt;remarks&gt;Shares buffered lookahead with PeekChar, counted reads and line reads.
+Counts graphemes rather than UTF-8 bytes or Unicode scalars; maximum 65536 UTF-8 bytes.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Close">
+      <summary>&lt;summary&gt;Closes this wrapper and its output unless leaveOpen was selected. Does not flush or finish.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Create(System.IO.SyncOutputStream)">
+      <summary>&lt;summary&gt;Creates a synchronous text wrapper using UTF-8, without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Create(System.IO.SyncOutputStream,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a UTF-8 wrapper with explicit ownership of the underlying stream.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Create(System.IO.SyncOutputStream,System.Text.Encoding)">
+      <summary>&lt;summary&gt;Creates a wrapper using the supplied encoding without transferring bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Create(System.IO.SyncOutputStream,System.Text.Encoding,System.Boolean)">
+      <summary>&lt;summary&gt;Creates a wrapper with the supplied encoding and ownership policy.&lt;/summary&gt;
+&lt;remarks&gt;Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
+No input is read or output written. Use one buffering wrapper per stream direction.&lt;/remarks&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Finish">
+      <summary>&lt;summary&gt;Finalizes encoding. Repeated successful finalization returns zero.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Flush">
+      <summary>&lt;summary&gt;Flushes the underlying output without finalizing the encoder.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.Write(System.String)">
+      <summary>&lt;summary&gt;Encodes and writes text; returns the number of encoded bytes.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncStreamWriter.WriteLine(System.String)">
+      <summary>&lt;summary&gt;Encodes and writes text followed by LF; returns the encoded byte count.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextReader.PeekChar">
+      <summary>&lt;summary&gt;Peeks at the next grapheme without consuming it; None denotes EOF.&lt;/summary&gt;
+&lt;returns&gt;Char or a text read error. May buffer underlying input to find a boundary.&lt;/returns&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextReader.Read(System.Int32)">
+      <summary>&lt;summary&gt;Reads the requested grapheme count, or the shorter remainder at EOF.&lt;/summary&gt;
+&lt;param name=&quot;count&quot;&gt;Nonnegative grapheme count; zero consumes nothing.&lt;/param&gt;
+&lt;returns&gt;text or a text read error.&lt;/returns&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextReader.Read(System.Int32,System.Int32)">
+      <summary>&lt;summary&gt;Reads the requested grapheme count with a separate result byte bound.&lt;/summary&gt;
+&lt;param name=&quot;count&quot;&gt;Nonnegative grapheme count; zero consumes nothing.&lt;/param&gt;
+&lt;param name=&quot;maxUtf8Bytes&quot;&gt;Maximum UTF-8 bytes in the returned text.&lt;/param&gt;
+&lt;returns&gt;text, shorter at EOF, or a text read error.&lt;/returns&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextReader.ReadChar">
+      <summary>&lt;summary&gt;Reads one grapheme; None denotes EOF.&lt;/summary&gt;
+&lt;returns&gt;Char or a text read error.&lt;/returns&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextWriter.Close">
+      <summary>&lt;summary&gt;Closes the text writer according to its ownership policy.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextWriter.Finish">
+      <summary>&lt;summary&gt;Finalizes text encoding; Flush does not finalize conversion.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextWriter.Flush">
+      <summary>&lt;summary&gt;Flushes output without finalizing encoding.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextWriter.Write(System.String)">
+      <summary>&lt;summary&gt;Writes encoded text and returns the encoded byte count.&lt;/summary&gt;</summary>
+    </member>
+  <member name="M:System.IO.SyncTextWriter.WriteLine(System.String)">
+      <summary>&lt;summary&gt;Writes text followed by LF and returns the encoded byte count.&lt;/summary&gt;</summary>
+    </member>
+  <member name="T:System.IO.StreamError.Busy">
+      <summary>Another text write, flush or finalization is pending.</summary>
+    </member>
+  <member name="T:System.IO.SyncStreamReader">
+      <summary>&lt;summary&gt;Synchronous buffered text input with explicit stream ownership.&lt;/summary&gt;</summary>
+    </member>
+  <member name="T:System.IO.SyncStreamWriter">
+      <summary>&lt;summary&gt;Synchronous buffered text output with explicit stream ownership.&lt;/summary&gt;</summary>
+    </member>
+  <member name="T:System.IO.SyncTextReader">
+      <summary>&lt;summary&gt;Synchronous decoded text reads sharing one logical cursor.&lt;/summary&gt;</summary>
+    </member>
+  <member name="T:System.IO.SyncTextWriter">
+      <summary>&lt;summary&gt;Synchronous text output without Task wrapping or retaining caller state across suspension.&lt;/summary&gt;</summary>
+    </member>
 </members>
 </doc>

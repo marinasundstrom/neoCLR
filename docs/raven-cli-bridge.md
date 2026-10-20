@@ -13618,3 +13618,22 @@ remains authoritative. These transformations do not make private methods public.
 
 Raven native compiler change: `69f91e49f` on `codex/neoclr`; no main-branch change
 is needed for this target-specific emitter admission.
+
+### Source-core text cleanup and synchronous console — 2026-10-20
+
+Raven `codex/neoclr` commit `100f98a2f` sets the existing RuntimeDisposalContract
+`AllowAsyncScopeExitCleanup` for source-core projects with an explicit
+`RavenNeoClrAsyncLibrary`, matching downstream native-reference builds. The
+configuration regression checks enabled and disabled cases. This fixes RAVT006
+for ordinary `use` scopes across async suspension; it does not add fault unwinding
+or iterator cleanup. Native metadata and lowering retain scope ownership; no new
+CLI encoding or IL opcode is introduced. Ordinary .NET configuration is unchanged.
+
+ConsoleWriteBytes now also admits exact ReadOnlySlice<byte> input. The interpreter
+snapshots the selected initialized bytes before releasing managed graph access;
+JIT/AOT resolve the checked view for a synchronous host call that neither retains
+the pointer nor calls managed code. Existing readonly Memory and bootstrap array
+forms remain admitted for old artifacts. Mutable/wrong-element views remain
+rejected. Sync console providers no longer fabricate Task/Promise completion.
+The native semantic owner is System.Runtime; the CLI reference is documentation
+scaffolding and borrowed members remain covered by the native API snapshot.

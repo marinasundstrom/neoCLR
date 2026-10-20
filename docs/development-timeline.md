@@ -20155,3 +20155,26 @@ The assistant proposed SupportedModes flags and shared encoding/decoding state, 
 explicit errors for unavailable modes. These text contracts and the property remain
 proposed; the byte-capability implementation does not claim to deliver them. See
 [the mode design questions](stream-design.md#text-capabilities-and-provider-dependent-modes--2026-10-20-proposal).
+
+## 2026-10-20 — explicit synchronous text escape hatch
+
+The author asked for sync byte and text capabilities so inherently synchronous
+providers need not manufacture asynchronous operations. An initial assistant draft
+used dual-mode StreamReader/StreamWriter plus SupportedModes. The author clarified
+that async remains the default, requested fallible factories, and then proposed
+separate synchronous classes. The assistant recommended StreamReader/StreamWriter
+for async capabilities and SyncStreamReader/SyncStreamWriter for direct synchronous
+contracts. The author directed continuation and specifically rejected portraying
+blocking console I/O as asynchronous.
+
+Implementation in progress: four wrappers with private constructors and Create
+factories; independent SyncTextReader/SyncTextWriter; no mode flags or marker base
+interfaces. Create performs no I/O and currently succeeds for valid providers;
+errors in conversion/transfers remain operation results. One codec session and
+byte buffer belong to each wrapper; do not place competing buffered readers on
+one input. Console's current blocking provider now uses synchronous capabilities,
+including direct text convenience calls. This is a deliberate source-breaking
+migration, not a compatibility shim. Genuine async console readiness/cancellation
+remains separate work. The source-core compiler cleanup configuration gap is fixed
+on Raven codex/neoclr (100f98a2f); execution qualification is recorded in the
+[sync text experiment](experiments/sync-text/README.md).
