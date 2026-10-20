@@ -121,3 +121,5 @@ EquatableTo and ComparableTo: it compares civil date first, then every tick of t
 time of day, without interpreting a timezone. These contracts apply to boxed values
 and supported record components as well. Hashes are execution-local, not persistent
 identifiers. Ordinary struct default value semantics remain a separate runtime gap.
+
+Development `TimeZone` values compare by their case-sensitive IANA identifier within the fixed bundled rule database; aliases stay distinct. `ZonedDateTime` compares the same instant in the same named zone, with matching hashes through typed, Object and equality-interface calls. Compare its `Instant` when zone identity should be ignored. Zone display returns the identifier; zoned display remains diagnostic type text. See the [API reference](/docs/api/system/time/TimeZone/) and [qualified cases](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/zoned-values/README.md).

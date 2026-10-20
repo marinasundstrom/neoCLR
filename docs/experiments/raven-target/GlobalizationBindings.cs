@@ -20,7 +20,10 @@ static class GlobalizationBindings
         namespace Time {
         public struct DateTime { }
         public struct LocalTimeMapping { public struct Unique { } public struct Ambiguous { } public struct Skipped { } }
-        public sealed class ZonedDateTime {
+        public sealed class ZonedDateTime : EquatableTo<ZonedDateTime> {
+            public bool Equals(ZonedDateTime other) => default;
+            public override bool Equals(object other) => default;
+            public override int GetHashCode() => default;
             private ZonedDateTime() { }
             public static Result<ZonedDateTime,DateTimeParseError> Parse(string value, TimeZone zone) => default;
             public static Result<ZonedDateTime,TimeZoneError> Create(Instant instant, TimeZone zone) => default;
@@ -29,7 +32,11 @@ static class GlobalizationBindings
             public LocalDateTime LocalDateTime => default;
             public TimeOffset Offset => default;
         }
-        public sealed class TimeZone {
+        public sealed class TimeZone : EquatableTo<TimeZone> {
+            public bool Equals(TimeZone other) => default;
+            public override bool Equals(object other) => default;
+            public override int GetHashCode() => default;
+            public override string ToString() => default;
             private TimeZone() { }
             public static TimeZone Utc => default;
             public static string DatabaseVersion => default;

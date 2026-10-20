@@ -73,6 +73,20 @@ let memory: Memory<int> = data
 ReplaceFirst(memory[1..])
 ```
 
+## Persistent region equality
+
+Development `Equals(Object?)` and `GetHashCode()` compare the backing owner, offset
+and length. Writable and readonly memory of the same element type can describe an
+equal region. Mutating elements does not change its hash; equal contents in separate
+arrays do not make their views equal. Empty windows retain their owner and offset,
+and differ from default ownerless memory. Exact type tests and unboxing still retain
+the writable/readonly nominal distinction.
+
+These inherited Object calls box, even with direct method syntax. A typed nonboxing
+contract remains a follow-up. Native qualification covers byte views; borrowed slices
+remain unboxable. `ToString()` provides diagnostic type text, not byte decoding.
+[Region and GC qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/memory-object/README.md).
+
 ## Bounds, lifetime and errors
 
 Start/count arguments are relative to the view. Negative or excessive indexes,

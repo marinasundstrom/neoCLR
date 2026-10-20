@@ -8,7 +8,7 @@ Compiler-generated carriers, module functions and internal helpers are not count
 See the [review and findings](class-library-soundness-20261020.md#whole-library-contract-pass) for manual interpretation,
 inherited/runtime contracts, execution evidence, allocation concerns and remaining gaps.
 
-**260 declarations**: Borrowed view: 2; Contract: 66; Enum: 12; Intrinsic: 17; Owned view: 2; Record: 2; Reference: 91; Reference value: 5; Static: 11; Union: 33; Value: 19.
+**260 declarations**: Borrowed view: 2; Contract: 66; Enum: 12; Intrinsic: 17; Owned view: 2; Record: 2; Reference: 89; Reference value: 7; Static: 11; Union: 33; Value: 19.
 
 `Et` = typed Equals; `Eo` = Object Equals; `H` = parameterless GetHashCode;
 `T` = parameterless ToString; `Tf` = formatted ToString overload; `*` = authored override.
@@ -244,9 +244,9 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.Time.SystemClock](../../runtime/raven/src/System/Time/SystemClock.rvn#L6) | Reference | — |
 | [System.Time.TimeOfDay](../../runtime/raven/src/System/Time/TimeOfDay.rvn#L7) | Value | T*, Tf, Et, Eo*, H* |
 | [System.Time.TimeOffset](../../runtime/raven/src/System/Time/TimeOffset.rvn#L8) | Value | Et, Eo*, H* |
-| [System.Time.TimeZone](../../runtime/raven/src/System/Time/TimeZone.rvn#L8) | Reference | — |
+| [System.Time.TimeZone](../../runtime/raven/src/System/Time/TimeZone.rvn#L8) | Reference value | Et, Eo*, H*, T* |
 | [System.Time.TimeZoneError](../../runtime/raven/src/System/Time/TimeZoneError.rvn#L6) | Union | T* |
-| [System.Time.ZonedDateTime](../../runtime/raven/src/System/Time/ZonedDateTime.rvn#L8) | Reference | — |
+| [System.Time.ZonedDateTime](../../runtime/raven/src/System/Time/ZonedDateTime.rvn#L8) | Reference value | Et, Eo*, H* |
 | [System.UInt16](../../runtime/raven/src/System/UInt16.rvn#L5) | Intrinsic | — |
 | [System.UInt32](../../runtime/raven/src/System/UInt32.rvn#L5) | Intrinsic | — |
 | [System.UInt64](../../runtime/raven/src/System/UInt64.rvn#L5) | Intrinsic | — |

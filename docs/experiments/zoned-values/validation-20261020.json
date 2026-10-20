@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/zoned-value-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Named zone and zoned value contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/zoned-value-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Named zone and zoned value contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/zoned-value-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Named zone and zoned value contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/zoned-value-app/app": "def4c4ab9dfc9a477ba771e9c13264675dcb09a391a822cea83ff417a402ad29",
+    "/Users/robert/Projects/neoclr/target/zoned-value-app/app.dll": "1abb276b9a790450d813c38e6cb5fdb0f7b30ca3e4ec93f96c026f23e1ece25d",
+    "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/bin/neoclr-codegen": "614b78b75d0338d729be4519fb57071da3338eba1ddbad6747ea4999206d8fb4",
+    "/Users/robert/Projects/neoclr/target/zoned-value-bundle/bundle/lib/System.Runtime.dll": "429b32e813a40f6e2f74230ab527ae5f10118a320aa120ec1a5bc0cbada89010"
+  }
+}

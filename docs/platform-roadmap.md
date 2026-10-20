@@ -14,6 +14,8 @@ but their references and boxing still count. The first follow-up
 [Culture-aware Formattable and bounded civil/duration formats](experiments/formattable-culture/README.md)
 now connect explicit culture to composite formatting. The [time-value contracts](experiments/time-values/README.md)
 complete boxed equality/hash and LocalDateTime equality/ordering.
+[Named-zone and zoned-value contracts](experiments/zoned-values/README.md) now give
+TimeZone and ZonedDateTime explicit value equality across typed/Object/interface calls.
 [HttpVersion value contracts](experiments/http-version-values/README.md) also align
 typed/boxed equality, hashes and display. [Ordinary struct defaults](experiments/struct-defaults/README.md)
 add runtime fieldwise equality/hash while preserving explicit EquatableTo contracts.

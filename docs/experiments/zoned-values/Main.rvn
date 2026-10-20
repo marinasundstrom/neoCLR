@@ -1,0 +1,62 @@
+import System.*
+import System.Time.*
+import System.Result.*
+import System.Collections.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Zone(name: string) -> TimeZone {
+    let Ok(value) = TimeZone.Find(name) else {
+        System.Fail("Zone lookup")
+    }
+    return value
+}
+
+func Zoned(text: string, zone: TimeZone) -> ZonedDateTime {
+    let Ok(value) = ZonedDateTime.Parse(text, zone) else {
+        System.Fail("Zoned parse")
+    }
+    return value
+}
+
+func Equal(left: Object, right: Object) {
+    Check(left.Equals(right) && right.Equals(left), "Zoned value symmetry")
+    Check(left.GetHashCode() == right.GetHashCode(), "Zoned value hashes")
+    Check(!left.Equals(null) && !left.Equals("other"), "Zoned wrong type")
+}
+
+func Main() {
+    let utc = TimeZone.Utc
+    let again = Zone("UTC")
+    Check(!Object.ReferenceEquals(utc, again), "Independent zone instances")
+    Equal(utc, again)
+    let zoneContract: EquatableTo<TimeZone> = utc
+    Check(zoneContract.Equals(again), "Zone equality interface")
+    Check(utc.ToString() == "UTC" && ((Object)again).ToString() == "UTC", "Zone display")
+    let alias = Zone("Etc/UTC")
+    Check(!utc.Equals(alias), "Aliases retain named identity")
+    let stockholm = Zone("Europe/Stockholm")
+    Equal(stockholm, Zone("Europe/Stockholm"))
+    let first = Zoned("2024-10-27T02:30:00+02:00", stockholm)
+    let same = Zoned("2024-10-27T02:30:00+02:00", Zone("Europe/Stockholm"))
+    let second = Zoned("2024-10-27T02:30:00+01:00", stockholm)
+    Equal(first, same)
+    let zonedContract: EquatableTo<ZonedDateTime> = first
+    Check(zonedContract.Equals(same), "Zoned equality interface")
+    Check(first.LocalDateTime.Equals(second.LocalDateTime), "Overlap has same civil fields")
+    Check(!first.Equals(second), "Overlap instants differ")
+    let universal = Zoned("2024-10-27T00:30:00Z", utc)
+    Check(first.Instant.Equals(universal.Instant) && !first.Equals(universal), "Same instant different zone")
+    Check(((Object)first).ToString() == first.ToString(), "Inherited diagnostic display is consistent")
+    let values = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(values.TryAdd(first, 1) && !values.TryAdd(same, 2), "Duplicate zoned key")
+    Check(values.TryAdd(second, 3) && values.TryAdd(universal, 4), "Distinct zoned keys")
+    System.Runtime.GC.Collect()
+    Equal(first, same)
+    Equal(stockholm, Zone("Europe/Stockholm"))
+    Console.WriteLine("Named zone and zoned value contracts: passed")
+}

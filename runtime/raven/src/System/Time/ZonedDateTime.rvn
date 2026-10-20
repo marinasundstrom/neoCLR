@@ -5,7 +5,7 @@ import System.*
 import System.Result.*
 
 /// An immutable resolved instant and its projection under a named zone's rules.
-public class ZonedDateTime {
+public class ZonedDateTime : EquatableTo<ZonedDateTime> {
     private var instant: Instant
     private var zone: TimeZone
     private var local: LocalDateTime
@@ -36,6 +36,16 @@ public class ZonedDateTime {
         }
         return Ok(ZonedDateTime(instant, zone, local, offset))
     }
+
+    /// Compares the same instant in the same named zone. Use Instant for timeline-only equality.
+    /// Local fields and offset are deterministic projections under the fixed bundled rules.
+    func Equals(other: ZonedDateTime) -> bool => instant.Equals(other.instant) && zone.Equals(other.zone)
+
+    /// Compares zoned values; null and other types are unequal.
+    override func Equals(other: Object?) -> bool => other is ZonedDateTime value && Equals(value)
+
+    /// Combines instant and named-zone hashes without allocating wrappers or formatted strings.
+    override func GetHashCode() -> int => HashCode.Combine(instant.GetHashCode(), zone.GetHashCode())
 
     val Instant: Instant => instant
     val Zone: TimeZone => zone

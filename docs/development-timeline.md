@@ -20462,3 +20462,5 @@ for the test results and artifact identities. No release publication is claimed.
 - **Open:** Primitive adapters, Memory region equality/boxing and deliberate
   contracts for value-like time classes require further work. The inventory is a
   coverage record, not a claim that all methods, platforms or release gates passed.
+
+- **Subsequent actions in the same consistency review:** [Integral Object adapters](experiments/integer-object/README.md) and [persistent memory region equality](experiments/memory-object/README.md) now have interpreter/JIT/AOT evidence. The assistant selected explicit named-zone and zoned-value equality after comparing .NET TimeZoneInfo and Noda Time, documenting the fixed-database assumption and alias distinction. [Time contracts and validation](experiments/zoned-values/README.md) retain reference representation, with explicit EquatableTo declarations. Typed nonboxing Memory APIs, broader native view elements, floating display and remaining formatting/release gates are still open.

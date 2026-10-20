@@ -5,12 +5,25 @@ import System.*
 import System.Result.*
 
 /// Named IANA rules, separate from culture, calendar and the system clock.
-public class TimeZone {
+public class TimeZone : EquatableTo<TimeZone> {
     private var identifier: string
 
     private init(id: string) {
         identifier = id
     }
+
+    /// Compares requested case-sensitive identifiers in the immutable bundled rule database.
+    /// Aliases remain distinct named zones even when their current rules coincide.
+    func Equals(other: TimeZone) -> bool => String.CompareOrdinal(identifier, other.identifier) == 0
+
+    /// Compares named-zone values; null and other types are unequal.
+    override func Equals(other: Object?) -> bool => other is TimeZone value && Equals(value)
+
+    /// Hashes zone identity without allocating encoded text or querying rules.
+    override func GetHashCode() -> int => neoCLR.Runtime.StringHashOrdinal(identifier)
+
+    /// Returns the original IANA identifier, not localized display text.
+    override func ToString() -> string => identifier
 
     static val Utc: TimeZone => TimeZone("UTC")
     static val DatabaseVersion: string => neoCLR.Runtime.TimeZoneDatabaseVersion()
