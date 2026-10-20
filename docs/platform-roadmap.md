@@ -28,7 +28,9 @@ boxed dispatch, explicit ordinal policies and preserved UTF-8 storage. See the
 [canonical text evidence](experiments/canonical-text/README.md).
 Native generated equality/hash now has a [bounded positional-record fix](experiments/record-values/README.md).
 [Closed tagged-union components](experiments/record-unions/README.md), including ConsoleKeyInfo, now have typed and boxed equality/hash qualification. Generic record owners, unsupported union payloads, floating-point components,
-imported value-record discovery and formatting remain release review gaps. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
+automatic imported record discovery and formatting remain release review gaps.
+[Explicit imported value contracts](experiments/record-components/README.md) now allow
+Index/Range components without boxing; missing equality/hash contracts remain rejected. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
 with unchanged-owner reuse and measured changed-result allocations. The
 [String utilities](experiments/string-utilities/README.md) add nullable predicates
 and explicit/interface comparison; [line-ending replacement](experiments/string-lines/README.md)

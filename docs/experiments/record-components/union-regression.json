@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-component-union-regression-v1/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record unions\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-component-union-regression-v1/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record unions\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-component-union-regression-v1/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record unions\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "unsupported-component",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/record-unions/Unsupported.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/record-unions/Unsupported.rvn(4,13): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct UnsupportedKey.\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-component-union-regression-v1/app": "041b5b4c2abaa634b2f894c44361a4d2a787faa0c6723c5ef1d48ef1f7ded881",
+    "/Users/robert/Projects/neoclr/target/record-component-union-regression-v1/app.dll": "1d977335d9ed475532257ae32c84418031d67f7a619cc695ce664c854e9a1fa4",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll": "b3b077f607506adb5ef7acf2531afe468a00ba4a14db09af26b1c5c7b9bf1b2e",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "7a5091a90c7b993f5248fa4dd43d03aa2cf5a605753396ddd3f6a6f71d032b71",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll": "d25385916098b910821ba3dee6aeea42edb95667979fb7645acd1df86bcbc2fb"
+  }
+}

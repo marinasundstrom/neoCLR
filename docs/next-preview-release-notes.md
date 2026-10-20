@@ -51,7 +51,9 @@ String.Format/Formattable are implemented with focused development qualification
 Original UTF-8 bytes are preserved. Shared-storage String views remain deferred;
 position-based search/splitting and provider/primitive-specifier formatting remain
 coverage gaps. Native generated record equality/hash is qualified for bounded
-nongeneric positional records, including supported closed tagged-union components.
+nongeneric positional records, including supported closed tagged-union components
+and [explicit imported value contracts](experiments/record-components/README.md)
+such as Index and Range.
 Generic record owners, unsupported components, imported value-record discovery and
 generated formatting remain gaps; see [record union evidence](experiments/record-unions/README.md).
 

@@ -1,0 +1,42 @@
+import System.*
+import System.Option.*
+
+record struct Position(Value: Index)
+record struct Interval(Value: Range)
+record struct OptionalPosition(Value: Option<Index>)
+record struct Envelope(Value: Position)
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    let first = Position(Index(2, false))
+    let same = Position(Index.FromStart(2))
+    let different = Position(Index.FromEnd(2))
+    Check(first == same && first.Equals(same), "imported Index equality")
+    Check(first.GetHashCode() == same.GetHashCode(), "imported Index hash")
+    Check(first != different && different != first, "Index direction participates")
+    Check(first != Position(Index(3)), "Index offset participates")
+    let interval = Interval(Range(Index(1), Index.FromEnd(2)))
+    let equalInterval = Interval(Range(Index(1), Index.FromEnd(2)))
+    Check(interval == equalInterval, "imported Range equality")
+    Check(interval.GetHashCode() == equalInterval.GetHashCode(), "imported Range hash")
+    Check(interval != Interval(Range(Index(1), Index(2))), "Range end participates")
+    Check(interval != Interval(Range(Index(2), Index.FromEnd(2))), "Range start participates")
+    let optional = OptionalPosition(Some(Index(2)))
+    let sameOptional = OptionalPosition(Some(Index.FromStart(2)))
+    Check(optional == sameOptional, "union imported payload")
+    Check(optional.GetHashCode() == sameOptional.GetHashCode(), "union imported payload hash")
+    Check(optional != OptionalPosition(None), "union case participates")
+    Check(Envelope(first) == Envelope(same), "nested source record")
+    let boxed: Object = first
+    Check(boxed.Equals(same), "boxed wrapper equality")
+    Check(boxed.GetHashCode() == first.GetHashCode(), "boxed wrapper hash")
+    Check(!boxed.Equals(different) && !boxed.Equals(null), "boxed unequal and null")
+    let zero: Position = default
+    Check(zero == Position(Index.Start), "default imported storage")
+    Console.WriteLine("PASS record components")
+}

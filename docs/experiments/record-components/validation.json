@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-component-app-v1/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record components\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-component-app-v1/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record components\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-component-app-v1/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record components\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "MissingHash",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/record-components/MissingHash.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/record-components/MissingHash.rvn(5,13): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct Unsupported.\n",
+      "passed": true
+    },
+    {
+      "case": "MissingContract",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/record-components/MissingContract.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/record-components/MissingContract.rvn(5,13): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct Unsupported.\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-component-app-v1/app": "4ffa85424fa384c6baed9948da7325320935bd3a8f0cbf8dd8023efe2502ca35",
+    "/Users/robert/Projects/neoclr/target/record-component-app-v1/app.dll": "75d4b879797a41a661afbeb0588bb230b65d8987caf083a39daa5938d06c7a56",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll": "b3b077f607506adb5ef7acf2531afe468a00ba4a14db09af26b1c5c7b9bf1b2e",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "7a5091a90c7b993f5248fa4dd43d03aa2cf5a605753396ddd3f6a6f71d032b71",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/bin/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "/Users/robert/Projects/neoclr/target/record-component-bundle-v1/bundle/lib/System.Runtime.dll": "d25385916098b910821ba3dee6aeea42edb95667979fb7645acd1df86bcbc2fb"
+  }
+}

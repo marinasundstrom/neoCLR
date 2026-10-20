@@ -40,7 +40,11 @@ adds verified native boxed value equality/hash dispatch. This does not close ite
 in full. The subsequent [record-unions experiment](../../experiments/record-unions/README.md)
 qualifies closed tagged-union components, including ConsoleKeyInfo's Option<int>,
 across all three engines. Generic record owners, unsupported/floating-point
-components, imported value-record discovery and formatting remain.
+components, automatic imported record discovery and formatting remain.
+[Explicit imported value contracts](../../experiments/record-components/README.md)
+now admit nongeneric Index/Range components using their public typed methods.
+ConsoleKeyInfo still lacks a declared self-equality interface for use as an imported
+component; Duration lacks a declared hash method. These remain explicit gaps.
 Native primitive Object-dispatch adapters are also incomplete; direct record component
 operations avoid that path without asserting those boxed APIs are qualified. The
 original failure JSON above remains historical evidence. No new release identity or

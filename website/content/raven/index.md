@@ -75,7 +75,11 @@ provide implementation details.
 Native positional records now support generated equality and matching hashes for
 qualified components, including canonical String/Char text, integers, Boolean,
 enums, nested source records and closed tagged-union payloads such as `Option<int>`.
-This includes ConsoleKeyInfo's optional scalar. Typed and boxed record comparisons
+This includes ConsoleKeyInfo's optional scalar. Nongeneric imported components
+with an explicit `EquatableTo<Self>` contract and public typed equality/hash methods,
+such as `Index` and `Range`, are also supported without boxing their components.
+[Imported component validation](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-components)
+records the limits and allocation measurements. Typed and boxed record comparisons
 are tested across interpreter, JIT and AOT. Generic record owners, unsupported union
 payloads, floating-point components, imported value-record discovery and generated formatting remain gaps;
 this is development support, not full record parity in a published release.

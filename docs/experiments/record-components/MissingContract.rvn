@@ -1,0 +1,9 @@
+import System.*
+
+record struct Unsupported(Value: System.ConsoleKeyInfo)
+
+func Main() {
+    let value: System.ConsoleKeyInfo = default
+    let key = Unsupported(value)
+    Console.WriteLine((key == key).ToString())
+}

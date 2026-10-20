@@ -1,0 +1,2 @@
+Baseline compiler: 0199ba140 (record-union-compiler-v2 build), imported Index component.
+/Users/robert/Projects/neoclr/docs/experiments/record-components/Program.rvn(5,13): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct Position.
