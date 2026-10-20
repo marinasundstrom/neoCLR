@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-format-app-v2/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record formatting\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-format-app-v2/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record formatting\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-format-app-v2/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record formatting\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "Unsupported",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/record-formatting/Unsupported.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/record-formatting/Unsupported.rvn(3,13): error NEOMETA001: Native emission does not support record formatting requires supported scalar components and native text helpers: struct Wrapped.\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-format-app-v2/app": "4c7712ef165986dd477f043a7b77a9b07d138271c0570775f6021386b9736498",
+    "/Users/robert/Projects/neoclr/target/record-format-app-v2/app.dll": "3512907ce358fc06d286fd415876c18a0012024d24be302d27573df117d136e5",
+    "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/sdk/tools/rvnc/rvnc.dll": "4c9cbaaad9b3b1ae8f7a24a93faa001cfedad0f7b8054b48ee308be49d45856f",
+    "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "127a0eed3aaba84e0eedc36e4bfd316c10190d3f43bc9f76d0df885a7430a902",
+    "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/bin/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "/Users/robert/Projects/neoclr/target/record-format-bundle-v1/bundle/lib/System.Runtime.dll": "4660a7082286201ba77b97bc182998ee25009b14b564d9a0668d73cd3c92096a"
+  }
+}

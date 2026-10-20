@@ -1,0 +1,4 @@
+Compiler: target/record-component-compiler-v1 (pre-fix)
+Source: record struct Label(Value: int); Console.WriteLine(Label(42).ToString())
+Exit: 1
+error NEOMETA001: Native emission does not support unregistered dependency: RecordComponents for struct Label.virtual override func ToString() -> string.

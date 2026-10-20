@@ -1,0 +1,24 @@
+import System.*
+record struct Label(Value: int)
+record struct Details(Name: string?, Enabled: bool, Count: long, Mark: char)
+record struct Envelope(Item: Label)
+
+func Check(actual: string, expected: string) {
+    if !actual.Equals(expected, StringComparison.Ordinal) {
+        Console.WriteLine(actual)
+        System.Fail("record display mismatch")
+    }
+}
+
+func Main() {
+    Check(Label(42).ToString(), "Label { Value = 42 }")
+    Check(Label(-2147483647 - 1).ToString(), "Label { Value = -2147483648 }")
+    Check(Envelope(Label(-7)).ToString(), "Envelope { Item = Label { Value = -7 } }")
+    Check(Details(null, false, 9223372036854775807, 'é').ToString(), "Details { Name = null, Enabled = False, Count = 9223372036854775807, Mark = 'é' }")
+    Check(Details("hello", true, -9, 'x').ToString(), "Details { Name = \"hello\", Enabled = True, Count = -9, Mark = 'x' }")
+    Check(Details("a\\b\"c", true, 0, '\'').ToString(), "Details { Name = \"a\\\\b\\\"c\", Enabled = True, Count = 0, Mark = '\\'' }")
+    Check(Details("é", false, 0, 'é').ToString(), "Details { Name = \"é\", Enabled = False, Count = 0, Mark = 'é' }")
+    let boxed: Object = Label(17)
+    Check(boxed.ToString(), "Label { Value = 17 }")
+    Console.WriteLine("PASS record formatting")
+}

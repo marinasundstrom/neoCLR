@@ -1,0 +1,3 @@
+import System.*
+record struct Wrapped(Value: Index)
+func Main() { Console.WriteLine(Wrapped(Index.Start).ToString()) }

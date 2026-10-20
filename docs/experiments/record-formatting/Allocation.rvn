@@ -1,0 +1,34 @@
+import System.*
+import System.Text.*
+
+record struct Label(Value: int)
+record struct Envelope(Item: Label)
+
+func Main(args: string[]) {
+    var count = 0
+    if args[0] != "baseline" {
+        count = 128
+    }
+    var i = 0
+    while i < count {
+        var text = ""
+        if args[0] == "generated" {
+            text = Envelope(Label(i)).ToString()
+        } else {
+            let builder = StringBuilder()
+            builder.Append("Envelope { ")
+            builder.Append("Item = ")
+            builder.Append("Label { ")
+            builder.Append("Value = ")
+            builder.Append(i.ToString())
+            builder.Append(" }")
+            builder.Append(" }")
+            text = builder.ToString()
+        }
+        if text.GetUtf8ByteCount() < 36 {
+            System.Fail("record display missing")
+        }
+        i += 1
+    }
+    Console.WriteLine("PASS")
+}

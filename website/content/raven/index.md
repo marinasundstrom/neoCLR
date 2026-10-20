@@ -81,8 +81,15 @@ such as `Index` and `Range`, are also supported without boxing their components.
 [Imported component validation](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-components)
 records the limits and allocation measurements. Typed and boxed record comparisons
 are tested across interpreter, JIT and AOT. Generic record owners, unsupported union
-payloads, floating-point components, imported value-record discovery and generated formatting remain gaps;
+payloads, floating-point components, imported value-record discovery and broader generated formatting remain gaps;
 this is development support, not full record parity in a published release.
+
+Development native record formatting now covers scalar and nested positional record
+structs, with named members, quoted text and boxed `ToString()` dispatch. It uses
+one builder for nested values and typed scalar formatting; result and builder
+storage still allocate, and the current 65,536 UTF-8-byte builder limit applies.
+Union, enum, imported-value and generic record formatting remain gaps. This is
+pre-release compiler work, not a claim of full record support.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)
 
