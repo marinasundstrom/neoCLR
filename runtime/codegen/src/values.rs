@@ -2518,12 +2518,17 @@ pub(crate) fn compile_into(
                 }
                 if let Some(kind) = value_kind {
                     let d = details.unwrap();
-                    // Primitive boxes preserve value semantics through the ordinary
+                    // Primitive and enum boxes preserve value semantics through the ordinary
                     // Object slots, including calls made from generic code.
                     for (index, wide, floating) in d
                         .int32_boxes
                         .values()
                         .chain(d.boolean_boxes.values())
+                        .chain(
+                            d.empty_record_boxes
+                                .values()
+                                .filter(|index| input.types[**index].enum_info.is_some()),
+                        )
                         .map(|index| (*index, false, false))
                         .chain(d.int64_boxes.values().map(|index| (*index, true, false)))
                         .chain(

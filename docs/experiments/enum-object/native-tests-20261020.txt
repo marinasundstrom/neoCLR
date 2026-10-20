@@ -1,0 +1,16 @@
+macOS ARM64, Xcode SDK 26.2
+
+running 1 test
+test enum_boxes_preserve_nominal_equality_and_hashing ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 183 filtered out; finished in 1.39s
+
+running 1 test
+test floating_boxes_preserve_value_equality_and_hashing ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 183 filtered out; finished in 1.25s
+
+running 1 test
+test ordinary_struct_defaults_execute_in_native_code ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 183 filtered out; finished in 0.78s

@@ -19,6 +19,7 @@ values or requiring special runtime record types.
 | Duration | Typed/Object equality and hashes cover all signed ticks | [Duration values](../experiments/duration-values/README.md) |
 | Formatting | Culture reaches Formattable; bounded time/duration formats and all composite arities work | [culture formatting](../experiments/formattable-culture/README.md) |
 | Other time values | Date, TimeOfDay, Instant, TimeOffset and LocalDateTime have matching Object equality/hash; LocalDateTime has civil equality/ordering interfaces | [time values](../experiments/time-values/README.md) |
+| Enum Object values | Native Int32-backed enum equality/hash adapters retain exact type and underlying value; enum formatting remains unsupported | [enum qualification](../experiments/enum-object/README.md) |
 | Floating Object values | Native Equals/GetHashCode now preserves NaN, signed zero and exact types, including ordinary/generic struct fields | [floating Object qualification](../experiments/floating-object/README.md#native-backend-qualification--2026-10-20) |
 | HTTP version | Both components participate in typed/Object equality and hashes; display dispatch matches the reference contract | [HTTP version values](../experiments/http-version-values/README.md) |
 
@@ -35,7 +36,7 @@ should be reused when its assumptions are unchanged.
   [qualification](../experiments/struct-defaults/README.md). Extend supported native
   field shapes as their boxed adapters become available; this is not full .NET
   ValueType coverage and does not synthesize EquatableTo or ordinary operators.
-- Generic record display, enum boxed adapters and primitive
+- Generic record display, boxed enum formatting and primitive
   self-equality/formatting coverage remain incomplete. Floating-point equality must
   handle NaN and signed zero consistently with hashing; do not replace it casually
   with the equality operator.

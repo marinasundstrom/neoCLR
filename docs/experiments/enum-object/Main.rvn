@@ -1,0 +1,63 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+public enum State { Ready = 1, Alias = 1, Failed = -1 }
+public enum Other { Ready = 1 }
+
+struct Holder<T> {
+    val Value: T
+    init(value: T) {
+        Value = value
+    }
+}
+
+struct Status {
+    val Value: State
+    init(value: State) {
+        Value = value
+    }
+}
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    var original = State.Ready
+    let copied: Object = original
+    original = State.Failed
+    let alias: Object = State.Alias
+    Check(copied.Equals(alias) && !Object.ReferenceEquals(copied, alias), "Alias equality and separate boxes")
+    Check(copied.GetHashCode() == alias.GetHashCode(), "Alias hashes")
+    Check(!copied.Equals(Other.Ready) && !copied.Equals(1) && !copied.Equals(null), "Exact enum types")
+    Check(!copied.Equals(original), "Copied enum payload")
+    Check(copied is State && !(copied is Other) && (State)copied == State.Ready, "Type tests and exact unboxing")
+    let first: Object = Status(State.Ready)
+    let second: Object = Status(State.Alias)
+    Check(first.Equals(second) && first.GetHashCode() == second.GetHashCode(), "Default enum field contracts")
+    Check(!first.Equals(Status(State.Failed)), "Different enum field")
+    let generic: Object = Holder<State>(State.Ready)
+    let sameGeneric: Object = Holder<State>(State.Alias)
+    Check(generic.Equals(sameGeneric) && generic.GetHashCode() == sameGeneric.GetHashCode(), "Generic enum fields")
+    Check(!generic.Equals(Holder<Other>(Other.Ready)), "Closed generic identity")
+    let values = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(values.TryAdd(copied, 1) && !values.TryAdd(alias, 2), "Repeated alias key")
+    Check(values.TryAdd(Other.Ready, 3) && values.TryAdd(1, 4), "Distinct enum and integer keys")
+    var n = 0
+    while n < 400 {
+        let temporary: Object = State.Ready
+        Check(temporary.Equals(copied), "Repeated enum boxing")
+        n += 1
+    }
+    System.Runtime.GC.Collect()
+    if let Some(value) = values.Find(State.Alias) {
+        Check(value == 1 && values.Count == 3, "Enum key after collection")
+    } else {
+        System.Fail("Enum key lost")
+    }
+    Check(copied.Equals(State.Ready), "Copied enum after collection")
+    Console.WriteLine("Enum Object keys, copied values and GC: passed")
+}

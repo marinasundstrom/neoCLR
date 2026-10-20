@@ -13276,3 +13276,104 @@ int main(void) {
     // the explicit floating-box admission diagnostic. Never silently display a tag.
     assert!(!rejected.stderr.is_empty());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn enum_boxes_preserve_nominal_equality_and_hashing() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
+    const EQUALS: &str = "callvirt instance System.Object::Equals(System.Object)";
+    const HASH: &str = "callvirt instance System.Object::GetHashCode()";
+    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    for value in [0, 1, -1, 42, i32::MIN, i32::MAX] {
+        body.push_str(&format!("ldc.i4 {value}\nnewobj State\nbox State\nldc.i4 {value}\nnewobj State\nbox State\n{EQUALS}\nbrfalse failed\n"));
+        body.push_str(&format!(
+            "ldc.i4 {value}\nnewobj State\nbox State\n{HASH}\nldc.i4 {value}\nceq\nbrfalse failed\n"
+        ));
+        for other in [
+            format!("ldc.i4 {value}\nnewobj Other\nbox Other"),
+            format!("ldc.i4 {value}\nbox Int32"),
+            "ldloc empty".to_owned(),
+            format!("ldc.i4 {}\nnewobj State\nbox State", value.wrapping_add(1)),
+        ] {
+            body.push_str(&format!(
+                "ldc.i4 {value}\nnewobj State\nbox State\n{other}\n{EQUALS}\nbrtrue failed\n"
+            ));
+        }
+    }
+    let source = format!(
+        ".module EnumDefaults\n.type State\n.enum Int32\n.literal Ready 1\n.literal Alias 1\n.field private Bits Int32\n.end\n.type Other\n.enum Int32\n.field private Bits Int32\n.end\n.function Calculate(Int32 unused) -> Int32\n{body}ldc.i4 42\nret\nfailed:\nldc.i4 -1\nret\n.end"
+    );
+    let mut app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed)
+            .unwrap()
+            .remove(0);
+    let result = compile_linked_module(
+        &dir,
+        &seed,
+        &app,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(
+        dir.0.join("host.c"),
+        r#"
+#include "text-arena.h"
+int main(void) {
+    uint64_t storage[1024];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t value=-99;
+    int status=neoclr_entry_v4(0,&value,&ctx);
+    if (status) { neoclr_aot_render_fault(stderr,&ctx.fault); return status; }
+    return value == 42 ? 0 : 99;
+}
+"#,
+    )
+    .unwrap();
+    let result = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let result = Command::new(dir.0.join("app")).output().unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let display = ".module EnumDisplay\n.type State\n.enum Int32\n.field private Bits Int32\n.end\n.function Calculate(Int32 unused) -> Int32\nldc.i4 1\nnewobj State\nbox State\ncallvirt instance System.Object::ToString()\npop\nldc.i4 42\nret\n.end";
+    app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(display)], &seed)
+            .unwrap()
+            .remove(0);
+    neoclr::LoadedProgram::with_library(&app, &seed)
+        .unwrap()
+        .verify()
+        .unwrap();
+    let rejected = compile_linked_module(
+        &dir,
+        &seed,
+        &app,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(!rejected.status.success());
+    assert!(!rejected.stderr.is_empty());
+}

@@ -49,7 +49,7 @@ paths can follow measurement without changing equality semantics.
 Borrowed views, primitive definitions and enum definitions do not receive these
 ordinary-struct bodies. Other field shapes remain bounded by each engine's existing
 boxing/dispatch support. [Floating-point Object adapters](../floating-object/README.md#native-backend-qualification--2026-10-20)
-now qualify those fields in interpreter/JIT/AOT; native enum adapters remain a gap. Unsupported shapes must not silently fall back to object identity.
+now qualify those fields in interpreter/JIT/AOT; [enum adapters](../enum-object/README.md) subsequently qualify Int32-backed enum fields. Unsupported shapes must not silently fall back to object identity.
 
 ## Validation
 

@@ -20424,3 +20424,20 @@ for the test results and artifact identities. No release publication is claimed.
   Formattable support should also be considered. The review will distinguish value
   and reference identity, diagnostic display and serialization, and verify Object
   and interface dispatch alongside typed calls.
+
+## 2026-10-20 — Prefer shared value-type handling
+
+- **Author direction:** “We are looking for consistent handling in the type system.
+  To avoid special behavior if not required. For instance when there is shared
+  Value type semantics.” This clarification came during the next enum equality/hash
+  gap after floating-point Object dispatch.
+- **Assistant response and action:** Reuse existing value-box storage, metadata and
+  integer payload dispatch for enums, retaining the required exact concrete-type
+  check. Remove the initially drafted enum-specific report flag/options list;
+  inspect existing verified type metadata instead. No separate enum box layout,
+  ABI or interface synthesis is introduced. Formatting still needs value-aware
+  behavior and must not silently fall back to an enum type name.
+- **Author confirmation:** Avoid special enum machinery beyond required semantics,
+  and avoid unnecessary duplication for other reference and value types as well.
+- **Validation:** The bounded [enum qualification](experiments/enum-object/README.md)
+  records results; the broader class/struct review and release gates remain open.

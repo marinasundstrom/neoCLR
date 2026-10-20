@@ -114,7 +114,10 @@ The [development consumer](https://github.com/marinasundstrom/neoCLR/blob/main/d
 covers direct and boxed calls, integer fields, nested and generic structs, nulls,
 canonical String fields and custom reference equality. Floating Object adapters and
 default floating fields now pass interpreter/JIT/AOT, including NaN and signed zero.
-Native enum boxed adapters remain a gap. Borrowed views and enum/primitive definitions
+Int32-backed enum boxes also preserve exact-type/value equality and underlying-value
+hashes; see the [enum qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/enum-object/README.md).
+Native selection rejects enum boxes combined with virtual Object.ToString pending
+value-aware formatting. Borrowed views and enum/primitive definitions
 do not receive ordinary struct
 fallback bodies. This is bounded support rather than every .NET value shape.
 

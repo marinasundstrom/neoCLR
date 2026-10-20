@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Enum Object keys, copied values and GC: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Enum Object keys, copied values and GC: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-object-final-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Enum Object keys, copied values and GC: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/enum-object-final-app/app": "08c37573dbf8c27c56b0d2c7f71df6074b8b0b0b9bd9fb1531327a00256347b9",
+    "/Users/robert/Projects/neoclr/target/enum-object-final-app/app.dll": "e37b2844849387bb5a5b3208646bcbca01559f5f1c5e024eda576fa58877f03d",
+    "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/bin/neoclr": "a1d74bc3306486f569bb52856b08140b2119fb001a69ed1b0873c4a6ff7bc022",
+    "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/bin/neoclr-codegen": "a2dcc21d659c4b6f43d8e00299786ad92b0285616c56f8cdaff93b31ae84f6ef",
+    "/Users/robert/Projects/neoclr/target/enum-object-final-bundle/bundle/lib/System.Runtime.dll": "330d92c1374d652a7f96369835afb25d8c75088504ed4e013adb3deaea6b0d4f"
+  }
+}

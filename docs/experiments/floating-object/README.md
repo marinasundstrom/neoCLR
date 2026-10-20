@@ -57,8 +57,9 @@ or typed equality interface. Converting a value to Object and default struct fie
 boxing still allocate. This correctness qualification makes no throughput or
 allocation-reduction claim. Boxed floating ToString remains unsupported: the native
 admission check still rejects a selected load set containing floating boxes together
-with virtual Object.ToString. Enum Object adapters and broader primitive formatting
-remain separate gaps, not deliberate semantic differences.
+with virtual Object.ToString. The subsequent [enum adapter qualification](../enum-object/README.md) extends
+equality/hash to Int32-backed enums. Enum and broader primitive formatting remain
+gaps, not deliberate semantic differences.
 
 Reproduce with a matched development bundle:
 
