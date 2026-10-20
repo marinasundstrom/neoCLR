@@ -6,13 +6,13 @@ class Label {
 }
 
 class CustomFormat : Formattable {
-    func ToString(format: string) -> string {
+    func ToString(format: string, culture: System.Globalization.Culture) -> string {
         return if format.IsEmpty { "default" } else { "custom:" + format }
     }
 }
 
 struct FormattedValue : Formattable {
-    func ToString(format: string) -> string => "value:" + format
+    func ToString(format: string, culture: System.Globalization.Culture) -> string => "value:" + format
 }
 
 struct FormattedPayload : Formattable {
@@ -20,7 +20,7 @@ struct FormattedPayload : Formattable {
     init(text: string) {
         self.text = text
     }
-    func ToString(format: string) -> string => text + format
+    func ToString(format: string, culture: System.Globalization.Culture) -> string => text + format
 }
 
 func Check(actual: string, expected: string) {

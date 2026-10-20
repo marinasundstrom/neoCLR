@@ -101,8 +101,11 @@ static class GlobalizationBindings
                 public static DateTimeFormat Create(Culture culture, System.Time.Calendar calendar) => default;
                 public DateTimeFormat WithCalendar(System.Time.Calendar calendar) => default;
                 public Result<string,InvalidDateError> FormatDate(Date date) => default;
+                public Result<string,InvalidDateError> FormatDate(Date date, string format) => default;
                 public string FormatTime(TimeOfDay time) => default;
+                public string FormatTime(TimeOfDay time, string format) => default;
                 public Result<string,InvalidDateError> FormatLocalDateTime(LocalDateTime value) => default;
+                public Result<string,InvalidDateError> FormatLocalDateTime(LocalDateTime value, string format) => default;
             }
         }
         """;
@@ -159,9 +162,9 @@ static class GlobalizationBindings
             (Format, "get_Culture") => ("", Culture, false),
             (Format, "Create") => ($"{Culture},{Calendar}", Format, true),
             (Format, "WithCalendar") => (Calendar, Format, false),
-            (Format, "FormatDate") => ("System.Time.Date", "System.Result<String,System.Time.InvalidDateError>", false),
-            (Format, "FormatTime") => ("System.Time.TimeOfDay", "String", false),
-            (Format, "FormatLocalDateTime") => ("System.Time.LocalDateTime", "System.Result<String,System.Time.InvalidDateError>", false),
+            (Format, "FormatDate") => (reference.Parameters.Count == 2 ? "System.Time.Date,String" : "System.Time.Date", "System.Result<String,System.Time.InvalidDateError>", false),
+            (Format, "FormatTime") => (reference.Parameters.Count == 2 ? "System.Time.TimeOfDay,String" : "System.Time.TimeOfDay", "String", false),
+            (Format, "FormatLocalDateTime") => (reference.Parameters.Count == 2 ? "System.Time.LocalDateTime,String" : "System.Time.LocalDateTime", "System.Result<String,System.Time.InvalidDateError>", false),
             _ => throw new InvalidDataException("Unsupported globalization member: " + reference.FullName)
         };
         var contract = owner == Provider;

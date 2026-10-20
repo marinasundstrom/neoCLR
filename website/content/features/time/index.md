@@ -93,3 +93,24 @@ broader zone ranges and scheduling remain future work. Resource localization rem
 
 [API reference →](../../docs/namespaces.html)
 · [Detailed contracts and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/time-zones.md)
+
+## Standard formatting (development)
+
+Date, TimeOfDay, LocalDateTime and Duration implement
+[Formattable](/docs/api/System/Formattable/index.html) with an explicit Culture.
+`String.Format(culture, format, ...)` forwards that culture. Default composite calls
+resolve one current-culture snapshot when a formattable value is encountered.
+
+| Type | Formats |
+| --- | --- |
+| Duration | c (also empty/t/T): invariant constant; g: compact; G: days and seven fraction digits |
+| Date | empty/G/d: current numeric convention; O/o: invariant Gregorian |
+| TimeOfDay | empty/G: culture with seven fraction digits; O/o: invariant; t: hours/minutes; T: hours/minutes/seconds |
+| LocalDateTime | empty/G: culture; O/o: invariant roundtrip; s: invariant sortable seconds |
+
+Duration g/G uses a comma for Swedish. Constant formatting supports every signed
+64-bit tick count. LocalDateTime never adds a timezone or offset. These are bounded
+formats over the current culture/calendar policies; custom patterns, general format
+providers and full .NET locale patterns are not implemented. Unsupported specifiers
+fault. Existing numeric civil G/d conventions retain their precision and do not claim
+.NET's complete culture-pattern behavior.

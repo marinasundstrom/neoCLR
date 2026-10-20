@@ -4,7 +4,7 @@ import System.*
 
 import System.Result.*
 
-public struct LocalDateTime {
+public struct LocalDateTime : Formattable {
     /// <summary>Parses a supported numeric civil value using Culture.Current.</summary>
     /// <param name="value">The complete text; whitespace, offsets and zone names are not accepted.</param>
     /// <returns>A value or InvalidFormat/OutOfRange. Use the explicit culture overload for deterministic input.</returns>
@@ -72,4 +72,21 @@ public struct LocalDateTime {
 
     val Date: Date => StoredDate
     val Time: TimeOfDay => StoredTime
+    /// Formats with Culture.Current; supported formats are documented by DateTimeFormat.FormatLocalDateTime.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Formats with an explicit culture; unsupported specifiers fault. O/o is invariant.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        let Ok(text) = culture.DateTimeFormat.FormatLocalDateTime(self, format) else {
+            System.Fail("A supported culture must format every valid LocalDateTime")
+        }
+        return text
+    }
+
+    /// Formats the civil date and time using Culture.Current, without an offset or zone.
+    override func ToString() -> string => ToString("", Globalization.Culture.Current)
+
+    /// Formats the civil date and time using an explicit culture.
+    func ToString(culture: Globalization.Culture) -> string => ToString("", culture)
+
 }

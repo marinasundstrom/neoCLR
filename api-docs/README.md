@@ -2730,3 +2730,11 @@ check it does not inspect a value or adopt its runtime type. It uses the same ru
 relationship limits as TypeInfo.AssignableTo. This is an explicit neoCLR compiler
 service addition, not a .NET RuntimeHelpers compatibility claim. See the
 [design and matched allocation evidence](../docs/experiments/record-generics/README.md#descriptor-free-policy-and-corrected-allocation-control).
+
+## Culture-aware formatting — 2026-10-20
+
+Refresh the legacy and native references for the two-argument Formattable contract,
+culture-first String.Format overloads, civil standard formats and Duration display.
+The historical one-argument checkpoint above is superseded; custom implementations
+must accept Culture and consumers must be recompiled. No new type selection or manual
+exclusion is required. [Contract and validation](../docs/experiments/formattable-culture/README.md).

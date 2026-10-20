@@ -7,9 +7,14 @@
 **Class-library release review (author direction, 2026-10-20):** review classes and
 structs for behavior, interface implementation and justified allocation, fixing concrete
 issues together before release qualification. Allocation count alone is not a defect;
-ownership, retained state and useful results justify allocation. The first follow-up
+ownership, retained state and useful results justify allocation. Prioritize avoidable
+short-lived wrappers, copied buffers and intermediate strings; value types can help,
+but their references and boxing still count. The first follow-up
 [completes Duration value equality/hash](experiments/duration-values/README.md).
-The broader inventory review remains in progress; this does not certify all types.
+[Culture-aware Formattable and bounded civil/duration formats](experiments/formattable-culture/README.md)
+now connect explicit culture to composite formatting. Primitive numeric formats and
+general providers remain gaps. The broader inventory review remains in progress;
+this does not certify all types.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)

@@ -26,6 +26,26 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-20 — Allocation lifetime and value types
+
+The author clarifies that allocations are not inherently bad; short-lived allocations
+that create collection work are often avoidable through code/API design, and structs
+can suit short-lived values. The assistant agrees to prioritize avoidable temporary
+wrappers, copies and intermediate strings rather than allocation count alone. It
+clarifies that unboxed structs avoid their own object allocation, but can contain
+managed references or box when used through Object/interfaces. This refines the
+existing class-library review direction; it is not a zero-allocation requirement.
+
+## 2026-10-20 — Formattable and globalization
+
+During the author-directed class/struct soundness review, the author asks to inspect
+Formattable and add format/globalization support within the existing API. The
+assistant identifies the missing culture argument and implements a concrete Culture
+parameter, culture-first composite overloads and bounded date/time/duration formats.
+This is a development interface migration, not full IFormatProvider or locale-data
+support. The broader equality/hash/display review remains open.
+[Contract, comparison, costs and validation](experiments/formattable-culture/README.md).
+
 ## 2026-10-20 — Platform influences and performance ambition
 
 The author describes neoCLR as retaining the best parts of .NET, with Raven bringing

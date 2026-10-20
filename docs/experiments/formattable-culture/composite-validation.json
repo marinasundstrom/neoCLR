@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "fixture": "utilities",
+      "engine": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/formattable-composite-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "line:1\nline:1:2\nline:1:2:3\nline:4\nwrite:1:2:3:4:5:6:10\nPASS composite formatting\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "utilities",
+      "engine": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/formattable-composite-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "line:1\nline:1:2\nline:1:2:3\nline:4\nwrite:1:2:3:4:5:6:10\nPASS composite formatting\n",
+      "stderr": ""
+    },
+    {
+      "fixture": "utilities",
+      "engine": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/formattable-composite-app/app"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "line:1\nline:1:2\nline:1:2:3\nline:4\nwrite:1:2:3:4:5:6:10\nPASS composite formatting\n",
+      "stderr": ""
+    }
+  ]
+}

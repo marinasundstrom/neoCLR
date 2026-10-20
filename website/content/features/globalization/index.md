@@ -72,3 +72,8 @@ not own resource loading. Those unified localization interfaces remain future wo
 
 [API reference →](../../docs/namespaces.html) · [Date/time APIs →](../time/)
 · [Design comparisons and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/calendar-globalization.md)
+
+Development Formattable now receives the existing Culture explicitly. Culture-first
+String.Format overloads and bounded date/time/duration formats connect composite
+formatting to these policies. See [supported time formats](/features/time/).
+This does not add numeric format providers or general locale-pattern data.

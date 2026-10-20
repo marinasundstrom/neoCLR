@@ -174,12 +174,19 @@ text utility, not an HTTP framing operation.
 
 `String.Format` and the matching `Console.Write`/`WriteLine` overloads accept indexed
 placeholders, alignment and escaped braces. `System.Formattable` lets a type interpret
-its own format string through `ToString(format: string)`. Alignment counts graphemes;
+its own format string through `ToString(format: string, culture: Culture)`. Alignment counts graphemes;
 null arguments produce empty text. Types without Formattable use ordinary ToString.
 
 One-, two- and three-argument overloads avoid an argument array; a params overload
 handles larger lists. This is not allocation-free: boxing, text fragments and final
 output can allocate. Formatted output currently has the builder's 65536-byte limit;
-culture-provider and primitive numeric-format integration remain gaps. Write is
-awaitable and flushes; WriteLine keeps its synchronous behavior. String storage/view
+custom providers and primitive numeric-format integration remain gaps. Console output
+uses its synchronous text writer. String storage/view
 changes remain deferred.
+
+Culture-first `String.Format(culture, format, ...)` overloads pass the selected culture
+to every Formattable item. Existing overloads resolve one current-culture snapshot
+when needed. Date, TimeOfDay, LocalDateTime and Duration implement the interface;
+see [time formatting](/features/time/) for the supported development specifiers.
+Implementations of the earlier one-argument Formattable contract must add the culture
+parameter and consumers must be recompiled. No full locale-pattern support is implied.

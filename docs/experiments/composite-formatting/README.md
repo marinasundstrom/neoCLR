@@ -90,3 +90,10 @@ missing-description warnings remain. No website publication or release is perfor
 
 Final public qualification: all 39 executions pass across interpreter, JIT and AOT,
 including the formatted-output limit fault without partial console output.
+
+## Contract update — 2026-10-20
+
+The executable custom implementations now use `ToString(format, culture)`. The
+original one-argument interface and provider limitations above describe the original
+checkpoint. See [culture integration](../formattable-culture/README.md) for current
+culture propagation, supported formats and matching-library validation.

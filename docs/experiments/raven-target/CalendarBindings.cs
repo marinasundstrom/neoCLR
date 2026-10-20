@@ -8,6 +8,17 @@ static class CalendarBindings
     public const string TimeResult = "System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>";
     sealed record Member(string Owner, string Name, string[] Args, string Result, bool Instance = false);
     static readonly Member[] Members = [
+        new("Date", "ToString", ["String"], "String", true),
+        new("Date", "ToString", ["String", "System.Globalization.Culture"], "String", true),
+        new("TimeOfDay", "ToString", ["String"], "String", true),
+        new("TimeOfDay", "ToString", ["String", "System.Globalization.Culture"], "String", true),
+        new("LocalDateTime", "ToString", ["String"], "String", true),
+        new("LocalDateTime", "ToString", ["String", "System.Globalization.Culture"], "String", true),
+        new("Duration", "ToString", ["String"], "String", true),
+        new("Duration", "ToString", ["String", "System.Globalization.Culture"], "String", true),
+        new("LocalDateTime", "ToString", [], "String", true),
+        new("Duration", "ToString", [], "String", true),
+        new("LocalDateTime", "ToString", ["System.Globalization.Culture"], "String", true),
         new("Instant", "Parse", ["String"], "System.Result<System.Time.Instant,System.Time.DateTimeParseError>"),
         new("Duration", "Parse", ["String"], "System.Result<System.Time.Duration,System.Time.DateTimeParseError>"),
         new("TimeOffset", "Parse", ["String"], "System.Result<System.Time.TimeOffset,System.Time.DateTimeParseError>"),
@@ -75,7 +86,7 @@ static class CalendarBindings
         "Create" when member.Owner == "Date" => new[] { "year", "month", "day" }[index],
         "Create" when member.Owner == "TimeOfDay" => new[] { "hour", "minute", "second", "fractionTicks" }[index],
         "Create" when member.Owner == "LocalDateTime" => new[] { "date", "time" }[index],
-        "ToString" => "culture",
+        "ToString" => member.Args[index] == "String" ? "format" : "culture",
         "Parse" => index == 0 ? "value" : "culture",
         "AddDays" => "days",
         "AddMonths" => "months",
@@ -90,7 +101,7 @@ static class CalendarBindings
         _ => throw new InvalidDataException("Missing calendar parameter name: " + member.Name)
     };
     public static string Declarations => "namespace Time { public interface Clock { Instant Now { get; } } public class SystemClock : Clock { public SystemClock() { } public Instant Now => default; }\n" + string.Join("\n", Members.GroupBy(m => m.Owner).Select(group =>
-        $"public struct {group.Key} {{ " + string.Join(" ", group.Select(m =>
+        $"public struct {group.Key}{(group.Key is "Date" or "TimeOfDay" or "LocalDateTime" or "Duration" ? " : System.Formattable" : "")} {{ " + string.Join(" ", group.Select(m =>
             m.Name.StartsWith("get_") ? $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name[4..]} => default;"
             : $"public {((m.Name == "ToString" && m.Args.Length == 0 || m.Owner == "Duration" && (m.Name == "GetHashCode" || m.Name == "Equals" && m.Args.SequenceEqual(["System.Object"]))) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }")) + " }";
     public static void ProjectLayout(ModuleDefinition module)
@@ -148,11 +159,11 @@ static class CalendarBindings
         var signature = RuntimeSignatures.Match(reference, definition, t => GlobalizationBindings.Type(t) ?? Type(t) ?? GenericUnionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => "System.Time." + m.Owner == reference.DeclaringType.FullName && m.Name == reference.Name
             && m.Instance == reference.HasThis && m.Args.SequenceEqual(signature.Args) && m.Result == signature.Result);
-        if (member is null || (definition.IsVirtual && !definition.IsFinal && !(member.Owner is "Date" or "TimeOfDay" && member.Name == "ToString" && member.Args.Length == 0 && !definition.IsNewSlot))) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
+        if (member is null || (definition.IsVirtual && !definition.IsFinal && !(member.Owner is "Date" or "TimeOfDay" or "LocalDateTime" or "Duration" && member.Name == "ToString" && member.Args.Length == 0 && !definition.IsNewSlot))) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
         return new(member.Instance ? AdapterName(member) : "System.Time." + member.Owner + "::" + member.Name,
             member.Instance ? new[] { "System.Time." + member.Owner + "&" }.Concat(member.Args).ToArray() : member.Args, member.Result);
     }
-    static string AdapterName(Member member) => "Runtime" + member.Owner + member.Name + (member.Name == "ToString" && member.Args.Length == 1 ? "Culture" : "");
+    static string AdapterName(Member member) => "Runtime" + member.Owner + member.Name + (member.Name == "ToString" ? string.Concat(member.Args.Select(a => a == "String" ? "Format" : "Culture")) : "");
     public static string Adapters => ".function RuntimeNewSystemClock() -> System.Time.SystemClock\nnewobj instance System.Time.SystemClock::.ctor()\nret\n.end\n" + string.Join("\n", Members.Where(m => m.Instance).Select(m =>
         $".function {AdapterName(m)}(System.Time.{m.Owner}& source{string.Concat(m.Args.Select((a, i) => "," + a + " arg" + i))}) -> {m.Result}\nldarg source\n"
         + string.Concat(m.Args.Select((_, i) => $"ldarg arg{i}\n")) + $"call instance System.Time.{m.Owner}::{m.Name}({string.Join(',', m.Args)})\nret\n.end\n"));

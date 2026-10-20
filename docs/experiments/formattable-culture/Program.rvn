@@ -1,0 +1,70 @@
+import System.*
+import System.Time.*
+import System.Globalization.*
+import System.Result.*
+
+func Check(value: bool, message: string) {
+    if !value { System.Fail(message) }
+}
+
+class CultureSnapshot : Formattable {
+    private var previous: Culture? = null
+    func ToString(format: string, culture: Culture) -> string {
+        if previous is Culture selected { Check(Object.ReferenceEquals(selected, culture), "one culture snapshot") }
+        previous = culture
+        return "ok"
+    }
+}
+
+class CultureEcho : Formattable {
+    func ToString(format: string, culture: Culture) -> string => culture.Name + format
+}
+
+func Main() {
+    let invariant = Culture.Invariant
+    let swedish = Culture.SwedishSweden
+    let zero = Duration.FromTicks(0)
+    Check(zero.ToString() == "00:00:00", "zero constant")
+    Check(zero.ToString("g", swedish) == "0:00:00", "zero general")
+    Check(zero.ToString("G", swedish) == "0:00:00:00,0000000", "zero long")
+    let value = Duration.FromTicks(937841200000L)
+    Check(value.ToString() == "1.02:03:04.1200000", "constant")
+    Check(value.ToString("g", swedish) == "1:2:03:04,12", "short culture")
+    Check(value.ToString("G", invariant) == "1:02:03:04.1200000", "long invariant")
+    Check(value.ToString("c", swedish) == value.ToString(), "constant ignores culture")
+    let min = Duration.FromTicks(-9223372036854775807L - 1L)
+    let max = Duration.FromTicks(9223372036854775807L)
+    Check(min.ToString() == "-10675199.02:48:05.4775808", "minimum")
+    Check(max.ToString() == "10675199.02:48:05.4775807", "maximum")
+    if Duration.Parse(min.ToString()) is Ok(let parsed) { Check(parsed.Equals(min), "minimum roundtrip") } else { System.Fail("parse minimum") }
+    let boxed: Object = value
+    Check(boxed.ToString() == value.ToString(), "boxed display")
+    let contract: Formattable = value
+    Check(contract.ToString("g", swedish) == "1:2:03:04,12", "interface format")
+    Check(String.Format(swedish, "{0:g}", value) == "1:2:03:04,12", "composite value")
+    let snapshot = CultureSnapshot()
+    Check(String.Format("{0}/{0}", snapshot) == "ok/ok", "default culture dispatch")
+    let echo = CultureEcho()
+    Check(String.Format(swedish, "{0:x}/{1:y}", echo, echo) == "sv-SEx/sv-SEy", "two args")
+    Check(String.Format(swedish, "{0}/{1}/{2}", echo, echo, echo) == "sv-SE/sv-SE/sv-SE", "three args")
+    let arguments: Object?[] = [echo, echo, echo, echo]
+    Check(String.Format(swedish, "{0}/{3}", arguments) == "sv-SE/sv-SE", "params")
+    if Date.Create(2026, 10, 20) is Ok(let date) {
+        if TimeOfDay.Create(14, 5, 9, 1234000) is Ok(let time) {
+            let local = LocalDateTime.Create(date, time)
+            Check(date.ToString("O", Culture.HebrewIsrael) == "2026-10-20", "Gregorian roundtrip")
+            Check(time.ToString("t", swedish) == "14:05", "short time")
+            Check(time.ToString("T", swedish) == "14:05:09", "long time")
+            Check(time.ToString("G", swedish) == "14:05:09,1234000", "Swedish precision")
+            Check(time.ToString("O", swedish) == "14:05:09.1234000", "invariant time")
+            Check(local.ToString("s", swedish) == "2026-10-20T14:05:09", "sortable")
+            Check(local.ToString("O", swedish) == "2026-10-20T14:05:09.1234000", "roundtrip local")
+            Check(String.Format(swedish, "{0:d}|{1:G}|{2:G}", date, time, local) == "2026-10-20|14:05:09,1234000|2026-10-20 14:05:09,1234000", "composite civil")
+            let dateBox: Object = date
+            let timeBox: Object = time
+            let localBox: Object = local
+            Check(dateBox.ToString() == date.ToString() && timeBox.ToString() == time.ToString() && localBox.ToString() == local.ToString(), "civil Object dispatch")
+        } else { System.Fail("time creation") }
+    } else { System.Fail("date creation") }
+    Console.WriteLine("PASS culture formatting")
+}

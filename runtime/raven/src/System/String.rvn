@@ -9,9 +9,9 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
     /// <param name="arg0">Values formatted through ToString; null produces empty text.</param>
     /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
-    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives one Culture.Current snapshot per call; explicit Culture overloads are available. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
     static func Format(format: string, arg0: object?) -> string {
-        return Text.CompositeFormatting.Format(format, 1, arg0, null, null, null)
+        return Text.CompositeFormatting.Format(format, 1, arg0, null, null, null, null)
     }
 
     /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
@@ -19,9 +19,9 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     /// <param name="arg0">Values formatted through ToString; null produces empty text.</param>
     /// <param name="arg1">Values formatted through ToString; null produces empty text.</param>
     /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
-    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives one Culture.Current snapshot per call; explicit Culture overloads are available. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
     static func Format(format: string, arg0: object?, arg1: object?) -> string {
-        return Text.CompositeFormatting.Format(format, 2, arg0, arg1, null, null)
+        return Text.CompositeFormatting.Format(format, 2, arg0, arg1, null, null, null)
     }
 
     /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
@@ -30,18 +30,61 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     /// <param name="arg1">Values formatted through ToString; null produces empty text.</param>
     /// <param name="arg2">Values formatted through ToString; null produces empty text.</param>
     /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
-    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives one Culture.Current snapshot per call; explicit Culture overloads are available. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
     static func Format(format: string, arg0: object?, arg1: object?, arg2: object?) -> string {
-        return Text.CompositeFormatting.Format(format, 3, arg0, arg1, arg2, null)
+        return Text.CompositeFormatting.Format(format, 3, arg0, arg1, arg2, null, null)
     }
 
     /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
     /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
     /// <param name="arguments">Values formatted through ToString; null produces empty text.</param>
     /// <returns>Formatted UTF-8 text; unchanged literal-only input is reused.</returns>
-    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Culture providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
+    /// <remarks>Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives one Culture.Current snapshot per call; explicit Culture overloads are available. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.</remarks>
     static func Format(format: string, params arguments: object?[]) -> string {
-        return Text.CompositeFormatting.Format(format, arguments.Length, null, null, null, arguments)
+        return Text.CompositeFormatting.Format(format, arguments.Length, null, null, null, arguments, null)
+    }
+
+    /// Formats indexed arguments with escaped braces and optional grapheme alignment.
+    /// culture: Supported culture supplied to every Formattable argument.
+    /// format: Composite text using {index[,alignment][:format]}; {{ and }} escape braces.
+    /// arg0: Values formatted through ToString; null produces empty text.
+    /// Formatted UTF-8 text; unchanged literal-only input is reused.
+    /// Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives the supplied culture; no ambient culture is read. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.
+    static func Format(culture: Globalization.Culture, format: string, arg0: object?) -> string {
+        return Text.CompositeFormatting.Format(format, 1, arg0, null, null, null, culture)
+    }
+
+    /// Formats indexed arguments with escaped braces and optional grapheme alignment.
+    /// culture: Supported culture supplied to every Formattable argument.
+    /// format: Composite text using {index[,alignment][:format]}; {{ and }} escape braces.
+    /// arg0: Values formatted through ToString; null produces empty text.
+    /// arg1: Values formatted through ToString; null produces empty text.
+    /// Formatted UTF-8 text; unchanged literal-only input is reused.
+    /// Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives the supplied culture; no ambient culture is read. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.
+    static func Format(culture: Globalization.Culture, format: string, arg0: object?, arg1: object?) -> string {
+        return Text.CompositeFormatting.Format(format, 2, arg0, arg1, null, null, culture)
+    }
+
+    /// Formats indexed arguments with escaped braces and optional grapheme alignment.
+    /// culture: Supported culture supplied to every Formattable argument.
+    /// format: Composite text using {index[,alignment][:format]}; {{ and }} escape braces.
+    /// arg0: Values formatted through ToString; null produces empty text.
+    /// arg1: Values formatted through ToString; null produces empty text.
+    /// arg2: Values formatted through ToString; null produces empty text.
+    /// Formatted UTF-8 text; unchanged literal-only input is reused.
+    /// Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives the supplied culture; no ambient culture is read. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.
+    static func Format(culture: Globalization.Culture, format: string, arg0: object?, arg1: object?, arg2: object?) -> string {
+        return Text.CompositeFormatting.Format(format, 3, arg0, arg1, arg2, null, culture)
+    }
+
+    /// Formats indexed arguments with escaped braces and optional grapheme alignment.
+    /// culture: Supported culture supplied to every Formattable argument.
+    /// format: Composite text using {index[,alignment][:format]}; {{ and }} escape braces.
+    /// arguments: Values formatted through ToString; null produces empty text.
+    /// Formatted UTF-8 text; unchanged literal-only input is reused.
+    /// Development API. Type-specific specifiers dispatch through Formattable; other values use ToString. Formattable receives the supplied culture; no ambient culture is read. Custom providers are unsupported. Invalid syntax/indexes and output over 65536 bytes fault. Alignment counts graphemes, not terminal columns. Fixed-arity overloads avoid an argument array; value arguments may box.
+    static func Format(culture: Globalization.Culture, format: string, params arguments: object?[]) -> string {
+        return Text.CompositeFormatting.Format(format, arguments.Length, null, null, null, arguments, culture)
     }
 
     /// Borrows immutable UTF-8 bytes. Byte offsets are independent of grapheme indexes.

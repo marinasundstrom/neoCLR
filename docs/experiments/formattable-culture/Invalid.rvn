@@ -1,0 +1,20 @@
+import System.*
+import System.Time.*
+import System.Globalization.*
+
+func Main(arguments: string[]) {
+    let kind = arguments[0]
+    if kind == "duration" {
+        String.Format(Culture.Invariant, "{0:unsupported}", Duration.FromTicks(0))
+    } else if kind == "date" {
+        let value: Date = default
+        value.ToString("unsupported", Culture.Invariant)
+    } else if kind == "time" {
+        let value: TimeOfDay = default
+        value.ToString("unsupported", Culture.Invariant)
+    } else {
+        let value: LocalDateTime = default
+        value.ToString("unsupported", Culture.Invariant)
+    }
+    Console.WriteLine("Unexpected format success")
+}

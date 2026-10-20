@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Extend Formattable to accept an explicit Culture and add culture-first String.Format overloads. Default composite calls resolve one culture snapshot lazily. Add bounded standard Date, TimeOfDay, LocalDateTime and Duration formats, including full signed-tick constant duration display and Swedish g/G fractions. This replaces the development one-argument interface: custom implementations and consumers must be recompiled. Unsupported specifiers fault; primitive numeric specifiers, custom providers and full locale patterns remain gaps. Pass 18 focused public/regression/fault executions across interpreter/JIT/AOT, four native API snapshot checks and the 4913-page website build; refresh public API references and formatting guidance.
+
 - Complete Duration's Object equality and hash contract using all signed tick bits, preserving typed equality and default zero. Qualify typed/interface/boxed calls, null/wrong types, signed boundaries, hash collisions and direct/generic record and pair components across interpreter/JIT/AOT. Refresh API documentation. Record the author's broader class-library soundness review as the release objective; allocations are evaluated by purpose and impact, not count alone.
 
 - Record the author’s .NET/CLR default for runtime execution and ABI design, including review of existing neoCLR-specific conventions. Clarify that records remain ordinary classes/structs with compiler-generated members/interfaces, not a separate runtime representation. Record the missing IEquatable/EquatableTo synthesis mapping as a compiler/core gap. This is design policy, not a completed ABI migration or binary-compatibility claim.

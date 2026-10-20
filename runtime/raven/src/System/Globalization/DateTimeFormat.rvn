@@ -59,6 +59,57 @@ public class DateTimeFormat {
         let date = FormatDate(value.Date)?
         return Ok(date + rules.DateTimeSeparator + FormatTime(value.Time))
     }
+
+    /// Supports empty/G/d for the selected numeric date, and O/o for invariant Gregorian yyyy-MM-dd.
+    /// Other specifiers fault. Selected-calendar range failures retain InvalidDateError.
+    func FormatDate(date: System.Time.Date, format: string) -> System.Result<string, System.Time.InvalidDateError> {
+        if format == "" || format == "G" || format == "d" {
+            return FormatDate(date)
+        }
+        if format == "O" || format == "o" {
+            return Invariant.FormatDate(date)
+        }
+        System.Fail("Unsupported Date format")
+        return Error(System.Time.InvalidDateError())
+    }
+
+    /// Supports empty/G for existing culture precision, O/o for invariant seven-digit precision,
+    /// T for HH:mm:ss and t for HH:mm. Other specifiers fault.
+    func FormatTime(time: System.Time.TimeOfDay, format: string) -> string {
+        if format == "" || format == "G" {
+            return FormatTime(time)
+        }
+        if format == "O" || format == "o" {
+            return Invariant.FormatTime(time)
+        }
+        if format == "T" || format == "t" {
+            let digits = DateTimeFormatDigits()
+            let text = digits.Pad(time.Hour, 2) + ":" + digits.Pad(time.Minute, 2)
+            return if format == "T" { text + ":" + digits.Pad(time.Second, 2) } else { text }
+        }
+        System.Fail("Unsupported TimeOfDay format")
+        return ""
+    }
+
+    /// Supports empty/G for the selected civil conventions, O/o for invariant seven-digit precision,
+    /// and s for invariant yyyy-MM-ddTHH:mm:ss. No format adds an offset or a zone.
+    /// Other specifiers fault; selected-calendar range failures retain InvalidDateError.
+    func FormatLocalDateTime(value: System.Time.LocalDateTime, format: string) -> System.Result<string, System.Time.InvalidDateError> {
+        if format == "" || format == "G" {
+            return FormatLocalDateTime(value)
+        }
+        if format == "O" || format == "o" {
+            return Invariant.FormatLocalDateTime(value)
+        }
+        if format == "s" {
+            let selected = Invariant
+            let date = selected.FormatDate(value.Date)?
+            return Ok(date + "T" + selected.FormatTime(value.Time, "T"))
+        }
+        System.Fail("Unsupported LocalDateTime format")
+        return Error(System.Time.InvalidDateError())
+    }
+
 }
 
 internal interface DateTimeFormatRules {

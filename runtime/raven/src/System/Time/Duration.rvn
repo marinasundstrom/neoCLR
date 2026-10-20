@@ -2,7 +2,7 @@ module System.Time
 
 import System.*
 
-public struct Duration : ComparableTo<Duration>, EquatableTo<Duration> {
+public struct Duration : ComparableTo<Duration>, EquatableTo<Duration>, Formattable {
     private field StoredTicks: long
 
     private init(ticks: long) {
@@ -47,4 +47,57 @@ public struct Duration : ComparableTo<Duration>, EquatableTo<Duration> {
         }
         return 0
     }
+    /// Formats the invariant constant representation, including every tick of precision.
+    override func ToString() -> string => FormatDuration("c", ".")
+
+    /// Formats with Culture.Current for g/G; c, t and T are invariant.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Supports empty/c/t/T (invariant), g (optional day and fractional digits) and
+    /// G (day and seven fractional digits always present). Swedish g/G uses a comma.
+    /// Unsupported specifiers fault. All signed Int64 tick values are supported.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        let separator = if culture.Name == "sv-SE" { "," } else { "." }
+        return FormatDuration(format, separator)
+    }
+
+    private func FormatDuration(format: string, separator: string) -> string {
+        let constant = format == "" || format == "c" || format == "t" || format == "T"
+        if !constant && format != "g" && format != "G" {
+            System.Fail("Unsupported Duration format")
+        }
+        // Split before negating: Int64.MinValue itself cannot be made positive.
+        var days = StoredTicks / 864000000000L
+        var remaining = StoredTicks % 864000000000L
+        let builder = Text.StringBuilder()
+        if StoredTicks < 0L {
+            builder.Append("-")
+            days = -days
+            remaining = -remaining
+        }
+        let digits = Globalization.DateTimeFormatDigits()
+        if days != 0L || format == "G" {
+            builder.Append(days.ToString())
+            builder.Append(if constant { "." } else { ":" })
+        }
+        let hours = (int)(remaining / 36000000000L)
+        builder.Append(digits.Pad(hours, if format == "g" { 1 } else { 2 }))
+        builder.Append(":" + digits.Pad((int)(remaining / 600000000L % 60L), 2))
+        builder.Append(":" + digits.Pad((int)(remaining / 10000000L % 60L), 2))
+        let fraction = (int)(remaining % 10000000L)
+        if fraction != 0 || format == "G" {
+            builder.Append(if constant { "." } else { separator })
+            var text = digits.Pad(fraction, 7)
+            if format == "g" {
+                var length = text.Length
+                while length > 0 && text.Utf8Bytes[length - 1] == 48 {
+                    length -= 1
+                }
+                text = text[..length]
+            }
+            builder.Append(text)
+        }
+        return builder.ToString()
+    }
+
 }

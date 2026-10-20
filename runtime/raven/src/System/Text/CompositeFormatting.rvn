@@ -5,7 +5,8 @@ import System.*
 // Shared composite formatting engine. Scan ASCII syntax in borrowed UTF-8;
 // never enumerate graphemes merely to find braces or decimal indexes.
 internal static class CompositeFormatting {
-    static func Format(format: string, count: int, arg0: object?, arg1: object?, arg2: object?, arguments: object?[]?) -> string {
+    static func Format(format: string, count: int, arg0: object?, arg1: object?, arg2: object?, arguments: object?[]?, culture: Globalization.Culture?) -> string {
+        var selectedCulture = culture
         let bytes = format.Utf8Bytes
         let builder = StringBuilder()
         var position = 0
@@ -101,7 +102,12 @@ internal static class CompositeFormatting {
             }
             var text = ""
             if argument is Formattable formattable {
-                text = formattable.ToString(itemFormat)
+                if selectedCulture is not Globalization.Culture {
+                    selectedCulture = Globalization.Culture.Current
+                }
+                if selectedCulture is Globalization.Culture selected {
+                    text = formattable.ToString(itemFormat, selected)
+                }
             } else if argument is object present {
                 // Match composite formatting fallback for types without Formattable.
                 text = present.ToString()

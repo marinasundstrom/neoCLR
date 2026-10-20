@@ -1,0 +1,76 @@
+{
+  "expectedFault": "date",
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-invalid-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--",
+        "date"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported Date format\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E476C6F62616C697A6174696F6E_4461746554696D65466F726D6174.M_466F726D617444617465 [instruction 29]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E54696D65_44617465.M_546F537472696E67 [instruction 5]\n   at NeoMetadata_73B0A1915A2F2572B71B043D48D998C73CB487CD95792D4D0A739F42AC597B1C.F_4D61696E [instruction 28]\n",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-invalid-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr-jit-host.dylib",
+        "--",
+        "date"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported Date format\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Globalization.DateTimeFormat.FormatDate [instruction 29]\n   at System.Time.Date.ToString [instruction 5]\n   at Main [instruction 28]\n",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/formattable-culture-invalid-app/app",
+        "date"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported Date format\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Globalization.DateTimeFormat.FormatDate [instruction 29]\n   at System.Time.Date.ToString [instruction 5]\n   at Main [instruction 28]\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/formattable-culture-invalid-app/app": "17b43bcd5cbfe0cd9d05e88eae156b39ca6034550c56f9bdfff6375f911e72ed",
+    "/Users/robert/Projects/neoclr/target/formattable-culture-invalid-app/app.dll": "805e29b8e42cfdb41c73337a304f6fe2f9f3794e4e1d66a156a4331aa6fb80f2",
+    "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/bin/neoclr-codegen": "36b9cf3059de373ea96981a7ee83bbc0bc95a06998f4cca7d12eedf6e1f4e4e5",
+    "/Users/robert/Projects/neoclr/target/formattable-culture-bundle/bundle/lib/System.Runtime.dll": "c7cc801f357bd4a71a42aed310f919c71642d80c5ff8f87b1c8ea2c7a79f748f"
+  }
+}

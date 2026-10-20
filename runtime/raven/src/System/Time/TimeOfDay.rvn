@@ -4,7 +4,7 @@ import System.*
 
 import System.Result.*
 
-public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay> {
+public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay>, Formattable {
     /// <summary>Parses a supported numeric civil value using Culture.Current.</summary>
     /// <param name="value">The complete text; whitespace, offsets and zone names are not accepted.</param>
     /// <returns>A value or InvalidFormat/OutOfRange. Use the explicit culture overload for deterministic input.</returns>
@@ -109,4 +109,12 @@ public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay> {
         }
         return 0
     }
+    /// Formats with Culture.Current; supported formats are documented by DateTimeFormat.FormatTime.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Formats with an explicit culture; unsupported specifiers fault. O/o is invariant.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        return culture.DateTimeFormat.FormatTime(self, format)
+    }
+
 }

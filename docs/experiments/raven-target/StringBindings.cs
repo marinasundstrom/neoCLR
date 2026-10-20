@@ -5,6 +5,10 @@ static class StringBindings
 {
     sealed record Member(string Name, string[] Parameters, string Result, bool Instance = false, bool ByRefReceiver = false);
     static readonly Member[] Members = [
+        new("Format", ["System.Globalization.Culture", "String", "System.Object"], "String"),
+        new("Format", ["System.Globalization.Culture", "String", "System.Object", "System.Object"], "String"),
+        new("Format", ["System.Globalization.Culture", "String", "System.Object", "System.Object", "System.Object"], "String"),
+        new("Format", ["System.Globalization.Culture", "String", "arrayref<System.Object>"], "String"),
         new("Format", ["String", "System.Object"], "String"),
         new("Format", ["String", "System.Object", "System.Object"], "String"),
         new("Format", ["String", "System.Object", "System.Object", "System.Object"], "String"),
@@ -53,6 +57,7 @@ static class StringBindings
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
     static string ParameterName(Member member, int index) => member.Name switch {
+        "Format" when member.Parameters[0] == "System.Globalization.Culture" => index == 0 ? "culture" : index == 1 ? "format" : member.Parameters[index].StartsWith("arrayref") ? "arguments" : "arg" + (index - 2),
         "Format" => index == 0 ? "format" : member.Parameters[index].StartsWith("arrayref") ? "arguments" : "arg" + (index - 1),
         "Compare" => index == 0 ? "left" : index == 1 ? "right" : "comparison",
         "Concat" or "CompareOrdinal" or "CompareOrdinalIgnoreCase" => index == 0 ? "left" : "right",
@@ -68,7 +73,7 @@ static class StringBindings
         "SliceUtf8" => index == 0 ? "byteStart" : "byteLength",
         _ => throw new InvalidDataException("Missing String parameter name: " + member.Name)
     };
-    static string CSharp(string type) => type switch { "System.StringComparison" => "StringComparison", "String" => "string", "arrayref<String>" => "string[]", "arrayref<System.Object>" => "params object?[]", "System.Object" => "object?", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
+    static string CSharp(string type) => type switch { "System.Globalization.Culture" => "System.Globalization.Culture", "System.StringComparison" => "StringComparison", "String" => "string", "arrayref<String>" => "string[]", "arrayref<System.Object>" => "params object?[]", "System.Object" => "object?", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results, bool collections) => "public sealed class String { " + string.Join(" ", Members.Where(m => (results || m.Result != ResultBindings.Slice)
         && (collections || m.Name is not ("GetIterator" or "GetScalars" or "get_Item" or "Compare" or "CompareOrdinalIgnoreCase"))).Select(m =>
         m.Name == "get_Item" ? "public char this[int index] => default;" :
@@ -97,7 +102,7 @@ static class StringBindings
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
         if (reference.DeclaringType.FullName != "System.String" || !RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope)) ? "System.Object" : EnumBindings.Type(t) ?? ManagedArrayBindings.Type(t) ?? CollectionBindings.Type(t) ?? ResultBindings.Type(t));
+        var signature = RuntimeSignatures.Match(reference, definition, t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope)) ? "System.Object" : GlobalizationBindings.Type(t) ?? EnumBindings.Type(t) ?? ManagedArrayBindings.Type(t) ?? CollectionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => m.Name == reference.Name && m.Instance == reference.HasThis
             && m.Result == signature.Result && m.Parameters.SequenceEqual(signature.Args))
             ?? throw new InvalidDataException("Unsupported String member: " + reference.FullName);
