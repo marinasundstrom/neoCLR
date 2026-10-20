@@ -23,6 +23,9 @@ is not a claim of existing .NET binary compatibility. Existing neoCLR-specific A
 choices remain subject to review, with reasons, costs, validation and migration
 recorded for retained differences. No wholesale ABI replacement is implied by this
 policy update; assess affected contracts as part of their implementation work.
+The author clarified that records should remain ordinary classes/structs with
+compiler-generated semantics and interfaces; do not introduce a separate record
+runtime representation or ABI to compensate for incomplete compiler synthesis.
 
 Different syntax or internals are permitted, but difference
 alone is not an improvement. More runtime machinery is an option to evaluate, not

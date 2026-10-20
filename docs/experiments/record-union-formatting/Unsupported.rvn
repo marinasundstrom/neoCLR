@@ -1,0 +1,6 @@
+import System.*
+import System.Option.*
+record struct Unsupported(Value: Option<Index>)
+func Main() {
+    Console.WriteLine(Unsupported(Some(Index.Start)).ToString())
+}

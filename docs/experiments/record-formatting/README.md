@@ -33,6 +33,9 @@ Ordinary Raven/.NET synthesis is unchanged.
 
 ## Boundaries
 
+A subsequent [union component slice](../record-union-formatting/README.md) extends
+this qualification. The scope below describes the original scalar cohort.
+
 Generic records, record classes, union/enum/imported-value and floating-point
 components remain unqualified for native generated formatting. Calls to un-emitted
 source record formatting now report the missing scalar/text-helper contract rather

@@ -44,7 +44,7 @@ components, automatic imported record discovery and formatting remain.
 [Explicit imported value contracts](../../experiments/record-components/README.md)
 now admit nongeneric Index/Range components using their public typed methods.
 ConsoleKeyInfo still lacks a declared self-equality interface for use as an imported
-component; Duration lacks a declared hash method. These remain explicit gaps.
+component (shared synthesis looks up IEquatable<T>, while neoCLR declares EquatableTo<T>); Duration lacks a declared hash method. These remain explicit gaps.
 Native primitive Object-dispatch adapters are also incomplete; direct record component
 operations avoid that path without asserting those boxed APIs are qualified. The
 original failure JSON above remains historical evidence. No new release identity or
@@ -54,7 +54,8 @@ platform/package gate is established by this fix.
 
 [Scalar and nested record struct display](../../experiments/record-formatting/README.md)
 now has generated native bodies and targeted diagnostics for unsupported formatting.
-This does not qualify union/enum/imported/floating-point components, generic records
+[Closed declared union components](../../experiments/record-union-formatting/README.md)
+are now included. This does not qualify enum/imported/floating-point components, generic records
 or record classes. Empty positional syntax also exposed an earlier frontend rejection;
 keep it separate from emitted formatting. Item 1 is still only partially closed.
 

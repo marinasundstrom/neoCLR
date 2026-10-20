@@ -20285,3 +20285,14 @@ retained differences. This exchange does not establish .NET binary compatibility
 or report an ABI migration. [Design research](design-research.md) now records the
 extended default. The in-progress record formatting uses existing typed calls,
 case-pattern contracts and ordinary override dispatch; it adds no ABI convention.
+
+The author then narrowed the immediate concern to records: they are built on
+classes and structs and should be treated as compiler-generated forms with the
+appropriate semantics and interfaces. The author directed continuing within those
+boundaries. The assistant agreed that record behavior belongs in ordinary emitted
+members/interfaces, not a separate runtime representation or ABI. Inspection found
+that Raven's shared synthesis currently looks up `System.IEquatable<T>`, whereas
+the selected neoCLR core declares `EquatableTo<T>`; therefore native records still
+lack that synthesized interface contract. This is a compiler/core integration gap,
+not a proposed record-semantic divergence. The union-display slice does not repair
+that mapping or claim complete class-record/generic support.

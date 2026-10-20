@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-union-format-app-v2/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record union formatting\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-union-format-app-v2/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record union formatting\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-format-app-v2/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record union formatting\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "Unsupported",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/record-union-formatting/Unsupported.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/record-union-formatting/Unsupported.rvn(4,13): error NEOMETA001: Native emission does not support record formatting requires supported scalar components and native text helpers: struct Unsupported.\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-union-format-app-v2/app": "3acec888e98ea5aee00d813b0494720681eb8f9e9218612d6fd8bdbb59f02784",
+    "/Users/robert/Projects/neoclr/target/record-union-format-app-v2/app.dll": "83995d8447e1b68fe83a51e57896164d8e6e2b4af0842cb53d69a4877159dc9c",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/sdk/tools/rvnc/rvnc.dll": "599692908211b1362e4cb1869ce6da49100f0454f2f9aaf32ce6e7ee37b8a4c3",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "6d7103c1e848917f1df0f807454f2bdfc96ee4be56cc269e590f904c12c232f7",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll": "c5957837eb2b173b8cdb1d0c7d981bb1f12facce44748d1e9be889f3a1ee232e"
+  }
+}

@@ -88,7 +88,9 @@ Development native record formatting now covers scalar and nested positional rec
 structs, with named members, quoted text and boxed `ToString()` dispatch. It uses
 one builder for nested values and typed scalar formatting; result and builder
 storage still allocate, and the current 65,536 UTF-8-byte builder limit applies.
-Union, enum, imported-value and generic record formatting remain gaps. This is
+Closed declared union components now display their case and payloads through the same
+builder; an uninitialized carrier remains distinct from an empty case. Enum,
+imported-value and generic record formatting remain gaps. This is
 pre-release compiler work, not a claim of full record support.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)
