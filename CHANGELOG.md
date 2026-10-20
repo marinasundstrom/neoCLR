@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Correct Index, Range and seven error value ToString declarations to override Object. Preserve existing text and shared equality/hash defaults; qualify direct, boxed and composite display in interpreter/JIT/AOT. Refresh the matching compiler reference and native API documentation snapshots.
+
 - Implement native Int32 enum general ToString through existing value boxes, numeric formatting and StringBuilder text materialization. Share mask/alias ordering with the interpreter; support names, flags, unnamed values and signed boundaries without managed temporary parts arrays. Qualify direct/boxed Raven calls across interpreter/JIT/AOT and native allocation footprints. Replace the earlier enum-display rejection; explicit formats and broader enum representations remain gaps.
 
 - Add native Int32-backed enum Object equality/hash adapters, retaining exact enum identity and copied payloads for default ordinary/generic struct fields. Add edge-value and source-consumer qualification; reject native enum boxes combined with virtual Object.ToString until enum formatting is implemented, instead of permitting type-name fallback. No compiler, public signature or ABI change.

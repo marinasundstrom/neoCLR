@@ -3,7 +3,7 @@ module System
 public struct OverflowError {
     public init() { }
 
-    func ToString() -> string {
+    override func ToString() -> string {
         return "Overflow"
     }
 }

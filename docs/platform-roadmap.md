@@ -21,7 +21,8 @@ add runtime fieldwise equality/hash while preserving explicit EquatableTo contra
 now qualifies floating fields too. [Enum Object adapters](experiments/enum-object/README.md)
 extend equality/hash to Int32-backed enum fields. [Enum general formatting](experiments/enum-display/README.md)
 now reuses shared numeric/text services for names, flags and unnamed values; other
-field shapes and formats remain bounded. Primitive numeric formats and
+field shapes and formats remain bounded. [Ordinary value display overrides](experiments/value-display/README.md)
+align Index, Range and seven errors across direct/boxed/composite calls. Primitive numeric formats and
 general providers remain gaps. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
 this does not certify all types.
 

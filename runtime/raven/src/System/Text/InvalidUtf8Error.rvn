@@ -1,5 +1,5 @@
 module System.Text
 
 public struct InvalidUtf8Error {
-    func ToString() -> string => "InvalidUtf8"
+    override func ToString() -> string => "InvalidUtf8"
 }

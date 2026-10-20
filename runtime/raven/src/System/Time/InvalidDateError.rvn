@@ -5,7 +5,7 @@ import System.*
 public struct InvalidDateError {
     public init() { }
 
-    func ToString() -> string {
+    override func ToString() -> string {
         return "InvalidDate"
     }
 }

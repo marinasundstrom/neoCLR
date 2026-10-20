@@ -17,7 +17,7 @@ static class IndexRangeDeclarations
             public bool Equals(Index other) => default;
             public override bool Equals(object other) => default;
             public override int GetHashCode() => default;
-            public new string ToString() => default;
+            public override string ToString() => default;
         }
         public struct Range : EquatableTo<Range> {
             public Range(Index start, Index end) { }
@@ -31,7 +31,7 @@ static class IndexRangeDeclarations
             public bool Equals(Range other) => default;
             public override bool Equals(object other) => default;
             public override int GetHashCode() => default;
-            public new string ToString() => default;
+            public override string ToString() => default;
         }
         namespace Runtime.CompilerServices {
             public static class RuntimeHelpers {

@@ -1,7 +1,7 @@
 module System
 
 public struct EnvironmentError {
-    func ToString() -> string {
+    override func ToString() -> string {
         return "EnvironmentUnavailable"
     }
 }

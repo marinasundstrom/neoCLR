@@ -29,9 +29,9 @@ should be reused when its assumptions are unchanged.
 
 ## Remaining concrete candidates
 
-- Index/Range and several ordinary error structs declare ToString without override.
-  Check direct versus Object/interface dispatch before changing declarations; do
-  not conflate display repair with default structural value equality.
+- [Index/Range and seven error display overrides](../experiments/value-display/README.md)
+  now preserve direct/boxed/composite output in interpreter/JIT/AOT. This repairs
+  dispatch; it does not change their existing equality or allocation policy.
 - Ordinary structs now have runtime-owned fieldwise defaults; see the
   [qualification](../experiments/struct-defaults/README.md). Extend supported native
   field shapes as their boxed adapters become available; this is not full .NET

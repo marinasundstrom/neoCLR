@@ -1,0 +1,70 @@
+{
+  "passed": false,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/value-display-baseline/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Boxed value display\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_9D3D706DD0CE0F5167DFCF8615E99E99CCAB2E9B83B02180E85DC78EB15C8D34.F_436865636B [instruction 3]\n   at NeoMetadata_9D3D706DD0CE0F5167DFCF8615E99E99CCAB2E9B83B02180E85DC78EB15C8D34.F_446973706C6179 [instruction 10]\n   at NeoMetadata_9D3D706DD0CE0F5167DFCF8615E99E99CCAB2E9B83B02180E85DC78EB15C8D34.F_4D61696E [instruction 8]\n",
+      "passed": false
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/value-display-baseline/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Boxed value display\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at Check [instruction 3]\n   at Display [instruction 10]\n   at Main [instruction 8]\n",
+      "passed": false
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/value-display-baseline/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Boxed value display\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at Check [instruction 3]\n   at Display [instruction 10]\n   at Main [instruction 8]\n",
+      "passed": false
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/value-display-baseline/app": "81e69bd3656a9e3710e900228fea3cc86d77e4e72776b906fd57c615bb9a5bef",
+    "/Users/robert/Projects/neoclr/target/value-display-baseline/app.dll": "f6a25080d2eafa9c59ebcad7c4cff7d87019c631efd878a5f730814b1540e7a4",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr": "a1d74bc3306486f569bb52856b08140b2119fb001a69ed1b0873c4a6ff7bc022",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr-codegen": "e87b0eb57eb40d16821c0cc0d549871b6bb3a206450c485fc3fa0208827d40ac",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll": "330d92c1374d652a7f96369835afb25d8c75088504ed4e013adb3deaea6b0d4f"
+  }
+}

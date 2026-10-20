@@ -58,7 +58,7 @@ static class ErrorBindings
     public static string Declarations => string.Join("\n", Cases.Select(entry => {
         var error = entry.Key; var name = error.Split('.').Last();
         var declaration = (entry.Value.Length > 0 ? "[System.Runtime.CompilerServices.Union] " : "")
-            + "public struct " + name + " { public string ToString() => default; "
+            + "public struct " + name + " { public " + (entry.Value.Length == 0 ? "override " : "") + "string ToString() => default; "
             + (entry.Value.Length == 0 && error != "System.EnvironmentError" ? $"public {name}() {{ }} " : "")
             + string.Join(" ", entry.Value.Select(c => $"public struct {c} {{ public {c}() {{ }} }} public {name}({c} value) {{ }} public bool Is{c} => false; public {c} Get{c}() => default;")) + " }";
         var separator = error.LastIndexOf('.');

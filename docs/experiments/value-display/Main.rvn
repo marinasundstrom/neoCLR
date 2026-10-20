@@ -1,0 +1,68 @@
+import System.*
+import System.Text.*
+import System.Time.*
+import System.Storage.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Display(value: Object, direct: string, expected: string) {
+    Check(direct == expected, "Direct value display")
+    Check(value.ToString() == expected, "Boxed value display")
+    Check(String.Format("{0}", value) == expected, "Composite value display")
+}
+
+func Equal(left: Object, right: Object) {
+    Check(left.Equals(right) && right.Equals(left), "Symmetric value equality")
+    Check(left.GetHashCode() == right.GetHashCode(), "Equal value hashes")
+    Check(!left.Equals(null) && !left.Equals("other"), "Wrong value type")
+}
+
+func Main() {
+    let index = Index.FromEnd(3)
+    Display(index, index.ToString(), "^3")
+    let start = Index.Start
+    Display(start, start.ToString(), "0")
+    let end = Index.End
+    Display(end, end.ToString(), "^0")
+    let maximum = Index.FromEnd(2147483647)
+    Display(maximum, maximum.ToString(), "^2147483647")
+    let range = Range(Index.FromStart(1), Index.FromEnd(2))
+    Display(range, range.ToString(), "1..^2")
+    let all = Range.All
+    Display(all, all.ToString(), "0..^0")
+    let invalidRange = InvalidRangeError()
+    Display(invalidRange, invalidRange.ToString(), "InvalidRange")
+    let overflow = OverflowError()
+    Display(overflow, overflow.ToString(), "Overflow")
+    let environment = EnvironmentError()
+    Display(environment, environment.ToString(), "EnvironmentUnavailable")
+    let utf8 = InvalidUtf8Error()
+    Display(utf8, utf8.ToString(), "InvalidUtf8")
+    let date = InvalidDateError()
+    Display(date, date.ToString(), "InvalidDate")
+    let time = InvalidTimeError()
+    Display(time, time.ToString(), "InvalidTime")
+    let path = InvalidPathError()
+    Display(path, path.ToString(), "InvalidPath")
+    Equal(index, Index.FromEnd(3))
+    Equal(range, Range(Index.FromStart(1), Index.FromEnd(2)))
+    Equal(invalidRange, InvalidRangeError())
+    Equal(overflow, OverflowError())
+    Equal(environment, EnvironmentError())
+    Equal(utf8, InvalidUtf8Error())
+    Equal(date, InvalidDateError())
+    Equal(time, InvalidTimeError())
+    Equal(path, InvalidPathError())
+    let typedIndex: EquatableTo<Index> = index
+    let typedRange: EquatableTo<Range> = range
+    Check(typedIndex.Equals(Index.FromEnd(3)) && typedRange.Equals(range), "Existing typed interfaces")
+    Check(!index.Equals(Index.FromStart(3)) && !range.Equals(Range.All), "Distinct boundary values")
+    Check(!((Object)invalidRange).Equals(overflow), "Empty structs keep exact type identity")
+    System.Runtime.GC.Collect()
+    Display(index, index.ToString(), "^3")
+    Console.WriteLine("Value display, equality and hashes: passed")
+}

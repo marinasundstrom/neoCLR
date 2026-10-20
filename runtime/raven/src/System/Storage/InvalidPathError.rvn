@@ -1,5 +1,5 @@
 module System.Storage
 
 public struct InvalidPathError {
-    func ToString() -> string => "InvalidPath"
+    override func ToString() -> string => "InvalidPath"
 }

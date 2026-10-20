@@ -72,7 +72,7 @@ public struct Range : EquatableTo<Range> {
         return HashCode.Combine(first.GetHashCode(), last.GetHashCode())
     }
     /// Formats the two boundaries separated by .. .
-    func ToString() -> string {
+    override func ToString() -> string {
         let first = start
         let last = end
         return String.Concat(String.Concat(first.ToString(), ".."), last.ToString())

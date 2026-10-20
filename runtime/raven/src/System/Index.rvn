@@ -49,5 +49,5 @@ public struct Index : EquatableTo<Index> {
     /// Returns a hash consistent with typed equality.
     override func GetHashCode() -> int => if fromEnd { -offset - 1 } else { offset }
     /// Formats the value, prefixing end-relative indexes with ^.
-    func ToString() -> string => if fromEnd { String.Concat("^", offset.ToString()) } else { offset.ToString() }
+    override func ToString() -> string => if fromEnd { String.Concat("^", offset.ToString()) } else { offset.ToString() }
 }
