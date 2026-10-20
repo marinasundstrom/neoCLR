@@ -63,6 +63,7 @@ pub(super) struct Profile<'a> {
     pub locals: Vec<Vec<Ty>>,
     pub results: Vec<Option<Ty>>,
     pub dispatch: HashMap<usize, Vec<(usize, usize)>>,
+    pub boxed_interfaces: Vec<(usize, usize)>,
 }
 pub(super) type Stacks = Vec<Option<Vec<Ty>>>;
 
@@ -263,6 +264,7 @@ impl<'a> Profile<'a> {
             locals: vec![],
             results: vec![],
             dispatch: object_display.cloned().unwrap_or_default(),
+            boxed_interfaces: vec![],
         };
         // Compute bounded inline layouts before using any storage or call signatures.
         // A visiting node is an illegal inline cycle, including otherwise unused types.
@@ -451,16 +453,7 @@ impl<'a> Profile<'a> {
             for (index, t) in f.parameters.iter().enumerate() {
                 if let Type::ByRef(target) = t {
                     let projected_receiver = index == 0
-                        && matches!(
-                            **target,
-                            Type::Int32
-                                | Type::Boolean
-                                | Type::Int64
-                                | Type::UInt64
-                                | Type::IntPtr
-                                | Type::UIntPtr
-                                | Type::Char
-                        )
+                        && crate::selection::projected_primitive(target)
                         && primitive_receivers.is_some_and(|indices| indices.contains(&i));
                     if !f.out_parameters.contains(&index) && !projected_receiver {
                         return Err(
@@ -1063,7 +1056,7 @@ impl<'a> Profile<'a> {
                 expected,
             ),
             (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) => {
-                crate::selection::implements_interface(
+                self.boxed_interfaces.contains(&(*actual, *expected)) || crate::selection::implements_interface(
                     self.input,
                     &Type::Named(self.input.types[*actual].name.clone()),
                     &Type::Named(self.input.types[*expected].name.clone()),
@@ -1136,19 +1129,14 @@ impl<'a> Profile<'a> {
                 .map(|(n, _)| n)
                 .collect(),
             Ty::Interface(i) => {
-                let target = Type::Named(self.input.types[*i].name.clone());
                 self.input
                     .types
                     .iter()
                     .enumerate()
-                    .filter(|(_, t)| {
+                    .filter(|(n, t)| {
                         t.representation == Representation::Record
                             && !t.is_abstract
-                            && crate::selection::implements_interface(
-                                self.input,
-                                &Type::Named(t.name.clone()),
-                                &target,
-                            )
+                            && self.reference_assignable(&Ty::Reference(*n), &Ty::Interface(*i))
                     })
                     .map(|(i, _)| i)
                     .collect()

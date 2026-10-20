@@ -123,3 +123,7 @@ checks; none is a substitute for a replacement release's platform gates.
 All 261 source declarations also map to type pages in the matching native API render (`scripts/audit-type-contracts.py --check --native-site <rendered-site>`). This checks type-page coverage, not every member signature or executable behavior.
 
 The [globalization foundation](../experiments/culture-formats/README.md) adds NumberFormat as an ordinary immutable policy with inherited reference identity, taking the inventory to 261 public declarations. Culture calendar/group arrays are independent snapshots; numeric/time decimal data is shared without constructing a numeric policy for each Duration format.
+
+[Bounded Int32/Int64 formatting](../experiments/integer-formats/README.md) adds explicit Formattable contracts and D/F/N output through shared culture data. Other numeric kinds, custom patterns and significant-digit formatting remain gaps; default Object equality/hash semantics are unchanged.
+
+[Primitive interface qualification](../experiments/primitive-interfaces/README.md) extends the normal boxed value contract across scalar widths, floating values, Boolean and Char. Native-width generic arguments now share ordinary admission. This does not synthesize equality interfaces or close floating Object formatting.

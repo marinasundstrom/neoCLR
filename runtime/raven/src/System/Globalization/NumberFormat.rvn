@@ -11,6 +11,9 @@ public class NumberFormat {
 
     internal static func DecimalSeparator(culture: Culture) -> string => if culture.Name == "sv-SE" { "," } else { "." }
 
+    internal static func GroupSeparator(culture: Culture) -> string => if culture.Name == "sv-SE" { " " } else { "," }
+    internal static val DefaultDecimalDigits: int => 2
+
     /// Selects the built-in numeric conventions without resolving ambient preferences.
     static func Create(culture: Culture) -> NumberFormat => NumberFormat(culture)
     /// Returns invariant numeric conventions.
@@ -22,7 +25,7 @@ public class NumberFormat {
     /// A fresh array of grouping sizes, from the least significant group.
     val NumberGroupSizes: int[] => [3]
     /// Default fractional precision for fixed-point numeric formatting.
-    val NumberDecimalDigits: int => 2
+    val NumberDecimalDigits: int => DefaultDecimalDigits
     /// Positive sign used by the bounded numeric conventions.
     val PositiveSign: string => "+"
     /// Negative sign used by the bounded numeric conventions; no bidi marks are inserted.

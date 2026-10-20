@@ -136,8 +136,11 @@ the numeric decimal convention.
 
 Both Gregorian and Hebrew calendars can be selected independently of language.
 Returned calendar and grouping arrays are independent snapshots. These are foundational
-APIs: full locale patterns, custom providers, currency
-formatting and primitive numeric format specifiers remain gaps. See the API references
+APIs: full locale patterns, custom providers and currency formatting remain gaps.
+Development `Int32`/`Int64` formatting supports `D`, `F` and `N` with precision
+0–99 and explicit cultures, including Swedish nonbreaking-space grouping. These
+also work through `Formattable` and composite formatting. Other numeric types and
+custom numeric patterns remain gaps. See the API references
 for [Culture](/docs/api/system/globalization/Culture/),
 [DateTimeFormat](/docs/api/system/globalization/DateTimeFormat/) and
 [NumberFormat](/docs/api/system/globalization/NumberFormat/).

@@ -1,0 +1,106 @@
+module System.Globalization
+
+import System.*
+import System.Result.*
+
+// Shared signed integer formatter. One exactly sized byte buffer and final string;
+// no per-digit strings, argument boxes or formatting-policy objects.
+internal static class IntegerFormatting {
+    static func Format(value: long, format: string, culture: Culture) -> string {
+        let spec = format.Utf8Bytes
+        var code = 71
+        var precision = -1
+        if spec.Length > 0 {
+            code = (int)spec[0]
+            if code >= 97 && code <= 122 {
+                code -= 32
+            }
+            if spec.Length > 3 {
+                System.Fail("Unsupported integer format precision")
+            }
+            if spec.Length > 1 {
+                precision = 0
+                var index = 1
+                while index < spec.Length {
+                    let digit = (int)spec[index] - 48
+                    if digit < 0 || digit > 9 {
+                        System.Fail("Unsupported integer format precision")
+                    }
+                    precision = precision * 10 + digit
+                    index += 1
+                }
+            }
+        }
+        if code != 71 && code != 68 && code != 70 && code != 78 {
+            System.Fail("Unsupported integer format")
+        }
+        if code == 71 && precision > 0 {
+            System.Fail("Unsupported integer general precision")
+        }
+        if code == 71 || (code == 68 && precision <= 1) {
+            return neoCLR.Runtime.Int64ToString(value)
+        }
+        let fixedPoint = code == 70 || code == 78
+        if precision < 0 {
+            precision = if fixedPoint { NumberFormat.DefaultDecimalDigits } else { 0 }
+        }
+        var remaining = value
+        var digits = 1
+        while remaining <= -10L || remaining >= 10L {
+            digits += 1
+            remaining /= 10L
+        }
+        if !fixedPoint && precision > digits {
+            digits = precision
+        }
+        let separator = NumberFormat.DecimalSeparator(culture).Utf8Bytes
+        let group = NumberFormat.GroupSeparator(culture).Utf8Bytes
+        let groups = if code == 78 { (digits - 1) / 3 } else { 0 }
+        let fractionalBytes = if fixedPoint && precision > 0 { separator.Length + precision } else { 0 }
+        let negative = value < 0L
+        let length = digits + groups * group.Length + fractionalBytes + (if negative { 1 } else { 0 })
+        let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(length)
+        var cursor = length - fractionalBytes
+        remaining = value
+        var written = 0
+        while written < digits {
+            var digit = (int)(remaining % 10L)
+            if digit < 0 {
+                digit = -digit
+            }
+            remaining /= 10L
+            cursor -= 1
+            buffer[cursor] = (byte)(48 + digit)
+            written += 1
+            if code == 78 && written < digits && written % 3 == 0 {
+                var part = group.Length
+                while part > 0 {
+                    part -= 1
+                    cursor -= 1
+                    buffer[cursor] = group[part]
+                }
+            }
+        }
+        if negative {
+            buffer[0] = (byte)45
+        }
+        if fractionalBytes > 0 {
+            cursor = length - fractionalBytes
+            var part = 0
+            while part < separator.Length {
+                buffer[cursor] = separator[part]
+                cursor += 1
+                part += 1
+            }
+            while cursor < length {
+                buffer[cursor] = (byte)48
+                cursor += 1
+            }
+        }
+        let bytes: ReadOnlySlice<byte> = buffer
+        let Ok(text) = System.Text.Utf8.Decode(bytes) else {
+            System.Fail("Invalid integer formatting output")
+        }
+        return text
+    }
+}

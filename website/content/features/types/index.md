@@ -94,3 +94,11 @@ tracks execution-mode validation.
 [.NET comparison](../../comparison/)
 
 Development qualification now covers signed, unsigned and native-width integer equality, hashes and decimal display through Object, including narrow sign/zero extension and UInt64 boundaries. These use existing scalar boxes and formatting services; Object conversion still allocates a box. Floating boxed display and broader numeric formats remain gaps.
+
+Development primitive interface support preserves each scalar value type's declared
+interfaces when boxed. Interface calls borrow that box's payload and invoke the same
+value method used by direct calls; converting to an interface does not create a second
+box. This includes narrow/unsigned/native-width integers, floating values, Boolean and
+Char. Exact generic arguments remain significant, and the runtime does not invent
+undeclared equality interfaces. `Int32` and `Int64` also implement `Formattable` for
+bounded culture-aware D/F/N formatting; other numeric format coverage remains a gap.

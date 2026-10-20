@@ -161,6 +161,7 @@ pub struct Options {
     pub primitive_receivers: Vec<usize>,
     pub string_virtual_calls: HashSet<(usize, usize)>,
     pub string_interfaces: Option<Vec<usize>>,
+    pub boxed_interfaces: Vec<(usize, usize)>,
     pub object_value_kinds: HashMap<usize, String>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
     pub interface_dispatch: HashMap<usize, Vec<(usize, usize)>>,
@@ -212,6 +213,11 @@ impl Options {
                     ))
                 })
                 .collect(),
+            boxed_interfaces: report.and_then(|r| r["boxedInterfaceViews"].as_array())
+                .into_iter().flatten().filter_map(|r| Some((
+                    r["typeCompiledIndex"].as_u64()? as usize,
+                    r["interfaceCompiledIndex"].as_u64()? as usize,
+                ))).collect(),
             string_interfaces: report
                 .and_then(|r| r["stringInterfaceViews"].as_array())
                 .map(|rows| {

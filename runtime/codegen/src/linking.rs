@@ -486,6 +486,7 @@ pub fn prepare(
     // Retain original closed String conformance before private specialization
     // erases interface arguments and primitive declarations leave the inventory.
     let mut string_interfaces = vec![];
+    let mut scalar_interfaces = vec![];
     for row in report["types"].as_array().unwrap() {
         let source = row["sourceIndex"].as_u64().unwrap() as usize;
         if input.types[source].representation != neoclr::metadata::Representation::Interface {
@@ -506,6 +507,11 @@ pub fn prepare(
         } else {
             neoclr::metadata::Type::Named(input.types[source].name.clone())
         };
+        for primitive in super::selection::SCALAR_PRIMITIVES {
+            if super::selection::implements_interface(&source_conformance, primitive, &target) {
+                scalar_interfaces.push(json!({"primitive":primitive,"interfaceCompiledIndex":row["compiledIndex"]}));
+            }
+        }
         if super::selection::implements_interface(
             &source_conformance,
             &neoclr::metadata::Type::String,
@@ -515,6 +521,7 @@ pub fn prepare(
         }
     }
     report["stringInterfaceViews"] = json!(string_interfaces);
+    report["scalarInterfaceViews"] = json!(scalar_interfaces);
     if let Some((_, mut specialization)) = specialized {
         for row in specialization["types"].as_array_mut().unwrap() {
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
@@ -986,18 +993,7 @@ pub fn prepare(
         .iter()
         .enumerate()
         .filter(|(_, f)| {
-            matches!(
-                f.owner,
-                Some(
-                    neoclr::metadata::Type::Int32
-                        | neoclr::metadata::Type::Boolean
-                        | neoclr::metadata::Type::Int64
-                        | neoclr::metadata::Type::UInt64
-                        | neoclr::metadata::Type::IntPtr
-                        | neoclr::metadata::Type::UIntPtr
-                        | neoclr::metadata::Type::Char
-                )
-            ) && f.instance
+            f.owner.as_ref().is_some_and(super::selection::projected_primitive) && f.instance
         })
         .map(|(i, f)| (i, f.owner.clone().unwrap()))
         .collect();

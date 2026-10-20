@@ -1,0 +1,43 @@
+import System.*
+import System.Globalization.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    let invariant = Culture.Invariant
+    let swedish = Culture.SwedishSweden
+    let value = -12345
+    Check(value.ToString("D8", invariant) == "-00012345", "Decimal padding")
+    Check(value.ToString("d0", invariant) == "-12345", "Lowercase decimal")
+    Check(value.ToString("", invariant) == "-12345", "Default")
+    Check(value.ToString("G0", invariant) == "-12345", "General zero precision")
+    Check(value.ToString("F", invariant) == "-12345.00", "Default fixed precision")
+    Check(value.ToString("f3", swedish) == "-12345,000", "Swedish fixed")
+    Check(value.ToString("N0", invariant) == "-12,345", "Grouped integer")
+    Check(value.ToString("n", swedish) == "-12 345,00", "Swedish NBSP grouping")
+    Check(value.ToString("N2", Culture.HebrewIsrael) == "-12,345.00", "Israeli number")
+    Check(value.ToString("N2", Culture.EnglishUnitedKingdom) == "-12,345.00", "UK number")
+    Check(value.ToString("N2", Culture.EnglishUnitedStates) == "-12,345.00", "US number")
+    let zero = 0
+    Check(zero.ToString("D4", invariant) == "0000", "Zero padding")
+    Check(zero.ToString("N0", invariant) == "0", "Zero grouping")
+    Check(zero.ToString("F0", invariant) == "0", "Zero fractions")
+    Check(zero.ToString("D99", invariant).Length == 99, "Maximum decimal precision")
+    Check(zero.ToString("F99", invariant).Length == 101, "Maximum fixed precision")
+    let minimum = -2147483648
+    Check(minimum.ToString("N0", invariant) == "-2,147,483,648", "Int32 minimum")
+    Check(Int64.MinValue.ToString("N0", invariant) == "-9,223,372,036,854,775,808", "Int64 minimum")
+    Check(Int64.MaxValue.ToString("D", invariant) == "9223372036854775807", "Int64 maximum")
+    let formattable: Formattable = value
+    Check(formattable.ToString("N1", swedish) == "-12 345,0", "Boxed interface")
+    Check(String.Format(swedish, "{0:N2}", value) == "-12 345,00", "Composite Int32")
+    Check(String.Format(invariant, "{0:D}", Int64.MinValue) == "-9223372036854775808", "Composite Int64")
+    Check(value.ToString("D") == "-12345", "Current culture overload")
+    System.Runtime.GC.Collect()
+    Check(formattable.ToString("F0", invariant) == "-12345", "Interface after GC")
+    Console.WriteLine("Integer formatting: passed")
+}

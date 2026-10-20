@@ -685,6 +685,37 @@ fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Opt
     Ok(Some(implicit_implementation(input, &Type::String, f)?.0))
 }
 
+/// Scalar value owners share the same borrowed-receiver and boxed-interface contract.
+pub(super) const SCALAR_PRIMITIVES: &[Type] = &[
+    Type::SByte, Type::Byte, Type::Int16, Type::UInt16, Type::Int32, Type::UInt32,
+    Type::Int64, Type::UInt64, Type::IntPtr, Type::UIntPtr, Type::Single, Type::Double,
+    Type::Boolean, Type::Char,
+];
+
+pub(super) fn projected_primitive(ty: &Type) -> bool {
+    SCALAR_PRIMITIVES.contains(ty)
+}
+
+fn scalar_interface_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(Type, usize)>, Error> {
+    let f = &input.functions[contract];
+    if !interface_contract(input, f) { return Ok(vec![]); }
+    let mut primitives = vec![];
+    for &index in reached {
+        for op in &input.functions[index].body {
+            if let Op::BoxValue(ty) = op {
+                if projected_primitive(ty) && !primitives.contains(ty)
+                    && implements_interface(input, ty, f.owner.as_ref().unwrap()) {
+                    primitives.push(ty.clone());
+                }
+            }
+        }
+    }
+    primitives.into_iter().map(|ty| {
+        let target = implicit_implementation(input, &ty, f)?.0;
+        Ok((ty, target))
+    }).collect()
+}
+
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Optional conformance types add verification-only roots; omit them for dispatch tables.
 /// Original conformance is verified before private projection; this is not a binder.
@@ -1129,6 +1160,9 @@ pub(super) fn select_inventory_with_host_roots(
             }
         }
         for &contract in &functions {
+            for (_, target) in scalar_interface_targets(input, contract, &functions)? {
+                if !functions.contains(&target) { pending.push(target); }
+            }
             if let Some(target) = string_dispatch_target(input, contract)? {
                 if !functions.contains(&target) {
                     pending.push(target);
@@ -1281,7 +1315,11 @@ pub(super) fn select_inventory_with_host_roots(
     let mut class_dispatch = vec![];
     let mut string_dispatch = vec![];
     let mut char_dispatch = vec![];
+    let mut scalar_dispatch = vec![];
     for (compiled, source) in rows.iter().enumerate() {
+        for (primitive, target) in scalar_interface_targets(input, *source, &functions)? {
+            scalar_dispatch.push(json!({"contractCompiledIndex":compiled,"primitive":primitive,"functionCompiledIndex":rows.binary_search(&target).unwrap()}));
+        }
         if let Some(target) = string_dispatch_target(input, *source)? {
             string_dispatch.push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":rows.binary_search(&target).unwrap()}));
         }
@@ -1320,7 +1358,7 @@ pub(super) fn select_inventory_with_host_roots(
         "entryArguments": matches!(input.functions[*root_index].parameters.as_slice(), [Type::ArrayRef(t)] if **t == Type::String),
         "hostRoots": host_roots.iter().map(|i| json!({"sourceIndex":i,"compiledIndex":rows.binary_search(i).unwrap(),"name":input.functions[*i].name,"reason":"explicit runtime adapter"})).collect::<Vec<_>>(),
         "policy":"explicit closed world with constructed-class implicit interface dispatch; ordinary selected bodies retained; verified Object-slot dispatch replaces private slot bodies; bounded class virtual dispatch; no dynamic loading",
-        "charObjectDispatch":char_dispatch, "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "classVirtualDispatch":class_dispatch, "arrayBackingProjection":array_backing,
+        "scalarInterfaceDispatch":scalar_dispatch, "charObjectDispatch":char_dispatch, "stringInterfaceDispatch":string_dispatch, "interfaceDispatch":dispatch, "objectDisplayDispatch":object_dispatch, "classVirtualDispatch":class_dispatch, "arrayBackingProjection":array_backing,
         "referenceArrayBackingProjections": reference_backings.iter().filter_map(|source| type_rows.binary_search(source).ok().map(|compiled| json!({"sourceIndex":source,"compiledIndex":compiled}))).collect::<Vec<_>>(),
         "metadataPolicy":"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
         "functions": rows.iter().enumerate().map(|(new, old)| json!({"sourceIndex":old,"compiledIndex":new,"definition":input.functions[*old].definition,"name":input.functions[*old].name})).collect::<Vec<_>>(),

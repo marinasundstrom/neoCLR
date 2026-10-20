@@ -1,0 +1,7 @@
+import System.*
+import System.Globalization.*
+
+func Main(args: string[]) {
+    let value = 1
+    Console.WriteLine(value.ToString(args[0], Culture.Invariant))
+}

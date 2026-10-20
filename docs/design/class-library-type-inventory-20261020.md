@@ -129,8 +129,8 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.IO.TextWriter](../../runtime/raven/src/System/IO/TextWriter.rvn#L6) | Contract | — |
 | [System.Index](../../runtime/raven/src/System/Index.rvn#L4) | Value | Et, Eo*, H*, T* |
 | [System.Int16](../../runtime/raven/src/System/Int16.rvn#L5) | Intrinsic | — |
-| [System.Int32](../../runtime/raven/src/System/Int32.rvn#L5) | Intrinsic | Et, T |
-| [System.Int64](../../runtime/raven/src/System/Int64.rvn#L5) | Intrinsic | T |
+| [System.Int32](../../runtime/raven/src/System/Int32.rvn#L5) | Intrinsic | Et, T, Tf |
+| [System.Int64](../../runtime/raven/src/System/Int64.rvn#L5) | Intrinsic | T, Tf |
 | [System.IntPtr](../../runtime/raven/src/System/IntPtr.rvn#L3) | Intrinsic | — |
 | [System.IntegerDivisionError](../../runtime/raven/src/System/IntegerDivisionError.rvn#L3) | Union | T* |
 | [System.Introspection.AssemblyInfo](../../runtime/raven/src/System/Introspection/AssemblyInfo.rvn#L7) | Contract | — |

@@ -5,23 +5,7 @@ use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
 fn scalar_box_type(ty: &Type) -> bool {
-    matches!(
-        ty,
-        Type::SByte
-            | Type::Byte
-            | Type::Int16
-            | Type::UInt16
-            | Type::Int32
-            | Type::UInt32
-            | Type::Int64
-            | Type::UInt64
-            | Type::IntPtr
-            | Type::UIntPtr
-            | Type::Single
-            | Type::Double
-            | Type::Boolean
-            | Type::Char
-    )
+    crate::selection::projected_primitive(ty)
 }
 
 fn persistent_memory(input: &neoclr::Module, ty: &Type) -> bool {
@@ -268,6 +252,32 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     {
         return Err("boxed floating-point ToString is not yet supported".into());
     }
+    // Map verified primitive interface relationships to the existing private box tags.
+    // Ordinary interface dispatch then borrows the exact scalar payload.
+    let scalar_boxes = int32_index.map(|i| (Type::Int32, i)).into_iter()
+        .chain(int64_index.map(|i| (Type::Int64, i)))
+        .chain(bool_index.map(|i| (Type::Boolean, i)))
+        .chain(extra_scalars.values().map(|(i, ty)| (ty.clone(), *i)))
+        .collect::<Vec<_>>();
+    let mut boxed_interfaces = vec![];
+    for (primitive, index) in scalar_boxes {
+        for view in report["scalarInterfaceViews"].as_array().cloned().unwrap_or_default() {
+            if view["primitive"] == json!(primitive) {
+                let interface = view["interfaceCompiledIndex"].as_u64().ok_or("invalid scalar interface view")? as usize;
+                boxed_interfaces.push(json!({"typeCompiledIndex":index,"interfaceCompiledIndex":interface}));
+            }
+        }
+        for target in report["scalarInterfaceDispatch"].as_array().cloned().unwrap_or_default() {
+            if target["primitive"] != json!(primitive) { continue; }
+            let dispatch = report["interfaceDispatch"].as_array_mut().ok_or("missing interface dispatch")?
+                .iter_mut().find(|row| row["contractCompiledIndex"] == target["contractCompiledIndex"])
+                .ok_or("missing scalar interface contract")?;
+            dispatch["targets"].as_array_mut().ok_or("invalid interface targets")?.push(json!({
+                "typeCompiledIndex":index,"functionCompiledIndex":target["functionCompiledIndex"]
+            }));
+        }
+    }
+    report["boxedInterfaceViews"] = json!(boxed_interfaces);
     let char_targets = report["charObjectDispatch"]
         .as_array()
         .cloned()

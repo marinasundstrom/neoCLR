@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-formats-invalid-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--",
+        "N100"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported integer format precision\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E476C6F62616C697A6174696F6E_496E7465676572466F726D617474696E67.M_466F726D6174 [instruction 39]\n   at System.Int32.ToString [instruction 5]\n   at NeoMetadata_540176DA19DD81E823EBA7E9AE6271CAAA523B2DF5862F3455ADC135F028E8FE.F_4D61696E [instruction 7]\n",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-formats-invalid-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-jit-host.dylib",
+        "--",
+        "N100"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported integer format precision\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Globalization.IntegerFormatting.Format [instruction 39]\n   at System.Int32.ToString [instruction 5]\n   at Main [instruction 7]\n",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-invalid-app/app",
+        "N100"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: Unsupported integer format precision\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Globalization.IntegerFormatting.Format [instruction 39]\n   at System.Int32.ToString [instruction 5]\n   at Main [instruction 7]\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/integer-formats-invalid-app/app": "352d7700d5d81737960e144daeab015cfb2a7c7fb00047bf023b6ceca8eb669b",
+    "/Users/robert/Projects/neoclr/target/integer-formats-invalid-app/app.dll": "48d402794a3a2e998f282e14393bdecc82f714a6a259da77e310faf611ad45c0",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-codegen": "614b78b75d0338d729be4519fb57071da3338eba1ddbad6747ea4999206d8fb4",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll": "cd7b6b53371e2d8220538b6811871d2cef15b247a085ba40e3861833bde4d70b"
+  }
+}

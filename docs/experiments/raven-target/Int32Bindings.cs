@@ -3,7 +3,7 @@ using Mono.Cecil;
 // Existing numeric Result contracts; error/carrier mechanics live in ResultBindings.
 static class Int32Bindings
 {
-    public const string Declarations = "public struct Int32 { public static Result<int, NumberParseError> Parse(string value) => default; public static Result<int, IntegerDivisionError> Divide(int dividend, int divisor) => default; public bool Equals(int other) => false; public int CompareTo(int other) => 0; public string ToString() => default; }";
+    public const string Declarations = "public struct Int32 : Formattable { public static Result<int, NumberParseError> Parse(string value) => default; public static Result<int, IntegerDivisionError> Divide(int dividend, int divisor) => default; public bool Equals(int other) => false; public int CompareTo(int other) => 0; public string ToString() => default; public string ToString(string format) => default; public string ToString(string format, Globalization.Culture culture) => default; }";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (reference.DeclaringType.FullName != "System.Int32") return null;

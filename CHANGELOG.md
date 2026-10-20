@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Preserve declared interfaces on native primitive boxes and dispatch through the existing borrowed value receiver across scalar kinds. Admit native-width integer generic arguments. No equality interfaces are synthesized; source conformance and exact generic arguments remain authoritative.
+
+- Add Int32/Int64 Formattable and culture-aware D/F/N formatting (precision 0–99), plus default G/G0, through one shared signed-integer formatter. Preserve signed minima and use borrowed UTF-8 views over one output buffer; direct, interface and composite calls share the contract. Unsupported formats fault; other numeric types and custom patterns remain gaps.
+
 - Add immutable NumberFormat data, DateTimeFormat metadata and Culture.OptionalCalendars for the bounded globalization foundation. Add en-GB/en-US cultures and explicit region preference resolution, with UK/US numeric dates and US twelve-hour AM/PM time. Duration/time fractions share numeric decimal policy; returned arrays cannot mutate culture conventions. Full locale patterns, localized signs and primitive numeric formats remain gaps.
 
 - Give TimeZone and ZonedDateTime explicit typed/Object equality and matching hashes. Zones compare case-sensitive IANA identifiers within the fixed bundled rule database; zoned values compare instant plus named zone. Equal reconstructed values now share dictionary-key identity; aliases and different zones remain distinct. TimeZone display reuses its identifier. Refresh API references and reconcile all 260 public declarations with native type pages.

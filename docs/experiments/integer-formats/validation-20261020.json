@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-formats-qualified-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Integer formatting: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-formats-qualified-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Integer formatting: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-qualified-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Integer formatting: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/integer-formats-qualified-app/app": "8f29de6c7a5be6b88b271ce52aaa78def174f441cbf0bd0aaea8b0a933407ef1",
+    "/Users/robert/Projects/neoclr/target/integer-formats-qualified-app/app.dll": "67205f9f9498811eebe1fb0ae6a3cbaa92229c81ab09f636b5e9a0f01bee1ebf",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-codegen": "75950d45b1b769ee7123f2a9e30928829eeabab36a0d71ef885fab13135129e7",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll": "cd7b6b53371e2d8220538b6811871d2cef15b247a085ba40e3861833bde4d70b"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "passed": false,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-formats-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Integer formatting: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/integer-formats-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "InvalidCast: Invalid cast\n   at Main [instruction 170]\n",
+      "passed": false
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/integer-formats-app/app"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "InvalidCast: Invalid cast\n   at Main [instruction 170]\n",
+      "passed": false
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/integer-formats-app/app": "e3b04813add5cb9772e703ea05438d431d7037fa967d22a1fa34a920e661528e",
+    "/Users/robert/Projects/neoclr/target/integer-formats-app/app.dll": "247ff684c41c0d15da4d0239c8ba4d70bf3df66d281db9636304efeb504a0cfd",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/bin/neoclr-codegen": "614b78b75d0338d729be4519fb57071da3338eba1ddbad6747ea4999206d8fb4",
+    "/Users/robert/Projects/neoclr/target/integer-formats-fixed-bundle/bundle/lib/System.Runtime.dll": "cd7b6b53371e2d8220538b6811871d2cef15b247a085ba40e3861833bde4d70b"
+  }
+}

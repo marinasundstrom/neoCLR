@@ -17,7 +17,7 @@ pub(super) fn trace_layout(
     input: &neoclr::Module,
     details: Option<&crate::fault_details::Options>,
 ) -> Result<serde_json::Value, Error> {
-    let p = Profile::new(
+    let mut p = Profile::new(
         input,
         details.is_some_and(|d| d.reference_arena),
         details.and_then(|d| d.object_base),
@@ -29,6 +29,7 @@ pub(super) fn trace_layout(
         details.map(|d| d.primitive_receivers.as_slice()),
         details.is_some_and(|d| d.native_stack_budget),
     )?;
+    p.boxed_interfaces = details.map(|d| d.boxed_interfaces.clone()).unwrap_or_default();
     let mut report = gc_layout::report(&p);
     report["preOperationPlans"] = gc_points::report(&p, details)?;
     Ok(report)
@@ -473,7 +474,7 @@ pub(crate) fn compile_into(
     if stack_budget && !details.is_some_and(|d| d.native_gc) {
         return Err("native stack budget requires GC frame publication".into());
     }
-    let p = Profile::new(
+    let mut p = Profile::new(
         input,
         references,
         details.and_then(|d| d.object_base),
@@ -485,6 +486,7 @@ pub(crate) fn compile_into(
         details.map(|d| d.primitive_receivers.as_slice()),
         details.is_some_and(|d| d.native_stack_budget),
     )?;
+    p.boxed_interfaces = details.map(|d| d.boxed_interfaces.clone()).unwrap_or_default();
     let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
     if bootstrap && !details.is_some_and(|d| d.native_gc) {
         return Err("native host bootstrap requires native GC".into());
@@ -2496,11 +2498,7 @@ pub(crate) fn compile_into(
                     b.switch_to_block(matched);
                     let mut adapted = parameters.clone();
                     if input.functions[target].receiver_byref
-                        || (details.is_some_and(|d| d.primitive_receivers.contains(&target))
-                            && input.functions[target].parameters.first()
-                                == Some(&neoclr::metadata::Type::ByRef(Box::new(
-                                    neoclr::metadata::Type::Char,
-                                ))))
+                        || details.is_some_and(|d| d.primitive_receivers.contains(&target))
                     {
                         // A value override borrows the payload of the rooted box.
                         adapted[0] = b.ins().iadd_imm(parameters[0], 8);

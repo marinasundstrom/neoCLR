@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Int32 : Number, EquatableTo<int> {
+public struct Int32 : Number, EquatableTo<int>, Formattable {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: int
@@ -39,6 +39,15 @@ public struct Int32 : Number, EquatableTo<int> {
 
     func ToString() -> string {
         return neoCLR.Runtime.Int32ToString(m_value)
+    }
+
+    /// Formats with the current culture. Supports empty/G/G0, D, F and N; D/F/N precision is 0–99.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Formats with explicit culture. D pads integer digits; F adds fractional zeros; N also groups.
+    /// Unsupported specifiers or precision fault. Parsing remains invariant.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        return Globalization.IntegerFormatting.Format((long)m_value, format, culture)
     }
 
     static val Zero: int => (int)0

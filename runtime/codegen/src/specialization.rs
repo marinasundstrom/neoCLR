@@ -816,6 +816,8 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
         | Type::Char
         | Type::Int64
         | Type::UInt64
+        | Type::IntPtr
+        | Type::UIntPtr
         | Type::RuntimeTypeHandle
         | Type::Named(_) => Ok(()),
         Type::ArrayRef(element) => validate_argument(element, depth + 1),
@@ -1427,14 +1429,12 @@ pub(crate) fn expand_with_conformance(
                 .and_then(|shape| expanded.types[shape.row].definition.clone());
         }
     }
-    // String is an intrinsic reference, so it never consumes a nominal shape.
-    // Retain only its proven, reached closed interface views after argument erasure.
-    if let Some(string) = expanded
-        .types
-        .iter_mut()
-        .find(|t| t.name == "System.String")
-    {
-        string.implements = context
+    // Intrinsic storage does not consume nominal shapes. Preserve its verified,
+    // reached closed interface views through the same argument-erasure path.
+    for intrinsic in std::iter::once(&Type::String).chain(super::selection::SCALAR_PRIMITIVES) {
+        let Some(original) = input.type_definition(intrinsic) else { continue; };
+        let Some(projected) = expanded.types.iter_mut().find(|t| t.name == original.name) else { continue; };
+        projected.implements = context
             .shapes
             .iter()
             .filter_map(|shape| {
@@ -1450,7 +1450,7 @@ pub(crate) fn expand_with_conformance(
                         arguments: shape.arguments.clone(),
                     }
                 };
-                super::selection::implements_interface(input, &Type::String, &target)
+                super::selection::implements_interface(input, intrinsic, &target)
                     .then(|| Type::Named(shape.name.clone()))
             })
             .collect();
