@@ -2663,3 +2663,8 @@ The native snapshot covers borrowed console transfers; the legacy CLI scaffold
 continues to omit opaque Slice/ReadOnlySlice members, documented in streams.md.
 The historical CLI execution bridge is not a current execution target for the
 new factory and sync contracts. Native compiler/library bundles are authoritative.
+
+All four text interfaces and wrappers also expose NewLine as a mutable string
+property. Both snapshots document exact UTF-8 input delimiters, literal output
+appending, LF defaults and the explicit CRLF migration. No constants type or enum
+is introduced.

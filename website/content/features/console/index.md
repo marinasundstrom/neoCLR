@@ -38,7 +38,7 @@ synchronous escape hatch. All use Result-returning Create factories.
 
 The shape is familiar from .NET Console: text properties and standard byte-stream factories. The contracts differ: input uses typed Result and Option values, text is strict UTF-8, and operations have explicit bounds. .NET ReadLine returns null at EOF; this API returns None.
 
-Console operations return directly and can block; they do not manufacture Tasks. ReadLine recognizes LF and CRLF, preserves a lone CR as data, and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers emit LF without a BOM and allow at most 65,536 encoded bytes per call, including a newline. SyncStreamWriter completes writes directly; callers flush explicitly. Encoding selection, console redirection setters and terminal controls are not implemented.
+Console operations return directly and can block; they do not manufacture Tasks. ReadLine recognizes the exact configured NewLine string (LF by default), and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers append their configured NewLine string (LF by default) without a BOM and allow at most 65,536 encoded bytes per call, including a newline. SyncStreamWriter completes writes directly; callers flush explicitly. Encoding selection, console redirection setters and terminal controls are not implemented.
 
 Embedding hosts opt into the byte-output hooks. Older hosts, including the current worker and debugger adapters, support legacy WriteLine but return an I/O error for the new output streams. See the [API guide](../../docs/console.html) for ownership and host behavior.
 
@@ -88,3 +88,11 @@ against the boxed copy with GC roots retained. Records without an override use t
 type-name default consistently in interpreter, JIT and AOT. This closes native backend gaps;
 installed Preview 16 binaries retain their earlier limits. Floating-point Object formatting remains unsupported. Development JSON record
 serialization is documented separately in the [JSON guide](/docs/json.html).
+
+## Configurable line endings
+
+TextReader, TextWriter and their explicit Sync equivalents expose `NewLine: string`.
+Use `"\r\n"`, `"\n"`, `"\r"`, or a custom sequence. Readers remove that exact
+sequence; writers append it in WriteLine. With LF configured, CR stays in the
+returned text. An empty reader delimiter is an error; an empty writer delimiter
+appends nothing. See the [full contract](../../docs/console.html#configurable-line-delimiters-development).

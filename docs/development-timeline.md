@@ -20178,3 +20178,18 @@ migration, not a compatibility shim. Genuine async console readiness/cancellatio
 remains separate work. The source-core compiler cleanup configuration gap is fixed
 on Raven codex/neoclr (100f98a2f); execution qualification is recorded in the
 [sync text experiment](experiments/sync-text/README.md).
+
+The author then requested configurable line endings on TextReader and TextWriter,
+clarified that the input should be a string sequence rather than an enum, and
+explicitly included both sync interfaces. The assistant implements NewLine on all
+four interfaces with exact UTF-8 reader matching and literal writer appending.
+Default LF now preserves a preceding CR; CRLF must be configured explicitly. A
+constants class was deferred as unnecessary. Validation is recorded in the same
+sync-text and console-text-reading consumers.
+
+The author asked what comes next for Console and suggested key reads. The assistant
+confirmed the committed synchronous console integration and proposed ReadKey and
+TryReadKey with key/modifier/optional-text data, explicit terminal mode ownership,
+echo and Ctrl+C policy, and capability limits for redirected/legacy terminal input.
+This is a proposed next slice, not an implemented key API; line-delimiter
+qualification remains the current work.

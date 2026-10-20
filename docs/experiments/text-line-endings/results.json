@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "engine": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/line-text-lines-app-v2/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Data.PostgreSql.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS line endings\n",
+      "stderr": ""
+    },
+    {
+      "engine": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/line-text-lines-app-v2/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/lib/System.Data.PostgreSql.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/line-text-bundle-v2/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS line endings\n",
+      "stderr": ""
+    },
+    {
+      "engine": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/line-text-lines-app-v2/app"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "stdout": "PASS line endings\n",
+      "stderr": ""
+    }
+  ]
+}

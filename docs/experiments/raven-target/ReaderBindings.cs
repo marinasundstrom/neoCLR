@@ -43,6 +43,7 @@ static class ReaderBindings
         }
         namespace IO {
             public interface TextWriter {
+                string NewLine { get; set; }
                 Concurrency.Tasks.Task<Result<int, StreamError>> Finish();
                 Concurrency.Tasks.Task<Result<int, StreamError>> Write(string text);
                 Concurrency.Tasks.Task<Result<int, StreamError>> WriteLine(string text);
@@ -50,6 +51,7 @@ static class ReaderBindings
                 void Close();
             }
             public sealed class StreamWriter : TextWriter {
+                public string NewLine { get; set; }
                 private StreamWriter() { }
                 public Concurrency.Tasks.Task<Result<int, StreamError>> Finish() => default;
                 public static Result<StreamWriter, StreamError> Create(OutputStream output) => default;
@@ -69,6 +71,7 @@ static class ReaderBindings
                 public void Close() { }
             }
             public interface TextReader {
+                string NewLine { get; set; }
                 Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar();
                 Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar();
                 Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count);
@@ -78,6 +81,7 @@ static class ReaderBindings
                 void Close();
             }
             public sealed class StreamReader : TextReader {
+                public string NewLine { get; set; }
                 private StreamReader() { }
                 public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar() => default;
                 public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar() => default;
@@ -92,6 +96,7 @@ static class ReaderBindings
                 public void Close() { }
             }
             public interface SyncTextReader {
+                string NewLine { get; set; }
                 Result<Option<char>, TextReadError> PeekChar();
                 Result<Option<char>, TextReadError> ReadChar();
                 Result<string, TextReadError> Read(int count);
@@ -101,6 +106,7 @@ static class ReaderBindings
                 void Close();
             }
             public sealed class SyncStreamReader : SyncTextReader {
+                public string NewLine { get; set; }
                 private SyncStreamReader() { }
                 public Result<Option<char>, TextReadError> PeekChar() => default;
                 public Result<Option<char>, TextReadError> ReadChar() => default;
@@ -115,6 +121,7 @@ static class ReaderBindings
                 public void Close() { }
             }
             public interface SyncTextWriter {
+                string NewLine { get; set; }
                 Result<int, StreamError> Finish();
                 Result<int, StreamError> Write(string text);
                 Result<int, StreamError> WriteLine(string text);
@@ -122,6 +129,7 @@ static class ReaderBindings
                 void Close();
             }
             public sealed class SyncStreamWriter : SyncTextWriter {
+                public string NewLine { get; set; }
                 private SyncStreamWriter() { }
                 public Result<int, StreamError> Finish() => default;
                 public static Result<SyncStreamWriter, StreamError> Create(SyncOutputStream output) => default;

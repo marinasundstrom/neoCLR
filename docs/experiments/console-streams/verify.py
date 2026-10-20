@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-console-streams-') as folder:
     if args.case in ('all', 'greeting'):
         build('Main.rvn')
         for data, out, err in [
-            ('värld\r\n'.encode(), 'Name: Hello, värld\n'.encode(), b'Read one line\n'),
+            ('värld\r\n'.encode(), 'Name: Hello, värld\r\n'.encode(), b'Read one line\n'),
             (b'\n', b'Name: Hello, \n', b'Read one line\n'),
             (b'', b'Name: End of input\n', b''),
             (b'last', b'Name: Hello, last\n', b'Read one line\n'),

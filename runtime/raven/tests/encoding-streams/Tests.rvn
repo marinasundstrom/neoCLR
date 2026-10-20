@@ -131,6 +131,7 @@ func GReader() -> Result<unit, TestFailure> {
     let Ok(reader) = StreamReader.Create(source, Encodings.Ascii, true) else {
         System.Fail("Unable to create text wrapper")
     }
+    reader.NewLine = "\r\n"
     let Ok(Some(line)) = CompletedValue(reader.ReadLine(1)) else {
         return Error(TestFailure("ASCII line", "Some", "Error or None"))
     }

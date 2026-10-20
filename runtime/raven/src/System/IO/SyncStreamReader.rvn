@@ -9,6 +9,10 @@ import System.Runtime.CompilerServices.*
 
 /// <summary>Synchronous buffered text input with explicit stream ownership.</summary>
 public class SyncStreamReader : SyncTextReader {
+    /// <summary>Exact nonempty line delimiter, removed from ReadLine results. Defaults to LF.</summary>
+    /// <remarks>Each operation snapshots this setting before transferring bytes.</remarks>
+    var NewLine: string { get; set; } = "\n"
+
     private init(input: SyncInputStream, encoding: Encoding, leaveOpen: bool) {
         self.input = input
         decoder = encoding.CreateDecoder()
@@ -36,6 +40,8 @@ public class SyncStreamReader : SyncTextReader {
     static func Create(input: SyncInputStream, encoding: Encoding, leaveOpen: bool) -> Result<SyncStreamReader, TextReadError> {
         return Ok(SyncStreamReader(input, encoding, leaveOpen))
     }
+
+    private var lineDelimiter: TextLineDelimiter?
 
     private val input: SyncInputStream
     private var decoder: Decoder
@@ -245,6 +251,24 @@ public class SyncStreamReader : SyncTextReader {
         return result
     }
 
+    private func GetLineDelimiter() -> Result<TextLineDelimiter, TextReadError> {
+        let ending = NewLine
+        if ending.IsEmpty {
+            return Error(TextReadError.InvalidRange)
+        }
+        if ending.Utf8Bytes.Length > 65536 {
+            return Error(TextReadError.LimitExceeded)
+        }
+        if lineDelimiter is TextLineDelimiter cached {
+            if String.CompareOrdinal(cached.Text, ending) == 0 {
+                return Ok(cached)
+            }
+        }
+        let created = TextLineDelimiter(ending)
+        lineDelimiter = created
+        return Ok(created)
+    }
+
     private func ReadLineCore(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
         if closed {
             return Error(TextReadError.Closed)
@@ -255,35 +279,44 @@ public class SyncStreamReader : SyncTextReader {
         if maxUtf8Bytes > 65536 {
             return Error(TextReadError.LimitExceeded)
         }
+        let delimiter = GetLineDelimiter()?
         let buffer = readBuffer
         let line = ArrayList<byte>()
-        var accepted = 0
+        var matched = 0
         while true {
             let part = DrainPending()
             let byteCount = part.Utf8Bytes.Length
             var index = 0
             while index < byteCount {
                 let value = part.Utf8Bytes[index]
-                if value == 10 {
+                let previous = matched
+                matched = delimiter.Advance(matched, value)
+                if matched == delimiter.Length {
                     match part.SliceUtf8(index + 1, byteCount - index - 1) {
                         Ok(let suffix) => pendingText = suffix
                         Error(_) => System.Fail("Invalid decoded line suffix")
                     }
-                    var lineLength = line.Count
-                    if lineLength > 0 && line[lineLength - 1] == 13 {
-                        lineLength -= 1
-                    }
-                    return TextReadSupport.DecodeLine(line, lineLength)
+                    return TextReadSupport.DecodeLine(line, line.Count)
                 }
-                if line.Count >= maxUtf8Bytes && (line.Count > maxUtf8Bytes || value != 13) {
+                let confirmed = previous + 1 - matched
+                if confirmed > maxUtf8Bytes - line.Count {
                     return Error(TextReadError.LimitExceeded)
                 }
-                line.Add(value)
+                var emitted = 0
+                while emitted < confirmed {
+                    line.Add(if emitted < previous { delimiter.ByteAt(emitted) } else { value })
+                    emitted += 1
+                }
                 index += 1
             }
             if eof {
-                if line.Count > maxUtf8Bytes {
+                if matched > maxUtf8Bytes - line.Count {
                     return Error(TextReadError.LimitExceeded)
+                }
+                var prefix = 0
+                while prefix < matched {
+                    line.Add(delimiter.ByteAt(prefix))
+                    prefix += 1
                 }
                 if line.Count == 0 {
                     let absent: Option<string> = None()
@@ -291,14 +324,10 @@ public class SyncStreamReader : SyncTextReader {
                 }
                 return TextReadSupport.DecodeLine(line, line.Count)
             }
-            if accepted > maxUtf8Bytes + 1 {
-                return Error(TextReadError.LimitExceeded)
-            }
             match ReadPart(buffer, 1, 1) {
                 Ok(let decoded) => pendingText = decoded
                 Error(let error) => return Error(error)
             }
-            accepted += lastRead
         }
         return Error(TextReadError.IoFailure)
     }

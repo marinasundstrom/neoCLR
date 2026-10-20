@@ -44,3 +44,27 @@ four classes and separate execution loops. Grapheme text and UTF-8 result bounds
 remain neoCLR-specific. Sources:
 [Stream](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream?view=net-10.0),
 [StreamReader implementation](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/IO/StreamReader.cs).
+
+## Configurable string line delimiters
+
+NewLine is available on all four text interfaces and concrete wrappers. It defaults
+to LF. Readers remove that exact UTF-8 sequence, with ordinal matching and a cached
+KMP prefix table; writers append it in WriteLine. A partial delimiter prefix at
+EOF is data. Empty reader delimiters fail before input; empty writer delimiters
+append nothing. The line buffer excludes possible delimiter prefixes until they
+are confirmed as content. Each operation snapshots the configured string.
+
+The expanded sync and async consumers cover LF, CRLF, CR, ASCII and Unicode
+delimiters across one-byte reads, overlapping prefixes, canonical-equivalent but
+byte-distinct text, property dispatch through interfaces, empty delimiters,
+configuration changes, incomplete EOF prefixes and exact byte counts. They also
+exercise Console.Write's borrowed output path.
+
+Default LF now preserves CR before LF; configure CRLF explicitly to remove both.
+This is an intentional migration from the prior automatic CR stripping.
+
+Updated delimiter execution results replace the earlier fixture results: all three
+engines pass against target/sync-text-libraries-v12. See the
+[async delimiter qualification](../text-line-endings/README.md) for matching
+artifacts, the input-inventory cap repair and behavior coverage. The full current
+website check renders 4690 pages with 124 legacy pages retained.

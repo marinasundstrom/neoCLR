@@ -7,6 +7,10 @@ import System.Runtime.CompilerServices.*
 
 /// <summary>Synchronous buffered text output with explicit stream ownership.</summary>
 public class SyncStreamWriter : SyncTextWriter {
+    /// <summary>String appended by WriteLine. Defaults to LF; an empty string appends nothing.</summary>
+    /// <remarks>Each operation snapshots this setting before transferring bytes.</remarks>
+    var NewLine: string { get; set; } = "\n"
+
     private init(output: SyncOutputStream, encoding: Encoding, leaveOpen: bool) {
         self.output = output
         encoder = encoding.CreateEncoder()
@@ -38,7 +42,7 @@ public class SyncStreamWriter : SyncTextWriter {
     /// <summary>Encodes and writes text; returns the number of encoded bytes.</summary>
     func Write(text: string) -> Result<int, StreamError> => Run(text, false, false)
 
-    /// <summary>Encodes and writes text followed by LF; returns the encoded byte count.</summary>
+    /// <summary>Encodes and writes text followed by NewLine; returns the encoded byte count.</summary>
     func WriteLine(text: string) -> Result<int, StreamError> => Run(text, true, false)
 
     /// <summary>Finalizes encoding. Repeated successful finalization returns zero.</summary>
@@ -69,11 +73,12 @@ public class SyncStreamWriter : SyncTextWriter {
         if failed || operation.WasAbandoned || finished {
             return Error(StreamError.InvalidEncoding)
         }
-        let limit = if line { 65535 } else { 65536 }
-        if text.Utf8Bytes.Length > limit {
+        let ending = if line { NewLine } else { "" }
+        let endingBytes = ending.Utf8Bytes.Length
+        if endingBytes > 65536 || text.Utf8Bytes.Length > 65536 - endingBytes {
             return Error(StreamError.LimitExceeded)
         }
-        let content = if line { text + "\n" } else { text }
+        let content = if ending.IsEmpty { text } else { text + ending }
         match encoder.Accept(content, final) {
             Ok(_) => { }
             Error(EncodingError.LimitExceeded) => return Error(StreamError.LimitExceeded)

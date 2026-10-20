@@ -1,0 +1,178 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.IO.*
+import System.Text.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+
+class FragmentedInput : InputStream {
+    private val text: string
+    private val chunk: int
+    private var offset: int = 0
+    private var reads: int = 0
+
+    init(text: string, chunk: int) {
+        self.text = text
+        self.chunk = chunk
+    }
+
+    val Reads: int => reads
+
+    func Read(buffer: byte[], start: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, start, count, CancellationToken.None)
+    }
+
+    func Read(buffer: byte[], start: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> {
+        reads += 1
+        var copied = 0
+        while copied < count && copied < chunk && offset < text.Utf8Bytes.Length {
+            buffer[start + copied] = text.Utf8Bytes[offset]
+            copied += 1
+            offset += 1
+        }
+        let result: Result<int, StreamError> = Ok(copied)
+        return Task.FromResult(result)
+    }
+
+    func Close() { }
+}
+
+// Deliberately controlled pending-source adapter to test overlapping read rejection.
+class PendingInput : InputStream {
+    val Source: Promise<Result<int, StreamError>> = Promise<Result<int, StreamError>>()
+
+    func Read(buffer: byte[], start: int, count: int) -> Task<Result<int, StreamError>> => Source.Task
+    func Read(buffer: byte[], start: int, count: int, token: CancellationToken) -> Task<Result<int, StreamError>> => Source.Task
+    func Close() { }
+}
+
+// Controlled output and outcome observer are test adapters, not production scheduling.
+class PendingOutput : OutputStream {
+    val Source: Promise<Result<unit, StreamError>> = Promise<Result<unit, StreamError>>()
+    func Write(buffer: byte[], start: int, count: int) -> Task<Result<unit, StreamError>> => Source.Task
+    func Write(buffer: byte[], start: int, count: int, token: CancellationToken) -> Task<Result<unit, StreamError>> => Source.Task
+    func Flush() -> Task<Result<unit, StreamError>> {
+        let result: Result<unit, StreamError> = Ok(())
+        return Task.FromResult(result)
+    }
+    func Flush(token: CancellationToken) -> Task<Result<unit, StreamError>> => Flush()
+    func Close() { }
+}
+
+func ObserveWrite(task: Task<Result<int, StreamError>>) -> Task<unit> {
+    let observed = Promise<unit>()
+    task.OnCompleted(() => { _ = observed.Complete(()) })
+    return observed.Task
+}
+
+func ObserveRead(task: Task<Result<Option<char>, TextReadError>>) -> Task<unit> {
+    let observed = Promise<unit>()
+    task.OnCompleted(() => { _ = observed.Complete(()) })
+    return observed.Task
+}
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func Text(result: Result<string, TextReadError>, expected: string) {
+    match result {
+        Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
+        Error(let error) => System.Fail("Unexpected text error: " + error.ToString())
+    }
+}
+
+func Character(result: Result<Option<char>, TextReadError>, expected: string) {
+    match result {
+        Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
+        _ => System.Fail("Expected character")
+    }
+}
+
+func End(result: Result<Option<char>, TextReadError>) {
+    match result {
+        Ok(None) => { }
+        _ => System.Fail("Expected character EOF")
+    }
+}
+
+async func Main() -> Task<unit> {
+    for ending in ["\n", "\r\n", "\r", "END", "abab", "💥"] {
+        let input = FragmentedInput("a" + ending + "b" + ending, 1)
+        let Ok(lines) = StreamReader.Create(input) else {
+            System.Fail("Delimiter reader")
+        }
+        let textReader: TextReader = lines
+        textReader.NewLine = ending
+        Check(textReader.NewLine == ending, "Interface newline property")
+        Check(await lines.ReadLine(1) is Ok(Some("a")), "First configured line")
+        Check(await lines.ReadLine(1) is Ok(Some("b")), "Second configured line")
+        Check(await lines.ReadLine(0) is Ok(None), "Delimiter EOF")
+    }
+    let pendingInput = PendingInput()
+    let Ok(pendingReader) = StreamReader.Create(pendingInput) else {
+        System.Fail("Pending delimiter reader")
+    }
+    pendingReader.NewLine = "END"
+    let pendingLine = pendingReader.ReadLine(0)
+    Check(!pendingLine.IsCompleted, "Line read did not suspend")
+    pendingReader.NewLine = ""
+    _ = pendingInput.Source.Complete(Ok(0))
+    Check(await pendingLine is Ok(None), "Changed pending delimiter")
+    Check(await pendingReader.ReadLine(0) is Error(TextReadError.InvalidRange), "Next delimiter configuration")
+
+    let exactInput = FragmentedInput("xéyéz", 1)
+    let Ok(exact) = StreamReader.Create(exactInput) else {
+        System.Fail("Exact delimiter reader")
+    }
+    exact.NewLine = "é"
+    Check(await exact.ReadLine(4) is Ok(Some("xéy")), "Delimiter must compare UTF-8 ordinally")
+    Check(await exact.ReadLine(1) is Ok(Some("z")), "Delimiter tail")
+
+    let invalidInput = FragmentedInput("aaabtail", 1)
+    let Ok(overlap) = StreamReader.Create(invalidInput) else {
+        System.Fail("Overlap reader")
+    }
+    overlap.NewLine = ""
+    Check(await overlap.ReadLine(8) is Error(TextReadError.InvalidRange), "Empty delimiter")
+    Check(invalidInput.Reads == 0, "Invalid delimiter consumed input")
+    overlap.NewLine = "aab"
+    Check(await overlap.ReadLine(1) is Ok(Some("a")), "Overlapping delimiter prefixes")
+    overlap.NewLine = "il"
+    Check(await overlap.ReadLine(2) is Ok(Some("ta")), "Changed delimiter")
+
+    let Ok(prefixReader) = StreamReader.Create(FragmentedInput("xEN", 1)) else {
+        System.Fail("Partial delimiter reader")
+    }
+    prefixReader.NewLine = "END"
+    Check(await prefixReader.ReadLine(3) is Ok(Some("xEN")), "Partial delimiter at EOF")
+    let Ok(lfReader) = StreamReader.Create(FragmentedInput("x\r\n", 1)) else {
+        System.Fail("LF reader")
+    }
+    Check(await lfReader.ReadLine(2) is Ok(Some("x\r")), "LF must preserve CR")
+
+    let newlineOutput = MemoryStream()
+    let Ok(createdWriter) = StreamWriter.Create(newlineOutput, true) else {
+        System.Fail("Newline writer")
+    }
+    let textWriter: TextWriter = createdWriter
+    textWriter.NewLine = "\r\n"
+    Check(await textWriter.WriteLine("x") is Ok(3), "CRLF writer bytes")
+    textWriter.NewLine = "💥"
+    Check(await textWriter.WriteLine("") is Ok(4), "Unicode writer delimiter")
+    textWriter.NewLine = ""
+    Check(await textWriter.WriteLine("y") is Ok(1), "Empty writer delimiter")
+    Check(await textWriter.Finish() is Ok(0), "Newline finish")
+    textWriter.Close()
+    Check(newlineOutput.Seek(0) is Ok(0), "Newline seek")
+    let Ok(newlineReader) = StreamReader.Create(newlineOutput) else {
+        System.Fail("Newline output reader")
+    }
+    Text(await newlineReader.ReadToEnd(20), "x\r\n💥y")
+
+    Console.Write("PASS line endings\n")
+}

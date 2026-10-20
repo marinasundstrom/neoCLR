@@ -113,10 +113,12 @@ async func Main() -> Task<unit> {
         Character(await reader.ReadChar(), "é")
         Text(await reader.Read(2), "👩‍💻🇸🇪")
         Character(await reader.PeekChar(), "\r\n")
+        reader.NewLine = "\r\n"
         match await reader.ReadLine(100) {
             Ok(Some(let line)) => Check(line.IsEmpty, "Peek before empty line")
             _ => System.Fail("Expected empty line")
         }
+        reader.NewLine = "\n"
         Character(await reader.ReadChar(), "n")
         match await reader.ReadLine(100) {
             Ok(Some(let line)) => Check(line == "ext", "Mixed character and line cursor")
@@ -205,5 +207,5 @@ async func Main() -> Task<unit> {
     }
     Text(Console.In.Read(10), "tail")
     End(Console.ReadChar())
-    Console.WriteLine("PASS console text reads")
+    Console.Write("PASS console text reads\n")
 }

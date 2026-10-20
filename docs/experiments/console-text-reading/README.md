@@ -48,3 +48,13 @@ The API snapshot check, four native-snapshot tests and the 4596-page website bui
 pass (124 legacy pages retained). The subsequent author direction calls for optional
 synchronous capabilities rather than forcing all providers into Task-returning APIs;
 those capabilities are the next slice, not implemented by this text-read commit.
+
+## Updated qualification — separate sync console and string delimiters
+
+The fixture now uses Create factories and direct Console operations. It also
+checks genuinely pending async reader/writer overlap, cancellation cleanup and
+writer invalidation after an abandoned transfer. CRLF line consumption is configured
+explicitly with NewLine. All three engines pass in the current results.json using
+ target/line-text-bundle-v2/bundle and target/line-text-async-app-v3. Earlier
+reproduction details above describe the historical first text-read slice. Exact
+delimiter cases are separately qualified in ../text-line-endings.

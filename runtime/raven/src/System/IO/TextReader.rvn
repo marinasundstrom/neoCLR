@@ -5,6 +5,8 @@ import System.Concurrency.Tasks.*
 
 /// <summary>Asynchronous decoded text reads sharing one logical cursor.</summary>
 public interface TextReader {
+    /// <summary>Exact nonempty line delimiter, removed from ReadLine results. Defaults to LF.</summary>
+    var NewLine: string { get; set; }
     /// <summary>Peeks at the next grapheme without consuming it; None denotes EOF.</summary>
     /// <returns>Awaited Char or a text read error. May buffer underlying input to find a boundary.</returns>
     func PeekChar() -> Task<Result<Option<char>, TextReadError>>

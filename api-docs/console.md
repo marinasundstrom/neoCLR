@@ -76,10 +76,11 @@ covers fragmented UTF-8, repeated peek, mixed reads, byte bounds, EOF and pendin
 ## Line input
 
 `ReadLine` returns `Some("")` for an empty line and `None` for EOF before any data.
-An unterminated final line is returned once. LF and CRLF terminate a line; **a lone
-CR is data** in this first implementation. UTF-8 decoding is strict and preserves
+An unterminated final line is returned once. ReadLine removes the exact configured NewLine string, which defaults to LF.
+With that default, CR remains data, including immediately before LF. Configure
+"\r\n" to consume CRLF as one delimiter. UTF-8 decoding is strict and preserves
 a BOM. A malformed line returns InvalidUtf8. ReadLine itself requests no bytes
-past LF; it first consumes any lookahead retained by character/count reads.
+past a complete delimiter; it first consumes any lookahead retained by character/count reads.
 Repeated Console.In access now preserves that same buffered cursor.
 
 StreamReader implements the same bounded `ReadLine` method for any InputStream.
@@ -97,9 +98,9 @@ interrupted by cancellation while executing.
 ## Text and byte output
 
 `TextWriter.Write(text)` and `WriteLine(text)` return `Task<Result<int, StreamError>>`:
-the byte count on success, including LF for WriteLine. StreamWriter writes UTF-8
+the byte count on success, including NewLine for WriteLine. StreamWriter writes UTF-8
 without a BOM, handles short writes and reports IoFailure if a stream makes zero
-progress. Each call accepts at most 65536 encoded bytes, including any LF. A failed
+progress. Each call accepts at most 65536 encoded bytes, including NewLine. A failed
 write may already have produced output; there is no rollback or atomic-write promise.
 Raw OutputStream.Write preserves arbitrary bytes and completes successfully only for the full range.
 
@@ -270,3 +271,41 @@ Migration: replace constructor calls with Create and handle the Result. Remove
 await from Console reads, Write and calls through Console.In/Out/Error. Raw console
 reads/writes take borrowed Slice/ReadOnlySlice windows, not array/offset/count.
 Async console host integration is not implemented by this change.
+
+## Configurable line delimiters (development)
+
+All four text interfaces and all four stream text wrappers expose
+`var NewLine: string { get; set; }`, defaulting to `"\n"`. No enum or constants
+class is required. Set the property on a saved Console.In/Out/Error reference to
+configure that wrapper; output property accesses create separate wrappers.
+
+Writers append the exact string in WriteLine. An empty string appends nothing;
+Write never rewrites newlines already present in text. The existing 65536-byte
+UTF-8 input bound includes the appended delimiter, and the selected encoder may
+reject characters it cannot represent. Configuration does not perform output.
+
+Readers recognize an exact UTF-8 sequence and exclude it from the returned line.
+Matching is ordinal, even though ordinary String equality is canonically aware.
+The delimiter can contain multiple Unicode scalars or graphemes and can cross
+any byte-read boundary. An empty delimiter reports InvalidRange; more than 65536
+UTF-8 bytes reports LimitExceeded before input is consumed. An unterminated final
+line includes an incomplete delimiter prefix as data. EOF without data is None;
+a complete delimiter at the start returns Some(""). Result-byte bounds exclude
+the complete delimiter. A limit or decoding failure does not rewind input.
+
+Operations snapshot the configuration when they begin. Changes affect the next
+operation; no mutable borrowed string view crosses suspension. Readers cache an
+ordinal delimiter matcher and reuse it until the setting changes. This avoids
+quadratic rescanning for overlapping prefixes; it does not eliminate line/String
+allocations.
+
+Migration: the former implicit CR removal before LF is gone. Configure `"\r\n"`
+when reading CRLF, or use `"\n"` and preserve CR as content. This exact contract
+is shared by synchronous and asynchronous wrappers. Console.ReadLine uses the
+configuration of the shared Console.In reader. Unicode grapheme Read/PeekChar
+and ReadToEnd are unaffected.
+
+.NET exposes a string [TextWriter.NewLine](https://learn.microsoft.com/en-us/dotnet/api/system.io.textwriter.newline?view=net-10.0).
+neoCLR extends that configuration to readers as requested by the author. Exact
+reader delimiters make framing predictable, at the cost of configuring mixed or
+platform-specific input explicitly. There is no automatic newline-detection mode.

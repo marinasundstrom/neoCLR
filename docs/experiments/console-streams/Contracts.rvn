@@ -166,7 +166,9 @@ func Main() {
     let Ok(reader) = SyncStreamReader.Create(input, true) else {
         System.Fail("Unable to create text wrapper")
     }
+    reader.NewLine = "\r\n"
     Check(ReadExpectedSync(reader, 2, "å") is Ok(_))
+    reader.NewLine = "\n"
     Check(ReadExpectedSync(reader, 0, "") is Ok(_))
     reader.Close()
     // Closing the reader leaves this stream open, at the next unread byte.

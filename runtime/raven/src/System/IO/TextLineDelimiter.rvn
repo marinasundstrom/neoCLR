@@ -1,0 +1,44 @@
+module System.IO
+
+import System.*
+import System.Runtime.CompilerServices.*
+
+// Immutable, cached per reader configuration. KMP handles overlapping delimiters
+// in linear input time without retaining a borrowed UTF-8 view across suspension.
+internal class TextLineDelimiter {
+    val Text: string
+    val Length: int
+    private val fallback: int[]
+
+    init(text: string) {
+        Text = text
+        Length = text.Utf8Bytes.Length
+        fallback = CheckedStorage.Reserve<int>(Length)
+        fallback[0] = 0
+        var matched = 0
+        var index = 1
+        while index < Length {
+            while matched > 0 && text.Utf8Bytes[index] != text.Utf8Bytes[matched] {
+                matched = fallback[matched - 1]
+            }
+            if text.Utf8Bytes[index] == text.Utf8Bytes[matched] {
+                matched += 1
+            }
+            fallback[index] = matched
+            index += 1
+        }
+    }
+
+    func ByteAt(index: int) -> byte => Text.Utf8Bytes[index]
+
+    func Advance(matched: int, value: byte) -> int {
+        var next = matched
+        while next > 0 && value != Text.Utf8Bytes[next] {
+            next = fallback[next - 1]
+        }
+        if value == Text.Utf8Bytes[next] {
+            next += 1
+        }
+        return next
+    }
+}

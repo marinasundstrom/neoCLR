@@ -39,6 +39,7 @@ func AUnicodeLines() -> Result<unit, TestFailure> {
         let Ok(reader) = StreamReader.Create(source) else {
             System.Fail("Unable to create text wrapper")
         }
+        reader.NewLine = "\r\n"
         _ = ReadLineText(reader, text.GetUtf8ByteCount(), text)?
         _ = Assert.True(CompletedValue(reader.ReadLine(0)) is Ok(None), "Line EOF")?
         reader.Close()
