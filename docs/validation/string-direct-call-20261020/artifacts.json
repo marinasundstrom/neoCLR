@@ -1,0 +1,12 @@
+{
+  "scope": "Development backend regression on macOS ARM64; not a frozen release package",
+  "sourceBase": "ba8c77897",
+  "sha256": {
+    "target/debug/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "target/debug/deps/console-ba1bb92fc99d4d0c": "9dd2c2e7ddbf5cfcbea931384ad23fe02225f48a997259a028ba5b2875fccb28",
+    "runtime/codegen/src/linking.rs": "c58242905b38f55c00541ea1e792389fd23c0972e13332c3551f701603b44d4c",
+    "runtime/codegen/src/fault_details.rs": "f9ae0f4990360e85d9af40f2b502d3fa0a89941c7a0fb20fbcce90b964526456",
+    "runtime/codegen/src/values.rs": "99d80925287bbd76bf6a3f3c67f408b069cbab34d623e0b09cb118e022357ab6",
+    "runtime/codegen/tests/console.rs": "7e463e24b52d0fce70bd93722f977f80c6bc6d5e69df30b5341c64ff2f7336cc"
+  }
+}

@@ -3383,22 +3383,6 @@ pub(crate) fn compile_into(
                     true,
                 );
             }
-            // Every early return must follow GC frame registration: finish()
-            // inserts frame cleanup on all return edges, including null faults.
-            if details.is_some_and(|d| d.string_receivers.contains(&i)) {
-                let null = b.ins().icmp_imm(IntCC::Equal, parameters[0], 0);
-                let status = b.ins().iconst(types::I32, 6);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, null, status, Some(&site));
-            }
-
             if let Some(guard) = crate::type_initialization::entry_owner(input, f)
                 .and_then(|owner| owner.definition_name())
                 .and_then(|name| initialization_guards.get(name))
@@ -4690,7 +4674,9 @@ pub(crate) fn compile_into(
                         } else {
                             None
                         };
-                        if matches!(op, Op::CallVirtual(_)) {
+                        if matches!(op, Op::CallVirtual(_))
+                            || details.is_some_and(|d| d.string_virtual_calls.contains(&(i, pc)))
+                        {
                             // Unlike direct call, callvirt checks null before entering
                             // even a nonvirtual target; capture the caller's site.
                             null_reference(&mut b, call_args[0], site.as_ref());

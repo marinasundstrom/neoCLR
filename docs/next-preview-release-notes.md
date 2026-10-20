@@ -12,9 +12,10 @@ version is `0.1.17-neoclr.20261019.1`, using Raven native compiler
 
 The identity above belongs to the superseded candidate and must not be reused as
 qualification for current source. [Current triage](validation/release-readiness-20261020/README.md)
-tracks bounded native record equality/hash fixes and remaining component/formatting gaps, raw
-null String direct-call parity, and orders fresh source/package/editor/performance
-gates after those issues are resolved. No replacement package identity is selected.
+tracks bounded native record equality/hash fixes and remaining component/formatting gaps.
+The [String call-projection fix](validation/string-direct-call-20261020/README.md)
+closes the recorded direct-call discrepancy. Fresh source/package/editor/performance
+gates remain required. No replacement package identity is selected.
 
 ## Implemented scope for replacement review
 

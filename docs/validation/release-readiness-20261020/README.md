@@ -46,6 +46,15 @@ operations avoid that path without asserting those boxed APIs are qualified. The
 original failure JSON above remains historical evidence. No new release identity or
 platform/package gate is established by this fix.
 
+## Follow-up: String call projection
+
+The [focused backend repair](../string-direct-call-20261020/README.md) closes item 2's
+recorded wrapper-entry discrepancy. Native projection preserves null checks at
+original callvirt sites and retains interpreter behavior for direct calls. This
+does not promise portable CLR semantics for null direct receivers or change Raven
+source nullability. The baseline failure is retained with the new regression.
+Fresh matched-package qualification below is still required.
+
 ## Required release qualification
 
 - Canonical committed/extracted-source checks, including relevant format/Clippy,

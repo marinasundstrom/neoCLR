@@ -2631,7 +2631,12 @@ fn string_instance_projection_preserves_receiver_arguments_and_null_faults() {
 ldarg mode
 ldc.i4 0
 ceq
+brtrue NonNull
+ldarg mode
+ldc.i4 4
+ceq
 brfalse Null
+NonNull:
 ldstr "receiver"
 stloc text
 br Invoke
@@ -2639,6 +2644,14 @@ Null:
 ldloca text
 initobj String
 Invoke:
+ldarg mode
+ldc.i4 3
+ceq
+brtrue RawAnswer
+ldarg mode
+ldc.i4 4
+ceq
+brtrue RawCount
 ldloc text
 ldarg mode
 ldc.i4 2
@@ -2649,6 +2662,15 @@ ret
 Direct:
 ldc.i4 42
 callvirt instance System.String::AotAnswer(Int32)
+ret
+RawAnswer:
+ldloc text
+ldc.i4 42
+call instance System.String::AotAnswer(Int32)
+ret
+RawCount:
+ldloc text
+call instance System.String::AotCount()
 ret
 .end
 "#;
@@ -2708,12 +2730,34 @@ ret
         r#"
 #include "text-arena.h"
 #include <stdlib.h>
+#include <string.h>
+#ifdef JIT_HOST
+#include "native-gc.h"
+typedef int32_t (*entry_v4)(int32_t, int32_t *, neoclr_aot_context *);
+int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, const char **argv) {
+    (void)argc; (void)argv;
+    if (!entry || with_args) return 90;
+    entry_v4 callable;
+    _Static_assert(sizeof(callable) == sizeof(entry), "entry pointer size");
+    memcpy(&callable, &entry, sizeof(callable));
+    for (int mode=0; mode<5; mode++) {
+        uint64_t storage[16];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+        int32_t result=-99;int status=callable(mode,&result,&ctx);
+        if (mode==1 || mode==2) {
+            if (status!=6 || result!=-99) return 91;
+        } else if (status || result!=(mode==3?42:8)) return 92;
+        if (neoclr_root_probe_head_v1() || neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used) return 93;
+    }
+    return 0;
+}
+#else
 int main(int argc,char **argv) {
     uint64_t storage[16];neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
     int32_t result=-99;int status=neoclr_entry_v4(argc>1?atoi(argv[1]):0,&result,&ctx);
     if (status) { if(result!=-99)return 92;neoclr_aot_render_fault(stderr,&ctx.fault);return 1; }
     printf("%d\n",result);return 0;
 }
+#endif
 "#,
     )
     .unwrap();
@@ -2735,7 +2779,7 @@ int main(int argc,char **argv) {
     let method = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
-    for mode in 0..3 {
+    for mode in 0..5 {
         let expected = method.invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default());
         let r = Command::new(dir.0.join("app"))
             .arg(mode.to_string())
@@ -2747,7 +2791,7 @@ int main(int argc,char **argv) {
                 assert_eq!(r.status.code(), Some(0));
                 assert_eq!(
                     r.stdout,
-                    if mode == 0 {
+                    if mode == 0 || mode == 4 {
                         b"8\n".as_slice()
                     } else {
                         b"42\n".as_slice()
@@ -2764,6 +2808,62 @@ int main(int argc,char **argv) {
             }
         }
     }
+
+    let linked = Command::new("clang")
+        .args([
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-dynamiclib",
+            "-DJIT_HOST",
+            "-DNEOCLR_NATIVE_GC",
+            "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-console/native-gc.c"))
+        .arg(base.join("aot-console/root-probe.c"))
+        .arg(base.join("aot-console/native-stack.c"))
+        .arg("-o")
+        .arg(dir.0.join("host.dylib"))
+        .output()
+        .unwrap();
+    assert!(
+        linked.status.success(),
+        "{}",
+        String::from_utf8_lossy(&linked.stderr)
+    );
+    let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
+        .args(["--jit-managed", "--closed-world"])
+        .arg(dir.0.join("app.neox"))
+        .arg("Calculate")
+        .arg(dir.0.join("host.dylib"))
+        .arg("--system")
+        .arg(dir.0.join("seed.neox"))
+        .arg("--module")
+        .arg(dir.0.join("empty.neoil"))
+        .args([
+            "--compile-system",
+            "--reference-arena",
+            "--bind-utf8-text",
+            "--native-gc",
+            "--native-stack-budget",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        jit.status.success(),
+        "{}",
+        String::from_utf8_lossy(&jit.stderr)
+    );
+    let stderr = String::from_utf8_lossy(&jit.stderr);
+    let result: serde_json::Value =
+        serde_json::from_str(stderr.split("JIT_RESULT ").nth(1).unwrap().trim()).unwrap();
+    assert_eq!(result["guestExitCode"], 0, "{stderr}");
 }
 
 #[test]

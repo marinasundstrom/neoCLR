@@ -157,7 +157,7 @@ pub struct Options {
     pub reference_array_backings: Vec<usize>,
     pub string_dispatch: HashMap<usize, usize>,
     pub primitive_receivers: Vec<usize>,
-    pub string_receivers: Vec<usize>,
+    pub string_virtual_calls: HashSet<(usize, usize)>,
     pub string_interfaces: Option<Vec<usize>>,
     pub object_value_kinds: HashMap<usize, String>,
     pub object_display: HashMap<usize, Vec<(usize, usize)>>,
@@ -174,11 +174,16 @@ impl Options {
                 .flatten()
                 .filter_map(|r| r["thunkCompiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            string_receivers: report
-                .and_then(|r| r["stringInstanceProjections"].as_array())
+            string_virtual_calls: report
+                .and_then(|r| r["stringVirtualCallSites"].as_array())
                 .into_iter()
                 .flatten()
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .filter_map(|r| {
+                    Some((
+                        r["compiledIndex"].as_u64()? as usize,
+                        r["instruction"].as_u64()? as usize,
+                    ))
+                })
                 .collect(),
             primitive_receivers: report
                 .and_then(|r| r["primitiveInstanceProjections"].as_array())

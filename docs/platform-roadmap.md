@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) tracks the bounded native record equality/hash fix and remaining component/formatting gaps, raw null String direct-call parity, and a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
+**Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) tracks the bounded native record equality/hash fix and remaining component/formatting gaps, the [String call-projection repair](validation/string-direct-call-20261020/README.md), and a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
@@ -42,9 +42,10 @@ explicitly defers String storage/view work and requests composite formatting.
 [String.Format, Console overloads and Formattable](experiments/composite-formatting/README.md)
 provide the shared Raven formatter; boxed nominal interface dispatch is repaired in
 the native backend. Provider/primitive-specifier integration and direct writer
-formatting remain gaps. Position-based
-search/splitting and the direct-call null String bridge discrepancy remain review
-items; replacement release qualification remains pending.
+formatting and position-based search/splitting remain coverage gaps. The
+[direct-call String projection fix](validation/string-direct-call-20261020/README.md)
+closes the recorded wrapper-entry discrepancy; replacement release qualification
+remains pending.
 
 **Author-directed follow-up (2026-10-19):** after the HTTP content integration,
 update website coverage of Slice/Memory design and the experimental concurrent GC,

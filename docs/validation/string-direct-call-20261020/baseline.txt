@@ -1,0 +1,22 @@
+Baseline: neoCLR ba8c77897, expanded regression, original backend.
+
+running 1 test
+test string_instance_projection_preserves_receiver_arguments_and_null_faults ... FAILED
+
+failures:
+
+---- string_instance_projection_preserves_receiver_arguments_and_null_faults stdout ----
+
+thread 'string_instance_projection_preserves_receiver_arguments_and_null_faults' (82028216) panicked at runtime/codegen/tests/console.rs:2789:17:
+assertion `left == right` failed
+  left: Some(1)
+ right: Some(0)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    string_instance_projection_preserves_receiver_arguments_and_null_faults
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 180 filtered out; finished in 2.58s
+
+error: test failed, to rerun pass `-p neoclr-codegen --test console`

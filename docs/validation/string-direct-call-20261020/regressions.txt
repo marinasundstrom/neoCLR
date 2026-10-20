@@ -1,0 +1,14 @@
+Existing neighboring regressions, unchanged production fix:
+
+
+running 1 test
+test string_interface_dispatch_calls_verified_bodies_and_preserves_faults ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 180 filtered out; finished in 2.96s
+
+
+
+running 1 test
+test object_display_dispatch_preserves_overrides_null_and_fault_frames ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 180 filtered out; finished in 2.29s

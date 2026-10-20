@@ -1086,6 +1086,9 @@ pub fn prepare(
             return Err("String instance projection requires public or explicit-interface nonvirtual wrappers and --reference-arena".into());
         }
     }
+    // Projection erases instance-call metadata. Preserve each callvirt check at
+    // its original caller site; a callee-entry check would also affect direct call.
+    let mut string_virtual_calls = Vec::new();
     for (i, f) in selected.functions.iter_mut().enumerate() {
         if string_members.contains(&i) {
             if !f.interface_implementations.is_empty() {
@@ -1118,13 +1121,17 @@ pub fn prepare(
                 origin.nullable_annotations.clear();
             }
         }
-        for op in &mut f.body {
+        for (pc, op) in f.body.iter_mut().enumerate() {
+            let checked_receiver = matches!(op, Op::CallVirtual(_));
             if let Op::Call(target) | Op::CallVirtual(target) = op {
                 if target
                     .definition
                     .as_ref()
                     .is_some_and(|id| string_members.contains(&(id.index as usize)))
                 {
+                    if checked_receiver {
+                        string_virtual_calls.push(json!({"compiledIndex": i, "instruction": pc}));
+                    }
                     target.owner = None;
                     target.instance = false;
                     target.parameters.insert(0, neoclr::metadata::Type::String);
@@ -1133,6 +1140,7 @@ pub fn prepare(
             }
         }
     }
+    report["stringVirtualCallSites"] = json!(string_virtual_calls);
     report["stringInstanceProjections"] = json!(string_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified public nonvirtual String wrapper; explicit receiver, unchanged CIL argument indices"})).collect::<Vec<_>>());
     if reference_arena {
