@@ -687,33 +687,55 @@ fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Opt
 
 /// Scalar value owners share the same borrowed-receiver and boxed-interface contract.
 pub(super) const SCALAR_PRIMITIVES: &[Type] = &[
-    Type::SByte, Type::Byte, Type::Int16, Type::UInt16, Type::Int32, Type::UInt32,
-    Type::Int64, Type::UInt64, Type::IntPtr, Type::UIntPtr, Type::Single, Type::Double,
-    Type::Boolean, Type::Char,
+    Type::SByte,
+    Type::Byte,
+    Type::Int16,
+    Type::UInt16,
+    Type::Int32,
+    Type::UInt32,
+    Type::Int64,
+    Type::UInt64,
+    Type::IntPtr,
+    Type::UIntPtr,
+    Type::Single,
+    Type::Double,
+    Type::Boolean,
+    Type::Char,
 ];
 
 pub(super) fn projected_primitive(ty: &Type) -> bool {
     SCALAR_PRIMITIVES.contains(ty)
 }
 
-fn scalar_interface_targets(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>) -> Result<Vec<(Type, usize)>, Error> {
+fn scalar_interface_targets(
+    input: &neoclr::Module,
+    contract: usize,
+    reached: &BTreeSet<usize>,
+) -> Result<Vec<(Type, usize)>, Error> {
     let f = &input.functions[contract];
-    if !interface_contract(input, f) { return Ok(vec![]); }
+    if !interface_contract(input, f) {
+        return Ok(vec![]);
+    }
     let mut primitives = vec![];
     for &index in reached {
         for op in &input.functions[index].body {
             if let Op::BoxValue(ty) = op {
-                if projected_primitive(ty) && !primitives.contains(ty)
-                    && implements_interface(input, ty, f.owner.as_ref().unwrap()) {
+                if projected_primitive(ty)
+                    && !primitives.contains(ty)
+                    && implements_interface(input, ty, f.owner.as_ref().unwrap())
+                {
                     primitives.push(ty.clone());
                 }
             }
         }
     }
-    primitives.into_iter().map(|ty| {
-        let target = implicit_implementation(input, &ty, f)?.0;
-        Ok((ty, target))
-    }).collect()
+    primitives
+        .into_iter()
+        .map(|ty| {
+            let target = implicit_implementation(input, &ty, f)?.0;
+            Ok((ty, target))
+        })
+        .collect()
 }
 
 /// Exact implicit implementations for classes constructed by the reachable program.
@@ -1161,7 +1183,9 @@ pub(super) fn select_inventory_with_host_roots(
         }
         for &contract in &functions {
             for (_, target) in scalar_interface_targets(input, contract, &functions)? {
-                if !functions.contains(&target) { pending.push(target); }
+                if !functions.contains(&target) {
+                    pending.push(target);
+                }
             }
             if let Some(target) = string_dispatch_target(input, contract)? {
                 if !functions.contains(&target) {

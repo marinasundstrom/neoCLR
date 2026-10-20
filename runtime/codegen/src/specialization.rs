@@ -1432,8 +1432,12 @@ pub(crate) fn expand_with_conformance(
     // Intrinsic storage does not consume nominal shapes. Preserve its verified,
     // reached closed interface views through the same argument-erasure path.
     for intrinsic in std::iter::once(&Type::String).chain(super::selection::SCALAR_PRIMITIVES) {
-        let Some(original) = input.type_definition(intrinsic) else { continue; };
-        let Some(projected) = expanded.types.iter_mut().find(|t| t.name == original.name) else { continue; };
+        let Some(original) = input.type_definition(intrinsic) else {
+            continue;
+        };
+        let Some(projected) = expanded.types.iter_mut().find(|t| t.name == original.name) else {
+            continue;
+        };
         projected.implements = context
             .shapes
             .iter()

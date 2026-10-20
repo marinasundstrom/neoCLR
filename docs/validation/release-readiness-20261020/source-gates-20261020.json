@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-20",
+  "baseRevision": "386e1c7b01bc2c2492fa557b18666f23ad8c2039",
+  "host": "macOS ARM64",
+  "checks": {
+    "workspaceRustfmt": "passed",
+    "rootStrictClippyAllTargets": "passed",
+    "numericFormatTests": 2,
+    "nativeIntegerTests": 9,
+    "nominalInheritanceTests": 5,
+    "hostValidatorTests": 3,
+    "noticePackages": 139,
+    "noticeFiles": 256,
+    "websitePages": 5036
+  },
+  "expandedBackendStrictClippy": {
+    "passed": false,
+    "libraryDiagnostics": 75
+  },
+  "scope": "Development source gates only; full extracted-source tests, matched packages, other platforms and release performance remain open.",
+  "changedRustSha256": {
+    "runtime/codegen/src/bindings.rs": "a2c6a94f9eb045c9efcd46750b1930432430abe1c76443b6d0d38f6ee3686f25",
+    "runtime/codegen/src/boxing.rs": "622ce64b9c3df642558e6f9909a874cf52e455c631ef3df7da1538e9aded9ca8",
+    "runtime/codegen/src/fault_details.rs": "3f0a79b6fe1e4926181c19df9c7d259b934d4e8f1ef3de2655e66d932ec38e58",
+    "runtime/codegen/src/linking.rs": "ba06cdec20de2cabf5126bccfca47088094eb49ce65b45f8bdcadb03210808a5",
+    "runtime/codegen/src/selection.rs": "28fe44237d3d3487c95913dedc50955233c73463632106a78fb8b79eaabe175b",
+    "runtime/codegen/src/specialization.rs": "0d6fca9ec509772704fbcd3e8e526522b8aca677076f0a6e6a45e25ad5676c8f",
+    "runtime/codegen/src/value_profile.rs": "d7d2922948dcbef5e8256484d27f9b2cd8ddf7eb1bcaad89ed643e355d89f819",
+    "runtime/codegen/src/values.rs": "e2830bea11ee7200f8a40dd37487a16dd17983262b55594803d0a9981f7ebb50",
+    "src/inheritance.rs": "9d088665ee9a41e9ee80f192548911ededd86ab5ee881de02496e026beb2c7ae",
+    "src/intrinsic_objects.rs": "30e3d0340177f31f4fd1196bd918cf13fff761f70d824b764d3a355263e5c3c9",
+    "src/lib.rs": "e238b9c66be992c1e6890089b6cc407a7cf847f0f9469a80a81e6a65346a553d",
+    "src/native.rs": "26a420e4471ed8f39b4e4ab13287a731de7e1c70321d8016161ab5b5b751d4c8",
+    "src/numeric_format_core.rs": "3d6f1e40d465705e91d2afec100b505b1ff756c284d0e77efd3a7594c3d6b7d5",
+    "tests/native_integers.rs": "368751e85108128c6ba8005a178bc131befe84243e6954311997bcd045f53cfa"
+  }
+}

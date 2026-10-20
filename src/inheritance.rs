@@ -402,9 +402,9 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         if (method.is_virtual || method.is_override)
             && (!method.is_virtual
                 || !method.instance
-                || (!method.receiver_byref
-                    && !(text_override && method.owner.as_ref() == Some(&Type::String))
-                    && !method
+                || !(method.receiver_byref
+                    || (text_override && method.owner.as_ref() == Some(&Type::String))
+                    || method
                         .owner
                         .as_ref()
                         .is_some_and(|owner| module.is_reference_type(owner)))

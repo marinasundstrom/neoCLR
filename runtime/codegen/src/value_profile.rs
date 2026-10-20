@@ -1056,11 +1056,12 @@ impl<'a> Profile<'a> {
                 expected,
             ),
             (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) => {
-                self.boxed_interfaces.contains(&(*actual, *expected)) || crate::selection::implements_interface(
-                    self.input,
-                    &Type::Named(self.input.types[*actual].name.clone()),
-                    &Type::Named(self.input.types[*expected].name.clone()),
-                )
+                self.boxed_interfaces.contains(&(*actual, *expected))
+                    || crate::selection::implements_interface(
+                        self.input,
+                        &Type::Named(self.input.types[*actual].name.clone()),
+                        &Type::Named(self.input.types[*expected].name.clone()),
+                    )
             }
             (Ty::Reference(actual), Ty::Reference(expected)) => {
                 self.derives_from(*actual, *expected)
@@ -1128,19 +1129,18 @@ impl<'a> Profile<'a> {
                 })
                 .map(|(n, _)| n)
                 .collect(),
-            Ty::Interface(i) => {
-                self.input
-                    .types
-                    .iter()
-                    .enumerate()
-                    .filter(|(n, t)| {
-                        t.representation == Representation::Record
-                            && !t.is_abstract
-                            && self.reference_assignable(&Ty::Reference(*n), &Ty::Interface(*i))
-                    })
-                    .map(|(i, _)| i)
-                    .collect()
-            }
+            Ty::Interface(i) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
+                .filter(|(n, t)| {
+                    t.representation == Representation::Record
+                        && !t.is_abstract
+                        && self.reference_assignable(&Ty::Reference(*n), &Ty::Interface(*i))
+                })
+                .map(|(i, _)| i)
+                .collect(),
             _ => unreachable!("admitted reference target"),
         }
     }

@@ -342,7 +342,12 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             || f.instance
             || f.receiver_byref
             || f.receiver_readonly
-            || f.parameters != if matches!(implementation, "single-format-v1" | "double-format-v1") { vec![parameter, Type::Int32, Type::Int32, Type::Boolean] } else { vec![parameter] }
+            || f.parameters
+                != if matches!(implementation, "single-format-v1" | "double-format-v1") {
+                    vec![parameter, Type::Int32, Type::Int32, Type::Boolean]
+                } else {
+                    vec![parameter]
+                }
             || f.returns != result
             || f.no_result
             || f.impl_flags != 0x1000

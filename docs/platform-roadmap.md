@@ -37,7 +37,7 @@ extend equality/hash to Int32-backed enum fields. [Enum general formatting](expe
 now reuses shared numeric/text services for names, flags and unnamed values; other
 field shapes and formats remain bounded. [Ordinary value display overrides](experiments/value-display/README.md)
 align Index, Range and seven errors across direct/boxed/composite calls. The bounded numeric
-formats/parsers are under final qualification; general providers remain deferred. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
+formats/parsers and enum parsing are qualified; general providers remain deferred. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
 the [260-declaration inventory](design/class-library-type-inventory-20261020.md) now covers the whole authored public surface, with family execution evidence and explicit remaining gaps. This is not whole-library execution certification.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.

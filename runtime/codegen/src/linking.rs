@@ -509,7 +509,9 @@ pub fn prepare(
         };
         for primitive in super::selection::SCALAR_PRIMITIVES {
             if super::selection::implements_interface(&source_conformance, primitive, &target) {
-                scalar_interfaces.push(json!({"primitive":primitive,"interfaceCompiledIndex":row["compiledIndex"]}));
+                scalar_interfaces.push(
+                    json!({"primitive":primitive,"interfaceCompiledIndex":row["compiledIndex"]}),
+                );
             }
         }
         if super::selection::implements_interface(
@@ -979,7 +981,10 @@ pub fn prepare(
         .iter()
         .enumerate()
         .filter(|(_, f)| {
-            f.owner.as_ref().is_some_and(super::selection::projected_primitive) && f.instance
+            f.owner
+                .as_ref()
+                .is_some_and(super::selection::projected_primitive)
+                && f.instance
         })
         .map(|(i, f)| (i, f.owner.clone().unwrap()))
         .collect();

@@ -36,15 +36,16 @@ should be reused when its assumptions are unchanged.
   [qualification](../experiments/struct-defaults/README.md). Extend supported native
   field shapes as their boxed adapters become available; this is not full .NET
   ValueType coverage and does not synthesize EquatableTo or ordinary operators.
-- Generic record display, explicit enum format specifiers and primitive
-  self-equality/formatting coverage remain incomplete. Floating-point equality must
-  handle NaN and signed zero consistently with hashing; do not replace it casually
-  with the equality operator.
+- Generic record display and explicit enum format specifiers remain incomplete.
+  Primitive self-equality and bounded formatting now have focused qualification in
+  [primitive equality](../experiments/primitive-equality/README.md) and
+  [numeric formats](../experiments/numeric-formats/README.md), including floating
+  NaN/signed-zero Object equality and hashing; IEEE operators remain distinct.
 - Instant and TimeOffset display need a deliberate representation contract over
   their entire supported domains. Instant admits signed tick values outside the
   bounded civil year range; an ISO-only formatter must not silently lose that domain.
-- Primitive numeric format strings, custom patterns/providers and comprehensive
-  locale data remain separate from the now-qualified culture propagation.
+- Bounded primitive numeric format strings and culture parsing are now qualified.
+  Custom patterns/providers and comprehensive locale data remain deferred.
 
 ## Families still requiring review coverage
 

@@ -5,7 +5,52 @@ Reviewed neoCLR `9f4fdc809` and the matched Raven compiler `100f98a2f`;
 Raven `db4014f71` adds bridge documentation only. This is triage, not release approval
 or a passed package gate. No candidate version, tag or publication date is selected.
 
-## Fix or resolve before freezing
+## Current stabilization checkpoint
+
+After the author-directed globalization and enum work, neoCLR `386e1c7b0` and
+Raven `08c0bce8c` are the latest functional/documentation checkpoints. The compiler
+binary is still the separately hashed `4c051e332-dirty-record-policy-metadata-function-bound`
+cohort; Raven HEAD alone does not reproduce that compiler bundle. Freeze requires
+reconciling that provenance and constructing a fresh matched package.
+
+Completed evidence superseding earlier gaps below:
+
+- Numeric primitives now declare explicit EquatableTo and Formattable contracts;
+  floating NaN/signed-zero Object equality and hashes and all supported scalar
+  adapters have focused qualification. [Numeric globalization](../../experiments/numeric-formats/README.md)
+  passes 23 built-in tests per engine (69 executions). Custom patterns/providers,
+  localized digits/sign policies and additional locales remain deferred.
+- [Enum parsing](../../experiments/enum-parsing/README.md) passes four built-in tests
+  per engine (12 executions), with matching API snapshots and a 5,036-page website
+  build. Missing native generic-method struct/Enum constraints mean runtime type
+  validation today; this is an explicit compiler/metadata gap. Existing Int32-only
+  storage and ASCII member names remain bounded preview support.
+- Ordinary struct defaults, scalar Object adapters, persistent Memory region
+  equality and explicit value display overrides now have evidence in the
+  [class-library review](../../design/class-library-soundness-20261020.md).
+  This does not certify every record component or every library method.
+
+Source-gate cleanup has resumed: formatting drift is corrected and the configured
+root-package Clippy gate passes, alongside 16 focused numeric/inheritance regressions,
+three host-validator tests and notice verification (139 packages, 256 files).
+[Retained source-gate evidence](source-gates-20261020.json) records the limited scope.
+An additional strict check of `neoclr-codegen` reports 75 existing library diagnostics
+(mostly collapsible conditions, redundant unit expressions and argument-count lints).
+That expanded backend gate is not green; retain it as separate cleanup work rather
+than suppressing its warnings or claiming workspace-wide Clippy success.
+
+The next bounded stabilization task is backend lint cleanup and resolution
+of the remaining record/display and generic-constraint scope before package freeze.
+Keep the follow-ups bounded: reproduce forwarded-out assignment on Raven main;
+extend native method constraints through producer, reader, importer and emission
+without a Parse-specific exception; then qualify the remaining generated record
+formatting shapes. Each needs focused positive and rejection tests. Rebuild and
+pin the actual compiler/library/runtime cohort before extracting a candidate SDK.
+No new public API expansion is required to run those checks. The original failures
+below remain historical evidence; do not mistake them for fresh failures or use
+focused development successes to close the cross-platform package gates.
+
+## Original review: fix or resolve before freezing
 
 1. **Native record-generated equality.** A fresh compile of
    [RecordGap.rvn](../../experiments/canonical-text/RecordGap.rvn) still rejects

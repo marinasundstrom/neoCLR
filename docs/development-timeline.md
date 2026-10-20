@@ -20534,3 +20534,9 @@ author decision endorsing that limitation as permanent. See the
 [enum parsing evidence](experiments/enum-parsing/README.md) and the
 [release review](validation/release-readiness-20261020/README.md). Release selection,
 platform/package qualification and publication remain separate unfinished work.
+
+Follow-up author direction in the same session: “Continue fixing all the issues and
+then continue the release”. The assistant continues compiler/backend stabilization
+and matched-package qualification rather than treating known gaps as completed work.
+A returned generic out-call reproduction fails on Raven main; a shared return-flow
+repair is being validated there before deliberate transfer to the native branch.

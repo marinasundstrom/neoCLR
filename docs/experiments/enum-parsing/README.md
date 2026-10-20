@@ -52,3 +52,10 @@ reset and ordinary display after collection. Run with `scripts/test-runtime-libr
 executions) on macOS ARM64. The backend malformed-signature/no-enum-token regression
 passes; four API snapshot checks and the 5,036-page website build pass. These are
 development checks, not a replacement package or cross-platform release qualification.
+
+Compiler follow-up: the forwarding TryParse overload explicitly initializes its out
+parameter before calling the other overload. Without that initialization this compiler
+reported RAV0269 (unassigned out parameter). Initialization preserves the documented
+reset contract; general forwarded-out definite-assignment behavior needs an isolated
+Raven-main reproduction before deciding on a compiler fix. This is not evidence
+that ordinary caller out arguments fail (those are exercised by the built-in tests).

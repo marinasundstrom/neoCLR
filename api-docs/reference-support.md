@@ -20,6 +20,38 @@ numbers and comma-separated names. Parse returns Result with NumberParseError;
 TryParse resets its out parameter on failure. Enum type arguments are runtime-checked
 until native method constraints can represent struct/Enum bounds.
 
+## Enum parsing (development)
+
+```raven
+static func Parse<TEnum>(text: string?) -> Result<TEnum, NumberParseError>
+static func Parse<TEnum>(text: string?, ignoreCase: bool) -> Result<TEnum, NumberParseError>
+static func TryParse<TEnum>(text: string?, out result: TEnum) -> bool
+static func TryParse<TEnum>(text: string?, ignoreCase: bool, out result: TEnum) -> bool
+```
+
+`text` accepts a declared name, comma-separated names, or one signed decimal Int32.
+Surrounding whitespace is ignored. Numbers need not name declared members, and lists
+combine bits even without Flags. `ignoreCase` selects ordinal case-insensitive matching;
+omitting it means case-sensitive matching. Null, empty text, unknown names, empty list
+tokens, numeric lists, hexadecimal and fractional input produce `InvalidFormat`.
+An out-of-range integer produces `Overflow`. TryParse returns false for both errors
+and writes the zero/default enum value; success writes the parsed value.
+
+`TEnum` must be a supported Int32 enum. Invalid type arguments fault at runtime,
+including with null text, until native method constraints support struct/Enum bounds.
+Current metadata admits ASCII member names. Parse uses Result rather than throwing
+.NET parsing exceptions. This API may allocate trimmed/token strings, an enum box
+and a Result carrier; it does not allocate names/values snapshot arrays.
+
+The built-in suite includes this usage:
+
+```raven
+var value = State.Failed
+let success = Enum.TryParse<State>("READY", true, out value)
+```
+
+Here `State` declares `Ready = 1` and `Failed = -1`; success is true and value is Ready.
+
 <a id="metadata-scaffolds"></a>
 
 ## Native metadata and documentation inputs

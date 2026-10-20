@@ -181,10 +181,18 @@ impl IntrinsicValue {
             Self::Char(ref value) => value.clone().into(),
             Self::String(ref value) => value.clone(),
             Self::Single(_) | Self::Double(_) => {
-                let (value, single) = match *self { Self::Single(v) => (v as f64, true), Self::Double(v) => (v, false), _ => unreachable!() };
-                let buffer = crate::numeric_format_core::format(value, single, b'G', -1, false).ok()?;
-                std::str::from_utf8(&buffer.bytes[..buffer.len]).ok()?.to_owned().into()
-            },
+                let (value, single) = match *self {
+                    Self::Single(v) => (v as f64, true),
+                    Self::Double(v) => (v, false),
+                    _ => unreachable!(),
+                };
+                let buffer =
+                    crate::numeric_format_core::format(value, single, b'G', -1, false).ok()?;
+                std::str::from_utf8(&buffer.bytes[..buffer.len])
+                    .ok()?
+                    .to_owned()
+                    .into()
+            }
         })
     }
 
@@ -239,8 +247,8 @@ fn intrinsic_value(module: &Module, object: &ObjectReference) -> Result<Intrinsi
         (Type::Byte, Value::Byte(value)) => Ok(IntrinsicValue::Int32(value as i32)),
         (Type::Int16, Value::Int16(value)) => Ok(IntrinsicValue::Int32(value as i32)),
         (Type::UInt16, Value::UInt16(value)) => Ok(IntrinsicValue::Int32(value as i32)),
-        (Type::UInt32, Value::UInt32(value)) => Ok(IntrinsicValue::UInt32(value as u32)),
-        (Type::UInt64, Value::UInt64(value)) => Ok(IntrinsicValue::UInt64(value as u64)),
+        (Type::UInt32, Value::UInt32(value)) => Ok(IntrinsicValue::UInt32(value)),
+        (Type::UInt64, Value::UInt64(value)) => Ok(IntrinsicValue::UInt64(value)),
         (Type::IntPtr, Value::IntPtr(value)) => Ok(IntrinsicValue::Int64(value as i64)),
         (Type::UIntPtr, Value::UIntPtr(value)) => Ok(IntrinsicValue::UInt64(value as u64)),
         (Type::Int64, Value::Int64(value)) => Ok(IntrinsicValue::Int64(value)),

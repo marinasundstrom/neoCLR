@@ -215,11 +215,17 @@ impl Options {
                     ))
                 })
                 .collect(),
-            boxed_interfaces: report.and_then(|r| r["boxedInterfaceViews"].as_array())
-                .into_iter().flatten().filter_map(|r| Some((
-                    r["typeCompiledIndex"].as_u64()? as usize,
-                    r["interfaceCompiledIndex"].as_u64()? as usize,
-                ))).collect(),
+            boxed_interfaces: report
+                .and_then(|r| r["boxedInterfaceViews"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["typeCompiledIndex"].as_u64()? as usize,
+                        r["interfaceCompiledIndex"].as_u64()? as usize,
+                    ))
+                })
+                .collect(),
             string_interfaces: report
                 .and_then(|r| r["stringInterfaceViews"].as_array())
                 .map(|rows| {
@@ -1342,12 +1348,20 @@ impl Options {
                 .filter(|r| r["implementation"] == "char-text-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            single_format: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            single_format: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "single-format-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            double_format: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            double_format: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "double-format-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             int64_to_string: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()

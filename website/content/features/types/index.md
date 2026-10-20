@@ -89,7 +89,8 @@ Development `Enum.Parse<TEnum>` returns a typed Result; `TryParse<TEnum>` writes
 output value and returns Boolean. Both accept names, signed decimal values and
 comma-separated names, with explicit optional case folding. Int32 storage and ASCII
 member names remain the current boundary. Enum type arguments are checked at runtime;
-compile-time enum constraints remain a gap. See the [Enum reference](/docs/api/System/Enum/).
+compile-time enum constraints remain a gap. See the [Enum reference](/docs/api/System/Enum/)
+and [parsing contract](/docs/reference-support.html#enum-parsing-development).
 Numeric primitives now support Formattable and boxed floating-point display. This
 does not yet cover every .NET field shape or dispatch path. The [Object API guide](/docs/objects.html) records the
 supported contracts and [implementation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)

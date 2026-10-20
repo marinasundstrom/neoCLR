@@ -254,7 +254,13 @@ ret
         .unwrap();
     for value in [0, 1, usize::MAX] {
         assert_eq!(
-            equals.invoke(vec![Value::UIntPtr(value), Value::UInt64(value as u64)], ExecutionOptions::default()).unwrap().value,
+            equals
+                .invoke(
+                    vec![Value::UIntPtr(value), Value::UInt64(value as u64)],
+                    ExecutionOptions::default()
+                )
+                .unwrap()
+                .value,
             Value::Boolean(true)
         );
         assert_eq!(
