@@ -2,7 +2,7 @@
 
 **Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) tracks the bounded native record equality/hash fix and remaining component/formatting gaps, the [String call-projection repair](validation/string-direct-call-20261020/README.md), and a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
 
-**Record formatting follow-up (2026-10-20):** [Scalar and nested positional record formatting](experiments/record-formatting/README.md) now has native bodies, including [closed declared union components](experiments/record-union-formatting/README.md); enum and broader component/generic formatting remain gaps. Keep the replacement matched-package gates open.
+**Record formatting follow-up (2026-10-20):** [Scalar and nested positional record formatting](experiments/record-formatting/README.md) now has native bodies, including [closed declared union components](experiments/record-union-formatting/README.md); enum and broader component/generic formatting remain gaps. [Explicit equality-interface qualification](experiments/record-interface-contracts/README.md) verifies ordinary dispatch and improves unsupported-contract diagnostics; automatic interface synthesis remains open. Keep the replacement matched-package gates open.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)

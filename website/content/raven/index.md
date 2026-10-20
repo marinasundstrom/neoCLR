@@ -83,6 +83,9 @@ records the limits and allocation measurements. Typed and boxed record compariso
 are tested across interpreter, JIT and AOT. Generic record owners, unsupported union
 payloads, floating-point components, imported value-record discovery and broader generated formatting remain gaps;
 this is development support, not full record parity in a published release.
+Supported records can explicitly implement `EquatableTo<Self>` through their
+generated equality method and ordinary interface dispatch. Automatic native record
+interface synthesis remains a gap; unsupported promised contracts are rejected.
 
 Development native record formatting now covers scalar and nested positional record
 structs, with named members, quoted text and boxed `ToString()` dispatch. It uses

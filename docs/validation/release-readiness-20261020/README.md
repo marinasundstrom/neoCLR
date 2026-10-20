@@ -44,7 +44,7 @@ components, automatic imported record discovery and formatting remain.
 [Explicit imported value contracts](../../experiments/record-components/README.md)
 now admit nongeneric Index/Range components using their public typed methods.
 ConsoleKeyInfo still lacks a declared self-equality interface for use as an imported
-component (shared synthesis looks up IEquatable<T>, while neoCLR declares EquatableTo<T>); Duration lacks a declared hash method. These remain explicit gaps.
+component (shared synthesis looks up IEquatable<T>, while neoCLR declares EquatableTo<T>); Duration lacks a declared hash method. These remain explicit gaps. [Explicit record-interface qualification](../../experiments/record-interface-contracts/README.md) verifies the existing ordinary dispatch path and earlier rejection of unsupported promised contracts; it does not close automatic synthesis.
 Native primitive Object-dispatch adapters are also incomplete; direct record component
 operations avoid that path without asserting those boxed APIs are qualified. The
 original failure JSON above remains historical evidence. No new release identity or

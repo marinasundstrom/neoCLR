@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-interface-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record interface\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-interface-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record interface\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-interface-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record interface\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-interface-app/app": "c63374434fcf9657b5cb139b2b16aaa65cfbdc48b3981cd49aa34284330969d2",
+    "/Users/robert/Projects/neoclr/target/record-interface-app/app.dll": "3ec6c380662dd93db7dcd857ad586140985d1d2f89189fb2a33368846c06a39d",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/sdk/tools/rvnc/rvnc.dll": "599692908211b1362e4cb1869ce6da49100f0454f2f9aaf32ce6e7ee37b8a4c3",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "6d7103c1e848917f1df0f807454f2bdfc96ee4be56cc269e590f904c12c232f7",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/bin/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "/Users/robert/Projects/neoclr/target/record-union-format-bundle-v2/bundle/lib/System.Runtime.dll": "c5957837eb2b173b8cdb1d0c7d981bb1f12facce44748d1e9be889f3a1ee232e"
+  }
+}

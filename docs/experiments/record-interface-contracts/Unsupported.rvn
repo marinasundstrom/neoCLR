@@ -1,0 +1,10 @@
+import System.*
+struct Storage { val Value: int = 0 }
+record struct Broken(Value: Storage) : EquatableTo<Broken>
+func Main() {
+    let duration: Storage = default
+    let contract: EquatableTo<Broken> = Broken(duration)
+    if !contract.Equals(Broken(duration)) {
+        System.Fail("record equality")
+    }
+}

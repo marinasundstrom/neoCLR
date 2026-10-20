@@ -1,0 +1,10 @@
+import System.*
+record struct Key(Value: int) : EquatableTo<Key>
+func Main() {
+    let key = Key(42)
+    let contract: EquatableTo<Key> = key
+    if !contract.Equals(Key(42)) || contract.Equals(Key(43)) {
+        System.Fail("record interface equality")
+    }
+    Console.WriteLine("PASS record interface")
+}
