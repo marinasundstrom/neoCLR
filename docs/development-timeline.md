@@ -20271,3 +20271,17 @@ candidate scope to distinguish implemented text/console work from proposals and
 recorded the required source/platform/editor/performance gates. Additional console
 capabilities and String views remain follow-ups. No fixes, new release identity,
 package qualification or publication are claimed by this review.
+
+### .NET runtime and ABI defaults reaffirmed — 2026-10-20
+
+During the native record-formatting continuation, the author directed: “We should
+follow the .NET conventions, for the runtime and execution, unless we diverge.”
+The author then clarified: “Even ABIs”. The assistant accepted .NET/CLR conventions
+as the default for runtime contracts, execution and ABI design, including calling
+conventions, argument/return passing, value layout, interface dispatch and interop.
+The assistant proposed reviewing existing neoCLR-specific choices rather than
+assuming they are accepted divergences, documenting reasons/tradeoffs/tests for
+retained differences. This exchange does not establish .NET binary compatibility
+or report an ABI migration. [Design research](design-research.md) now records the
+extended default. The in-progress record formatting uses existing typed calls,
+case-pattern contracts and ordinary override dispatch; it adds no ABI convention.

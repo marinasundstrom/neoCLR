@@ -15,6 +15,15 @@ an unimplemented feature is a gap rather than a reason to invent different seman
 This updates the default without requiring identical CLR internals or undoing justified
 UTF-8 platform choices. Preserve earlier decisions and reassess them when affected.
 
+On 2026-10-20 the author explicitly extended this default to runtime execution and
+ABIs. Compare calling conventions, argument/return passing, value layout, dispatch
+and interop against the corresponding .NET/CLR contract before choosing a different
+one. Identify the relevant target/platform and implementation layer; this direction
+is not a claim of existing .NET binary compatibility. Existing neoCLR-specific ABI
+choices remain subject to review, with reasons, costs, validation and migration
+recorded for retained differences. No wholesale ABI replacement is implied by this
+policy update; assess affected contracts as part of their implementation work.
+
 Different syntax or internals are permitted, but difference
 alone is not an improvement. More runtime machinery is an option to evaluate, not
 an automatic preference. Historical .NET/CLR compatibility accommodations are
