@@ -1,0 +1,1 @@
+native build: /Users/robert/Projects/neoclr/docs/experiments/http-version-values/Program.rvn(22,46): error RAV1504: Cannot assign 'HttpVersion' to 'EquatableTo<HttpVersion>'

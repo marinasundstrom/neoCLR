@@ -19,6 +19,7 @@ values or requiring special runtime record types.
 | Duration | Typed/Object equality and hashes cover all signed ticks | [Duration values](../experiments/duration-values/README.md) |
 | Formatting | Culture reaches Formattable; bounded time/duration formats and all composite arities work | [culture formatting](../experiments/formattable-culture/README.md) |
 | Other time values | Date, TimeOfDay, Instant, TimeOffset and LocalDateTime have matching Object equality/hash; LocalDateTime has civil equality/ordering interfaces | [time values](../experiments/time-values/README.md) |
+| HTTP version | Both components participate in typed/Object equality and hashes; display dispatch matches the reference contract | [HTTP version values](../experiments/http-version-values/README.md) |
 
 These consumers qualify their documented contracts in interpreter/JIT/AOT. They
 are not exhaustive tests of every member or every class-library type. Prior evidence
@@ -26,9 +27,6 @@ should be reused when its assumptions are unchanged.
 
 ## Remaining concrete candidates
 
-- `System.Web.Http.HttpVersion` exposes typed equality but lacks EquatableTo and
-  Object equality/hash overrides. Its existing ToString is not an override. Test
-  both components, defaults, separate boxes and response/request version consumers.
 - Index/Range and several ordinary error structs declare ToString without override.
   Check direct versus Object/interface dispatch before changing declarations; do
   not conflate display repair with default structural value equality.

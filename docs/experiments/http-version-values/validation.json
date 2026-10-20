@@ -1,0 +1,86 @@
+{
+  "expectedFault": false,
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-version-value-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Web.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP version values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-version-value-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Web.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP version values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-version-value-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP version values\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/http-version-value-app/app": "58929c9aa638ce515b00b165ca7853670903960337fa44a90162706e9b119aaa",
+    "/Users/robert/Projects/neoclr/target/http-version-value-app/app.dll": "970940305019418dda576132c30eb760040cc328a3b769b223a41ca9cef9fd8f",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/bin/neoclr-codegen": "36b9cf3059de373ea96981a7ee83bbc0bc95a06998f4cca7d12eedf6e1f4e4e5",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Runtime.dll": "330d92c1374d652a7f96369835afb25d8c75088504ed4e013adb3deaea6b0d4f",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Data.dll": "4ef4c63599dd96d29a9cff0fea00380e30c918aac6c1bc97aff9a72cc893c569",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Networking.dll": "237c6bec846954a47165477a040fe8c6f78e40c5d5c178fa7ad9b30a28307c9e",
+    "/Users/robert/Projects/neoclr/target/http-version-value-bundle/bundle/lib/System.Web.dll": "8721bdad487095e94471be0f9b6ee2ba1b41de18e9fb5c47081ee95ee885c03b"
+  }
+}

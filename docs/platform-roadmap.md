@@ -13,7 +13,9 @@ but their references and boxing still count. The first follow-up
 [completes Duration value equality/hash](experiments/duration-values/README.md).
 [Culture-aware Formattable and bounded civil/duration formats](experiments/formattable-culture/README.md)
 now connect explicit culture to composite formatting. The [time-value contracts](experiments/time-values/README.md)
-complete boxed equality/hash and LocalDateTime equality/ordering. Primitive numeric formats and
+complete boxed equality/hash and LocalDateTime equality/ordering.
+[HttpVersion value contracts](experiments/http-version-values/README.md) also align
+typed/boxed equality, hashes and display. Primitive numeric formats and
 general providers remain gaps. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
 this does not certify all types.
 

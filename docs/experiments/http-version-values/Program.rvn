@@ -1,0 +1,61 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Web.Http.*
+
+record struct Protocol(Value: HttpVersion)
+record struct Generic<T>(Value: T)
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func CheckVersion(major: int, minor: int, text: string) {
+    let value = HttpVersion(major, minor)
+    let same = HttpVersion(major, minor)
+    let otherMajor = HttpVersion(if major == 0 { 1 } else { 0 }, minor)
+    let otherMinor = HttpVersion(major, if minor == 0 { 1 } else { 0 })
+    Check(value.Major == major && value.Minor == minor, "components")
+    Check(value.Equals(same) && !value.Equals(otherMajor) && !value.Equals(otherMinor), "typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "equal hashes")
+    let contract: EquatableTo<HttpVersion> = value
+    Check(contract.Equals(same) && !contract.Equals(otherMinor), "interface equality")
+    let boxed: Object = value
+    let second: Object = same
+    Check(boxed.Equals(second) && second.Equals(boxed), "distinct boxes")
+    Check(!boxed.Equals(otherMajor) && !boxed.Equals(otherMinor) && !boxed.Equals(null) && !boxed.Equals(major), "boxed type checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "boxed hash")
+    Check(value.ToString() == text && boxed.ToString() == text, "display dispatch")
+    Check(String.Format("[{0}]", value) == "[" + text + "]", "composite display")
+    let wrapper = Protocol(value)
+    Check(wrapper == Protocol(same) && wrapper != Protocol(otherMinor), "record equality")
+    Check(wrapper.GetHashCode() == Protocol(same).GetHashCode(), "record hash")
+    let generic = Generic<HttpVersion>(value)
+    Check(generic == Generic<HttpVersion>(same) && generic != Generic<HttpVersion>(otherMajor), "generic equality")
+    Check(generic.GetHashCode() == Generic<HttpVersion>(same).GetHashCode(), "generic hash")
+    Check(Generic<Object>(boxed) == Generic<Object>(second), "erased equality")
+    Check(KeyValuePair<HttpVersion, int>(value, 1) == KeyValuePair<HttpVersion, int>(same, 1), "imported pair")
+}
+
+func Main() {
+    CheckVersion(0, 0, "0.0")
+    CheckVersion(1, 1, "1.1")
+    CheckVersion(2, 0, "2.0")
+    CheckVersion(2147483647, 2147483647, "2147483647.2147483647")
+    let zero: HttpVersion = default
+    Check(zero.Equals(HttpVersion(0, 0)), "default value")
+    Check(HttpVersion.Http11.Equals(HttpVersion(1, 1)), "HTTP 1.1 constant")
+    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let version: Object = response.Version
+    Check(version.Equals(HttpVersion.Http11) && version.ToString() == "1.1", "response version")
+    response.Dispose()
+    let Ok(request) = HttpRequest.Get("http://localhost/") else {
+        System.Fail("request creation")
+    }
+    let requestVersion: Object = request.Version
+    Check(requestVersion.Equals(HttpVersion.Http11) && requestVersion.GetHashCode() == HttpVersion.Http11.GetHashCode(), "request version")
+    request.Dispose()
+    Console.WriteLine("PASS HTTP version values")
+}

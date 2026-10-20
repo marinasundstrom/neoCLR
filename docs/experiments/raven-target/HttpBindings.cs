@@ -112,12 +112,14 @@ static class HttpBindings
                 public override int GetHashCode() => default;
                 public override string ToString() => default;
             }
-            public readonly struct HttpVersion {
+            public readonly struct HttpVersion : EquatableTo<HttpVersion> {
                 public HttpVersion(int major, int minor) { }
                 public int Major => default;
                 public int Minor => default;
                 public static HttpVersion Http11 => default;
                 public bool Equals(HttpVersion other) => default;
+                public override bool Equals(object other) => default;
+                public override int GetHashCode() => default;
                 public override string ToString() => default;
             }
             public sealed class HttpRequest : Disposable {

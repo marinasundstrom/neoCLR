@@ -278,3 +278,9 @@ honor `leaveOpen`. See [content ownership](/docs/http-body-streams.html).
 Client responses expose `StatusCode`, `IsSuccessStatusCode`, `Version` and
 `ReasonPhrase`. The reason text is descriptive; success uses the numeric status.
 Custom HTTP/1.1 phrases are decoded only when read, without consuming body data.
+
+Development `HttpVersion` now implements `EquatableTo<HttpVersion>` and matching
+Object equality/hash overrides. Typed and boxed values compare both protocol
+components, and ToString consistently formats major.minor. This also applies to
+versions obtained from requests and responses; supported transport protocols remain
+unchanged. Hashes are execution-local and do not indicate protocol support.

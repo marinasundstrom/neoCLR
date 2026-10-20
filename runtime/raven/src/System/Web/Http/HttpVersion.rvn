@@ -3,7 +3,7 @@ module System.Web.Http
 import System.*
 
 /// An immutable protocol version value. Representing a version does not enable transport support.
-public struct HttpVersion {
+public struct HttpVersion : EquatableTo<HttpVersion> {
     private val major: int
     private val minor: int
 
@@ -22,6 +22,12 @@ public struct HttpVersion {
     static val Http11: HttpVersion => HttpVersion(1, 1)
     /// Compares both protocol components without allocating.
     func Equals(other: HttpVersion) -> bool => major == other.major && minor == other.minor
+    /// Compares both components with a boxed version; null and other types are unequal.
+    override func Equals(other: Object?) -> bool {
+        return other is HttpVersion value && Equals(value)
+    }
+    /// Combines both components consistently with equality; not a persistent identifier.
+    override func GetHashCode() -> int => HashCode.Combine(major, minor)
     /// Formats the version as major.minor; only explicit formatting creates text.
-    func ToString() -> string => String.Concat(major.ToString(), String.Concat(".", minor.ToString()))
+    override func ToString() -> string => String.Concat(major.ToString(), String.Concat(".", minor.ToString()))
 }

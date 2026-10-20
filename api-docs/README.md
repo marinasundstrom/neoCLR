@@ -2746,3 +2746,9 @@ TimeOffset and LocalDateTime, and typed LocalDateTime equality/ordering. Project
 existing self-equality/comparison interfaces for the six time structs, including
 Duration. No new types or manual exclusions are needed.
 [Contract and validation](../docs/experiments/time-values/README.md).
+
+## HTTP version value contracts — 2026-10-20
+
+Refresh both references for HttpVersion's EquatableTo interface, Object equality/hash
+and corrected source ToString override. The existing type selection covers every
+member; no manual exclusion is added. See [validation](../docs/experiments/http-version-values/README.md).
