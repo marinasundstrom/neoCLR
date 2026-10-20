@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Declare EquatableTo<T> explicitly on all fourteen scalar primitives, adding typed Equals where absent. Preserve exact integer/Boolean values, canonical Char equality, and floating NaN/signed-zero semantics consistent with Object equality and hashes; IEEE operators stay unchanged. Direct typed calls avoid boxing; conversion to an interface still boxes.
+
 - Preserve declared interfaces on native primitive boxes and dispatch through the existing borrowed value receiver across scalar kinds. Admit native-width integer generic arguments. No equality interfaces are synthesized; source conformance and exact generic arguments remain authoritative.
 
 - Add Int32/Int64 Formattable and culture-aware D/F/N formatting (precision 0–99), plus default G/G0, through one shared signed-integer formatter. Preserve signed minima and use borrowed UTF-8 views over one output buffer; direct, interface and composite calls share the contract. Unsupported formats fault; other numeric types and custom patterns remain gaps.

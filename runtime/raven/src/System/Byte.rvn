@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Byte : Number {
+public struct Byte : Number, EquatableTo<byte> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: byte
@@ -31,6 +31,9 @@ public struct Byte : Number {
         System.Fail("invalid native parse status")
         return Error(NumberParseError.InvalidFormat())
     }
+
+    /// Tests equality with another value of the same type without boxing.
+    func Equals(other: byte) -> bool => m_value == other
 
     func CompareTo(other: byte) -> int {
         if m_value < other {

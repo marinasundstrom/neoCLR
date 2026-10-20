@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct UInt64 : Number {
+public struct UInt64 : Number, EquatableTo<ulong> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: ulong
@@ -31,6 +31,9 @@ public struct UInt64 : Number {
         System.Fail("invalid native parse status")
         return Error(NumberParseError.InvalidFormat())
     }
+
+    /// Tests equality with another value of the same type without boxing.
+    func Equals(other: ulong) -> bool => m_value == other
 
     func CompareTo(other: ulong) -> int {
         if m_value < other {

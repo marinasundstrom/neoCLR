@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Boolean : ComparableTo<bool> {
+public struct Boolean : ComparableTo<bool>, EquatableTo<bool> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: bool
@@ -20,6 +20,9 @@ public struct Boolean : ComparableTo<bool> {
         System.Fail("invalid native parse status")
         return Error(BooleanParseError.InvalidFormat())
     }
+
+    /// Tests equality with another value of the same type without boxing.
+    func Equals(other: bool) -> bool => m_value == other
 
     func CompareTo(other: bool) -> int {
         if m_value == other {

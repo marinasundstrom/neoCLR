@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Int64 : Number, Formattable {
+public struct Int64 : Number, Formattable, EquatableTo<long> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: long
@@ -46,6 +46,9 @@ public struct Int64 : Number, Formattable {
     static func -(left: long, right: long) -> long => (long)(left - right)
     static func *(left: long, right: long) -> long => (long)(left * right)
     static func /(left: long, right: long) -> long => (long)(left / right)
+
+    /// Tests equality with another value of the same type without boxing.
+    func Equals(other: long) -> bool => m_value == other
 
     func CompareTo(other: long) -> int {
         if m_value < other {

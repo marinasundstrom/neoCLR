@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Primitive equality contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Primitive equality contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/primitive-equality-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Primitive equality contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/primitive-equality-app/app": "02320366178522814f48502bb5da51af16c14f9056093138f8f5b7267a536c52",
+    "/Users/robert/Projects/neoclr/target/primitive-equality-app/app.dll": "678294427993a877d700de7306f9491f3a7a7c31089cc0a4a153c9e076830826",
+    "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/bin/neoclr-codegen": "0004ffb802dfaf52bf1a88a3d55fa80a603dc845cea0d0b4f8673f6df33e430a",
+    "/Users/robert/Projects/neoclr/target/primitive-equality-fixed-bundle/bundle/lib/System.Runtime.dll": "1665de4f8934adeae311cb550418e46d921a712b3a4958c14e2a7ee66f28a545"
+  }
+}

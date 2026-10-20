@@ -127,3 +127,9 @@ The [globalization foundation](../experiments/culture-formats/README.md) adds Nu
 [Bounded Int32/Int64 formatting](../experiments/integer-formats/README.md) adds explicit Formattable contracts and D/F/N output through shared culture data. Other numeric kinds, custom patterns and significant-digit formatting remain gaps; default Object equality/hash semantics are unchanged.
 
 [Primitive interface qualification](../experiments/primitive-interfaces/README.md) extends the normal boxed value contract across scalar widths, floating values, Boolean and Char. Native-width generic arguments now share ordinary admission. This does not synthesize equality interfaces or close floating Object formatting.
+
+[Explicit primitive equality](../experiments/primitive-equality/README.md) completes
+the declared EquatableTo<T> contract across the fourteen scalar kinds. Typed calls
+reuse scalar storage; interface conversions retain ordinary boxing. Floating and
+Char semantics match existing Object equality/hash rules. This does not add automatic
+struct interface synthesis or change operators.

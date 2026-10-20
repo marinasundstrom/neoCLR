@@ -97,7 +97,7 @@ func Main() {
     Check(compare13.CompareTo(Char.FromString("b")) == value13.CompareTo(Char.FromString("b")), "char borrowed receiver")
     Check(compare13.CompareTo(Char.FromString("b")) < 0, "char signed and width behavior")
     Check(!(object1 is ComparableTo<int>), "Exact generic interface")
-    Check(!(object1 is EquatableTo<byte>), "No undeclared equality interface")
+    Check(!(object1 is EquatableTo<int>), "No equality interface for a different primitive type")
     let equatable = (EquatableTo<int>)object4
     Check(equatable.Equals(-2147483648), "Explicit integer equality interface")
     System.Runtime.GC.Collect()

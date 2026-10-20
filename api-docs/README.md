@@ -2752,3 +2752,13 @@ Duration. No new types or manual exclusions are needed.
 Refresh both references for HttpVersion's EquatableTo interface, Object equality/hash
 and corrected source ToString override. The existing type selection covers every
 member; no manual exclusion is added. See [validation](../docs/experiments/http-version-values/README.md).
+
+### Explicit primitive equality (2026-10-20 development)
+
+All fourteen scalar primitives now explicitly declare EquatableTo<T>; twelve gain
+Equals(T), while Int32 and Char retain their existing methods. The compiler reference,
+XML summaries and native snapshot include the relationships and methods on already
+selected types. The snapshot is generated from primitive-equality-fixed-bundle libraries
+with the recorded compiler bridge and native documentation renderer 8da3a45f8.
+[Qualification](../docs/experiments/primitive-equality/README.md) distinguishes typed
+calls from boxing, and records floating and grapheme semantics. No public type is excluded.

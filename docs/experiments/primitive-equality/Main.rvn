@@ -1,0 +1,176 @@
+import System.*
+import System.Result.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        Console.WriteLine(message)
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    let value0 = (sbyte)-1
+    let object0: Object = value0
+    Check(object0 is ComparableTo<sbyte>, "sbyte interface identity")
+    Check(object0 is EquatableTo<sbyte>, "sbyte equality interface identity")
+    let equality0 = (EquatableTo<sbyte>)object0
+    Check(equality0.Equals(value0) && value0.Equals(value0), "sbyte typed and interface equality")
+    let compare0 = (ComparableTo<sbyte>)object0
+    Check(compare0.CompareTo((sbyte)1) == value0.CompareTo((sbyte)1), "sbyte borrowed receiver")
+    Check(compare0.CompareTo((sbyte)1) < 0, "sbyte signed and width behavior")
+    let value1 = (byte)42
+    let object1: Object = value1
+    Check(object1 is ComparableTo<byte>, "byte interface identity")
+    Check(object1 is EquatableTo<byte>, "byte equality interface identity")
+    let equality1 = (EquatableTo<byte>)object1
+    Check(equality1.Equals(value1) && value1.Equals(value1), "byte typed and interface equality")
+    let compare1 = (ComparableTo<byte>)object1
+    Check(compare1.CompareTo((byte)43) == value1.CompareTo((byte)43), "byte borrowed receiver")
+    Check(compare1.CompareTo((byte)43) < 0, "byte signed and width behavior")
+    let value2 = (short)-32768
+    let object2: Object = value2
+    Check(object2 is ComparableTo<short>, "short interface identity")
+    Check(object2 is EquatableTo<short>, "short equality interface identity")
+    let equality2 = (EquatableTo<short>)object2
+    Check(equality2.Equals(value2) && value2.Equals(value2), "short typed and interface equality")
+    let compare2 = (ComparableTo<short>)object2
+    Check(compare2.CompareTo((short)1) == value2.CompareTo((short)1), "short borrowed receiver")
+    Check(compare2.CompareTo((short)1) < 0, "short signed and width behavior")
+    let value3 = (ushort)65534
+    let object3: Object = value3
+    Check(object3 is ComparableTo<ushort>, "ushort interface identity")
+    Check(object3 is EquatableTo<ushort>, "ushort equality interface identity")
+    let equality3 = (EquatableTo<ushort>)object3
+    Check(equality3.Equals(value3) && value3.Equals(value3), "ushort typed and interface equality")
+    let compare3 = (ComparableTo<ushort>)object3
+    Check(compare3.CompareTo((ushort)65535) == value3.CompareTo((ushort)65535), "ushort borrowed receiver")
+    Check(compare3.CompareTo((ushort)65535) < 0, "ushort signed and width behavior")
+    let value4 = -2147483648
+    let object4: Object = value4
+    Check(object4 is ComparableTo<int>, "int interface identity")
+    Check(object4 is EquatableTo<int>, "int equality interface identity")
+    let equality4 = (EquatableTo<int>)object4
+    Check(equality4.Equals(value4) && value4.Equals(value4), "int typed and interface equality")
+    let compare4 = (ComparableTo<int>)object4
+    Check(compare4.CompareTo(1) == value4.CompareTo(1), "int borrowed receiver")
+    Check(compare4.CompareTo(1) < 0, "int signed and width behavior")
+    let value5 = (uint)4294967294L
+    let object5: Object = value5
+    Check(object5 is ComparableTo<uint>, "uint interface identity")
+    Check(object5 is EquatableTo<uint>, "uint equality interface identity")
+    let equality5 = (EquatableTo<uint>)object5
+    Check(equality5.Equals(value5) && value5.Equals(value5), "uint typed and interface equality")
+    let compare5 = (ComparableTo<uint>)object5
+    Check(compare5.CompareTo((uint)4294967295L) == value5.CompareTo((uint)4294967295L), "uint borrowed receiver")
+    Check(compare5.CompareTo((uint)4294967295L) < 0, "uint signed and width behavior")
+    let value6 = Int64.MinValue
+    let object6: Object = value6
+    Check(object6 is ComparableTo<long>, "long interface identity")
+    Check(object6 is EquatableTo<long>, "long equality interface identity")
+    let equality6 = (EquatableTo<long>)object6
+    Check(equality6.Equals(value6) && value6.Equals(value6), "long typed and interface equality")
+    let compare6 = (ComparableTo<long>)object6
+    Check(compare6.CompareTo(1L) == value6.CompareTo(1L), "long borrowed receiver")
+    Check(compare6.CompareTo(1L) < 0, "long signed and width behavior")
+    let Ok(max64) = UInt64.Parse("18446744073709551615") else {
+        System.Fail("Unsigned boundary")
+    }
+    let value7 = max64 - (ulong)1
+    let object7: Object = value7
+    Check(object7 is ComparableTo<ulong>, "ulong interface identity")
+    Check(object7 is EquatableTo<ulong>, "ulong equality interface identity")
+    let equality7 = (EquatableTo<ulong>)object7
+    Check(equality7.Equals(value7) && value7.Equals(value7), "ulong typed and interface equality")
+    let compare7 = (ComparableTo<ulong>)object7
+    Check(compare7.CompareTo(max64) == value7.CompareTo(max64), "ulong borrowed receiver")
+    Check(compare7.CompareTo(max64) < 0, "ulong signed and width behavior")
+    let value8 = (nint)-1
+    let object8: Object = value8
+    Check(object8 is ComparableTo<nint>, "nint interface identity")
+    Check(object8 is EquatableTo<nint>, "nint equality interface identity")
+    let equality8 = (EquatableTo<nint>)object8
+    Check(equality8.Equals(value8) && value8.Equals(value8), "nint typed and interface equality")
+    let compare8 = (ComparableTo<nint>)object8
+    Check(compare8.CompareTo((nint)1) == value8.CompareTo((nint)1), "nint borrowed receiver")
+    Check(compare8.CompareTo((nint)1) < 0, "nint signed and width behavior")
+    let value9 = (nuint)42
+    let object9: Object = value9
+    Check(object9 is ComparableTo<nuint>, "nuint interface identity")
+    Check(object9 is EquatableTo<nuint>, "nuint equality interface identity")
+    let equality9 = (EquatableTo<nuint>)object9
+    Check(equality9.Equals(value9) && value9.Equals(value9), "nuint typed and interface equality")
+    let compare9 = (ComparableTo<nuint>)object9
+    Check(compare9.CompareTo((nuint)43) == value9.CompareTo((nuint)43), "nuint borrowed receiver")
+    Check(compare9.CompareTo((nuint)43) < 0, "nuint signed and width behavior")
+    let value10 = (float)-1.5
+    let object10: Object = value10
+    Check(object10 is ComparableTo<float>, "float interface identity")
+    Check(object10 is EquatableTo<float>, "float equality interface identity")
+    let equality10 = (EquatableTo<float>)object10
+    Check(equality10.Equals(value10) && value10.Equals(value10), "float typed and interface equality")
+    let compare10 = (ComparableTo<float>)object10
+    Check(compare10.CompareTo((float)1.5) == value10.CompareTo((float)1.5), "float borrowed receiver")
+    Check(compare10.CompareTo((float)1.5) < 0, "float signed and width behavior")
+    let value11 = -1.5
+    let object11: Object = value11
+    Check(object11 is ComparableTo<double>, "double interface identity")
+    Check(object11 is EquatableTo<double>, "double equality interface identity")
+    let equality11 = (EquatableTo<double>)object11
+    Check(equality11.Equals(value11) && value11.Equals(value11), "double typed and interface equality")
+    let compare11 = (ComparableTo<double>)object11
+    Check(compare11.CompareTo(1.5) == value11.CompareTo(1.5), "double borrowed receiver")
+    Check(compare11.CompareTo(1.5) < 0, "double signed and width behavior")
+    let value12 = false
+    let object12: Object = value12
+    Check(object12 is ComparableTo<bool>, "bool interface identity")
+    Check(object12 is EquatableTo<bool>, "bool equality interface identity")
+    let equality12 = (EquatableTo<bool>)object12
+    Check(equality12.Equals(value12) && value12.Equals(value12), "bool typed and interface equality")
+    let compare12 = (ComparableTo<bool>)object12
+    Check(compare12.CompareTo(true) == value12.CompareTo(true), "bool borrowed receiver")
+    Check(compare12.CompareTo(true) < 0, "bool signed and width behavior")
+    let value13 = Char.FromString("a")
+    let object13: Object = value13
+    Check(object13 is ComparableTo<char>, "char interface identity")
+    Check(object13 is EquatableTo<char>, "char equality interface identity")
+    let equality13 = (EquatableTo<char>)object13
+    Check(equality13.Equals(value13) && value13.Equals(value13), "char typed and interface equality")
+    let compare13 = (ComparableTo<char>)object13
+    Check(compare13.CompareTo(Char.FromString("b")) == value13.CompareTo(Char.FromString("b")), "char borrowed receiver")
+    Check(compare13.CompareTo(Char.FromString("b")) < 0, "char signed and width behavior")
+    Check(!(object1 is ComparableTo<int>), "Exact generic interface")
+    Check(!(object1 is EquatableTo<int>), "No equality for a different primitive type")
+    let equatable = (EquatableTo<int>)object4
+    Check(equatable.Equals(-2147483648), "Explicit integer equality interface")
+    Check(!equality0.Equals((sbyte)1) && !equality1.Equals((byte)43), "Narrow inequality")
+    Check(!equality2.Equals((short)1) && !equality3.Equals((ushort)65535), "Short inequality")
+    Check(!equality4.Equals(1) && !equality5.Equals((uint)4294967295L), "Integer inequality")
+    Check(!equality6.Equals(1L) && !equality7.Equals(max64), "Wide inequality")
+    Check(!equality8.Equals((nint)1) && !equality9.Equals((nuint)43), "Native inequality")
+    Check(!equality10.Equals((float)1.5) && !equality11.Equals(1.5), "Float inequality")
+    Check(!equality12.Equals(true) && !equality13.Equals(Char.FromString("b")), "Boolean and grapheme inequality")
+    let nan = 0.0 / 0.0
+    let nan32 = (float)nan
+    let nanObject: Object = nan
+    let nan32Object: Object = nan32
+    let nanEquality = (EquatableTo<double>)nanObject
+    let nan32Equality = (EquatableTo<float>)nan32Object
+    Check(nan.Equals(nan) && nanEquality.Equals(nan) && nanObject.Equals(nan), "Double NaN equality")
+    Check(nan32.Equals(nan32) && nan32Equality.Equals(nan32) && nan32Object.Equals(nan32), "Single NaN equality")
+    Check(!(nan == nan) && !(nan32 == nan32), "NaN operators unchanged")
+    Check(!nanEquality.Equals(0.0) && !nan32Equality.Equals((float)0), "NaN differs from numbers")
+    let zero = 0.0
+    let zero32 = (float)0
+    Check(zero.Equals(-0.0) && zero32.Equals((float)-0.0), "Signed zero equality")
+    let zeroObject: Object = zero
+    let minusZeroObject: Object = -0.0
+    Check(zeroObject.GetHashCode() == minusZeroObject.GetHashCode(), "Signed zero hash consistency")
+    let composed = Char.FromString("é")
+    let decomposed = Char.FromString("e\u0301")
+    let grapheme: EquatableTo<char> = composed
+    Check(composed.Equals(decomposed) && grapheme.Equals(decomposed), "Canonical grapheme equality")
+    System.Runtime.GC.Collect()
+    Check(compare2.CompareTo((short)1) < 0, "Borrowed box retained across GC")
+    Check(compare11.CompareTo(1.5) < 0, "Floating box retained across GC")
+    Console.WriteLine("Primitive equality contracts: passed")
+}

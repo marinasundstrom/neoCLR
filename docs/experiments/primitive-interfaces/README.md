@@ -15,8 +15,9 @@ encoding is introduced. Private box tags do not pretend to be new source classes
 fabricated methods. Source metadata remains authoritative.
 
 The supported scalar receiver projection is shared by signed/unsigned integer widths,
-native-width integers, Single, Double, Boolean and Char. The implementation neither
+native-width integers, Single, Double, Boolean and Char. The runtime neither
 adds EquatableTo nor infers structural semantics from empty primitive declarations.
+The subsequent [library equality slice](../primitive-equality/README.md) explicitly declares it.
 Generic interfaces retain their exact type arguments. String already has a separate
 reference-storage adapter and is unchanged. Floating Object display remains a separate
 existing limitation; fixing interface conformance does not claim it is implemented.
@@ -29,7 +30,7 @@ claim of CLR binary ABI compatibility.
 
 The Raven consumer exercises all fourteen scalar kinds through ComparableTo<T>,
 checks direct/interface agreement, exact generic identity, the explicit Int32 equality
-contract, the absence of undeclared Byte equality, unsigned high bits, signed extension,
+contract, the absence of equality for a different primitive type, unsigned high bits, signed extension,
 and references retained across GC. The integer-format consumer separately exercises
 Formattable and composite dispatch, with a retained pre-fix baseline. JSON reports
 record interpreter/JIT/AOT outcomes and artifact hashes.
@@ -46,3 +47,7 @@ Qualification: all fourteen primitive comparison receivers, casts, exact generic
 and retained boxes pass in interpreter, JIT and AOT on macOS ARM64. The integer
 formatting consumer also passes all three engines; the existing borrowed-receiver
 native regression and four API snapshot checks pass.
+
+The original validation report predates explicit Byte equality and tested its then
+undeclared interface. The consumer now checks a different type argument; subsequent
+primitive-equality evidence covers the updated declared contracts.

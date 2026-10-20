@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Double : Number {
+public struct Double : Number, EquatableTo<double> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: double
@@ -31,6 +31,9 @@ public struct Double : Number {
         System.Fail("invalid native parse status")
         return Error(NumberParseError.InvalidFormat())
     }
+
+    /// Tests value equality; NaNs compare equal and signed zeros compare equal.
+    func Equals(other: double) -> bool => m_value == other || (m_value != m_value && other != other)
 
     func CompareTo(other: double) -> int {
         if m_value != m_value {

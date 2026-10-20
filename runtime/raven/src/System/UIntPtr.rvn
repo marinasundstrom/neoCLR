@@ -1,9 +1,12 @@
 module System
 
-public struct UIntPtr : ComparableTo<nuint> {
+public struct UIntPtr : ComparableTo<nuint>, EquatableTo<nuint> {
     // The runtime supplies intrinsic native-width storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: nuint
+
+    /// Tests equality with another value of the same type without boxing.
+    func Equals(other: nuint) -> bool => neoCLR.Runtime.UIntPtrToUInt64(m_value) == neoCLR.Runtime.UIntPtrToUInt64(other)
 
     func CompareTo(other: nuint) -> int {
         let left = neoCLR.Runtime.UIntPtrToUInt64(m_value)

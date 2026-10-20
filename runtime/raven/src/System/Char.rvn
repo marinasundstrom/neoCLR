@@ -3,7 +3,7 @@ module System
 import System.Option.*
 
 
-public struct Char : ComparableTo<char> {
+public struct Char : ComparableTo<char>, EquatableTo<char> {
     // Immutable grapheme storage is supplied by the runtime.
     #pragma warning disable-next-line RAV9032
     private field m_value: char
