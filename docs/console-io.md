@@ -346,3 +346,15 @@ contract, not a public hosting API or a permanent thread restriction on Console.
 [Eleven native checks and the existing Raven text consumer](experiments/terminal-input/README.md#native-invocation-scope-checkpoint)
 qualify macOS host cleanup and regression behavior. Windows terminal acquisition
 remains unsupported, and the changed Windows host has not been tested in this slice.
+
+
+## Public Raven key input — 2026-10-20
+
+Console.OpenKeyInput now acquires the invocation-owned terminal service and returns
+ConsoleKeyReader. Its synchronous ReadKey uses the bounded Raven decoder, returns
+value results and avoids per-key text/array allocation. The private scalar bridge
+is implemented by interpreter, JIT and AOT. See the [public key API](../api-docs/console.md#terminal-keys-development)
+and [PTY/allocation qualification](experiments/console-read-key/README.md). Earlier
+checkpoint descriptions above record the staged implementation; public guest
+binding is now complete for the documented POSIX entry-thread scope. Text-to-key
+handoff, native worker attachment and Windows terminal support remain open.

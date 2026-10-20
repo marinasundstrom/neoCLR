@@ -13647,3 +13647,25 @@ is a metadata resource bound, not a reachable-code or runtime allocation limit.
 Diagnostics report actual counts and caps. Original-scope verification, borrow
 checks and reachability selection remain in force. No Raven/CLI representation or
 public semantic change is involved.
+
+## Synchronous terminal key bridge (2026-10-20)
+
+Raven `100f98a2f` emits the public ConsoleKeyReader implementation and its ordinary
+value/union results from source. Runtime Contract configuration is unchanged.
+Three exact private InternalCalls return Int32: ConsoleTerminalOpen(Boolean),
+ConsoleTerminalReadByte(Int32 handle, Int32 timeoutMilliseconds), and
+ConsoleTerminalClose(Int32 handle). No erased Value or managed pointer crosses
+this boundary. Open returns a positive invocation-owned handle; read returns
+0..255, -1 pending or -2 EOF; service errors use negative statuses. Native lowering
+requires the declared InternalCall signature and matching bundle, and passes the
+private invocation context to the C scope service. Interpreter waits run outside
+managed graph access and retain cancellation/cleanup ownership.
+
+This is runtime lifecycle integration, so InternalCall is intentional rather than
+application native FFI. The private scalar ABI and native entry-thread scope are
+not a future Native API commitment. A native metadata/backend service descriptor
+should eventually replace reserved-name binding; bulk input requires coordinated
+buffer ownership first. See [public ReadKey qualification](experiments/console-read-key/README.md)
+and [design tradeoffs](design/console-input-review-20261020.md). The aggregate CLI
+reference remains documentation-only; it does not establish executable CLI bridge
+support for the new APIs. No .NET compiler behavior changes.

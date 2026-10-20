@@ -244,3 +244,36 @@ invocation service, not a deliberate new public Console rule. No guest API or
 compiler bridge is enabled until that contract and input cursor ownership are
 qualified. The provider lifetime bounds handle uniqueness; reloading a private
 native provider is not a promise that old host-held integer handles remain usable.
+
+## Public synchronous key reader (2026-10-20)
+
+The implemented entry is `Console.OpenKeyInput([captureInterrupts])`, returning a
+fallible disposable `ConsoleKeyReader`; `ReadKey()` blocks without echo and returns
+`Result<Option<ConsoleKeyInfo>, ConsoleKeyError>`. This follows .NET's logical key
+and modifier concepts, but a scope owns terminal mode and signal policy, errors are
+typed, and EOF is explicit. Unlike .NET's UTF-16 KeyChar, `TextScalar: Option<int>`
+represents one Unicode scalar without allocating text. It does not claim a complete
+grapheme, physical key position, key-up event or keyboard layout mapping. Shift,
+Alt and Control are Boolean value properties; no flags allocation or new text type
+is needed. The record constructor accepts user-supplied values; decoder-produced
+scalars are validated Unicode. Future Rune integration can improve that static type.
+
+The decoder consumes a reusable 32-byte buffer. The private host bridge transfers
+one byte as Int32 per call, avoiding managed buffer pinning and retained native
+pointers. This trades additional host transitions/syscalls for simple lossless
+ownership; bulk reads with one shared input queue are a future optimization, not a
+throughput claim. Unsupported sequences and invalid UTF-8 return errors. Any
+unconsumed bytes survive Close and reopen, or subsequent Console byte/text input.
+Legacy Escape syntax uses a 30 ms **inter-byte** timeout, bounded by the 32-byte
+sequence limit. An Alt-prefixed UTF-8 scalar is not subject to that idle timeout.
+
+Text-to-key handoff remains a gap: after the first ordinary byte read, acquisition
+returns Busy for the rest of that invocation. This conservatively protects all
+text decoder/lookahead state, including independently created wrappers. Key-to-text
+handoff is supported. Callers must serialize console input/session access; the
+public managed admission flag is not a thread synchronization primitive. Native
+scope lookup currently admits only the invocation entry thread; Windows terminal
+acquisition remains unsupported. These are qualification gaps, not permanent
+language or console contracts. Default opening preserves signal handling; callers
+must explicitly choose capture to receive Ctrl+C as a key. Scope exit and ordinary
+invocation faults restore modes; forced termination cannot guarantee cleanup.

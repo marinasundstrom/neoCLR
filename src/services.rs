@@ -175,7 +175,10 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::TypeEquals
             | crate::native::Binding::TypeArgumentCount
             | crate::native::Binding::TypeArgument => RuntimeService::TypeInspection,
-            crate::native::Binding::ConsoleReadByte => RuntimeService::ConsoleInput,
+            crate::native::Binding::ConsoleReadByte
+            | crate::native::Binding::ConsoleTerminalOpen
+            | crate::native::Binding::ConsoleTerminalReadByte
+            | crate::native::Binding::ConsoleTerminalClose => RuntimeService::ConsoleInput,
             // Closing an opaque handle may release an input or output resource.
             // Report both logical uses; this is analysis, not an access-control policy.
             crate::native::Binding::FileResource(crate::file_streams::Operation::Close) => {

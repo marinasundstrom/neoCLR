@@ -1,0 +1,224 @@
+module System
+
+import System.*
+import System.IO.*
+import System.Runtime.CompilerServices.*
+import System.Result.*
+import System.Option.*
+
+/// <summary>Logical terminal key identity; Unicode text without a named key uses None.</summary>
+public enum ConsoleKey {
+    None = 0
+    Backspace = 8
+    Tab = 9
+    Enter = 13
+    Escape = 27
+    Space = 32
+    D0 = 48
+    D1 = 49
+    D2 = 50
+    D3 = 51
+    D4 = 52
+    D5 = 53
+    D6 = 54
+    D7 = 55
+    D8 = 56
+    D9 = 57
+    A = 65
+    B = 66
+    C = 67
+    D = 68
+    E = 69
+    F = 70
+    G = 71
+    H = 72
+    I = 73
+    J = 74
+    K = 75
+    L = 76
+    M = 77
+    N = 78
+    O = 79
+    P = 80
+    Q = 81
+    R = 82
+    S = 83
+    T = 84
+    U = 85
+    V = 86
+    W = 87
+    X = 88
+    Y = 89
+    Z = 90
+    UpArrow = 256
+    DownArrow = 257
+    RightArrow = 258
+    LeftArrow = 259
+    Home = 260
+    End = 261
+    Insert = 262
+    Delete = 263
+    PageUp = 264
+    PageDown = 265
+    F1 = 272
+    F2 = 273
+    F3 = 274
+    F4 = 275
+    F5 = 276
+    F6 = 277
+    F7 = 278
+    F8 = 279
+    F9 = 280
+    F10 = 281
+    F11 = 282
+    F12 = 283
+}
+
+/// <summary>A decoded key value. TextScalar is a Unicode scalar, not a grapheme or an allocated String.</summary>
+/// <remarks>Shift is reported only when explicitly encoded; uppercase text alone does not imply Shift.
+/// Legacy terminals cannot distinguish Tab from Ctrl+I, Enter from Ctrl+M or Backspace from Ctrl+H.</remarks>
+public record struct ConsoleKeyInfo(val Key: ConsoleKey, val Shift: bool, val Alt: bool,
+    val Control: bool, val TextScalar: Option<int>)
+
+/// <summary>Exclusive synchronous key input. Use a disposal scope to restore terminal settings.</summary>
+/// <remarks>Open through Console.OpenKeyInput before using text input. Reads do not echo.
+/// One serialized caller per session. Current native support is POSIX on the invocation entry thread.
+/// A legacy Escape prefix uses a 30 ms inter-byte timeout; incomplete UTF-8 waits for completion or EOF.</remarks>
+public class ConsoleKeyReader : Disposable {
+    private val handle: int
+    private val buffer: byte[] = CheckedStorage.Reserve<byte>(32)
+    private var count: int = 0
+    private var ended: bool = false
+    private var closed: bool = false
+    private val operation: TextIOOperation = TextIOOperation(false)
+
+    internal init(handle: int) {
+        self.handle = handle
+        var next = Console.TakeKeyByte()
+        while next >= 0 {
+            buffer[count] = (byte)next
+            count += 1
+            next = Console.TakeKeyByte()
+        }
+    }
+
+    internal static func Failure(status: int) -> ConsoleKeyError {
+        return match status {
+            -3 => ConsoleKeyError.Unavailable
+            -4 => ConsoleKeyError.Busy
+            -5 => ConsoleKeyError.Closed
+            _ => ConsoleKeyError.ReadFailed
+        }
+    }
+
+    /// <summary>Blocks for one key without echo, returning None at terminal EOF.</summary>
+    /// <returns>A value containing logical key, modifiers and optional Unicode scalar, or a typed error.</returns>
+    /// <remarks>Allocates no per-key text or byte array. Invalid UTF-8 and unsupported sequences are consumed;
+    /// an unrelated following byte is retained for the next read. Closing returns that byte to Console input.</remarks>
+    func ReadKey() -> Result<Option<ConsoleKeyInfo>, ConsoleKeyError> {
+        if closed {
+            return Error(ConsoleKeyError.Closed)
+        }
+        if operation.Active {
+            return Error(ConsoleKeyError.Busy)
+        }
+        operation.Begin()
+        use lease = operation
+        let result = ReadCore()
+        operation.Complete()
+        return result
+    }
+
+    private func ReadCore() -> Result<Option<ConsoleKeyInfo>, ConsoleKeyError> {
+        var finish = ended
+        while true {
+            if count == 0 && ended {
+                return Ok(None)
+            }
+            let step = TerminalKeyDecoder.Decode(buffer[..count], finish)
+            if step.State != 0 {
+                var scalar: Option<int> = None
+                if step.TextLength > 0 {
+                    let first = (int)buffer[step.TextOffset]
+                    var value = first
+                    if step.TextLength == 2 {
+                        value = first - 192
+                    } else if step.TextLength == 3 {
+                        value = first - 224
+                    } else if step.TextLength == 4 {
+                        value = first - 240
+                    }
+                    var index = 1
+                    while index < step.TextLength {
+                        value = value * 64 + (int)buffer[step.TextOffset + index] - 128
+                        index += 1
+                    }
+                    scalar = Some(value)
+                }
+                // Reading only one transport byte at a time bounds retained lookahead to one byte.
+                count -= step.Consumed
+                var retained = 0
+                while retained < count {
+                    buffer[retained] = buffer[step.Consumed + retained]
+                    retained += 1
+                }
+                if step.State == 2 {
+                    return Error(ConsoleKeyError.UnsupportedSequence)
+                }
+                if step.State == 3 {
+                    return Error(ConsoleKeyError.InvalidUtf8)
+                }
+                var key = step.Key
+                if key < 256 && key != 8 && key != 9 && key != 13 && key != 27 && key != 32 &&
+                    !(key >= 48 && key <= 57) && !(key >= 65 && key <= 90) {
+                    key = 0
+                }
+                let info = ConsoleKeyInfo((ConsoleKey)key, step.Modifiers % 2 != 0,
+                    (step.Modifiers / 2) % 2 != 0, step.Modifiers >= 4, scalar)
+                return Ok(Some(info))
+            }
+            // Only legacy escape syntax has a deadline. An Alt-prefixed UTF-8 scalar
+            // must not be rejected merely because subsequent bytes arrive slowly.
+            let escape = count > 0 && buffer[0] == 27 &&
+                (count == 1 || buffer[1] == 91 || buffer[1] == 79)
+            let next = neoCLR.Runtime.ConsoleTerminalReadByte(handle, if escape { 30 } else { -1 })
+            if next >= 0 {
+                buffer[count] = (byte)next
+                count += 1
+            } else if next == -1 {
+                finish = true
+            } else if next == -2 {
+                ended = true
+                finish = true
+            } else {
+                return Error(Failure(next))
+            }
+        }
+        return Ok(None)
+    }
+
+    /// <summary>Restores terminal modes. A failed restoration can be retried.</summary>
+    func Close() -> Result<unit, ConsoleKeyError> {
+        if closed {
+            return Ok(())
+        }
+        if operation.Active {
+            return Error(ConsoleKeyError.Busy)
+        }
+        let status = neoCLR.Runtime.ConsoleTerminalClose(handle)
+        if status < 0 {
+            return Error(Failure(status))
+        }
+        closed = true
+        Console.ReleaseKeyInput(buffer, count)
+        return Ok(())
+    }
+
+    /// <summary>Closes the session; invocation cleanup retries restoration after an I/O failure.</summary>
+    func Dispose() {
+        match Close() {
+            Ok(_) => { }
+            Error(_) => { }
+        }
+    }
+}

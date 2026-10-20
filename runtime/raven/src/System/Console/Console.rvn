@@ -8,6 +8,49 @@ import System.Option.*
 
 public static class Console {
     private static var inputReader: SyncTextReader?
+    private static var textInputUsed: bool = false
+    private static var keyInputActive: bool = false
+    private static var pendingKeyBytes: byte[]?
+    private static var pendingKeyOffset: int = 0
+    private static var pendingKeyCount: int = 0
+
+    /// <summary>Acquires synchronous, non-echoing terminal key input before text input starts.</summary>
+    /// <param name="captureInterrupts">When true, signal characters such as Ctrl+C are returned as keys instead of generating terminal signals.</param>
+    /// <returns>An exclusive disposable reader, or Unavailable, Busy or ReadFailed.</returns>
+    /// <remarks>Defaults to preserving signal handling. Redirected stdin and unsupported hosts return Unavailable.
+    /// Text input can follow a closed key session, but a text cursor cannot currently be handed back to key mode.</remarks>
+    static func OpenKeyInput(captureInterrupts: bool) -> Result<ConsoleKeyReader, ConsoleKeyError> {
+        if textInputUsed || keyInputActive {
+            return Error(ConsoleKeyError.Busy)
+        }
+        let handle = neoCLR.Runtime.ConsoleTerminalOpen(captureInterrupts)
+        if handle < 0 {
+            return Error(ConsoleKeyReader.Failure(handle))
+        }
+        keyInputActive = true
+        let reader = ConsoleKeyReader(handle)
+        return Ok(reader)
+    }
+
+    /// <summary>Acquires key input while preserving terminal signal handling.</summary>
+    static func OpenKeyInput() -> Result<ConsoleKeyReader, ConsoleKeyError> => OpenKeyInput(false)
+
+    internal static func TakeKeyByte() -> int {
+        if pendingKeyOffset < pendingKeyCount && pendingKeyBytes is byte[] bytes {
+            let value = (int)bytes[pendingKeyOffset]
+            pendingKeyOffset += 1
+            return value
+        }
+        pendingKeyBytes = null
+        return -1
+    }
+
+    internal static func ReleaseKeyInput(bytes: byte[], count: int) {
+        pendingKeyBytes = bytes
+        pendingKeyOffset = 0
+        pendingKeyCount = count
+        keyInputActive = false
+    }
 
     /// <summary>Writes composite text.</summary>
     /// <param name="format">Composite format text; see String.Format.</param>
@@ -84,6 +127,14 @@ public static class Console {
     }
 
     static func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
+        if keyInputActive {
+            return Error(ConsoleReadError.Unavailable())
+        }
+        textInputUsed = true
+        let pendingByte = TakeKeyByte()
+        if pendingByte >= 0 {
+            return Ok(Some((byte)pendingByte))
+        }
         let payload = neoCLR.Runtime.ConsoleReadByte()
         if neoCLR.Runtime.IsValue<int>(payload) {
             let status = neoCLR.Runtime.UnpackValue<int>(payload)

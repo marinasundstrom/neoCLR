@@ -16,3 +16,11 @@ internal extern func WriteLine(value: string) -> System.Void;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func UInt64ToString(value: ulong) -> string;
+
+// Invocation-owned terminal service, not a stable native host ABI.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ConsoleTerminalOpen(captureInterrupts: bool) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ConsoleTerminalReadByte(handle: int, timeoutMilliseconds: int) -> int;
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ConsoleTerminalClose(handle: int) -> int;

@@ -65,19 +65,44 @@ pub fn console_read_byte(
         .as_array()
         .ok_or("missing selection inventory")?
     {
-        if row["name"] != "neoCLR.Runtime.ConsoleReadByte" {
-            continue;
-        }
+        let name = row["name"].as_str().unwrap_or("");
+        let (parameters, returns, implementation, symbol) = match name {
+            "neoCLR.Runtime.ConsoleReadByte" => (
+                vec![],
+                Type::Value,
+                "console-read-byte-v1",
+                "neoclr_console_read_byte_v1",
+            ),
+            "neoCLR.Runtime.ConsoleTerminalOpen" => (
+                vec![Type::Boolean],
+                Type::Int32,
+                "console-terminal-open-v1",
+                "neoclr_terminal_scope_open_v1",
+            ),
+            "neoCLR.Runtime.ConsoleTerminalReadByte" => (
+                vec![Type::Int32, Type::Int32],
+                Type::Int32,
+                "console-terminal-read-byte-v1",
+                "neoclr_terminal_scope_read_byte_v1",
+            ),
+            "neoCLR.Runtime.ConsoleTerminalClose" => (
+                vec![Type::Int32],
+                Type::Int32,
+                "console-terminal-close-v1",
+                "neoclr_terminal_scope_close_v1",
+            ),
+            _ => continue,
+        };
         let f = &mut input.functions[row["compiledIndex"]
             .as_u64()
             .ok_or("missing compiled index")? as usize];
-        if f.name != "neoCLR.Runtime.ConsoleReadByte"
+        if f.name != name
             || f.owner.is_some()
             || f.instance
             || f.receiver_byref
             || f.receiver_readonly
-            || !f.parameters.is_empty()
-            || f.returns != Type::Value
+            || f.parameters != parameters
+            || f.returns != returns
             || f.no_result
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
@@ -99,10 +124,14 @@ pub fn console_read_byte(
         // A verifiable private placeholder. Only this reported definition is lowered
         // to the native service; no opcode or guest name is an intrinsic by itself.
         f.impl_flags = 0;
-        f.body = vec![Op::Void, Op::PackValue(Type::Void), Op::Return];
+        f.body = if returns == Type::Value {
+            vec![Op::Void, Op::PackValue(Type::Void), Op::Return]
+        } else {
+            vec![Op::Int(0), Op::Return]
+        };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
-            "compiledIndex": row["compiledIndex"], "implementation": "console-read-byte-v1",
-            "symbol": "neoclr_console_read_byte_v1"}));
+            "compiledIndex": row["compiledIndex"], "implementation": implementation,
+            "symbol": symbol}));
     }
     Ok(bindings)
 }
@@ -2903,6 +2932,52 @@ mod utf8_slice_tests {
                 _ => bad.functions[0].body = vec![Op::Branch(0)],
             }
             assert!(utf8_text(&mut bad, &selection).is_err());
+        }
+    }
+}
+
+#[cfg(test)]
+mod terminal_tests {
+    use super::*;
+    #[test]
+    fn terminal_bindings_require_exact_internal_contracts() {
+        for (name, parameters) in [
+            ("ConsoleTerminalOpen", vec![Type::Boolean]),
+            ("ConsoleTerminalReadByte", vec![Type::Int32, Type::Int32]),
+            ("ConsoleTerminalClose", vec![Type::Int32]),
+        ] {
+            let mut original = neoclr::assemble(
+                ".module Probe\n.function Placeholder() -> Int32\nldc.i4 0\nret\n.end",
+            )
+            .unwrap();
+            let f = &mut original.functions[0];
+            f.name = format!("neoCLR.Runtime.{name}");
+            f.parameters = parameters;
+            f.body.clear();
+            f.impl_flags = 0x1000;
+            let selection = json!({"functions":[{"name":f.name,"compiledIndex":0}]});
+            assert_eq!(
+                console_read_byte(&mut original.clone(), &selection)
+                    .unwrap()
+                    .len(),
+                1
+            );
+            for change in 0..6 {
+                let mut invalid = original.clone();
+                let f = &mut invalid.functions[0];
+                match change {
+                    0 => f.parameters.push(Type::Int32),
+                    1 => f.returns = Type::Value,
+                    2 => f.body.push(Op::Return),
+                    3 => f.impl_flags = 0,
+                    4 => f.instance = true,
+                    _ => f.no_result = true,
+                }
+                assert!(
+                    console_read_byte(&mut invalid, &selection).is_err(),
+                    "{name} mutation {change}"
+                );
+            }
         }
     }
 }

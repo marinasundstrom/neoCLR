@@ -18,6 +18,7 @@ pub struct Options {
     pub windows_http_experiment: bool,
     pub user_faults: Vec<usize>,
     pub console_read_byte: Vec<usize>,
+    pub console_terminal: Vec<(usize, usize)>,
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
     pub console_write_memory: Vec<usize>,
@@ -1318,6 +1319,20 @@ impl Options {
                 .flatten()
                 .filter(|r| r["implementation"] == "native-integer-to64-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            console_terminal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    let kind = match r["implementation"].as_str()? {
+                        "console-terminal-open-v1" => 0,
+                        "console-terminal-read-byte-v1" => 1,
+                        "console-terminal-close-v1" => 2,
+                        _ => return None,
+                    };
+                    Some((r["compiledIndex"].as_u64()? as usize, kind))
+                })
                 .collect(),
             console_read_byte: report
                 .and_then(|r| r["nativeBindings"].as_array())

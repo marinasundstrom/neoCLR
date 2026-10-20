@@ -2668,3 +2668,17 @@ All four text interfaces and wrappers also expose NewLine as a mutable string
 property. Both snapshots document exact UTF-8 input delimiters, literal output
 appending, LF defaults and the explicit CRLF migration. No constants type or enum
 is introduced.
+
+
+Development (2026-10-20): Console.OpenKeyInput, ConsoleKeyReader, ConsoleKeyInfo,
+ConsoleKey and the ConsoleKeyError union are included in the legacy selection and
+native API snapshot. The [console guide](console.md#terminal-keys-development)
+covers scalar versus grapheme text, scoped ownership, typed failures and current
+text-to-key/worker/Windows limitations. No renderer exclusion is needed. Legacy
+projection is for documentation; public execution is validated from source-native
+libraries. Internal terminal decoder/bridge functions remain intentionally private.
+The new error case descriptions render from source. RavenDoc still reports missing
+summaries for compiler-generated ConsoleKeyError/case ToString members, as with
+existing unions. These members remain visible; they are not excluded. Synthesized
+member descriptions remain a renderer/documentation maintenance gap, while all
+key acquisition/read failures are documented in the console guide.

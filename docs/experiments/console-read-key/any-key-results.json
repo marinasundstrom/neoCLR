@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "engine": "interpreter",
+      "case": "any-key",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/readkey-any-v1/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Data.PostgreSql.dll",
+        "--instructions",
+        "100000000"
+      ]
+    },
+    {
+      "engine": "jit",
+      "case": "any-key",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/readkey-any-v1/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/lib/System.Data.PostgreSql.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/readkey-bundle-v1/bundle/bin/neoclr-jit-host.dylib"
+      ]
+    },
+    {
+      "engine": "aot",
+      "case": "any-key",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/readkey-any-v1/app"
+      ]
+    }
+  ]
+}

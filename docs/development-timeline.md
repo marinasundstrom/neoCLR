@@ -20210,3 +20210,37 @@ TryReadKey with key/modifier/optional-text data, explicit terminal mode ownershi
 echo and Ctrl+C policy, and capability limits for redirected/legacy terminal input.
 This is a proposed next slice, not an implemented key API; line-delimiter
 qualification remains the current work.
+
+
+### Public ReadKey follow-through — 2026-10-20
+
+The author explicitly directed “Continue through readkey” after the transport,
+decoder and cleanup foundations. The assistant implemented Console.OpenKeyInput
+and a scoped synchronous ConsoleKeyReader.ReadKey, with value results, logical
+keys, Boolean modifiers and optional Unicode scalar text. The assistant chose
+explicit captureInterrupts and non-echoing reads; this is implementation judgment,
+not a recorded author decision about the exact API shape. Char remains a grapheme.
+
+The public consumer passes interpreter/JIT/AOT with real PTYs, and a 128-read native
+managed-allocation comparison has seven allocations both with and without reads,
+all reclaimed. Eager collection counts rise; no throughput claim is made. Both API
+references and the console website are updated. Text-to-key switching is still
+rejected once ordinary input starts to protect decoder/lookahead state; key-to-text
+handoff preserves retained bytes. Windows, native worker attachment, richer terminal
+protocols and genuine async console readiness remain gaps. See the
+[ReadKey evidence](experiments/console-read-key/README.md) and
+[design comparison](design/console-input-review-20261020.md#public-synchronous-key-reader-2026-10-20).
+
+The author observed that this enables console-based tools. The assistant agreed
+that text I/O, key commands, shortcuts and scoped cleanup establish that foundation,
+while noting that full-screen tools would additionally need cursor positioning,
+terminal size and resize events. Those additions were not treated as authorization
+to expand this ReadKey implementation into a complete terminal UI framework.
+
+The author then gave “an app that closes when any key is pressed” as an example,
+followed by apps closing on explicit Ctrl+C and potentially overriding a future
+close attempt. The assistant adds compiled AnyKey and CtrlC examples and explains
+that capture mode already gives application code control over keyboard Ctrl+C.
+A separate general shutdown-request API is proposed for later, with cancellation
+only where the host permits it; forced termination cannot be vetoed. No shutdown
+API or full-screen terminal framework is implemented in this slice.

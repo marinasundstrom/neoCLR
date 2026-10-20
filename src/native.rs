@@ -145,6 +145,9 @@ pub(crate) enum Binding {
     ReadAllText,
     WriteAllText,
     ConsoleReadByte,
+    ConsoleTerminalOpen,
+    ConsoleTerminalReadByte,
+    ConsoleTerminalClose,
     ConsoleWriteBytes,
     ConsoleFlush,
 }
@@ -1161,6 +1164,15 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ConsoleWriteBytes, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleFlush", [Type::Boolean]) => (Binding::ConsoleFlush, Type::Value),
+        ("neoCLR.Runtime.ConsoleTerminalOpen", [Type::Boolean]) => {
+            (Binding::ConsoleTerminalOpen, Type::Int32)
+        }
+        ("neoCLR.Runtime.ConsoleTerminalReadByte", [Type::Int32, Type::Int32]) => {
+            (Binding::ConsoleTerminalReadByte, Type::Int32)
+        }
+        ("neoCLR.Runtime.ConsoleTerminalClose", [Type::Int32]) => {
+            (Binding::ConsoleTerminalClose, Type::Int32)
+        }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
         ("neoCLR.Runtime.StartWorker", [callback, Type::String])
             if *callback == crate::assembler::parse_type("fn<String,String>")? =>

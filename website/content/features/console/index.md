@@ -38,9 +38,45 @@ synchronous escape hatch. All use Result-returning Create factories.
 
 The shape is familiar from .NET Console: text properties and standard byte-stream factories. The contracts differ: input uses typed Result and Option values, text is strict UTF-8, and operations have explicit bounds. .NET ReadLine returns null at EOF; this API returns None.
 
-Console operations return directly and can block; they do not manufacture Tasks. ReadLine recognizes the exact configured NewLine string (LF by default), and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers append their configured NewLine string (LF by default) without a BOM and allow at most 65,536 encoded bytes per call, including a newline. SyncStreamWriter completes writes directly; callers flush explicitly. Encoding selection, console redirection setters and terminal controls are not implemented.
+Console operations return directly and can block; they do not manufacture Tasks. ReadLine recognizes the exact configured NewLine string (LF by default), and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers append their configured NewLine string (LF by default) without a BOM and allow at most 65,536 encoded bytes per call, including a newline. SyncStreamWriter completes writes directly; callers flush explicitly. Console redirection setters, colors and cursor controls are not implemented.
 
 Embedding hosts opt into the byte-output hooks. Older hosts, including the current worker and debugger adapters, support legacy WriteLine but return an I/O error for the new output streams. See the [API guide](../../docs/console.html) for ownership and host behavior.
+
+## Key input (development)
+
+Open a scoped `ConsoleKeyReader` with `Console.OpenKeyInput()` and call `ReadKey()`.
+Use `OpenKeyInput(true)` to receive Ctrl+C as input. Reads block without echo and
+return values containing logical key identity, modifiers and optional Unicode scalar
+text. They create no per-key strings, byte arrays or Tasks. Unicode scalar text is
+distinct from neoCLR's grapheme `Char`.
+
+A small “press any key to exit” application:
+
+```raven
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() {
+    let Ok(keys) = Console.OpenKeyInput(true) else {
+        System.Fail("Terminal key input is unavailable")
+    }
+    use input = keys
+    Console.WriteLine("Press any key to exit.")
+    let Ok(Some(_)) = keys.ReadKey() else {
+        System.Fail("Unable to read a key")
+    }
+}
+```
+
+To exit only on Ctrl+C, continue reading until `key.Control` is true and `key.Key`
+is `ConsoleKey.C`. The application chooses whether to exit or keep running. See the
+[compiled Ctrl+C example](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-read-key/CtrlC.rvn).
+
+Close or dispose the reader to restore terminal settings. Current support is POSIX;
+native reads require the invocation entry thread. Open key input before starting
+text reads. Key-to-text switching preserves remaining bytes; the reverse handoff is
+still pending. See the [key API contracts and limitations](../../docs/console.html#terminal-keys-development).
 
 <a id="direction"></a>
 

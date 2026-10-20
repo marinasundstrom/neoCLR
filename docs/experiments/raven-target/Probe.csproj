@@ -28,6 +28,7 @@
     <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileReadError.rvn" LogicalName="NeoCLR.FileReadError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileWriteError.rvn" LogicalName="NeoCLR.FileWriteError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/ConsoleReadError.rvn" LogicalName="NeoCLR.ConsoleReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Console/ConsoleKeyError.rvn" LogicalName="NeoCLR.ConsoleKeyError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Text/Utf8SliceError.rvn" LogicalName="NeoCLR.Utf8SliceError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Linq/SingleError.rvn" LogicalName="NeoCLR.SingleError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/IntegerDivisionError.rvn" LogicalName="NeoCLR.IntegerDivisionError.rvn" />

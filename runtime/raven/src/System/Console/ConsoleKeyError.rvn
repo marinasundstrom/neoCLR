@@ -1,0 +1,17 @@
+module System
+
+/// <summary>Failure to acquire or read a synchronous terminal key session.</summary>
+public union ConsoleKeyError {
+    /// <summary>The host or redirected input does not support terminal key input.</summary>
+    case Unavailable
+    /// <summary>Input is already owned or a read overlaps another operation.</summary>
+    case Busy
+    /// <summary>The terminal key session is closed.</summary>
+    case Closed
+    /// <summary>Terminal input or mode restoration failed.</summary>
+    case ReadFailed
+    /// <summary>A consumed terminal escape sequence is not supported.</summary>
+    case UnsupportedSequence
+    /// <summary>Consumed input contains malformed or truncated UTF-8.</summary>
+    case InvalidUtf8
+}

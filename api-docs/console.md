@@ -6,8 +6,7 @@ standard stream accessors when code needs a SyncInputStream, SyncOutputStream, S
 or SyncTextWriter.
 
 Console is a static class. Development text reads operate on Unicode graphemes.
-Terminal key handling, colors, cursor movement and nonblocking guest console host I/O
-remain unimplemented. Development Console text reads and Write are synchronous because the current
+Development terminal keys are available through Console.OpenKeyInput and ConsoleKeyReader. Colors, cursor movement and nonblocking guest console host I/O remain unimplemented. Development Console text reads and Write are synchronous because the current
 standard-console provider makes blocking host calls. No completed Task disguises
 that behavior. Async stream wrappers remain the default outside this explicit
 synchronous escape hatch.
@@ -54,7 +53,7 @@ A grapheme ending in an ordinary letter can still acquire a later combining mark
 The reader retains its final cluster until a subsequent boundary, EOF or a definite
 LF boundary establishes completion. This can require lookahead and can wait on live
 input. It does not split an incomplete UTF-8 sequence or substitute an idle timeout
-for Unicode segmentation. Key events are a separate, still-pending terminal API.
+for Unicode segmentation. Key events use the separate synchronous ConsoleKeyReader API.
 
 Async StreamReader operations reject overlap with TextReadError.Busy; await them
 before starting another. Console uses SyncStreamReader directly and can block.
@@ -216,9 +215,7 @@ formatting. No culture, format-string or IFormatProvider support is introduced.
 
 ## Terminal input host foundation (development)
 
-The Rust host API now offers a scoped POSIX input transport. This does not add
-Raven Console key-reading members; Windows, scheduler integration and managed
-key events remain pending. The grapheme text reads above use the existing stream provider. The host types are documented here manually because
+The Rust host API offers a scoped POSIX input transport, now used by the public key reader below. Windows and async scheduler integration remain pending. The grapheme text reads above use the existing stream provider. The host types are documented here manually because
 RavenDoc renders class-library metadata, not the Rust embedding crate.
 
 | Rust API | Contract |
@@ -311,28 +308,91 @@ neoCLR extends that configuration to readers as requested by the author. Exact
 reader delimiters make framing predictable, at the cost of configuring mixed or
 platform-specific input explicitly. There is no automatic newline-detection mode.
 
-### Internal key decoder checkpoint (development)
+### Key decoder and invocation ownership (development)
 
-An internal Raven decoder is qualified for borrowed-buffer UTF-8 and a bounded
-legacy key-sequence profile. It creates no Strings for decoded text. This does
-**not** add Console.ReadKey or terminal acquisition to the public library API.
-The [kernel contract and allocation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-key-decoder/README.md)
-identify remaining ownership, native provider and protocol limitations.
+The internal Raven decoder operates on borrowed UTF-8 and a bounded legacy sequence
+profile. The [decoder evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-key-decoder/README.md)
+is complemented by the public ReadKey tests below. Rust invocation ownership handles
+cancellation and cleanup, including bounded synchronous waits. Matching native entry
+hosts own a terminal scope and restore it before diagnostics and heap release on
+ordinary success/fault returns. Native worker attachment remains pending.
 
-The runtime also has a tested internal invocation-owned terminal cleanup service,
-including bounded synchronous cancellation waits. It is not yet connected to guest
-Console acquisition, and does not establish JIT/AOT provider parity or a public
-cancellable ReadKey contract. Public signatures remain unchanged.
+The [native transport and scope checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/terminal-input/README.md)
+cover raw bytes, restoration, nested contexts and serial JIT host reuse. POSIX
+legacy byte reads are unbuffered so libc cannot strand terminal input. ReadKey is
+synchronous; this does not establish an async/cancellable public key contract.
 
-A matching private POSIX byte transport is now tested in the native C host, including
-mode restoration and input ownership. Native legacy reads no longer use FILE
-read-ahead. This does not yet connect Console key reads to that transport or register
-it with native invocation cleanup. See the [native transport checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/terminal-input/README.md#native-posix-transport-checkpoint).
+## Terminal keys (development)
 
-### Native invocation cleanup checkpoint (development)
+`Console.OpenKeyInput()` preserves signal handling; `Console.OpenKeyInput(true)`
+explicitly captures signal characters, including Ctrl+C. Both return
+`Result<ConsoleKeyReader, ConsoleKeyError>`. Use a disposal scope; reads do not echo.
+Open before starting text input. Redirected input returns Unavailable. POSIX native
+support currently requires the invocation entry thread; Windows support is pending.
+Serialize all console input and session operations.
 
-Native entry hosts now own a terminal scope and restore it after ordinary or fault
-return, before diagnostics and heap release. Tests cover real JIT host cleanup and
-serial reuse. The scope currently belongs to the entry thread; worker attachment
-and guest key-read bindings remain gaps. This adds no public Console signatures.
-See the [scope contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/terminal-input/README.md#native-invocation-scope-checkpoint).
+| Member | Contract |
+| --- | --- |
+| `ConsoleKeyReader.ReadKey()` | `Result<Option<ConsoleKeyInfo>, ConsoleKeyError>`; blocks, None at EOF |
+| `ConsoleKeyReader.Close()` | `Result<unit, ConsoleKeyError>`; restores modes, repeatable; retry after failure |
+| `ConsoleKeyReader.Dispose()` | Attempts Close; invocation cleanup retries restoration on failure |
+| `ConsoleKeyInfo(Key, Shift, Alt, Control, TextScalar)` | Value constructor; properties retain these arguments |
+| `Key: ConsoleKey` | Logical letters/digits, Space, Tab, Enter, Backspace, Escape, arrows, Home/End, Insert/Delete, PageUp/PageDown, F1–F12; None for other text |
+| `Shift`, `Alt`, `Control: bool` | Reported modifiers, with legacy terminal ambiguities |
+| `TextScalar: Option<int>` | Valid Unicode scalar for decoder-produced text; None for control/navigation; never a grapheme |
+
+`ConsoleKeyError` has Unavailable (unsupported/redirected host), Busy (input already
+owned), Closed, ReadFailed, UnsupportedSequence and InvalidUtf8 cases. Malformed
+bytes or unsupported sequences are consumed; an unrelated following byte is retained.
+Close hands remaining bytes back to the next key reader or Console text/byte input.
+After any ordinary input byte read, key acquisition returns Busy for that invocation:
+text-to-key handoff remains unsupported to protect buffered decoder/lookahead state.
+This also means a raw ReadByte cannot precede a new key session.
+
+The reader owns one reusable byte buffer. ReadKey has no per-key strings, arrays or
+Tasks. A Unicode scalar may be only part of a grapheme. Uppercase text alone does not
+imply Shift. Legacy terminals cannot distinguish Tab/Ctrl+I or Enter/Ctrl+M;
+Escape-prefixed text is interpreted as Alt. Escape syntax has a 30 ms inter-byte
+timeout; incomplete UTF-8 waits for more bytes or EOF. Complete sequences are bounded
+at 32 bytes. This is a small keyboard foundation, without mouse/paste/key-release
+protocol negotiation. Ordinary faults trigger invocation cleanup; forced process
+termination cannot guarantee terminal restoration.
+
+[Public API PTY tests and allocation measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-read-key/README.md)
+are retained in the repository. Native generated type/member pages cover the four
+new types; the aggregate reference also includes their signatures.
+
+### Explicit Ctrl+C exit
+
+Capture mode lets the application decide what Ctrl+C means. This example ignores
+ordinary keys and exits only on Ctrl+C; its disposal scope restores terminal settings.
+It can instead continue, or ask for confirmation, at the `ConsoleKey.C` branch.
+
+```raven
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Main() {
+    let Ok(keys) = Console.OpenKeyInput(true) else {
+        System.Fail("Terminal key input is unavailable")
+    }
+    use input = keys
+    Console.WriteLine("Press Ctrl+C to exit.")
+    while true {
+        let Ok(Some(key)) = keys.ReadKey() else {
+            System.Fail("Unable to read a key")
+        }
+        if key.Control {
+            match key.Key {
+                ConsoleKey.C => return
+                _ => { }
+            }
+        }
+    }
+}
+```
+
+This handles keyboard input while the key session owns the terminal. It does not
+install a general process-signal or close-request handler. A broader shutdown-request
+API, including cancellation where supported, remains future work.

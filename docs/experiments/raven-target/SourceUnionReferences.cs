@@ -17,6 +17,7 @@ static class SourceUnionReferences
         "System.Storage.FileReadError",
         "System.Storage.FileWriteError",
         "System.ConsoleReadError",
+        "System.ConsoleKeyError",
         "System.Text.Utf8SliceError",
         "System.BooleanParseError",
         "System.NumberParseError",

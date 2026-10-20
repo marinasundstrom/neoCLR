@@ -39,6 +39,8 @@ static class ProcessBindings
         ("System.Environment", "GetEnvironmentVariable", ["String"], "System.Result<System.Option<String>,System.EnvironmentError>")
     ];
     public const string ConsoleDeclaration = """
+        public static Result<ConsoleKeyReader, ConsoleKeyError> OpenKeyInput() => default;
+        public static Result<ConsoleKeyReader, ConsoleKeyError> OpenKeyInput(bool captureInterrupts) => default;
         public static void Write(string format, object? arg0) { }
         public static void Write(string format, object? arg0, object? arg1) { }
         public static void Write(string format, object? arg0, object? arg1, object? arg2) { }
@@ -77,6 +79,86 @@ static class ProcessBindings
         public static void WriteLine(System.UIntPtr value) { }
         """;
     public const string Declarations = """
+        public enum ConsoleKey {
+            None = 0,
+            Backspace = 8,
+            Tab = 9,
+            Enter = 13,
+            Escape = 27,
+            Space = 32,
+            D0 = 48,
+            D1 = 49,
+            D2 = 50,
+            D3 = 51,
+            D4 = 52,
+            D5 = 53,
+            D6 = 54,
+            D7 = 55,
+            D8 = 56,
+            D9 = 57,
+            A = 65,
+            B = 66,
+            C = 67,
+            D = 68,
+            E = 69,
+            F = 70,
+            G = 71,
+            H = 72,
+            I = 73,
+            J = 74,
+            K = 75,
+            L = 76,
+            M = 77,
+            N = 78,
+            O = 79,
+            P = 80,
+            Q = 81,
+            R = 82,
+            S = 83,
+            T = 84,
+            U = 85,
+            V = 86,
+            W = 87,
+            X = 88,
+            Y = 89,
+            Z = 90,
+            UpArrow = 256,
+            DownArrow = 257,
+            RightArrow = 258,
+            LeftArrow = 259,
+            Home = 260,
+            End = 261,
+            Insert = 262,
+            Delete = 263,
+            PageUp = 264,
+            PageDown = 265,
+            F1 = 272,
+            F2 = 273,
+            F3 = 274,
+            F4 = 275,
+            F5 = 276,
+            F6 = 277,
+            F7 = 278,
+            F8 = 279,
+            F9 = 280,
+            F10 = 281,
+            F11 = 282,
+            F12 = 283
+        }
+        public struct ConsoleKeyInfo {
+            public ConsoleKeyInfo(ConsoleKey key, bool shift, bool alt, bool control, Option<int> textScalar) { }
+            public ConsoleKey Key => default;
+            public bool Shift => default;
+            public bool Alt => default;
+            public bool Control => default;
+            public Option<int> TextScalar => default;
+        }
+        public class ConsoleKeyReader : Disposable {
+            internal ConsoleKeyReader() { }
+            public Result<Option<ConsoleKeyInfo>, ConsoleKeyError> ReadKey() => default;
+            public Result<PropagationUnit, ConsoleKeyError> Close() => default;
+            public void Dispose() { }
+        }
         public static class Environment {
             public static string[] GetCommandLineArgs() => default;
             public static Result<string, EnvironmentError> GetCurrentDirectory() => default;

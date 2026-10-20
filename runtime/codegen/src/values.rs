@@ -660,6 +660,22 @@ pub(crate) fn compile_into(
     let diagnostic_data = details
         .map(|options| crate::fault_details::Data::new(module, input, options))
         .transpose()?;
+    let mut terminal_services = Vec::new();
+    if details.is_some_and(|d| !d.console_terminal.is_empty()) {
+        for (symbol, count) in [
+            ("neoclr_terminal_scope_open_v1", 1),
+            ("neoclr_terminal_scope_read_byte_v1", 2),
+            ("neoclr_terminal_scope_close_v1", 1),
+        ] {
+            let mut sig = module.make_signature();
+            sig.params.push(AbiParam::new(types::I64));
+            for _ in 0..count {
+                sig.params.push(AbiParam::new(types::I32));
+            }
+            sig.returns.push(AbiParam::new(types::I32));
+            terminal_services.push(module.declare_function(symbol, Linkage::Import, &sig)?);
+        }
+    }
     let input_service = if details.is_some_and(|d| !d.console_read_byte.is_empty()) {
         let mut sig = module.make_signature();
         sig.returns.push(AbiParam::new(types::I32));
@@ -2939,6 +2955,32 @@ pub(crate) fn compile_into(
                 let payload = b.ins().select(failed, code, raw);
                 let payload = b.ins().uextend(types::I64, payload);
                 write(&mut b, output, &[tag, payload]);
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(module, &mut context.func, frame);
+                }
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                continue;
+            }
+            if let Some((_, kind)) =
+                details.and_then(|d| d.console_terminal.iter().find(|(index, _)| *index == i))
+            {
+                let service = module.declare_func_in_func(terminal_services[*kind], b.func);
+                let mut args = vec![fault_context.unwrap()];
+                for parameter in parameters.iter().take(f.parameters.len()) {
+                    let value = if b.func.dfg.value_type(*parameter) == types::I32 {
+                        *parameter
+                    } else {
+                        b.ins().uextend(types::I32, *parameter)
+                    };
+                    args.push(value);
+                }
+                let call = b.ins().call(service, &args);
+                let value = b.inst_results(call)[0];
+                write(&mut b, output, &[value]);
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();

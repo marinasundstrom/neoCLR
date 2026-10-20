@@ -15,7 +15,8 @@ pub(super) fn native_body(
         return true;
     }
     details.is_some_and(|d| {
-        d.tls.contains_key(&i)
+        d.console_terminal.iter().any(|(index, _)| *index == i)
+            || d.tls.contains_key(&i)
             || d.cryptography.contains_key(&i)
             || d.primitive_parsers.contains_key(&i)
             || d.object_type_queries.contains_key(&i)

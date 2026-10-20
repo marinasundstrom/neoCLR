@@ -19,6 +19,7 @@ static class ErrorBindings
         ["System.IO.StreamError"] = ["InvalidPath", "NotFound", "AccessDenied", "WrongKind", "AlreadyExists", "Closed", "InvalidRange", "LimitExceeded", "WrongAccess", "IoFailure", "InvalidEncoding", "InvalidData", "Busy"],
         ["System.Storage.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         ["System.Storage.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
+        ["System.ConsoleKeyError"] = ["Unavailable", "Busy", "Closed", "ReadFailed", "UnsupportedSequence", "InvalidUtf8"],
         ["System.ConsoleReadError"] = ["Unavailable", "ReadFailed"],
         ["System.Text.InvalidUtf8Error"] = [],
         ["System.Text.Utf8SliceError"] = ["OutOfRange", "InvalidBoundary"],

@@ -3,16 +3,19 @@
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
 adds scoped caller-buffer bytes, nonblocking and timed/blocking reads, capabilities and input ownership. The [Raven text reads](experiments/console-text-reading/README.md) now add shared
-peek/character/count/line cursors and pass interpreter/JIT/AOT. [Internal key decoding](experiments/console-key-decoder/README.md) now has borrowed-buffer and value-result qualification; the Rust invocation now has a tested terminal cleanup service (not yet guest-bound); public terminal keys,
-async console readiness/cancellation, native guest/provider lifecycle integration and Windows
-Unicode input remain open; this is not guest API completion or replacement release qualification.
+peek/character/count/line cursors and pass interpreter/JIT/AOT. [Public key reads](experiments/console-read-key/README.md) now connect the borrowed-buffer
+Raven decoder to invocation-owned Rust/native providers. Console.OpenKeyInput and
+ConsoleKeyReader.ReadKey pass interpreter/JIT/AOT PTY tests and add no per-key managed
+allocations in the native diagnostic. Async console readiness, text-to-key cursor
+handoff, native worker attachment and Windows Unicode input remain open; this does
+not establish replacement release qualification.
 Optional [synchronous byte capabilities](experiments/sync-streams/README.md) now have a
 MemoryStream implementation. Separate synchronous text wrappers and direct Console
 contracts are implemented under [qualification](experiments/sync-text/README.md),
 without forcing async providers to implement synchronous I/O. The matching C
 POSIX byte transport now passes direct native tests and removes legacy FILE
 read-ahead; native root-thread invocation scopes now restore modes on success/fault return.
-Guest binding, shared input-cursor coordination and native worker attachment remain open.
+Guest binding and lossless key-to-text handoff are implemented. Text-to-key handoff is conservatively rejected after ordinary input starts; shared cursor coordination and native worker attachment remain open.
 
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are

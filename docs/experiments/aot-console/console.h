@@ -57,6 +57,8 @@ int32_t neoclr_terminal_scope_enter_v1(neoclr_terminal_scope_v1 *, const void *c
 int32_t neoclr_terminal_scope_leave_v1(neoclr_terminal_scope_v1 *);
 /* open: positive private handle or negative transport status. Handles never reuse while this provider remains loaded.
  * read/close require the exact context and handle; unknown ownership returns -5. */
+/* Scalar guest bridge: 0..255 byte, -1 Pending, -2 End; errors as above. */
+int32_t neoclr_terminal_scope_read_byte_v1(const void *context, int32_t handle, int32_t timeout_ms);
 int32_t neoclr_terminal_scope_open_v1(const void *context, int32_t capture_interrupts);
 int32_t neoclr_terminal_scope_read_v1(const void *context, int32_t handle,
     unsigned char *, uint64_t length, int32_t timeout_ms);

@@ -156,6 +156,9 @@ impl HostCall {
                 | Binding::WriteAllText
                 | Binding::WriteLine
                 | Binding::ConsoleReadByte
+                | Binding::ConsoleTerminalOpen
+                | Binding::ConsoleTerminalReadByte
+                | Binding::ConsoleTerminalClose
                 | Binding::ConsoleFlush
         )
     }
@@ -279,6 +282,13 @@ impl HostCall {
                 let binding = crate::native::bind(&self.callee)?;
                 let before = output.len();
                 let value = match binding {
+                    crate::native::Binding::ConsoleTerminalOpen
+                    | crate::native::Binding::ConsoleTerminalReadByte
+                    | crate::native::Binding::ConsoleTerminalClose => state
+                        .invocation
+                        .terminal
+                        .invoke(&binding, &self.args, options.console.as_deref())?,
+
                     crate::native::Binding::FileResource(
                         crate::file_streams::Operation::ReadInto,
                     ) => {

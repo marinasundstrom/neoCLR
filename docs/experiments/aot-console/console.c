@@ -240,3 +240,9 @@ int32_t neoclr_terminal_scope_close_v1(const void *context, int32_t handle) {
     if (!scope || handle <= 0 || scope->handle != handle) return -5;
     return neoclr_terminal_close_v1(&scope->input);
 }
+
+int32_t neoclr_terminal_scope_read_byte_v1(const void *context, int32_t handle, int32_t timeout_ms) {
+    uint8_t byte = 0;
+    int32_t result = neoclr_terminal_scope_read_v1(context, handle, &byte, 1, timeout_ms);
+    return result == 1 ? byte : result;
+}

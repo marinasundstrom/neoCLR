@@ -1,0 +1,130 @@
+import System.*
+import System.Result.*
+import System.Option.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Read(reader: ConsoleKeyReader) -> ConsoleKeyInfo {
+    let Ok(Some(info)) = reader.ReadKey() else {
+        System.Fail("expected key")
+    }
+    return info
+}
+
+func Scalar(info: ConsoleKeyInfo, expected: int) {
+    let Some(value) = info.TextScalar else {
+        System.Fail("expected scalar")
+    }
+    Check(value == expected, "scalar value")
+}
+
+func Main(args: string[]) {
+    let mode = args[0]
+    if mode == "redirected" {
+        let Error(ConsoleKeyError.Unavailable) = Console.OpenKeyInput() else {
+            System.Fail("redirected input must reject key acquisition")
+        }
+        Console.WriteLine("PASS")
+        return
+    }
+    if mode == "text-first" {
+        let Ok(Some(_)) = Console.PeekChar() else {
+            System.Fail("peek")
+        }
+        let Error(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
+            System.Fail("text cursor must retain ownership")
+        }
+        let Ok(Some(text)) = Console.ReadLine() else {
+            System.Fail("line")
+        }
+        Check(text == "abc", "peek retained")
+        Console.WriteLine("PASS")
+        return
+    }
+    let Ok(keys) = Console.OpenKeyInput(true) else {
+        System.Fail("open key input")
+    }
+    // Deliberately omit use in this mode to exercise invocation fault cleanup.
+    if mode == "fault" {
+        System.Fail("key session fault cleanup")
+    }
+    use scope = keys
+    let Error(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
+        System.Fail("exclusive keys")
+    }
+    let Error(_) = Console.ReadByte() else {
+        System.Fail("text cannot steal keys")
+    }
+    Console.WriteLine("READY")
+    if mode == "handoff" {
+        let Error(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
+            System.Fail("handoff invalid UTF8")
+        }
+        let Ok(_) = keys.Close() else {
+            System.Fail("handoff close")
+        }
+        Console.WriteLine("TEXT")
+        let Ok(Some(text)) = Console.ReadLine() else {
+            System.Fail("handoff line")
+        }
+        Check(text == "ztail", "retained byte before text")
+        Console.WriteLine("PASS")
+        return
+    }
+    if mode == "baseline" || mode == "allocation" {
+        var index = 0
+        while index < 128 {
+            if mode == "allocation" {
+                Scalar(Read(keys), 97)
+            }
+            index += 1
+        }
+    } else {
+        let a = Read(keys)
+        Check((int)a.Key == 65 && !a.Shift && !a.Control && !a.Alt, "letter")
+        Scalar(a, 97)
+        let control = Read(keys)
+        Check((int)control.Key == 67 && control.Control, "Ctrl+C capture")
+        let arrow = Read(keys)
+        Check((int)arrow.Key == 259 && arrow.Control && arrow.Shift, "modified arrow")
+        Scalar(Read(keys), 233)
+        Scalar(Read(keys), 128512)
+        let alt = Read(keys)
+        Check(alt.Alt, "Alt text")
+        Scalar(alt, 120)
+        Check((int)Read(keys).Key == 27, "standalone Escape")
+        let Error(ConsoleKeyError.UnsupportedSequence) = keys.ReadKey() else {
+            System.Fail("unsupported sequence")
+        }
+        let Error(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
+            System.Fail("invalid UTF8")
+        }
+        // The invalid continuation byte is the following 'z'. Closing hands it back.
+    }
+    let Ok(_) = keys.Close() else {
+        System.Fail("close keys")
+    }
+    let Error(ConsoleKeyError.Closed) = keys.ReadKey() else {
+        System.Fail("closed keys")
+    }
+    if mode == "keys" {
+        let Ok(reopened) = Console.OpenKeyInput() else {
+            System.Fail("reopen keys")
+        }
+        use next = reopened
+        Scalar(Read(reopened), 122)
+        let Ok(_) = reopened.Close() else {
+            System.Fail("close reopened")
+        }
+        Console.WriteLine("TEXT")
+        let Ok(Some(text)) = Console.ReadLine() else {
+            System.Fail("text after keys")
+        }
+        Check(text == "tail", "text handoff")
+    }
+    Console.WriteLine("PASS")
+}

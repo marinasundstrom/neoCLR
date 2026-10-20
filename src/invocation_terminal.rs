@@ -1,5 +1,5 @@
 //! Invocation-owned terminal modes. All operations run outside managed graph access.
-//! Guest bindings are deliberately deferred until native-provider parity is available.
+//! Private scalar guest bridge shares the native provider status contract.
 use crate::{CancellationToken, Console, TerminalInput, TerminalOptions, TerminalRead};
 use std::{
     io,
@@ -55,7 +55,6 @@ impl Service {
     }
 
     // Private transport handles, never OS descriptors. No reuse across invocations.
-    #[allow(dead_code)] // Admission awaits coordinated guest/native bindings.
     pub(crate) fn open(&self, console: &dyn Console, options: TerminalOptions) -> io::Result<i32> {
         let mut state = self.state.lock().unwrap();
         self.check()?;
@@ -82,7 +81,6 @@ impl Service {
         Ok(handle)
     }
 
-    #[allow(dead_code)] // Admission awaits coordinated guest/native bindings.
     pub(crate) fn read(
         &self,
         handle: i32,
@@ -148,7 +146,6 @@ impl Service {
         }
     }
 
-    #[allow(dead_code)] // Admission awaits coordinated guest/native bindings.
     pub(crate) fn close(&self, handle: i32) -> io::Result<()> {
         let mut state = self.state.lock().unwrap();
         if handle <= 0 || state.handle != handle {
@@ -162,6 +159,58 @@ impl Service {
             state.input.take();
         }
         Ok(())
+    }
+
+    pub(crate) fn invoke(
+        &self,
+        binding: &crate::native::Binding,
+        args: &[crate::Value],
+        console: Option<&dyn Console>,
+    ) -> Result<crate::Value, crate::Fault> {
+        use crate::{Value, native::Binding};
+        let result = match (binding, args) {
+            (Binding::ConsoleTerminalOpen, [Value::Boolean(capture)]) => match console {
+                Some(console) => self.open(
+                    console,
+                    TerminalOptions {
+                        capture_interrupts: *capture,
+                    },
+                ),
+                None => Err(io::ErrorKind::Unsupported.into()),
+            },
+            (Binding::ConsoleTerminalReadByte, [Value::Int32(handle), Value::Int32(timeout)])
+                if *timeout >= -1 =>
+            {
+                let mut byte = [0u8];
+                self.read(
+                    *handle,
+                    &mut byte,
+                    if *timeout == -1 {
+                        None
+                    } else {
+                        Some(Duration::from_millis(*timeout as u64))
+                    },
+                )
+                .map(|result| match result {
+                    TerminalRead::Data(_) => i32::from(byte[0]),
+                    TerminalRead::Pending => -1,
+                    TerminalRead::End => -2,
+                })
+            }
+            (Binding::ConsoleTerminalClose, [Value::Int32(handle)]) => {
+                self.close(*handle).map(|()| 0)
+            }
+            _ => return Err(crate::Fault::new("invalid terminal bridge arguments")),
+        };
+        Ok(Value::Int32(result.unwrap_or_else(
+            |error| match error.kind() {
+                io::ErrorKind::Unsupported => -3,
+                io::ErrorKind::WouldBlock => -4,
+                io::ErrorKind::NotConnected => -5,
+                io::ErrorKind::InvalidInput => -6,
+                _ => -7,
+            },
+        )))
     }
 
     pub(crate) fn request_stop(&self) {
@@ -526,5 +575,72 @@ mod tests {
             TerminalRead::Pending
         );
         assert!(start.elapsed() >= Duration::from_millis(35));
+    }
+    #[test]
+    fn scalar_guest_bridge_reports_bytes_and_lifecycle_status() {
+        use crate::{Value, native::Binding};
+        let service = Service::new(CancellationToken::new());
+        let host = host(Mode::Data);
+        let Value::Int32(id) = service
+            .invoke(
+                &Binding::ConsoleTerminalOpen,
+                &[Value::Boolean(true)],
+                Some(&host),
+            )
+            .unwrap()
+        else {
+            panic!("handle")
+        };
+        assert!(id > 0);
+        assert!(matches!(
+            service
+                .invoke(
+                    &Binding::ConsoleTerminalOpen,
+                    &[Value::Boolean(false)],
+                    Some(&host)
+                )
+                .unwrap(),
+            Value::Int32(-4)
+        ));
+        assert!(matches!(
+            service
+                .invoke(
+                    &Binding::ConsoleTerminalReadByte,
+                    &[Value::Int32(id), Value::Int32(0)],
+                    Some(&host)
+                )
+                .unwrap(),
+            Value::Int32(0..=255)
+        ));
+        assert!(matches!(
+            service
+                .invoke(
+                    &Binding::ConsoleTerminalClose,
+                    &[Value::Int32(id)],
+                    Some(&host)
+                )
+                .unwrap(),
+            Value::Int32(0)
+        ));
+        assert!(matches!(
+            service
+                .invoke(
+                    &Binding::ConsoleTerminalReadByte,
+                    &[Value::Int32(id), Value::Int32(0)],
+                    Some(&host)
+                )
+                .unwrap(),
+            Value::Int32(-5)
+        ));
+        assert!(matches!(
+            service
+                .invoke(
+                    &Binding::ConsoleTerminalOpen,
+                    &[Value::Boolean(false)],
+                    None
+                )
+                .unwrap(),
+            Value::Int32(-3)
+        ));
     }
 }
