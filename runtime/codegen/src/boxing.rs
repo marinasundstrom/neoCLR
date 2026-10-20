@@ -243,15 +243,6 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         };
         sites.push(json!({"functionCompiledIndex":caller,"instruction":pc,"helperCompiledIndex":helper,"typeCompiledIndex":index}));
     }
-    if extra_scalars
-        .values()
-        .any(|(_, ty)| matches!(ty, Type::Single | Type::Double))
-        && report["objectDisplayDispatch"]
-            .as_array()
-            .is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString"))
-    {
-        return Err("boxed floating-point ToString is not yet supported".into());
-    }
     // Map verified primitive interface relationships to the existing private box tags.
     // Ordinary interface dispatch then borrows the exact scalar payload.
     let scalar_boxes = int32_index.map(|i| (Type::Int32, i)).into_iter()

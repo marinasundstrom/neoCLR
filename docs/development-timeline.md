@@ -20480,3 +20480,41 @@ The formatting consumer then exposed lost native primitive interface identity. T
 The author also requested explicit EquatableTo contracts on applicable primitive types. The assistant proposed typed equality matching existing Object semantics, including floating NaNs and signed zero and canonical grapheme equality. This is a class-library declaration task, not runtime synthesis for arbitrary structs; implementation follows the shared dispatch fix.
 
 The follow-up adds explicit library declarations and typed methods for all fourteen scalar primitives, retaining Char’s existing canonical comparison. Floating equality matches Object’s NaN and signed-zero behavior, and native-width equality uses the same exact-width conversion services as comparison. [Focused evidence](experiments/primitive-equality/README.md) records qualification; broader numeric Formattable support remains a separate follow-up.
+
+
+### 2026-10-20 — Numeric formatting, culture parsing and test ownership
+
+The author requested Formattable on remaining numeric primitives, then added that
+parsing must support culture too. The assistant extended the shared integer path,
+introduced one floating conversion core for interpreter/native execution, and added
+explicit-culture parsers while preserving invariant overloads. The author then
+instructed using the built-in test framework instead of standalone apps unless
+necessary. The assistant moved the pending API consumer into a discovered suite
+with Result assertions and included existing invariant parsing regressions; the
+uncommitted standalone application was removed. A separate Rust core test and .NET
+differential check validate implementation-level rounding and roundtrip behavior.
+The extra services exposed a metadata producer capacity gap, repaired in its owning
+library without changing Raven compiler semantics. [Evidence and limits](experiments/numeric-formats/README.md)
+record the resulting contract; broad locale/provider support remains open.
+
+The author additionally requested tests specifically for globalization. The assistant
+added seven discovered tests for the five culture profiles, preference resolution
+and UK/US clock behavior, including isolation of returned calendar and grouping
+arrays. These complement the formatting/parsing suite and use the built-in framework.
+
+### 2026-10-20 — Bound globalization and return to release work
+
+The author asked to determine when globalization, formatting and parsing are good
+enough for now, then add enum Parse/TryParse and resume main work. The assistant
+proposed closing this increment after focused three-engine qualification of the
+five cultures and supported numeric APIs, keeping custom patterns, additional
+locales and broad provider support deferred. Enum parsing is the next bounded task;
+release-readiness work follows it. This records the sequence, not completion of
+enum parsing or release qualification.
+
+The globalization increment subsequently passed 23 discovered built-in tests in
+interpreter/JIT/macOS ARM64 native execution (69 passes). Tests exposed and repaired
+static native-width method admission, a floating adapter ABI mismatch, and native
+interpreter return normalization. Focused runtime/metadata regressions, API checks
+and the 5032-page website build pass. The bounded increment is complete; enum
+Parse/TryParse and replacement release qualification remain subsequent work.

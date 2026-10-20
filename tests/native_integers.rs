@@ -223,6 +223,13 @@ ldarg 0
 call neoCLR.Runtime.UIntPtrToUInt64(UIntPtr)
 ret
 .end
+.function UnsignedEquals(UIntPtr, UInt64) -> Boolean
+ldarg 0
+call neoCLR.Runtime.UIntPtrToUInt64(UIntPtr)
+ldarg 1
+ceq
+ret
+.end
 "#;
     let module = assemble(source).unwrap();
     let program = LoadedProgram::new(&module).unwrap();
@@ -242,7 +249,14 @@ ret
             Value::Int64(value as i64)
         );
     }
+    let equals = program
+        .resolve_function(&parse_function_ref("UnsignedEquals(UIntPtr,UInt64)").unwrap())
+        .unwrap();
     for value in [0, 1, usize::MAX] {
+        assert_eq!(
+            equals.invoke(vec![Value::UIntPtr(value), Value::UInt64(value as u64)], ExecutionOptions::default()).unwrap().value,
+            Value::Boolean(true)
+        );
         assert_eq!(
             unsigned
                 .invoke(vec![Value::UIntPtr(value)], ExecutionOptions::default())

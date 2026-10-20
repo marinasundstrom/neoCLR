@@ -230,3 +230,6 @@ int32_t neoclr_char_is_single_grapheme_v1(const neoclr_aot_text *text, int32_t *
     *output = neoclr_is_single_grapheme_v1(text->bytes, text->length);
     return 0;
 }
+
+/* Shared text adapter build entry point for retained native host recipes. */
+#include "../../../runtime/native/text/numeric-format.c"

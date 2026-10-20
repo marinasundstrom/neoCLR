@@ -47,6 +47,10 @@ int32_t neoclr_int64_to_string_rooted_v1(int64_t, neoclr_aot_text_arena *, const
 int32_t neoclr_uint64_to_string_rooted_v1(uint64_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
                                 const neoclr_aot_text **output);
+int32_t neoclr_single_format_v1(float, int32_t, int32_t, int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_single_format_rooted_v1(float, int32_t, int32_t, int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_double_format_v1(double, int32_t, int32_t, int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_double_format_rooted_v1(double, int32_t, int32_t, int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_int64_to_string_v1(int64_t value, neoclr_aot_text_arena *arena,
                                 const neoclr_aot_text **output);
 int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,

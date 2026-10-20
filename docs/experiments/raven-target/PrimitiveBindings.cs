@@ -11,8 +11,12 @@ static class PrimitiveBindings
     public static string Project(string source)
     {
         foreach (var type in Types)
-            source = source.Replace($"public struct {type} {{ }}", $"public struct {type}" + (type == "Int64" ? " : Formattable" : "") + $" {{ public int CompareTo({type} other) => 0; "
+            source = source.Replace($"public struct {type} {{ }}", $"public struct {type}" + (type != "Char" ? " : Formattable" : "") + $" {{ public int CompareTo({type} other) => 0; "
                 + (type != "Char" ? $"public bool Equals({type} other) => false; " : "")
+                + (type != "Char" ? $"public static Result<{type}, NumberParseError> Parse(string text, Globalization.Culture culture) => default;" : "")
+                + (type is "IntPtr" or "UIntPtr" ? $"public static Result<{type}, NumberParseError> Parse(string text) => default;" : "")
+                + (type != "Char" && type != "Int64" ? "public string ToString(string format) => default; public string ToString(string format, Globalization.Culture culture) => default;" : "")
+                + (type == "Single" ? "public string ToString() => default;" : "")
                 + (type == "Int64" ? "public static Result<long, NumberParseError> Parse(string value) => default; public string ToString() => default; public string ToString(string format) => default; public string ToString(string format, Globalization.Culture culture) => default; public static long MinValue => default; public static long MaxValue => default;" : "")
                 + (NumberBindings.HasNewParser(type) ? $"public static Result<{type}, NumberParseError> Parse(string value) => default;" : "")
                 + (type == "Char" ? "public static char FromString(string text) => default; public static Option<char> TryFromString(string text) => default; public bool Equals(char other, StringComparison comparison) => default; public override string ToString() => default; public bool Equals(char other) => default; public override bool Equals(object? other) => default; public override int GetHashCode() => default;" : "") + " }");

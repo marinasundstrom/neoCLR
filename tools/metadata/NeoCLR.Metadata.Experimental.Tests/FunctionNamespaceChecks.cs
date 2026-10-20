@@ -50,6 +50,19 @@ internal static class FunctionNamespaceChecks
         try { NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(changed.ToJsonString())); throw new Exception("namespace/name mismatch accepted"); }
         catch (InvalidDataException) { }
     }
+    internal static void FunctionCount()
+    {
+        var graph = Create();
+        for (var i = 3; i < 257; i++) { var method = graph.AddFunction("Count", "F" + i, new(PrimitiveType.Int32, [])); method.LoadConstant(i); method.Return(); }
+        var native = NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly());
+        var projection = AssemblyDefinition.ReadAssembly(native.CreateReferenceAssembly(graph.CoreLibrary), false);
+        if (projection.MainModule.Functions.Count != 257) throw new Exception("function inventory truncated at legacy limit");
+        for (var i = 257; i < 4096; i++) { var method = graph.AddFunction("Count", "F" + i, new(PrimitiveType.Int32, [])); method.LoadConstant(i); method.Return(); }
+        try { graph.AddFunction("Count", "Overflow", new(PrimitiveType.Int32, [])); throw new Exception("function limit not enforced"); }
+        catch (ArgumentException) { }
+        if (graph.Functions.Count != 4096) throw new Exception("limit failure mutated graph");
+        Console.WriteLine("PASS module function count: 257 roundtrip and 4096 bound");
+    }
     internal static async Task RunRuntime(string runtime, string output)
     {
         Run();

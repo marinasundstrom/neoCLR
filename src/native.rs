@@ -95,6 +95,7 @@ pub(crate) enum Binding {
     StringCasing(bool),
     Int32ToString,
     IntegerToString,
+    FloatingFormat(bool),
     NativeIntegerTo64,
     NativeAllocate,
     NativeFree,
@@ -632,6 +633,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         | ("neoCLR.Runtime.UInt64ToString", [Type::UInt64]) => {
             (Binding::IntegerToString, Type::String)
         }
+        ("neoCLR.Runtime.FormatSingle", [Type::Single, Type::Int32, Type::Int32, Type::Boolean]) => (Binding::FloatingFormat(true), Type::String),
+        ("neoCLR.Runtime.FormatDouble", [Type::Double, Type::Int32, Type::Int32, Type::Boolean]) => (Binding::FloatingFormat(false), Type::String),
         ("neoCLR.Runtime.NativeAllocate", [Type::UIntPtr]) => {
             (Binding::NativeAllocate, Type::Ptr(Box::new(Type::Void)))
         }
@@ -1672,6 +1675,11 @@ impl Binding {
             }
             (Self::Int32ToString, [Value::Int32(number)]) => {
                 Ok(Value::String(number.to_string().into()))
+            }
+            (Self::FloatingFormat(single), [value, Value::Int32(code), Value::Int32(precision), Value::Boolean(swedish)]) => {
+                let value = match value { Value::Single(v) => *v as f64, Value::Double(v) => *v, _ => return Err(Fault::new("invalid floating format")) };
+                let buffer = crate::numeric_format_core::format(value, *single, *code as u8, *precision, *swedish).map_err(|_| Fault::new("invalid floating format"))?;
+                Ok(Value::String(std::str::from_utf8(&buffer.bytes[..buffer.len]).unwrap().to_owned().into()))
             }
             (Self::IntegerToString, [Value::Int64(number)]) => {
                 Ok(Value::String(number.to_string().into()))

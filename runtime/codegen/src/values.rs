@@ -639,6 +639,16 @@ pub(crate) fn compile_into(
         None
     };
 
+    let mut floating_display = vec![];
+    if let Some(d) = details.filter(|d| !d.floating_boxes.is_empty() && d.object_display.keys().any(|i| !d.object_value_kinds.contains_key(i))) {
+        for (ty, symbol) in [(types::F32, if d.native_gc { "neoclr_single_format_rooted_v1" } else { "neoclr_single_format_v1" }),
+                             (types::F64, if d.native_gc { "neoclr_double_format_rooted_v1" } else { "neoclr_double_format_v1" })] {
+            let mut sig = module.make_signature();
+            sig.params.extend([ty, types::I32, types::I32, types::I32, types::I64, types::I64].map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            floating_display.push(module.declare_function(symbol, Linkage::Import, &sig)?);
+        }
+    }
     let mut default_display_literals = vec![];
     if let Some(details) = details {
         for (index, text) in &details.object_default_display {
@@ -1627,6 +1637,20 @@ pub(crate) fn compile_into(
             }
         }
     }
+    let mut float_format_services = std::collections::HashMap::new();
+    if let Some(d) = details {
+        for (indices, ty, symbol) in [
+            (&d.single_format, types::F32, if d.native_gc { "neoclr_single_format_rooted_v1" } else { "neoclr_single_format_v1" }),
+            (&d.double_format, types::F64, if d.native_gc { "neoclr_double_format_rooted_v1" } else { "neoclr_double_format_v1" }),
+        ] {
+            if indices.is_empty() { continue; }
+            let mut sig = module.make_signature();
+            sig.params.extend([ty, types::I32, types::I32, types::I32, types::I64, types::I64].map(AbiParam::new));
+            sig.returns.push(AbiParam::new(types::I32));
+            let service = module.declare_function(symbol, Linkage::Import, &sig)?;
+            for index in indices { float_format_services.insert(*index, service); }
+        }
+    }
     let character_service = if details.is_some_and(|d| !d.char_from_string.is_empty()) {
         let mut sig = module.make_signature();
         sig.params
@@ -2542,6 +2566,21 @@ pub(crate) fn compile_into(
                     b.switch_to_block(next);
                 }
                 if display {
+                    for &(index, wide) in &details.unwrap().floating_boxes {
+                        let matched = b.create_block(); let next = b.create_block();
+                        let equal = matches_type(&mut b, &p, tag, index);
+                        b.ins().brif(equal, matched, &[], next, &[]); b.switch_to_block(matched);
+                        let value = b.ins().load(if wide { types::F64 } else { types::F32 }, MemFlags::new(), parameters[0], 8);
+                        let code = b.ins().iconst(types::I32, 71); let precision = b.ins().iconst(types::I32, -1);
+                        let swedish = b.ins().iconst(types::I32, 0); let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        let service = module.declare_func_in_func(floating_display[usize::from(wide)], b.func);
+                        let call = b.ins().call(service, &[value, code, precision, swedish, arena, output]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
+                        site.capture_frame = false; return_if_detailed(&mut b, failed, status, Some(&site));
+                        b.ins().return_(&[status]); b.switch_to_block(next);
+                    }
                     if let Some((signed_service, unsigned_service)) = integral_display {
                         for &(index, wide, signed) in &details.unwrap().integral_boxes {
                             let matched = b.create_block();
@@ -3586,17 +3625,21 @@ pub(crate) fn compile_into(
             }
             if details.is_some_and(|d| d.int32_to_string.contains(&i))
                 || wide_format_services.contains_key(&i)
+                || float_format_services.contains_key(&i)
             {
                 let service = module.declare_func_in_func(
-                    wide_format_services
-                        .get(&i)
+                    float_format_services.get(&i).or_else(|| wide_format_services.get(&i))
                         .copied()
                         .or(format_service)
                         .unwrap(),
                     b.func,
                 );
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                let call = b.ins().call(service, &[parameters[0], arena, output]);
+                let args = if float_format_services.contains_key(&i) {
+                    let swedish = parameters[3];
+                    vec![parameters[0], parameters[1], parameters[2], swedish, arena, output]
+                } else { vec![parameters[0], arena, output] };
+                let call = b.ins().call(service, &args);
                 let raw = b.inst_results(call)[0];
                 // Only success and resource exhaustion are service outcomes. Other
                 // failures become RuntimeError; adapters cannot manufacture UserFault.

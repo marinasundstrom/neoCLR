@@ -19,9 +19,9 @@ PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'windows-console'
 
 def native_text_sources():
     return [ROOT / 'tools/aot-native-text/Cargo.toml', ROOT / 'tools/aot-native-text/Cargo.lock',
-            ROOT / 'tools/aot-native-text/src/lib.rs',
+            ROOT / 'tools/aot-native-text/src/lib.rs', ROOT / 'runtime/native/text/numeric-format.c',
             *[ROOT / 'src' / name for name in
-              ('string_search.rs', 'string_normalization.rs', 'string_normalization_data.rs', 'string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs', 'time_zone_rules.rs')]]
+              ('string_search.rs', 'string_normalization.rs', 'string_normalization_data.rs', 'string_comparison.rs', 'string_case_folding.rs', 'string_casing_data.rs', 'string_casing_kernel.rs', 'numeric_parse_core.rs', 'numeric_format_core.rs', 'time_zone_rules.rs')]]
 
 
 def native_kernel_archive_name(windows, time_zone_rules=False):

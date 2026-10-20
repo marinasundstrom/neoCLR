@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--function-count"]) { FunctionNamespaceChecks.FunctionCount(); return 0; }
+
 if (args is ["--text-overrides"])
 {
     TextOverrideReferenceChecks.Run();

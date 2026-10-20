@@ -433,3 +433,15 @@ mod search_tests {
         assert_eq!(output, 42);
     }
 }
+
+#[path = "../../../src/numeric_format_core.rs"]
+mod numeric_format;
+/// Writes invariant or bounded Swedish numeric UTF-8 into caller-owned stack storage.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_format_float_bytes_v1(value: f64, single: i32, code: i32, precision: i32, swedish: i32, output: *mut u8, capacity: usize, length: *mut usize) -> i32 {
+    if output.is_null() || length.is_null() || !(0..=255).contains(&code) { return 3; }
+    let Ok(buffer) = numeric_format::format(value, single != 0, code as u8, precision, swedish != 0) else { return 3; };
+    if buffer.len > capacity { return 3; }
+    unsafe { core::ptr::copy_nonoverlapping(buffer.bytes.as_ptr(), output, buffer.len); *length = buffer.len; }
+    0
+}

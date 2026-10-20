@@ -1,0 +1,75 @@
+module System.Globalization
+
+import System.*
+import System.Result.*
+
+// Validate culture punctuation before calling the shared strict invariant parser.
+internal static class NumericParsing {
+    static func Normalize(text: string, culture: Culture, floating: bool) -> Result<string, NumberParseError> {
+        let bytes = text.Utf8Bytes
+        let swedish = culture.Name == "sv-SE"
+        var index = 0
+        var digits = 0
+        var grouped = false
+        var integer = true
+        var decimalSeen = false
+        var exponent = false
+        var removed = 0
+        var changed = false
+        while index < bytes.Length {
+            let code = (int)bytes[index]
+            let group = if swedish { code == 194 && index + 1 < bytes.Length && (int)bytes[index + 1] == 160 } else { code == 44 }
+            if group {
+                if !integer || digits == 0 || (grouped && digits != 3) || (!grouped && digits > 3) {
+                    return Error(NumberParseError.InvalidFormat())
+                }
+                grouped = true
+                digits = 0
+                let size = if swedish { 2 } else { 1 }
+                removed += size
+                index += size
+                changed = true
+            } else {
+                if code == (if swedish { 44 } else { 46 }) {
+                    if !floating || decimalSeen || exponent || (grouped && digits != 3) {
+                        return Error(NumberParseError.InvalidFormat())
+                    }
+                    decimalSeen = true
+                    integer = false
+                    if swedish { changed = true }
+                } else if code == 46 && swedish {
+                    return Error(NumberParseError.InvalidFormat())
+                } else if code == 69 || code == 101 {
+                    if integer && grouped && digits != 3 {
+                        return Error(NumberParseError.InvalidFormat())
+                    }
+                    integer = false
+                    exponent = true
+                } else if integer && code >= 48 && code <= 57 {
+                    digits += 1
+                }
+                index += 1
+            }
+        }
+        if integer && grouped && digits != 3 { return Error(NumberParseError.InvalidFormat()) }
+        if !changed { return Ok(text) }
+        let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(bytes.Length - removed)
+        index = 0
+        var output = 0
+        while index < bytes.Length {
+            let code = (int)bytes[index]
+            if swedish && code == 194 && index + 1 < bytes.Length && (int)bytes[index + 1] == 160 {
+                index += 2
+            } else if !swedish && code == 44 {
+                index += 1
+            } else {
+                buffer[output] = if swedish && code == 44 { (byte)46 } else { bytes[index] }
+                output += 1
+                index += 1
+            }
+        }
+        let normalized: ReadOnlySlice<byte> = buffer
+        let Ok(value) = System.Text.Utf8.Decode(normalized) else { return Error(NumberParseError.InvalidFormat()) }
+        return Ok(value)
+    }
+}

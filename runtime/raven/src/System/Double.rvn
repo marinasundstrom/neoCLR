@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Double : Number, EquatableTo<double> {
+public struct Double : Number, EquatableTo<double>, Formattable {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: double
@@ -34,6 +34,25 @@ public struct Double : Number, EquatableTo<double> {
 
     /// Tests value equality; NaNs compare equal and signed zeros compare equal.
     func Equals(other: double) -> bool => m_value == other || (m_value != m_value && other != other)
+
+    /// Returns invariant shortest round-trip text, preserving negative zero.
+    func ToString() -> string => ToString("G", Globalization.Culture.Invariant)
+
+    /// Parses explicit culture punctuation with strict three-digit grouping; whitespace is not accepted.
+    static func Parse(text: string, culture: Globalization.Culture) -> Result<double, NumberParseError> {
+        let normalized = Globalization.NumericParsing.Normalize(text, culture, true)?
+        return Parse(normalized)
+    }
+
+    /// Formats with the current culture using G, R, F, N or E; precision is 0–99.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Formats with explicit culture. R ignores valid precision; unsupported formats fault.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        let code = Globalization.FloatingFormatting.FormatCode(format)
+        let precision = Globalization.FloatingFormatting.Precision(format)
+        return neoCLR.Runtime.FormatDouble(m_value, code, precision, culture.Name == "sv-SE")
+    }
 
     func CompareTo(other: double) -> int {
         if m_value != m_value {

@@ -1,0 +1,40 @@
+Shared formatting kernel: rustc --test src/numeric_format_core.rs
+
+running 2 tests
+test tests::formats_boundaries_and_rounding ... ok
+test tests::deterministic_finite_roundtrips ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+Metadata producer: NeoCLR.Metadata.Experimental.Tests --function-count
+PASS module function count: 257 roundtrip and 4096 bound
+
+Native-call storage/evaluation-stack regression: cargo test --test native_integers --test native
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.65s
+     Running tests/native.rs (target/debug/deps/native-430cefc493721598)
+
+running 5 tests
+test native_registry_checks_full_signature_and_implementation_shape ... ok
+test missing_native_declarations_are_not_resolved_by_name ... ok
+test methodimpl_internalcall_round_trips_as_clr_flag ... ok
+test unknown_implementation_flags_are_rejected_by_loader ... ok
+test a_native_name_without_the_flag_executes_its_il_body ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s
+
+     Running tests/native_integers.rs (target/debug/deps/native_integers-ad3bd365b12c2474)
+
+running 9 tests
+test native_integer_widening_services_preserve_signed_and_unsigned_extremes ... ok
+test sample_round_trips_address_arithmetic_and_releases_storage ... ok
+test native_integer_fields_round_trip_through_memory ... ok
+test native_integer_pointer_reconstruction_handles_null_and_unknown_addresses ... ok
+test conversions_sign_extend_zero_extend_and_truncate ... ok
+test invalid_types_and_native_allocation_limits_fault ... ok
+test checked_native_arithmetic_faults_at_the_instruction ... ok
+test aliases_have_canonical_identity_and_native_layout ... ok
+test arithmetic_uses_native_width_and_opcode_signedness ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.85s

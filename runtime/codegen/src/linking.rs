@@ -930,24 +930,10 @@ pub fn prepare(
         .iter()
         .enumerate()
         .filter(|(_, f)| {
-            matches!(
-                f.owner,
-                Some(
-                    neoclr::metadata::Type::Single
-                        | neoclr::metadata::Type::Double
-                        | neoclr::metadata::Type::SByte
-                        | neoclr::metadata::Type::Byte
-                        | neoclr::metadata::Type::Int16
-                        | neoclr::metadata::Type::UInt16
-                        | neoclr::metadata::Type::UInt32
-                        | neoclr::metadata::Type::Char
-                        | neoclr::metadata::Type::String
-                        | neoclr::metadata::Type::Int32
-                        | neoclr::metadata::Type::Boolean
-                        | neoclr::metadata::Type::Int64
-                        | neoclr::metadata::Type::UInt64
-                )
-            ) && !f.instance
+            f.owner.as_ref().is_some_and(|owner| {
+                super::selection::projected_primitive(owner)
+                    || *owner == neoclr::metadata::Type::String
+            }) && !f.instance
                 && !f.receiver_byref
         })
         .map(|(i, _)| i)

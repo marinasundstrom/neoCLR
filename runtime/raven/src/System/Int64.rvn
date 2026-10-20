@@ -30,6 +30,12 @@ public struct Int64 : Number, Formattable, EquatableTo<long> {
         return neoCLR.Runtime.Int64ToString(m_value)
     }
 
+    /// Parses explicit culture punctuation with strict three-digit grouping; whitespace is not accepted.
+    static func Parse(text: string, culture: Globalization.Culture) -> Result<long, NumberParseError> {
+        let normalized = Globalization.NumericParsing.Normalize(text, culture, false)?
+        return Parse(normalized)
+    }
+
     /// Formats with the current culture. Supports empty/G/G0, D, F and N; D/F/N precision is 0–99.
     func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
 

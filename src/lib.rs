@@ -57,6 +57,7 @@ pub mod memory;
 pub mod metadata;
 mod native;
 mod numeric_parse;
+mod numeric_format_core;
 mod object_identity;
 #[doc(hidden)]
 pub mod value_defaults;

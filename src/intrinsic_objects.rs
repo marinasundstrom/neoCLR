@@ -180,7 +180,11 @@ impl IntrinsicValue {
             Self::Boolean(value) => if value { "True" } else { "False" }.into(),
             Self::Char(ref value) => value.clone().into(),
             Self::String(ref value) => value.clone(),
-            Self::Single(_) | Self::Double(_) => return None,
+            Self::Single(_) | Self::Double(_) => {
+                let (value, single) = match *self { Self::Single(v) => (v as f64, true), Self::Double(v) => (v, false), _ => unreachable!() };
+                let buffer = crate::numeric_format_core::format(value, single, b'G', -1, false).ok()?;
+                std::str::from_utf8(&buffer.bytes[..buffer.len]).ok()?.to_owned().into()
+            },
         })
     }
 

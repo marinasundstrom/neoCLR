@@ -1,0 +1,163 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Globalization.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("Integral formatting preserves widths culture and interface dispatch")]
+func IntegralFormats() -> Result<unit, TestFailure> {
+
+    let invariant = Culture.Invariant
+    let swedish = Culture.SwedishSweden
+    let a = (sbyte)-128
+    let b = (byte)255
+    let c = (short)-32768
+    let d = (ushort)65535
+    let e = (uint)4294967295L
+    let Ok(f) = UInt64.Parse("18446744073709551615") else { return Assert.True(false, "Unsigned maximum") }
+    let g = (nint)-1234
+    let h = (nuint)1234
+    _ = Assert.True(a.ToString("D4", invariant) == "-0128", "SByte digits")?
+    _ = Assert.True(b.ToString("F", invariant) == "255.00", "Byte fixed")?
+    _ = Assert.True(c.ToString("N0", invariant) == "-32,768", "Int16 grouping")?
+    _ = Assert.True(d.ToString("N", swedish) == "65 535,00", "UInt16 culture")?
+    _ = Assert.True(e.ToString("N0", invariant) == "4,294,967,295", "UInt32 high bits")?
+    _ = Assert.True(f.ToString("G", invariant) == "18446744073709551615", "UInt64 maximum")?
+    _ = Assert.True(f.ToString("N2", swedish) == "18 446 744 073 709 551 615,00", "UInt64 grouping")?
+    _ = Assert.True(Int64.MinValue.ToString("N0", invariant) == "-9,223,372,036,854,775,808", "Signed minimum regression")?
+    _ = Assert.True(g.ToString("N0", invariant) == "-1,234" && h.ToString("F1", invariant) == "1234.0", "Native widths")?
+    let fa: Formattable = a
+    let fb: Formattable = b
+    let fc: Formattable = c
+    let fd: Formattable = d
+    let fe: Formattable = e
+    let ff: Formattable = f
+    let fg: Formattable = g
+    let fh: Formattable = h
+    _ = Assert.True(fa.ToString("D4", invariant) == a.ToString("D4", invariant), "SByte interface")?
+    _ = Assert.True(fb.ToString("F", invariant) == b.ToString("F", invariant), "Byte interface")?
+    _ = Assert.True(fc.ToString("N0", invariant) == c.ToString("N0", invariant), "Int16 interface")?
+    _ = Assert.True(fd.ToString("N", swedish) == d.ToString("N", swedish), "UInt16 interface")?
+    _ = Assert.True(fe.ToString("N0", invariant) == e.ToString("N0", invariant), "UInt32 interface")?
+    _ = Assert.True(ff.ToString("G", invariant) == f.ToString("G", invariant), "UInt64 interface")?
+    _ = Assert.True(fg.ToString("N0", invariant) == g.ToString("N0", invariant), "IntPtr interface")?
+    _ = Assert.True(fh.ToString("F1", invariant) == h.ToString("F1", invariant), "UIntPtr interface")?
+    System.Runtime.GC.Collect()
+    return Assert.True(ff.ToString("N0", invariant) == "18,446,744,073,709,551,615", "Integer interface retained across GC")
+}
+
+[Test("Floating formatting preserves precision culture and boxed display")]
+func FloatingFormats() -> Result<unit, TestFailure> {
+    let invariant = Culture.Invariant
+    let swedish = Culture.SwedishSweden
+    let b = (byte)255
+    let x = 1234.5
+    let y = (float)0.1
+    _ = Assert.True(x.ToString("N2", swedish) == "1 234,50", "Floating grouping")?
+    _ = Assert.True(x.ToString("e2", invariant) == "1.23e+003", "Scientific output")?
+    _ = Assert.True(x.ToString("G3", invariant) == "1.23E+03", "Significant digits")?
+    _ = Assert.True(y.ToString() == "0.1", "Single shortest precision")?
+    let fx: Formattable = x
+    let fy: Formattable = y
+    _ = Assert.True(fx.ToString("F1", invariant) == "1234.5" && fy.ToString("F2", invariant) == "0.10", "Floating interfaces")?
+    _ = Assert.True(String.Format(swedish, "{0:N2}", x) == "1 234,50", "Floating composite")?
+    _ = Assert.True(String.Format(invariant, "{0:D2}", b) == "255", "Unsigned composite")?
+    let midpoint = 2.5
+    let oddMidpoint = 3.5
+    _ = Assert.True(midpoint.ToString("F0", invariant) == "2" && oddMidpoint.ToString("F0", invariant) == "4", "Ties to even")?
+    let negativeZero = -0.0
+    _ = Assert.True(negativeZero.ToString() == "-0" && negativeZero.ToString("F2", invariant) == "-0.00", "Negative zero")?
+    let nan = 0.0 / 0.0
+    let infinity = 1.0 / 0.0
+    _ = Assert.True(nan.ToString() == "NaN" && infinity.ToString("N", swedish) == "Infinity", "Non-finite values")?
+    _ = Assert.True(String.Format(swedish, "{0}", x) == "1234,5", "Default composite culture")?
+    _ = Assert.True(x.ToString("F1", Culture.HebrewIsrael) == "1234.5", "Israeli numeric culture")?
+    _ = Assert.True(x.ToString("F1", Culture.EnglishUnitedKingdom) == "1234.5", "UK numeric culture")?
+    _ = Assert.True(x.ToString("F1", Culture.EnglishUnitedStates) == "1234.5", "US numeric culture")?
+    let boxed: Object = x
+    _ = Assert.True(boxed.ToString() == "1234.5", "Boxed floating display")?
+    let Ok(tiny) = Double.Parse("5E-324") else { return Assert.True(false, "Subnormal parse") }
+    let Ok(huge) = Double.Parse("1.7976931348623157E+308") else { return Assert.True(false, "Maximum parse") }
+    let Ok(tinyRoundtrip) = Double.Parse(tiny.ToString("R", invariant)) else { return Assert.True(false, "Subnormal roundtrip parse") }
+    let Ok(hugeRoundtrip) = Double.Parse(huge.ToString("R", invariant)) else { return Assert.True(false, "Maximum roundtrip parse") }
+    _ = Assert.True(tiny.Equals(tinyRoundtrip) && huge.Equals(hugeRoundtrip), "Double boundaries roundtrip")?
+    _ = Assert.True(huge.ToString("F99", invariant).Length == 409, "Bounded maximum precision")?
+    System.Runtime.GC.Collect()
+    _ = Assert.True(fy.ToString("R", invariant) == "0.1", "Interfaces retained across GC")?
+    return Ok(())
+}
+
+[Test("Culture parsing covers every numeric primitive and roundtrips formatting")]
+func CultureParsing() -> Result<unit, TestFailure> {
+    let swedish = Culture.SwedishSweden
+    let invariant = Culture.Invariant
+    if SByte.Parse("-128", swedish) is Ok(let parsedSByte) {
+        _ = Assert.True(parsedSByte.Equals((sbyte)-128), "SByte culture parsing")?
+    } else { return Assert.True(false, "SByte must parse valid culture text") }
+    if Byte.Parse("255", swedish) is Ok(let parsedByte) {
+        _ = Assert.True(parsedByte.Equals((byte)255), "Byte culture parsing")?
+    } else { return Assert.True(false, "Byte must parse valid culture text") }
+    if Int16.Parse("-32 768", swedish) is Ok(let parsedInt16) {
+        _ = Assert.True(parsedInt16.Equals((short)-32768), "Int16 culture parsing")?
+    } else { return Assert.True(false, "Int16 must parse valid culture text") }
+    if UInt16.Parse("65 535", swedish) is Ok(let parsedUInt16) {
+        _ = Assert.True(parsedUInt16.Equals((ushort)65535), "UInt16 culture parsing")?
+    } else { return Assert.True(false, "UInt16 must parse valid culture text") }
+    if Int32.Parse("-2 147 483 648", swedish) is Ok(let parsedInt32) {
+        _ = Assert.True(parsedInt32.Equals(-2147483648), "Int32 culture parsing")?
+    } else { return Assert.True(false, "Int32 must parse valid culture text") }
+    if UInt32.Parse("4 294 967 295", swedish) is Ok(let parsedUInt32) {
+        _ = Assert.True(parsedUInt32.Equals((uint)4294967295L), "UInt32 culture parsing")?
+    } else { return Assert.True(false, "UInt32 must parse valid culture text") }
+    if Int64.Parse("-9 223 372 036 854 775 808", swedish) is Ok(let parsedInt64) {
+        _ = Assert.True(parsedInt64.Equals(Int64.MinValue), "Int64 culture parsing")?
+    } else { return Assert.True(false, "Int64 must parse valid culture text") }
+    if UInt64.Parse("18 446 744 073 709 551 615", swedish) is Ok(let parsedUInt64) {
+        _ = Assert.True(parsedUInt64.Equals(((ulong)9223372036854775807L * (ulong)2 + (ulong)1)), "UInt64 culture parsing")?
+    } else { return Assert.True(false, "UInt64 must parse valid culture text") }
+    if IntPtr.Parse("-1 234", swedish) is Ok(let parsedIntPtr) {
+        _ = Assert.True(parsedIntPtr.Equals((nint)-1234), "IntPtr culture parsing")?
+    } else { return Assert.True(false, "IntPtr must parse valid culture text") }
+    if UIntPtr.Parse("1 234", swedish) is Ok(let parsedUIntPtr) {
+        _ = Assert.True(parsedUIntPtr.Equals((nuint)1234), "UIntPtr culture parsing")?
+    } else { return Assert.True(false, "UIntPtr must parse valid culture text") }
+    if Single.Parse("1 234,5", swedish) is Ok(let parsedSingle) {
+        _ = Assert.True(parsedSingle.Equals((float)1234.5), "Single culture parsing")?
+    } else { return Assert.True(false, "Single must parse valid culture text") }
+    if Double.Parse("1 234,5e+2", swedish) is Ok(let parsedDouble) {
+        _ = Assert.True(parsedDouble.Equals(123450.0), "Double culture parsing")?
+    } else { return Assert.True(false, "Double must parse valid culture text") }
+    let roundtripValue = 1234.5678901234567
+    if Double.Parse(roundtripValue.ToString("R", swedish), swedish) is Ok(let parsed) {
+        _ = Assert.True(roundtripValue.Equals(parsed), "Localized roundtrip")?
+    } else { return Assert.True(false, "Localized roundtrip must parse") }
+    if Double.Parse("-0,0", swedish) is Ok(let zero) {
+        _ = Assert.True(zero.ToString("R", invariant) == "-0", "Parsing preserves negative zero")?
+    } else { return Assert.True(false, "Negative zero must parse") }
+    _ = Assert.True(Double.Parse("NaN", swedish) is Ok(let nan) && nan.Equals(nan), "NaN culture parse")?
+    _ = Assert.True(IntPtr.Parse("-1234") is Ok(let pointer) && pointer.Equals((nint)-1234), "Invariant native integer")?
+    return Assert.True(UIntPtr.Parse("1234") is Ok(let pointer) && pointer.Equals((nuint)1234), "Invariant native unsigned integer")
+}
+
+[Test("Culture parsing rejects malformed groups mixed separators and overflow")]
+func CultureParsingFailures() -> Result<unit, TestFailure> {
+    let swedish = Culture.SwedishSweden
+    let invariant = Culture.Invariant
+    _ = Assert.True(Int32.Parse("12,34", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 12,34")?
+    _ = Assert.True(Int32.Parse("1234,567", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1234,567")?
+    _ = Assert.True(Int32.Parse("1,,234", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1,,234")?
+    _ = Assert.True(Int32.Parse("1,234,", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1,234,")?
+    _ = Assert.True(Int32.Parse("1 23", swedish) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1 23")?
+    _ = Assert.True(Int32.Parse("1.234", swedish) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1.234")?
+    _ = Assert.True(Int32.Parse("1,0", swedish) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1,0")?
+    _ = Assert.True(Double.Parse("1,234.5", swedish) is Error(NumberParseError.InvalidFormat), "Double rejects 1,234.5")?
+    _ = Assert.True(Double.Parse("1,23", invariant) is Error(NumberParseError.InvalidFormat), "Double rejects 1,23")?
+    _ = Assert.True(Double.Parse("1,234.5,678", invariant) is Error(NumberParseError.InvalidFormat), "Double rejects 1,234.5,678")?
+    _ = Assert.True(Double.Parse("1 234,5 6", swedish) is Error(NumberParseError.InvalidFormat), "Double rejects 1 234,5 6")?
+    _ = Assert.True(Double.Parse(" 1,5", swedish) is Error(NumberParseError.InvalidFormat), "Double rejects  1,5")?
+    _ = Assert.True(Byte.Parse("256", invariant) is Error(NumberParseError.Overflow), "Byte rejects 256")?
+    _ = Assert.True(UInt64.Parse("18 446 744 073 709 551 616", swedish) is Error(NumberParseError.Overflow), "UInt64 rejects 18 446 744 073 709 551 616")?
+    _ = Assert.True(Single.Parse("1,0e99", swedish) is Error(NumberParseError.Overflow), "Single rejects 1,0e99")?
+    return Assert.True(Double.Parse("1,5") is Error(NumberParseError.InvalidFormat), "Invariant overload remains unchanged")
+}

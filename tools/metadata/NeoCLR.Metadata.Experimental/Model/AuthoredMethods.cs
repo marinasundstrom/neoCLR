@@ -143,9 +143,10 @@ public sealed partial class AssemblyBuilder
         if (definition.AuthoredSignature is not { } signature || definition.Producer is not null || definition.IsTypeDeclaration)
             throw new ArgumentException("function must be an unattached authored declaration");
         signature.ValidateOwner(this);
-        if (functions.Count >= 256 || functions.Any(m => m.Namespace == definition.Namespace && m.Name == definition.Name &&
+        if (functions.Count >= 4096) throw new ArgumentException("module function limit (4096) exceeded");
+        if (functions.Any(m => m.Namespace == definition.Namespace && m.Name == definition.Name &&
             m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
-            throw new ArgumentException("duplicate function or exceeded limit");
+            throw new ArgumentException("duplicate function");
         functions.Add(new MethodBuilder(this, definition));
     }
 }

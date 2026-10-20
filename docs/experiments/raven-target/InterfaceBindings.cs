@@ -104,7 +104,7 @@ static class InterfaceBindings
     {
         foreach (var name in new[]{"SByte","Byte","Int16","UInt16","Char","Int32","UInt32","Int64","UInt64","IntPtr","UIntPtr","Single","Double","Boolean"})
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : ComparableTo<" + name + ">, EquatableTo<" + name + "> {");
-        foreach (var name in new[]{"Int32", "Int64"})
+        foreach (var name in new[]{"SByte", "Byte", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "IntPtr", "UIntPtr", "Single", "Double"})
             source = source.Replace("public struct " + name + " : Formattable {", "public struct " + name + " : Formattable, ComparableTo<" + name + ">, EquatableTo<" + name + "> {");
         foreach (var name in new[]{"Date","TimeOfDay","Instant","Duration","TimeOffset"})
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : ComparableTo<" + name + ">, EquatableTo<" + name + "> {");

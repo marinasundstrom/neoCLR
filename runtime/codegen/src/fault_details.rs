@@ -133,6 +133,8 @@ pub struct Options {
     pub char_is_single_grapheme: Vec<usize>,
     pub char_from_string: Vec<usize>,
     pub char_text: Vec<usize>,
+    pub single_format: Vec<usize>,
+    pub double_format: Vec<usize>,
     pub int64_to_string: Vec<usize>,
     pub uint64_to_string: Vec<usize>,
     pub native_integer_to64: Vec<usize>,
@@ -1340,6 +1342,12 @@ impl Options {
                 .filter(|r| r["implementation"] == "char-text-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            single_format: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "single-format-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            double_format: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "double-format-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             int64_to_string: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter()

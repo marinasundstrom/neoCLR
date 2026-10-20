@@ -1,6 +1,13 @@
 # neoCLR platform roadmap
 
-**Foundational globalization (author direction, 2026-10-20):** [Culture formatting data](experiments/culture-formats/README.md) extends the existing date/time policy with numeric conventions, selectable calendars and UK/US profiles alongside invariant, Swedish and Hebrew-Israel. Formatting belongs to globalization; complete locale patterns, custom policies and primitive numeric specifiers remain gaps. The [bounded integer formatting follow-up](experiments/integer-formats/README.md) connects Int32/Int64 D/F/N to these policies. A [primitive interface correction](experiments/primitive-interfaces/README.md) preserves verified scalar conformance through native boxing and borrowed dispatch. The author asks for good-enough coverage, not exhaustive globalization; custom patterns remain deferred, while broader numeric Formattable coverage is the author-directed follow-up.
+**Bounded completion and return to main work (author direction, 2026-10-20):** The globalization/formatting/parsing increment now meets its bounded exit criterion: the five profiles, supported
+numeric formats and explicit-culture parsers pass focused built-in tests in the
+interpreter, JIT and native backend (23 tests, 69 executions), with matching API documentation. Defer custom
+patterns, arbitrary providers and additional locales. Next implement enum Parse and
+TryParse, then resume the release-readiness work below; this does not permanently
+reprioritize the platform roadmap.
+
+**Foundational globalization (author direction, 2026-10-20):** [Culture formatting data](experiments/culture-formats/README.md) extends the existing date/time policy with numeric conventions, selectable calendars and UK/US profiles alongside invariant, Swedish and Hebrew-Israel. Formatting belongs to globalization; complete locale patterns and custom policies remain gaps. The [bounded integer formatting follow-up](experiments/integer-formats/README.md) connects Int32/Int64 D/F/N to these policies. A [primitive interface correction](experiments/primitive-interfaces/README.md) preserves verified scalar conformance through native boxing and borrowed dispatch. The author asks for good-enough coverage, not exhaustive globalization; [Remaining numeric Formattable and culture parsing](experiments/numeric-formats/README.md) extend that foundation; custom patterns and providers remain deferred.
 Explicit primitive EquatableTo<T> contracts are tracked in the [equality qualification](experiments/primitive-equality/README.md); the runtime does not synthesize this interface for arbitrary structs.
 
 **Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) tracks the bounded native record equality/hash fix and remaining component/formatting gaps, the [String call-projection repair](validation/string-direct-call-20261020/README.md), and a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
@@ -27,8 +34,8 @@ now qualifies floating fields too. [Enum Object adapters](experiments/enum-objec
 extend equality/hash to Int32-backed enum fields. [Enum general formatting](experiments/enum-display/README.md)
 now reuses shared numeric/text services for names, flags and unnamed values; other
 field shapes and formats remain bounded. [Ordinary value display overrides](experiments/value-display/README.md)
-align Index, Range and seven errors across direct/boxed/composite calls. Primitive numeric formats and
-general providers remain gaps. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
+align Index, Range and seven errors across direct/boxed/composite calls. The bounded numeric
+formats/parsers are under final qualification; general providers remain deferred. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
 the [260-declaration inventory](design/class-library-type-inventory-20261020.md) now covers the whole authored public surface, with family execution evidence and explicit remaining gaps. This is not whole-library execution certification.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.

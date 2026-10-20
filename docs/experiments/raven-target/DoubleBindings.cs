@@ -7,7 +7,7 @@ static class DoubleBindings
     static readonly string[] Binary = ["Pow", "Min", "Max"];
     public static string MathDeclarations => string.Join(" ", Unary.Select(n => $"public static double {n}(double value) => 0;")
         .Concat(Binary.Select(n => $"public static double {n}(double left, double right) => 0;")));
-    public const string Declarations = "public struct Double { public static Result<Double, NumberParseError> Parse(string value) => default; public int CompareTo(double other) => 0; public bool Equals(double other) => false; }";
+    public const string Declarations = "public struct Double : Formattable { public static Result<Double, NumberParseError> Parse(string text, Globalization.Culture culture) => default; public static Result<Double, NumberParseError> Parse(string value) => default; public int CompareTo(double other) => 0; public bool Equals(double other) => false; public string ToString() => default; public string ToString(string format) => default; public string ToString(string format, Globalization.Culture culture) => default; }";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;

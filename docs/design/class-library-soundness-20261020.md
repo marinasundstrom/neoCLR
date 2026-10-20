@@ -133,3 +133,5 @@ the declared EquatableTo<T> contract across the fourteen scalar kinds. Typed cal
 reuse scalar storage; interface conversions retain ordinary boxing. Floating and
 Char semantics match existing Object equality/hash rules. This does not add automatic
 struct interface synthesis or change operators.
+
+[Numeric formats and explicit culture parsing](../experiments/numeric-formats/README.md) extend Formattable to all numeric primitives and close boxed floating display. Native/interpreted conversion shares bounded stack storage; translated culture parsing retains a normalization allocation. Public qualification uses the built-in test framework. Custom providers/styles and full format coverage remain gaps.

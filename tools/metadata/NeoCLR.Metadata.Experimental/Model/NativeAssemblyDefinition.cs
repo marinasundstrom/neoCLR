@@ -1001,7 +1001,7 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
-                counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
+                counts.TryGetValue(ownerIndex, out int count); Require(count < (ownerIndex < 0 ? 4096 : 256), "too many methods per owner"); counts[ownerIndex] = count + 1;
                 var parameterNames = new Dictionary<int, string>();
                 if (method.TryGetProperty("parameter_names", out _))
                 {

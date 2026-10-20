@@ -13983,3 +13983,32 @@ probe validates exact intrinsic admission and rejects malformed signatures. The
 allocation harness now materializes arguments and mode strings outside the loop;
 matched before/after results and artifact hashes live in neoCLR's
 `docs/experiments/record-generics`. These are development checks, not release qualification.
+
+### Primitive numeric formatting and module function capacity (2026-10-20)
+
+The Raven source library adds explicit Formattable and culture Parse overloads;
+ordinary primitive storage and interface calls are unchanged. Floating conversion
+uses private matched InternalCall declarations for `(Single|Double, Int32 code,
+Int32 precision, Boolean Swedish) -> String`; the runtime owns a shared bounded
+conversion core and the existing text-arena transport. No Runtime Contract setting,
+CLI signature encoding or public native ABI changes. The Boolean is temporary
+bounded-profile policy selected by Raven; future configurable formatting data will
+need a richer internal contract rather than exposing this switch publicly.
+
+Two additional ownerless services exposed the metadata producer's historical
+256-function cap. The neoCLR-owned producer and native reader now agree on the
+existing 4096-function module inventory bound; nominal type method limits remain
+256. This changes admission, not tokens or metadata representation. The focused
+producer test round-trips 257 ownerless functions and rejects the 4097th without
+mutating the graph. Raven compiler code is unchanged; the selected compiler bundle
+contains the rebuilt NeoCLR.Metadata.Experimental.dll and records its hash. Native
+metadata/codegen already represents these module functions directly. General Raven
+main and codex/neoclr remain separate; no branch merge is involved.
+
+See [numeric contracts and evidence](experiments/numeric-formats/README.md) for
+format bounds, culture parsing differences, tests and remaining limitations.
+
+Native-width static members exposed a backend admission gap during built-in tests.
+IntPtr/UIntPtr static methods now use the existing verified primitive-owner projection,
+with the shared scalar classification replacing a separate list. This changes neoCLR
+codegen admission only; Raven source semantics and CLI encoding are unchanged.

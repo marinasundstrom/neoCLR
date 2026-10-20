@@ -25,7 +25,7 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.AttributeUsageAttribute](../../runtime/raven/src/System/AttributeUsageAttribute.rvn#L5) | Reference | — |
 | [System.Boolean](../../runtime/raven/src/System/Boolean.rvn#L5) | Intrinsic | Et |
 | [System.BooleanParseError](../../runtime/raven/src/System/BooleanParseError.rvn#L3) | Union | — |
-| [System.Byte](../../runtime/raven/src/System/Byte.rvn#L5) | Intrinsic | Et |
+| [System.Byte](../../runtime/raven/src/System/Byte.rvn#L5) | Intrinsic | Et, Tf |
 | [System.Char](../../runtime/raven/src/System/Char.rvn#L6) | Intrinsic | T*, Et, Eo*, H* |
 | [System.Clonable](../../runtime/raven/src/System/Clonable.rvn#L3) | Contract | — |
 | [System.Closable<E>](../../runtime/raven/src/System/Closable.rvn#L3) | Contract | — |
@@ -96,7 +96,7 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.Data.Sql.SqlValue](../../runtime/raven/src/System/Data/Sql/SqlValue.rvn#L6) | Union | — |
 | [System.Diagnostics.StackTrace](../../runtime/raven/src/System/Diagnostics/StackTrace.rvn#L6) | Reference | T* |
 | [System.Disposable](../../runtime/raven/src/System/Disposable.rvn#L3) | Contract | — |
-| [System.Double](../../runtime/raven/src/System/Double.rvn#L5) | Intrinsic | Et |
+| [System.Double](../../runtime/raven/src/System/Double.rvn#L5) | Intrinsic | Et, T, Tf |
 | [System.EnvironmentError](../../runtime/raven/src/System/EnvironmentError.rvn#L3) | Value | T* |
 | [System.EquatableTo<in T>](../../runtime/raven/src/System/EquatableTo.rvn#L3) | Contract | Et |
 | [System.Formattable](../../runtime/raven/src/System/Formattable.rvn#L4) | Contract | Tf |
@@ -128,10 +128,10 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.IO.TextReader](../../runtime/raven/src/System/IO/TextReader.rvn#L7) | Contract | — |
 | [System.IO.TextWriter](../../runtime/raven/src/System/IO/TextWriter.rvn#L6) | Contract | — |
 | [System.Index](../../runtime/raven/src/System/Index.rvn#L4) | Value | Et, Eo*, H*, T* |
-| [System.Int16](../../runtime/raven/src/System/Int16.rvn#L5) | Intrinsic | Et |
+| [System.Int16](../../runtime/raven/src/System/Int16.rvn#L5) | Intrinsic | Et, Tf |
 | [System.Int32](../../runtime/raven/src/System/Int32.rvn#L5) | Intrinsic | Et, T, Tf |
 | [System.Int64](../../runtime/raven/src/System/Int64.rvn#L5) | Intrinsic | T, Tf, Et |
-| [System.IntPtr](../../runtime/raven/src/System/IntPtr.rvn#L3) | Intrinsic | Et |
+| [System.IntPtr](../../runtime/raven/src/System/IntPtr.rvn#L5) | Intrinsic | Et, Tf |
 | [System.IntegerDivisionError](../../runtime/raven/src/System/IntegerDivisionError.rvn#L3) | Union | T* |
 | [System.Introspection.AssemblyInfo](../../runtime/raven/src/System/Introspection/AssemblyInfo.rvn#L7) | Contract | — |
 | [System.Introspection.BindingFlags](../../runtime/raven/src/System/Introspection/BindingFlags.rvn#L4) | Enum | — |
@@ -199,12 +199,12 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.Runtime.Reflection.ReflectionError](../../runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn#L3) | Union | — |
 | [System.Runtime.RuntimeContext](../../runtime/raven/src/System/Runtime/RuntimeContext.rvn#L7) | Reference | — |
 | [System.RuntimeTypeHandle](../../runtime/raven/src/System/RuntimeTypeHandle.rvn#L4) | Intrinsic | — |
-| [System.SByte](../../runtime/raven/src/System/SByte.rvn#L5) | Intrinsic | Et |
+| [System.SByte](../../runtime/raven/src/System/SByte.rvn#L5) | Intrinsic | Et, Tf |
 | [System.Security.Cryptography.CryptographyError](../../runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn#L4) | Union | T* |
 | [System.Security.Cryptography.HMACSHA256](../../runtime/raven/src/System/Security/Cryptography/HMACSHA256.rvn#L7) | Static | — |
 | [System.Security.Cryptography.RandomNumberGenerator](../../runtime/raven/src/System/Security/Cryptography/RandomNumberGenerator.rvn#L7) | Static | — |
 | [System.Security.Cryptography.SHA256](../../runtime/raven/src/System/Security/Cryptography/SHA256.rvn#L7) | Static | — |
-| [System.Single](../../runtime/raven/src/System/Single.rvn#L5) | Intrinsic | Et |
+| [System.Single](../../runtime/raven/src/System/Single.rvn#L5) | Intrinsic | Et, T, Tf |
 | [System.Slice<T>](../../runtime/raven/src/System/Slice.rvn#L5) | Borrowed view | — |
 | [System.Storage.Directory](../../runtime/raven/src/System/Storage/StorageItems.rvn#L17) | Contract | — |
 | [System.Storage.EntryKind](../../runtime/raven/src/System/Storage/EntryKind.rvn#L3) | Enum | — |
@@ -248,10 +248,10 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.Time.TimeZone](../../runtime/raven/src/System/Time/TimeZone.rvn#L8) | Reference value | Et, Eo*, H*, T* |
 | [System.Time.TimeZoneError](../../runtime/raven/src/System/Time/TimeZoneError.rvn#L6) | Union | T* |
 | [System.Time.ZonedDateTime](../../runtime/raven/src/System/Time/ZonedDateTime.rvn#L8) | Reference value | Et, Eo*, H* |
-| [System.UInt16](../../runtime/raven/src/System/UInt16.rvn#L5) | Intrinsic | Et |
-| [System.UInt32](../../runtime/raven/src/System/UInt32.rvn#L5) | Intrinsic | Et |
-| [System.UInt64](../../runtime/raven/src/System/UInt64.rvn#L5) | Intrinsic | Et |
-| [System.UIntPtr](../../runtime/raven/src/System/UIntPtr.rvn#L3) | Intrinsic | Et |
+| [System.UInt16](../../runtime/raven/src/System/UInt16.rvn#L5) | Intrinsic | Et, Tf |
+| [System.UInt32](../../runtime/raven/src/System/UInt32.rvn#L5) | Intrinsic | Et, Tf |
+| [System.UInt64](../../runtime/raven/src/System/UInt64.rvn#L5) | Intrinsic | Et, Tf |
+| [System.UIntPtr](../../runtime/raven/src/System/UIntPtr.rvn#L5) | Intrinsic | Et, Tf |
 | [System.Uri](../../runtime/raven/src/System/Uri.rvn#L6) | Reference value | Et, Eo*, H*, T* |
 | [System.UriError](../../runtime/raven/src/System/UriError.rvn#L3) | Union | T* |
 | [System.Value](../../runtime/raven/src/System/Value.rvn#L4) | Intrinsic | — |

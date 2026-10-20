@@ -714,3 +714,15 @@ rather than timing-only assertions. No new scheduling attribute is added in this
 Category evidence: [18 JIT/AOT checks](category-evidence/execution.json),
 [empty-category rejection](category-evidence/discovery.json), and
 [existing JIT runner checks](category-evidence/runner.json) pass on macOS ARM64.
+
+## Globalization and numeric formats (2026-10-20)
+
+The `globalization` suite checks all five built-in culture profiles, date/time and
+number conventions, UK/US clock boundaries, preference resolution and independent
+calendar/group-size arrays. The `numeric-formatting` suite checks numeric
+Formattable dispatch, precision, boundaries, culture-aware parsing and rejection;
+`primitive-parsing` preserves the invariant parsing regression coverage. All use
+discovered `[Test]` functions and Result assertions. Run these focused suites with
+`--suite globalization --suite numeric-formatting --suite primitive-parsing` and
+`--mode interpreter --mode jit --mode native`, supplying a matching bundle and
+its runtime/codegen/JIT host. See [contracts and evidence](../../../docs/experiments/numeric-formats/README.md).

@@ -114,6 +114,8 @@ pub(super) fn native_body(
                 &d.string_slice_utf8,
                 &d.char_from_string,
                 &d.char_text,
+                &d.single_format,
+                &d.double_format,
                 &d.int64_to_string,
                 &d.uint64_to_string,
                 &d.native_integer_to64,

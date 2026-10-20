@@ -318,6 +318,8 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             Some("neoCLR.Runtime.ParseBoolean") => (Type::String, Type::Value, "parse-boolean-v1"),
             Some("neoCLR.Runtime.ParseInt64") => (Type::String, Type::Value, "parse-int64-v1"),
             Some("neoCLR.Runtime.ParseInt32") => (Type::String, Type::Value, "parse-int32-v1"),
+            Some("neoCLR.Runtime.FormatSingle") => (Type::Single, Type::String, "single-format-v1"),
+            Some("neoCLR.Runtime.FormatDouble") => (Type::Double, Type::String, "double-format-v1"),
             Some("neoCLR.Runtime.Int64ToString") => {
                 (Type::Int64, Type::String, "int64-to-string-v1")
             }
@@ -340,7 +342,7 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             || f.instance
             || f.receiver_byref
             || f.receiver_readonly
-            || f.parameters != [parameter]
+            || f.parameters != if matches!(implementation, "single-format-v1" | "double-format-v1") { vec![parameter, Type::Int32, Type::Int32, Type::Boolean] } else { vec![parameter] }
             || f.returns != result
             || f.no_result
             || f.impl_flags != 0x1000
@@ -358,7 +360,7 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native integer text binding requires exact reserved Int32/Int64 parsing or other primitive parsing, Int64/UInt64 formatting or native-integer conversion InternalCall contract".into());
+            return Err("native integer text binding requires exact reserved Int32/Int64 parsing or other primitive parsing, integer/floating formatting or native-integer conversion InternalCall contract".into());
         }
         f.impl_flags = 0;
         f.body = if result == Type::String {
@@ -383,6 +385,8 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
                 "parse-boolean-v1" => Some("neoclr_parse_boolean_v1"),
                 "parse-int64-v1" => Some("neoclr_parse_int64_v1"),
                 "parse-int32-v1" => Some("neoclr_parse_int32_v1"),
+                "single-format-v1" => Some("neoclr_single_format_v1"),
+                "double-format-v1" => Some("neoclr_double_format_v1"),
                 "int64-to-string-v1" => Some("neoclr_int64_to_string_v1"),
                 "uint64-to-string-v1" => Some("neoclr_uint64_to_string_v1"),
                 _ => None,

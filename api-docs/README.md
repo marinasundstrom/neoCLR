@@ -2762,3 +2762,13 @@ selected types. The snapshot is generated from primitive-equality-fixed-bundle l
 with the recorded compiler bridge and native documentation renderer 8da3a45f8.
 [Qualification](../docs/experiments/primitive-equality/README.md) distinguishes typed
 calls from boxing, and records floating and grapheme semantics. No public type is excluded.
+
+### Primitive numeric formats and culture parsing (2026-10-20 development)
+
+All numeric primitives remain selected for both API snapshots. The references now
+include their Formattable declarations, formatting overloads, explicit-culture Parse
+overloads, native-width invariant parsers and floating parameterless display. Private
+format/parsing helpers and InternalCalls are not public APIs. The matching library
+snapshot uses the rebuilt metadata producer with the module function bound repair;
+Raven compiler semantics are unchanged. [Contracts and validation](../docs/experiments/numeric-formats/README.md)
+record format/precision bounds, strict culture parsing and allocation limitations.

@@ -5270,7 +5270,7 @@ fn interpret_instructions_with_dispatch(
                         };
                         expect(&value, &callee.returns)?;
                         if !callee.no_result {
-                            frame.stack.push(value);
+                            frame.stack.push(value.on_stack());
                         }
                     } else {
                         if frames.len() >= limits.frames {

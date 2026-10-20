@@ -85,7 +85,7 @@ generic, empty and reference-field cases pass interpreter, JIT and AOT checks.
 Floating fields also pass these checks, including NaN and signed-zero equality.
 Int32-backed enum fields use exact enum type and underlying-value equality.
 Enum display now supports names, flags and unnamed numeric values.
-Native boxed floating-point formatting remains a gap; this
+Numeric primitives now support Formattable and boxed floating-point display. This
 does not yet cover every .NET field shape or dispatch path. The [Object API guide](/docs/objects.html) records the
 supported contracts and [implementation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)
 tracks execution-mode validation.
@@ -93,7 +93,7 @@ tracks execution-mode validation.
 [Object API](../../docs/objects.html) · [Garbage collection](../gc/) ·
 [.NET comparison](../../comparison/)
 
-Development qualification now covers signed, unsigned and native-width integer equality, hashes and decimal display through Object, including narrow sign/zero extension and UInt64 boundaries. These use existing scalar boxes and formatting services; Object conversion still allocates a box. Floating boxed display and broader numeric formats remain gaps.
+Development qualification now covers signed, unsigned and native-width integer equality, hashes and decimal display through Object, including narrow sign/zero extension and UInt64 boundaries. These use existing scalar boxes and formatting services; Object conversion still allocates a box. Floating boxed display uses the shared numeric formatting implementation; custom formats and providers remain gaps.
 
 Development primitive interface support preserves each scalar value type's declared
 interfaces when boxed. Interface calls borrow that box's payload and invoke the same
@@ -109,3 +109,9 @@ Typed `Equals` calls do not require boxing; storing a value in an interface does
 Floating `Equals` treats NaNs as equal and positive/negative zero as equal, matching
 Object equality and hashing; IEEE `==` retains its NaN behavior. Char equality keeps
 canonical grapheme semantics. This does not synthesize the interface for user structs.
+
+Numeric primitives implement `Formattable`: integers support bounded G/D/F/N;
+Single and Double support G/R/F/N/E, shortest round-trip output and explicit precision.
+`Parse(text, culture)` accepts the corresponding decimal/group conventions and
+validates grouping; ordinary `Parse(text)` stays invariant. See [formatting and
+culture](../time/) for the supported profiles and limitations.

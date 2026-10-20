@@ -1,12 +1,36 @@
 module System
 
-public struct IntPtr : ComparableTo<nint>, EquatableTo<nint> {
+import System.Result.*
+
+public struct IntPtr : ComparableTo<nint>, EquatableTo<nint>, Formattable {
     // The runtime supplies intrinsic native-width storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: nint
 
+    /// Parses invariant integer text and checks the native-width range.
+    static func Parse(text: string) -> Result<nint, NumberParseError> {
+        let value = Int64.Parse(text)?
+        let result = (nint)value
+        if neoCLR.Runtime.IntPtrToInt64(result) != value { return Error(NumberParseError.Overflow()) }
+        return Ok(result)
+    }
+
     /// Tests equality with another value of the same type without boxing.
     func Equals(other: nint) -> bool => neoCLR.Runtime.IntPtrToInt64(m_value) == neoCLR.Runtime.IntPtrToInt64(other)
+
+    /// Parses explicit culture punctuation with strict three-digit grouping; whitespace is not accepted.
+    static func Parse(text: string, culture: Globalization.Culture) -> Result<nint, NumberParseError> {
+        let normalized = Globalization.NumericParsing.Normalize(text, culture, false)?
+        return Parse(normalized)
+    }
+
+    /// Formats with the current culture using empty/G/G0, D, F or N; precision is 0–99.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Formats with explicit culture; unsupported formats or precision fault.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        return Globalization.IntegerFormatting.Format(neoCLR.Runtime.IntPtrToInt64(m_value), format, culture)
+    }
 
     func CompareTo(other: nint) -> int {
         let left = neoCLR.Runtime.IntPtrToInt64(m_value)

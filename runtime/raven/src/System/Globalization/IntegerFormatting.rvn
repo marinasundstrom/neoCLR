@@ -3,10 +3,20 @@ module System.Globalization
 import System.*
 import System.Result.*
 
-// Shared signed integer formatter. One exactly sized byte buffer and final string;
+// Shared integer formatter. One exactly sized byte buffer and final string;
 // no per-digit strings, argument boxes or formatting-policy objects.
 internal static class IntegerFormatting {
     static func Format(value: long, format: string, culture: Culture) -> string {
+        let negative = value < 0L
+        let magnitude = if negative { (ulong)(-(value + 1L)) + (ulong)1 } else { (ulong)value }
+        return FormatMagnitude(magnitude, negative, format, culture)
+    }
+
+    static func FormatUnsigned(value: ulong, format: string, culture: Culture) -> string {
+        return FormatMagnitude(value, false, format, culture)
+    }
+
+    private static func FormatMagnitude(value: ulong, negative: bool, format: string, culture: Culture) -> string {
         let spec = format.Utf8Bytes
         var code = 71
         var precision = -1
@@ -38,7 +48,7 @@ internal static class IntegerFormatting {
             System.Fail("Unsupported integer general precision")
         }
         if code == 71 || (code == 68 && precision <= 1) {
-            return neoCLR.Runtime.Int64ToString(value)
+            return if negative { neoCLR.Runtime.Int64ToString(-((long)(value - (ulong)1)) - 1L) } else { neoCLR.Runtime.UInt64ToString(value) }
         }
         let fixedPoint = code == 70 || code == 78
         if precision < 0 {
@@ -46,9 +56,9 @@ internal static class IntegerFormatting {
         }
         var remaining = value
         var digits = 1
-        while remaining <= -10L || remaining >= 10L {
+        while remaining >= (ulong)10 {
             digits += 1
-            remaining /= 10L
+            remaining /= (ulong)10
         }
         if !fixedPoint && precision > digits {
             digits = precision
@@ -57,18 +67,14 @@ internal static class IntegerFormatting {
         let group = NumberFormat.GroupSeparator(culture).Utf8Bytes
         let groups = if code == 78 { (digits - 1) / 3 } else { 0 }
         let fractionalBytes = if fixedPoint && precision > 0 { separator.Length + precision } else { 0 }
-        let negative = value < 0L
         let length = digits + groups * group.Length + fractionalBytes + (if negative { 1 } else { 0 })
         let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(length)
         var cursor = length - fractionalBytes
         remaining = value
         var written = 0
         while written < digits {
-            var digit = (int)(remaining % 10L)
-            if digit < 0 {
-                digit = -digit
-            }
-            remaining /= 10L
+            let digit = (int)(remaining % (ulong)10)
+            remaining /= (ulong)10
             cursor -= 1
             buffer[cursor] = (byte)(48 + digit)
             written += 1

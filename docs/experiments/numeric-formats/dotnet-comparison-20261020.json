@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "value": "0.1",
+      "format": "G",
+      "dotnet": "0.1",
+      "neoclr": "0.1",
+      "passed": true
+    },
+    {
+      "value": "1e16",
+      "format": "G",
+      "dotnet": "10000000000000000",
+      "neoclr": "10000000000000000",
+      "passed": true
+    },
+    {
+      "value": "1e17",
+      "format": "G",
+      "dotnet": "1E+17",
+      "neoclr": "1E+17",
+      "passed": true
+    },
+    {
+      "value": "0.0001",
+      "format": "G",
+      "dotnet": "0.0001",
+      "neoclr": "0.0001",
+      "passed": true
+    },
+    {
+      "value": "0.00001",
+      "format": "G",
+      "dotnet": "1E-05",
+      "neoclr": "1E-05",
+      "passed": true
+    },
+    {
+      "value": "1234.5",
+      "format": "G3",
+      "dotnet": "1.23E+03",
+      "neoclr": "1.23E+03",
+      "passed": true
+    },
+    {
+      "value": "1234.5",
+      "format": "E2",
+      "dotnet": "1.23E+003",
+      "neoclr": "1.23E+003",
+      "passed": true
+    },
+    {
+      "value": "2.5",
+      "format": "F0",
+      "dotnet": "2",
+      "neoclr": "2",
+      "passed": true
+    },
+    {
+      "value": "3.5",
+      "format": "F0",
+      "dotnet": "4",
+      "neoclr": "4",
+      "passed": true
+    },
+    {
+      "value": "-0.0",
+      "format": "G",
+      "dotnet": "-0",
+      "neoclr": "-0",
+      "passed": true
+    },
+    {
+      "value": "-0.0",
+      "format": "F2",
+      "dotnet": "-0.00",
+      "neoclr": "-0.00",
+      "passed": true
+    },
+    {
+      "value": "1.2345678901234567",
+      "format": "R",
+      "dotnet": "1.2345678901234567",
+      "neoclr": "1.2345678901234567",
+      "passed": true
+    },
+    {
+      "value": "5e-324",
+      "format": "R",
+      "dotnet": "5E-324",
+      "neoclr": "5E-324",
+      "passed": true
+    },
+    {
+      "value": "1.7976931348623157e308",
+      "format": "R",
+      "dotnet": "1.7976931348623157E+308",
+      "neoclr": "1.7976931348623157E+308",
+      "passed": true
+    }
+  ]
+}

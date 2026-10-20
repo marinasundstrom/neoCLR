@@ -68,7 +68,7 @@ func ParseUInt32() -> Result<unit, TestFailure> {
 [Test("UInt64 parsing preserves values and reports overflow")]
 func ParseUInt64() -> Result<unit, TestFailure> {
     if UInt64.Parse("18446744073709551615") is Ok(let value) {
-        _ = Assert.True(value == (ulong)-1L, "Parsed UInt64 value")?
+        _ = Assert.True(value == ((ulong)9223372036854775807L * (ulong)2 + (ulong)1), "Parsed UInt64 value")?
     } else {
         return Assert.True(false, "Valid UInt64 text must parse")
     }

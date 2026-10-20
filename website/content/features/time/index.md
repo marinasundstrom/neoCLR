@@ -144,3 +144,18 @@ custom numeric patterns remain gaps. See the API references
 for [Culture](/docs/api/system/globalization/Culture/),
 [DateTimeFormat](/docs/api/system/globalization/DateTimeFormat/) and
 [NumberFormat](/docs/api/system/globalization/NumberFormat/).
+
+### Numeric formatting and parsing (development)
+
+All numeric primitives support `ToString(format, culture)` and
+`Parse(text, culture)`. Integers support G/D/F/N; Single and Double support G/R/F/N/E.
+Precision is bounded to 0–99. Floating G/R output preserves round-trip identity,
+including negative zero; explicit precision rounds ties to even. N groups digits
+using the selected culture. Unsupported/custom formats fault.
+
+Culture parsing validates groups of three and uses the profile's decimal separator.
+Swedish grouping uses U+00A0. Whitespace, mixed punctuation and malformed groups
+return parse errors. Integer parsing accepts grouped integers but no fractions;
+floating parsing also accepts exponents. The original one-argument Parse overloads
+remain invariant for protocol data. This is a bounded API, without NumberStyles,
+custom providers or the full .NET globalization catalog.

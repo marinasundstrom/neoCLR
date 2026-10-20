@@ -1,0 +1,101 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Globalization.*
+import System.Time.*
+import System.Result.*
+import NeoClr.Testing.*
+
+func Profile(culture: Culture, dateText: string, decimalSeparator: string, groupSeparator: string) -> Result<unit, TestFailure> {
+    let format = culture.DateTimeFormat
+    let Ok(date) = Date.Create(2024, 3, 9) else {
+        return Assert.True(false, "Date")
+    }
+    let Ok(text) = format.FormatDate(date) else {
+        return Assert.True(false, "Date format")
+    }
+    _ = Assert.True(text == dateText, "Date convention")?
+    _ = Assert.True(format.TimeSeparator == ":" && format.ShortTimePattern == (if culture.Name == "en-US" { "h:mm tt" } else { "HH:mm" }) && format.LongTimePattern == (if culture.Name == "en-US" { "h:mm:ss tt" } else { "HH:mm:ss" }), "Time metadata")?
+    let numbers = culture.NumberFormat
+    _ = Assert.True(numbers.NumberDecimalSeparator == decimalSeparator && numbers.NumberGroupSeparator == groupSeparator, "Number separators")?
+    _ = Assert.True(numbers.NumberDecimalDigits == 2 && numbers.PositiveSign == "+" && numbers.NegativeSign == "-", "Number signs and precision")?
+    let groups = numbers.NumberGroupSizes
+    _ = Assert.True(groups.Length == 1 && groups[0] == 3, "Group sizes")?
+    groups[0] = 9
+    _ = Assert.True(numbers.NumberGroupSizes[0] == 3, "No shared mutable grouping")?
+    let calendars = culture.OptionalCalendars
+    _ = Assert.True(calendars.Length == 2 && calendars[0].Id == culture.DefaultCalendar.Id && calendars[1].Id == "hebrew", "Optional calendars")?
+    let hebrew = format.WithCalendar(calendars[1])
+    let Ok(projected) = hebrew.FormatDate(date) else {
+        return Assert.True(false, "Hebrew calendar projection")
+    }
+    _ = Assert.True(projected.Length > 0 && format.Calendar.Id == "gregory", "Independent immutable calendar choice")?
+    calendars[0] = Calendar.Hebrew
+    _ = Assert.True(culture.OptionalCalendars[0].Id == "gregory", "No shared mutable calendar array")?
+    _ = Assert.True(format.FractionalSecondSeparator == decimalSeparator, "Time decimal metadata")?
+    _ = Assert.True(Duration.FromTicks(15000000L).ToString("g", culture) == "0:00:01" + decimalSeparator + "5", "Duration data integration")?
+    _ = Assert.True(Duration.FromTicks(15000000L).ToString("c", culture) == "00:00:01.5000000", "Invariant duration unchanged")?
+    _ = Assert.True(date.ToString("O", culture) == "2024-03-09", "Invariant roundtrip unchanged")?
+    return Ok(())
+}
+
+[Test("Invariant formatting data and calendar isolation")]
+func ProfileInvariant() -> Result<unit, TestFailure> {
+    return Profile(Culture.Invariant, "2024-03-09", ".", ",")
+}
+
+[Test("SwedishSweden formatting data and calendar isolation")]
+func ProfileSwedishSweden() -> Result<unit, TestFailure> {
+    return Profile(Culture.SwedishSweden, "2024-03-09", ",", " ")
+}
+
+[Test("HebrewIsrael formatting data and calendar isolation")]
+func ProfileHebrewIsrael() -> Result<unit, TestFailure> {
+    return Profile(Culture.HebrewIsrael, "09.03.2024", ".", ",")
+}
+
+[Test("EnglishUnitedKingdom formatting data and calendar isolation")]
+func ProfileEnglishUnitedKingdom() -> Result<unit, TestFailure> {
+    return Profile(Culture.EnglishUnitedKingdom, "09/03/2024", ".", ",")
+}
+
+[Test("EnglishUnitedStates formatting data and calendar isolation")]
+func ProfileEnglishUnitedStates() -> Result<unit, TestFailure> {
+    return Profile(Culture.EnglishUnitedStates, "3/9/2024", ".", ",")
+}
+
+[Test("Culture preferences resolve explicit regions and bounded fallbacks")]
+func Preferences() -> Result<unit, TestFailure> {
+    _ = Assert.True(Culture.EnglishUnitedKingdom.Language.Code == "en" && Culture.EnglishUnitedStates.Language.Code == Language.English.Code, "English language")?
+    _ = Assert.True(SystemCultureProvider.FromPreference("en_GB.UTF-8").Current.Name == "en-GB", "UK resolver")?
+    _ = Assert.True(SystemCultureProvider.FromPreference("EN-us").Current.Name == "en-US", "US resolver")?
+    _ = Assert.True(SystemCultureProvider.FromPreference("en-CA").Current.Name == "", "Unsupported English region")?
+    _ = Assert.True(!SystemCultureProvider.FromPreference("en-US").IsFallback, "Exact culture preference")?
+    _ = Assert.True(SystemCultureProvider.FromPreference("en").IsFallback, "Neutral English fallback")?
+    _ = Assert.True(NumberFormat.Invariant.NumberDecimalSeparator == ".", "Invariant number factory")?
+    return Ok(())
+}
+
+[Test("UK and US clocks preserve midnight noon and invariant output")]
+func Clocks() -> Result<unit, TestFailure> {
+    let us = Culture.EnglishUnitedStates.DateTimeFormat
+    let uk = Culture.EnglishUnitedKingdom.DateTimeFormat
+    _ = Assert.True(us.AMDesignator == "AM" && us.PMDesignator == "PM" && uk.AMDesignator == "", "Clock designators")?
+    let Ok(midnight) = TimeOfDay.Parse("00:00:00") else {
+        return Assert.True(false, "Midnight")
+    }
+    let Ok(noon) = TimeOfDay.Parse("12:00:00") else {
+        return Assert.True(false, "Noon")
+    }
+    let Ok(afternoon) = TimeOfDay.Parse("14:30:05.1234567") else {
+        return Assert.True(false, "Afternoon")
+    }
+    _ = Assert.True(us.FormatTime(midnight, "t") == "12:00 AM", "US midnight")?
+    _ = Assert.True(us.FormatTime(noon, "T") == "12:00:00 PM", "US noon")?
+    _ = Assert.True(us.FormatTime(afternoon, "t") == "2:30 PM", "US short time")?
+    _ = Assert.True(us.FormatTime(afternoon) == "2:30:05.1234567 PM", "US fractional time")?
+    _ = Assert.True(uk.FormatTime(afternoon, "t") == "14:30", "UK short time")?
+    _ = Assert.True(us.FormatTime(afternoon, "O") == "14:30:05.1234567", "US invariant roundtrip")?
+    System.Runtime.GC.Collect()
+    return Ok(())
+}

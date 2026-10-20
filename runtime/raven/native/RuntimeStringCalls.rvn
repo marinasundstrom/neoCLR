@@ -134,3 +134,9 @@ internal extern func CharCompareOrdinal(left: char, right: char) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func CharCompareOrdinalIgnoreCase(left: char, right: char) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FormatSingle(value: float, code: int, precision: int, swedish: bool) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FormatDouble(value: double, code: int, precision: int, swedish: bool) -> string;

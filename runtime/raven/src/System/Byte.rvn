@@ -2,7 +2,7 @@ module System
 
 import System.Result.*
 
-public struct Byte : Number, EquatableTo<byte> {
+public struct Byte : Number, EquatableTo<byte>, Formattable {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: byte
@@ -34,6 +34,20 @@ public struct Byte : Number, EquatableTo<byte> {
 
     /// Tests equality with another value of the same type without boxing.
     func Equals(other: byte) -> bool => m_value == other
+
+    /// Parses explicit culture punctuation with strict three-digit grouping; whitespace is not accepted.
+    static func Parse(text: string, culture: Globalization.Culture) -> Result<byte, NumberParseError> {
+        let normalized = Globalization.NumericParsing.Normalize(text, culture, false)?
+        return Parse(normalized)
+    }
+
+    /// Formats with the current culture using empty/G/G0, D, F or N; precision is 0–99.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+
+    /// Formats with explicit culture; unsupported formats or precision fault.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        return Globalization.IntegerFormatting.FormatUnsigned((ulong)m_value, format, culture)
+    }
 
     func CompareTo(other: byte) -> int {
         if m_value < other {

@@ -41,7 +41,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="parameterCount">Number of Int32 parameters, 0–256.</param>
     /// <param name="returnsValue">True for Int32, false for no result.</param>
     /// <returns>An assembly-owned function with a null declaring type.</returns>
-    /// <exception cref="ArgumentException">Invalid/duplicate signature or more than 256 functions.</exception>
+    /// <exception cref="ArgumentException">Invalid/duplicate signature or more than 4096 functions.</exception>
     public MethodBuilder AddFunction(string name, int parameterCount = 0, bool returnsValue = true)
         => AddFunction(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
     /// <summary>Adds a static assembly-owned function with an explicit primitive or owned-class signature.</summary>
