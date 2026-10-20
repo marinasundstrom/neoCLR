@@ -26,6 +26,7 @@ pub fn body(module: &Module, owner: &Type, contract: &Function) -> Result<Option
         && contract.parameters.is_empty()
         && contract.returns == Type::Int32;
     if definition.is_reference_type
+        || definition.memory_view.is_some()
         || definition.primitive_reference
         || crate::memory_view_contract::contains_borrowed(module, owner)
         || Type::from_name(&definition.name).is_primitive()

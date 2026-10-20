@@ -1,0 +1,64 @@
+import System.*
+import System.Collections.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Equal(left: Object, right: Object) {
+    Check(left.Equals(right) && right.Equals(left), "Memory region equality")
+    Check(left.GetHashCode() == right.GetHashCode(), "Memory region hashes")
+    Check(!left.Equals(null) && !left.Equals(0), "Memory wrong type")
+}
+
+func Retain() -> Object {
+    let memory: Memory<byte> = [1b, 2b, 3b, 4b]
+    return memory.Slice(1, 2)
+}
+
+func Main() {
+    let data = [10b, 20b, 30b, 40b]
+    let memory: Memory<byte> = data
+    let same: Memory<byte> = data
+    let readonly: ReadOnlyMemory<byte> = memory
+    Equal(memory, same)
+    Equal(memory, readonly)
+    Check(memory.Equals(readonly) && memory.GetHashCode() == readonly.GetHashCode(), "Direct region calls")
+    Check(memory.ToString().ContainsOrdinal("Memory"), "Memory diagnostic display")
+    Equal(memory.Slice(1, 2), readonly.Slice(1, 2))
+    Check(!((Object)memory).Equals(memory.Slice(1)), "Different offset and length")
+    Check(!((Object)memory.Slice(0, 2)).Equals(memory.Slice(1, 2)), "Different offset")
+    let other: Memory<byte> = [10b, 20b, 30b, 40b]
+    Check(!((Object)memory).Equals(other), "Equal contents have distinct owners")
+    let retained: Object = memory.Slice(1, 2)
+    let hash = retained.GetHashCode()
+    data[1] = 99b
+    Equal(retained, readonly.Slice(1, 2))
+    Check(retained.GetHashCode() == hash, "Mutation preserves region hash")
+    Equal(default(Memory<byte>), default(ReadOnlyMemory<byte>))
+    Check(((Object)default(Memory<byte>)).GetHashCode() == 0, "Default region hash")
+    Equal(memory.Slice(4, 0), readonly.Slice(4, 0))
+    Check(!((Object)memory.Slice(0, 0)).Equals(memory.Slice(4, 0)), "Empty offsets remain distinct")
+    Check(!((Object)default(Memory<byte>)).Equals(memory.Slice(0, 0)), "Default has no owner")
+    let map = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
+    Check(map.TryAdd(memory, 1) && !map.TryAdd(readonly, 2), "Readonly shares region identity")
+    let soleOwner = Retain()
+    System.Runtime.GC.Collect()
+    Equal(retained, readonly.Slice(1, 2))
+    if retained is Memory<byte> restored {
+        let view: Slice<byte> = restored
+        Check(view[0] == 99b && view[1] == 30b, "Unboxed retained owner and window")
+    } else {
+        System.Fail("Exact memory unboxing")
+    }
+    if soleOwner is Memory<byte> owned {
+        let bytes: Slice<byte> = owned
+        Check(bytes[0] == 2b && bytes[1] == 3b, "Box retains sole owner across GC")
+    } else {
+        System.Fail("Sole owner unboxing")
+    }
+    Check(!(retained is ReadOnlyMemory<byte>), "Equality does not change nominal unboxing")
+    Console.WriteLine("Memory region contracts: passed")
+}

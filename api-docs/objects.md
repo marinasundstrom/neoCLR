@@ -561,3 +561,7 @@ may box and formatting allocates fragments/results. See the
 [contract and tested sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/composite-formatting/README.md).
 
 The [integral Object qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/integer-object/README.md) extends the shared scalar path to SByte, Byte, Int16, UInt16, UInt32, UInt64, IntPtr and UIntPtr. Typed payload reads preserve sign/zero extension. Direct inherited calls and boxed/composite formatting pass interpreter/JIT/AOT on macOS ARM64; existing scalar box allocations remain.
+
+### Persistent memory regions
+
+Development Memory/ReadOnlyMemory Object equality compares owner, offset and length across writable/readonly access. Hashes are stable when contents change. Default ownerless memory differs from empty owner-retaining windows; exact type tests/unboxing still distinguish writable from readonly types. Existing inherited Object calls box. Native qualification is byte-only; borrowed slices cannot box. [Region and GC evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/memory-object/README.md).

@@ -24,6 +24,12 @@ fn scalar_box_type(ty: &Type) -> bool {
     )
 }
 
+fn persistent_memory(input: &neoclr::Module, ty: &Type) -> bool {
+    input
+        .type_definition(ty)
+        .is_some_and(|t| t.memory_view.is_some_and(|kind| !kind.is_borrowed()))
+}
+
 pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
     let module: &neoclr::Module = input;
     let sites: Vec<_> = input
@@ -46,9 +52,9 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     if sites.iter().any(|(_, _, ty)| {
         input
             .type_definition(ty)
-            .is_some_and(|t| t.memory_view.is_some())
+            .is_some_and(|t| t.memory_view.is_some_and(|kind| kind.is_borrowed()))
     }) {
-        return Err("native memory-view boxing is not implemented".into());
+        return Err("borrowed memory views cannot be boxed".into());
     }
     if sites.is_empty() {
         return Ok(());
@@ -394,13 +400,17 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .enumerate()
                 .filter_map(move |(pc, op)| match op {
                     Op::IsInstance(t)
-                        if (scalar_box_type(t) || crate::scalar_unions::record(module, t))
+                        if (scalar_box_type(t)
+                            || persistent_memory(module, t)
+                            || crate::scalar_unions::record(module, t))
                             && !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), false))
                     }
                     Op::UnboxAny(t)
-                        if (scalar_box_type(t) || crate::scalar_unions::record(module, t))
+                        if (scalar_box_type(t)
+                            || persistent_memory(module, t)
+                            || crate::scalar_unions::record(module, t))
                             && !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), true))

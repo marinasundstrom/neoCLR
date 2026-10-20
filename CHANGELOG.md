@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Give persistent Memory/ReadOnlyMemory Object equality matching owner/offset/length semantics across access restrictions, with mutation-stable region hashes. Reuse native byte-view payloads and ordinary boxes/unboxing; preserve borrowed Slice rejection. Qualify defaults, distinct empty windows, dictionary keys and sole-owner retention across GC in interpreter/JIT/AOT. Native element support remains byte-only and inherited Object calls still box.
+
 - Complete narrow, unsigned and native-width integer Object equality/hash and invariant decimal display using existing scalar boxes, typed payload reads and numeric text services. Qualify signed/unsigned boundaries, exact types, direct/boxed/composite calls, dictionary keys and GC in interpreter/JIT/AOT on macOS ARM64; no new EquatableTo declarations or ABI.
 
 - Inventory all 260 authored public class-library type declarations and record equality/hash/display, inheritance and allocation findings with explicit execution limits. Add reference/value family qualification across interpreter/JIT/AOT; fix native console host selection for synchronous code retaining timer services, without requiring a generated default task queue.

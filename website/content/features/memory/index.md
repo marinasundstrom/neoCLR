@@ -76,3 +76,5 @@ checks. Other native element specializations remain unqualified.
 [Type and member reference](../../docs/memory-views.html) ·
 [Reference and value types](../types/) · [Arrays](../arrays/) · [HTTP](../web/) · [Garbage collection](../gc/) ·
 [Implementation and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/memory-view-library-audit.md)
+
+Development Object equality for persistent memory views compares the same backing owner, offset and length, including writable/readonly projections. It does not compare contents. Mutation preserves region hashes, and boxing retains the owner across collection. Inherited Object calls still box; native qualification currently covers byte views. Borrowed slices remain unboxable. See the [Object contract reference](/docs/objects.html#persistent-memory-regions).

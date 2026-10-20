@@ -5,8 +5,8 @@
 //! path and the start below jointly identify the first element, including an
 //! empty window at the end. No payload is read/copied to construct a view.
 //! Value::MemoryView supplies tracing and storage/return checks. Metadata admission
-//! and suspension checks enforce interpreter lifetimes; native lowering remains
-//! unsupported. Do not encode Slice as an ordinary Value::Object.
+//! and suspension checks enforce interpreter lifetimes. Native lowering separately
+//! admits the byte-view profile. Do not encode Slice as an ordinary Value::Object.
 use crate::{
     Fault, FaultCode, ManagedHeap, SlotReference, Value,
     metadata::{MemoryViewKind as Kind, Type},
@@ -133,6 +133,46 @@ impl MemoryView {
 
     pub(crate) fn utf8(slice: Utf8Slice) -> Self {
         Self(View::Utf8(slice))
+    }
+
+    /// Persistent memory identity is its owner/window, independent of access mode
+    /// and contents. Borrowed views never participate in Object contracts.
+    pub(crate) fn region_equals(&self, other: &Self) -> Result<bool, Fault> {
+        self.assigned()?;
+        other.assigned()?;
+        if self.is_borrowed()
+            || other.is_borrowed()
+            || self.ty().generic_arguments() != other.ty().generic_arguments()
+        {
+            return Ok(false);
+        }
+        Ok(match (&self.0, &other.0) {
+            (View::Empty(..), View::Empty(..)) => true,
+            (View::Memory(a), View::Memory(b)) => {
+                a.view.array.same_location(&b.view.array) && a.view.window == b.view.window
+            }
+            _ => false,
+        })
+    }
+
+    pub(crate) fn region_hash(&self) -> Result<i32, Fault> {
+        self.assigned()?;
+        match &self.0 {
+            View::Empty(kind, _) if !kind.is_borrowed() => Ok(0),
+            View::Memory(memory) => {
+                let owner = memory
+                    .view
+                    .array
+                    .allocation_id()
+                    .ok_or_else(|| Fault::new("persistent memory requires a heap owner"))?;
+                let hash = crate::object_identity::mix_hash(owner as u64);
+                Ok(
+                    (hash.wrapping_mul(31) ^ memory.view.window.start as i32).wrapping_mul(31)
+                        ^ memory.view.window.length as i32,
+                )
+            }
+            _ => Err(Fault::new("borrowed views cannot be hashed through Object")),
+        }
     }
 
     pub(crate) fn is_borrowed(&self) -> bool {

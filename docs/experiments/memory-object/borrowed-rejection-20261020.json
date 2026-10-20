@@ -1,0 +1,5 @@
+{
+  "passed": true,
+  "expected": "Borrowed Slice cannot convert to Object",
+  "error": "/Users/robert/Projects/neoclr/docs/experiments/memory-object/Borrowed.rvn(6,27): error RAV1504: Cannot assign 'Slice<byte>' to 'object'\n"
+}

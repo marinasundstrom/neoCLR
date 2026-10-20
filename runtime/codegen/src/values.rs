@@ -2336,7 +2336,9 @@ pub(crate) fn compile_into(
                     || details.unwrap().boolean_boxes.contains_key(&i);
                 let payload = if primitive {
                     8
-                } else if input.types[record].fields.is_empty() {
+                } else if input.types[record].fields.is_empty()
+                    && input.types[record].memory_view.is_none()
+                {
                     0
                 } else {
                     p.bytes(&p.args[i][0])
@@ -2624,6 +2626,97 @@ pub(crate) fn compile_into(
                 }
                 if let Some(kind) = value_kind {
                     let d = details.unwrap();
+                    // Persistent views share region identity across writable/readonly
+                    // projections. Their payload is the existing owner/offset/length ABI.
+                    let memory_boxes: Vec<_> = d
+                        .empty_record_boxes
+                        .values()
+                        .copied()
+                        .filter(|index| {
+                            input.types[*index]
+                                .memory_view
+                                .is_some_and(|k| !k.is_borrowed())
+                        })
+                        .collect();
+                    for &index in &memory_boxes {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let equal = matches_type(&mut b, &p, tag, index);
+                        b.ins().brif(equal, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let left_owner =
+                            b.ins().load(types::I64, MemFlags::new(), parameters[0], 8);
+                        let left_start =
+                            b.ins().load(types::I32, MemFlags::new(), parameters[0], 16);
+                        let left_length =
+                            b.ins().load(types::I32, MemFlags::new(), parameters[0], 24);
+                        let value = if kind == "Equals" {
+                            let inspect = b.create_block();
+                            let compare = b.create_block();
+                            let different = b.create_block();
+                            let done = b.create_block();
+                            b.append_block_param(done, types::I32);
+                            let nonnull = b.ins().icmp_imm(IntCC::NotEqual, parameters[1], 0);
+                            let low = b.ins().band_imm(parameters[1], 1);
+                            let untagged = b.ins().icmp_imm(IntCC::Equal, low, 0);
+                            let boxed = b.ins().band(nonnull, untagged);
+                            b.ins().brif(boxed, inspect, &[], different, &[]);
+                            b.switch_to_block(inspect);
+                            let right_tag =
+                                b.ins().load(types::I64, MemFlags::new(), parameters[1], 0);
+                            // Keep element identity explicit even though the current profile
+                            // admits Byte views only. Access mode does not affect the region.
+                            let mut compatible = b.ins().iconst(types::I8, 0);
+                            for &candidate in &memory_boxes {
+                                if neoclr::native_metadata::memory_view_element(
+                                    &input.types[candidate],
+                                ) != neoclr::native_metadata::memory_view_element(
+                                    &input.types[index],
+                                ) {
+                                    continue;
+                                }
+                                let matches = matches_type(&mut b, &p, right_tag, candidate);
+                                compatible = b.ins().bor(compatible, matches);
+                            }
+                            b.ins().brif(compatible, compare, &[], different, &[]);
+                            b.switch_to_block(compare);
+                            let right_owner =
+                                b.ins().load(types::I64, MemFlags::new(), parameters[1], 8);
+                            let right_start =
+                                b.ins().load(types::I32, MemFlags::new(), parameters[1], 16);
+                            let right_length =
+                                b.ins().load(types::I32, MemFlags::new(), parameters[1], 24);
+                            let owner = b.ins().icmp(IntCC::Equal, left_owner, right_owner);
+                            let start = b.ins().icmp(IntCC::Equal, left_start, right_start);
+                            let length = b.ins().icmp(IntCC::Equal, left_length, right_length);
+                            let same = b.ins().band(owner, start);
+                            let same = b.ins().band(same, length);
+                            let same = b.ins().uextend(types::I32, same);
+                            b.ins().jump(done, &[same.into()]);
+                            b.switch_to_block(different);
+                            let no = b.ins().iconst(types::I32, 0);
+                            b.ins().jump(done, &[no.into()]);
+                            b.switch_to_block(done);
+                            b.block_params(done)[0]
+                        } else {
+                            // The current collector does not move payload addresses.
+                            // Hashes are process-local and need not match interpreter numbers.
+                            let high = b.ins().ushr_imm(left_owner, 32);
+                            let bits = b.ins().bxor(left_owner, high);
+                            let hash = b.ins().ireduce(types::I32, bits);
+                            let hash = b.ins().imul_imm(hash, 31);
+                            let hash = b.ins().bxor(hash, left_start);
+                            let hash = b.ins().imul_imm(hash, 31);
+                            let hash = b.ins().bxor(hash, left_length);
+                            let empty = b.ins().icmp_imm(IntCC::Equal, left_owner, 0);
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().select(empty, zero, hash)
+                        };
+                        write(&mut b, output, &[value]);
+                        let status = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[status]);
+                        b.switch_to_block(next);
+                    }
                     // Primitive and enum boxes preserve value semantics through the ordinary
                     // Object slots, including calls made from generic code.
                     for (index, wide, floating) in d

@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/memory-object-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Memory region contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/memory-object-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Memory region contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/memory-object-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Memory region contracts: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/memory-object-app/app": "4a9b6c06ffef34b90611c632e426260ad6ed9d8a26665c1d02b930da2aa9d032",
+    "/Users/robert/Projects/neoclr/target/memory-object-app/app.dll": "3c6a648a770b82623ea315938548263888fda18c1d4b6bd70b61c34e45789ac6",
+    "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/bin/neoclr": "84c01cd7cd162bf901a60ce1e068246bda896376441095b5149b16d818740cd6",
+    "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/bin/neoclr-codegen": "614b78b75d0338d729be4519fb57071da3338eba1ddbad6747ea4999206d8fb4",
+    "/Users/robert/Projects/neoclr/target/memory-object-bundle/bundle/lib/System.Runtime.dll": "2761ca15b13a569633fbf4f6483c13996277ca9dc02b356bc754fb6397640290"
+  }
+}

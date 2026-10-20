@@ -32,7 +32,10 @@ pub(crate) fn dispatch(
             | Type::String
     ) && module
         .type_definition(&object.concrete_type())
-        .is_none_or(|definition| definition.enum_info.is_none())
+        .is_none_or(|definition| {
+            definition.enum_info.is_none()
+                && definition.memory_view.is_none_or(|kind| kind.is_borrowed())
+        })
         || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
         || !crate::object_root::owns_slot(module, contract)
         || !contract.instance
@@ -56,6 +59,36 @@ pub(crate) fn dispatch(
         && contract.returns == Type::String;
     if !equality && !hashing && !display {
         return Ok(None);
+    }
+    if module
+        .type_definition(&object.concrete_type())
+        .is_some_and(|definition| {
+            definition
+                .memory_view
+                .is_some_and(|kind| !kind.is_borrowed())
+        })
+    {
+        if display {
+            return Ok(None); // Ordinary diagnostic type display, not byte decoding.
+        }
+        let Value::MemoryView(view) = object.reference.read()? else {
+            return Err(Fault::new("invalid boxed memory storage"));
+        };
+        if hashing {
+            return Ok(Some(Value::Int32(view.region_hash()?)));
+        }
+        let [other] = arguments else {
+            return Err(Fault::new("memory equality requires one Object argument"));
+        };
+        let equal = if let Value::ObjectReference(other) = other {
+            match other.reference.read()? {
+                Value::MemoryView(other) => view.region_equals(&other)?,
+                _ => false,
+            }
+        } else {
+            false
+        };
+        return Ok(Some(Value::Boolean(equal)));
     }
     // Authored text overrides use the same body for typed and boxed calls.
     // Retain intrinsic defaults for libraries without those declarations.

@@ -1,0 +1,8 @@
+import System.*
+
+func Main() {
+    let data = [1b, 2b]
+    let borrowed: Slice<byte> = data
+    let escaped: Object = borrowed
+    Console.WriteLine(escaped.ToString())
+}
