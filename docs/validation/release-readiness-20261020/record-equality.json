@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-20",
+  "runtimeRevision": "9f4fdc8095ae627d34dff50c423b4e3d1db78613",
+  "compilerRevision": "100f98a2f",
+  "bundle": "target/readkey-bundle-v1/bundle",
+  "project": "docs/experiments/canonical-text/RecordGap.rvnproj",
+  "observedProject": "target/release-readiness-20261020/RecordGap.rvnproj",
+  "scope": "Same project settings, with an absolute Compile path to RecordGap.rvn; fresh compile, not historical evidence. Failure occurs before interpreter/JIT/AOT execution.",
+  "exitCode": 1,
+  "diagnostic": "native build: /Users/robert/Projects/neoclr/docs/experiments/canonical-text/RecordGap.rvn(5,13): error NEOMETA001: Native emission does not support unregistered dependency: CanonicalText for struct TextKey.static func ==(left: TextKey, right: TextKey) -> bool."
+}

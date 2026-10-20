@@ -20244,3 +20244,17 @@ that capture mode already gives application code control over keyboard Ctrl+C.
 A separate general shutdown-request API is proposed for later, with cancellation
 only where the host permits it; forced termination cannot be vetoed. No shutdown
 API or full-screen terminal framework is implemented in this slice.
+
+
+### Return to release readiness — 2026-10-20
+
+The author asked to continue toward release and identify urgent issues or compiler
+gaps. The assistant reviewed the roadmap and superseded candidate, freshly reproduced
+native record-generated equality rejection using the current compiler, and proposed
+fixing normal record value semantics first, resolving raw direct-call null String
+parity, then freezing a new matched package. Hashing/formatting remain unqualified;
+the new reproduction establishes only equality rejection. The assistant updated
+candidate scope to distinguish implemented text/console work from proposals and
+recorded the required source/platform/editor/performance gates. Additional console
+capabilities and String views remain follow-ups. No fixes, new release identity,
+package qualification or publication are claimed by this review.

@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) freshly reproduces native generated-record equality rejection, identifies raw null String direct-call parity for resolution, and requires a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
+
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
 adds scoped caller-buffer bytes, nonblocking and timed/blocking reads, capabilities and input ownership. The [Raven text reads](experiments/console-text-reading/README.md) now add shared

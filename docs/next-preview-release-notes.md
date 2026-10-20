@@ -8,7 +8,15 @@ version is `0.1.17-neoclr.20261019.1`, using Raven native compiler
 `2d22055dca58dcf991c6001dfe5d93657577d9d6`. Publication date remains unset.
 [Preview 16](preview-16-release-notes.md) and its assets remain unchanged.
 
-## Selected scope
+## Replacement readiness (2026-10-20)
+
+The identity above belongs to the superseded candidate and must not be reused as
+qualification for current source. [Current triage](validation/release-readiness-20261020/README.md)
+confirms native generated record equality still fails compilation, tracks raw
+null String direct-call parity, and orders fresh source/package/editor/performance
+gates after those issues are resolved. No replacement package identity is selected.
+
+## Implemented scope for replacement review
 
 - Slice/ReadOnlySlice and Memory/ReadOnlyMemory integration across supported byte
   buffers, codecs, streams, cryptography and networking; explicit ownership and
@@ -35,9 +43,20 @@ producers. Transport remains HTTP/1.1; unknown-length outgoing framing and incre
 JSON token serialization are not claimed. Experimental concurrent GC is not promoted
 to a universal throughput improvement or the production default.
 
-String and StringBuilder have separate source reviews. Swift is the text-semantic
-model; canonical equality, typed text positions, missing search/formatting APIs and
-builder storage improvements remain proposed work, not features in this candidate.
+String and StringBuilder have separate source reviews. Swift remains the text-semantic
+model. Canonical String/Char equality and matching hashes, Unicode 17 segmentation,
+search predicates, trimming/line-ending utilities, Char helpers, builder reuse and
+String.Format/Formattable are implemented with focused development qualification.
+Original UTF-8 bytes are preserved. Shared-storage String views remain deferred;
+position-based search/splitting and provider/primitive-specifier formatting remain
+coverage gaps. Native generated record equality is a confirmed compiler gap.
+
+Console now exposes synchronous byte/text capabilities with configurable line endings,
+and scoped ReadKey with logical keys, modifiers and optional Unicode scalar text.
+POSIX entry-thread keys, any-key exit and Ctrl+C-only exit pass interpreter/JIT/AOT.
+Windows key input, text-to-key switching and native worker attachment remain unsupported.
+These additions require a new matched package run; development evidence is not
+extracted release-package acceptance.
 
 ## Qualification remaining
 
