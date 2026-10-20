@@ -21,7 +21,8 @@ The native runtime/backend owns this repair; compiler-projected Enum ancestry is
 unchanged. `EquatableTo` remains an explicit contract. Hash values are not a
 persistent serialization contract.
 
-Native enum formatting remains unsupported. A selected load set combining enum
+At this checkpoint native enum formatting remained unsupported. The subsequent
+[formatting qualification](../enum-display/README.md) removes the rejection below. A selected load set combining enum
 boxes with virtual Object.ToString is rejected, including calls on unrelated types,
 until value-aware formatting is implemented. This conservative admission rule
 prevents the existing default display path from silently returning an enum type

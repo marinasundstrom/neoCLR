@@ -84,7 +84,8 @@ Ordinary struct defaults are development functionality. The example and nested,
 generic, empty and reference-field cases pass interpreter, JIT and AOT checks.
 Floating fields also pass these checks, including NaN and signed-zero equality.
 Int32-backed enum fields use exact enum type and underlying-value equality.
-Native boxed enum and floating-point formatting remain gaps; this
+Enum display now supports names, flags and unnamed numeric values.
+Native boxed floating-point formatting remains a gap; this
 does not yet cover every .NET field shape or dispatch path. The [Object API guide](/docs/objects.html) records the
 supported contracts and [implementation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)
 tracks execution-mode validation.

@@ -1200,3 +1200,11 @@ mod type_catalog_tests {
         assert!(module_types(&source, identity, "Missing").is_err());
     }
 }
+
+/// Enum general-format masks in the same order and alias policy as the interpreter.
+/// Build-time data only; no new guest reflection or formatting contract.
+pub fn enum_format_candidates(
+    info: &crate::metadata::EnumInfo,
+) -> Vec<&crate::metadata::EnumMember> {
+    crate::enums::format_candidates(info)
+}

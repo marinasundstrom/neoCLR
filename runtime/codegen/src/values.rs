@@ -1,5 +1,7 @@
 //! Inline value/member lowering. Records travel as field snapshots, not owning pointers.
 use super::{Error, checked_arithmetic, flow, return_if_detailed};
+#[path = "enum_display.rs"]
+mod enum_display;
 #[path = "gc_layout.rs"]
 mod gc_layout;
 #[path = "gc_points.rs"]
@@ -597,6 +599,7 @@ pub(crate) fn compile_into(
             }
         }
     }
+    let enum_display = enum_display::Display::prepare(input, details, module)?;
     let mut default_display_literals = vec![];
     if let Some(details) = details {
         for (index, text) in &details.object_default_display {
@@ -2502,6 +2505,30 @@ pub(crate) fn compile_into(
                     b.switch_to_block(next);
                 }
                 if display {
+                    if let Some(enums) = &enum_display {
+                        for &index in enums.types() {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = matches_type(&mut b, &p, tag, index);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let status = enums.emit(module, &mut b, index, value, arena, output);
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            let mut site = diagnostic_data.as_ref().unwrap().site(
+                                module,
+                                &mut b,
+                                fault_context.unwrap(),
+                                i,
+                                0,
+                            );
+                            site.capture_frame = false;
+                            return_if_detailed(&mut b, failed, status, Some(&site));
+                            b.ins().return_(&[status]);
+                            b.switch_to_block(next);
+                        }
+                    }
                     for &(index, literal) in &default_display_literals {
                         let matched = b.create_block();
                         let next = b.create_block();

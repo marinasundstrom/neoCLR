@@ -8,9 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Implement native Int32 enum general ToString through existing value boxes, numeric formatting and StringBuilder text materialization. Share mask/alias ordering with the interpreter; support names, flags, unnamed values and signed boundaries without managed temporary parts arrays. Qualify direct/boxed Raven calls across interpreter/JIT/AOT and native allocation footprints. Replace the earlier enum-display rejection; explicit formats and broader enum representations remain gaps.
+
 - Add native Int32-backed enum Object equality/hash adapters, retaining exact enum identity and copied payloads for default ordinary/generic struct fields. Add edge-value and source-consumer qualification; reject native enum boxes combined with virtual Object.ToString until enum formatting is implemented, instead of permitting type-name fallback. No compiler, public signature or ABI change.
 
-- Add native boxed Single/Double Object equality and hashing using the existing box layout. Preserve exact types, NaN equality, signed-zero hash normalization and IEEE operators; default ordinary/generic struct fields now use these adapters. Qualify native edge cases and the interpreter/JIT/AOT HashMap/struct consumer across explicit GC. Update Object and value-type documentation; native boxed enum/floating formatting remain gaps. No typed EquatableTo interface, compiler mapping or ABI change.
+- Add native boxed Single/Double Object equality and hashing using the existing box layout. Preserve exact types, NaN equality, signed-zero hash normalization and IEEE operators; default ordinary/generic struct fields now use these adapters. Qualify native edge cases and the interpreter/JIT/AOT HashMap/struct consumer across explicit GC. Update Object and value-type documentation; native boxed floating formatting remains a gap. No typed EquatableTo interface, compiler mapping or ABI change.
 
 - Add a reference-types versus value-types website guide covering copying and shared fields, identity, boxing, default and record equality, explicit EquatableTo contracts, allocation lifetime and memory views. Extract examples from the qualified struct consumer and link the page from Guides, memory views and the Object reference. Build and validate all 4930 website pages; publication remains separate.
 

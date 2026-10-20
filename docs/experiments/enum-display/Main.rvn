@@ -1,0 +1,82 @@
+import System.*
+
+public enum State { Ready = 1, Alias = 1, Failed = -1 }
+[System.Flags]
+public enum Access { None = 0, Read = 1, Alias = 1, Write = 2, Both = 3, Execute = 4 }
+[System.Flags]
+public enum Sparse { Read = 1, High = -2147483648 }
+
+[System.Flags]
+public enum FullBits {
+    Bit00 = 1
+    Bit01 = 2
+    Bit02 = 4
+    Bit03 = 8
+    Bit04 = 16
+    Bit05 = 32
+    Bit06 = 64
+    Bit07 = 128
+    Bit08 = 256
+    Bit09 = 512
+    Bit10 = 1024
+    Bit11 = 2048
+    Bit12 = 4096
+    Bit13 = 8192
+    Bit14 = 16384
+    Bit15 = 32768
+    Bit16 = 65536
+    Bit17 = 131072
+    Bit18 = 262144
+    Bit19 = 524288
+    Bit20 = 1048576
+    Bit21 = 2097152
+    Bit22 = 4194304
+    Bit23 = 8388608
+    Bit24 = 16777216
+    Bit25 = 33554432
+    Bit26 = 67108864
+    Bit27 = 134217728
+    Bit28 = 268435456
+    Bit29 = 536870912
+    Bit30 = 1073741824
+    Bit31 = -2147483648
+}
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Text(value: Object, expected: string) {
+    Check(value.ToString() == expected, "Enum display")
+}
+
+func Main() {
+    Text(State.Ready, "Ready")
+    Text(State.Alias, "Ready")
+    Text(State.Failed, "Failed")
+    Text((State)0, "0")
+    Text((State)42, "42")
+    Text((State)(-2147483648), "-2147483648")
+    Text((State)2147483647, "2147483647")
+    Text(Access.None, "None")
+    Text(Access.Read | Access.Execute, "Read, Execute")
+    Text(Access.Both | Access.Execute, "Both, Execute")
+    Text((Access)8, "8")
+    Text((Access)(-1), "-1")
+    Text((Sparse)0, "0")
+    Text(Sparse.Read | Sparse.High, "Read, High")
+    Check(State.Alias.ToString() == "Ready", "Direct enum display")
+    Check((Access.Read | Access.Execute).ToString() == "Read, Execute", "Direct flags display")
+    Text((FullBits)(-1), "Bit00, Bit01, Bit02, Bit03, Bit04, Bit05, Bit06, Bit07, Bit08, Bit09, Bit10, Bit11, Bit12, Bit13, Bit14, Bit15, Bit16, Bit17, Bit18, Bit19, Bit20, Bit21, Bit22, Bit23, Bit24, Bit25, Bit26, Bit27, Bit28, Bit29, Bit30, Bit31")
+    let retained = (Access.Both | Access.Execute).ToString()
+    var n = 0
+    while n < 400 {
+        Text(Access.Read | Access.Execute, "Read, Execute")
+        n += 1
+    }
+    System.Runtime.GC.Collect()
+    Check(retained == "Both, Execute", "Retained enum text")
+    Console.WriteLine("Enum names, flags, numeric values and GC: passed")
+}

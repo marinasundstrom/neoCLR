@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/enum-display-final-app/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Enum names, flags, numeric values and GC: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/enum-display-final-app/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "Enum names, flags, numeric values and GC: passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/enum-display-final-app/app"
+      ],
+      "exitCode": 0,
+      "stdout": "Enum names, flags, numeric values and GC: passed\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/enum-display-final-app/app": "95effc8c37a01d79aef161a9ecfaecac02f97a86fe254a9d500a0d0f6cadc1fe",
+    "/Users/robert/Projects/neoclr/target/enum-display-final-app/app.dll": "cfc3c52191afb4dadee5448052256f373eff4b03fa05f6ce397491ecc44ece5f",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "b15474c1bab5e80898926bf5b3e3336e1187a246296a27a22c07bed34f207637",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "de54cc12edb190772abd4ea129bc2c0328f7495fd2c5d3bec46bc1d38eead893",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr": "a1d74bc3306486f569bb52856b08140b2119fb001a69ed1b0873c4a6ff7bc022",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/bin/neoclr-codegen": "e87b0eb57eb40d16821c0cc0d549871b6bb3a206450c485fc3fa0208827d40ac",
+    "/Users/robert/Projects/neoclr/target/enum-display-bundle/bundle/lib/System.Runtime.dll": "330d92c1374d652a7f96369835afb25d8c75088504ed4e013adb3deaea6b0d4f"
+  }
+}

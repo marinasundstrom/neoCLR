@@ -13284,7 +13284,7 @@ fn enum_boxes_preserve_nominal_equality_and_hashing() {
     let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
     const EQUALS: &str = "callvirt instance System.Object::Equals(System.Object)";
     const HASH: &str = "callvirt instance System.Object::GetHashCode()";
-    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    let mut body = ".local System.Object empty\nldarg unused\nldc.i4 0\nbne.un Allocation\nldloca empty\ninitobj System.Object\n".to_owned();
     for value in [0, 1, -1, 42, i32::MIN, i32::MAX] {
         body.push_str(&format!("ldc.i4 {value}\nnewobj State\nbox State\nldc.i4 {value}\nnewobj State\nbox State\n{EQUALS}\nbrfalse failed\n"));
         body.push_str(&format!(
@@ -13301,10 +13301,37 @@ fn enum_boxes_preserve_nominal_equality_and_hashing() {
             ));
         }
     }
+    for (ty, value, expected) in [
+        ("State", 1, "Ready"),
+        ("State", 0, "0"),
+        ("State", -1, "-1"),
+        ("State", i32::MIN, "-2147483648"),
+        ("State", i32::MAX, "2147483647"),
+        ("Access", 0, "None"),
+        ("Access", 1, "Read"),
+        ("Access", 3, "Both"),
+        ("Access", 5, "Read, Execute"),
+        ("Access", 7, "Both, Execute"),
+        ("Access", 8, "8"),
+        ("Access", -1, "-1"),
+        ("Sparse", 0, "0"),
+        ("Sparse", -2147483647, "Read, High"),
+    ] {
+        body.push_str(&format!("ldc.i4 {value}\nnewobj {ty}\nbox {ty}\ncallvirt instance System.Object::ToString()\nldstr \"{expected}\"\nceq\nbrfalse failed\n"));
+    }
+    let mut full = ".type Full\n.enum Int32 flags\n.field private Bits Int32\n".to_owned();
+    let mut names = Vec::new();
+    for bit in 0..32 {
+        let name = format!("Bit{bit:02}");
+        full.push_str(&format!(".literal {name} {}\n", (1u32 << bit) as i32));
+        names.push(name);
+    }
+    full.push_str(".end\n");
+    body.push_str(&format!("ldc.i4 -1\nnewobj Full\nbox Full\ncallvirt instance System.Object::ToString()\nldstr \"{}\"\nceq\nbrfalse failed\n", names.join(", ")));
     let source = format!(
-        ".module EnumDefaults\n.type State\n.enum Int32\n.literal Ready 1\n.literal Alias 1\n.field private Bits Int32\n.end\n.type Other\n.enum Int32\n.field private Bits Int32\n.end\n.function Calculate(Int32 unused) -> Int32\n{body}ldc.i4 42\nret\nfailed:\nldc.i4 -1\nret\n.end"
+        ".module EnumDefaults\n{full}.type Access\n.enum Int32 flags\n.literal None 0\n.literal Read 1\n.literal Alias 1\n.literal Write 2\n.literal Both 3\n.literal Execute 4\n.field private Bits Int32\n.end\n.type Sparse\n.enum Int32 flags\n.literal Read 1\n.literal High -2147483648\n.field private Bits Int32\n.end\n.type State\n.enum Int32\n.literal Ready 1\n.literal Alias 1\n.field private Bits Int32\n.end\n.type Other\n.enum Int32\n.field private Bits Int32\n.end\n.function Calculate(Int32 unused) -> Int32\n{body}ldc.i4 42\nret\nAllocation:\nldarg unused\nnewobj Access\nbox Access\ncallvirt instance System.Object::ToString()\npop\nldc.i4 42\nret\nfailed:\nldc.i4 -1\nret\n.end"
     );
-    let mut app =
+    let app =
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed)
             .unwrap()
             .remove(0);
@@ -13312,7 +13339,11 @@ fn enum_boxes_preserve_nominal_equality_and_hashing() {
         &dir,
         &seed,
         &app,
-        &["--compile-system", "--reference-arena"],
+        &[
+            "--compile-system",
+            "--reference-arena",
+            "--bind-int32-to-string",
+        ],
     );
     assert!(
         result.status.success(),
@@ -13330,7 +13361,15 @@ int main(void) {
     int32_t value=-99;
     int status=neoclr_entry_v4(0,&value,&ctx);
     if (status) { neoclr_aot_render_fault(stderr,&ctx.fault); return status; }
-    return value == 42 ? 0 : 99;
+    if (value != 42) return 99;
+    const int masks[] = {1,5,8};
+    const uint64_t expected[] = {16,37,25};
+    for (int i=0; i<3; i++) {
+        ctx.text.used=0;
+        status=neoclr_entry_v4(masks[i],&value,&ctx);
+        if (status || value!=42 || ctx.text.used!=expected[i]) return 98;
+    }
+    return 0;
 }
 "#,
     )
@@ -13359,21 +13398,4 @@ int main(void) {
         "{}",
         String::from_utf8_lossy(&result.stderr)
     );
-    let display = ".module EnumDisplay\n.type State\n.enum Int32\n.field private Bits Int32\n.end\n.function Calculate(Int32 unused) -> Int32\nldc.i4 1\nnewobj State\nbox State\ncallvirt instance System.Object::ToString()\npop\nldc.i4 42\nret\n.end";
-    app =
-        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(display)], &seed)
-            .unwrap()
-            .remove(0);
-    neoclr::LoadedProgram::with_library(&app, &seed)
-        .unwrap()
-        .verify()
-        .unwrap();
-    let rejected = compile_linked_module(
-        &dir,
-        &seed,
-        &app,
-        &["--compile-system", "--reference-arena"],
-    );
-    assert!(!rejected.status.success());
-    assert!(!rejected.stderr.is_empty());
 }

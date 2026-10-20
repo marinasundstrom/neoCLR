@@ -271,15 +271,6 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     {
         return Err("boxed floating-point ToString is not yet supported".into());
     }
-    if helpers
-        .keys()
-        .any(|index| input.types[*index].enum_info.is_some())
-        && report["objectDisplayDispatch"]
-            .as_array()
-            .is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString"))
-    {
-        return Err("boxed enum ToString is not yet supported".into());
-    }
     let char_targets = report["charObjectDispatch"]
         .as_array()
         .cloned()

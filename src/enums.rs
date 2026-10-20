@@ -48,6 +48,15 @@ pub(crate) fn members(info: &EnumInfo) -> Vec<&crate::metadata::EnumMember> {
     result
 }
 
+/// Ascending unsigned masks, with the first declared alias retained. Shared by
+/// interpreted formatting and native code generation; zero never consumes bits.
+pub(crate) fn format_candidates(info: &EnumInfo) -> Vec<&crate::metadata::EnumMember> {
+    let mut unique = members(info);
+    unique.dedup_by_key(|member| member.value);
+    unique.retain(|member| member.value != 0);
+    unique
+}
+
 pub(crate) fn format(info: &EnumInfo, value: i32) -> String {
     if let Some(member) = info.members.iter().find(|member| member.value == value) {
         return member.name.clone();
@@ -56,9 +65,7 @@ pub(crate) fn format(info: &EnumInfo, value: i32) -> String {
         let mut remaining = value as u32;
         let mut names = Vec::new();
         // Prefer the first declared alias for a given mask.
-        let mut unique = members(info);
-        unique.dedup_by_key(|member| member.value);
-        for member in unique.into_iter().rev() {
+        for member in format_candidates(info).into_iter().rev() {
             let bits = member.value as u32;
             if bits != 0 && remaining & bits == bits {
                 remaining &= !bits;
