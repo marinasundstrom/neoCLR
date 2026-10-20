@@ -1,6 +1,9 @@
 //! Host-owned terminal transport. Key/text decoding belongs above this byte boundary.
 use std::io::{self, IsTerminal};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
+#[cfg(unix)]
+use std::time::Instant;
 
 /// Independently detected process streams; terminal input support is platform-specific.
 /// Terminal detection does not imply UTF-8, ANSI support, or any particular font.
@@ -36,13 +39,29 @@ pub enum TerminalRead {
 }
 
 /// Exclusive unbuffered transport, intended for an invocation-owned terminal session.
-/// Reads never wait for input. A scheduler must arrange readiness notification before retrying;
+/// `try_read` never waits for input. A scheduler must arrange readiness notification before retrying;
 /// polling this interface in a tight loop is not an asynchronous implementation.
 /// Input bytes preserve the host encoding; no decoding, normalization or key inference occurs.
 /// Restore modes explicitly with close (which reports errors), or best-effort on Drop.
 pub trait TerminalInput: std::fmt::Debug + Send {
     /// Read into caller-owned storage. An empty destination is InvalidInput.
     fn try_read(&mut self, destination: &mut [u8]) -> io::Result<TerminalRead>;
+    /// Synchronously wait for bytes, end, or timeout using caller-owned storage.
+    /// None waits indefinitely; zero is equivalent to try_read. Pending means timeout.
+    /// Hosts without a blocking adapter return Unsupported rather than polling.
+    fn read(
+        &mut self,
+        destination: &mut [u8],
+        timeout: Option<Duration>,
+    ) -> io::Result<TerminalRead> {
+        if timeout == Some(Duration::ZERO) {
+            return self.try_read(destination);
+        }
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "blocking terminal input unavailable",
+        ))
+    }
     /// Idempotent after success. On failure the session retains ownership for a retry.
     fn close(&mut self) -> io::Result<()>;
 }
@@ -197,9 +216,11 @@ mod posix {
             }
             Ok(session)
         }
-    }
-    impl TerminalInput for Session {
-        fn try_read(&mut self, destination: &mut [u8]) -> io::Result<TerminalRead> {
+        fn read_once(
+            &mut self,
+            destination: &mut [u8],
+            timeout_ms: i32,
+        ) -> io::Result<TerminalRead> {
             let fd = self
                 .fd
                 .as_ref()
@@ -221,7 +242,7 @@ mod posix {
                 events: libc::POLLIN,
                 revents: 0,
             };
-            let ready = unsafe { libc::poll(&mut readiness, 1, 0) };
+            let ready = unsafe { libc::poll(&mut readiness, 1, timeout_ms) };
             if ready < 0 {
                 let error = io::Error::last_os_error();
                 return if error.kind() == io::ErrorKind::Interrupted {
@@ -266,6 +287,48 @@ mod posix {
             } else {
                 // VMIN=0 permits a zero-length read even though the terminal is still open.
                 Ok(TerminalRead::Pending)
+            }
+        }
+    }
+    impl TerminalInput for Session {
+        fn try_read(&mut self, destination: &mut [u8]) -> io::Result<TerminalRead> {
+            self.read_once(destination, 0)
+        }
+        fn read(
+            &mut self,
+            destination: &mut [u8],
+            timeout: Option<Duration>,
+        ) -> io::Result<TerminalRead> {
+            if timeout == Some(Duration::ZERO) {
+                return self.try_read(destination);
+            }
+            let deadline = match timeout {
+                Some(duration) => Some(Instant::now().checked_add(duration).ok_or_else(|| {
+                    io::Error::new(io::ErrorKind::InvalidInput, "terminal timeout too large")
+                })?),
+                None => None,
+            };
+            loop {
+                let timeout_ms = match deadline {
+                    None => -1,
+                    Some(deadline) => {
+                        let remaining = deadline.saturating_duration_since(Instant::now());
+                        // Round up: a sub-millisecond remainder must not turn into busy polling.
+                        remaining
+                            .as_millis()
+                            .saturating_add(u128::from(remaining.subsec_nanos() % 1_000_000 != 0))
+                            .min(i32::MAX as u128) as i32
+                    }
+                };
+                match self.read_once(destination, timeout_ms)? {
+                    TerminalRead::Pending => {
+                        if deadline.is_some_and(|deadline| Instant::now() >= deadline) {
+                            return Ok(TerminalRead::Pending);
+                        }
+                        // Interrupted waits and spurious readiness retain the original deadline.
+                    }
+                    result => return Ok(result),
+                }
             }
         }
         fn close(&mut self) -> io::Result<()> {
@@ -381,6 +444,72 @@ mod posix {
                 session.try_read(&mut buffer).unwrap_err().kind(),
                 io::ErrorKind::NotConnected
             );
+        }
+        #[test]
+        fn blocking_read_waits_for_input_and_reuses_destination() {
+            let (master, slave) = pty();
+            let original = mode(&slave);
+            let mut session =
+                Session::open(slave.as_raw_fd(), TerminalOptions::default(), lease()).unwrap();
+            let writer = std::thread::spawn(move || {
+                std::thread::sleep(Duration::from_millis(25));
+                let bytes = b"\xc3\xa9\x1b[A";
+                assert_eq!(
+                    unsafe { libc::write(master.as_raw_fd(), bytes.as_ptr().cast(), bytes.len()) },
+                    bytes.len() as isize
+                );
+                master
+            });
+            let mut buffer = [0; 1];
+            let mut received = [0; 5];
+            for byte in &mut received {
+                assert_eq!(
+                    session
+                        .read(&mut buffer, Some(Duration::from_secs(2)))
+                        .unwrap(),
+                    TerminalRead::Data(1)
+                );
+                *byte = buffer[0];
+            }
+            let _master = writer.join().unwrap();
+            assert_eq!(&received, b"\xc3\xa9\x1b[A");
+            session.close().unwrap();
+            assert_mode(original, mode(&slave));
+            assert_eq!(
+                session.read(&mut buffer, None).unwrap_err().kind(),
+                io::ErrorKind::NotConnected
+            );
+        }
+        #[test]
+        fn blocking_timeout_and_validation_preserve_session() {
+            let (_master, slave) = pty();
+            let mut session =
+                Session::open(slave.as_raw_fd(), TerminalOptions::default(), lease()).unwrap();
+            let start = Instant::now();
+            assert_eq!(
+                session
+                    .read(&mut [0; 1], Some(Duration::from_millis(15)))
+                    .unwrap(),
+                TerminalRead::Pending
+            );
+            assert!(start.elapsed() >= Duration::from_millis(15));
+            assert_eq!(
+                session.read(&mut [0; 1], Some(Duration::ZERO)).unwrap(),
+                TerminalRead::Pending
+            );
+            assert_eq!(
+                session.read(&mut [], None).unwrap_err().kind(),
+                io::ErrorKind::InvalidInput
+            );
+        }
+        #[test]
+        fn blocking_read_reports_hangup() {
+            let (master, slave) = pty();
+            let mut session =
+                Session::open(slave.as_raw_fd(), TerminalOptions::default(), lease()).unwrap();
+            drop(master);
+            assert_eq!(session.read(&mut [0; 1], None).unwrap(), TerminalRead::End);
+            assert_eq!(session.read(&mut [0; 1], None).unwrap(), TerminalRead::End);
         }
         #[test]
         fn default_signal_mode_and_drop_restore() {

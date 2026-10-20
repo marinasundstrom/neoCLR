@@ -228,6 +228,7 @@ RavenDoc renders class-library metadata, not the Rust embedding crate.
 | `Console::open_terminal(TerminalOptions) -> io::Result<Box<dyn TerminalInput>>` | Exclusive scoped input; unsupported by default and on redirected Stdio input. |
 | `TerminalOptions { capture_interrupts: bool }` | Defaults to false; POSIX true captures all ISIG characters, including Ctrl+C/quit/suspend. |
 | `TerminalInput::try_read(&mut self, &mut [u8]) -> io::Result<TerminalRead>` | Nonblocking bytes into caller storage; `Pending`, `Data(usize)` or `End`. Empty buffers fail. |
+| `TerminalInput::read(&mut self, &mut [u8], Option<Duration>) -> io::Result<TerminalRead>` | Synchronous wait: None waits indefinitely, duration returns Pending on timeout, zero tries immediately. POSIX uses OS readiness; other hosts default to Unsupported. Same buffer/closed errors as try_read; unrepresentable deadlines are InvalidInput. |
 | `TerminalInput::close(&mut self) -> io::Result<()>` | Restores modes and releases input; retryable on restoration failure, idempotent after success. Drop makes a best-effort attempt. |
 
 `StdioConsole` shares ownership across instances, rejecting concurrent terminal or

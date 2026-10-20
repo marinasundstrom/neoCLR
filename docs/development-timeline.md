@@ -26,6 +26,18 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-20 — Keep Console small and allocation-conscious
+
+The author clarifies that Console need not copy .NET exactly, asks to avoid building
+a complete terminal API, and emphasizes performance using the existing buffer/view
+infrastructure. The assistant proposes a small foundation: sync text I/O, scoped
+key input, explicit modifiers/interrupt policy, and caller-owned text storage rather
+than a String per key. These are design proposals, not completed guest key APIs.
+The next implemented host step adds OS-backed blocking/timed reads into caller storage
+and removes sleep polling from the terminal diagnostic. Key decoding, invocation cleanup
+and matching native providers remain open. See [transport evidence](console-io.md#development-terminal-host-transport--2026-10-20).
+
+
 ## 2026-10-19 — Consistent canonical text semantics
 
 The author asks what the assistant recommends for canonical String/Char equality,

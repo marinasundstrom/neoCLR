@@ -181,6 +181,19 @@ construction occurs at this boundary. The caller must supply an encoding-aware
 layer: POSIX terminal bytes are not guaranteed to be UTF-8. VMIN/VTIME zero plus a
 zero-time readiness check avoid waiting for input; no file-description flags change.
 
+`read(&mut [u8], Option<Duration>)` is the synchronous wait capability. `None`
+waits until bytes or end; a duration bounds the wait and returns `Pending` on
+timeout; zero delegates to `try_read`. Custom hosts default to `Unsupported` for
+nonzero waits. POSIX uses `poll`, rounding fractional milliseconds up and retaining
+one deadline across interrupted waits. Long waits are split at the poll integer
+limit. Empty buffers and closed sessions retain the same errors. Successful reads
+use the supplied buffer directly, with no intermediate array, String, Task or Promise.
+This is a Rust host API only; no guest ABI or native intrinsic is added. The existing
+host transport is the appropriate layer for OS readiness, while key interpretation
+remains intended for the Raven library. It is not an async scheduler or cancellation
+mechanism. Compared with .NET's blocking ReadKey, this lower byte boundary deliberately
+separates waiting from decoding and echo, enabling caller-owned storage.
+
 Sessions disable canonical input, echo, extended input processing, byte stripping,
 newline translation and software output-flow control. Output processing is retained.
 By default ISIG remains enabled; `capture_interrupts: true` disables POSIX signal
@@ -202,7 +215,11 @@ Focused evidence: `cargo test --lib console::` exercises a real pseudo-terminal,
 nonblocking idle reads, preserved UTF-8/control/escape bytes, capture/default ISIG,
 close/drop restoration, closed/empty-buffer errors, redirected input, input ownership
 and hangup. `cargo run --example terminal_input` is an interactive byte diagnostic;
-its explicit 10 ms polling is not a production async implementation.
+it now waits directly in the host rather than sleeping between polls. It reports
+allocator calls around each read, excluding acquisition and diagnostic output.
+The [reproducible PTY check](experiments/terminal-input/README.md) measured zero
+Rust allocator calls in five fragmented reads and verified terminal restoration;
+this is not a guest key-decoder or throughput claim.
 
 Next integration requirements are invocation-owned cleanup, scheduler readiness and
 cancellation, the matching JIT/AOT provider, Windows Unicode input, and Raven key,

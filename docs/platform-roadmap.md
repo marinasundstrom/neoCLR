@@ -2,7 +2,7 @@
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
-adds scoped nonblocking bytes, capabilities and input ownership. The [Raven text reads](experiments/console-text-reading/README.md) now add shared
+adds scoped caller-buffer bytes, nonblocking and timed/blocking reads, capabilities and input ownership. The [Raven text reads](experiments/console-text-reading/README.md) now add shared
 peek/character/count/line cursors and pass interpreter/JIT/AOT. Terminal keys,
 async console readiness/cancellation, native terminal-provider parity and Windows
 Unicode input remain open; this is not guest API completion or replacement release qualification.
