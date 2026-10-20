@@ -26,6 +26,19 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-20 — Platform influences and performance ambition
+
+The author describes neoCLR as retaining the best parts of .NET, with Raven bringing
+ergonomics influenced by Swift and Rust, and states that the runtime aims to be as
+performant as Go. The assistant accepts this as a design direction and a measurable
+performance target, not an achieved performance claim. This complements the default
+.NET API/semantic comparison policy; deliberate divergences still need benefits,
+costs and validation. Representative end-to-end benchmarks, allocation/GC costs and
+latency distributions are needed before claiming parity. No new benchmark result or
+permanent roadmap resequencing follows from this exchange. Release stabilization
+continues with native record value semantics.
+
+
 ## 2026-10-20 — Keep Console small and allocation-conscious
 
 The author clarifies that Console need not copy .NET exactly, asks to avoid building

@@ -1,0 +1,8 @@
+import System.*
+
+record struct UnsupportedKey(Value: double)
+
+func Main() {
+    let key = UnsupportedKey(1)
+    Console.WriteLine((key == key).ToString())
+}

@@ -1279,7 +1279,7 @@ pub fn prepare(
         }
     }
     // Value receivers have no derived allocation type. Original-scope verification
-    // has checked their Object.ToString override contract; retain its borrowed body.
+    // has checked their Object slot override contract; retain its borrowed body.
     let value_display: Vec<_> = selected
         .functions
         .iter()
@@ -1292,9 +1292,7 @@ pub fn prepare(
                 && f.is_override
                 && !f.is_abstract
                 && f.impl_flags == 0
-                && f.name.rsplit('.').next() == Some("ToString")
-                && f.parameters.is_empty()
-                && f.returns == neoclr::metadata::Type::String
+                && super::selection::object_slot_shape(f)
                 && !f.no_result
                 && f.generic_parameters.is_empty()
                 && f.generic_arguments.is_empty()
@@ -1321,7 +1319,7 @@ pub fn prepare(
         selected.functions[i].is_override = false;
     }
     report["valueDisplayProjections"] = json!(value_display.iter().map(|i| json!({"compiledIndex":i,
-        "policy":"verified value ToString override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
+        "policy":"verified value Object override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
     super::class_dispatch::project(&mut selected, &mut report)?;
     let sealed_members: Vec<_> = selected
         .functions

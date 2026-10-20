@@ -8,7 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
-- Refresh replacement-release scope after the text/console work and record release-readiness triage. Reproduce native record-generated equality rejection with the current compiler, retain raw null String direct-call parity for resolution, and order fresh matched-package qualification. Add a reproducible record-gap project; no compiler fix, replacement version or release qualification is claimed.
+- Advance replacement-release readiness after text/console work: retain the original generated-record equality rejection as historical evidence and add bounded native record equality/hash support with matching Raven synthesis. Qualify verified boxed value Object overrides and a source consumer across interpreter/JIT/AOT, plus unsupported-component diagnostics. Generic/union/floating-point records, imported value-record discovery, formatting and raw null String direct-call parity remain gaps. Fresh matched-package qualification remains required; no replacement version or release approval is claimed.
+
+- Record the author's .NET platform, Swift/Rust ergonomics and Go-performance ambition as project direction rather than measured parity.
 
 - Add Console.OpenKeyInput, disposable ConsoleKeyReader.ReadKey, ConsoleKey/ConsoleKeyInfo and ConsoleKeyError. Connect exact scalar runtime bindings across interpreter/JIT/AOT; preserve terminal cleanup, explicit Ctrl+C capture and unread bytes on Close/reopen or subsequent text input. Fifteen real-PTY/public executions, six any-key/Ctrl+C sample executions and 24 focused transport/binding tests pass. A 128-read native diagnostic adds no managed allocations over baseline (7 in both, all reclaimed), while eager collection checks increase; no throughput claim. Refresh both API references and console website guidance. Key mode must precede ordinary input; native worker attachment, Windows and async readiness remain gaps. No per-key strings, byte arrays or Tasks are created.
 

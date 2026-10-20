@@ -273,7 +273,7 @@ pub(super) fn inherited_object_member(
     true
 }
 
-fn object_slot_shape(f: &neoclr::metadata::Function) -> bool {
+pub(super) fn object_slot_shape(f: &neoclr::metadata::Function) -> bool {
     match f.name.rsplit('.').next() {
         Some("ToString") => f.parameters.is_empty() && f.returns == Type::String,
         Some("GetHashCode") => f.parameters.is_empty() && f.returns == Type::Int32,
@@ -333,12 +333,12 @@ pub(super) fn object_value_override(
         let definition = input
             .type_definition(&current)
             .ok_or("Object value dispatch requires a local class")?;
-        let value_display = !definition.is_reference_type
-            && object_display_contract(contract)
+        let value_receiver = !definition.is_reference_type
+            && object_dispatch_contract(contract)
             && definition.representation == neoclr::metadata::Representation::Record;
-        if !definition.is_reference_type && !value_display {
+        if !definition.is_reference_type && !value_receiver {
             return Err(
-                "Object value dispatch requires a class receiver or value display override".into(),
+                "Object value dispatch requires a class receiver or verified value override".into(),
             );
         }
         let arguments = match &current {
@@ -366,7 +366,7 @@ pub(super) fn object_value_override(
                 continue;
             }
             if method.is_abstract
-                || method.receiver_byref != value_display
+                || method.receiver_byref != value_receiver
                 || method.returns != contract.returns
                 || method.no_result
             {

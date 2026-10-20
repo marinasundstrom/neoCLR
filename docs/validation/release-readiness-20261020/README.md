@@ -32,6 +32,18 @@ or a passed package gate. No candidate version, tag or publication date is selec
    identity cannot certify them. Refresh scope, pin exact runtime/backend/compiler/
    libraries/editor revisions and build a new package identity after fixes.
 
+## Follow-up: bounded record value semantics
+
+The [record-values experiment](../../experiments/record-values/README.md) now closes
+the original canonical-text record rejection for supported positional records and
+adds verified native boxed value equality/hash dispatch. This does not close item 1
+in full: generic and union-valued records, including ConsoleKeyInfo's Option<int>,
+floating-point components, imported value-record discovery and formatting remain.
+Native primitive Object-dispatch adapters are also incomplete; direct record component
+operations avoid that path without asserting those boxed APIs are qualified. The
+original failure JSON above remains historical evidence. No new release identity or
+platform/package gate is established by this fix.
+
 ## Required release qualification
 
 - Canonical committed/extracted-source checks, including relevant format/Clippy,

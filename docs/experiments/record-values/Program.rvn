@@ -1,0 +1,58 @@
+import System.*
+
+record struct TextKey(Text: string, Character: char)
+record struct KeyCode(Key: ConsoleKey)
+record struct WideKey(Value: long)
+record struct NumberKey(Number: int, Enabled: bool)
+record struct NestedKey(Text: TextKey, Number: NumberKey)
+record class ReferenceKey(Text: string?, Number: int)
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    let first = TextKey("é", 'é')
+    let second = TextKey("é", 'é')
+    Check(first == second, "canonical operator")
+    Check(!(first != second), "canonical inequality")
+    Check(first.Equals(second), "typed equality")
+    Check(first.GetHashCode() == second.GetHashCode(), "canonical hash")
+    Check(first != TextKey("other", 'é'), "unequal first component")
+    Check(first != TextKey("é", 'x'), "unequal last component")
+    let boxedFirst: Object = first
+    let boxedSecond: Object = second
+    Check(boxedFirst.Equals(boxedSecond), "boxed equality")
+    Check(boxedFirst.GetHashCode() == boxedSecond.GetHashCode(), "boxed hash")
+    Check(!boxedFirst.Equals(null), "boxed null")
+    Check(!boxedFirst.Equals("é"), "boxed different type")
+    Check(NumberKey(42, true) != NumberKey(42, false), "Boolean difference")
+    Check(KeyCode(ConsoleKey.Enter) == KeyCode(ConsoleKey.Enter), "enum equality")
+    Check(KeyCode(ConsoleKey.Enter) != KeyCode(ConsoleKey.Escape), "enum difference")
+    Check(KeyCode(ConsoleKey.Enter).GetHashCode() == KeyCode(ConsoleKey.Enter).GetHashCode(), "enum hash")
+    let wide: long = 4294967296
+    Check(WideKey(wide) == WideKey(wide), "wide equality")
+    Check(WideKey(wide) != WideKey(0), "wide difference")
+    Check(WideKey(wide).GetHashCode() == WideKey(wide).GetHashCode(), "wide hash")
+    let nestedFirst = NestedKey(first, NumberKey(42, true))
+    let nestedSecond = NestedKey(second, NumberKey(42, true))
+    Check(nestedFirst == nestedSecond, "nested equality")
+    Check(nestedFirst.GetHashCode() == nestedSecond.GetHashCode(), "nested hash")
+    Check(nestedFirst != NestedKey(first, NumberKey(43, true)), "nested difference")
+    let referenceFirst = ReferenceKey(null, 42)
+    let referenceSecond = ReferenceKey(null, 42)
+    Check(referenceFirst == referenceSecond, "reference null components")
+    Check(referenceFirst.GetHashCode() == referenceSecond.GetHashCode(), "reference null hash")
+    Check(referenceFirst != ReferenceKey("text", 42), "reference different component")
+    Check(ReferenceKey("text", 42) != referenceFirst, "reference different component reversed")
+    Check(ReferenceKey("é", 42) == ReferenceKey("é", 42), "reference canonical components")
+    let boxedReference: Object = referenceFirst
+    Check(boxedReference.Equals(referenceSecond), "boxed reference record")
+    let empty: ReferenceKey? = null
+    Check(!(referenceFirst == empty), "reference null right")
+    Check(!(empty == referenceFirst), "reference null left")
+    Check(empty == empty, "reference both null")
+    Console.WriteLine("PASS record values")
+}

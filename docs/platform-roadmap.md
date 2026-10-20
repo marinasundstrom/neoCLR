@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) freshly reproduces native generated-record equality rejection, identifies raw null String direct-call parity for resolution, and requires a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
+**Release readiness (author direction, 2026-10-20):** return to release stabilization after ReadKey. The [current review](validation/release-readiness-20261020/README.md) tracks the bounded native record equality/hash fix and remaining component/formatting gaps, raw null String direct-call parity, and a replacement matched package with source, platform, editor and performance gates. Console enhancements beyond the qualified foundation remain follow-ups; no replacement identity is selected.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
@@ -26,8 +26,9 @@ passes Unicode conformance without allocations. Public canonical String/Char
 comparison and hashing now pass interpreter/JIT/AOT qualification, including
 boxed dispatch, explicit ordinal policies and preserved UTF-8 storage. See the
 [canonical text evidence](experiments/canonical-text/README.md).
-Native record-generated equality/hash remains an existing compiler gap, separately
-reproduced. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
+Native generated equality/hash now has a [bounded positional-record fix](experiments/record-values/README.md).
+Generic/union-valued records (including ConsoleKeyInfo), floating-point components,
+imported value-record discovery and formatting remain release review gaps. Unicode whitespace trimming is now [qualified across three engines](experiments/string-trimming/README.md),
 with unchanged-owner reuse and measured changed-result allocations. The
 [String utilities](experiments/string-utilities/README.md) add nullable predicates
 and explicit/interface comparison; [line-ending replacement](experiments/string-lines/README.md)

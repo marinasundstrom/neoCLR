@@ -70,6 +70,17 @@ nullable/pointer conversions and extension/interface mutation operators remain g
 [Operator contracts and supported forms](https://github.com/marinasundstrom/neoclr/tree/main/docs/validation/compound-operators#checked-blocks-and-constant-evaluation)
 provide implementation details.
 
+## Record values in development
+
+Native positional records now support generated equality and matching hashes for
+qualified components, including canonical String/Char text, integers, Boolean,
+enums and nested source records. Typed and boxed record comparisons are tested
+across interpreter, JIT and AOT. Generic and union-valued records, floating-point
+components, imported value-record discovery and generated formatting remain gaps;
+this is development support, not full record parity in a published release.
+
+[Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)
+
 <a id="targets"></a>
 
 ## The .NET and neoCLR targets
