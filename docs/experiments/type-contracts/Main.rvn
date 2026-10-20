@@ -1,0 +1,82 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Text.*
+import System.Storage.*
+import System.Result.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Identity(value: Object, other: Object) {
+    Check(value.Equals(value), "Reference reflexivity")
+    Check(!value.Equals(other) && !other.Equals(value), "Distinct owner identity")
+    Check(!value.Equals(null), "Null reference inequality")
+    let hash = value.GetHashCode()
+    System.Runtime.GC.Collect()
+    Check(hash == value.GetHashCode(), "Stable identity hash after GC")
+}
+
+func Equal(left: Object, right: Object) {
+    Check(left.Equals(right) && right.Equals(left), "Symmetric value equality")
+    Check(left.GetHashCode() == right.GetHashCode(), "Value hash consistency")
+    Check(!left.Equals(null), "Null value inequality")
+}
+
+func Main() {
+    let left = ArrayList<int>()
+    let right = ArrayList<int>()
+    left.Add(1)
+    right.Add(1)
+    Identity(left, right)
+    let listHash = left.GetHashCode()
+    left.Add(2)
+    Check(left.GetHashCode() == listHash, "Mutation preserves owner hash")
+    Identity([1, 2], [1, 2])
+    let builder = StringBuilder()
+    let other = StringBuilder()
+    builder.Append("abc")
+    other.Append("abc")
+    Identity(builder, other)
+    let before = builder.GetHashCode()
+    let text = ((Object)builder).ToString()
+    builder.Append("d")
+    Check(text == "abc" && builder.ToString() == "abcd", "Independent builder snapshot")
+    Check(before == builder.GetHashCode(), "Builder content does not change identity hash")
+    let source = CancellationTokenSource()
+    let second = CancellationTokenSource()
+    Identity(source, second)
+    Equal(source.Token, source.Token)
+    Equal(CancellationToken.None, CancellationToken.None)
+    Check(!((Object)source.Token).Equals(second.Token), "Token source identity")
+    let tokenHash = ((Object)source.Token).GetHashCode()
+    source.Cancel()
+    Check(tokenHash == ((Object)source.Token).GetHashCode(), "Cancellation preserves token identity")
+    let Ok(path) = Path.Parse("a/b") else {
+        System.Fail("Path parse")
+        return
+    }
+    let Ok(samePath) = Path.Parse("a/b") else {
+        System.Fail("Path parse")
+        return
+    }
+    Equal(path, samePath)
+    Check(!Object.ReferenceEquals(path, samePath), "Paths are separate value objects")
+    Check(((Object)path).ToString() == "a/b", "Path display")
+    let Ok(uri) = Uri.Parse("https://example.com/a") else {
+        System.Fail("URI parse")
+        return
+    }
+    let Ok(sameUri) = Uri.Parse("https://example.com/a") else {
+        System.Fail("URI parse")
+        return
+    }
+    Equal(uri, sameUri)
+    Check(((Object)uri).ToString() == "https://example.com/a", "URI display")
+    source.Dispose()
+    second.Dispose()
+    Console.WriteLine("Type contract families: passed")
+}

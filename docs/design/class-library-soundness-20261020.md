@@ -78,3 +78,44 @@ also distinguishes typed/constrained calls from conversions to interface objects
 implementing EquatableTo does not make every interface conversion allocation-free.
 neoCLR must qualify those paths independently; existing generic record boxes remain
 a measured limitation, not a required semantic allocation.
+
+## Whole-library contract pass
+
+Author direction, 2026-10-20: extend the check to most/all types, continue through
+issues, and make consistency an explicit objective. The [reproducible inventory](class-library-type-inventory-20261020.md)
+covers **all 260 authored top-level public declarations**, including the optional
+PostgreSQL provider: 66 interfaces, 11 static classes, 12 enums, 33 unions, two
+records, two borrowed views, two persistent views, 17 intrinsic types, 19 ordinary
+structs and 96 reference classes. This is a declaration/inheritance and implementation
+review, not execution qualification of all methods. Internal reflection implementations
+were additionally inspected because they implement the public descriptor contracts.
+
+Consistency means typed/Object/interface dispatch agrees where supported; equal values
+have equal hashes; display overrides remain virtual; and reference identity is not
+replaced by content equality just because an object has fields. The ordinary shared
+value fallback remains separate from user-declared EquatableTo contracts. Missing
+backend support is a gap, never an alternative equality policy.
+
+| Reviewed family | Finding and allocation assessment | Evidence / remaining scope |
+| --- | --- | --- |
+| Interfaces and static services | Interfaces specify behavior; comparer Equals/GetHashCode operate on arguments, not the comparer object's identity. Static crypto, console and runtime services have no instance value identity to implement. | All declarations inventoried; provider behavior is not execution-qualified by this check. |
+| Mutable collections, arrays, builders and owner/service classes | Inherited Object equality/hash is appropriate for mutable owners; mutation must not change identity hash. StringBuilder's override returns a cached immutable snapshot, with allocations when changed text is materialized. | [Family consumer](../experiments/type-contracts/README.md), [collections](../experiments/native-collections/README.md), [retention](../experiments/native-collections-gc/README.md). Explicit comparer keys must remain stable; snapshot iteration intentionally allocates. |
+| Index, Range and empty error structs | Shared fieldwise/empty-value equality remains; nine hidden display methods were inconsistent and are now overrides. | [Direct/boxed/composite checks](../experiments/value-display/README.md). Range and Index still form intermediate component text; no allocation improvement claimed. |
+| Other ordinary structs | CancellationToken compares its source identity through shared defaults, unaffected by cancellation; NetworkDeadline stores one monotonic stamp. HashCode is a mutable accumulator, not a recommended stable key. | [Family consumer](../experiments/type-contracts/README.md) tests token copies/defaults/different sources and GC. Deadline and accumulator reviewed in source; no new typed interfaces synthesized. |
+| String and Char | Canonical equality/hash agree; protocol code uses explicit ordinal policies. Original UTF-8 is preserved. | [Canonical model](string-api-review-20261019.md), [Char](../experiments/char-object/README.md). Object/interface adaptation can allocate; a struct containing references is not allocation-free by definition. |
+| Numeric primitives and runtime tokens | Int32/Int64/Boolean, floating and Char adapters differ in coverage. Narrow/unsigned/native-width primitives lack Object adapters despite supported storage and unboxing. RuntimeTypeHandle is intrinsic, not an empty user struct. | Concrete primitive adapter follow-up underway; numeric formatting/providers and handle boxing need separate qualification. Do not treat empty-looking intrinsic source declarations as empty-value contracts. |
+| Enums | Share nominal value boxes and numeric/text services; exact type participates in equality, while hashes can collide between types. | [Equality](../experiments/enum-object/README.md), [display](../experiments/enum-display/README.md). Int32 backing only; explicit format specifiers remain gaps. |
+| Records and unions | Generated record equality policies cover qualified declared components; generic records still box values. Union case/payload semantics must not be inferred from an ordinary struct source scan. | [Records](../experiments/record-generics/README.md), [union components](../experiments/record-unions/README.md). Whole-union Object boxing and broader generic formatting remain explicit gaps; not every error union is individually executed here. |
+| Slice and Memory | Borrowed views cannot box/escape. Persistent view equality should describe storage region, not mutable contents; current native Memory boxing is explicitly rejected. | `runtime/codegen/src/boxing.rs`, view implementation contracts. Follow-up requires owner/offset/length equality and matching hashes, including empty views; do not infer semantics from fieldless source projections. |
+| Uri, Path, HttpMethod and IPAddress | Each authored equality override has a matching hash. Uri/Path use ordinal text; HttpMethod uses ordinal-ignore-case; IPAddress compares address bytes/family. IPv4/IPv6 inherit the base contract. ToString returns stored text where available. | [Family consumer](../experiments/type-contracts/README.md) qualifies Uri/Path. IPAddress formatting currently assembles intermediate strings; a bounded buffer is a candidate, not a measured regression. |
+| Date/time and globalization | Date/TimeOfDay/Duration/LocalDateTime and Instant/TimeOffset have matching value hashes. Instant/TimeOffset lack deliberate full-domain display. TimeZone, ZonedDateTime, Calendar and culture objects currently inherit identity. | [Time values](../experiments/time-values/README.md), [formatting](../experiments/formattable-culture/README.md). Review value-like classes deliberately; zone rules, aliases and database version make equality by name alone insufficient without a documented contract. |
+| Reflection descriptors | Internal runtime descriptors pair every Object equality override with a hash. Type wrappers compare execution handles across their concrete wrappers; hashes use display names (collisions between different types are legal). Member identities use owner/definition or stored identity consistently. | [Reflection execution](../experiments/reflection-execution/README.md). DisplayName hashing may materialize text; caching or runtime identity hashing requires measurement and canonical-handle guarantees. |
+| Streams, networking, HTTP, JSON and SQL owners | Mutable/lifecycle objects retain reference identity. A JsonValue class is not automatically structural JSON equality; SQL rows/results and HttpContent are owners/views with separate contracts. Stream capabilities do not imply blocking adapters. | Declaration/override review across every public type; existing domain tests remain evidence for their stated scope. This pass does not certify I/O timing, cancellation, disposal races, serializer throughput or provider correctness. |
+
+The fresh family consumer exposed a concrete build-host defect: synchronous cancellation
+retained a timer-cancel service without selecting the invocation-owned scheduler host.
+The builder now selects that host from timer bindings too and omits default-queue
+draining when no Drain function is compiled. The same source passes interpreter/JIT/AOT.
+This is a host dependency fix, not a new asynchronous API or a forced allocation in
+ordinary equality. Source and metadata/API snapshot checks complement these execution
+checks; none is a substitute for a replacement release's platform gates.

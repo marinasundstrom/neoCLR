@@ -294,7 +294,13 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         selection = json.loads(run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags], phase='native-compilation'))
         runtime_async = any(binding.get('implementation', '').startswith('runtime-async-')
                             for binding in selection.get('nativeBindings', []))
-        async_host = runtime_async or bool(selection.get('taskQueueFrames'))
+        # Synchronous cancellation/disposal can retain timer services even when
+        # no async method or task frame is reachable. Those services still need
+        # invocation-owned scheduler state and the timer host implementation.
+        timer_host = any(binding.get('implementation', '').startswith('timer-')
+                         for binding in selection.get('nativeBindings', []))
+        async_host = runtime_async or timer_host or bool(selection.get('taskQueueFrames'))
+        no_default_queue = 'Drain' not in selection.get('taskQueueFrames', {})
         if async_host:
             # Async console applications need the same invocation ownership and
             # task/scheduler services as HTTP, without requiring a different profile.
@@ -380,7 +386,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['/DNEOCLR_HTTPS_SERVER'] if https_server else []), '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http or async_host else []), *(['/DNEOCLR_RUNTIME_ASYNC', '/I' + str(ROOT / 'runtime/native/async')] if runtime_async else []), '/I' + str(base), '/Fo' + str(output) + '/',
+                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['/DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['/DNEOCLR_HTTPS_SERVER'] if https_server else []), '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http or async_host else []), *(['/DNEOCLR_RUNTIME_ASYNC', '/I' + str(ROOT / 'runtime/native/async')] if runtime_async else []), '/I' + str(base), '/Fo' + str(output) + '/',
                  '/Fe:' + str(pending), *adapters, obj, *native_text, *native_tls, *native_crypto, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http or async_host or native_crypto or managed_tls else []),
                  *(['Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib'] if https_server or native_crypto or managed_tls else [])], phase='host-compile-link')
             import re
@@ -392,7 +398,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_RUNTIME_ASYNC', '-I', ROOT / 'runtime/native/async', '-Wno-deprecated-declarations'] if runtime_async else []), *(['-DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['-DNEOCLR_RUNTIME_ASYNC', '-I', ROOT / 'runtime/native/async', '-Wno-deprecated-declarations'] if runtime_async else []), *(['-DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
             if system_culture:

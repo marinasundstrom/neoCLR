@@ -59,8 +59,10 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
     tasks.complete = neoclr_scheduler_complete_v1;
     status = neoclr_process_entry(argc, argv, &result, context);
     while (!status && !host_error) {
+#ifndef NEOCLR_NO_DEFAULT_QUEUE
         status = neoclr_drain_default_queue_v1(context);
         if (status) break;
+#endif
         uint64_t callback = 0;
         int32_t progress = neoclr_scheduler_acquire_v1(context, &callback, NULL);
         if (progress == NEOCLR_SCHEDULER_IDLE) break;

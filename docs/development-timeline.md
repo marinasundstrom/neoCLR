@@ -20441,3 +20441,24 @@ for the test results and artifact identities. No release publication is claimed.
   and avoid unnecessary duplication for other reference and value types as well.
 - **Validation:** The bounded [enum qualification](experiments/enum-object/README.md)
   records results; the broader class/struct review and release gates remain open.
+
+## 2026-10-20 — Whole-library consistency review
+
+- **Author direction:** Continue checking type semantics, Equals, GetHashCode and
+  ToString, accounting for efficiency; extend the check to “most if not all types”.
+  After the assistant identified remaining primitive, Memory and value-like-class
+  gaps, the author directed continuation through those issues and emphasized:
+  “One of the objectives in this work is achieving consistency”.
+- **Assistant response:** Use the same equality/hash/display rules across typed,
+  boxed and interface calls, sharing runtime behavior where the semantics agree.
+  Distinguish declaration inspection from execution qualification and deliberate
+  identity contracts from incomplete value support.
+- **Completed:** [Inventory all 260 public declarations](design/class-library-type-inventory-20261020.md),
+  [repair nine display overrides](experiments/value-display/README.md), and qualify
+  [enum formatting](experiments/enum-display/README.md). The representative
+  [reference/value consumer](experiments/type-contracts/README.md) exposed a native
+  host dependency gap for synchronous cancellation; it now passes interpreter/JIT/AOT
+  with timer-aware host selection and optional default-queue draining.
+- **Open:** Primitive adapters, Memory region equality/boxing and deliberate
+  contracts for value-like time classes require further work. The inventory is a
+  coverage record, not a claim that all methods, platforms or release gates passed.

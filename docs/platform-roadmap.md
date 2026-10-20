@@ -24,7 +24,7 @@ now reuses shared numeric/text services for names, flags and unnamed values; oth
 field shapes and formats remain bounded. [Ordinary value display overrides](experiments/value-display/README.md)
 align Index, Range and seven errors across direct/boxed/composite calls. Primitive numeric formats and
 general providers remain gaps. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
-this does not certify all types.
+the [260-declaration inventory](design/class-library-type-inventory-20261020.md) now covers the whole authored public surface, with family execution evidence and explicit remaining gaps. This is not whole-library execution certification.
 
 **Author-directed console work (2026-10-20):** implement a modern console input API.
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
