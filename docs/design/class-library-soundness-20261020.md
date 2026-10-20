@@ -60,3 +60,19 @@ runtime/raven/providers` currently finds 149 declaration lines. This is only a s
 search aid: it excludes unions and internal helpers and is not a coverage metric.
 A whole-library completion claim requires closing the concrete gaps and mapping
 remaining families to supported contracts and focused evidence.
+
+## Default equality versus generated operators
+
+Author clarification, 2026-10-20: ordinary structs need useful overridable default
+value equality, and EquatableTo provides the typed comparison path. The general
+fallback must be addressed separately from completing individual library types.
+
+[.NET ValueType.Equals](https://learn.microsoft.com/en-us/dotnet/api/system.valuetype.equals?view=net-6.0)
+provides ordinary struct value equality. [C# equality operators](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/equality-operators)
+are not supplied automatically for plain structs; record structs synthesize equality
+members. Follow that distinction unless the author chooses a language divergence.
+The [struct specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/structs)
+also distinguishes typed/constrained calls from conversions to interface objects:
+implementing EquatableTo does not make every interface conversion allocation-free.
+neoCLR must qualify those paths independently; existing generic record boxes remain
+a measured limitation, not a required semantic allocation.

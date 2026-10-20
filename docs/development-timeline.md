@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-20 — Default struct equality and the typed fast path
+
+After the HttpVersion repair, the author emphasizes ordinary struct default value
+equality, overridability and typed EquatableTo comparisons that avoid Object boxing.
+The author also describes equality/inequality operators as defaults. The assistant
+distinguishes the .NET contracts: ordinary structs inherit ValueType equality/hash,
+while C# record structs synthesize typed equality and operators; plain structs do
+not automatically receive those operators. Typed/constrained calls can avoid boxing,
+but converting a struct into an interface value can still box.
+
+The assistant identifies the missing general struct fallback as the underlying
+runtime gap; individual library overrides are useful contracts but do not close it.
+This clarification does not approve automatic operator synthesis for all ordinary
+Raven structs. See the [review record](design/class-library-soundness-20261020.md).
+
 ## 2026-10-20 — Allocation lifetime and value types
 
 The author clarifies that allocations are not inherently bad; short-lived allocations

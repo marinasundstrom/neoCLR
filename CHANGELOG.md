@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Clarify the class-library review distinction between ordinary struct default equality/hash, record operator synthesis and typed/constrained comparison paths. Record interface-conversion boxing and the general struct fallback as separate runtime work; no ordinary-struct operator policy changes.
+
 - Complete HttpVersion's EquatableTo and Object equality/hash contracts and make its existing ToString an override, aligning source and reference metadata. Compare both protocol components, retain default 0.0 and nonnegative Int32 components, and preserve HTTP/1.1 transport scope. Qualify typed/interface/boxed calls, direct/generic/imported records, component boundaries and request/response versions across interpreter/JIT/AOT. Four native API snapshot checks and the website build pass; update API references and class-library review evidence.
 
 - Complete Date, TimeOfDay, Instant, TimeOffset and LocalDateTime Object equality and value hashing. Add typed civil equality/ordering and self interfaces to LocalDateTime, comparing date then complete tick of day without timezone or culture conversion. Align reference-assembly interface declarations, replace the now-valid Date missing-hash fixture with positive time-value coverage, and retain the compiler's synthetic negative contract. The boundary/default/record consumer passes interpreter/JIT/AOT; update both API references and time guidance. Record remaining class-library review candidates; ordinary struct default methods remain a runtime gap.
