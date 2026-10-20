@@ -256,9 +256,20 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
     if report["objectDisplayDispatch"]
         .as_array()
         .is_some_and(|rows| !rows.is_empty())
-        && extra_scalars.values().any(|(_, ty)| *ty != Type::Char)
+        && extra_scalars
+            .values()
+            .any(|(_, ty)| *ty != Type::Char && !matches!(ty, Type::Single | Type::Double))
     {
         return Err("Object dispatch for this primitive box kind is not yet supported".into());
+    }
+    if extra_scalars
+        .values()
+        .any(|(_, ty)| matches!(ty, Type::Single | Type::Double))
+        && report["objectDisplayDispatch"]
+            .as_array()
+            .is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString"))
+    {
+        return Err("boxed floating-point ToString is not yet supported".into());
     }
     let char_targets = report["charObjectDispatch"]
         .as_array()

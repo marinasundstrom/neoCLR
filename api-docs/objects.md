@@ -112,9 +112,10 @@ field defaults avoid extra field boxes; nested/default Object calls can still al
 
 The [development consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)
 covers direct and boxed calls, integer fields, nested and generic structs, nulls,
-canonical String fields and custom reference equality. Native floating-point and enum
-boxed adapters remain gaps; interpreter floating field equality handles NaN and signed
-zero. Borrowed views and enum/primitive definitions do not receive ordinary struct
+canonical String fields and custom reference equality. Floating Object adapters and
+default floating fields now pass interpreter/JIT/AOT, including NaN and signed zero.
+Native enum boxed adapters remain a gap. Borrowed views and enum/primitive definitions
+do not receive ordinary struct
 fallback bodies. This is bounded support rather than every .NET value shape.
 
 ## Direction under review
@@ -194,6 +195,11 @@ Double XORs its upper/lower halves. NaN and positive infinity may share a hash b
 remain unequal. These rules allow explicit Object comparer callbacks to find NaN
 and signed-zero map keys reliably. Hashes are not persistent identifiers. Floating
 boxed ToString and source-declared typed Equals/GetHashCode remain outside this slice.
+The [floating-value consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/floating-object/README.md#native-backend-qualification--2026-10-20)
+passes interpreter and macOS ARM64 JIT/AOT, including floating fields in ordinary and
+generic structs. Native selection still rejects floating boxes combined with virtual
+Object.ToString; boxing storage support does not imply boxed formatting support.
+
 
 Development String boundaries and Char validation use Unicode 17 extended grapheme
 segmentation in both the interpreter and native helper. Newly recognized combining

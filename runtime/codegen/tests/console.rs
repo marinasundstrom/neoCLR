@@ -13116,3 +13116,163 @@ int main(void) {
         String::from_utf8_lossy(&result.stderr)
     );
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn floating_boxes_preserve_value_equality_and_hashing() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(OBJECT_DISPLAY_SEED).unwrap();
+    const EQUALS: &str = "callvirt instance System.Object::Equals(System.Object)";
+    const HASH: &str = "callvirt instance System.Object::GetHashCode()";
+    let mut body = ".local System.Object empty\nldloca empty\ninitobj System.Object\n".to_owned();
+    for (opcode, ty, nan_hash) in [
+        ("ldc.r4", "Single", 0x7f800000),
+        ("ldc.r8", "Double", 0x7ff00000),
+    ] {
+        for (left, right, equal) in [
+            ("NaN", "NaN", true),
+            ("0", "-0", true),
+            ("inf", "inf", true),
+            ("inf", "-inf", false),
+            ("NaN", "0", false),
+            ("1.5", "1.5", true),
+            ("1.5", "1.25", false),
+        ] {
+            let branch = if equal { "brfalse" } else { "brtrue" };
+            body.push_str(&format!(
+                "{opcode} {left}\nbox {ty}\n{opcode} {right}\nbox {ty}\n{EQUALS}\n{branch} failed\n"
+            ));
+        }
+        for (value, expected) in [
+            ("NaN", nan_hash),
+            ("0", 0),
+            ("-0", 0),
+            ("inf", nan_hash),
+            ("-inf", nan_hash | i32::MIN),
+            (
+                "1.5",
+                if ty == "Single" {
+                    0x3fc00000
+                } else {
+                    0x3ff80000
+                },
+            ),
+            (
+                if ty == "Single" {
+                    "1.40129846e-45"
+                } else {
+                    "4.9406564584124654e-324"
+                },
+                1,
+            ),
+        ] {
+            body.push_str(&format!(
+                "{opcode} {value}\nbox {ty}\n{HASH}\nldc.i4 {expected}\nceq\nbrfalse failed\n"
+            ));
+        }
+        for other in ["ldc.i4 1\nbox Int32", "ldloc empty"] {
+            body.push_str(&format!(
+                "{opcode} 1\nbox {ty}\n{other}\n{EQUALS}\nbrtrue failed\n"
+            ));
+        }
+        body.push_str(&format!("{opcode} 1\nbox {ty}\n{opcode} 1\nbox {ty}\nref.eq\nbrtrue failed\n{opcode} NaN\n{opcode} NaN\nceq\nbrtrue failed\n"));
+    }
+    body.push_str(&format!("ldc.r4 1\nbox Single\nldc.r8 1\nbox Double\n{EQUALS}\nbrtrue failed\nldc.i4 42\nret\nfailed:\nldc.i4 -1"));
+    let source = format!(
+        ".module FloatingDefaults\n.function Calculate(Int32 unused) -> Int32\n{body}\nret\n.end"
+    );
+    let mut app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &seed)
+            .unwrap()
+            .remove(0);
+    let mut sequence = 0;
+    for function in &mut app.functions {
+        for op in &mut function.body {
+            match op {
+                neoclr::metadata::Instruction::Float32 { bits }
+                    if f32::from_bits(*bits).is_nan() =>
+                {
+                    *bits = [0x7f800001, 0xffc01234][sequence % 2];
+                    sequence += 1;
+                }
+                neoclr::metadata::Instruction::Float64 { bits }
+                    if f64::from_bits(*bits).is_nan() =>
+                {
+                    *bits = [0x7ff0000000000001, 0xfff8123456789000][sequence % 2];
+                    sequence += 1;
+                }
+                _ => {}
+            }
+        }
+    }
+    let result = compile_linked_module(
+        &dir,
+        &seed,
+        &app,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
+    fs::write(
+        dir.0.join("host.c"),
+        r#"
+#include "text-arena.h"
+int main(void) {
+    uint64_t storage[1024];
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,sizeof(storage),0}};
+    int32_t value=-99;
+    int status=neoclr_entry_v4(0,&value,&ctx);
+    if (status) { neoclr_aot_render_fault(stderr,&ctx.fault); return status; }
+    return value == 42 ? 0 : 99;
+}
+"#,
+    )
+    .unwrap();
+    let result = Command::new("clang")
+        .args([
+            "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
+        ])
+        .arg(base.join("aot-console"))
+        .arg(dir.0.join("host.c"))
+        .arg(base.join("aot-console/text-arena.c"))
+        .arg(base.join("aot-fault-details/render.c"))
+        .arg(dir.0.join("app.o"))
+        .arg("-o")
+        .arg(dir.0.join("app"))
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let result = Command::new(dir.0.join("app")).output().unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let display = ".module FloatingDisplay\n.function Calculate(Int32 unused) -> Int32\nldc.r8 1.5\nbox Double\ncallvirt instance System.Object::ToString()\npop\nldc.i4 42\nret\n.end";
+    let app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(display)], &seed)
+            .unwrap()
+            .remove(0);
+    neoclr::LoadedProgram::with_library(&app, &seed)
+        .unwrap()
+        .verify()
+        .unwrap();
+    let rejected = compile_linked_module(
+        &dir,
+        &seed,
+        &app,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(!rejected.status.success());
+    // Formatting remains outside this profile; projection can reject it before
+    // the explicit floating-box admission diagnostic. Never silently display a tag.
+    assert!(!rejected.stderr.is_empty());
+}

@@ -17,7 +17,9 @@ complete boxed equality/hash and LocalDateTime equality/ordering.
 [HttpVersion value contracts](experiments/http-version-values/README.md) also align
 typed/boxed equality, hashes and display. [Ordinary struct defaults](experiments/struct-defaults/README.md)
 add runtime fieldwise equality/hash while preserving explicit EquatableTo contracts.
-Native boxed field-shape coverage remains bounded. Primitive numeric formats and
+[Floating Object equality/hash](experiments/floating-object/README.md#native-backend-qualification--2026-10-20)
+now qualifies floating fields too; enum adapters and other native field shapes remain
+bounded. Primitive numeric formats and
 general providers remain gaps. The [broader review](design/class-library-soundness-20261020.md) remains in progress;
 this does not certify all types.
 

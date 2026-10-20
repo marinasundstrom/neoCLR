@@ -82,8 +82,9 @@ copying its contents. See [slices and memory](../memory/).
 
 Ordinary struct defaults are development functionality. The example and nested,
 generic, empty and reference-field cases pass interpreter, JIT and AOT checks.
-Native floating-point and enum boxed adapters remain gaps; this does not yet cover
-every .NET field shape or dispatch path. The [Object API guide](/docs/objects.html) records the
+Floating fields also pass these checks, including NaN and signed-zero equality.
+Native enum boxed adapters and boxed floating-point formatting remain gaps; this
+does not yet cover every .NET field shape or dispatch path. The [Object API guide](/docs/objects.html) records the
 supported contracts and [implementation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)
 tracks execution-mode validation.
 

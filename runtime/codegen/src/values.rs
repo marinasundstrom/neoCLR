@@ -2520,19 +2520,29 @@ pub(crate) fn compile_into(
                     let d = details.unwrap();
                     // Primitive boxes preserve value semantics through the ordinary
                     // Object slots, including calls made from generic code.
-                    for (index, wide) in d
+                    for (index, wide, floating) in d
                         .int32_boxes
                         .values()
                         .chain(d.boolean_boxes.values())
-                        .map(|index| (*index, false))
-                        .chain(d.int64_boxes.values().map(|index| (*index, true)))
+                        .map(|index| (*index, false, false))
+                        .chain(d.int64_boxes.values().map(|index| (*index, true, false)))
+                        .chain(
+                            d.floating_boxes
+                                .iter()
+                                .map(|(index, wide)| (*index, *wide, true)),
+                        )
                     {
                         let matched = b.create_block();
                         let next = b.create_block();
                         let equal = matches_type(&mut b, &p, tag, index);
                         b.ins().brif(equal, matched, &[], next, &[]);
                         b.switch_to_block(matched);
-                        let payload_type = if wide { types::I64 } else { types::I32 };
+                        let payload_type = match (floating, wide) {
+                            (true, true) => types::F64,
+                            (true, false) => types::F32,
+                            (false, true) => types::I64,
+                            (false, false) => types::I32,
+                        };
                         let left = b
                             .ins()
                             .load(payload_type, MemFlags::new(), parameters[0], 8);
@@ -2557,7 +2567,15 @@ pub(crate) fn compile_into(
                             let right =
                                 b.ins()
                                     .load(payload_type, MemFlags::new(), parameters[1], 8);
-                            let equal = b.ins().icmp(IntCC::Equal, left, right);
+                            let equal = if floating {
+                                let equal = b.ins().fcmp(FloatCC::Equal, left, right);
+                                let left_nan = b.ins().fcmp(FloatCC::Unordered, left, left);
+                                let right_nan = b.ins().fcmp(FloatCC::Unordered, right, right);
+                                let both_nan = b.ins().band(left_nan, right_nan);
+                                b.ins().bor(equal, both_nan)
+                            } else {
+                                b.ins().icmp(IntCC::Equal, left, right)
+                            };
                             let equal = b.ins().uextend(types::I32, equal);
                             b.ins().jump(result, &[equal.into()]);
                             b.switch_to_block(different);
@@ -2565,6 +2583,32 @@ pub(crate) fn compile_into(
                             b.ins().jump(result, &[no.into()]);
                             b.switch_to_block(result);
                             b.block_params(result)[0]
+                        } else if floating {
+                            let integer = if wide { types::I64 } else { types::I32 };
+                            let bits = b.ins().bitcast(integer, MemFlags::new(), left);
+                            let magnitude = b
+                                .ins()
+                                .band_imm(bits, if wide { i64::MAX } else { i32::MAX as i64 });
+                            let is_zero = b.ins().icmp_imm(IntCC::Equal, magnitude, 0);
+                            let zero = b.ins().iconst(integer, 0);
+                            let bits = b.ins().select(is_zero, zero, bits);
+                            let nan = b.ins().fcmp(FloatCC::Unordered, left, left);
+                            let canonical = b.ins().iconst(
+                                integer,
+                                if wide {
+                                    0x7ff0_0000_0000_0000
+                                } else {
+                                    0x7f80_0000
+                                },
+                            );
+                            let bits = b.ins().select(nan, canonical, bits);
+                            if wide {
+                                let high = b.ins().ushr_imm(bits, 32);
+                                let mixed = b.ins().bxor(bits, high);
+                                b.ins().ireduce(types::I32, mixed)
+                            } else {
+                                bits
+                            }
                         } else if wide {
                             let high = b.ins().ushr_imm(left, 32);
                             let mixed = b.ins().bxor(left, high);
