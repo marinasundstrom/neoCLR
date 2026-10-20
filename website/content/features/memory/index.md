@@ -74,5 +74,5 @@ Socket and TLS integration includes completion, cancellation and selected-window
 checks. Other native element specializations remain unqualified.
 
 [Type and member reference](../../docs/memory-views.html) ·
-[Arrays](../arrays/) · [HTTP](../web/) · [Garbage collection](../gc/) ·
+[Reference and value types](../types/) · [Arrays](../arrays/) · [HTTP](../web/) · [Garbage collection](../gc/) ·
 [Implementation and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/memory-view-library-audit.md)

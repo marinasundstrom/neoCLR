@@ -22,6 +22,8 @@
       href: features/networking/index.md
 - name: Everyday code
   items:
+    - name: "Reference types and value types"
+      href: features/types/index.md
     - name: "Raven for neoCLR"
       href: raven/index.md
     - name: "Option and Result"

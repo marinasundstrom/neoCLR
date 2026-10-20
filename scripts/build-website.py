@@ -329,6 +329,8 @@ def main():
         'CONSOLE_PROPAGATION_SAMPLE': ('docs/experiments/console-streams/Propagation.rvn', 'func ReadInput()', '\nfunc Main()', False),
         'CONSOLE_IF_LET_SAMPLE': ('docs/experiments/console-streams/IfLet.rvn', 'func ReadInput()', '\nfunc Main()', False),
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'async func Main()', '\n}', True),
+        'STRUCT_DEFAULT_DECLARATION': ('docs/experiments/struct-defaults/Program.rvn', 'struct Plain {', 'struct Empty {}', False),
+        'STRUCT_DEFAULT_USAGE': ('docs/experiments/struct-defaults/Program.rvn', '    let first = Plain(42, 4294967297L)', '    let another: Object = second', True),
         'MEMORY_WINDOW_SAMPLE': ('docs/validation/memory-views-20261019/native-memory.rvn', '    let data: byte[] = [(byte)10, (byte)20, (byte)30, (byte)40]', '    window[0] = (byte)99', True),
         'ARRAY_TOUR': (raven + 'library-array-tour.rvn', 'import System.*', '\n}', True),
         'TASK_AWAIT_SAMPLE': (raven + 'library-async-default-queue.rvn', 'func Describe', '\n    return ()\n}', True),

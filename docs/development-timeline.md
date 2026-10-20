@@ -44,7 +44,11 @@ explicit overrides preserved, independent of typed interfaces and generated oper
 The author confirms consistency by default and says “EquatableTo remains a user
 implemented contract”; divergence requires value. The author also requests an on-site
 explanation of reference versus value types. Implementation and validation are tracked
-in the [struct default work](experiments/struct-defaults/README.md).
+in the [struct default work](experiments/struct-defaults/README.md). The implementation
+now passes its focused tests and matched interpreter/JIT/AOT consumer. The new
+[website guide](../website/content/features/types/index.md) explains the model with
+examples extracted from that consumer; the 4930-page site build passes. Publication
+remains separate, and native floating/enum boxed adapter gaps remain open.
 
 This clarification does not approve automatic operator synthesis for all ordinary
 Raven structs. See the [review record](design/class-library-soundness-20261020.md).

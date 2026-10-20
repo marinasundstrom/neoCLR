@@ -1,0 +1,91 @@
+# Reference types and value types
+
+Choose a type by what copying it should mean. A class gives an object a shared
+identity. A struct represents a value whose fields are copied when the value is
+assigned or passed by value. neoCLR follows the .NET reference/value model, with
+Raven providing the declarations and compiler-generated record members.
+
+| Operation | Reference type, such as a class | Value type, such as a struct |
+| --- | --- | --- |
+| Assignment or by-value argument | Copies a reference to the same object | Copies the value's fields |
+| Mutation through one copy | Other aliases see the same object's changes | The other value's own fields are independent |
+| Reference fields inside it | Refer to other objects | Still refer to the same objects after copying |
+| Default equality | Object identity for ordinary classes | Same runtime type and equal instance fields |
+| Conversion to Object | Retains object identity | Boxes a copy in managed storage |
+
+Neither kind of assignment performs a deep clone. Copying a struct containing an
+array reference does not copy the array's elements. Readonly access prevents writes
+through that access path; it does not make every referenced object immutable.
+
+## A small value, with an optional Object view
+
+This struct represents two numbers:
+
+```raven
+{{STRUCT_DEFAULT_DECLARATION}}
+```
+
+Two independently constructed values can have the same contents:
+
+```raven
+{{STRUCT_DEFAULT_USAGE}}
+```
+
+`first.Equals(second)` and `boxed.Equals(another)` compare the fields. The two
+separate boxes have different identities, so `Object.ReferenceEquals(boxed, another)`
+is false. Equal values have equal hash codes, but a matching hash does not prove
+equality. Never persist hash codes or use them as unique identifiers.
+
+Ordinary structs use runtime-provided default equality and hashing. A custom
+`Equals(Object)` override takes precedence; pair it with a matching `GetHashCode()`.
+Reference fields use their own equality contracts: a class without an override
+compares by identity, while a class with an override can compare its contents.
+
+`EquatableTo<T>` is an explicit, user-implemented typed contract. It allows a
+comparison to accept `T` directly instead of requiring an Object argument. It does
+not make conversion of a struct into an interface object allocation-free. Typed
+and supported constrained calls can avoid boxing; an Object or interface conversion
+can still need a box.
+
+## Records express compiler-generated behavior
+
+A record class is still a reference type; a record struct is still a value type.
+Raven generates their equality and other supported record members. That generated
+behavior is separate from the runtime's ordinary struct fallback. Default struct
+value equality does not automatically declare `EquatableTo<T>` or add `==` and `!=`
+operators to every ordinary struct.
+
+String is a reference type with content equality. neoCLR deliberately uses canonical
+Unicode equality over preserved UTF-8 storage, so string fields follow that text
+contract rather than .NET's default ordinal String equality. See
+[strings and UTF-8](../strings/) for explicit ordinal operations.
+
+## Allocation follows storage and lifetime
+
+“Value type” does not mean “always on the stack.” A value can live in a local,
+a register, an array element, a class field or a managed box. A value embedded in
+an existing object does not require its own object allocation. References inside
+values still keep their targets reachable by the GC.
+
+Small values can avoid temporary wrapper objects, but copying large values has a
+cost. Boxing also allocates storage and copies the value. Choose classes when shared
+identity and ownership fit the problem, and structs when independent copied values
+fit it. Allocation for a useful result or owner is appropriate; repeated temporary
+boxes and copied buffers deserve attention.
+
+`Slice<T>` and `ReadOnlySlice<T>` are borrowed value views with additional lifetime
+rules. `Memory<T>` and `ReadOnlyMemory<T>` retain an owner and can cross asynchronous
+suspension. Copying any of these views shares the underlying storage rather than
+copying its contents. See [slices and memory](../memory/).
+
+## Development coverage
+
+Ordinary struct defaults are development functionality. The example and nested,
+generic, empty and reference-field cases pass interpreter, JIT and AOT checks.
+Native floating-point and enum boxed adapters remain gaps; this does not yet cover
+every .NET field shape or dispatch path. The [Object API guide](/docs/objects.html) records the
+supported contracts and [implementation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/struct-defaults/README.md)
+tracks execution-mode validation.
+
+[Object API](../../docs/objects.html) · [Garbage collection](../gc/) ·
+[.NET comparison](../../comparison/)

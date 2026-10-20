@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-20
 
+- Add a reference-types versus value-types website guide covering copying and shared fields, identity, boxing, default and record equality, explicit EquatableTo contracts, allocation lifetime and memory views. Extract examples from the qualified struct consumer and link the page from Guides, memory views and the Object reference. Build and validate all 4930 website pages; publication remains separate.
+
 - Implement runtime-owned fieldwise Equals/GetHashCode defaults for ordinary nominal structs, preserving explicit overrides, exact closed types, private fields and source reflection. Keep EquatableTo user-implemented and ordinary operators unchanged. Share helper construction between interpreter and native preparation; compare/hash integer and Boolean fields without extra field boxes and admit matching wide native bitwise operands. Qualify direct/boxed, nested/generic, empty/null and reference-field contracts; native floating/enum boxed adapters remain gaps. Update the class-library review and Object API guide.
 
 - Complete HttpVersion's EquatableTo and Object equality/hash contracts and make its existing ToString an override, aligning source and reference metadata. Compare both protocol components, retain default 0.0 and nonnegative Int32 components, and preserve HTTP/1.1 transport scope. Qualify typed/interface/boxed calls, direct/generic/imported records, component boundaries and request/response versions across interpreter/JIT/AOT. Four native API snapshot checks and the website build pass; update API references and class-library review evidence.

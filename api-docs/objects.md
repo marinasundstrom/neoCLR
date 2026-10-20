@@ -2,7 +2,8 @@
 
 neoCLR distinguishes reference types from
 value types. Assigning a class instance shares its reference; assigning a value
-copies its fields. A reference field inside a copied value still refers to the same
+copies its fields. See [reference types and value types](/features/types/) for the
+copying, boxing and allocation model. A reference field inside a copied value still refers to the same
 object. Neither assignment performs a deep clone.
 
 ## Object's current API

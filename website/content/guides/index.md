@@ -36,7 +36,8 @@ Read [Raven for neoCLR](/raven/) for the language used in the examples.
 Coming from C#? The [.NET comparison](/comparison/) explains familiar concepts
 and deliberate differences.
 
-[Modules](/features/modules/) organize declarations.
+[Reference types and value types](/features/types/) explain copying, identity,
+boxing and equality. [Modules](/features/modules/) organize declarations.
 [Introspection](/features/introspection/) describes them;
 [reflection](/features/reflection/) can construct objects and invoke members.
 [Architecture](/architecture/) explains the compiler and runtime layers.
