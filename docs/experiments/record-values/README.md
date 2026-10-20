@@ -1,5 +1,9 @@
 # Native positional record value semantics
 
+Follow-up: [closed tagged-union components](../record-unions/README.md) now qualify
+ConsoleKeyInfo equality/hash. The artifacts and limitations below describe the
+earlier checkpoint; the follow-up also reruns this consumer against its new bundle.
+
 Development qualification, 2026-10-20. This fixes the original canonical-text
 record's generated equality rejection and establishes a bounded value-semantics
 foundation. It does not close every record release gap.

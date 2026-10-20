@@ -1,0 +1,19 @@
+import System.*
+import System.Option.*
+
+func Main(args: string[]) {
+    var count = 0
+    if args[0] == "allocation" {
+        count = 128
+    }
+    var i = 0
+    while i < count {
+        let key = ConsoleKeyInfo(ConsoleKey.A, false, false, true, Some(i))
+        let other = ConsoleKeyInfo(ConsoleKey.A, false, false, true, Some(i))
+        if key != other || key.GetHashCode() != other.GetHashCode() {
+            System.Fail("key value semantics")
+        }
+        i += 1
+    }
+    Console.WriteLine("PASS")
+}

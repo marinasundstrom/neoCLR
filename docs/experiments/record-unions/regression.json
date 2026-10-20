@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-union-regression-v2/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-union-regression-v2/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-union-regression-v2/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS record values\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "unsupported-component",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/record-values/Unsupported.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/record-values/Unsupported.rvn(5,13): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct UnsupportedKey.\n",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-union-regression-v2/app": "a8291eee6636186612aaf9d5f2730a4128ed30a3b8a1aadc9f5db79262910132",
+    "/Users/robert/Projects/neoclr/target/record-union-regression-v2/app.dll": "fa921eff0051aaf7222f3f84868bb8338f78f4bfdd83fe01d7145c9b5908b96d",
+    "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/sdk/tools/rvnc/rvnc.dll": "f1d58a42050148d279aa929fcebbdcc479e4c36599bfddfdb3a07708ce34e244",
+    "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "2095acfd6142f93a9b150787e74b8ee1cfa107e2ac0e3ab290bdeb00502d8b5a",
+    "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/bin/neoclr-codegen": "8026c803358727f9565d6755a37c07ffad75f43e14eece910affe609c9db92d0",
+    "/Users/robert/Projects/neoclr/target/record-union-bundle-v2/bundle/lib/System.Runtime.dll": "89a73469c9c623d8c9ec089909ad1597717368fa9ffa5e774232a2d934a091f1"
+  }
+}

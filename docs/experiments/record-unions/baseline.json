@@ -1,0 +1,6 @@
+{
+  "source": "import System.*\nimport System.Option.*\n\nrecord struct OptionalKey(Value: Option<int>)\n\nfunc Main() {\n    let left = OptionalKey(Some(42))\n    let right = OptionalKey(Some(42))\n    Console.WriteLine((left == right).ToString())\n}\n",
+  "compiler": "Raven 054c1c8d9",
+  "compilerSha256": "82d8508883e5bbb33fa3275ce8660a79f8636318b47b724df2a230af11b32e4e",
+  "diagnostic": "/Users/robert/Projects/neoclr/docs/experiments/record-unions/Program.rvn(6,13): error NEOMETA001: Native emission does not support record value semantics require supported component equality and hashing: struct OptionalKey.\n"
+}

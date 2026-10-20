@@ -2682,3 +2682,15 @@ summaries for compiler-generated ConsoleKeyError/case ToString members, as with
 existing unions. These members remain visible; they are not excluded. Synthesized
 member descriptions remain a renderer/documentation maintenance gap, while all
 key acquisition/read failures are documented in the console guide.
+
+
+### ConsoleKeyInfo value members — 2026-10-20
+
+Native record synthesis now emits typed/Object Equals, GetHashCode, == and != for
+ConsoleKeyInfo, including Option<int> case/payload comparison. Both reference inputs
+and authored XML cover these members. The pinned native renderer collapses equality
+and inequality to `operator_operator___.html`, where inequality overwrites equality.
+`manual-members.json` records the exact two IDs and links their complete signatures
+at `/docs/console.html#key-value-equality`; the native type page links that reference.
+No type or other member is excluded. A general RavenDoc route fix remains a Raven
+main candidate to validate independently and carry deliberately to the neoCLR line.

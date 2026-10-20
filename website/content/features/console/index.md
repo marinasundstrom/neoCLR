@@ -132,3 +132,10 @@ Use `"\r\n"`, `"\n"`, `"\r"`, or a custom sequence. Readers remove that exact
 sequence; writers append it in WriteLine. With LF configured, CR stays in the
 returned text. An empty reader delimiter is an error; an empty writer delimiter
 appends nothing. See the [full contract](../../docs/console.html#configurable-line-delimiters-development).
+
+
+Development key values support `==`, `!=`, typed and boxed `Equals`, and matching
+`GetHashCode`. Comparisons include every modifier and the optional Unicode scalar's
+case and payload. `None`, `Some(0)` and an uninitialized Option remain distinct.
+[Validation and allocation scope](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-unions)
+cover the three execution engines; this does not establish a throughput improvement.

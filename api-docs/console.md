@@ -337,6 +337,9 @@ Serialize all console input and session operations.
 | `ConsoleKeyReader.Close()` | `Result<unit, ConsoleKeyError>`; restores modes, repeatable; retry after failure |
 | `ConsoleKeyReader.Dispose()` | Attempts Close; invocation cleanup retries restoration on failure |
 | `ConsoleKeyInfo(Key, Shift, Alt, Control, TextScalar)` | Value constructor; properties retain these arguments |
+| `ConsoleKeyInfo.Equals(ConsoleKeyInfo)` / `==` / `!=` | Memberwise value comparison, including the TextScalar case and scalar payload |
+| `ConsoleKeyInfo.Equals(Object?)` | Equal boxed key values compare equal; null and other types return false |
+| `ConsoleKeyInfo.GetHashCode()` | Equal key values have equal hashes; hashes are not persistent identifiers |
 | `Key: ConsoleKey` | Logical letters/digits, Space, Tab, Enter, Backspace, Escape, arrows, Home/End, Insert/Delete, PageUp/PageDown, F1–F12; None for other text |
 | `Shift`, `Alt`, `Control: bool` | Reported modifiers, with legacy terminal ambiguities |
 | `TextScalar: Option<int>` | Valid Unicode scalar for decoder-produced text; None for control/navigation; never a grapheme |
@@ -396,3 +399,32 @@ func Main() {
 This handles keyboard input while the key session owns the terminal. It does not
 install a general process-signal or close-request handler. A broader shutdown-request
 API, including cancellation where supported, remains future work.
+
+
+Development qualification (2026-10-20): key equality and hashing now include the
+optional scalar without boxing it. `None`, `Some(0)` and an uninitialized Option
+remain distinct. Typed key operations have a separate allocation diagnostic;
+explicitly boxing a key still allocates. See the
+[record-union validation](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-unions).
+
+
+<a id="key-value-equality"></a>
+
+### ConsoleKeyInfo value equality (development)
+
+| Member | Contract |
+| --- | --- |
+| `static func ==(left: ConsoleKeyInfo, right: ConsoleKeyInfo) -> bool` | True when Key, Shift, Alt, Control and the TextScalar case/payload are equal. |
+| `static func !=(left: ConsoleKeyInfo, right: ConsoleKeyInfo) -> bool` | Negation of equality. |
+| `func Equals(other: ConsoleKeyInfo) -> bool` | Same memberwise comparison as `==`. |
+| `override func Equals(obj: Object?) -> bool` | True for an equal boxed ConsoleKeyInfo; false for null or another type. |
+| `override func GetHashCode() -> int` | Equal keys have equal hashes. Hashes are not persistent identifiers. |
+
+Typed operations compare the optional scalar without boxing it. Explicit boxing
+still follows the value-box allocation contract. No normalization or validation of
+manually constructed scalar values is performed by equality. Default Option storage,
+None and Some(0) remain different values. These operations introduce no typed error
+result. See the validation linked above for execution modes and allocation scope.
+
+The pinned renderer currently gives the two operators the same generated URL. This
+manual member reference preserves both contracts while that renderer gap is open.

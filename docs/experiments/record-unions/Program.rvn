@@ -1,0 +1,79 @@
+import System.*
+import System.Option.*
+import System.Result.*
+
+record struct OptionalKey(Value: Option<int>)
+record struct TextKey(Value: Option<string>)
+record struct NullableTextKey(Value: Option<string?>)
+record struct CharacterKey(Value: Option<char>)
+record struct NestedKey(Value: Option<Option<int>>)
+record struct ResultKey(Value: Result<int, string>)
+union Choice {
+    case Empty
+    case Number(value: int)
+    case Pair(text: string, number: int)
+}
+record struct ChoiceKey(Value: Choice)
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    let first = OptionalKey(Some(42))
+    let second = OptionalKey(Some(42))
+    let absent = OptionalKey(None)
+    Check(first == second && first.Equals(second), "same payload")
+    Check(first.GetHashCode() == second.GetHashCode(), "same hash")
+    Check(first != OptionalKey(Some(43)), "different payload")
+    Check(first != absent && absent != first, "different case in both directions")
+    Check(absent == OptionalKey(None), "empty case")
+    let uninitialized: OptionalKey = default
+    Check(uninitialized == uninitialized, "default carrier equality")
+    Check(uninitialized != absent && absent != uninitialized, "default is not None")
+    Check(uninitialized.GetHashCode() == uninitialized.GetHashCode(), "default hash")
+    let leftText = TextKey(Some("é"))
+    let rightText = TextKey(Some("é"))
+    Check(leftText == rightText, "canonical payload")
+    Check(leftText.GetHashCode() == rightText.GetHashCode(), "canonical payload hash")
+    let nullText = NullableTextKey(Some(null))
+    Check(nullText == NullableTextKey(Some(null)), "nullable payload")
+    Check(nullText.GetHashCode() == NullableTextKey(Some(null)).GetHashCode(), "nullable payload hash")
+    Check(nullText != NullableTextKey(None), "null payload is not empty case")
+    Check(NullableTextKey(Some("text")) != nullText && nullText != NullableTextKey(Some("text")), "nullable payload in both directions")
+    let leftChar = CharacterKey(Some('é'))
+    let rightChar = CharacterKey(Some('é'))
+    Check(leftChar == rightChar, "canonical Char payload")
+    Check(leftChar.GetHashCode() == rightChar.GetHashCode(), "canonical Char hash")
+    Check(NestedKey(Some(Some(42))) == NestedKey(Some(Some(42))), "nested payload")
+    Check(NestedKey(Some(None)) != NestedKey(None), "nested empty versus outer empty")
+    Check(ResultKey(Ok(42)) == ResultKey(Ok(42)), "Result success")
+    Check(ResultKey(Error("é")) == ResultKey(Error("é")), "Result canonical error")
+    Check(ResultKey(Ok(42)) != ResultKey(Error("42")), "Result different cases")
+    let pair = ChoiceKey(Choice.Pair("é", 42))
+    let samePair = ChoiceKey(Choice.Pair("é", 42))
+    Check(pair == samePair, "multiple payload fields")
+    Check(pair.GetHashCode() == samePair.GetHashCode(), "multiple payload hash")
+    Check(pair != ChoiceKey(Choice.Pair("é", 43)), "last payload differs")
+    Check(pair != ChoiceKey(Choice.Number(42)), "different local case")
+    let boxedFirst: Object = first
+    let boxedSecond: Object = second
+    Check(boxedFirst.Equals(boxedSecond), "boxed equality")
+    Check(boxedFirst.GetHashCode() == boxedSecond.GetHashCode(), "boxed hash")
+    Check(!boxedFirst.Equals(absent) && !boxedFirst.Equals(null), "boxed different case and null")
+    let key = ConsoleKeyInfo(ConsoleKey.A, false, false, true, Some(97))
+    let sameKey = ConsoleKeyInfo(ConsoleKey.A, false, false, true, Some(97))
+    Check(key == sameKey && key.Equals(sameKey), "public ConsoleKeyInfo equality")
+    Check(key.GetHashCode() == sameKey.GetHashCode(), "public ConsoleKeyInfo hash")
+    Check(key != ConsoleKeyInfo(ConsoleKey.A, false, false, false, Some(97)), "modifier difference")
+    Check(key != ConsoleKeyInfo(ConsoleKey.A, false, false, true, Some(98)), "scalar difference")
+    Check(key != ConsoleKeyInfo(ConsoleKey.A, false, false, true, None), "scalar case difference")
+    let boxedKey: Object = key
+    Check(boxedKey.Equals(sameKey), "boxed public key equality")
+    Check(boxedKey.GetHashCode() == key.GetHashCode(), "boxed public key hash")
+    let defaultKey: ConsoleKeyInfo = default
+    Check(defaultKey != ConsoleKeyInfo(ConsoleKey.None, false, false, false, None), "default key versus explicit None")
+    Console.WriteLine("PASS record unions")
+}

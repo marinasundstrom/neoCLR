@@ -114,5 +114,13 @@
   "M:System.Text.Encoding.Decode": {
     "output": "docs/streams.html#incremental-encoding-development",
     "reason": "The legacy CLI scaffold cannot encode these opaque Slice/Memory signatures. The native snapshot renders the members; this route covers the intermediate legacy website pass."
+  },
+  "M:System.ConsoleKeyInfo.op_Equality(System.ConsoleKeyInfo,System.ConsoleKeyInfo)": {
+    "output": "docs/console.html#key-value-equality",
+    "reason": "Pinned RavenDoc maps == and != to the same operator_operator___.html route; the inequality page overwrites equality. The linked manual entry documents both signatures and behavior."
+  },
+  "M:System.ConsoleKeyInfo.op_Inequality(System.ConsoleKeyInfo,System.ConsoleKeyInfo)": {
+    "output": "docs/console.html#key-value-equality",
+    "reason": "Pinned RavenDoc maps == and != to the same operator_operator___.html route; the inequality page overwrites equality. The linked manual entry documents both signatures and behavior."
   }
 }

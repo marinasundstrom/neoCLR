@@ -152,6 +152,11 @@ static class ProcessBindings
             public bool Alt => default;
             public bool Control => default;
             public Option<int> TextScalar => default;
+            public bool Equals(ConsoleKeyInfo other) => default;
+            public override bool Equals(object? obj) => default;
+            public override int GetHashCode() => default;
+            public static bool operator ==(ConsoleKeyInfo left, ConsoleKeyInfo right) => default;
+            public static bool operator !=(ConsoleKeyInfo left, ConsoleKeyInfo right) => default;
         }
         public class ConsoleKeyReader : Disposable {
             internal ConsoleKeyReader() { }

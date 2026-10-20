@@ -74,9 +74,10 @@ provide implementation details.
 
 Native positional records now support generated equality and matching hashes for
 qualified components, including canonical String/Char text, integers, Boolean,
-enums and nested source records. Typed and boxed record comparisons are tested
-across interpreter, JIT and AOT. Generic and union-valued records, floating-point
-components, imported value-record discovery and generated formatting remain gaps;
+enums, nested source records and closed tagged-union payloads such as `Option<int>`.
+This includes ConsoleKeyInfo's optional scalar. Typed and boxed record comparisons
+are tested across interpreter, JIT and AOT. Generic record owners, unsupported union
+payloads, floating-point components, imported value-record discovery and generated formatting remain gaps;
 this is development support, not full record parity in a published release.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)

@@ -1,0 +1,7 @@
+import System.*
+import System.Option.*
+record struct UnsupportedKey(Value: Option<double>)
+func Main() {
+    let key = UnsupportedKey(None)
+    Console.WriteLine((key == key).ToString())
+}

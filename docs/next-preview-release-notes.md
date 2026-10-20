@@ -12,7 +12,7 @@ version is `0.1.17-neoclr.20261019.1`, using Raven native compiler
 
 The identity above belongs to the superseded candidate and must not be reused as
 qualification for current source. [Current triage](validation/release-readiness-20261020/README.md)
-confirms native generated record equality still fails compilation, tracks raw
+tracks bounded native record equality/hash fixes and remaining component/formatting gaps, raw
 null String direct-call parity, and orders fresh source/package/editor/performance
 gates after those issues are resolved. No replacement package identity is selected.
 
@@ -49,7 +49,10 @@ search predicates, trimming/line-ending utilities, Char helpers, builder reuse a
 String.Format/Formattable are implemented with focused development qualification.
 Original UTF-8 bytes are preserved. Shared-storage String views remain deferred;
 position-based search/splitting and provider/primitive-specifier formatting remain
-coverage gaps. Native generated record equality is a confirmed compiler gap.
+coverage gaps. Native generated record equality/hash is qualified for bounded
+nongeneric positional records, including supported closed tagged-union components.
+Generic record owners, unsupported components, imported value-record discovery and
+generated formatting remain gaps; see [record union evidence](experiments/record-unions/README.md).
 
 Console now exposes synchronous byte/text capabilities with configurable line endings,
 and scoped ReadKey with logical keys, modifiers and optional Unicode scalar text.
