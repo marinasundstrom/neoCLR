@@ -310,3 +310,11 @@ and ReadToEnd are unaffected.
 neoCLR extends that configuration to readers as requested by the author. Exact
 reader delimiters make framing predictable, at the cost of configuring mixed or
 platform-specific input explicitly. There is no automatic newline-detection mode.
+
+### Internal key decoder checkpoint (development)
+
+An internal Raven decoder is qualified for borrowed-buffer UTF-8 and a bounded
+legacy key-sequence profile. It creates no Strings for decoded text. This does
+**not** add Console.ReadKey or terminal acquisition to the public library API.
+The [kernel contract and allocation evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/console-key-decoder/README.md)
+identify remaining ownership, native provider and protocol limitations.

@@ -1,0 +1,180 @@
+module System
+
+import System.*
+
+// Internal transport-independent result. Text is a window in the caller's input,
+// never an owned String or Char. State: 0 needs input, 1 decoded, 2 unsupported,
+// 3 invalid UTF-8. Key: ASCII logical key or navigation 256..265 / F1..F12 272..283.
+internal record struct TerminalKeyStep(val State: int, val Consumed: int, val Key: int,
+    val Modifiers: int, val TextOffset: int, val TextLength: int)
+
+internal static class TerminalKeyDecoder {
+    // Caller retains incomplete bytes. finish is EOF or an explicit escape deadline,
+    // not an arbitrary idle gap in a UTF-8 scalar. No terminal modes are negotiated.
+    static func Decode(input: ReadOnlySlice<byte>, finish: bool) -> TerminalKeyStep {
+        if input.Length == 0 {
+            return TerminalKeyStep(0, 0, 0, 0, 0, 0)
+        }
+        if input[0] != 27 {
+            return Text(input, 0, 0, finish)
+        }
+        if input.Length == 1 {
+            if finish {
+                return TerminalKeyStep(1, 1, 27, 0, 0, 0)
+            }
+            return TerminalKeyStep(0, 0, 0, 0, 0, 0)
+        }
+        if input[1] == 91 || input[1] == 79 {
+            return Sequence(input, finish)
+        }
+        // Escape-prefixed text is the selected legacy Alt convention, not proof
+        // of a physical modifier. Two Escape bytes preserve two Escape events.
+        if input[1] == 27 {
+            return TerminalKeyStep(1, 1, 27, 0, 0, 0)
+        }
+        return Text(input, 1, 2, finish)
+    }
+
+    private static func Text(input: ReadOnlySlice<byte>, offset: int, modifiers: int, finish: bool) -> TerminalKeyStep {
+        let first = (int)input[offset]
+        if first < 128 {
+            var key = first
+            var flags = modifiers
+            var length = 0
+            if first >= 32 && first < 127 {
+                length = 1
+                if first >= 97 && first <= 122 {
+                    key = first - 32
+                }
+            } else if first == 127 {
+                key = 8
+            } else if first >= 1 && first <= 26 && first != 8 && first != 9 && first != 13 {
+                key = first + 64
+                flags += 4
+            }
+            return TerminalKeyStep(1, offset + 1, key, flags, offset, length)
+        }
+        var count = 0
+        if first >= 194 && first <= 223 {
+            count = 2
+        } else if first >= 224 && first <= 239 {
+            count = 3
+        } else if first >= 240 && first <= 244 {
+            count = 4
+        } else {
+            return TerminalKeyStep(3, offset + 1, 0, 0, 0, 0)
+        }
+        var index = 1
+        while index < count {
+            if offset + index >= input.Length {
+                if finish {
+                    return TerminalKeyStep(3, input.Length, 0, 0, 0, 0)
+                }
+                return TerminalKeyStep(0, 0, 0, 0, 0, 0)
+            }
+            let value = (int)input[offset + index]
+            if value < 128 || value > 191 ||
+                (index == 1 && ((first == 224 && value < 160) ||
+                (first == 237 && value > 159) || (first == 240 && value < 144) ||
+                (first == 244 && value > 143))) {
+                // Preserve the offending byte for the caller's next decode.
+                return TerminalKeyStep(3, offset + index, 0, 0, 0, 0)
+            }
+            index += 1
+        }
+        return TerminalKeyStep(1, offset + count, 0, modifiers, offset, count)
+    }
+
+    private static func Sequence(input: ReadOnlySlice<byte>, finish: bool) -> TerminalKeyStep {
+        var index = 2
+        var first = 0
+        var modifier = 0
+        var separated = false
+        var digits = 0
+        var valid = true
+        while index < input.Length && index < 32 {
+            let value = (int)input[index]
+            if value >= 64 && value <= 126 {
+                var key = 0
+                if input[1] == 79 {
+                    if index == 2 {
+                        key = FinalKey(value)
+                    }
+                } else if valid && (!separated || (digits > 0 && modifier >= 1 && modifier <= 8)) {
+                    if value == 126 {
+                        key = TildeKey(first)
+                    } else if first == 0 || first == 1 {
+                        key = FinalKey(value)
+                        if separated && first != 1 {
+                            key = 0
+                        }
+                    }
+                }
+                if key != 0 {
+                    var flags = 0
+                    if separated {
+                        flags = modifier - 1
+                    }
+                    return TerminalKeyStep(1, index + 1, key, flags, 0, 0)
+                }
+                return TerminalKeyStep(2, index + 1, 0, 0, 0, 0)
+            }
+            if value >= 48 && value <= 57 {
+                digits += 1
+                if digits > 3 {
+                    valid = false
+                } else if separated {
+                    modifier = modifier * 10 + value - 48
+                } else {
+                    first = first * 10 + value - 48
+                }
+            } else if value == 59 && !separated && digits > 0 {
+                separated = true
+                digits = 0
+            } else {
+                valid = false
+            }
+            index += 1
+        }
+        if index == 32 || finish {
+            return TerminalKeyStep(2, index, 0, 0, 0, 0)
+        }
+        return TerminalKeyStep(0, 0, 0, 0, 0, 0)
+    }
+
+    private static func FinalKey(value: int) -> int {
+        return match value {
+            65 => 256 // Up
+            66 => 257 // Down
+            67 => 258 // Right
+            68 => 259 // Left
+            72 => 260 // Home
+            70 => 261 // End
+            80 => 272 // F1
+            81 => 273
+            82 => 274
+            83 => 275
+            _ => 0
+        }
+    }
+
+    private static func TildeKey(value: int) -> int {
+        return match value {
+            1 => 260
+            2 => 262 // Insert
+            3 => 263 // Delete
+            4 => 261
+            5 => 264 // PageUp
+            6 => 265 // PageDown
+            15 => 276 // F5
+            17 => 277
+            18 => 278
+            19 => 279
+            20 => 280
+            21 => 281
+            23 => 282
+            24 => 283
+            _ => 0
+        }
+    }
+}

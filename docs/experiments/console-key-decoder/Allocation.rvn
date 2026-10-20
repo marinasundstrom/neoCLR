@@ -1,0 +1,20 @@
+import System.*
+
+func Main(args: string[]) {
+    let mode = args[0]
+    let unicode = "😀"
+    let modified = "\u001b[1;6D"
+    var iteration = 0
+    while iteration < 128 {
+        if mode == "decode" {
+            let text = TerminalKeyDecoder.Decode(unicode.Utf8Bytes, false)
+            let key = TerminalKeyDecoder.Decode(modified.Utf8Bytes, false)
+            let pending = TerminalKeyDecoder.Decode(unicode.Utf8Bytes.Slice(0, 2), false)
+            if text.TextLength != 4 || key.Modifiers != 5 || pending.Consumed != 0 {
+                System.Fail("Decoder allocation fixture")
+            }
+        }
+        iteration += 1
+    }
+    Console.WriteLine("PASS key allocation")
+}

@@ -34,7 +34,10 @@ infrastructure. The assistant proposes a small foundation: sync text I/O, scoped
 key input, explicit modifiers/interrupt policy, and caller-owned text storage rather
 than a String per key. These are design proposals, not completed guest key APIs.
 The next implemented host step adds OS-backed blocking/timed reads into caller storage
-and removes sleep polling from the terminal diagnostic. Key decoding, invocation cleanup
+and removes sleep polling from the terminal diagnostic. A subsequent internal Raven
+decoder step qualifies borrowed input and value/text-window results across the three
+engines; its native allocation diagnostic matches baseline. This does not complete
+the public key-read or terminal-provider integration. Key decoding, invocation cleanup
 and matching native providers remain open. See [transport evidence](console-io.md#development-terminal-host-transport--2026-10-20).
 
 

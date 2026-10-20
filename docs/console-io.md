@@ -240,3 +240,13 @@ reads, byte bounds, fragmented graphemes and pending-source suspension. The
 [API guide](../api-docs/console.md#grapheme-peek-and-counted-reads-development) documents
 the complete text contract. Existing console host reads still block; the POSIX
 terminal transport is not yet an async guest provider.
+
+## Internal key decoding foundation — 2026-10-20
+
+The [Raven decoder kernel](experiments/console-key-decoder/README.md) now consumes
+borrowed UTF-8 bytes and returns value results with input-relative text windows.
+It covers a bounded legacy navigation/function-key profile, modifiers, incomplete
+input and strict UTF-8 errors. This is internal groundwork; Console still has no
+public key-read API. Invocation cleanup, shared cursor ownership and matching
+native providers remain required. The 384-call native diagnostic adds no managed
+allocations over baseline; CPU/throughput and interpreter allocations are unmeasured.

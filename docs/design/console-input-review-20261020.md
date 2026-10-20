@@ -1,11 +1,11 @@
 # Console key input and encoding review — 2026-10-20
 
-Status: researched public API proposal; a first POSIX host-transport foundation is now
-implemented, while Raven keys, async reads and native-backend integration remain open.
+Status: researched public API proposal; POSIX host transport and an internal Raven
+decoder are implemented, while public key reads and native-backend integration remain open.
 See [implementation and focused evidence](../console-io.md#development-terminal-host-transport--2026-10-20). The author
 requests console key/combinations/Ctrl+C support and asks about encoding. The current
-console supplies byte streams and strict UTF-8 line/text wrappers; host I/O is blocking,
-even where managed methods return inline-settled Tasks. There is no terminal key API.
+console supplies byte streams and strict UTF-8 line/text wrappers through explicit
+synchronous interfaces. Host I/O is blocking. There is no public terminal key API.
 
 ## Modern Console direction
 
@@ -172,3 +172,22 @@ of [ReadBlockAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.textr
 UTF-8 String output and grapheme counting preserve the platform's existing text model;
 they cost owned result storage, boundary lookahead and possible waiting on live input.
 Buffer-target and cancellation overloads remain explicit gaps, not permanent exclusions.
+
+## Internal decoder checkpoint — 2026-10-20
+
+The author narrows scope to a small performant foundation, without requiring .NET's
+exact Console shape. An internal Raven decoder now implements a bounded legacy
+UTF-8/xterm profile over ReadOnlySlice<byte>, returning a value and caller-buffer
+text offsets instead of allocating strings. [Contract and evidence](../experiments/console-key-decoder/README.md)
+cover ambiguity, malformed input, fragmentation and measured native allocations.
+This remains groundwork; it does not expose Console.ReadKey or acquire a terminal.
+
+Compared with .NET ConsoleKeyInfo's key/UTF-16 character/modifiers, byte windows
+preserve UTF-8 without constructing a string or misrepresenting a scalar as neoCLR
+Char. The cost is explicit buffer lifetime and separate grapheme assembly. The
+[xterm control-sequence reference](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
+is the source for the supported CSI/SS3 and modifier encodings. Only modifiers 1–8
+are admitted; Meta and other protocol extensions remain unsupported. Escape-prefixed
+Alt is a profile convention, not reliable physical-key identification. Unknown
+sequences are not silently promoted to known keys. This profile is provisional
+until the public session/provider contract selects supported terminal protocols.

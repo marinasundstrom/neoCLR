@@ -195,6 +195,7 @@
     "runtime/raven/src/System/Concurrency/Workers.rvn": "9f31811b38550e4b14793d5dc3391168c2ef91c3219ad5c3ea1091751c451b7c",
     "runtime/raven/src/System/Console/Console.rvn": "25e51ddc1253423e2a86c6c463a84bd87fc282414b6c5b1da9e8f7e469e07137",
     "runtime/raven/src/System/Console/Streams.rvn": "5150ae90090b45da1c45be763b6e56f083040128bf7de698bb69147c36385902",
+    "runtime/raven/src/System/Console/TerminalKeyDecoder.rvn": "95f7eb9a6a1cfb6b446ad613982fba63c43ca655c6390f4e077334ab8aa1e59b",
     "runtime/raven/src/System/ConsoleReadError.rvn": "7e2be132a2c7cc6c60b41d7edf2e12ab79a6bb58e85c2174ef31afed8cdcbc3f",
     "runtime/raven/src/System/ConvertibleInto.rvn": "c4b149f27db40407df127c5d137a0c799ace3e392f56f48050a3e0a97fb35626",
     "runtime/raven/src/System/Data/Json/CollectionAdapters.rvn": "ae70f195d1df5ce76a0bfc8a6c728a6d4be1721a8022a739a633aaa07560f1e2",

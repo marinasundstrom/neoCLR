@@ -1,0 +1,74 @@
+import System.*
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func Key(text: string, key: int, modifiers: int, length: int) {
+    let step = TerminalKeyDecoder.Decode(text.Utf8Bytes, false)
+    Check(step.State == 1 && step.Consumed == text.Utf8Bytes.Length, "key consumption")
+    Check(step.Key == key && step.Modifiers == modifiers && step.TextLength == length, "key value")
+}
+
+func Main() {
+    Key("a", 65, 0, 1)
+    Key("A", 65, 0, 1)
+    Key("é", 0, 0, 2)
+    Key("😀", 0, 0, 4)
+    Key("\t", 9, 0, 0)
+    Key("\r", 13, 0, 0)
+    let escape = "\u001b"
+    Key(escape + "[A", 256, 0, 0)
+    Key(escape + "[1;6D", 259, 5, 0)
+    Key(escape + "[15;3~", 276, 2, 0)
+    Key(escape + "OP", 272, 0, 0)
+    Key(escape + "é", 0, 2, 2)
+    let ctrlC = "\u0003"
+    Key(ctrlC, 67, 4, 0)
+    Check(TerminalKeyDecoder.Decode(escape.Utf8Bytes, false).State == 0, "pending Escape")
+    Check(TerminalKeyDecoder.Decode(escape.Utf8Bytes, true).Key == 27, "literal Escape")
+    let sequence = escape + "[1;8A"
+    var count = 1
+    while count < sequence.Utf8Bytes.Length {
+        let step = TerminalKeyDecoder.Decode(sequence.Utf8Bytes.Slice(0, count), false)
+        Check(step.State == 0 && step.Consumed == 0, "fragment retained")
+        count += 1
+    }
+    Key(sequence, 256, 7, 0)
+    let unicode = "😀"
+    count = 1
+    while count < unicode.Utf8Bytes.Length {
+        let step = TerminalKeyDecoder.Decode(unicode.Utf8Bytes.Slice(0, count), false)
+        Check(step.State == 0 && step.Consumed == 0, "UTF8 fragment retained")
+        Check(TerminalKeyDecoder.Decode(unicode.Utf8Bytes.Slice(0, count), true).State == 3, "UTF8 truncated")
+        count += 1
+    }
+    let unknown = escape + "[200~"
+    Check(TerminalKeyDecoder.Decode(unknown.Utf8Bytes, false).State == 2, "unsupported paste")
+    let malformed: byte[] = [(byte)240, (byte)128, (byte)128, (byte)128]
+    Check(TerminalKeyDecoder.Decode(malformed[0..], false).State == 3, "overlong UTF8")
+    let invalidContinuation: byte[] = [(byte)226, (byte)65]
+    let invalid = TerminalKeyDecoder.Decode(invalidContinuation[0..], false)
+    Check(invalid.State == 3 && invalid.Consumed == 1, "preserve next ASCII")
+    let surrogate: byte[] = [(byte)237, (byte)160, (byte)128]
+    Check(TerminalKeyDecoder.Decode(surrogate[0..], false).State == 3, "surrogate rejected")
+    let aboveUnicode: byte[] = [(byte)244, (byte)144, (byte)128, (byte)128]
+    Check(TerminalKeyDecoder.Decode(aboveUnicode[0..], false).State == 3, "Unicode maximum")
+    for suffix in ["[1;9A", "[;5A", "[1;A", "[123456789012345678901234567890123456789A"] {
+        let bytes = escape + suffix
+        let step = TerminalKeyDecoder.Decode(bytes.Utf8Bytes, false)
+        Check(step.State == 2 && step.Consumed <= 32, "unsupported bounded sequence")
+    }
+    let paired = TerminalKeyDecoder.Decode((escape + escape).Utf8Bytes, false)
+    Check(paired.Key == 27 && paired.Consumed == 1, "preserve second Escape")
+    let combined = "é"
+    let initial = TerminalKeyDecoder.Decode(combined.Utf8Bytes, false)
+    Check(initial.TextLength == 1 && initial.Consumed == 1, "text scalar not grapheme")
+    let mark = TerminalKeyDecoder.Decode(combined.Utf8Bytes.Slice(1, 2), false)
+    Check(mark.Key == 0 && mark.TextLength == 2, "combining text retained")
+    let alt = TerminalKeyDecoder.Decode((escape + "é").Utf8Bytes, false)
+    Check(alt.TextOffset == 1, "Alt text window excludes Escape")
+    Console.Write("PASS terminal key decoder\n")
+}

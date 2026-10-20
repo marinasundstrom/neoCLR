@@ -6,24 +6,24 @@
     "revision": "main"
   },
   "sha256": "5d52b1870ed85fc27f6c40be4ff12bdeaa9d06f79c5b8b1e43a1ef875ed2c5f1",
-  "librarySourceRevision": "d50db72a1470b1c17646fdb7957b3f698ca38130",
+  "librarySourceRevision": "7b54abdd00c785f0ad089e0ebbaa5691932f67e6",
   "compilerRevision": "100f98a2f",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "c1d2cb80fe81d9b2054d097a471801f85167bc53ad833316ebf4590a4b1719bf"
+    "sha256": "882b2360363f84c00aa214051a4a3b6318f590788b5273522b1904a7840b0091"
   },
   "rendererRevision": "03bcc23d6",
   "libraryArtifacts": {
-    "System.Runtime.dll": "b45f53f37e6a3c09c065994c155b9ea0a87d12e8269b9a00f2e98868b623612c",
-    "System.Data.dll": "d03cdc9e6f9c2ac873c002ae7c3037f3a81d623717b0789161f2b16c3721f133",
-    "System.Networking.dll": "b8a7a3f22ea60cb5126ab8b8c685adf636aa47d9ddfb894984b470554f2a4082",
-    "System.Web.dll": "15ea7f60d95869f1024d79329d938825341570f83ce83f61a24e29647e0b4151",
-    "System.Data.PostgreSql.dll": "36d3b2f51d03150b5cc434b833b14f7775f2198082897494db0678be57792b8c",
+    "System.Runtime.dll": "36a54bc4ec9f149a68779c4d3c9b693bf747f8521f38616e2193753c0fc919c2",
+    "System.Data.dll": "edd70a887e067bc5cef89bbdac78e957530094c6969724c659ba0e922417af28",
+    "System.Networking.dll": "f855e4e0a5398fa57e80cc02b0db852aa1f62aa035a0ff53ee4973e0d55b2795",
+    "System.Web.dll": "3ae360b5fc891250f45740aa494d4ce547c88a8a1a498c526685aa26e6984ec1",
+    "System.Data.PostgreSql.dll": "0d9da4803f5c5104ecd6e75db1e923d1d34c26bde51599e25561bc91957e85aa",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "48de027e6f56b3c4a4ca95be830d2c533f7b8f9dd9c89b0abe708de0fd5b98e4",
-    "restored-xml-comments.json": "014ca7935912e21631775248e052a2518ddcb640655ab84300b94cad6ddbc8fc"
+    "restored-xml-comments.json": "4616b97101bed75da664d262c1aed223287127183834d832065ee75b508e05cb"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }
