@@ -23,7 +23,11 @@ Positive execution reuses the preceding matched union-formatting bundle because
 this change affects only rejection of unsupported contracts. No new class-library
 API, layout or calling convention is introduced; no API snapshot refresh is needed.
 
-## Remaining automatic synthesis gap
+## Historical automatic synthesis gap
+
+[Automatic native record interfaces](../record-auto-interfaces/README.md) now close
+the nongeneric synthesis gap. This section records the preceding investigation,
+not current guidance to add interfaces manually.
 
 Shared Raven binding currently looks up System.IEquatable<T>, while neoCLR's core
 exposes EquatableTo<T>. Historical RavenRecordAssemblyName/RavenRecordEquatableType

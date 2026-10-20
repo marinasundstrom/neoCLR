@@ -39,7 +39,7 @@ command = ['dotnet', str(compiler), 'neoclr', '--project',
            str(Path(__file__).resolve().with_name('Unsupported.rvnproj'))]
 result = subprocess.run(command, env={**os.environ, 'NeoClrBundleRoot': str(bundle)},
                         text=True, capture_output=True, timeout=120)
-passed = result.returncode != 0 and 'record value semantics require supported component equality and hashing' in result.stdout + result.stderr
+passed = result.returncode != 0 and any(message in result.stdout + result.stderr for message in ['record value semantics require supported component equality and hashing', 'record equality interface requires supported component equality and hashing'])
 rows.append(dict(case='unsupported-component', command=command, exitCode=result.returncode,
                  stdout=result.stdout, stderr=result.stderr, passed=passed))
 print(f'unsupported-component: {"PASS" if passed else "FAIL"}', flush=True)

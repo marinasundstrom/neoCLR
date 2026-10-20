@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "executions": [
+    {
+      "case": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-app-v2/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS automatic record interfaces\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-app-v2/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/bin/neoclr-jit-host.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS automatic record interfaces\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "case": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/record-auto-interface-app-v2/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS automatic record interfaces\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-app-v2/app": "07311c5e89927f6a22786dd9c8915ce9bff37f5e4879614449e8d73f682b6578",
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-app-v2/app.dll": "80d9abe9aa09624b690f3658cad755f577c7547303e5fadd6aa7afe7284ad72f",
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/sdk/tools/rvnc/rvnc.dll": "87947429a1de27cf13194e741bd8600afdfc52eb41c0e957e3cd7db16df5d586",
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "e1c6d843c18cb009a1c6f534dc9e1958ec7b965b94c5e24e432e0dd96dd32741",
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/bin/neoclr": "50b40022ebb422f21de8ad649bff3648aed5989916871aabf9cecf9b93ef294c",
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/bin/neoclr-codegen": "d0bec4365896373981c251c6bc727fc0cd07ad74016d09c4184b9a5db33b466d",
+    "/Users/robert/Projects/neoclr/target/record-auto-interface-bundle-v2/bundle/lib/System.Runtime.dll": "fa617f0bebdf4e4695067dacd225d39e648f37f95f76d10fdc27793e7292c993"
+  }
+}

@@ -2694,3 +2694,14 @@ and inequality to `operator_operator___.html`, where inequality overwrites equal
 at `/docs/console.html#key-value-equality`; the native type page links that reference.
 No type or other member is excluded. A general RavenDoc route fix remains a Raven
 main candidate to validate independently and carry deliberately to the neoCLR line.
+
+### Automatic ConsoleKeyInfo equality interface — 2026-10-20
+
+The native compiler now emits EquatableTo<ConsoleKeyInfo> automatically, using the
+existing generated typed Equals and ordinary interface metadata. The aggregate
+reference mirrors that relationship; the native snapshot is rebuilt from matching
+five-library outputs. The type and manual console reference describe implicit
+interface conversion and use as an imported record component. Existing operator
+route exclusions are unchanged. The pinned audit renderer remains 03bcc23d6.
+Generic native record interface/body synthesis is still incomplete and is not
+advertised for KeyValuePair. This update does not publish the website.

@@ -1,0 +1,7 @@
+Checked RavenDoc reference assembly and source fingerprints
+PASS production native metadata rendering with selected explicit core contract
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.019s
+
+OK

@@ -1,0 +1,2 @@
+/Users/robert/Projects/neoclr/docs/experiments/record-auto-interfaces/Program.rvn(8,38): error RAV1504: Cannot assign 'Key' to 'EquatableTo<Key>'
+/Users/robert/Projects/neoclr/docs/experiments/record-auto-interfaces/Program.rvn(15,49): error RAV1504: Cannot assign 'ConsoleKeyInfo' to 'EquatableTo<ConsoleKeyInfo>'

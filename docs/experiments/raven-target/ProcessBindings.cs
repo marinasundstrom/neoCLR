@@ -145,7 +145,7 @@ static class ProcessBindings
             F11 = 282,
             F12 = 283
         }
-        public struct ConsoleKeyInfo {
+        public struct ConsoleKeyInfo : EquatableTo<ConsoleKeyInfo> {
             public ConsoleKeyInfo(ConsoleKey key, bool shift, bool alt, bool control, Option<int> textScalar) { }
             public ConsoleKey Key => default;
             public bool Shift => default;

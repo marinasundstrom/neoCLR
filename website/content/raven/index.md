@@ -83,9 +83,11 @@ records the limits and allocation measurements. Typed and boxed record compariso
 are tested across interpreter, JIT and AOT. Generic record owners, unsupported union
 payloads, floating-point components, imported value-record discovery and broader generated formatting remain gaps;
 this is development support, not full record parity in a published release.
-Supported records can explicitly implement `EquatableTo<Self>` through their
-generated equality method and ordinary interface dispatch. Automatic native record
-interface synthesis remains a gap; unsupported promised contracts are rejected.
+Supported nongeneric records automatically implement `EquatableTo<Self>` through
+their generated equality method and ordinary interface dispatch. This includes
+imported ConsoleKeyInfo values and records containing them. Unsupported nongeneric
+component contracts are rejected at declaration. Native generic record equality
+remains a gap; .NET generic records retain their ordinary interface semantics.
 
 Development native record formatting now covers scalar and nested positional record
 structs, with named members, quoted text and boxed `ToString()` dispatch. It uses

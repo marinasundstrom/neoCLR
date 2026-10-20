@@ -1,0 +1,12 @@
+Focused RecordClassSemanticTests:
+  Restore was successful.
+Test run for /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    34, Skipped:     0, Total:    34, Duration: 7 s - Raven.CodeAnalysis.Tests.dll (net11.0)
+
+Explicit generic .NET interface defaults:
+Test run for /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 641 ms - Raven.CodeAnalysis.Tests.dll (net11.0)

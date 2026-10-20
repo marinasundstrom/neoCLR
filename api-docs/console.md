@@ -412,6 +412,11 @@ explicitly boxing a key still allocates. See the
 
 ### ConsoleKeyInfo value equality (development)
 
+The compiler automatically implements `EquatableTo<ConsoleKeyInfo>`. Interface
+conversion and `Equals` use the same generated value semantics, including when
+ConsoleKeyInfo is imported as a component of another supported record.
+
+
 | Member | Contract |
 | --- | --- |
 | `static func ==(left: ConsoleKeyInfo, right: ConsoleKeyInfo) -> bool` | True when Key, Shift, Alt, Control and the TextScalar case/payload are equal. |

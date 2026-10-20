@@ -30,8 +30,11 @@ that the type author keep equality and hashing consistent.
 
 Types that lack these contracts remain rejected with NEOMETA001 for record value
 operations. Storage/accessors/deconstruction remain available. In particular,
-ConsoleKeyInfo can compare/hash itself but does not yet declare EquatableTo<Self>,
-so using it as an imported component remains a gap. Duration lacks a declared hash
+The original cohort did not synthesize ConsoleKeyInfo's self-equality interface.
+[Automatic record interfaces](../record-auto-interfaces/README.md) now close that
+gap. The current missing-contract regression uses OverflowError, an ordinary
+struct with no self-equality contract. Historical results below retain their
+original cohort scope. Duration lacks a declared hash
 method. Neither is silently accepted using Object identity or a guessed contract.
 Generic record owners, constructed generic components, imported record discovery,
 explicit value-interface implementation resolution and generated formatting remain

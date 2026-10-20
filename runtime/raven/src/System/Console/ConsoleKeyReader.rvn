@@ -77,7 +77,7 @@ public enum ConsoleKey {
 /// <summary>A decoded key value. TextScalar is a Unicode scalar, not a grapheme or an allocated String.</summary>
 /// <remarks>Shift is reported only when explicitly encoded; uppercase text alone does not imply Shift.
 /// Legacy terminals cannot distinguish Tab from Ctrl+I, Enter from Ctrl+M or Backspace from Ctrl+H.
-/// Equality compares all fields, including the active TextScalar case and scalar value.
+/// Compiler-generated self-equality interface compares all fields, including the active TextScalar case and scalar value.
 /// Equal keys have equal hashes; None, Some(0) and an uninitialized Option are distinct.</remarks>
 public record struct ConsoleKeyInfo(val Key: ConsoleKey, val Shift: bool, val Alt: bool,
     val Control: bool, val TextScalar: Option<int>)

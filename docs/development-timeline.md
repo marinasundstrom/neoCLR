@@ -20296,3 +20296,25 @@ the selected neoCLR core declares `EquatableTo<T>`; therefore native records sti
 lack that synthesized interface contract. This is a compiler/core integration gap,
 not a proposed record-semantic divergence. The union-display slice does not repair
 that mapping or claim complete class-record/generic support.
+
+### Fixing record synthesis rather than explicit-interface workarounds — 2026-10-20
+
+The author questioned why record struct semantics remained difficult given working
+struct support, directed continuing, and asked that anything used to go around the
+actual problem be cleaned up. The assistant acknowledged that the preceding slice
+qualified explicit interfaces rather than fixing automatic synthesis. The assistant
+then moved the interface identity into the existing target runtime contract and
+connected normal binding to it: .NET retains IEquatable<T>, while supported native
+nongeneric records receive EquatableTo<Self> automatically. No record runtime ABI,
+manual ConsoleKeyInfo interface clause or equality implementation was introduced.
+The old ConsoleKeyInfo rejection fixture is replaced by positive imported-component
+coverage; an ordinary struct without a contract retains the negative test. Earlier
+explicit-interface evidence remains historical, not a recommended workaround.
+
+Nongeneric records with unsupported component bodies now reject at declaration.
+Generic native record equality remains a documented backend capability gap; its
+existing storage-only surface was not presented as full record semantics. The
+assistant validated source structs/classes and imported ConsoleKeyInfo interface
+calls and wrapper equality/hash, retained .NET generic interface tests, and refreshed
+API/website inputs. See [the qualification](experiments/record-auto-interfaces/README.md)
+for the test results and artifact identities. No release publication is claimed.
