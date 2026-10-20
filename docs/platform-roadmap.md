@@ -4,12 +4,14 @@
 The [POSIX host foundation](console-io.md#development-terminal-host-transport--2026-10-20)
 adds scoped caller-buffer bytes, nonblocking and timed/blocking reads, capabilities and input ownership. The [Raven text reads](experiments/console-text-reading/README.md) now add shared
 peek/character/count/line cursors and pass interpreter/JIT/AOT. [Internal key decoding](experiments/console-key-decoder/README.md) now has borrowed-buffer and value-result qualification; the Rust invocation now has a tested terminal cleanup service (not yet guest-bound); public terminal keys,
-async console readiness/cancellation, native terminal-provider parity and Windows
+async console readiness/cancellation, native guest/provider lifecycle integration and Windows
 Unicode input remain open; this is not guest API completion or replacement release qualification.
 Optional [synchronous byte capabilities](experiments/sync-streams/README.md) now have a
 MemoryStream implementation. Separate synchronous text wrappers and direct Console
 contracts are implemented under [qualification](experiments/sync-text/README.md),
-without forcing async providers to implement synchronous I/O.
+without forcing async providers to implement synchronous I/O. The matching C
+POSIX byte transport now passes direct native tests and removes legacy FILE
+read-ahead; guest binding and native invocation registration remain open.
 
 **Text release prerequisite (2026-10-19):** fix String and StringBuilder before
 selecting the replacement release candidate. Builder reuse improvements are

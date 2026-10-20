@@ -17,7 +17,8 @@ legacy seed services are supported; the public Console wrapper is never replaced
 -2 unavailable, -3 read failure. Codegen translates these outcomes to the existing
 private erased transport; other results become an invalid Int32 status, reaching
 Console's ordinary `System.Fail("invalid native I/O status")` path. The C adapter
-uses stdin and distinguishes EOF from `ferror`. Embedding hosts may replace the
+uses stdin and distinguishes EOF from read failure (POSIX uses unbuffered `read`;
+Windows retains `fgetc`/`ferror`). Embedding hosts may replace the
 adapter, including returning unavailable. There is no global guest value buffer or
 managed runtime dependency. Input is synchronous and can block; cancellation,
 worker contexts and concurrent host service isolation are not provided by this POC.

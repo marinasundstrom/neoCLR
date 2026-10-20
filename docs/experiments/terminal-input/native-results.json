@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "platform": "Darwin",
+  "buildCommand": [
+    "cc",
+    "-std=c11",
+    "-D_POSIX_C_SOURCE=200809L",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "/Users/robert/Projects/neoclr/docs/experiments/terminal-input/native.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/native-terminal-v3/terminal-native"
+  ],
+  "cases": [
+    {
+      "case": "redirected",
+      "passed": true
+    },
+    {
+      "case": "bytes",
+      "passed": true
+    },
+    {
+      "case": "switch",
+      "passed": true
+    },
+    {
+      "case": "keys",
+      "passed": true
+    },
+    {
+      "case": "hangup",
+      "passed": true
+    },
+    {
+      "case": "replace",
+      "passed": true
+    }
+  ]
+}

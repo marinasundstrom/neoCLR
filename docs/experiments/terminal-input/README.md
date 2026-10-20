@@ -32,3 +32,36 @@ The existing `console-key-decoder` executable was also replayed successfully in 
 interpreter built with the new root teardown path. That consumer exercises normal
 VM teardown; only the private lifecycle tests acquire a terminal through the new
 service. No guest acquisition binding or standalone native provider is implemented.
+
+## Native POSIX transport checkpoint
+
+```sh
+python3 docs/experiments/terminal-input/check_native.py --output target/native-terminal-v3
+```
+
+On macOS, use a matching Xcode compiler and SDK in PATH/SDKROOT. The checked-in
+`native-results.json` records six passing executable cases on macOS arm64, compiled
+with C11 and warnings as errors: redirected input rejection, all 256 legacy byte
+values/EOF, legacy-to-terminal switching without read-ahead, captured control and
+fragmented UTF-8/escape bytes, hangup/final disposal, and replacement of stdin while
+the original terminal is restored through its owned descriptor. The key-input case
+also checks empty/oversized buffers, invalid timeouts, nonblocking and timed idle
+reads, same/second-session rejection, legacy-reader exclusion, mode flags,
+close idempotency, closed reads and reacquisition.
+
+The matching native console output/range regression also passes:
+
+```sh
+cargo test --release -p neoclr-codegen --test console \
+  linked_stream_adapter_preserves_ranges_limits_and_channels
+```
+
+This qualifies the C transport directly, not guest key reads or native invocation
+registration. The native legacy byte reader now uses unbuffered POSIX read; there
+is no hidden FILE input buffer to strand bytes on a mode switch. The provider has
+no explicit heap allocation in its read path, but this checkpoint does not measure
+libc/kernel allocations or claim end-to-end throughput. Windows terminal input
+remains unsupported; its existing legacy byte reader is retained.
+
+The existing Raven console-text consumer was freshly linked against this C provider
+and passes as a standalone AOT executable with its Unicode/line input fixture.

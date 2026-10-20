@@ -284,3 +284,36 @@ read, overlap, stale handles, retryable close failures, finite deadlines, host r
 panic cleanup and real POSIX pseudo-terminal mode restoration, alongside existing
 invocation/worker regressions. Existing decoder and transport allocation evidence
 is unchanged and does not establish a complete Console.ReadKey path.
+
+## Native terminal transport checkpoint — 2026-10-20
+
+The C console provider now has a private POSIX terminal adapter matching the Rust
+transport's caller-buffer behavior. The existing native byte reader uses unbuffered
+`read` on POSIX, removing FILE read-ahead that could strand queued input when switching
+to terminal mode. A provider-local atomic lease excludes legacy byte reads while a
+terminal session is active and rejects a second session. Overlapping legacy reads
+also reject with the existing ReadFailed status instead of waiting on stdio locking,
+matching the Rust provider’s exclusive-input policy. This does not coordinate
+unrelated C libraries, direct descriptor reads, or independently linked Rust/C
+providers operating concurrently; guest invocation binding must select one owner.
+
+The caller zero-initializes and owns session storage, serializes access, and must not
+copy an active session. Open duplicates stdin with close-on-exec and saves termios;
+close restores that device even if stdin has been replaced. Failed restoration keeps
+ownership for retry. Final dispose attempts restoration and releases the descriptor
+and lease even if restoration fails, corresponding to the Rust best-effort Drop path.
+There is no automatic process-signal cleanup or native invocation registration yet.
+
+The private header in `docs/experiments/aot-console/console.h` describes open/read/
+close/dispose statuses. Read borrows a writable byte buffer of 1–65536 bytes; zero
+wait is nonblocking, -1 waits indefinitely, and positive milliseconds bound the total
+wait across interruptions. Bytes, pending and end are distinct. Poll rounds fractional
+milliseconds up. No key inference, UTF-8 decoding, Task, Promise or intermediate
+buffer is introduced. Ctrl+C/quit/suspend capture disables ISIG explicitly. Windows
+returns unsupported for terminal acquisition rather than treating redirected bytes
+as keys.
+
+[Six native executable checks](experiments/terminal-input/README.md#native-posix-transport-checkpoint)
+qualify transport behavior and restoration on macOS arm64. The existing output
+adapter regression also passes. Decoder-to-provider guest bindings and native
+invocation cleanup remain pending; this is not public Console.ReadKey support.

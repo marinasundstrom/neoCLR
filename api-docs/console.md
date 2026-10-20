@@ -323,3 +323,8 @@ The runtime also has a tested internal invocation-owned terminal cleanup service
 including bounded synchronous cancellation waits. It is not yet connected to guest
 Console acquisition, and does not establish JIT/AOT provider parity or a public
 cancellable ReadKey contract. Public signatures remain unchanged.
+
+A matching private POSIX byte transport is now tested in the native C host, including
+mode restoration and input ownership. Native legacy reads no longer use FILE
+read-ahead. This does not yet connect Console key reads to that transport or register
+it with native invocation cleanup. See the [native transport checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/terminal-input/README.md#native-posix-transport-checkpoint).

@@ -209,3 +209,22 @@ lifetimes, but requires deliberate coordination with buffered Console.In before 
 public key API can be added. Interim cancellation uses bounded 20 ms OS waits; this
 limits normal cancellation delay at the cost of periodic idle wakeups. A wakeable
 native wait is a future optimization, not shipped asynchronous console support.
+
+## Native provider transport checkpoint — 2026-10-20
+
+The native C host now supplies a private caller-buffer POSIX transport and removes
+legacy FILE read-ahead. The same input cursor must remain reachable when switching
+between standard reads and a terminal session; retaining a hidden stdio input queue
+would violate that requirement. The provider's explicit session storage and retryable
+close/final-dispose split make ownership visible without allocating a String or task
+for input. Its fixed-state design is a transport seam, not a new public Console API.
+
+This layer performs OS operations without managed heap access, so it belongs in the
+replaceable host adapter rather than adding key parsing to runtime intrinsics. Native
+invocation registration and guest handle binding still require lifecycle integration.
+No compiler mappings, CLI metadata or guest signatures change in this checkpoint.
+Compared with .NET's public key/text abstraction, these private bytes deliberately
+leave Unicode and key interpretation in Raven. Costs include a private native ABI,
+explicit caller cleanup, platform-specific termios storage, and currently unsupported
+Windows terminal acquisition. The Rust/C transports are tested separately; concurrent
+mixed-provider process-stdin ownership is not yet coordinated.
