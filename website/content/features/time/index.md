@@ -114,3 +114,10 @@ formats over the current culture/calendar policies; custom patterns, general for
 providers and full .NET locale patterns are not implemented. Unsupported specifiers
 fault. Existing numeric civil G/d conventions retain their precision and do not claim
 .NET's complete culture-pattern behavior.
+
+Development Date, TimeOfDay, Instant, TimeOffset and LocalDateTime now provide
+matching typed/Object equality and value hashes. LocalDateTime also implements
+EquatableTo and ComparableTo: it compares civil date first, then every tick of the
+time of day, without interpreting a timezone. These contracts apply to boxed values
+and supported record components as well. Hashes are execution-local, not persistent
+identifiers. Ordinary struct default value semantics remain a separate runtime gap.

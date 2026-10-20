@@ -4,7 +4,7 @@ import System.*
 
 import System.Result.*
 
-public struct LocalDateTime : Formattable {
+public struct LocalDateTime : EquatableTo<LocalDateTime>, ComparableTo<LocalDateTime>, Formattable {
     /// <summary>Parses a supported numeric civil value using Culture.Current.</summary>
     /// <param name="value">The complete text; whitespace, offsets and zone names are not accepted.</param>
     /// <returns>A value or InvalidFormat/OutOfRange. Use the explicit culture overload for deterministic input.</returns>
@@ -72,6 +72,28 @@ public struct LocalDateTime : Formattable {
 
     val Date: Date => StoredDate
     val Time: TimeOfDay => StoredTime
+
+    /// Compares both civil fields, without applying a timezone or culture.
+    func Equals(other: LocalDateTime) -> bool {
+        return StoredDate.Equals(other.StoredDate) && StoredTime.Equals(other.StoredTime)
+    }
+
+    /// Compares a boxed civil value; null and other types are unequal.
+    override func Equals(other: Object?) -> bool {
+        return other is LocalDateTime value && Equals(value)
+    }
+
+    /// Combines the date and complete tick-of-day hashes; not a persistent identifier.
+    override func GetHashCode() -> int {
+        return HashCode.Combine(StoredDate.GetHashCode(), StoredTime.GetHashCode())
+    }
+
+    /// Orders by date first, then complete tick of day; this does not compare instants.
+    func CompareTo(other: LocalDateTime) -> int {
+        let dateOrder = StoredDate.CompareTo(other.StoredDate)
+        return if dateOrder != 0 { dateOrder } else { StoredTime.CompareTo(other.StoredTime) }
+    }
+
     /// Formats with Culture.Current; supported formats are documented by DateTimeFormat.FormatLocalDateTime.
     func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
 

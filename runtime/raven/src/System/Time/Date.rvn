@@ -197,6 +197,16 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
         return StoredDayNumber == other.StoredDayNumber
     }
 
+    /// Compares the complete value with a boxed Date; null and other types are unequal.
+    override func Equals(other: Object?) -> bool {
+        return other is Date value && Equals(value)
+    }
+
+    /// Returns an execution-local value hash consistent with equality; not a persistent identifier.
+    override func GetHashCode() -> int {
+        return StoredDayNumber
+    }
+
     func CompareTo(other: Date) -> int {
         if StoredDayNumber < other.StoredDayNumber {
             return -1

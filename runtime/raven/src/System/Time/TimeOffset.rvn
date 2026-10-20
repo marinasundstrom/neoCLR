@@ -61,6 +61,16 @@ public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
 
     func Equals(other: TimeOffset) -> bool => StoredSeconds == other.StoredSeconds
 
+    /// Compares the complete value with a boxed TimeOffset; null and other types are unequal.
+    override func Equals(other: Object?) -> bool {
+        return other is TimeOffset value && Equals(value)
+    }
+
+    /// Returns an execution-local value hash consistent with equality; not a persistent identifier.
+    override func GetHashCode() -> int {
+        return StoredSeconds
+    }
+
     func CompareTo(other: TimeOffset) -> int {
         if StoredSeconds < other.StoredSeconds {
             return -1

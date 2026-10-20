@@ -1,0 +1,186 @@
+import System.*
+import System.Time.*
+import System.Collections.*
+import System.Result.*
+
+record struct Generic<T>(Value: T)
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func DateOf(day: int) -> Date {
+    let Ok(value) = Date.FromDayNumber(day) else { System.Fail("date factory") }
+    return value
+}
+func TimeOf(ticks: long) -> TimeOfDay {
+    let Ok(value) = TimeOfDay.FromTicks(ticks) else { System.Fail("time factory") }
+    return value
+}
+func OffsetOf(seconds: int) -> TimeOffset {
+    let Ok(value) = TimeOffset.FromSeconds(seconds) else { System.Fail("offset factory") }
+    return value
+}
+
+record struct DateRecord(Value: Date)
+
+func CheckDate(value: Date, same: Date, greater: Date) {
+    Check(value.Equals(same) && !value.Equals(greater), "Date typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "Date equal hashes")
+    let equatable: EquatableTo<Date> = value
+    Check(equatable.Equals(same) && !equatable.Equals(greater), "Date equality interface")
+    let comparable: ComparableTo<Date> = value
+    Check(comparable.CompareTo(same) == 0 && comparable.CompareTo(greater) < 0 && greater.CompareTo(value) > 0, "Date ordering")
+    let boxed: Object = value
+    let second: Object = same
+    Check(boxed.Equals(second) && second.Equals(boxed), "Date separate boxes")
+    Check(!boxed.Equals(greater) && !boxed.Equals(null) && !boxed.Equals(0), "Date boxed type and null checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "Date boxed hash")
+    let wrapper = DateRecord(value)
+    Check(wrapper == DateRecord(same) && wrapper != DateRecord(greater), "Date record")
+    Check(wrapper.GetHashCode() == DateRecord(same).GetHashCode(), "Date record hash")
+    let generic = Generic<Date>(value)
+    Check(generic == Generic<Date>(same) && generic != Generic<Date>(greater), "Date generic")
+    Check(generic.GetHashCode() == Generic<Date>(same).GetHashCode(), "Date generic hash")
+    Check(Generic<Object>(boxed) == Generic<Object>(second) && Generic<Object>(boxed) != Generic<Object>(greater), "Date erased generic")
+    let pair = KeyValuePair<Date, int>(value, 3)
+    Check(pair == KeyValuePair<Date, int>(same, 3) && pair != KeyValuePair<Date, int>(greater, 3), "Date imported pair")
+}
+
+record struct TimeOfDayRecord(Value: TimeOfDay)
+
+func CheckTimeOfDay(value: TimeOfDay, same: TimeOfDay, greater: TimeOfDay) {
+    Check(value.Equals(same) && !value.Equals(greater), "TimeOfDay typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "TimeOfDay equal hashes")
+    let equatable: EquatableTo<TimeOfDay> = value
+    Check(equatable.Equals(same) && !equatable.Equals(greater), "TimeOfDay equality interface")
+    let comparable: ComparableTo<TimeOfDay> = value
+    Check(comparable.CompareTo(same) == 0 && comparable.CompareTo(greater) < 0 && greater.CompareTo(value) > 0, "TimeOfDay ordering")
+    let boxed: Object = value
+    let second: Object = same
+    Check(boxed.Equals(second) && second.Equals(boxed), "TimeOfDay separate boxes")
+    Check(!boxed.Equals(greater) && !boxed.Equals(null) && !boxed.Equals(0), "TimeOfDay boxed type and null checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "TimeOfDay boxed hash")
+    let wrapper = TimeOfDayRecord(value)
+    Check(wrapper == TimeOfDayRecord(same) && wrapper != TimeOfDayRecord(greater), "TimeOfDay record")
+    Check(wrapper.GetHashCode() == TimeOfDayRecord(same).GetHashCode(), "TimeOfDay record hash")
+    let generic = Generic<TimeOfDay>(value)
+    Check(generic == Generic<TimeOfDay>(same) && generic != Generic<TimeOfDay>(greater), "TimeOfDay generic")
+    Check(generic.GetHashCode() == Generic<TimeOfDay>(same).GetHashCode(), "TimeOfDay generic hash")
+    Check(Generic<Object>(boxed) == Generic<Object>(second) && Generic<Object>(boxed) != Generic<Object>(greater), "TimeOfDay erased generic")
+    let pair = KeyValuePair<TimeOfDay, int>(value, 3)
+    Check(pair == KeyValuePair<TimeOfDay, int>(same, 3) && pair != KeyValuePair<TimeOfDay, int>(greater, 3), "TimeOfDay imported pair")
+}
+
+record struct InstantRecord(Value: Instant)
+
+func CheckInstant(value: Instant, same: Instant, greater: Instant) {
+    Check(value.Equals(same) && !value.Equals(greater), "Instant typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "Instant equal hashes")
+    let equatable: EquatableTo<Instant> = value
+    Check(equatable.Equals(same) && !equatable.Equals(greater), "Instant equality interface")
+    let comparable: ComparableTo<Instant> = value
+    Check(comparable.CompareTo(same) == 0 && comparable.CompareTo(greater) < 0 && greater.CompareTo(value) > 0, "Instant ordering")
+    let boxed: Object = value
+    let second: Object = same
+    Check(boxed.Equals(second) && second.Equals(boxed), "Instant separate boxes")
+    Check(!boxed.Equals(greater) && !boxed.Equals(null) && !boxed.Equals(0), "Instant boxed type and null checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "Instant boxed hash")
+    let wrapper = InstantRecord(value)
+    Check(wrapper == InstantRecord(same) && wrapper != InstantRecord(greater), "Instant record")
+    Check(wrapper.GetHashCode() == InstantRecord(same).GetHashCode(), "Instant record hash")
+    let generic = Generic<Instant>(value)
+    Check(generic == Generic<Instant>(same) && generic != Generic<Instant>(greater), "Instant generic")
+    Check(generic.GetHashCode() == Generic<Instant>(same).GetHashCode(), "Instant generic hash")
+    Check(Generic<Object>(boxed) == Generic<Object>(second) && Generic<Object>(boxed) != Generic<Object>(greater), "Instant erased generic")
+    let pair = KeyValuePair<Instant, int>(value, 3)
+    Check(pair == KeyValuePair<Instant, int>(same, 3) && pair != KeyValuePair<Instant, int>(greater, 3), "Instant imported pair")
+}
+
+record struct TimeOffsetRecord(Value: TimeOffset)
+
+func CheckTimeOffset(value: TimeOffset, same: TimeOffset, greater: TimeOffset) {
+    Check(value.Equals(same) && !value.Equals(greater), "TimeOffset typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "TimeOffset equal hashes")
+    let equatable: EquatableTo<TimeOffset> = value
+    Check(equatable.Equals(same) && !equatable.Equals(greater), "TimeOffset equality interface")
+    let comparable: ComparableTo<TimeOffset> = value
+    Check(comparable.CompareTo(same) == 0 && comparable.CompareTo(greater) < 0 && greater.CompareTo(value) > 0, "TimeOffset ordering")
+    let boxed: Object = value
+    let second: Object = same
+    Check(boxed.Equals(second) && second.Equals(boxed), "TimeOffset separate boxes")
+    Check(!boxed.Equals(greater) && !boxed.Equals(null) && !boxed.Equals(0), "TimeOffset boxed type and null checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "TimeOffset boxed hash")
+    let wrapper = TimeOffsetRecord(value)
+    Check(wrapper == TimeOffsetRecord(same) && wrapper != TimeOffsetRecord(greater), "TimeOffset record")
+    Check(wrapper.GetHashCode() == TimeOffsetRecord(same).GetHashCode(), "TimeOffset record hash")
+    let generic = Generic<TimeOffset>(value)
+    Check(generic == Generic<TimeOffset>(same) && generic != Generic<TimeOffset>(greater), "TimeOffset generic")
+    Check(generic.GetHashCode() == Generic<TimeOffset>(same).GetHashCode(), "TimeOffset generic hash")
+    Check(Generic<Object>(boxed) == Generic<Object>(second) && Generic<Object>(boxed) != Generic<Object>(greater), "TimeOffset erased generic")
+    let pair = KeyValuePair<TimeOffset, int>(value, 3)
+    Check(pair == KeyValuePair<TimeOffset, int>(same, 3) && pair != KeyValuePair<TimeOffset, int>(greater, 3), "TimeOffset imported pair")
+}
+
+record struct LocalDateTimeRecord(Value: LocalDateTime)
+
+func CheckLocalDateTime(value: LocalDateTime, same: LocalDateTime, greater: LocalDateTime) {
+    Check(value.Equals(same) && !value.Equals(greater), "LocalDateTime typed equality")
+    Check(value.GetHashCode() == same.GetHashCode(), "LocalDateTime equal hashes")
+    let equatable: EquatableTo<LocalDateTime> = value
+    Check(equatable.Equals(same) && !equatable.Equals(greater), "LocalDateTime equality interface")
+    let comparable: ComparableTo<LocalDateTime> = value
+    Check(comparable.CompareTo(same) == 0 && comparable.CompareTo(greater) < 0 && greater.CompareTo(value) > 0, "LocalDateTime ordering")
+    let boxed: Object = value
+    let second: Object = same
+    Check(boxed.Equals(second) && second.Equals(boxed), "LocalDateTime separate boxes")
+    Check(!boxed.Equals(greater) && !boxed.Equals(null) && !boxed.Equals(0), "LocalDateTime boxed type and null checks")
+    Check(boxed.GetHashCode() == value.GetHashCode(), "LocalDateTime boxed hash")
+    let wrapper = LocalDateTimeRecord(value)
+    Check(wrapper == LocalDateTimeRecord(same) && wrapper != LocalDateTimeRecord(greater), "LocalDateTime record")
+    Check(wrapper.GetHashCode() == LocalDateTimeRecord(same).GetHashCode(), "LocalDateTime record hash")
+    let generic = Generic<LocalDateTime>(value)
+    Check(generic == Generic<LocalDateTime>(same) && generic != Generic<LocalDateTime>(greater), "LocalDateTime generic")
+    Check(generic.GetHashCode() == Generic<LocalDateTime>(same).GetHashCode(), "LocalDateTime generic hash")
+    Check(Generic<Object>(boxed) == Generic<Object>(second) && Generic<Object>(boxed) != Generic<Object>(greater), "LocalDateTime erased generic")
+    let pair = KeyValuePair<LocalDateTime, int>(value, 3)
+    Check(pair == KeyValuePair<LocalDateTime, int>(same, 3) && pair != KeyValuePair<LocalDateTime, int>(greater, 3), "LocalDateTime imported pair")
+}
+
+func Main() {
+    CheckDate(DateOf(0), DateOf(0), DateOf(1))
+    CheckDate(DateOf(3652057), DateOf(3652057), DateOf(3652058))
+    CheckTimeOfDay(TimeOf(0), TimeOf(0), TimeOf(1))
+    CheckTimeOfDay(TimeOf(863999999998L), TimeOf(863999999998L), TimeOf(863999999999L))
+    CheckTimeOfDay(TimeOf(1), TimeOf(1), TimeOf(4294967297L))
+    CheckInstant(Instant.FromUnixTimeTicks(-9223372036854775807L - 1L), Instant.FromUnixTimeTicks(-9223372036854775807L - 1L), Instant.FromUnixTimeTicks(9223372036854775807L))
+    CheckInstant(Instant.FromUnixTimeTicks(-1), Instant.FromUnixTimeTicks(-1), Instant.FromUnixTimeTicks(0))
+    CheckInstant(Instant.FromUnixTimeTicks(1), Instant.FromUnixTimeTicks(1), Instant.FromUnixTimeTicks(4294967297L))
+    CheckTimeOffset(OffsetOf(-64800), OffsetOf(-64800), OffsetOf(64800))
+    CheckTimeOffset(OffsetOf(0), OffsetOf(0), OffsetOf(1))
+    let start = LocalDateTime.Create(DateOf(0), TimeOf(0))
+    let nextTick = LocalDateTime.Create(DateOf(0), TimeOf(1))
+    CheckLocalDateTime(start, start, nextTick)
+    let endDay = LocalDateTime.Create(DateOf(0), TimeOf(863999999999L))
+    let nextDay = LocalDateTime.Create(DateOf(1), TimeOf(0))
+    CheckLocalDateTime(endDay, endDay, nextDay)
+    CheckLocalDateTime(LocalDateTime.Create(DateOf(3652058), TimeOf(863999999998L)), LocalDateTime.Create(DateOf(3652058), TimeOf(863999999998L)), LocalDateTime.Create(DateOf(3652058), TimeOf(863999999999L)))
+    let dateDefault: Date = default
+    let timeDefault: TimeOfDay = default
+    let instantDefault: Instant = default
+    let offsetDefault: TimeOffset = default
+    let localDefault: LocalDateTime = default
+    Check(dateDefault.Equals(DateOf(0)) && timeDefault.Equals(TimeOf(0)), "civil defaults")
+    Check(instantDefault.Equals(Instant.FromUnixTimeTicks(0)) && offsetDefault.Equals(TimeOffset.Zero), "timeline defaults")
+    Check(localDefault.Equals(start), "local default")
+    let zeroInstant = Instant.FromUnixTimeTicks(0)
+    let collision = Instant.FromUnixTimeTicks(4294967297L)
+    Check(zeroInstant.GetHashCode() == collision.GetHashCode() && !zeroInstant.Equals(collision), "hash collision is not equality")
+    Check(TimeOf(1).GetHashCode() != TimeOf(4294967297L).GetHashCode(), "high time bits")
+    Check(start.GetHashCode() != nextTick.GetHashCode() && start.GetHashCode() != nextDay.GetHashCode(), "both local fields hashed")
+    let instantBox: Object = zeroInstant
+    Check(!instantBox.Equals(Duration.FromTicks(0)), "different tick value types")
+    Console.WriteLine("PASS time values")
+}

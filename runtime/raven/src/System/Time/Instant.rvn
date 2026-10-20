@@ -51,6 +51,16 @@ public struct Instant : ComparableTo<Instant>, EquatableTo<Instant> {
         return StoredTicks == other.StoredTicks
     }
 
+    /// Compares the complete value with a boxed Instant; null and other types are unequal.
+    override func Equals(other: Object?) -> bool {
+        return other is Instant value && Equals(value)
+    }
+
+    /// Returns an execution-local value hash consistent with equality; not a persistent identifier.
+    override func GetHashCode() -> int {
+        return (int)StoredTicks ^ (int)(StoredTicks >> 32)
+    }
+
     func CompareTo(other: Instant) -> int {
         if StoredTicks < other.StoredTicks {
             return -1

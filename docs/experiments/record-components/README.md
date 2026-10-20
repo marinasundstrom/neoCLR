@@ -35,8 +35,10 @@ The original cohort did not synthesize ConsoleKeyInfo's self-equality interface.
 gap. The current missing-contract regression uses OverflowError, an ordinary
 struct with no self-equality contract. Historical results below retain their
 original cohort scope. The [Duration follow-up](../duration-values/README.md) now supplies
-its Object equality/hash contract; the missing-hash fixture uses Date until its own
-contract is completed. Missing contracts are not accepted using guessed identity.
+its Object equality/hash contract. The [time-value follow-up](../time-values/README.md)
+now also completes Date and the other time structs, replacing that public missing-hash
+fixture with positive coverage. The compiler source-core probe retains its intentionally
+incomplete imported type to test missing-hash rejection. Missing contracts are not accepted using guessed identity.
 Generic record owners, constructed generic components, imported record discovery,
 explicit value-interface implementation resolution and generated formatting remain
 separate work. Source-defined ordinary structs are not newly admitted by this slice.
@@ -48,8 +50,9 @@ The compiler source-core metadata probe now covers an imported positive contract
 missing hashing, a method-only lookalike and an interface with the wrong self type.
 The executable consumer exercises Index direction/offset, both Range boundaries,
 Option<Index>, nested source records, default storage and boxed wrapper operations.
-The two negative consumers retain targeted diagnostics for missing hash and missing
-interface contracts. Boxing a wrapper explicitly still allocates.
+Historical negative results cover missing hash and missing interface contracts. The
+remaining public negative consumer covers a missing interface; missing-hash rejection
+is covered by the compiler source-core probe. Boxing a wrapper explicitly still allocates.
 
 Build with `scripts/build-native-project.py --profile console` using:
 

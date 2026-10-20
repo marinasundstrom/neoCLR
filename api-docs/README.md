@@ -2738,3 +2738,11 @@ culture-first String.Format overloads, civil standard formats and Duration displ
 The historical one-argument checkpoint above is superseded; custom implementations
 must accept Culture and consumers must be recompiled. No new type selection or manual
 exclusion is required. [Contract and validation](../docs/experiments/formattable-culture/README.md).
+
+## Time-value contracts — 2026-10-20
+
+Refresh both references for Object equality/hash on Date, TimeOfDay, Instant,
+TimeOffset and LocalDateTime, and typed LocalDateTime equality/ordering. Project the
+existing self-equality/comparison interfaces for the six time structs, including
+Duration. No new types or manual exclusions are needed.
+[Contract and validation](../docs/experiments/time-values/README.md).

@@ -8,6 +8,18 @@ static class CalendarBindings
     public const string TimeResult = "System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>";
     sealed record Member(string Owner, string Name, string[] Args, string Result, bool Instance = false);
     static readonly Member[] Members = [
+        new("Date", "Equals", ["System.Object"], "Boolean", true),
+        new("Date", "GetHashCode", [], "Int32", true),
+        new("TimeOfDay", "Equals", ["System.Object"], "Boolean", true),
+        new("TimeOfDay", "GetHashCode", [], "Int32", true),
+        new("Instant", "Equals", ["System.Object"], "Boolean", true),
+        new("Instant", "GetHashCode", [], "Int32", true),
+        new("TimeOffset", "Equals", ["System.Object"], "Boolean", true),
+        new("TimeOffset", "GetHashCode", [], "Int32", true),
+        new("LocalDateTime", "Equals", ["System.Object"], "Boolean", true),
+        new("LocalDateTime", "GetHashCode", [], "Int32", true),
+        new("LocalDateTime", "Equals", ["System.Time.LocalDateTime"], "Boolean", true),
+        new("LocalDateTime", "CompareTo", ["System.Time.LocalDateTime"], "Int32", true),
         new("Date", "ToString", ["String"], "String", true),
         new("Date", "ToString", ["String", "System.Globalization.Culture"], "String", true),
         new("TimeOfDay", "ToString", ["String"], "String", true),
@@ -100,10 +112,14 @@ static class CalendarBindings
         "Equals" or "CompareTo" => "other",
         _ => throw new InvalidDataException("Missing calendar parameter name: " + member.Name)
     };
+    static bool IsObjectOverride(Member member) =>
+        member.Name is "ToString" or "GetHashCode" && member.Args.Length == 0
+        || member.Name == "Equals" && member.Args.SequenceEqual(["System.Object"]);
+
     public static string Declarations => "namespace Time { public interface Clock { Instant Now { get; } } public class SystemClock : Clock { public SystemClock() { } public Instant Now => default; }\n" + string.Join("\n", Members.GroupBy(m => m.Owner).Select(group =>
-        $"public struct {group.Key}{(group.Key is "Date" or "TimeOfDay" or "LocalDateTime" or "Duration" ? " : System.Formattable" : "")} {{ " + string.Join(" ", group.Select(m =>
+        $"public struct {group.Key} : System.EquatableTo<{group.Key}>, System.ComparableTo<{group.Key}>{(group.Key is "Date" or "TimeOfDay" or "LocalDateTime" or "Duration" ? ", System.Formattable" : "")} {{ " + string.Join(" ", group.Select(m =>
             m.Name.StartsWith("get_") ? $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name[4..]} => default;"
-            : $"public {((m.Name == "ToString" && m.Args.Length == 0 || m.Owner == "Duration" && (m.Name == "GetHashCode" || m.Name == "Equals" && m.Args.SequenceEqual(["System.Object"]))) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }")) + " }";
+            : $"public {(IsObjectOverride(m) ? "override " : m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }")) + " }";
     public static void ProjectLayout(ModuleDefinition module)
     {
         var attribute = new TypeDefinition("System.Runtime.CompilerServices", "IsReadOnlyAttribute",
@@ -159,7 +175,7 @@ static class CalendarBindings
         var signature = RuntimeSignatures.Match(reference, definition, t => GlobalizationBindings.Type(t) ?? Type(t) ?? GenericUnionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => "System.Time." + m.Owner == reference.DeclaringType.FullName && m.Name == reference.Name
             && m.Instance == reference.HasThis && m.Args.SequenceEqual(signature.Args) && m.Result == signature.Result);
-        if (member is null || (definition.IsVirtual && !definition.IsFinal && !(member.Owner is "Date" or "TimeOfDay" or "LocalDateTime" or "Duration" && member.Name == "ToString" && member.Args.Length == 0 && !definition.IsNewSlot))) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
+        if (member is null || (definition.IsVirtual && !definition.IsFinal && !(!definition.IsNewSlot && IsObjectOverride(member)))) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
         return new(member.Instance ? AdapterName(member) : "System.Time." + member.Owner + "::" + member.Name,
             member.Instance ? new[] { "System.Time." + member.Owner + "&" }.Concat(member.Args).ToArray() : member.Args, member.Result);
     }

@@ -26,3 +26,7 @@ this Duration fix. No compiler or runtime backend change is required. The tested
 is the retained `4c051e332-dirty-record-policy` binary (source committed as Raven
 `8da3a45f8`), with fresh `target/duration-value-libraries` and
 `target/duration-value-bundle/bundle`. API snapshots use the matching libraries.
+
+The subsequent [time-value follow-up](../time-values/README.md) completes Date and
+retires the public MissingHash fixture. The old diagnostic files are historical;
+the compiler's deliberately incomplete imported-type test remains the negative case.

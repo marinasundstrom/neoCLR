@@ -1,0 +1,9 @@
+PASS production native metadata rendering with selected explicit core contract
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.019s
+
+OK
+
+Integrated native preview; checked 4927 neoCLR website pages; 124 legacy pages retained
+Built and checked 4927 RavenDoc pages: /Users/robert/Projects/neoclr/target/website

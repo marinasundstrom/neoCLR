@@ -1,0 +1,3 @@
+native build: /Users/robert/Projects/neoclr/docs/experiments/time-values/Program.rvn(132,49): error RAV1504: Cannot assign 'LocalDateTime' to 'EquatableTo<LocalDateTime>'
+/Users/robert/Projects/neoclr/docs/experiments/time-values/Program.rvn(134,51): error RAV1504: Cannot assign 'LocalDateTime' to 'ComparableTo<LocalDateTime>'
+/Users/robert/Projects/neoclr/docs/experiments/time-values/Program.rvn(135,91): error RAV0117: 'LocalDateTime' has no member 'CompareTo'.
