@@ -1,0 +1,1 @@
+/Users/robert/Projects/neoclr/docs/experiments/record-formatting/Unsupported.rvn(3,13): error NEOMETA001: Native emission does not support record formatting requires supported scalar components and native text helpers: struct Wrapped<T>.

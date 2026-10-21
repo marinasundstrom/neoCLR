@@ -1,5 +1,5 @@
 import System.*
-record struct Wrapped<T>(Value: T)
+record Wrapped(Value: int)
 func Main() {
-    Console.WriteLine(Wrapped<int>(1).ToString())
+    Console.WriteLine(Wrapped(1).ToString())
 }

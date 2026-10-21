@@ -14359,3 +14359,16 @@ open elements and rank-taking construction remain gaps. Native snapshots, descri
 queries and reflective array allocation share retention of array type tokens and
 executable array casts. The JSON proof uses the built-in test runner's filter and
 the normal runtime-type deserialization overload, without a redundant vector token.
+
+## Generic record display closure — 2026-10-21
+
+The matching native compiler now emits positional record-struct display for
+type-parameter components using ordinary Object conversion/virtual dispatch, with
+Raven text quoting and null handling. It does not change the Runtime Contract,
+CLI bridge representation, metadata ABI or ordinary .NET emission. The compiler
+owns synthesis; the runtime owns boxing, GC and virtual dispatch. Native specialization
+consumes those ordinary methods; future unboxing/constrained-call optimization must
+preserve the same behavior. Generic value fields currently box once and nested
+generic formatting may allocate intermediate strings. Record classes remain a gap.
+See [implementation and focused evidence](experiments/record-formatting/README.md#generic-component-display--2026-10-21).
+Previously built imported libraries do not acquire overrides until rebuilt.

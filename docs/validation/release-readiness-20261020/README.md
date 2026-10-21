@@ -7,19 +7,19 @@ or a passed package gate. No candidate version, tag or publication date is selec
 
 ## Foundation closure checkpoint — 2026-10-21
 
-Author-directed DI and localization additions have a tested integration checkpoint.
-The subsequent requirement for open-generic localizer providers remains open. See [DI evidence](../../experiments/dependency-injection/README.md),
-[localization evidence](../../experiments/localization/README.md) and
-[method discovery](../../experiments/generic-method-state/README.md). The compiler
-for this development cohort is clean Raven `codex/neoclr` revision `793b71408`;
-reports retain runtime/backend/library input hashes. This supersedes the older
-compiler identity below for these tests only, not for unrerun package gates.
+Author-directed DI and localization now include open-generic provider integration,
+committed in neoCLR `014cb0fb3` with Raven `cc64f787d`. See the
+[114 built-in executions](../../experiments/dependency-injection/open-generic-validation.json)
+and [bounded contract](../../experiments/dependency-injection/open-generics.md).
+This supersedes the earlier provider blocker; it does not replace extracted-package
+qualification. Existing library artifacts retain their own compiler identities.
 
-Complete open-generic provider integration, then return to the remaining generated
-record/display scope and matched package qualification. Do not expand localization/DI or reflection to fill every possible
-API gap: collection/keyed constructor injection,
-pluralization and caching are documented follow-ups. No release tag or version is
-selected, and no website publication is implied by a local build.
+Generic component display in source record structs now passes 30 built-in executions
+with Raven `2607945d3`; see [evidence](../../experiments/record-formatting/generic-validation.json).
+Continue through record-class semantics, rebuilt libraries and matched package qualification.
+Do not expand localization/DI or reflection to fill every possible API gap:
+collection/keyed constructor injection, pluralization and caching remain follow-ups.
+No release tag or version is selected, and a local website build is not publication.
 
 ## Earlier stabilization checkpoint
 

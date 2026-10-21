@@ -146,3 +146,31 @@ missing-contract regression. [Execution evidence](floating-validation-20261021.j
 records compiler/runtime identities and results. The preceding gap audit retains the
 original equality-synthesis rejection as a baseline. Generic record formatting and
 record classes remain gaps; clean release-package qualification remains separate.
+
+## Generic component display — 2026-10-21
+
+The [baseline](generic-baseline.txt) reproduces rejection with compiler `cc64f787d`.
+Native generated display now admits positional record structs with type-parameter
+components. Each such component is evaluated once into an Object local. Null is
+printed explicitly; String and Char retain Raven's quoting/escaping; other values
+use ordinary virtual `ToString` dispatch. Nested generic records therefore use
+their own override. Known nongeneric components retain the existing direct path.
+This follows .NET's ordinary value/Object display contract while retaining Raven's
+language-level punctuation. The shared .NET emitter is unchanged.
+
+This is a correctness closure, not a performance claim: a generic value component
+is boxed once, and nested generic display produces an intermediate string. Reference
+components do not need a value box. Builder, escaping and output allocations remain.
+There is no new reflection descriptor, intrinsic or metadata ABI. Native generic
+specialization consumes ordinary generated method bodies. Record classes and
+recursive object-display policies remain outside this slice. The unsupported
+fixture now uses a record class; older validation files retain the earlier generic
+rejection as historical evidence.
+
+The built-in `record-formatting` suite adds generic scalar/text/null and nested/boxed
+cases, including collection between boxing and dispatch. Validation for this slice
+is retained separately in [generic-validation.json](generic-validation.json): all
+ten tests pass in interpreter/native/JIT execution (30 executions), with Raven
+`2607945d3`. The record-class rejection remains targeted. Package qualification remains
+open. Core/library artifacts from the preceding cohort are reused, so this does not
+claim that previously built imported generic records gained new overrides.

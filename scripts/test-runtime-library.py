@@ -364,6 +364,8 @@ RECORD_FORMATTING_NAMES = [
     'Floating record contracts agree across boxed interface and nested calls',
     'Floating records use value equality for NaNs zeros and infinities',
     'Floating record display uses primitive text including negative zero',
+    'Generic record display uses nested and boxed value dispatch',
+    'Generic record display preserves text null and primitive contracts',
     'Records use imported value formatting across typed and boxed calls',
     'Nested records and unions retain imported value display contracts',
     'Record scalar formatting preserves null and original Unicode text',

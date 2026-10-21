@@ -117,3 +117,27 @@ func FloatingText() -> Result<unit, TestFailure> {
     _ = Assert.Equal("OptionalFloating { Value = Option.Some(NaN) }", OptionalFloating(Some(nan)).ToString())?
     return Assert.Equal("NestedFloating { Value = Floating { Wide = 1.5, Narrow = 2.5 } }", NestedFloating(value).ToString())
 }
+
+record struct Wrapped<T>(Value: T)
+
+[Test("Generic record display preserves text null and primitive contracts")]
+func GenericText() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("Wrapped { Value = 42 }", Wrapped<int>(42).ToString())?
+    _ = Assert.Equal("Wrapped { Value = True }", Wrapped<bool>(true).ToString())?
+    _ = Assert.Equal("Wrapped { Value = NaN }", Wrapped<double>(Double.NaN).ToString())?
+    _ = Assert.Equal("Wrapped { Value = \"é\\\"\\\\\" }", Wrapped<string>("é\"\\").ToString())?
+    _ = Assert.Equal("Wrapped { Value = 'é' }", Wrapped<Char>('é').ToString())?
+    _ = Assert.Equal("Wrapped { Value = \"text\" }", Wrapped<object>("text").ToString())?
+    return Assert.Equal("Wrapped { Value = null }", Wrapped<string?>(null).ToString())
+}
+
+[Test("Generic record display uses nested and boxed value dispatch")]
+func GenericDispatch() -> Result<unit, TestFailure> {
+    let value = Wrapped<Position>(Position(Index.FromEnd(2)))
+    let boxed: object = value
+    System.Runtime.GC.Collect()
+    _ = Assert.Equal("Wrapped { Value = Position { Value = ^2 } }", value.ToString())?
+    _ = Assert.Equal(value.ToString(), boxed.ToString())?
+    _ = Assert.Equal("Wrapped { Value = Read, Write }", Wrapped<Access>(Access.Read | Access.Write).ToString())?
+    return Assert.Equal("Wrapped { Value = Wrapped { Value = 5 } }", Wrapped<Wrapped<int>>(Wrapped<int>(5)).ToString())
+}

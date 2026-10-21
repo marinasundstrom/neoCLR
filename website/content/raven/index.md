@@ -98,8 +98,12 @@ storage still allocate, and the current 65,536 UTF-8-byte builder limit applies.
 Closed declared union components now display their case and payloads through the same
 builder; an uninitialized carrier remains distinct from an empty case. Imported
 values with declared public ToString and floating primitives use direct calls.
-Int32-backed enums reuse Object display with a temporary box. Generic record and
-record-class formatting remain gaps. This is
+Int32-backed enums reuse Object display with a temporary box. Development compiler
+support also covers type-parameter components in source record structs, preserving
+quoted text and null through ordinary Object dispatch. Generic value components box
+once and nested generic display can allocate intermediate strings; previously built
+libraries need rebuilding to gain those overrides. Record-class formatting remains
+a gap. This is
 pre-release compiler work, not a claim of full record support.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)
