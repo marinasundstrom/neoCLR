@@ -49,19 +49,12 @@ fn sample_uses_generic_functions_without_losing_reference_access() {
 }
 
 #[test]
-fn generic_method_reflection_reports_its_current_limit() {
+fn generic_method_reflection_describes_unbound_signatures() {
     let module = frontend::compile("record Helpers() { static func Id<T>(x: T) -> T { return x } }\nfunc Main() -> () { typeof(Helpers).GetMethods() }").unwrap();
-    let error = LoadedProgram::new(&module)
+    LoadedProgram::new(&module)
         .unwrap()
         .run(Limits::default())
-        .unwrap_err();
-    assert!(
-        error
-            .message
-            .contains("generic method definition reflection"),
-        "{}",
-        error.message
-    );
+        .unwrap();
 }
 
 #[test]

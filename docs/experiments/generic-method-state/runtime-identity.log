@@ -1,0 +1,9 @@
+Blocking waiting for file lock on artifact directory
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 19s
+     Running unittests src/lib.rs (target/debug/deps/neoclr-1b3c574e258f4c55)
+
+running 1 test
+test reflection::generic_method_state_tests::method_snapshots_distinguish_owner_and_method_parameters ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 370 filtered out; finished in 0.29s

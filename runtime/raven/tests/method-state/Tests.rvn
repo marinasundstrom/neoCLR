@@ -1,0 +1,50 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Result.*
+import NeoClr.Testing.*
+
+class MethodOwner<T> {
+    func Read(value: T) -> T => value
+    func Echo<U>(value: U) -> U => value
+    func Other<U>(value: U) -> U => value
+}
+
+[Test("Method generic state separates owner and method parameters")]
+func MethodState() -> Result<unit, TestFailure> {
+    var count = 0
+    var echo: TypeInfo? = null
+    var other: TypeInfo? = null
+    for method in typeof(MethodOwner<int>).GetMethods() {
+        if method.Name == "Read" {
+            _ = Assert.True(!method.IsGenericMethod, "ordinary method")?
+            _ = Assert.True(!method.IsGenericMethodDefinition, "ordinary definition")?
+            _ = Assert.True(!method.ContainsGenericParameters, "closed owner")?
+            _ = Assert.True(method.ReturnType.Equals(typeof(int)), "owner substitution")?
+            count += 1
+        }
+        if method.Name == "Echo" || method.Name == "Other" {
+            _ = Assert.True(method.IsGenericMethod, "generic method")?
+            _ = Assert.True(method.IsGenericMethodDefinition, "generic definition")?
+            _ = Assert.True(method.ContainsGenericParameters, "unbound method parameter")?
+            _ = Assert.True(method.ReturnType.IsGenericParameter, "parameter descriptor")?
+            _ = Assert.Equal("U", method.ReturnType.DisplayName)?
+            for parameter in method.GetParameters() {
+                _ = Assert.True(parameter.ParameterType.Equals(method.ReturnType), "same parameter identity")?
+            }
+            if method.Name == "Echo" {
+                echo = method.ReturnType
+            } else {
+                other = method.ReturnType
+            }
+            count += 1
+        }
+    }
+    _ = Assert.Equal(3, count)?
+    if echo is TypeInfo first && other is TypeInfo second {
+        return Assert.True(!first.Equals(second), "different method declarations")
+    }
+    return Assert.True(false, "missing method descriptors")
+}

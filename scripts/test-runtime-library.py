@@ -456,7 +456,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -464,6 +464,8 @@ def main():
     parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
     modes = args.mode or ['jit']
+    if 'method-state' in (args.suite or []) and modes != ['interpreter']:
+        parser.error('method-state currently requires --mode interpreter; native type-method retention is pending')
     bundled_bin = args.bundle.resolve() / 'bin'
     if (bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')).is_file():
         if args.runtime == parser.get_default('runtime'):
@@ -494,6 +496,7 @@ def main():
     validation_spec.loader.exec_module(validation)
     relationship_names = ['Arrays preserve element identity', 'Closed generic types remain distinct', 'Type identity and assignment direction', 'Boxing and instance checks reject null', 'Interface assignment includes inherited contracts', 'Subclass checks are strict and exclude interfaces']
     expected = [
+        ('method-state', 0, 'PASS Method generic state separates owner and method parameters\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
         ('type-relations', 0, ''.join('PASS ' + n + '\n' for n in relationship_names) + f'Tests: {len(relationship_names)}, passed: {len(relationship_names)}, failed: 0, skipped: 0\n'),
         ('http-lifetime', 0, ''.join('PASS ' + n + '\n' for n in HTTP_LIFETIME_NAMES) + f'Tests: {len(HTTP_LIFETIME_NAMES)}, passed: {len(HTTP_LIFETIME_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-content-copy', 0, ''.join('PASS ' + n + '\n' for n in HTTP_CONTENT_COPY_NAMES) + f'Tests: {len(HTTP_CONTENT_COPY_NAMES)}, passed: {len(HTTP_CONTENT_COPY_NAMES)}, failed: 0, skipped: 0\n'),
@@ -552,9 +555,9 @@ def main():
                 if Path(relative).is_absolute() or lib not in path.parents or not path.is_file() or sha(path) != expected_hash:
                     raise ValueError('Bundle file mismatch: ' + relative)
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
-        # Internal DI activation remains opt-in until native retention is qualified.
+        # Method discovery remains opt-in until native type-method retention is implemented.
         selected = [case for case in expected
-                    if not args.suite or case[0] in args.suite]
+                    if (not args.suite and case[0] != 'method-state') or case[0] in (args.suite or [])]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')

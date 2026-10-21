@@ -11,6 +11,7 @@ fn token(table: u32, row: usize) -> Result<i32, Fault> {
 pub(crate) fn definition<'a>(module: &'a Module, identity: &TypeIdentity) -> Option<&'a TypeDef> {
     let id = match identity {
         TypeIdentity::Tuple(_)
+        | TypeIdentity::MethodGenericParameter { .. }
         | TypeIdentity::Function { .. }
         | TypeIdentity::Union(_)
         | TypeIdentity::Intersection(_) => {

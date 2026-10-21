@@ -216,7 +216,7 @@ fn module_function<'a>(
 }
 
 /// Describe an admitted module function without binding or executing it.
-/// Open generic method signatures currently fault rather than being omitted.
+/// Open generic signatures retain declaration-owned parameter identities.
 pub fn module_function_snapshot(
     module: &Module,
     identity: &str,
@@ -268,33 +268,30 @@ pub fn snapshot_token(
     source: &Module,
     handle: &crate::TypeDescriptor,
 ) -> Result<crate::metadata::Instruction, Fault> {
-    use crate::type_identity::TypeIdentity;
-    match &handle.identity {
-        TypeIdentity::GenericParameter { definition, index } => {
-            retain_definition_token(target, source, definition, Some(*index))
-        }
-        TypeIdentity::Definition { definition, .. }
-            if handle
-                .generic_arguments
-                .iter()
-                .any(|arg| matches!(arg.identity, TypeIdentity::GenericParameter { .. })) =>
-        {
-            let declaration = source
-                .types
-                .iter()
-                .find(|d| d.definition.as_ref() == Some(definition))
-                .ok_or_else(|| Fault::new("unknown snapshot definition"))?;
-            if *handle != crate::type_identity::describe_definition(source, declaration)? {
-                return Err(Fault::new(
-                    "partially open snapshot tokens are not supported",
-                ));
-            }
-            retain_definition_token(target, source, definition, None)
-        }
-        _ => Ok(crate::metadata::Instruction::LoadTypeToken(handle_type(
+    if !handle.identity.contains_generic_parameters() {
+        return Ok(crate::metadata::Instruction::LoadTypeToken(handle_type(
             source, handle,
-        )?)),
+        )?));
     }
+    let canonical = crate::type_identity::describe_identity(source, &handle.identity)?;
+    if &canonical != handle {
+        return Err(Fault::new(
+            "snapshot descriptor does not match its source identity",
+        ));
+    }
+    let index = if let Some(index) = target
+        .native_descriptors
+        .iter()
+        .position(|d| d.identity == handle.identity)
+    {
+        index
+    } else {
+        target.native_descriptors.push(canonical);
+        target.native_descriptors.len() - 1
+    };
+    Ok(crate::metadata::Instruction::LoadMetadataToken(
+        u32::try_from(index).map_err(|_| Fault::new("metadata descriptor table overflow"))?,
+    ))
 }
 
 /// Resolve the exact scoped runtime provider used by interpreter materialization.
@@ -579,13 +576,18 @@ fault "test body must not execute"
         assert_eq!(named.len(), 1);
         assert_eq!(fields(&named[0])[0], Value::String("Tag".into()));
         module.functions[index].generic_parameters = vec![Some("T".into())];
-        assert!(
-            module_function_snapshot(&module, "Package", "Example.Tests", &id)
-                .unwrap_err()
-                .to_string()
-                .contains("generic method definition")
+        module.functions[index].parameters[0] = Type::MethodTypeParameter(0);
+        module.functions[index].returns = Type::MethodTypeParameter(0);
+        let snapshot = module_function_snapshot(&module, "Package", "Example.Tests", &id).unwrap();
+        assert_eq!(
+            &fields(&snapshot)[16..19],
+            &[
+                Value::Boolean(true),
+                Value::Boolean(true),
+                Value::Boolean(true)
+            ]
         );
-        // Attributes remain available even when signature materialization is unsupported.
+        // Attribute discovery does not depend on signature closedness.
         assert!(module_function_attributes(&module, "Package", "Example.Tests", &id).is_ok());
     }
     #[test]

@@ -29,6 +29,12 @@ public sealed interface FieldInfo : MemberInfo {
 }
 
 public sealed interface MethodInfo : MemberInfo {
+    /// True for a generic method definition or a constructed generic method.
+    val IsGenericMethod: bool { get }
+    /// True when the method's own generic arguments remain its declared parameters.
+    val IsGenericMethodDefinition: bool { get }
+    /// True when this method or its declaring type contains unbound parameters.
+    val ContainsGenericParameters: bool { get }
     val ReturnType: TypeInfo { get }
     val IsStatic: bool { get }
     val IsPublic: bool { get }
@@ -196,6 +202,9 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     private field StoredIsVirtual: bool
     private field StoredIsOverride: bool
     private field StoredIsAbstract: bool
+    private val StoredIsGenericMethod: bool
+    private val StoredIsGenericMethodDefinition: bool
+    private val StoredContainsGenericParameters: bool
     private field StoredIdentity: string
 
     private init(
@@ -205,7 +214,8 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         isAssembly: bool, isReceiverByRef: bool,
         definitionIndex: int, parameters: ParameterSnapshot,
         isReadOnly: bool, isVirtual: bool,
-        isOverride: bool, isAbstract: bool): base(name, declaringType, metadataToken) {
+        isOverride: bool, isAbstract: bool,
+        isGenericMethod: bool, isGenericMethodDefinition: bool, containsGenericParameters: bool): base(name, declaringType, metadataToken) {
         StoredReturnType = returnType
         StoredIsStatic = isStatic
         StoredIsPublic = isPublic
@@ -218,9 +228,15 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         StoredIsVirtual = isVirtual
         StoredIsOverride = isOverride
         StoredIsAbstract = isAbstract
+        StoredIsGenericMethod = isGenericMethod
+        StoredIsGenericMethodDefinition = isGenericMethodDefinition
+        StoredContainsGenericParameters = containsGenericParameters
         StoredIdentity = ""
     }
 
+    val IsGenericMethod: bool => StoredIsGenericMethod
+    val IsGenericMethodDefinition: bool => StoredIsGenericMethodDefinition
+    val ContainsGenericParameters: bool => StoredContainsGenericParameters
     val ReturnType: TypeInfo => StoredReturnType
     val IsStatic: bool => StoredIsStatic
     val IsPublic: bool => StoredIsPublic
@@ -489,6 +505,8 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     func GetFields(flags: BindingFlags) -> Sequence<FieldInfo>
     func GetConstructors() -> Sequence<ConstructorInfo>
     func GetConstructors(flags: BindingFlags) -> Sequence<ConstructorInfo>
+    /// <summary>Describes declared methods, including generic definitions and open owner signatures.</summary>
+    /// <remarks>Native type-method retention is not yet implemented; this discovery entry point currently requires interpreted execution.</remarks>
     func GetMethods() -> Sequence<MethodInfo>
     func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo>
     func GetProperties() -> Sequence<PropertyInfo>
@@ -1181,7 +1199,7 @@ public enum GenericVariance {
     Contravariant = 2
 }
 
-/// An unbound generic type parameter discovered on an open type definition.
+/// An unbound generic parameter discovered on a type or method definition.
 /// Closed generic arguments describe their actual types instead.
 public sealed interface GenericParameterTypeInfo : TypeInfo {
     /// The declaration's variance; invariant when no annotation is present.

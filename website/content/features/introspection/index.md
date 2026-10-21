@@ -135,6 +135,10 @@ The development `TypeInfo` API distinguishes `IsGenericType`,
 An inheritance-open class need not be generic: `IsOpen` keeps its inheritance meaning.
 Arrays and structural function types are not nominal generic types.
 
-DI uses this shared contract to reject unbound registrations. Generic method
-state and discovery of open-type members or generic method definitions remain
-follow-up work; these properties do not add runtime generic construction APIs.
+DI uses this shared contract to reject unbound registrations. The development
+`MethodInfo` API also exposes `IsGenericMethod`, `IsGenericMethodDefinition` and
+`ContainsGenericParameters`. An ordinary method on an open generic owner can
+contain unbound parameters without itself being generic. Interpreted method
+discovery preserves these signature identities. Native type-method retention
+remains a gap; the flags do not grant reflective invocation or runtime generic
+construction.

@@ -166,16 +166,12 @@ impl Query {
             None => 0,
             _ => return Err(Fault::new("invalid reflection argument")),
         };
-        // Definition discovery admits open generics, but member substitution still
-        // needs a closed type in this preview.
-        if handle
-            .generic_arguments
-            .iter()
-            .any(|a| matches!(a.identity, TypeIdentity::GenericParameter { .. }))
+        // Method signatures admit descriptive open parameters. Other member
+        // queries still require a closed owner in this preview.
+        if handle.identity.contains_generic_parameters()
             && matches!(
                 self,
                 Self::Fields
-                    | Self::Methods
                     | Self::Constructors
                     | Self::Properties
                     | Self::Interfaces
@@ -191,6 +187,21 @@ impl Query {
         match self {
             Self::CustomAttributes => custom_attributes(module, &ty, argument, limits),
             Self::DeclaringType => {
+                if let TypeIdentity::MethodGenericParameter { declaring_type, .. } =
+                    &handle.identity
+                {
+                    return option(
+                        module,
+                        type_contract(module),
+                        declaring_type
+                            .as_deref()
+                            .map(|id| {
+                                crate::type_identity::describe_identity(module, id)
+                                    .map(|descriptor| snapshot_type(module, descriptor))
+                            })
+                            .transpose()?,
+                    );
+                }
                 let parent = match &handle.identity {
                     TypeIdentity::Definition { .. } => {
                         handle.declaring_type.as_ref().and_then(|id| {
@@ -240,7 +251,11 @@ impl Query {
                     matches!(handle.identity, TypeIdentity::Definition { .. })
                         && definition.is_some_and(|d| d.before_field_init)
                 }
-                17 => matches!(handle.identity, TypeIdentity::GenericParameter { .. }),
+                17 => matches!(
+                    handle.identity,
+                    TypeIdentity::GenericParameter { .. }
+                        | TypeIdentity::MethodGenericParameter { .. }
+                ),
                 18 | 19 => match &handle.identity {
                     TypeIdentity::GenericParameter { definition, index } => {
                         let owner = module
@@ -335,9 +350,7 @@ impl Query {
             })),
             Self::DisplayName => Ok(Value::String(
                 (match argument {
-                    0 if matches!(handle.identity, TypeIdentity::GenericParameter { .. }) => {
-                        handle.name.clone()
-                    }
+                    0 if handle.identity.contains_generic_parameters() => handle.name.clone(),
                     0 if definition.is_some_and(|d| {
                         d.origin.is_some()
                             || !d.generic_parameters.is_empty()
@@ -442,12 +455,15 @@ impl Query {
             Self::ElementType => option(
                 module,
                 type_contract(module),
-                match &ty {
-                    Type::Array(t)
-                    | Type::ArrayRef(t)
-                    | Type::ByRef(t)
-                    | Type::ReadOnlyByRef(t)
-                    | Type::Ptr(t) => Some(type_value(module, t)?),
+                match &handle.identity {
+                    TypeIdentity::Array(t)
+                    | TypeIdentity::ArrayRef(t)
+                    | TypeIdentity::ByRef(t)
+                    | TypeIdentity::ReadOnlyByRef(t)
+                    | TypeIdentity::Ptr(t) => Some(snapshot_type(
+                        module,
+                        crate::type_identity::describe_identity(module, t)?,
+                    )),
                     _ => None,
                 },
             ),
@@ -1117,6 +1133,41 @@ fn has_method_metadata(module: &Module, f: &Function) -> bool {
         })
 }
 
+fn member_owner(
+    module: &Module,
+    owner: &Type,
+    f: &Function,
+) -> Result<Option<TypeDescriptor>, Fault> {
+    if f.owner.is_none() {
+        return Ok(None);
+    }
+    if let Ok(descriptor) = crate::type_identity::describe_loaded(module, owner) {
+        return Ok(Some(descriptor));
+    }
+    let definition = module
+        .type_definition(owner)
+        .ok_or_else(|| Fault::new("missing open method owner"))?;
+    let descriptor = crate::type_identity::describe_definition(module, definition)?;
+    Ok(Some(crate::type_identity::describe_member(
+        module,
+        owner,
+        Some(&descriptor),
+        None,
+    )?))
+}
+
+fn member_type_value(
+    module: &QueryContext,
+    ty: &Type,
+    owner: Option<&TypeDescriptor>,
+    f: &Function,
+) -> Result<Value, Fault> {
+    Ok(snapshot_type(
+        module,
+        crate::type_identity::describe_member(module, ty, owner, Some(f))?,
+    ))
+}
+
 // Keep the independent CLI parameter tables explicit at this metadata boundary.
 #[allow(clippy::too_many_arguments)]
 fn parameters(
@@ -1132,6 +1183,10 @@ fn parameters(
     readonly: &[usize],
     limits: &Limits,
 ) -> Result<Value, Fault> {
+    let descriptor = function
+        .map(|f| member_owner(module, declaring_type, f))
+        .transpose()?
+        .flatten();
     array(
         "System.Introspection.ParameterInfo",
         types.iter().enumerate().map(|(i, ty)| {
@@ -1148,7 +1203,11 @@ fn parameters(
                         .into(),
                 ),
                 index_value(i)?,
-                type_value(module, &qualified)?,
+                if let Some(f) = function {
+                    member_type_value(module, &qualified, descriptor.as_ref(), f)?
+                } else {
+                    type_value(module, &qualified)?
+                },
                 Value::Boolean(out.contains(&i)),
                 Value::Boolean(conditional.contains(&i)),
                 Value::Boolean(readonly.contains(&i) || matches!(ty, Type::ReadOnlyByRef(_))),
@@ -1173,7 +1232,12 @@ fn parameters(
                 )?);
                 // Retain a compact owner key, not a member snapshot containing
                 // this parameter list. Equality does not depend on token presence.
-                fields.push(type_value(module, declaring_type)?);
+                fields.push(member_type_value(
+                    module,
+                    declaring_type,
+                    descriptor.as_ref(),
+                    f,
+                )?);
                 fields.push(Value::Int32(member_kind));
                 fields.push(index_value(member_index)?);
                 fields.push(Value::String(
@@ -1196,11 +1260,23 @@ fn method(
     arguments: &[Type],
     limits: &Limits,
 ) -> Result<Value, Fault> {
-    if !f.generic_parameters.is_empty() && f.generic_arguments.len() != f.generic_parameters.len() {
-        return Err(Fault::new(
-            "generic method definition reflection is not yet supported",
-        ));
-    }
+    let owner_descriptor = member_owner(module, owner, f)?;
+    let is_generic = !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty();
+    let is_definition = is_generic && f.generic_arguments.is_empty();
+    let generic_arguments = f
+        .generic_arguments
+        .iter()
+        .map(|argument| {
+            crate::type_identity::describe_member(module, argument, owner_descriptor.as_ref(), None)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let contains_parameters = is_definition
+        || generic_arguments
+            .iter()
+            .any(|argument| argument.identity.contains_generic_parameters())
+        || owner_descriptor
+            .as_ref()
+            .is_some_and(|o| o.identity.contains_generic_parameters());
     let synthesized = f.definition.is_none() && matches!(owner, Type::Function(_));
     let definition_index = if synthesized {
         -1
@@ -1251,8 +1327,13 @@ fn method(
                 }
                 .into(),
             ),
-            type_value(module, owner)?,
-            type_value(module, &f.returns.substitute_type_parameters(arguments)?)?,
+            member_type_value(module, owner, owner_descriptor.as_ref(), f)?,
+            member_type_value(
+                module,
+                &f.returns.substitute_type_parameters(arguments)?,
+                owner_descriptor.as_ref(),
+                f,
+            )?,
             Value::Boolean(!f.instance),
             Value::Boolean(member_access(f) == SourceAccess::Public),
             Value::Boolean(member_access(f) == SourceAccess::Private),
@@ -1298,6 +1379,11 @@ fn method(
         && !crate::type_initialization::is_initializer(f)
     {
         if let Value::Object { fields, .. } = &mut result {
+            fields.extend([
+                Value::Boolean(is_generic),
+                Value::Boolean(is_definition),
+                Value::Boolean(contains_parameters),
+            ]);
             fields.push(Value::String(
                 format!(
                     "{:?}|{:?}|{}|{:?}",
@@ -1434,6 +1520,19 @@ pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<
             out_when_true: out_when_true.clone(),
         })),
         TypeIdentity::GenericParameter { index, .. } => Type::TypeParameter(*index),
+        TypeIdentity::MethodGenericParameter {
+            definition, index, ..
+        } => {
+            let method = module
+                .functions
+                .iter()
+                .find(|f| f.definition.as_ref() == Some(definition))
+                .ok_or_else(|| Fault::new("method parameter belongs to another load set"))?;
+            if usize::from(*index) >= method.generic_parameters.len() {
+                return Err(Fault::new("method parameter index out of range"));
+            }
+            Type::MethodTypeParameter(*index)
+        }
         TypeIdentity::ByRef(t) => Type::ByRef(nested(t)?),
         TypeIdentity::ReadOnlyByRef(t) => Type::ReadOnlyByRef(nested(t)?),
         TypeIdentity::Array(t) => Type::Array(nested(t)?),
@@ -1633,7 +1732,7 @@ pub(crate) fn materialize(
                             if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Definition { .. }))
                             {
                                 "System.Introspection.RuntimeNominalTypeInfo"
-                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::GenericParameter { .. }))
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::GenericParameter { .. } | TypeIdentity::MethodGenericParameter { .. }))
                             {
                                 "System.Introspection.RuntimeGenericParameterTypeInfo"
                             } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Function { .. }))
@@ -2048,5 +2147,134 @@ ret
                 .to_string()
                 .contains("requires the updated CustomAttributeNamedArgument library contract")
         );
+    }
+}
+
+#[cfg(test)]
+mod generic_method_state_tests {
+    use super::*;
+
+    fn fields(value: &Value) -> &[Value] {
+        let Value::Object { fields, .. } = value else {
+            panic!("snapshot object")
+        };
+        fields
+    }
+    fn handle(value: &Value) -> &TypeDescriptor {
+        let Value::RuntimeTypeHandle(handle) = &fields(value)[0] else {
+            panic!("type handle")
+        };
+        handle
+    }
+
+    #[test]
+    fn method_snapshots_distinguish_owner_and_method_parameters() {
+        let module = crate::assemble(".module MethodState\n.type class Atom\n.end\n.type class Box<T>\n.method instance Read(T value) -> T\nldarg value\nret\n.end\n.method instance Echo<U>(U value) -> U\nldarg value\nret\n.end\n.method instance Other<U>(U value) -> U\nldarg value\nret\n.end\n.end\n").unwrap();
+        let open = crate::type_identity::describe_definition(&module, &module.types[1]).unwrap();
+        let closed = crate::type_identity::describe_loaded(
+            &module,
+            &Type::Constructed {
+                definition: "Box".into(),
+                arguments: vec![Type::Named("Atom".into())],
+            },
+        )
+        .unwrap();
+        for (owner, is_open) in [(open, true), (closed, false)] {
+            let Value::Array { elements, .. } = Query::Methods
+                .invoke_profile(
+                    &module,
+                    &[
+                        Value::RuntimeTypeHandle(Box::new(owner.clone())),
+                        Value::Int32(28),
+                    ],
+                    &Limits::default(),
+                    true,
+                )
+                .unwrap()
+            else {
+                panic!("method vector")
+            };
+            assert_eq!(elements.len(), 3);
+            let read = fields(&elements[0]);
+            assert_eq!(
+                &read[16..19],
+                &[
+                    Value::Boolean(false),
+                    Value::Boolean(false),
+                    Value::Boolean(is_open)
+                ]
+            );
+            assert_eq!(
+                handle(&read[4]).identity,
+                owner.generic_arguments[0].identity
+            );
+            let echo = fields(&elements[1]);
+            assert_eq!(
+                &echo[16..19],
+                &[
+                    Value::Boolean(true),
+                    Value::Boolean(true),
+                    Value::Boolean(true)
+                ]
+            );
+            let parameter = handle(&echo[4]);
+            assert!(matches!(
+                parameter.identity,
+                TypeIdentity::MethodGenericParameter { index: 0, .. }
+            ));
+            assert!(parameter.identity.contains_generic_parameters());
+            #[cfg(feature = "native-metadata")]
+            {
+                let mut target = module.clone();
+                let token = crate::native_metadata::snapshot_token(&mut target, &module, parameter)
+                    .unwrap();
+                assert!(matches!(
+                    token,
+                    crate::metadata::Instruction::LoadMetadataToken(_)
+                ));
+                let mut forged = parameter.clone();
+                forged.name = "forged".into();
+                assert!(
+                    crate::native_metadata::snapshot_token(&mut target, &module, &forged).is_err()
+                );
+                let function = &module.functions[1];
+                let wrapped = crate::type_identity::describe_member(
+                    &module,
+                    &Type::ArrayRef(Box::new(Type::MethodTypeParameter(0))),
+                    Some(&owner),
+                    Some(function),
+                )
+                .unwrap();
+                assert_eq!(
+                    crate::type_identity::describe_identity(&module, &wrapped.identity).unwrap(),
+                    wrapped
+                );
+                assert!(
+                    crate::native_metadata::snapshot_token(&mut target, &module, &wrapped).is_ok()
+                );
+                assert_eq!(
+                    Query::DisplayName
+                        .invoke_profile(
+                            &module,
+                            &[
+                                Value::RuntimeTypeHandle(Box::new(wrapped.clone())),
+                                Value::Int32(0)
+                            ],
+                            &Limits::default(),
+                            true
+                        )
+                        .unwrap(),
+                    Value::String(wrapped.name.into())
+                );
+            }
+            let Value::Array { elements: args, .. } = &echo[11] else {
+                panic!("parameters")
+            };
+            assert_eq!(handle(&fields(&args[0])[2]).identity, parameter.identity);
+            assert_ne!(
+                handle(&fields(&elements[2])[4]).identity,
+                parameter.identity
+            );
+        }
     }
 }

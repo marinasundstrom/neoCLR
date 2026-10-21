@@ -31,7 +31,7 @@ GetFunctions exposes all visibility levels in loaded metadata order, following t
 host ModuleInfo.GetFunctions contract. Unlike .NET physical Module.GetMethods, its
 scope is the assembly's exact logical namespace; this deliberate namespace model
 is documented in the module design. It neither loads assemblies nor grants invocation.
-Open generic signatures currently fail explicitly rather than silently disappearing.
+The later [generic method-state increment](../generic-method-state/README.md) admits descriptive open signatures; its validation and native limits are tracked separately.
 Method-level attribute lookup checks the exact module and method token and rejects
 missing/ambiguous matches. Parameter/return attribute queries for ownerless functions
 remain unsupported. [Explicit native retention](native-retention/README.md) now

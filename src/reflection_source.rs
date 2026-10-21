@@ -65,7 +65,8 @@ pub(crate) fn provider(module: &Module, contract: &Type, fields: &[Value]) -> Re
         "System.Introspection.TypeInfo" => match fields.first() {
             Some(Value::RuntimeTypeHandle(handle)) => match &handle.identity {
                 TypeIdentity::Definition { .. } => "RuntimeNominalTypeInfo",
-                TypeIdentity::GenericParameter { .. } => "RuntimeGenericParameterTypeInfo",
+                TypeIdentity::GenericParameter { .. }
+                | TypeIdentity::MethodGenericParameter { .. } => "RuntimeGenericParameterTypeInfo",
                 TypeIdentity::Function { .. } => "RuntimeFunctionTypeInfo",
                 TypeIdentity::Union(_) => "RuntimeUnionTypeInfo",
                 TypeIdentity::Intersection(_) => "RuntimeIntersectionTypeInfo",

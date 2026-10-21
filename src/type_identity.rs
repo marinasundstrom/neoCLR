@@ -24,6 +24,12 @@ pub enum TypeIdentity {
         definition: TypeDefId,
         index: u16,
     },
+    /// A method parameter retains both its source member and declaring type view.
+    MethodGenericParameter {
+        definition: crate::metadata::MemberId,
+        declaring_type: Option<Box<TypeIdentity>>,
+        index: u16,
+    },
     Definition {
         definition: TypeDefId,
         arguments: Vec<TypeIdentity>,
@@ -39,7 +45,7 @@ pub enum TypeIdentity {
 impl TypeIdentity {
     pub(crate) fn contains_generic_parameters(&self) -> bool {
         match self {
-            Self::GenericParameter { .. } => true,
+            Self::GenericParameter { .. } | Self::MethodGenericParameter { .. } => true,
             Self::Definition { arguments, .. }
             | Self::Tuple(arguments)
             | Self::Union(arguments)
@@ -104,6 +110,300 @@ pub(crate) fn describe_host(module: &Module, ty: &Type) -> Result<TypeDescriptor
 // It does not grant permission to name those types in executable instructions.
 pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {
     describe_validated(module, normalized)
+}
+
+/// Describe a verified member signature without treating its open parameters as
+/// executable types. Parameter identity includes the declaration, not just its name.
+pub(crate) fn describe_member(
+    module: &Module,
+    ty: &Type,
+    owner: Option<&TypeDescriptor>,
+    method: Option<&crate::metadata::Function>,
+) -> Result<TypeDescriptor, Fault> {
+    if let Type::TypeParameter(index) = ty {
+        return owner
+            .and_then(|o| o.generic_arguments.get(usize::from(*index)))
+            .cloned()
+            .ok_or_else(|| Fault::new("missing declaring type parameter"));
+    }
+    if let Type::MethodTypeParameter(index) = ty {
+        let method = method.ok_or_else(|| Fault::new("missing method parameter context"))?;
+        if let Some(argument) = method.generic_arguments.get(usize::from(*index)) {
+            // Constructed arguments are in the caller's scope. Do not recursively
+            // substitute the same method parameter with itself.
+            return describe_member(module, argument, owner, None);
+        }
+        let name = method
+            .generic_parameters
+            .get(usize::from(*index))
+            .ok_or_else(|| Fault::new("missing declaring method parameter"))?
+            .clone()
+            .unwrap_or_else(|| format!("T{index}"));
+        return Ok(TypeDescriptor {
+            identity: TypeIdentity::MethodGenericParameter {
+                definition: method
+                    .definition
+                    .clone()
+                    .ok_or_else(|| Fault::new("missing method identity"))?,
+                declaring_type: owner.map(|o| Box::new(o.identity.clone())),
+                index: *index,
+            },
+            name,
+            generic_arguments: vec![],
+            constituents: vec![],
+            tuple_elements: vec![],
+            tuple_element_names: vec![],
+            declaring_type: owner.and_then(|o| match &o.identity {
+                TypeIdentity::Definition { definition, .. } => Some(definition.clone()),
+                _ => None,
+            }),
+        });
+    }
+    if let Ok(closed) = describe_loaded(module, ty) {
+        return Ok(closed);
+    }
+    let nested = |ty| describe_member(module, ty, owner, method);
+    let many = |types: &[Type]| {
+        types
+            .iter()
+            .map(|ty| describe_member(module, ty, owner, method))
+            .collect::<Result<Vec<_>, _>>()
+    };
+    let mut result = TypeDescriptor {
+        identity: TypeIdentity::Tuple(vec![]),
+        name: String::new(),
+        generic_arguments: vec![],
+        constituents: vec![],
+        tuple_elements: vec![],
+        tuple_element_names: vec![],
+        declaring_type: None,
+    };
+    match ty {
+        Type::Constructed { arguments, .. } => {
+            let declaration = module
+                .type_definition(ty)
+                .ok_or_else(|| Fault::new("missing open signature declaration"))?;
+            if arguments.len() != declaration.generic_parameters.len() {
+                return Err(Fault::new("open signature generic arity mismatch"));
+            }
+            result = describe_definition(module, declaration)?;
+            result.generic_arguments = many(arguments)?;
+            result.identity = TypeIdentity::Definition {
+                definition: declaration
+                    .definition
+                    .clone()
+                    .ok_or_else(|| Fault::new("missing type identity"))?,
+                arguments: result
+                    .generic_arguments
+                    .iter()
+                    .map(|a| a.identity.clone())
+                    .collect(),
+            };
+        }
+        Type::ByRef(t)
+        | Type::ReadOnlyByRef(t)
+        | Type::Array(t)
+        | Type::ArrayRef(t)
+        | Type::Ptr(t)
+        | Type::InterfaceRef(t) => {
+            let element = nested(t)?;
+            let identity = Box::new(element.identity.clone());
+            let (kind, name) = match ty {
+                Type::ByRef(_) => (TypeIdentity::ByRef(identity), format!("{}&", element.name)),
+                Type::ReadOnlyByRef(_) => (
+                    TypeIdentity::ReadOnlyByRef(identity),
+                    format!("readonly {}&", element.name),
+                ),
+                Type::Array(_) => (TypeIdentity::Array(identity), format!("{}[]", element.name)),
+                Type::ArrayRef(_) => (
+                    TypeIdentity::ArrayRef(identity),
+                    format!("arrayref<{}>", element.name),
+                ),
+                Type::Ptr(_) => (TypeIdentity::Ptr(identity), format!("{}*", element.name)),
+                _ => (
+                    TypeIdentity::InterfaceRef(identity),
+                    format!("InterfaceRef<{}>", element.name),
+                ),
+            };
+            result.identity = kind;
+            result.name = name;
+            if matches!(ty, Type::ArrayRef(_)) && module.type_definition(ty).is_some() {
+                result.generic_arguments.push(element);
+            }
+        }
+        Type::Tuple(parts) => {
+            result.tuple_elements = many(parts)?;
+            result.identity = TypeIdentity::Tuple(
+                result
+                    .tuple_elements
+                    .iter()
+                    .map(|p| p.identity.clone())
+                    .collect(),
+            );
+            result.name = format!(
+                "tuple<{}>",
+                result
+                    .tuple_elements
+                    .iter()
+                    .map(|p| p.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            );
+            result.tuple_element_names = (0..parts.len())
+                .map(|i| parts.names().get(i).cloned().flatten())
+                .collect();
+        }
+        Type::Union(parts) | Type::Intersection(parts) => {
+            result.constituents = many(parts)?;
+            let identities = result
+                .constituents
+                .iter()
+                .map(|p| p.identity.clone())
+                .collect();
+            let union = matches!(ty, Type::Union(_));
+            result.identity = if union {
+                TypeIdentity::Union(identities)
+            } else {
+                TypeIdentity::Intersection(identities)
+            };
+            result.name = format!(
+                "{}<{}>",
+                if union { "union" } else { "intersection" },
+                result
+                    .constituents
+                    .iter()
+                    .map(|p| p.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            );
+        }
+        Type::Function(shape) => {
+            let parameters = many(&shape.parameters)?;
+            let returns = nested(&shape.returns)?;
+            let mut names = parameters
+                .iter()
+                .enumerate()
+                .map(|(i, p)| {
+                    format!(
+                        "{}{}",
+                        if shape.out_parameters.contains(&i) {
+                            "out "
+                        } else if shape.out_when_true.contains(&i) {
+                            "outtrue "
+                        } else {
+                            ""
+                        },
+                        p.name
+                    )
+                })
+                .collect::<Vec<_>>();
+            names.push(format!(
+                "{}{}",
+                if shape.no_result { "noresult " } else { "" },
+                returns.name
+            ));
+            result.name = format!("fn<{}>", names.join(","));
+            result.identity = TypeIdentity::Function {
+                parameters: parameters.into_iter().map(|p| p.identity).collect(),
+                returns: Box::new(returns.identity),
+                no_result: shape.no_result,
+                out_parameters: shape.out_parameters.clone(),
+                out_when_true: shape.out_when_true.clone(),
+            };
+        }
+        _ => return describe_loaded(module, ty),
+    }
+    Ok(result)
+}
+
+/// Reconstruct authenticated descriptive metadata from its source-owned identity.
+/// This is not executable type construction and never relaxes signature admission.
+pub(crate) fn describe_identity(
+    module: &Module,
+    identity: &TypeIdentity,
+) -> Result<TypeDescriptor, Fault> {
+    fn children(identity: &TypeIdentity) -> Vec<&TypeIdentity> {
+        match identity {
+            TypeIdentity::Definition { arguments, .. }
+            | TypeIdentity::Tuple(arguments)
+            | TypeIdentity::Union(arguments)
+            | TypeIdentity::Intersection(arguments) => arguments.iter().collect(),
+            TypeIdentity::Function {
+                parameters,
+                returns,
+                ..
+            } => parameters
+                .iter()
+                .chain(std::iter::once(returns.as_ref()))
+                .collect(),
+            TypeIdentity::Array(t)
+            | TypeIdentity::ArrayRef(t)
+            | TypeIdentity::ByRef(t)
+            | TypeIdentity::ReadOnlyByRef(t)
+            | TypeIdentity::Ptr(t)
+            | TypeIdentity::InterfaceRef(t) => vec![t],
+            _ => vec![],
+        }
+    }
+    fn parameter(identity: &TypeIdentity, method: bool) -> Option<&TypeIdentity> {
+        if matches!(
+            (identity, method),
+            (TypeIdentity::MethodGenericParameter { .. }, true)
+                | (TypeIdentity::GenericParameter { .. }, false)
+        ) {
+            return Some(identity);
+        }
+        children(identity)
+            .into_iter()
+            .find_map(|child| parameter(child, method))
+    }
+    let ty = crate::reflection::from_identity(module, identity)?;
+    if !identity.contains_generic_parameters() {
+        return describe_loaded(module, &ty);
+    }
+    if let Some(TypeIdentity::MethodGenericParameter {
+        definition,
+        declaring_type,
+        ..
+    }) = parameter(identity, true)
+    {
+        let method = module
+            .functions
+            .iter()
+            .find(|f| f.definition.as_ref() == Some(definition))
+            .ok_or_else(|| Fault::new("missing method descriptor declaration"))?;
+        let owner = declaring_type
+            .as_deref()
+            .map(|id| describe_identity(module, id))
+            .transpose()?;
+        let declared_owner = method
+            .owner
+            .as_ref()
+            .and_then(|ty| module.type_definition(ty))
+            .and_then(|definition| definition.definition.as_ref());
+        let supplied_owner = owner
+            .as_ref()
+            .and_then(|descriptor| match &descriptor.identity {
+                TypeIdentity::Definition { definition, .. } => Some(definition),
+                _ => None,
+            });
+        if declared_owner != supplied_owner || (method.owner.is_none() && owner.is_some()) {
+            return Err(Fault::new(
+                "method parameter has an unrelated declaring type",
+            ));
+        }
+        return describe_member(module, &ty, owner.as_ref(), Some(method));
+    }
+    let Some(TypeIdentity::GenericParameter { definition, .. }) = parameter(identity, false) else {
+        return Err(Fault::new("missing generic descriptor context"));
+    };
+    let owner = module
+        .types
+        .iter()
+        .find(|d| d.definition.as_ref() == Some(definition))
+        .ok_or_else(|| Fault::new("missing generic descriptor declaration"))?;
+    let owner = describe_definition(module, owner)?;
+    describe_member(module, &ty, Some(&owner), None)
 }
 
 fn describe_validated(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {

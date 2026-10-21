@@ -8,7 +8,7 @@ public sealed interface ModuleInfo {
     val Name: string { get }
     val Assembly: AssemblyInfo { get }
     /// <summary>Gets directly declared module functions in metadata order, without visibility filtering or execution.</summary>
-    /// <remarks>Excludes type members and child namespaces. Open generic signatures are currently unsupported. Native retention is not yet supported.</remarks>
+    /// <remarks>Excludes type members and child namespaces. Open signatures retain descriptive generic parameters. Native discovery requires explicit module-function retention. No invocation is granted.</remarks>
     func GetFunctions() -> Sequence<MethodInfo>
     func GetTypes() -> Sequence<TypeInfo>
 }

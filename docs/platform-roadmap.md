@@ -6,8 +6,9 @@ Localization is committed as `da9e6aec7`. The author directs proceeding to DI wi
 automatic constructor injection; [activation groundwork](experiments/dependency-injection/README.md)
 tracks the development public container, keyed and conditional registrations,
 function services and cached constructor activation. [Generic type-state flags](experiments/generic-type-state/README.md) now
-share runtime identity semantics with DI. Method-definition discovery and generic
-method-state flags, generic implementation retention and release qualification remain open.
+share runtime identity semantics with DI. [Method-state groundwork](experiments/generic-method-state/README.md) adds shared flags and
+interpreter definition discovery. Native type-method retention, generic implementation
+retention and release qualification remain open.
 [Scope and validation](experiments/localization/README.md) remain a bounded addition;
 this does not replace release qualification or expand arbitrary locale support.
 

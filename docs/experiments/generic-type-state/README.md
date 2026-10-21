@@ -17,8 +17,9 @@ native machine-code execution. Built-in type-relations assertions exercise the
 public properties for closed generic types, ordinary inheritance-open classes,
 arrays and structural functions. The DI suite checks the migrated registration path.
 
-MethodInfo generic-state flags remain pending because generic-method definition
-and open-type member discovery are not implemented. This is a support gap, not a
+MethodInfo generic-state flags were pending at this slice. The subsequent
+[method-state groundwork](../generic-method-state/README.md) adds them and interpreter
+definition discovery; native type-method retention remains pending. This is a support gap, not a
 policy that open methods are nongeneric. MakeGenericType/MakeGenericMethod and open
 generic DI registrations are outside this increment. Native generic implementation
 constructor retention remains separate.

@@ -2820,3 +2820,9 @@ native metadata, with a linked [contract guide](dependency-injection.md). It is
 not added to the older CLI scaffold's selected type list: structural function
 factory signatures and native class-library types are represented by the matching
 native audit/snapshot instead. Constructor retention boundaries remain documented.
+
+2026-10-21: MethodInfo generic-state properties and descriptive method parameters
+are included in the native reference snapshot (Raven 793b71408, method-state-libraries-v1).
+GetMethods documents its current interpreter-only discovery limit; native
+type-method retention remains separate work. See
+[method-state evidence](../docs/experiments/generic-method-state/README.md).

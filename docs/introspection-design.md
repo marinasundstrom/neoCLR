@@ -954,10 +954,26 @@ same meanings. A matching runtime, backend and class library are required; there
 is no metadata-format, executable generic-instantiation or compiler syntax change.
 DI now consumes ContainsGenericParameters instead of a private recursive walk.
 
-MethodInfo generic state remains a separate gap: member discovery on an open type
-and discovery of a generic method definition currently reject. They must retain
-owner and method parameter identities before adding reliable flags. In particular,
-[MethodInfo.ContainsGenericParameters](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodinfo.containsgenericparameters?view=net-10.0)
-must include an open declaring type even when the method is not itself generic.
-This increment does not imply MakeGenericType/MakeGenericMethod or open DI
-registrations are implemented.
+### Generic method state (development, 2026-10-21)
+
+MethodInfo now exposes IsGenericMethod, IsGenericMethodDefinition and
+ContainsGenericParameters. Following
+[MethodInfo.ContainsGenericParameters](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodinfo.containsgenericparameters?view=net-10.0),
+a nongeneric method on an open declaring type has only the last flag set.
+A generic method definition remains open even when its declaring type is closed.
+Method parameter identity includes the source member and declaring type view;
+parameters with the same name on different methods are not equal. Signature
+snapshots retain these identities through return and parameter types. This is
+metadata description, not permission to construct or execute an open method.
+
+The interpreter now admits these method definitions through GetMethods and module
+function discovery. Native module-function snapshot recipes share the same fields
+and authenticated descriptive tokens. Native **type-method discovery still needs
+an explicit retention policy and projection**; GetMethods is not yet qualified on
+AOT/JIT. Constructor retention does not implicitly retain methods. Native open
+signature element/member traversal and general reflective invocation remain gaps.
+MakeGenericType/MakeGenericMethod and open generic DI registrations remain outside
+this increment. Matching runtime/backend and class-library snapshots are required
+because RuntimeMethodInfo's private layout adds three Boolean fields. Compiler
+emission and serialized metadata formats are unchanged. See the
+[method-state validation](experiments/generic-method-state/README.md).

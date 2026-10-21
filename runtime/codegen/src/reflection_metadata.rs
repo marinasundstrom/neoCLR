@@ -370,6 +370,7 @@ pub fn bind_queries(
         return Ok(vec![]);
     }
     let mut open_tokens = Vec::new();
+    let mut tokens = vec![];
     for op in input.functions.iter().flat_map(|f| &f.body) {
         if let Op::LoadMetadataToken(index) = op
             && !open_tokens.contains(index)
@@ -389,21 +390,15 @@ pub fn bind_queries(
                 .map_err(|e| e.to_string())?
                 .clone();
             for parameter in &descriptor.generic_arguments {
-                let neoclr::TypeIdentity::GenericParameter { definition, index } =
-                    &parameter.identity
-                else {
-                    return Err("open definition has a non-parameter argument".into());
-                };
-                let Op::LoadMetadataToken(index) =
-                    neoclr::native_metadata::retain_definition_token(
-                        input,
-                        source,
-                        definition,
-                        Some(*index),
-                    )
-                    .map_err(|e| e.to_string())?
-                else {
-                    return Err("expected descriptive argument token".into());
+                let token = neoclr::native_metadata::snapshot_token(input, source, parameter)
+                    .map_err(|e| e.to_string())?;
+                let Op::LoadMetadataToken(index) = token else {
+                    if let Op::LoadTypeToken(ty) = token
+                        && !tokens.contains(&ty)
+                    {
+                        tokens.push(ty);
+                    }
+                    continue;
                 };
                 if !open_tokens.contains(&index) {
                     open_tokens.push(index);
@@ -412,7 +407,6 @@ pub fn bind_queries(
             next += 1;
         }
     }
-    let mut tokens = vec![];
     for f in &input.functions {
         for op in &f.body {
             if let Op::LoadTypeToken(t) = op
@@ -1300,18 +1294,8 @@ fn open_query_prefix(
             ]),
             "neoCLR.Runtime.TypeArgument" => {
                 for (ordinal, parameter) in descriptor.generic_arguments.iter().enumerate() {
-                    let neoclr::TypeIdentity::GenericParameter { definition, index } =
-                        &parameter.identity
-                    else {
-                        return Err("open argument lacks declaring identity".into());
-                    };
-                    let token = neoclr::native_metadata::retain_definition_token(
-                        input,
-                        source,
-                        definition,
-                        Some(*index),
-                    )
-                    .map_err(|e| e.to_string())?;
+                    let token = neoclr::native_metadata::snapshot_token(input, source, parameter)
+                        .map_err(|e| e.to_string())?;
                     let next = body.len() + 6;
                     body.extend([
                         Op::Arg(1),
