@@ -1336,6 +1336,15 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                     crate::type_identity::retained_descriptor(module, *index)?;
                 }
                 Op::LoadTypeToken(ty)
+                    if matches!(ty, Type::Named(_))
+                        && module.types.iter().any(|d| {
+                            Some(d.name.as_str()) == ty.definition_name()
+                                && !d.generic_parameters.is_empty()
+                        }) =>
+                {
+                    crate::type_identity::describe_token(module, ty)?;
+                }
+                Op::LoadTypeToken(ty)
                 | Op::PackValue(ty)
                 | Op::IsValue(ty)
                 | Op::UnpackValue(ty)
@@ -4241,7 +4250,7 @@ fn interpret_instructions_with_dispatch(
                 }
                 Op::LoadTypeToken(ty) => {
                     frame.stack.push(Value::RuntimeTypeHandle(Box::new(
-                        crate::type_identity::describe(module, ty)?,
+                        crate::type_identity::describe_token(module, ty)?,
                     )));
                 }
                 Op::PackValue(ty) => {
@@ -4404,7 +4413,11 @@ fn interpret_instructions_with_dispatch(
                         return Err(Fault::new("interface declarations require callvirt"));
                     }
                     crate::access::check_call(module, Some(&function), &callee)?;
-                    callee.map_types(|ty| {
+                    callee.map_type_uses(|ty, is_token| {
+                        if is_token {
+                            crate::type_identity::describe_token(module, ty)?;
+                            return Ok(ty.clone());
+                        }
                         check_type_context(
                             ty,
                             module,

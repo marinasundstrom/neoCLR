@@ -5,7 +5,10 @@ pub const TYPES: usize = 1024;
 pub const FUNCTIONS: usize = 2048;
 // Every generic clone also counts toward FUNCTIONS.
 pub const FUNCTION_CLONES: usize = FUNCTIONS;
-pub const INPUT_TYPES: usize = 1024;
+// The intermediate inventory contains source declarations plus specialized
+// shapes. Selection still limits the executable image to TYPES. Raw linked
+// source remains separately bounded by MAX_LOAD_SET_TYPES.
+pub const INPUT_TYPES: usize = 2 * TYPES;
 pub const INPUT_FUNCTIONS: usize = 8192;
 // Match NEOCLR_NATIVE_LAYOUT_LANES in the native host header.
 pub const INLINE_LANES: usize = 256;

@@ -247,6 +247,10 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     public void LoadTypeToken(SignatureType type) => Emit(OpCode.Ldtoken, type);
 
+    /// <summary>Emits ldtoken for a generic declaration, independently of the caller's parameter scope.</summary>
+    public void LoadTypeDefinitionToken(SignatureType type) => Emit(OpCode.Ldtoken, type.DefinitionToken());
+
+
     public void Emit(OpCode opCode, SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);

@@ -1,6 +1,6 @@
 //! Bounded explicit library load sets. Verify original module scopes before any
 //! canonical projection; never let relocation authorize cross-module access.
-use neoclr::metadata::{Instruction as Op, MemberId, TypeDefId};
+use neoclr::metadata::{Instruction as Op, MemberId, Type, TypeDefId};
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
@@ -232,6 +232,33 @@ pub fn prepare(
                 .position(|candidate| candidate == id)
                 .ok_or("array backing targets an unsupplied definition")?;
             assembly.array_backing = Some(type_id(index));
+        }
+    }
+    // Definition-token operands describe metadata; they never instantiate an
+    // executable generic type or consume the caller's type parameter scope.
+    for fi in 0..joined.functions.len() {
+        for oi in 0..joined.functions[fi].body.len() {
+            let Op::LoadTypeToken(Type::Named(name)) = &joined.functions[fi].body[oi] else {
+                continue;
+            };
+            let Some(declaration) = source_metadata
+                .types
+                .iter()
+                .find(|d| &d.name == name && !d.generic_parameters.is_empty())
+            else {
+                continue;
+            };
+            let id = declaration
+                .definition
+                .as_ref()
+                .ok_or("generic token has no source definition")?;
+            joined.functions[fi].body[oi] = neoclr::native_metadata::retain_definition_token(
+                &mut joined,
+                &source_metadata,
+                id,
+                None,
+            )
+            .map_err(|e| e.to_string())?;
         }
     }
     let mut reflection_retention = context

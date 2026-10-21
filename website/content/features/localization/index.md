@@ -54,16 +54,13 @@ Attach `WithMissingKeyHandler` to report absent display keys to a console or log
 
 ## Use a localizer through dependency injection
 
-Load the resources once, then register the typed localizer as a singleton. A
-scoped consumer can receive `Localizer<FeatureX>` in its constructor:
+Register a configured factory once. An open generic registration supplies
+`Localizer<T>` for each resource type requested by a consumer:
 
 ```raven
 let resources = JsonLocalizerProvider("resources")
-let Ok(strings) = resources.Load<FeatureX>(Culture.SwedishSweden) else {
-    return Assert.True(false, "Load typed JSON catalogue")
-}
 let services: ServiceCollection = DefaultServiceCollection()
-_ = Assert.True(services.AddSingleton<Localizer<FeatureX>>(strings) is Ok(_), "Register resources")?
+_ = Assert.True(services.AddLocalization(JsonLocalizerFactory(resources, Culture.SwedishSweden)) is Ok(_), "Register resources")?
 _ = Assert.True(services.AddScoped<LocalizedGreeting>() is Ok(_), "Register consumer")?
 let Ok(provider) = services.Build() else {
     return Assert.True(false, "Build localized graph")
@@ -82,7 +79,7 @@ This excerpt comes from the built-in localization contract test; its assertions
 propagate `TestFailure` when setup fails. The scoped consumer
 formats `"Totalt {0:F2}"` from `FeatureX.json` as `"Totalt 12,00"` for Swedish,
 while a regional key still comes from `FeatureX.sv-SE.json`. Native applications
-must retain the consumer's constructor for activation, as described in the
+must retain the consumer's constructor and `DefaultLocalizer` constructors for activation, as described in the
 [dependency injection sample](/features/dependency-injection/).
 
 ## A bounded foundation
@@ -93,9 +90,20 @@ fixed overloads for one to three arguments avoid an argument array.
 
 This foundation supports the five built-in cultures and flat string catalogues,
 with a 64 KiB and 4,096-entry limit per file. Nested resources, plural rules, reload
-watching and automatic caching are not implemented. File loading is synchronous;
+watching and shared concurrent caching are not implemented. The JSON DI factory
+reuses a lazy catalogue per resource type; direct provider.Load calls load independently. File loading is synchronous;
 borrowed input streams can be read asynchronously. Current native/JIT file loading
 requires the macOS host file-input service.
 
 [Localization API reference →](/docs/localization.html) ·
 [Culture and formatting →](/features/globalization/)
+
+For a native project, add the adapter retention alongside your consumer roots:
+
+```sh
+--reflection-constructor-type 'System.Localization.DefaultLocalizer`1'
+```
+
+The native project builder resolves this exact metadata name from the supplied
+class-library modules. It retains the closed adapter shapes observed through
+`Localizer<T>` requests; it does not enable arbitrary runtime code generation.

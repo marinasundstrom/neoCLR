@@ -1424,9 +1424,17 @@ impl Function {
         &self,
         mut map: impl FnMut(&Type) -> Result<Type, crate::Fault>,
     ) -> Result<Self, crate::Fault> {
+        self.map_type_uses(|ty, _| map(ty))
+    }
+
+    /// Transform signatures while distinguishing descriptive ldtoken operands.
+    pub(crate) fn map_type_uses(
+        &self,
+        mut map: impl FnMut(&Type, bool) -> Result<Type, crate::Fault>,
+    ) -> Result<Self, crate::Fault> {
         let mut result = self.clone();
         if let Some(owner) = &mut result.owner {
-            *owner = map(owner)?;
+            *owner = map(owner, false)?;
         }
         for ty in result
             .parameters
@@ -1434,73 +1442,76 @@ impl Function {
             .chain(&mut result.locals)
             .chain([&mut result.returns])
         {
-            *ty = map(ty)?;
+            *ty = map(ty, false)?;
         }
-        crate::constraints::map_types(&mut result.generic_constraints, &mut map)?;
+        crate::constraints::map_types(&mut result.generic_constraints, &mut |ty: &Type| {
+            map(ty, false)
+        })?;
         for target in &mut result.interface_implementations {
             if let Some(owner) = &mut target.owner {
-                *owner = map(owner)?;
+                *owner = map(owner, false)?;
             }
             for ty in target
                 .parameters
                 .iter_mut()
                 .chain(&mut target.generic_arguments)
             {
-                *ty = map(ty)?;
+                *ty = map(ty, false)?;
             }
         }
         for op in &mut result.body {
             match op {
+                Instruction::LoadTypeToken(ty) => *ty = map(ty, true)?,
                 Instruction::StaticField { owner, .. }
                 | Instruction::SetStaticField { owner, .. } => {
-                    *owner = map(owner)?;
+                    *owner = map(owner, false)?;
                 }
                 Instruction::BindNativeFunction { function_type, .. } => {
-                    *function_type = map(function_type)?;
+                    *function_type = map(function_type, false)?;
                 }
                 Instruction::BindFunction {
                     function_type,
                     target,
                 } => {
-                    *function_type = map(function_type)?;
+                    *function_type = map(function_type, false)?;
                     if let Some(owner) = &mut target.owner {
-                        *owner = map(owner)?;
+                        *owner = map(owner, false)?;
                     }
                     for ty in target
                         .parameters
                         .iter_mut()
                         .chain(&mut target.generic_arguments)
                     {
-                        *ty = map(ty)?;
+                        *ty = map(ty, false)?;
                     }
                 }
                 Instruction::CallSelf {
                     self_type, target, ..
                 } => {
-                    *self_type = map(self_type)?;
+                    *self_type = map(self_type, false)?;
                     if let Some(owner) = &mut target.owner {
-                        *owner = map(owner)?;
+                        *owner = map(owner, false)?;
                     }
                     for ty in target
                         .parameters
                         .iter_mut()
                         .chain(&mut target.generic_arguments)
                     {
-                        *ty = map(ty)?;
+                        *ty = map(ty, false)?;
                     }
                 }
                 Instruction::Call(target)
                 | Instruction::CallVirtual(target)
                 | Instruction::Construct(target) => {
                     if let Some(owner) = &mut target.owner {
-                        *owner = map(owner)?;
+                        *owner = map(owner, false)?;
                     }
                     for ty in target
                         .parameters
                         .iter_mut()
                         .chain(&mut target.generic_arguments)
                     {
-                        *ty = map(ty)?;
+                        *ty = map(ty, false)?;
                     }
                 }
                 Instruction::New(ty)
@@ -1517,7 +1528,6 @@ impl Function {
                 | Instruction::CastClass(ty)
                 | Instruction::IsInstance(ty)
                 | Instruction::BorrowInterface(ty)
-                | Instruction::LoadTypeToken(ty)
                 | Instruction::PackValue(ty)
                 | Instruction::IsValue(ty)
                 | Instruction::UnpackValue(ty)
@@ -1530,7 +1540,7 @@ impl Function {
                 | Instruction::InitializeObject(ty)
                 | Instruction::NullPointer(ty)
                 | Instruction::PointerCast(ty)
-                | Instruction::PointerFromInt(ty) => *ty = map(ty)?,
+                | Instruction::PointerFromInt(ty) => *ty = map(ty, false)?,
                 _ => (),
             }
         }

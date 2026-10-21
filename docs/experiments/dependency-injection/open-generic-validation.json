@@ -1,0 +1,225 @@
+{
+  "date": "2026-10-21",
+  "compilerRevision": "cc64f787d",
+  "scope": "Open generic DI/localization, vector construction and focused JSON consumer proof",
+  "builtInTestExecutions": 114,
+  "runs": [
+    {
+      "passed": true,
+      "modes": [
+        "interpreter",
+        "native",
+        "jit"
+      ],
+      "suites": [
+        "type-relations"
+      ],
+      "aotSha256": "770561cb7cca813bae227d14aad37dc9297980c7d137b95caa9f1981ab0abcfe",
+      "interpreterSha256": "ef10e53e06142ae5c775bd14959dd465084a5199757697859ef1a35b0fb7f42d",
+      "jitHostSha256": "fbbf46f316fc47dff84ba6920f5929ebd6fbdc24b60a4db2711a4e9063ffbe24",
+      "cases": [
+        {
+          "suite": "type-relations",
+          "mode": "interpreter",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 61.659,
+          "stdout": "PASS Arrays preserve element identity\nPASS Closed generic types remain distinct\nPASS Type identity and assignment direction\nPASS Boxing and instance checks reject null\nPASS Interface assignment includes inherited contracts\nPASS Subclass checks are strict and exclude interfaces\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "suite": "type-relations",
+          "mode": "native",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 0.392,
+          "stdout": "PASS Arrays preserve element identity\nPASS Closed generic types remain distinct\nPASS Type identity and assignment direction\nPASS Boxing and instance checks reject null\nPASS Interface assignment includes inherited contracts\nPASS Subclass checks are strict and exclude interfaces\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "suite": "type-relations",
+          "mode": "jit",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 41.822,
+          "stdout": "PASS Arrays preserve element identity\nPASS Closed generic types remain distinct\nPASS Type identity and assignment direction\nPASS Boxing and instance checks reject null\nPASS Interface assignment includes inherited contracts\nPASS Subclass checks are strict and exclude interfaces\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "modes": [
+        "interpreter",
+        "native",
+        "jit"
+      ],
+      "suites": [
+        "dependency-injection"
+      ],
+      "aotSha256": "770561cb7cca813bae227d14aad37dc9297980c7d137b95caa9f1981ab0abcfe",
+      "interpreterSha256": "ef10e53e06142ae5c775bd14959dd465084a5199757697859ef1a35b0fb7f42d",
+      "jitHostSha256": "fbbf46f316fc47dff84ba6920f5929ebd6fbdc24b60a4db2711a4e9063ffbe24",
+      "cases": [
+        {
+          "suite": "dependency-injection",
+          "mode": "interpreter",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 132.944,
+          "stdout": "PASS DI selects the greediest available public constructor\nPASS DI activates typed localizer dependencies through a retained plan\nPASS DI rejects ambiguous missing and inaccessible constructors\nPASS DI builds plans without executing constructors or factories\nPASS DI registry snapshots registrations and injects typed localizers\nPASS DI isolates scopes and shares only singleton instances\nPASS DI rejects cycles and captive scopes without poisoning resolution state\nPASS DI disposes owned services in reverse order and leaves instances caller owned\nPASS DI validates factories and registrations and resets failed singleton factories\nPASS DI injects the current provider and root disposal invalidates live scopes\nPASS DI conventional lookups distinguish missing services from activation errors\nPASS DI generic registrations preserve factory failures and plural singleton slots\nPASS DI cleans up factory results when disposal reenters resolution\nPASS DI keyed lookups isolate registrations and preserve ordinary key equality\nPASS DI keyed factories and scopes preserve independent lifetime slots\nPASS DI retrieves keyed bound function objects without invoking them as factories\nPASS DI TryAdd preserves existing type and key registrations without activating factories\nPASS DI diamond graphs preserve lifetimes and independent scope ownership\nPASS DI closes open generic registrations and isolates scoped caches by type\nPASS DI open generic singletons preserve exact overrides keyed lookup and plural order\nPASS DI website sample resolves a scoped constructor graph and disposes scopes\nTests: 21, passed: 21, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "suite": "dependency-injection",
+          "mode": "native",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 0.508,
+          "stdout": "PASS DI selects the greediest available public constructor\nPASS DI activates typed localizer dependencies through a retained plan\nPASS DI rejects ambiguous missing and inaccessible constructors\nPASS DI builds plans without executing constructors or factories\nPASS DI registry snapshots registrations and injects typed localizers\nPASS DI isolates scopes and shares only singleton instances\nPASS DI rejects cycles and captive scopes without poisoning resolution state\nPASS DI disposes owned services in reverse order and leaves instances caller owned\nPASS DI validates factories and registrations and resets failed singleton factories\nPASS DI injects the current provider and root disposal invalidates live scopes\nPASS DI conventional lookups distinguish missing services from activation errors\nPASS DI generic registrations preserve factory failures and plural singleton slots\nPASS DI cleans up factory results when disposal reenters resolution\nPASS DI keyed lookups isolate registrations and preserve ordinary key equality\nPASS DI keyed factories and scopes preserve independent lifetime slots\nPASS DI retrieves keyed bound function objects without invoking them as factories\nPASS DI TryAdd preserves existing type and key registrations without activating factories\nPASS DI diamond graphs preserve lifetimes and independent scope ownership\nPASS DI closes open generic registrations and isolates scoped caches by type\nPASS DI open generic singletons preserve exact overrides keyed lookup and plural order\nPASS DI website sample resolves a scoped constructor graph and disposes scopes\nTests: 21, passed: 21, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "suite": "dependency-injection",
+          "mode": "jit",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 110.058,
+          "stdout": "PASS DI selects the greediest available public constructor\nPASS DI activates typed localizer dependencies through a retained plan\nPASS DI rejects ambiguous missing and inaccessible constructors\nPASS DI builds plans without executing constructors or factories\nPASS DI registry snapshots registrations and injects typed localizers\nPASS DI isolates scopes and shares only singleton instances\nPASS DI rejects cycles and captive scopes without poisoning resolution state\nPASS DI disposes owned services in reverse order and leaves instances caller owned\nPASS DI validates factories and registrations and resets failed singleton factories\nPASS DI injects the current provider and root disposal invalidates live scopes\nPASS DI conventional lookups distinguish missing services from activation errors\nPASS DI generic registrations preserve factory failures and plural singleton slots\nPASS DI cleans up factory results when disposal reenters resolution\nPASS DI keyed lookups isolate registrations and preserve ordinary key equality\nPASS DI keyed factories and scopes preserve independent lifetime slots\nPASS DI retrieves keyed bound function objects without invoking them as factories\nPASS DI TryAdd preserves existing type and key registrations without activating factories\nPASS DI diamond graphs preserve lifetimes and independent scope ownership\nPASS DI closes open generic registrations and isolates scoped caches by type\nPASS DI open generic singletons preserve exact overrides keyed lookup and plural order\nPASS DI website sample resolves a scoped constructor graph and disposes scopes\nTests: 21, passed: 21, failed: 0, skipped: 0\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "modes": [
+        "interpreter",
+        "native",
+        "jit"
+      ],
+      "suites": [
+        "localization"
+      ],
+      "aotSha256": "770561cb7cca813bae227d14aad37dc9297980c7d137b95caa9f1981ab0abcfe",
+      "interpreterSha256": "ef10e53e06142ae5c775bd14959dd465084a5199757697859ef1a35b0fb7f42d",
+      "jitHostSha256": "fbbf46f316fc47dff84ba6920f5929ebd6fbdc24b60a4db2711a4e9063ffbe24",
+      "cases": [
+        {
+          "suite": "localization",
+          "mode": "interpreter",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 85.642,
+          "stdout": "PASS Localizer preserves strings and distinguishes missing from empty\nPASS Localizer uses ordinal keys and decodes JSON escapes\nPASS Localizer rejects malformed and non-string catalogues\nPASS Localizer supports catalogues beyond provisional DOM limits\nPASS Localizer reads borrowed streams and explicit files\nPASS Localizer diagnostics report only missing display lookups\nPASS Localizer scopes and cultures fall back per key\nPASS Localizer invariant fallback is configurable and typed scope is explicit\nPASS Localizer resolves templates before formatting arguments\nPASS Localizer integrates typed JSON resources with scoped constructor injection\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "suite": "localization",
+          "mode": "native",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 0.666,
+          "stdout": "PASS Localizer preserves strings and distinguishes missing from empty\nPASS Localizer uses ordinal keys and decodes JSON escapes\nPASS Localizer rejects malformed and non-string catalogues\nPASS Localizer supports catalogues beyond provisional DOM limits\nPASS Localizer reads borrowed streams and explicit files\nPASS Localizer diagnostics report only missing display lookups\nPASS Localizer scopes and cultures fall back per key\nPASS Localizer invariant fallback is configurable and typed scope is explicit\nPASS Localizer resolves templates before formatting arguments\nPASS Localizer integrates typed JSON resources with scoped constructor injection\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "suite": "localization",
+          "mode": "jit",
+          "repetition": 1,
+          "exitCode": 0,
+          "elapsedSeconds": 162.038,
+          "stdout": "PASS Localizer preserves strings and distinguishes missing from empty\nPASS Localizer uses ordinal keys and decodes JSON escapes\nPASS Localizer rejects malformed and non-string catalogues\nPASS Localizer supports catalogues beyond provisional DOM limits\nPASS Localizer reads borrowed streams and explicit files\nPASS Localizer diagnostics report only missing display lookups\nPASS Localizer scopes and cultures fall back per key\nPASS Localizer invariant fallback is configurable and typed scope is explicit\nPASS Localizer resolves templates before formatting arguments\nPASS Localizer integrates typed JSON resources with scoped constructor injection\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "passed": true,
+      "aotSha256": "fac0b9505739348f53de0b86da0b294898591a85659df880974e773567e9383c",
+      "cases": [
+        {
+          "mode": "native",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/make-array-json-native-proof-final/app.pending",
+            "--filter",
+            "JSON byte input borrows selected windows"
+          ],
+          "exitCode": 0,
+          "stdout": "PASS JSON byte input borrows selected windows and returns owned mapped values\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "mode": "jit",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/make-array-json-final/json-streams-build/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Web.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Data.PostgreSql.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Runtime.dll",
+            "--jit-host",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/bin/neoclr-jit-host.dylib",
+            "--jit-compiler",
+            "/Users/robert/Projects/neoclr/target/make-array-codegen-shared",
+            "--reflection-roots",
+            "/Users/robert/Projects/neoclr/target/make-array-json-final/json-reflection-roots.json",
+            "--",
+            "--filter",
+            "JSON byte input borrows selected windows"
+          ],
+          "exitCode": 0,
+          "stdout": "PASS JSON byte input borrows selected windows and returns owned mapped values\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+          "stderr": ""
+        },
+        {
+          "mode": "interpreter",
+          "command": [
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/bin/neoclr",
+            "run",
+            "/Users/robert/Projects/neoclr/target/make-array-json-final/json-streams-build/app.dll",
+            "--system",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.runtime.neox",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Runtime.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Data.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Networking.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Web.dll",
+            "--module",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Data.PostgreSql.dll",
+            "--object-root",
+            "/Users/robert/Projects/neoclr/target/make-array-bundle/lib/System.Runtime.dll",
+            "--execution",
+            "interpreter",
+            "--",
+            "--filter",
+            "JSON byte input borrows selected windows"
+          ],
+          "exitCode": 0,
+          "stdout": "PASS JSON byte input borrows selected windows and returns owned mapped values\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+          "stderr": "",
+          "elapsedSeconds": 58.534
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "The JSON proof uses the built-in runner filter; the unrelated full JSON suite was stopped and is not claimed as qualified.",
+    "DI/localization and type-relations results precede the final shared array-cast inventory correction; their unaffected evidence is reused. The JSON proof qualifies that correction in all three execution modes.",
+    "Runtime array identity/rejection unit test, 14 descriptor-query tests, cast-inventory regression and seven snapshot regressions pass.",
+    "Native source lint, API snapshot checks and 5622-page local website build pass. No deployment or release was performed."
+  ]
+}

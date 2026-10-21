@@ -212,11 +212,8 @@ public class LocalizedGreeting {
 [Test("Localizer integrates typed JSON resources with scoped constructor injection")]
 func JDependencyInjection() -> Result<unit, TestFailure> {
     let resources = JsonLocalizerProvider("resources")
-    let Ok(strings) = resources.Load<FeatureX>(Culture.SwedishSweden) else {
-        return Assert.True(false, "Load typed JSON catalogue")
-    }
     let services: ServiceCollection = DefaultServiceCollection()
-    _ = Assert.True(services.AddSingleton<Localizer<FeatureX>>(strings) is Ok(_), "Register resources")?
+    _ = Assert.True(services.AddLocalization(JsonLocalizerFactory(resources, Culture.SwedishSweden)) is Ok(_), "Register open typed localizers")?
     _ = Assert.True(services.AddScoped<LocalizedGreeting>() is Ok(_), "Register consumer")?
     let Ok(provider) = services.Build() else {
         return Assert.True(false, "Build localized graph")
@@ -234,5 +231,12 @@ func JDependencyInjection() -> Result<unit, TestFailure> {
     }
     _ = Assert.True(Object.ReferenceEquals(first, second), "Scoped identity")?
     _ = Assert.Equal("scoped sv-SE", first.Region)?
-    return Assert.Equal("Totalt 12,00", first.Total(12))
+    _ = Assert.Equal("Totalt 12,00", first.Total(12))?
+    let Ok(other) = scope.GetRequiredService<Localizer<OtherPage>>() else {
+        return Assert.True(false, "Resolve another type without another registration")
+    }
+    _ = Assert.Equal("Other 12", other["invoice", 12])?
+    return Assert.Equal("regional", other["regional"])
 }
+
+public class OtherPage { }

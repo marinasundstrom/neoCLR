@@ -5,6 +5,145 @@ use neoclr::metadata::{
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
+fn generic_constructor_owners(
+    source: &neoclr::Module,
+    declaration: &neoclr::metadata::TypeDef,
+) -> Result<Vec<Type>, Error> {
+    fn collect(ty: &Type, types: &mut Vec<Type>) {
+        match ty {
+            Type::Constructed { arguments, .. } => {
+                if !types.contains(ty) {
+                    types.push(ty.clone());
+                }
+                for argument in arguments {
+                    collect(argument, types);
+                }
+            }
+            Type::ArrayRef(t)
+            | Type::Array(t)
+            | Type::ByRef(t)
+            | Type::ReadOnlyByRef(t)
+            | Type::Ptr(t)
+            | Type::InterfaceRef(t) => collect(t, types),
+            Type::Tuple(parts) => {
+                for part in parts.iter() {
+                    collect(part, types);
+                }
+            }
+            Type::Union(parts) | Type::Intersection(parts) => {
+                for part in parts {
+                    collect(part, types);
+                }
+            }
+            Type::Function(f) => {
+                for p in &f.parameters {
+                    collect(p, types);
+                }
+                collect(&f.returns, types);
+            }
+            _ => (),
+        }
+    }
+    let mut types = Vec::new();
+    for f in &source.functions {
+        for t in f
+            .parameters
+            .iter()
+            .chain(f.locals.iter())
+            .chain(std::iter::once(&f.returns))
+            .chain(f.owner.iter())
+        {
+            collect(t, &mut types);
+        }
+        for op in &f.body {
+            match op {
+                Op::LoadTypeToken(t) => collect(t, &mut types),
+                Op::Call(r)
+                | Op::CallVirtual(r)
+                | Op::Construct(r)
+                | Op::BindFunction { target: r, .. } => {
+                    for t in r
+                        .generic_arguments
+                        .iter()
+                        .chain(r.parameters.iter())
+                        .chain(r.owner.iter())
+                    {
+                        collect(t, &mut types);
+                    }
+                }
+                _ => (),
+            }
+        }
+    }
+    // Retain closed implementations reached through their declared service views.
+    // Assignability remains checked on the actual closed type during resolution.
+    let mut services = vec![declaration.name.clone()];
+    let mut next = 0;
+    while next < services.len() {
+        if let Some(d) = source.types.iter().find(|d| d.name == services[next]) {
+            for ty in d.implements.iter().chain(d.base.iter()) {
+                if let Some(name) = ty.definition_name()
+                    && !services.iter().any(|n| n == name)
+                {
+                    services.push(name.into());
+                }
+            }
+        }
+        next += 1;
+    }
+    let mut owners = Vec::new();
+    for ty in types {
+        let Type::Constructed {
+            definition,
+            arguments,
+        } = ty
+        else {
+            continue;
+        };
+        if !services.contains(&definition)
+            || arguments.len() != declaration.generic_parameters.len()
+        {
+            continue;
+        }
+        let owner = Type::Constructed {
+            definition: declaration.name.clone(),
+            arguments,
+        };
+        let Ok(descriptor) = neoclr::native_metadata::describe_type(source, &owner) else {
+            continue;
+        };
+        if neoclr::native_metadata::descriptor_shape(source, &descriptor, 24)
+            .map_err(|e| e.to_string())?
+        {
+            continue;
+        }
+        let mut bound = neoclr::native_metadata::generic_definition(source, &descriptor)
+            .map_err(|e| e.to_string())?;
+        let mut valid = true;
+        for (index, argument) in descriptor.generic_arguments.iter().enumerate() {
+            match neoclr::native_metadata::apply_generic_argument(
+                source,
+                &bound,
+                index as i32,
+                argument,
+            ) {
+                Ok(value) => bound = value,
+                Err(_) => {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        if valid && !owners.contains(&owner) {
+            owners.push(owner);
+        }
+    }
+    if owners.len() > 64 {
+        return Err("generic constructor retention exceeds 64 closed owners".into());
+    }
+    Ok(owners)
+}
+
 pub fn bind(
     input: &mut neoclr::Module,
     source: &neoclr::Module,
@@ -213,14 +352,30 @@ pub fn bind(
             .iter()
             .position(|d| *d == definition)
             .ok_or("reflection root definition is not in the explicit source load set")?;
-        if selected.iter().any(|(i, _, _, _)| *i == index) {
+        if rows
+            .iter()
+            .any(|r: &Value| r["definition"] == root["definition"])
+        {
             return Err("duplicate reflection root definition".into());
         }
         let ty = &source.types[index];
         if !ty.generic_parameters.is_empty() {
-            return Err(
-                "reflection construction roots currently require nongeneric declarations".into(),
-            );
+            if !field_policy[3]
+                || field_policy[..3].iter().any(|v| *v)
+                || property_policy.iter().any(|v| *v)
+                || custom_attributes
+            {
+                return Err(
+                    "generic roots currently support exact constructor retention only".into(),
+                );
+            }
+            let owners = generic_constructor_owners(source, ty)?;
+            rows.push(json!({"definition":definition,"sourceName":ty.name,"construct":construct,
+                "fields":false,"fieldGetters":false,"fieldSetters":false,"constructors":true,
+                "customAttributes":false,"properties":false,"getters":false,"setters":false,
+                "constructorOwners":owners,"checkStatus":2,"constructor":null,
+                "policy":"explicit generic declaration; closed constructor owners observed through service signatures"}));
+            continue;
         }
         let owner = Type::Named(ty.name.clone());
         let candidates: Vec<_> = source

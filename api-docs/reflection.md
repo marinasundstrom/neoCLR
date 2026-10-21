@@ -256,3 +256,40 @@ These descriptor additions require a matching runtime and System.Runtime bundle;
 old RuntimeFieldInfo provider layouts must be rebuilt. Legacy source-origin token tables
 remain readable, with absent tokens reported as None. No change to ordinary Raven/.NET
 reflection or compiler Runtime Contract selection is implied.
+
+## Generic definition and construction (development)
+
+`TypeInfo.GetGenericTypeDefinition() -> TypeInfo` returns the exact declaration
+of a generic definition or construction; nongeneric inputs fault.
+`MakeGenericType(arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError>`
+closes a generic definition with ordered, closed arguments. It validates arity,
+argument admissibility and constraints. Errors are InvalidDefinition, ArgumentCount,
+InvalidArgument and NotRetained. Native execution can only return retained closed
+specializations; an absent transition returns NotRetained. Partially open types,
+Void, borrowed references, pointers and runtime handles are not supported arguments.
+Unlike .NET's exception-based API, recoverable construction errors use Result.
+No object is instantiated by either operation; constructor invocation still needs
+its own retention/access grant.
+
+### Constructing vector types
+
+`TypeInfo.MakeArrayType() -> TypeInfo` returns the zero-based managed vector
+identity for its element type. It allocates no array storage. For example,
+`typeof(int).MakeArrayType()` equals `typeof(int[])`, and calling it on
+`typeof(int[])` produces `typeof(int[][])`.
+
+This follows the parameterless [.NET Type.MakeArrayType contract](https://learn.microsoft.com/en-us/dotnet/api/system.type.makearraytype?view=net-10.0).
+The rank-taking overload is not implemented. Open element types, void, byrefs,
+pointers and runtime handles are currently unsupported and fault; these are
+bounded implementation gaps, not a new general array contract. Native/JIT
+construction requires the resulting vector shape to be retained in the image,
+including through an executable array cast or an explicit type token. Type
+construction and reflective array creation share this inventory.
+
+Useful consumers include `ArrayReflection.Create(arrayType, values)` and
+`JsonSerializer.Deserialize(text, arrayType)` when an element type is selected
+at runtime. Both have built-in tests. The JSON mapper already receives a complete
+target type and therefore does not reconstruct it unnecessarily.
+`MakeGenericType` has a production consumer in DI's open-registration closure:
+requested service arguments close the implementation definition before constructor
+planning and per-closed-type caching.

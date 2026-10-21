@@ -262,6 +262,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 report['inputs'][str(path)] = sha(path)
             reflection_roots = runpy.run_path(str(helper))['reflection_roots'](
                 runtime, assembly, reflection_types or reflection_constructor_types or reflection_method_types, run,
+                modules=libraries,
                 **({'constructors': True} if reflection_constructor_types else {'methods': True} if reflection_method_types else {}))[1]
         context = ['--system', seed, *[arg for path in libraries for arg in ('--module', path)],
                    '--object-root', libraries[0]]

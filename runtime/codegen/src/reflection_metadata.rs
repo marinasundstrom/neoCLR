@@ -198,7 +198,7 @@ pub(super) fn semantic_token(
         .types
         .iter()
         .position(|t| t.name == *name)
-        .ok_or("missing token type")?;
+        .ok_or_else(|| format!("missing token type: {name}"))?;
     let row = report["sourceMetadata"]["types"]
         .as_array()
         .ok_or("missing source catalogue")?
@@ -337,9 +337,26 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 25], Error> {
     Ok(result)
 }
 
-/// Bind descriptor queries over the admitted token producers. The catalogue is
-/// authoritative for semantic names; private specialized names are never exposed.
-pub fn bind_queries(
+/// Translate a source descriptor into its selected native token.
+fn query_token(
+    input: &mut neoclr::Module,
+    source: &neoclr::Module,
+    report: &Value,
+    descriptor: &neoclr::TypeDescriptor,
+) -> Result<neoclr::metadata::Instruction, Error> {
+    use neoclr::metadata::Instruction as Op;
+    Ok(
+        match neoclr::native_metadata::snapshot_token(input, source, descriptor)
+            .map_err(|e| e.to_string())?
+        {
+            Op::LoadTypeToken(ty) => Op::LoadTypeToken(native_token(input, report, &ty)?),
+            op => op,
+        },
+    )
+}
+
+/// Bind argument application to retained constructions without adding executable bodies.
+fn bind_generic_arguments(
     input: &mut neoclr::Module,
     source: &neoclr::Module,
     report: &Value,
@@ -353,8 +370,174 @@ pub fn bind_queries(
             matches!(
                 r["name"].as_str(),
                 Some(
+                    "neoCLR.Runtime.TypeApplyGenericArgument"
+                        | "neoCLR.Runtime.TypeApplyGenericArgumentCheck"
+                )
+            )
+        })
+        .collect();
+    if queries.is_empty() {
+        return Ok(vec![]);
+    }
+    let mut transitions = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for row in report["sourceMetadata"]["types"]
+        .as_array()
+        .into_iter()
+        .flatten()
+    {
+        let arguments: Vec<Type> = serde_json::from_value(row["typeArguments"].clone())?;
+        // Executable lowering also retains internal Result<unit> carriers using
+        // Void. These are not admissible public MakeGenericType arguments.
+        if arguments.is_empty()
+            || arguments.iter().any(|argument| {
+                matches!(
+                    argument,
+                    Type::Void
+                        | Type::ByRef(_)
+                        | Type::ReadOnlyByRef(_)
+                        | Type::Ptr(_)
+                        | Type::RuntimeTypeHandle
+                )
+            })
+        {
+            continue;
+        }
+        let owner = Type::Constructed {
+            definition: row["name"]
+                .as_str()
+                .ok_or("missing generic declaration")?
+                .into(),
+            arguments,
+        };
+        let descriptor =
+            neoclr::native_metadata::describe_type(source, &owner).map_err(|e| e.to_string())?;
+        // Executable specialization does not imply that every argument has a
+        // retained public type token (for example internal structural tuples).
+        // Such constructions remain explicitly NotRetained at runtime.
+        if descriptor.generic_arguments.iter().any(|argument| {
+            neoclr::native_metadata::handle_type(source, argument)
+                .ok()
+                .and_then(|ty| native_token(input, report, &ty).ok())
+                .is_none()
+        }) {
+            continue;
+        }
+        let mut bound = neoclr::native_metadata::generic_definition(source, &descriptor)
+            .map_err(|e| e.to_string())?;
+        for (index, argument) in descriptor.generic_arguments.iter().enumerate() {
+            let result = neoclr::native_metadata::apply_generic_argument(
+                source,
+                &bound,
+                index as i32,
+                argument,
+            )
+            .map_err(|e| e.to_string())?;
+            let transition = (
+                query_token(input, source, report, &bound)?,
+                index as i32,
+                query_token(input, source, report, argument)?,
+                query_token(input, source, report, &result)?,
+            );
+            if seen.insert((bound.identity.clone(), index, argument.identity.clone())) {
+                transitions.push(transition);
+            }
+            bound = result;
+        }
+    }
+    let mut bindings = Vec::new();
+    for row in queries {
+        let index = row["compiledIndex"].as_u64().ok_or("missing query index")? as usize;
+        let f = &mut input.functions[index];
+        let check = row["name"] == "neoCLR.Runtime.TypeApplyGenericArgumentCheck";
+        if f.owner.is_some()
+            || f.instance
+            || f.parameters
+                != [
+                    Type::RuntimeTypeHandle,
+                    Type::Int32,
+                    Type::RuntimeTypeHandle,
+                ]
+            || f.returns
+                != if check {
+                    Type::Int32
+                } else {
+                    Type::RuntimeTypeHandle
+                }
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.pinvoke.is_some()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(
+                "generic construction requires exact reserved InternalCall contract".into(),
+            );
+        }
+        let mut body = Vec::new();
+        for (owner, ordinal, argument, result) in &transitions {
+            let mut skips = Vec::new();
+            for (position, expected) in [
+                (0, owner.clone()),
+                (1, Op::Int(*ordinal)),
+                (2, argument.clone()),
+            ] {
+                body.extend([Op::Arg(position), expected, Op::Equal]);
+                skips.push(body.len());
+                body.push(Op::BranchFalse(0));
+            }
+            body.extend([if check { Op::Int(0) } else { result.clone() }, Op::Return]);
+            for skip in skips {
+                body[skip] = Op::BranchFalse(body.len());
+            }
+        }
+        if check {
+            body.extend([Op::Int(2), Op::Return]);
+        } else {
+            body.push(Op::Fault(
+                "generic type construction was not retained".into(),
+            ));
+        }
+        f.body = body;
+        f.impl_flags = 0;
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,"implementation":"retained-generic-argument-application-v1","transitionCount":transitions.len()}));
+    }
+    Ok(bindings)
+}
+
+/// Bind descriptor queries over the admitted token producers. The catalogue is
+/// authoritative for semantic names; private specialized names are never exposed.
+pub fn bind_queries(
+    input: &mut neoclr::Module,
+    source: &neoclr::Module,
+    report: &Value,
+) -> Result<Vec<Value>, Error> {
+    use neoclr::metadata::Instruction as Op;
+    let generic_bindings = bind_generic_arguments(input, source, report)?;
+    let queries: Vec<_> = report["functions"]
+        .as_array()
+        .ok_or("missing function inventory")?
+        .iter()
+        .filter(|r| {
+            matches!(
+                r["name"].as_str(),
+                Some(
                     "neoCLR.Runtime.TypeName"
                         | "neoCLR.Runtime.TypeDisplayName"
+                        | "neoCLR.Runtime.TypeGenericDefinition"
+                        | "neoCLR.Runtime.TypeMakeArray"
                         | "neoCLR.Runtime.TypeArgumentCount"
                         | "neoCLR.Runtime.TypeMetadataToken"
                         | "neoCLR.Runtime.TypeArgument"
@@ -367,7 +550,7 @@ pub fn bind_queries(
         .cloned()
         .collect();
     if queries.is_empty() {
-        return Ok(vec![]);
+        return Ok(generic_bindings);
     }
     let mut open_tokens = Vec::new();
     let mut tokens = vec![];
@@ -390,8 +573,7 @@ pub fn bind_queries(
                 .map_err(|e| e.to_string())?
                 .clone();
             for parameter in &descriptor.generic_arguments {
-                let token = neoclr::native_metadata::snapshot_token(input, source, parameter)
-                    .map_err(|e| e.to_string())?;
+                let token = query_token(input, source, report, parameter)?;
                 let Op::LoadMetadataToken(index) = token else {
                     if let Op::LoadTypeToken(ty) = token
                         && !tokens.contains(&ty)
@@ -407,12 +589,22 @@ pub fn bind_queries(
             next += 1;
         }
     }
+    let arrays_needed = queries
+        .iter()
+        .any(|r| r["name"] == "neoCLR.Runtime.TypeMakeArray");
     for f in &input.functions {
         for op in &f.body {
-            if let Op::LoadTypeToken(t) = op
-                && !tokens.contains(t)
+            let token = match op {
+                Op::LoadTypeToken(t) => Some(t.clone()),
+                // Executable array casts already retain these shapes. A caller
+                // should not need a redundant typeof(T[]) to construct its handle.
+                _ if arrays_needed => super::reflection_arrays::retained_array_type(op).cloned(),
+                _ => None,
+            };
+            if let Some(token) = token
+                && !tokens.contains(&token)
             {
-                tokens.push(t.clone());
+                tokens.push(token);
             }
         }
     }
@@ -528,7 +720,47 @@ pub fn bind_queries(
         semantic_types.push(semantic_type);
         descriptors.push((token.clone(), name, count, shapes, metadata_token));
     }
-    let mut bindings = vec![];
+    let definitions_needed = queries
+        .iter()
+        .any(|r| r["name"] == "neoCLR.Runtime.TypeGenericDefinition");
+    let mut definition_rows = Vec::new();
+    if definitions_needed {
+        let mut produced = Vec::new();
+        for owner in &semantic_types {
+            let definition = neoclr::native_metadata::type_generic_definition(source, owner).ok();
+            let token = definition
+                .as_ref()
+                .map(|d| neoclr::native_metadata::snapshot_token(input, source, d))
+                .transpose()
+                .map_err(|e| e.to_string())?;
+            definition_rows.push(token);
+            if let Some(d) = definition {
+                produced.push(d);
+            }
+        }
+        for index in open_tokens.clone() {
+            let descriptor = neoclr::native_metadata::descriptor(input, index)
+                .map_err(|e| e.to_string())?
+                .clone();
+            if let Ok(d) = neoclr::native_metadata::generic_definition(source, &descriptor) {
+                produced.push(d);
+            }
+        }
+        for definition in produced {
+            for descriptor in
+                std::iter::once(&definition).chain(definition.generic_arguments.iter())
+            {
+                if let Op::LoadMetadataToken(index) =
+                    neoclr::native_metadata::snapshot_token(input, source, descriptor)
+                        .map_err(|e| e.to_string())?
+                    && !open_tokens.contains(&index)
+                {
+                    open_tokens.push(index);
+                }
+            }
+        }
+    }
+    let mut bindings = generic_bindings;
     for row in queries {
         let index = row["compiledIndex"].as_u64().ok_or("missing query index")? as usize;
         let assignable = row["name"] == "neoCLR.Runtime.ReflectionAssignable";
@@ -544,22 +776,30 @@ pub fn bind_queries(
                         neoclr::native_metadata::subclass(source, source_type, target_type)
                     }
                     .map_err(|e| e.to_string())?;
-                    if matches {
+                    if matches && !(assignable && i == j) {
                         related[i].push(j);
                     }
                 }
             }
         }
-        let prefix = open_query_prefix(input, source, &open_tokens, row["name"].as_str().unwrap())?;
+        let prefix = open_query_prefix(
+            input,
+            source,
+            report,
+            &open_tokens,
+            row["name"].as_str().unwrap(),
+        )?;
         let f = &mut input.functions[index];
         let metadata_tokens = row["name"] == "neoCLR.Runtime.TypeMetadataToken";
         let names = row["name"] == "neoCLR.Runtime.TypeName";
         let display = row["name"] == "neoCLR.Runtime.TypeDisplayName";
         let shapes = row["name"] == "neoCLR.Runtime.TypeShape";
         let arguments = row["name"] == "neoCLR.Runtime.TypeArgument";
+        let definition = row["name"] == "neoCLR.Runtime.TypeGenericDefinition";
+        let make_array = row["name"] == "neoCLR.Runtime.TypeMakeArray";
         let result = if names || display {
             Type::String
-        } else if arguments {
+        } else if arguments || definition || make_array {
             Type::RuntimeTypeHandle
         } else if shapes || relationship {
             Type::Boolean
@@ -598,25 +838,48 @@ pub fn bind_queries(
         {
             return Err("native descriptor query requires exact reserved TypeName/TypeDisplayName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken/ReflectionAssignable/ReflectionSubclass InternalCall contract".into());
         }
-        // Validate the selector once, then emit only true flags per descriptor.
-        // Emitting all fourteen Boolean branches exceeded the bounded backend's
-        // method budget when HTTP and JSON retained more than ninety types.
-        let mut body = if shapes {
+        // Validate selectors once and encode shape flags as a bit mask to keep
+        // descriptor dispatch within the bounded backend's method budget.
+        let mut body = if shapes || display {
             vec![
                 Op::Arg(1),
                 Op::Int(0),
                 Op::Less,
                 Op::BranchFalse(5),
-                Op::Fault("unknown type shape query".into()),
+                Op::Fault(
+                    if shapes {
+                        "unknown type shape query"
+                    } else {
+                        "unknown type display query"
+                    }
+                    .into(),
+                ),
                 Op::Arg(1),
-                Op::Int(25),
+                Op::Int(if shapes { 25 } else { 2 }),
                 Op::Less,
                 Op::BranchTrue(10),
-                Op::Fault("unknown type shape query".into()),
+                Op::Fault(
+                    if shapes {
+                        "unknown type shape query"
+                    } else {
+                        "unknown type name query"
+                    }
+                    .into(),
+                ),
             ]
         } else {
             vec![]
         };
+        if assignable {
+            body.extend([
+                Op::Arg(0),
+                Op::Arg(1),
+                Op::Equal,
+                Op::BranchFalse(6),
+                Op::Bool(true),
+                Op::Return,
+            ]);
+        }
         for (descriptor, (token, name, count, flags, metadata_token)) in
             descriptors.iter().enumerate()
         {
@@ -628,18 +891,44 @@ pub fn bind_queries(
                 Op::BranchFalse(0),
             ]);
             if relationship {
-                for target in &related[descriptor] {
-                    let next = body.len() + 6;
+                let mut matches = Vec::new();
+                for (position, target) in related[descriptor].iter().enumerate() {
                     body.extend([
                         Op::Arg(1),
                         Op::LoadTypeToken(descriptors[*target].0.clone()),
                         Op::Equal,
-                        Op::BranchFalse(next),
-                        Op::Bool(true),
-                        Op::Return,
                     ]);
+                    if position + 1 == related[descriptor].len() {
+                        body.push(Op::Return);
+                    } else {
+                        matches.push(body.len());
+                        body.push(Op::BranchTrue(0));
+                    }
                 }
-                body.extend([Op::Bool(false), Op::Return]);
+                if related[descriptor].is_empty() {
+                    body.extend([Op::Bool(false), Op::Return]);
+                }
+                if !matches.is_empty() {
+                    for branch in matches {
+                        body[branch] = Op::BranchTrue(body.len());
+                    }
+                    body.extend([Op::Bool(true), Op::Return]);
+                }
+            } else if make_array {
+                let array = Type::ArrayRef(Box::new(token.clone()));
+                if descriptors.iter().any(|row| row.0 == array) {
+                    body.extend([Op::LoadTypeToken(array), Op::Return]);
+                } else {
+                    body.push(Op::Fault("array type construction was not retained".into()));
+                }
+            } else if definition {
+                if let Some(token) = &definition_rows[descriptor] {
+                    body.extend([token.clone(), Op::Return]);
+                } else {
+                    body.push(Op::Fault(
+                        "generic definition requires a nominal generic type".into(),
+                    ));
+                }
             } else if arguments {
                 for (index, token) in argument_rows[descriptor].iter().enumerate() {
                     let next = body.len() + 6;
@@ -654,40 +943,43 @@ pub fn bind_queries(
                 }
                 body.push(Op::Fault("generic argument index out of range".into()));
             } else if display {
-                for selector in 0..2 {
-                    let name = neoclr::native_metadata::type_display_name(
-                        source,
-                        &semantic_types[descriptor],
-                        selector,
-                    )
-                    .map_err(|e| e.to_string())?;
-                    let next = body.len() + 6;
-                    body.extend([
-                        Op::Arg(1),
-                        Op::Int(selector),
-                        Op::Equal,
-                        Op::BranchFalse(next),
-                        Op::String(name),
-                        Op::Return,
-                    ]);
-                }
-                body.push(Op::Fault("unknown type name query".into()));
+                let name = neoclr::native_metadata::type_display_name(
+                    source,
+                    &semantic_types[descriptor],
+                    0,
+                )
+                .map_err(|e| e.to_string())?;
+                let namespace = neoclr::native_metadata::type_display_name(
+                    source,
+                    &semantic_types[descriptor],
+                    1,
+                )
+                .map_err(|e| e.to_string())?;
+                let next = body.len() + 6;
+                body.extend([
+                    Op::Arg(1),
+                    Op::Int(0),
+                    Op::Equal,
+                    Op::BranchFalse(next),
+                    Op::String(name),
+                    Op::Return,
+                    Op::String(namespace),
+                    Op::Return,
+                ]);
             } else if shapes {
-                for (selector, value) in flags.iter().enumerate() {
-                    if !value {
-                        continue;
-                    }
-                    let next = body.len() + 6;
-                    body.extend([
-                        Op::Arg(1),
-                        Op::Int(selector as i32),
-                        Op::Equal,
-                        Op::BranchFalse(next),
-                        Op::Bool(*value),
-                        Op::Return,
-                    ]);
-                }
-                body.extend([Op::Bool(false), Op::Return]);
+                let mask = flags.iter().enumerate().fold(0i32, |mask, (index, value)| {
+                    mask | if *value { 1 << index } else { 0 }
+                });
+                body.extend([
+                    Op::Int(mask),
+                    Op::Int(1),
+                    Op::Arg(1),
+                    Op::ShiftLeft,
+                    Op::BitAnd,
+                    Op::Int(0),
+                    Op::Greater,
+                    Op::Return,
+                ]);
             } else {
                 body.extend([
                     if names {
@@ -719,6 +1011,14 @@ pub fn bind_queries(
             combined.extend(body);
             body = combined;
         }
+        if body.len() > 8192 {
+            return Err(format!(
+                "{} generated {} instructions, exceeding the 8192 instruction method bound",
+                f.name,
+                body.len()
+            )
+            .into());
+        }
         f.impl_flags = 0;
         f.body = body;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
@@ -738,6 +1038,26 @@ mod tests {
         let report = json!({"functions":[{"name":"neoCLR.Runtime.TypeName","compiledIndex":0}],
             "sourceMetadata":{"types":[{"compiledTypeIndex":0,"name":"Original","origin":{"name":"Café"},"typeArguments":[]}]}});
         (module, report)
+    }
+
+    #[test]
+    fn array_construction_discovers_executable_cast_shapes() {
+        let (mut input, mut report) = query();
+        input.functions[0].name = "neoCLR.Runtime.TypeMakeArray".into();
+        input.functions[0].returns = Type::RuntimeTypeHandle;
+        report["functions"][0]["name"] = json!(input.functions[0].name);
+        let array = Type::ArrayRef(Box::new(Type::Named("HiddenBackendName".into())));
+        // The input contains an executable cast, but no array type token.
+        input.functions[1].body.push(Op::CastClass(array.clone()));
+        let mut source = input.clone();
+        source.types[0].name = "Original".into();
+        bind_queries(&mut input, &source, &report).unwrap();
+        assert!(
+            input.functions[0]
+                .body
+                .iter()
+                .any(|op| matches!(op, Op::LoadTypeToken(t) if t == &array))
+        );
     }
 
     #[test]
@@ -1209,23 +1529,39 @@ mod object_tests {
 fn open_query_prefix(
     input: &mut neoclr::Module,
     source: &neoclr::Module,
+    report: &Value,
     tokens: &[u32],
     query: &str,
 ) -> Result<Vec<neoclr::metadata::Instruction>, Error> {
     use neoclr::metadata::Instruction as Op;
     let mut body = Vec::new();
-    if query == "neoCLR.Runtime.TypeShape" && !tokens.is_empty() {
+    let display = query == "neoCLR.Runtime.TypeDisplayName";
+    if (query == "neoCLR.Runtime.TypeShape" || display) && !tokens.is_empty() {
         body.extend([
             Op::Arg(1),
             Op::Int(0),
             Op::Less,
             Op::BranchFalse(5),
-            Op::Fault("unknown type shape query".into()),
+            Op::Fault(
+                if display {
+                    "unknown type name query"
+                } else {
+                    "unknown type shape query"
+                }
+                .into(),
+            ),
             Op::Arg(1),
-            Op::Int(25),
+            Op::Int(if display { 2 } else { 25 }),
             Op::Less,
             Op::BranchTrue(10),
-            Op::Fault("unknown type shape query".into()),
+            Op::Fault(
+                if display {
+                    "unknown type name query"
+                } else {
+                    "unknown type shape query"
+                }
+                .into(),
+            ),
         ]);
     }
     let relationship = matches!(
@@ -1262,24 +1598,38 @@ fn open_query_prefix(
         match query {
             "neoCLR.Runtime.TypeName" => body.extend([Op::String(descriptor.name), Op::Return]),
             "neoCLR.Runtime.TypeDisplayName" => {
-                for selector in 0..2 {
-                    let name = neoclr::native_metadata::descriptor_display_name(
-                        source,
-                        &descriptor,
-                        selector,
-                    )
+                let name = neoclr::native_metadata::descriptor_display_name(source, &descriptor, 0)
                     .map_err(|e| e.to_string())?;
-                    let next = body.len() + 6;
-                    body.extend([
-                        Op::Arg(1),
-                        Op::Int(selector),
-                        Op::Equal,
-                        Op::BranchFalse(next),
-                        Op::String(name),
-                        Op::Return,
-                    ]);
+                let namespace =
+                    neoclr::native_metadata::descriptor_display_name(source, &descriptor, 1)
+                        .map_err(|e| e.to_string())?;
+                let next = body.len() + 6;
+                body.extend([
+                    Op::Arg(1),
+                    Op::Int(0),
+                    Op::Equal,
+                    Op::BranchFalse(next),
+                    Op::String(name),
+                    Op::Return,
+                    Op::String(namespace),
+                    Op::Return,
+                ]);
+            }
+            "neoCLR.Runtime.TypeMakeArray" => {
+                body.push(Op::Fault("open array construction is not supported".into()))
+            }
+            "neoCLR.Runtime.TypeGenericDefinition" => {
+                match neoclr::native_metadata::generic_definition(source, &descriptor) {
+                    Ok(definition) => {
+                        let token =
+                            neoclr::native_metadata::snapshot_token(input, source, &definition)
+                                .map_err(|e| e.to_string())?;
+                        body.extend([token, Op::Return]);
+                    }
+                    Err(_) => body.push(Op::Fault(
+                        "generic definition requires a nominal generic type".into(),
+                    )),
                 }
-                body.push(Op::Fault("unknown type name query".into()));
             }
             "neoCLR.Runtime.TypeArgumentCount" => body.extend([
                 Op::Int(descriptor.generic_arguments.len() as i32),
@@ -1294,8 +1644,7 @@ fn open_query_prefix(
             ]),
             "neoCLR.Runtime.TypeArgument" => {
                 for (ordinal, parameter) in descriptor.generic_arguments.iter().enumerate() {
-                    let token = neoclr::native_metadata::snapshot_token(input, source, parameter)
-                        .map_err(|e| e.to_string())?;
+                    let token = query_token(input, source, report, parameter)?;
                     let next = body.len() + 6;
                     body.extend([
                         Op::Arg(1),
@@ -1309,23 +1658,24 @@ fn open_query_prefix(
                 body.push(Op::Fault("generic argument index out of range".into()));
             }
             "neoCLR.Runtime.TypeShape" => {
+                let mut mask = 0i32;
                 for selector in 0..25 {
-                    let fact =
-                        neoclr::native_metadata::descriptor_shape(source, &descriptor, selector)
-                            .map_err(|e| e.to_string())?;
-                    if fact {
-                        let next = body.len() + 6;
-                        body.extend([
-                            Op::Arg(1),
-                            Op::Int(selector),
-                            Op::Equal,
-                            Op::BranchFalse(next),
-                            Op::Bool(true),
-                            Op::Return,
-                        ]);
+                    if neoclr::native_metadata::descriptor_shape(source, &descriptor, selector)
+                        .map_err(|e| e.to_string())?
+                    {
+                        mask |= 1 << selector;
                     }
                 }
-                body.extend([Op::Bool(false), Op::Return]);
+                body.extend([
+                    Op::Int(mask),
+                    Op::Int(1),
+                    Op::Arg(1),
+                    Op::ShiftLeft,
+                    Op::BitAnd,
+                    Op::Int(0),
+                    Op::Greater,
+                    Op::Return,
+                ]);
             }
             _ => return Err("unsupported open descriptor query".into()),
         }
@@ -1340,7 +1690,7 @@ mod open_query_tests {
     use neoclr::metadata::{FunctionRef, Instruction as Op};
 
     fn fixture() -> (neoclr::Module, neoclr::Module, Value) {
-        let source = neoclr::assemble(".module OpenQueries\n.entry Main\n.interface Example.Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.interface Fixed<T>\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeMetadataToken(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeDisplayName(RuntimeTypeHandle,Int32) -> String\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        let source = neoclr::assemble(".module OpenQueries\n.entry Main\n.interface Example.Producer<T>\n.variance out\n.end\n.interface Consumer<T>\n.variance in\n.end\n.interface Fixed<T>\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeArgumentCount(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeMetadataToken(RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeDisplayName(RuntimeTypeHandle,Int32) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.TypeGenericDefinition(RuntimeTypeHandle) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
         let mut input = source.clone();
         let definition = source.types[0].definition.as_ref().unwrap();
         let open =
@@ -1394,6 +1744,10 @@ mod open_query_tests {
             Op::String("T".into()),
         );
         check(vec![open.clone(), call("TypeArgumentCount")], Op::Int(1));
+        check(
+            vec![open.clone(), call("TypeGenericDefinition")],
+            open.clone(),
+        );
         for (selector, expected) in [(21, true), (22, true), (23, false), (24, true)] {
             check(
                 vec![open.clone(), Op::Int(selector), call("TypeShape")],
@@ -1451,7 +1805,7 @@ mod open_query_tests {
             body[i] = Op::BranchFalse(fail);
         }
         input.functions.last_mut().unwrap().body = body;
-        let report = json!({"functions":source.functions.iter().enumerate().take(6).map(|(i,f)| json!({"compiledIndex":i,"name":f.name,"definition":f.definition})).collect::<Vec<_>>()});
+        let report = json!({"functions":source.functions.iter().enumerate().take(7).map(|(i,f)| json!({"compiledIndex":i,"name":f.name,"definition":f.definition})).collect::<Vec<_>>()});
         (input, source, report)
     }
 
@@ -1566,6 +1920,64 @@ mod open_query_tests {
         );
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         crate::linking::descriptor_token_tests::assert_native_result(&selected, 42);
+    }
+
+    #[test]
+    fn partial_generic_arguments_use_the_selected_nominal_identity() {
+        let source = neoclr::assemble(".module PartialQueries\n.entry Main\n.type Pair<A,B>\n.end\n.type Item\n.end\n.function neoCLR.Runtime.TypeArgument(RuntimeTypeHandle,Int32) -> RuntimeTypeHandle\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n").unwrap();
+        let mut input = source.clone();
+        input.types[1].name = "Private.Item".into();
+        let open = neoclr::native_metadata::retain_definition_token(
+            &mut input,
+            &source,
+            source.types[0].definition.as_ref().unwrap(),
+            None,
+        )
+        .unwrap();
+        let Op::LoadMetadataToken(index) = open else {
+            panic!("definition token")
+        };
+        let definition = neoclr::native_metadata::descriptor(&input, index)
+            .unwrap()
+            .clone();
+        let item =
+            neoclr::native_metadata::describe_type(&source, &Type::Named("Item".into())).unwrap();
+        let partial =
+            neoclr::native_metadata::apply_generic_argument(&source, &definition, 0, &item)
+                .unwrap();
+        let partial =
+            neoclr::native_metadata::snapshot_token(&mut input, &source, &partial).unwrap();
+        let query = &source.functions[0];
+        let call = Op::Call(FunctionRef {
+            definition: query.definition.clone(),
+            name: query.name.clone(),
+            owner: None,
+            instance: false,
+            parameters: query.parameters.clone(),
+            generic_arguments: vec![],
+        });
+        input.functions[1].body = vec![
+            partial,
+            Op::Int(0),
+            call,
+            Op::LoadTypeToken(Type::Named("Private.Item".into())),
+            Op::Equal,
+            Op::BranchFalse(8),
+            Op::Int(42),
+            Op::Return,
+            Op::Int(1),
+            Op::Return,
+        ];
+        let report = json!({"functions":[{"compiledIndex":0,"name":query.name,"definition":query.definition}],
+            "sourceMetadata":{"types":[{"compiledTypeIndex":1,"name":"Item","typeArguments":[]}]}});
+        bind_queries(&mut input, &source, &report).unwrap();
+        localize_bound_queries(&mut input);
+        let program = neoclr::LoadedProgram::new(&input).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
     }
 
     #[test]

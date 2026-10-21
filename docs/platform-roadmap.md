@@ -12,7 +12,9 @@ closing DI and localization together before further stabilization: qualify the
 runnable DI sample and real JSON-backed typed localization through scoped
 constructor injection. The author subsequently requires provider registration against `Localizer<>`
 and resolution of `Localizer<HomePage>`: open-generic matching, activation and
-per-closed-service lifetime caches are now required before foundation closure.
+per-closed-service lifetime caches are now implemented and qualified. The built-in
+DI (21), localization (10) and type-relations (6) tests pass in interpreter, native
+and JIT execution. See [open-generic evidence](experiments/dependency-injection/open-generics.md).
 Matched release-package qualification remains open.
 [Scope and validation](experiments/localization/README.md) remain a bounded addition;
 this does not replace release qualification or expand arbitrary locale support.

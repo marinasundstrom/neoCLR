@@ -103,7 +103,7 @@ fn check_named(linked: &Module, source: &Module, name: &str, arity: usize) -> Re
     let owner = linked
         .types
         .iter()
-        .find(|d| d.name == name && d.generic_parameters.len() == arity)
+        .find(|d| d.name == name && (arity == 0 || d.generic_parameters.len() == arity))
         .and_then(|d| d.definition.as_ref())
         .ok_or_else(|| Fault::new(format!("missing definition identity for {name}")))?;
     check_module(source, &owner.module)

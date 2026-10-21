@@ -158,7 +158,7 @@ descriptor or factory adapter even when skipped; no allocation-free claim is mad
 
 Registration checks use `TypeInfo.ContainsGenericParameters`, the shared recursive
 identity query. Inheritance openness (`IsOpen`) does not reject an otherwise closed
-service. Open generic registrations remain unsupported.
+service. Open generic constructor mappings are supported; open factory/instance registrations are rejected.
 
 ## Tested application example
 
@@ -166,3 +166,19 @@ The [DI feature page](/features/dependency-injection/) includes a complete scope
 greeting example. Its source is shared with the built-in container tests; the
 [runnable project](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/dependency-injection/sample)
 shows the exact native constructor-retention option.
+
+## Open generic mappings (development)
+
+Register `typeof(Service<>)` with `typeof(Implementation<>)` using a constructor
+source and the desired lifetime. Both must be generic definitions of matching
+arity. Resolution closes the implementation with the requested service arguments,
+checks constraints and assignability, then uses the ordinary constructor plan.
+Exact closed registrations take precedence for single lookup. Plural lookup
+includes matching closed and open registrations in registration order.
+
+Caches and cycle detection are per registration and closed service identity;
+keys and lifetimes retain their existing rules. Invalid closure returns
+InvalidRegistration; constructor-plan failures return Activation. Native programs
+must retain the generic implementation constructors and the required closed
+service shapes. Unretained construction is an explicit failure, not dynamic code
+generation. Collection injection and keyed constructor annotations remain gaps.

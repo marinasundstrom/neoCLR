@@ -73,7 +73,14 @@ public union ServiceSource {
 /// An immutable service identity, activation source and lifetime.
 public class ServiceDescriptor {
     internal func Matches(type: TypeInfo, key: Object?) -> bool {
-        if !Service.Equals(type) { return false }
+        return Service.Equals(type) && MatchesKey(key)
+    }
+
+    internal func MatchesGeneric(type: TypeInfo, key: Object?) -> bool {
+        return Service.IsGenericTypeDefinition && type.IsConstructedGenericType && !type.ContainsGenericParameters && MatchesKey(key) && Service.Equals(type.GetGenericTypeDefinition())
+    }
+
+    private func MatchesKey(key: Object?) -> bool {
         if Object.ReferenceEquals(ServiceKey, key) { return true }
         if ServiceKey is Object registered { return registered.Equals(key) }
         return false
@@ -129,10 +136,17 @@ public class DefaultServiceCollection : ServiceCollection {
     /// Validates and retains an immutable descriptor without activating it.
     func Add(descriptor: ServiceDescriptor) -> Result<unit, ServiceError> {
         let service = descriptor.Service
-        if !ValidLifetime(descriptor.Lifetime) || !ValidService(service) {
+        if !ValidLifetime(descriptor.Lifetime) || (!service.IsGenericTypeDefinition && !ValidService(service)) {
             return Error(ServiceError.InvalidRegistration(service))
         }
-        if descriptor.Source is ServiceSource.Constructor(let implementation) {
+        if service.IsGenericTypeDefinition {
+            let ServiceSource.Constructor(implementation) = descriptor.Source else {
+                return Error(ServiceError.InvalidRegistration(service))
+            }
+            if !implementation.IsGenericTypeDefinition || implementation.GenericArgumentCount != service.GenericArgumentCount || implementation.IsAbstract || implementation.IsInterface || implementation.IsValueType || service.IsValueType {
+                return Error(ServiceError.InvalidRegistration(service))
+            }
+        } else if descriptor.Source is ServiceSource.Constructor(let implementation) {
             if !implementation.AssignableTo(service) || implementation.IsAbstract || implementation.IsInterface || implementation.ContainsGenericParameters || implementation.IsValueType || implementation.IsFunctionType {
                 return Error(ServiceError.InvalidRegistration(service))
             }
@@ -183,7 +197,7 @@ public class DefaultServiceCollection : ServiceCollection {
     private func Available(type: TypeInfo) -> bool {
         if type.Equals(typeof(ServiceProvider)) { return true }
         for registration in registrations {
-            if registration.ServiceKey is null && registration.Service.Equals(type) { return true }
+            if (registration.Matches(type, null) || registration.MatchesGeneric(type, null)) { return true }
         }
         return false
     }
@@ -193,7 +207,7 @@ public class DefaultServiceCollection : ServiceCollection {
         let snapshot = ArrayList<ServiceEntry>(registrations.Count)
         for registration in registrations {
             var plan: Option<ConstructorPlan> = None
-            if registration.Source is ServiceSource.Constructor(let implementation) {
+            if !registration.Service.IsGenericTypeDefinition && registration.Source is ServiceSource.Constructor(let implementation) {
                 match ConstructorPlan.Prepare(implementation, type => Available(type)) {
                     Ok(let prepared) => { plan = Some(prepared) }
                     Error(let error) => { return Error(ServiceError.Activation(registration.Service, error)) }
@@ -210,11 +224,24 @@ internal class ServiceSlot {
     var Resolving: bool = false
 }
 
+internal class ClosedServiceSlot {
+    val Index: int
+    val Service: TypeInfo
+    val Entry: ServiceEntry
+    val Slot = ServiceSlot()
+    init(index: int, service: TypeInfo, entry: ServiceEntry) {
+        Index = index
+        Service = service
+        Entry = entry
+    }
+}
+
 // Invocation-owned synchronous state; isolated workers cannot share this provider.
 internal class DefaultServiceProvider : ServiceProvider {
     private val registrations: Sequence<ServiceEntry>
     private val root: Option<DefaultServiceProvider>
     private val slots = ArrayList<ServiceSlot>()
+    private val closedSlots = ArrayList<ClosedServiceSlot>()
     private var owned = ArrayList<Object>()
     private var disposed = false
     private var activeResolutions = 0
@@ -260,7 +287,15 @@ internal class DefaultServiceProvider : ServiceProvider {
         var index = registrations.Count - 1
         while index >= 0 {
             if registrations[index].Registration.Matches(type, key) {
-                let value = ResolveSlot(index)?
+                let value = ResolveSlot(index, type)?
+                return Ok(Some(value))
+            }
+            index = index - 1
+        }
+        index = registrations.Count - 1
+        while index >= 0 {
+            if registrations[index].Registration.MatchesGeneric(type, key) {
+                let value = ResolveSlot(index, type)?
                 return Ok(Some(value))
             }
             index = index - 1
@@ -272,24 +307,30 @@ internal class DefaultServiceProvider : ServiceProvider {
         if IsDisposed { return Error(ServiceError.Disposed) }
         let results = ArrayList<Object>()
         for index in 0..registrations.Count {
-            if registrations[index].Registration.Matches(type, key) {
-                results.Add(ResolveSlot(index)?)
+            if registrations[index].Registration.Matches(type, key) || registrations[index].Registration.MatchesGeneric(type, key) {
+                results.Add(ResolveSlot(index, type)?)
             }
         }
         return Ok(results)
     }
 
-    private func ResolveSlot(index: int) -> Result<Object, ServiceError> {
+    private func ResolveSlot(index: int, type: TypeInfo) -> Result<Object, ServiceError> {
         if IsDisposed { return Error(ServiceError.Disposed) }
-        let entry = registrations[index]
-        let registration = entry.Registration
+        var entry = registrations[index]
+        var registration = entry.Registration
         if registration.Lifetime == ServiceLifetime.Singleton && root is Some(let owner) {
-            return owner.ResolveSlot(index)
+            return owner.ResolveSlot(index, type)
         }
         if registration.Lifetime == ServiceLifetime.Scoped && root is None {
-            return Error(ServiceError.ScopeRequired(registration.Service))
+            return Error(ServiceError.ScopeRequired(type))
         }
-        let slot = slots[index]
+        var slot = slots[index]
+        if registration.Service.IsGenericTypeDefinition {
+            let closed = Close(index, type)?
+            entry = closed.Entry
+            registration = entry.Registration
+            slot = closed.Slot
+        }
         if slot.Value is Some(let cached) { return Ok(cached) }
         if slot.Resolving { return Error(ServiceError.Cycle(registration.Service)) }
         slot.Resolving = true
@@ -300,6 +341,36 @@ internal class DefaultServiceProvider : ServiceProvider {
         let checked = Finish(registration, slot, result)
         if disposed && activeResolutions == 0 { owned = ArrayList<Object>() }
         return checked
+    }
+
+    private func Available(type: TypeInfo) -> bool {
+        if type.Equals(typeof(ServiceProvider)) { return true }
+        for entry in registrations {
+            if entry.Registration.Matches(type, null) || entry.Registration.MatchesGeneric(type, null) { return true }
+        }
+        return false
+    }
+
+    private func Close(index: int, service: TypeInfo) -> Result<ClosedServiceSlot, ServiceError> {
+        for closed in closedSlots {
+            if closed.Index == index && closed.Service.Equals(service) { return Ok(closed) }
+        }
+        let registration = registrations[index].Registration
+        let ServiceSource.Constructor(definition) = registration.Source else {
+            return Error(ServiceError.InvalidRegistration(service))
+        }
+        let Ok(implementation) = definition.MakeGenericType(service.GetGenericArguments()) else {
+            return Error(ServiceError.InvalidRegistration(service))
+        }
+        if !implementation.AssignableTo(service) { return Error(ServiceError.InvalidRegistration(service)) }
+        let plan = match ConstructorPlan.Prepare(implementation, type => Available(type)) {
+            Ok(let value) => value
+            Error(let error) => return Error(ServiceError.Activation(service, error))
+        }
+        let descriptor = ServiceDescriptor(service, registration.ServiceKey, ServiceSource.Constructor(implementation), registration.Lifetime)
+        let created = ClosedServiceSlot(index, service, ServiceEntry(descriptor, Some(plan)))
+        closedSlots.Add(created)
+        return Ok(created)
     }
 
     private func IsOwned(instance: Object) -> bool {
@@ -360,6 +431,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         }
         if activeResolutions == 0 { owned = ArrayList<Object>() }
         for slot in slots { slot.Value = None }
+        for closed in closedSlots { closed.Slot.Value = None }
     }
 }
 

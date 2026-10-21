@@ -1,0 +1,24 @@
+module System.Localization
+
+import System.*
+import System.Introspection.*
+
+/// Creates resource-scoped localizers without requiring a closed generic factory.
+public interface LocalizerFactory {
+    /// Selects resources associated with the supplied nominal type.
+    func Create(resourceType: TypeInfo) -> Localizer
+}
+
+/// The ordinary typed adapter used by the open generic localizer service registration.
+public class DefaultLocalizer<T> : Localizer<T> {
+    private val inner: Localizer
+
+    /// Selects the resource scope through the registered factory.
+    init(factory: LocalizerFactory) {
+        inner = factory.Create(typeof(T))
+    }
+
+    val Culture: Globalization.Culture => inner.Culture
+    val self[key: string]: string => inner[key]
+    func Find(key: string) -> Option<string> => inner.Find(key)
+}

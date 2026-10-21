@@ -8,24 +8,34 @@ import sys
 import tempfile
 
 
-def reflection_roots(runtime, assembly, names, run, constructors=False, methods=False):
+def reflection_roots(runtime, assembly, names, run, constructors=False, methods=False, modules=()):
     if constructors and methods:
         raise ValueError('Choose constructor or method retention')
     if not names:
         return []
-    with tempfile.TemporaryDirectory(prefix='neoclr-sample-reflection-') as directory:
-        listing = Path(directory) / 'module.neoil'
-        run([runtime, 'disassemble', assembly, listing])
-        text = listing.read_text()
-    metadata, _ = json.JSONDecoder().raw_decode(text[text.index('{'):])
+    def read_module(path):
+        with tempfile.TemporaryDirectory(prefix='neoclr-sample-reflection-') as directory:
+            listing = Path(directory) / 'module.neoil'
+            run([runtime, 'disassemble', path, listing])
+            text = listing.read_text()
+        return json.JSONDecoder().raw_decode(text[text.index('{'):])[0]
+
+    inventories = [read_module(assembly)]
     selected = []
     for name in names:
         suffix = '.T__' + name.encode().hex().upper()
-        matches = [i for i, item in enumerate(metadata['types']) if item.get('origin', {}).get('name') == name or item['name'].endswith(suffix)]
+        def candidates():
+            return [(metadata, i) for metadata in inventories for i, item in enumerate(metadata['types'])
+                    if item.get('origin', {}).get('name') == name or item['name'].endswith(suffix)]
+        matches = candidates()
+        if not matches and len(inventories) == 1:
+            inventories.extend(read_module(path) for path in modules)
+            matches = candidates()
         if len(matches) != 1:
             raise ValueError('Expected one reflection root: ' + name)
+        metadata, index = matches[0]
         selected.append(dict(definition=dict(module=metadata['name'], revision=metadata['revision'],
-                                             index=matches[0]), construct=True, properties=True,
+                                             index=index), construct=True, properties=True,
                              getters=True, setters=True))
     policy = dict(schemaVersion=2, types=selected)
     if constructors:

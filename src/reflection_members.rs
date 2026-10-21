@@ -96,7 +96,7 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
     let d = module.type_definition(&owner).ok_or(Error::Unsupported)?;
     if (!d.is_reference_type && kind != 4 && !matches!(kind, 2 | 3))
         || d.representation != Representation::Record
-        || !d.generic_parameters.is_empty()
+        || (!d.generic_parameters.is_empty() && kind != 4)
     {
         return Err(Error::Unsupported);
     }
@@ -239,7 +239,7 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
                 .functions
                 .iter()
                 .find(|f| {
-                    f.owner.as_ref() == Some(&owner)
+                    f.owner.as_ref().and_then(Type::definition_name) == owner.definition_name()
                         && f.definition
                             .as_ref()
                             .is_some_and(|id| id.index == index as u32)
@@ -281,6 +281,31 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
                         && !f.name.ends_with("..ctor")
                 })
                 .ok_or(Error::Missing)?
+        };
+        let closed;
+        let f = if kind == 4 && !d.generic_parameters.is_empty() {
+            let Type::Constructed {
+                arguments: type_arguments,
+                ..
+            } = &owner
+            else {
+                return Err(Error::Unbound);
+            };
+            let mut reference = target(f);
+            reference.owner = Some(owner.clone());
+            reference.parameters = f
+                .parameters
+                .iter()
+                .map(|t| {
+                    t.substitute_type_parameters(type_arguments)
+                        .map_err(|_| Error::Unsupported)
+                })
+                .collect::<Result<_, _>>()?;
+            closed = crate::vm::resolve_constructor(module, &reference)
+                .map_err(|_| Error::Unsupported)?;
+            &closed
+        } else {
+            f
         };
         if !shape(module, f, constructor, kind == 4) {
             return Err(Error::Unsupported);

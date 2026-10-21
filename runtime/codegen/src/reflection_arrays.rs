@@ -3,6 +3,16 @@ use neoclr::metadata::{FunctionRef, Instruction as Op, Type};
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
+/// Array shapes already required by executable metadata or checked casts.
+pub(crate) fn retained_array_type(op: &Op) -> Option<&Type> {
+    match op {
+        Op::LoadTypeToken(t @ Type::ArrayRef(_))
+        | Op::CastClass(t @ Type::ArrayRef(_))
+        | Op::IsInstance(t @ Type::ArrayRef(_)) => Some(t),
+        _ => None,
+    }
+}
+
 pub fn support_root(input: &neoclr::Module) -> Result<usize, Error> {
     let providers: Vec<_> = input
         .types
@@ -75,7 +85,7 @@ pub fn bind(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error>
     let mut arrays = vec![];
     for f in &input.functions {
         for op in &f.body {
-            if let Op::LoadTypeToken(t @ Type::ArrayRef(_)) = op
+            if let Some(t) = retained_array_type(op)
                 && !arrays.contains(t)
             {
                 arrays.push(t.clone());

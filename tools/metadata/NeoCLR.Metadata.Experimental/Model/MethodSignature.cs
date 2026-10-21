@@ -90,6 +90,15 @@ public sealed partial record SignatureType
     /// <summary>Gets a constructed nominal signature in a loaded snapshot, or null.</summary>
     public ReferencedGenericType? ReferencedGenericInstance { get; }
     internal static SignatureType FromConstruction(TypeReference definition, IEnumerable<SignatureType> arguments) => new(null, null, referencedGenericType: new(definition, arguments));
+    internal SignatureType DefinitionToken()
+    {
+        if (GenericInstance is { } instance) return new(null, instance.Definition);
+        if (ClassType is { } owned && owned.GenericParameterNames.Count > 0) return new(null, owned);
+        if (ImportedType is { GenericArity: > 0 } imported)
+            return new(null, null, importedType: new ImportedTypeReference(imported.Owner, imported.AssemblyIdentity,
+                imported.Namespace, imported.Name, imported.GenericArity, [], imported.IsValueType, imported.DeclaringType));
+        throw new ArgumentException("definition token requires a generic nominal declaration");
+    }
     internal static SignatureType FromReference(TypeReference reference) => new(null, null, referencedType: reference);
     internal static SignatureType FromTuple(TupleSignature tuple) => new(null, null, tuple: tuple);
     internal int NestingDepth => Tuple is { } tuple ? 1 + tuple.ElementTypes.Max(t => t.NestingDepth) : Composition is { } composition ? 1 + composition.Constituents.Max(t => t.NestingDepth) : PointerElement is { } pointer ? 1 + pointer.NestingDepth : ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;

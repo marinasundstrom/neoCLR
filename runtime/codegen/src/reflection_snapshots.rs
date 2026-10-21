@@ -472,16 +472,20 @@ pub fn bind(
     let mut method_tokens = vec![];
     let mut tokens = vec![];
     for op in input.functions.iter().flat_map(|f| &f.body) {
-        match op {
-            Op::LoadTypeToken(t) => {
-                vectors(t, &mut tokens);
-                if concrete(t) && !method_tokens.contains(t) {
-                    method_tokens.push(t.clone());
-                }
-                if concrete(t) && !base_tokens.contains(t) {
-                    base_tokens.push(t.clone());
-                }
+        let token = match op {
+            Op::LoadTypeToken(t) => Some(t),
+            _ => super::reflection_arrays::retained_array_type(op),
+        };
+        if let Some(t) = token {
+            vectors(t, &mut tokens);
+            if concrete(t) && !method_tokens.contains(t) {
+                method_tokens.push(t.clone());
             }
+            if concrete(t) && !base_tokens.contains(t) {
+                base_tokens.push(t.clone());
+            }
+        }
+        match op {
             Op::Call(target)
             | Op::CallVirtual(target)
             | Op::Construct(target)
@@ -881,13 +885,21 @@ pub fn bind(
                     .position(|definition| *definition == id)
                     .ok_or("missing declaring-type snapshot root")?;
                 let owner = Type::Named(source.types[ti].name.clone());
+                let token = if source.types[ti].generic_parameters.is_empty() {
+                    Op::LoadTypeToken(owner.clone())
+                } else {
+                    neoclr::native_metadata::retain_definition_token(
+                        factory.input,
+                        source,
+                        &id,
+                        None,
+                    )
+                    .map_err(|e| e.to_string())?
+                };
                 let branch = factory.body.len() + 3;
-                factory.body.extend([
-                    Op::Arg(0),
-                    Op::LoadTypeToken(owner.clone()),
-                    Op::Equal,
-                    Op::BranchFalse(0),
-                ]);
+                factory
+                    .body
+                    .extend([Op::Arg(0), token, Op::Equal, Op::BranchFalse(0)]);
                 let recipe = neoclr::native_metadata::declaring_type(source, &owner)
                     .map_err(|error| error.to_string())?;
                 factory.emit(&recipe, &expected)?;
@@ -939,13 +951,21 @@ pub fn bind(
                     .position(|definition| *definition == id)
                     .ok_or("missing module snapshot root")?;
                 let owner = Type::Named(source.types[ti].name.clone());
+                let token = if source.types[ti].generic_parameters.is_empty() {
+                    Op::LoadTypeToken(owner.clone())
+                } else {
+                    neoclr::native_metadata::retain_definition_token(
+                        factory.input,
+                        source,
+                        &id,
+                        None,
+                    )
+                    .map_err(|e| e.to_string())?
+                };
                 let skip = factory.body.len() + 3;
-                factory.body.extend([
-                    Op::Arg(0),
-                    Op::LoadTypeToken(owner.clone()),
-                    Op::Equal,
-                    Op::BranchFalse(0),
-                ]);
+                factory
+                    .body
+                    .extend([Op::Arg(0), token, Op::Equal, Op::BranchFalse(0)]);
                 factory.emit(
                     &neoclr::native_metadata::type_module(source, &owner)
                         .map_err(|e| e.to_string())?,
@@ -1076,95 +1096,100 @@ pub fn bind(
                     .iter()
                     .position(|d| *d == id)
                     .ok_or("missing snapshot root")?;
-                let owner = Type::Named(source.types[ti].name.clone());
-                let V::Array { elements, .. } = (if members {
-                    neoclr::native_metadata::members(source, &owner, constructors)
+                let owners: Vec<Type> = if constructors && row.get("constructorOwners").is_some() {
+                    serde_json::from_value(row["constructorOwners"].clone())?
                 } else {
-                    neoclr::native_metadata::properties(source, &owner)
-                })
-                .map_err(|e| e.to_string())?
-                else {
-                    return Err("invalid property recipe".into());
+                    vec![Type::Named(source.types[ti].name.clone())]
                 };
-                let branch = factory.body.len() + 3;
-                factory.body.extend([
-                    Op::Arg(0),
-                    Op::LoadTypeToken(owner),
-                    Op::Equal,
-                    Op::BranchFalse(0),
-                ]);
-                let mut masks = vec![];
-                if fields {
-                    let d = &source.types[ti];
-                    masks.extend(d.fields.iter().enumerate().map(|(i, _)| {
-                        (
-                            4,
-                            if d.origin.as_ref().map_or(
-                                d.fields[i].visibility == Visibility::Public,
-                                |o| {
-                                    o.field_access.get(i)
-                                        == Some(&neoclr::metadata_origin::SourceAccess::Public)
+                for owner in owners {
+                    let V::Array { elements, .. } = (if members {
+                        neoclr::native_metadata::members(source, &owner, constructors)
+                    } else {
+                        neoclr::native_metadata::properties(source, &owner)
+                    })
+                    .map_err(|e| e.to_string())?
+                    else {
+                        return Err("invalid property recipe".into());
+                    };
+                    let branch = factory.body.len() + 3;
+                    factory.body.extend([
+                        Op::Arg(0),
+                        Op::LoadTypeToken(owner),
+                        Op::Equal,
+                        Op::BranchFalse(0),
+                    ]);
+                    let mut masks = vec![];
+                    if fields {
+                        let d = &source.types[ti];
+                        masks.extend(d.fields.iter().enumerate().map(|(i, _)| {
+                            (
+                                4,
+                                if d.origin.as_ref().map_or(
+                                    d.fields[i].visibility == Visibility::Public,
+                                    |o| {
+                                        o.field_access.get(i)
+                                            == Some(&neoclr::metadata_origin::SourceAccess::Public)
+                                    },
+                                ) {
+                                    16
+                                } else {
+                                    32
                                 },
-                            ) {
-                                16
-                            } else {
-                                32
-                            },
-                        )
-                    }));
-                    masks.extend(d.static_fields.iter().map(|f| {
-                        (
-                            8,
-                            if f.visibility == Visibility::Public {
-                                16
-                            } else {
-                                32
-                            },
-                        )
-                    }));
-                    masks.extend(d.literal_fields.iter().map(|f| {
-                        (
-                            8,
-                            if f.visibility == Visibility::Public {
-                                16
-                            } else {
-                                32
-                            },
-                        )
-                    }));
-                } else if constructors {
-                    masks.extend(
-                        source
-                            .functions
-                            .iter()
-                            .filter(|f| {
-                                f.owner.as_ref().and_then(Type::definition_name)
-                                    == Some(source.types[ti].name.as_str())
-                                    && (f.name.ends_with("..ctor") || f.name.ends_with("..cctor"))
-                            })
-                            .map(|f| {
-                                (
-                                    if f.instance { 4 } else { 8 },
-                                    if f.origin.as_ref().map_or(
-                                        f.visibility == Visibility::Public,
-                                        |o| {
-                                            o.member_access
+                            )
+                        }));
+                        masks.extend(d.static_fields.iter().map(|f| {
+                            (
+                                8,
+                                if f.visibility == Visibility::Public {
+                                    16
+                                } else {
+                                    32
+                                },
+                            )
+                        }));
+                        masks.extend(d.literal_fields.iter().map(|f| {
+                            (
+                                8,
+                                if f.visibility == Visibility::Public {
+                                    16
+                                } else {
+                                    32
+                                },
+                            )
+                        }));
+                    } else if constructors {
+                        masks.extend(
+                            source
+                                .functions
+                                .iter()
+                                .filter(|f| {
+                                    f.owner.as_ref().and_then(Type::definition_name)
+                                        == Some(source.types[ti].name.as_str())
+                                        && (f.name.ends_with("..ctor")
+                                            || f.name.ends_with("..cctor"))
+                                })
+                                .map(|f| {
+                                    (
+                                        if f.instance { 4 } else { 8 },
+                                        if f.origin.as_ref().map_or(
+                                            f.visibility == Visibility::Public,
+                                            |o| {
+                                                o.member_access
                                                 == Some(
                                                     neoclr::metadata_origin::SourceAccess::Public,
                                                 )
+                                            },
+                                        ) {
+                                            16
+                                        } else {
+                                            32
                                         },
-                                    ) {
-                                        16
-                                    } else {
-                                        32
-                                    },
-                                )
-                            }),
-                    );
-                } else {
-                    for p in &source.types[ti].properties {
-                        let public =
-                            p.getter.iter().chain(&p.setter).any(|r| {
+                                    )
+                                }),
+                        );
+                    } else {
+                        for p in &source.types[ti].properties {
+                            let public = p.getter.iter().chain(&p.setter).any(|r| {
                                 source
                                     .functions
                                     .iter()
@@ -1187,11 +1212,15 @@ pub fn bind(
                                         )
                                     })
                             });
-                        masks.push((if p.instance { 4 } else { 8 }, if public { 16 } else { 32 }));
+                            masks.push((
+                                if p.instance { 4 } else { 8 },
+                                if public { 16 } else { 32 },
+                            ));
+                        }
                     }
+                    emit_filtered_members(&mut factory, &expected, element, &elements, &masks)?;
+                    factory.body[branch] = Op::BranchFalse(factory.body.len());
                 }
-                emit_filtered_members(&mut factory, &expected, element, &elements, &masks)?;
-                factory.body[branch] = Op::BranchFalse(factory.body.len());
             }
             factory.body.push(Op::Fault("native reflection property metadata was not retained; configure --reflection-roots".into()));
         } else {

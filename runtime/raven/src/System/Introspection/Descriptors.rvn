@@ -3,6 +3,7 @@ module System.Introspection
 import System.*
 import System.Collections.*
 import System.Option.*
+import System.Result.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface MemberInfo {
@@ -452,6 +453,9 @@ public sealed interface NominalTypeInfo : TypeInfo, MemberInfo {
     val Namespace: string { get }
 }
 
+/// Reasons a generic type cannot be constructed from the supplied arguments.
+public enum GenericTypeError { InvalidDefinition, ArgumentCount, InvalidArgument, NotRetained }
+
 public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     val DisplayName: string { get }
     val IsNominalType: bool { get }
@@ -468,6 +472,13 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     val ContainsGenericParameters: bool { get }
     val GenericArgumentCount: int { get }
     func GetGenericArgument(index: int) -> TypeInfo
+    /// Returns the source declaration for this nominal generic type; faults for nongeneric types.
+    func GetGenericTypeDefinition() -> TypeInfo
+    /// Constructs a closed nominal identity; native execution requires its retention.
+    func MakeGenericType(arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError>
+    /// Returns the zero-based vector type with this element type, without allocating an array.
+    /// Invalid elements and unavailable native array shapes cause a runtime fault.
+    func MakeArrayType() -> TypeInfo
     func Equals(other: TypeInfo) -> bool
     /// Returns whether this type can be assigned to a variable of target's type.
     func AssignableTo(target: TypeInfo) -> bool
@@ -531,6 +542,28 @@ internal open class RuntimeTypeInfo : TypeInfo {
             index += 1
         }
         return result
+    }
+
+    internal static func HandleOf(type: TypeInfo) -> RuntimeTypeHandle {
+        if type is RuntimeTypeInfo value { return value.ExecutionHandle }
+        if type is RuntimeNominalTypeInfo value { return value.ExecutionHandle }
+        if type is RuntimeFunctionTypeInfo value { return value.ExecutionHandle }
+        System.Fail("Invalid TypeInfo implementation")
+        return ((RuntimeNominalTypeInfo)typeof(Object)).ExecutionHandle
+    }
+
+    internal static func ConstructGeneric(handle: RuntimeTypeHandle, arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError> {
+        if !neoCLR.Runtime.TypeShape(handle, 22) { return Error(GenericTypeError.InvalidDefinition) }
+        if neoCLR.Runtime.TypeArgumentCount(handle) != arguments.Count { return Error(GenericTypeError.ArgumentCount) }
+        var bound = handle
+        for index in 0..arguments.Count {
+            let argument = HandleOf(arguments[index])
+            let status = neoCLR.Runtime.TypeApplyGenericArgumentCheck(bound, index, argument)
+            if status == 2 { return Error(GenericTypeError.NotRetained) }
+            if status != 0 { return Error(GenericTypeError.InvalidArgument) }
+            bound = neoCLR.Runtime.TypeApplyGenericArgument(bound, index, argument)
+        }
+        return Ok(FromHandle(bound))
     }
 
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
@@ -632,6 +665,18 @@ internal open class RuntimeTypeInfo : TypeInfo {
     val IsGenericParameter: bool => neoCLR.Runtime.TypeShape(Handle, 17)
     val ContainsGenericParameters: bool => neoCLR.Runtime.TypeShape(Handle, 24)
     val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
+
+    func MakeGenericType(arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError> {
+        return RuntimeTypeInfo.ConstructGeneric(Handle, arguments)
+    }
+
+    func MakeArrayType() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeMakeArray(Handle))
+    }
+
+    func GetGenericTypeDefinition() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeGenericDefinition(Handle))
+    }
 
     func GetGenericArgument(index: int) -> TypeInfo {
         return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeArgument(Handle, index))
@@ -800,6 +845,18 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     val IsGenericParameter: bool => neoCLR.Runtime.TypeShape(Handle, 17)
     val ContainsGenericParameters: bool => neoCLR.Runtime.TypeShape(Handle, 24)
     val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
+
+    func MakeGenericType(arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError> {
+        return RuntimeTypeInfo.ConstructGeneric(Handle, arguments)
+    }
+
+    func MakeArrayType() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeMakeArray(Handle))
+    }
+
+    func GetGenericTypeDefinition() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeGenericDefinition(Handle))
+    }
 
     func GetGenericArgument(index: int) -> TypeInfo {
         return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeArgument(Handle, index))
@@ -1103,6 +1160,18 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
     val IsGenericParameter: bool => neoCLR.Runtime.TypeShape(Handle, 17)
     val ContainsGenericParameters: bool => neoCLR.Runtime.TypeShape(Handle, 24)
     val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
+
+    func MakeGenericType(arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError> {
+        return RuntimeTypeInfo.ConstructGeneric(Handle, arguments)
+    }
+
+    func MakeArrayType() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeMakeArray(Handle))
+    }
+
+    func GetGenericTypeDefinition() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeGenericDefinition(Handle))
+    }
 
     func GetGenericArgument(index: int) -> TypeInfo {
         return RuntimeTypeInfo.FromHandle(neoCLR.Runtime.TypeArgument(Handle, index))

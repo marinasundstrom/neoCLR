@@ -342,7 +342,14 @@ func ByteInputOwnership() -> Result<unit, TestFailure> {
     let Ok(number) = JsonSerializer.Deserialize("42".Utf8Bytes, typeof(int)) else {
         return Assert.True(false, "Explicit type byte mapping")
     }
-    return Assert.Equal(42, (int)number)
+    _ = Assert.Equal(42, (int)number)?
+    let arrayType = typeof(int).MakeArrayType()
+    let Ok(array) = JsonSerializer.Deserialize("[10,20]", arrayType) else {
+        return Assert.True(false, "Runtime element type selects JSON array target")
+    }
+    let values = (int[])array
+    _ = Assert.Equal(2, values.Length)?
+    return Assert.Equal(20, values[1])
 }
 
 [Test("JSON byte input rejects invalid UTF-8 before syntax and preserves quotas")]

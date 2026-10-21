@@ -138,7 +138,13 @@ public class JsonLocalizerProvider {
     /// Loads using T's simple type name as the optional resource scope, retaining typed catalogue identity.
     /// Types with the same simple name share a scope; use explicit scope loading to avoid collisions.
     func Load<T>(culture: Culture) -> Result<Localizer<T>, LocalizationError> {
-        let resourceType = typeof(T)
+        let catalogue = Load(culture, typeof(T))?
+        let typed: Localizer<T> = TypedLocalizer<T>(catalogue)
+        return Ok(typed)
+    }
+
+    /// Loads resources for a nominal runtime type using the same simple-name scope as the generic Load overload.
+    func Load(culture: Culture, resourceType: TypeInfo) -> Result<Localizer, LocalizationError> {
         if !(resourceType is NominalTypeInfo) {
             return Error(LocalizationError.InvalidScope)
         }
@@ -156,9 +162,7 @@ public class JsonLocalizerProvider {
             Ok(let value) => value
             Error(_) => return Error(LocalizationError.InvalidScope)
         }
-        let catalogue = Load(culture, scope)?
-        let typed: Localizer<T> = TypedLocalizer<T>(catalogue)
-        return Ok(typed)
+        return Load(culture, scope)
     }
 
     private static func Layer(path: string, fallback: Localizer) -> Result<Localizer, LocalizationError> {

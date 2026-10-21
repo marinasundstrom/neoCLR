@@ -88,144 +88,163 @@ pub fn bind(
                 .position(|d| *d == definition)
                 .ok_or("missing constructor root")?;
             let d = &source.types[ti];
-            let owner = Type::from_name(&d.name);
-            let owner_branch = body.len() + 3;
-            body.extend([
-                Op::Arg(0),
-                Op::LoadTypeToken(owner.clone()),
-                Op::Equal,
-                Op::BranchFalse(0),
-            ]);
-            for (fi, constructor) in source.functions.iter().enumerate().filter(|(_, f)| {
-                f.owner.as_ref() == Some(&owner) && f.instance && f.name.ends_with("..ctor")
-            }) {
-                let next = body.len() + 3;
+            let owners: Vec<Type> = if row.get("constructorOwners").is_some() {
+                serde_json::from_value(row["constructorOwners"].clone())?
+            } else {
+                vec![Type::from_name(&d.name)]
+            };
+            for owner in owners {
+                let owner_branch = body.len() + 3;
                 body.extend([
-                    Op::Arg(1),
-                    Op::Int(i32::try_from(methods[fi].index)?),
+                    Op::Arg(0),
+                    Op::LoadTypeToken(owner.clone()),
                     Op::Equal,
                     Op::BranchFalse(0),
                 ]);
-                let public = d.visibility == Visibility::Public
-                    && d.origin
-                        .as_ref()
-                        .is_none_or(|o| o.publicly_visible != Some(false))
-                    && constructor.visibility == Visibility::Public
-                    && !constructor.origin.as_ref().is_some_and(|o| {
-                        o.member_access != Some(neoclr::metadata_origin::SourceAccess::Public)
-                    });
-                let supported = !d.is_abstract
-                    && d.generic_parameters.is_empty()
-                    && constructor.generic_parameters.is_empty()
-                    && !constructor.is_internal_call()
-                    && constructor.pinvoke.is_none()
-                    && constructor.no_result
-                    && constructor.returns == Type::Void
-                    && constructor.parameters.iter().all(|ty| {
-                        source.is_object_reference_type(ty)
-                            || matches!(
-                                ty,
-                                Type::Boolean
-                                    | Type::Char
-                                    | Type::SByte
-                                    | Type::Byte
-                                    | Type::Int16
-                                    | Type::UInt16
-                                    | Type::Int32
-                                    | Type::UInt32
-                                    | Type::Int64
-                                    | Type::UInt64
-                                    | Type::IntPtr
-                                    | Type::UIntPtr
-                                    | Type::Single
-                                    | Type::Double
-                            )
-                    });
-                if !supported {
-                    reject(&mut body, check, 2);
-                } else if !public || row["construct"] != true {
-                    reject(&mut body, check, 3);
-                } else {
-                    body.extend([Op::Arg(2), Op::ReferenceIsNull]);
-                    require(&mut body, check, 6);
-                    body.extend([Op::Arg(3), Op::ReferenceIsNull, Op::Bool(false), Op::Equal]);
-                    require(&mut body, check, 8);
+                for (fi, constructor) in source.functions.iter().enumerate().filter(|(_, f)| {
+                    f.owner.as_ref().and_then(Type::definition_name) == Some(d.name.as_str())
+                        && f.instance
+                        && f.name.ends_with("..ctor")
+                }) {
+                    let mut constructor = constructor.clone();
+                    if let Type::Constructed { arguments, .. } = &owner {
+                        constructor.parameters = constructor
+                            .parameters
+                            .iter()
+                            .map(|t| {
+                                t.substitute_type_parameters(arguments)
+                                    .map_err(|e| e.to_string())
+                            })
+                            .collect::<Result<_, _>>()?;
+                        constructor.owner = Some(owner.clone());
+                    }
+                    let next = body.len() + 3;
                     body.extend([
-                        Op::Arg(3),
-                        Op::ArrayLength,
-                        Op::ConvertInt32,
-                        Op::Int(i32::try_from(constructor.parameters.len())?),
+                        Op::Arg(1),
+                        Op::Int(i32::try_from(methods[fi].index)?),
                         Op::Equal,
+                        Op::BranchFalse(0),
                     ]);
-                    require(&mut body, check, 8);
-                    for (pi, ty) in constructor.parameters.iter().enumerate() {
-                        let reference = source.is_object_reference_type(ty);
-                        let skip_null = if reference {
-                            let branch = body.len() + 4;
-                            body.extend([
-                                Op::Arg(3),
-                                Op::Int(i32::try_from(pi)?),
-                                Op::ArrayElement(object.clone()),
-                                Op::ReferenceIsNull,
-                                Op::BranchTrue(0),
-                            ]);
-                            Some(branch)
-                        } else {
-                            None
-                        };
+                    let public = d.visibility == Visibility::Public
+                        && d.origin
+                            .as_ref()
+                            .is_none_or(|o| o.publicly_visible != Some(false))
+                        && constructor.visibility == Visibility::Public
+                        && !constructor.origin.as_ref().is_some_and(|o| {
+                            o.member_access != Some(neoclr::metadata_origin::SourceAccess::Public)
+                        });
+                    let supported = !d.is_abstract
+                        && constructor.generic_parameters.is_empty()
+                        && !constructor.is_internal_call()
+                        && constructor.pinvoke.is_none()
+                        && constructor.no_result
+                        && constructor.returns == Type::Void
+                        && constructor.parameters.iter().all(|ty| {
+                            source.is_object_reference_type(ty)
+                                || matches!(
+                                    ty,
+                                    Type::Boolean
+                                        | Type::Char
+                                        | Type::SByte
+                                        | Type::Byte
+                                        | Type::Int16
+                                        | Type::UInt16
+                                        | Type::Int32
+                                        | Type::UInt32
+                                        | Type::Int64
+                                        | Type::UInt64
+                                        | Type::IntPtr
+                                        | Type::UIntPtr
+                                        | Type::Single
+                                        | Type::Double
+                                )
+                        });
+                    if !supported {
+                        reject(&mut body, check, 2);
+                    } else if !public || row["construct"] != true {
+                        reject(&mut body, check, 3);
+                    } else {
+                        body.extend([Op::Arg(2), Op::ReferenceIsNull]);
+                        require(&mut body, check, 6);
+                        body.extend([Op::Arg(3), Op::ReferenceIsNull, Op::Bool(false), Op::Equal]);
+                        require(&mut body, check, 8);
                         body.extend([
                             Op::Arg(3),
-                            Op::Int(i32::try_from(pi)?),
-                            Op::ArrayElement(object.clone()),
-                            Op::IsInstance(ty.clone()),
-                            Op::ReferenceIsNull,
-                            Op::Bool(false),
+                            Op::ArrayLength,
+                            Op::ConvertInt32,
+                            Op::Int(i32::try_from(constructor.parameters.len())?),
                             Op::Equal,
                         ]);
                         require(&mut body, check, 8);
-                        if let Some(branch) = skip_null {
-                            body[branch] = Op::BranchTrue(body.len());
-                        }
-                    }
-                    if check {
-                        body.push(Op::Int(0));
-                    } else {
                         for (pi, ty) in constructor.parameters.iter().enumerate() {
+                            let reference = source.is_object_reference_type(ty);
+                            let skip_null = if reference {
+                                let branch = body.len() + 4;
+                                body.extend([
+                                    Op::Arg(3),
+                                    Op::Int(i32::try_from(pi)?),
+                                    Op::ArrayElement(object.clone()),
+                                    Op::ReferenceIsNull,
+                                    Op::BranchTrue(0),
+                                ]);
+                                Some(branch)
+                            } else {
+                                None
+                            };
                             body.extend([
                                 Op::Arg(3),
                                 Op::Int(i32::try_from(pi)?),
                                 Op::ArrayElement(object.clone()),
-                                if source.is_object_reference_type(ty) {
-                                    Op::CastClass(ty.clone())
-                                } else {
-                                    Op::UnboxAny(ty.clone())
-                                },
+                                Op::IsInstance(ty.clone()),
+                                Op::ReferenceIsNull,
+                                Op::Bool(false),
+                                Op::Equal,
                             ]);
+                            require(&mut body, check, 8);
+                            if let Some(branch) = skip_null {
+                                body[branch] = Op::BranchTrue(body.len());
+                            }
                         }
-                        let target = &input.functions[fi];
-                        body.push(Op::Construct(FunctionRef {
-                            definition: target.definition.clone(),
-                            name: target.name.clone(),
-                            owner: target.owner.clone(),
-                            instance: true,
-                            generic_arguments: vec![],
-                            parameters: target.parameters.clone(),
-                        }));
-                        body.push(if d.is_reference_type {
-                            Op::CastClass(object.clone())
+                        if check {
+                            body.push(Op::Int(0));
                         } else {
-                            Op::BoxValue(owner.clone())
-                        });
-                        if !roots.contains(&fi) {
-                            roots.push(fi);
+                            for (pi, ty) in constructor.parameters.iter().enumerate() {
+                                body.extend([
+                                    Op::Arg(3),
+                                    Op::Int(i32::try_from(pi)?),
+                                    Op::ArrayElement(object.clone()),
+                                    if source.is_object_reference_type(ty) {
+                                        Op::CastClass(ty.clone())
+                                    } else {
+                                        Op::UnboxAny(ty.clone())
+                                    },
+                                ]);
+                            }
+                            let target = &input.functions[fi];
+                            body.push(Op::Construct(FunctionRef {
+                                definition: target.definition.clone(),
+                                name: target.name.clone(),
+                                owner: Some(owner.clone()),
+                                instance: true,
+                                generic_arguments: vec![],
+                                parameters: constructor.parameters.clone(),
+                            }));
+                            body.push(if d.is_reference_type {
+                                Op::CastClass(object.clone())
+                            } else {
+                                Op::BoxValue(owner.clone())
+                            });
+                            if d.generic_parameters.is_empty() && !roots.contains(&fi) {
+                                roots.push(fi);
+                            }
                         }
+                        body.push(Op::Return);
                     }
-                    body.push(Op::Return);
+                    body[next] = Op::BranchFalse(body.len());
                 }
-                body[next] = Op::BranchFalse(body.len());
+                reject(&mut body, check, 4);
+                body[owner_branch] = Op::BranchFalse(body.len());
             }
-            reject(&mut body, check, 4);
-            body[owner_branch] = Op::BranchFalse(body.len());
         }
         reject(&mut body, check, 1);
         input.functions[index].impl_flags = 0;

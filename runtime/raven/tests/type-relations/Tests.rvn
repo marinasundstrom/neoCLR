@@ -56,6 +56,18 @@ func Instances() -> Result<unit, TestFailure> {
 [Test("Closed generic types remain distinct")]
 func Generics() -> Result<unit, TestFailure> {
     let generic = typeof(ArrayList<int>)
+    let definition = generic.GetGenericTypeDefinition()
+    _ = Assert.True(definition.IsGenericTypeDefinition, "Recovered definition")?
+    _ = Assert.True(definition.Equals(typeof(ArrayList<>)), "Definition literal identity")?
+    _ = Assert.True(definition.Equals(typeof(ArrayList<string>).GetGenericTypeDefinition()), "Arguments share the same definition")?
+    _ = Assert.True(definition.Equals(definition.GetGenericTypeDefinition()), "Definition is idempotent")?
+    _ = Assert.True(!definition.Equals(typeof(List<int>).GetGenericTypeDefinition()), "Distinct declarations")?
+    let Ok(reconstructed) = definition.MakeGenericType([typeof(int)]) else {
+        return Assert.True(false, "Unable to construct retained ArrayList<int>")
+    }
+    _ = Assert.True(reconstructed.Equals(generic), "Construction preserves closed identity")?
+    _ = Assert.True(definition.MakeGenericType([typeof(int), typeof(string)]) is Error(GenericTypeError.ArgumentCount), "Generic arity checked")?
+    _ = Assert.True(typeof(int).MakeGenericType([typeof(int)]) is Error(GenericTypeError.InvalidDefinition), "Non-generic definition rejected")?
     _ = Assert.True(generic.IsGenericType, "Constructed nominal type is generic")?
     _ = Assert.True(generic.IsConstructedGenericType, "Constructed identity")?
     _ = Assert.True(!generic.IsGenericTypeDefinition, "Closed type is not its definition")?
@@ -72,6 +84,14 @@ func Generics() -> Result<unit, TestFailure> {
 
 [Test("Arrays preserve element identity")]
 func Arrays() -> Result<unit, TestFailure> {
+    let constructed = typeof(int).MakeArrayType()
+    let values: Object?[] = [10, 20]
+    let array = (int[])System.Runtime.Reflection.ArrayReflection.Create(constructed, values)
+    _ = Assert.Equal(2, array.Length)?
+    _ = Assert.Equal(20, array[1])?
+    _ = Assert.True(typeof(int).MakeArrayType().Equals(typeof(int[])), "Construct integer vector identity")?
+    _ = Assert.True(typeof(string).MakeArrayType().Equals(typeof(string[])), "Construct reference vector identity")?
+    _ = Assert.True(typeof(int[]).MakeArrayType().Equals(typeof(int[][])), "Construct jagged vector identity")?
     _ = Assert.True(!typeof(int[]).IsGenericType, "Array is not a nominal generic type")?
     _ = Assert.True(!typeof(int[]).ContainsGenericParameters, "Closed array")?
     _ = Assert.True(typeof(int[]).AssignableTo(typeof(int[])), "array identity")?

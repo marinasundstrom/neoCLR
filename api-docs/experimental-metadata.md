@@ -10484,3 +10484,15 @@ Native snapshots, CLI reference projection and Raven import retain types and bit
 Use a matching runtime/compiler/metadata SDK; older readers reject these new shapes.
 Reflection getters and constant snapshots return the appropriate boxed primitive;
 reading a constant in source is inlined and needs no static storage or initialization.
+
+### Generic declaration tokens (development, 2026-10-21)
+
+`IILGenerator.LoadTypeDefinitionToken(SignatureType type)` emits a runtime type
+handle for the generic declaration underlying an owned/imported nominal signature.
+It discards supplied generic arguments only for this explicit token operation;
+normal `LoadTypeToken` retains constructed arguments. Obtain the generator from
+`MethodBuilder.GetILGenerator()`. Nongeneric/structural arguments are rejected.
+The declaration must belong to the current assembly or an explicitly imported
+reference. Native metadata retains the declaration identity without introducing
+caller-scoped parameters; CLI output uses the ordinary TypeDef/TypeRef ldtoken.
+This does not permit generic definitions as local/field storage.

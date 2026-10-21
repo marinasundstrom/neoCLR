@@ -14330,3 +14330,32 @@ emission is unchanged. Nine focused prepared-expression/index tests pass. Runtim
 Contract, metadata and ABI are unchanged. Nested-expression propagation restrictions
 remain, and async suspension in this assignment path is not independently qualified.
 See Raven's `docs/compiler/neoclr-cli-bridge.md` for compiler-side evidence.
+
+### Generic declaration tokens and localization DI (2026-10-21, development)
+
+Native `typeof(Foo<>)` is a declaration identity, while `typeof(Foo<T>)` is a
+constructed signature containing its actual arguments. The native linear emitter
+uses the metadata SDK's `LoadTypeDefinitionToken` for the former. Both encode the
+existing ldtoken operation; no caller-scoped type parameters are synthesized for
+an unbound definition. CLI output uses ordinary TypeDef/TypeRef tokens. Storage
+verification still rejects bare generic definitions.
+
+Runtime Contract selection is unchanged (`NeoCLR` native metadata output); the
+.NET emitter is unchanged. Shared runtime identity supports GetGenericTypeDefinition
+and bounded MakeGenericType; native executable constructor retention remains
+explicit. Open generic implementation roots can retain observed closed service
+views; this does not grant arbitrary runtime specialization or method invocation.
+The SDK, native emitter, runtime and codegen must be built together. The built-in
+neoCLR type-relations, dependency-injection and localization suites are the
+integration checks: all 37 tests pass in interpreter/native/JIT execution with Raven
+cc64f787d. API snapshots and the 5,622-page website pass. Native descriptor dispatch
+uses compact shape masks and shared relationship return branches, retaining the
+existing per-method instruction limit. Matched release-package qualification is
+not implied.
+
+`TypeInfo.MakeArrayType` uses an ordinary reserved RuntimeTypeHandle query; it does
+not add an IL opcode or alter array storage. Closed managed vectors are supported;
+open elements and rank-taking construction remain gaps. Native snapshots, descriptor
+queries and reflective array allocation share retention of array type tokens and
+executable array casts. The JSON proof uses the built-in test runner's filter and
+the normal runtime-type deserialization overload, without a redundant vector token.

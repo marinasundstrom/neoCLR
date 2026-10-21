@@ -324,6 +324,8 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI retrieves keyed bound function objects without invoking them as factories',
     'DI TryAdd preserves existing type and key registrations without activating factories',
     'DI diamond graphs preserve lifetimes and independent scope ownership',
+    'DI closes open generic registrations and isolates scoped caches by type',
+    'DI open generic singletons preserve exact overrides keyed lookup and plural order',
     'DI website sample resolves a scoped constructor graph and disposes scopes',
 ]
 
@@ -593,7 +595,7 @@ def main():
                 if name == 'dependency-injection':
                     di_types = reflection_names
                 elif name == 'localization':
-                    localization_types = reflection_names
+                    localization_types = reflection_names + ["System.Localization.DefaultLocalizer`1"]
                 else:
                     method_types = reflection_names
             if name == "json-streams":
@@ -664,7 +666,7 @@ def main():
             if name == 'localization':
                 localization_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
                     args.runtime.resolve(), build / 'app.dll', localization_types,
-                    lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True)[1]
+                    lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True, modules=[bundle / path for path in json.loads((bundle / "manifest.json").read_text())["modules"]])[1]
             if name == 'method-state':
                 method_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
                     args.runtime.resolve(), build / 'app.dll', method_types,

@@ -94,3 +94,34 @@ native file input remains a host capability gap. Interpreter storage uses its
 existing host implementation.
 
 [Localization feature guide](/features/localization/)
+
+## Dependency injection (development)
+
+`LocalizerFactory.Create(resourceType: TypeInfo) -> Localizer` is the nongeneric
+factory contract. `DefaultLocalizer<T>(factory: LocalizerFactory)` implements
+`Localizer<T>` by delegating to `factory.Create(typeof(T))`.
+
+`JsonLocalizerFactory(provider: JsonLocalizerProvider, culture: Culture)` fixes
+resource configuration and culture without I/O. Create caches a lazy localizer
+per exact resource type. First lookup synchronously loads the fallback chain;
+invalid resources fault. Use `provider.Load(culture, resourceType)` for a
+recoverable `Result<Localizer, LocalizationError>` instead. Find reports a missing
+key, not loading or formatting errors. Instances are for serialized guest access.
+
+`ServiceCollection.AddLocalization(factory: LocalizerFactory)` returns
+`Result<unit, ServiceError>`. It conditionally registers the caller-owned singleton
+factory and open transient `Localizer<> -> DefaultLocalizer<>` mapping. Existing
+explicit registrations win. Different resource types need no separate registration.
+Each resolution creates a small typed adapter; the JSON factory reuses catalogues.
+Retain DefaultLocalizer's constructors for native activation, as well as consumer
+constructors. No ambient culture, reload or plural rules are introduced.
+
+For a native project, add the adapter retention alongside your consumer roots:
+
+```sh
+--reflection-constructor-type 'System.Localization.DefaultLocalizer`1'
+```
+
+The native project builder resolves this exact metadata name from the supplied
+class-library modules. It retains the closed adapter shapes observed through
+`Localizer<T>` requests; it does not enable arbitrary runtime code generation.

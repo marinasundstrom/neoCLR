@@ -156,3 +156,15 @@ internal extern func EnumName(handle: RuntimeTypeHandle, index: int) -> string;
 internal extern func EnumBits(handle: RuntimeTypeHandle, index: int) -> int;
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func EnumBox(handle: RuntimeTypeHandle, value: int) -> Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeMakeArray(arg0: System.RuntimeTypeHandle) -> System.RuntimeTypeHandle;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeGenericDefinition(arg0: System.RuntimeTypeHandle) -> System.RuntimeTypeHandle;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeApplyGenericArgument(arg0: System.RuntimeTypeHandle, arg1: int, arg2: System.RuntimeTypeHandle) -> System.RuntimeTypeHandle;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeApplyGenericArgumentCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: System.RuntimeTypeHandle) -> int;

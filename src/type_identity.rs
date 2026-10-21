@@ -93,6 +93,103 @@ pub struct TypeDescriptor {
     pub declaring_type: Option<TypeDefId>,
 }
 
+/// Recover the exact declaration identity of a nominal generic view.
+pub(crate) fn generic_definition(
+    module: &Module,
+    descriptor: &TypeDescriptor,
+) -> Result<TypeDescriptor, Fault> {
+    let TypeIdentity::Definition {
+        definition,
+        arguments,
+    } = &descriptor.identity
+    else {
+        return Err(Fault::new(
+            "generic definition requires a nominal generic type",
+        ));
+    };
+    if arguments.is_empty() {
+        return Err(Fault::new("generic definition requires a generic type"));
+    }
+    let declaration = module
+        .types
+        .iter()
+        .find(|d| d.definition.as_ref() == Some(definition))
+        .ok_or_else(|| Fault::new("generic declaration is not loaded"))?;
+    describe_definition(module, declaration)
+}
+
+/// Apply one argument to an open generic identity. Executable constraints are
+/// checked only once the identity is fully closed.
+pub(crate) fn apply_generic_argument(
+    module: &Module,
+    owner: &TypeDescriptor,
+    index: i32,
+    argument: &TypeDescriptor,
+) -> Result<TypeDescriptor, Fault> {
+    let TypeIdentity::Definition {
+        definition,
+        arguments,
+    } = &owner.identity
+    else {
+        return Err(Fault::new(
+            "generic construction requires a nominal definition",
+        ));
+    };
+    let index = usize::try_from(index).map_err(|_| Fault::new("invalid generic argument index"))?;
+    if !matches!(arguments.get(index), Some(TypeIdentity::GenericParameter { definition: declaring, index: ordinal }) if declaring == definition && usize::from(*ordinal) == index)
+    {
+        return Err(Fault::new("generic argument position is not unbound"));
+    }
+    if argument.identity.contains_generic_parameters() {
+        return Err(Fault::new(
+            "generic construction currently requires closed arguments",
+        ));
+    }
+    let value = crate::reflection::from_identity(module, &argument.identity)?;
+    if matches!(
+        value,
+        Type::Void
+            | Type::ByRef(_)
+            | Type::ReadOnlyByRef(_)
+            | Type::Ptr(_)
+            | Type::RuntimeTypeHandle
+    ) {
+        return Err(Fault::new("invalid generic type argument"));
+    }
+    let mut bound = arguments.clone();
+    bound[index] = argument.identity.clone();
+    let identity = TypeIdentity::Definition {
+        definition: definition.clone(),
+        arguments: bound,
+    };
+    if !identity.contains_generic_parameters() {
+        let declaration = module
+            .types
+            .iter()
+            .find(|d| d.definition.as_ref() == Some(definition))
+            .ok_or_else(|| Fault::new("generic definition is not loaded"))?;
+        let Type::Constructed { arguments, .. } =
+            crate::reflection::from_identity(module, &identity)?
+        else {
+            return Err(Fault::new("invalid constructed identity"));
+        };
+        crate::constraints::check(module, &declaration.generic_constraints, &arguments)?;
+    }
+    describe_identity(module, &identity)
+}
+
+/// ldtoken may name a generic declaration without creating executable storage.
+pub(crate) fn describe_token(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
+    let normalized = crate::scope::normalize_type(module, ty)?;
+    if let Type::Named(name) = &normalized
+        && let Some(declaration) = module.types.iter().find(|d| &d.name == name)
+        && !declaration.generic_parameters.is_empty()
+    {
+        return describe_definition(module, declaration);
+    }
+    describe(module, &normalized)
+}
+
 pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
     let normalized = crate::scope::normalize_type(module, ty)?;
     resolve(module, &normalized)?;
@@ -981,6 +1078,116 @@ pub(crate) fn retained_descriptor(module: &Module, index: u32) -> Result<&TypeDe
 #[cfg(test)]
 mod generic_state_tests {
     use super::*;
+
+    #[test]
+    fn array_construction_preserves_elements_and_rejects_invalid_storage() {
+        let module = crate::assemble(".module Arrays\n").unwrap();
+        let module =
+            crate::library::link_modules(&module, crate::library::system().unwrap(), &[]).unwrap();
+        for element in [
+            Type::Int32,
+            Type::String,
+            Type::ArrayRef(Box::new(Type::Int32)),
+        ] {
+            let handle = describe(&module, &element).unwrap();
+            let result = crate::reflection::Query::MakeArray
+                .invoke(
+                    &module,
+                    &[crate::Value::RuntimeTypeHandle(Box::new(handle))],
+                    &crate::Limits::default(),
+                )
+                .unwrap();
+            let crate::Value::RuntimeTypeHandle(array) = result else {
+                panic!("array handle")
+            };
+            assert_eq!(
+                *array,
+                describe(&module, &Type::ArrayRef(Box::new(element))).unwrap()
+            );
+        }
+        for element in [
+            Type::Void,
+            Type::ByRef(Box::new(Type::Int32)),
+            Type::RuntimeTypeHandle,
+        ] {
+            let handle = describe(&module, &element).unwrap();
+            assert!(
+                crate::reflection::Query::MakeArray
+                    .invoke(
+                        &module,
+                        &[crate::Value::RuntimeTypeHandle(Box::new(handle))],
+                        &crate::Limits::default()
+                    )
+                    .is_err()
+            );
+        }
+    }
+
+    #[test]
+    fn definition_tokens_are_descriptive_not_open_storage() {
+        let mut module = crate::assemble(".module Definitions\n.entry Main\n.type Box<T>\n.end\n.function Main() -> RuntimeTypeHandle\ncall Definition()\nret\n.end\n.function Definition() -> RuntimeTypeHandle\nldtoken Box\nret\n.end\n").unwrap();
+        module.references = Some(vec![]);
+        let program = crate::LoadedProgram::new(&module).unwrap();
+        program.verify().unwrap();
+        let crate::Value::RuntimeTypeHandle(handle) =
+            program.run(crate::Limits::default()).unwrap().value
+        else {
+            panic!("type handle");
+        };
+        assert!(handle.identity.is_generic_definition());
+        assert!(resolve(&module, &Type::from_name("Box")).is_err());
+    }
+
+    #[test]
+    fn generic_construction_rejects_open_arguments_and_enforces_constraints() {
+        let module = crate::assemble(".module Definitions\n.type ValueOnly<T>\n.constraint T value\n.end\n.type Atom\n.end\n").unwrap();
+        let linked =
+            crate::library::link_modules(&module, crate::library::system().unwrap(), &[]).unwrap();
+        let module = &linked;
+        let definition = describe_token(module, &Type::from_name("ValueOnly")).unwrap();
+        let integer = describe(module, &Type::Int32).unwrap();
+        let closed = apply_generic_argument(module, &definition, 0, &integer).unwrap();
+        assert!(!closed.identity.contains_generic_parameters());
+        assert!(apply_generic_argument(module, &definition, 1, &integer).is_err());
+        assert!(apply_generic_argument(module, &closed, 0, &integer).is_err());
+        assert!(apply_generic_argument(module, &definition, 0, &definition).is_err());
+        let reference = describe(module, &Type::String).unwrap();
+        assert!(apply_generic_argument(module, &definition, 0, &reference).is_err());
+    }
+
+    #[test]
+    fn generic_definition_preserves_declaration_identity() {
+        let module = crate::assemble(
+            ".module Definitions\n.type Box<T>\n.end\n.type Other<T>\n.end\n.type Atom\n.end\n",
+        )
+        .unwrap();
+        let closed = describe_loaded(
+            &module,
+            &Type::Constructed {
+                definition: "Box".into(),
+                arguments: vec![Type::from_name("Atom")],
+            },
+        )
+        .unwrap();
+        let definition = generic_definition(&module, &closed).unwrap();
+        assert!(definition.identity.is_generic_definition());
+        assert_eq!(
+            generic_definition(&module, &definition).unwrap(),
+            definition
+        );
+        assert_ne!(
+            definition,
+            describe_definition(&module, &module.types[1]).unwrap()
+        );
+        assert!(
+            generic_definition(
+                &module,
+                &describe_loaded(&module, &Type::from_name("Atom")).unwrap()
+            )
+            .is_err()
+        );
+        assert!(generic_definition(&module, &definition.generic_arguments[0]).is_err());
+    }
 
     #[test]
     fn generic_state_uses_owner_identity_and_recurses_through_structural_types() {

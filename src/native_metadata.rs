@@ -128,7 +128,7 @@ pub fn declaring_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::DeclaringType.invoke_profile(
         module,
         &[Value::RuntimeTypeHandle(Box::new(
-            crate::type_identity::describe_loaded(module, owner)?,
+            crate::type_identity::describe_token(module, owner)?,
         ))],
         &Limits::default(),
         true,
@@ -141,7 +141,7 @@ pub fn type_module(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::Module.invoke_profile(
         module,
         &[Value::RuntimeTypeHandle(Box::new(
-            crate::type_identity::describe_loaded(module, owner)?,
+            crate::type_identity::describe_token(module, owner)?,
         ))],
         &Limits::default(),
         true,
@@ -1294,4 +1294,38 @@ pub fn enum_format_candidates(
     info: &crate::metadata::EnumInfo,
 ) -> Vec<&crate::metadata::EnumMember> {
     crate::enums::format_candidates(info)
+}
+
+/// Resolve a generic view to its source-owned generic definition.
+pub fn generic_definition(
+    module: &Module,
+    descriptor: &crate::TypeDescriptor,
+) -> Result<crate::TypeDescriptor, Fault> {
+    crate::type_identity::generic_definition(module, descriptor)
+}
+
+/// Resolve a closed semantic signature to its source-owned generic definition.
+pub fn type_generic_definition(
+    module: &Module,
+    owner: &Type,
+) -> Result<crate::TypeDescriptor, Fault> {
+    generic_definition(
+        module,
+        &crate::type_identity::describe_loaded(module, owner)?,
+    )
+}
+
+/// Apply an argument using shared generic identity and constraint validation.
+pub fn apply_generic_argument(
+    module: &Module,
+    owner: &crate::TypeDescriptor,
+    index: i32,
+    argument: &crate::TypeDescriptor,
+) -> Result<crate::TypeDescriptor, Fault> {
+    crate::type_identity::apply_generic_argument(module, owner, index, argument)
+}
+
+/// Describe an already admitted semantic signature.
+pub fn describe_type(module: &Module, owner: &Type) -> Result<crate::TypeDescriptor, Fault> {
+    crate::type_identity::describe_loaded(module, owner)
 }

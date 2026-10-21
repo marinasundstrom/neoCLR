@@ -28,6 +28,10 @@ pub(crate) enum Query {
     Properties,
     Interfaces,
     GenericArguments,
+    GenericDefinition,
+    MakeArray,
+    ApplyGenericArgument,
+    ApplyGenericArgumentCheck,
     Constituents,
     TupleElements,
     TupleNames,
@@ -78,6 +82,16 @@ impl Query {
             "neoCLR.Runtime.TypeTupleNames" => (Self::TupleNames, false, "String[]"),
             "neoCLR.Runtime.TypeTupleElements" => (Self::TupleElements, false, "System.Type[]"),
             "neoCLR.Runtime.TypeConstituents" => (Self::Constituents, false, "System.Type[]"),
+            "neoCLR.Runtime.TypeApplyGenericArgument" => {
+                (Self::ApplyGenericArgument, true, "RuntimeTypeHandle")
+            }
+            "neoCLR.Runtime.TypeApplyGenericArgumentCheck" => {
+                (Self::ApplyGenericArgumentCheck, true, "Int32")
+            }
+            "neoCLR.Runtime.TypeMakeArray" => (Self::MakeArray, false, "RuntimeTypeHandle"),
+            "neoCLR.Runtime.TypeGenericDefinition" => {
+                (Self::GenericDefinition, false, "RuntimeTypeHandle")
+            }
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
             }
@@ -444,6 +458,40 @@ impl Query {
                     limits,
                 )
             }
+            Self::ApplyGenericArgument | Self::ApplyGenericArgumentCheck => {
+                let Some(Value::RuntimeTypeHandle(value)) = args.get(2) else {
+                    return Err(Fault::new(
+                        "generic construction requires an argument handle",
+                    ));
+                };
+                let result =
+                    crate::type_identity::apply_generic_argument(module, handle, argument, value);
+                if matches!(self, Self::ApplyGenericArgumentCheck) {
+                    Ok(Value::Int32(if result.is_ok() { 0 } else { 1 }))
+                } else {
+                    result.map(|value| Value::RuntimeTypeHandle(Box::new(value)))
+                }
+            }
+            Self::MakeArray => {
+                if handle.identity.contains_generic_parameters()
+                    || matches!(
+                        ty,
+                        Type::Void
+                            | Type::ByRef(_)
+                            | Type::ReadOnlyByRef(_)
+                            | Type::Ptr(_)
+                            | Type::RuntimeTypeHandle
+                    )
+                {
+                    return Err(Fault::new("unsupported array element type"));
+                }
+                Ok(Value::RuntimeTypeHandle(Box::new(
+                    crate::type_identity::describe(module, &Type::ArrayRef(Box::new(ty)))?,
+                )))
+            }
+            Self::GenericDefinition => Ok(Value::RuntimeTypeHandle(Box::new(
+                crate::type_identity::generic_definition(module, handle)?,
+            ))),
             Self::BaseType => option(
                 module,
                 type_contract(module),

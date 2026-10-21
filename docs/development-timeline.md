@@ -20807,3 +20807,50 @@ The closed-service checkpoint now passes 19 DI tests and 10 localization tests p
 engine, plus two method-discovery tests per engine. The native runnable greeting
 prints `Hello, Ada!`; API snapshots, 5,580 website pages and 23 website tests pass.
 These results do not close the newly requested open-generic provider path.
+
+### Open generic localization registration — 2026-10-21
+
+The author clarified that registering a provider should allow resolution of
+`Localizer<HomePage>` through `Localizer<>`, then asked how Microsoft.Extensions
+localization uses DI and directed implementation. The assistant researched the
+.NET singleton nongeneric factory plus transient open generic adapter pattern
+and selected the same separation: DI closes ordinary generic implementations;
+localization chooses resources through `Create(TypeInfo)`.
+
+Implementation is under qualification in
+[the open generic work record](experiments/dependency-injection/open-generics.md).
+It includes shared generic definition/construction identities, native declaration
+tokens and constructor retention, and a lazy JSON factory. A compiled library is
+not yet proof of complete runtime behavior; interpreter/native/JIT qualification
+and API snapshot updates remain pending at this checkpoint.
+
+### 2026-10-21 — Array type construction and library proof cases
+
+The author requested `TypeInfo.MakeArrayType` if absent, then requested a quick
+scan of library consumers of both this method and `MakeGenericType`. The assistant
+found the former absent and added its parameterless vector form, following .NET's
+shape distinction. Closed vector construction is implemented; native retention,
+open elements and multidimensional support remain explicit limits. The scan found
+DI already closes implementation definitions using `MakeGenericType`. JSON's
+runtime-type deserialization and `ArrayReflection.Create` accept constructed array
+types, so built-in tests now exercise both consumers. The mapper itself already
+has the complete target type, and no redundant reconstruction was introduced.
+Qualification is in progress; see [reflection API](../api-docs/reflection.md).
+
+The JSON proof passed in the interpreter and exposed a native retention gap for
+an array shape already present in an executable cast. The assistant changed the
+shared native array inventory rather than adding a redundant `typeof(int[])` to
+the test. Type construction and reflective creation use the same discovery rule.
+
+Subsequent qualification completed the DI/localization foundation: 37 built-in tests
+passed in interpreter, native and JIT execution (111 executions), with matching
+API snapshots and a 5,622-page local website build. No deployment or release was
+performed. The two general compiler follow-ups above remain open.
+
+Final array qualification passed the focused JSON proof in interpreter, native and
+JIT execution without a redundant array type token. Combined with the 111 earlier
+foundation executions, [the retained evidence](experiments/dependency-injection/open-generic-validation.json)
+records 114 built-in executions. The broader unrelated JSON run was stopped,
+not reported as passed. A native replay initially reused an object-file output;
+a clean output path corrected that validation-script error. Runtime/backend
+regressions, lint and API documentation checks pass.

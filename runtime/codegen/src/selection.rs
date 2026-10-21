@@ -884,7 +884,7 @@ pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> 
     if input.functions.len() > crate::limits::INPUT_FUNCTIONS
         || input.types.len() > crate::limits::INPUT_TYPES
     {
-        return Err("closed-world input inventory exceeds bounds".into());
+        return Err(format!("closed-world input inventory exceeds bounds: {} functions (limit {}), {} types (limit {})", input.functions.len(), crate::limits::INPUT_FUNCTIONS, input.types.len(), crate::limits::INPUT_TYPES).into());
     }
     if single_assembly && input.assemblies.len() > 1 {
         return Err("closed-world selection requires one source assembly".into());

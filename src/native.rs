@@ -314,6 +314,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 Type::from_name("System.Introspection.TypeInfo"),
                 Type::Int32,
             ]
+        } else if matches!(
+            function.name.as_str(),
+            "neoCLR.Runtime.TypeApplyGenericArgument"
+                | "neoCLR.Runtime.TypeApplyGenericArgumentCheck"
+        ) {
+            vec![
+                Type::RuntimeTypeHandle,
+                Type::Int32,
+                Type::RuntimeTypeHandle,
+            ]
         } else if integer {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {

@@ -2833,3 +2833,20 @@ views without granting invocation. Matching reference comments and snapshots are
 refreshed; the fingerprint check and 5,580-page website build pass. The DI page
 links a runnable tested sample, and localization documents JSON-backed scoped
 constructor injection. Open-generic provider registration remains new required work.
+
+
+2026-10-21 open-generic DI work: the refreshed native reference includes
+GenericTypeError, TypeInfo.GetGenericTypeDefinition/MakeGenericType, LocalizerFactory,
+DefaultLocalizer<T>, JsonLocalizerFactory, provider.Load(Culture, TypeInfo) and
+LocalizationServices.AddLocalization. The legacy CLI scaffold does not project
+these additions; the native inventory and linked reflection/localization guides
+provide coverage. LoadTypeDefinitionToken is documented in the experimental SDK
+manual. Runtime qualification is recorded separately from documentation rendering.
+
+### Vector type construction — 2026-10-21
+
+The native snapshot includes `TypeInfo.MakeArrayType` and its runtime-backed
+implementations, refreshed from `target/make-array-libraries` with Raven cc64f787d.
+The [manual reflection entry](reflection.md#constructing-vector-types) documents
+vector-only shape, retained native constructions, unsupported open elements and
+consumer proof cases. This native API is not represented by the legacy CLI scaffold.

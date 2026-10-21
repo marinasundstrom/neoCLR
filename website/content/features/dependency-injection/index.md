@@ -85,10 +85,12 @@ service; typed plural lookup reuses its result storage.
 ## Current boundaries
 
 Native automatic construction requires explicit constructor retention, resolved
-from the final executable's type names. Nongeneric implementation classes can
-depend on closed generic interfaces such as `Localizer<Feature>`. Open generic
-registrations, native generic implementation retention, collection injection and
-keyed constructor-parameter annotations are future work.
+from exact source identities. Open generic constructor mappings close the
+implementation with the requested service arguments. Exact closed registrations
+win for single lookup; plural lookup preserves registration order. Singleton and
+scoped caches are separate for each closed type. Native execution requires the
+corresponding retained closed shapes. Collection injection and keyed
+constructor-parameter annotations remain future work.
 
 Read the [API contract](../../docs/dependency-injection.md) for signatures, errors,
 ownership and native build configuration. The built-in dependency-injection suite

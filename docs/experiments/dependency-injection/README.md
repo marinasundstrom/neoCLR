@@ -22,9 +22,9 @@ The intended container follows registration, transient/scoped/singleton lifetime
 and ownership conventions. The API uses Result errors instead of exceptions,
 consistent with current neoCLR APIs. Competing constructors are checked by their
 parameter-type sets, matching the default .NET container.
-Optional defaults, enumerable injection and open registrations are not implemented.
+Optional defaults and enumerable injection are not implemented. Open generic constructor mappings are being qualified in [the integration record](open-generics.md).
 Keyed services and conditional TryAdd registrations are supported. Closed typed dependencies such as Localizer<Feature> are ordinary
-service identities. Abstract/interface/unbound-generic/value implementation types are rejected.
+service identities. Abstract/interface/value implementation types are rejected; open definitions require an open generic constructor mapping.
 Inheritance-open classes remain valid; TypeInfo.IsOpen is not a generic-state flag.
 
 Preparation does not instantiate dependencies. Activation reserves one argument
@@ -135,3 +135,12 @@ our earlier open-generic deferral: shared generic definition/construction metada
 closed implementation activation and cache slots per registration/closed service
 are now required before DI/localization closure. The sample above qualifies the
 existing closed-service path, not this new requirement.
+
+## Open generic foundation closure — 2026-10-21
+
+The subsequent [open-generic implementation](open-generics.md) now qualifies all
+21 DI tests and 10 localization tests in interpreter, native and JIT execution.
+A caller-owned singleton factory and transient open adapter resolve two unrelated
+typed resource scopes through ordinary constructor injection. Native constructor
+retention remains explicit; broader runtime specialization and matched-package
+release qualification are separate work.

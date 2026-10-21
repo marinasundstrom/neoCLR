@@ -429,3 +429,85 @@ func ZWebsiteSample() -> Result<unit, TestFailure> {
     }
     return Assert.Equal("Hello, Ada!", text)
 }
+
+public interface GenericService<T> {
+    val Argument: TypeInfo { get }
+}
+
+public class GenericServiceImplementation<T> : GenericService<T> {
+    val Argument: TypeInfo => typeof(T)
+}
+
+public class GenericConsumer<T> {
+    val Service: GenericService<T>
+    init(service: GenericService<T>) { Service = service }
+}
+
+public class GenericOwned<T> : Disposable {
+    private val log: DisposalLog
+    init(log: DisposalLog) { self.log = log }
+    func Dispose() { log.Append("D") }
+}
+
+public class GenericCycle<T> {
+    init(other: GenericCycle<T>) { }
+}
+
+[Test("DI closes open generic registrations and isolates scoped caches by type")]
+func YOpenGenericScopes() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = Assert.True(services.Add(typeof(GenericService<>), typeof(GenericServiceImplementation<>), ServiceLifetime.Scoped) is Ok(_), "Open interface registration")?
+    _ = Assert.True(services.Add(typeof(GenericConsumer<>), typeof(GenericConsumer<>), ServiceLifetime.Transient) is Ok(_), "Open consumer registration")?
+    let log = DisposalLog()
+    _ = services.AddSingleton<DisposalLog>(log)
+    _ = services.Add(typeof(GenericOwned<>), typeof(GenericOwned<>), ServiceLifetime.Scoped)
+    _ = services.Add(typeof(GenericCycle<>), typeof(GenericCycle<>), ServiceLifetime.Transient)
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build generic provider") }
+    use root = provider
+    _ = Assert.True(root.GetRequiredService<GenericService<int>>() is Error(ServiceError.ScopeRequired(_)), "Scoped service needs a scope")?
+    let Ok(firstScope) = root.CreateScope() else { return Assert.True(false, "First scope") }
+    use scope = firstScope
+    let Ok(secondScope) = root.CreateScope() else { return Assert.True(false, "Second scope") }
+    use other = secondScope
+    let Ok(first) = scope.GetRequiredService<GenericConsumer<int>>() else { return Assert.True(false, "Closed consumer") }
+    let Ok(repeated) = scope.GetRequiredService<GenericService<int>>() else { return Assert.True(false, "Repeated service") }
+    let Ok(text) = scope.GetRequiredService<GenericService<string>>() else { return Assert.True(false, "Another argument") }
+    let Ok(separate) = other.GetRequiredService<GenericService<int>>() else { return Assert.True(false, "Another scope") }
+    _ = Assert.True(Object.ReferenceEquals(first.Service, repeated), "Closed slot shared within scope")?
+    _ = Assert.True(!Object.ReferenceEquals(repeated, text), "Different type arguments use different slots")?
+    _ = Assert.True(!Object.ReferenceEquals(repeated, separate), "Scopes isolate closed slots")?
+    _ = Assert.True(repeated.Argument.Equals(typeof(int)), "Integer argument")?
+    _ = Assert.True(text.Argument.Equals(typeof(string)), "String argument")?
+    _ = Assert.True(scope.GetRequiredService<GenericCycle<int>>() is Error(ServiceError.Cycle(_)), "Closed cycle detected")?
+    _ = Assert.True(scope.GetRequiredService<GenericCycle<int>>() is Error(ServiceError.Cycle(_)), "Closed cycle state resets")?
+    _ = Assert.True(scope.GetRequiredService<GenericOwned<int>>() is Ok(_), "Owned integer instance")?
+    _ = Assert.True(scope.GetRequiredService<GenericOwned<string>>() is Ok(_), "Owned string instance")?
+    scope.Dispose()
+    scope.Dispose()
+    return Assert.Equal("DD", log.Text)
+}
+
+[Test("DI open generic singletons preserve exact overrides keyed lookup and plural order")]
+func YOpenGenericSingletons() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let closed: GenericService<int> = GenericServiceImplementation<int>()
+    _ = Assert.True(services.AddInstance(typeof(GenericService<int>), closed) is Ok(_), "Exact instance")?
+    _ = Assert.True(services.Add(typeof(GenericService<>), typeof(GenericServiceImplementation<>), ServiceLifetime.Singleton) is Ok(_), "Open singleton")?
+    _ = Assert.True(services.AddKeyed(typeof(GenericService<>), "key", typeof(GenericServiceImplementation<>), ServiceLifetime.Singleton) is Ok(_), "Keyed open singleton")?
+    _ = Assert.True(services.TryAdd(ServiceDescriptor(typeof(GenericService<>), ServiceSource.Constructor(typeof(GenericServiceImplementation<>)), ServiceLifetime.Transient)) is Ok(false), "TryAdd preserves open slot")?
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build generic provider") }
+    use root = provider
+    let Ok(scopeProvider) = root.CreateScope() else { return Assert.True(false, "Scope") }
+    use scope = scopeProvider
+    let Ok(exact) = scope.GetRequiredService<GenericService<int>>() else { return Assert.True(false, "Exact precedence") }
+    _ = Assert.True(Object.ReferenceEquals(exact, closed), "Exact registration wins despite later open registration")?
+    let Ok(text) = root.GetRequiredService<GenericService<string>>() else { return Assert.True(false, "Singleton") }
+    let Ok(repeated) = scope.GetRequiredService<GenericService<string>>() else { return Assert.True(false, "Scope singleton") }
+    _ = Assert.True(Object.ReferenceEquals(text, repeated), "Singleton shared across scopes")?
+    let Ok(keyed) = scope.GetRequiredKeyedService<GenericService<string>>("key") else { return Assert.True(false, "Keyed generic singleton") }
+    _ = Assert.True(!Object.ReferenceEquals(keyed, text), "Independent key slot")?
+    let Ok(all) = root.GetServices<GenericService<int>>() else { return Assert.True(false, "Plural generic registrations") }
+    _ = Assert.Equal(2, all.Count)?
+    _ = Assert.True(Object.ReferenceEquals(all[0], closed), "Registration order")?
+    return Assert.True(!Object.ReferenceEquals(all[1], closed), "Plural includes open registration")
+}
