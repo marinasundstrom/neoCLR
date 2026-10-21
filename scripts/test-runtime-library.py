@@ -307,6 +307,9 @@ PATH_VALUES_NAMES = [
 RECORD_FORMATTING_NAMES = [
     'Record enum payload display survives boxed dispatch and collection',
     'Record enum display preserves names flags and numeric fallback',
+    'Floating record contracts agree across boxed interface and nested calls',
+    'Floating records use value equality for NaNs zeros and infinities',
+    'Floating record display uses primitive text including negative zero',
     'Records use imported value formatting across typed and boxed calls',
     'Nested records and unions retain imported value display contracts',
     'Record scalar formatting preserves null and original Unicode text',

@@ -60,9 +60,11 @@ and closed-union shapes. Imported value components can use their declared public
 `ToString()` contract; Index and Range are covered by built-in tests. Generated calls
 avoid component boxing, although returned strings and builder storage allocate.
 Int32-backed enum components reuse ordinary enum display for names, flags and
-numeric fallback; that path currently allocates a temporary enum box. Floating
-components, generic record formatting and record-class formatting remain gaps in
-native support.
+numeric fallback; that path currently allocates a temporary enum box. Single and
+Double components use primitive value equality and display: NaNs compare equal,
+and signed zeros share equality and hashes. Their generated hashing currently boxes
+through Object. Generic record formatting and record-class formatting remain gaps
+in native support.
 
 String is a reference type with content equality. neoCLR deliberately uses canonical
 Unicode equality over preserved UTF-8 storage, so string fields follow that text

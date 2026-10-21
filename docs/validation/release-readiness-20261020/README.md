@@ -113,8 +113,9 @@ now has generated native bodies and targeted diagnostics for unsupported formatt
 [Closed declared union components](../../experiments/record-union-formatting/README.md)
 are now included. [Imported value display contracts](../../experiments/record-formatting/README.md#imported-value-formatting-follow-up--2026-10-21)
 now cover Index/Range in nested records and union payloads. [Enum component display](../../experiments/record-formatting/README.md#enum-component-follow-up--2026-10-21)
-now reuses ordinary Object formatting with a documented box allocation. Floating-point
-components, generic records and record classes remain gaps. Empty positional syntax also exposed an earlier frontend rejection;
+now reuses ordinary Object formatting with a documented box allocation. [Floating components](../../experiments/record-formatting/README.md#floating-component-follow-up--2026-10-21)
+now reuse primitive equality/display and Object hashing, including NaNs and signed
+zeros. Generic record formatting and record classes remain gaps. Empty positional syntax also exposed an earlier frontend rejection;
 keep it separate from emitted formatting. Item 1 is still only partially closed.
 
 ## Follow-up: String call projection

@@ -80,7 +80,9 @@ with an explicit `EquatableTo<Self>` contract and public typed equality/hash met
 such as `Index` and `Range`, are also supported without boxing their components.
 [Imported component validation](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-components)
 records the limits and allocation measurements. Typed and boxed record comparisons
-are tested across interpreter, JIT and AOT. Unsupported union payloads, floating-point components and broader generated formatting remain gaps;
+are tested across interpreter, JIT and AOT. Single/Double components use primitive value equality, including NaNs and signed
+zeros, and ordinary Object hashing (currently boxed). Unsupported union payloads
+and broader generated formatting remain gaps;
 this is development support, not full record parity in a published release.
 Supported nongeneric records automatically implement `EquatableTo<Self>` through
 their generated equality method and ordinary interface dispatch. This includes
@@ -94,8 +96,10 @@ structs, with named members, quoted text and boxed `ToString()` dispatch. It use
 one builder for nested values and typed scalar formatting; result and builder
 storage still allocate, and the current 65,536 UTF-8-byte builder limit applies.
 Closed declared union components now display their case and payloads through the same
-builder; an uninitialized carrier remains distinct from an empty case. Enum,
-imported-value and generic record formatting remain gaps. This is
+builder; an uninitialized carrier remains distinct from an empty case. Imported
+values with declared public ToString and floating primitives use direct calls.
+Int32-backed enums reuse Object display with a temporary box. Generic record and
+record-class formatting remain gaps. This is
 pre-release compiler work, not a claim of full record support.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)

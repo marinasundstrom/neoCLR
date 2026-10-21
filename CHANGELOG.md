@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Admit Single/Double record components through existing primitive equality/display and Object hashing. Cover NaNs, signed zeros, infinities, defaults, nested/union values and boxed/interface dispatch in built-in tests. Document temporary hashing boxes; no primitive API, ABI or performance claim. Generic record display and release-package qualification remain open.
+
 - Extend generated record display to Int32-backed enum components through existing Object formatting, preserving names, aliases, flags and numeric fallback. Document temporary enum boxing; keep imported direct value formatting unboxed. Add built-in local/imported enum and union-payload coverage, with broader record/release gaps retained.
 
 - Qualify generated native record display through imported value ToString contracts using built-in Index/Range tests, including boxed record dispatch, nesting, union payloads and preserved UTF-8. Calls add no component boxing; returned strings still allocate. Recheck and retain enum/floating/generic/class gaps; update release review and website scope. No runtime API or ABI change.

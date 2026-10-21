@@ -120,3 +120,29 @@ records exact artifacts and results.
 The preceding gap audit is the enum rejection baseline. Floating components,
 generic owners and record classes remain gaps. This is development qualification,
 not a matched release bundle or a performance result.
+
+## Floating component follow-up — 2026-10-21
+
+Native nongeneric positional record structs now admit Single and Double components
+for generated equality, hashing and display. This uses existing typed primitive
+Equals/ToString and ordinary Object hashing, rather than record-specific floating
+algorithms. As with .NET record component equality, NaNs compare equal and signed
+zeros compare equal with matching hashes. Floating operators themselves still use
+IEEE comparisons, so a NaN does not compare equal through primitive `==`.
+
+The generated typed equality/display calls do not box their floating components.
+Hashing currently uses the existing Object fallback and therefore boxes each floating
+component. Record-to-Object or interface conversion also boxes, and formatting results
+and the builder allocate. No allocation reduction or throughput improvement is claimed.
+No primitive API, Runtime Contract configuration, metadata encoding or ABI changes.
+Ordinary Raven/.NET emission remains unchanged.
+
+Built-in tests exercise both widths, NaNs, signed zeros, infinities, unequal finite
+components, default values, boxed/interface dispatch, nested records, union payloads,
+hash agreement and invariant text including negative zero. Prior imported/scalar/enum
+cases run alongside them. All 24 executions (eight tests across interpreter, JIT and
+native) pass with Raven `4b61e2737` on `codex/neoclr`, as does the source-core
+missing-contract regression. [Execution evidence](floating-validation-20261021.json)
+records compiler/runtime identities and results. The preceding gap audit retains the
+original equality-synthesis rejection as a baseline. Generic record formatting and
+record classes remain gaps; clean release-package qualification remains separate.

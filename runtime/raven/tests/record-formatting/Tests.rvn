@@ -64,3 +64,56 @@ func EnumPayloads() -> Result<unit, TestFailure> {
     _ = Assert.Equal("OptionalPermission { Value = Option.Some(Read, Execute) }", text)?
     return Assert.Equal(text, value.ToString())
 }
+
+record struct Floating(Wide: double, Narrow: float)
+record struct OptionalFloating(Value: Option<double>)
+record struct NestedFloating(Value: Floating)
+
+[Test("Floating records use value equality for NaNs zeros and infinities")]
+func FloatingEquality() -> Result<unit, TestFailure> {
+    let nan = 0.0 / 0.0
+    let left = Floating(nan, (float)nan)
+    let right = Floating(-nan, (float)(-nan))
+    _ = Assert.True(nan != nan && left == right && left.Equals(right) && !(left != right), "Record equality uses Equals semantics")?
+    _ = Assert.Equal(left.GetHashCode(), right.GetHashCode())?
+    let zero = Floating(0.0, (float)0.0)
+    let negativeZero = Floating(-0.0, (float)(-0.0))
+    let absent: Floating = default
+    _ = Assert.True(absent == zero, "Default storage")?
+    _ = Assert.True(zero == negativeZero, "Signed zero equality")?
+    _ = Assert.Equal(zero.GetHashCode(), negativeZero.GetHashCode())?
+    let infinity = 1.0 / 0.0
+    _ = Assert.True(Floating(infinity, (float)infinity) != Floating(-infinity, (float)infinity), "Infinity sign")?
+    _ = Assert.True(Floating(1.0, (float)2.0) != Floating(1.0, (float)3.0), "Single participates")?
+    return Assert.True(Floating(1.0, (float)2.0) != Floating(3.0, (float)2.0), "Double participates")
+}
+
+[Test("Floating record contracts agree across boxed interface and nested calls")]
+func FloatingDispatch() -> Result<unit, TestFailure> {
+    let nan = 0.0 / 0.0
+    let value = Floating(nan, (float)nan)
+    let boxed: object = value
+    let contract: EquatableTo<Floating> = value
+    System.Runtime.GC.Collect()
+    _ = Assert.True(boxed.Equals(value) && contract.Equals(value), "Boxed and interface equality")?
+    _ = Assert.True(!boxed.Equals(null) && !boxed.Equals(nan), "Nominal record identity")?
+    _ = Assert.Equal(value.GetHashCode(), boxed.GetHashCode())?
+    _ = Assert.True(NestedFloating(value) == NestedFloating(value), "Nested equality")?
+    let first = OptionalFloating(Some(nan))
+    let second = OptionalFloating(Some(-nan))
+    _ = Assert.True(first == second && first != OptionalFloating(None), "Union payload equality")?
+    return Assert.Equal(first.GetHashCode(), second.GetHashCode())
+}
+
+[Test("Floating record display uses primitive text including negative zero")]
+func FloatingText() -> Result<unit, TestFailure> {
+    let nan = 0.0 / 0.0
+    let infinity = 1.0 / 0.0
+    _ = Assert.Equal("Floating { Wide = NaN, Narrow = Infinity }", Floating(nan, (float)infinity).ToString())?
+    _ = Assert.Equal("Floating { Wide = -0, Narrow = -0 }", Floating(-0.0, (float)(-0.0)).ToString())?
+    let value = Floating(1.5, (float)2.5)
+    let boxed: object = value
+    _ = Assert.Equal("Floating { Wide = 1.5, Narrow = 2.5 }", boxed.ToString())?
+    _ = Assert.Equal("OptionalFloating { Value = Option.Some(NaN) }", OptionalFloating(Some(nan)).ToString())?
+    return Assert.Equal("NestedFloating { Value = Floating { Wide = 1.5, Narrow = 2.5 } }", NestedFloating(value).ToString())
+}
