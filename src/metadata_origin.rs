@@ -147,13 +147,15 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                     || matches!(
                         ty.representation,
                         crate::metadata::Representation::Interface
-                            | crate::metadata::Representation::Runtime
                     )
-                    || ty.primitive_reference)
+                    || ty.primitive_reference
+                    || ty.representation == crate::metadata::Representation::Runtime
+                        && !matches!(ty.name.as_str(), "System.Single" | "System.Double"))
         {
             return Err(Fault::new("unsupported literal field owner or count"));
         }
         for field in &ty.literal_fields {
+            field.value.instruction()?;
             if field.name.is_empty()
                 || field.name.len() > 1024
                 || field.name.chars().any(char::is_control)
@@ -518,6 +520,43 @@ mod literal_field_tests {
     use super::*;
 
     #[test]
+    fn floating_literals_preserve_bits_and_reject_malformed_encodings() {
+        use crate::metadata::{Instruction, LiteralValue};
+        for (json, expected) in [
+            (
+                serde_json::json!({"single_bits": "80000000"}),
+                Instruction::Float32 { bits: 0x80000000 },
+            ),
+            (
+                serde_json::json!({"double_bits": "7ff8000000000123"}),
+                Instruction::Float64 {
+                    bits: 0x7ff8000000000123,
+                },
+            ),
+        ] {
+            let value: LiteralValue = serde_json::from_value(json.clone()).unwrap();
+            assert_eq!(serde_json::to_value(&value).unwrap(), json);
+            assert_eq!(
+                serde_json::to_value(value.instruction().unwrap()).unwrap(),
+                serde_json::to_value(expected).unwrap()
+            );
+        }
+        for json in [
+            serde_json::json!({"single_bits": "0"}),
+            serde_json::json!({"double_bits": "zzzzzzzzzzzzzzzz"}),
+        ] {
+            let value: LiteralValue = serde_json::from_value(json).unwrap();
+            assert!(value.instruction().is_err());
+        }
+        assert!(
+            serde_json::from_value::<LiteralValue>(
+                serde_json::json!({"single_bits": "00000000", "extra": 1})
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
     fn class_literals_roundtrip_without_storage_and_reject_duplicate_names() {
         let mut module =
             crate::assembler::parse_module(".module Constants\n.references ()\n").unwrap();
@@ -531,7 +570,10 @@ mod literal_field_tests {
         validate(&module).unwrap();
         let restored: Module =
             serde_json::from_slice(&serde_json::to_vec(&module).unwrap()).unwrap();
-        assert_eq!(restored.types[0].literal_fields[0].value, 42);
+        assert!(matches!(
+            restored.types[0].literal_fields[0].value,
+            crate::metadata::LiteralValue::Int32(42)
+        ));
         assert!(restored.types[0].fields.is_empty());
         assert!(restored.types[0].static_fields.is_empty());
         let literal = module.types[0].literal_fields[0].clone();

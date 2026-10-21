@@ -5,7 +5,8 @@ using Mono.Cecil.Cil;
 // not another nested value. No ordinary user-defined type gets this projection.
 static class PrimitiveLibrary
 {
-    static readonly Dictionary<string, MetadataType> Kinds = new() {
+    static readonly Dictionary<string, MetadataType> Kinds = new()
+    {
         ["System.SByte"] = MetadataType.SByte,
         ["System.Byte"] = MetadataType.Byte,
         ["System.Int16"] = MetadataType.Int16,
@@ -69,9 +70,11 @@ static class PrimitiveLibrary
         foreach (var candidate in new[] { type, contract })
             if (!candidate.IsValueType || !candidate.IsSequentialLayout || candidate.HasGenericParameters
                 || candidate.PackingSize != -1 || candidate.ClassSize != -1
-                || candidate.Fields.Count != 1 || candidate.Fields[0].Name != "m_value"
-                || candidate.Fields[0].FieldType.MetadataType != Kinds[type.FullName]
-                || !candidate.Fields[0].IsPrivate || candidate.Fields[0].IsStatic
+                || candidate.Fields.Count(f => !f.IsLiteral) != 1
+                || candidate.Fields.Where(f => !f.IsLiteral).Any(f => f.Name != "m_value" ||
+                    f.FieldType.MetadataType != Kinds[type.FullName] || !f.IsPrivate || f.IsStatic)
+                || candidate.Fields.Where(f => f.IsLiteral).Any(f => !f.IsStatic ||
+                    f.FieldType.MetadataType != Kinds[type.FullName] || !f.HasConstant)
                 || candidate.Methods.Any(m => m.IsConstructor && !IsDefaultConstructor(m)))
                 throw new InvalidDataException("Unsupported primitive library storage or constructor: " + candidate.FullName);
 

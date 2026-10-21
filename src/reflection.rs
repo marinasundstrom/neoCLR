@@ -548,7 +548,7 @@ impl Query {
                         .chain(d.literal_fields.iter().map(|f| {
                             (
                                 f.name.as_str(),
-                                Type::Int32,
+                                f.value.ty(),
                                 match f.visibility {
                                     Visibility::Public => SourceAccess::Public,
                                     Visibility::Internal => SourceAccess::Assembly,
@@ -557,7 +557,7 @@ impl Query {
                                 },
                                 true,
                                 false,
-                                Some(f.value),
+                                Some(&f.value),
                             )
                         }));
                     for (index, (name, ty, access, is_static, readonly, constant)) in
@@ -590,7 +590,23 @@ impl Query {
                                 Value::Boolean(readonly),
                                 Value::Boolean(constant.is_some()),
                                 constant
-                                    .map(|n| Value::Erased(Box::new(Value::Int32(n))))
+                                    .map(|n| {
+                                        n.instruction().map(|op| {
+                                            Value::Erased(Box::new(match op {
+                                                crate::metadata::Instruction::Int(v) => {
+                                                    Value::Int32(v)
+                                                }
+                                                crate::metadata::Instruction::Float32 { bits } => {
+                                                    Value::Single(f32::from_bits(bits))
+                                                }
+                                                crate::metadata::Instruction::Float64 { bits } => {
+                                                    Value::Double(f64::from_bits(bits))
+                                                }
+                                                _ => unreachable!("literal instruction"),
+                                            }))
+                                        })
+                                    })
+                                    .transpose()?
                                     .unwrap_or_else(|| {
                                         Value::NullObjectReference(Type::from_name("System.Object"))
                                     }),

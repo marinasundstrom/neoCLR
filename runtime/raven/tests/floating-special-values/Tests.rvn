@@ -1,0 +1,57 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+public class Constants {
+    public const WideNaN: double = Double.NaN
+    public const NarrowInfinity: float = Single.PositiveInfinity
+    public const NegativeZero: double = -0.0
+}
+
+[Test("Floating named constants preserve IEEE and value equality contracts")]
+func AConstants() -> Result<unit, TestFailure> {
+    let wide = Double.NaN
+    let narrow = Single.NaN
+    _ = Assert.True(wide != wide && narrow != narrow, "IEEE NaN operators")?
+    _ = Assert.True(wide.Equals(wide) && narrow.Equals(narrow), "Value NaN equality")?
+    _ = Assert.True(Double.IsNaN(Constants.WideNaN), "User constant import")?
+    _ = Assert.True(Single.IsPositiveInfinity(Constants.NarrowInfinity), "Single constant width")?
+    _ = Assert.Equal("-0", Constants.NegativeZero.ToString())?
+    return Assert.True(Double.PositiveInfinity > 1.0 && Double.NegativeInfinity < -1.0, "Infinity ordering")
+}
+
+[Test("Floating classification covers both widths signs and finite values")]
+func BClassification() -> Result<unit, TestFailure> {
+    let wide: double[] = [Double.NaN, -Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity, 0.0, -0.0, 1.5, -1.5]
+    let narrow: float[] = [Single.NaN, -Single.NaN, Single.PositiveInfinity, Single.NegativeInfinity, (float)0.0, (float)(-0.0), (float)1.5, (float)(-1.5)]
+    var i = 0
+    while i < wide.Length {
+        _ = Assert.True(Double.IsNaN(wide[i]) == (i < 2) && Single.IsNaN(narrow[i]) == (i < 2), "NaN classification")?
+        _ = Assert.True(Double.IsInfinity(wide[i]) == (i == 2 || i == 3) && Single.IsInfinity(narrow[i]) == (i == 2 || i == 3), "Infinity classification")?
+        _ = Assert.True(Double.IsPositiveInfinity(wide[i]) == (i == 2) && Single.IsPositiveInfinity(narrow[i]) == (i == 2), "Positive infinity")?
+        _ = Assert.True(Double.IsNegativeInfinity(wide[i]) == (i == 3) && Single.IsNegativeInfinity(narrow[i]) == (i == 3), "Negative infinity")?
+        _ = Assert.True(Double.IsFinite(wide[i]) == (i >= 4) && Single.IsFinite(narrow[i]) == (i >= 4), "Finite classification")?
+        i += 1
+    }
+    let finite = narrow[6]
+    let negated = -finite
+    _ = Assert.True(negated == (float)(-1.5), "Single finite negation")?
+    let zero = narrow[4]
+    let negativeZero = -zero
+    _ = Assert.Equal("-0", negativeZero.ToString())?
+    let infinity = narrow[2]
+    return Assert.True(Single.IsNegativeInfinity(-infinity), "Single infinity negation")
+}
+
+[Test("Floating special values format and parse through existing contracts")]
+func CText() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("NaN", Double.NaN.ToString())?
+    _ = Assert.Equal("NaN", Single.NaN.ToString())?
+    _ = Assert.Equal("Infinity", Double.PositiveInfinity.ToString())?
+    _ = Assert.Equal("-Infinity", Single.NegativeInfinity.ToString())?
+    let Ok(wide) = Double.Parse("NaN") else { return Assert.True(false, "Double parse") }
+    let Ok(narrow) = Single.Parse("-Infinity") else { return Assert.True(false, "Single parse") }
+    return Assert.True(Double.IsNaN(wide) && Single.IsNegativeInfinity(narrow), "Parsed classification")
+}

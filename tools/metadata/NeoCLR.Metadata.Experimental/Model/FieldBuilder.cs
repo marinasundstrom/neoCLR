@@ -66,7 +66,7 @@ public sealed partial class TypeBuilder
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (definition.IsLiteral)
         {
-            if ((IsEnum ? !ReferenceEquals(type.ClassType, this) : type.Primitive != PrimitiveType.Int32 || IsInterface || NativePrimitive is not null || NativeGrapheme) || definition.Constant is null || literalFields.Count >= 256 || MetadataFields.Any(f => f.Name == name))
+            if ((IsEnum ? !ReferenceEquals(type.ClassType, this) : type.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Single or PrimitiveType.Double) || IsInterface || NativePrimitive is not (null or PrimitiveType.Single or PrimitiveType.Double) || NativeGrapheme) || definition.Constant is null || literalFields.Count >= 256 || MetadataFields.Any(f => f.Name == name))
                 throw new ArgumentException("literal fields require an Int32 constant and an enum or nominal storage owner");
             var literal = new FieldBuilder(this, definition, -1); literalFields.Add(literal); definition.Producer = literal; return literal;
         }

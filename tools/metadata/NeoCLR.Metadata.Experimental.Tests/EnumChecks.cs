@@ -48,30 +48,30 @@ internal static class EnumChecks
         ValidateRejections();
         ValidateUnicodeNames();
         foreach (bool manual in new[] { false, true })
-        foreach (bool flags in new[] { false, true })
-        {
-            var graph = Create(manual, flags);
-            var cli = graph.Write();
-            var loadedAssembly = Assembly.Load(cli);
-            var loaded = loadedAssembly.GetType("Example.State")!;
-            if (loaded.IsDefined(typeof(FlagsAttribute), false) != flags || !loaded.IsEnum || Enum.GetUnderlyingType(loaded) != typeof(int) || Convert.ToInt32(Enum.Parse(loaded, "Negative")) != -1 ||
-                (int)loadedAssembly.GetType("Example.Program")!.GetMethod("Run")!.Invoke(null, null)! != 42)
-                throw new Exception("CLI enum behavior was not preserved");
-            foreach (var snapshot in new[] { AssemblyDefinition.ReadAssembly(cli, false), AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph)) })
+            foreach (bool flags in new[] { false, true })
             {
-                var declaration = snapshot.MainModule.Types.Single(t => t.Name == "State");
-                if (declaration.IsFlagsEnum != flags || !declaration.IsEnum || !declaration.IsValueType || declaration.Fields.Count(f => f.IsLiteral) != 3 ||
-                    declaration.Fields.Single(f => f.Name == "Ready").Constant != 42 || declaration.Fields.Single(f => f.Name == "Negative").Constant != -1)
-                    throw new Exception("enum facts were lost on read");
-                if (snapshot.IsNative)
+                var graph = Create(manual, flags);
+                var cli = graph.Write();
+                var loadedAssembly = Assembly.Load(cli);
+                var loaded = loadedAssembly.GetType("Example.State")!;
+                if (loaded.IsDefined(typeof(FlagsAttribute), false) != flags || !loaded.IsEnum || Enum.GetUnderlyingType(loaded) != typeof(int) || Convert.ToInt32(Enum.Parse(loaded, "Negative")) != -1 ||
+                    (int)loadedAssembly.GetType("Example.Program")!.GetMethod("Run")!.Invoke(null, null)! != 42)
+                    throw new Exception("CLI enum behavior was not preserved");
+                foreach (var snapshot in new[] { AssemblyDefinition.ReadAssembly(cli, false), AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph)) })
                 {
-                    var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([snapshot]);
-                    var view = context.Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "State");
-                    if (view.IsFlagsEnum != flags || !view.IsEnum || view.GetFields().Single(f => f.Name == "Ready").Constant != 42)
-                        throw new Exception("enum introspection facts were lost");
+                    var declaration = snapshot.MainModule.Types.Single(t => t.Name == "State");
+                    if (declaration.IsFlagsEnum != flags || !declaration.IsEnum || !declaration.IsValueType || declaration.Fields.Count(f => f.IsLiteral) != 3 ||
+                        !Equals(declaration.Fields.Single(f => f.Name == "Ready").Constant, 42) || !Equals(declaration.Fields.Single(f => f.Name == "Negative").Constant, -1))
+                        throw new Exception("enum facts were lost on read");
+                    if (snapshot.IsNative)
+                    {
+                        var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([snapshot]);
+                        var view = context.Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "State");
+                        if (view.IsFlagsEnum != flags || !view.IsEnum || !Equals(view.GetFields().Single(f => f.Name == "Ready").Constant, 42))
+                            throw new Exception("enum introspection facts were lost");
+                    }
                 }
             }
-        }
     }
 
     private static void ValidateUnicodeNames()
@@ -84,7 +84,7 @@ internal static class EnumChecks
         {
             var literals = snapshot.MainModule.Types.Single(t => t.IsEnum).Fields.Where(f => f.IsLiteral).ToArray();
             for (var index = 0; index < names.Length; index++)
-                if (literals.Single(f => f.Name == names[index]).Constant != index + 100)
+                if (!Equals(literals.Single(f => f.Name == names[index]).Constant, index + 100))
                     throw new Exception("enum metadata normalized or lost a Unicode name");
         }
         foreach (var invalid in new[] { "", " ", "Bad\0Name", "Bad\nName", "\ud800" })

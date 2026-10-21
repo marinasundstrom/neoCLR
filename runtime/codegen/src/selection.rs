@@ -10,7 +10,9 @@ type Error = Box<dyn std::error::Error>;
 pub(crate) fn scalar_array_element(t: &Type) -> bool {
     matches!(
         t,
-        Type::Int32
+        Type::Single
+            | Type::Double
+            | Type::Int32
             | Type::UInt32
             | Type::Int64
             | Type::UInt64

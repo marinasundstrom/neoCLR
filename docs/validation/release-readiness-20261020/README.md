@@ -15,6 +15,8 @@ reconciling that provenance and constructing a fresh matched package.
 
 Completed evidence superseding earlier gaps below:
 
+- [Floating special values](../../experiments/floating-special-values/README.md) pass 33 built-in executions across all three engines, with typed constant metadata, literal receivers, floating arrays and native Single negation. The shared constant evaluator fix is on Raven main 13f34e357 and native 58980b280. API snapshots and a 5,070-page website build pass. This development cohort does not replace the matched-package gate.
+
 - Numeric primitives now declare explicit EquatableTo and Formattable contracts;
   floating NaN/signed-zero Object equality and hashes and all supported scalar
   adapters have focused qualification. [Numeric globalization](../../experiments/numeric-formats/README.md)

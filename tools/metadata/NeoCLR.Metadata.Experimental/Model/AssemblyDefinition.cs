@@ -174,14 +174,19 @@ public sealed partial class AssemblyDefinition
             int signatureBytes = 0;
             var methods = new List<MethodRow>();
             var typeRows = rows.ToDictionary(row => row.Token);
-            int? ReadInt32Constant(ConstantHandle handle)
+            object? ReadFieldConstant(ConstantHandle handle)
             {
                 if (handle.IsNil) return null;
                 var constant = reader.GetConstant(handle);
-                if (constant.TypeCode != ConstantTypeCode.Int32) return null;
                 var blob = reader.GetBlobReader(constant.Value);
-                if (blob.Length != 4) throw new InvalidDataException("invalid Int32 constant");
-                return blob.ReadInt32();
+                return constant.TypeCode switch
+                {
+                    ConstantTypeCode.Int32 when blob.Length == 4 => (object)blob.ReadInt32(),
+                    ConstantTypeCode.Single when blob.Length == 4 => blob.ReadSingle(),
+                    ConstantTypeCode.Double when blob.Length == 8 => blob.ReadDouble(),
+                    ConstantTypeCode.Int32 or ConstantTypeCode.Single or ConstantTypeCode.Double => throw new InvalidDataException("invalid scalar constant"),
+                    _ => null
+                };
             }
             var fields = new List<FieldRow>();
             foreach (var handle in reader.FieldDefinitions)
@@ -193,7 +198,7 @@ public sealed partial class AssemblyDefinition
                 if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
                     throw new InvalidDataException("missing or excessive field signature data");
                 signatureBytes += length;
-                fields.Add(new((uint)MetadataTokens.GetToken(handle), owner, ReadName(field.Name), (ushort)field.Attributes, reader.GetBlobBytes(field.Signature), Constant: ReadInt32Constant(field.GetDefaultValue())));
+                fields.Add(new((uint)MetadataTokens.GetToken(handle), owner, ReadName(field.Name), (ushort)field.Attributes, reader.GetBlobBytes(field.Signature), Constant: ReadFieldConstant(field.GetDefaultValue())));
             }
             foreach (var handle in reader.MethodDefinitions)
             {
@@ -431,7 +436,7 @@ public sealed partial class AssemblyDefinition
     }
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null, bool IsInitOnly = false);
-    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null, int? Constant = null);
+    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null, object? Constant = null);
     internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null, NativeSignatureTypeRow[]? Arguments = null, bool IsSelf = false, bool IsByReference = false, NativeMethodSignatureRow? Function = null, bool IsPointer = false, ReferenceCompositionKind? CompositionKind = null, NativeSignatureTypeRow[]? Constituents = null, NativeSignatureTypeRow[]? TupleElements = null, string?[]? TupleNames = null)
     {
         internal SignatureType Materialize(ModuleDefinition module) => TupleElements is { } elements ? SignatureType.FromTuple(new TupleSignature(elements.Select(t => t.Materialize(module)).ToArray(), TupleNames)) : CompositionKind is { } kind ? SignatureType.FromComposition(kind, Constituents!.Select(t => t.Materialize(module))) : IsPointer ? SignatureType.PointerTo(Element!.Materialize(module)) : Function is { } function ? SignatureType.Function(function.Materialize(module)) : IsByReference ? SignatureType.ByReference(Element!.Materialize(module)) : IsSelf ? SignatureType.Self : Arguments is { } arguments ? SignatureType.FromConstruction(module.GetNativeSignatureType(TypeToken).ReferencedType!, arguments.Select(a => a.Materialize(module)))

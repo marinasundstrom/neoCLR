@@ -4,9 +4,12 @@ using Mono.Cecil;
 static class PrimitiveBindings
 {
     public static readonly string[] Types = ["SByte", "Byte", "Int16", "UInt16", "Char", "UInt32", "Int64", "UInt64", "Single", "IntPtr", "UIntPtr"];
-    public static string Stack(string type) => type switch {
+    public static string Stack(string type) => type switch
+    {
         "SByte" or "Byte" or "Int16" or "UInt16" or "UInt32" => "Int32",
-        "UInt64" => "Int64", "Single" => "Double", _ => type
+        "UInt64" => "Int64",
+        "Single" => "Double",
+        _ => type
     };
     public static string Project(string source)
     {
@@ -16,7 +19,7 @@ static class PrimitiveBindings
                 + (type != "Char" ? $"public static Result<{type}, NumberParseError> Parse(string text, Globalization.Culture culture) => default;" : "")
                 + (type is "IntPtr" or "UIntPtr" ? $"public static Result<{type}, NumberParseError> Parse(string text) => default;" : "")
                 + (type != "Char" && type != "Int64" ? "public string ToString(string format) => default; public string ToString(string format, Globalization.Culture culture) => default;" : "")
-                + (type == "Single" ? "public string ToString() => default;" : "")
+                + (type == "Single" ? "public string ToString() => default;public const float NaN = (float)0.0 / (float)0.0; public const float PositiveInfinity = (float)1.0 / (float)0.0; public const float NegativeInfinity = (float)(-1.0) / (float)0.0; public static bool IsNaN(float value) => false; public static bool IsInfinity(float value) => false; public static bool IsPositiveInfinity(float value) => false; public static bool IsNegativeInfinity(float value) => false; public static bool IsFinite(float value) => false; " : "")
                 + (type == "Int64" ? "public static Result<long, NumberParseError> Parse(string value) => default; public string ToString() => default; public string ToString(string format) => default; public string ToString(string format, Globalization.Culture culture) => default; public static long MinValue => default; public static long MaxValue => default;" : "")
                 + (NumberBindings.HasNewParser(type) ? $"public static Result<{type}, NumberParseError> Parse(string value) => default;" : "")
                 + (type == "Char" ? "public static char FromString(string text) => default; public static Option<char> TryFromString(string text) => default; public bool Equals(char other, StringComparison comparison) => default; public override string ToString() => default; public bool Equals(char other) => default; public override bool Equals(object? other) => default; public override int GetHashCode() => default;" : "") + " }");
@@ -36,7 +39,8 @@ static class PrimitiveBindings
         if (reference.HasThis && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "CompareTo"
             && result == "Int32" && args.SequenceEqual(new[] { owner }))
             return new("Runtime" + owner + "CompareTo", [owner + "&", owner], result);
-        if (owner == "Int64") {
+        if (owner == "Int64")
+        {
             if (!reference.HasThis && reference.Name == "Parse" && result == "System.Result<Int64,System.NumberParseError>" && args.SequenceEqual(new[] { "String" }))
                 return new("System.Int64::Parse", args, result);
             if (!reference.HasThis && reference.Name is "get_MinValue" or "get_MaxValue" && result == "Int64" && args.Length == 0)
@@ -44,7 +48,8 @@ static class PrimitiveBindings
             if (reference.HasThis && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "ToString" && result == "String" && args.Length == 0)
                 return new("RuntimeInt64ToString", ["Int64&"], result);
         }
-        if (owner == "Char") {
+        if (owner == "Char")
+        {
             if (!reference.HasThis && reference.Name == "FromString" && result == "Char" && args.SequenceEqual(new[] { "String" }))
                 return new("System.Char::FromString", args, result);
             if (reference.HasThis && reference.Name == "ToString" && result == "String" && args.Length == 0)
@@ -55,8 +60,13 @@ static class PrimitiveBindings
         throw new InvalidDataException("Unsupported primitive member: " + reference.FullName);
     }
     public static string Adapters => ".function RuntimeInt64ToString(Int64& source) -> String\nldarg source\ncall instance System.Int64::ToString()\nret\n.end\n" + ".function RuntimeCharToString(Char& source) -> String\nldarg source\ncall instance System.Char::ToString()\nret\n.end\n.function RuntimeCharEquals(Char& source,Char other) -> Boolean\nldarg source\nldarg other\ncall instance System.Char::Equals(Char)\nret\n.end\n" + string.Join("\n", Types.Select(t => $".function Runtime{t}CompareTo({t}& source,{t} other) -> Int32\nldarg source\nldarg other\ncall instance System.{t}::CompareTo({t})\nret\n.end\n"));
-    public static string? Default(string type) => Types.Contains(type) ? type switch {
-        "Char" => "ldstr \"\\u0000\"\ncall neoCLR.Runtime.CharFromString(String)", "Single" => "ldc.r4 0", "Int64" or "UInt64" => "ldc.i8 0",
-        "IntPtr" => "ldc.i4 0\nconv.i", "UIntPtr" => "ldc.i4 0\nconv.u", _ => "ldc.i4 0"
+    public static string? Default(string type) => Types.Contains(type) ? type switch
+    {
+        "Char" => "ldstr \"\\u0000\"\ncall neoCLR.Runtime.CharFromString(String)",
+        "Single" => "ldc.r4 0",
+        "Int64" or "UInt64" => "ldc.i8 0",
+        "IntPtr" => "ldc.i4 0\nconv.i",
+        "UIntPtr" => "ldc.i4 0\nconv.u",
+        _ => "ldc.i4 0"
     } : null;
 }

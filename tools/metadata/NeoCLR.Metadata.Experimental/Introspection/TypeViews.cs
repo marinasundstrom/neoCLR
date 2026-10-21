@@ -197,8 +197,8 @@ public sealed class FieldInfo
     public bool IsReadOnly { get; }
     /// <summary>Gets whether the field is a static literal.</summary>
     public bool IsLiteral { get; }
-    /// <summary>Gets its supported Int32 constant, or null when absent or unsupported.</summary>
-    public int? Constant { get; }
+    /// <summary>Gets its supported Int32, Single or Double constant, or null when absent or unsupported.</summary>
+    public object? Constant { get; }
 }
 
 /// <summary>An unmanaged pointer signature view. It conveys no ownership or dereference capability.</summary>

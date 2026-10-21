@@ -6651,7 +6651,7 @@ Manual definitions use the same validation path: attach a sealed `TypeDefinition
 extending the explicit core System.Enum, with `value__` attributes 0x606 and Int32
 signature, then add fields with attributes 0x8056, the attached enum signature and an
 Int32 constant. The existing three-argument `FieldDefinition` constructor is retained;
-the four-argument overload accepts `int? constant`. Constants require literal flags;
+the four-argument overload accepts `object? constant`. Constants require literal flags;
 ordinary fields cannot carry one. Duplicate or invalid declarations throw
 `ArgumentException`; invalid final enum shapes throw `InvalidDataException` on writing.
 Flags, other widths, generic/nested enums, interfaces and enum-owned methods/properties
@@ -6660,7 +6660,7 @@ is unaffected.
 
 `TypeDefinition.IsEnum`, `TypeBuilder.IsEnum` and introspection
 `NominalTypeInfo.IsEnum` report enum declarations. `FieldDefinition.IsLiteral` and
-introspection `FieldInfo.IsLiteral` identify static literals; their `int? Constant`
+introspection `FieldInfo.IsLiteral` identify static literals; their `object? Constant`
 returns a supported Int32 constant or null. CLI readers retain other raw signature
 bytes; this does not expand CLI nominal field-signature decoding. Native readers
 project canonical nominal literal signatures and reject unsupported enum shapes.
@@ -10249,7 +10249,7 @@ This SDK extension does not admit new structural constraint forms.
 
 ### Int32 class constants
 
-`FieldDefinition(string name, ushort attributes, SignatureType fieldType, int? constant)`
+`FieldDefinition(string name, ushort attributes, SignatureType fieldType, object? constant)`
 now accepts Int32 literal fields on nominal class/value owners as well as enum members.
 Use Static | Literal | HasDefault (`0x8050`) plus Public (`6`), Assembly (`3`) or
 Private (`1`), and `PrimitiveType.Int32`. Attach through `TypeDefinition.Fields`.
@@ -10465,3 +10465,22 @@ Validation: metadata tests `--method-class-bounds`, `--method-categories`,
 `--function-kind-constraint`, `--structural-method-constraints`; backend
 specialization tests; Raven's `--method-category-import` probe. No guest public
 signature or RavenDoc input changes in this increment.
+
+### Floating literal fields — development 2026-10-21
+
+FieldDefinition's constant constructor and FieldDefinition/Introspection.FieldInfo
+`Constant` now accept/return boxed Int32, Single or Double values (`object?`).
+Callers previously using nullable-Int32 members must pattern-match or cast the
+returned value. Null means absent or unsupported. Literal flags remain
+Static|Literal|HasDefault; a mismatched floating width throws ArgumentException.
+Supported nominal owners and the Single/Double primitive owners can declare these
+storage-free constants. Enum literals remain Int32-backed.
+
+CLI constants use the standard typed Constant table. Native `literal_fields.value`
+retains an Int32 number for existing literals and uses `{ "single_bits": "xxxxxxxx" }`
+or `{ "double_bits": "xxxxxxxxxxxxxxxx" }` for floats. Exact-width hexadecimal
+strings preserve infinities, signed zero and NaN payloads; malformed values reject.
+Native snapshots, CLI reference projection and Raven import retain types and bits.
+Use a matching runtime/compiler/metadata SDK; older readers reject these new shapes.
+Reflection getters and constant snapshots return the appropriate boxed primitive;
+reading a constant in source is inlined and needs no static storage or initialization.

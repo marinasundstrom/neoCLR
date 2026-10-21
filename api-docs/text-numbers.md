@@ -147,3 +147,15 @@ Mixed operand/result types, checked default interface operators, instance Self
 specialization and production Complex semantics are outside this initial surface.
 Rebuild consumers against the matching library/compiler bundle. Ordinary Raven/.NET
 continues using the platform's System.Numerics APIs; these interfaces are NeoCLR APIs.
+
+## Floating special values — development
+
+Single and Double each expose constant fields `NaN`, `PositiveInfinity`, and
+`NegativeInfinity`, following .NET. They require no initialization or storage.
+Use `IsNaN(value)` to recognize NaNs, not `value == NaN`: floating equality
+operators still treat NaNs as unequal, while typed Equals treats NaNs as equal.
+`IsInfinity`, `IsPositiveInfinity`, `IsNegativeInfinity`, and `IsFinite` classify
+the same primitive value without allocation. Finite includes both signed zeros.
+NaN sign/payload is not part of the public constant's contract; classification
+accepts every NaN representation. Formatting and parsing keep the existing invariant
+NaN/Infinity spellings. These are current development APIs, not published-release claims.

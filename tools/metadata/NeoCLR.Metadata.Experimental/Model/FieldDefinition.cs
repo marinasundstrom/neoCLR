@@ -30,8 +30,8 @@ public sealed partial class FieldDefinition
     }
     /// <summary>Gets CLI-shaped FieldAttributes flags.</summary>
     public ushort Attributes { get; }
-    /// <summary>Gets the Int32 literal value, or null when absent or unsupported.</summary>
-    public int? Constant { get; }
+    /// <summary>Gets the Int32, Single or Double literal value, or null when absent or unsupported.</summary>
+    public object? Constant { get; }
     /// <summary>Gets whether this is a static literal declaration.</summary>
     public bool IsLiteral => (Attributes & 0x50) == 0x50;
     /// <summary>Copies the raw signature, retaining unsupported encodings.</summary>
@@ -57,9 +57,24 @@ public sealed partial class FieldDefinition
     {
         if (nativeType is { } native) { type = native.Primitive ?? PrimitiveType.Void; return type != PrimitiveType.Void; }
         if (FieldType is { } authored) { type = authored.Primitive ?? PrimitiveType.Void; return type != PrimitiveType.Void; }
-        type = signature.Length == 2 && signature[0] == 0x06 ? signature[1] switch {
-            0x08 => PrimitiveType.Int32, 0x0c => PrimitiveType.Single, 0x0d => PrimitiveType.Double, 0x05 => PrimitiveType.Byte, 0x04 => PrimitiveType.SByte, 0x06 => PrimitiveType.Int16, 0x07 => PrimitiveType.UInt16, 0x09 => PrimitiveType.UInt32, 0x0b => PrimitiveType.UInt64, 0x18 => PrimitiveType.IntPtr, 0x19 => PrimitiveType.UIntPtr,  0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
-            _ => PrimitiveType.Void } : PrimitiveType.Void;
+        type = signature.Length == 2 && signature[0] == 0x06 ? signature[1] switch
+        {
+            0x08 => PrimitiveType.Int32,
+            0x0c => PrimitiveType.Single,
+            0x0d => PrimitiveType.Double,
+            0x05 => PrimitiveType.Byte,
+            0x04 => PrimitiveType.SByte,
+            0x06 => PrimitiveType.Int16,
+            0x07 => PrimitiveType.UInt16,
+            0x09 => PrimitiveType.UInt32,
+            0x0b => PrimitiveType.UInt64,
+            0x18 => PrimitiveType.IntPtr,
+            0x19 => PrimitiveType.UIntPtr,
+            0x0a => PrimitiveType.Int64,
+            0x02 => PrimitiveType.Boolean,
+            0x0e => PrimitiveType.String,
+            _ => PrimitiveType.Void
+        } : PrimitiveType.Void;
         return type != PrimitiveType.Void;
     }
 }

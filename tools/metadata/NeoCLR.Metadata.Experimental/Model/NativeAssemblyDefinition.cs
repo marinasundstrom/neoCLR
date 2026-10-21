@@ -15,7 +15,7 @@ public sealed partial class NativeAssemblyDefinition
         internal bool BeforeFieldInit { get; init; }
         internal GenericVariance[] Variance { get; init; } = [];
         internal FieldRow[] StaticFields { get; init; } = [];
-        internal (string Name, int Value, ushort Attributes)[] LiteralFields { get; init; } = [];
+        internal (string Name, object Value, ushort Attributes)[] LiteralFields { get; init; } = [];
         internal (string Name, int Value)[]? EnumMembers { get; init; }
         internal bool IsClosedHierarchy { get; init; }
         internal bool IsObjectRoot { get; init; }
@@ -306,9 +306,12 @@ public sealed partial class NativeAssemblyDefinition
                 if (type.TryGetProperty("memory_view", out var memoryViewNode))
                 {
                     typeFields.Add("memory_view");
-                    memoryView = memoryViewNode.GetString() switch {
-                        "slice" => MemoryViewKind.Slice, "read_only_slice" => MemoryViewKind.ReadOnlySlice,
-                        "memory" => MemoryViewKind.Memory, "read_only_memory" => MemoryViewKind.ReadOnlyMemory,
+                    memoryView = memoryViewNode.GetString() switch
+                    {
+                        "slice" => MemoryViewKind.Slice,
+                        "read_only_slice" => MemoryViewKind.ReadOnlySlice,
+                        "memory" => MemoryViewKind.Memory,
+                        "read_only_memory" => MemoryViewKind.ReadOnlyMemory,
                         _ => throw new InvalidDataException("invalid memory-view kind")
                     };
                     Require(Text(type, "name") == "System." + memoryView.ToString() && typeNames.Length == 1 &&
@@ -362,9 +365,9 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Shape(field, "name", "value", "visibility");
                     var access = Text(field, "visibility") switch { "public" => 6, "internal" => 3, "private" => 1, _ => throw new InvalidDataException("invalid literal visibility") };
-                    return (Name: Text(field, "name"), Value: field.GetProperty("value").GetInt32(), Attributes: (ushort)(0x8050 | access));
+                    return (Name: Text(field, "name"), Value: LiteralConstant.Decode(field.GetProperty("value")), Attributes: (ushort)(0x8050 | access));
                 }).ToArray() : [];
-                Require(literalRows.Length == 0 || !isInterface && !isPrimitive && enumMembers is null, "unsupported literal field owner");
+                Require(literalRows.Length == 0 || !isInterface && !primitiveReference && (!isPrimitive || Text(type, "name") is "System.Single" or "System.Double") && enumMembers is null, "unsupported literal field owner");
                 Require(fieldRows.Select(f => f.Name).Concat(staticRows.Select(f => f.Name)).Concat(literalRows.Select(f => f.Name)).Distinct().Count() == fieldRows.Count + staticRows.Length + literalRows.Length, "duplicate literal field name");
                 Require(staticRows.Length == 0 || !isInterface && !isPrimitive && enumMembers is null, "unsupported static field owner");
                 Require(fieldRows.Select(f => f.Name).Concat(staticRows.Select(f => f.Name)).Distinct().Count() == fieldRows.Count + staticRows.Length, "duplicate field name");
@@ -776,7 +779,7 @@ public sealed partial class NativeAssemblyDefinition
             }
             for (int i = 0; i < types.Count; i++)
                 foreach (var field in types[i].LiteralFields)
-                    signatureOwners[i].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, PrimitiveType.Int32, field.Value));
+                    signatureOwners[i].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, LiteralConstant.Type(field.Value), field.Value));
             signatureGraph.ValidateValueLayouts();
             typeArity = 0;
             string TypeKey(SignatureType type) => type.Tuple is { } tuple ? "tuple:" + JsonSerializer.Serialize(tuple.ElementTypes.Select(TypeKey)) : type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
@@ -888,7 +891,8 @@ public sealed partial class NativeAssemblyDefinition
                         Require(parameter >= 0 && parameter < genericArity, "invalid method constraint ordinal");
                         if (kind.ValueKind == JsonValueKind.String)
                         {
-                            var flag = kind.GetString() switch {
+                            var flag = kind.GetString() switch
+                            {
                                 "ReferenceType" => TypeParameterConstraints.ReferenceType,
                                 "ValueType" => TypeParameterConstraints.ValueType,
                                 "DefaultConstructor" => TypeParameterConstraints.DefaultConstructor,
@@ -1242,7 +1246,7 @@ public sealed partial class NativeAssemblyDefinition
         {
             if (types[t].EnumMembers is null) foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
             foreach (var field in types[t].StaticFields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly, isStatic: true);
-            foreach (var field in types[t].LiteralFields) owners[t].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, PrimitiveType.Int32, field.Value));
+            foreach (var field in types[t].LiteralFields) owners[t].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, LiteralConstant.Type(field.Value), field.Value));
         }
         var mappedOwners = new Dictionary<TypeBuilder, TypeBuilder>();
         TypeBuilder RemapOwner(TypeBuilder original)

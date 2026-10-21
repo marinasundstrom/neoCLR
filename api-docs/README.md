@@ -2783,3 +2783,13 @@ snapshot uses the matched enum-parsing source libraries and renderer 6bd12a225.
 name preservation and ordinal comparison. Public signatures and reference type
 selection are unchanged; API fingerprint checks and the 5,036-page website build
 pass. Runtime metadata names no longer inherit legacy source-token restrictions.
+
+### Floating special values (2026-10-21)
+
+The already selected Single/Double types gain NaN and signed-infinity constant fields,
+and IsNaN/IsInfinity/IsPositiveInfinity/IsNegativeInfinity/IsFinite. Member XML and the
+numeric guide document constant semantics and IEEE/value-equality distinctions.
+The native snapshot and CLI reference are refreshed from the matching floating
+literal compiler; snapshot checks and the 5,070-page website build pass. No types
+are excluded. The experimental metadata manual documents
+the widened `object? Constant` surface and exact native bit encoding.

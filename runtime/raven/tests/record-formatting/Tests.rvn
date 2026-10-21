@@ -71,7 +71,7 @@ record struct NestedFloating(Value: Floating)
 
 [Test("Floating records use value equality for NaNs zeros and infinities")]
 func FloatingEquality() -> Result<unit, TestFailure> {
-    let nan = 0.0 / 0.0
+    let nan = Double.NaN
     let left = Floating(nan, (float)nan)
     let right = Floating(-nan, (float)(-nan))
     _ = Assert.True(nan != nan && left == right && left.Equals(right) && !(left != right), "Record equality uses Equals semantics")?
@@ -82,7 +82,7 @@ func FloatingEquality() -> Result<unit, TestFailure> {
     _ = Assert.True(absent == zero, "Default storage")?
     _ = Assert.True(zero == negativeZero, "Signed zero equality")?
     _ = Assert.Equal(zero.GetHashCode(), negativeZero.GetHashCode())?
-    let infinity = 1.0 / 0.0
+    let infinity = Double.PositiveInfinity
     _ = Assert.True(Floating(infinity, (float)infinity) != Floating(-infinity, (float)infinity), "Infinity sign")?
     _ = Assert.True(Floating(1.0, (float)2.0) != Floating(1.0, (float)3.0), "Single participates")?
     return Assert.True(Floating(1.0, (float)2.0) != Floating(3.0, (float)2.0), "Double participates")
@@ -90,7 +90,7 @@ func FloatingEquality() -> Result<unit, TestFailure> {
 
 [Test("Floating record contracts agree across boxed interface and nested calls")]
 func FloatingDispatch() -> Result<unit, TestFailure> {
-    let nan = 0.0 / 0.0
+    let nan = Double.NaN
     let value = Floating(nan, (float)nan)
     let boxed: object = value
     let contract: EquatableTo<Floating> = value
@@ -107,8 +107,8 @@ func FloatingDispatch() -> Result<unit, TestFailure> {
 
 [Test("Floating record display uses primitive text including negative zero")]
 func FloatingText() -> Result<unit, TestFailure> {
-    let nan = 0.0 / 0.0
-    let infinity = 1.0 / 0.0
+    let nan = Double.NaN
+    let infinity = Double.PositiveInfinity
     _ = Assert.Equal("Floating { Wide = NaN, Narrow = Infinity }", Floating(nan, (float)infinity).ToString())?
     _ = Assert.Equal("Floating { Wide = -0, Narrow = -0 }", Floating(-0.0, (float)(-0.0)).ToString())?
     let value = Floating(1.5, (float)2.5)

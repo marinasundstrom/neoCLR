@@ -5231,7 +5231,7 @@ pub(crate) fn compile_into(
                     }
                     Op::Negate => {
                         let value = pop(&mut stack);
-                        stack.push(if matches!(top(), Ty::Double) {
+                        stack.push(if matches!(top(), Ty::Single | Ty::Double) {
                             b.ins().fneg(value)
                         } else {
                             b.ins().ineg(value)

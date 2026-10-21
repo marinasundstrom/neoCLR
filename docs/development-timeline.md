@@ -20575,3 +20575,44 @@ keeping legacy source-token parsing separate. The six built-in tests now pass in
 three engines (18 executions), with 25 metadata naming regressions, two enum unit tests
 and producer/reader round-trip/rejection coverage. The fix is implemented; generic
 method bounds and the replacement release gates remain open.
+
+
+### 2026-10-21 — Floating constants and generic numeric contracts
+
+- **Author:** During record-value qualification, asked whether floating types should
+  have NaN fields, then directed continuing the main work afterward. Asked how this
+  relates to .NET System.Numerics and what neoCLR could do differently, explicitly
+  noting that no further change was necessarily required.
+- **Assistant:** Identified missing concrete members and proposed adding NaN and
+  signed-infinity constants plus classification helpers. Implementation exposed the
+  native Int32-only literal restriction and missing Single constant lowering; work
+  extends the existing metadata/compiler path instead of using computed properties.
+- **Comparison/proposal:** .NET concrete fields and generic numeric interface
+  capabilities are distinct. Raven Self could simplify a future floating capability;
+  a narrower contract trades uniform Number-based classification for smaller
+  requirements. This is a proposal, not an approved interface redesign. Keep the
+  current Number contract unchanged and resume release stabilization afterward.
+- **Evidence/status:** See [floating special values](experiments/floating-special-values/README.md)
+  for implementation and qualification; no generic math expansion or release was
+  authorized by this discussion.
+
+### 2026-10-21 — Possible numeric capability hierarchy
+
+- **Author:** Proposed that future System.Numerics development could introduce
+  IntegerNumber and FloatingPointNumber derived interfaces, each holding the
+  relevant capabilities. This was conditional future direction, not a request to
+  implement the hierarchy during release stabilization.
+- **Assistant:** Agreed with a shared Number base and distinct integer/floating
+  capabilities; proposed keeping NaN/infinity in a further IEEE-754-specific
+  contract so a decimal floating type need not promise those values, following
+  the distinction in .NET generic math. Names and complete member sets remain open.
+- **Action/status:** Recorded the proposal; retained the current Number contract
+  and continued focused floating/runtime qualification.
+
+- **Subsequent author direction:** Asked about Decimal, then explicitly requested
+  implementing it now and clarified: “You should just implement the Decimal type,
+  not extend System.Numerics with the additional proposed interfaces”.
+- **Assistant response:** Accepted a separate Decimal increment using existing
+  Number, EquatableTo and Formattable contracts, with .NET-style 96-bit coefficient,
+  sign and scale. Implementation and qualification remain pending; no new numeric
+  hierarchy is authorized by this request.

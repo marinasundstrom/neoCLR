@@ -2342,8 +2342,11 @@ impl<'a> Profile<'a> {
                 }
                 Op::Negate => {
                     let value = pop(&mut stack)?;
-                    if !matches!(value, Ty::Int | Ty::Wide | Ty::Size | Ty::Double) {
-                        return Err(fail(pc, "negation requires an integer or Double"));
+                    if !matches!(
+                        value,
+                        Ty::Int | Ty::Wide | Ty::Size | Ty::Single | Ty::Double
+                    ) {
+                        return Err(fail(pc, "negation requires an integer or floating value"));
                     }
                     stack.push(value);
                 }

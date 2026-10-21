@@ -10,14 +10,14 @@ public sealed partial class TypeDefinition
     /// <param name="primitive">A fixed- or native-width numeric primitive, Boolean, explicitly owned unit Void, RuntimeTypeHandle, Value or String.</param>
     /// <exception cref="InvalidOperationException">The declaration is a loaded snapshot.</exception>
     /// <exception cref="ArgumentException">The identity/category/storage is incompatible or the designation conflicts.</exception>
-    /// <remarks>No record fields, static constructors, nesting or generic parameters are allowed. Only String admits instance constructors. Numeric/Boolean bodies access scalar storage through ldobj/stobj; String bodies use the reference receiver directly. This does not authorize duplicate primitive ownership across dependencies.
+    /// <remarks>No record fields, static constructors, nesting or generic parameters are allowed. Only String admits instance constructors. Single and Double may declare storage-free scalar constants. Numeric/Boolean bodies access scalar storage through ldobj/stobj; String bodies use the reference receiver directly. This does not authorize duplicate primitive ownership across dependencies.
     /// Native emission preserves existing Runtime representation; executable CLI emission rejects this designation.</remarks>
     public void SetNativePrimitive(PrimitiveType primitive)
     {
         if (authoredFields is null) throw new InvalidOperationException("loaded primitive declarations are immutable");
         if (!IsSupportedNativePrimitive(primitive) || NativePrimitive is { } previous && previous != primitive ||
             Namespace != "System" || Name != primitive.ToString() || IsValueType != (primitive != PrimitiveType.String) || GenericArity != 0 || DeclaringType is not null ||
-            (primitive == PrimitiveType.String ? (Attributes & 0xa0) != 0 : (Attributes & 0x1b8) != 0x108) || Fields.Count != 0 || Methods.Any(m => m.Name == ".cctor" || m.Name == ".ctor" && primitive != PrimitiveType.String))
+            (primitive == PrimitiveType.String ? (Attributes & 0xa0) != 0 : (Attributes & 0x1b8) != 0x108) || Fields.Any(f => !f.IsLiteral || primitive is not (PrimitiveType.Single or PrimitiveType.Double)) || Methods.Any(m => m.Name == ".cctor" || m.Name == ".ctor" && primitive != PrimitiveType.String))
             throw new ArgumentException("native primitive declaration requires its canonical System type category with no record storage or unsupported constructors", nameof(primitive));
         NativePrimitive = primitive;
     }
@@ -29,7 +29,7 @@ public sealed partial class TypeDefinition
     public void SetNativePrimitiveReference(PrimitiveType primitive)
     {
         SetNativePrimitive(primitive);
-        if (Methods.Count != 0 || Interfaces.Count != 0 || Properties.Count != 0)
+        if (Fields.Count != 0 || Methods.Count != 0 || Interfaces.Count != 0 || Properties.Count != 0)
             throw new ArgumentException("primitive reference must be memberless");
         IsNativePrimitiveReference = true;
     }

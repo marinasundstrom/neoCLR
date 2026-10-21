@@ -14178,3 +14178,48 @@ The neoCLR built-in suite exercises both widths, NaNs/zeros/infinities/defaults,
 records/unions, boxed/interface calls, hashes and text; evidence is recorded in
 `docs/experiments/record-formatting/floating-validation-20261021.json`. Generic record
 display, record classes and matched release-package validation remain separate gaps.
+
+### Floating constants and classification (2026-10-21)
+
+Single/Double now expose constant NaN/PositiveInfinity/NegativeInfinity and static
+IsNaN/IsInfinity/IsPositiveInfinity/IsNegativeInfinity/IsFinite. This follows .NET's
+concrete floating API and IEEE/value-equality distinctions. Number and generic
+System.Numerics contracts are unchanged; broader generic math is deferred.
+
+The shared metadata field-constant surface now uses object? (Int32/Single/Double),
+with standard CLI Constant rows. Native literal fields retain Int32 numeric values;
+floating values use exact-width single_bits/double_bits hexadecimal strings under
+value, preserving NaN payloads, infinity and signed zero. No guest storage or .cctor
+is allocated for constants. Matching compiler, metadata SDK and runtime versions
+are required; older native readers reject floating literal payloads. Host callers
+must replace nullable-Int32-specific Constant access with pattern matching/casts.
+
+Raven's native adapter emits/imports typed field constants and the branch's portable
+lowering now handles Single constants alongside Double. That lowering file does not
+exist on Raven main; ordinary .NET emission is unchanged, so no unrelated branch
+merge or main fix is implied. Runtime Contract configuration is unchanged. The CLI
+reference bridge now exposes the same constant fields/helper signatures and permits
+literal primitive fields without changing scalar instance storage. Native reflection
+and dynamic field reads retain the appropriate primitive type; a native backend
+replacement must preserve typed constants, exact bits and read-only literal behavior.
+
+Validation: metadata CLI/native/reference roundtrips, signed-zero and NaN payload bits,
+malformed/width rejection, Rust literal validation and built-in floating-special-values
+plus record-formatting suites. See neoCLR's docs/experiments/floating-special-values
+for exact artifacts/results. The temporary enum/hash boxing previously documented is
+unrelated to loading these constants. This is not matched release-package acceptance.
+
+Qualified imported constants also exposed a shared Raven binder gap: the typed
+constant evaluator recognized BoundFieldAccess but not the equivalent qualified
+BoundMemberAccessExpression. The fix is developed on Raven main and deliberately
+carried to codex/neoclr; it reads only fields already marked const and never
+evaluates properties or ordinary static storage. The ordinary CLI regression
+imports user-declared Int32/Single/Double literals and verifies dependent emitted
+constants. Runtime Contract configuration and native ABI are unchanged.
+
+Raven main 13f34e357 passes 46 focused constant-evaluation tests. Native constant
+instance calls use temporary value receivers rather than addresses into nonexistent
+field storage, reusing existing lowering without a managed allocation. A separate
+.NET 11 framework lookup issue (inaccessible property selected for Double.NaN,
+Single.PositiveInfinity or Int32.MinValue) remains a general-main follow-up; the
+imported user-literal regression isolates the evaluator fix from that issue.

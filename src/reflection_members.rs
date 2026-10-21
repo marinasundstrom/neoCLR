@@ -156,7 +156,13 @@ fn plan(module: &Module, args: &[Value], kind: u8) -> Result<Plan, Error> {
                 if literal.visibility != Visibility::Public || kind == 3 {
                     return Err(Error::Access);
                 }
-                body.extend([Op::Int(literal.value), Op::BoxValue(Type::Int32)]);
+                body.extend([
+                    literal
+                        .value
+                        .instruction()
+                        .map_err(|_| Error::Unsupported)?,
+                    Op::BoxValue(literal.value.ty()),
+                ]);
             }
             body.push(Op::Return);
             return Ok(Plan { body });

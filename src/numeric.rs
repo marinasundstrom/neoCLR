@@ -237,3 +237,21 @@ pub(crate) fn branch_condition(op: &Op, left: Value, right: Value) -> Result<boo
     };
     Ok(value != invert)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn single_negation_preserves_width_and_flips_sign() {
+        for bits in [0_u32, 0x80000000, 0x3fc00000, 0x7f800000, 0x7fc00123] {
+            let Value::Double(value) =
+                unary(&Op::Negate, Value::Single(f32::from_bits(bits)).on_stack()).unwrap()
+            else {
+                panic!("negation did not preserve the floating evaluation stack");
+            };
+            assert_eq!((value as f32).to_bits(), bits ^ 0x80000000);
+        }
+        assert!(unary(&Op::BitNot, Value::Single(1.0).on_stack()).is_err());
+    }
+}

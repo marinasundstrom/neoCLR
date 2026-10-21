@@ -132,3 +132,10 @@ Single and Double support G/R/F/N/E, shortest round-trip output and explicit pre
 `Parse(text, culture)` accepts the corresponding decimal/group conventions and
 validates grouping; ordinary `Parse(text)` stays invariant. See [formatting and
 culture](../time/) for the supported profiles and limitations.
+
+
+Development Single and Double expose `NaN`, `PositiveInfinity`, and
+`NegativeInfinity` as constant fields, plus `IsNaN`, `IsInfinity`,
+`IsPositiveInfinity`, `IsNegativeInfinity`, and `IsFinite`. Use `IsNaN` rather than
+comparing a value with `NaN`. These constants and classification calls do not allocate.
+See the [numeric API guide](/docs/text-numbers.html).

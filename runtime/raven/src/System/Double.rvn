@@ -10,6 +10,24 @@ public struct Double : Number, EquatableTo<double>, Formattable {
     static val Zero: double => (double)0
     static val One: double => (double)1
 
+    /// Represents an IEEE not-a-number value. Use IsNaN to test for any NaN.
+    public const NaN: double = (double)0.0 / (double)0.0
+    /// Represents positive infinity.
+    public const PositiveInfinity: double = (double)1.0 / (double)0.0
+    /// Represents negative infinity.
+    public const NegativeInfinity: double = (double)(-1.0) / (double)0.0
+
+    /// Returns true for every NaN representation, regardless of sign or payload.
+    static func IsNaN(value: double) -> bool => value != value
+    /// Returns true for positive or negative infinity.
+    static func IsInfinity(value: double) -> bool => value == PositiveInfinity || value == NegativeInfinity
+    /// Returns true only for positive infinity.
+    static func IsPositiveInfinity(value: double) -> bool => value == PositiveInfinity
+    /// Returns true only for negative infinity.
+    static func IsNegativeInfinity(value: double) -> bool => value == NegativeInfinity
+    /// Returns true for finite values, including either signed zero.
+    static func IsFinite(value: double) -> bool => !IsNaN(value) && !IsInfinity(value)
+
     static func +(left: double, right: double) -> double => (double)(left + right)
     static func -(left: double, right: double) -> double => (double)(left - right)
     static func *(left: double, right: double) -> double => (double)(left * right)

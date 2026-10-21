@@ -124,9 +124,9 @@ pub fn bind(
                             }),
                         )
                         .chain(
-                            d.literal_fields
-                                .iter()
-                                .map(|f| (Type::Int32, f.visibility, true, true, Some(f.value), 0)),
+                            d.literal_fields.iter().map(|f| {
+                                (f.value.ty(), f.visibility, true, true, Some(&f.value), 0)
+                            }),
                         );
                 for (ordinal, (ty, access, is_static, readonly, constant, slot)) in
                     fields.enumerate()
@@ -255,7 +255,7 @@ pub fn bind(
                                 body.push(Op::Load(0));
                             } else {
                                 body.push(if let Some(value) = constant {
-                                    Op::Int(value)
+                                    value.instruction().map_err(|e| e.to_string())?
                                 } else if is_static {
                                     Op::StaticField {
                                         owner: owner.clone(),

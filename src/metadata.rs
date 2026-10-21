@@ -377,13 +377,51 @@ impl MemoryViewKind {
     }
 }
 
-/// Storage-free Int32 constant declared by a nominal type.
+/// Storage-free scalar constant declared by a nominal type.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct LiteralField {
     pub name: String,
-    pub value: i32,
+    pub value: LiteralValue,
     pub visibility: Visibility,
+}
+
+/// Exact scalar literal. Hex strings preserve floating bits through JSON tooling.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged, deny_unknown_fields)]
+pub enum LiteralValue {
+    Int32(i32),
+    Single { single_bits: String },
+    Double { double_bits: String },
+}
+
+impl LiteralValue {
+    pub fn ty(&self) -> Type {
+        match self {
+            Self::Int32(_) => Type::Int32,
+            Self::Single { .. } => Type::Single,
+            Self::Double { .. } => Type::Double,
+        }
+    }
+
+    pub fn instruction(&self) -> Result<Instruction, crate::Fault> {
+        fn bits(text: &str, width: usize) -> Result<u64, crate::Fault> {
+            if text.len() != width || !text.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return Err(crate::Fault::new("invalid floating literal bits"));
+            }
+            u64::from_str_radix(text, 16)
+                .map_err(|_| crate::Fault::new("invalid floating literal bits"))
+        }
+        Ok(match self {
+            Self::Int32(value) => Instruction::Int(*value),
+            Self::Single { single_bits } => Instruction::Float32 {
+                bits: bits(single_bits, 8)? as u32,
+            },
+            Self::Double { double_bits } => Instruction::Float64 {
+                bits: bits(double_bits, 16)?,
+            },
+        })
+    }
 }
 
 /// Preview Int32-backed enum contract. Named values do not restrict the value domain.
