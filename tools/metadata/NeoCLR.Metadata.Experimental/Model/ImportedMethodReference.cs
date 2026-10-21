@@ -64,21 +64,21 @@ public sealed partial class AssemblyBuilder
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver)
         => ImportReferenceCore(definition, dependencyCoreLibrary, resolver, false);
 
-    /// <summary>Imports a native free-function contract while preserving experimental reference compositions.</summary>
-    /// <param name="definition">A function from an opt-in immutable native snapshot.</param>
+    /// <summary>Imports a native static callable contract while preserving experimental reference compositions.</summary>
+    /// <param name="definition">A static method or free function from an opt-in immutable native snapshot; ordinary generic method parameters are supported.</param>
     /// <param name="dependencyCoreLibrary">The explicit matching core identity.</param>
     /// <param name="resolver">Optional exact dependency resolver for nominal bounds.</param>
     /// <returns>An output-owned callable reference retaining the native compound descriptor.</returns>
     /// <exception cref="ArgumentNullException">The definition or core identity is null.</exception>
-    /// <exception cref="InvalidDataException">The declaration is not a nongeneric native free function, or normal import validation fails.</exception>
+    /// <exception cref="InvalidDataException">The declaration is not a native static callable, or normal import validation fails.</exception>
     /// <remarks>Native emission only. This does not enable authored compound storage or CLI projection.
     /// Runtime execution uses native structural signatures and runtime verification.</remarks>
     public ImportedMethodReference ImportExperimentalCompositionReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        if (!definition.Module.Assembly.IsNative || definition.DeclaringType is not null || !definition.IsStatic ||
-            definition.GenericArity != 0 || definition.ImplementationAttributes != 0 || definition.NativeImport is not null)
-            throw new InvalidDataException("experimental composition import requires a nongeneric native free function");
+        if (!definition.Module.Assembly.IsNative || !definition.IsStatic ||
+            definition.ImplementationAttributes != 0 || definition.NativeImport is not null)
+            throw new InvalidDataException($"experimental composition import requires a native static callable: {definition.Name}, owner {definition.DeclaringType?.Name ?? "<global>"}");
         return ImportReferenceCore(definition, dependencyCoreLibrary, resolver, true);
     }
 

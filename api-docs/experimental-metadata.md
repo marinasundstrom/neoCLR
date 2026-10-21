@@ -10496,3 +10496,23 @@ The declaration must belong to the current assembly or an explicitly imported
 reference. Native metadata retains the declaration identity without introducing
 caller-scoped parameters; CLI output uses the ordinary TypeDef/TypeRef ldtoken.
 This does not permit generic definitions as local/field storage.
+
+### Native generic composition imports (2026-10-21)
+
+The explicit `ImportExperimentalCompositionReference` path now accepts native static
+methods (including generic extension methods) as well as free functions. Generic
+class, value-type and interface wrappers retain composed arguments through the
+ordinary checked generic construction/substitution path. This repairs the
+`HttpClientJsonExtensions.GetFromJson<T>` import of
+`Task<Result<T, HttpError | JsonError>>`; the public HTTP API is unchanged.
+Default imports still reject compositions. Generic closure involving composed
+storage still requires `EnableExperimentalCompositionStorage`, and normal access,
+arity, constraints, nesting limits and provider identity checks remain in force.
+Instance composition-call import is not introduced by this change.
+
+This is a native metadata SDK correction, with no CLI projection, Runtime Contract
+configuration or ABI change. The existing explicit Raven native backend owns
+selection of this import path; ordinary .NET compilation is unchanged. SDK
+composition-import and authored-composition tests pass, and the freshly compiled
+HTTP client/server pass interpreter end-to-end requests (including UTF-8 JSON and
+invalid input). Fresh packaged SDK/JIT qualification remains separate.

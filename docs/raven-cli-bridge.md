@@ -14405,3 +14405,23 @@ already carries the generated methods; no additional bridge replacement is neede
 for these bodies. Finite recursive display uses virtual calls; actual cycles retain
 stack limits. Source hierarchies and rebuilt imported KeyValuePair display are
 covered by the built-in record suite. See [scope and evidence](experiments/record-formatting/README.md#inherited-and-recursive-records--2026-10-21).
+
+### Native generic composition imports (2026-10-21)
+
+The explicit `ImportExperimentalCompositionReference` path now accepts native static
+methods (including generic extension methods) as well as free functions. Generic
+class, value-type and interface wrappers retain composed arguments through the
+ordinary checked generic construction/substitution path. This repairs the
+`HttpClientJsonExtensions.GetFromJson<T>` import of
+`Task<Result<T, HttpError | JsonError>>`; the public HTTP API is unchanged.
+Default imports still reject compositions. Generic closure involving composed
+storage still requires `EnableExperimentalCompositionStorage`, and normal access,
+arity, constraints, nesting limits and provider identity checks remain in force.
+Instance composition-call import is not introduced by this change.
+
+This is a native metadata SDK correction, with no CLI projection, Runtime Contract
+configuration or ABI change. The existing explicit Raven native backend owns
+selection of this import path; ordinary .NET compilation is unchanged. SDK
+composition-import and authored-composition tests pass, and the freshly compiled
+HTTP client/server pass interpreter end-to-end requests (including UTF-8 JSON and
+invalid input). Fresh packaged SDK/JIT qualification remains separate.

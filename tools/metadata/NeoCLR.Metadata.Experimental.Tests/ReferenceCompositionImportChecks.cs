@@ -24,6 +24,13 @@ internal static class ReferenceCompositionImportChecks
         otherBoth.AddInterfaceImplementation(a); otherBoth.AddInterfaceImplementation(derivedB);
         var otherCtor = otherBoth.AddConstructor(Array.Empty<PrimitiveType>()); otherCtor.Return();
         var answer = provider.AddFunction("Answer"); answer.LoadConstant(42); answer.Return();
+        var genericEcho = provider.AddFunction("GenericEcho",
+            new MethodSignature(a, [a, SignatureType.MethodParameter(0)], ["T"]));
+        genericEcho.LoadArgument(0); genericEcho.Return();
+        var algorithms = provider.AddType("Example", "Algorithms");
+        var genericStatic = algorithms.AddMethod("GenericStaticEcho",
+            new MethodSignature(a, [a, SignatureType.MethodParameter(0)], ["T"]));
+        genericStatic.LoadArgument(0); genericStatic.Return();
         var source = JsonNode.Parse(provider.WriteNativeAssembly())!;
         JsonNode Bound(int index) => new JsonObject { ["Named"] = source["types"]![index]!["name"]!.DeepClone() };
         JsonNode Compound(string kind, bool reverse = false, int second = 1) => new JsonObject { [kind] = new JsonArray(Bound(reverse ? second : 0), Bound(reverse ? 0 : second)) };
@@ -33,6 +40,11 @@ internal static class ReferenceCompositionImportChecks
             root["functions"]![0]!["returns"] = Compound(kind, second: second);
             root["functions"]![1]!["parameters"]![0] = Compound(inputKind ?? kind, true, second);
             root["functions"]![1]!["returns"] = Compound(inputKind ?? kind, second: second);
+            root["functions"]![3]!["parameters"]![0] = Compound(kind, second: second);
+            root["functions"]![3]!["returns"] = Compound(kind, second: second);
+            var staticBody = root["functions"]!.AsArray().Single(f => f!["origin"]?["name"]?.GetValue<string>() == "GenericStaticEcho")!;
+            staticBody["parameters"]![0] = Compound(kind, second: second);
+            staticBody["returns"] = Compound(kind, second: second);
             return NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(root.ToJsonString()));
         }
         foreach (var scenario in new[] { (Kind: "Union", Label: "Union", Second: 1), (Kind: "Intersection", Label: "Intersection", Second: 1), (Kind: "Intersection", Label: "RedundantIntersection", Second: 2) })
@@ -63,7 +75,19 @@ internal static class ReferenceCompositionImportChecks
             genericBody.LoadConstant(42); genericBody.Return();
             var local = main.DeclareExperimentalCompositionResultLocal(importedFactory);
             main.Call(importedFactory); main.StoreLocal(local); main.LoadLocal(local);
-            main.Call(importedEcho); main.Emit(OpCode.Pop); main.LoadConstant(42); main.Return();
+            main.Call(importedEcho);
+            var genericDefinition = snapshot.MainModule.Functions.Single(m => m.Name == "GenericEcho");
+            Reject(() => consumer.ImportReference(genericDefinition, core));
+            var genericImport = consumer.ImportExperimentalCompositionReference(genericDefinition, core);
+            var genericCall = genericImport.MakeGenericInstance(PrimitiveType.Int32);
+            Check(genericCall.Signature.ParameterTypes[1].Primitive == PrimitiveType.Int32 &&
+                genericCall.Signature.ReturnType.Composition is not null, "generic substitution preserves composition");
+            main.LoadConstant(42); main.Call(genericCall);
+            var staticDefinition = snapshot.MainModule.Types.Single(t => t.Name == "Algorithms").Methods.Single();
+            Reject(() => consumer.ImportReference(staticDefinition, core));
+            var staticCall = consumer.ImportExperimentalCompositionReference(staticDefinition, core).MakeGenericInstance(PrimitiveType.Int32);
+            main.LoadConstant(42); main.Call(staticCall);
+            main.Emit(OpCode.Pop); main.LoadConstant(42); main.Return();
             var foreign = new AssemblyBuilder(new("Foreign", new Version(1, 0, 0, 0)), core).AddFunction("Main");
             Reject(() => foreign.DeclareExperimentalCompositionResultLocal(importedFactory));
             foreach (var invalid in new[] { "uninitialized", "wrong-value", "address" })

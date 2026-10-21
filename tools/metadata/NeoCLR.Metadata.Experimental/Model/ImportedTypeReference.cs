@@ -143,7 +143,7 @@ public sealed partial class AssemblyBuilder
         var imported = ImportReference(definition, core);
         var arguments = construction.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions, allowTuples)).ToArray();
         if (!arguments.Any(t => t.ContainsComposition)) return imported.MakeGenericInstance(arguments);
-        if (!allowCompositions || definition.IsValueType || (definition.Attributes & 0x20) != 0 ||
+        if (!allowCompositions ||
             arguments.Length != imported.GenericArity || arguments.Any(t => t.NestingDepth >= 16))
             throw new InvalidDataException("unsupported experimental composition wrapper import");
         return new ImportedTypeReference(this, imported.AssemblyIdentity, imported.Namespace, imported.Name,

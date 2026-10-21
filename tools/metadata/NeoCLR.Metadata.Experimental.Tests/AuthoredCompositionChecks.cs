@@ -122,6 +122,23 @@ internal static class AuthoredCompositionChecks
                 .FunctionSignature!.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("union callable alternative or its union return lost");
         var consumer = new AssemblyBuilder(new("CallableUnionConsumer", new Version(1, 0, 0, 0)), core);
+        var importedGeneric = consumer.ImportExperimentalCompositionReference(
+            valueSnapshot.MainModule.Functions.Single(f => f.Name == "GenericValueEcho"), core);
+        Reject(() => importedGeneric.MakeGenericInstance(PrimitiveType.Int32));
+        consumer.EnableExperimentalCompositionStorage(importedGeneric);
+        var closedGeneric = importedGeneric.MakeGenericInstance(PrimitiveType.Int32);
+        var closedWrapper = closedGeneric.Signature.ReturnType.ImportedType!;
+        if (!closedWrapper.IsValueType || closedWrapper.TypeArguments[0].Primitive != PrimitiveType.Int32 ||
+            closedWrapper.TypeArguments[1].Composition?.Kind != ReferenceCompositionKind.Union ||
+            closedGeneric.Signature.ParameterTypes[0] != closedGeneric.Signature.ReturnType)
+            throw new Exception("imported generic value wrapper lost substitution or composition");
+        var importedOpen = consumer.ImportExperimentalCompositionReference(
+            valueSnapshot.MainModule.Functions.Single(f => f.Name == "OpenEcho"), core);
+        consumer.EnableExperimentalCompositionStorage(importedOpen);
+        var closedOpen = importedOpen.MakeGenericInstance(PrimitiveType.Int32);
+        if (closedOpen.Signature.ReturnType.Composition!.Constituents.Single(t => t.ImportedType?.TypeArguments.Count > 0)
+            .ImportedType!.TypeArguments[0].Primitive != PrimitiveType.Int32)
+            throw new Exception("imported nested composition lost method substitution");
         var importedCallable = consumer.ImportExperimentalCompositionReference(
             valueSnapshot.MainModule.Functions.Single(f => f.Name == "CallableUnionEcho"), core);
         var importedShape = importedCallable.Signature.ReturnType.Composition!.Constituents.Single(t => t.FunctionSignature is not null).FunctionSignature!;
