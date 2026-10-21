@@ -14223,3 +14223,19 @@ field storage, reusing existing lowering without a managed allocation. A separat
 .NET 11 framework lookup issue (inaccessible property selected for Double.NaN,
 Single.PositiveInfinity or Int32.MinValue) remains a general-main follow-up; the
 imported user-literal regression isolates the evaluator fix from that issue.
+
+### Decimal native library contracts (2026-10-21, development)
+
+Decimal is an ordinary source-defined Raven struct. Native compiler capability
+`AllowsDecimalValueContracts` lowers decimal literals, arithmetic/comparison and
+integral input conversions to declared constructors/operators, as the CLI emitter
+does for .NET Decimal. No new neoIL instruction, runtime scalar category, numeric
+interface or Runtime Contract option is introduced. Native metadata and the
+existing value ABI retain its fields; this is not CLR binary-layout compatibility.
+
+Use the matching compiler and source library. Decimal is not projected by the
+legacy CLI documentation scaffold; the native API reference documents members.
+Floating conversions, integral extraction and decimal constant fields remain gaps.
+Built-in Decimal tests cover the supported native contracts and CLR arithmetic
+vectors. Native call optimization is a future backend concern; no replacement
+metadata encoding is required for the ordinary nominal value type.

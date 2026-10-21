@@ -214,6 +214,8 @@
     "runtime/raven/src/System/Data/Sql/SqlMapper.rvn": "faaaa333aeaca1d8cedcff7dfc37d6db7c867073db84c8a7210218307989b607",
     "runtime/raven/src/System/Data/Sql/SqlParameters.rvn": "d0c697f35942e29851854e34eeab29ad2718b70fae23ef285b150fc856f74d75",
     "runtime/raven/src/System/Data/Sql/SqlValue.rvn": "36d24d801cfc15524e0567333bd3bd87f9968a6d0fa4fd4c050a6c83b5e01ade",
+    "runtime/raven/src/System/Decimal.rvn": "baeb2f2f56b3581950a167e5666a07361e40a27c8c20d8607e74975af11619eb",
+    "runtime/raven/src/System/DecimalMagnitude.rvn": "ee6fb2351b80c6a322ed30cf2d194a6d746d7f0bd42e673d32533083cf99386d",
     "runtime/raven/src/System/Diagnostics/StackTrace.rvn": "4f6a25436c6f772e0e8c20607160ec7493d7a0d7ca96cb23a9d58dd2f73f89ac",
     "runtime/raven/src/System/Disposable.rvn": "c25420ff01885d43e81c874bc6bb9e908a1ce8d03071ceb2e51073e236702bbb",
     "runtime/raven/src/System/Double.rvn": "37b0d4a5a8bcbfe7a819295a3926457b54bf6694d1b7b859ffbbce162ae57055",

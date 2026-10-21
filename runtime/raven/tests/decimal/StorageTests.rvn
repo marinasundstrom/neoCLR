@@ -1,0 +1,14 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Non-byte slice lowering is currently interpreter-only; separate from the common suite.
+[Test("Decimal GetBits writes only the caller supplied slice")]
+func Storage() -> Result<unit, TestFailure> {
+    let value = Decimal(123450, 0, 0, false, (byte)2)
+    let words = [99, 0, 0, 0, 0, 99]
+    _ = Assert.True(Decimal.GetBits(value, words[1..5]) == 4, "Word count")?
+    return Assert.True(words[0] == 99 && words[5] == 99 && words[1] == 123450 && words[4] == 131072, "Window contents and boundaries")
+}

@@ -50,7 +50,8 @@ The executable report consumer is maintained in
 
 [Number](xref:System.Number) supplies static `Zero`, `One`, the binary
 `+`, `-`, `*`, `/` operators, and inherited `CompareTo`. Implementers are SByte,
-Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single and Double. Boolean and
+Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single and Double, plus the
+development native Decimal value type described below. Boolean and
 Char are not numbers. There is no Parsable interface; numeric-specific parsing
 remains a future design question.
 
@@ -61,7 +62,7 @@ arithmetic and wraps when narrowed. Floating operations retain IEEE behavior;
 CompareTo orders NaN below finite numbers and compares NaNs equal, while operators
 retain their IEEE rules. Zero/One are properties, not compile-time constants.
 
-The current importer supports closed static application functions constrained solely
+The legacy CLI importer supports closed static application functions constrained solely
 by `Number`, specialized for these ten concrete types. It does not yet admit
 arbitrary user-defined numeric types, generic classes, additional constraints or
 open runtime generic dispatch. General static/default/access-controlled interface
@@ -159,3 +160,44 @@ the same primitive value without allocation. Finite includes both signed zeros.
 NaN sign/payload is not part of the public constant's contract; classification
 accepts every NaN representation. Formatting and parsing keep the existing invariant
 NaN/Infinity spellings. These are current development APIs, not published-release claims.
+
+## Decimal (development)
+
+`System.Decimal` is a Raven value type with a 96-bit unsigned coefficient, a sign,
+and a stored scale from 0 to 28. It implements the existing `Number`,
+`EquatableTo<Decimal>` and `Formattable` contracts. It has no NaN or infinity.
+There are no additional numeric capability interfaces in this increment.
+
+Like .NET Decimal, arithmetic uses base-ten values and rounds discarded digits to
+nearest, ties to even. Equivalent scales and signed zeros compare equal and have
+matching hashes. General formatting preserves the stored scale: `1.00` remains
+`1.00`. This is a logical representation contract, not a CLR binary-layout guarantee.
+
+The native reference documents constructors from integers and coefficient words,
+`Zero`, `One`, `MinusOne`, `MinValue`, `MaxValue`, `Scale`, arithmetic and comparison
+operators, `CompareTo`, `Equals`, `GetHashCode`, `IsZero`, `IsNegative`, `Abs`,
+`Negate`, `Round`, `Floor`, `Ceiling`, `Truncate`, and `GetBits`.
+`GetBits(value)` allocates four independent words in low/middle/high/flags order;
+`GetBits(value, destination: Slice<int>)` writes those words into caller storage.
+
+`Parse(text)` returns `Result<Decimal, NumberParseError>` and accepts an optional
+ASCII sign and decimal point. It rejects whitespace, exponents and grouping.
+The explicit-culture overload uses the existing strict numeric grouping policy.
+`TryParse` accepts nullable input and resets its out value to zero on failure.
+Excess fractional precision is rounded; an unrepresentable magnitude is `Overflow`.
+
+`ToString()` is invariant. Format overloads use current or explicit culture and
+support G/G0 and F/N with precision 0–99. Custom patterns, exponential formatting,
+float conversions and integral extraction conversions are outside this foundation.
+Invalid format/scale, arithmetic overflow and division by zero use neoCLR's current
+terminal `System.Fail` contract, rather than recoverable CLR arithmetic exceptions.
+
+Arithmetic scratch storage is an ordinary value type; it does not create byte or
+limb arrays. Formatting allocates output storage and a String. Interface/Object
+conversion may box; explicit-culture parsing may allocate normalized text. No
+claim of zero allocation for the complete API is made.
+
+The caller-storage `Slice<int>` overload currently requires interpreter execution:
+native/JIT slice lowering supports byte views only. The allocating `GetBits(value)`
+overload is available across the execution modes. This is a backend gap, not a
+permanent Decimal restriction.

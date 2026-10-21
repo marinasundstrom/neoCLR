@@ -1,0 +1,239 @@
+module System
+
+// Seven base-10^9 limbs hold exact intermediate products and aligned coefficients.
+// Ordinary value storage: arithmetic does not allocate arrays or managed objects.
+internal struct DecimalMagnitude {
+    private var d0: ulong
+    private var d1: ulong
+    private var d2: ulong
+    private var d3: ulong
+    private var d4: ulong
+    private var d5: ulong
+    private var d6: ulong
+
+    static func FromUInt64(value: ulong) -> DecimalMagnitude {
+        var result = default(DecimalMagnitude)
+        var remaining = value
+        var index = 0
+        while remaining != (ulong)0 {
+            result.Set(index, remaining % (ulong)1000000000)
+            remaining /= (ulong)1000000000
+            index += 1
+        }
+        return result
+    }
+
+    static func FromWords(low: uint, middle: uint, high: uint) -> DecimalMagnitude {
+        var result = FromUInt64((ulong)high)
+        result.MultiplySmall((ulong)4294967296L)
+        result.AddSmall((ulong)middle)
+        result.MultiplySmall((ulong)4294967296L)
+        result.AddSmall((ulong)low)
+        return result
+    }
+
+    func Get(index: int) -> ulong {
+        if index == 0 {
+            return d0
+        }
+        if index == 1 {
+            return d1
+        }
+        if index == 2 {
+            return d2
+        }
+        if index == 3 {
+            return d3
+        }
+        if index == 4 {
+            return d4
+        }
+        if index == 5 {
+            return d5
+        }
+        if index == 6 {
+            return d6
+        }
+        return (ulong)0
+    }
+
+    private func Set(index: int, value: ulong) {
+        if index == 0 {
+            d0 = value
+        }
+        if index == 1 {
+            d1 = value
+        }
+        if index == 2 {
+            d2 = value
+        }
+        if index == 3 {
+            d3 = value
+        }
+        if index == 4 {
+            d4 = value
+        }
+        if index == 5 {
+            d5 = value
+        }
+        if index == 6 {
+            d6 = value
+        }
+    }
+
+    val IsZero: bool => d0 == (ulong)0 && d1 == (ulong)0 && d2 == (ulong)0 && d3 == (ulong)0 && d4 == (ulong)0 && d5 == (ulong)0 && d6 == (ulong)0
+    val IsOdd: bool => d0 % (ulong)2 != (ulong)0
+
+    func CompareTo(other: DecimalMagnitude) -> int {
+        var index = 6
+        while index >= 0 {
+            if Get(index) < other.Get(index) {
+                return -1
+            }
+            if Get(index) > other.Get(index) {
+                return 1
+            }
+            index -= 1
+        }
+        return 0
+    }
+
+    func AddSmall(value: ulong) {
+        var carry = value
+        var index = 0
+        while carry != (ulong)0 && index < 7 {
+            let sum = Get(index) + carry
+            Set(index, sum % (ulong)1000000000)
+            carry = sum / (ulong)1000000000
+            index += 1
+        }
+        if carry != (ulong)0 {
+            System.Fail("Decimal scratch overflow")
+        }
+    }
+
+    func MultiplySmall(value: ulong) {
+        var carry = (ulong)0
+        var index = 0
+        while index < 7 {
+            let product = Get(index) * value + carry
+            Set(index, product % (ulong)1000000000)
+            carry = product / (ulong)1000000000
+            index += 1
+        }
+        if carry != (ulong)0 {
+            System.Fail("Decimal scratch overflow")
+        }
+    }
+
+    // Divisor is at most 2^32, keeping remainder * 10^9 inside UInt64.
+    func DivideSmall(value: ulong) -> ulong {
+        var remainder = (ulong)0
+        var index = 6
+        while index >= 0 {
+            let part = remainder * (ulong)1000000000 + Get(index)
+            Set(index, part / value)
+            remainder = part % value
+            index -= 1
+        }
+        return remainder
+    }
+
+    func ScaleUp(count: int) {
+        var index = 0
+        while index < count {
+            MultiplySmall((ulong)10)
+            index += 1
+        }
+    }
+
+    static func Add(left: DecimalMagnitude, right: DecimalMagnitude) -> DecimalMagnitude {
+        var result = default(DecimalMagnitude)
+        var carry = (ulong)0
+        var index = 0
+        while index < 7 {
+            let sum = left.Get(index) + right.Get(index) + carry
+            result.Set(index, sum % (ulong)1000000000)
+            carry = sum / (ulong)1000000000
+            index += 1
+        }
+        if carry != (ulong)0 {
+            System.Fail("Decimal scratch overflow")
+        }
+        return result
+    }
+
+    // Caller establishes left >= right.
+    static func Subtract(left: DecimalMagnitude, right: DecimalMagnitude) -> DecimalMagnitude {
+        var result = default(DecimalMagnitude)
+        var borrow = (ulong)0
+        var index = 0
+        while index < 7 {
+            let subtrahend = right.Get(index) + borrow
+            let digit = left.Get(index)
+            if digit < subtrahend {
+                result.Set(index, digit + (ulong)1000000000 - subtrahend)
+                borrow = (ulong)1
+            } else {
+                result.Set(index, digit - subtrahend)
+                borrow = (ulong)0
+            }
+            index += 1
+        }
+        return result
+    }
+
+    static func Multiply(left: DecimalMagnitude, right: DecimalMagnitude) -> DecimalMagnitude {
+        var result = default(DecimalMagnitude)
+        var i = 0
+        while i < 7 {
+            var carry = (ulong)0
+            var j = 0
+            while j + i < 7 {
+                let product = left.Get(i) * right.Get(j) + result.Get(i + j) + carry
+                result.Set(i + j, product % (ulong)1000000000)
+                carry = product / (ulong)1000000000
+                j += 1
+            }
+            if carry != (ulong)0 {
+                System.Fail("Decimal scratch overflow")
+            }
+            i += 1
+        }
+        return result
+    }
+
+    // Decimal long division avoids a double approximation and retains exact remainder.
+    static func Divide(dividend: DecimalMagnitude, divisor: DecimalMagnitude, out remainder: DecimalMagnitude) -> DecimalMagnitude {
+        var quotient = default(DecimalMagnitude)
+        remainder = default(DecimalMagnitude)
+        var place = FromUInt64((ulong)1)
+        var digits = 1
+        var probe = dividend
+        while probe.CompareTo(FromUInt64((ulong)10)) >= 0 {
+            _ = probe.DivideSmall((ulong)10)
+            place.MultiplySmall((ulong)10)
+            digits += 1
+        }
+        var remaining = dividend
+        while digits > 0 {
+            var digit = 0
+            while remaining.CompareTo(place) >= 0 {
+                remaining = Subtract(remaining, place)
+                digit += 1
+            }
+            remainder.MultiplySmall((ulong)10)
+            remainder.AddSmall((ulong)digit)
+            var answer = 0
+            while remainder.CompareTo(divisor) >= 0 {
+                remainder = Subtract(remainder, divisor)
+                answer += 1
+            }
+            quotient.MultiplySmall((ulong)10)
+            quotient.AddSmall((ulong)answer)
+            _ = place.DivideSmall((ulong)10)
+            digits -= 1
+        }
+        return quotient
+    }
+}

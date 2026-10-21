@@ -1,0 +1,553 @@
+module System
+
+import System.Result.*
+
+/// An exact base-ten value with a 96-bit coefficient and scale from zero through 28.
+/// Arithmetic rounds discarded digits to even and faults on overflow or division by zero.
+public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
+    private val flags: int
+    private val high: uint
+    private val low: uint
+    private val middle: uint
+
+    /// Creates an exact integral value.
+    init(value: int) {
+        let magnitude = if value < 0 { (ulong)(-(long)value) } else { (ulong)value }
+        low = (uint)magnitude
+        middle = (uint)0
+        high = (uint)0
+        flags = if value < 0 { -2147483648 } else { 0 }
+    }
+
+    /// Creates an exact signed integral value, including Int64.MinValue.
+    init(value: long) {
+        let magnitude = if value < 0L { (ulong)(-(value + 1L)) + (ulong)1 } else { (ulong)value }
+        low = (uint)magnitude
+        middle = (uint)(magnitude >> 32)
+        high = (uint)0
+        flags = if value < 0L { -2147483648 } else { 0 }
+    }
+
+    /// Creates an exact unsigned integral value.
+    init(value: ulong) {
+        low = (uint)value
+        middle = (uint)(value >> 32)
+        high = (uint)0
+        flags = 0
+    }
+
+    /// Creates a value from the three coefficient words, sign and scale; scale above 28 faults.
+    init(lo: int, mid: int, hi: int, isNegative: bool, scale: byte) {
+        if scale > (byte)28 {
+            System.Fail("Decimal scale must be between 0 and 28")
+        }
+        low = (uint)lo
+        middle = (uint)mid
+        high = (uint)hi
+        flags = ((int)scale << 16) | (if isNegative { -2147483648 } else { 0 })
+    }
+
+    private init(magnitude: DecimalMagnitude, negative: bool, scale: int) {
+        var remaining = magnitude
+        low = (uint)remaining.DivideSmall((ulong)4294967296L)
+        middle = (uint)remaining.DivideSmall((ulong)4294967296L)
+        high = (uint)remaining.DivideSmall((ulong)4294967296L)
+        flags = (scale << 16) | (if negative { -2147483648 } else { 0 })
+    }
+
+    /// Number of fractional decimal places retained in the representation.
+    val Scale: byte => (byte)((flags >> 16) & 255)
+    private val Negative: bool => flags < 0
+    private val Magnitude: DecimalMagnitude => DecimalMagnitude.FromWords(low, middle, high)
+    private static val Limit: DecimalMagnitude => DecimalMagnitude.FromWords(unchecked((uint)-1), unchecked((uint)-1), unchecked((uint)-1))
+
+    /// The additive identity.
+    static val Zero: Decimal => default(Decimal)
+    /// The multiplicative identity.
+    static val One: Decimal => Decimal(1)
+    /// Negative one.
+    static val MinusOne: Decimal => Decimal(-1)
+    /// The largest representable value: 79228162514264337593543950335.
+    static val MaxValue: Decimal => Decimal(-1, -1, -1, false, (byte)0)
+    /// The smallest representable value: -79228162514264337593543950335.
+    static val MinValue: Decimal => Decimal(-1, -1, -1, true, (byte)0)
+
+    /// Converts an Int32 exactly.
+    static func implicit(value: int) -> Decimal => Decimal(value)
+    /// Converts an Int64 exactly.
+    static func implicit(value: long) -> Decimal => Decimal(value)
+    /// Converts a UInt32 exactly.
+    static func implicit(value: uint) -> Decimal => Decimal((ulong)value)
+    /// Converts a UInt64 exactly.
+    static func implicit(value: ulong) -> Decimal => Decimal(value)
+
+    /// Tests the stored sign, including negative zero.
+    static func IsNegative(value: Decimal) -> bool => value.Negative
+    /// Tests numerical zero, independently of sign and scale.
+    static func IsZero(value: Decimal) -> bool => value.Magnitude.IsZero
+
+    /// Returns independent low, middle, high and flags words, matching Decimal.GetBits ordering.
+    static func GetBits(value: Decimal) -> int[] => [(int)value.low, (int)value.middle, (int)value.high, value.flags]
+
+    /// Writes four representation words without allocation; a shorter destination faults.
+    static func GetBits(value: Decimal, destination: Slice<int>) -> int {
+        if destination.Length < 4 {
+            System.Fail("Decimal.GetBits requires four elements")
+        }
+        destination[0] = (int)value.low
+        destination[1] = (int)value.middle
+        destination[2] = (int)value.high
+        destination[3] = value.flags
+        return 4
+    }
+
+    /// Compares numerical values; equivalent scales and either signed zero are equal.
+    func Equals(other: Decimal) -> bool => CompareTo(other) == 0
+    /// Compares a boxed Decimal using numerical value equality.
+    override func Equals(other: Object?) -> bool => other is Decimal value && Equals(value)
+
+    /// Returns a value hash independent of equivalent scale and signed-zero encodings.
+    override func GetHashCode() -> int {
+        var magnitude = Magnitude
+        if magnitude.IsZero {
+            return 0
+        }
+        var scale = (int)Scale
+        while scale > 0 {
+            var reduced = magnitude
+            if reduced.DivideSmall((ulong)10) != (ulong)0 {
+                break
+            }
+            magnitude = reduced
+            scale -= 1
+        }
+        let lo = magnitude.DivideSmall((ulong)4294967296L)
+        let mid = magnitude.DivideSmall((ulong)4294967296L)
+        let hi = magnitude.DivideSmall((ulong)4294967296L)
+        return (int)lo ^ (int)mid ^ (int)hi ^ (scale << 16) ^ (if Negative { -2147483648 } else { 0 })
+    }
+
+    /// Orders values without rounding or conversion to binary floating point.
+    func CompareTo(other: Decimal) -> int {
+        var left = Magnitude
+        var right = other.Magnitude
+        if left.IsZero && right.IsZero {
+            return 0
+        }
+        if Negative != other.Negative { return if Negative { -1 } else { 1 } }
+        let scale = if Scale > other.Scale { (int)Scale } else { (int)other.Scale }
+        left.ScaleUp(scale - (int)Scale)
+        right.ScaleUp(scale - (int)other.Scale)
+        let result = left.CompareTo(right)
+        return if Negative { -result } else { result }
+    }
+
+    static func ==(left: Decimal, right: Decimal) -> bool => left.Equals(right)
+    static func !=(left: Decimal, right: Decimal) -> bool => !left.Equals(right)
+    static func <(left: Decimal, right: Decimal) -> bool => left.CompareTo(right) < 0
+    static func >(left: Decimal, right: Decimal) -> bool => left.CompareTo(right) > 0
+    static func <=(left: Decimal, right: Decimal) -> bool => left.CompareTo(right) <= 0
+    static func >=(left: Decimal, right: Decimal) -> bool => left.CompareTo(right) >= 0
+    static func +(value: Decimal) -> Decimal => value
+    static func -(value: Decimal) -> Decimal => Negate(value)
+
+    /// Changes the sign while preserving coefficient and scale.
+    static func Negate(value: Decimal) -> Decimal => Decimal((int)value.low, (int)value.middle, (int)value.high, !value.Negative, value.Scale)
+    /// Returns the absolute value, clearing the sign of negative zero too.
+    static func Abs(value: Decimal) -> Decimal => Decimal((int)value.low, (int)value.middle, (int)value.high, false, value.Scale)
+
+    private static func Require(value: Result<Decimal, NumberParseError>) -> Decimal {
+        let Ok(result) = value else {
+            System.Fail("Decimal overflow")
+            return Zero
+        }
+        return result
+    }
+
+    // Reduce once from the exact intermediate; retry from it if rounding carries.
+    private static func Fit(value: DecimalMagnitude, negative: bool, scale: int, sticky: bool) -> Result<Decimal, NumberParseError> {
+        if value.IsZero && !sticky {
+            var zeroScale = scale
+            if zeroScale > 28 {
+                zeroScale = 28
+            }
+            if zeroScale < 0 {
+                zeroScale = 0
+            }
+            return Ok(Decimal(value, negative, zeroScale))
+        }
+        if scale < 0 {
+            if scale < -28 || value.CompareTo(Limit) > 0 {
+                return Error(NumberParseError.Overflow())
+            }
+            var scaled = value
+            scaled.ScaleUp(-scale)
+            if scaled.CompareTo(Limit) > 0 {
+                return Error(NumberParseError.Overflow())
+            }
+            return Ok(Decimal(scaled, negative, 0))
+        }
+        if scale > 90 {
+            return Ok(Decimal(default(DecimalMagnitude), negative, 28))
+        }
+        var drop = if scale > 28 { scale - 28 } else { 0 }
+        while drop <= scale {
+            var candidate = value
+            var previous = sticky
+            var digit = (ulong)0
+            var index = 0
+            while index < drop {
+                if digit != (ulong)0 {
+                    previous = true
+                }
+                digit = candidate.DivideSmall((ulong)10)
+                index += 1
+            }
+            if candidate.CompareTo(Limit) <= 0 {
+                if digit > (ulong)5 || (digit == (ulong)5 && (previous || candidate.IsOdd)) {
+                    candidate.AddSmall((ulong)1)
+                }
+                if candidate.CompareTo(Limit) <= 0 {
+                    return Ok(Decimal(candidate, negative, scale - drop))
+                }
+            }
+            drop += 1
+        }
+        return Error(NumberParseError.Overflow())
+    }
+
+    static func +(left: Decimal, right: Decimal) -> Decimal {
+        let scale = if left.Scale > right.Scale { (int)left.Scale } else { (int)right.Scale }
+        var a = left.Magnitude
+        var b = right.Magnitude
+        a.ScaleUp(scale - (int)left.Scale)
+        b.ScaleUp(scale - (int)right.Scale)
+        if left.Negative == right.Negative {
+            return Require(Fit(DecimalMagnitude.Add(a, b), left.Negative, scale, false))
+        }
+        if a.CompareTo(b) >= 0 {
+            return Require(Fit(DecimalMagnitude.Subtract(a, b), left.Negative, scale, false))
+        }
+        return Require(Fit(DecimalMagnitude.Subtract(b, a), right.Negative, scale, false))
+    }
+
+    static func -(left: Decimal, right: Decimal) -> Decimal => left + Negate(right)
+    /// Multiplies exact coefficients, rounding only when the result needs a smaller scale.
+    static func *(left: Decimal, right: Decimal) -> Decimal {
+        let scale = (int)left.Scale + (int)right.Scale
+        let narrow = left.high == (uint)0 && left.middle == (uint)0 && right.high == (uint)0 && right.middle == (uint)0
+        // Match Decimal's observable zero representation for narrow underflow and
+        // wide zero products, without depending on its binary multiplication algorithm.
+        if (narrow && scale > 47) || (!narrow && (IsZero(left) || IsZero(right))) {
+            return Zero
+        }
+        return Require(Fit(DecimalMagnitude.Multiply(left.Magnitude, right.Magnitude), left.Negative != right.Negative, scale, false))
+    }
+
+    static func /(left: Decimal, right: Decimal) -> Decimal {
+        if IsZero(right) {
+            System.Fail("Decimal division by zero")
+        }
+        var a = left.Magnitude
+        var b = right.Magnitude
+        let common = if left.Scale > right.Scale { (int)left.Scale } else { (int)right.Scale }
+        a.ScaleUp(common - (int)left.Scale)
+        b.ScaleUp(common - (int)right.Scale)
+        var remainder = default(DecimalMagnitude)
+        var quotient = DecimalMagnitude.Divide(a, b, out remainder)
+        if quotient.CompareTo(Limit) > 0 {
+            System.Fail("Decimal overflow")
+        }
+        var scale = 0
+        let minimumScale = if left.Scale > right.Scale { (int)left.Scale - (int)right.Scale } else { 0 }
+        while (!remainder.IsZero || scale < minimumScale) && scale < 28 {
+            remainder.MultiplySmall((ulong)10)
+            var digit = (ulong)0
+            while remainder.CompareTo(b) >= 0 {
+                remainder = DecimalMagnitude.Subtract(remainder, b)
+                digit += (ulong)1
+            }
+            quotient.MultiplySmall((ulong)10)
+            quotient.AddSmall(digit)
+            scale += 1
+            if quotient.CompareTo(Limit) > 0 {
+                return Require(Fit(quotient, left.Negative != right.Negative, scale, !remainder.IsZero))
+            }
+        }
+        if !remainder.IsZero {
+            remainder.MultiplySmall((ulong)10)
+            var digit = (ulong)0
+            while remainder.CompareTo(b) >= 0 {
+                remainder = DecimalMagnitude.Subtract(remainder, b)
+                digit += (ulong)1
+            }
+            quotient.MultiplySmall((ulong)10)
+            quotient.AddSmall(digit)
+            scale += 1
+        }
+        let result = Require(Fit(quotient, left.Negative != right.Negative, scale, !remainder.IsZero))
+        var coefficient = result.Magnitude
+        var finalScale = (int)result.Scale
+        if coefficient.IsZero && !IsZero(left) {
+            return Decimal(coefficient, result.Negative, 0)
+        }
+        while finalScale > minimumScale {
+            var reduced = coefficient
+            if reduced.DivideSmall((ulong)10) != (ulong)0 {
+                break
+            }
+            coefficient = reduced
+            finalScale -= 1
+        }
+        return Decimal(coefficient, result.Negative, finalScale)
+    }
+
+    static func %(left: Decimal, right: Decimal) -> Decimal {
+        if IsZero(right) {
+            System.Fail("Decimal division by zero")
+        }
+        let scale = if left.Scale > right.Scale { (int)left.Scale } else { (int)right.Scale }
+        var a = left.Magnitude
+        var b = right.Magnitude
+        a.ScaleUp(scale - (int)left.Scale)
+        b.ScaleUp(scale - (int)right.Scale)
+        // A smaller dividend is already the exact remainder, including its scale.
+        if a.CompareTo(b) < 0 {
+            return left
+        }
+        var remainder = default(DecimalMagnitude)
+        _ = DecimalMagnitude.Divide(a, b, out remainder)
+        return Require(Fit(remainder, left.Negative, scale, false))
+    }
+
+    /// Rounds to an integral value using nearest, ties-to-even.
+    static func Round(value: Decimal) -> Decimal => Round(value, 0)
+    /// Rounds to 0–28 fractional places using nearest, ties-to-even; invalid precision faults.
+    static func Round(value: Decimal, decimals: int) -> Decimal {
+        if decimals < 0 || decimals > 28 {
+            System.Fail("Decimal rounding precision must be between 0 and 28")
+        }
+        if decimals >= (int)value.Scale {
+            return value
+        }
+        var magnitude = value.Magnitude
+        var digit = (ulong)0
+        var sticky = false
+        var scale = (int)value.Scale
+        while scale > decimals {
+            if digit != (ulong)0 {
+                sticky = true
+            }
+            digit = magnitude.DivideSmall((ulong)10)
+            scale -= 1
+        }
+        if digit > (ulong)5 || (digit == (ulong)5 && (sticky || magnitude.IsOdd)) {
+            magnitude.AddSmall((ulong)1)
+        }
+        return Decimal(magnitude, value.Negative, decimals)
+    }
+
+    /// Removes the fractional part toward zero.
+    static func Truncate(value: Decimal) -> Decimal {
+        var magnitude = value.Magnitude
+        var scale = (int)value.Scale
+        while scale > 0 {
+            _ = magnitude.DivideSmall((ulong)10)
+            scale -= 1
+        }
+        return Decimal(magnitude, value.Negative, 0)
+    }
+    /// Returns the largest integral value no greater than the input.
+    static func Floor(value: Decimal) -> Decimal {
+        let integral = Truncate(value)
+        return if value.Negative && !integral.Equals(value) { integral - One } else { integral }
+    }
+    /// Returns the smallest integral value no less than the input.
+    static func Ceiling(value: Decimal) -> Decimal {
+        let integral = Truncate(value)
+        if !value.Negative && !integral.Equals(value) {
+            return integral + One
+        }
+        return integral
+    }
+
+    /// Parses strict invariant decimal text with an optional sign and decimal point.
+    /// Whitespace, exponent notation and group separators are not accepted.
+    static func Parse(text: string) -> Result<Decimal, NumberParseError> {
+        let bytes = text.Utf8Bytes
+        if bytes.Length == 0 {
+            return Error(NumberParseError.InvalidFormat())
+        }
+        var index = 0
+        var negative = false
+        if bytes[0] == (byte)45 || bytes[0] == (byte)43 {
+            negative = bytes[0] == (byte)45
+            index = 1
+        }
+        var magnitude = default(DecimalMagnitude)
+        var fraction = 0
+        var point = false
+        var any = false
+        var significant = 0
+        var discarded = 0
+        var sticky = false
+        while index < bytes.Length {
+            let digit = (int)bytes[index] - 48
+            if bytes[index] == (byte)46 && !point {
+                point = true
+            } else if digit >= 0 && digit <= 9 {
+                any = true
+                if point {
+                    fraction += 1
+                }
+                if significant > 0 || digit != 0 {
+                    if significant < 60 {
+                        magnitude.MultiplySmall((ulong)10)
+                        magnitude.AddSmall((ulong)digit)
+                        significant += 1
+                    } else {
+                        discarded += 1
+                        if digit != 0 {
+                            sticky = true
+                        }
+                    }
+                }
+            } else { return Error(NumberParseError.InvalidFormat()) }
+            index += 1
+        }
+        if !any {
+            return Error(NumberParseError.InvalidFormat())
+        }
+        return Fit(magnitude, negative, fraction - discarded, sticky)
+    }
+
+    /// Parses explicit culture punctuation using the shared strict grouping policy.
+    static func Parse(text: string, culture: Globalization.Culture) -> Result<Decimal, NumberParseError> {
+        let normalized = Globalization.NumericParsing.Normalize(text, culture, true)?
+        return Parse(normalized)
+    }
+
+    /// Tries invariant parsing; failure sets result to zero.
+    static func TryParse(text: string?, out result: Decimal) -> bool {
+        result = Zero
+        if text is string input {
+            let parsed = Parse(input)
+            if parsed is Ok(let value) {
+                result = value
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Tries explicit-culture parsing; failure sets result to zero.
+    static func TryParse(text: string?, culture: Globalization.Culture, out result: Decimal) -> bool {
+        result = Zero
+        if text is string input {
+            let parsed = Parse(input, culture)
+            if parsed is Ok(let value) {
+                result = value
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Formats invariant general decimal text, preserving the stored scale.
+    override func ToString() -> string => ToString("G", Globalization.Culture.Invariant)
+    /// Formats G/G0, F or N with Culture.Current; F/N precision is 0–99.
+    func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
+    /// Formats G/G0, F or N with an explicit culture; unsupported formats fault.
+    func ToString(format: string, culture: Globalization.Culture) -> string {
+        let spec = format.Utf8Bytes
+        var code = 71
+        var precision = -1
+        if spec.Length > 0 {
+            code = (int)spec[0]
+            if code >= 97 && code <= 122 {
+                code -= 32
+            }
+            if spec.Length > 3 {
+                System.Fail("Unsupported Decimal precision")
+            }
+            if spec.Length > 1 {
+                precision = 0
+                var formatIndex = 1
+                while formatIndex < spec.Length {
+                    let digit = (int)spec[formatIndex] - 48
+                    if digit < 0 || digit > 9 {
+                        System.Fail("Unsupported Decimal precision")
+                    }
+                    precision = precision * 10 + digit
+                    formatIndex += 1
+                }
+            }
+        }
+        if code != 71 && code != 70 && code != 78 {
+            System.Fail("Unsupported Decimal format")
+        }
+        if code == 71 && precision > 0 {
+            System.Fail("Unsupported Decimal general precision")
+        }
+        if code != 71 && precision < 0 {
+            precision = Globalization.NumberFormat.DefaultDecimalDigits
+        }
+        let rounded = if code != 71 && precision < (int)Scale { Round(self, precision) } else { self }
+        var magnitude = rounded.Magnitude
+        var probe = magnitude
+        var digits = 1
+        while probe.CompareTo(DecimalMagnitude.FromUInt64((ulong)10)) >= 0 {
+            _ = probe.DivideSmall((ulong)10)
+            digits += 1
+        }
+        let storedScale = (int)rounded.Scale
+        let fraction = if code == 71 { storedScale } else { precision }
+        let integerDigits = if digits > storedScale { digits - storedScale } else { 1 }
+        let negative = rounded.Negative && !magnitude.IsZero
+        let separator = Globalization.NumberFormat.DecimalSeparator(culture).Utf8Bytes
+        let group = Globalization.NumberFormat.GroupSeparator(culture).Utf8Bytes
+        let groups = if code == 78 { (integerDigits - 1) / 3 } else { 0 }
+        let sign = if negative { 1 } else { 0 }
+        let fractionBytes = if fraction > 0 { separator.Length + fraction } else { 0 }
+        let length = sign + integerDigits + groups * group.Length + fractionBytes
+        let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(length)
+        var cursor = length
+        var index = fraction
+        while index > 0 {
+            cursor -= 1
+            buffer[cursor] = if index > storedScale { (byte)48 } else { (byte)(48 + (int)magnitude.DivideSmall((ulong)10)) }
+            index -= 1
+        }
+        if fraction > 0 {
+            index = separator.Length
+            while index > 0 {
+                index -= 1
+                cursor -= 1
+                buffer[cursor] = separator[index]
+            }
+        }
+        index = 0
+        while index < integerDigits {
+            cursor -= 1
+            buffer[cursor] = (byte)(48 + (int)magnitude.DivideSmall((ulong)10))
+            index += 1
+            if code == 78 && index < integerDigits && index % 3 == 0 {
+                var part = group.Length
+                while part > 0 {
+                    part -= 1
+                    cursor -= 1
+                    buffer[cursor] = group[part]
+                }
+            }
+        }
+        if negative {
+            buffer[0] = (byte)45
+        }
+        let bytes: ReadOnlySlice<byte> = buffer
+        let Ok(text) = Text.Utf8.Decode(bytes) else {
+            System.Fail("Invalid Decimal formatting buffer")
+            return ""
+        }
+        return text
+    }
+}

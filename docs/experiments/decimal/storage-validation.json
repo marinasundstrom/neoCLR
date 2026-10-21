@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "command": [
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/bin/neoclr",
+    "run",
+    "/Users/robert/Projects/neoclr/runtime/raven/tests/decimal/bin/neoclr/DecimalStorageTests.dll",
+    "--system",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.runtime.neox",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.Runtime.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.Data.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.Networking.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.Web.dll",
+    "--module",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.Data.PostgreSql.dll",
+    "--object-root",
+    "/Users/robert/Projects/neoclr/target/decimal-bundle/lib/System.Runtime.dll",
+    "--execution",
+    "interpreter",
+    "--instructions",
+    "100000000"
+  ],
+  "exitCode": 0,
+  "stdout": "PASS Decimal GetBits writes only the caller supplied slice\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+  "stderr": ""
+}

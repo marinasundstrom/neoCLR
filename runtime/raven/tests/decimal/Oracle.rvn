@@ -1,0 +1,290 @@
+module NeoClr.RuntimeTests
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("Decimal arithmetic agrees with CLR boundary vectors")]
+func FOracle() -> Result<unit, TestFailure> {
+    var failures = 0
+    var actual = ""
+    let Ok(a0) = Decimal.Parse("0") else { return Assert.True(false, "a0") }
+    let Ok(b0) = Decimal.Parse("-1.25") else { return Assert.True(false, "b0") }
+    actual = (a0 + b0).ToString()
+    if actual != "-1.25" {
+        Console.WriteLine("CLR vector 0: expected -1.25, actual " + actual)
+        failures += 1
+    }
+    actual = (a0 - b0).ToString()
+    if actual != "1.25" {
+        Console.WriteLine("CLR vector 1: expected 1.25, actual " + actual)
+        failures += 1
+    }
+    actual = (a0 * b0).ToString()
+    if actual != "0.00" {
+        Console.WriteLine("CLR vector 2: expected 0.00, actual " + actual)
+        failures += 1
+    }
+    actual = (a0 / b0).ToString()
+    if actual != "0" {
+        Console.WriteLine("CLR vector 3: expected 0, actual " + actual)
+        failures += 1
+    }
+    actual = (a0 % b0).ToString()
+    if actual != "0" {
+        Console.WriteLine("CLR vector 4: expected 0, actual " + actual)
+        failures += 1
+    }
+    let Ok(a1) = Decimal.Parse("-0.00") else { return Assert.True(false, "a1") }
+    let Ok(b1) = Decimal.Parse("0.1") else { return Assert.True(false, "b1") }
+    actual = (a1 + b1).ToString()
+    if actual != "0.10" {
+        Console.WriteLine("CLR vector 5: expected 0.10, actual " + actual)
+        failures += 1
+    }
+    actual = (a1 - b1).ToString()
+    if actual != "-0.10" {
+        Console.WriteLine("CLR vector 6: expected -0.10, actual " + actual)
+        failures += 1
+    }
+    actual = (a1 * b1).ToString()
+    if actual != "0.000" {
+        Console.WriteLine("CLR vector 7: expected 0.000, actual " + actual)
+        failures += 1
+    }
+    actual = (a1 / b1).ToString()
+    if actual != "0.0" {
+        Console.WriteLine("CLR vector 8: expected 0.0, actual " + actual)
+        failures += 1
+    }
+    actual = (a1 % b1).ToString()
+    if actual != "0.00" {
+        Console.WriteLine("CLR vector 9: expected 0.00, actual " + actual)
+        failures += 1
+    }
+    let Ok(a2) = Decimal.Parse("1.00") else { return Assert.True(false, "a2") }
+    let Ok(b2) = Decimal.Parse("3") else { return Assert.True(false, "b2") }
+    actual = (a2 + b2).ToString()
+    if actual != "4.00" {
+        Console.WriteLine("CLR vector 10: expected 4.00, actual " + actual)
+        failures += 1
+    }
+    actual = (a2 - b2).ToString()
+    if actual != "-2.00" {
+        Console.WriteLine("CLR vector 11: expected -2.00, actual " + actual)
+        failures += 1
+    }
+    actual = (a2 * b2).ToString()
+    if actual != "3.00" {
+        Console.WriteLine("CLR vector 12: expected 3.00, actual " + actual)
+        failures += 1
+    }
+    actual = (a2 / b2).ToString()
+    if actual != "0.3333333333333333333333333333" {
+        Console.WriteLine("CLR vector 13: expected 0.3333333333333333333333333333, actual " + actual)
+        failures += 1
+    }
+    actual = (a2 % b2).ToString()
+    if actual != "1.00" {
+        Console.WriteLine("CLR vector 14: expected 1.00, actual " + actual)
+        failures += 1
+    }
+    let Ok(a3) = Decimal.Parse("-1.25") else { return Assert.True(false, "a3") }
+    let Ok(b3) = Decimal.Parse("79228162514264337593543950335") else { return Assert.True(false, "b3") }
+    actual = (a3 + b3).ToString()
+    if actual != "79228162514264337593543950334" {
+        Console.WriteLine("CLR vector 15: expected 79228162514264337593543950334, actual " + actual)
+        failures += 1
+    }
+    actual = (a3 / b3).ToString()
+    if actual != "0" {
+        Console.WriteLine("CLR vector 16: expected 0, actual " + actual)
+        failures += 1
+    }
+    actual = (a3 % b3).ToString()
+    if actual != "-1.25" {
+        Console.WriteLine("CLR vector 17: expected -1.25, actual " + actual)
+        failures += 1
+    }
+    let Ok(a4) = Decimal.Parse("0.1") else { return Assert.True(false, "a4") }
+    let Ok(b4) = Decimal.Parse("0.0000000000000000000000000001") else { return Assert.True(false, "b4") }
+    actual = (a4 + b4).ToString()
+    if actual != "0.1000000000000000000000000001" {
+        Console.WriteLine("CLR vector 18: expected 0.1000000000000000000000000001, actual " + actual)
+        failures += 1
+    }
+    actual = (a4 - b4).ToString()
+    if actual != "0.0999999999999999999999999999" {
+        Console.WriteLine("CLR vector 19: expected 0.0999999999999999999999999999, actual " + actual)
+        failures += 1
+    }
+    actual = (a4 * b4).ToString()
+    if actual != "0.0000000000000000000000000000" {
+        Console.WriteLine("CLR vector 20: expected 0.0000000000000000000000000000, actual " + actual)
+        failures += 1
+    }
+    actual = (a4 / b4).ToString()
+    if actual != "1000000000000000000000000000" {
+        Console.WriteLine("CLR vector 21: expected 1000000000000000000000000000, actual " + actual)
+        failures += 1
+    }
+    actual = (a4 % b4).ToString()
+    if actual != "0.0000000000000000000000000000" {
+        Console.WriteLine("CLR vector 22: expected 0.0000000000000000000000000000, actual " + actual)
+        failures += 1
+    }
+    let Ok(a5) = Decimal.Parse("3") else { return Assert.True(false, "a5") }
+    let Ok(b5) = Decimal.Parse("123456789012345.6789") else { return Assert.True(false, "b5") }
+    actual = (a5 + b5).ToString()
+    if actual != "123456789012348.6789" {
+        Console.WriteLine("CLR vector 23: expected 123456789012348.6789, actual " + actual)
+        failures += 1
+    }
+    actual = (a5 - b5).ToString()
+    if actual != "-123456789012342.6789" {
+        Console.WriteLine("CLR vector 24: expected -123456789012342.6789, actual " + actual)
+        failures += 1
+    }
+    actual = (a5 * b5).ToString()
+    if actual != "370370367037037.0367" {
+        Console.WriteLine("CLR vector 25: expected 370370367037037.0367, actual " + actual)
+        failures += 1
+    }
+    actual = (a5 / b5).ToString()
+    if actual != "0.0000000000000243000002187" {
+        Console.WriteLine("CLR vector 26: expected 0.0000000000000243000002187, actual " + actual)
+        failures += 1
+    }
+    actual = (a5 % b5).ToString()
+    if actual != "3" {
+        Console.WriteLine("CLR vector 27: expected 3, actual " + actual)
+        failures += 1
+    }
+    let Ok(a6) = Decimal.Parse("79228162514264337593543950335") else { return Assert.True(false, "a6") }
+    let Ok(b6) = Decimal.Parse("-999999999.999999999") else { return Assert.True(false, "b6") }
+    actual = (a6 + b6).ToString()
+    if actual != "79228162514264337592543950335" {
+        Console.WriteLine("CLR vector 28: expected 79228162514264337592543950335, actual " + actual)
+        failures += 1
+    }
+    actual = (a6 / b6).ToString()
+    if actual != "-79228162514264337672.77211285" {
+        Console.WriteLine("CLR vector 29: expected -79228162514264337672.77211285, actual " + actual)
+        failures += 1
+    }
+    actual = (a6 % b6).ToString()
+    if actual != "772112849.264337672" {
+        Console.WriteLine("CLR vector 30: expected 772112849.264337672, actual " + actual)
+        failures += 1
+    }
+    let Ok(a7) = Decimal.Parse("0.0000000000000000000000000001") else { return Assert.True(false, "a7") }
+    let Ok(b7) = Decimal.Parse("2.5") else { return Assert.True(false, "b7") }
+    actual = (a7 + b7).ToString()
+    if actual != "2.5000000000000000000000000001" {
+        Console.WriteLine("CLR vector 31: expected 2.5000000000000000000000000001, actual " + actual)
+        failures += 1
+    }
+    actual = (a7 - b7).ToString()
+    if actual != "-2.4999999999999999999999999999" {
+        Console.WriteLine("CLR vector 32: expected -2.4999999999999999999999999999, actual " + actual)
+        failures += 1
+    }
+    actual = (a7 * b7).ToString()
+    if actual != "0.0000000000000000000000000002" {
+        Console.WriteLine("CLR vector 33: expected 0.0000000000000000000000000002, actual " + actual)
+        failures += 1
+    }
+    actual = (a7 / b7).ToString()
+    if actual != "0" {
+        Console.WriteLine("CLR vector 34: expected 0, actual " + actual)
+        failures += 1
+    }
+    actual = (a7 % b7).ToString()
+    if actual != "0.0000000000000000000000000001" {
+        Console.WriteLine("CLR vector 35: expected 0.0000000000000000000000000001, actual " + actual)
+        failures += 1
+    }
+    let Ok(a8) = Decimal.Parse("123456789012345.6789") else { return Assert.True(false, "a8") }
+    let Ok(b8) = Decimal.Parse("0.0000000000000000000000000003") else { return Assert.True(false, "b8") }
+    actual = (a8 + b8).ToString()
+    if actual != "123456789012345.67890000000000" {
+        Console.WriteLine("CLR vector 36: expected 123456789012345.67890000000000, actual " + actual)
+        failures += 1
+    }
+    actual = (a8 - b8).ToString()
+    if actual != "123456789012345.67890000000000" {
+        Console.WriteLine("CLR vector 37: expected 123456789012345.67890000000000, actual " + actual)
+        failures += 1
+    }
+    actual = (a8 * b8).ToString()
+    if actual != "0.0000000000000370370367037037" {
+        Console.WriteLine("CLR vector 38: expected 0.0000000000000370370367037037, actual " + actual)
+        failures += 1
+    }
+    actual = (a8 % b8).ToString()
+    if actual != "0.0000000000000000000000000000" {
+        Console.WriteLine("CLR vector 39: expected 0.0000000000000000000000000000, actual " + actual)
+        failures += 1
+    }
+    let Ok(a9) = Decimal.Parse("-999999999.999999999") else { return Assert.True(false, "a9") }
+    let Ok(b9) = Decimal.Parse("0") else { return Assert.True(false, "b9") }
+    actual = (a9 + b9).ToString()
+    if actual != "-999999999.999999999" {
+        Console.WriteLine("CLR vector 40: expected -999999999.999999999, actual " + actual)
+        failures += 1
+    }
+    actual = (a9 - b9).ToString()
+    if actual != "-999999999.999999999" {
+        Console.WriteLine("CLR vector 41: expected -999999999.999999999, actual " + actual)
+        failures += 1
+    }
+    actual = (a9 * b9).ToString()
+    if actual != "0" {
+        Console.WriteLine("CLR vector 42: expected 0, actual " + actual)
+        failures += 1
+    }
+    let Ok(a10) = Decimal.Parse("2.5") else { return Assert.True(false, "a10") }
+    let Ok(b10) = Decimal.Parse("-0.00") else { return Assert.True(false, "b10") }
+    actual = (a10 + b10).ToString()
+    if actual != "2.50" {
+        Console.WriteLine("CLR vector 43: expected 2.50, actual " + actual)
+        failures += 1
+    }
+    actual = (a10 - b10).ToString()
+    if actual != "2.50" {
+        Console.WriteLine("CLR vector 44: expected 2.50, actual " + actual)
+        failures += 1
+    }
+    actual = (a10 * b10).ToString()
+    if actual != "0.000" {
+        Console.WriteLine("CLR vector 45: expected 0.000, actual " + actual)
+        failures += 1
+    }
+    let Ok(a11) = Decimal.Parse("0.0000000000000000000000000003") else { return Assert.True(false, "a11") }
+    let Ok(b11) = Decimal.Parse("1.00") else { return Assert.True(false, "b11") }
+    actual = (a11 + b11).ToString()
+    if actual != "1.0000000000000000000000000003" {
+        Console.WriteLine("CLR vector 46: expected 1.0000000000000000000000000003, actual " + actual)
+        failures += 1
+    }
+    actual = (a11 - b11).ToString()
+    if actual != "-0.9999999999999999999999999997" {
+        Console.WriteLine("CLR vector 47: expected -0.9999999999999999999999999997, actual " + actual)
+        failures += 1
+    }
+    actual = (a11 * b11).ToString()
+    if actual != "0.0000000000000000000000000003" {
+        Console.WriteLine("CLR vector 48: expected 0.0000000000000000000000000003, actual " + actual)
+        failures += 1
+    }
+    actual = (a11 / b11).ToString()
+    if actual != "0.0000000000000000000000000003" {
+        Console.WriteLine("CLR vector 49: expected 0.0000000000000000000000000003, actual " + actual)
+        failures += 1
+    }
+    actual = (a11 % b11).ToString()
+    if actual != "0.0000000000000000000000000003" {
+        Console.WriteLine("CLR vector 50: expected 0.0000000000000000000000000003, actual " + actual)
+        failures += 1
+    }
+    return Assert.True(failures == 0, "CLR arithmetic vectors")
+}

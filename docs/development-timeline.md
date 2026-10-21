@@ -20614,5 +20614,27 @@ method bounds and the replacement release gates remain open.
   not extend System.Numerics with the additional proposed interfaces”.
 - **Assistant response:** Accepted a separate Decimal increment using existing
   Number, EquatableTo and Formattable contracts, with .NET-style 96-bit coefficient,
-  sign and scale. Implementation and qualification remain pending; no new numeric
-  hierarchy is authorized by this request.
+  sign and scale. The [implemented foundation](experiments/decimal/README.md) now
+  passes 21 common built-in executions, one interpreter-only slice test and 51 CLR
+  arithmetic vectors per common execution mode. Compiler lowering and shared Self
+  interface fixes are committed separately; API snapshots and the website pass.
+  No new numeric hierarchy was added.
+
+### 2026-10-21 — Currency and globalization
+
+- **Author:** While Decimal qualification was finishing, asked: “How should globalization handle currency?”
+- **Assistant proposal:** Keep Decimal as the amount, currency identity separate,
+  and culture responsible for presentation. Follow .NET NumberFormatInfo currency
+  conventions and a familiar C format, while also allowing explicit currency plus
+  culture (for example USD displayed with Swedish conventions). Parsing should not
+  infer currency from an ambiguous symbol. Display rounding must not alter stored
+  values; cash rounding and exchange-rate conversion are separate operations.
+- **Research:** [.NET numeric format data](https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-globalization-numberformatinfo)
+  and [Unicode LDML number/currency data](https://www.unicode.org/reports/tr35/tr35-numbers.html)
+  provide the comparison and data model. Existing neoCLR NumberFormat contains
+  ordinary numeric conventions only; currency formatting is a proposal, not an
+  implemented feature or an instruction to expand the Decimal increment.
+
+- **Subsequent author decision:** “OK add that support next”. Currency identity,
+  culture formatting and expected-currency parsing are now authorized as the next
+  bounded increment. Cash rounding and currency conversion remain separate.

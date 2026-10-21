@@ -2793,3 +2793,11 @@ The native snapshot and CLI reference are refreshed from the matching floating
 literal compiler; snapshot checks and the 5,070-page website build pass. No types
 are excluded. The experimental metadata manual documents
 the widened `object? Constant` surface and exact native bit encoding.
+
+Development (2026-10-21): Decimal is documented by the native library snapshot,
+including constructors, operators, value contracts, rounding, formatting, parsing
+and both GetBits overloads. The legacy CLI CoreProbe scaffold does not project
+System.Decimal; do not treat its type inventory as native coverage. Native
+RavenDoc selection includes Decimal automatically; the linked
+[numeric guide](text-numbers.md#decimal-development) records behavior and limits.
+The CLI scaffold limitation does not exclude any native Decimal member page.

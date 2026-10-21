@@ -139,3 +139,10 @@ Development Single and Double expose `NaN`, `PositiveInfinity`, and
 `IsPositiveInfinity`, `IsNegativeInfinity`, and `IsFinite`. Use `IsNaN` rather than
 comparing a value with `NaN`. These constants and classification calls do not allocate.
 See the [numeric API guide](/docs/text-numbers.html).
+
+Development `Decimal` adds finite base-ten arithmetic with a 96-bit coefficient
+and scale 0–28. It uses ordinary value-type semantics and the existing `Number`,
+`EquatableTo<Decimal>` and `Formattable` contracts. Equality and hashing ignore
+scale differences; general formatting preserves them. Arithmetic uses value-type
+scratch storage rather than temporary arrays. See the
+[Decimal API and current limits](/docs/text-numbers.html#decimal-development).
