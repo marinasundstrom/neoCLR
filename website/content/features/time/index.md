@@ -122,7 +122,7 @@ time of day, without interpreting a timezone. These contracts apply to boxed val
 and supported record components as well. Hashes are execution-local, not persistent
 identifiers. Ordinary struct default value semantics remain a separate runtime gap.
 
-Development `TimeZone` values compare by their case-sensitive IANA identifier within the fixed bundled rule database; aliases stay distinct. `ZonedDateTime` compares the same instant in the same named zone, with matching hashes through typed, Object and equality-interface calls. Compare its `Instant` when zone identity should be ignored. Zone display returns the identifier; zoned display remains diagnostic type text. See the [API reference](/docs/api/system/time/TimeZone/) and [qualified cases](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/zoned-values/README.md).
+Development `TimeZone` values compare by their case-sensitive IANA identifier within the fixed bundled rule database; aliases stay distinct. `ZonedDateTime` compares the same instant in the same named zone, with matching hashes through typed, Object and equality-interface calls. Compare its `Instant` when zone identity should be ignored. Zone display returns the identifier; zoned display remains diagnostic type text. See the [API reference](/docs/api/System/Time/TimeZone/) and [qualified cases](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/zoned-values/README.md).
 
 ## Development: culture formatting foundation
 
@@ -141,9 +141,9 @@ Development `Int32`/`Int64` formatting supports `D`, `F` and `N` with precision
 0–99 and explicit cultures, including Swedish nonbreaking-space grouping. These
 also work through `Formattable` and composite formatting. Other numeric types and
 custom numeric patterns remain gaps. See the API references
-for [Culture](/docs/api/system/globalization/Culture/),
-[DateTimeFormat](/docs/api/system/globalization/DateTimeFormat/) and
-[NumberFormat](/docs/api/system/globalization/NumberFormat/).
+for [Culture](/docs/api/System/Globalization/Culture/),
+[DateTimeFormat](/docs/api/System/Globalization/DateTimeFormat/) and
+[NumberFormat](/docs/api/System/Globalization/NumberFormat/).
 
 ### Numeric formatting and parsing (development)
 

@@ -67,7 +67,10 @@ class PageCheck(HTMLParser):
         if not self.stack or self.stack.pop() != tag:
             raise ValueError('Mismatched closing HTML tag: ' + tag)
 
-    def check(self, path, pages):
+    def check(self, path, pages, page_paths=None):
+        # URLs are case-sensitive even when the local filesystem is not.
+        if page_paths is None:
+            page_paths = {str(page) for page in pages}
         if self.stack:
             raise ValueError('Unclosed HTML tags: ' + ', '.join(self.stack))
         for link in self.links:
@@ -77,7 +80,8 @@ class PageCheck(HTMLParser):
             target = (path.parent / unquote(url.path)).resolve() if url.path else path
             if target.is_dir():
                 target /= 'index.html'
-            if not target.is_relative_to(OUTPUT.resolve()) or not target.is_file():
+            if (not target.is_relative_to(OUTPUT.resolve()) or not target.is_file()
+                    or (target.suffix.lower() == '.html' and str(target) not in page_paths)):
                 raise ValueError(f'Missing local asset in {path.name}: {link}')
             if url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
                 raise ValueError(f'Missing anchor in {path.name}: {link}')
@@ -590,8 +594,9 @@ def main():
         except ValueError as error:
             raise ValueError(f"{path}: {error}") from error
         pages[path.resolve()] = check
+    page_paths = {str(path) for path in pages}
     for path, check in pages.items():
-        check.check(path, pages)
+        check.check(path, pages, page_paths)
     (OUTPUT / '.nojekyll').touch()
     publish_site(OUTPUT, publish_destination, audit)
     OUTPUT = publish_destination

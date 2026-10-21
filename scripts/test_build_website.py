@@ -50,6 +50,14 @@ class PageLinks(unittest.TestCase):
         home.check(root, self.pages)
         guide.check(path, self.pages)
 
+    def test_page_url_case_must_match_on_case_insensitive_filesystems_too(self):
+        self.page('docs/api/System/Time/TimeZone/index.html', '<main>Zone</main>')
+        path, guide = self.page('index.html', '<a href="docs/api/system/time/TimeZone/">Zone</a>')
+        with self.assertRaisesRegex(ValueError, 'Missing local asset'):
+            guide.check(path, self.pages)
+        path, guide = self.page('index.html', '<a href="docs/api/System/Time/TimeZone/">Zone</a>')
+        guide.check(path, self.pages)
+
     def test_missing_cross_page_anchor_fails(self):
         self.page('index.html', '<main id="library"></main>')
         path, guide = self.page('features/info/index.html', '<a href="../../#missing">Home</a>')

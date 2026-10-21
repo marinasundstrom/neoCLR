@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Repair four case-mismatched Time/Globalization API links exposed by Linux website publication, and validate exact HTML page URL casing even on case-insensitive development filesystems. All 24 website tests pass, including the cross-platform casing regression. Keep the failed publication distinct from a successful local build.
+
 - Review Slice against .NET Span for release: distinguish existing lifetime/bounds tests from final qualification, record missing copy/fill/clear helpers, reference-return indexing and region/content equality considerations, and retain the native byte-view scope. Recommendations are not documented as implemented APIs.
 
 - Measure development macOS ARM64 assembly/AOT output and SDK/toolchain installation sizes, with executed Unicode greeting and JSON mapping consumers, artifact/catalogue hashes and reproducible tooling. Publish exact-scope tables on the Native compilation page, distinguishing application assemblies from complete executables and build-time SDK costs. Record default unstripped outputs and platform/cohort limits; this is not release or HTTP qualification.
