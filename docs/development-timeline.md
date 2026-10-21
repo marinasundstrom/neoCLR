@@ -20555,3 +20555,23 @@ initialization is removed; rebuilt libraries pass 12 built-in enum executions.
 completed fix from generic method constraints, Unicode names and the still-open
 matched-package/platform/performance release gates. No replacement release has been
 published by these actions.
+
+
+### Unicode names use ordinary identifier semantics
+
+The author clarified: “Unicode names work for most if not all identifiers - like in
+.NET”. The assistant agreed that namespaces, types, methods, fields and enum members
+should follow ordinary identifier rules. The concrete defect was an additional
+ASCII-only restriction in enum metadata validation, despite Unicode already being
+supported for ordinary metadata fields. The fix reuses existing metadata text
+validation and preserves exact name bytes; it does not introduce an enum-only
+Unicode lexer or normalization policy. Metadata round-trip and malformed-name tests
+pass; built-in execution qualification is recorded with the enum experiment.
+
+The ordinary identifier control then reproduced rejection of a Unicode constructor
+parameter (`värde`). At the author’s “We should fix it”, the assistant extended the
+repair to shared parameter/local, generic-parameter and property metadata validation,
+keeping legacy source-token parsing separate. The six built-in tests now pass in all
+three engines (18 executions), with 25 metadata naming regressions, two enum unit tests
+and producer/reader round-trip/rejection coverage. The fix is implemented; generic
+method bounds and the replacement release gates remain open.

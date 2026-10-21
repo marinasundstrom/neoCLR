@@ -279,6 +279,8 @@ ENUM_PARSING_NAMES = [
     'Enum names preserve aliases ordinal case and imported types',
     'Enum numbers preserve signed bounds and unnamed values',
     'Enum TryParse resets output and rejects malformed input',
+    'Unicode type member parameter and local identifiers use ordinary binding',
+    'Enum names preserve Unicode and explicit ordinal identity',
 ]
 
 PRIMITIVE_PARSING_NAMES = [

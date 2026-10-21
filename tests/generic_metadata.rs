@@ -78,7 +78,7 @@ fn loader_checks_generic_metadata_and_accepts_legacy_definitions() {
     json["types"][0]["fields"][0]["ty"] = serde_json::json!({"TypeParameter":1});
     assert!(load(&json.to_string()).is_err());
     let mut json = serde_json::to_value(&module).unwrap();
-    json["types"][0]["generic_parameters"] = serde_json::json!(["bad name"]);
+    json["types"][0]["generic_parameters"] = serde_json::json!(["bad\nname"]);
     assert!(load(&json.to_string()).is_err());
     let plain = assemble(".module Test\n.type Plain\n.field Value Int32\n.end").unwrap();
     let json = serde_json::to_value(&plain).unwrap();

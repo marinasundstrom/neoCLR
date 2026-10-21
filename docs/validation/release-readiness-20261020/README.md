@@ -20,11 +20,12 @@ Completed evidence superseding earlier gaps below:
   adapters have focused qualification. [Numeric globalization](../../experiments/numeric-formats/README.md)
   passes 23 built-in tests per engine (69 executions). Custom patterns/providers,
   localized digits/sign policies and additional locales remain deferred.
-- [Enum parsing](../../experiments/enum-parsing/README.md) passes four built-in tests
-  per engine (12 executions), with matching API snapshots and a 5,036-page website
+- [Enum parsing](../../experiments/enum-parsing/README.md) passes six built-in tests
+  per engine (18 executions), with matching API snapshots and a 5,036-page website
   build. Missing native generic-method struct/Enum constraints mean runtime type
-  validation today; this is an explicit compiler/metadata gap. Existing Int32-only
-  storage and ASCII member names remain bounded preview support.
+  validation today; this is an explicit compiler/metadata gap. Int32-only storage
+  remains bounded preview support. Unicode enum and ordinary metadata names are
+  qualified, with shared runtime validation and unchanged source-language binding.
 - Ordinary struct defaults, scalar Object adapters, persistent Memory region
   equality and explicit value display overrides now have evidence in the
   [class-library review](../../design/class-library-soundness-20261020.md).

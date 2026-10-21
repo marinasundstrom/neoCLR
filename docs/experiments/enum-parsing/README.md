@@ -17,12 +17,13 @@ fractional input are rejected. Numeric overflow is distinguished from invalid fo
 by Parse; TryParse returns false for either. Parse uses neoCLR's existing Result
 error contract rather than .NET exceptions, allowing ordinary error propagation.
 
-Current enum storage is Int32 and metadata member names are ASCII identifiers.
+Current enum storage is Int32. Unicode metadata names are preserved without normalization.
 The generic methods currently validate enum type arguments at runtime: native
 method constraints cannot yet express `struct, Enum`. Invalid type arguments fault,
 even on null input; they do not return a parsing error. This is a compiler/metadata
-constraint gap, not an intended permanent divergence from typed .NET overloads.
-Unicode enum member metadata and other backing widths are separate existing gaps.
+constraint gap. .NET’s generic overloads use a struct constraint and validate enum
+identity at runtime; stronger struct/Enum bounds would be a deliberate compile-time
+restriction. Other backing widths remain a separate gap.
 
 ## Implementation and allocation
 
@@ -67,4 +68,40 @@ still resets output on failure. [Built-in qualification](out-forward-validation-
 passes all four enum tests in interpreter, JIT and native execution (12 passes).
 The compiler bundle now records the committed revision; the earlier report remains
 historical evidence. No Runtime Contract configuration, ABI, metadata encoding or
-public signature changes. Generic method constraints and Unicode names remain open.
+public signature changes. Generic method constraints remain open.
+
+## Unicode metadata names (2026-10-21)
+
+Enum literals now use the ordinary metadata name validation instead of an extra
+ASCII identifier restriction. The producer, native reader and runtime preserve
+names exactly, reject empty/control-containing names and duplicates, and retain the
+reserved storage-name and 1024 UTF-16-unit metadata limit. Raven continues to own
+source identifier syntax; metadata acceptance is not a new source lexer rule.
+
+[ECMA-335, Partition I §8.5.1](https://ecma-international.org/publications-and-standards/standards/ecma-335/)
+permits Unicode metadata names and distinguishes metadata identity from language/CLS
+identifier restrictions. Following that model avoids enum-only naming machinery.
+No native metadata encoding, layout or ABI change is needed; existing UTF-8 storage
+already represents the names. Ordinal enum parsing does not inherit String’s
+canonical-equivalence default. Explicit ignoreCase uses the existing ordinal folding
+policy; it does not normalize canonically equivalent spellings.
+
+
+The broader Raven fixture exposed the same ASCII restriction on constructor
+parameter metadata (`värde`). Runtime validation now also accepts ordinary Unicode
+parameter/local, type/method generic-parameter and property names. It validates
+metadata as descriptive text, not as neoIL tokens; ordinary numeric or space-containing
+metadata names are accepted too, while empty/control-containing names, duplicates
+and reserved slots remain rejected. Instructions continue to reference slots by
+index. The legacy neoIL/frontend textual grammar is unchanged and its helper is
+explicitly named `valid_source_slot_name` to prevent reuse for metadata admission.
+
+
+[Unicode execution report](unicode-validation-20261021.json): six built-in tests
+pass in each of interpreter, JIT and native execution (18 passes) on macOS ARM64.
+The ordinary identifier fixture includes a generic class, property, method, constructor
+parameter, local and generic function using Unicode names. Two enum runtime tests,
+25 naming/generic-metadata/property regressions and the metadata CLI/native round-trip
+and rejection suite pass. Strict runtime library Clippy, API fingerprint checks and
+the 5,036-page website build pass. These are development gates; the replacement
+package, platform and performance gates remain open.

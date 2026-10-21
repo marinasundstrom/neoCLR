@@ -50,7 +50,7 @@ public sealed partial class TypeBuilder
         if (Definition.CustomAttributes.Count(Definition.IsFlagsAttribute) > 1) throw new InvalidDataException("duplicate core FlagsAttribute");
         if (GenericParameterNames.Count != 0 || Definition.DeclaringType is not null || InterfaceSignatures.Any() || Methods.Count != 0 ||
             fields.Count != 1 || fields[0].Name != "value__" || fields[0].FieldType.Primitive != PrimitiveType.Int32 || fields[0].Definition.Attributes != 0x606 ||
-            literalFields.Any(f => !f.Name.All(c => char.IsAsciiLetterOrDigit(c) || c == '_') || char.IsDigit(f.Name[0]) || !ReferenceEquals(f.FieldType.ClassType, this) || f.Definition.Constant is not int))
+            literalFields.Any(f => !ReferenceEquals(f.FieldType.ClassType, this) || f.Definition.Constant is not int))
             throw new InvalidDataException("enum requires Int32 value__ storage and owned Int32 literal members");
     }
 }

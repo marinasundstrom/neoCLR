@@ -14024,8 +14024,8 @@ authoritative. Compiler bundle: 4c051e332-dirty-record-policy-metadata-function-
 
 Native method metadata currently cannot express struct/Enum generic constraints.
 These methods validate concrete type arguments at runtime pending a general metadata
-and compiler constraint extension. Unicode enum names and backing widths beyond Int32
-are also existing gaps. Owners: Raven semantic/native emission and neoCLR metadata
+and compiler constraint extension. Backing widths beyond Int32 remain an existing gap.
+Unicode enum names are repaired by the validation follow-up below. Owners: Raven semantic/native emission and neoCLR metadata
 producer/reader/runtime validation. Do not implement a name-based compiler exception
 for Parse. See [contract and focused qualification](experiments/enum-parsing/README.md).
 
@@ -14041,3 +14041,30 @@ Both branches pass 44 focused tests. Rebuilt native source libraries and the bui
 executions with the forwarding initialization workaround removed. Owners: Raven
 binding/flow analysis; neoCLR source-library integration. This closes the forwarding
 gap, not generic method constraints or replacement package qualification.
+
+
+### Ordinary Unicode names for enum literals (2026-10-21)
+
+Remove the enum-only ASCII identifier check from native metadata production, reading
+and runtime validation. Reuse the existing descriptive-name validation: preserve
+Unicode names without normalization; reject empty/control-containing, duplicate or
+reserved storage names and excessive metadata lengths. CLI literal-field names and
+native UTF-8 names retain their existing representation. Raven binding and Runtime
+Contract configuration are unchanged; source identifier syntax remains a language
+responsibility. No special enum ABI or temporary bridge representation is added.
+
+The matching metadata library must travel with compiler `b83a618a0` (documentation
+follow-up `4a0522413`); binary hashes are retained in built-in test evidence. Owners:
+neoCLR metadata producer/reader and runtime. Compare ECMA-335 I.8.5.1 ordinary name
+semantics in the [enum review](experiments/enum-parsing/README.md). This fixes name
+validation, not native generic method bounds or non-Int32 enum storage.
+
+
+The built-in ordinary-name control additionally exposed native rejection of the
+constructor parameter `värde`. Shared runtime validation now treats parameter/local,
+generic-parameter and property metadata names as descriptive Unicode, rather than
+requiring the legacy neoIL token grammar. Slot/accessor identities and execution are
+unchanged. Raw metadata numeric/space-containing names are admitted; malformed,
+duplicate and reserved names still reject. `valid_source_slot_name` remains confined
+to source parsing. This restores ordinary compiler-emitted identifiers without
+normalizing names or adding enum-specific binding behavior.

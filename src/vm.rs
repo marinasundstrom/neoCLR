@@ -476,7 +476,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
         }
         let mut parameter_names = HashSet::new();
         for name in def.generic_parameters.iter().flatten() {
-            if !crate::metadata::valid_slot_name(name)
+            if !crate::metadata_origin::text(name)
                 || Type::from_name(name).is_primitive()
                 || !parameter_names.insert(name)
             {
@@ -836,7 +836,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 ));
             }
             for name in function.generic_parameters.iter().flatten() {
-                if !crate::metadata::valid_slot_name(name)
+                if !crate::metadata_origin::text(name)
                     || Type::from_name(name).is_primitive()
                     || !names.insert(name)
                 {
@@ -1358,13 +1358,10 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                     .name
                     .rsplit_once('.')
                     .is_some_and(|(scope, member)| {
-                        !scope.is_empty()
-                            && scope
-                                .chars()
-                                .all(|c| c.is_ascii_alphanumeric() || "_.+`<>,[]".contains(c))
-                            && crate::metadata::valid_slot_name(member)
+                        crate::metadata_origin::text(scope) && crate::metadata_origin::text(member)
                     });
-            if !(crate::metadata::valid_slot_name(&property.name) || qualified_name)
+            if !(!property.name.contains('.') && crate::metadata_origin::text(&property.name)
+                || qualified_name)
                 || !signatures.insert((&property.name, property.instance, &property.parameters))
             {
                 return Err(Fault::new("invalid or duplicate property signature"));

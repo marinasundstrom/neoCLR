@@ -1031,7 +1031,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .iter()
                                 .enumerate()
                                 .map(|(index, ty)| match ty {
-                                    Type::Named(name) if crate::metadata::valid_slot_name(name) => {
+                                    Type::Named(name)
+                                        if crate::metadata::valid_source_slot_name(name) =>
+                                    {
                                         Ok(Some(name.clone()))
                                     }
                                     Type::MethodTypeParameter(i) if *i as usize == index => {
@@ -1517,7 +1519,7 @@ fn parse_slot(text: &str) -> Result<(Option<String>, Type), Fault> {
     let (ty, name) = text
         .rsplit_once(char::is_whitespace)
         .ok_or_else(|| Fault::new("expected Type or Type name"))?;
-    if !crate::metadata::valid_slot_name(name) {
+    if !crate::metadata::valid_source_slot_name(name) {
         return Err(Fault::new("invalid parameter/local name"));
     }
     Ok((Some(name.into()), parse_type(ty)?))
@@ -1646,7 +1648,7 @@ fn parse_type_declaration(text: &str) -> Result<(String, Vec<Option<String>>), F
         let parameter = parameter.trim();
         if parameter == format!("!{}", names.len()) {
             names.push(None);
-        } else if crate::metadata::valid_slot_name(parameter) {
+        } else if crate::metadata::valid_source_slot_name(parameter) {
             names.push(Some(parameter.into()));
         } else {
             return Err(Fault::new("expected type parameter name or its index"));

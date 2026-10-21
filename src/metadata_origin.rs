@@ -129,7 +129,7 @@ pub struct NullableAnnotation {
     pub uniform: bool,
 }
 
-fn text(value: &str) -> bool {
+pub(crate) fn text(value: &str) -> bool {
     !value.trim().is_empty() && !value.chars().any(char::is_control)
 }
 

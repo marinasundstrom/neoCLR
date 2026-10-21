@@ -608,7 +608,7 @@ impl Parser {
     }
     fn name(&mut self) -> Result<Token, Fault> {
         let token = self.take();
-        if !crate::metadata::valid_slot_name(&token.text) {
+        if !crate::metadata::valid_source_slot_name(&token.text) {
             return Err(token.error("expected a name"));
         }
         if [
@@ -1531,7 +1531,7 @@ impl Parser {
         } else if at.text == "true" || at.text == "false" {
             let value = at.text == "true";
             self.node(at, ExprKind::Bool(value), 1)?
-        } else if crate::metadata::valid_slot_name(&at.text) {
+        } else if crate::metadata::valid_source_slot_name(&at.text) {
             // A closed generic owner followed by a member is a static call path.
             // Speculation must leave ordinary comparison expressions untouched.
             let saved = self.position;

@@ -4,7 +4,8 @@
 numeric formats and explicit-culture parsers pass focused built-in tests in the
 interpreter, JIT and native backend (23 tests, 69 executions), with matching API documentation. Defer custom
 patterns, arbitrary providers and additional locales. [Enum Parse/TryParse](experiments/enum-parsing/README.md)
-now passes 12 built-in executions across all three engines; runtime type validation
+now passes 18 built-in executions across all three engines, including Unicode names
+and ordinary identifier binding; runtime type validation
 is implemented while native generic-method enum constraints remain a gap. Resume
 the release-readiness work below; this does not permanently
 reprioritize the platform roadmap.

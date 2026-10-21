@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-21",
+  "host": "macOS ARM64",
+  "checks": {
+    "enumRuntimeUnitTests": 2,
+    "namingGenericPropertyRegressionTests": 25,
+    "metadataEnumDefinitions": "passed CLI/native round-trip and rejection suite",
+    "runtimeLibraryStrictClippy": "passed",
+    "apiReferenceFingerprints": "passed",
+    "websitePages": 5036
+  },
+  "sourceSha256": {
+    "runtime/raven/tests/enum-parsing/Tests.rvn": "69736d44b1ff7578926b1e66e9c4d3850facd58a075309e4d4719ef5925337f8",
+    "scripts/test-runtime-library.py": "b74701396bb9af18b8ff019cb1f18ae4a34a07fa8553adcb5a6d5c6ae6a3d6db",
+    "src/assembler.rs": "4a04bbf28a28d476b0a751a369b97f6ac9a78e980dd7b620c96ee5969ed308d4",
+    "src/enums.rs": "7a7c01f5afba543e570ad03360578681052737fcbceb3baa011acf66d64e01bf",
+    "src/frontend.rs": "3a6fcfa7d0446326590604f68ee1a4f35e9e3274d7dcaa991d418948cb5853ac",
+    "src/metadata.rs": "26dbfbe368dfc37734f2a51810dd54dc9dd6a76aea137aa1d5ee164d2a29a749",
+    "src/metadata_origin.rs": "d39f1271c3059d73031bfe6d44f5e44089a4fdcbbf0be4d12dce9d8b138d6460",
+    "src/vm.rs": "8cdd819b988411b92dac26e937e0dd945d117d0502710624268113d4e536a9e2",
+    "tests/generic_metadata.rs": "2152158a42c45eb5e37af0b16667207891875597d1e9e0d1fcd269e74554cc0b",
+    "tests/names.rs": "6713c6e269ffb5624c3a1e9556fa530a53cc5daaafca5b9367c17283b6192094",
+    "tests/properties.rs": "3097d72214cb60db069cfe84cc31f65ef8b578ddbfb767cb3b08c3aead4b8443",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/EnumChecks.cs": "a88930216efdf924c2b1d4d9b5283575b6c4bfbd80b3cb3c73b1b10f230da6d3",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/Program.cs": "28b001faa80bef2738e6fa2f143cc72c363e457d21646a1de00b4673dca23600",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/EnumBuilder.cs": "1b58921f53d416647034454d0d333b1d058f4ab1d57eb4ee5b2b6dd765e85901",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyDefinition.cs": "f57288aeaa517ebe7a384c96e16554e233eda28e89ef6bfac48040aeaf62598f"
+  }
+}

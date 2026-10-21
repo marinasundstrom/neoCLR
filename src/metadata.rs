@@ -1178,7 +1178,8 @@ impl Module {
     }
 }
 
-pub(crate) fn valid_slot_name(name: &str) -> bool {
+// Textual neoIL/legacy frontend grammar only; native metadata names are descriptive Unicode.
+pub(crate) fn valid_source_slot_name(name: &str) -> bool {
     let mut chars = name.chars();
     chars
         .next()
@@ -1198,7 +1199,10 @@ pub(crate) fn validate_slot_names(
     }
     let mut seen = std::collections::HashSet::new();
     for name in names.iter().flatten() {
-        if !valid_slot_name(name) || (reserve_this && name == "this") || !seen.insert(name) {
+        if !crate::metadata_origin::text(name)
+            || (reserve_this && name == "this")
+            || !seen.insert(name)
+        {
             return Err(crate::Fault::new(format!(
                 "invalid, duplicate or reserved slot name {name:?}"
             )));

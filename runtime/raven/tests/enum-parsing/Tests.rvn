@@ -8,6 +8,7 @@ public enum State { Zero = 0, Ready = 1, Alias = 1, Failed = -1 }
 [Flags]
 public enum Access { None = 0, Read = 1, Alias = 1, Write = 2, Both = 3, Execute = 4, High = -2147483648 }
 public enum Empty {}
+public enum Letters { Ångström = 1, Café = 2, שלום = 3 }
 
 [Test("Enum names preserve aliases ordinal case and imported types")]
 func Names() -> Result<unit, TestFailure> {
@@ -55,4 +56,36 @@ func TryResults() -> Result<unit, TestFailure> {
         _ = Assert.True(!Enum.TryParse<State>(text, out value) && value == State.Zero, "Failure resets output")?
     }
     return Ok(())
+}
+
+[Test("Enum names preserve Unicode and explicit ordinal identity")]
+func UnicodeNames() -> Result<unit, TestFailure> {
+    let Ok(accent) = Enum.Parse<Letters>("Café") else { return Assert.True(false, "Accented name") }
+    _ = Assert.True(accent == Letters.Café, "Accented identity")?
+    let Ok(folded) = Enum.Parse<Letters>("ångström", true) else { return Assert.True(false, "Unicode case folding") }
+    _ = Assert.True(folded == Letters.Ångström, "Unicode case value")?
+    let Ok(hebrew) = Enum.Parse<Letters>("שלום") else { return Assert.True(false, "Hebrew name") }
+    _ = Assert.True(hebrew == Letters.שלום, "Hebrew identity")?
+    _ = Assert.True(Enum.Parse<Letters>("Café") is Error(_), "Ordinal names do not normalize")?
+    let Ok(list) = Enum.Parse<Letters>("Ångström, Café") else { return Assert.True(false, "Unicode list") }
+    System.Runtime.GC.Collect()
+    return Assert.True((int)list == 3 && accent.ToString().Equals("Café", StringComparison.Ordinal), "Names retain bytes through display")
+}
+
+class Mätning<Τ> {
+    val Värde: Τ
+    init(värde: Τ) {
+        Värde = värde
+    }
+    func Läs() -> Τ => Värde
+}
+
+[Test("Unicode type member parameter and local identifiers use ordinary binding")]
+func UnicodeIdentifiers() -> Result<unit, TestFailure> {
+    let mätning = Mätning<int>(42)
+    return Assert.Equal(42, Behåll<int>(mätning.Läs()))
+}
+
+func Behåll<Τ>(värde: Τ) -> Τ {
+    return värde
 }

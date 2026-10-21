@@ -39,7 +39,8 @@ and writes the zero/default enum value; success writes the parsed value.
 
 `TEnum` must be a supported Int32 enum. Invalid type arguments fault at runtime,
 including with null text, until native method constraints support struct/Enum bounds.
-Current metadata admits ASCII member names. Parse uses Result rather than throwing
+Unicode member names are preserved; ordinal matching does not normalize canonically
+equivalent spellings. Parse uses Result rather than throwing
 .NET parsing exceptions. This API may allocate trimmed/token strings, an enum box
 and a Result carrier; it does not allocate names/values snapshot arrays.
 

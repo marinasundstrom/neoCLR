@@ -110,6 +110,7 @@ if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 
 if (args is ["--primitive-base"]) { PrimitiveBaseChecks.Run(); return 0; }
+if (args is ["--enum-definitions"]) { EnumChecks.Run(); return 0; }
 if (args is ["--enum-base"]) { EnumBaseChecks.Run(); return 0; }
 if (args is ["--value-type-base"]) { ValueTypeBaseChecks.Run(); return 0; }
 if (args is ["--external-class-base"]) { ExternalClassBaseAuthoringChecks.Run(); return 0; }

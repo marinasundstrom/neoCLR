@@ -26,12 +26,9 @@ pub(crate) fn validate(module: &crate::Module, def: &TypeDef) -> Result<(), Faul
     }
     let mut names = std::collections::HashSet::new();
     for member in &info.members {
-        if member.name.is_empty()
-            || !member
-                .name
-                .chars()
-                .all(|c| c.is_ascii_alphanumeric() || c == '_')
-            || member.name.chars().next().unwrap().is_ascii_digit()
+        if !crate::metadata_origin::text(&member.name)
+            || member.name == "value__"
+            || member.name.encode_utf16().count() > 1024
             || !names.insert(&member.name)
         {
             return Err(Fault::new("invalid or duplicate enum member name"));
@@ -107,6 +104,29 @@ pub(crate) fn emit(name: &str, info: &EnumInfo) -> String {
 mod tests {
     use super::*;
     use crate::metadata::EnumMember;
+
+    #[test]
+    fn metadata_names_preserve_unicode_and_reject_invalid_duplicates() {
+        let mut module = crate::assemble(".module Names\n.type State\n.enum Int32\n.field private Bits Int32\n.literal Ready 1\n.end\n").unwrap();
+        for name in ["Ångström", "Café", "Cafe\u{301}", "שלום", "𐐀"] {
+            module.types[0].enum_info.as_mut().unwrap().members[0].name = name.into();
+            validate(&module, &module.types[0]).unwrap();
+            assert_eq!(format(module.types[0].enum_info.as_ref().unwrap(), 1), name);
+        }
+        for name in ["", " ", "Bad\0Name", "Bad\nName", "value__"] {
+            module.types[0].enum_info.as_mut().unwrap().members[0].name = name.into();
+            assert!(validate(&module, &module.types[0]).is_err());
+        }
+        let info = module.types[0].enum_info.as_mut().unwrap();
+        info.members[0].name = "Café".into();
+        info.members.push(EnumMember {
+            name: "Cafe\u{301}".into(),
+            value: 2,
+        });
+        validate(&module, &module.types[0]).unwrap();
+        module.types[0].enum_info.as_mut().unwrap().members[1].name = "Café".into();
+        assert!(validate(&module, &module.types[0]).is_err());
+    }
 
     #[test]
     fn names_values_and_formatting_share_unsigned_metadata_order() {

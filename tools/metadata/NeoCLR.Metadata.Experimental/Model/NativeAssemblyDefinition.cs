@@ -297,7 +297,7 @@ public sealed partial class NativeAssemblyDefinition
                     enumMembers = Array(enumInfo, "members", 256).Select(member =>
                     {
                         Shape(member, "name", "value"); var memberName = Text(member, "name"); CheckName(memberName);
-                        Require(memberName != "value__" && memberName.Length <= 1024 && memberName.All(c => char.IsAsciiLetterOrDigit(c) || c == '_') && !char.IsDigit(memberName[0]), "invalid enum member");
+                        Require(memberName != "value__" && memberName.Length <= 1024, "invalid enum member");
                         return (memberName, member.GetProperty("value").GetInt32());
                     }).ToArray();
                     Require(enumMembers.Select(m => m.Name).Distinct().Count() == enumMembers.Length && typeNames.Length == 0 && declaringType < 0 && baseInterfaces.Length == 0, "unsupported enum relationships or duplicate members");

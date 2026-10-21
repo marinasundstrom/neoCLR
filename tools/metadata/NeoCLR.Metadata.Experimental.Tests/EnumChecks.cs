@@ -46,6 +46,7 @@ internal static class EnumChecks
     internal static void Run()
     {
         ValidateRejections();
+        ValidateUnicodeNames();
         foreach (bool manual in new[] { false, true })
         foreach (bool flags in new[] { false, true })
         {
@@ -73,6 +74,23 @@ internal static class EnumChecks
         }
     }
 
+    private static void ValidateUnicodeNames()
+    {
+        var graph = Create(false);
+        var type = graph.Types.Single(t => t.IsEnum);
+        var names = new[] { "Ångström", "Café", "Cafe\u0301", "שלום", "𐐀" };
+        for (var index = 0; index < names.Length; index++) type.AddEnumMember(names[index], index + 100);
+        foreach (var snapshot in new[] { AssemblyDefinition.ReadAssembly(graph.Write(), false), AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph)) })
+        {
+            var literals = snapshot.MainModule.Types.Single(t => t.IsEnum).Fields.Where(f => f.IsLiteral).ToArray();
+            for (var index = 0; index < names.Length; index++)
+                if (literals.Single(f => f.Name == names[index]).Constant != index + 100)
+                    throw new Exception("enum metadata normalized or lost a Unicode name");
+        }
+        foreach (var invalid in new[] { "", " ", "Bad\0Name", "Bad\nName", "\ud800" })
+            Reject(() => type.AddEnumMember(invalid, 0));
+    }
+
     private static void Reject(Action action)
     {
         try { action(); }
@@ -93,6 +111,10 @@ internal static class EnumChecks
             row => row["enum_info"]!["flags"] = "invalid",
             row => row["enum_info"]!["underlying"] = "Int64",
             row => row["enum_info"]!["members"]![1]!["name"] = "Ready",
+            row => row["enum_info"]!["members"]![1]!["name"] = " ",
+            row => row["enum_info"]!["members"]![1]!["name"] = "Bad\0Name",
+            row => row["enum_info"]!["members"]![1]!["name"] = "value__",
+            row => row["enum_info"]!["members"]![1]!["name"] = new string('é', 1025),
             row => row["fields"]![0]!["ty"] = "Int64",
             row => row["origin"]!["field_readonly"]![0] = true,
         })

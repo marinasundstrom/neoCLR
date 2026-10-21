@@ -109,7 +109,7 @@ fn loader_validates_name_tables_and_accepts_omitted_legacy_tables() {
         serde_json::json!(["too", "many"]),
         serde_json::json!([""]),
         serde_json::json!(["this"]),
-        serde_json::json!(["12"]),
+        serde_json::json!(["bad\0name"]),
     ] {
         let mut json = base.clone();
         json["functions"][0]["parameter_names"] = names;
@@ -118,7 +118,7 @@ fn loader_validates_name_tables_and_accepts_omitted_legacy_tables() {
     for names in [
         serde_json::json!(["short"]),
         serde_json::json!(["same", "same"]),
-        serde_json::json!(["bad name", null]),
+        serde_json::json!(["bad\nname", null]),
     ] {
         let mut json = base.clone();
         json["functions"][1]["local_names"] = names;
@@ -196,4 +196,21 @@ fn unnamed_type_first_parameters_and_locals_execute_by_index() {
 fn ordinary_success() -> Value {
     let module = assemble(".module Expected\n.entry Main\n.function Main() -> System.Result<Void,String>\nldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\nret\n.end").unwrap();
     neoclr::run(&module, Limits::default()).unwrap().value
+}
+
+#[test]
+fn metadata_slot_names_preserve_unicode_without_source_lexer_restrictions() {
+    let base =
+        serde_json::to_value(assemble(include_str!("../examples/names.neoil")).unwrap()).unwrap();
+    for name in ["värde", "Cafe\u{301}", "שלום", "𐐀", "12", "metadata name"] {
+        let mut json = base.clone();
+        json["functions"][0]["parameter_names"] = serde_json::json!([name]);
+        json["functions"][1]["local_names"] = serde_json::json!([name, null]);
+        let loaded = load(&json.to_string()).unwrap();
+        assert_eq!(
+            loaded.functions[0].parameter_names[0].as_deref(),
+            Some(name)
+        );
+        assert_eq!(run(&loaded, Limits::default()).unwrap().output, ["42"]);
+    }
 }

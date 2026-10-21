@@ -211,7 +211,7 @@ fn qualified_property_metadata_names_preserve_accessor_execution() {
     for name in [
         "Contracts.Counted.
 Value",
-        "Contracts.Counted.bad name",
+        "Contracts.Counted.bad\0name",
         ".Value",
     ] {
         module.types[0].properties[0].name = name.into();

@@ -2777,3 +2777,9 @@ record format/precision bounds, strict culture parsing and allocation limitation
 reference snapshots, with nullable input, out result, Result errors and runtime-only
 enum validation documented. No type selection exclusion is introduced. The native
 snapshot uses the matched enum-parsing source libraries and renderer 6bd12a225.
+
+2026-10-21: Unicode enum names now use ordinary metadata validation. The linked
+[Enum parsing contract](reference-support.md#enum-parsing-development) records exact
+name preservation and ordinal comparison. Public signatures and reference type
+selection are unchanged; API fingerprint checks and the 5,036-page website build
+pass. Runtime metadata names no longer inherit legacy source-token restrictions.
