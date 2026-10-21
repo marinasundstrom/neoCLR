@@ -739,7 +739,6 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                     && !value_receiver)
                 || (function.is_override && !class_owner && !value_receiver)
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
-                || function.pinvoke.is_some()
                 || (!value_receiver
                     && !class_owner
                     && !function.interface_implementations.is_empty()))

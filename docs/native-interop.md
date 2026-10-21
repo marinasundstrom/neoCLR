@@ -369,3 +369,51 @@ callable ownership and foreign-thread entry, platform qualification, and native
 exports with sidecar metadata. These remain future work and are not prerequisites
 for this authorized merge. Attribute spellings, expanded lifetime contracts and
 sidecar schema remain unsettled; no registration API is inferred from extern names.
+
+
+### Managed and native buffers: release review — 2026-10-21
+
+The author asks for a practical native-import foundation for library and framework
+evaluation, including raw pointers, without requiring Slice or Memory in foreign
+signatures. The existing C ABI pointer-plus-length contract is the starting point.
+As with .NET native imports, an imported declaration describes the foreign ABI;
+a managed wrapper can expose a safer buffer API independently of that signature.
+
+A runtime validation gap rejected Raven's no-result Void native imports, despite
+the foreign-call executor already supporting C void results. Removing that rejection
+lets these calls use the ordinary no-result return path, without a synthetic guest
+stack value. The built-in pointer-write regression keeps a value on the caller's
+stack across the import and checks that the native allocation is released.
+
+Three contracts must remain distinct:
+
+- Managed Slice/Memory retain managed storage under their existing lifetime rules.
+  A scoped native borrow still needs an explicit address-stability and GC-owner
+  lifetime contract; keeping an object alive alone is not a pinning guarantee.
+- Native pointer/length imports can manipulate foreign-owned buffers today in the
+  interpreter. Foreign allocations must be released by their matching native API;
+  an untracked pointer is not permission for guest memory loads or guest Free.
+- A persistent native-backed Memory view would need an owner/lease contract that
+  prevents disposal while views or asynchronous operations still use the storage.
+  That contract is not implemented by merely returning a pointer.
+
+JIT/AOT lowering of arbitrary imports remains a release-evaluation gap, especially
+now that editor execution defaults to JIT. Native-backed Memory and a scoped managed
+buffer bridge are follow-up work, not current API guarantees. Input text marshalling
+currently copies to temporary terminated storage; pointer signatures avoid requiring
+that conversion but do not by themselves establish a safe managed borrowing API.
+
+The comparison follows Microsoft's [native interoperability guidance](https://learn.microsoft.com/en-us/dotnet/standard/native-interop/best-practices):
+match the C signature, give native resources explicit ownership, and distinguish
+object retention from pinning. neoCLR's pending borrowing contract should avoid
+unnecessary buffer copies where storage representation permits it; the cost is an
+explicit lifetime restriction, and zero-copy behavior still needs validation.
+
+Validation on macOS ARM64: all 28 native-import and 12 no-result tests pass,
+including the built-in native no-result/caller-stack regression. An additional Raven consumer compiled by the installed development SDK
+successfully allocates four bytes through a C library, fills them with 7, reads a
+sum of 28 through that library, releases the buffer, and checks that its native live
+allocation count is zero. It executes with the repaired interpreter and the existing
+bundle libraries; this is not qualification of an unchanged packaged runtime.
+Local inputs and the successful command/result are retained under
+`target/native-import-installed-20261021/` (`fixed-interpreter.json`).

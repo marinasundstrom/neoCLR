@@ -37,6 +37,22 @@ not modify, free, retain or return addresses into temporary string buffers. Embe
 NULs fault instead of silently truncating text. UTF-16 is 16-bit code units on every
 host, not C's host-dependent wchar_t.
 
+## Managed and native buffers
+
+Native libraries can use explicit pointer-and-length parameters. A foreign-owned
+buffer must be released through its matching native API; retaining its pointer does
+not transfer ownership to neoCLR. Raw pointer imports currently execute in the
+interpreter.
+
+Slice and Memory remain managed views. A future scoped native borrow must guarantee
+both address stability and owner lifetime, while persistent native-backed Memory
+needs a disposal/lease contract. Neither bridge is implemented yet. Imported
+functions do not need to accept Slice or Memory themselves: a library wrapper can
+provide the managed API around a conventional C ABI.
+
+Arbitrary native imports under JIT/AOT remain an evaluation gap, including when
+using the development editor's default JIT task.
+
 ## Loading and limits
 
 Libraries load on first invocation; successful symbol resolution is cached and the

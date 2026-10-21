@@ -82,6 +82,44 @@ fn sample_round_trips_calls_native_and_frees_storage() {
 }
 
 #[test]
+fn native_no_result_call_preserves_the_callers_stack() {
+    let fixture = Fixture::new();
+    let module = assemble(&format!(
+        r#".module Test
+.entry Main
+.function Imported(Int32*,Int32) -> noresult
+.pinvoke {} "neoclr_set_i32" cdecl
+.end
+.function Main() -> Int32
+.local Int32* value
+ldc.i4 1
+heap.alloc Int32
+stloc value
+ldloc value
+ldc.i4 0
+stind.i4
+ldc.i4 2
+ldloc value
+ldc.i4 40
+call Imported(Int32*,Int32)
+ldloc value
+ldind.i4
+add
+ldloc value
+heap.free
+pop
+ret
+.end"#,
+        fixture.import
+    ))
+    .unwrap();
+    let loaded = load(&serde_json::to_string(&module).unwrap()).unwrap();
+    let execution = fixture.execute(&loaded).unwrap();
+    assert_eq!(execution.value, Value::Int32(42));
+    assert_eq!(execution.memory.live_allocations(), 0);
+}
+
+#[test]
 fn scalar_arguments_and_returns_follow_the_c_abi() {
     let fixture = Fixture::new();
     for (ty, symbol, body, expected) in [

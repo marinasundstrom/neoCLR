@@ -20885,3 +20885,21 @@ byte-view qualification must not imply general generic support. The
 [review](validation/release-readiness-20261020/slice-span-review-20261021.md) records
 recommendations separately from implemented work; no broader scope approval is
 inferred from the question.
+
+
+## 2026-10-21 — Native buffers for platform evaluation
+
+The author asks to consider managed/native memory integration and basic native
+imports for evaluators building libraries or frameworks. They explicitly do not
+require Slice or Memory in imported function signatures. The assistant identifies
+pointer/length imports as the existing low-level foundation, with scoped managed
+borrowing and native-owner leases as separate contracts. An installed-compiler
+buffer consumer exposes a runtime rejection of no-result native Void methods; the
+bounded repair reuses ordinary no-result call handling. JIT/AOT arbitrary imports
+and safe managed/native view bridging remain open. See the
+[native buffer review](native-interop.md#managed-and-native-buffers-release-review--2026-10-21).
+
+The focused stack regression and installed-SDK C-buffer consumer pass with the
+repaired interpreter on macOS ARM64. The consumer checks native allocation, fill,
+sum and matching release, including a zero live-allocation count. It does not prove
+JIT/AOT import support or expose the native buffer as a managed Slice.

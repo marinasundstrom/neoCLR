@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Admit native imports with ordinary no-result Void metadata, fixing Raven-emitted C void calls without adding a guest stack result. All 28 native-import and 12 no-result tests pass, including a new pointer-write/caller-stack regression; an installed-SDK native-owned buffer consumer passes with the repaired interpreter. Record the native-buffer evaluation direction and distinguish existing interpreter pointer imports from pending JIT/AOT imports, scoped managed borrowing and native-backed Memory ownership.
+
 - Repair four case-mismatched Time/Globalization API links exposed by Linux website publication, and validate exact HTML page URL casing even on case-insensitive development filesystems. All 24 website tests pass, including the cross-platform casing regression. Keep the failed publication distinct from a successful local build.
 
 - Review Slice against .NET Span for release: distinguish existing lifetime/bounds tests from final qualification, record missing copy/fill/clear helpers, reference-return indexing and region/content equality considerations, and retain the native byte-view scope. Recommendations are not documented as implemented APIs.

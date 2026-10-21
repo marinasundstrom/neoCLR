@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Native buffer evaluation (author direction, 2026-10-21):** Review basic native
+imports and managed/native memory integration for library authors. Fix the bounded
+no-result native-call validation gap; retain JIT/AOT imports, scoped managed
+borrowing and persistent native-owner leases as distinct open work. See the
+[native buffer review](native-interop.md#managed-and-native-buffers-release-review--2026-10-21).
+This review does not imply that Slice or Memory must be foreign ABI parameter types.
+
 **Record display stabilization (2026-10-21):** The native compiler closes generated
 formatting for type-parameter components in positional record structs using ordinary
 Object display contracts. [Focused evidence and costs](experiments/record-formatting/README.md#generic-component-display--2026-10-21)
