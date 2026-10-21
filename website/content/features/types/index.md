@@ -55,6 +55,13 @@ behavior is separate from the runtime's ordinary struct fallback. Default struct
 value equality does not automatically declare `EquatableTo<T>` or add `==` and `!=`
 operators to every ordinary struct.
 
+Development native record-struct display supports the qualified scalar, nested-record
+and closed-union shapes. Imported value components can use their declared public
+`ToString()` contract; Index and Range are covered by built-in tests. Generated calls
+avoid component boxing, although returned strings and builder storage allocate.
+Enum/floating components, generic record formatting and record-class formatting
+remain gaps in native support.
+
 String is a reference type with content equality. neoCLR deliberately uses canonical
 Unicode equality over preserved UTF-8 storage, so string fields follow that text
 contract rather than .NET's default ordinal String equality. See

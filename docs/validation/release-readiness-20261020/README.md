@@ -111,8 +111,9 @@ platform/package gate is established by this fix.
 [Scalar and nested record struct display](../../experiments/record-formatting/README.md)
 now has generated native bodies and targeted diagnostics for unsupported formatting.
 [Closed declared union components](../../experiments/record-union-formatting/README.md)
-are now included. This does not qualify enum/imported/floating-point components, generic records
-or record classes. Empty positional syntax also exposed an earlier frontend rejection;
+are now included. [Imported value display contracts](../../experiments/record-formatting/README.md#imported-value-formatting-follow-up--2026-10-21)
+now cover Index/Range in nested records and union payloads. The current audit still
+rejects enum/floating-point components, generic records or record classes. Empty positional syntax also exposed an earlier frontend rejection;
 keep it separate from emitted formatting. Item 1 is still only partially closed.
 
 ## Follow-up: String call projection

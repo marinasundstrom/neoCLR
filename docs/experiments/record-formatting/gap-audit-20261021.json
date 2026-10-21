@@ -1,0 +1,58 @@
+[
+  {
+    "case": "enum",
+    "source": "enum State { Ready = 1 }\nrecord struct Wrapped(Value: State)\nfunc Main() { Console.WriteLine(Wrapped(State.Ready).ToString()) }",
+    "command": [
+      "dotnet",
+      "/Users/robert/Projects/neoclr/target/record-imported-bundle/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/target/record-format-gap-audit/enum/Test.rvnproj"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "/Users/robert/Projects/neoclr/target/record-format-gap-audit/enum/Program.rvn(4,13): error NEOMETA001: Native emission does not support record formatting requires supported scalar components and native text helpers: struct Wrapped.\n"
+  },
+  {
+    "case": "floating",
+    "source": "record struct Wrapped(Value: double)\nfunc Main() { Console.WriteLine(Wrapped(1.5).ToString()) }",
+    "command": [
+      "dotnet",
+      "/Users/robert/Projects/neoclr/target/record-imported-bundle/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/target/record-format-gap-audit/floating/Test.rvnproj"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "/Users/robert/Projects/neoclr/target/record-format-gap-audit/floating/Program.rvn(2,1): error NEOMETA001: Native emission does not support record equality interface requires supported component equality and hashing: struct Wrapped.\n"
+  },
+  {
+    "case": "generic",
+    "source": "record struct Wrapped<T>(Value: T)\nfunc Main() { Console.WriteLine(Wrapped<int>(1).ToString()) }",
+    "command": [
+      "dotnet",
+      "/Users/robert/Projects/neoclr/target/record-imported-bundle/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/target/record-format-gap-audit/generic/Test.rvnproj"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "/Users/robert/Projects/neoclr/target/record-format-gap-audit/generic/Program.rvn(3,13): error NEOMETA001: Native emission does not support record formatting requires supported scalar components and native text helpers: struct Wrapped<T>.\n"
+  },
+  {
+    "case": "class",
+    "source": "record class Wrapped(Value: int)\nfunc Main() { Console.WriteLine(Wrapped(1).ToString()) }",
+    "command": [
+      "dotnet",
+      "/Users/robert/Projects/neoclr/target/record-imported-bundle/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/Projects/neoclr/target/record-format-gap-audit/class/Test.rvnproj"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "/Users/robert/Projects/neoclr/target/record-format-gap-audit/class/Program.rvn(3,13): error NEOMETA001: Native emission does not support record formatting requires supported scalar components and native text helpers: class Wrapped.\n"
+  }
+]

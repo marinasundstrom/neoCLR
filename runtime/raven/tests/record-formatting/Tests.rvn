@@ -1,0 +1,40 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+record struct Position(Value: Index)
+record struct Interval(Value: Range)
+record struct Envelope(Position: Position, Interval: Interval)
+record struct OptionalPosition(Value: Option<Index>)
+
+[Test("Records use imported value formatting across typed and boxed calls")]
+func ImportedValues() -> Result<unit, TestFailure> {
+    let position = Position(Index.FromEnd(2))
+    let interval = Interval(Range(Index.FromStart(1), Index.FromEnd(2)))
+    _ = Assert.Equal("Position { Value = ^2 }", position.ToString())?
+    _ = Assert.Equal("Interval { Value = 1..^2 }", interval.ToString())?
+    let boxed: object = position
+    System.Runtime.GC.Collect()
+    return Assert.Equal(position.ToString(), boxed.ToString())
+}
+
+[Test("Nested records and unions retain imported value display contracts")]
+func NestedValues() -> Result<unit, TestFailure> {
+    let envelope = Envelope(Position(Index.Start), Interval(Range.All))
+    _ = Assert.Equal("Envelope { Position = Position { Value = 0 }, Interval = Interval { Value = 0..^0 } }", envelope.ToString())?
+    let some = OptionalPosition(Some(Index.FromEnd(3)))
+    _ = Assert.Equal("OptionalPosition { Value = Option.Some(^3) }", some.ToString())?
+    return Assert.Equal("OptionalPosition { Value = Option.None }", OptionalPosition(None).ToString())
+}
+
+record struct Scalars(Number: int, Flag: bool, Text: string?)
+
+[Test("Record scalar formatting preserves null and original Unicode text")]
+func ScalarsAndNull() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("Scalars { Number = -2147483648, Flag = True, Text = null }", Scalars(-2147483648, true, null).ToString())?
+    let expected = "Scalars { Number = 42, Flag = False, Text = \"é\" }"
+    return Assert.True(Scalars(42, false, "é").ToString().Equals(expected, StringComparison.Ordinal), "Original UTF-8 representation")
+}

@@ -67,3 +67,31 @@ and reclamation, not HTTP throughput or host allocator activity. Baseline: 2 all
 python3 docs/experiments/record-formatting/check.py target/record-format-bundle-v1/bundle target/record-format-app-v2 --output docs/experiments/record-formatting/validation.json
 python3 docs/experiments/record-formatting/measure.py target/record-format-allocation-v1 --output docs/experiments/record-formatting/allocation-results.json
 ```
+
+## Imported value formatting follow-up — 2026-10-21
+
+Native generated display now calls a public, concrete, parameterless String-returning
+`ToString` declared by an imported value type. Admission and emission share that
+method selection. This follows .NET's use of component display contracts without
+inspecting private fields or guessing that a type is a record. There is no new
+Runtime Contract configuration, metadata encoding or ABI. Ordinary Raven/.NET
+synthesis is unchanged. The existing equality/hash admission remains independent.
+
+The generated call uses the value receiver directly, without adding a component
+Object box. The component's returned string and existing builder still allocate;
+this change makes no allocation-count or throughput claim. Ref-like values and
+inherited Object fallback are not admitted by this rule. Generic owners, enum and
+floating components, and record classes remain unqualified. In particular the
+floating repro rejects at equality synthesis before formatting.
+
+Raven `bf541d49c` on `codex/neoclr` supplies the compiler fix. All nine executions
+(three tests across interpreter, JIT and native) pass. The built-in
+`record-formatting` suite covers Index and Range, typed/boxed record
+calls, nested records, Option payloads, null, scalar display and ordinal preservation
+of decomposed UTF-8. See [the execution report](imported-validation-20261021.json),
+[the current gap audit](gap-audit-20261021.json), and
+[the missing-helper compiler regression](imported-source-core-20261021.txt).
+The original Unsupported Index fixture is now a generic-owner rejection fixture;
+the earlier dated validation remains a historical result. Libraries/runtime/backend
+are reused from the method-constraint cohort; only the compiler is rebuilt. This is
+development evidence, not clean extracted-package qualification.
