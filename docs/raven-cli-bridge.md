@@ -14242,6 +14242,9 @@ metadata encoding is required for the ordinary nominal value type.
 
 ### Monetary records (development, 2026-10-21)
 
+Initial integration evidence; the subsequent positional-parity section below
+supersedes the name and deconstruction limits recorded here.
+
 Native record methods now use ordinary callable lowering. Source nominal record
 components with explicit equality/hash/display contracts use the same policy as
 imported values; MonetaryAmount exercises Decimal and Currency components.
@@ -14256,3 +14259,19 @@ with deconstruction assignment. Matching is bounded to the same non-nullable val
 type and simple/no outer capture. The current parser requires an `else` branch for
 `let MonetaryAmount(amount, currency) = value else { ... }`; allowing omission for
 an irrefutable named record pattern remains a separate general Raven syntax gap.
+
+
+### Positional declaration parity and Money rename (2026-10-21)
+
+Raven main d39ef018a implements irrefutable named declarations, inherited accessible
+Deconstruct lookup and runtime equality patterns for qualified readonly static
+members. The native line carries f5daaaea1 deliberately and adds backend lowering in
+ddd62881f. No Runtime Contract option,
+monetary mapping or new CLI encoding is involved. Native lowering uses ordinary
+reference checks/conversion, unboxing and Deconstruct calls for broad object/base
+inputs, and ordinary Object.Equals for runtime equality patterns. This equality
+path may box values, matching existing .NET pattern semantics; it is not a claim
+of allocation-free pattern matching. Named/unnamed assignment shares inherited
+receiver conversion. The public monetary type is now Money; prior MonetaryAmount
+references must migrate. Native and .NET qualification are tracked separately in
+[deconstruction evidence](experiments/deconstruction/README.md).

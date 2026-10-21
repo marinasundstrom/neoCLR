@@ -20661,3 +20661,26 @@ method bounds and the replacement release gates remain open.
   Website/API documentation is refreshed. Named `let` patterns without `else`
   remain a general Raven parser follow-up; the record uses the supported pattern
   contract. Decimal regression results are recorded in the currency evidence.
+
+
+### 2026-10-21 — General deconstruction semantics and the Money name
+
+- **Author:** Requested named and unnamed positional deconstruction without else,
+  component patterns with else, and parity between Raven's .NET and neoCLR targets.
+  Distinguished simple component binding from positional patterns whose type name
+  can constrain a broader input. Requested reference/value/derived-type test cases.
+- **Assistant:** Implemented the shared declaration and inherited-member lookup on
+  Raven main, with runtime equality patterns for qualified readonly static members.
+  The tests exposed missing record-struct Equals bodies on .NET; this was fixed as
+  an ordinary record contract, not a monetary special case. All 88 focused .NET
+  semantic/execution tests pass in main d39ef018a; f5daaaea1 carries the commit to
+  codex/neoclr. Native lowering and consumer validation are separate work.
+- **Author:** Subsequently requested `Money` instead of `MonetaryAmount` for clarity.
+  The public type, parsing return signatures, tests and current API documentation
+  are renamed without a compatibility alias. Prior evidence retains the old name
+  as a historical record. Failure branches must still exit to establish definite
+  assignment; an empty else block is not sufficient for a refutable binding.
+- **Outcome:** Native lowering is committed as ddd62881f; all 30 built-in
+  deconstruction/currency executions pass across native/JIT/interpreter. The
+  refreshed Money API reference is included in the validated 5,216-page local
+  website. See [qualification evidence](experiments/deconstruction/README.md).

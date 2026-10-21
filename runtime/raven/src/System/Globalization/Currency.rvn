@@ -102,7 +102,7 @@ public struct Currency : EquatableTo<Currency> {
 
     /// Parses an amount with this expected currency and exact culture punctuation.
     /// Currency symbols/codes must match; an ambiguous symbol never selects another currency.
-    func ParseAmount(text: string, culture: Culture) -> Result<MonetaryAmount, NumberParseError> => MonetaryAmount.Parse(text, self, culture)
+    func ParseAmount(text: string, culture: Culture) -> Result<Money, NumberParseError> => Money.Parse(text, self, culture)
 
     internal static func ForCulture(culture: Culture) -> Currency {
         if culture.Name == "sv-SE" {

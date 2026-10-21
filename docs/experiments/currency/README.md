@@ -1,5 +1,9 @@
 # Monetary foundation — development, 2026-10-21
 
+Historical qualification: the author subsequently renamed MonetaryAmount to Money.
+See [deconstruction and Money follow-up](../deconstruction/README.md) for the current
+name and completed language integration; the evidence below retains its original names.
+
 Author-directed bounded work after Decimal. MonetaryAmount is the primary API:
 an ordinary record struct with Decimal Amount and Currency Currency. Positional
 storage, equality, hashing and deconstruction remain compiler-generated; there is

@@ -1,7 +1,12 @@
 # neoCLR platform roadmap
 
+**Deconstruction parity (author direction, 2026-10-21):** [The deconstruction increment](experiments/deconstruction/README.md)
+puts general named/unnamed declaration and matching semantics on Raven main first,
+then validates native lowering independently. The author renames the monetary
+record to Money. This closes language/API gaps without changing release priorities.
+
 **Monetary foundation (author direction, 2026-10-21):** [Currency work](experiments/currency/README.md)
-adds a denomination-bearing MonetaryAmount record as the primary monetary API,
+adds a denomination-bearing Money record as the primary monetary API,
 retaining Decimal currency formatting as a lower-level convenience. Language gains
 default writing direction. This bounded addition does not expand the numeric
 interface hierarchy or replace remaining release qualification; final validation

@@ -6,13 +6,13 @@ import System.Result.*
 /// A monetary value with explicit currency identity and unchanged Decimal precision.
 /// Record equality, hashing and positional deconstruction include both components.
 /// The default value is zero in Currency.Unspecified; construction never rounds or converts.
-public record struct MonetaryAmount(val Amount: Decimal, val Currency: Currency) : Formattable {
+public record struct Money(val Amount: Decimal, val Currency: Currency) : Formattable {
     /// Parses an explicitly expected currency; symbols never infer currency identity.
     /// Exact culture punctuation, spacing and direction marks are required.
-    static func Parse(text: string, currency: Currency, culture: Culture) -> Result<MonetaryAmount, NumberParseError> {
+    static func Parse(text: string, currency: Currency, culture: Culture) -> Result<Money, NumberParseError> {
         let parsed = CurrencyFormatting.Parse(text, currency, culture)
         if parsed is Ok(let amount) {
-            return Ok(MonetaryAmount(amount, currency))
+            return Ok(Money(amount, currency))
         }
         let Error(error) = parsed else { return Error(NumberParseError.InvalidFormat()) }
         return Error(error)
@@ -33,7 +33,7 @@ public record struct MonetaryAmount(val Amount: Decimal, val Currency: Currency)
             return Format(culture)
         }
         if bytes.Length > 3 || (bytes[0] != (byte)67 && bytes[0] != (byte)99) {
-            System.Fail("Unsupported MonetaryAmount format")
+            System.Fail("Unsupported Money format")
         }
         if bytes.Length == 1 {
             return Format(culture)
@@ -43,7 +43,7 @@ public record struct MonetaryAmount(val Amount: Decimal, val Currency: Currency)
         while index < bytes.Length {
             let digit = (int)bytes[index] - 48
             if digit < 0 || digit > 9 {
-                System.Fail("Unsupported MonetaryAmount precision")
+                System.Fail("Unsupported Money precision")
             }
             precision = precision * 10 + digit
             index += 1

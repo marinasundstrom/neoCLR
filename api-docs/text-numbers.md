@@ -205,15 +205,15 @@ permanent Decimal restriction.
 
 ## Monetary values (development)
 
-Prefer `System.Globalization.MonetaryAmount`, a record struct with readonly
+Prefer `System.Globalization.Money`, a record struct with readonly
 `Amount: Decimal` and `Currency: Currency` components. Construction preserves all
 Decimal precision. Equality and hashing include currency identity and numerical
-Decimal equality; positional deconstruction is supported. Named `let MonetaryAmount(amount, currency) = value` patterns currently require an `else` branch. The default is zero
+Decimal equality; positional deconstruction is supported. Named `let Money(amount, currency) = value` and unnamed `let (amount, currency) = value` declarations bind components directly. Refutable patterns, such as `Money(amount, Currency.SEK)` or matching an object input, require an exiting `else` branch. The default is zero
 with `Currency.Unspecified` (XXX). No implicit conversion discards currency.
 
-`MonetaryAmount.Parse(text, currency, culture)` and
+`Money.Parse(text, currency, culture)` and
 `currency.ParseAmount(text, culture)` return
-`Result<MonetaryAmount, NumberParseError>`. An explicit expected currency is required:
+`Result<Money, NumberParseError>`. An explicit expected currency is required:
 ambiguous symbols never select a denomination. Parsing accepts the expected symbol
 or uppercase ISO code, exact locale spacing and direction marks, and valid groups
 of three. Bare numbers, mismatched symbols and malformed grouping are rejected.

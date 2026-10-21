@@ -81,8 +81,9 @@ This does not add numeric format providers or general locale-pattern data.
 
 ## Monetary values (development)
 
-Use `MonetaryAmount`, a record struct combining Decimal and Currency, to keep
-money's denomination with its value. Parsing returns that record; equality and
+Use `Money`, a record struct combining Decimal and Currency, to keep
+money's denomination with its value. Both named `let Money(amount, currency) = money`
+and unnamed `let (amount, currency) = money` deconstruct the record. Parsing returns that record; equality and
 hashing include both components. Construction preserves precision, and changing
 the formatting culture never changes the currency. Display rounding leaves the
 stored amount untouched. Decimal C formatting remains a lower-level convenience.

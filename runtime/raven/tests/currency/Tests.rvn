@@ -75,22 +75,22 @@ func EPolicies() -> Result<unit, TestFailure> {
     return Assert.True(!Language.English.IsRightToLeft && !Language.Swedish.IsRightToLeft && !Language.Undetermined.IsRightToLeft, "LTR defaults")
 }
 
-[Test("MonetaryAmount records preserve identity precision and deconstruction")]
+[Test("Money records preserve identity precision and deconstruction")]
 func FRecords() -> Result<unit, TestFailure> {
-    let money = MonetaryAmount(1234.500m, Currency.USD)
-    let MonetaryAmount(amount, currency) = money else { return Assert.True(false, "Record pattern") }
+    let money = Money(1234.500m, Currency.USD)
+    let Money(amount, currency) = money
     _ = Assert.True(amount == 1234.5m && currency == Currency.USD, "Positional components")?
-    let equal = MonetaryAmount(1234.5m, Currency.USD)
+    let equal = Money(1234.5m, Currency.USD)
     _ = Assert.True(money == equal && money.GetHashCode() == equal.GetHashCode(), "Numeric record equality and hash")?
-    _ = Assert.True(money != MonetaryAmount(amount, Currency.SEK), "Currency participates in equality")?
+    _ = Assert.True(money != Money(amount, Currency.SEK), "Currency participates in equality")?
     let boxed: object = money
     _ = Assert.True(boxed.Equals(equal), "Boxed record equality")?
     _ = Assert.Equal("1 234,50 US$", money.Format(Culture.SwedishSweden))?
     let formatted: Formattable = money
     _ = Assert.Equal("US$1,234", formatted.ToString("C0", Culture.EnglishUnitedKingdom))?
-    let Ok(parsed) = MonetaryAmount.Parse("¥1.2345", Currency.JPY, Culture.EnglishUnitedStates) else { return Assert.True(false, "Parse precision") }
+    let Ok(parsed) = Money.Parse("¥1.2345", Currency.JPY, Culture.EnglishUnitedStates) else { return Assert.True(false, "Parse precision") }
     _ = Assert.True(parsed.Amount == 1.2345m && parsed.Currency == Currency.JPY, "Parsing does not round to display precision")?
-    _ = Assert.True(default(MonetaryAmount) == MonetaryAmount(0m, Currency.Unspecified), "Default record")?
-    _ = Assert.Equal("MonetaryAmount { Amount = 1234.500, Currency = USD }", money.ToString())?
+    _ = Assert.True(default(Money) == Money(0m, Currency.Unspecified), "Default record")?
+    _ = Assert.Equal("Money { Amount = 1234.500, Currency = USD }", money.ToString())?
     return Assert.Equal("1234.500", money.Amount.ToString())
 }

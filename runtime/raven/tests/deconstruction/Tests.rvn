@@ -1,0 +1,73 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Globalization.*
+import System.Result.*
+import NeoClr.Testing.*
+
+record class ReferencePair(val First: int, val Second: int)
+open class Parent {
+    func Deconstruct(out first: int, out second: int) {
+        first = 40
+        second = 2
+    }
+}
+class Child : Parent {}
+
+func ReadReference(value: object?) -> int {
+    let ReferencePair(first, 2) = value else { return -1 }
+    return first
+}
+func ReadChild(value: Parent) -> int {
+    let Child(first, second) = value else { return -1 }
+    return first + second
+}
+func ReadChildObject(value: object?) -> int {
+    let Child(first, second) = value else { return -1 }
+    return first + second
+}
+func ReadMoney(value: object?) -> Decimal {
+    let Money(amount, Currency.SEK) = value else { return -1m }
+    return amount
+}
+func ReadUnnamed(value: Money) -> Decimal {
+    let (amount, Currency.SEK) = value else { return -1m }
+    return amount
+}
+
+[Test("Value deconstruction binds named and unnamed locals")]
+func AValue() -> Result<unit, TestFailure> {
+    let money = Money(12.50m, Currency.SEK)
+    let Money(amount, currency) = money
+    let (otherAmount, otherCurrency) = money
+    return Assert.True(amount == otherAmount && currency == otherCurrency && amount == 12.5m, "Value components")
+}
+
+[Test("Reference deconstruction binds named and unnamed locals")]
+func BReference() -> Result<unit, TestFailure> {
+    let pair = ReferencePair(40, 2)
+    let ReferencePair(first, second) = pair
+    let (a, b) = pair
+    _ = Assert.True(first + second == 42 && a == first && b == second, "Reference components")?
+    _ = Assert.True(ReadReference(pair) == 40 && ReadReference(ReferencePair(40, 3)) == -1, "Component match")?
+    return Assert.True(ReadReference(null) == -1 && ReadReference("wrong") == -1, "Null and wrong type")
+}
+
+[Test("Positional patterns narrow derived and object references")]
+func CDerived() -> Result<unit, TestFailure> {
+    let child = Child()
+    let Child(first, second) = child
+    let (a, b) = child
+    _ = Assert.True(first + second == 42 && a + b == 42, "Inherited deconstruction")?
+    _ = Assert.True(ReadChild(child) == 42 && ReadChild(Parent()) == -1, "Base type narrowing")?
+    return Assert.True(ReadChildObject(child) == 42 && ReadChildObject(Parent()) == -1 && ReadChildObject(null) == -1, "Object type narrowing")
+}
+
+[Test("Qualified currency patterns match values and reject mismatches")]
+func DPatterns() -> Result<unit, TestFailure> {
+    let sek = Money(12.5m, Currency.SEK)
+    let usd = Money(12.5m, Currency.USD)
+    _ = Assert.True(ReadMoney(sek) == 12.5m && ReadMoney(usd) == -1m, "Boxed value and currency equality")?
+    _ = Assert.True(ReadMoney(null) == -1m && ReadMoney("wrong") == -1m, "Value type test failure")?
+    return Assert.True(ReadUnnamed(sek) == 12.5m && ReadUnnamed(usd) == -1m, "Unnamed positional pattern")
+}
