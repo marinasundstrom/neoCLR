@@ -315,7 +315,7 @@ mod tests {
             assert_eq!(value.hash(), expected);
         }
         assert!(!IntrinsicValue::Single(f32::NAN).equals(&IntrinsicValue::Double(f64::NAN)));
-        assert!(IntrinsicValue::Single(1.0).display().is_none());
-        assert!(IntrinsicValue::Double(1.0).display().is_none());
+        assert_eq!(IntrinsicValue::Single(1.0).display().unwrap().as_str(), "1");
+        assert_eq!(IntrinsicValue::Double(1.0).display().unwrap().as_str(), "1");
     }
 }
