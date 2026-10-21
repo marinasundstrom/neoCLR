@@ -14382,3 +14382,10 @@ class equality/hash contracts are covered by the built-in suite rather than
 reimplemented. Nested class output still allocates. Inherited/recursive display
 and the separately observed self-typed copy-constructor collision remain gaps;
 see the record-formatting evidence.
+
+### Copy-constructor source diagnostic
+
+Raven main `8eca1f07d` repairs the shared self-typed positional/copy-constructor
+collision. The native carry now reports RAV0111 before encoding, replacing
+NEOMETA003. No runtime or bridge representation change; 37 shared semantic tests
+and an independently built native diagnostic probe establish the fix.

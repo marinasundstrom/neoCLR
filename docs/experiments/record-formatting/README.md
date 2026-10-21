@@ -207,3 +207,13 @@ the generated copy constructor. Adding another positional component allows the
 recursive display probe to reach its intended NEOMETA001 diagnostic. This collision
 is not fixed here; determine the general Raven/.NET diagnostic and synthesis policy
 on main before carrying a fix to the native line.
+
+### Copy-constructor diagnostic closed
+
+Raven main `8eca1f07d` now rejects the single self-typed record-class primary
+constructor with RAV0111, including nullable and generic spellings. All 37 focused
+record semantic tests pass (32 before the fix); emission is rejected before
+metadata encoding. Native carry `e73b03792` independently builds and the retained repro
+now reports the same source diagnostic. This follows [C# CS8910](https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-messages/constructor-errors);
+nullable annotations cannot distinguish signatures. The earlier NEOMETA003
+observation above describes the repaired behavior, not an open platform limitation.
