@@ -73,7 +73,7 @@ provide implementation details.
 ## Record values in development
 
 Native positional records now support generated equality and matching hashes for
-qualified components, including canonical String/Char text, integers, Boolean,
+qualified components, including canonical String/Character text, integers, Boolean,
 enums, nested source records and closed tagged-union payloads such as `Option<int>`.
 This includes ConsoleKeyInfo's optional scalar. Nongeneric imported components
 with an explicit `EquatableTo<Self>` contract and public typed equality/hash methods,

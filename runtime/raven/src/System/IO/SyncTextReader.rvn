@@ -7,11 +7,11 @@ public interface SyncTextReader {
     /// <summary>Exact nonempty line delimiter, removed from ReadLine results. Defaults to LF.</summary>
     var NewLine: string { get; set; }
     /// <summary>Peeks at the next grapheme without consuming it; None denotes EOF.</summary>
-    /// <returns>Char or a text read error. May buffer underlying input to find a boundary.</returns>
-    func PeekChar() -> Result<Option<char>, TextReadError>
+    /// <returns>Character or a text read error. May buffer underlying input to find a boundary.</returns>
+    func PeekChar() -> Result<Option<Character>, TextReadError>
     /// <summary>Reads one grapheme; None denotes EOF.</summary>
-    /// <returns>Char or a text read error.</returns>
-    func ReadChar() -> Result<Option<char>, TextReadError>
+    /// <returns>Character or a text read error.</returns>
+    func ReadChar() -> Result<Option<Character>, TextReadError>
     /// <summary>Reads the requested grapheme count, or the shorter remainder at EOF.</summary>
     /// <param name="count">Nonnegative grapheme count; zero consumes nothing.</param>
     /// <returns>text or a text read error.</returns>

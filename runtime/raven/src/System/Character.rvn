@@ -3,22 +3,28 @@ module System
 import System.Option.*
 
 
-public struct Char : ComparableTo<char>, EquatableTo<char> {
+/// <summary>An immutable Unicode extended grapheme cluster backed by preserved UTF-8 text.</summary>
+/// <remarks>Character literals infer this type. Equality and hashing use canonical Unicode equivalence; this is not a numeric code unit.</remarks>
+public struct Character : ComparableTo<Character>, EquatableTo<Character> {
     // Immutable grapheme storage is supplied by the runtime.
     #pragma warning disable-next-line RAV9032
-    private field m_value: char
+    private field m_value: Character
 
-    static func FromString(text: string) -> char {
+    /// <summary>Creates one Character from a complete extended grapheme cluster.</summary>
+    /// <param name="text">Exactly one non-empty grapheme, preserving its UTF-8 spelling.</param>
+    /// <returns>The original grapheme value.</returns>
+    /// <remarks>Invalid empty or multi-grapheme text faults; use TryFromString for recoverable validation.</remarks>
+    static func FromString(text: string) -> Character {
         return neoCLR.Runtime.CharFromString(text)
     }
 
-    /// <summary>Creates a Char when text is exactly one extended grapheme cluster.</summary>
+    /// <summary>Creates a Character when text is exactly one extended grapheme cluster.</summary>
     /// <param name="text">Non-null UTF-8 text to validate; empty or multiple graphemes return None.</param>
     /// <returns>Some containing the original grapheme spelling, or None.</returns>
     /// <remarks>Uses Unicode 17 boundaries and preserves bytes without normalization.
-    /// Checks whether the first grapheme occupies the entire input; no temporary String or Char array is created.
-    /// Successful construction follows the runtime's Char storage and Option allocation rules.</remarks>
-    static func TryFromString(text: string) -> Option<char> {
+    /// Checks whether the first grapheme occupies the entire input; no temporary String or Character array is created.
+    /// Successful construction follows the runtime's Character storage and Option allocation rules.</remarks>
+    static func TryFromString(text: string) -> Option<Character> {
         if !neoCLR.Runtime.CharIsSingleGrapheme(text) {
             return None
         }
@@ -30,7 +36,7 @@ public struct Char : ComparableTo<char>, EquatableTo<char> {
     }
 
     /// Tests canonical equivalence of graphemes without allocating text.
-    func Equals(other: char) -> bool {
+    func Equals(other: Character) -> bool {
         return neoCLR.Runtime.CharCompareCanonical(m_value, other) == 0
     }
 
@@ -39,8 +45,8 @@ public struct Char : ComparableTo<char>, EquatableTo<char> {
     /// <param name="comparison">Canonical, Ordinal byte identity, or OrdinalIgnoreCase simple-fold scalar identity.</param>
     /// <returns>True when the entire graphemes match under the selected policy.</returns>
     /// <remarks>Unknown modes fault with RuntimeError. Simple folding does not normalize or expand.
-    /// Compares Char storage directly without converting it to String; original bytes are preserved.</remarks>
-    func Equals(other: char, comparison: StringComparison) -> bool {
+    /// Compares Character storage directly without converting it to String; original bytes are preserved.</remarks>
+    func Equals(other: Character, comparison: StringComparison) -> bool {
         if comparison == StringComparison.Canonical {
             return neoCLR.Runtime.CharCompareCanonical(m_value, other) == 0
         }
@@ -55,7 +61,7 @@ public struct Char : ComparableTo<char>, EquatableTo<char> {
     }
 
     override func Equals(other: Object?) -> bool {
-        if other is char character {
+        if other is Character character {
             return Equals(character)
         }
         return false
@@ -65,7 +71,7 @@ public struct Char : ComparableTo<char>, EquatableTo<char> {
     override func GetHashCode() -> int => neoCLR.Runtime.CharHashCanonical(m_value)
 
     /// Orders canonical NFD scalar sequences, without linguistic collation.
-    func CompareTo(other: char) -> int {
+    func CompareTo(other: Character) -> int {
         return neoCLR.Runtime.CharCompareCanonical(m_value, other)
     }
 }

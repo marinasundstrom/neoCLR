@@ -380,7 +380,7 @@ mod primitive_reference_tests {
         for case in 0..6 {
             let mut reference = valid.clone();
             match case {
-                0 => reference.name = "System.Char".into(),
+                0 => reference.name = "System.Character".into(),
                 1 => reference.packing = Some(8),
                 2 => reference.minimum_size = Some(8),
                 3 => reference.is_abstract = true,

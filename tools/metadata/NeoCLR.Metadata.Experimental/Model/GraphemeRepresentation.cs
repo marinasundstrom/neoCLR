@@ -5,16 +5,16 @@ public sealed partial class TypeDefinition
     /// <summary>Whether this declaration owns the native Unicode grapheme Char representation.</summary>
     public bool NativeGrapheme { get; private set; }
 
-    /// <summary>Designates canonical System.Char as runtime-owned grapheme storage, not a CLI code unit.</summary>
+    /// <summary>Designates canonical System.Character as runtime-owned grapheme storage, not a CLI code unit.</summary>
     /// <exception cref="InvalidOperationException">The definition is a loaded snapshot.</exception>
     /// <exception cref="ArgumentException">The definition has the wrong identity, category or storage.</exception>
     public void SetNativeGrapheme()
     {
         if (authoredFields is null) throw new InvalidOperationException("loaded grapheme declarations are immutable");
-        if (NativePrimitive is not null || Namespace != "System" || Name != "Char" || !IsValueType ||
+        if (NativePrimitive is not null || Namespace != "System" || Name != "Character" || !IsValueType ||
             GenericArity != 0 || DeclaringType is not null || (Attributes & 0x1b8) != 0x108 ||
             Fields.Count != 0 || Methods.Any(m => m.Name is ".ctor" or ".cctor"))
-            throw new ArgumentException("native grapheme requires canonical System.Char value storage without fields or constructors");
+            throw new ArgumentException("native grapheme requires canonical System.Character value storage without fields or constructors");
         NativeGrapheme = true;
     }
 }
@@ -32,17 +32,17 @@ public sealed partial class TypeBuilder
 public sealed partial class AssemblyBuilder
 {
     private ImportedTypeReference? externalGrapheme;
-    /// <summary>Designates an output-owned external System.Char reference as native grapheme storage.</summary>
-    /// <param name="type">An explicitly supplied nongeneric top-level System.Char value reference.</param>
+    /// <summary>Designates an output-owned external System.Character reference as native grapheme storage.</summary>
+    /// <param name="type">An explicitly supplied nongeneric top-level System.Character value reference.</param>
     /// <exception cref="ArgumentNullException">The reference is null.</exception>
     /// <exception cref="ArgumentException">The reference is foreign or has an incompatible identity/category.</exception>
     /// <exception cref="InvalidDataException">Another dependency owns Char, or ordinary methods were already authored.</exception>
     public void SetNativeGrapheme(ImportedTypeReference type)
     {
         ArgumentNullException.ThrowIfNull(type);
-        if (!ReferenceEquals(type.Owner, this) || type.Namespace != "System" || type.Name != "Char" ||
+        if (!ReferenceEquals(type.Owner, this) || type.Namespace != "System" || type.Name != "Character" ||
             !type.IsValueType || type.GenericArity != 0 || type.DeclaringType is not null)
-            throw new ArgumentException("native grapheme requires an output-owned canonical System.Char value reference", nameof(type));
+            throw new ArgumentException("native grapheme requires an output-owned canonical System.Character value reference", nameof(type));
         if (types.Any(t => t.NativeGrapheme) ||
             externalGrapheme is not null && !Equals(externalGrapheme, type) ||
             authoredCallableReferences.Concat(importedReferences.Values).Any(m => Equals(m.DeclaringReference, type) && m.Target.DeclaringType?.NativeGrapheme != true))

@@ -52,7 +52,7 @@ and consumer conversions between int[] and `Iterable<int>` preserve array identi
 and support iteration in interpreter/AOT/JIT. Result remains invariant. Sliceable was removed with borrowed array views.
 
 String is also a reference argument. `Producer<string>` can widen to `Producer<Object>`
-or Producer<`Iterable<char>`>, and the corresponding consumers narrow to
+or Producer<`Iterable<Character>`>, and the corresponding consumers narrow to
 `Consumer<string>`. The interpreter allocates an ordinary view handle while sharing
 the UTF-8 owner; native dispatch adapts its pointer tag without allocating a wrapper
 or copying text. Nominal conformance remains explicit, and reverse/value-boxing

@@ -30,7 +30,7 @@ ret
 .end
 .function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeCharToString(Char& source) -> String
 ldarg source
-call instance System.Char::ToString()
+call instance System.Character::ToString()
 ret
 .end
 .function neoCLR.Library.System.Globalization.DateTimeFormat.RuntimeTimeOfDayget_Hour(System.Time.TimeOfDay& source) -> Int32

@@ -387,8 +387,8 @@ public sealed partial class NativeAssemblyDefinition
                 else if (isPrimitive)
                 {
                     Require(nativeName.StartsWith("System.", StringComparison.Ordinal), "primitive requires canonical identity");
-                    primitive = nativeName == "System.Char" ? null : ReadPrimitive(nativeName[7..], nativeName == "System.Void");
-                    Require((nativeName == "System.Char" || primitive is { } scalar && TypeDefinition.IsSupportedNativePrimitive(scalar)) && isValueType == (primitive != PrimitiveType.String) && !isStatic &&
+                    primitive = nativeName == "System.Character" ? null : ReadPrimitive(nativeName[7..], nativeName == "System.Void");
+                    Require((nativeName == "System.Character" || primitive is { } scalar && TypeDefinition.IsSupportedNativePrimitive(scalar)) && isValueType == (primitive != PrimitiveType.String) && !isStatic &&
                         declaringType < 0 && typeNames.Length == 0 && fieldRows.Count == 0 && enumMembers is null,
                         "invalid runtime primitive declaration");
                     Require(!primitiveReference || primitive is not null && baseInterfaces.Length == 0 && propertyElements.Length == 0, "invalid primitive reference contract");
@@ -442,7 +442,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + staticRows.Length + literalRows.Length + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { MemoryView = memoryView, BeforeFieldInit = beforeFieldInit, Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, key == "field_tokens" ? 768 : 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { MemoryView = memoryView, BeforeFieldInit = beforeFieldInit, Variance = variance, StaticFields = staticRows, LiteralFields = literalRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, RawBase = type.TryGetProperty("base", out var baseSignatureNode) ? baseSignatureNode.Clone() : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Character", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, key == "field_tokens" ? 768 : 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -553,8 +553,8 @@ public sealed partial class NativeAssemblyDefinition
                     {
                         var localCharacter = signatureOwners.SingleOrDefault(t => t.NativeGrapheme);
                         if (localCharacter is not null) return localCharacter;
-                        Require(nativeTypeAliases.TryGetValue(("System.Char", 0), out var character) && character.ValueType && character.Namespace == "System" && character.Name == "Char" && character.Declaring is null, "Char requires an explicit core value alias");
-                        return ImportExternalType(signatureGraph, "System.Char", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                        Require(nativeTypeAliases.TryGetValue(("System.Character", 0), out var character) && character.ValueType && character.Namespace == "System" && character.Name == "Character" && character.Declaring is null, "Char requires an explicit core value alias");
+                        return ImportExternalType(signatureGraph, "System.Character", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
                     }
                     if (element.GetString() == "SelfType")
                     {
@@ -857,7 +857,7 @@ public sealed partial class NativeAssemblyDefinition
                     var constructed = !primitiveOwner && owner.TryGetProperty("Constructed", out construction);
                     if (!primitiveOwner) Shape(owner, constructed ? "Constructed" : "Named");
                     if (constructed) Shape(construction, "definition", "arguments");
-                    var ownerName = primitiveOwner ? "System." + (owner.GetString() == "Char" ? "Char" : ReadPrimitive(owner.GetString(), false).ToString()) : constructed ? Text(construction, "definition") : Text(owner, "Named");
+                    var ownerName = primitiveOwner ? "System." + (owner.GetString() == "Char" ? "Character" : ReadPrimitive(owner.GetString(), false).ToString()) : constructed ? Text(construction, "definition") : Text(owner, "Named");
                     ownerIndex = types.FindIndex(t => t.NativeName == ownerName); Require(ownerIndex >= 0, "missing native method owner");
                     Require(!types[ownerIndex].PrimitiveReference, "primitive reference cannot declare members");
                     Require(types[ownerIndex].EnumMembers is null && primitiveOwner == (types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme), "invalid native owner representation");
@@ -1145,7 +1145,7 @@ public sealed partial class NativeAssemblyDefinition
                                 Require(arguments[i].GetProperty("TypeParameter").GetInt32() == i, "property accessor requires canonical open owner");
                             }
                         }
-                        var ownerName = primitiveOwner ? "System." + (referenceOwner.GetString() == "Char" ? "Char" : ReadPrimitive(referenceOwner.GetString(), false).ToString()) : constructed ? Text(construction, "definition") : Text(referenceOwner, "Named");
+                        var ownerName = primitiveOwner ? "System." + (referenceOwner.GetString() == "Char" ? "Character" : ReadPrimitive(referenceOwner.GetString(), false).ToString()) : constructed ? Text(construction, "definition") : Text(referenceOwner, "Named");
                         Require(ownerName == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
                         var parameters = Array(reference, "parameters", 256).Select(p => ReadType(p, false, allowByReference: true, allowSelf: types[owner].IsInterface)).ToArray();
                         Require(parameters.SequenceEqual(setter ? indices.Append(valueType) : indices), "property accessor parameters mismatch");
@@ -1202,7 +1202,7 @@ public sealed partial class NativeAssemblyDefinition
         ArgumentNullException.ThrowIfNull(coreLibrary);
         if (nativeTypeAliases.TryGetValue(("System.Void", 0), out var unitAlias) && !unitAlias.Assembly.Equals(coreLibrary))
             throw new InvalidDataException("inhabited Void projection requires the explicit core scope");
-        if (nativeTypeAliases.TryGetValue(("System.Char", 0), out var charAlias) && !charAlias.Assembly.Equals(coreLibrary))
+        if (nativeTypeAliases.TryGetValue(("System.Character", 0), out var charAlias) && !charAlias.Assembly.Equals(coreLibrary))
             throw new InvalidDataException("Char projection requires the explicit core scope");
         if (nativeTypeAliases.TryGetValue(("System.Value", 0), out var erasedAlias) && !erasedAlias.Assembly.Equals(coreLibrary))
             throw new InvalidDataException("Value projection requires the explicit core scope");
@@ -1216,7 +1216,7 @@ public sealed partial class NativeAssemblyDefinition
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
         for (int i = 0; i < types.Length; i++)
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
-        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && (nativeTypeAliases.ContainsKey(("System.Void", 0)) || types.Any(t => t.NativePrimitive == PrimitiveType.Void)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
+        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Character") : type.GetString() == "Void" && (nativeTypeAliases.ContainsKey(("System.Void", 0)) || types.Any(t => t.NativePrimitive == PrimitiveType.Void)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())

@@ -1,12 +1,18 @@
 # Strings, characters and encoding
 
-A String is Unicode text. A Char is one grapheme cluster—a practical approximation
+A String is Unicode text. A Character is one grapheme cluster—a practical approximation
 of a character as a reader perceives it. UTF-8 is the internal encoding; converting
 between text and bytes is an explicit operation.
 
+The development API names the grapheme type `Character` (previously `Char`).
+Character literals infer it, and explicit annotations use `Character` after
+`import System.*`. The neoCLR target treats `char` as an ordinary identifier,
+not a type alias. Raven targeting .NET retains its `char` keyword and UTF-16 type.
+Rebuild libraries and consumers together when migrating.
+
 ## Count and iterate characters
 
-`Length` counts grapheme clusters, and string iteration yields Char values:
+`Length` counts grapheme clusters, and string iteration yields Character values:
 
 ```raven
 {{GRAPHEME_COUNTS}}
@@ -45,7 +51,7 @@ String indexing addresses graphemes. Bracket access with Index or Range is a
 convenience that can fault on invalid bounds; validate inputs or use the checked
 operations described in the [sequence-access guide](/docs/sequence-access.html).
 
-In the development API, String and Char equality recognizes canonical Unicode 17
+In the development API, String and Character equality recognizes canonical Unicode 17
 equivalence: precomposed é and e followed by a combining accent compare equal and
 have matching hashes. Their original UTF-8 bytes remain unchanged. Comparisons
 and hashing do not allocate normalized copies.
@@ -66,20 +72,20 @@ Development grapheme segmentation now uses Unicode 17 alongside canonical
 comparison. This changes boundaries for some newer combining marks; stored bytes
 remain unchanged. Scalar category classification still uses Unicode 16.
 Case conversion, folding and segmentation have their own versioned Unicode rules;
-consult the [String](xref:System.String) and [Char](xref:System.Char) contracts when
+consult the [String](xref:System.String) and [Character](/docs/api/System/Character/index.html) contracts when
 text boundaries or cross-platform comparison must be exact.
 
 ## Work with one character
 
-Development `Char.TryFromString(text)` returns `Some(char)` for one complete
+Development `Character.TryFromString(text)` returns `Some(character)` for one complete
 grapheme and `None` for empty text or multiple graphemes. It preserves the original
-UTF-8 spelling. `Char.Equals(other, comparison)` also supports explicit Canonical,
+UTF-8 spelling. `Character.Equals(other, comparison)` also supports explicit Canonical,
 Ordinal and OrdinalIgnoreCase policies, comparing character storage directly.
 For example, composed and decomposed accents match canonically but differ ordinally.
 
-Char represents a grapheme, while `UnicodeScalar` owns scalar category checks.
-Successful Char/Option construction can allocate under the current representation;
-a borrowed Char byte view remains future work. See the [Char reference](xref:System.Char).
+Character represents a grapheme, while `UnicodeScalar` owns scalar category checks.
+Successful Character/Option construction can allocate under the current representation;
+a borrowed Character byte view remains future work. See the [Character reference](/docs/api/System/Character/index.html).
 
 ## Search text
 
@@ -143,7 +149,7 @@ Both builder and conversion APIs enforce explicit size limits.
 
 In development, `String.Utf8Bytes` also works in native JIT/AOT: it borrows immutable
 UTF-8 storage without an encoding array and retains managed text through collection.
-Its indices count bytes; Char and ordinary string indexing remain grapheme-based.
+Its indices count bytes; Character and ordinary string indexing remain grapheme-based.
 Use `ToArray()` only when an independent mutable byte array is needed.
 
 

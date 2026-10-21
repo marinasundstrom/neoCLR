@@ -137,7 +137,7 @@
     <Compile Include="src/System/Boolean.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Char'">
-    <Compile Include="src/System/Char.rvn" />
+    <Compile Include="src/System/Character.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Value'">
     <Compile Include="src/System/Value.rvn" />

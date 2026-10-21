@@ -2870,3 +2870,13 @@ No public type is excluded. The manual also clarifies inherited value hashing,
 which the generic Object summary does not describe accurately for this struct.
 The historical CLI CoreProbe inventory is unchanged; the native renderer selects
 the real public type directly from System.Runtime, as with the other native-only APIs.
+
+### Character naming (2026-10-21)
+
+The native snapshot now renders `System.Character`, its constructors/helpers and
+all affected text/console signatures from the complete source-built library.
+The native type is selected directly; no public type is excluded. Supplemental
+content explains the grapheme contract and the removal of the neoCLR `char` alias.
+The historical CLI CoreProbe reference still has System.Char and is not rebuilt
+as if it were the native library. Current guides link Character; the native
+snapshot and its matching compiler revision define the development contract.

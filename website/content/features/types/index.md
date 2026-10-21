@@ -116,15 +116,15 @@ Development primitive interface support preserves each scalar value type's decla
 interfaces when boxed. Interface calls borrow that box's payload and invoke the same
 value method used by direct calls; converting to an interface does not create a second
 box. This includes narrow/unsigned/native-width integers, floating values, Boolean and
-Char. Exact generic arguments remain significant, and the runtime does not invent
+Character. Exact generic arguments remain significant, and the runtime does not invent
 undeclared equality interfaces. `Int32` and `Int64` also implement `Formattable` for
 bounded culture-aware D/F/N formatting; other numeric format coverage remains a gap.
 
 The development primitive library explicitly implements `EquatableTo<T>` for all
-signed, unsigned and native-width integers, `Single`, `Double`, `Boolean` and `Char`.
+signed, unsigned and native-width integers, `Single`, `Double`, `Boolean` and `Character`.
 Typed `Equals` calls do not require boxing; storing a value in an interface does.
 Floating `Equals` treats NaNs as equal and positive/negative zero as equal, matching
-Object equality and hashing; IEEE `==` retains its NaN behavior. Char equality keeps
+Object equality and hashing; IEEE `==` retains its NaN behavior. Character equality keeps
 canonical grapheme semantics. This does not synthesize the interface for user structs.
 
 Numeric primitives implement `Formattable`: integers support bounded G/D/F/N;

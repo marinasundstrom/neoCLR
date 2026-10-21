@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/Char.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+; Generated from runtime/raven/src/System/Character.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Character.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -14,7 +14,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Character.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1

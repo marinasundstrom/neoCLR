@@ -48,7 +48,7 @@ Open a scoped `ConsoleKeyReader` with `Console.OpenKeyInput()` and call `ReadKey
 Use `OpenKeyInput(true)` to receive Ctrl+C as input. Reads block without echo and
 return values containing logical key identity, modifiers and optional Unicode scalar
 text. They create no per-key strings, byte arrays or Tasks. Unicode scalar text is
-distinct from neoCLR's grapheme `Char`.
+distinct from neoCLR's grapheme `Character`.
 
 A small “press any key to exit” application:
 
@@ -112,7 +112,7 @@ executable name. Main() without parameters is also supported.
 
 ## Displaying values
 
-WriteLine overloads accept Boolean, Char and integer types without
+WriteLine overloads accept Boolean, Character and integer types without
 boxing. WriteLine(object?) is the fallback: it calls the object's ToString override,
 or writes an empty line for null. Integer text uses invariant decimal digits.
 Floating-point numeric formatting and format providers remain future work.

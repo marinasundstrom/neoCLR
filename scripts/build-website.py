@@ -595,8 +595,11 @@ def main():
             raise ValueError(f"{path}: {error}") from error
         pages[path.resolve()] = check
     page_paths = {str(path) for path in pages}
-    for path, check in pages.items():
-        check.check(path, pages, page_paths)
+    # Native-only types can be link targets before the legacy staging pass knows
+    # them. preview.py validates all links in the complete overlay before publish.
+    if audit is None:
+        for path, check in pages.items():
+            check.check(path, pages, page_paths)
     (OUTPUT / '.nojekyll').touch()
     publish_site(OUTPUT, publish_destination, audit)
     OUTPUT = publish_destination

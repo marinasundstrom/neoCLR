@@ -3,7 +3,7 @@ module System
 import System.*
 
 // Internal transport-independent result. Text is a window in the caller's input,
-// never an owned String or Char. State: 0 needs input, 1 decoded, 2 unsupported,
+// never an owned String or Character. State: 0 needs input, 1 decoded, 2 unsupported,
 // 3 invalid UTF-8. Key: ASCII logical key or navigation 256..265 / F1..F12 272..283.
 internal record struct TerminalKeyStep(val State: int, val Consumed: int, val Key: int,
     val Modifiers: int, val TextOffset: int, val TextLength: int)

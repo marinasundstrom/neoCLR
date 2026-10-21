@@ -2418,7 +2418,7 @@ impl Lowerer<'_> {
                     .push(format!("ldstr {}", serde_json::to_string(&text).unwrap()));
                 self.body
                     .push("call neoCLR.Runtime.CharFromString(String)".into());
-                Ok(Ty::Record("System.Char".into()))
+                Ok(Ty::Record("System.Character".into()))
             }
             ExprKind::String(value) => {
                 self.body

@@ -156,7 +156,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         var parameters = target.Signature.ParameterTypes.Select(TypeKey).ToArray();
         var ownerName = TypeName(owner);
         var intrinsicCharOwner = reference.Identity.Equals(core) && Library.ModuleName == "System" &&
-            owner is { Namespace: "System", Name: "Char", IsValueType: true, GenericArity: 0, DeclaringType: null };
+            owner is { Namespace: "System", Name: "Character", IsValueType: true, GenericArity: 0, DeclaringType: null };
         var ownerKey = intrinsicCharOwner ? "Char" : intrinsicPrimitiveOwner ? owner.Name : owner.GenericArity == 0 ? "Named(" + ownerName + ")" : "Constructed(" + ownerName + ";" + string.Join(",", Enumerable.Range(0, owner.GenericArity).Select(i => "TypeParameter(" + i + ")")) + ")";
         var matches = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
             f.GetProperty("name").GetString() == name && f.TryGetProperty("owner", out var nativeOwner) && (namespaceContainer ? nativeOwner.ValueKind == JsonValueKind.Null : TypeKey(nativeOwner) == ownerKey) && Flag(f, "instance") == !definition.IsStatic &&
@@ -185,7 +185,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Void" && type.IsValueType && type.GenericArity == 0;
     internal static bool IsIntrinsicChar(ImportedTypeReference type) => type.Owner.IsNativeGrapheme(type) ||
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
-        type.DeclaringType is null && type.Namespace == "System" && type.Name == "Char" && type.IsValueType && type.GenericArity == 0;
+        type.DeclaringType is null && type.Namespace == "System" && type.Name == "Character" && type.IsValueType && type.GenericArity == 0;
     internal static bool IsErasedValue(ImportedTypeReference type) => type.Owner.AuthoredPrimitiveOwner(type) == PrimitiveType.Value ||
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Value" && type.IsValueType && type.GenericArity == 0;

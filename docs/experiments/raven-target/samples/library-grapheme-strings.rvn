@@ -4,16 +4,16 @@ import System.Console.*
 import System.Text.*
 
 class CharacterBox {
-    private var stored: char
+    private var stored: Character
 
-    init(value: char) {
+    init(value: Character) {
         stored = value
     }
 
-    val Value: char => stored
+    val Value: Character => stored
 }
 
-func Describe(value: char) -> string {
+func Describe(value: Character) -> string {
     return match value {
         'é' => "Combining character"
         '👨‍👩‍👧‍👦' => "Family"
@@ -21,7 +21,7 @@ func Describe(value: char) -> string {
     }
 }
 
-func ShowCharacters(text: Iterable<char>) {
+func ShowCharacters(text: Iterable<Character>) {
     for character in text {
         WriteLine(character.ToString())
     }
@@ -36,8 +36,8 @@ func Main() {
     for character in "é" {
         WriteLine(Describe(character))
     }
-    let characters: char[] = ['A', 'é', '👨‍👩‍👧‍👦']
-    characters[0] = Char.FromString("👍🏽")
+    let characters: Character[] = ['A', 'é', '👨‍👩‍👧‍👦']
+    characters[0] = Character.FromString("👍🏽")
     for character in characters {
         WriteLine(character.ToString())
     }
@@ -49,7 +49,7 @@ func Main() {
         }
     }
     WriteLine("".Length)
-    let initial: char = default(char)
+    let initial: Character = default(Character)
     if initial.Equals('\0') {
         WriteLine("Default NUL")
     }

@@ -147,7 +147,7 @@ Variance follows explicit nominal interfaces, including those inherited through
 imported class bases. Compatible producer and consumer views preserve reference
 identity for classes, interfaces, arrays and strings. For example, an array can
 widen to its declared Iterable contract without changing its invariant element
-storage. Strings can expose Object or `Iterable<char>` views without copying UTF-8
+storage. Strings can expose Object or `Iterable<Character>` views without copying UTF-8
 bytes. Reverse and unrelated conversions are rejected.
 
 See the [variance reference](/docs/interface-variance.html) for conversion rules,

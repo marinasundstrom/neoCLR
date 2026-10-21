@@ -27,7 +27,7 @@ that bypassing the override still describes the concrete object.
 
 Virtual ToString dispatch supports named structs with explicit overrides and boxed
 all signed/unsigned integer and native-width integer values, plus Boolean. Integers produce culture-independent decimal text;
-Boolean produces True or False, matching .NET spelling. Char returns its full grapheme text. String through Object returns its unchanged text. Floating boxed display remains unsupported; use typed formatting where available. It does
+Boolean produces True or False, matching .NET spelling. Character returns its full grapheme text. String through Object returns its unchanged text. Floating boxed display remains unsupported; use typed formatting where available. It does
 not add Console.WriteLine(Object), serialization, culture/format overloads or string
 identity. GetType's existing string/boxed paths remain supported.
 
@@ -84,7 +84,7 @@ and explicit Object base Equals/GetHashCode use that owner; virtual String equal
 and hashing use canonical Unicode 17 text identity. Separate constructions can be
 canonically equal without sharing bytes or reference identity. Explicit String.Intern
 shares exact stored spellings within one execution; literals are not automatically interned. Virtual
-boxed-value Equals/GetHashCode support signed/unsigned and native-width integers, Boolean, Single, Double, Char,
+boxed-value Equals/GetHashCode support signed/unsigned and native-width integers, Boolean, Single, Double, Character,
 explicit named-struct overrides and ordinary struct defaults, with engine limits
 described below.
 ReferenceEquals can compare box identities, but does not supply boxed value equality.
@@ -207,18 +207,18 @@ generic structs. Native selection still rejects floating boxes combined with vir
 Object.ToString; boxing storage support does not imply boxed formatting support.
 
 
-Development String boundaries and Char validation use Unicode 17 extended grapheme
+Development String boundaries and Character validation use Unicode 17 extended grapheme
 segmentation in both the interpreter and native helper. Newly recognized combining
-marks can change counts and valid Char constructions compared with the prior Unicode
+marks can change counts and valid Character constructions compared with the prior Unicode
 16 rules. This does not change UTF-8 storage or the separate scalar category table.
 
-[Char](xref:System.Char) compares canonical Unicode 17 grapheme identity, rejects other
+[Character](/docs/api/System/Character/index.html) compares canonical Unicode 17 grapheme identity, rejects other
 concrete types and null, and hashes the same canonical sequence. Canonically equivalent
 composed and decomposed spellings compare equal while preserving their bytes. Object ToString returns
 all stored text, including combining marks and emoji joiners. Unlike .NET Char,
-neoCLR Char is not a UTF-16 code unit and does not use .NET's code-unit hash.
+neoCLR Character is not a UTF-16 code unit and does not use .NET's code-unit hash.
 
-String and Char expose matching typed and Object overrides in the development
+String and Character expose matching typed and Object overrides in the development
 library. Their native dispatch preserves the same source bodies. The remaining
 primitive policies use bounded intrinsics for the selected Object slots. This does
 not add typed GetHashCode members for other primitives, general struct equality, nullable
@@ -363,7 +363,7 @@ values. Explicitly authored operators retain their own contracts.
 Supported generic API signatures admit Object, including `HashMap<Object, Object>`.
 Supply explicit callbacks: `(left, right) => left.Equals(right)` and
 `key => key.GetHashCode()`. Paths and type descriptors use their represented-value
-contracts; supported boxed Int32/Int64/Boolean/Single/Double/Char values use exact-type value equality, while
+contracts; supported boxed Int32/Int64/Boolean/Single/Double/Character values use exact-type value equality, while
 ordinary classes retain allocation identity. Equal keys must have equal hashes.
 
 The compiled sample checks duplicate keys, replacement, deliberate collisions,
@@ -391,8 +391,8 @@ host retention, but can collide and must not be persisted. Virtual GetHashCode u
 the content hash instead.
 No automatic literal interning, nullable String storage, stable hash numbers or source-declared String
 Object overrides are added. The reference-only scaffold constructor is excluded:
-create strings with literals, `String(Sequence<char>)`, Concat and text APIs.
-String implements `Sequence<char>`; its Count is explicit and Length remains public.
+create strings with literals, `String(Sequence<Character>)`, Concat and text APIs.
+String implements `Sequence<Character>`; its Count is explicit and Length remains public.
 
 The content contract follows .NET String Object equality and display. neoCLR uses
 UTF-8 rather than .NET UTF-16 and does not adopt .NET's randomized hash algorithm;
@@ -487,7 +487,7 @@ Unicode 17 White_Space scalars at the requested edges, preserving all retained
 UTF-8 bytes. A combining mark is retained even when its preceding leading space is
 removed; trimming is scalar classification, while indexing remains grapheme-based.
 Unchanged results reuse the original owner. Changed nonempty results copy only the
-retained text through the checked runtime service, without temporary byte or Char
+retained text through the checked runtime service, without temporary byte or Character
 arrays. These methods must not replace protocol-specific whitespace validation.
 
 
@@ -510,7 +510,7 @@ framing rather than this general text operation for HTTP.
 
 
 Development `Contains(string)`, `StartsWith(string)` and `EndsWith(string)` use
-canonical whole-grapheme matching, consistent with String/Char equality. For example,
+canonical whole-grapheme matching, consistent with String/Character equality. For example,
 `"é".Contains("é")` is true, while `"é".Contains("e")` is false. Each also accepts
 `StringComparison`: Canonical retains those boundaries, Ordinal matches exact UTF-8
 bytes, and OrdinalIgnoreCase matches Unicode 17 simple-folded scalars without
@@ -526,20 +526,20 @@ made. The public overloads have interpreter/JIT/AOT fixtures in the repository's
 `docs/experiments/string-search` directory. Original UTF-8 storage is unchanged.
 
 
-Development `Char.TryFromString(text)` returns `Some(char)` for exactly one
+Development `Character.TryFromString(text)` returns `Some(character)` for exactly one
 Unicode 17 extended grapheme cluster and `None` for empty text or multiple clusters.
 Text is non-null. Original bytes are preserved, including combining marks, CRLF,
 flags, emoji sequences and NUL. The check compares the first cluster's extent with
-the input; it does not build a Char array or normalize text. Successful creation
-uses the existing Char storage and Option carrier, so this is not a zero-allocation
+the input; it does not build a Character array or normalize text. Successful creation
+uses the existing Character storage and Option carrier, so this is not a zero-allocation
 construction guarantee. FromString remains the faulting alternative.
 
-`Char.Equals(other, comparison)` applies Canonical, Ordinal byte identity or
+`Character.Equals(other, comparison)` applies Canonical, Ordinal byte identity or
 OrdinalIgnoreCase simple-fold scalar identity to the entire grapheme. Unknown modes
-fault with RuntimeError. It compares Char storage directly without an intermediate
+fault with RuntimeError. It compares Character storage directly without an intermediate
 String. Canonical remains the default for typed/boxed equality and hashing; callers
 using another equality policy must choose compatible hashing. A general borrowed
-Char.Utf8Bytes view is not implemented: interpreter Char storage still needs an
+Character.Utf8Bytes view is not implemented: interpreter Character storage still needs an
 ownership solution before that contract can avoid copying.
 
 ### Composite formatting (development)

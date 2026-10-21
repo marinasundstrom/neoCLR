@@ -60,7 +60,7 @@ compatibility or a claim of universally faster code.
 
 ## Text keeps its own semantics
 
-A String owns UTF-8 bytes, while Char represents a grapheme rather than a storage
+A String owns UTF-8 bytes, while Character represents a grapheme rather than a storage
 unit. String indexing and slicing remain text operations. `String.Utf8Bytes`
 exposes a borrowed readonly byte view for byte-oriented work without a conversion
 array; it does not change the string's grapheme indexing contract.

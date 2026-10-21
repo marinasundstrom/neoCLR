@@ -4,7 +4,7 @@ import System.Result.*
 import System.Option.*
 import System.Text.Utf8SliceError
 
-public class String : EquatableTo<string>, ComparableTo<string>, Collections.Sequence<char> {
+public class String : EquatableTo<string>, ComparableTo<string>, Collections.Sequence<Character> {
     /// <summary>Formats indexed arguments with escaped braces and optional grapheme alignment.</summary>
     /// <param name="format">Composite text using {index[,alignment][:format]}; {{ and }} escape braces.</param>
     /// <param name="arg0">Values formatted through ToString; null produces empty text.</param>
@@ -95,13 +95,13 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     private field m_value: string
 
     /// Snapshots characters into immutable Unicode text; later input mutation is independent.
-    init(characters: Collections.Sequence<char>) {
+    init(characters: Collections.Sequence<Character>) {
         m_value = CreateFromCharacters(characters)
     }
 
-    internal static func CreateFromCharacters(characters: Collections.Sequence<char>) -> string {
+    internal static func CreateFromCharacters(characters: Collections.Sequence<Character>) -> string {
         let count = characters.Count
-        let snapshot = Runtime.CompilerServices.CheckedStorage.Reserve<char>(count)
+        let snapshot = Runtime.CompilerServices.CheckedStorage.Reserve<Character>(count)
         let iterator = characters.GetIterator()
         var index = 0
         while iterator.MoveNext() {
@@ -115,14 +115,14 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         return neoCLR.Runtime.StringFromChars(snapshot)
     }
 
-    val Collections.Collection<char>.Count: int => neoCLR.Runtime.StringGraphemeCount(m_value)
+    val Collections.Collection<Character>.Count: int => neoCLR.Runtime.StringGraphemeCount(m_value)
 
-    val self[index: int]: char {
+    val self[index: int]: Character {
         get => neoCLR.Runtime.StringGraphemeAt(m_value, index)
     }
 
     /// Applies a directional grapheme index; invalid element bounds fault.
-    val self[index: Index]: char {
+    val self[index: Index]: Character {
         get => neoCLR.Runtime.StringGraphemeAt(m_value, index.GetOffset(Length))
     }
 
@@ -135,7 +135,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     }
 
     /// Returns a grapheme, or None when index is outside the text.
-    func Get(index: int) -> Option<char> {
+    func Get(index: int) -> Option<Character> {
         if index < 0 {
             return None
         }
@@ -146,7 +146,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     }
 
     /// Returns a grapheme at a directional index, or None when outside the text.
-    func Get(index: Index) -> Option<char> => Get(index.GetOffset(Length))
+    func Get(index: Index) -> Option<Character> => Get(index.GetOffset(Length))
 
     /// Copies a grapheme range, or returns InvalidRangeError for invalid bounds.
     func Slice(range: Range) -> Result<string, InvalidRangeError> {
@@ -496,7 +496,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     val Length: int => neoCLR.Runtime.StringGraphemeCount(m_value)
 
 
-    func GetIterator() -> Collections.Iterator<char> {
+    func GetIterator() -> Collections.Iterator<Character> {
         let elements = neoCLR.Runtime.StringGraphemes(m_value)
         return elements.GetIterator()
     }

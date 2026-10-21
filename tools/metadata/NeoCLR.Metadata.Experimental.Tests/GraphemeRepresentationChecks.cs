@@ -12,7 +12,7 @@ internal static class GraphemeRepresentationChecks
             TypeBuilder character;
             if (manual)
             {
-                var definition = new TypeDefinition("System", "Char", 0x109,
+                var definition = new TypeDefinition("System", "Character", 0x109,
                     graph.Definition.MainModule.ImportReference(graph.CoreLibrary, "System", "ValueType"));
                 definition.SetNativeGrapheme();
                 graph.Definition.MainModule.Types.Add(definition);
@@ -20,14 +20,14 @@ internal static class GraphemeRepresentationChecks
             }
             else
             {
-                character = graph.AddValueType("System", "Char");
+                character = graph.AddValueType("System", "Character");
                 character.SetNativeGrapheme();
             }
             var echo = character.AddInstanceMethod("Echo", new(character, []));
             var il = echo.GetILGenerator(); il.LoadArgument(0); il.LoadObject(character); il.Return();
             var image = RuntimeAssemblyContainer.WriteBinary(graph);
             var snapshot = AssemblyDefinition.ReadNativeAssembly(image);
-            var loaded = snapshot.MainModule.Types.Single(t => t.Name == "Char");
+            var loaded = snapshot.MainModule.Types.Single(t => t.Name == "Character");
             if (!loaded.NativeGrapheme || !loaded.IsValueType || loaded.NativePrimitive is not null)
                 throw new Exception("grapheme declaration became numeric or reference storage");
             var view = new MetadataLoadContext([snapshot]).Resolve(snapshot.Identity).GetTypes().Single();
@@ -39,7 +39,7 @@ internal static class GraphemeRepresentationChecks
                 var consumer = new AssemblyBuilder(new(authored ? "AuthoredGraphemeConsumer" : "ImportedGraphemeConsumer", new Version(1, 0, 0, 0)), graph.CoreLibrary);
                 var reference = authored
                     ? consumer.CreateValueTypeReference(snapshot.Identity, graph.CoreLibrary,
-                        Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "System", "Char")
+                        Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "System", "Character")
                     : consumer.ImportReference(loaded, graph.CoreLibrary);
                 consumer.SetNativeGrapheme(reference);
                 Reject(() => consumer.CreateMethodReference(reference, ".ctor", new(PrimitiveType.Void, [])));
@@ -63,7 +63,7 @@ internal static class GraphemeRepresentationChecks
                 Reject(() => _ = missing.Resolve(consumerSnapshot.Identity).GetModules().SelectMany(module => module.GetFunctions()).Single().ReturnType);
                 Reject(() => graph.SetNativeGrapheme(reference));
                 Reject(() => consumer.SetNativeGrapheme(consumer.CreateValueTypeReference(
-                    new("WrongOwner", new Version(1, 0, 0, 0)), graph.CoreLibrary, new string('a', 64), "System", "Char")));
+                    new("WrongOwner", new Version(1, 0, 0, 0)), graph.CoreLibrary, new string('a', 64), "System", "Character")));
                 if (!manual && Environment.GetEnvironmentVariable("NEOCLR_GRAPHEME_ARTIFACT") is { } consumerPath)
                 {
                     File.WriteAllBytes(consumerPath + (authored ? ".authored" : ".imported"), consumerImage);
@@ -80,23 +80,24 @@ internal static class GraphemeRepresentationChecks
         {
             var duplicate = new AssemblyBuilder(new("Duplicate", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
             var external = duplicate.CreateValueTypeReference(new("External", new Version(1, 0, 0, 0)), duplicate.CoreLibrary,
-                new string('d', 64), "System", "Char");
+                new string('d', 64), "System", "Character");
             if (externalFirst) duplicate.SetNativeGrapheme(external);
-            duplicate.AddValueType("System", "Char").SetNativeGrapheme();
+            duplicate.AddValueType("System", "Character").SetNativeGrapheme();
             if (externalFirst) Reject(() => duplicate.WriteNativeAssembly());
             else Reject(() => duplicate.SetNativeGrapheme(external));
         }
         var invalid = new AssemblyBuilder(new("Invalid", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
         Reject(() => invalid.SetNativeGrapheme(null!));
         var late = invalid.CreateValueTypeReference(new("Late", new Version(1, 0, 0, 0)), invalid.CoreLibrary,
-            new string('b', 64), "System", "Char");
+            new string('b', 64), "System", "Character");
         invalid.CreateMethodReference(late, "Ordinary", new(PrimitiveType.Int32, []));
         Reject(() => invalid.SetNativeGrapheme(late));
         var wrong = invalid.CreateValueTypeReference(new("Wrong", new Version(1, 0, 0, 0)), invalid.CoreLibrary,
-            new string('c', 64), "Other", "Char");
+            new string('c', 64), "Other", "Character");
         Reject(() => invalid.SetNativeGrapheme(wrong));
-        Reject(() => invalid.AddClass("System", "Char").SetNativeGrapheme());
-        Reject(() => invalid.AddValueType("Other", "Char").SetNativeGrapheme());
+        Reject(() => invalid.AddClass("System", "Character").SetNativeGrapheme());
+        Reject(() => invalid.AddValueType("Other", "Character").SetNativeGrapheme());
+        Reject(() => invalid.AddValueType("System", "Char").SetNativeGrapheme());
     }
     private static void Reject(Action action)
     {

@@ -19,7 +19,7 @@ Legacy Console.WriteLine diagnostics and ReadByte retain their immediate host pa
 | `Console.Error` | `SyncTextWriter` | Write UTF-8 standard error |
 | `OpenStandardInput()` | `SyncInputStream` | Read raw bytes |
 | `OpenStandardOutput()` / `OpenStandardError()` | `SyncOutputStream` | Write raw bytes without text conversion |
-| `PeekChar()` / `ReadChar()` | `Result<Option<char>, TextReadError>` | Peek/read one grapheme; None at EOF |
+| `PeekChar()` / `ReadChar()` | `Result<Option<Character>, TextReadError>` | Peek/read one grapheme; None at EOF |
 | `Read(count)` / `Read(count, maxUtf8Bytes)` | `Result<string, TextReadError>` | Requested grapheme count, shorter at EOF |
 | `ReadLine()` | `Result<Option<string>, TextReadError>` | Read a line with a 65536-byte content bound |
 | `ReadLine(maxUtf8Bytes)` | `Result<Option<string>, TextReadError>` | Read a line with an explicit content bound |
@@ -39,7 +39,7 @@ TextReader/TextWriter or InputStream/OutputStream directly for custom destinatio
 TextReader and StreamReader also expose `PeekChar()`, `ReadChar()`, `Read(count)`
 and `Read(count, maxUtf8Bytes)`, matching the Console convenience methods.
 Peek does not advance the **logical text cursor**, but may read and buffer underlying
-bytes. Repeated peeks reuse the cached Char. The next read sees the same original
+bytes. Repeated peeks reuse the cached Character. The next read sees the same original
 UTF-8 spelling, including combining marks and emoji sequences.
 
 Counted Read waits for the requested number of complete graphemes, or returns a
@@ -62,7 +62,7 @@ cancellation remain separate work. Result, String and decoder allocations remain
 this is not an allocation-free console API.
 
 .NET's [Peek](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.peek?view=net-10.0)
-is synchronous and uses an integer sentinel. neoCLR uses Option with its grapheme Char model; StreamReader offers async peek
+is synchronous and uses an integer sentinel. neoCLR uses Option with its grapheme Character model; StreamReader offers async peek
 and SyncStreamReader/Console offer direct peek. Counted reads follow the fill-or-EOF behavior
 of [.NET ReadBlockAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.readblockasync?view=net-10.0),
 returning UTF-8 String rather than filling a UTF-16 character buffer. This preserves
@@ -203,9 +203,9 @@ the Task contract describes possible future completion without claiming that thi
 ## Object and scalar output
 
 WriteLine(object?) calls virtual ToString and writes an empty line for null.
-Specific overloads accept Boolean, Char, SByte, Byte, Int16, UInt16, Int32, UInt32,
+Specific overloads accept Boolean, Character, SByte, Byte, Int16, UInt16, Int32, UInt32,
 Int64, UInt64, IntPtr and UIntPtr without boxing. Integers use invariant decimal
-text; Boolean writes True/False; Char writes its neoCLR grapheme text. Existing
+text; Boolean writes True/False; Character writes its neoCLR grapheme text. Existing
 string and Int32 overloads remain preferred over object.
 
 The object overload preserves the type's current ToString contract. Floating-point

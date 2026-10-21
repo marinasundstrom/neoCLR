@@ -3,7 +3,7 @@
 <a id="casing-and-decimal-reporting-development"></a>
 
 The native **text model is Unicode text**; **UTF-8 is the native storage representation**.
-String exposes grapheme and scalar views. Char represents one grapheme cluster, potentially
+String exposes grapheme and scalar views. Character represents one grapheme cluster, potentially
 containing several scalar values. Scalar APIs currently use uint and UnicodeScalar helpers;
 a dedicated rune type is not implemented. Byte represents one encoded byte.
 
@@ -52,7 +52,7 @@ The executable report consumer is maintained in
 `+`, `-`, `*`, `/` operators, and inherited `CompareTo`. Implementers are SByte,
 Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single and Double, plus the
 development native Decimal value type described below. Boolean and
-Char are not numbers. There is no Parsable interface; numeric-specific parsing
+Character are not numbers. There is no Parsable interface; numeric-specific parsing
 remains a future design question.
 
 Integer addition/subtraction/multiplication wrap at the destination width. Integer

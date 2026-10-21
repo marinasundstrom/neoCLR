@@ -10523,3 +10523,13 @@ selection of this import path; ordinary .NET compilation is unchanged. SDK
 composition-import and authored-composition tests pass, and the freshly compiled
 HTTP client/server pass interpreter end-to-end requests (including UTF-8 JSON and
 invalid input). Fresh packaged SDK/JIT qualification remains separate.
+
+### Development Character identity (2026-10-21)
+
+Native grapheme owners and references now require `System.Character`, replacing
+`System.Char` in the native APIs described above. The serialized `Char` tag and
+runtime service names are unchanged implementation details. Rebuild all native
+consumers with the matching compiler/library; this is a development API migration.
+Ordinary CLI `System.Char` imports, including signed core scope and `0x03` encoding,
+remain UTF-16 code units. The focused metadata checks use a small separate CLI
+fixture so they do not depend on the full test runner's field count.

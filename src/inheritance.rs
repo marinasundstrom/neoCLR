@@ -26,7 +26,7 @@ pub(crate) fn has_intrinsic_string_root(
 // Text keeps intrinsic storage while implementing the selected Object slots.
 fn has_text_object_root(module: &Module, definition: &crate::metadata::TypeDef) -> bool {
     has_intrinsic_string_root(module, definition)
-        || (definition.name == "System.Char"
+        || (definition.name == "System.Character"
             && definition.representation == Representation::Runtime
             && has_value_type_root(module, definition))
 }

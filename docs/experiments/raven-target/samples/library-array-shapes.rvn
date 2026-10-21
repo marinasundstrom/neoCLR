@@ -6,7 +6,7 @@ func Show(value: long) {
 }
 
 func ShowType(value: TypeInfo) {
-    WriteLine(value.Name)
+    WriteLine(value.DisplayName)
 }
 
 func Main() {
@@ -20,13 +20,15 @@ func Main() {
     }
     let types: TypeInfo[] = [typeof(int), typeof(string)]
     types.ForEach(ShowType)
-    let comparisons: ComparableTo<int>[] = [42]
-    WriteLine(comparisons[0].CompareTo(42))
+    let comparisons: EquatableTo<int>[] = [42]
+    if comparisons[0].Equals(42) {
+        WriteLine(0)
+    }
     let bytes: byte[] = [(byte)255]
     WriteLine((int)bytes[0])
     let shorts: ushort[] = [(ushort)65535]
     WriteLine((int)shorts[0])
-    let chars: char[] = ['é']
+    let chars: Character[] = ['é']
     WriteLine(chars[0].ToString())
     let nested: int[][] = [[42]]
     WriteLine(nested[0][0])

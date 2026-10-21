@@ -8,4 +8,5 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup><ProjectReference Include="../NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../NeoCLR.Metadata.CharacterFixture/NeoCLR.Metadata.CharacterFixture.csproj" /></ItemGroup>
 </Project>

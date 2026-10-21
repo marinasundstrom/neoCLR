@@ -127,7 +127,7 @@ func GenericText() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Wrapped { Value = True }", Wrapped<bool>(true).ToString())?
     _ = Assert.Equal("Wrapped { Value = NaN }", Wrapped<double>(Double.NaN).ToString())?
     _ = Assert.Equal("Wrapped { Value = \"é\\\"\\\\\" }", Wrapped<string>("é\"\\").ToString())?
-    _ = Assert.Equal("Wrapped { Value = 'é' }", Wrapped<Char>('é').ToString())?
+    _ = Assert.Equal("Wrapped { Value = 'é' }", Wrapped<Character>('é').ToString())?
     _ = Assert.Equal("Wrapped { Value = \"text\" }", Wrapped<object>("text").ToString())?
     return Assert.Equal("Wrapped { Value = null }", Wrapped<string?>(null).ToString())
 }

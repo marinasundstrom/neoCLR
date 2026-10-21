@@ -5,7 +5,7 @@ func ShowLong(value: long, other: long) {
     WriteLine(value.CompareTo(other))
 }
 
-func ShowChar(value: char, other: char) {
+func ShowChar(value: Character, other: Character) {
     WriteLine(value.CompareTo(other))
 }
 
@@ -14,8 +14,8 @@ func Main() {
     let octet: byte = 255b
     let small: short = (short)-32768
     let wide: ushort = (ushort)65535
-    let unsigned: uint = (uint)-1
-    let large: ulong = (ulong)-1L
+    let unsigned: uint = unchecked((uint)-1)
+    let large: ulong = unchecked((ulong)-1L)
     let single: float = 1.5f
     WriteLine(signed.CompareTo((sbyte)0))
     WriteLine(octet.CompareTo((byte)0))

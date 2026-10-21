@@ -19,8 +19,8 @@ fn integer_ordering_is_overflow_safe_and_uses_typed_interfaces() {
         ("Boolean", "ldc.bool false", "ldc.bool true"),
         (
             "Char",
-            "ldstr \"A\"\ncall System.Char::FromString(String)",
-            "ldstr \"é\"\ncall System.Char::FromString(String)",
+            "ldstr \"A\"\ncall System.Character::FromString(String)",
+            "ldstr \"é\"\ncall System.Character::FromString(String)",
         ),
         ("Int32", "ldc.i4 -2147483648", "ldc.i4 2147483647"),
         (

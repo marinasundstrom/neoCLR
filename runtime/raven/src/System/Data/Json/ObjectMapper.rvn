@@ -39,7 +39,7 @@ internal class ObjectMapper {
            type.Equals(typeof(UInt32)) || type.Equals(typeof(Int64)) ||
            type.Equals(typeof(UInt64)) || type.Equals(typeof(IntPtr)) ||
            type.Equals(typeof(UIntPtr)) || type.Equals(typeof(Single)) ||
-           type.Equals(typeof(Double)) || type.Equals(typeof(Char)) ||
+           type.Equals(typeof(Double)) || type.Equals(typeof(Character)) ||
            type.Equals(typeof(RuntimeTypeHandle)) {
             return Error(JsonError.UnsupportedMapping("Unsupported scalar type"))
         }

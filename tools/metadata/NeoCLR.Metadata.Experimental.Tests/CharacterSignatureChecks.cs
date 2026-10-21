@@ -21,7 +21,7 @@ internal static class CharacterSignatureChecks
             var il = echo.GetILGenerator(); il.LoadArgument(0); il.Return();
         }
         var unbound = new AssemblyBuilder(new("UnboundGrapheme", new Version(1, 0, 0, 0)), core);
-        unbound.AddValueType("System", "Char").SetNativeGrapheme();
+        unbound.AddValueType("System", "Character").SetNativeGrapheme();
         var ordinary = unbound.ImportReference(fixture.Methods.Single(m => m.Name == "Echo"), core);
         if (ordinary.Signature.ReturnType.ImportedType?.AssemblyIdentity != core)
             throw new Exception("unbound CLI Char must not select native storage");
@@ -43,10 +43,4 @@ internal static class CharacterSignatureChecks
         }
         finally { context.Unload(); }
     }
-}
-
-public static class CharacterFixture
-{
-    public static char Echo(char value) => value;
-    public static char[] Vector(char[] value) => value;
 }

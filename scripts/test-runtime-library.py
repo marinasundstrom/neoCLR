@@ -238,6 +238,7 @@ MEMORY_STREAM_NAMES = [
     'MemoryStream overwrites preserve length and untouched bytes',
 ]
 STRING_CONSTRUCTION_NAMES = [
+    'Character literals preserve graphemes and allow char identifiers',
     'String construction copies character storage',
     'String construction accepts an empty character sequence',
     'String construction preserves and merges grapheme boundaries',

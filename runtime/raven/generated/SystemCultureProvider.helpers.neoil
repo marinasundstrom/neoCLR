@@ -24,7 +24,7 @@ ret
 .end
 .function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeCharToString(Char& source) -> String
 ldarg source
-call instance System.Char::ToString()
+call instance System.Character::ToString()
 ret
 .end
 .function neoCLR.Library.System.Globalization.SystemCultureProvider.RuntimeBooleanFromInt32(Int32 value) -> Boolean

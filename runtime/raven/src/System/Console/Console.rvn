@@ -175,7 +175,7 @@ public static class Console {
         WriteLine(if value { "True" } else { "False" })
     }
 
-    static func WriteLine(value: char) {
+    static func WriteLine(value: Character) {
         WriteLine(neoCLR.Runtime.CharText(value))
     }
 
@@ -250,13 +250,13 @@ public static class Console {
     static func OpenStandardError() -> SyncOutputStream => ConsoleOutputStream(true)
 
     /// <summary>Peeks at the next UTF-8 grapheme without advancing Console.In.</summary>
-    /// <returns>Returned Char, None at EOF, or a text read error.</returns>
+    /// <returns>Returned Character, None at EOF, or a text read error.</returns>
     /// <remarks>May read ahead to find a grapheme boundary. Shares the invocation-owned text reader.</remarks>
-    static func PeekChar() -> Result<Option<char>, TextReadError> => In.PeekChar()
+    static func PeekChar() -> Result<Option<Character>, TextReadError> => In.PeekChar()
 
     /// <summary>Reads one UTF-8 grapheme from the shared Console.In cursor.</summary>
-    /// <returns>Returned Char, None at EOF, or a text read error.</returns>
-    static func ReadChar() -> Result<Option<char>, TextReadError> => In.ReadChar()
+    /// <returns>Returned Character, None at EOF, or a text read error.</returns>
+    static func ReadChar() -> Result<Option<Character>, TextReadError> => In.ReadChar()
 
     /// <summary>Reads a requested grapheme count, or the shorter remainder at EOF.</summary>
     /// <param name="count">Count from zero through 65536; zero consumes nothing.</param>

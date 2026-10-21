@@ -1,3 +1,4 @@
+import System.*
 import System.Runtime.CompilerServices.*
 
 module neoCLR.Runtime
@@ -12,10 +13,10 @@ internal extern func Int32ToString(arg0: int) -> string;
 internal extern func Int64ToString(arg0: long) -> string;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func StringFromChars(arg0: char[]) -> string;
+internal extern func StringFromChars(arg0: Character[]) -> string;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func StringGraphemeAt(arg0: string, arg1: int) -> char;
+internal extern func StringGraphemeAt(arg0: string, arg1: int) -> Character;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringIntern(arg0: string) -> string;
@@ -48,10 +49,10 @@ internal extern func StringEndsWithOrdinal(arg0: string, arg1: string) -> bool;
 internal extern func StringGraphemeCount(arg0: string) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CharFromString(arg0: string) -> char;
+internal extern func CharFromString(arg0: string) -> Character;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CharText(arg0: char) -> string;
+internal extern func CharText(arg0: Character) -> string;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func CharCategory(arg0: uint) -> int;
@@ -78,7 +79,7 @@ internal extern func Utf8Decode(arg0: byte[]) -> System.Value;
 internal extern func Utf8DecodeSlice(bytes: System.ReadOnlySlice<byte>) -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func StringGraphemes(text: string) -> char[];
+internal extern func StringGraphemes(text: string) -> Character[];
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringScalars(text: string) -> uint[];
@@ -99,7 +100,7 @@ internal func StringEquals(left: string, right: string) -> bool {
 }
 
 
-// Canonical services preserve stored UTF-8 bytes. Char operations consume the
+// Canonical services preserve stored UTF-8 bytes. Character operations consume the
 // grapheme directly, avoiding intermediate CharText string allocations.
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringCompareCanonical(left: string, right: string) -> int;
@@ -108,10 +109,10 @@ internal extern func StringCompareCanonical(left: string, right: string) -> int;
 internal extern func StringHashCanonical(text: string) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CharCompareCanonical(left: char, right: char) -> int;
+internal extern func CharCompareCanonical(left: Character, right: Character) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CharHashCanonical(value: char) -> int;
+internal extern func CharHashCanonical(value: Character) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func StringContainsCanonical(text: string, pattern: string) -> bool;
@@ -130,10 +131,10 @@ internal extern func StringEndsWithOrdinalIgnoreCase(text: string, pattern: stri
 internal extern func CharIsSingleGrapheme(text: string) -> bool;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CharCompareOrdinal(left: char, right: char) -> int;
+internal extern func CharCompareOrdinal(left: Character, right: Character) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
-internal extern func CharCompareOrdinalIgnoreCase(left: char, right: char) -> int;
+internal extern func CharCompareOrdinalIgnoreCase(left: Character, right: Character) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func FormatSingle(value: float, code: int, precision: int, swedish: bool) -> string;

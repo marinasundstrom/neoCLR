@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Character naming (author direction, 2026-10-21):** Rename the development
+grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain
+ordinary .NET `Char`. This bounded API clarification preserves storage and text
+semantics. [Integration and migration](raven-cli-bridge.md#character-naming-contract-2026-10-21)
+record validation; native buffer and release work remain the active priorities.
+
 **Native buffer evaluation (author direction, 2026-10-21):** Review basic native
 imports and managed/native memory integration for library authors. Fix the bounded
 no-result native-call validation gap; retain JIT/AOT imports, scoped managed

@@ -147,6 +147,12 @@ if (args is ["--check-module-consumer", var moduleConsumer])
     Console.WriteLine("PASS Raven explicit and empty logical modules through host introspection"); return 0;
 }
 
+if (args.Contains("--character-signatures"))
+{
+    GraphemeRepresentationChecks.Run();
+    CharacterSignatureChecks.Run();
+    return 0;
+}
 if (args.Length >= 1 && args[0] == "--declaration-modules") { DeclarationModuleChecks.Run(args.Length > 1 ? args[1] : null); return 0; }
 
 if (args is ["--erased-values", var valueOutput]) { ErasedValueChecks.Run(valueOutput); return 0; }

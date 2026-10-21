@@ -36,7 +36,7 @@ fn grapheme_construction_preserves_text_and_validates_host_values() {
         let value = Value::Char(text.into());
         assert_eq!(
             invoke(
-                "System.Char::FromString(String)",
+                "System.Character::FromString(String)",
                 vec![Value::String(text.into())]
             )
             .unwrap(),
@@ -47,7 +47,7 @@ fn grapheme_construction_preserves_text_and_validates_host_values() {
     for text in ["", "ab", "🇸🇪🇩🇰", "a\0"] {
         assert!(
             invoke(
-                "System.Char::FromString(String)",
+                "System.Character::FromString(String)",
                 vec![Value::String(text.into())]
             )
             .is_err()

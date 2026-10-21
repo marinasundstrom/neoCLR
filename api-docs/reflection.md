@@ -149,7 +149,7 @@ vector. Input element storage is copied; referenced objects retain identity. Ope
 use ordinary VM type, bounds, allocation and rooting checks. Invalid indexes, wrong
 boxed types, null array inputs, unbound descriptors and unsupported element types cause
 terminal runtime Faults; these methods do not return ReflectionError. Supported elements
-are the runtime's built-in numeric/Boolean/Char scalars and object-reference types,
+are the runtime's built-in numeric/Boolean/Character scalars and object-reference types,
 including arrays. Custom structs/unions and multidimensional arrays are unsupported.
 
 Compared with [.NET Array](https://learn.microsoft.com/en-us/dotnet/api/system.array),

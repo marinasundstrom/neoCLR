@@ -38,3 +38,8 @@ manifest expansion, test include_str calls, examples and historical bridge tools
 Migrate active consumers to native Raven artifacts or purpose-specific test
 fixtures, retain a reproducible historical bundle where needed, and verify those
 consumers. Archiving mirrors is separate from deleting neoIL support or tests.
+
+Development Character migration (2026-10-21): the retained neoIL fixtures now use
+`System.Character` for canonical runtime identity. Their old CLI generation JSON
+receipts remain historical records, not fresh build evidence. Production libraries
+are rebuilt from the Raven projects; the native bundle records current source hashes.

@@ -20954,3 +20954,21 @@ native view ownership remain subsequent work, not completed by the compiler fix.
 - **Open:** Pointer arithmetic and scoped Slice conversion require separate layout,
   bounds and lifetime qualification. No ownership or safety guarantee is inferred
   from address equality.
+
+## 2026-10-21 — Name the grapheme type Character
+
+- **Author:** Asked to rename the char class to Character to distinguish it from
+  code-unit char, and to make the char keyword unavailable as a mapped keyword on
+  neoCLR targets. Subsequently directed continuation.
+- **Assistant:** Implemented the parser policy on Raven main first, then carried
+  it to the native compiler branch. Renamed the Raven library type and canonical
+  native ownership while retaining the runtime grapheme representation. .NET's
+  Char remains unchanged. This follows the existing text model; it is not a
+  new string-view design or an allocation optimization.
+- **Actions/evidence:** Updated the source library, compiler/editor policy,
+  metadata SDK, retained neoIL test mirrors and current API/website guidance.
+  [Integration details](raven-cli-bridge.md#character-naming-contract-2026-10-21)
+  distinguish the public API from the internal Char wire tag. Test results and
+  remaining release qualification are recorded with the implementation changelog.
+- **Open:** Native borrowing, native Memory ownership and broader release
+  qualification remain separate work; this naming request does not close them.
