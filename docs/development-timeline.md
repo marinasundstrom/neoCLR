@@ -20854,3 +20854,12 @@ records 114 built-in executions. The broader unrelated JSON run was stopped,
 not reported as passed. A native replay initially reused an object-file output;
 a clean output path corrected that validation-script error. Runtime/backend
 regressions, lint and API documentation checks pass.
+
+### 2026-10-21 — Distinguish editor JIT execution from native compilation
+
+The author requested a default VS Code option to compile and run with JIT, with
+an explicit option to compile into native code. The assistant implemented generated
+development tasks named Build and Run (JIT) and Compile to Native, preserving the
+ordinary .NET path. The native task uses the existing separate build kit and its
+platform/profile limits; it does not imply arbitrary AOT support or a published
+release. See [editor actions](native-poc-bundle.md#development-editor-execution-actions-2026-10-21).

@@ -74,11 +74,18 @@ if not a.installed_editor:
     editor_settings['raven.languageServerPath'] = str(server)
 (vscode / 'settings.json').write_text(json.dumps(editor_settings, indent=2))
 tasks = []
-for name, tail in [('Build', []), ('Run', ['--run', str(a.runtime.resolve())])]:
+for name, tail in [('Build', []), ('Build and Run (JIT)', ['--run', str(a.runtime.resolve()), '--execution', 'jit'])]:
     tasks.append(dict(label='neoCLR: ' + name, type='process', command='dotnet',
         args=[str(compiler), 'neoclr', '--project', '${workspaceFolder}/App.rvnproj'] + tail,
-        group='build' if name == 'Build' else 'test', problemMatcher=[]))
-(vscode / 'tasks.json').write_text(json.dumps({'version': '2.0.0', 'tasks': tasks}, indent=2))
+        group=dict(kind='build', isDefault=True) if name != 'Build' else 'build', problemMatcher=[]))
+tasks.append(dict(label='neoCLR: Compile to Native', type='process', command='python3',
+    args=['${input:nativeBuildKit}/scripts/build-native-project.py', '--project',
+          '${workspaceFolder}/App.rvnproj', '--output', '${input:nativeOutput}'], problemMatcher=[]))
+inputs = [dict(id='nativeBuildKit', type='promptString',
+               description='Matching extracted native build kit directory (currently macOS ARM64)'),
+          dict(id='nativeOutput', type='promptString',
+               description='New absolute output directory for the native executable (must not exist)')]
+(vscode / 'tasks.json').write_text(json.dumps({'version': '2.0.0', 'tasks': tasks, 'inputs': inputs}, indent=2))
 (out / 'acceptance.json').write_text(json.dumps({'compiler': str(compiler), 'runtime': str(a.runtime.resolve()), 'classLibraryBundle': bool(a.bundle), 'bundleDocumentation': bool(a.bundle and json.loads((refs / 'bundle.json').read_text()).get('documentation'))}, indent=2))
 print(out)
 

@@ -395,3 +395,27 @@ It reuses the selected bundle's explicit primitive-only Core.dll and compiler;
 it does not claim to remove the primitive bootstrap. The output must be new and
 is a development artifact, not a reissued Preview 13 release. The Windows HTTP
 Actions perform this preparation automatically using the pinned archive.
+
+### Development editor execution actions (2026-10-21)
+
+Generated development sample tasks use **neoCLR: Build and Run (JIT)** as the
+default build action (`Tasks: Run Build Task`). This compiles saved Raven source
+to a neoCLR assembly and explicitly runs it with JIT. Missing JIT tools are an
+error, never a silent interpreter fallback. Interpreter execution remains an
+explicit runner option (`--execution interpreter`).
+
+**neoCLR: Compile to Native** is a separate AOT build action. It prompts for a
+matching extracted native build kit and a new absolute output directory, then
+uses the kit's existing checked compiler/linker pipeline. It produces an executable
+and build report without running the program. Current packaged build kits target
+macOS ARM64 and require Apple build tools; HTTP samples select the bounded HTTP
+host and JSON samples retain their declared reflection types. Native compilation
+still has the build kit's documented runtime/profile limits. Repeated builds
+currently require fresh output directories. A native build kit is separate from
+the JIT bundle; the ordinary Raven/.NET extension execution path is unchanged.
+
+The editor fixture uses the explicit native compiler command
+`rvnc neoclr --project App.rvnproj --run /path/to/neoclr --execution jit`.
+This new selector affects execution only; omitted selectors retain the existing
+interpreter command behavior for diagnostic consumers. No Runtime Contract,
+metadata representation or ABI changes.

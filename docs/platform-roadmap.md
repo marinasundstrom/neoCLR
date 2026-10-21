@@ -5710,3 +5710,14 @@ Author-directed HTTP API follow-up (2026-10-19): expose message Version and requ
 disposal before continuing native expression lowering. The current version value
 reports HTTP/1.1 only; it does not establish negotiation or additional protocols.
 ReasonPhrase preservation for client responses is the next bounded metadata slice.
+
+#### Release qualification update — 2026-10-21
+
+Author-directed editor refinement: generated development tasks now distinguish
+default **Build and Run (JIT)** from explicit **Compile to Native** using the
+existing platform-limited build kit. This does not expand AOT support or change
+milestone priorities. Six task/runner tests and exact collections JIT output pass;
+matching SDK/installed-editor qualification is still required before release.
+The HTTP JSON generic-composition import blocker is repaired (033942653), with
+SDK contract tests and client/server interpreter requests passing.
+See [development editor contract](native-poc-bundle.md#development-editor-execution-actions-2026-10-21).

@@ -214,6 +214,10 @@ exports.run = async function () {
     const tasks = await vscode.tasks.fetchTasks();
     const build = tasks.find(t => t.name === 'neoCLR: Build');
     assert(build, 'configured native build task');
+    const jit = tasks.find(t => t.name === 'neoCLR: Build and Run (JIT)');
+    assert(jit && jit.group && jit.group.isDefault, 'JIT is the default build action');
+    assert.deepStrictEqual(jit.execution.args.slice(-2), ['--execution', 'jit']);
+    assert(tasks.some(t => t.name === 'neoCLR: Compile to Native'), 'separate native compilation action');
     assert.strictEqual(await taskExit(build), 0); record('configured VS Code native build task');
     const capturedTask = (taskFolder, taskRoot, project, name) => {
       const capture = 'import pathlib,subprocess,sys; r=subprocess.run(sys.argv[3:],capture_output=True); pathlib.Path(sys.argv[1]).write_bytes(r.stdout); pathlib.Path(sys.argv[2]).write_bytes(r.stderr); sys.exit(r.returncode)';

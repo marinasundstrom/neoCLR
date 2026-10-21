@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Make generated development VS Code tasks default to Build and Run (JIT), with explicit execution selection and a separate Compile to Native action using a matching build kit. Native compilation builds without launching and retains macOS ARM64/profile/fresh-output limits; ordinary .NET execution is unchanged. Six runner/task tests, exact collections output under JIT, and three CLI option rejection controls pass. Update development website guidance without relabeling published preview downloads; refreshed installed-editor/native-kit qualification remains pending.
+
 - Repair explicit native composition imports for generic static methods and value/interface wrappers, closing the HTTP JSON extension import gap without changing HTTP APIs or metadata ABI. Keep default imports and composed-storage closure opt-in. SDK composition/import tests and freshly compiled HTTP client/server interpreter requests pass; package/JIT qualification remains pending.
 
 - Resume fresh package qualification after record stabilization. Pin the Windows workflow default to Raven 328349bf7 and expose an internal SDK/VSIX version input instead of silently reusing the superseded October 19 candidate version. This starts qualification, not release publication. The clean-source run exposed stale assertions that floating Object display was unavailable; update them to verify the existing Single/Double output, with a passing focused regression. No runtime behavior changes.

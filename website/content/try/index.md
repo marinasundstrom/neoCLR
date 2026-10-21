@@ -36,6 +36,13 @@ the extracted folder. Open `application-order-collections.rvn`, then choose
 The task compiles your Raven code and runs it on neoCLR. Try the `tasks` and `json`
 sample folders next.
 
+Development bundles for the next release provide **neoCLR: Build and Run (JIT)**
+as the default build task, plus a separate **neoCLR: Compile to Native** action.
+The native action requires a matching build kit (currently macOS ARM64), Apple
+build tools, and a fresh output directory; it builds without launching the result.
+These task labels are development changes; the preview.16 download above retains
+its existing **neoCLR: Run** task.
+
 [Learn Raven →](../raven/) · [Explore the APIs →](../docs/)
 
 <a id="project"></a>

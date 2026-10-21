@@ -54,6 +54,8 @@ def reflection_roots(runtime, assembly, names, run, constructors=False, methods=
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('sample')
+    parser.add_argument('--execution', choices=('jit', 'interpreter'),
+                        help='Explicit execution mode; otherwise use the bundle default')
     parser.add_argument('--bundle', type=Path, default=Path(__file__).resolve().parent.parent)
     parser.epilog = 'Pass program arguments after --, for example: http-json-client -- http://127.0.0.1:8080/'
     command_line = sys.argv[1:]
@@ -70,8 +72,9 @@ def main():
         return subprocess.run(list(map(str, command)), cwd=folder, check=True)
     run(['dotnet', root / 'sdk/tools/rvnc/rvnc.dll', 'neoclr', '--project', folder / 'App.rvnproj'])
     assembly = folder / 'bin/neoclr/App.dll'
-    if manifest.get('jit', {}).get('default'):
-        context = reflection_roots(runtime, assembly, manifest['samples'][args.sample].get('reflectionTypes', []), run)
+    if args.execution == 'jit' or (args.execution is None and manifest.get('jit', {}).get('default')):
+        context = ['--execution', 'jit', *reflection_roots(
+            runtime, assembly, manifest['samples'][args.sample].get('reflectionTypes', []), run)]
     else:
         context = ['--execution', 'interpreter', '--system', root / manifest['runtimeSeed'],
                    '--instructions', '100000000']

@@ -33,6 +33,20 @@ class SampleArguments(unittest.TestCase):
             self.assertEqual(command[command.index('--') + 1:], guest)
             self.assertEqual(command[0], str(root.resolve() / 'bin/neoclr'))
 
+    def test_jit_task_never_silently_falls_back_to_interpretation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'samples/json').mkdir(parents=True)
+            (root / 'manifest.json').write_text(json.dumps(dict(
+                samples={'json': {}}, runtime='bin/neoclr', modules=[])))
+            with patch.object(sys, 'argv', ['runner', 'json', '--bundle', str(root), '--execution', 'jit']), \
+                    patch.object(runner.subprocess, 'run'), \
+                    patch.object(runner.subprocess, 'call', return_value=7) as execute:
+                with self.assertRaises(SystemExit) as result:
+                    runner.main()
+            self.assertEqual(result.exception.code, 7)
+            self.assertEqual(execute.call_args.args[0][-2:], ['--execution', 'jit'])
+
     def test_reflection_preparation_can_repeat_without_overwriting_a_listing(self):
         with tempfile.TemporaryDirectory() as directory:
             assembly = Path(directory) / 'App.dll'
@@ -101,8 +115,17 @@ class SampleArguments(unittest.TestCase):
                 self.assertEqual(tasks['tasks'][0]['args'][-2:], ['--', '${input:' + identifier + '}'])
                 self.assertEqual(tasks['inputs'][0]['id'], identifier)
             tasks = json.loads((root / 'samples/json/.vscode/tasks.json').read_text())
-            self.assertNotIn('inputs', tasks)
-            self.assertEqual(tasks['tasks'][0]['args'][-1], 'json')
+            self.assertEqual(tasks['tasks'][0]['args'][-2:], ['--execution', 'jit'])
+            for name in names:
+                tasks = json.loads((root / 'samples' / name / '.vscode/tasks.json').read_text())
+                default, native = tasks['tasks']
+                self.assertEqual(default['label'], 'neoCLR: Build and Run (JIT)')
+                self.assertEqual(default['group'], dict(kind='build', isDefault=True))
+                self.assertEqual(native['label'], 'neoCLR: Compile to Native')
+                self.assertNotIn('group', native)
+                self.assertEqual(native['args'][1:3], ['--project', '${workspaceFolder}/App.rvnproj'])
+                self.assertNotIn('--run', native['args'])
+                self.assertIn('nativeBuildKit', [item['id'] for item in tasks['inputs']])
 
 
 if __name__ == '__main__':

@@ -37,7 +37,7 @@ def configure_editor_tasks(bundle, names):
     for name in names:
         settings = bundle / 'samples' / name / '.vscode'
         settings.mkdir(exist_ok=True)
-        arguments = ['${workspaceFolder}/../../tools/run-native-sample.py', name]
+        arguments = ['${workspaceFolder}/../../tools/run-native-sample.py', name, '--execution', 'jit']
         inputs = []
         if name == 'http-json-server':
             inputs = [dict(id='requestCount', type='promptString',
@@ -48,8 +48,20 @@ def configure_editor_tasks(bundle, names):
                            description='Server URL using the port printed by the server', default='http://127.0.0.1:8080/')]
             arguments += ['--', '${input:serverUrl}']
         tasks = {'version': '2.0.0', 'tasks': [dict(
-            label='neoCLR: Run', type='process', command='python3', args=arguments,
-            problemMatcher=[])]}
+            label='neoCLR: Build and Run (JIT)', type='process', command='python3', args=arguments,
+            group=dict(kind='build', isDefault=True), problemMatcher=[])]}
+        native_arguments = ['${input:nativeBuildKit}/scripts/build-native-project.py',
+                            '--project', '${workspaceFolder}/App.rvnproj',
+                            '--output', '${input:nativeOutput}',
+                            '--profile', 'http' if name.startswith('http-') else 'console']
+        for type_name in sample_definitions()[name][2]:
+            native_arguments += ['--reflection-type', type_name]
+        tasks['tasks'].append(dict(label='neoCLR: Compile to Native', type='process',
+                                   command='python3', args=native_arguments, problemMatcher=[]))
+        inputs += [dict(id='nativeBuildKit', type='promptString',
+                        description='Matching extracted native build kit directory (currently macOS ARM64)'),
+                   dict(id='nativeOutput', type='promptString',
+                        description='New absolute output directory for the native executable (must not exist)')]
         if inputs:
             tasks['inputs'] = inputs
         (settings / 'tasks.json').write_text(json.dumps(tasks, indent=2) + '\n')
