@@ -75,6 +75,20 @@ class SampleArguments(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     runner.reflection_roots('neoclr', assembly, ['Missing.Service'], disassemble, constructors=True)
 
+    def test_method_retention_is_descriptive_and_resolves_final_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            assembly = Path(directory) / 'App.dll'
+            def disassemble(command):
+                command[-1].write_text(json.dumps(dict(name='Sample', revision=2, types=[
+                    dict(name='Opaque', origin=dict(name='App.Owner'))])))
+            args = runner.reflection_roots('neoclr', assembly, ['App.Owner'], disassemble, methods=True)
+            policy = json.loads(args[1].read_text())
+            self.assertEqual(policy['schemaVersion'], 8)
+            self.assertEqual(policy['types'], [])
+            self.assertEqual(policy['methodTypes'], [dict(module='Sample', revision=2, index=0)])
+            with self.assertRaises(ValueError):
+                runner.reflection_roots('neoclr', assembly, ['App.Owner'], disassemble, constructors=True, methods=True)
+
     def test_http_tasks_prompt_for_required_program_inputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

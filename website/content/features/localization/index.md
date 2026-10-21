@@ -52,6 +52,39 @@ fallback file. Invalid composite templates follow `String.Format` error behavior
 Attach `WithMissingKeyHandler` to report absent display keys to a console or logger.
 `Find` remains quiet, and successful fallback does not trigger a missing-key report.
 
+## Use a localizer through dependency injection
+
+Load the resources once, then register the typed localizer as a singleton. A
+scoped consumer can receive `Localizer<FeatureX>` in its constructor:
+
+```raven
+let resources = JsonLocalizerProvider("resources")
+let Ok(strings) = resources.Load<FeatureX>(Culture.SwedishSweden) else {
+    return Assert.True(false, "Load typed JSON catalogue")
+}
+let services: ServiceCollection = DefaultServiceCollection()
+_ = Assert.True(services.AddSingleton<Localizer<FeatureX>>(strings) is Ok(_), "Register resources")?
+_ = Assert.True(services.AddScoped<LocalizedGreeting>() is Ok(_), "Register consumer")?
+let Ok(provider) = services.Build() else {
+    return Assert.True(false, "Build localized graph")
+}
+use root = provider
+let Ok(createdScope) = root.CreateScope() else {
+    return Assert.True(false, "Create scope")
+}
+use scope = createdScope
+let Ok(first) = scope.GetRequiredService<LocalizedGreeting>() else {
+    return Assert.True(false, "Resolve localized service")
+}
+```
+
+This excerpt comes from the built-in localization contract test; its assertions
+propagate `TestFailure` when setup fails. The scoped consumer
+formats `"Totalt {0:F2}"` from `FeatureX.json` as `"Totalt 12,00"` for Swedish,
+while a regional key still comes from `FeatureX.sv-SE.json`. Native applications
+must retain the consumer's constructor for activation, as described in the
+[dependency injection sample](/features/dependency-injection/).
+
 ## A bounded foundation
 
 Reuse loaded localizers. Loading creates owned catalogues; ordinary lookup reuses

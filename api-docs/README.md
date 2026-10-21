@@ -2826,3 +2826,10 @@ are included in the native reference snapshot (Raven 793b71408, method-state-lib
 GetMethods documents its current interpreter-only discovery limit; native
 type-method retention remains separate work. See
 [method-state evidence](../docs/experiments/generic-method-state/README.md).
+
+Development checkpoint (2026-10-21): native TypeInfo.GetMethods now requires explicit
+methodTypes retention and describes generic definitions plus observed closed owner
+views without granting invocation. Matching reference comments and snapshots are
+refreshed; the fingerprint check and 5,580-page website build pass. The DI page
+links a runnable tested sample, and localization documents JSON-backed scoped
+constructor injection. Open-generic provider registration remains new required work.

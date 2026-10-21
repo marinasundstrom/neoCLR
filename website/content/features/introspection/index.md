@@ -139,6 +139,6 @@ DI uses this shared contract to reject unbound registrations. The development
 `MethodInfo` API also exposes `IsGenericMethod`, `IsGenericMethodDefinition` and
 `ContainsGenericParameters`. An ordinary method on an open generic owner can
 contain unbound parameters without itself being generic. Interpreted method
-discovery preserves these signature identities. Native type-method retention
-remains a gap; the flags do not grant reflective invocation or runtime generic
-construction.
+discovery preserves these signature identities. Native discovery requires explicit
+method retention for the inspected declarations. It does not grant reflective
+invocation or runtime generic construction.

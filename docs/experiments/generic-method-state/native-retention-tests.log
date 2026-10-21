@@ -1,0 +1,10 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 42.75s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-05e8b8e4a2ce6647)
+
+running 2 tests
+test reflection_construction::tests::method_retention_is_descriptive_and_accepts_generic_definitions ... ok
+test reflection_snapshots::catalog_tests::method_retention_projects_open_and_observed_closed_owners_without_invocation ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 122 filtered out; finished in 0.26s

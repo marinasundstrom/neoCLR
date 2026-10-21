@@ -968,9 +968,12 @@ metadata description, not permission to construct or execute an open method.
 
 The interpreter now admits these method definitions through GetMethods and module
 function discovery. Native module-function snapshot recipes share the same fields
-and authenticated descriptive tokens. Native **type-method discovery still needs
-an explicit retention policy and projection**; GetMethods is not yet qualified on
-AOT/JIT. Constructor retention does not implicitly retain methods. Native open
+and authenticated descriptive tokens. Native type-method discovery uses explicit
+schema-8 `methodTypes` retention, separate from constructor execution. Each retained
+declaration admits its open definition and closed owner tokens present in the
+compiled program. The generated projection uses ordinary traced snapshots and the
+same binding-flag filter as fields, constructors and properties. Unretained owners
+fault explicitly. No method body is retained merely for inspection. Native open
 signature element/member traversal and general reflective invocation remain gaps.
 MakeGenericType/MakeGenericMethod and open generic DI registrations remain outside
 this increment. Matching runtime/backend and class-library snapshots are required

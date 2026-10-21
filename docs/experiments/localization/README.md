@@ -120,3 +120,25 @@ source before that final commit. Main Raven's independent fix is 56343767e.
 The test bundle composes matching development libraries/compiler and current
 runtime/codegen with the recorded [JIT host recipe](jit-host-recipe.json). This is
 focused qualification, not a release bundle or Windows/Linux certification.
+
+## Foundation exit scope — 2026-10-21
+
+The author asks to close localization alongside DI before further stabilization.
+The final integration test loads real `FeatureX` JSON catalogues, registers
+`Localizer<FeatureX>` as a singleton and resolves a constructor-injected scoped
+consumer twice. It checks scope identity, regional lookup and Swedish formatting
+of an invariant fallback template. The dedicated website page links this with DI.
+
+The author subsequently clarifies that provider registration against `Localizer<>`
+must resolve `Localizer<HomePage>` automatically. The instance-registration test is
+useful coverage but does not close that requirement. Open-generic DI integration
+remains required; plural rules, reload/watchers,
+automatic caching, larger catalogues and additional locales remain future work.
+The existing macOS native file-host limitation remains explicit. Neither this
+integration nor the container implies thread-safe shared mutable services.
+
+The final 10 localization tests pass on interpreter/native/JIT (30 executions).
+The same [report](di-integration-tests.json) and [output](di-integration-tests.log)
+contain two method-discovery tests per engine (six executions). API snapshot checks,
+the 5,580-page website build and all 23 website tests pass. This is the closed-instance
+integration checkpoint, not completion of open-generic provider registration.

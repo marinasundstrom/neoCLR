@@ -159,3 +159,10 @@ descriptor or factory adapter even when skipped; no allocation-free claim is mad
 Registration checks use `TypeInfo.ContainsGenericParameters`, the shared recursive
 identity query. Inheritance openness (`IsOpen`) does not reject an otherwise closed
 service. Open generic registrations remain unsupported.
+
+## Tested application example
+
+The [DI feature page](/features/dependency-injection/) includes a complete scoped
+greeting example. Its source is shared with the built-in container tests; the
+[runnable project](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/dependency-injection/sample)
+shows the exact native constructor-retention option.

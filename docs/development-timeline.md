@@ -20775,3 +20775,35 @@ transient roots/branches, shared scoped nodes and a cross-scope singleton. Check
 cover deep scoped resolution rejection at the root, independent scopes created
 from scopes, repeated disposal, root invalidation and surviving scope ownership.
 Validation outcomes are recorded in the dependency-injection experiment evidence.
+
+### Finish DI, then resume stabilization (2026-10-21)
+
+The author directs: “We shall finish the di story, add a website page, with a
+sample, and then resume release work. Stabilization”. The author adds that urgent
+reflection issues should still be fixed. The assistant proposes completing the
+current native method-discovery dependency, qualifying the DI foundation and
+adding a tested runnable sample to its dedicated feature page, then returning to
+matched-package/source stabilization. Broader reflection expansion remains
+separate unless a supported DI path or release check exposes an urgent issue.
+The method-state groundwork is committed as 9aa13d3fc; native retention and final
+DI sample qualification are in progress, not yet a passed release gate.
+
+The author then adds: “And we should also wrap the localization story before
+moving on to further stabilization.” The assistant includes real JSON-backed
+Localizer<T> constructor injection, culture fallback/formatting checks and a linked
+website example in the exit scope. It defers pluralization, caching and additional
+locales instead of expanding the foundation before release qualification.
+
+The author clarifies the exit requirement: register a provider once against
+`typeof(Localizer<>)`, then resolve `Localizer<HomePage>` using HomePage as its type
+argument. The assistant acknowledges that the instance-registration test does not
+meet this requirement. Open-generic matching, activation and caches per closed
+service identity are now required work, superseding the earlier proposal to defer
+all open-generic registration. The shared runtime/DI path must supply this behavior,
+not a localization-specific type-name or casting shortcut. Implementation remains
+open at the present checkpoint.
+
+The closed-service checkpoint now passes 19 DI tests and 10 localization tests per
+engine, plus two method-discovery tests per engine. The native runnable greeting
+prints `Hello, Ada!`; API snapshots, 5,580 website pages and 23 website tests pass.
+These results do not close the newly requested open-generic provider path.

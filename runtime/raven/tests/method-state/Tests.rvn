@@ -12,12 +12,14 @@ class MethodOwner<T> {
     func Other<U>(value: U) -> U => value
 }
 
+func InspectMethods<T>() -> Sequence<MethodInfo> => typeof(T).GetMethods()
+
 [Test("Method generic state separates owner and method parameters")]
 func MethodState() -> Result<unit, TestFailure> {
     var count = 0
     var echo: TypeInfo? = null
     var other: TypeInfo? = null
-    for method in typeof(MethodOwner<int>).GetMethods() {
+    for method in InspectMethods<MethodOwner<int>>() {
         if method.Name == "Read" {
             _ = Assert.True(!method.IsGenericMethod, "ordinary method")?
             _ = Assert.True(!method.IsGenericMethodDefinition, "ordinary definition")?
@@ -47,4 +49,34 @@ func MethodState() -> Result<unit, TestFailure> {
         return Assert.True(!first.Equals(second), "different method declarations")
     }
     return Assert.True(false, "missing method descriptors")
+}
+
+struct MethodValue {
+    func Read() -> int => 42
+    static func Stamp() -> int => 42
+    private static func Hidden() -> int => 42
+}
+
+[Test("Method discovery filters visibility and scope on value types")]
+func MethodFilters() -> Result<unit, TestFailure> {
+    var count = 0
+    for method in typeof(MethodValue).GetMethods(BindingFlags.Static | BindingFlags.NonPublic) {
+        _ = Assert.Equal("Hidden", method.Name)?
+        _ = Assert.True(method.IsStatic && method.IsPrivate, "private static metadata")?
+        _ = Assert.True(!method.IsGenericMethod && !method.ContainsGenericParameters, "closed nongeneric signature")?
+        count += 1
+    }
+    _ = Assert.Equal(1, count)?
+    count = 0
+    for method in typeof(MethodValue).GetMethods(BindingFlags.Instance | BindingFlags.Public) {
+        _ = Assert.Equal("Read", method.Name)?
+        _ = Assert.True(!method.IsStatic && method.IsPublic, "public instance metadata")?
+        count += 1
+    }
+    _ = Assert.Equal(1, count)?
+    count = 0
+    for method in typeof(MethodValue).GetMethods(BindingFlags.Default) {
+        count += 1
+    }
+    return Assert.Equal(0, count)
 }

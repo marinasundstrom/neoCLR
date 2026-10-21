@@ -118,7 +118,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False, reflection_types=None, reflection_constructor_types=None):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False, reflection_types=None, reflection_constructor_types=None, reflection_method_types=None):
     validate_https_server(https_server, profile, bootstrap_root, (ROOT / 'native-build-kit.json').exists())
     if not 0 < command_timeout <= 3600:
         raise ValueError("Command timeout must be between 1 and 3600 seconds")
@@ -128,8 +128,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         raise ValueError("HTTP heap bytes must be a multiple of eight from 8 through 2147483640")
     if http_heap_bytes != 1048576 and profile not in (PROFILES['http'], PROFILES['windows-http']):
         raise ValueError("HTTP heap configuration requires an HTTP profile")
-    if sum(bool(value) for value in (reflection_roots, reflection_types, reflection_constructor_types)) > 1:
-        raise ValueError('Choose one reflection policy: roots, property types or constructor types')
+    if sum(bool(value) for value in (reflection_roots, reflection_types, reflection_constructor_types, reflection_method_types)) > 1:
+        raise ValueError('Choose one reflection policy: roots, property types, constructor types or method types')
     windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
     http = profile in (PROFILES['http'], PROFILES['windows-http'])
     if bootstrap_root and not http:
@@ -254,15 +254,15 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise RuntimeError('Raven did not report a valid native project output')
         assembly = output / 'app.dll'
         shutil.copy2(paths[-1], assembly)
-        if reflection_types or reflection_constructor_types:
+        if reflection_types or reflection_constructor_types or reflection_method_types:
             bundle_manifest = json.loads((bundle / 'manifest.json').read_text())
             runtime = bundle / bundle_manifest['runtime']
             helper = bundle / 'tools/run-native-sample.py'
             for path in (runtime, helper):
                 report['inputs'][str(path)] = sha(path)
             reflection_roots = runpy.run_path(str(helper))['reflection_roots'](
-                runtime, assembly, reflection_types or reflection_constructor_types, run,
-                **({'constructors': True} if reflection_constructor_types else {}))[1]
+                runtime, assembly, reflection_types or reflection_constructor_types or reflection_method_types, run,
+                **({'constructors': True} if reflection_constructor_types else {'methods': True} if reflection_method_types else {}))[1]
         context = ['--system', seed, *[arg for path in libraries for arg in ('--module', path)],
                    '--object-root', libraries[0]]
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
@@ -431,6 +431,7 @@ def main():
                         help='Explicit native service/host profile (default: console)')
     parser.add_argument('--https-server', action='store_true', help='Source-only macOS/Windows HTTP host: TLS for all accepted connections; PEM credentials are supplied at runtime')
     parser.add_argument('--reflection-type', action='append', default=[], help='Application type name retained from the freshly compiled assembly; repeat for multiple types')
+    parser.add_argument('--reflection-method-type', action='append', default=[], help='Exact application type whose declared methods may be inspected; does not retain invocation')
     parser.add_argument('--reflection-constructor-type', action='append', default=[], help='Exact application type name whose public constructors may be invoked; resolved after compilation')
     parser.add_argument('--reflection-roots', type=Path, help='Private versioned source-identity reflection retention JSON')
     parser.add_argument('--byte-array-limit', type=int, default=65536, help='Private native byte-array allocation limit; heap capacity remains independent')
@@ -449,6 +450,7 @@ def main():
                     reflection_roots=args.reflection_roots.resolve() if args.reflection_roots else None,
                     reflection_types=args.reflection_type,
                     reflection_constructor_types=args.reflection_constructor_type,
+                    reflection_method_types=args.reflection_method_type,
                     byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes, command_timeout=args.command_timeout, https_server=args.https_server))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)

@@ -7,6 +7,7 @@ import System.Concurrency.Tasks.TaskOutcome.*
 import System.Data.Json.*
 import System.IO.*
 import System.Globalization.*
+import System.DependencyInjection.*
 import System.Localization.*
 import System.Option.*
 import System.Result.*
@@ -123,7 +124,7 @@ func FDiagnostics() -> Result<unit, TestFailure> {
 }
 
 
-class FeatureX { }
+public class FeatureX { }
 
 [Test("Localizer scopes and cultures fall back per key")]
 func GFallback() -> Result<unit, TestFailure> {
@@ -195,4 +196,43 @@ func IFormatting() -> Result<unit, TestFailure> {
     _ = Assert.Equal("missing {0}", reporting["missing {0}", 12])?
     _ = Assert.True(reporting.Find("missing {0}", 12) is None, "Quiet formatted lookup")?
     return Assert.Equal(1, missing.Count)
+}
+
+public class LocalizedGreeting {
+    private val strings: Localizer<FeatureX>
+
+    init(strings: Localizer<FeatureX>) {
+        self.strings = strings
+    }
+
+    func Total(value: int) -> string => strings["invoice", value]
+    val Region: string => strings["regional"]
+}
+
+[Test("Localizer integrates typed JSON resources with scoped constructor injection")]
+func JDependencyInjection() -> Result<unit, TestFailure> {
+    let resources = JsonLocalizerProvider("resources")
+    let Ok(strings) = resources.Load<FeatureX>(Culture.SwedishSweden) else {
+        return Assert.True(false, "Load typed JSON catalogue")
+    }
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = Assert.True(services.AddSingleton<Localizer<FeatureX>>(strings) is Ok(_), "Register resources")?
+    _ = Assert.True(services.AddScoped<LocalizedGreeting>() is Ok(_), "Register consumer")?
+    let Ok(provider) = services.Build() else {
+        return Assert.True(false, "Build localized graph")
+    }
+    use root = provider
+    let Ok(createdScope) = root.CreateScope() else {
+        return Assert.True(false, "Create scope")
+    }
+    use scope = createdScope
+    let Ok(first) = scope.GetRequiredService<LocalizedGreeting>() else {
+        return Assert.True(false, "Resolve localized service")
+    }
+    let Ok(second) = scope.GetRequiredService<LocalizedGreeting>() else {
+        return Assert.True(false, "Reuse scoped service")
+    }
+    _ = Assert.True(Object.ReferenceEquals(first, second), "Scoped identity")?
+    _ = Assert.Equal("scoped sv-SE", first.Region)?
+    return Assert.Equal("Totalt 12,00", first.Total(12))
 }

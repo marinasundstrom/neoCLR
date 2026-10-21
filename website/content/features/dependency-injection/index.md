@@ -10,6 +10,55 @@ instances use the same registration model.
 service relationships visible. The built-in tests use these registrations to
 inject a typed localizer into a greeting service.
 
+## A greeting command with a scoped service
+
+This sample registers settings once and lets the container construct a scoped
+`Greeter`. A scope can represent a command or request. `?` propagates registration
+and resolution failures; `use` releases the scope and provider when the function
+returns, including an early error return.
+
+```raven
+module Examples.DependencyInjection
+
+import System.*
+import System.DependencyInjection.*
+import System.Result.*
+
+public class GreetingSettings {
+    val Prefix: string
+
+    init(prefix: string) {
+        Prefix = prefix
+    }
+}
+
+public class Greeter {
+    private val settings: GreetingSettings
+
+    init(settings: GreetingSettings) {
+        self.settings = settings
+    }
+
+    func Greet(name: string) -> string => settings.Prefix + ", " + name + "!"
+}
+
+// A scope can represent one command, request or other bounded unit of work.
+public func CreateGreeting(name: string) -> Result<string, ServiceError> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<GreetingSettings>(GreetingSettings("Hello"))?
+    _ = services.AddScoped<Greeter>()?
+    use root = services.Build()?
+    use scope = root.CreateScope()?
+    let greeter = scope.GetRequiredService<Greeter>()?
+    return Ok(greeter.Greet(name))
+}
+```
+
+`CreateGreeting("Ada")` returns `Ok("Hello, Ada!")`. The sample's shared source is
+compiled into the built-in DI tests, alongside the larger graph and disposal cases.
+The [complete runnable project](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/dependency-injection/sample)
+includes its entry point and build instructions.
+
 ## Lookups distinguish absence from failure
 
 `GetRequiredService<T>()` returns the value or an error. `GetService<T>()` returns

@@ -5,7 +5,23 @@ Reviewed neoCLR `9f4fdc809` and the matched Raven compiler `100f98a2f`;
 Raven `db4014f71` adds bridge documentation only. This is triage, not release approval
 or a passed package gate. No candidate version, tag or publication date is selected.
 
-## Current stabilization checkpoint
+## Foundation closure checkpoint — 2026-10-21
+
+Author-directed DI and localization additions have a tested integration checkpoint.
+The subsequent requirement for open-generic localizer providers remains open. See [DI evidence](../../experiments/dependency-injection/README.md),
+[localization evidence](../../experiments/localization/README.md) and
+[method discovery](../../experiments/generic-method-state/README.md). The compiler
+for this development cohort is clean Raven `codex/neoclr` revision `793b71408`;
+reports retain runtime/backend/library input hashes. This supersedes the older
+compiler identity below for these tests only, not for unrerun package gates.
+
+Complete open-generic provider integration, then return to the remaining generated
+record/display scope and matched package qualification. Do not expand localization/DI or reflection to fill every possible
+API gap: collection/keyed constructor injection,
+pluralization and caching are documented follow-ups. No release tag or version is
+selected, and no website publication is implied by a local build.
+
+## Earlier stabilization checkpoint
 
 After the author-directed globalization and enum work, neoCLR `386e1c7b0` and
 Raven `08c0bce8c` are the latest functional/documentation checkpoints. The compiler

@@ -107,10 +107,9 @@ pub fn bind(
                     Op::BranchFalse(0),
                 ]);
                 let public = d.visibility == Visibility::Public
-                    && !d
-                        .origin
+                    && d.origin
                         .as_ref()
-                        .is_some_and(|o| o.publicly_visible == Some(false))
+                        .is_none_or(|o| o.publicly_visible != Some(false))
                     && constructor.visibility == Visibility::Public
                     && !constructor.origin.as_ref().is_some_and(|o| {
                         o.member_access != Some(neoclr::metadata_origin::SourceAccess::Public)

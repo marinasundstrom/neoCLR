@@ -7,8 +7,13 @@ automatic constructor injection; [activation groundwork](experiments/dependency-
 tracks the development public container, keyed and conditional registrations,
 function services and cached constructor activation. [Generic type-state flags](experiments/generic-type-state/README.md) now
 share runtime identity semantics with DI. [Method-state groundwork](experiments/generic-method-state/README.md) adds shared flags and
-interpreter definition discovery. Native type-method retention, generic implementation
-retention and release qualification remain open.
+definition discovery with explicit native method retention. The author directs
+closing DI and localization together before further stabilization: qualify the
+runnable DI sample and real JSON-backed typed localization through scoped
+constructor injection. The author subsequently requires provider registration against `Localizer<>`
+and resolution of `Localizer<HomePage>`: open-generic matching, activation and
+per-closed-service lifetime caches are now required before foundation closure.
+Matched release-package qualification remains open.
 [Scope and validation](experiments/localization/README.md) remain a bounded addition;
 this does not replace release qualification or expand arbitrary locale support.
 

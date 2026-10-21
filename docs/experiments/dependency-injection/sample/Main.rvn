@@ -1,0 +1,14 @@
+module Examples.DependencyInjection
+
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    let result = CreateGreeting("Ada")
+    let Ok(text) = result else {
+        Console.WriteLine("Could not create the greeting service.")
+        return 1
+    }
+    Console.WriteLine(text)
+    return 0
+}

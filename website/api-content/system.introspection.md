@@ -22,4 +22,4 @@ See the [reflection reference](/docs/reflection.html).
 
 Development MethodInfo generic-state flags distinguish method definitions from
 owner openness. Interpreted GetMethods supports descriptive generic signatures;
-native type-method discovery still requires retention/projection work.
+native type-method discovery requires explicit `methodTypes` retention.

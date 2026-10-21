@@ -421,3 +421,11 @@ func RGraphs() -> Result<unit, TestFailure> {
     _ = Assert.Equal(1, c.Left.Shared.DisposalCount)?
     return Ok(())
 }
+
+[Test("DI website sample resolves a scoped constructor graph and disposes scopes")]
+func ZWebsiteSample() -> Result<unit, TestFailure> {
+    let Ok(text) = Examples.DependencyInjection.CreateGreeting("Ada") else {
+        return Assert.True(false, "Resolve website sample")
+    }
+    return Assert.Equal("Hello, Ada!", text)
+}

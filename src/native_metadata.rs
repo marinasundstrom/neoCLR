@@ -54,6 +54,42 @@ pub fn members(module: &Module, owner: &Type, constructors: bool) -> Result<Valu
     )
 }
 
+/// Get a source declaration's owner signature, without executable specialization.
+pub fn definition_owner(
+    module: &Module,
+    identity: &crate::metadata::TypeDefId,
+) -> Result<Type, Fault> {
+    module
+        .types
+        .iter()
+        .find(|d| d.definition.as_ref() == Some(identity))
+        .map(|d| d.open_type())
+        .ok_or_else(|| Fault::new("missing source declaration"))
+}
+
+/// Describe declared methods on an exact closed owner or its open definition.
+/// Retention is descriptive only and does not select any callable body.
+pub fn methods(module: &Module, owner: &Type) -> Result<(crate::TypeDescriptor, Value), Fault> {
+    let declaration = module
+        .type_definition(owner)
+        .ok_or_else(|| Fault::new("method discovery requires a nominal owner"))?;
+    let descriptor = if owner == &declaration.open_type() {
+        crate::type_identity::describe_definition(module, declaration)?
+    } else {
+        crate::type_identity::describe_loaded(module, owner)?
+    };
+    let value = crate::reflection::Query::Methods.invoke_profile(
+        module,
+        &[
+            Value::RuntimeTypeHandle(Box::new(descriptor.clone())),
+            Value::Int32(60),
+        ],
+        &Limits::default(),
+        true,
+    )?;
+    Ok((descriptor, value))
+}
+
 /// Return the optional logical element descriptor recipe.
 pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::ElementType.invoke_profile(

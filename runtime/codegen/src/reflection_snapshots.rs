@@ -372,6 +372,51 @@ impl Factory<'_> {
     }
 }
 
+fn emit_filtered_members(
+    factory: &mut Factory<'_>,
+    expected: &Type,
+    element: &Type,
+    elements: &[V],
+    masks: &[(i32, i32)],
+) -> Result<(), Error> {
+    let array = factory.local(expected.clone());
+    let count = factory.local(Type::Int32);
+    factory.body.extend([Op::Int(0), Op::Store(count)]);
+    if masks.len() != elements.len() {
+        return Err("member recipe inventory mismatch".into());
+    }
+    for &(scope, access) in masks {
+        predicate(&mut factory.body, scope, access);
+        let skip = factory.body.len();
+        factory.body.push(Op::BranchFalse(0));
+        factory
+            .body
+            .extend([Op::Load(count), Op::Int(1), Op::Add, Op::Store(count)]);
+        factory.body[skip] = Op::BranchFalse(factory.body.len());
+    }
+    factory.body.extend([
+        Op::Load(count),
+        Op::ReserveArray(element.clone()),
+        Op::Store(array),
+        Op::Int(0),
+        Op::Store(count),
+    ]);
+    for (v, &(scope, access)) in elements.iter().zip(masks) {
+        predicate(&mut factory.body, scope, access);
+        let skip = factory.body.len();
+        factory.body.push(Op::BranchFalse(0));
+        factory.body.extend([Op::Load(array), Op::Load(count)]);
+        factory.emit(v, element)?;
+        factory.body.push(Op::StoreArrayElement(element.clone()));
+        factory
+            .body
+            .extend([Op::Load(count), Op::Int(1), Op::Add, Op::Store(count)]);
+        factory.body[skip] = Op::BranchFalse(factory.body.len());
+    }
+    factory.body.extend([Op::Load(array), Op::Return]);
+    Ok(())
+}
+
 pub fn bind(
     input: &mut neoclr::Module,
     source: &neoclr::Module,
@@ -387,6 +432,7 @@ pub fn bind(
                 f.name.as_str(),
                 "neoCLR.Runtime.TypeFields"
                     | "neoCLR.Runtime.TypeConstructors"
+                    | "neoCLR.Runtime.TypeMethods"
                     | "neoCLR.Runtime.TypeProperties"
                     | "neoCLR.Runtime.TypeModule"
                     | "neoCLR.Runtime.TypeDeclaringType"
@@ -423,11 +469,15 @@ pub fn bind(
         }
     }
     let mut base_tokens = vec![];
+    let mut method_tokens = vec![];
     let mut tokens = vec![];
     for op in input.functions.iter().flat_map(|f| &f.body) {
         match op {
             Op::LoadTypeToken(t) => {
                 vectors(t, &mut tokens);
+                if concrete(t) && !method_tokens.contains(t) {
+                    method_tokens.push(t.clone());
+                }
                 if concrete(t) && !base_tokens.contains(t) {
                     base_tokens.push(t.clone());
                 }
@@ -438,6 +488,11 @@ pub fn bind(
             | Op::BindFunction { target, .. } => {
                 for argument in &target.generic_arguments {
                     vectors(argument, &mut tokens);
+                    // typeof(T) is closed during later specialization. Retained
+                    // method views must include explicit generic call arguments.
+                    if concrete(argument) && !method_tokens.contains(argument) {
+                        method_tokens.push(argument.clone());
+                    }
                 }
             }
             _ => {}
@@ -505,6 +560,7 @@ pub fn bind(
         let properties = f.name.ends_with("Properties");
         let fields = f.name.ends_with("TypeFields");
         let constructors = f.name.ends_with("TypeConstructors");
+        let methods = f.name.ends_with("TypeMethods");
         let members = fields || constructors;
         let attributes = f.name == "neoCLR.Runtime.MemberCustomAttributes";
         let module_attributes = f.name == "neoCLR.Runtime.ModuleMemberCustomAttributes";
@@ -524,7 +580,7 @@ pub fn bind(
                         vec![Type::String, Type::String]
                     } else if assembly_name || assembly_modules || assembly_types {
                         vec![Type::String]
-                    } else if properties || members {
+                    } else if properties || members || methods {
                         vec![Type::RuntimeTypeHandle, Type::Int32]
                     } else {
                         vec![Type::RuntimeTypeHandle]
@@ -901,6 +957,85 @@ pub fn bind(
             factory.body.push(Op::Fault(
                 "native logical module metadata was not retained".into(),
             ));
+        } else if methods {
+            let Type::ArrayRef(element) = &expected else {
+                return Err("TypeMethods requires MethodInfo vector".into());
+            };
+            if name(source, element) != Some("System.Introspection.MethodInfo") {
+                return Err("TypeMethods requires scoped MethodInfo".into());
+            }
+            factory.body.extend([
+                Op::Arg(1),
+                Op::Int(!62),
+                Op::BitAnd,
+                Op::Int(0),
+                Op::Equal,
+                Op::BranchTrue(7),
+                Op::Fault("unsupported BindingFlags bits".into()),
+            ]);
+            for entry in retention["methodTypes"].as_array().into_iter().flatten() {
+                let id: TypeDefId = serde_json::from_value(entry.clone())?;
+                if !definitions.contains(&id) {
+                    return Err("missing method snapshot root".into());
+                }
+                let open_owner = neoclr::native_metadata::definition_owner(source, &id)
+                    .map_err(|e| e.to_string())?;
+                let mut owners = vec![open_owner.clone()];
+                for token in &method_tokens {
+                    if source
+                        .type_definition(token)
+                        .and_then(|d| d.definition.as_ref())
+                        == Some(&id)
+                        && !owners.contains(token)
+                    {
+                        owners.push(token.clone());
+                    }
+                }
+                let masks: Vec<_> = source
+                    .functions
+                    .iter()
+                    .filter(|f| {
+                        f.owner.as_ref() == Some(&open_owner)
+                            && !f.name.ends_with("..ctor")
+                            && !f.name.ends_with("..cctor")
+                    })
+                    .map(|f| {
+                        (
+                            if f.instance { 4 } else { 8 },
+                            if f.origin
+                                .as_ref()
+                                .map_or(f.visibility == Visibility::Public, |o| {
+                                    o.member_access
+                                        == Some(neoclr::metadata_origin::SourceAccess::Public)
+                                })
+                            {
+                                16
+                            } else {
+                                32
+                            },
+                        )
+                    })
+                    .collect();
+                for owner in owners {
+                    let (descriptor, recipe) = neoclr::native_metadata::methods(source, &owner)
+                        .map_err(|e| e.to_string())?;
+                    let V::Array { elements, .. } = recipe else {
+                        return Err("invalid method snapshot recipe".into());
+                    };
+                    let token =
+                        neoclr::native_metadata::snapshot_token(factory.input, source, &descriptor)
+                            .map_err(|e| e.to_string())?;
+                    let branch = factory.body.len() + 3;
+                    factory
+                        .body
+                        .extend([Op::Arg(0), token, Op::Equal, Op::BranchFalse(0)]);
+                    emit_filtered_members(&mut factory, &expected, element, &elements, &masks)?;
+                    factory.body[branch] = Op::BranchFalse(factory.body.len());
+                }
+            }
+            factory.body.push(Op::Fault(
+                "native method metadata was not retained; configure methodTypes".into(),
+            ));
         } else if properties || members {
             let Type::ArrayRef(element) = &expected else {
                 return Err("TypeProperties requires PropertyInfo vector".into());
@@ -958,9 +1093,6 @@ pub fn bind(
                     Op::Equal,
                     Op::BranchFalse(0),
                 ]);
-                let array = factory.local(expected.clone());
-                let count = factory.local(Type::Int32);
-                factory.body.extend([Op::Int(0), Op::Store(count)]);
                 let mut masks = vec![];
                 if fields {
                     let d = &source.types[ti];
@@ -1058,40 +1190,7 @@ pub fn bind(
                         masks.push((if p.instance { 4 } else { 8 }, if public { 16 } else { 32 }));
                     }
                 }
-                if masks.len() != elements.len() {
-                    return Err("property recipe inventory mismatch".into());
-                }
-                for &(scope, access) in &masks {
-                    predicate(&mut factory.body, scope, access);
-                    let skip = factory.body.len();
-                    factory.body.push(Op::BranchFalse(0));
-                    factory
-                        .body
-                        .extend([Op::Load(count), Op::Int(1), Op::Add, Op::Store(count)]);
-                    factory.body[skip] = Op::BranchFalse(factory.body.len());
-                }
-                factory.body.extend([
-                    Op::Load(count),
-                    Op::ReserveArray((**element).clone()),
-                    Op::Store(array),
-                    Op::Int(0),
-                    Op::Store(count),
-                ]);
-                for (v, &(scope, access)) in elements.iter().zip(&masks) {
-                    predicate(&mut factory.body, scope, access);
-                    let skip = factory.body.len();
-                    factory.body.push(Op::BranchFalse(0));
-                    factory.body.extend([Op::Load(array), Op::Load(count)]);
-                    factory.emit(v, element)?;
-                    factory
-                        .body
-                        .push(Op::StoreArrayElement((**element).clone()));
-                    factory
-                        .body
-                        .extend([Op::Load(count), Op::Int(1), Op::Add, Op::Store(count)]);
-                    factory.body[skip] = Op::BranchFalse(factory.body.len());
-                }
-                factory.body.extend([Op::Load(array), Op::Return]);
+                emit_filtered_members(&mut factory, &expected, element, &elements, &masks)?;
                 factory.body[branch] = Op::BranchFalse(factory.body.len());
             }
             factory.body.push(Op::Fault("native reflection property metadata was not retained; configure --reflection-roots".into()));
@@ -1358,6 +1457,45 @@ fn bind_attributes(
 #[cfg(test)]
 mod catalog_tests {
     use super::*;
+
+    #[test]
+    fn method_retention_projects_open_and_observed_closed_owners_without_invocation() {
+        let mut source = neoclr::assemble(".module Methods\n.type Empty<T>\n.end\n.type Atom\n.end\n.function neoCLR.Runtime.TypeMethods(RuntimeTypeHandle,Int32) -> System.Introspection.MethodInfo[]\n.methodimpl InternalCall\n.end\n.function Main() -> RuntimeTypeHandle\nldtoken Empty<Atom>\nret\n.end\n").unwrap();
+        // Assembly parsing uses the legacy core service shape; the native source
+        // library supplies the vector signature verified by this binder.
+        source.functions[0].returns =
+            Type::ArrayRef(Box::new(Type::from_name("System.Introspection.MethodInfo")));
+        let ids: Vec<_> = source
+            .types
+            .iter()
+            .map(|d| d.definition.clone().unwrap())
+            .collect();
+        let mut input = source.clone();
+        let mut policy = json!({"types":[],"methodTypes":[ids[0]]});
+        bind(&mut input, &source, &ids, &mut policy).unwrap();
+        let body = &input.functions[0].body;
+        assert!(body.iter().any(|op| matches!(op, Op::LoadMetadataToken(_))));
+        assert!(
+            body.iter()
+                .any(|op| matches!(op, Op::LoadTypeToken(Type::Constructed { .. })))
+        );
+        assert!(
+            !body
+                .iter()
+                .any(|op| matches!(op, Op::Call(_) | Op::Construct(_)))
+        );
+        assert!(
+            matches!(body.last(), Some(Op::Fault(message)) if message.contains("not retained"))
+        );
+        let mut unretained = source.clone();
+        bind(&mut unretained, &source, &ids, &mut json!({"types":[]})).unwrap();
+        assert!(
+            !unretained.functions[0]
+                .body
+                .iter()
+                .any(|op| matches!(op, Op::ReserveArray(_)))
+        );
+    }
 
     #[test]
     fn type_discovery_requires_retention_and_exact_contracts() {

@@ -1,0 +1,34 @@
+module Examples.DependencyInjection
+
+import System.*
+import System.DependencyInjection.*
+import System.Result.*
+
+public class GreetingSettings {
+    val Prefix: string
+
+    init(prefix: string) {
+        Prefix = prefix
+    }
+}
+
+public class Greeter {
+    private val settings: GreetingSettings
+
+    init(settings: GreetingSettings) {
+        self.settings = settings
+    }
+
+    func Greet(name: string) -> string => settings.Prefix + ", " + name + "!"
+}
+
+// A scope can represent one command, request or other bounded unit of work.
+public func CreateGreeting(name: string) -> Result<string, ServiceError> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<GreetingSettings>(GreetingSettings("Hello"))?
+    _ = services.AddScoped<Greeter>()?
+    use root = services.Build()?
+    use scope = root.CreateScope()?
+    let greeter = scope.GetRequiredService<Greeter>()?
+    return Ok(greeter.Greet(name))
+}

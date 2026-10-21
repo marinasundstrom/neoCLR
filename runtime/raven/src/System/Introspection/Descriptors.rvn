@@ -506,7 +506,7 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     func GetConstructors() -> Sequence<ConstructorInfo>
     func GetConstructors(flags: BindingFlags) -> Sequence<ConstructorInfo>
     /// <summary>Describes declared methods, including generic definitions and open owner signatures.</summary>
-    /// <remarks>Native type-method retention is not yet implemented; this discovery entry point currently requires interpreted execution.</remarks>
+    /// <remarks>Native discovery requires explicit methodTypes retention; it describes the definition and closed owner tokens present in the compiled program, without granting invocation.</remarks>
     func GetMethods() -> Sequence<MethodInfo>
     func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo>
     func GetProperties() -> Sequence<PropertyInfo>

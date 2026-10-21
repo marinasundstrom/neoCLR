@@ -61,8 +61,9 @@ concurrency claim is made.
 
 ## Remaining integration gaps
 
-- TypeInfo generic-state flags now supply shared openness checks. MethodInfo
-  flags and open/generic-method definition discovery remain requested follow-up.
+- TypeInfo generic-state flags supply shared openness checks. MethodInfo flags and
+  descriptive generic method discovery are implemented separately; DI constructor
+  activation does not require retaining ordinary methods.
 - Native automatic construction currently retains nongeneric declarations only.
 - Open generic registration, enumerable constructor injection and keyed constructor
   annotations remain beyond the closed-service foundation.
@@ -119,3 +120,18 @@ The matching native API snapshot check passes and the website build checks 5,564
 Both focused backend projection regressions pass: function `unbox.any` becomes a
 checked reference cast, while whole-union boxing retains its structural identity
 restriction (`cargo test -p neoclr-codegen --lib boxing::structural_union_tests`).
+
+## Tested website sample — 2026-10-21
+
+The complete [greeting project](sample/README.md) shares its implementation with
+the built-in DI suite. All 19 tests pass in interpreter/native/JIT (57 executions);
+[foundation report](foundation-tests.json) also contains the earlier two-test
+method-discovery run. The separately built native executable prints `Hello, Ada!`;
+[build provenance](sample-build.json) and [output](sample-output.log) are retained.
+
+The author subsequently requests registering a provider against `Localizer<>`
+and resolving arbitrary closed `Localizer<HomePage>` services. This supersedes
+our earlier open-generic deferral: shared generic definition/construction metadata,
+closed implementation activation and cache slots per registration/closed service
+are now required before DI/localization closure. The sample above qualifies the
+existing closed-service path, not this new requirement.

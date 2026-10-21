@@ -324,6 +324,7 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI retrieves keyed bound function objects without invoking them as factories',
     'DI TryAdd preserves existing type and key registrations without activating factories',
     'DI diamond graphs preserve lifetimes and independent scope ownership',
+    'DI website sample resolves a scoped constructor graph and disposes scopes',
 ]
 
 LOCALIZATION_NAMES = [
@@ -336,6 +337,7 @@ LOCALIZATION_NAMES = [
     'Localizer scopes and cultures fall back per key',
     'Localizer invariant fallback is configurable and typed scope is explicit',
     'Localizer resolves templates before formatting arguments',
+    'Localizer integrates typed JSON resources with scoped constructor injection',
 ]
 
 DECONSTRUCTION_NAMES = [
@@ -464,8 +466,6 @@ def main():
     parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
     modes = args.mode or ['jit']
-    if 'method-state' in (args.suite or []) and modes != ['interpreter']:
-        parser.error('method-state currently requires --mode interpreter; native type-method retention is pending')
     bundled_bin = args.bundle.resolve() / 'bin'
     if (bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')).is_file():
         if args.runtime == parser.get_default('runtime'):
@@ -486,6 +486,7 @@ def main():
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
               *sorted((TESTS / 'localization').rglob('*.json')),
+              *sorted((ROOT / 'docs/experiments/dependency-injection/sample').glob('*.rvn')),
               *sorted((ROOT / 'runtime/raven/src/System/DependencyInjection').glob('*.rvn'))]
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
@@ -496,7 +497,7 @@ def main():
     validation_spec.loader.exec_module(validation)
     relationship_names = ['Arrays preserve element identity', 'Closed generic types remain distinct', 'Type identity and assignment direction', 'Boxing and instance checks reject null', 'Interface assignment includes inherited contracts', 'Subclass checks are strict and exclude interfaces']
     expected = [
-        ('method-state', 0, 'PASS Method generic state separates owner and method parameters\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+        ('method-state', 0, 'PASS Method discovery filters visibility and scope on value types\nPASS Method generic state separates owner and method parameters\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
         ('type-relations', 0, ''.join('PASS ' + n + '\n' for n in relationship_names) + f'Tests: {len(relationship_names)}, passed: {len(relationship_names)}, failed: 0, skipped: 0\n'),
         ('http-lifetime', 0, ''.join('PASS ' + n + '\n' for n in HTTP_LIFETIME_NAMES) + f'Tests: {len(HTTP_LIFETIME_NAMES)}, passed: {len(HTTP_LIFETIME_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-content-copy', 0, ''.join('PASS ' + n + '\n' for n in HTTP_CONTENT_COPY_NAMES) + f'Tests: {len(HTTP_CONTENT_COPY_NAMES)}, passed: {len(HTTP_CONTENT_COPY_NAMES)}, failed: 0, skipped: 0\n'),
@@ -555,9 +556,9 @@ def main():
                 if Path(relative).is_absolute() or lib not in path.parents or not path.is_file() or sha(path) != expected_hash:
                     raise ValueError('Bundle file mismatch: ' + relative)
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
-        # Method discovery remains opt-in until native type-method retention is implemented.
+        # Only explicitly qualified suites enter the default release gate.
         selected = [case for case in expected
-                    if (not args.suite and case[0] != 'method-state') or case[0] in (args.suite or [])]
+                    if not args.suite or case[0] in args.suite]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')
@@ -573,20 +574,28 @@ def main():
             profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'localization', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
-            if name == 'dependency-injection':
+            if name in ('dependency-injection', 'method-state', 'localization'):
                 # Derive exact identities from the discovered application, never from
                 # hard-coded metadata ordinals. Only public test service fixtures
                 # receive constructor metadata and executable retention.
                 compiled = (out / (name + '-discovery') / 'compile.stdout.log').read_text()
                 assembly = next(line.removeprefix('Native build output: ') for line in compiled.splitlines()
                                 if line.startswith('Native build output: '))
-                listing = out / 'di-reflection-module.neoil'
+                listing = out / (name + '-reflection-module.neoil')
                 subprocess.run([str(args.runtime.resolve()), 'disassemble', assembly, str(listing)], check=True, capture_output=True)
                 text = listing.read_text()
                 metadata, _ = json.JSONDecoder().raw_decode(text[text.index('{'):])
-                di_types = [declaration['origin']['name'] for declaration in metadata['types']
-                            if declaration.get('origin', {}).get('publicly_visible')
-                            and declaration.get('origin', {}).get('name', '').startswith('NeoClr.RuntimeTests.')]
+                reflection_names = [declaration['origin']['name'] for declaration in metadata['types']
+                                    if declaration.get('origin', {}).get('name', '').startswith(('NeoClr.RuntimeTests.', 'Examples.DependencyInjection.'))
+                                    and (declaration.get('origin', {}).get('publicly_visible') if name == 'dependency-injection'
+                                         else declaration['origin']['name'].endswith('.LocalizedGreeting') if name == 'localization'
+                                         else any(marker in declaration['origin']['name'] for marker in ('MethodOwner', 'MethodValue')))]
+                if name == 'dependency-injection':
+                    di_types = reflection_names
+                elif name == 'localization':
+                    localization_types = reflection_names
+                else:
+                    method_types = reflection_names
             if name == "json-streams":
                 # Scalar ObjectMapper paths select reflection services. Retain only the
                 # runtime's first type identity, without constructors or members.
@@ -610,6 +619,12 @@ def main():
                 if name == "json-streams":
                     # Scalar mapping needs a reflection scope, but no retained model constructors.
                     command += ["--reflection-roots", json_roots, "--command-timeout", "600"]
+                if name == "localization":
+                    command += [arg for type_name in localization_types for arg in ("--reflection-constructor-type", type_name)]
+                    command += ["--command-timeout", "600"]
+                if name == "method-state":
+                    command += [arg for type_name in method_types for arg in ("--reflection-method-type", type_name)]
+                    command += ["--command-timeout", "600"]
                 if name == "dependency-injection":
                     command += [arg for type_name in di_types for arg in ("--reflection-constructor-type", type_name)]
                     command += ["--command-timeout", "600"]
@@ -646,6 +661,14 @@ def main():
                 di_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
                     args.runtime.resolve(), build / 'app.dll', di_types,
                     lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True)[1]
+            if name == 'localization':
+                localization_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
+                    args.runtime.resolve(), build / 'app.dll', localization_types,
+                    lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True)[1]
+            if name == 'method-state':
+                method_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
+                    args.runtime.resolve(), build / 'app.dll', method_types,
+                    lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), methods=True)[1]
             isolated = out / (name + '-isolated')
             isolated.mkdir()
             if name == 'localization':
@@ -678,6 +701,10 @@ def main():
                         jit += ["--reflection-roots", json_roots]
                     if name == "dependency-injection":
                         jit += ["--reflection-roots", di_roots]
+                    if name == "method-state":
+                        jit += ["--reflection-roots", method_roots]
+                    if name == "localization":
+                        jit += ["--reflection-roots", localization_roots]
                     executions.append((mode, jit, isolated if name == 'localization' else ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:

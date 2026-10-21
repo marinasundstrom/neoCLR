@@ -8,7 +8,9 @@ import sys
 import tempfile
 
 
-def reflection_roots(runtime, assembly, names, run, constructors=False):
+def reflection_roots(runtime, assembly, names, run, constructors=False, methods=False):
+    if constructors and methods:
+        raise ValueError('Choose constructor or method retention')
     if not names:
         return []
     with tempfile.TemporaryDirectory(prefix='neoclr-sample-reflection-') as directory:
@@ -31,6 +33,9 @@ def reflection_roots(runtime, assembly, names, run, constructors=False):
             root.update(properties=False, getters=False, setters=False, customAttributes=False,
                         fields=False, fieldGetters=False, fieldSetters=False, constructors=True)
         policy.update(schemaVersion=7, moduleCatalogs=[], moduleFunctions=[], typeCatalogs=[])
+    if methods:
+        policy = dict(schemaVersion=8, types=[], moduleCatalogs=[], moduleFunctions=[],
+                      typeCatalogs=[], methodTypes=[root['definition'] for root in selected])
     path = assembly.with_suffix('.reflection.json')
     path.write_text(json.dumps(policy, indent=2) + '\n')
     return ['--reflection-roots', path]

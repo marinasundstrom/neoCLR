@@ -1,0 +1,49 @@
+method-state (interpreter):
+PASS Method discovery filters visibility and scope on value types
+PASS Method generic state separates owner and method parameters
+Tests: 2, passed: 2, failed: 0, skipped: 0
+method-state (native):
+PASS Method discovery filters visibility and scope on value types
+PASS Method generic state separates owner and method parameters
+Tests: 2, passed: 2, failed: 0, skipped: 0
+method-state (jit):
+PASS Method discovery filters visibility and scope on value types
+PASS Method generic state separates owner and method parameters
+Tests: 2, passed: 2, failed: 0, skipped: 0
+localization (interpreter):
+PASS Localizer preserves strings and distinguishes missing from empty
+PASS Localizer uses ordinal keys and decodes JSON escapes
+PASS Localizer rejects malformed and non-string catalogues
+PASS Localizer supports catalogues beyond provisional DOM limits
+PASS Localizer reads borrowed streams and explicit files
+PASS Localizer diagnostics report only missing display lookups
+PASS Localizer scopes and cultures fall back per key
+PASS Localizer invariant fallback is configurable and typed scope is explicit
+PASS Localizer resolves templates before formatting arguments
+PASS Localizer integrates typed JSON resources with scoped constructor injection
+Tests: 10, passed: 10, failed: 0, skipped: 0
+localization (native):
+PASS Localizer preserves strings and distinguishes missing from empty
+PASS Localizer uses ordinal keys and decodes JSON escapes
+PASS Localizer rejects malformed and non-string catalogues
+PASS Localizer supports catalogues beyond provisional DOM limits
+PASS Localizer reads borrowed streams and explicit files
+PASS Localizer diagnostics report only missing display lookups
+PASS Localizer scopes and cultures fall back per key
+PASS Localizer invariant fallback is configurable and typed scope is explicit
+PASS Localizer resolves templates before formatting arguments
+PASS Localizer integrates typed JSON resources with scoped constructor injection
+Tests: 10, passed: 10, failed: 0, skipped: 0
+localization (jit):
+PASS Localizer preserves strings and distinguishes missing from empty
+PASS Localizer uses ordinal keys and decodes JSON escapes
+PASS Localizer rejects malformed and non-string catalogues
+PASS Localizer supports catalogues beyond provisional DOM limits
+PASS Localizer reads borrowed streams and explicit files
+PASS Localizer diagnostics report only missing display lookups
+PASS Localizer scopes and cultures fall back per key
+PASS Localizer invariant fallback is configurable and typed scope is explicit
+PASS Localizer resolves templates before formatting arguments
+PASS Localizer integrates typed JSON resources with scoped constructor injection
+Tests: 10, passed: 10, failed: 0, skipped: 0
+Runtime library tests: PASS

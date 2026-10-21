@@ -20,7 +20,9 @@ pub fn bind(
         .and_then(Value::as_u64)
         .unwrap_or(0);
     if config.len()
-        != if version >= 6 {
+        != if version >= 8 {
+            6
+        } else if version >= 6 {
             5
         } else if version == 5 {
             4
@@ -29,9 +31,9 @@ pub fn bind(
         } else {
             2
         }
-        || !matches!(version, 1..=7)
+        || !matches!(version, 1..=8)
     {
-        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, 5 with moduleCatalogs and moduleFunctions, 6 additionally with typeCatalogs, or 7 with field and constructor retention".into());
+        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, 5 with moduleCatalogs and moduleFunctions, 6 additionally with typeCatalogs, 7 with field and constructor retention, or 8 additionally with methodTypes".into());
     }
     let roots = config
         .get("types")
@@ -115,10 +117,33 @@ pub fn bind(
             function_modules.push(entry.clone());
         }
     }
+    let mut method_types = vec![];
+    if version >= 8 {
+        let requested = config
+            .get("methodTypes")
+            .and_then(Value::as_array)
+            .ok_or("methodTypes must be an array of type definition identities")?;
+        if requested.len() > 64 {
+            return Err("methodTypes admits at most 64 declarations".into());
+        }
+        for entry in requested {
+            let id: TypeDefId = serde_json::from_value(entry.clone())?;
+            if !definitions.contains(&id) {
+                return Err(
+                    "methodTypes declaration is not in the explicit source load set".into(),
+                );
+            }
+            if method_types.contains(&id) {
+                return Err("duplicate methodTypes declaration".into());
+            }
+            method_types.push(id);
+        }
+    }
     if (roots.is_empty()
         && catalogs.is_empty()
         && function_modules.is_empty()
-        && type_catalogs.is_empty())
+        && type_catalogs.is_empty()
+        && method_types.is_empty())
         || roots.len() > 64
     {
         return Err("reflection roots require one to 64 types, an explicit module catalog or a function scope".into());
@@ -132,7 +157,7 @@ pub fn bind(
         let field_count = match version {
             1 => 2,
             2 => 5,
-            7 => 10,
+            7 | 8 => 10,
             _ => 6,
         };
         if fields.len() != field_count
@@ -346,12 +371,44 @@ pub fn bind(
     if version >= 6 {
         result["typeCatalogs"] = json!(type_catalogs);
     }
+    if version >= 8 {
+        result["methodTypes"] = json!(method_types);
+    }
     Ok(result)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn method_retention_is_descriptive_and_accepts_generic_definitions() {
+        let source = neoclr::assemble(".module Methods\n.type Owner<T>\n.end\n").unwrap();
+        let id = source.types[0].definition.clone().unwrap();
+        let policy = json!({"schemaVersion":8,"types":[],"moduleCatalogs":[],
+            "moduleFunctions":[],"typeCatalogs":[],"methodTypes":[id]});
+        let mut input = source.clone();
+        let result = bind(&mut input, &source, &[id.clone()], &[], &policy).unwrap();
+        assert_eq!(result["types"], json!([]));
+        assert_eq!(result["methodTypes"], json!([id]));
+        assert_eq!(input.functions.len(), source.functions.len());
+        let mut invalid = policy.clone();
+        invalid["methodTypes"] = json!([id, id]);
+        assert!(
+            bind(&mut input, &source, &[id.clone()], &[], &invalid)
+                .unwrap_err()
+                .to_string()
+                .contains("duplicate")
+        );
+        assert!(
+            bind(&mut input, &source, &[], &[], &policy)
+                .unwrap_err()
+                .to_string()
+                .contains("load set")
+        );
+        invalid["methodTypes"] = json!(true);
+        assert!(bind(&mut input, &source, &[id], &[], &invalid).is_err());
+    }
 
     #[test]
     fn field_retention_requires_explicit_metadata_and_boolean_policies() {

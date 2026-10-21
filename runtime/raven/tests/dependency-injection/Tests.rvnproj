@@ -14,5 +14,6 @@
     <Compile Include="../collections/Main.rvn" />
     <Compile Include="Tests.rvn" />
     <Compile Include="ServicesTests.rvn" />
+    <Compile Include="../../../../docs/experiments/dependency-injection/sample/Greeting.rvn" />
   </ItemGroup>
 </Project>

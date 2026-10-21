@@ -285,7 +285,8 @@ pub fn prepare(
         || joined.functions.iter().any(|f| {
             matches!(
                 f.name.as_str(),
-                "neoCLR.Runtime.ReflectionConstructorInvoke"
+                "neoCLR.Runtime.TypeMethods"
+                    | "neoCLR.Runtime.ReflectionConstructorInvoke"
                     | "neoCLR.Runtime.ReflectionConstructorInvokeCheck"
                     | "neoCLR.Runtime.ReflectionFieldGet"
                     | "neoCLR.Runtime.ReflectionFieldGetCheck"
