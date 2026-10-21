@@ -1,0 +1,101 @@
+module System.DependencyInjection
+
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Option.*
+import System.Result.*
+import System.Runtime.Reflection.*
+
+// Internal foundation: qualify activation before publishing container contracts.
+internal enum ActivationError {
+    UnsupportedType
+    MissingConstructor
+    AmbiguousConstructor
+    MissingDependency
+    InvocationFailed
+}
+
+internal class ConstructorPlan {
+    private val constructor: ConstructorInfo
+    private val storedParameters: Sequence<ParameterInfo>
+
+    private init(selected: ConstructorInfo) {
+        constructor = selected
+        storedParameters = selected.GetParameters()
+    }
+
+    internal val ParameterCount: int => storedParameters.Count
+
+    // Availability is metadata-only: never resolve services while choosing a constructor.
+    internal static func Prepare(type: TypeInfo, available: (TypeInfo) -> bool) -> Result<ConstructorPlan, ActivationError> {
+        if type.IsAbstract || type.IsInterface || type.IsOpen || type.IsValueType {
+            return Error(ActivationError.UnsupportedType)
+        }
+        let constructors = type.GetConstructors()
+        var selected: Option<ConstructorInfo> = None
+        var count = -1
+        for candidate in constructors {
+            if !candidate.IsPublic || candidate.IsStatic {
+                continue
+            }
+            let parameters = candidate.GetParameters()
+            var usable = true
+            for parameter in parameters {
+                if !available(parameter.ParameterType) {
+                    usable = false
+                }
+            }
+            if usable && parameters.Count > count {
+                selected = Some(candidate)
+                count = parameters.Count
+            }
+        }
+        let Some(best) = selected else {
+            return Error(ActivationError.MissingConstructor)
+        }
+        let bestParameters = best.GetParameters()
+        // Like the default .NET container, another applicable constructor is
+        // ambiguous if it requires a service type absent from the chosen one.
+        for candidate in constructors {
+            if candidate.DefinitionIndex == best.DefinitionIndex || !candidate.IsPublic || candidate.IsStatic {
+                continue
+            }
+            let parameters = candidate.GetParameters()
+            var usable = true
+            var subset = true
+            for parameter in parameters {
+                if !available(parameter.ParameterType) {
+                    usable = false
+                }
+                var found = false
+                for bestParameter in bestParameters {
+                    if parameter.ParameterType.Equals(bestParameter.ParameterType) {
+                        found = true
+                    }
+                }
+                if !found {
+                    subset = false
+                }
+            }
+            if usable && !subset {
+                return Error(ActivationError.AmbiguousConstructor)
+            }
+        }
+        return Ok(ConstructorPlan(best))
+    }
+
+    internal func Activate(resolve: (TypeInfo) -> Option<Object>) -> Result<Object, ActivationError> {
+        let arguments = ArrayList<Object?>(storedParameters.Count)
+        for parameter in storedParameters {
+            let Some(value) = resolve(parameter.ParameterType) else {
+                return Error(ActivationError.MissingDependency)
+            }
+            arguments.Add(value)
+        }
+        if constructor.Invoke(arguments) is Ok(let instance) {
+            return Ok(instance)
+        }
+        return Error(ActivationError.InvocationFailed)
+    }
+}

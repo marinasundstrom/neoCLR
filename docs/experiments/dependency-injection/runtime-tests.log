@@ -1,0 +1,7 @@
+dependency-injection (interpreter):
+PASS DI selects the greediest available public constructor
+PASS DI activates typed localizer dependencies through a retained plan
+PASS DI rejects ambiguous missing and inaccessible constructors
+PASS DI activation reports missing and invalid dependency values
+Tests: 4, passed: 4, failed: 0, skipped: 0
+Runtime library tests: PASS

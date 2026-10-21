@@ -304,6 +304,13 @@ PATH_VALUES_NAMES = [
     'Path equality distinguishes case roots and normalization',
     'Path equality agrees across typed interface and Object dispatch',
 ]
+DEPENDENCY_INJECTION_NAMES = [
+    'DI selects the greediest available public constructor',
+    'DI activates typed localizer dependencies through a retained plan',
+    'DI rejects ambiguous missing and inaccessible constructors',
+    'DI activation reports missing and invalid dependency values',
+]
+
 LOCALIZATION_NAMES = [
     'Localizer preserves strings and distinguishes missing from empty',
     'Localizer uses ordinal keys and decodes JSON escapes',
@@ -434,8 +441,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
-                        help='Run only this suite (repeatable); default runs all suites')
+    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+                        help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
                         help='Execution modes to qualify (repeatable); defaults to JIT')
@@ -461,7 +468,8 @@ def main():
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
-              *sorted((TESTS / 'localization').rglob('*.json'))]
+              *sorted((TESTS / 'localization').rglob('*.json')),
+              ROOT / 'docs/experiments/dependency-injection/ConstructorPlan.rvn']
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
@@ -491,6 +499,7 @@ def main():
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('dependency-injection', 0, ''.join('PASS ' + n + '\n' for n in DEPENDENCY_INJECTION_NAMES) + f'Tests: {len(DEPENDENCY_INJECTION_NAMES)}, passed: {len(DEPENDENCY_INJECTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('localization', 0, ''.join('PASS ' + n + '\n' for n in LOCALIZATION_NAMES) + f'Tests: {len(LOCALIZATION_NAMES)}, passed: {len(LOCALIZATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('deconstruction', 0, ''.join('PASS ' + n + '\n' for n in DECONSTRUCTION_NAMES) + f'Tests: {len(DECONSTRUCTION_NAMES)}, passed: {len(DECONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('currency', 0, ''.join('PASS ' + n + '\n' for n in CURRENCY_NAMES) + f'Tests: {len(CURRENCY_NAMES)}, passed: {len(CURRENCY_NAMES)}, failed: 0, skipped: 0\n'),
@@ -528,7 +537,9 @@ def main():
                 if Path(relative).is_absolute() or lib not in path.parents or not path.is_file() or sha(path) != expected_hash:
                     raise ValueError('Bundle file mismatch: ' + relative)
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
-        selected = [case for case in expected if not args.suite or case[0] in args.suite]
+        # Internal DI activation remains opt-in until native retention is qualified.
+        selected = [case for case in expected
+                    if (case[0] in args.suite if args.suite else case[0] != 'dependency-injection')]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')

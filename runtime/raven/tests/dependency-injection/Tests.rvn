@@ -1,0 +1,78 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.DependencyInjection.*
+import System.Globalization.*
+import System.Introspection.*
+import System.Localization.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+public class Feature { }
+public class Strings : Localizer<Feature> {
+    val Culture: Culture => System.Globalization.Culture.Invariant
+    val self[key: string]: string => "Hello"
+    func Find(key: string) -> Option<string> => Some("Hello")
+}
+public class Greeting {
+    val Text: string
+    init() { Text = "Default" }
+    init(strings: Localizer<Feature>) { Text = strings["Greeting"] }
+}
+public class Ambiguous {
+    init(strings: Localizer<Feature>) { }
+    init(feature: Feature) { }
+}
+public class Missing {
+    init(feature: Feature) { }
+}
+public class PrivateOnly {
+    private init() { }
+}
+
+[Test("DI selects the greediest available public constructor")]
+func ASelect() -> Result<unit, TestFailure> {
+    let Ok(plan) = ConstructorPlan.Prepare(typeof(Greeting), type => type.Equals(typeof(Localizer<Feature>))) else {
+        return Assert.True(false, "Prepare typed localizer constructor")
+    }
+    _ = Assert.Equal(1, plan.ParameterCount)?
+    let Ok(empty) = ConstructorPlan.Prepare(typeof(Greeting), type => false) else {
+        return Assert.True(false, "Prepare parameterless fallback")
+    }
+    return Assert.Equal(0, empty.ParameterCount)
+}
+
+[Test("DI activates typed localizer dependencies through a retained plan")]
+func BActivate() -> Result<unit, TestFailure> {
+    let Ok(plan) = ConstructorPlan.Prepare(typeof(Greeting), type => type.Equals(typeof(Localizer<Feature>))) else {
+        return Assert.True(false, "Prepare")
+    }
+    let strings = Strings()
+    let Ok(instance) = plan.Activate(type => Some<Object>(strings)) else {
+        return Assert.True(false, "Activate")
+    }
+    let greeting = (Greeting)instance
+    _ = Assert.Equal("Hello", greeting.Text)?
+    let Ok(second) = plan.Activate(type => Some<Object>(strings)) else {
+        return Assert.True(false, "Reuse plan")
+    }
+    return Assert.True(!Object.ReferenceEquals(instance, second), "Fresh transient instances")
+}
+
+[Test("DI rejects ambiguous missing and inaccessible constructors")]
+func CReject() -> Result<unit, TestFailure> {
+    _ = Assert.True(ConstructorPlan.Prepare(typeof(Ambiguous), type => true) is Error(ActivationError.AmbiguousConstructor), "Ambiguous")?
+    _ = Assert.True(ConstructorPlan.Prepare(typeof(Missing), type => false) is Error(ActivationError.MissingConstructor), "Missing")?
+    _ = Assert.True(ConstructorPlan.Prepare(typeof(PrivateOnly), type => true) is Error(ActivationError.MissingConstructor), "Private")?
+    return Assert.True(ConstructorPlan.Prepare(typeof(Localizer), type => true) is Error(ActivationError.UnsupportedType), "Interface")
+}
+
+[Test("DI activation reports missing and invalid dependency values")]
+func DErrors() -> Result<unit, TestFailure> {
+    let Ok(plan) = ConstructorPlan.Prepare(typeof(Greeting), type => true) else {
+        return Assert.True(false, "Prepare")
+    }
+    _ = Assert.True(plan.Activate(type => None) is Error(ActivationError.MissingDependency), "Missing after preparation")?
+    return Assert.True(plan.Activate(type => Some<Object>(Feature())) is Error(ActivationError.InvocationFailed), "Wrong runtime value")
+}

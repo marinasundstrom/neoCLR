@@ -14291,3 +14291,18 @@ lowering pack arguments; fixed overloads avoid that array. Main's 11 extension-i
 execution tests pass. The SDK regression checks imported receivers and rejects a
 wrong receiver; built-in localization tests cover the consuming native contract.
 See [localization evidence](experiments/localization/README.md).
+
+### Construction-payload captures exposed by DI (2026-10-21)
+
+Raven main `69dde95e3`, carried independently as native `5f6e7a29c`, fixes shared
+bound-tree traversal of ordinary constructor arguments, initializer entries and
+union-case payloads. A captured local inside `Some<Object>(strings)` was previously
+absent from the lambda capture set, producing an undeclared-local native emission
+error. The general .NET regression confirms this is not a native semantic rule.
+Runtime Contract configuration, temporary CLI representation, native metadata and
+closure ABI are unchanged; existing supported capture shapes remain the boundary.
+The fix belongs to Raven's shared semantic infrastructure, with no separate native
+metadata replacement needed. Five new emitted .NET cases and the native-emitted
+built-in DI activation fixture provide coverage; native/JIT reflective activation
+retention remains a separate qualification gap. See the
+[activation evidence](experiments/dependency-injection/README.md).

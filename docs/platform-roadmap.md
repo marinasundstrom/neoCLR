@@ -2,7 +2,9 @@
 
 **Localization foundation (author direction, 2026-10-21):** Add explicit JSON
 resources, optional typed scopes, per-key culture fallback, lookup-first formatting and diagnostics.
-The author directs committing this increment before DI with automatic constructor injection.
+Localization is committed as `da9e6aec7`. The author directs proceeding to DI with
+automatic constructor injection; [activation groundwork](experiments/dependency-injection/README.md)
+tracks the internal implementation and remaining container gates.
 [Scope and validation](experiments/localization/README.md) remain a bounded addition;
 this does not replace release qualification or expand arbitrary locale support.
 

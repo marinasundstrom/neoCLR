@@ -20711,3 +20711,22 @@ returns None. Formatting uses the selected culture, independent of resource fall
 The author explicitly directed committing localization before beginning dependency
 injection with automatic constructor injection. That DI implementation remains next;
 large-application localization optimization is deferred.
+
+### 2026-10-21 — Localization commit and DI activation groundwork
+
+The author asked whether the params-indexer fix belongs on Raven main. The assistant
+reported that it was implemented on main as `56343767e` and carried deliberately
+to the native branch as `550cbc87c`; imported generic-instance admission is native
+work (`4afc75dd8`). The author then directed: “OK. Fix this and move on to the
+dependency injection infrastructure”.
+
+The assistant committed localization as `da9e6aec7` after 27 built-in executions
+and 23 backend specialization tests passed. The next bounded implementation is
+[internal constructor activation](experiments/dependency-injection/README.md),
+using existing introspection and invocation rather than new runtime machinery.
+Four built-in interpreter tests pass. Public collection/provider contracts, scopes,
+ownership and concurrent/native qualification remain unfinished. A callback capture
+gap surfaced during the tests. The author directed fixing compiler gaps as they
+arise. The assistant reproduced it on Raven main, fixed shared construction-payload
+traversal (`69dde95e3`), carried it to native (`5f6e7a29c`) and restored the direct
+callback fixture. Main validates semantic captures and emitted .NET execution.
