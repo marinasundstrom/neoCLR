@@ -292,6 +292,12 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             Append(new(opCode == OpCode.ValueIs ? "value.is" : "value.unpack", Type: elementType));
             return;
         }
+        if (opCode == OpCode.PointerCast)
+        {
+            if (elementType.PointerElement is null) throw new ArgumentException("PointerCast requires an unmanaged pointer target", nameof(elementType));
+            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+            Append(new("pointer.cast", Type: elementType)); return;
+        }
         if (opCode == OpCode.Castclass)
         {
             if (!IsReferenceSignature(elementType)) throw new ArgumentException("Castclass requires a reference target", nameof(elementType));

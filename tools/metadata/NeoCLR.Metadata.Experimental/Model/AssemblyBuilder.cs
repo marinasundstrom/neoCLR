@@ -922,6 +922,7 @@ public sealed partial class AssemblyBuilder
                     case "convertUInt32": code.WriteByte(0x6d); break;
                     case "convertUInt64": code.WriteByte(0x6e); break;
                     case "convertIntPtr": code.WriteByte(0xd3); break;
+                    case "pointer.cast": code.WriteByte(0xe0); break;
                     case "convertUIntPtr": code.WriteByte(0xe0); break;
                     case "divide.unsigned": code.WriteByte(0x5c); break;
                     case "remainder.unsigned": code.WriteByte(0x5e); break;

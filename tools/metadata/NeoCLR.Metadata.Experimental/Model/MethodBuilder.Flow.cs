@@ -288,6 +288,11 @@ public sealed partial class MethodBuilder
                         _ => PrimitiveType.Int32
                     };
                     break;
+                case "pointer.cast":
+                    if (stack.Count == 0 || stack[^1].PointerElement is null)
+                        throw new InvalidDataException("pointer cast requires an unmanaged pointer");
+                    stack[^1] = instruction.Type!;
+                    break;
                 case "convertSingle":
                 case "convertDouble":
                 case "convertSByte":
@@ -401,8 +406,8 @@ public sealed partial class MethodBuilder
                     var floatingType = stack[^1]; Pop(floatingType); Pop(floatingType);
                     stack.Add(PrimitiveType.Boolean); break;
                 case "equal":
-                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double or PrimitiveType.Boolean))
-                        throw new InvalidDataException("equality requires numeric or Boolean operands");
+                    if (stack.Count == 0 || stack[^1].PointerElement is null && stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double or PrimitiveType.Boolean))
+                        throw new InvalidDataException("equality requires matching numeric, Boolean or pointer operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
                 case "value.is":
                 case "value.unpack":

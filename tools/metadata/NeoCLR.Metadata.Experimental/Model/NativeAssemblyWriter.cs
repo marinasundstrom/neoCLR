@@ -230,6 +230,7 @@ public sealed partial class AssemblyBuilder
             "convertUInt32" => new { op = "conv.u4" },
             "convertUInt64" => new { op = "conv.u8" },
             "convertIntPtr" => new { op = "conv.i" },
+            "pointer.cast" => new { op = "ptr.cast", arg = SignatureValue(instruction.Type!.PointerElement!) },
             "convertUIntPtr" => new { op = "conv.u" },
             "divide.unsigned" => new { op = "div.un" },
             "remainder.unsigned" => new { op = "rem.un" },

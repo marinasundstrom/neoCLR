@@ -1,0 +1,40 @@
+import NeoClr.Testing.*
+import System.*
+import System.Result.*
+import System.Runtime.InteropServices.*
+
+[Test("Typed native pointers compare addresses and preserve borrowed storage")]
+unsafe func Equality() -> Result<unit, TestFailure> {
+    let raw = NativeMemory.Alloc((nuint)4)
+    let first = Ptr<int>((*int)raw)
+    let copy = Ptr<int>(first.Pointer)
+    let empty = default(Ptr<int>)
+    let equal = first == copy && first.Equals(copy) && !(first != copy)
+    let distinct = first != empty && !(first == empty)
+    NativeMemory.Free(first.Pointer)
+    return Assert.True(equal && distinct, "Aliases compare by address; null differs")
+}
+
+[Test("Typed native pointer hashes match aliases without reading storage")]
+unsafe func Hashes() -> Result<unit, TestFailure> {
+    let raw = NativeMemory.Alloc((nuint)4)
+    let first = Ptr<int>((*int)raw)
+    let copy = Ptr<int>(first.Pointer)
+    let hash = first.GetHashCode()
+    System.Runtime.GC.Collect()
+    let same = hash == copy.GetHashCode()
+    let boxed: Object = copy
+    let boxedEqual = first.Equals(boxed) && boxed.GetHashCode() == hash
+    NativeMemory.Free(raw)
+    return Assert.True(same && boxedEqual, "Typed and boxed contracts agree without dereferencing uninitialized storage")
+}
+
+[Test("Default typed native pointers preserve null and generic forwarding")]
+unsafe func Defaults() -> Result<unit, TestFailure> {
+    let empty = default(Ptr<int>)
+    let copy = Forward(empty)
+    NativeMemory.Free(copy.Pointer)
+    return Assert.True(empty == copy && empty.GetHashCode() == copy.GetHashCode(), "Default and copied null pointers agree")
+}
+
+func Forward<T>(pointer: Ptr<T>) -> Ptr<T> where T: struct => pointer

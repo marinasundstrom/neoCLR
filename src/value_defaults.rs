@@ -83,7 +83,7 @@ pub fn body(module: &Module, owner: &Type, contract: &Function) -> Result<Option
             let ty = field
                 .ty
                 .substitute_type_parameters(owner.generic_arguments())?;
-            if integral_width(&ty).is_some() || ty == Type::Boolean {
+            if integral_width(&ty).is_some() || ty == Type::Boolean || matches!(ty, Type::Ptr(_)) {
                 code.extend([
                     Op::Arg(0),
                     Op::Field(index),
@@ -136,6 +136,29 @@ pub fn body(module: &Module, owner: &Type, contract: &Function) -> Result<Option
             let ty = field
                 .ty
                 .substitute_type_parameters(owner.generic_arguments())?;
+            if matches!(ty, Type::Ptr(_)) {
+                // Hash address bits without boxing a pointer or reading its target.
+                code.extend([
+                    Op::Load(1),
+                    Op::Int(31),
+                    Op::Mul,
+                    Op::Arg(0),
+                    Op::Field(index),
+                    Op::ConvertNativeUInt,
+                    Op::ConvertUInt64,
+                    Op::Arg(0),
+                    Op::Field(index),
+                    Op::ConvertNativeUInt,
+                    Op::ConvertUInt64,
+                    Op::Int(32),
+                    Op::ShiftRight,
+                    Op::BitXor,
+                    Op::ConvertInt32,
+                    Op::BitXor,
+                    Op::Store(1),
+                ]);
+                continue;
+            }
             if let Some(wide) = integral_width(&ty) {
                 code.extend([
                     Op::Load(1),

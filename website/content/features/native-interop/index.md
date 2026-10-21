@@ -87,3 +87,17 @@ registration/unregistration lifetime contract. Raven mapping syntax and JIT/AOT 
 remain next. The longer-term goal is an AOT library plus versioned public-interface
 metadata for runtime and native consumers. Export stubs and that sidecar format are
 not implemented yet.
+
+
+## Typed pointers in development
+
+[`System.Runtime.InteropServices.Ptr<T>`](/docs/typed-pointers.html) wraps a borrowed native `*T`, with
+`T: struct`. It supports typed address equality through `==`, `!=` and `Equals`,
+with consistent value hashing. Copying it copies only the pointer; callers retain
+responsibility for allocation lifetime and the matching release operation.
+`Pointer` exposes the raw address for native calls. The built-in native-pointer
+suite tests aliases, null defaults and equality/hashing across boxing and collection.
+
+A struct constraint does not establish an unmanaged layout. Native layout checks
+still apply. Pointer arithmetic and safe native Slice borrowing remain future work;
+this wrapper does not change the interpreter-only native import limitation.

@@ -20940,3 +20940,17 @@ targets through fields, calls and dependency imports, with validation for invali
 scopes/targets. Ten compiler pointer tests, the metadata pointer group, and an
 interpreter C-buffer forwarding/release consumer pass. The public Ptr wrapper and
 native view ownership remain subsequent work, not completed by the compiler fix.
+
+
+### Typed-pointer constraints and operators — 2026-10-21
+
+- **Author:** Asked that `T` be constrained as a struct, then suggested operator overloads.
+- **Assistant:** Proposed address equality (`==`/`!=`) with matching typed/boxed
+  equality and hashing, retaining explicit allocation ownership. Explained that a
+  struct constraint alone does not exclude managed fields.
+- **Action:** Added the constraint and equality operators to the development Ptr
+  wrapper; extended native lowering and default value hashing rather than treating
+  the wrapper as a special runtime type. Validation is tracked in the changelog.
+- **Open:** Pointer arithmetic and scoped Slice conversion require separate layout,
+  bounds and lifetime qualification. No ownership or safety guarantee is inferred
+  from address equality.

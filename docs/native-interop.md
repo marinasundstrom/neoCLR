@@ -417,3 +417,30 @@ allocation count is zero. It executes with the repaired interpreter and the exis
 bundle libraries; this is not qualification of an unchanged packaged runtime.
 Local inputs and the successful command/result are retained under
 `target/native-import-installed-20261021/` (`fixed-interpreter.json`).
+
+
+### Typed native addresses (development, 2026-10-21)
+
+`System.Runtime.InteropServices.Ptr<T>` is a non-owning value type constrained
+with `where T: struct`. Its constructor wraps a raw `*T`; `Pointer` exposes that
+same address for an explicit ABI boundary. Copying the wrapper neither copies
+storage nor retains or releases its allocation. `NativeMemory.Alloc` and `Free`
+remain the allocation pair; foreign allocations require their matching foreign
+release function.
+
+`==`, `!=`, typed `EquatableTo<Ptr<T>>.Equals` and boxed `Equals` compare addresses
+for the same element type. Default struct hashing handles pointer fields directly,
+without boxing the pointer or reading the target. Hashes are process-local and
+must not be persisted. Null is represented by `default(Ptr<T>)`.
+
+This follows [.NET pointer address equality](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#pointer-comparison-operators).
+The generic wrapper supplies ordinary value contracts unavailable on raw pointers.
+It does not introduce memory safety: a struct may contain managed references, so
+the existing native-layout validation remains necessary. Unsupported native layouts
+are gaps, not permission to reinterpret managed storage. Arithmetic, implicit
+wrapper conversions, ownership leases and pointer-to-Slice conversion remain open.
+
+Native lowering retains the generic pointer target and emits `ptr.cast` for
+explicit reinterpretation or implicit void erasure. Temporary CLI metadata uses
+PTR/VAR/MVAR and `conv.u`; the native backend preserves target identity. No Runtime
+Contract setting changes. Built-in tests live in `runtime/raven/tests/native-pointers`.

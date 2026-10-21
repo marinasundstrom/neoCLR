@@ -45,8 +45,8 @@ public sealed partial class AssemblyBuilder
     internal IReadOnlyDictionary<int, TypeParameterConstraints> ImportedSpecialConstraints(ImportedTypeReference reference)
         => new ReadOnlyDictionary<int, TypeParameterConstraints>(importedSpecialConstraints.TryGetValue(InterfaceDefinition(reference), out var constraints) ? constraints : new());
 
-    /// <summary>Registers a resolved special requirement on an imported generic class definition.</summary>
-    /// <param name="reference">Output-owned unconstructed top-level generic reference class.</param>
+    /// <summary>Registers a resolved special requirement on an imported generic class or value definition.</summary>
+    /// <param name="reference">Output-owned unconstructed top-level generic class or value type.</param>
     /// <param name="parameterIndex">Definition parameter ordinal.</param>
     /// <param name="constraints">ReferenceType, ValueType, DefaultConstructor or compatible combinations; native FunctionType alone.</param>
     /// <exception cref="ArgumentException">Wrong owner, ordinal, category or unsupported flags.</exception>
@@ -58,11 +58,11 @@ public sealed partial class AssemblyBuilder
     {
         ArgumentNullException.ThrowIfNull(reference);
         if (!ReferenceEquals(reference.Owner, this) || reference.TypeArguments.Count != 0 || reference.DeclaringType is not null ||
-            reference.IsValueType || IsAuthoredInterface(reference) || parameterIndex < 0 || parameterIndex >= reference.GenericArity ||
+            IsAuthoredInterface(reference) || parameterIndex < 0 || parameterIndex >= reference.GenericArity ||
             constraints == TypeParameterConstraints.None || ((int)constraints & ~60) != 0 ||
             constraints.HasFlag(TypeParameterConstraints.FunctionType) && constraints != TypeParameterConstraints.FunctionType ||
             (constraints & (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType)) == (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType))
-            throw new ArgumentException("requires an owned generic class definition and compatible special constraints");
+            throw new ArgumentException("requires an owned generic class or value definition and compatible special constraints");
         if ((constraints.HasFlag(TypeParameterConstraints.ValueType) || constraints.HasFlag(TypeParameterConstraints.FunctionType)) && ImportedBounds(reference).ContainsKey(parameterIndex))
             throw new ArgumentException("value constraint conflicts with nominal class bound");
         if (!importedSpecialConstraints.TryGetValue(reference, out var registered))

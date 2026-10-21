@@ -105,6 +105,10 @@ attachment and builder convenience methods share validation. `GetILGenerator()` 
 exact pointer target identity through arguments, locals, calls and returns; returning a
 different pointer target rejects during writing. This does not provide allocation,
 ownership, pointer arithmetic or dereference operations in the C# instruction API.
+`Emit(OpCode.PointerCast, destinationPointerType)` reinterprets a pointer without
+changing its address; both input and output must be supported pointer signatures.
+It emits native `ptr.cast` or CLI `conv.u`. `Ceq` accepts matching pointer types
+and returns Boolean without dereferencing either address.
 
 CLI output uses standard `ELEMENT_TYPE_PTR` (including `PTR VOID`), and native output
 uses the existing `Ptr` category without a format-version change. Both readers preserve
@@ -6301,7 +6305,8 @@ an unnamed parameter and retains names through constructed generic views.
 
 `AssemblyBuilder.CreateValueTypeReference(AssemblyIdentity dependency,
 AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
-string name, int genericArity = 0)` authors a public unconstrained value identity.
+string name, int genericArity = 0)` authors a public value identity.
+Register any supported generic category requirements with `SetSpecialConstraints`.
 It has the exact identity, core, digest and resource validation of `CreateTypeReference`.
 It neither loads the dependency nor proves its storage layout.
 
@@ -9958,7 +9963,7 @@ constraint semantics within the bounded profile described below.
 
 | API | Contract |
 | --- | --- |
-| `AssemblyBuilder.SetSpecialConstraints(ImportedTypeReference reference, int parameterIndex, TypeParameterConstraints constraints)` | Register nonzero ReferenceType, ValueType, DefaultConstructor or compatible combinations on an output-owned unconstructed top-level generic reference class. ReferenceType and ValueType conflict; ValueType conflicts with a nominal class bound. Unlike the local builder setter, None does not clear dependency facts. |
+| `AssemblyBuilder.SetSpecialConstraints(ImportedTypeReference reference, int parameterIndex, TypeParameterConstraints constraints)` | Register nonzero ReferenceType, ValueType, DefaultConstructor or compatible combinations on an output-owned unconstructed top-level generic class or value type. ReferenceType and ValueType conflict; ValueType conflicts with a nominal class bound. Unlike the local builder setter, None does not clear dependency facts. |
 | `AssemblyBuilder.AddBaseTypeConstraint(ImportedTypeReference reference, int parameterIndex, ImportedTypeReference baseType)` | Register one nongeneric nominal class bound per parameter. Both references belong to the output. Closed arguments must have the bound's nominal ancestry. No structural conformance is inferred. |
 | `AssemblyBuilder.DeclareDefaultConstructor(ImportedTypeReference reference, bool available)` | Record whether a dependency reference class is concrete and has a public parameterless constructor. The host inspects the actual declaration. Value/interface, constructed, nested and foreign references reject. |
 | `ImportedTypeReference.SpecialConstraints` | Read-only dictionary of registered flags by definition parameter ordinal. Constructions query the same definition contract. |

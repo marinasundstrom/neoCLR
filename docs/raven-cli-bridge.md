@@ -14466,3 +14466,16 @@ compiled source wrapper forwards its native allocation to the matching C release
 under the interpreter. Managed/nominal pointees, arbitrary JIT/AOT native imports,
 and safe pointer-to-Slice ownership remain separate gaps. This does not make a raw
 pointer safe or owning, nor does it introduce a new public Ptr library type yet.
+
+
+### Typed native pointer operations (2026-10-21)
+
+General pointer conversion classification is implemented on Raven main in
+`1e2b43ce4` and carried deliberately to `codex/neoclr` in `469e6a092`.
+The native portable layer admits pointer casts/equality and applies the existing
+special-constraint capability to value types instead of rejecting every constrained
+struct. Metadata emits `ptr.cast` with its exact pointee; the temporary CLI path
+uses `conv.u`. Typed pointer fields retain PTR/VAR/MVAR representation.
+There are no Runtime Contract changes or automatic lifetime extensions.
+The native SDK owns stack validation; Raven owns semantic classification/lowering.
+Native Slice borrowing, arbitrary native layouts and JIT/AOT imports remain gaps.

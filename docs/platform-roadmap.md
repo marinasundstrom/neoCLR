@@ -6,6 +6,10 @@ no-result native-call validation gap; retain JIT/AOT imports, scoped managed
 borrowing and persistent native-owner leases as distinct open work. See the
 [native buffer review](native-interop.md#managed-and-native-buffers-release-review--2026-10-21).
 This review does not imply that Slice or Memory must be foreign ABI parameter types.
+The [typed-pointer foundation](experiments/native-pointers/README.md) now adds
+`Ptr<T> where T: struct`, address equality and ordinary value hashing. The three
+built-in library tests pass in the interpreter. Scoped borrowing and native import
+execution in JIT/AOT remain separate release gaps.
 
 **Record display stabilization (2026-10-21):** The native compiler closes generated
 formatting for type-parameter components in positional record structs using ordinary

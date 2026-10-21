@@ -263,3 +263,24 @@ fn defaults_can_read_private_fields_without_exposing_them_to_callers() {
         .is_err()
     );
 }
+
+#[test]
+fn pointer_fields_use_address_equality_and_hash_without_dereferencing_or_boxing() {
+    let declarations = ".type PointerValue\n.field Address Int32*\n.end";
+    for pointer in ["ptr.null Int32", "ldc.i4 1\nheap.alloc Int32"] {
+        let setup = format!(".local Int32* address\n{pointer}\nstloc address\n");
+        let value = "ldloc address\nnewobj PointerValue\nbox PointerValue";
+        for body in [
+            format!("{setup}{value}\n{value}\n{EQUALS}"),
+            format!("{setup}{value}\n{HASH}\n{value}\n{HASH}\nceq"),
+        ] {
+            assert_eq!(
+                run(&body, declarations, "Boolean", 2).unwrap().value,
+                Value::Boolean(true)
+            );
+        }
+    }
+    assert_eq!(run(
+        &format!("ldc.i4 1\nheap.alloc Int32\nnewobj PointerValue\nbox PointerValue\nptr.null Int32\nnewobj PointerValue\nbox PointerValue\n{EQUALS}"),
+        declarations, "Boolean", 2).unwrap().value, Value::Boolean(false));
+}

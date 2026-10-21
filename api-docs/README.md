@@ -2861,3 +2861,12 @@ compiler service, not a claim of API identity with .NET RuntimeHelpers. Generate
 record-class equality uses it after null guards. The opt-in interpreter allocation
 test measures repeated equality; public GC counters remain unsupported by native/JIT
 bindings, so that test does not establish native allocation counts or throughput.
+
+Development (2026-10-21): `System.Runtime.InteropServices.Ptr<T>` is selected in
+the native reference, including its struct constraint and pointer getter. RavenDoc
+sanitizes both equality operators to `operator_operator___.html`, so the generated
+type page links the complete [manual pointer reference](typed-pointers.md).
+No public type is excluded. The manual also clarifies inherited value hashing,
+which the generic Object summary does not describe accurately for this struct.
+The historical CLI CoreProbe inventory is unchanged; the native renderer selects
+the real public type directly from System.Runtime, as with the other native-only APIs.

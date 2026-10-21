@@ -1,0 +1,30 @@
+module System.Runtime.InteropServices
+
+/// A non-owning typed native pointer. Copying this value copies the address, not its storage.
+/// Native use requires an unsafe context and a live allocation with a compatible layout.
+/// The default value contains a null pointer. This type neither keeps storage alive nor frees it.
+public struct Ptr<T> : System.EquatableTo<Ptr<T>> where T: struct {
+    private val pointer: *T
+
+    /// Wraps an unmanaged pointer without copying memory or acquiring ownership.
+    /// The caller remains responsible for the pointed-to storage and its matching release operation.
+    init(pointer: *T) {
+        self.pointer = pointer
+    }
+
+    /// Gets the underlying unmanaged pointer for an explicit native ABI boundary.
+    /// Access through it must respect the allocation's bounds, alignment, initialization and lifetime.
+    val Pointer: *T => pointer
+
+    /// Compares addresses without reading either allocation or changing its lifetime.
+    func Equals(other: Ptr<T>) -> bool => pointer == other.Pointer
+
+    /// Compares a boxed pointer of the same element type by address.
+    override func Equals(other: System.Object?) -> bool => other is Ptr<T> value && Equals(value)
+
+    /// Tests whether two pointers of the same element type contain the same address.
+    static func ==(left: Ptr<T>, right: Ptr<T>) -> bool => left.Equals(right)
+
+    /// Tests whether two pointers of the same element type contain different addresses.
+    static func !=(left: Ptr<T>, right: Ptr<T>) -> bool => !left.Equals(right)
+}

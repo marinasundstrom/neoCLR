@@ -9,6 +9,7 @@ internal static class PointerSignatureChecks
     internal static void Run()
     {
         GenericRoundTrips();
+        PointerCasts();
         var graph = new AssemblyBuilder(new("PointerSignatures", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var owner = graph.AddType("Example", "Pointers");
         var pointer = SignatureType.PointerTo(PrimitiveType.Void);
@@ -79,9 +80,35 @@ internal static class PointerSignatureChecks
         catch (InvalidDataException) { }
     }
 
+    private static void PointerCasts()
+    {
+        var graph = new AssemblyBuilder(new("PointerCasts", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var source = SignatureType.PointerTo(PrimitiveType.Void);
+        var target = SignatureType.PointerTo(PrimitiveType.Byte);
+        var method = graph.AddFunction("Cast", new(target, [source]));
+        method.LoadArgument(0);
+        method.Emit(OpCode.PointerCast, target);
+        method.Return();
+        var equality = graph.AddFunction("Same", new(PrimitiveType.Boolean, [target, target]));
+        equality.LoadArgument(0); equality.LoadArgument(1); equality.Emit(OpCode.Ceq); equality.Return();
+        _ = graph.Write();
+        _ = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+        Reject(() => method.Emit(OpCode.PointerCast, PrimitiveType.Int32));
+        var invalid = new AssemblyBuilder(new("InvalidPointerCast", new(1, 0, 0, 0)), graph.CoreLibrary);
+        var bad = invalid.AddFunction("Bad", new(target, [PrimitiveType.Int32]));
+        bad.LoadArgument(0); bad.Emit(OpCode.PointerCast, target); bad.Return();
+        try { invalid.Write(); throw new Exception("non-pointer cast accepted"); }
+        catch (InvalidDataException) { }
+    }
+
     private static void GenericRoundTrips()
     {
         var graph = new AssemblyBuilder(new("GenericPointers", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var constrainedConsumer = new AssemblyBuilder(new("ConstrainedConsumer", new(1, 0, 0, 0)), graph.CoreLibrary);
+        var imported = constrainedConsumer.CreateValueTypeReference(graph.Identity, graph.CoreLibrary, new string('b', 64), "Example", "ConstrainedPointer`1", 1);
+        constrainedConsumer.SetSpecialConstraints(imported, 0, TypeParameterConstraints.ValueType);
+        _ = imported.MakeGenericInstance(PrimitiveType.Int32);
+        Reject(() => imported.MakeGenericInstance(PrimitiveType.String));
         var owner = graph.AddGenericClass("Example", "PointerBox", ["T"]);
         var pointer = SignatureType.PointerTo(SignatureType.TypeParameter(0));
         var field = owner.AddField("Pointer", pointer, FieldVisibility.Public);

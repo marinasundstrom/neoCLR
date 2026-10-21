@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Add the development `System.Runtime.InteropServices.Ptr<T>` non-owning wrapper with `where T: struct`, a raw pointer getter, address `==`/`!=`, typed EquatableTo and boxed equality. Extend ordinary value defaults to compare/hash pointer fields without field boxing or target reads. Native metadata supports pointer casts/equality and imported value-type constraints; Raven main supplies the separately validated pointer conversions. The three built-in pointer tests, seven value-default tests, focused SDK group and 42 native-line compiler pointer tests pass; five libraries and the native API snapshot are refreshed, and the 5,637-page website build passes. Arithmetic, native Slice borrowing and JIT/AOT imports remain open. Document the operator renderer collision with a linked manual reference.
+
 - Preserve scoped generic pointer targets through metadata construction, substitution, native imports and overload identity; reject out-of-scope parameters and unsupported closed targets. Matching Raven native emission retains `*T` rather than erasing it. The focused metadata pointer group, ten compiler pointer tests and an interpreter source/native buffer consumer pass. No public Ptr library type or safe native Slice conversion is introduced by this foundation.
 
 - Record the typed-pointer and native-buffer ownership discussion, identifying existing NativeMemory allocation APIs and Ptr metadata. Keep proposed safe borrowing and ownership contracts explicitly unimplemented; no public API or pointer representation changes.

@@ -140,6 +140,8 @@
       href: docs/text-numbers.md
     - name: "Local time mapping payloads"
       href: docs/time-zone-mappings.md
+    - name: "Typed native pointers"
+      href: docs/typed-pointers.md
     - name: "Native interop contracts"
       href: docs/native-interop.md
     - name: "Cryptography"

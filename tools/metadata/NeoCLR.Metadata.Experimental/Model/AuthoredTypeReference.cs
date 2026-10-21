@@ -20,13 +20,13 @@ public sealed partial class AssemblyBuilder
         string artifactSha256, string @namespace, string name, int genericArity = 0)
         => CreateNominalReference(dependency, dependencyCoreLibrary, artifactSha256, @namespace, name, genericArity, false);
 
-    /// <summary>Authors a public unconstrained value-type identity from explicit dependency facts.</summary>
+    /// <summary>Authors a public value-type identity from explicit dependency facts.</summary>
     /// <param name="dependency">Exact unsigned external assembly identity.</param>
     /// <param name="dependencyCoreLibrary">Core identity, equal to the output core.</param>
     /// <param name="artifactSha256">64 hexadecimal SHA-256 digits for the selected native image.</param>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Metadata name including any generic arity suffix.</param>
-    /// <param name="genericArity">Number of invariant unconstrained parameters, zero to 32.</param>
+    /// <param name="genericArity">Number of invariant parameters, zero to 32; register supported requirements with SetSpecialConstraints.</param>
     /// <returns>An interned output-owned value definition reference.</returns>
     /// <exception cref="ArgumentException">The digest is malformed.</exception>
     /// <exception cref="InvalidDataException">Unsupported identity, core, name, arity, conflicting snapshot or resource limit.</exception>
