@@ -1,0 +1,7 @@
+import System.*
+
+record Node(Next: Node?)
+
+func Main() {
+    Console.WriteLine(Node(null).ToString())
+}

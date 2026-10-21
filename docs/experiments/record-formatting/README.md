@@ -174,3 +174,36 @@ ten tests pass in interpreter/native/JIT execution (30 executions), with Raven
 `2607945d3`. The record-class rejection remains targeted. Package qualification remains
 open. Core/library artifacts from the preceding cohort are reused, so this does not
 claim that previously built imported generic records gained new overrides.
+
+## Root record-class display — 2026-10-21
+
+The [preceding compiler](class-baseline.txt) rejected generated class display.
+The native formatter now admits source positional record classes directly based on
+Object, within the existing supported component set. Property calls use reference
+receivers. Nested class components check null and use their ordinary virtual display
+method; nested value records still append into the enclosing builder. This preserves
+reference identity alongside generated component equality, as .NET record classes do.
+Raven's quoted text and explicit null spelling remain deliberate language semantics.
+
+No new runtime machinery, Runtime Contract, metadata or ABI is introduced. The
+existing generated class equality/hash/null handling is unchanged and is exercised
+through typed, Object and EquatableTo calls. Nested class display allocates its own
+builder/output string; references do not require value boxing. This is a correctness
+closure with no performance claim. Inherited and recursive records remain outside
+qualification; the unsupported fixture now isolates recursive display.
+
+The built-in suite adds distinct-but-equal class instances, both/one-null operators,
+unrelated Object comparison, matching hashes, boxed display after collection, and
+nullable class components in both class and struct records. Validation is retained
+in [class-validation.json](class-validation.json): all twelve tests pass in
+interpreter/native/JIT execution (36 executions), using Raven `6279c7130`. Recursive
+display retains its targeted diagnostic. Previously compiled libraries remain unchanged until
+rebuilt; matched release-package qualification is still required.
+
+A separate [compiler repro](CopyConstructorCollision.rvn) (`record Node(Next: Node?)`)
+produces this [retained diagnostic](copy-constructor-collision.txt): it reports native
+metadata error NEOMETA003 (invalid or duplicate method), apparently colliding with
+the generated copy constructor. Adding another positional component allows the
+recursive display probe to reach its intended NEOMETA001 diagnostic. This collision
+is not fixed here; determine the general Raven/.NET diagnostic and synthesis policy
+on main before carrying a fix to the native line.

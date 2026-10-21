@@ -1,5 +1,7 @@
 import System.*
-record Wrapped(Value: int)
+
+record Node(Name: string, Next: Node?)
+
 func Main() {
-    Console.WriteLine(Wrapped(1).ToString())
+    Console.WriteLine(Node("root", null).ToString())
 }

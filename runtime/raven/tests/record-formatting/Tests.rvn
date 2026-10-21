@@ -141,3 +141,35 @@ func GenericDispatch() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Wrapped { Value = Read, Write }", Wrapped<Access>(Access.Read | Access.Write).ToString())?
     return Assert.Equal("Wrapped { Value = Wrapped { Value = 5 } }", Wrapped<Wrapped<int>>(Wrapped<int>(5)).ToString())
 }
+
+record Person(Name: string, Age: int)
+record Household(Owner: Person?)
+record struct Contact(Owner: Person?)
+
+[Test("Root record classes preserve value equality and reference identity")]
+func ReferenceContracts() -> Result<unit, TestFailure> {
+    let first = Person("Ada", 37)
+    let equal = Person("Ada", 37)
+    let different = Person("Ada", 38)
+    let absent: Person? = null
+    let alsoAbsent: Person? = null
+    let boxed: object = first
+    let contract: EquatableTo<Person> = first
+    _ = Assert.True(absent == alsoAbsent && !(absent != alsoAbsent), "Both absent")?
+    _ = Assert.True(!Object.ReferenceEquals(first, equal), "Separate instances")?
+    _ = Assert.True(first == equal && first != different && first != absent && absent != first, "Operators")?
+    _ = Assert.True(first.Equals(equal) && boxed.Equals(equal) && contract.Equals(equal), "Dispatch")?
+    _ = Assert.True(!first.Equals(null) && !boxed.Equals(42), "Absent and unrelated")?
+    _ = Assert.Equal(first.GetHashCode(), equal.GetHashCode())?
+    System.Runtime.GC.Collect()
+    return Assert.Equal("Person { Name = \"Ada\", Age = 37 }", boxed.ToString())
+}
+
+[Test("Record class display preserves nested and absent references")]
+func ReferenceDisplay() -> Result<unit, TestFailure> {
+    let owner = Person("Ada", 37)
+    _ = Assert.Equal("Household { Owner = Person { Name = \"Ada\", Age = 37 } }", Household(owner).ToString())?
+    _ = Assert.Equal("Household { Owner = null }", Household(null).ToString())?
+    _ = Assert.Equal("Contact { Owner = null }", Contact(null).ToString())?
+    return Assert.Equal("Contact { Owner = Person { Name = \"Ada\", Age = 37 } }", Contact(owner).ToString())
+}

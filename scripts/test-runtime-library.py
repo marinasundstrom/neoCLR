@@ -368,6 +368,8 @@ RECORD_FORMATTING_NAMES = [
     'Generic record display preserves text null and primitive contracts',
     'Records use imported value formatting across typed and boxed calls',
     'Nested records and unions retain imported value display contracts',
+    'Root record classes preserve value equality and reference identity',
+    'Record class display preserves nested and absent references',
     'Record scalar formatting preserves null and original Unicode text',
 ]
 INDEX_RANGE_NAMES = [

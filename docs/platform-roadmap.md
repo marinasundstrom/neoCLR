@@ -3,8 +3,9 @@
 **Record display stabilization (2026-10-21):** The native compiler closes generated
 formatting for type-parameter components in positional record structs using ordinary
 Object display contracts. [Focused evidence and costs](experiments/record-formatting/README.md#generic-component-display--2026-10-21)
-track this bounded correctness slice. Record-class display and fresh matched-package
-qualification remain open; no throughput improvement is claimed.
+track this bounded correctness slice. Root record-class display is also qualified
+with reference/null/equality regressions. Inherited/recursive records and fresh
+matched-package qualification remain open; no throughput improvement is claimed.
 
 **Localization foundation (author direction, 2026-10-21):** Add explicit JSON
 resources, optional typed scopes, per-key culture fallback, lookup-first formatting and diagnostics.

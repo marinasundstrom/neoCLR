@@ -14372,3 +14372,13 @@ preserve the same behavior. Generic value fields currently box once and nested
 generic formatting may allocate intermediate strings. Record classes remain a gap.
 See [implementation and focused evidence](experiments/record-formatting/README.md#generic-component-display--2026-10-21).
 Previously built imported libraries do not acquire overrides until rebuilt.
+
+### Root record-class follow-up
+
+The native emitter also admits positional record classes directly based on Object.
+Getters receive references; nested class display uses a null guard and virtual
+ToString. Runtime representation, boxing policy and ABI are unchanged. Existing
+class equality/hash contracts are covered by the built-in suite rather than
+reimplemented. Nested class output still allocates. Inherited/recursive display
+and the separately observed self-typed copy-constructor collision remain gaps;
+see the record-formatting evidence.

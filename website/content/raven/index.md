@@ -102,8 +102,11 @@ Int32-backed enums reuse Object display with a temporary box. Development compil
 support also covers type-parameter components in source record structs, preserving
 quoted text and null through ordinary Object dispatch. Generic value components box
 once and nested generic display can allocate intermediate strings; previously built
-libraries need rebuilding to gain those overrides. Record-class formatting remains
-a gap. This is
+libraries need rebuilding to gain those overrides. Source record classes directly
+based on Object now support the same bounded component display, with ordinary
+reference receivers and null-safe virtual display for nested class components.
+Nested class display allocates intermediate strings. Inherited and recursive
+record display remain unqualified. This is
 pre-release compiler work, not a claim of full record support.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)

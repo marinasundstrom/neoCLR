@@ -16,7 +16,13 @@ qualification. Existing library artifacts retain their own compiler identities.
 
 Generic component display in source record structs now passes 30 built-in executions
 with Raven `2607945d3`; see [evidence](../../experiments/record-formatting/generic-validation.json).
-Continue through record-class semantics, rebuilt libraries and matched package qualification.
+Root record-class display now has a bounded implementation and built-in reference
+identity/equality/hash/display coverage: all 36 executions pass with Raven
+`6279c7130` ([evidence](../../experiments/record-formatting/class-validation.json)). Continue
+through remaining inherited/recursive record scope, rebuilt libraries and matched
+package qualification. The single self-typed positional component/copy-constructor
+collision remains a compiler diagnostic gap (NEOMETA003); investigate general
+Raven synthesis on main before carrying a native fix.
 Do not expand localization/DI or reflection to fill every possible API gap:
 collection/keyed constructor injection, pluralization and caching remain follow-ups.
 No release tag or version is selected, and a local website build is not publication.
