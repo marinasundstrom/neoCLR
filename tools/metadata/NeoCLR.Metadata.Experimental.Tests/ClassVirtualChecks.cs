@@ -33,11 +33,17 @@ internal static class ClassVirtualChecks
         il = childRead.GetILGenerator(); il.LoadArgument(0); il.LoadField(field); il.Return();
         var childSet = Slot(child, "Set", new(PrimitiveType.Void, [PrimitiveType.Int32]), 0x46);
         il = childSet.GetILGenerator(); il.LoadArgument(0); il.LoadArgument(1); il.Call(set); il.Return();
+        var baseDirect = parent.AddInstanceMethod("Direct", new MethodSignature(PrimitiveType.Int32, []));
+        il = baseDirect.GetILGenerator(); il.LoadConstant(-9); il.Return();
+        var childDirect = child.AddInstanceMethod("Direct", new MethodSignature(PrimitiveType.Int32, []));
+        il = childDirect.GetILGenerator(); il.LoadConstant(9); il.Return();
         var main = graph.AddFunction("Main"); graph.EntryPoint = main;
         il = main.GetILGenerator(); var item = il.DeclareLocal(child); il.NewObject(ctor); il.StoreLocal(item);
         il.LoadLocal(item); il.CallVirtual(contract); il.Emit(OpCode.Pop);
         il.LoadLocal(item); il.LoadConstant(42); il.CallVirtual(set);
-        il.LoadLocal(item); il.CallVirtual(read); il.Return();
+        il.LoadLocal(item); il.CallVirtual(read);
+        il.LoadLocal(item); il.Call(baseDirect); il.Add();
+        il.LoadLocal(item); il.Call(childDirect); il.Add(); il.Return();
         return graph;
     }
     internal static void Run()
@@ -49,6 +55,9 @@ internal static class ClassVirtualChecks
             var cli = System.Reflection.Assembly.Load(graph.Write());
             var child = cli.GetType("Example.Derived")!; var parent = child.BaseType!;
             var item = Activator.CreateInstance(child)!;
+            if ((int)parent.GetMethod("Direct")!.Invoke(item, null)! != -9 ||
+                (int)child.GetMethod("Direct")!.Invoke(item, null)! != 9)
+                throw new Exception("nonvirtual hiding changed declaration-owner dispatch");
             var contract = cli.GetType("Example.Reader")!.GetMethod("Read")!;
             if ((int)contract.Invoke(item, null)! != 7) throw new Exception("CLI abstract interface dispatch failed");
             parent.GetMethod("Set")!.Invoke(item, [42]);
@@ -104,6 +113,11 @@ internal static class ClassVirtualChecks
             {
                 var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
                 start.ArgumentList.Add(command); start.ArgumentList.Add(path);
+                if (command == "run")
+                {
+                    start.ArgumentList.Add("--execution");
+                    start.ArgumentList.Add("interpreter");
+                }
                 using var process = Process.Start(start)!;
                 var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
                 using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));

@@ -367,7 +367,10 @@ RECORD_FORMATTING_NAMES = [
     'Generic record display uses nested and boxed value dispatch',
     'Generic record display preserves text null and primitive contracts',
     'Records use imported value formatting across typed and boxed calls',
+    'Inherited record equality observes runtime type and derived state',
+    'Inherited record display includes base members through virtual calls',
     'Nested records and unions retain imported value display contracts',
+    'Recursive record shapes display finite reference chains',
     'Root record classes preserve value equality and reference identity',
     'Record class display preserves nested and absent references',
     'Record scalar formatting preserves null and original Unicode text',
@@ -464,7 +467,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -472,6 +475,8 @@ def main():
     parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
     modes = args.mode or ['jit']
+    if args.suite and 'record-allocations' in args.suite and set(modes) != {'interpreter'}:
+        parser.error('record-allocations requires --mode interpreter; native/JIT GC counters are not bound')
     bundled_bin = args.bundle.resolve() / 'bin'
     if (bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')).is_file():
         if args.runtime == parser.get_default('runtime'):
@@ -530,6 +535,7 @@ def main():
         ('currency', 0, ''.join('PASS ' + n + '\n' for n in CURRENCY_NAMES) + f'Tests: {len(CURRENCY_NAMES)}, passed: {len(CURRENCY_NAMES)}, failed: 0, skipped: 0\n'),
         ('decimal', 0, ''.join('PASS ' + n + '\n' for n in DECIMAL_NAMES) + f'Tests: {len(DECIMAL_NAMES)}, passed: {len(DECIMAL_NAMES)}, failed: 0, skipped: 0\n'),
         ('floating-special-values', 0, ''.join('PASS ' + n + '\n' for n in FLOATING_SPECIAL_NAMES) + f'Tests: {len(FLOATING_SPECIAL_NAMES)}, passed: {len(FLOATING_SPECIAL_NAMES)}, failed: 0, skipped: 0\n'),
+        ('record-allocations', 0, 'PASS Record class equality avoids reflection descriptor allocations\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
         ('record-formatting', 0, ''.join('PASS ' + n + '\n' for n in RECORD_FORMATTING_NAMES) + f'Tests: {len(RECORD_FORMATTING_NAMES)}, passed: {len(RECORD_FORMATTING_NAMES)}, failed: 0, skipped: 0\n'),
         ('enum-parsing', 0, ''.join('PASS ' + n + '\n' for n in ENUM_PARSING_NAMES) + f'Tests: {len(ENUM_PARSING_NAMES)}, passed: {len(ENUM_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('globalization', 0, ''.join('PASS ' + n + '\n' for n in GLOBALIZATION_NAMES) + f'Tests: {len(GLOBALIZATION_NAMES)}, passed: {len(GLOBALIZATION_NAMES)}, failed: 0, skipped: 0\n'),
@@ -564,7 +570,7 @@ def main():
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
         # Only explicitly qualified suites enter the default release gate.
         selected = [case for case in expected
-                    if not args.suite or case[0] in args.suite]
+                    if (not args.suite and case[0] != 'record-allocations') or (args.suite and case[0] in args.suite)]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')

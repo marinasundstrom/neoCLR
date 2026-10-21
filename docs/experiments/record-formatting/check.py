@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate native record formatting and its unsupported-component diagnostic."""
+"""Validate native record formatting and its copy-constructor collision diagnostic."""
 import argparse
 import hashlib
 import json
@@ -35,12 +35,12 @@ for engine in ['interpreter', 'jit', 'aot']:
                      stdout=result.stdout, stderr=result.stderr, passed=passed))
     print(f'{engine}: {"PASS" if passed else "FAIL"}', flush=True)
 compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
-for case in ['Unsupported']:
+for case in ['CopyConstructorCollision']:
     command = ['dotnet', str(compiler), 'neoclr', '--project',
                str(Path(__file__).resolve().with_name(case + '.rvnproj'))]
     result = subprocess.run(command, env={**os.environ, 'NeoClrBundleRoot': str(bundle)},
                             text=True, capture_output=True, timeout=120)
-    passed = result.returncode != 0 and 'record formatting requires supported scalar components and native text helpers' in result.stdout + result.stderr
+    passed = result.returncode != 0 and 'RAV0111' in result.stdout + result.stderr
     rows.append(dict(case=case, command=command, exitCode=result.returncode,
                      stdout=result.stdout, stderr=result.stderr, passed=passed))
     print(f'{case}: {"PASS" if passed else "FAIL"}', flush=True)

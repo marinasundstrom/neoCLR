@@ -30,8 +30,7 @@ The development generic path currently boxes value components. Declared-type
 relationship selection now uses handles without allocating reflection descriptors;
 value boxing still allocates. The tested native scope includes
 Int32, Int64, Boolean, String, nullable references, authored equality contracts,
-Index/Range and nested generic records. Floating-point/enum generic Object adapters,
-ordinary structs without value overrides and generic record formatting remain gaps;
+Index/Range and nested generic records. Broader component contracts remain bounded;
 unsupported component contracts can cause a terminal Fault or native compilation
 rejection. This is an implementation limit, not a different intended equality model.
 
@@ -42,3 +41,11 @@ this reference preserves both signatures.
 
 Index and Range now also override `Equals(Object?)` and `GetHashCode`, preserving
 their typed contracts through Object and generic parameters.
+
+## Display
+
+Development rebuilt libraries override `ToString()` with named components:
+`KeyValuePair { Key = 1, Value = "one" }`. Text is quoted, null is explicit, and
+other values use their ordinary display contracts. Generic value components box;
+nested display can allocate intermediate strings in addition to builder/output
+storage. The built-in record-formatting suite exercises the imported library type.

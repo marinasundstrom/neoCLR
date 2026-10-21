@@ -217,3 +217,49 @@ metadata encoding. Native carry `e73b03792` independently builds and the retaine
 now reports the same source diagnostic. This follows [C# CS8910](https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-messages/constructor-errors);
 nullable annotations cannot distinguish signatures. The earlier NEOMETA003
 observation above describes the repaired behavior, not an open platform limitation.
+
+
+## Inherited and recursive records — 2026-10-21
+
+The native compiler now gathers inherited and declared source-record components
+for equality, hashing and display. Base-typed operators and typed Equals dispatch
+to the actual record's virtual Object.Equals; that method compares exact runtime
+type identity before component values. This fixes equality ignoring derived state
+or equating distinct derived types. Raven main 9645e24f5 fixes the same .NET-target
+behavior, independently covered by emitted execution tests. Main ab1bc96d3 marks
+record copy constructors as initializing required members. Native portable lowering
+now passes the source object to the base record copy constructor.
+
+The runtime and metadata SDK allow nonvirtual methods with the same signature on
+base and derived types, retaining owner-specific direct dispatch. Virtual hiding
+still requires an explicit supported slot contract. No record-specific runtime type
+or ABI is added. A new public compiler service,
+RuntimeHelpers.HaveSameRuntimeType, compares existing object type handles without
+reflection descriptor allocations; both inputs must be non-null. Older compiler
+cores retain the descriptor fallback. This is an implementation service rather than
+a different equality policy from .NET. See the matching Raven compiler bridge docs.
+
+Finite recursive reference graphs now display through ordinary null-safe virtual
+calls. Actual cycles retain ordinary stack limits rather than an invented cycle
+placeholder. Generic boxes, builders, output strings and nested display strings
+remain allocation costs. The qualified hierarchy scope is source records, including
+generic bases; arbitrary imported record-base synthesis remains outside this slice.
+All five source libraries were rebuilt, and the built-in consumer checks imported
+KeyValuePair display. Earlier rejection reports above remain historical evidence.
+
+The opt-in `record-allocations` built-in suite measures 64 equality comparisons
+between existing objects, after a negative component-value assertion. Public GC
+counters are currently interpreter-only: this test cannot qualify native/JIT counts
+or claim a throughput improvement. Ordinary record-formatting contracts run in all
+three engines. Matched extracted-package qualification remains a separate gate.
+
+Validation: Raven native `328349bf7` (tested compiler built from its source changes),
+[45 passing executions](inheritance-validation.json) and
+[one passing interpreter allocation contract](allocation-validation.json). The retained
+reports identify exact artifact hashes and the development build revision label.
+Thirteen Rust inheritance/virtual tests, SDK CLR/native direct-dispatch checks and
+strict runtime-library Clippy also pass. These are focused development checks, not
+an extracted release package gate.
+
+API snapshots, 23 website tests and the 5,626-page local website build pass.
+[Supporting check logs](supporting-checks.json) retain the focused source checks.

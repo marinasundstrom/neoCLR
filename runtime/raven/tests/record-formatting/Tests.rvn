@@ -18,6 +18,7 @@ func ImportedValues() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Interval { Value = 1..^2 }", interval.ToString())?
     let boxed: object = position
     System.Runtime.GC.Collect()
+    _ = Assert.Equal("KeyValuePair { Key = 1, Value = \"one\" }", System.Collections.KeyValuePair<int, string>(1, "one").ToString())?
     return Assert.Equal(position.ToString(), boxed.ToString())
 }
 
@@ -172,4 +173,54 @@ func ReferenceDisplay() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Household { Owner = null }", Household(null).ToString())?
     _ = Assert.Equal("Contact { Owner = null }", Contact(null).ToString())?
     return Assert.Equal("Contact { Owner = Person { Name = \"Ada\", Age = 37 } }", Contact(owner).ToString())
+}
+
+record Link(Name: string, Next: Link?)
+
+[Test("Recursive record shapes display finite reference chains")]
+func RecursiveReferences() -> Result<unit, TestFailure> {
+    let first = Link("first", Link("last", null))
+    let equal = Link("first", Link("last", null))
+    _ = Assert.True(first == equal, "Recursive equality")?
+    _ = Assert.Equal(first.GetHashCode(), equal.GetHashCode())?
+    let boxed: object = first
+    System.Runtime.GC.Collect()
+    return Assert.Equal("Link { Name = \"first\", Next = Link { Name = \"last\", Next = null } }", boxed.ToString())
+}
+
+open record Entity(Id: int)
+record Item(Id: int, Name: string) : Entity(Id)
+record Other(Id: int) : Entity(Id)
+record Leaf(Name: string) : Entity(7)
+open record GenericEntity<T>(Value: T)
+record GenericItem<T>(Value: T, Id: int) : GenericEntity<T>(Value)
+
+[Test("Inherited record equality observes runtime type and derived state")]
+func InheritedContracts() -> Result<unit, TestFailure> {
+    let first: Entity = Item(1, "a")
+    let same: Entity = Item(1, "a")
+    let changed: Entity = Item(1, "b")
+    let other: Entity = Other(1)
+    let root = Entity(1)
+    let contract: EquatableTo<Entity> = first
+    let boxed: object = first
+    _ = Assert.True(first == same && first.Equals(same) && contract.Equals(same), "Same runtime type and state")?
+    _ = Assert.True(first != changed && !first.Equals(changed) && !contract.Equals(changed), "Derived state")?
+    _ = Assert.True(first != other && other != first && first != root && root != first, "Symmetric type identity")?
+    _ = Assert.True(boxed.Equals(same) && !boxed.Equals(other), "Object dispatch")?
+    _ = Assert.Equal(first.GetHashCode(), same.GetHashCode())?
+    let generic: GenericEntity<string> = GenericItem<string>("a", 1)
+    let genericSame: GenericEntity<string> = GenericItem<string>("a", 1)
+    let genericChanged: GenericEntity<string> = GenericItem<string>("a", 2)
+    return Assert.True(generic == genericSame && generic != genericChanged, "Generic inherited state")
+}
+
+[Test("Inherited record display includes base members through virtual calls")]
+func InheritedDisplay() -> Result<unit, TestFailure> {
+    let original = Item(9, "copy")
+    let copy = Item(original)
+    _ = Assert.True(!Object.ReferenceEquals(original, copy) && original == copy, "Copy preserves base and derived state")?
+    let value: Entity = Item(1, "a")
+    _ = Assert.Equal("Item { Id = 1, Name = \"a\" }", value.ToString())?
+    return Assert.Equal("Leaf { Id = 7, Name = \"x\" }", Leaf("x").ToString())
 }

@@ -144,3 +144,48 @@ fn missing_base_chain_and_cyclic_this_delegation_fault() {
             .contains("cyclic")
     );
 }
+
+#[test]
+fn nonvirtual_hiding_keeps_declaring_owner_dispatch() {
+    let m = assemble(
+        r#"
+.module Hidden
+.entry Main
+.type class Base
+.method instance .ctor() -> void
+ret
+.end
+.method instance Read() -> Int32
+ldc.i4 2
+ret
+.end
+.end
+.type class Derived
+.extends Base
+.method instance .ctor() -> void
+ldarg 0
+call instance Base::.ctor()
+ret
+.end
+.method instance Read() -> Int32
+ldc.i4 40
+ret
+.end
+.end
+.function Main() -> Int32
+.local Derived item
+newobj instance Derived::.ctor()
+stloc item
+ldloc item
+call instance Base::Read()
+ldloc item
+call instance Derived::Read()
+add
+ret
+.end
+"#,
+    )
+    .unwrap();
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}

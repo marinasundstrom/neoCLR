@@ -1,0 +1,28 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+open record Entity(Id: int)
+record Other(Id: int) : Entity(Id)
+
+[Test("Record class equality avoids reflection descriptor allocations")]
+func AllocationContracts() -> Result<unit, TestFailure> {
+    let left = Entity(7)
+    let right = Entity(7)
+    let other = Other(7)
+    _ = Assert.True(System.Runtime.CompilerServices.RuntimeHelpers.HaveSameRuntimeType(left, right), "Equal runtime identities")?
+    _ = Assert.True(!System.Runtime.CompilerServices.RuntimeHelpers.HaveSameRuntimeType(left, other), "Derived identity differs")?
+    _ = Assert.True(left != Entity(8), "Different component values")?
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var index = 0
+    var equal = true
+    while index < 64 {
+        equal = equal && left == right
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    _ = Assert.True(equal, "Repeated equality")?
+    return Assert.True(allocated == 0, "No managed allocation during repeated equality")
+}

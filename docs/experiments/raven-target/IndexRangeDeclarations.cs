@@ -37,6 +37,7 @@ static class IndexRangeDeclarations
             public static class RuntimeHelpers {
                 public static void DrainEntryTasks() { }
                 public static bool IsAssignable<TSource, TTarget>() => default;
+                public static bool HaveSameRuntimeType(object left, object right) => default;
                 public static T[] GetSubArray<T>(T[] array, Range range) => default;
             }
         }

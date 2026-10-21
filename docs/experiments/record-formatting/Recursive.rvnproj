@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <AssemblyName>RecordFormattingUnsupported</AssemblyName>
+    <AssemblyName>RecordFormattingRecursive</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Unsupported.rvn" />
+    <Compile Include="Recursive.rvn" />
   </ItemGroup>
 </Project>

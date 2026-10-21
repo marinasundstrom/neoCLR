@@ -2850,3 +2850,14 @@ implementations, refreshed from `target/make-array-libraries` with Raven cc64f78
 The [manual reflection entry](reflection.md#constructing-vector-types) documents
 vector-only shape, retained native constructions, unsupported open elements and
 consumer proof cases. This native API is not represented by the legacy CLI scaffold.
+
+
+### Record runtime identity service (2026-10-21)
+
+RuntimeHelpers.HaveSameRuntimeType(Object,Object) is included in the native and
+legacy reference snapshots. Both arguments must be non-null. It compares exact
+runtime type handles without allocating reflection descriptors; it is a neoCLR
+compiler service, not a claim of API identity with .NET RuntimeHelpers. Generated
+record-class equality uses it after null guards. The opt-in interpreter allocation
+test measures repeated equality; public GC counters remain unsupported by native/JIT
+bindings, so that test does not establish native allocation counts or throughput.

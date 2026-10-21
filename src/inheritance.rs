@@ -474,7 +474,11 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
                     "override must preserve the exact inherited virtual contract",
                 ));
             }
-        } else if inherited.is_some() && !method.name.ends_with("..ctor") {
+        } else if inherited
+            .as_ref()
+            .is_some_and(|parent| method.is_virtual || parent.is_virtual)
+            && !method.name.ends_with("..ctor")
+        {
             return Err(Fault::new(
                 "inherited method hiding is unsupported; use override for virtual methods",
             ));

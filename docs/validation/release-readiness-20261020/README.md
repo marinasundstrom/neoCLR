@@ -19,8 +19,11 @@ with Raven `2607945d3`; see [evidence](../../experiments/record-formatting/gener
 Root record-class display now has a bounded implementation and built-in reference
 identity/equality/hash/display coverage: all 36 executions pass with Raven
 `6279c7130` ([evidence](../../experiments/record-formatting/class-validation.json)). Continue
-through remaining inherited/recursive record scope, rebuilt libraries and matched
-package qualification. The single self-typed positional component/copy-constructor
+with matched package qualification: inherited/recursive source records and base
+copies now pass [45 executions](../../experiments/record-formatting/inheritance-validation.json)
+with Raven 328349bf7, and all five libraries were rebuilt. The
+[allocation control](../../experiments/record-formatting/allocation-validation.json)
+passes in the interpreter; native/JIT public GC counters remain unbound. The single self-typed positional component/copy-constructor
 collision is fixed on Raven main `8eca1f07d` and carried to native: RAV0111
 now rejects the invalid constructor signature before metadata encoding.
 Do not expand localization/DI or reflection to fill every possible API gap:

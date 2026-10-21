@@ -224,7 +224,8 @@ public sealed partial class TypeBuilder
                     !MethodDefinition.IsObjectOverride(method.Name, method.Signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))
                     throw new InvalidDataException($"override requires an exact inherited virtual contract: {Namespace}.{Name}.{method.Name}");
             }
-            else if (inherited.Method is not null) throw new InvalidDataException("inherited method hiding is unsupported");
+            else if (inherited.Method is not null && (method.IsVirtual || inherited.Method.IsVirtual))
+                throw new InvalidDataException("hiding virtual methods requires an explicit supported slot contract");
         }
         if (IsAbstract) return;
         foreach (var contract in inheritedMethods.Where(m => m.Method.IsAbstract))

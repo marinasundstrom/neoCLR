@@ -1,0 +1,34 @@
+{
+  "scope": "Focused record inheritance and documentation checks; not extracted package qualification",
+  "ravenNativeCommit": "328349bf7",
+  "checks": {
+    "record-hiding-rust-tests": {
+      "sha256": "250f549330dad47fd12e90448d74f91932fb16069ad7cae8aa1cf50c1275b363",
+      "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 35.01s\n     Running tests/class_virtual.rs (target/debug/deps/class_virtual-c7c78fa0cac00d2a)\n\nrunning 7 tests\ntest readonly_contract_is_enforced_in_override_without_verification ... ok\ntest virtual_mutation_and_reference_return_use_original_derived_owner ... ok\ntest reflection_exposes_virtual_and_override_flags_on_declared_methods ... ok\ntest source_frame_heap_inherited_method_and_artifact_dispatch ... ok\ntest overrides_require_exact_contracts_and_hiding_is_rejected ... ok\ntest call_can_select_base_body_while_callvirt_selects_override ... ok\ntest override_reference_retains_heap_owner_under_pressure_and_frame_escape_faults ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.89s\n\n     Running tests/nominal_inheritance.rs (target/debug/deps/nominal_inheritance-cda8644f6e9e7801)\n\nrunning 6 tests\ntest abstract_construction_and_wrong_override_contract_are_rejected ... ok\ntest base_and_interface_dispatch_use_concrete_object_and_base_constructor_fields ... ok\ntest nonvirtual_hiding_keeps_declaring_owner_dispatch ... ok\ntest class_virtual_dispatch_and_nonvirtual_call_have_distinct_behavior ... ok\ntest missing_base_chain_and_cyclic_this_delegation_fault ... ok\ntest repeated_and_foreign_receiver_constructor_calls_fault_without_verifier ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.03s\n\n"
+    },
+    "nonvirtual-hiding-focused": {
+      "sha256": "134c2b716aae856692d88d212b9dc6ffa87e75091670fa99fc808440c5fc4cd3",
+      "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 07s\n     Running tests/nominal_inheritance.rs (target/debug/deps/nominal_inheritance-cda8644f6e9e7801)\n\nrunning 1 test\ntest nonvirtual_hiding_keeps_declaring_owner_dispatch ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 1.56s\n\n"
+    },
+    "nonvirtual-hiding-sdk-v3": {
+      "sha256": "2ea72369277578eabed6a58b749d9f7df409ad8b2f1fca7348af252efa60386b",
+      "output": "PASS class virtual/abstract slots, overrides and interface dispatch: CLR and native return 42\n"
+    },
+    "record-closure-clippy": {
+      "sha256": "031f848d7fe31b49fb3596c5aea51b5430e2e6a52a60b255ad617a19ceb7a0a9",
+      "output": "    Blocking waiting for file lock on build directory\n   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 09s\n"
+    },
+    "record-closure-website-tests": {
+      "sha256": "abc35815028899675624d8c9c111c28ad2357f79e75d53b33570d75d2bb0d2a2",
+      "output": "..........API descriptions still needed: Example.Public\n...API descriptions still needed: Example.Public\n..........\n----------------------------------------------------------------------\nRan 23 tests in 30.031s\n\nOK\n"
+    },
+    "record-closure-reference-check": {
+      "sha256": "4cb8d1fd9c31376815473df52b21ae7c0f3f6177cdb5b415223d150273f780eb",
+      "output": "Checked RavenDoc reference assembly and source fingerprints\n"
+    },
+    "record-closure-notices-tests": {
+      "sha256": "51c7b155c4b8a2cd6c14bc10fd8f93697246606bb5e13dfdeecf0772092d5eb7",
+      "output": ".\n----------------------------------------------------------------------\nRan 1 test in 0.353s\n\nOK\n"
+    }
+  }
+}

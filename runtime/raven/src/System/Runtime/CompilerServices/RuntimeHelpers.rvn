@@ -14,6 +14,12 @@ public static class RuntimeHelpers {
         return neoCLR.Runtime.ReflectionAssignable(neoCLR.Runtime.TypeHandle<TSource>(), neoCLR.Runtime.TypeHandle<TTarget>())
     }
 
+    /// Compares exact runtime type identities without allocating reflection descriptors.
+    /// Both objects must be non-null. Used by generated record-class equality.
+    static func HaveSameRuntimeType(left: object, right: object) -> bool {
+        return neoCLR.Runtime.TypeEquals(neoCLR.Runtime.ObjectTypeHandle(left), neoCLR.Runtime.ObjectTypeHandle(right))
+    }
+
     /// Borrows a range without copying; invalid ranges fault.
     static func GetSlice<T>(array: T[], range: System.Range) -> System.Slice<T> {
         let bounds = range.GetOffsetAndLength(array.Length)

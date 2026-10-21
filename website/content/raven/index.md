@@ -101,13 +101,13 @@ values with declared public ToString and floating primitives use direct calls.
 Int32-backed enums reuse Object display with a temporary box. Development compiler
 support also covers type-parameter components in source record structs, preserving
 quoted text and null through ordinary Object dispatch. Generic value components box
-once and nested generic display can allocate intermediate strings; previously built
-libraries need rebuilding to gain those overrides. Source record classes directly
-based on Object now support the same bounded component display, with ordinary
-reference receivers and null-safe virtual display for nested class components.
-Nested class display allocates intermediate strings. Inherited and recursive
-record display remain unqualified. This is
-pre-release compiler work, not a claim of full record support.
+once and nested generic display can allocate intermediate strings. Rebuilt libraries
+include these overrides, including KeyValuePair. Source record classes support
+inherited component display and finite recursive reference graphs through ordinary
+virtual calls. Base-typed equality compares the actual runtime type and all inherited
+components; copies preserve base state. Nested class display allocates intermediate
+strings, and cyclic graphs retain ordinary stack limits. This is pre-release compiler
+work within the supported component set, not a claim of full record support.
 
 [Record validation and limits](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-values)
 

@@ -14389,3 +14389,19 @@ Raven main `8eca1f07d` repairs the shared self-typed positional/copy-constructor
 collision. The native carry now reports RAV0111 before encoding, replacing
 NEOMETA003. No runtime or bridge representation change; 37 shared semantic tests
 and an independently built native diagnostic probe establish the fix.
+
+
+## Source record inheritance and recursive display (2026-10-21)
+
+Native source record hierarchies now use ordinary virtual Object equality plus
+exact runtime-type identity and inherited component comparison. RuntimeHelpers.
+HaveSameRuntimeType is a non-null compiler service using existing object/type
+handles, with no reflection descriptor allocation or new runtime ABI. The Raven
+compiler keeps a descriptor fallback for older cores. General equality/copy changes
+are developed on Raven main (9645e24f5, ab1bc96d3) and carried separately to the
+native branch; portable base-copy lowering and native formatting are target-specific.
+No new Runtime Contract configuration or CLI carrier is introduced. Native metadata
+already carries the generated methods; no additional bridge replacement is needed
+for these bodies. Finite recursive display uses virtual calls; actual cycles retain
+stack limits. Source hierarchies and rebuilt imported KeyValuePair display are
+covered by the built-in record suite. See [scope and evidence](experiments/record-formatting/README.md#inherited-and-recursive-records--2026-10-21).
