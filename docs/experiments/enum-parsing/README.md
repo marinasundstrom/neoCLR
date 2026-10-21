@@ -18,12 +18,11 @@ by Parse; TryParse returns false for either. Parse uses neoCLR's existing Result
 error contract rather than .NET exceptions, allowing ordinary error propagation.
 
 Current enum storage is Int32. Unicode metadata names are preserved without normalization.
-The generic methods currently validate enum type arguments at runtime: native
-method constraints cannot yet express `struct, Enum`. Invalid type arguments fault,
-even on null input; they do not return a parsing error. This is a compiler/metadata
-constraint gap. .NET’s generic overloads use a struct constraint and validate enum
-identity at runtime; stronger struct/Enum bounds would be a deliberate compile-time
-restriction. Other backing widths remain a separate gap.
+The generic overloads now require `where TEnum: struct`, matching .NET. Reference
+types and unconstrained generic forwarding reject at compile time. Enum identity
+is validated at runtime: a non-enum value type faults even on null input and does
+not return a parsing error. A stronger struct/Enum bound is deliberately not added
+to this .NET-shaped API. Other backing widths remain a separate gap.
 
 ## Implementation and allocation
 
@@ -105,3 +104,24 @@ parameter, local and generic function using Unicode names. Two enum runtime test
 and rejection suite pass. Strict runtime library Clippy, API fingerprint checks and
 the 5,036-page website build pass. These are development gates; the replacement
 package, platform and performance gates remain open.
+
+
+## Generic contract qualified (2026-10-21)
+
+Raven `77dbe0302` and neoCLR `db1b06067` now support ordinary method categories and
+nongeneric class bounds. All four Parse/TryParse overloads use `where TEnum: struct`,
+matching .NET's contract without adding a stronger Enum bound. Existing enum identity
+validation remains authoritative for value types. This closes the earlier missing
+method-category gap. Source callers forwarding an unconstrained type parameter must
+add the struct constraint; reference-type calls now reject before execution.
+
+All four source libraries rebuild from the committed compiler. The [built-in
+report](constraint-validation-20261021.json) passes six tests in all three engines
+(18 executions), including a generic forwarding helper. [InvalidTypeArguments.rvn](InvalidTypeArguments.rvn)
+is an intentionally noncompiling diagnostic fixture: both the String argument and
+unconstrained forwarding produce RAV0320 against the rebuilt library. Runtime API
+checks use the built-in test framework; a compile-rejection fixture cannot live in
+the executable suite. CLI/native API references are refreshed from the matching
+source and compiler. The five-library documentation bundle includes the optional
+PostgreSQL provider already present in the website inventory. These are development
+checks, not a selected release package or cross-platform acceptance.

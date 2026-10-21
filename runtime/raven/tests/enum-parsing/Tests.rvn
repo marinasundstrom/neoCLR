@@ -10,6 +10,8 @@ public enum Access { None = 0, Read = 1, Alias = 1, Write = 2, Both = 3, Execute
 public enum Empty {}
 public enum Letters { Ångström = 1, Café = 2, שלום = 3 }
 
+func ParseEnum<TEnum>(text: string) -> Result<TEnum, NumberParseError> where TEnum: struct => Enum.Parse<TEnum>(text)
+
 [Test("Enum names preserve aliases ordinal case and imported types")]
 func Names() -> Result<unit, TestFailure> {
     let Ok(ready) = Enum.Parse<State>("Ready") else { return Assert.True(false, "Named value") }
@@ -19,6 +21,8 @@ func Names() -> Result<unit, TestFailure> {
     _ = Assert.True(folded == ready && Enum.Parse<State>("ready") is Error(_), "Case is explicit")?
     let Ok(imported) = Enum.Parse<StringComparison>("Ordinal") else { return Assert.True(false, "Imported enum") }
     _ = Assert.True(imported == StringComparison.Ordinal, "Imported identity")?
+    let Ok(forwarded) = ParseEnum<State>("Ready") else { return Assert.True(false, "Constrained forwarding") }
+    _ = Assert.True(forwarded == ready, "Forwarded enum identity")?
     System.Runtime.GC.Collect()
     return Assert.True(ready.ToString() == "Ready", "Parsed value retains normal enum display")
 }

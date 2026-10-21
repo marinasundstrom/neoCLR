@@ -22,8 +22,9 @@ Completed evidence superseding earlier gaps below:
   localized digits/sign policies and additional locales remain deferred.
 - [Enum parsing](../../experiments/enum-parsing/README.md) passes six built-in tests
   per engine (18 executions), with matching API snapshots and a 5,036-page website
-  build. Missing native generic-method struct/Enum constraints mean runtime type
-  validation today; this is an explicit compiler/metadata gap. Int32-only storage
+  build. The generic overloads now require struct and retain runtime enum-identity
+  validation, matching .NET; source constraints and 18 built-in executions pass
+  against rebuilt libraries. Int32-only storage
   remains bounded preview support. Unicode enum and ordinary metadata names are
   qualified, with shared runtime validation and unchanged source-language binding.
 - Ordinary struct defaults, scalar Object adapters, persistent Memory region
@@ -48,8 +49,9 @@ metadata producer/reader/importer now preserves ordinary category flags, with
 focused round-trip, rejection and forwarding coverage plus 20 specialization tests
 and CLI/interpreter/JIT execution ([evidence](method-categories-20261021.json)); nongeneric nominal method class bounds and Raven native category emission/import
 now have focused qualification (21 specialization tests plus separate-provider
-compiler probes; [evidence](method-class-bounds-20261021.json)). Update guest Enum constraints and rebuild the matched cohort
-before closing that API gap. Continue without a Parse-specific exception; then qualify the remaining generated record
+compiler probes; [evidence](method-class-bounds-20261021.json)). Guest Enum struct constraints now pass against the rebuilt compiler/libraries
+([qualification](../../experiments/enum-parsing/constraint-validation-20261021.json));
+the stronger Enum bound is not needed to match .NET. Continue without a Parse-specific exception; then qualify the remaining generated record
 formatting shapes. Each needs focused positive and rejection tests. Rebuild and
 pin the actual compiler/library/runtime cohort before extracting a candidate SDK.
 No new public API expansion is required to run those checks. The original failures

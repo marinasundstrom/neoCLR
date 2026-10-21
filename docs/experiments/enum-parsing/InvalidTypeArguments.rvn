@@ -1,0 +1,7 @@
+module Negative
+import System.*
+func Bad() -> int {
+    _ = Enum.Parse<string>("Ready")
+    return 0
+}
+func Forward<T>(text: string) -> Result<T, NumberParseError> => Enum.Parse<T>(text)

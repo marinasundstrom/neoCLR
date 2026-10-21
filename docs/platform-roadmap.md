@@ -5,12 +5,11 @@ numeric formats and explicit-culture parsers pass focused built-in tests in the
 interpreter, JIT and native backend (23 tests, 69 executions), with matching API documentation. Defer custom
 patterns, arbitrary providers and additional locales. [Enum Parse/TryParse](experiments/enum-parsing/README.md)
 now passes 18 built-in executions across all three engines, including Unicode names
-and ordinary identifier binding; runtime type validation
-is implemented while native generic-method enum constraints remain a gap. The
-shared metadata category prerequisite now preserves class/struct/new requirements;
-Raven native emission/import and nongeneric nominal method class bounds now have
-focused qualification. Guest enum signatures and matched release-package checks
-remain open. Resume
+and ordinary identifier binding. Generic Parse/TryParse now require struct, matching
+.NET, with runtime enum-identity validation; constrained forwarding and rejection
+are qualified. Raven native method categories and nongeneric class bounds now have
+focused qualification. Continue with record/display scope and matched release-package
+checks in
 the release-readiness work below; this does not permanently
 reprioritize the platform roadmap.
 

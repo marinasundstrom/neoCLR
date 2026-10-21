@@ -17,16 +17,15 @@ names and values, with TypeInfo and constrained generic overloads. Its class rem
 non-constructible; its presence does not imply every .NET Enum method is supported.
 Development Parse/TryParse generic overloads now support Int32 enum names, signed
 numbers and comma-separated names. Parse returns Result with NumberParseError;
-TryParse resets its out parameter on failure. Enum type arguments are runtime-checked
-until native method constraints can represent struct/Enum bounds.
+TryParse resets its out parameter on failure. The generic overloads require struct type arguments; enum identity is checked at runtime, matching .NET.
 
 ## Enum parsing (development)
 
 ```raven
-static func Parse<TEnum>(text: string?) -> Result<TEnum, NumberParseError>
-static func Parse<TEnum>(text: string?, ignoreCase: bool) -> Result<TEnum, NumberParseError>
-static func TryParse<TEnum>(text: string?, out result: TEnum) -> bool
-static func TryParse<TEnum>(text: string?, ignoreCase: bool, out result: TEnum) -> bool
+static func Parse<TEnum>(text: string?) -> Result<TEnum, NumberParseError> where TEnum: struct
+static func Parse<TEnum>(text: string?, ignoreCase: bool) -> Result<TEnum, NumberParseError> where TEnum: struct
+static func TryParse<TEnum>(text: string?, out result: TEnum) -> bool where TEnum: struct
+static func TryParse<TEnum>(text: string?, ignoreCase: bool, out result: TEnum) -> bool where TEnum: struct
 ```
 
 `text` accepts a declared name, comma-separated names, or one signed decimal Int32.
@@ -37,8 +36,9 @@ tokens, numeric lists, hexadecimal and fractional input produce `InvalidFormat`.
 An out-of-range integer produces `Overflow`. TryParse returns false for both errors
 and writes the zero/default enum value; success writes the parsed value.
 
-`TEnum` must be a supported Int32 enum. Invalid type arguments fault at runtime,
-including with null text, until native method constraints support struct/Enum bounds.
+`TEnum` must be a supported Int32 enum. Reference types and unconstrained generic
+forwarding reject at compile time. Non-enum value types still fault at runtime,
+including with null text, as in .NET’s generic enum parsing contract.
 Unicode member names are preserved; ordinal matching does not normalize canonically
 equivalent spellings. Parse uses Result rather than throwing
 .NET parsing exceptions. This API may allocate trimmed/token strings, an enum box

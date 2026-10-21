@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "5ae8488630ea51c2d62e167485f4a96f28c8bb80c1d8ed5a6fd24c255fb18ab0",
+  "assemblySha256": "9482a3eb337c87f3e5c3309f724e64ebab1d49bb1428d99e2ebfb6694637fb54",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "ac39837d2dd0fc554dc8adee2ee92a108edb8fa96a886b74e4eb0e40616f5cce",
+    "api-docs/NeoCLR.CoreProbe.xml": "509de4b71fb68140f0bf9678aa2eb41bbc910a0eb1a7798223375640f311f7b0",
     "api-docs/exclusions.json": "16413aaa43acdfc76196658c46a76e64cf77b67fe1645a9ec0e5a39c57e8f38a",
     "api-docs/manual-members.json": "082d4590c30749b661a4fe6e0a0778c85aa0d4042ccd05044fd053b61f01b0f5",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -39,7 +39,7 @@
     "docs/experiments/raven-target/EmptyLibrary.cs": "94063d95f47320072221ad3f2564018544e20f063b6849e31f0003dd68757fc0",
     "docs/experiments/raven-target/EntryPointBindings.cs": "8ac06ec1b61b489bcbe276dd951ddf66374052d43f703c4d3ce5b1c4a5443522",
     "docs/experiments/raven-target/EnumBindings.cs": "0e7d3081303ca7a957469702870149d7a353435635b62edebd549d2120ad515c",
-    "docs/experiments/raven-target/EnumHelpersBindings.cs": "c73eb93de1df97c137017de0c0b55a3b372b5120c9fb66f5719e4c75a2c294cc",
+    "docs/experiments/raven-target/EnumHelpersBindings.cs": "cd8a7e107e7b5a3de293cc91b8c5ca0824679af59dbd784b2742537e78a5ed4f",
     "docs/experiments/raven-target/ErrorBindings.cs": "d606c64a89f25abab548f099002a7f267e1510a4f43a5a41e39f66db7ef3e4b6",
     "docs/experiments/raven-target/ErrorCarrierLibrary.cs": "1ce40411b87e70ce90d5f03c97c9ae16b205c25c44825398485370954da46171",
     "docs/experiments/raven-target/FaultBindings.cs": "52444680c9d0a0b74ab97ab13c07e881bd4628aaf382bf237547fc366bb73e54",

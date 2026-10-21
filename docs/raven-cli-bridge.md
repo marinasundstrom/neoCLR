@@ -14022,7 +14022,7 @@ contract. No additional native ABI or Runtime Contract option is introduced. Leg
 CLI reference methods are documentation fixtures only; native Raven bodies remain
 authoritative. Compiler bundle: 4c051e332-dirty-record-policy-metadata-function-bound.
 
-Raven native method emission currently cannot express struct/Enum generic constraints.
+At this earlier checkpoint, Raven native method emission could not express struct/Enum generic constraints.
 These methods validate concrete type arguments at runtime pending a general metadata
 and compiler constraint extension. Backing widths beyond Int32 remain an existing gap.
 Unicode enum names are repaired by the validation follow-up below. Owners: Raven semantic/native emission and neoCLR metadata
@@ -14116,3 +14116,16 @@ Twenty-one specialization tests pass. Raven's separate-provider probe covers fre
 functions, static class methods, categories, a class bound, imported forwarding and
 RAV0320 rejections. This is development validation, not package qualification. Guest
 Enum API constraints and the refreshed matched compiler/library bundle follow.
+
+
+### Enum API method constraint qualification (2026-10-21)
+
+The rebuilt Raven `77dbe0302` / neoCLR `db1b06067` development cohort compiles all four
+core libraries with Enum.Parse/TryParse constrained to struct. This follows .NET's
+generic enum parsing contract; enum identity remains a runtime check. Reference
+types and unconstrained generic forwarding reject with RAV0320. Six built-in tests
+pass in interpreter/JIT/native, including generic forwarding. No Runtime Contract,
+native encoding or ABI changes. The API references use matching native/CLI inputs.
+See `docs/experiments/enum-parsing/constraint-validation-20261021.json`. The runtime
+and backend are rebuilt; the unchanged host adapter is retained and hashed. This
+is not a frozen SDK, Windows qualification or HTTP performance result.
