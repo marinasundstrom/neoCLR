@@ -227,6 +227,15 @@ impl Query {
                 crate::assembly_info::type_module_value(module, d)
             }
             Self::Shape => Ok(Value::Boolean(match argument {
+                21 => {
+                    matches!(&handle.identity, TypeIdentity::Definition { arguments, .. } if !arguments.is_empty())
+                }
+                22 => handle.identity.is_generic_definition(),
+                23 => {
+                    matches!(&handle.identity, TypeIdentity::Definition { arguments, .. } if !arguments.is_empty())
+                        && !handle.identity.is_generic_definition()
+                }
+                24 => handle.identity.contains_generic_parameters(),
                 20 => {
                     matches!(handle.identity, TypeIdentity::Definition { .. })
                         && definition.is_some_and(|d| d.before_field_init)

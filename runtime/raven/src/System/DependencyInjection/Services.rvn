@@ -133,7 +133,7 @@ public class DefaultServiceCollection : ServiceCollection {
             return Error(ServiceError.InvalidRegistration(service))
         }
         if descriptor.Source is ServiceSource.Constructor(let implementation) {
-            if !implementation.AssignableTo(service) || implementation.IsAbstract || implementation.IsInterface || ConstructorPlan.HasUnboundParameters(implementation) || implementation.IsValueType || implementation.IsFunctionType {
+            if !implementation.AssignableTo(service) || implementation.IsAbstract || implementation.IsInterface || implementation.ContainsGenericParameters || implementation.IsValueType || implementation.IsFunctionType {
                 return Error(ServiceError.InvalidRegistration(service))
             }
         } else if descriptor.Source is ServiceSource.Instance(let instance) {
@@ -152,7 +152,7 @@ public class DefaultServiceCollection : ServiceCollection {
     }
 
     private func ValidService(service: TypeInfo) -> bool {
-        return !ConstructorPlan.HasUnboundParameters(service) && !service.IsValueType && !service.IsByRef && !service.IsPointer && !service.Equals(typeof(ServiceProvider))
+        return !service.ContainsGenericParameters && !service.IsValueType && !service.IsByRef && !service.IsPointer && !service.Equals(typeof(ServiceProvider))
     }
 
     /// Registers an unkeyed implementation.

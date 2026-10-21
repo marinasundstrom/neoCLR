@@ -440,6 +440,16 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     val DisplayName: string { get }
     val IsNominalType: bool { get }
     val IsFunctionType: bool { get }
+    /// True for a nominal generic definition or constructed nominal generic type.
+    val IsGenericType: bool { get }
+    /// True when this identity is the declaration with its own unbound parameters.
+    val IsGenericTypeDefinition: bool { get }
+    /// True for a constructed nominal generic identity, whether open or closed.
+    val IsConstructedGenericType: bool { get }
+    /// True when this identity is an unbound generic parameter.
+    val IsGenericParameter: bool { get }
+    /// Recursively tests unbound parameters, including element and structural types.
+    val ContainsGenericParameters: bool { get }
     val GenericArgumentCount: int { get }
     func GetGenericArgument(index: int) -> TypeInfo
     func Equals(other: TypeInfo) -> bool
@@ -598,6 +608,11 @@ internal open class RuntimeTypeInfo : TypeInfo {
     val DisplayName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
     val IsNominalType: bool => neoCLR.Runtime.TypeShape(Handle, 12)
     val IsFunctionType: bool => neoCLR.Runtime.TypeShape(Handle, 13)
+    val IsGenericType: bool => neoCLR.Runtime.TypeShape(Handle, 21)
+    val IsGenericTypeDefinition: bool => neoCLR.Runtime.TypeShape(Handle, 22)
+    val IsConstructedGenericType: bool => neoCLR.Runtime.TypeShape(Handle, 23)
+    val IsGenericParameter: bool => neoCLR.Runtime.TypeShape(Handle, 17)
+    val ContainsGenericParameters: bool => neoCLR.Runtime.TypeShape(Handle, 24)
     val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
@@ -761,6 +776,11 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     val DisplayName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
     val IsNominalType: bool => neoCLR.Runtime.TypeShape(Handle, 12)
     val IsFunctionType: bool => neoCLR.Runtime.TypeShape(Handle, 13)
+    val IsGenericType: bool => neoCLR.Runtime.TypeShape(Handle, 21)
+    val IsGenericTypeDefinition: bool => neoCLR.Runtime.TypeShape(Handle, 22)
+    val IsConstructedGenericType: bool => neoCLR.Runtime.TypeShape(Handle, 23)
+    val IsGenericParameter: bool => neoCLR.Runtime.TypeShape(Handle, 17)
+    val ContainsGenericParameters: bool => neoCLR.Runtime.TypeShape(Handle, 24)
     val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
@@ -1059,6 +1079,11 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
     val DisplayName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
     val IsNominalType: bool => neoCLR.Runtime.TypeShape(Handle, 12)
     val IsFunctionType: bool => neoCLR.Runtime.TypeShape(Handle, 13)
+    val IsGenericType: bool => neoCLR.Runtime.TypeShape(Handle, 21)
+    val IsGenericTypeDefinition: bool => neoCLR.Runtime.TypeShape(Handle, 22)
+    val IsConstructedGenericType: bool => neoCLR.Runtime.TypeShape(Handle, 23)
+    val IsGenericParameter: bool => neoCLR.Runtime.TypeShape(Handle, 17)
+    val ContainsGenericParameters: bool => neoCLR.Runtime.TypeShape(Handle, 24)
     val GenericArgumentCount: int => neoCLR.Runtime.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {

@@ -61,7 +61,8 @@ concurrency claim is made.
 
 ## Remaining integration gaps
 
-- Generic-state TypeInfo/MethodInfo reflection flags remain requested follow-up.
+- TypeInfo generic-state flags now supply shared openness checks. MethodInfo
+  flags and open/generic-method definition discovery remain requested follow-up.
 - Native automatic construction currently retains nongeneric declarations only.
 - Open generic registration, enumerable constructor injection and keyed constructor
   annotations remain beyond the closed-service foundation.

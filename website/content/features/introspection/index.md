@@ -125,3 +125,16 @@ FieldInfo distinguishes readonly storage and Int32 literals through `IsInitOnly`
 `TypeInitializer` constructor descriptor. Inspection never runs the initializer.
 See the [introspection reference](/docs/introspection.html) and
 [reflection execution limits](/docs/reflection.html#fields-and-type-initializers-development).
+
+## Generic state
+
+The development `TypeInfo` API distinguishes `IsGenericType`,
+`IsGenericTypeDefinition`, `IsConstructedGenericType` and `IsGenericParameter`.
+`ContainsGenericParameters` checks the whole identity recursively. A closed
+`ArrayList<int>` is constructed and generic, but contains no unbound parameters.
+An inheritance-open class need not be generic: `IsOpen` keeps its inheritance meaning.
+Arrays and structural function types are not nominal generic types.
+
+DI uses this shared contract to reject unbound registrations. Generic method
+state and discovery of open-type members or generic method definitions remain
+follow-up work; these properties do not add runtime generic construction APIs.

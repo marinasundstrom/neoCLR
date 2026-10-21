@@ -36,6 +36,41 @@ pub enum TypeIdentity {
     InterfaceRef(Box<TypeIdentity>),
 }
 
+impl TypeIdentity {
+    pub(crate) fn contains_generic_parameters(&self) -> bool {
+        match self {
+            Self::GenericParameter { .. } => true,
+            Self::Definition { arguments, .. }
+            | Self::Tuple(arguments)
+            | Self::Union(arguments)
+            | Self::Intersection(arguments) => {
+                arguments.iter().any(Self::contains_generic_parameters)
+            }
+            Self::Function {
+                parameters,
+                returns,
+                ..
+            } => {
+                parameters.iter().any(Self::contains_generic_parameters)
+                    || returns.contains_generic_parameters()
+            }
+            Self::ByRef(element)
+            | Self::ReadOnlyByRef(element)
+            | Self::Array(element)
+            | Self::ArrayRef(element)
+            | Self::Ptr(element)
+            | Self::InterfaceRef(element) => element.contains_generic_parameters(),
+        }
+    }
+
+    pub(crate) fn is_generic_definition(&self) -> bool {
+        matches!(self, Self::Definition { definition, arguments }
+            if !arguments.is_empty() && arguments.iter().enumerate().all(|(position, argument)|
+                matches!(argument, Self::GenericParameter { definition: owner, index }
+                    if owner == definition && usize::from(*index) == position)))
+    }
+}
+
 /// Read-only type information resolved within one loaded program.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeDescriptor {
@@ -641,4 +676,63 @@ pub(crate) fn retained_descriptor(module: &Module, index: u32) -> Result<&TypeDe
         .native_descriptors
         .get(index as usize)
         .ok_or_else(|| Fault::new("metadata token has no retained descriptor"))
+}
+
+#[cfg(test)]
+mod generic_state_tests {
+    use super::*;
+
+    #[test]
+    fn generic_state_uses_owner_identity_and_recurses_through_structural_types() {
+        let owner = TypeDefId {
+            module: "M".into(),
+            revision: Some("1".into()),
+            index: 0,
+        };
+        let parameter = TypeIdentity::GenericParameter {
+            definition: owner.clone(),
+            index: 0,
+        };
+        let open = TypeIdentity::Definition {
+            definition: owner.clone(),
+            arguments: vec![parameter.clone()],
+        };
+        assert!(open.is_generic_definition());
+        assert!(open.contains_generic_parameters());
+        let closed = TypeIdentity::Definition {
+            definition: owner.clone(),
+            arguments: vec![],
+        };
+        assert!(!closed.is_generic_definition());
+        assert!(!closed.contains_generic_parameters());
+        let other = TypeDefId {
+            index: 1,
+            ..owner.clone()
+        };
+        let constructed = TypeIdentity::Definition {
+            definition: other,
+            arguments: vec![parameter.clone()],
+        };
+        assert!(!constructed.is_generic_definition());
+        assert!(constructed.contains_generic_parameters());
+        for wrapper in [
+            TypeIdentity::ArrayRef(Box::new(parameter.clone())),
+            TypeIdentity::ByRef(Box::new(parameter.clone())),
+            TypeIdentity::ReadOnlyByRef(Box::new(parameter.clone())),
+            TypeIdentity::Ptr(Box::new(parameter.clone())),
+            TypeIdentity::Tuple(vec![closed.clone(), parameter.clone()]),
+            TypeIdentity::Union(vec![closed.clone(), parameter.clone()]),
+            TypeIdentity::Intersection(vec![closed.clone(), parameter.clone()]),
+            TypeIdentity::Function {
+                parameters: vec![closed],
+                returns: Box::new(parameter),
+                no_result: false,
+                out_parameters: vec![],
+                out_when_true: vec![],
+            },
+        ] {
+            assert!(wrapper.contains_generic_parameters(), "{wrapper:?}");
+            assert!(!wrapper.is_generic_definition(), "{wrapper:?}");
+        }
+    }
 }

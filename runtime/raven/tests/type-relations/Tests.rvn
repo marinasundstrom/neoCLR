@@ -55,6 +55,16 @@ func Instances() -> Result<unit, TestFailure> {
 
 [Test("Closed generic types remain distinct")]
 func Generics() -> Result<unit, TestFailure> {
+    let generic = typeof(ArrayList<int>)
+    _ = Assert.True(generic.IsGenericType, "Constructed nominal type is generic")?
+    _ = Assert.True(generic.IsConstructedGenericType, "Constructed identity")?
+    _ = Assert.True(!generic.IsGenericTypeDefinition, "Closed type is not its definition")?
+    _ = Assert.True(!generic.ContainsGenericParameters, "All arguments supplied")?
+    _ = Assert.True(!generic.IsGenericParameter, "Constructed type is not a parameter")?
+    _ = Assert.True(!typeof(Parent).IsGenericType, "Inheritance openness is not genericity")?
+    _ = Assert.True(!typeof(Parent).ContainsGenericParameters, "Open class has no generic parameters")?
+    _ = Assert.True(!typeof((int) -> int).IsGenericType, "Structural function is not nominal generic")?
+    _ = Assert.True(!typeof((int) -> int).ContainsGenericParameters, "Closed function shape")?
     _ = Assert.True(typeof(ArrayList<int>).AssignableTo(typeof(List<int>)), "constructed interface")?
     _ = Assert.True(!typeof(ArrayList<int>).AssignableTo(typeof(List<string>)), "different arguments")?
     return Assert.True(!typeof(ArrayList<string>).AssignableTo(typeof(ArrayList<Object>)), "invariant class")
@@ -62,6 +72,8 @@ func Generics() -> Result<unit, TestFailure> {
 
 [Test("Arrays preserve element identity")]
 func Arrays() -> Result<unit, TestFailure> {
+    _ = Assert.True(!typeof(int[]).IsGenericType, "Array is not a nominal generic type")?
+    _ = Assert.True(!typeof(int[]).ContainsGenericParameters, "Closed array")?
     _ = Assert.True(typeof(int[]).AssignableTo(typeof(int[])), "array identity")?
     _ = Assert.True(typeof(int[]).AssignableTo(typeof(Object)), "array object")?
     return Assert.True(!typeof(int[]).AssignableTo(typeof(string[])), "array element mismatch")

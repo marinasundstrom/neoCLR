@@ -932,3 +932,32 @@ its property-oriented policy. Four tooling tests verify exact-name resolution,
 changed ordinals, missing types and existing sample behavior. The built-in DI
 suite passes all 13 native tests; two backend tests check invocation and rejection
 without relying on emitted opcode snapshots.
+
+## Generic type state (development, 2026-10-21)
+
+TypeInfo now exposes IsGenericType, IsGenericTypeDefinition,
+IsConstructedGenericType, IsGenericParameter and ContainsGenericParameters.
+These follow [.NET's generic reflection distinctions](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/reflection-and-attributes/generics-and-reflection).
+IsOpen continues to describe inheritance, independently of generic state.
+A nominal generic definition has its own ordered parameter identities; a
+constructed identity is not a definition merely because some arguments are open.
+ContainsGenericParameters recursively examines argument, element and structural
+identities without materializing intermediate guest TypeInfo objects or argument
+arrays. This is not a claim that the host query machinery never allocates. Arrays
+and native structural functions/tuples/unions are not nominal generic types, even
+when their components contain generic parameters. This follows neoCLR's existing
+structural identity model rather than .NET's nominal ValueTuple representation.
+
+The reserved TypeShape service adds selectors 21–24; selector 17 already identifies
+parameters. Native closed-token projection and retained open descriptors use the
+same meanings. A matching runtime, backend and class library are required; there
+is no metadata-format, executable generic-instantiation or compiler syntax change.
+DI now consumes ContainsGenericParameters instead of a private recursive walk.
+
+MethodInfo generic state remains a separate gap: member discovery on an open type
+and discovery of a generic method definition currently reject. They must retain
+owner and method parameter identities before adding reliable flags. In particular,
+[MethodInfo.ContainsGenericParameters](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodinfo.containsgenericparameters?view=net-10.0)
+must include an open declaring type even when the method is not itself generic.
+This increment does not imply MakeGenericType/MakeGenericMethod or open DI
+registrations are implemented.

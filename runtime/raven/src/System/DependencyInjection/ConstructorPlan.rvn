@@ -26,20 +26,9 @@ internal class ConstructorPlan {
 
     internal val ParameterCount: int => storedParameters.Count
 
-    internal static func HasUnboundParameters(type: TypeInfo) -> bool {
-        if type is GenericParameterTypeInfo { return true }
-        for argument in type.GetGenericArguments() {
-            if HasUnboundParameters(argument) { return true }
-        }
-        if type.GetElementType() is Some(let element) {
-            return HasUnboundParameters(element)
-        }
-        return false
-    }
-
     // Availability is metadata-only: never resolve services while choosing a constructor.
     internal static func Prepare(type: TypeInfo, available: (TypeInfo) -> bool) -> Result<ConstructorPlan, ActivationError> {
-        if type.IsAbstract || type.IsInterface || HasUnboundParameters(type) || type.IsValueType {
+        if type.IsAbstract || type.IsInterface || type.ContainsGenericParameters || type.IsValueType {
             return Error(ActivationError.UnsupportedType)
         }
         let constructors = type.GetConstructors()

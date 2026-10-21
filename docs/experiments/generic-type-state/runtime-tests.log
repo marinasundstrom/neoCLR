@@ -1,0 +1,9 @@
+    Blocking waiting for file lock on artifact directory
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 08s
+     Running unittests src/lib.rs (target/debug/deps/neoclr-ce6cc4a584f2ea21)
+
+running 1 test
+test type_identity::generic_state_tests::generic_state_uses_owner_identity_and_recurses_through_structural_types ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 361 filtered out; finished in 0.00s

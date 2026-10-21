@@ -155,3 +155,7 @@ identity; non-null keys use ordinary equality. The bool result is a deliberate
 neoCLR addition to .NET's conditional-registration convention. `TryAddEnumerable`
 and wildcard keys are not part of this foundation. Registration may allocate a
 descriptor or factory adapter even when skipped; no allocation-free claim is made.
+
+Registration checks use `TypeInfo.ContainsGenericParameters`, the shared recursive
+identity query. Inheritance openness (`IsOpen`) does not reject an otherwise closed
+service. Open generic registrations remain unsupported.
