@@ -20730,3 +20730,24 @@ gap surfaced during the tests. The author directed fixing compiler gaps as they
 arise. The assistant reproduced it on Raven main, fixed shared construction-payload
 traversal (`69dde95e3`), carried it to native (`5f6e7a29c`) and restored the direct
 callback fixture. Main validates semantic captures and emitted .NET execution.
+
+### 2026-10-21 — DI contracts, lifetimes and generic reflection
+
+The author requests .NET-derived `GetService`, `GetRequiredService`, `GetServices`,
+ServiceDescriptor, generic registration and scope/lifetime APIs, adapted to neoCLR.
+The assistant implements an unpublished container prototype with Result failures,
+Option for absence, immutable registration snapshots, transient/scoped/singleton
+resolution and ownership checks. Initial 12 built-in interpreter tests pass.
+
+The author also requests open/closed generic-state flags for TypeInfo and
+MethodInfo. The assistant proposes the .NET distinctions, including
+ContainsGenericParameters on methods whose declaring type is open. Existing
+TypeInfo.IsOpen describes inheritance, so it cannot serve as this flag. Generic
+method-definition discovery remains an identified runtime gap, not a deliberate
+divergence. These reflection additions remain pending.
+
+Typed generic factories expose a native structural-function substitution bug.
+The assistant fixes Raven codex/neoclr (`d14b7340a`), with all 11 focused compiler
+tests passing; ordinary .NET cases already pass. The author directs continuing
+through completion of DI, fixing general and native-specific compiler gaps along
+the way. Native activation, public integration and documentation remain next.

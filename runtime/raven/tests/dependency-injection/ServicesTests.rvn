@@ -1,0 +1,236 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.DependencyInjection.*
+import System.Introspection.*
+import System.Localization.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+public class TransientService { }
+public class ScopedService { }
+public class SingletonService { }
+public class CycleA { init(other: CycleB) { } }
+public class CycleB { init(other: CycleA) { } }
+public class Captive { init(dependency: ScopedService) { } }
+public class ProviderConsumer {
+    val Provider: ServiceProvider
+    init(provider: ServiceProvider) { Provider = provider }
+}
+public class DisposalLog {
+    var Text: string = ""
+    func Append(text: string) { Text = Text + text }
+}
+public class OwnedDependency : Disposable {
+    private val log: DisposalLog
+    init(log: DisposalLog) { self.log = log }
+    func Dispose() { log.Append("D") }
+}
+public class OwnedConsumer : Disposable {
+    private val log: DisposalLog
+    init(dependency: OwnedDependency, log: DisposalLog) { self.log = log }
+    func Dispose() { log.Append("C") }
+}
+public class ExternalService : Disposable {
+    var Count: int = 0
+    func Dispose() { Count = Count + 1 }
+}
+
+[Test("DI registry snapshots registrations and injects typed localizers")]
+func ERegistry() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let strings = Strings()
+    _ = Assert.True(services.AddInstance(typeof(Localizer<Feature>), strings) is Ok(_), "Register localizer")?
+    _ = Assert.True(services.Add(typeof(Greeting), typeof(Greeting), ServiceLifetime.Transient) is Ok(_), "Register consumer")?
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(greeting) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Resolve") }
+    _ = Assert.Equal("Hello", greeting.Text)?
+    _ = Assert.True(services.Add(typeof(Feature), typeof(Feature), ServiceLifetime.Singleton) is Ok(_), "Later registration")?
+    _ = Assert.True(provider.GetRequiredService<Feature>() is Error(ServiceError.Missing(_)), "Snapshot excludes later registration")?
+    let Ok(newProvider) = services.Build() else { return Assert.True(false, "Build new snapshot") }
+    _ = Assert.True(newProvider.GetRequiredService<Feature>() is Ok(_), "New snapshot sees registration")?
+    provider.Dispose()
+    newProvider.Dispose()
+    return Ok(())
+}
+
+[Test("DI isolates scopes and shares only singleton instances")]
+func FLifetimes() -> Result<unit, TestFailure> {
+    let services = DefaultServiceCollection()
+    _ = services.Add(typeof(TransientService), typeof(TransientService), ServiceLifetime.Transient)
+    _ = services.Add(typeof(ScopedService), typeof(ScopedService), ServiceLifetime.Scoped)
+    _ = services.Add(typeof(SingletonService), typeof(SingletonService), ServiceLifetime.Singleton)
+    let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(first) = root.CreateScope() else { return Assert.True(false, "Scope") }
+    let Ok(second) = first.CreateScope() else { return Assert.True(false, "Independent nested scope") }
+    let Ok(a) = first.GetRequiredService<TransientService>() else { return Assert.True(false, "Transient") }
+    let Ok(b) = first.GetRequiredService<TransientService>() else { return Assert.True(false, "Transient again") }
+    _ = Assert.True(!Object.ReferenceEquals(a, b), "Transient identity")?
+    let Ok(c) = first.GetRequiredService<ScopedService>() else { return Assert.True(false, "Scoped") }
+    let Ok(d) = first.GetRequiredService<ScopedService>() else { return Assert.True(false, "Scoped again") }
+    let Ok(e) = second.GetRequiredService<ScopedService>() else { return Assert.True(false, "Other scope") }
+    _ = Assert.True(Object.ReferenceEquals(c, d) && !Object.ReferenceEquals(c, e), "Scoped identities")?
+    let Ok(f) = first.GetRequiredService<SingletonService>() else { return Assert.True(false, "Singleton") }
+    let Ok(g) = second.GetRequiredService<SingletonService>() else { return Assert.True(false, "Singleton again") }
+    _ = Assert.True(Object.ReferenceEquals(f, g), "Shared singleton")?
+    _ = Assert.True(root.GetRequiredService<ScopedService>() is Error(ServiceError.ScopeRequired(_)), "No root scoped resolution")?
+    first.Dispose()
+    second.Dispose()
+    root.Dispose()
+    return Ok(())
+}
+
+[Test("DI rejects cycles and captive scopes without poisoning resolution state")]
+func GFailures() -> Result<unit, TestFailure> {
+    let services = DefaultServiceCollection()
+    _ = services.Add(typeof(CycleA), typeof(CycleA), ServiceLifetime.Transient)
+    _ = services.Add(typeof(CycleB), typeof(CycleB), ServiceLifetime.Transient)
+    _ = services.Add(typeof(ScopedService), typeof(ScopedService), ServiceLifetime.Scoped)
+    _ = services.Add(typeof(Captive), typeof(Captive), ServiceLifetime.Singleton)
+    _ = services.Add(typeof(Feature), typeof(Feature), ServiceLifetime.Transient)
+    let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
+    _ = Assert.True(root.GetRequiredService<CycleA>() is Error(ServiceError.Cycle(_)), "Cycle")?
+    _ = Assert.True(root.GetRequiredService<CycleA>() is Error(ServiceError.Cycle(_)), "State resets")?
+    let Ok(scope) = root.CreateScope() else { return Assert.True(false, "Scope") }
+    _ = Assert.True(scope.GetRequiredService<Captive>() is Error(ServiceError.ScopeRequired(_)), "Singleton cannot capture scope")?
+    _ = Assert.True(scope.GetRequiredService<Feature>() is Ok(_), "Independent resolution survives failures")?
+    scope.Dispose()
+    root.Dispose()
+    return Ok(())
+}
+
+[Test("DI disposes owned services in reverse order and leaves instances caller owned")]
+func HDisposal() -> Result<unit, TestFailure> {
+    let services = DefaultServiceCollection()
+    let log = DisposalLog()
+    let external = ExternalService()
+    _ = services.AddInstance(typeof(DisposalLog), log)
+    _ = services.AddInstance(typeof(ExternalService), external)
+    _ = services.Add(typeof(OwnedDependency), typeof(OwnedDependency), ServiceLifetime.Transient)
+    _ = services.Add(typeof(OwnedConsumer), typeof(OwnedConsumer), ServiceLifetime.Scoped)
+    let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(scope) = root.CreateScope() else { return Assert.True(false, "Scope") }
+    _ = Assert.True(scope.GetRequiredService<OwnedConsumer>() is Ok(_), "Resolve owned graph")?
+    _ = Assert.True(scope.GetRequiredService<ExternalService>() is Ok(_), "Resolve external")?
+    scope.Dispose()
+    scope.Dispose()
+    _ = Assert.Equal("CD", log.Text)?
+    _ = Assert.True(scope.GetRequiredService<OwnedConsumer>() is Error(ServiceError.Disposed), "Disposed scope")?
+    _ = Assert.True(scope.CreateScope() is Error(ServiceError.Disposed), "Cannot create scope after disposal")?
+    root.Dispose()
+    return Assert.Equal(0, external.Count)
+}
+
+[Test("DI validates factories and registrations and resets failed singleton factories")]
+func IFactories() -> Result<unit, TestFailure> {
+    let services = DefaultServiceCollection()
+    _ = Assert.True(services.Add(typeof(Localizer), typeof(Feature), ServiceLifetime.Singleton) is Error(ServiceError.InvalidRegistration(_)), "Invalid implementation")?
+    _ = Assert.True(services.AddInstance(typeof(Localizer), Feature()) is Error(ServiceError.InvalidRegistration(_)), "Invalid instance")?
+    _ = services.AddFactory(typeof(Feature), provider => Ok<Object>(Strings()), ServiceLifetime.Singleton)
+    let Ok(bad) = services.Build() else { return Assert.True(false, "Build factory") }
+    _ = Assert.True(bad.GetRequiredService<Feature>() is Error(ServiceError.InvalidFactoryResult(_)), "Wrong result")?
+    _ = Assert.True(bad.GetRequiredService<Feature>() is Error(ServiceError.InvalidFactoryResult(_)), "Failed singleton not cached or poisoned")?
+    let expected = Feature()
+    _ = services.AddFactory(typeof(Feature), provider => Ok<Object>(expected), ServiceLifetime.Singleton)
+    let Ok(good) = services.Build() else { return Assert.True(false, "Build later registration") }
+    let Ok(actual) = good.GetRequiredService<Feature>() else { return Assert.True(false, "Last registration wins") }
+    _ = Assert.True(Object.ReferenceEquals(expected, actual), "Factory result retained")?
+    bad.Dispose()
+    good.Dispose()
+    return Ok(())
+}
+
+[Test("DI injects the current provider and root disposal invalidates live scopes")]
+func JProvider() -> Result<unit, TestFailure> {
+    let services = DefaultServiceCollection()
+    _ = services.Add(typeof(ProviderConsumer), typeof(ProviderConsumer), ServiceLifetime.Transient)
+    let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(scope) = root.CreateScope() else { return Assert.True(false, "Scope") }
+    let Ok(consumer) = scope.GetRequiredService<ProviderConsumer>() else { return Assert.True(false, "Provider injection") }
+    _ = Assert.True(Object.ReferenceEquals(scope, consumer.Provider), "Current provider")?
+    root.Dispose()
+    _ = Assert.True(scope.GetRequiredService<ProviderConsumer>() is Error(ServiceError.Disposed), "Root invalidates scope")?
+    scope.Dispose()
+    return Ok(())
+}
+
+public open class ExtensibleService { }
+
+[Test("DI conventional lookups distinguish missing services from activation errors")]
+func KLookups() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let first = Feature()
+    let last = Feature()
+    _ = services.AddSingleton<Feature>(first)
+    _ = services.Add(ServiceDescriptor(typeof(Feature), ServiceSource.Instance(last), ServiceLifetime.Singleton))
+    _ = services.AddTransient<ExtensibleService>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(Some(single)) = provider.GetService<Feature>() else { return Assert.True(false, "Optional last") }
+    _ = Assert.True(Object.ReferenceEquals(last, single), "Last registration wins")?
+    let Ok(all) = provider.GetServices<Feature>() else { return Assert.True(false, "Plural") }
+    _ = Assert.Equal(2, all.Count)?
+    _ = Assert.True(Object.ReferenceEquals(first, all[0]) && Object.ReferenceEquals(last, all[1]), "Registration order")?
+    var count = 0
+    for item in all { count = count + 1 }
+    _ = Assert.Equal(2, count)?
+    _ = Assert.True(provider.GetService<Missing>() is Ok(None), "Missing optional")?
+    _ = Assert.True(provider.GetRequiredService<Missing>() is Error(ServiceError.Missing(_)), "Missing required")?
+    let Ok(empty) = provider.GetServices<Missing>() else { return Assert.True(false, "Missing plural") }
+    _ = Assert.Equal(0, empty.Count)?
+    _ = Assert.True(provider.GetRequiredService<ExtensibleService>() is Ok(_), "Open inheritance is not an open generic")?
+    provider.Dispose()
+    return Ok(())
+}
+
+[Test("DI generic registrations preserve factory failures and plural singleton slots")]
+func LGenericRegistrations() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<Localizer<Feature>, Strings>()
+    _ = services.AddScoped<ScopedService>()
+    _ = services.AddSingleton<Feature>()
+    _ = services.AddSingleton<Feature>()
+    _ = services.AddTransient<Greeting>(provider => {
+        let strings = provider.GetRequiredService<Localizer<Feature>>()?
+        return Ok(Greeting(strings))
+    })
+    _ = services.AddTransient<Missing>(provider => Error<ServiceError>(ServiceError.Missing(typeof(Feature))))
+    let Ok(root) = services.Build() else { return Assert.True(false, "Build generic registrations") }
+    let Ok(greeting) = root.GetRequiredService<Greeting>() else { return Assert.True(false, "Typed factory") }
+    _ = Assert.Equal("Hello", greeting.Text)?
+    _ = Assert.True(root.GetService<Missing>() is Error(ServiceError.Missing(_)), "Registered factory failure is not absence")?
+    _ = Assert.True(root.GetServices<Missing>() is Error(ServiceError.Missing(_)), "Plural propagates failure")?
+    let Ok(first) = root.GetServices<Feature>() else { return Assert.True(false, "First plural") }
+    let Ok(second) = root.GetServices<Feature>() else { return Assert.True(false, "Second plural") }
+    _ = Assert.True(!Object.ReferenceEquals(first[0], first[1]), "Independent singleton registration slots")?
+    _ = Assert.True(Object.ReferenceEquals(first[0], second[0]) && Object.ReferenceEquals(first[1], second[1]), "Cached per registration")?
+    root.Dispose()
+    return Ok(())
+}
+
+[Test("DI cleans up factory results when disposal reenters resolution")]
+func MFactoryDisposal() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let created = ExternalService()
+    _ = services.AddTransient<ExternalService>(provider => {
+        provider.Dispose()
+        return Ok(created)
+    })
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    _ = Assert.True(provider.GetRequiredService<ExternalService>() is Error(ServiceError.Disposed), "Do not publish after disposal")?
+    _ = Assert.Equal(1, created.Count)?
+    provider.Dispose()
+    _ = Assert.Equal(1, created.Count)?
+    let aliases: ServiceCollection = DefaultServiceCollection()
+    let shared = ExternalService()
+    _ = aliases.AddSingleton<ExternalService>(resolver => Ok(shared))
+    _ = aliases.AddTransient<Disposable>(resolver => {
+        let value = resolver.GetRequiredService<ExternalService>()?
+        resolver.Dispose()
+        return Ok<Disposable>(value)
+    })
+    let Ok(other) = aliases.Build() else { return Assert.True(false, "Build aliases") }
+    _ = Assert.True(other.GetRequiredService<Disposable>() is Error(ServiceError.Disposed), "Reject disposed alias")?
+    return Assert.Equal(1, shared.Count)
+}

@@ -309,6 +309,15 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI activates typed localizer dependencies through a retained plan',
     'DI rejects ambiguous missing and inaccessible constructors',
     'DI activation reports missing and invalid dependency values',
+    'DI registry snapshots registrations and injects typed localizers',
+    'DI isolates scopes and shares only singleton instances',
+    'DI rejects cycles and captive scopes without poisoning resolution state',
+    'DI disposes owned services in reverse order and leaves instances caller owned',
+    'DI validates factories and registrations and resets failed singleton factories',
+    'DI injects the current provider and root disposal invalidates live scopes',
+    'DI conventional lookups distinguish missing services from activation errors',
+    'DI generic registrations preserve factory failures and plural singleton slots',
+    'DI cleans up factory results when disposal reenters resolution',
 ]
 
 LOCALIZATION_NAMES = [
@@ -469,7 +478,7 @@ def main():
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
               *sorted((TESTS / 'localization').rglob('*.json')),
-              ROOT / 'docs/experiments/dependency-injection/ConstructorPlan.rvn']
+              *sorted((ROOT / 'docs/experiments/dependency-injection').glob('*.rvn'))]
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),

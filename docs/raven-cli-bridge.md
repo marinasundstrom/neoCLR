@@ -14306,3 +14306,15 @@ metadata replacement needed. Five new emitted .NET cases and the native-emitted
 built-in DI activation fixture provide coverage; native/JIT reflective activation
 retention remains a separate qualification gap. See the
 [activation evidence](experiments/dependency-injection/README.md).
+
+### Typed factory contextual substitution (2026-10-21)
+
+Native Raven `d14b7340a` substitutes explicit generic extension arguments through
+structural function signatures. A block-bodied factory now receives the closed
+result type, matching expression bodies and ordinary .NET delegates. This is a
+native binder correction: .NET regression cases pass unchanged, with no main
+carry required. No Runtime Contract configuration, temporary CLI encoding, native
+metadata or closure ABI change; the existing function support boundaries remain.
+The native representation needs no replacement for this semantic correction. All
+11 focused compiler tests pass, and the built-in DI factory consumer passes in
+the interpreter using the rebuilt compiler.

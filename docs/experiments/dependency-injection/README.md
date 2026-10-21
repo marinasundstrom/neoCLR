@@ -23,7 +23,8 @@ consistent with current neoCLR APIs. Competing constructors are checked by their
 parameter-type sets, matching the default .NET container.
 Optional defaults, keyed services, enumerable injection and open registrations are
 not implemented. Closed typed dependencies such as Localizer<Feature> are ordinary
-service identities. Abstract/interface/open/value implementation types are rejected.
+service identities. Abstract/interface/unbound-generic/value implementation types are rejected.
+Inheritance-open classes remain valid; TypeInfo.IsOpen is not a generic-state flag.
 
 Preparation does not instantiate dependencies. Activation allocates its result and
 argument storage; currently the Sequence reflection overload also snapshots its
@@ -31,16 +32,40 @@ arguments. This is a correctness foundation, not an allocation improvement claim
 A subsequent container should cache plans and use indexed dependency slots; it
 must not share mutable argument arrays across concurrent resolutions.
 
+## Container prototype
+
+[Services.rvn](Services.rvn) adds ServiceCollection, ServiceProvider and immutable
+ServiceDescriptor contracts to this unpublished test compilation. Registrations
+accept implementation types, factories or caller-owned instances. Generic
+AddTransient/AddScoped/AddSingleton helpers adapt to the same registration path.
+Build snapshots descriptors and caches constructor plans without activating services.
+
+GetRequiredService reports Missing, GetService returns None only for an absent
+registration, and GetServices preserves registration order. A single lookup uses
+the last registration. Factory and activation errors propagate through all three.
+Typed plural results project existing storage instead of copying a second array.
+
+Transient objects are fresh, scoped objects belong to independent scopes, and
+singletons belong to the root. Root scoped resolution rejects (always-on scope
+validation, unlike .NET's configurable policy). Current-provider injection is
+implicit. Cycles reject without poisoning subsequent resolution. Created disposable
+services are tracked once per provider and disposed in reverse creation order;
+registered instances remain caller-owned. Reentrant disposal during factory
+execution rejects publication and releases newly created results. Root disposal
+invalidates live scopes; callers still dispose those scopes to release their objects.
+
+This is serialized-use infrastructure: provider caches and resolution stacks are
+not thread-safe. Lookup is linear, and reflective activation allocates argument
+storage. There is no allocation-free or server-concurrency claim. Public keywords
+allow reflection over test fixtures; these contracts are not in the class library.
+
 ## Next integration gates
 
-- ServiceCollection and ServiceProvider interfaces and default implementations.
-- Immutable registration snapshot, explicit factories/instances and automatic
-  constructor registrations, with checked implementation assignability.
-- Cycle detection, scoped/singleton caches and captive-scope rejection.
-- Ownership: caller-owned instances stay caller-owned; container-created disposable
-  services are disposed once in reverse creation order; use-after-disposal rejects.
-- Concurrency and native/AOT retention validation before advertising server use.
-- API reference and website documentation when the public contracts are added.
+- Native/JIT exact constructor invocation and explicit retention qualification.
+- Thread-safe provider state before advertising concurrent server use.
+- Class-library integration, public API reference and website documentation.
+- Generic-state reflection flags; open generic registration and enumerable
+  constructor injection remain beyond the current closed-service prototype.
 
 ## Compiler gap fixed during integration
 
@@ -61,13 +86,20 @@ metadata encoding or closure ABI changes.
 
 ## Validation
 
-All four built-in tests pass in the interpreter with native compiler `5f6e7a29c`: selection, retained activation with
-Localizer<Feature>, ambiguous/missing/private/interface rejection, and missing or
-wrongly typed resolved arguments. Native/JIT activation is not yet qualified.
-See [test report](runtime-tests.json) and [output](runtime-tests.log). No public
-API changed in this internal experiment, so no API snapshot refresh or website
-build is required for this increment.
+All 13 built-in tests pass in the interpreter using native compiler `d14b7340a`,
+including typed factory callbacks, conventional lookups, independent singleton
+slots, current-provider injection, scope/cycle failures and reentrant disposal.
+See [container test report](services-runtime-tests.json) and
+[output](services-runtime-tests.log). Earlier four-test activation evidence is
+retained separately. Native/JIT activation is not yet qualified.
 
-Run explicitly with `scripts/test-runtime-library.py --suite dependency-injection
---mode interpreter` and a matching bundle/output directory. This internal suite
-is opt-in until native constructor retention has its own qualification.
+The native compiler correction substitutes explicit generic extension arguments
+inside structural-function signatures. Before the fix a block-bodied factory kept
+an unsubstituted TService result; expression-bodied and .NET cases passed. All 11
+focused compiler tests pass afterward. Runtime Contract, metadata and ABI remain
+unchanged; see the [integration note](../../raven-cli-bridge.md).
+
+No shipped public API changed in this experiment, so no API snapshot refresh or
+website build is required. Run explicitly with `scripts/test-runtime-library.py
+--suite dependency-injection --mode interpreter` and a matching bundle/output
+directory. This suite remains opt-in until native retention is qualified.

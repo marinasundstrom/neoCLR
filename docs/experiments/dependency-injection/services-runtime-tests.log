@@ -1,0 +1,16 @@
+dependency-injection (interpreter):
+PASS DI selects the greediest available public constructor
+PASS DI activates typed localizer dependencies through a retained plan
+PASS DI rejects ambiguous missing and inaccessible constructors
+PASS DI activation reports missing and invalid dependency values
+PASS DI registry snapshots registrations and injects typed localizers
+PASS DI isolates scopes and shares only singleton instances
+PASS DI rejects cycles and captive scopes without poisoning resolution state
+PASS DI disposes owned services in reverse order and leaves instances caller owned
+PASS DI validates factories and registrations and resets failed singleton factories
+PASS DI injects the current provider and root disposal invalidates live scopes
+PASS DI conventional lookups distinguish missing services from activation errors
+PASS DI generic registrations preserve factory failures and plural singleton slots
+PASS DI cleans up factory results when disposal reenters resolution
+Tests: 13, passed: 13, failed: 0, skipped: 0
+Runtime library tests: PASS

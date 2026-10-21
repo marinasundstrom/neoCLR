@@ -13,6 +13,8 @@
     <Compile Include="$(NeoClrTestRegistry)" />
     <Compile Include="../collections/Main.rvn" />
     <Compile Include="Tests.rvn" />
+    <Compile Include="ServicesTests.rvn" />
+    <Compile Include="../../../../docs/experiments/dependency-injection/Services.rvn" />
     <Compile Include="../../../../docs/experiments/dependency-injection/ConstructorPlan.rvn" />
   </ItemGroup>
 </Project>
