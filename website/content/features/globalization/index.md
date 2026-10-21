@@ -65,10 +65,9 @@ non-Gregorian parsing, timezone rules and bidirectional layout remain unsupporte
 
 ## Localization is independent
 
-Resource localization will use shared interfaces across feature areas. Providers and
-sources can differ, including JSON and resource files, while callers use the same
-localization contracts. Culture supplies language and formatting preferences; it does
-not own resource loading. Those unified localization interfaces remain future work.
+`System.Localization` provides string lookup independently of cultural formatting.
+See [localization](/features/localization/) for JSON resources, typed scopes,
+per-key fallback and optional missing-key diagnostics.
 
 [API reference →](../../docs/namespaces.html) · [Date/time APIs →](../time/)
 · [Design comparisons and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/calendar-globalization.md)

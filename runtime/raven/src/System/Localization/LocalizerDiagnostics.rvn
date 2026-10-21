@@ -1,0 +1,36 @@
+module System.Localization
+
+import System.*
+import System.Option.*
+
+internal class ReportingLocalizer : Localizer {
+    private val inner: Localizer
+    private val report: (string) -> unit
+
+    init(inner: Localizer, report: (string) -> unit) {
+        self.inner = inner
+        self.report = report
+    }
+
+    val self[key: string]: string {
+        get {
+            if inner.Find(key) is Some(let value) {
+                return value
+            }
+            report(key)
+            return key
+        }
+    }
+
+    val Culture: Globalization.Culture => inner.Culture
+
+    func Find(key: string) -> Option<string> => inner.Find(key)
+}
+
+/// Optional diagnostics for display lookups, independent of storage or logging providers.
+public extension LocalizerDiagnostics for Localizer {
+    /// Returns a wrapper that calls handler once for each missing indexer lookup, then returns the key.
+    /// Find stays quiet. Empty translations do not call handler. The caller owns throttling and locale context.
+    /// The handler runs synchronously and should not reenter this wrapper; handler faults propagate.
+    func WithMissingKeyHandler(handler: (string) -> unit) -> Localizer => ReportingLocalizer(self, handler)
+}

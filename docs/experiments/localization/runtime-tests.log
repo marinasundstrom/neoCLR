@@ -1,0 +1,34 @@
+localization (native):
+PASS Localizer preserves strings and distinguishes missing from empty
+PASS Localizer uses ordinal keys and decodes JSON escapes
+PASS Localizer rejects malformed and non-string catalogues
+PASS Localizer supports catalogues beyond provisional DOM limits
+PASS Localizer reads borrowed streams and explicit files
+PASS Localizer diagnostics report only missing display lookups
+PASS Localizer scopes and cultures fall back per key
+PASS Localizer invariant fallback is configurable and typed scope is explicit
+PASS Localizer resolves templates before formatting arguments
+Tests: 9, passed: 9, failed: 0, skipped: 0
+localization (jit):
+PASS Localizer preserves strings and distinguishes missing from empty
+PASS Localizer uses ordinal keys and decodes JSON escapes
+PASS Localizer rejects malformed and non-string catalogues
+PASS Localizer supports catalogues beyond provisional DOM limits
+PASS Localizer reads borrowed streams and explicit files
+PASS Localizer diagnostics report only missing display lookups
+PASS Localizer scopes and cultures fall back per key
+PASS Localizer invariant fallback is configurable and typed scope is explicit
+PASS Localizer resolves templates before formatting arguments
+Tests: 9, passed: 9, failed: 0, skipped: 0
+localization (interpreter):
+PASS Localizer preserves strings and distinguishes missing from empty
+PASS Localizer uses ordinal keys and decodes JSON escapes
+PASS Localizer rejects malformed and non-string catalogues
+PASS Localizer supports catalogues beyond provisional DOM limits
+PASS Localizer reads borrowed streams and explicit files
+PASS Localizer diagnostics report only missing display lookups
+PASS Localizer scopes and cultures fall back per key
+PASS Localizer invariant fallback is configurable and typed scope is explicit
+PASS Localizer resolves templates before formatting arguments
+Tests: 9, passed: 9, failed: 0, skipped: 0
+Runtime library tests: PASS

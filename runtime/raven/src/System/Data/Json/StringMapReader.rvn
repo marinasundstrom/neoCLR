@@ -1,0 +1,95 @@
+module System.Data.Json
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+// Flat resource documents need no DOM. Reuse JSON whitespace, UTF-8 and escape validation.
+internal class StringMapReader {
+    private var position: int = 0
+
+    private func Skip(bytes: ReadOnlySlice<byte>) {
+        while position < bytes.Length && JsonSyntax.Whitespace(bytes[position]) {
+            position += 1
+        }
+    }
+
+    private func Take(bytes: ReadOnlySlice<byte>, token: byte) -> bool {
+        Skip(bytes)
+        if position < bytes.Length && bytes[position] == token {
+            position += 1
+            return true
+        }
+        return false
+    }
+
+    private func Text(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
+        Skip(bytes)
+        let start = position
+        if !Take(bytes, (byte)34) {
+            return Error(JsonError.TypeMismatch("JSON string"))
+        }
+        var escaped = false
+        var needsDecoding = false
+        while position < bytes.Length {
+            let value = bytes[position]
+            position += 1
+            if escaped {
+                escaped = false
+            } else if value == 92 {
+                escaped = true
+                needsDecoding = true
+            } else if value <= 31 {
+                return Error(JsonError.Syntax("Unescaped control byte"))
+            } else if value == 34 {
+                if needsDecoding {
+                    return MessageReader().Read(bytes.Slice(start, position - start), 65536)
+                }
+                return match Encodings.Utf8.Decode(bytes.Slice(start + 1, position - start - 2)) {
+                    Ok(let text) => Ok(text)
+                    Error(_) => Error(JsonError.Syntax("Invalid UTF-8"))
+                }
+            }
+        }
+        return Error(JsonError.Syntax("Unclosed string"))
+    }
+
+    func Read(bytes: ReadOnlySlice<byte>) -> Result<HashMap<string, string>, JsonError> {
+        if bytes.Length > 65536 {
+            return Error(JsonError.LimitExceeded("Catalogue exceeds 65536 UTF-8 bytes"))
+        }
+        if !JsonSyntax.ValidUtf8(bytes) {
+            return Error(JsonError.Syntax("Invalid UTF-8"))
+        }
+        if !Take(bytes, (byte)123) {
+            return Error(JsonError.TypeMismatch("JSON object of strings"))
+        }
+        let entries = HashMap<string, string>(StringComparer.Ordinal)
+        if !Take(bytes, (byte)125) {
+            var closed = false
+            while !closed {
+                if entries.Count == 4096 {
+                    return Error(JsonError.LimitExceeded("Catalogue exceeds 4096 entries"))
+                }
+                let key = Text(bytes)?
+                if !Take(bytes, (byte)58) {
+                    return Error(JsonError.Syntax("Expected colon"))
+                }
+                let value = Text(bytes)?
+                if !entries.TryAdd(key, value) {
+                    return Error(JsonError.DuplicateField(key))
+                }
+                closed = Take(bytes, (byte)125)
+                if !closed && !Take(bytes, (byte)44) {
+                    return Error(JsonError.Syntax("Expected comma or object end"))
+                }
+            }
+        }
+        Skip(bytes)
+        if position != bytes.Length {
+            return Error(JsonError.Syntax("Trailing content"))
+        }
+        return Ok(entries)
+    }
+}

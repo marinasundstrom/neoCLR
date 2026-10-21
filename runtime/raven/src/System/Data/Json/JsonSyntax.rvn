@@ -214,10 +214,13 @@ internal class MessageReader {
         return Ok(value)
     }
 
-    func Read(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
+    func Read(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> => Read(bytes, 1024)
+
+    // Internal resource readers supply their own bounded document limit.
+    func Read(bytes: ReadOnlySlice<byte>, maxBytes: int) -> Result<string, JsonError> {
         let length = bytes.Length
-        if length > 1024 {
-            return Error(JsonError.LimitExceeded("Payload exceeds 1024 UTF-8 bytes"))
+        if length > maxBytes {
+            return Error(JsonError.LimitExceeded("JSON string exceeds byte limit"))
         }
         while position < length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1

@@ -143,6 +143,8 @@ def complete_services(command):
             command.insert(1, flag)
     if not any(Path(arg).name == 'native-runtime.c' for arg in command):
         additions.append(async_source)
+    if not windows:
+        additions.append(ROOT / 'docs/experiments/aot-console/file-input.c')
     if not windows and '-Wno-deprecated-declarations' not in command:
         command.insert(1, '-Wno-deprecated-declarations')
 

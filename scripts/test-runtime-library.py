@@ -304,6 +304,18 @@ PATH_VALUES_NAMES = [
     'Path equality distinguishes case roots and normalization',
     'Path equality agrees across typed interface and Object dispatch',
 ]
+LOCALIZATION_NAMES = [
+    'Localizer preserves strings and distinguishes missing from empty',
+    'Localizer uses ordinal keys and decodes JSON escapes',
+    'Localizer rejects malformed and non-string catalogues',
+    'Localizer supports catalogues beyond provisional DOM limits',
+    'Localizer reads borrowed streams and explicit files',
+    'Localizer diagnostics report only missing display lookups',
+    'Localizer scopes and cultures fall back per key',
+    'Localizer invariant fallback is configurable and typed scope is explicit',
+    'Localizer resolves templates before formatting arguments',
+]
+
 DECONSTRUCTION_NAMES = [
     'Value deconstruction binds named and unnamed locals',
     'Reference deconstruction binds named and unnamed locals',
@@ -422,7 +434,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -448,7 +460,8 @@ def main():
     inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py', ROOT / 'scripts/discover-runtime-tests.py', ROOT / 'scripts/validate-test-discovery.py',
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
-              *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj'))]
+              *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
+              *sorted((TESTS / 'localization').rglob('*.json'))]
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
@@ -478,6 +491,7 @@ def main():
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('localization', 0, ''.join('PASS ' + n + '\n' for n in LOCALIZATION_NAMES) + f'Tests: {len(LOCALIZATION_NAMES)}, passed: {len(LOCALIZATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('deconstruction', 0, ''.join('PASS ' + n + '\n' for n in DECONSTRUCTION_NAMES) + f'Tests: {len(DECONSTRUCTION_NAMES)}, passed: {len(DECONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('currency', 0, ''.join('PASS ' + n + '\n' for n in CURRENCY_NAMES) + f'Tests: {len(CURRENCY_NAMES)}, passed: {len(CURRENCY_NAMES)}, failed: 0, skipped: 0\n'),
         ('decimal', 0, ''.join('PASS ' + n + '\n' for n in DECIMAL_NAMES) + f'Tests: {len(DECIMAL_NAMES)}, passed: {len(DECIMAL_NAMES)}, failed: 0, skipped: 0\n'),
@@ -527,7 +541,7 @@ def main():
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need lifecycle bindings; JSON DOM fixtures also select HTTP content/socket handlers.
-            profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
+            profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'localization', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if name == "json-streams":
@@ -546,7 +560,7 @@ def main():
                 command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
                            profile, '--project', TESTS / name / 'Tests.rvnproj',
                            '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
-                if name in ("encoding-buffer-limits", "http-text"):
+                if name in ("encoding-buffer-limits", "http-text", "localization"):
                     command += ["--byte-array-limit", "131072"]
                 if name == "gzip":
                     command += ["--http-heap-bytes", "33554432"]
@@ -584,6 +598,10 @@ def main():
                 report['phases'].append(dict(suite=name, phase='registration-verification', elapsedSeconds=round(time.perf_counter() - started, 6)))
             isolated = out / (name + '-isolated')
             isolated.mkdir()
+            if name == 'localization':
+                for fixture in ('catalogue.json', 'invalid.json'):
+                    shutil.copyfile(ROOT / 'runtime/raven/tests/localization' / fixture, isolated / fixture)
+                shutil.copytree(ROOT / 'runtime/raven/tests/localization/resources', isolated / 'resources')
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
             if 'native' in modes:
                 shutil.copy2(build / exe.name, exe)
@@ -592,7 +610,7 @@ def main():
             interpreter = [args.runtime.resolve(), 'run', build / 'app.dll', '--system', lib / catalog['runtimeSeed'],
                            *[arg for a in catalog['assemblyNames'] for arg in ('--module', lib / (a + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
-            if name in ("encoding-buffer-limits", "http-text", "gzip"):
+            if name in ("encoding-buffer-limits", "http-text", "gzip", "localization"):
                 interpreter += ["--array-elements", "1048576", "--array-bytes", "268435456"]
                 report["gzipBufferBudgets" if name == "gzip" else "encodingBufferBudgets"] = dict(nativeByteArrayElements=65536 if name == "gzip" else 131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
@@ -601,14 +619,14 @@ def main():
                 if mode == 'native':
                     executions.append((mode, [exe], isolated, env))
                 elif mode == 'interpreter':
-                    executions.append((mode, interpreter + ['--execution', 'interpreter'], ROOT, None))
+                    executions.append((mode, interpreter + ['--execution', 'interpreter'], isolated if name == 'localization' else ROOT, None))
                 else:
                     jit = interpreter[:interpreter.index('--instructions')] + [
                         '--jit-host', args.jit_host.resolve(),
                         '--jit-compiler', args.aot.resolve()]
                     if name == "json-streams":
                         jit += ["--reflection-roots", json_roots]
-                    executions.append((mode, jit, ROOT, None))
+                    executions.append((mode, jit, isolated if name == 'localization' else ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:
                 started = time.perf_counter()

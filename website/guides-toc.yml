@@ -40,6 +40,8 @@
       href: features/strings/index.md
     - name: "Dates, times and zones"
       href: features/time/index.md
+    - name: "Localization"
+      href: features/localization/index.md
     - name: "Globalization"
       href: features/globalization/index.md
 - name: Runtime and tools
@@ -86,6 +88,8 @@
       href: docs/key-value-pair.md
     - name: "Interface variance"
       href: docs/interface-variance.md
+    - name: "Localization"
+      href: docs/localization.md
     - name: "JSON serialization"
       href: docs/json.md
     - name: "Streams"

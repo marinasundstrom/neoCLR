@@ -1144,7 +1144,8 @@ pub(super) fn select_inventory_with_host_roots(
                         if callable_invoke(target).is_some() {
                             continue;
                         }
-                        let callee = resolve(input, target)?;
+                        let callee = resolve(input, target)
+                            .map_err(|e| format!("in {}: {e}", input.functions[i].name))?;
                         let f = &input.functions[callee];
                         if matches!(op, Op::CallVirtual(_))
                             && !interface_contract(input, f)
@@ -1277,7 +1278,7 @@ pub(super) fn select_inventory_with_host_roots(
                 if callable_invoke(target).is_some() {
                     continue;
                 }
-                let old = resolve(input, target)?;
+                let old = resolve(input, target).map_err(|e| format!("in {}: {e}", f.name))?;
                 let new = rows.binary_search(&old).expect("selected call");
                 target.definition = Some(MemberId {
                     module: input.name.clone(),

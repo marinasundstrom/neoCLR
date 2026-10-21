@@ -29,6 +29,28 @@ internal static class GenericInstanceChecks
     internal static void Run()
     {
         var graph = Create();
+        var image = RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), graph.CoreLibrary);
+        var native = AssemblyDefinition.ReadNativeAssembly(image);
+        var receiver = native.MainModule.Types.Single(t => t.Name == "Order");
+        var imported = receiver.Methods.Single(m => m.Name == "Forward");
+        if (imported.IsStatic || imported.GenericArity != 1 || !ReferenceEquals(imported.DeclaringType, receiver))
+            throw new Exception("native generic instance method identity");
+        if (!native.Write().AsSpan().SequenceEqual(image)) throw new Exception("native generic method snapshot changed");
+        var consumer = new AssemblyBuilder(new("GenericConsumer", new Version(1, 0, 0, 0)), graph.CoreLibrary);
+        var importedOwner = consumer.CreateTypeReference(new("GenericProvider", new Version(1, 0, 0, 0)), graph.CoreLibrary, new string('a', 64), "Example", "Provider");
+        var signature = new MethodSignature(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["T"]);
+        var callable = consumer.CreateMethodReference(importedOwner, "Echo", signature);
+        if (callable.IsStatic || !ReferenceEquals(callable, consumer.CreateMethodReference(importedOwner, "Echo", signature)))
+            throw new Exception("authored generic instance contract interning");
+        var closed = callable.MakeGenericInstance(PrimitiveType.Int32);
+        var forward = consumer.AddType("Example", "Calls").AddMethod("Forward",
+            new MethodSignature(PrimitiveType.Int32, [(SignatureType)importedOwner]));
+        forward.LoadArgument(0); forward.LoadConstant(42); forward.Call(closed); forward.Return();
+        _ = consumer.WriteNativeAssembly();
+        _ = consumer.Write();
+        forward.ClearBody(); forward.LoadConstant(0); forward.LoadConstant(42); forward.Call(closed); forward.Return();
+        try { consumer.WriteNativeAssembly(); throw new Exception("wrong imported generic receiver accepted"); }
+        catch (InvalidDataException) { }
         var loaded = Assembly.Load(graph.Write());
         if (!Equals(loaded.EntryPoint!.Invoke(null, null), 42)) throw new Exception("generic instance execution");
         var projection = AssemblyDefinition.ReadAssembly(NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly()).CreateReferenceAssembly(graph.CoreLibrary), false);
@@ -61,6 +83,7 @@ internal static class GenericInstanceChecks
         {
             var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
             start.ArgumentList.Add(command); start.ArgumentList.Add(path);
+            if (command == "run") { start.ArgumentList.Add("--execution"); start.ArgumentList.Add("interpreter"); }
             using var process = Process.Start(start)!;
             var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync(); var text = await stdout + await stderr;

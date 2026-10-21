@@ -6,8 +6,8 @@ public sealed partial class AssemblyDefinition
     /// <param name="image">Complete schema-1/2/3 PE runtime container or schema-2/3 standalone NEOX with an assembly manifest.</param>
     /// <param name="resolver">Explicit dependency snapshots for external structural bounds; no implicit loading.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including unsupported generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
-    /// <remarks>This materialization profile admits nongeneric methods and static generic methods/functions with supported nongeneric interface bounds and scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and classes, values and interfaces with supported special constraint flags and owned nongeneric nominal class bounds (including supported nested declarations under generic or nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including unsupported generic static owners, unsupported field types and signatures beyond the bounded native profile.</exception>
+    /// <remarks>This materialization profile admits nongeneric methods and generic instance/static methods/functions with supported nongeneric interface bounds and scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and classes, values and interfaces with supported special constraint flags and owned nongeneric nominal class bounds (including supported nested declarations under generic or nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
     /// Admits supported union, intersection and named tuple signatures without opt-in. External intersection operands require exact resolver snapshots.
     /// Public value-type ToString overrides retain their inherited CLI slot flags and native call name.
     /// Writable ref/out parameters retain their element signature and output indices; readonly modes and byref constructors remain unsupported.
@@ -47,9 +47,9 @@ public sealed partial class NativeAssemblyDefinition
         if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => !SupportedMethod(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i))) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             (m.Name == ".ctor" && m.Signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)) ||
-            (m.Instance && m.Signature.GenericParameterNames.Count != 0) || !SupportedMethod(m.Signature.ReturnType) ||
+            !SupportedMethod(m.Signature.ReturnType) ||
             m.Signature.ParameterTypes.Any(p => !SupportedMethod(p.ByReferenceElement ?? p))))
-            throw new InvalidDataException("native definition materialization requires bounded static generic or nongeneric signatures and class/value/interface declarations with bounded constraints");
+            throw new InvalidDataException("native definition materialization requires bounded generic or nongeneric signatures and class/value/interface declarations with bounded constraints");
         var nominalTokens = types.Select((type, index) => (type, token: 0x02000002u + (uint)index))
             .ToDictionary(item => (item.type.DeclaringType < 0 ? 0u : 0x02000002u + (uint)item.type.DeclaringType, item.type.Namespace, item.type.Name), item => item.token);
         uint LocalToken(TypeBuilder type) => nominalTokens[(type.Definition.DeclaringType is { } parent ? LocalToken(parent.Producer!) : 0u, type.Namespace, type.Name)];

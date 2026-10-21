@@ -100,7 +100,7 @@ def support_files():
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
             *[base / 'aot-console' / name for name in
               ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
-               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c', 'time-zone.c')],
+               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c', 'time-zone.c', 'file-input.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
             *sorted((base / 'aot-console').glob('*.h')),
             *sorted((base / 'aot-scalar').glob('*.h')),
@@ -235,6 +235,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if bootstrap_root:
             adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
             adapters += [base / 'native-session.c']
+        if not windows:
+            adapters.append(base / 'file-input.c')
         adapters.append(ROOT / 'tools/native/entry-arguments.c')
         inputs = [*sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
@@ -269,6 +271,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             flags += ['--bind-cryptography', '--bind-tls']
         flags += ['--bind-scheduler', '--bind-task-queue', '--bind-timers']
         flags += ['--bind-runtime-async']
+        if not windows:
+            flags += ['--bind-file-input']
         if http:
             flags += [
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']

@@ -35,7 +35,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
     /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
     /// <remarks>The caller supplies resolved class member semantics or an abstract interface contract. No dependency is loaded or verified.
-    /// Authored interfaces require nongeneric abstract contracts. Instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
+    /// Authored interfaces require nongeneric abstract contracts. Virtual/interface instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors and generic virtual/interface methods are unsupported. Ordinary nonvirtual generic instance methods are supported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null)
@@ -88,8 +88,7 @@ public sealed partial class AssemblyBuilder
         if (isInterface && (constructor || signature.GenericParameterNames.Count != 0))
             throw new ArgumentException("interface contract requires a nongeneric method");
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" || name.Any(char.IsControl) ||
-            constructor && (isStatic || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
-            !isStatic && signature.GenericParameterNames.Count != 0)
+            constructor && (isStatic || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0))
             throw new ArgumentException("unsupported method or constructor contract", nameof(name));
         if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null))
             throw new InvalidDataException($"unsupported authored method signature: {declaringType}.{name}({string.Join(", ", signature.ParameterTypes)}) -> {signature.ReturnType}");

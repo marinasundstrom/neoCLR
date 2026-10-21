@@ -26,6 +26,7 @@ member for parameters, return values, errors and usage notes.
 | Streams and files | [System.IO](xref:System.IO) · [System.Storage](xref:System.Storage) · [Stream contracts](streams.md) |
 | Console and environment | [Console](xref:System.Console) · [Environment](xref:System.Environment) · [Standard streams](console.md) |
 | Tasks and concurrency | [System.Concurrency.Tasks](xref:System.Concurrency.Tasks) · [System.Concurrency](xref:System.Concurrency) |
+| Localization | [Catalogue loading and fallback](localization.md) · System.Localization |
 | Dates and globalization | [System.Time](xref:System.Time) · [System.Globalization](xref:System.Globalization) |
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [HTTP server](http-server.md) · [Body streams](http-body-streams.md) · [Routes](routes.md) |
 | Cryptography | [Hashing and secure random bytes](cryptography.md) · System.Security.Cryptography |

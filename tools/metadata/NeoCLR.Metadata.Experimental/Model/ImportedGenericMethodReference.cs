@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable instantiation of an imported static generic method.</summary>
+/// <summary>An immutable instantiation of an imported generic method.</summary>
 public sealed class ImportedGenericMethodReference
 {
     internal ImportedGenericMethodReference(ImportedMethodReference definition, GenericMethodInstance target)
@@ -24,7 +24,7 @@ public sealed partial class ImportedMethodReference
     public ImportedGenericMethodReference MakeGenericInstance(params SignatureType[] typeArguments)
     {
         ArgumentNullException.ThrowIfNull(typeArguments);
-        if (Target.DeclaringType?.GenericParameterNames.Count > 0 || !IsStatic || Target.Signature.GenericParameterNames.Count == 0 || typeArguments.Length != Target.Signature.GenericParameterNames.Count ||
+        if (Target.DeclaringType?.GenericParameterNames.Count > 0 || Target.Signature.GenericParameterNames.Count == 0 || typeArguments.Length != Target.Signature.GenericParameterNames.Count ||
             typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void))
             throw new ArgumentException("generic type arguments must match the imported definition", nameof(typeArguments));
         // Arguments belong to the consumer, not the private dependency definition graph.

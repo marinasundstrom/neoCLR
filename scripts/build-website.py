@@ -287,6 +287,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'LOCALIZATION_FORMAT_SAMPLE': ('runtime/raven/tests/localization/Tests.rvn', '    _ = Assert.Equal("Hej Raven!"', '    _ = Assert.Equal("A/B"', False),
         'SQL_PERSON_MODEL': ('docs/experiments/postgresql-people/Main.rvn', 'public class Person', '\n}', True),
         'SQL_POSITIONAL_PEOPLE': ('docs/experiments/postgresql-people/Main.rvn', '    let positional', '\n\n    let parameters', False),
         'SQL_NAMED_PEOPLE': ('docs/experiments/postgresql-people/Main.rvn', '    let parameters', '\n    return Ok', False),

@@ -1,0 +1,31 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.43s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-05e8b8e4a2ce6647)
+
+running 23 tests
+test specialization::tests::boxed_scalar_interface_body_specializes_generic_helpers ... ok
+test specialization::tests::input_function_inventory_remains_bounded ... ok
+test specialization::tests::memory_view_shapes_retain_exact_elements_without_admitting_native_layout ... ok
+test specialization::tests::deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack ... ok
+test specialization::tests::generic_class_override_without_base_call_retains_closed_slot ... ok
+test specialization::tests::generic_shape_expansion_has_its_own_bound_before_selection ... ok
+test specialization::tests::function_kind_constraint_preserves_typed_calls_after_specialization ... ok
+test specialization::tests::method_class_bounds_validate_before_specialization ... ok
+test specialization::tests::closed_type_budget_includes_nongeneric_dependency_shapes ... ok
+test specialization::tests::instance_methods_specialize_owner_and_method_parameters_independently ... ok
+test specialization::tests::method_categories_use_runtime_constraint_validation ... ok
+test specialization::tests::nominal_class_constraints_are_checked_before_specialization ... ok
+test specialization::tests::init_accessor_authority_survives_specialization_and_selection ... ok
+test specialization::tests::nominal_self_inheritance_closes_views_at_the_implementing_owner ... ok
+test specialization::tests::nested_generic_specializations_preserve_each_lexical_owner ... ok
+test specialization::tests::nominal_static_self_methods_specialize_without_erasing_conformance ... ok
+test specialization::tests::variant_interfaces_preserve_dispatch_and_identity_after_specialization ... ok
+test specialization::tests::special_type_constraints_are_checked_before_specialization ... ok
+test specialization::tests::variant_selection_ignores_unrelated_explicit_source_templates ... ok
+test specialization::tests::signature_only_classes_retain_closed_interface_conformance ... ok
+test specialization::tests::variant_interface_dispatch_closes_generic_implementations ... ok
+test specialization::tests::specialized_interface_dispatch_ignores_unselected_open_overload ... ok
+test specialization::tests::selected_function_budget_accepts_boundary_and_rejects_overflow ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 96 filtered out; finished in 5.31s

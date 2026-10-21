@@ -236,7 +236,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         foreach (var type in operand.TypeArguments)
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         operand.Target.Definition.ValidateMethodArguments(operand.TypeArguments, bodyBuilder);
-        Append(new("call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target));
+        Append(new("call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target,
+            Type: operand.Definition.IsStatic ? null : (SignatureType)operand.Definition.DeclaringReference!));
     }
 
     public void CallVirtual(MethodBuilder target) => Emit(OpCode.Callvirt, target);

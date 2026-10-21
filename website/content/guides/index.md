@@ -27,6 +27,7 @@ Start with a working application, then follow the APIs it uses.
 - [Arrays](/features/arrays/) and [indexing and slicing](/docs/sequence-access.html).
 - [JSON](/docs/json.html) — nodes, models and serialization.
 - [Strings and UTF-8](/features/strings/) — characters and explicit encoding.
+- [Localization](/features/localization/) — JSON resources, scoped lookup and fallback.
 - [Dates and times](/features/time/) and [globalization](/features/globalization/).
 - [Option and Result](/features/outcomes/) — absence and expected errors.
 

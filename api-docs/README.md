@@ -2809,3 +2809,8 @@ the monetary types or NumberFormat currency members. These exact legacy omission
 are documented; no corresponding native type/member exclusion is intended.
 The [monetary guide](text-numbers.md#monetary-values-development) supplies contracts,
 strict parsing limitations and the distinction between identity and presentation.
+
+Development (2026-10-21): System.Localization interfaces, diagnostics, JSON provider
+and error union are rendered from the native snapshot. The legacy CLI scaffold
+does not project these types; [the localization guide](localization.md) records
+contracts, assembly split, fallback and native host limits.

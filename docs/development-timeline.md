@@ -20684,3 +20684,30 @@ method bounds and the replacement release gates remain open.
   deconstruction/currency executions pass across native/JIT/interpreter. The
   refreshed Money API reference is included in the validated 5,216-page local
   website. See [qualification evidence](experiments/deconstruction/README.md).
+
+### 2026-10-21 — Explicit JSON localization catalogues
+
+- **Author:** Requested a small System.Localization interface and JSON provider,
+  noting IStringLocalizer/Factory and typed IStringLocalizer<T> without requiring
+  their exact model. Requested key-as-value fallback and configurable console
+  diagnostics, FeatureX.sv-SE.json/FeatureX.sv.json naming, optional scope, invariant
+  support, configurable directory, typed scope and configurable invariant fallback.
+- **Assistant:** Selected flat JSON string maps with documented limits rather than
+  claiming a universal industry format. Implemented an explicitly configured
+  provider, optional typed scope, per-key fallback and an opt-in reporting wrapper;
+  Find remains quiet. Explicit invariant selection is independent of automatic
+  fallback. Loading uses existing synchronous file storage and async borrowed streams.
+- **Open scope:** No full i18next/ICU message engine, arbitrary locale resolver,
+  hot reload or automatic caching. See [implementation and qualification](experiments/localization/README.md).
+
+### 2026-10-21 — Localization formatting and next DI step
+
+The author requested a separate localization feature page and argument-taking lookup,
+including `localizer["Greeting", name]` and safe lookup. The author clarified that
+lookup resolves the template first, then arguments are inserted. The assistant
+proposed retaining ordinary string/Option results and deferring a LocalizedString
+wrapper until provenance is needed. Missing indexer keys remain unchanged; Find
+returns None. Formatting uses the selected culture, independent of resource fallback.
+The author explicitly directed committing localization before beginning dependency
+injection with automatic constructor injection. That DI implementation remains next;
+large-application localization optimization is deferred.

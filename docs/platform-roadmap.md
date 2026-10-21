@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Localization foundation (author direction, 2026-10-21):** Add explicit JSON
+resources, optional typed scopes, per-key culture fallback, lookup-first formatting and diagnostics.
+The author directs committing this increment before DI with automatic constructor injection.
+[Scope and validation](experiments/localization/README.md) remain a bounded addition;
+this does not replace release qualification or expand arbitrary locale support.
+
 **Deconstruction parity (author direction, 2026-10-21):** [The deconstruction increment](experiments/deconstruction/README.md)
 puts general named/unnamed declaration and matching semantics on Raven main first,
 then validates native lowering independently. The author renames the monetary

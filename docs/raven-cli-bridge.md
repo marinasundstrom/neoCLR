@@ -14275,3 +14275,19 @@ of allocation-free pattern matching. Named/unnamed assignment shares inherited
 receiver conversion. The public monetary type is now Money; prior MonetaryAmount
 references must migrate. Native and .NET qualification are tracked separately in
 [deconstruction evidence](experiments/deconstruction/README.md).
+
+### Localization and generic instance imports (2026-10-21)
+
+Localizer<T> and JsonLocalizerProvider.Load<T> use ordinary interfaces and generic
+instance methods. The metadata SDK now admits these methods during materialization
+and authored imports, retaining generic arity and the consuming receiver identity.
+Raven's native emitter (4afc75dd8) admits them through AllowsGenericInstanceMethods; ordinary
+signature checks still apply. No new Runtime Contract setting, CLI bridge encoding
+or ABI is introduced; generic virtual/interface methods remain outside this scope.
+
+Raven main 56343767e fixes expanded array params for indexers, carried deliberately
+as 550cbc87c on the native compiler line. Ordinary parameter metadata and collection
+lowering pack arguments; fixed overloads avoid that array. Main's 11 extension-indexer
+execution tests pass. The SDK regression checks imported receivers and rejects a
+wrong receiver; built-in localization tests cover the consuming native contract.
+See [localization evidence](experiments/localization/README.md).

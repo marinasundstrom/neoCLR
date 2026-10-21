@@ -1064,10 +1064,12 @@ pub(crate) fn expand_with_conformance(
                 if let Op::BoxValue(ty) = op {
                     let owner = substitute(ty, &instance.types, &instance.methods)
                         .map_err(|e| e.to_string())?;
-                    if input.type_definition(&owner).is_some_and(|t| {
-                        !t.is_reference_type
-                            && t.representation == neoclr::metadata::Representation::Record
-                    }) {
+                    if super::selection::projected_primitive(&owner)
+                        || input.type_definition(&owner).is_some_and(|t| {
+                            !t.is_reference_type
+                                && t.representation == neoclr::metadata::Representation::Record
+                        })
+                    {
                         if !constructed.contains(&owner) {
                             constructed.push(owner.clone());
                         }
@@ -1160,6 +1162,19 @@ pub(crate) fn expand_with_conformance(
                         contract.owner.as_ref().unwrap(),
                     )
                 {
+                    continue;
+                }
+                // Scalar interface implementations can call generic helpers too. Discover
+                // them before selection so their complete bodies are specialized.
+                if super::selection::projected_primitive(owner) {
+                    if super::selection::interface_contract(input, &contract) {
+                        let (_, reference) =
+                            super::selection::implicit_implementation(input, owner, &contract)?;
+                        let instance = context.resolve(&reference)?;
+                        if !visited.contains(&instance.row) {
+                            pending.push(instance);
+                        }
+                    }
                     continue;
                 }
                 let definition = input
@@ -1537,6 +1552,44 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn boxed_scalar_interface_body_specializes_generic_helpers() {
+        let source = neoclr::assemble(
+            r#"
+.module System
+.type class System.Object
+.end
+.interface Format
+.method instance Render() -> Int32
+.end
+.end
+.type System.Int32
+.implements Format
+.method instance byref Render() -> Int32
+ldc.i4 42
+call Echo<Int32>(Int32)
+ret
+.end
+.end
+.function Echo<T>(T value) -> T
+ldarg value
+ret
+.end
+.function Main() -> Int32
+ldc.i4 1
+box Int32
+castclass Format
+callvirt instance Format::Render()
+ret
+.end
+"#,
+        )
+        .unwrap();
+        // Selection must discover the scalar interface body before specializing
+        // its generic helper. This isolated core fixture is not an application.
+        super::super::selection::prepare(&source, "Main").unwrap();
+    }
+
     #[test]
     fn memory_view_shapes_retain_exact_elements_without_admitting_native_layout() {
         use neoclr::metadata::{MemoryViewKind, Type};
