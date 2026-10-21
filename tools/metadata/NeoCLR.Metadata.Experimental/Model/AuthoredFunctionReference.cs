@@ -61,7 +61,7 @@ public sealed partial class AssemblyBuilder
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, null, name, signature, @namespace: @namespace));
         if (isInternalCall) reference.Target.SetInternalCall();
         reference.Target.ConstraintOwner = this;
-        reference.Target.Definition.AuthoredStructuralConstraints.AddRange(bounds);
+        reference.Target.Definition.AuthoredTypeConstraints.AddRange(bounds);
         authoredCallableReferences.Add(reference);
         return reference;
 

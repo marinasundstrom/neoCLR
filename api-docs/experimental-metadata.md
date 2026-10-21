@@ -10036,8 +10036,7 @@ rejects incompatible concrete arguments; `DefaultConstructor` requires a value t
 or a nonabstract class with a public parameterless constructor. Forwarded method
 and declaring-type parameters must prove the required flags; ValueType implies
 DefaultConstructor. Calls are revalidated on write. CLI bit 32 (AllowByRefLike) is
-unsupported and is never interpreted as native FunctionType. Nominal method class
-bounds and Raven's native category emission/import remain follow-up work.
+unsupported and is never interpreted as native FunctionType. Raven's native adapter now emits and imports these categories.
 
 `NeoCLR.Metadata.Experimental.Tests --method-categories` covers these contracts,
 combined interface/category bounds, imported rejection, CLI execution and all three
@@ -10434,3 +10433,35 @@ unconstructed System value definition owned by that builder; invalid shapes thro
 ArgumentException and conflicting contracts throw InvalidOperationException.
 Imported constructions and method owners keep the canonical runtime identity.
 This explicit contract is not inferred from a type's name alone.
+
+
+### Nominal method class bounds (2026-10-21 development)
+
+`MethodBuilder.AddBaseTypeConstraint(int parameterIndex, SignatureType bound)`
+adds one nongeneric reference-class bound per method parameter. The bound must be
+an owned local nonstatic class or an output-owned imported class with registered
+nominal identity. Invalid ordinals, values/interfaces, generic bounds, foreign
+owners, duplicates, a second class bound and FunctionType combinations throw
+`ArgumentException`; null throws `ArgumentNullException`. Ordinary category flags
+and interface bounds remain separate and may coexist with a class bound.
+
+`MethodDefinition.TypeConstraints` and introspection preserve the complete bound.
+The legacy interface-only query rejects known local class bounds. CLI uses ordinary
+GenericParamConstraint rows; native metadata uses the existing TypeBound shape.
+CLI/native readers, CLI reference projection and ordinary `ImportReference` retain
+nominal bounds; structural composition imports still require their explicit opt-in.
+The ordinary import now supports interface bounds too, replacing its earlier
+NotSupportedException for all bounded methods. Host-authored imported ancestry
+continues to require its explicit class-base facts.
+
+Closed local derived and generic-derived types satisfy a nongeneric base bound;
+method and declaring-type forwarding must prove the required ancestry. Native
+specialization reuses runtime ancestry validation before removing parameters.
+Open or constructed class *bounds* are outside this increment. Existing class
+inheritance reference-projection limits remain; the projection test uses a root
+class while derived cases are checked through CLI/native execution metadata.
+
+Validation: metadata tests `--method-class-bounds`, `--method-categories`,
+`--function-kind-constraint`, `--structural-method-constraints`; backend
+specialization tests; Raven's `--method-category-import` probe. No guest public
+signature or RavenDoc input changes in this increment.

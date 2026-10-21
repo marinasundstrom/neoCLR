@@ -14091,3 +14091,28 @@ validator before erasing generic parameters; unresolved/open arguments reject.
 Twenty focused specialization tests pass. The authored forwarding consumer
 returns 42 under CLR reflection, the neoCLR interpreter and rebuilt managed JIT. These development checks
 do not replace fresh matched-package qualification.
+
+
+### Native method categories and class bounds (2026-10-21)
+
+Raven's native adapter now explicitly enables method category and nongeneric nominal
+class-bound capabilities. A shared mapping preserves reference/value/constructor and
+FunctionType flags for both type and method parameters. Emission uses the shared
+metadata SDK; native semantic import retains the flags and class signatures, so
+binding rejects incompatible and unconstrained arguments before emission. Ordinary
+.NET capabilities remain unchanged. Runtime Contract configuration is unchanged.
+
+Class bounds use standard CLI GenericParamConstraint and existing native TypeBound
+metadata. Ordinary callable import now retains nominal class/interface bounds;
+structural composition bounds keep their explicit opt-in. Native specialization
+validates class ancestry through the existing runtime constraint checker before
+closing the method. No new encoding or ABI is introduced. Symbol-only and exact
+native snapshot import routes retain their existing ownership; broader constructed
+class bounds and existing class-inheritance CLI reference projection remain gaps.
+
+The focused SDK tests cover CLI/native/reference snapshots, CLR constraint rejection,
+derived and generic-derived arguments, forwarding and invalid/multiple bounds.
+Twenty-one specialization tests pass. Raven's separate-provider probe covers free
+functions, static class methods, categories, a class bound, imported forwarding and
+RAV0320 rejections. This is development validation, not package qualification. Guest
+Enum API constraints and the refreshed matched compiler/library bundle follow.

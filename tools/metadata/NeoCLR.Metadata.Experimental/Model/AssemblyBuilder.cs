@@ -1072,8 +1072,8 @@ public sealed partial class AssemblyBuilder
                         metadata.AddGenericParameterConstraint(parameter, typeHandles[constraint.BaseType]);
                 }
                 else
-                    foreach (var constraint in methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.NominalInterfaceConstraints.Where(c => c.ParameterIndex == i))
-                        metadata.AddGenericParameterConstraint(parameter, MetadataTokens.EntityHandle(ElementToken(methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.ConstraintSignature(constraint.InterfaceType))));
+                    foreach (var constraint in methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.TypeConstraints.Where(c => c.ParameterIndex == i))
+                        metadata.AddGenericParameterConstraint(parameter, MetadataTokens.EntityHandle(ElementToken(constraint.Bound)));
             }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),

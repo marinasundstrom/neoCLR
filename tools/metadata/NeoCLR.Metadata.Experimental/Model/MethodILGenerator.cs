@@ -492,7 +492,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(implementingType);
         if (!ReferenceEquals(target.Definition.Owner, caller.Assembly) || !target.Definition.IsInterfaceMethod || target.MethodArguments.Count != 0 ||
             implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+            !(caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
                 ? caller.ForwardedBoundsSatisfy(caller, index, target.DeclaringType)
                 : caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType))))
             throw new ArgumentException("constructed constrained call requires a matching method interface bound");
@@ -506,7 +506,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsInterfaceMethod ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringReference is not { GenericArity: 0 } owner ||
             implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+            !(caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
                 ? caller.ForwardedBoundsSatisfy(caller, index, owner)
                 : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner))))
             throw new ArgumentException("external constrained call requires a guaranteed completed nongeneric interface contract; instance calls require structural bounds");
@@ -520,7 +520,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         if (implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
             !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsAbstract ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType is not { IsInterface: true, GenericParameterNames.Count: 0 } owner ||
-            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+            !(caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
                 ? caller.ForwardedBoundsSatisfy(caller, index, owner)
                 : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner))))
             throw new ArgumentException("open constrained call requires a guaranteed owned nongeneric interface contract; instance calls require structural bounds");

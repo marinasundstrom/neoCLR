@@ -110,6 +110,8 @@ if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 
 if (args is ["--primitive-base"]) { PrimitiveBaseChecks.Run(); return 0; }
+if (args is ["--method-class-bounds"]) { MethodClassConstraintChecks.Run(); return 0; }
+
 if (args is ["--method-categories"]) { MethodCategoryConstraintChecks.Run(); return 0; }
 if (args is ["--enum-definitions"]) { EnumChecks.Run(); return 0; }
 if (args is ["--enum-base"]) { EnumBaseChecks.Run(); return 0; }
@@ -744,6 +746,7 @@ var tests = new (string Name, Action Body)[]
     ("External fieldless class bases", () => ExternalClassBaseAuthoringChecks.Run()),
     ("Fieldless ValueType ancestry", ValueTypeBaseChecks.Run),
     ("Method category constraints", MethodCategoryConstraintChecks.Run),
+    ("Method class constraints", MethodClassConstraintChecks.Run),
     ("Fieldless Enum ancestry", EnumBaseChecks.Run),
     ("Primitive ValueType ancestry", PrimitiveBaseChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),

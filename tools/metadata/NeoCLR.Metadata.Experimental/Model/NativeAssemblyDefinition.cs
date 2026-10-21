@@ -909,11 +909,13 @@ public sealed partial class NativeAssemblyDefinition
                         var bound = ReadType(rawBound, false, allowComposition: structural);
                         var boundOwner = System.Array.IndexOf(signatureOwners, bound.ClassType);
                         Require(parameter >= 0 && parameter < genericArity &&
-                            (structural || boundOwner >= 0 && types[boundOwner].IsInterface && types[boundOwner].GenericNames.Length == 0 ||
+                            (structural || boundOwner >= 0 && !types[boundOwner].IsValueType && !types[boundOwner].IsStatic && types[boundOwner].GenericNames.Length == 0 ||
                              bound.ImportedType is { GenericArity: 0, IsValueType: false, DeclaringType: null }) &&
                             !methodConstraints.Any(c => c.Parameter == parameter && Equals(c.Type, bound)), "unsupported or duplicate method type bound");
                         methodConstraints.Add((parameter, bound, boundOwner, structural));
                     }
+                Require(!methodConstraints.Where(c => !c.Structural && c.Owner >= 0 && !types[c.Owner].IsInterface)
+                    .GroupBy(c => c.Parameter).Any(group => group.Count() > 1), "multiple method class bounds");
                 var noResult = method.GetProperty("no_result").GetBoolean();
                 var resultType = ReadType(method.GetProperty("returns"), noResult, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface, allowComposition: allowComposition);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
@@ -1289,7 +1291,8 @@ public sealed partial class NativeAssemblyDefinition
             {
                 if (bound.Structural) throw new NotSupportedException("structural method bounds have no CLI projection");
                 if (bound.Owner < 0) throw new NotSupportedException("external method bounds require direct native import");
-                output.AddInterfaceConstraint(bound.Parameter, owners[bound.Owner]);
+                if (owners[bound.Owner].IsInterface) output.AddInterfaceConstraint(bound.Parameter, owners[bound.Owner]);
+                else output.AddBaseTypeConstraint(bound.Parameter, owners[bound.Owner]);
             }
             if (method.ParameterArrayIndex is { } parameterArray) output.SetParameterArray(parameterArray);
             projectedMethods.Add(output);

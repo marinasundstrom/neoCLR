@@ -8,7 +8,9 @@ now passes 18 built-in executions across all three engines, including Unicode na
 and ordinary identifier binding; runtime type validation
 is implemented while native generic-method enum constraints remain a gap. The
 shared metadata category prerequisite now preserves class/struct/new requirements;
-Raven native emission/import and nominal method class bounds remain open. Resume
+Raven native emission/import and nongeneric nominal method class bounds now have
+focused qualification. Guest enum signatures and matched release-package checks
+remain open. Resume
 the release-readiness work below; this does not permanently
 reprioritize the platform roadmap.
 

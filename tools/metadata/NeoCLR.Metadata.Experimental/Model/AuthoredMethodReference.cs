@@ -125,7 +125,7 @@ public sealed partial class AssemblyBuilder
             : new MethodBuilder(graph.Graph, owner, name, signature, visibility: visibility, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isVirtual || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.ConstraintOwner = this;
-        reference.Target.Definition.AuthoredStructuralConstraints.AddRange(bounds);
+        reference.Target.Definition.AuthoredTypeConstraints.AddRange(bounds);
         reference.Target.NativeValueOverride = isOverride;
         reference.Target.NativeImportObjectSlot = isObjectSlot;
         reference.Target.NativeImportObjectOwner = Equals(ExternalObjectRoot, declaringType);

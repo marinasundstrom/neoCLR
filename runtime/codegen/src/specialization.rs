@@ -33,7 +33,7 @@ fn check_method_constraints(
             | neoclr::metadata::ConstraintKind::ValueType
             | neoclr::metadata::ConstraintKind::DefaultConstructor
             | neoclr::metadata::ConstraintKind::FunctionType) => {
-                neoclr::native_metadata::validate_method_category(module, argument, category)
+                neoclr::native_metadata::validate_method_constraint(module, argument, category)
                     .map_err(|error| format!("method {} category: {error}", function.name))?;
             }
             neoclr::metadata::ConstraintKind::TypeBound(bound @ Type::Named(_))
@@ -49,6 +49,10 @@ fn check_method_constraints(
                             function.name
                         )
                     })?;
+            }
+            bound @ neoclr::metadata::ConstraintKind::TypeBound(Type::Named(_)) => {
+                neoclr::native_metadata::validate_method_constraint(module, argument, bound)
+                    .map_err(|error| format!("method {} class bound: {error}", function.name))?;
             }
             _ => return Err("unsupported generic method constraint".into()),
         }
@@ -1716,6 +1720,35 @@ ret
                 .unwrap_err()
                 .to_string()
                 .contains("constraint")
+        );
+    }
+
+    #[test]
+    fn method_class_bounds_validate_before_specialization() {
+        let source = neoclr::assemble(".module Bounds\n.entry Main\n.type class Base\n.end\n.type class Child\n.extends Base\n.end\n.function Answer<T>() -> Int32\n.constraint T Base\nldc.i4 42\nret\n.end\n.function Main() -> Int32\ncall Answer<Child>()\nret\n.end").unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        assert_eq!(
+            neoclr::LoadedProgram::new(&selected)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        let method = source
+            .functions
+            .iter()
+            .find(|f| f.name == "Answer")
+            .unwrap();
+        assert!(super::check_method_constraints(&source, method, &[super::Type::Int32]).is_err());
+        assert!(
+            super::check_method_constraints(
+                &source,
+                method,
+                &[super::Type::MethodTypeParameter(0)]
+            )
+            .is_err()
         );
     }
 

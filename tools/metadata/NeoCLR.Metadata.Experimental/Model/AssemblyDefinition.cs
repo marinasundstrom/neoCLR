@@ -297,7 +297,6 @@ public sealed partial class AssemblyDefinition
                     {
                         var bound = reader.GetGenericParameterConstraint(constraintHandle).Type;
                         if (bound.Kind != HandleKind.TypeReference && (bound.Kind != HandleKind.TypeDefinition ||
-                            (reader.GetTypeDefinition((TypeDefinitionHandle)bound).Attributes & System.Reflection.TypeAttributes.Interface) == 0 ||
                             reader.GetTypeDefinition((TypeDefinitionHandle)bound).GetGenericParameters().Count != 0))
                             unsupportedMethodBounds = true;
                         else

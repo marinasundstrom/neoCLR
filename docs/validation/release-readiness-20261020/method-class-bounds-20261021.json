@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-21",
+  "scope": "Native method categories and nongeneric nominal method class bounds",
+  "sdkChecks": "pass",
+  "backendTests": {
+    "passed": 21,
+    "failed": 0
+  },
+  "ravenChecks": "source emission, separate-provider native import, static class methods, constrained forwarding and RAV0320 rejection; existing FunctionType regression passes",
+  "clippy": "strict backend library pass",
+  "apiSnapshot": "pass",
+  "limitations": [
+    "Constructed class bounds remain unsupported",
+    "Existing inheritance CLI reference projection remains unsupported; root class-bound projection qualified separately",
+    "Guest Enum signatures and matched release package are not changed by this increment"
+  ],
+  "evidence": {
+    "target/method-class-bounds.log": {
+      "sha256": "a4ce53d885a4fa1c5c218ed21d28dede610a6d0aea613bdd2e87ac5bfa2a19d5",
+      "output": "PASS nominal method class constraints and CLI/native/reference/import contracts\n"
+    },
+    "target/method-class-categories-regression.log": {
+      "sha256": "721e9d8dd4746725daa6c248276de6d80417d5d7f4c7f3880ff78d4423f458ce",
+      "output": "PASS method category constraints, forwarding, imports and CLI/native/reference round trips\n"
+    },
+    "target/method-class-function-regression.log": {
+      "sha256": "ec522d35ce164bf1ccfbf0cc7e8fdbd76548ee4222322855763c639d88742aa4",
+      "output": "PASS native method function-kind authoring, forwarding, import, introspection and CLI rejection\nPASS native function-kind constraint and introspection\n"
+    },
+    "target/method-class-interface-final.log": {
+      "sha256": "660ff09bd1408ba3f1d85d64ea3f65daa284045d2bb897ef8b82eb1fcbb421dd",
+      "output": "PASS structural method constraint metadata and introspection\n"
+    },
+    "target/method-class-backend-tests.log": {
+      "sha256": "5f06d6889d0723a0ffb908876bf9f12a8e759d6963f24c604de47b6fc8a4fc63",
+      "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 32.07s\n     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-05e8b8e4a2ce6647)\n\nrunning 21 tests\ntest specialization::tests::input_function_inventory_remains_bounded ... ok\ntest specialization::tests::memory_view_shapes_retain_exact_elements_without_admitting_native_layout ... ok\ntest specialization::tests::deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack ... ok\ntest specialization::tests::generic_class_override_without_base_call_retains_closed_slot ... ok\ntest specialization::tests::generic_shape_expansion_has_its_own_bound_before_selection ... ok\ntest specialization::tests::method_class_bounds_validate_before_specialization ... ok\ntest specialization::tests::function_kind_constraint_preserves_typed_calls_after_specialization ... ok\ntest specialization::tests::method_categories_use_runtime_constraint_validation ... ok\ntest specialization::tests::closed_type_budget_includes_nongeneric_dependency_shapes ... ok\ntest specialization::tests::nominal_class_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::instance_methods_specialize_owner_and_method_parameters_independently ... ok\ntest specialization::tests::nested_generic_specializations_preserve_each_lexical_owner ... ok\ntest specialization::tests::init_accessor_authority_survives_specialization_and_selection ... ok\ntest specialization::tests::nominal_static_self_methods_specialize_without_erasing_conformance ... ok\ntest specialization::tests::special_type_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::variant_interfaces_preserve_dispatch_and_identity_after_specialization ... ok\ntest specialization::tests::variant_interface_dispatch_closes_generic_implementations ... ok\ntest specialization::tests::signature_only_classes_retain_closed_interface_conformance ... ok\ntest specialization::tests::variant_selection_ignores_unrelated_explicit_source_templates ... ok\ntest specialization::tests::specialized_interface_dispatch_ignores_unselected_open_overload ... ok\ntest specialization::tests::selected_function_budget_accepts_boundary_and_rejects_overflow ... ok\n\ntest result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 96 filtered out; finished in 5.64s\n\n"
+    },
+    "target/raven-method-class-final.log": {
+      "sha256": "024a2aa091c35d0ef23c299d8b891fb626bba6ba3610730e8d52af58a1a80f2f",
+      "output": "PASS native method category emission, import, forwarding and rejection\n"
+    },
+    "target/raven-method-class-function-regression.log": {
+      "sha256": "98f192cbfe8d95e142174ce200dd523473d2e5380e7e12c892f1191fa6cfb4e9",
+      "output": "PASS native function constraint import, symbolic forwarding and invalid argument diagnostics\n"
+    },
+    "target/method-class-clippy.log": {
+      "sha256": "57a376035c9e740934972513cf0e0e5e5c3eea3b396212597c79d36b74fd2c44",
+      "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Checking neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 30.23s\n"
+    }
+  }
+}

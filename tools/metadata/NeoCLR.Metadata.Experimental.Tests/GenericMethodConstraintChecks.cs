@@ -57,7 +57,8 @@ internal static class GenericMethodConstraintChecks
                 if (!ReferenceEquals(parameter.GetInterfaceConstraints().Single(), context.Resolve(definition.InterfaceConstraints.Single().InterfaceType))) throw new Exception("method bound facade");
                 Reject<InvalidOperationException>(() => definition.AddInterfaceConstraint(0, definition.InterfaceConstraints[0].InterfaceType));
                 var consumer = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), graph.CoreLibrary);
-                Reject<NotSupportedException>(() => consumer.ImportReference(definition, graph.CoreLibrary));
+                var importedMethod = consumer.ImportReference(definition, graph.CoreLibrary);
+                Reject<ArgumentException>(() => importedMethod.MakeGenericInstance(PrimitiveType.Int32));
             }
             var json = graph.WriteNativeAssembly();
             foreach (var bad in new[] { -1, 1 })

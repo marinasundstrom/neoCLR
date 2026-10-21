@@ -116,7 +116,7 @@ public sealed partial class AssemblyBuilder
     private ImportedMethodReference ImportReferenceCore(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver, bool allowCompositions, bool allowStructuralConstraints = false, bool allowTuples = false)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        if (!allowStructuralConstraints && definition.TypeConstraints.Count != 0) throw new NotSupportedException("imported method interface bounds require an explicit supported contract");
+        if (!allowStructuralConstraints && definition.TypeConstraints.Any(c => c.Bound.Composition is not null)) throw new NotSupportedException("imported method interface bounds require an explicit supported contract");
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
@@ -201,14 +201,14 @@ public sealed partial class AssemblyBuilder
         }
         foreach (var constraint in definition.SpecialConstraints)
             reference.Target.SetSpecialConstraints(constraint.Key, constraint.Value);
-        if (allowStructuralConstraints)
+        if (definition.TypeConstraints.Count != 0)
         {
             reference.Target.ConstraintOwner = this;
             foreach (var constraint in definition.TypeConstraints)
             {
                 var bound = ImportNativeSignatureType(constraint.Bound, dependencyCoreLibrary, resolver, true);
                 RegisterCompositionStorage(bound);
-                reference.Target.Definition.AuthoredStructuralConstraints.Add(new(constraint.ParameterIndex, bound));
+                reference.Target.Definition.AuthoredTypeConstraints.Add(new(constraint.ParameterIndex, bound));
             }
         }
         reference.Target.IsInitOnlySetter = type?.Properties.Any(p => p.IsInitOnly && ReferenceEquals(p.SetMethod, definition)) == true;

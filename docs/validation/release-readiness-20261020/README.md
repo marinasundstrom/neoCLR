@@ -46,8 +46,10 @@ generic-constraint scope before package freeze. Continue to
 extend native method constraints through Raven import and emission. The shared
 metadata producer/reader/importer now preserves ordinary category flags, with
 focused round-trip, rejection and forwarding coverage plus 20 specialization tests
-and CLI/interpreter/JIT execution ([evidence](method-categories-20261021.json)); nominal method class bounds
-remain open. Continue without a Parse-specific exception; then qualify the remaining generated record
+and CLI/interpreter/JIT execution ([evidence](method-categories-20261021.json)); nongeneric nominal method class bounds and Raven native category emission/import
+now have focused qualification (21 specialization tests plus separate-provider
+compiler probes; [evidence](method-class-bounds-20261021.json)). Update guest Enum constraints and rebuild the matched cohort
+before closing that API gap. Continue without a Parse-specific exception; then qualify the remaining generated record
 formatting shapes. Each needs focused positive and rejection tests. Rebuild and
 pin the actual compiler/library/runtime cohort before extracting a candidate SDK.
 No new public API expansion is required to run those checks. The original failures

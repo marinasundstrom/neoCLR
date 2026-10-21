@@ -803,24 +803,36 @@ pub fn interface_view(module: &Module, source: &Type, target: &Type) -> Result<T
     crate::variance::implemented_view(module, source, target)
 }
 
-/// Validate a closed method category argument using the ordinary runtime constraints.
+/// Validate a closed method category or nominal class bound using ordinary runtime constraints.
 /// Requires linked type metadata; native specialization must not erase an open proof.
-pub fn validate_method_category(
+pub fn validate_method_constraint(
     module: &Module,
     concrete: &Type,
-    category: &crate::metadata::ConstraintKind,
+    constraint: &crate::metadata::ConstraintKind,
 ) -> Result<(), Fault> {
     use crate::metadata::{ConstraintKind, GenericConstraint};
-    if !matches!(
-        category,
-        ConstraintKind::ReferenceType
-            | ConstraintKind::ValueType
-            | ConstraintKind::DefaultConstructor
-            | ConstraintKind::FunctionType
-    ) || crate::constraints::symbolic(concrete)
+    let supported_class = if let ConstraintKind::TypeBound(bound) = constraint {
+        !crate::constraints::symbolic(bound)
+            && module.type_definition(bound).is_some_and(|owner| {
+                owner.is_reference_type
+                    && owner.representation == crate::metadata::Representation::Record
+                    && owner.generic_parameters.is_empty()
+            })
+    } else {
+        false
+    };
+    if !(supported_class
+        || matches!(
+            constraint,
+            ConstraintKind::ReferenceType
+                | ConstraintKind::ValueType
+                | ConstraintKind::DefaultConstructor
+                | ConstraintKind::FunctionType
+        ))
+        || crate::constraints::symbolic(concrete)
     {
         return Err(Fault::new(
-            "method category specialization requires a closed category argument",
+            "method specialization requires a closed supported constraint argument",
         ));
     }
     crate::vm::check_type(concrete, module)?;
@@ -828,7 +840,7 @@ pub fn validate_method_category(
         module,
         &[GenericConstraint {
             parameter: 0,
-            kind: category.clone(),
+            kind: constraint.clone(),
         }],
         core::slice::from_ref(concrete),
     )
