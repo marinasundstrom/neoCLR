@@ -8,6 +8,12 @@ pub fn assignable(module: &Module, source: &Type, target: &Type) -> Result<bool,
     crate::type_relationships::assignable(module, source, target)
 }
 
+/// Return transitive interface views using the runtime's Self and owner substitutions.
+/// Interface declarations may still contain symbolic Self; concrete owners do not.
+pub fn interface_views(module: &Module, owner: &Type) -> Result<Vec<Type>, Fault> {
+    crate::interfaces::closure(module, owner)
+}
+
 /// Strict ancestry shares the interpreter's definition and implicit Object root.
 pub fn subclass(module: &Module, source: &Type, target: &Type) -> Result<bool, Fault> {
     crate::type_relationships::subclass(module, source, target)

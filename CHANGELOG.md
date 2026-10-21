@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Close inherited Self-dependent interface views at the concrete implementing owner during native specialization. Reuse the runtime interface closure instead of trying to specialize symbolic Self as a generic argument; retain verified relationships without mutating source metadata. This fixes boxed nominal Number implementations exposed by Decimal. Qualify all 22 specialization tests, including a reduced inherited-Self regression, and strict backend library Clippy.
+
 - Add Single/Double NaN and signed-infinity constant fields and allocation-free classification helpers. Extend shared typed field constants across CLI/native/reference metadata, Raven import, and runtime reflection using exact floating bit payloads; Constant now returns object? rather than int?, requiring host casts/pattern matching. Matching compiler/runtime/SDK required. Fix qualified imported constant evaluation and native literal instance receivers, admit Single/Double arrays through the existing typed scalar-array path, and add native Single negation while retaining the interpreter’s existing floating-stack normalization. Add built-in tests and refresh API documentation and the website numeric overview; generic Number contracts are unchanged.
 
 - Admit Single/Double record components through existing primitive equality/display and Object hashing. Cover NaNs, signed zeros, infinities, defaults, nested/union values and boxed/interface dispatch in built-in tests. Document temporary hashing boxes; no primitive API, ABI or performance claim. Generic record display and release-package qualification remain open.

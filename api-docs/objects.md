@@ -565,3 +565,11 @@ The [integral Object qualification](https://github.com/marinasundstrom/neoCLR/bl
 ### Persistent memory regions
 
 Development Memory/ReadOnlyMemory Object equality compares owner, offset and length across writable/readonly access. Hashes are stable when contents change. Default ownerless memory differs from empty owner-retaining windows; exact type tests/unboxing still distinguish writable from readonly types. Existing inherited Object calls box. Native qualification is byte-only; borrowed slices cannot box. [Region and GC evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/memory-object/README.md).
+
+Development native compiler metadata queries also expose
+`native_metadata::interface_views(module, owner)` to the in-repository backend.
+It reuses runtime interface closure and Self/owner substitution, without running
+guest code. Native specialization retains concrete inherited interface views on
+the implementing type; symbolic Self edges on an interface declaration are not
+executable generic instantiations. This is an unstable build-time Rust helper,
+not a guest reflection method or Native API ABI commitment.

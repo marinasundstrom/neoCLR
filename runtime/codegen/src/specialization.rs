@@ -408,8 +408,11 @@ impl Specializer<'_> {
         for field in &definition.static_fields {
             self.close(&field.ty, &arguments)?;
         }
-        for base in definition.base.iter().chain(&definition.implements) {
+        if let Some(base) = &definition.base {
             self.close(base, &arguments)?;
+        }
+        for interface in executable_interface_views(self.source, ty)? {
+            self.lower(&interface)?;
         }
         Ok(Type::Named(private_name))
     }
@@ -797,6 +800,16 @@ fn lowered_member_name(f: &Function, owner: Option<&Type>) -> String {
 }
 fn clone_name(name: &str, row: usize) -> String {
     format!("{name}$aot_method_{row}")
+}
+
+// Self-dependent inherited views belong to concrete owners. Flatten their verified
+// closure there; an interface declaration alone cannot choose a Self argument.
+fn executable_interface_views(input: &neoclr::Module, owner: &Type) -> Result<Vec<Type>, Error> {
+    Ok(neoclr::native_metadata::interface_views(input, owner)
+        .map_err(|error| error.to_string())?
+        .into_iter()
+        .filter(|view| view != owner && !view.contains_self())
+        .collect())
 }
 
 fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
@@ -1319,10 +1332,9 @@ pub(crate) fn expand_with_conformance(
             .as_ref()
             .map(|t| context.close(t, &shape.arguments))
             .transpose()?;
-        t.implements = t
-            .implements
+        t.implements = executable_interface_views(input, &source_interface)?
             .iter()
-            .map(|t| context.close(t, &shape.arguments))
+            .map(|t| context.lower(t))
             .collect::<Result<_, _>>()?;
         // Keep construction authority attached to the exact specialized setter.
         // Do not discover methods just because their property exists.
@@ -1586,6 +1598,39 @@ ret
                 .unwrap_err()
                 .to_string()
                 .contains("native ABI")
+        );
+    }
+
+    #[test]
+    fn nominal_self_inheritance_closes_views_at_the_implementing_owner() {
+        let text = include_str!("../../../docs/validation/numerics-interfaces/StaticSelf.neoil")
+            .replace(
+                ".interface Number\n",
+                ".interface Witness<T>\n.end\n.interface Number\n.implements Witness<Self>\n",
+            );
+        let source = neoclr::assemble(&text).unwrap();
+        let original = serde_json::to_value(&source).unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let count = expanded.types.iter().find(|t| t.name == "Count").unwrap();
+        assert!(count.implements.iter().any(|view| {
+            view.definition_name()
+                .is_some_and(|n| n.starts_with("Witness"))
+        }));
+        assert!(
+            expanded
+                .types
+                .iter()
+                .all(|t| t.implements.iter().all(|view| !view.contains_self()))
+        );
+        assert_eq!(serde_json::to_value(&source).unwrap(), original);
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        assert_eq!(
+            neoclr::LoadedProgram::new(&selected)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
         );
     }
 
