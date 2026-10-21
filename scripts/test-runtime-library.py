@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build and run the Raven runtime-library suite and runner contract in selected execution modes."""
+import runpy
 import argparse
 import hashlib
 import importlib.util
@@ -473,7 +474,7 @@ def main():
     run_started = time.perf_counter()
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py', ROOT / 'scripts/discover-runtime-tests.py', ROOT / 'scripts/validate-test-discovery.py',
+    inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py', ROOT / 'scripts/run-native-sample.py', ROOT / 'scripts/discover-runtime-tests.py', ROOT / 'scripts/validate-test-discovery.py',
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
@@ -564,6 +565,20 @@ def main():
             profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'localization', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
+            if name == 'dependency-injection':
+                # Derive exact identities from the discovered application, never from
+                # hard-coded metadata ordinals. Only public test service fixtures
+                # receive constructor metadata and executable retention.
+                compiled = (out / (name + '-discovery') / 'compile.stdout.log').read_text()
+                assembly = next(line.removeprefix('Native build output: ') for line in compiled.splitlines()
+                                if line.startswith('Native build output: '))
+                listing = out / 'di-reflection-module.neoil'
+                subprocess.run([str(args.runtime.resolve()), 'disassemble', assembly, str(listing)], check=True, capture_output=True)
+                text = listing.read_text()
+                metadata, _ = json.JSONDecoder().raw_decode(text[text.index('{'):])
+                di_types = [declaration['origin']['name'] for declaration in metadata['types']
+                            if declaration.get('origin', {}).get('publicly_visible')
+                            and declaration.get('origin', {}).get('name', '').startswith('NeoClr.RuntimeTests.')]
             if name == "json-streams":
                 # Scalar ObjectMapper paths select reflection services. Retain only the
                 # runtime's first type identity, without constructors or members.
@@ -587,6 +602,9 @@ def main():
                 if name == "json-streams":
                     # Scalar mapping needs a reflection scope, but no retained model constructors.
                     command += ["--reflection-roots", json_roots, "--command-timeout", "600"]
+                if name == "dependency-injection":
+                    command += [arg for type_name in di_types for arg in ("--reflection-constructor-type", type_name)]
+                    command += ["--command-timeout", "600"]
                 phase = 'native-project-build'
             else:
                 # Raven emits the same metadata assembly directly. JIT/interpreter
@@ -616,6 +634,10 @@ def main():
                 started = time.perf_counter()
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='registration-verification', elapsedSeconds=round(time.perf_counter() - started, 6)))
+            if name == 'dependency-injection':
+                di_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
+                    args.runtime.resolve(), build / 'app.dll', di_types,
+                    lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True)[1]
             isolated = out / (name + '-isolated')
             isolated.mkdir()
             if name == 'localization':
@@ -646,6 +668,8 @@ def main():
                         '--jit-compiler', args.aot.resolve()]
                     if name == "json-streams":
                         jit += ["--reflection-roots", json_roots]
+                    if name == "dependency-injection":
+                        jit += ["--reflection-roots", di_roots]
                     executions.append((mode, jit, isolated if name == 'localization' else ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:

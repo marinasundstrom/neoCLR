@@ -53,6 +53,28 @@ class SampleArguments(unittest.TestCase):
             self.assertTrue(all(not path.exists() for path in outputs))
             self.assertEqual(existing.read_text(), 'Keep this caller-owned listing')
 
+    def test_constructor_retention_resolves_exact_names_from_each_final_image(self):
+        with tempfile.TemporaryDirectory() as directory:
+            assembly = Path(directory) / 'App.dll'
+            for ordinal in (0, 1):
+                declarations = [dict(name='OpaqueA', origin=dict(name='App.Service')),
+                                dict(name='OpaqueB', origin=dict(name='Other.Service'))]
+                if ordinal:
+                    declarations.reverse()
+                def disassemble(command):
+                    command[-1].write_text(json.dumps(dict(name='Sample', revision=1, types=declarations)))
+                args = runner.reflection_roots('neoclr', assembly, ['App.Service'], disassemble, constructors=True)
+                policy = json.loads(args[1].read_text())
+                self.assertEqual(policy['schemaVersion'], 7)
+                root = policy['types'][0]
+                self.assertEqual(root['definition']['index'], ordinal)
+                self.assertTrue(root['constructors'])
+                self.assertTrue(root['construct'])
+                self.assertFalse(root['properties'])
+                self.assertFalse(root['fieldGetters'])
+                with self.assertRaises(ValueError):
+                    runner.reflection_roots('neoclr', assembly, ['Missing.Service'], disassemble, constructors=True)
+
     def test_http_tasks_prompt_for_required_program_inputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -61,7 +61,7 @@ allow reflection over test fixtures; these contracts are not in the class librar
 
 ## Next integration gates
 
-- Native/JIT exact constructor invocation and explicit retention qualification.
+- JIT qualification and class-library integration; native exact constructor invocation now passes.
 - Thread-safe provider state before advertising concurrent server use.
 - Class-library integration, public API reference and website documentation.
 - Generic-state reflection flags; open generic registration and enumerable
@@ -91,7 +91,9 @@ including typed factory callbacks, conventional lookups, independent singleton
 slots, current-provider injection, scope/cycle failures and reentrant disposal.
 See [container test report](services-runtime-tests.json) and
 [output](services-runtime-tests.log). Earlier four-test activation evidence is
-retained separately. Native/JIT activation is not yet qualified.
+retained separately. Native activation now also passes all 13 tests; see [native report](services-native-tests.json).
+Exact invocation uses schema-7 constructor and execution retention; final-image
+name resolution prevents stale discovery ordinals. JIT qualification is in progress.
 
 The native compiler correction substitutes explicit generic extension arguments
 inside structural-function signatures. Before the fix a block-bodied factory kept

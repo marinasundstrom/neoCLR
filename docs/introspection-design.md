@@ -907,3 +907,28 @@ traversal, Module.Assembly/GetTypes and module Object.Equals dispatch remain out
 this slice. Module-level function enumeration and runtime test discovery remain next
 work. Legacy CLI bootstrap generation is separately blocked by its Map contract;
 source-built native libraries and the reference bridge are qualified.
+
+### Exact native constructor invocation (development, 2026-10-21)
+
+The native backend now lowers the existing ConstructorInfo.Invoke contract to
+verified ordinary constructor calls. Schema-7 constructor metadata retention and
+`construct: true` jointly permit public exact-constructor execution. Metadata-only
+retention does not select constructor bodies. Checks validate the selected source
+member identity, accessibility, null receiver, argument count and argument types;
+reference arguments may be null. Unsupported shapes return the existing
+ReflectionError status, and unretained checks return UnboundMetadata. No new public
+API, runtime ABI, compiler mapping or CLI metadata representation is introduced.
+
+Compared with .NET ConstructorInfo.Invoke, current native retention remains
+explicit and bounded to nongeneric declarations, reference/scalar parameters and
+synchronous construction. General method invocation and generic implementation
+retention are separate gaps. The interpreter remains the semantic baseline.
+
+`build-native-project.py --reflection-constructor-type Full.Type.Name` resolves
+source names from the final compiled assembly and writes the private schema-7
+policy. Discovery and final compilation may reorder metadata; never reuse a
+discovery ordinal as an execution identity. Existing `--reflection-type` retains
+its property-oriented policy. Four tooling tests verify exact-name resolution,
+changed ordinals, missing types and existing sample behavior. The built-in DI
+suite passes all 13 native tests; two backend tests check invocation and rejection
+without relying on emitted opcode snapshots.

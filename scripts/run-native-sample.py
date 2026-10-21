@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-def reflection_roots(runtime, assembly, names, run):
+def reflection_roots(runtime, assembly, names, run, constructors=False):
     if not names:
         return []
     with tempfile.TemporaryDirectory(prefix='neoclr-sample-reflection-') as directory:
@@ -19,14 +19,20 @@ def reflection_roots(runtime, assembly, names, run):
     selected = []
     for name in names:
         suffix = '.T__' + name.encode().hex().upper()
-        matches = [i for i, item in enumerate(metadata['types']) if item['name'].endswith(suffix)]
+        matches = [i for i, item in enumerate(metadata['types']) if item.get('origin', {}).get('name') == name or item['name'].endswith(suffix)]
         if len(matches) != 1:
             raise ValueError('Expected one reflection root: ' + name)
         selected.append(dict(definition=dict(module=metadata['name'], revision=metadata['revision'],
                                              index=matches[0]), construct=True, properties=True,
                              getters=True, setters=True))
+    policy = dict(schemaVersion=2, types=selected)
+    if constructors:
+        for root in selected:
+            root.update(properties=False, getters=False, setters=False, customAttributes=False,
+                        fields=False, fieldGetters=False, fieldSetters=False, constructors=True)
+        policy.update(schemaVersion=7, moduleCatalogs=[], moduleFunctions=[], typeCatalogs=[])
     path = assembly.with_suffix('.reflection.json')
-    path.write_text(json.dumps(dict(schemaVersion=2, types=selected), indent=2) + '\n')
+    path.write_text(json.dumps(policy, indent=2) + '\n')
     return ['--reflection-roots', path]
 
 
