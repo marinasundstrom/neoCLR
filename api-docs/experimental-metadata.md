@@ -10017,17 +10017,36 @@ dynamic invocation are not delivered by this SDK addition. See
 
 `MethodBuilder.SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)`
 and `MethodDefinition.SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)`
-accept standalone `FunctionType`; `None` clears it. Invalid ordinals, other flags,
-and combinations with type bounds throw `ArgumentException`. Loaded definitions
+accept `ReferenceType`, `ValueType`, `DefaultConstructor` and compatible combinations,
+or standalone native `FunctionType`; `None` clears the flags. Reference/value flags
+conflict. Unknown flags, invalid ordinals and FunctionType combined with another
+flag or type bound throw `ArgumentException`. Ordinary category flags can coexist
+with nominal interface bounds. Loaded definitions
 are immutable (`InvalidOperationException`). `MethodDefinition.SpecialConstraints`
 exposes a read-only dictionary by ordinal (unsupported loaded CLI constraints throw
 `InvalidDataException` instead of appearing empty); `MethodGenericParameterTypeInfo.SpecialConstraints`
 returns the flags for that parameter. Type bounds remain separately available through
 `TypeConstraints`/`GetTypeConstraints`; the legacy interface-only query rejects a
-function-kind constraint rather than return an incomplete constraint view.
+category constraint rather than return an incomplete constraint view.
 
-Native authoring, snapshot reads and `AssemblyBuilder.ImportReference` preserve
-these requirements. `MakeGenericInstance` rejects nonfunction arguments. Forwarded
+Ordinary categories use the existing type-argument validator and CLI
+`GenericParameterAttributes` values 4/8/16. Native reads/writes, CLI reads/writes,
+reference projection and callable import preserve the flags. `MakeGenericInstance`
+rejects incompatible concrete arguments; `DefaultConstructor` requires a value type
+or a nonabstract class with a public parameterless constructor. Forwarded method
+and declaring-type parameters must prove the required flags; ValueType implies
+DefaultConstructor. Calls are revalidated on write. CLI bit 32 (AllowByRefLike) is
+unsupported and is never interpreted as native FunctionType. Nominal method class
+bounds and Raven's native category emission/import remain follow-up work.
+
+`NeoCLR.Metadata.Experimental.Tests --method-categories` covers these contracts,
+combined interface/category bounds, imported rejection, CLI execution and all three
+snapshot paths. Native specialization admits these categories through shared runtime validation
+before closing the method. This is host SDK/backend support, not a change to guest
+Enum signatures.
+
+Native authoring, snapshot reads and `AssemblyBuilder.ImportReference` also preserve
+the standalone FunctionType requirement. `MakeGenericInstance` rejects nonfunction arguments. Forwarded
 method parameters require a caller function constraint when emitting a call;
 writing revalidates this proof after edits. CLI executable/reference output rejects
 these native-only contracts. Unlike .NET's nominal Delegate constraint, no delegate

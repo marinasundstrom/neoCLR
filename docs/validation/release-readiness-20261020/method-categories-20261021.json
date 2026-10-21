@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-21",
+  "scope": "Shared method category constraints; Raven native emission/import and nominal method class bounds remain open",
+  "baseRevision": "081b399f474e9b2b9857568aca9fed06084ab642",
+  "developmentChanges": true,
+  "metadataChecks": {
+    "method-categories": "pass",
+    "function-kind-constraint": "pass",
+    "structural-method-constraints": "pass",
+    "imported-special-constraints": "pass"
+  },
+  "backendSpecializationTests": {
+    "passed": 20,
+    "failed": 0
+  },
+  "execution": {
+    "CLR": {
+      "result": 42
+    },
+    "interpreter": {
+      "result": 42
+    },
+    "JIT": {
+      "exitCode": 42,
+      "backend": "target/debug/neoclr-codegen",
+      "runtimeAndSystemSeed": "development Unicode bundle; not a matched release package"
+    }
+  },
+  "apiSnapshot": "pass",
+  "artifacts": {
+    "target/method-categories.neox": "64f50a2d1f104669d243d6459471ed3c7ab3b030a6e3525dd3ce166eb92e3f23",
+    "target/debug/neoclr-codegen": "4b571ede1be6b729aa34f9f29c028b07f75a4235f3c3f7cf428bbd26873f68f1",
+    "target/method-categories-final.log": "721e9d8dd4746725daa6c248276de6d80417d5d7f4c7f3880ff78d4423f458ce",
+    "target/method-categories-backend-tests.log": "5257ef2c567502e25cf0f11fd32db99164905c0eda4674d6fff514998033b958"
+  }
+}

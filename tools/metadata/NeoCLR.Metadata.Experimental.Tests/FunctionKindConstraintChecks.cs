@@ -55,9 +55,6 @@ internal static class FunctionKindConstraintChecks
 
     private static void MethodConstraints()
     {
-        var cliSnapshot = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(typeof(FunctionKindConstraintChecks).Assembly.Location), expectedExtended: false);
-        var cliMethod = cliSnapshot.MainModule.Types.Single(t => t.Name == nameof(FunctionKindConstraintChecks)).Methods.Single(m => m.Name == nameof(ReferenceOnly));
-        Expect<InvalidDataException>(() => _ = cliMethod.SpecialConstraints);
         var graph = new AssemblyBuilder(new("FunctionMethods", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var method = graph.AddFunction("Keep", new(SignatureType.MethodParameter(0), [SignatureType.MethodParameter(0)], ["F"]));
         method.SetSpecialConstraints(0, TypeParameterConstraints.FunctionType);
@@ -67,7 +64,7 @@ internal static class FunctionKindConstraintChecks
         Reject(() => method.MakeGenericInstance(PrimitiveType.Int32));
         Reject(() => method.MakeGenericInstance(graph.AddClass("Example", "NotFunction")));
         Reject(() => method.SetSpecialConstraints(1, TypeParameterConstraints.FunctionType));
-        Reject(() => method.SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType));
+        Reject(() => method.SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType | TypeParameterConstraints.FunctionType));
         var contract = graph.AddInterface("Example", "Contract");
         Reject(() => method.AddInterfaceConstraint(0, contract));
         method.SetSpecialConstraints(0, TypeParameterConstraints.None);
@@ -111,13 +108,12 @@ internal static class FunctionKindConstraintChecks
             var constraints = tree["functions"]!.AsArray().First(m => m!["generic_constraints"]?.AsArray().Any(c => c!["kind"]?.ToString() == "FunctionType") == true)!["generic_constraints"]!.AsArray();
             if (invalid == "duplicate") constraints.Add(constraints[0]!.DeepClone());
             else if (invalid == "ordinal") constraints[0]!["parameter"] = 10;
-            else if (invalid == "category") constraints[0]!["kind"] = "ReferenceType";
+            else if (invalid == "category") constraints[0]!["kind"] = "Unknown";
             else constraints.Add(new System.Text.Json.Nodes.JsonObject { ["parameter"] = 0, ["kind"] = new System.Text.Json.Nodes.JsonObject { ["TypeBound"] = new System.Text.Json.Nodes.JsonObject { ["Named"] = "Example.Contract" } } });
             Expect<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(tree.ToJsonString())));
         }
         Console.WriteLine("PASS native method function-kind authoring, forwarding, import, introspection and CLI rejection");
     }
-    private static T ReferenceOnly<T>(T value) where T : class => value;
 
     private static void Expect<T>(Action action) where T : Exception
     {

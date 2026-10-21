@@ -18,7 +18,7 @@ struct Shape {
     row: usize,
     name: String,
 }
-// Admit only closed nongeneric nominal interface bounds and the existing function category.
+// Admit closed nongeneric nominal interface bounds and ordinary runtime categories.
 fn check_method_constraints(
     module: &neoclr::Module,
     function: &Function,
@@ -29,10 +29,12 @@ fn check_method_constraints(
             .get(constraint.parameter as usize)
             .ok_or("generic method constraint argument missing")?;
         match &constraint.kind {
-            neoclr::metadata::ConstraintKind::FunctionType => {
-                if !matches!(argument, Type::Function(_)) {
-                    return Err("generic method argument violates function-kind constraint".into());
-                }
+            category @ (neoclr::metadata::ConstraintKind::ReferenceType
+            | neoclr::metadata::ConstraintKind::ValueType
+            | neoclr::metadata::ConstraintKind::DefaultConstructor
+            | neoclr::metadata::ConstraintKind::FunctionType) => {
+                neoclr::native_metadata::validate_method_category(module, argument, category)
+                    .map_err(|error| format!("method {} category: {error}", function.name))?;
             }
             neoclr::metadata::ConstraintKind::TypeBound(bound @ Type::Named(_))
                 if module.type_definition(bound).is_some_and(|t| {
@@ -1713,8 +1715,52 @@ ret
             super::expand(&invalid, "Main")
                 .unwrap_err()
                 .to_string()
-                .contains("function-kind")
+                .contains("constraint")
         );
+    }
+
+    #[test]
+    fn method_categories_use_runtime_constraint_validation() {
+        use neoclr::metadata::{ConstraintKind, GenericConstraint};
+        let source = neoclr::assemble(".module Categories\n.entry Main\n.function Keep<T>(T) -> T\nldarg 0\nret\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Keep<Int32>(Int32)\nret\n.end").unwrap();
+        for (kind, accepted) in [
+            (ConstraintKind::ValueType, true),
+            (ConstraintKind::DefaultConstructor, true),
+            (ConstraintKind::ReferenceType, false),
+        ] {
+            let mut module = source.clone();
+            module.functions[0].generic_constraints =
+                vec![GenericConstraint { parameter: 0, kind }];
+            let result = super::expand(&module, "Main");
+            assert_eq!(result.is_ok(), accepted);
+            if let Ok((expanded, _)) = result {
+                let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+                assert_eq!(
+                    neoclr::LoadedProgram::new(&selected)
+                        .unwrap()
+                        .run(neoclr::Limits::default())
+                        .unwrap()
+                        .value,
+                    neoclr::Value::Int32(42)
+                );
+            }
+            assert!(
+                super::check_method_constraints(
+                    &module,
+                    &module.functions[0],
+                    &[super::Type::MethodTypeParameter(0)]
+                )
+                .is_err()
+            );
+            assert!(
+                super::check_method_constraints(
+                    &module,
+                    &module.functions[0],
+                    &[super::Type::Named("Missing".into())]
+                )
+                .is_err()
+            );
+        }
     }
 
     #[test]

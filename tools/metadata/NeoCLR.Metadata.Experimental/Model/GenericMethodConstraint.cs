@@ -19,15 +19,15 @@ public sealed partial class MethodDefinition
         ? throw new InvalidDataException("method has unsupported generic parameter constraints")
         : new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(specialConstraints);
 
-    /// <summary>Sets a standalone native FunctionType requirement, or clears it with None.</summary>
+    /// <summary>Sets ordinary reference/value/constructor requirements or a standalone native FunctionType requirement; None clears flags.</summary>
     /// <exception cref="ArgumentException">Invalid ordinal, category or combination with a type bound.</exception>
     /// <exception cref="InvalidOperationException">The definition is a loaded immutable snapshot.</exception>
     public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
     {
         if (AuthoredSignature is null) throw new InvalidOperationException("loaded method constraints are immutable");
         if (parameterIndex < 0 || parameterIndex >= GenericArity ||
-            constraints is not (TypeParameterConstraints.None or TypeParameterConstraints.FunctionType) ||
-            constraints != TypeParameterConstraints.None && (TypeConstraints.Any(c => c.ParameterIndex == parameterIndex) ||
+            !TypeBuilder.ValidSpecialConstraintFlags(constraints) ||
+            constraints != TypeParameterConstraints.None && (constraints == TypeParameterConstraints.FunctionType && TypeConstraints.Any(c => c.ParameterIndex == parameterIndex) ||
                 !specialConstraints.ContainsKey(parameterIndex) && specialConstraints.Count + TypeConstraints.Count >= 128))
             throw new ArgumentException("invalid method category constraint");
         if (constraints == TypeParameterConstraints.None) specialConstraints.Remove(parameterIndex);
@@ -82,7 +82,7 @@ public sealed partial class MethodDefinition
         ArgumentNullException.ThrowIfNull(interfaceType);
         if (AuthoredSignature is null) throw new InvalidOperationException("loaded method constraints are immutable");
         var signature = ConstraintSignature(interfaceType);
-        if (specialConstraints.ContainsKey(parameterIndex) || specialConstraints.Count + authoredInterfaceConstraints.Count + AuthoredStructuralConstraints.Count >= 128 || parameterIndex < 0 || parameterIndex >= GenericArity ||
+        if (specialConstraints.GetValueOrDefault(parameterIndex) == TypeParameterConstraints.FunctionType || specialConstraints.Count + authoredInterfaceConstraints.Count + AuthoredStructuralConstraints.Count >= 128 || parameterIndex < 0 || parameterIndex >= GenericArity ||
             TypeConstraints.Any(c => c.ParameterIndex == parameterIndex && c.Bound == signature))
             throw new ArgumentException("invalid method interface constraint");
         authoredInterfaceConstraints.Add(new(parameterIndex, interfaceType));
@@ -106,7 +106,7 @@ public sealed partial class MethodDefinition
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Sets a standalone native FunctionType requirement, or clears it with None.</summary>
+    /// <summary>Sets ordinary reference/value/constructor requirements or a standalone native FunctionType requirement; None clears flags.</summary>
     /// <exception cref="ArgumentException">Invalid ordinal, category or existing type bound.</exception>
     public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
         => Definition.SetSpecialConstraints(parameterIndex, constraints);
@@ -195,10 +195,17 @@ public sealed partial class MethodBuilder
         foreach (var constraint in Definition.SpecialConstraints)
         {
             var argument = arguments[constraint.Key];
-            if (argument.FunctionSignature is not null) continue;
-            if (argument.MethodParameterIndex is { } parameter &&
-                (caller is null && deferOpen || caller?.Definition.SpecialConstraints.GetValueOrDefault(parameter) == TypeParameterConstraints.FunctionType)) continue;
-            throw new ArgumentException("generic method argument must be a structural function type");
+            if (argument.MethodParameterIndex is not null || argument.TypeParameterIndex is not null)
+            {
+                if (caller is null && deferOpen) continue;
+                var supplied = argument.MethodParameterIndex is { } parameter
+                    ? caller?.Definition.SpecialConstraints.GetValueOrDefault(parameter) ?? TypeParameterConstraints.None
+                    : caller?.DeclaringType?.SpecialConstraints.GetValueOrDefault(argument.TypeParameterIndex!.Value) ?? TypeParameterConstraints.None;
+                if (supplied.HasFlag(TypeParameterConstraints.ValueType)) supplied |= TypeParameterConstraints.DefaultConstructor;
+                if ((supplied & constraint.Value) == constraint.Value) continue;
+                throw new ArgumentException("forwarded generic argument lacks required category constraints");
+            }
+            TypeBuilder.ValidateSpecialTypeArgument(argument, constraint.Value, complete: true);
         }
         foreach (var constraint in Definition.AuthoredStructuralConstraints)
         {

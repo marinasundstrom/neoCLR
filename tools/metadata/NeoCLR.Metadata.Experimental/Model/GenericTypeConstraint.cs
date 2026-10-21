@@ -21,6 +21,11 @@ public enum TypeParameterConstraints
 
 public sealed partial class TypeBuilder
 {
+    internal static bool ValidSpecialConstraintFlags(TypeParameterConstraints flags)
+        => ((int)flags & ~60) == 0 &&
+            (!flags.HasFlag(TypeParameterConstraints.FunctionType) || flags == TypeParameterConstraints.FunctionType) &&
+            (flags & (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType)) != (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType);
+
     private Dictionary<int, TypeParameterConstraints> specialConstraints => Definition.SpecialConstraintStorage;
     /// <summary>Gets special requirements by parameter ordinal.</summary>
     public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => Definition.SpecialConstraints;
@@ -30,9 +35,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentException">Invalid index/bits or conflicting reference/value/base requirements.</exception>
     public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
     {
-        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || ((int)constraints & ~60) != 0 ||
-            constraints.HasFlag(TypeParameterConstraints.FunctionType) && constraints != TypeParameterConstraints.FunctionType ||
-            (constraints & (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType)) == (TypeParameterConstraints.ReferenceType | TypeParameterConstraints.ValueType) ||
+        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || !ValidSpecialConstraintFlags(constraints) ||
             (constraints.HasFlag(TypeParameterConstraints.ValueType) || constraints.HasFlag(TypeParameterConstraints.FunctionType)) && genericConstraints.Any(c => c.ParameterIndex == parameterIndex))
             throw new ArgumentException("invalid or conflicting special constraints");
         if (constraints == TypeParameterConstraints.None) specialConstraints.Remove(parameterIndex);

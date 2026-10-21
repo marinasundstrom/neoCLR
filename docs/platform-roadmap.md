@@ -6,7 +6,9 @@ interpreter, JIT and native backend (23 tests, 69 executions), with matching API
 patterns, arbitrary providers and additional locales. [Enum Parse/TryParse](experiments/enum-parsing/README.md)
 now passes 18 built-in executions across all three engines, including Unicode names
 and ordinary identifier binding; runtime type validation
-is implemented while native generic-method enum constraints remain a gap. Resume
+is implemented while native generic-method enum constraints remain a gap. The
+shared metadata category prerequisite now preserves class/struct/new requirements;
+Raven native emission/import and nominal method class bounds remain open. Resume
 the release-readiness work below; this does not permanently
 reprioritize the platform roadmap.
 

@@ -803,6 +803,37 @@ pub fn interface_view(module: &Module, source: &Type, target: &Type) -> Result<T
     crate::variance::implemented_view(module, source, target)
 }
 
+/// Validate a closed method category argument using the ordinary runtime constraints.
+/// Requires linked type metadata; native specialization must not erase an open proof.
+pub fn validate_method_category(
+    module: &Module,
+    concrete: &Type,
+    category: &crate::metadata::ConstraintKind,
+) -> Result<(), Fault> {
+    use crate::metadata::{ConstraintKind, GenericConstraint};
+    if !matches!(
+        category,
+        ConstraintKind::ReferenceType
+            | ConstraintKind::ValueType
+            | ConstraintKind::DefaultConstructor
+            | ConstraintKind::FunctionType
+    ) || crate::constraints::symbolic(concrete)
+    {
+        return Err(Fault::new(
+            "method category specialization requires a closed category argument",
+        ));
+    }
+    crate::vm::check_type(concrete, module)?;
+    crate::constraints::check(
+        module,
+        &[GenericConstraint {
+            parameter: 0,
+            kind: category.clone(),
+        }],
+        core::slice::from_ref(concrete),
+    )
+}
+
 /// Validate an exact closed nominal interface bound before native specialization.
 /// Requires complete linked metadata; structural matching and variant conversions do not qualify.
 /// Self contracts must be declared for this implementing type, including exact member signatures.

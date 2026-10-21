@@ -284,10 +284,15 @@ public sealed partial class AssemblyDefinition
                         throw new InvalidDataException("parameter metadata outside method signature");
                 }
                 var methodBounds = new List<MethodConstraintRow>();
+                var methodCategories = new Dictionary<int, TypeParameterConstraints>();
                 bool unsupportedMethodBounds = false;
                 foreach (var parameterHandle in method.GetGenericParameters())
                 {
                     var parameter = reader.GetGenericParameter(parameterHandle);
+                    // CLI bit 32 is AllowByRefLike, not the native FunctionType category.
+                    var flags = (TypeParameterConstraints)parameter.Attributes;
+                    if (!TypeBuilder.ValidSpecialConstraintFlags(flags) || flags.HasFlag(TypeParameterConstraints.FunctionType)) unsupportedMethodBounds = true;
+                    else if (flags != TypeParameterConstraints.None) methodCategories.Add(parameter.Index, flags);
                     foreach (var constraintHandle in parameter.GetConstraints())
                     {
                         var bound = reader.GetGenericParameterConstraint(constraintHandle).Type;
@@ -306,9 +311,9 @@ public sealed partial class AssemblyDefinition
                 methods.Add(new((uint)MetadataTokens.GetToken(handle), global ? 0 : declaring, ReadName(method.Name),
                     (ushort)method.Attributes, (ushort)method.ImplAttributes, method.GetGenericParameters().Count,
                     reader.GetBlobBytes(method.Signature),
-                    unsupportedMethodBounds || method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0).Any(),
+                    unsupportedMethodBounds || method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i).Any(),
                     method.GetParameters().Select(reader.GetParameter).Where(p => p.SequenceNumber > 0 && (p.Attributes & System.Reflection.ParameterAttributes.Out) != 0).Select(p => p.SequenceNumber - 1).ToArray(),
-                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray(), ParameterArrayIndex: parameterArray, NullableAnnotations: nullableAnnotations));
+                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray(), SpecialConstraints: methodCategories, ParameterArrayIndex: parameterArray, NullableAnnotations: nullableAnnotations));
             }
             var properties = new List<PropertyRow>();
             var methodRows = methods.ToDictionary(m => m.Token);

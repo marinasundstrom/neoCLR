@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Extend shared method metadata to preserve reference-type, value-type and default-constructor constraints through native/CLI snapshots, reference projection and callable imports. Reuse type-argument validation in metadata and native specialization, require constrained forwarding and retain FunctionType as a separate native-only contract. Qualify category/interface combinations, invalid arguments, 20 native-specialization tests and CLI/interpreter/JIT execution. Raven native emission/import and nominal method class bounds remain follow-up work; guest Enum signatures are unchanged.
+
 - Accept ordinary Unicode enum, parameter/local, generic-parameter and property metadata names without applying the legacy neoIL token grammar. Preserve exact names and ordinal enum parsing; retain malformed/duplicate/reserved-name checks and ordinary UTF-8 metadata representation. Keep source grammar validation separate. Qualify CLI/native metadata round-trip/rejection coverage, 27 runtime naming/enum regressions and six built-in tests across interpreter/JIT/native (18 executions), strict runtime library Clippy, API checks and the 5,036-page website. No ABI or public signature change.
 
 - Remove Enum.TryParse’s redundant forwarding initialization after fixing returned-out-call definite assignment on Raven main and carrying it to the native compiler branch. Rebuild the four source libraries from committed compiler b83a618a0 and qualify all 12 built-in enum executions; failure output reset remains in the actual parsing overload. No API or ABI change.

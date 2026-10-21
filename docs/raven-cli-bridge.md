@@ -14022,7 +14022,7 @@ contract. No additional native ABI or Runtime Contract option is introduced. Leg
 CLI reference methods are documentation fixtures only; native Raven bodies remain
 authoritative. Compiler bundle: 4c051e332-dirty-record-policy-metadata-function-bound.
 
-Native method metadata currently cannot express struct/Enum generic constraints.
+Raven native method emission currently cannot express struct/Enum generic constraints.
 These methods validate concrete type arguments at runtime pending a general metadata
 and compiler constraint extension. Backing widths beyond Int32 remain an existing gap.
 Unicode enum names are repaired by the validation follow-up below. Owners: Raven semantic/native emission and neoCLR metadata
@@ -14068,3 +14068,26 @@ unchanged. Raw metadata numeric/space-containing names are admitted; malformed,
 duplicate and reserved names still reject. `valid_source_slot_name` remains confined
 to source parsing. This restores ordinary compiler-emitted identifiers without
 normalizing names or adding enum-specific binding behavior.
+
+
+### Shared method category metadata (2026-10-21)
+
+The host metadata SDK now preserves reference/value/default-constructor method
+requirements through native and CLI emission, immutable reads, CLI reference
+projection and callable imports. It reuses the type-argument validator and checks
+forwarding guarantees at call construction and graph write. Ordinary nominal
+interface bounds can coexist with the category flags; FunctionType remains
+standalone and native-only. This follows [.NET GenericParameterAttributes](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.genericparameterattributes?view=net-10.0)
+for the ordinary 4/8/16 flags. CLI AllowByRefLike (32) is not the native FunctionType
+flag and remains unsupported by this reader.
+
+No Runtime Contract configuration, Raven emission capability or guest signature is
+changed by this prerequisite. No new temporary encoding is introduced: CLI has its
+standard flags and native metadata already has named category entries. Raven native
+emission/import and nominal method class bounds remain open. The focused SDK
+`--method-categories`, `--function-kind-constraint`, `--structural-method-constraints`
+and `--imported-special-constraints` checks pass. Native specialization now validates category constraints through the same runtime
+validator before erasing generic parameters; unresolved/open arguments reject.
+Twenty focused specialization tests pass. The authored forwarding consumer
+returns 42 under CLR reflection, the neoCLR interpreter and rebuilt managed JIT. These development checks
+do not replace fresh matched-package qualification.

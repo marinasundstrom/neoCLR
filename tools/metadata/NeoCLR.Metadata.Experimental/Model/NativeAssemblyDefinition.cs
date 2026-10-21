@@ -885,13 +885,23 @@ public sealed partial class NativeAssemblyDefinition
                         Shape(constraint, "parameter", "kind");
                         var parameter = constraint.GetProperty("parameter").GetInt32();
                         var kind = constraint.GetProperty("kind");
-                        Require(parameter >= 0 && parameter < genericArity && !methodSpecialConstraints.ContainsKey(parameter), "invalid or duplicate method category constraint");
+                        Require(parameter >= 0 && parameter < genericArity, "invalid method constraint ordinal");
                         if (kind.ValueKind == JsonValueKind.String)
                         {
-                            Require(kind.GetString() == "FunctionType" && !methodConstraints.Any(c => c.Parameter == parameter), "unsupported method category constraint");
-                            methodSpecialConstraints.Add(parameter, TypeParameterConstraints.FunctionType);
+                            var flag = kind.GetString() switch {
+                                "ReferenceType" => TypeParameterConstraints.ReferenceType,
+                                "ValueType" => TypeParameterConstraints.ValueType,
+                                "DefaultConstructor" => TypeParameterConstraints.DefaultConstructor,
+                                "FunctionType" => TypeParameterConstraints.FunctionType,
+                                _ => throw new InvalidDataException("unsupported method category constraint")
+                            };
+                            var existing = methodSpecialConstraints.GetValueOrDefault(parameter);
+                            Require(!existing.HasFlag(flag) && TypeBuilder.ValidSpecialConstraintFlags(existing | flag) &&
+                                (flag != TypeParameterConstraints.FunctionType || !methodConstraints.Any(c => c.Parameter == parameter)), "invalid or duplicate method category constraint");
+                            methodSpecialConstraints[parameter] = existing | flag;
                             continue;
                         }
+                        Require(methodSpecialConstraints.GetValueOrDefault(parameter) != TypeParameterConstraints.FunctionType, "function constraint cannot have type bounds");
                         Shape(kind, "TypeBound");
                         var rawBound = kind.GetProperty("TypeBound");
                         var structural = rawBound.ValueKind == JsonValueKind.Object &&
@@ -1273,7 +1283,8 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
-            if (method.SpecialConstraints.Count != 0) throw new NotSupportedException("function-kind method constraints have no CLI projection");
+            if (method.SpecialConstraints.Values.Contains(TypeParameterConstraints.FunctionType)) throw new NotSupportedException("function-kind method constraints have no CLI projection");
+            foreach (var (parameter, flags) in method.SpecialConstraints) output.SetSpecialConstraints(parameter, flags);
             foreach (var bound in method.TypeConstraints)
             {
                 if (bound.Structural) throw new NotSupportedException("structural method bounds have no CLI projection");

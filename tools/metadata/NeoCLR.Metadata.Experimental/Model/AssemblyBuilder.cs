@@ -418,7 +418,7 @@ public sealed partial class AssemblyBuilder
         var methods = ValidateGraph(validateBodies: !referenceOnly);
         if (methods.Any(m => m.Instructions.Any(i => i.Op == "type.token" && i.Type?.FunctionSignature is not null)))
             throw new InvalidDataException("structural function type tokens require native emission without CLI projection");
-        if (methods.Any(m => m.Definition.SpecialConstraints.Count != 0) || importedReferences.Values.Concat(authoredCallableReferences).Any(r => r.Target.Definition.SpecialConstraints.Count != 0))
+        if (methods.Any(m => m.Definition.SpecialConstraints.Values.Contains(TypeParameterConstraints.FunctionType)) || importedReferences.Values.Concat(authoredCallableReferences).Any(r => r.Target.Definition.SpecialConstraints.Values.Contains(TypeParameterConstraints.FunctionType)))
             throw new InvalidDataException("function-kind method constraints require native emission without CLI projection");
         if (!referenceOnly && methods.Any(m => m.Definition.NativeImport is not null))
             throw new InvalidDataException("native imports require native emission; CLI projection is reference-only");
@@ -1061,7 +1061,7 @@ public sealed partial class AssemblyBuilder
         foreach (var row in genericRows.OrderBy(r => r.Sort))
             for (int i = 0; i < row.Names.Count; i++)
             {
-                var attributes = row.Owner.Kind == HandleKind.TypeDefinition ? (GenericParameterAttributes)types[MetadataTokens.GetRowNumber(row.Owner) - 2].SpecialConstraints.GetValueOrDefault(i) : GenericParameterAttributes.None;
+                var attributes = row.Owner.Kind == HandleKind.TypeDefinition ? (GenericParameterAttributes)types[MetadataTokens.GetRowNumber(row.Owner) - 2].SpecialConstraints.GetValueOrDefault(i) : (GenericParameterAttributes)methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.SpecialConstraints.GetValueOrDefault(i);
                 if (row.Owner.Kind == HandleKind.TypeDefinition)
                     attributes |= (GenericParameterAttributes)(types[MetadataTokens.GetRowNumber(row.Owner) - 2].Definition.GenericParameterVariance?[i] ?? GenericVariance.Invariant);
                 var parameter = metadata.AddGenericParameter(row.Owner, attributes, metadata.GetOrAddString(row.Names[i]), i);
@@ -1072,7 +1072,7 @@ public sealed partial class AssemblyBuilder
                         metadata.AddGenericParameterConstraint(parameter, typeHandles[constraint.BaseType]);
                 }
                 else
-                    foreach (var constraint in methods[MetadataTokens.GetRowNumber(row.Owner) - 1].InterfaceConstraints.Where(c => c.ParameterIndex == i))
+                    foreach (var constraint in methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.NominalInterfaceConstraints.Where(c => c.ParameterIndex == i))
                         metadata.AddGenericParameterConstraint(parameter, MetadataTokens.EntityHandle(ElementToken(methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.ConstraintSignature(constraint.InterfaceType))));
             }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
