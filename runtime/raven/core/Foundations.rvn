@@ -21,7 +21,6 @@ public abstract class Enum : ValueType {
 
     /// Attempts case-sensitive parsing; failure leaves result at its default value.
     static func TryParse<TEnum>(text: string?, out result: TEnum) -> bool {
-        result = default
         return TryParse<TEnum>(text, false, out result)
     }
 

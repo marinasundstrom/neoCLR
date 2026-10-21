@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Remove Enum.TryParse’s redundant forwarding initialization after fixing returned-out-call definite assignment on Raven main and carrying it to the native compiler branch. Rebuild the four source libraries from committed compiler b83a618a0 and qualify all 12 built-in enum executions; failure output reset remains in the actual parsing overload. No API or ABI change.
+
 - Complete native-backend strict all-targets Clippy cleanup, preserving lowering behavior and removing redundant temporary clones. Retain five documented argument-count exceptions at explicit compiler/GC emission boundaries. Qualify 114 backend unit tests (one existing performance test remains opt-in). Repair the shared numeric formatter’s no-std build by using core iterators; native enum consumer qualification passes after rebuilding the text support library. No public signature or ABI change.
 
 ### 2026-10-20

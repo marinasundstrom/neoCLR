@@ -20540,3 +20540,18 @@ then continue the release”. The assistant continues compiler/backend stabiliza
 and matched-package qualification rather than treating known gaps as completed work.
 A returned generic out-call reproduction fails on Raven main; a shared return-flow
 repair is being validated there before deliberate transfer to the native branch.
+
+
+## 2026-10-21 — Continue release stabilization
+
+The author directed “Continue fixing all the issues and then continue the release”,
+then asked to continue after interrupted validation. The assistant completed the
+native-backend lint cleanup and repaired a no-std formatter build regression found
+by native consumer validation. Returned-out forwarding was reproduced and fixed on
+Raven main (`addfcb11e`), then deliberately carried to `codex/neoclr` (`b83a618a0`).
+Both compiler branches pass 44 focused tests. The redundant Enum.TryParse forwarding
+initialization is removed; rebuilt libraries pass 12 built-in enum executions.
+[Evidence and remaining gaps](experiments/enum-parsing/README.md) distinguish this
+completed fix from generic method constraints, Unicode names and the still-open
+matched-package/platform/performance release gates. No replacement release has been
+published by these actions.

@@ -53,9 +53,18 @@ executions) on macOS ARM64. The backend malformed-signature/no-enum-token regres
 passes; four API snapshot checks and the 5,036-page website build pass. These are
 development checks, not a replacement package or cross-platform release qualification.
 
-Compiler follow-up: the forwarding TryParse overload explicitly initializes its out
-parameter before calling the other overload. Without that initialization this compiler
-reported RAV0269 (unassigned out parameter). Initialization preserves the documented
-reset contract; general forwarded-out definite-assignment behavior needs an isolated
-Raven-main reproduction before deciding on a compiler fix. This is not evidence
-that ordinary caller out arguments fail (those are exercised by the built-in tests).
+## Returned out forwarding qualified (2026-10-21)
+
+Raven main `addfcb11e` fixes definite assignment for an out call in a return
+expression; native branch `b83a618a0` carries that fix deliberately. Both branches
+pass 44 focused byref semantic/codegen tests, including rejection of conditional
+paths that do not call the assigning method. The compiler now analyzes the returned
+expression before checking normal-exit assignment.
+
+The rebuilt compiler and all four source class libraries compile the forwarding
+TryParse overload without a redundant default assignment. The underlying overload
+still resets output on failure. [Built-in qualification](out-forward-validation-20261021.json)
+passes all four enum tests in interpreter, JIT and native execution (12 passes).
+The compiler bundle now records the committed revision; the earlier report remains
+historical evidence. No Runtime Contract configuration, ABI, metadata encoding or
+public signature changes. Generic method constraints and Unicode names remain open.

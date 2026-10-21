@@ -14028,3 +14028,16 @@ and compiler constraint extension. Unicode enum names and backing widths beyond 
 are also existing gaps. Owners: Raven semantic/native emission and neoCLR metadata
 producer/reader/runtime validation. Do not implement a name-based compiler exception
 for Parse. See [contract and focused qualification](experiments/enum-parsing/README.md).
+
+
+### Returned out-call definite assignment (2026-10-21)
+
+Raven main `addfcb11e`, carried to native branch `b83a618a0`, analyzes a returned
+expression before checking out parameters at normal exit. This is general compiler
+flow analysis, not a native ABI or Runtime Contract exception. The ordinary CLI/native
+byref and call representation remains unchanged; no temporary encoding is introduced.
+Both branches pass 44 focused tests. Rebuilt native source libraries and the built-in
+[enum suite](experiments/enum-parsing/out-forward-validation-20261021.json) pass 12
+executions with the forwarding initialization workaround removed. Owners: Raven
+binding/flow analysis; neoCLR source-library integration. This closes the forwarding
+gap, not generic method constraints or replacement package qualification.
