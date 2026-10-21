@@ -201,3 +201,19 @@ now removes policy descriptor allocations. A corrected matched harness measures 
 versus four additional allocations per integer comparison and two hashes. Value boxing
 and broader record gaps remain; this focused development evidence does not close the
 matched-package release gates above.
+
+
+## Completed clean-source run — 2026-10-21
+
+The clean-source `97ec3e2a1` run at
+`target/stabilization-source-20261021-v2` completed with four failing targets:
+`--lib`, `object_display`, `raven_reflection`, and `type_inspection`.
+The two floating-display assertions have focused fixes in current main; this run
+used the older extracted source and does not validate those fixes.
+
+Seven `raven_reflection` cases report `reflection snapshot field count mismatch`.
+The `type_inspection` rejection case fails its expectation for `ldtoken Box`.
+These require current-source investigation and focused fixes or corrected tests;
+the run does not establish whether the cause is stale fixtures or runtime behavior.
+No clean-source release pass is claimed. The full log and process result remain in
+`target/stabilization-source-20261021-v2.log` and its `report.json`.
