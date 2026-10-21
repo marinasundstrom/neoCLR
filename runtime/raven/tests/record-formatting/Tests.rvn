@@ -38,3 +38,29 @@ func ScalarsAndNull() -> Result<unit, TestFailure> {
     let expected = "Scalars { Number = 42, Flag = False, Text = \"é\" }"
     return Assert.True(Scalars(42, false, "é").ToString().Equals(expected, StringComparison.Ordinal), "Original UTF-8 representation")
 }
+
+[Flags]
+public enum Access { None = 0, Read = 1, Alias = 1, Write = 2, Execute = 4 }
+record struct Permissions(Value: Access)
+record struct Comparison(Value: StringComparison)
+record struct OptionalPermission(Value: Option<Access>)
+
+[Test("Record enum display preserves names flags and numeric fallback")]
+func EnumValues() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("Permissions { Value = Read }", Permissions(Access.Alias).ToString())?
+    _ = Assert.Equal("Permissions { Value = Read, Execute }", Permissions((Access)5).ToString())?
+    _ = Assert.Equal("Permissions { Value = 8 }", Permissions((Access)8).ToString())?
+    _ = Assert.Equal("Permissions { Value = -2147483648 }", Permissions((Access)(-2147483648)).ToString())?
+    _ = Assert.Equal("Permissions { Value = None }", Permissions(Access.None).ToString())?
+    return Assert.Equal("Comparison { Value = Ordinal }", Comparison(StringComparison.Ordinal).ToString())
+}
+
+[Test("Record enum payload display survives boxed dispatch and collection")]
+func EnumPayloads() -> Result<unit, TestFailure> {
+    let value = OptionalPermission(Some((Access)5))
+    let boxed: object = value
+    let text = boxed.ToString()
+    System.Runtime.GC.Collect()
+    _ = Assert.Equal("OptionalPermission { Value = Option.Some(Read, Execute) }", text)?
+    return Assert.Equal(text, value.ToString())
+}

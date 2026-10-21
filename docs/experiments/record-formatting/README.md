@@ -95,3 +95,28 @@ The original Unsupported Index fixture is now a generic-owner rejection fixture;
 the earlier dated validation remains a historical result. Libraries/runtime/backend
 are reused from the method-constraint cohort; only the compiler is rebuilt. This is
 development evidence, not clean extracted-package qualification.
+
+## Enum component follow-up — 2026-10-21
+
+Native nongeneric record-struct display now supports Int32-backed enum components,
+including imported enums and closed-union payloads. It calls the existing ordinary
+Object display contract, which owns alias selection, flag decomposition and numeric
+fallback. No copied enum tables, separate formatter or runtime service is introduced.
+This follows .NET general enum display; Raven's record punctuation is unchanged.
+
+The current Object contract requires a temporary enum box per formatted component.
+That is a known allocation cost, not an allocation optimization. Named-value display
+reuses image text; flags and numeric fallback retain their existing result allocation.
+A future borrowed-value display contract could remove the box without duplicating
+formatting policy. Imported values with their own direct formatter remain unboxed.
+Runtime Contract configuration, native metadata and ordinary .NET generation are unchanged.
+
+The five built-in record-formatting tests cover names/aliases, flag decomposition,
+zero, unnamed and negative values, imported enums, union payloads, boxed record
+calls and retention across collection, alongside earlier imported/scalar cases.
+All 15 executions pass with Raven `f13bf8de1` on `codex/neoclr`, together with
+the source-core missing-helper regression. [Execution evidence](enum-validation-20261021.json)
+records exact artifacts and results.
+The preceding gap audit is the enum rejection baseline. Floating components,
+generic owners and record classes remain gaps. This is development qualification,
+not a matched release bundle or a performance result.

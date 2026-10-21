@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Extend generated record display to Int32-backed enum components through existing Object formatting, preserving names, aliases, flags and numeric fallback. Document temporary enum boxing; keep imported direct value formatting unboxed. Add built-in local/imported enum and union-payload coverage, with broader record/release gaps retained.
+
 - Qualify generated native record display through imported value ToString contracts using built-in Index/Range tests, including boxed record dispatch, nesting, union payloads and preserved UTF-8. Calls add no component boxing; returned strings still allocate. Recheck and retain enum/floating/generic/class gaps; update release review and website scope. No runtime API or ABI change.
 
 - Constrain Enum.Parse/TryParse type parameters to struct, matching .NET while retaining runtime enum-identity validation for non-enum value types. Reference arguments and unconstrained forwarding now reject with RAV0320. Rebuild all four core libraries with Raven 77dbe0302, qualify six built-in tests across interpreter/JIT/native (18 executions), and refresh CLI/native API documentation, including the optional PostgreSQL documentation input. No parsing, storage or allocation-policy change; release-package qualification remains open.

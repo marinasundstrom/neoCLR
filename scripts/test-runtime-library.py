@@ -305,6 +305,8 @@ PATH_VALUES_NAMES = [
     'Path equality agrees across typed interface and Object dispatch',
 ]
 RECORD_FORMATTING_NAMES = [
+    'Record enum payload display survives boxed dispatch and collection',
+    'Record enum display preserves names flags and numeric fallback',
     'Records use imported value formatting across typed and boxed calls',
     'Nested records and unions retain imported value display contracts',
     'Record scalar formatting preserves null and original Unicode text',
