@@ -42,3 +42,28 @@ rates, sustained concurrency and HTTPS throughput are not newly measured.
 All execution and publication gates pass. [Preview 16](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16)
 is published; [verification](validation/release-20261018/publication.json) records the
 release commit and all asset identities.
+
+### Qualification findings — 2026-10-21 editor and HTTP follow-up
+
+Generated development editor tasks now make JIT execution explicit and provide
+a separate native compilation action; Raven 6aa3aacf5 and neoCLR 7db517701 record
+that contract. Six task/runner tests, exact collections JIT output, three CLI
+rejection controls and 23 website tests pass. Refreshed installed-bundle and native
+build-kit acceptance remain required; this is not release approval.
+
+The HTTP JSON import failure is repaired in 033942653 and passes SDK contract
+tests plus interpreter client/server requests. JIT qualification still fails at
+the 2,048 selected-function budget before server startup. A diagnostic build with
+a 4,096-function budget exceeded the 60-second startup deadline under concurrent
+source qualification; that experiment does not establish a solution and the
+source limit is unchanged. It also exposed a verifier cleanup gap: killing the
+runtime parent can leave the JIT child holding its output pipes. The diagnostic
+child was stopped explicitly. Both selection/startup behavior and process-tree
+cleanup require follow-up before repeating package qualification.
+
+The clean-source qualification snapshot predates the stale floating-display unit
+assertion repair and additionally exposed an obsolete boxed-Double rejection
+expectation in `tests/object_display.rs`. Keep the original failures as evidence;
+do not describe the extracted full-suite run as passing.
+
+The corrected boxed-Double integration test passes; production behavior is unchanged.
