@@ -20874,3 +20874,14 @@ measured development macOS ARM64 baseline and its reproduction procedure are in
 [the native size study](../benchmarks/native-size/README.md). The website table
 reports the large JSON footprint as measured, without claiming a size advantage
 or comparing unmatched .NET applications. HTTP/release qualification remains open.
+
+### 2026-10-21 — Compare Slice release scope with Span
+
+The author linked .NET 10 Span documentation and asked what should matter for the
+release. The assistant reviewed the primary contracts and local Raven types/tests,
+prioritizing lifetime/bounds qualification, missing copy/fill/clear operations,
+reference-return indexing and explicit region-versus-content equality. Native
+byte-view qualification must not imply general generic support. The
+[review](validation/release-readiness-20261020/slice-span-review-20261021.md) records
+recommendations separately from implemented work; no broader scope approval is
+inferred from the question.

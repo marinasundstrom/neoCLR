@@ -67,3 +67,5 @@ expectation in `tests/object_display.rs`. Keep the original failures as evidence
 do not describe the extracted full-suite run as passing.
 
 The corrected boxed-Double integration test passes; production behavior is unchanged.
+
+[Slice/Span release review](validation/release-readiness-20261020/slice-span-review-20261021.md) records the supported-type/lifetime gates, missing buffer helpers and by-reference indexing distinction. It is a review, not completed API expansion.

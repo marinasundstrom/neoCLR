@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Review Slice against .NET Span for release: distinguish existing lifetime/bounds tests from final qualification, record missing copy/fill/clear helpers, reference-return indexing and region/content equality considerations, and retain the native byte-view scope. Recommendations are not documented as implemented APIs.
+
 - Measure development macOS ARM64 assembly/AOT output and SDK/toolchain installation sizes, with executed Unicode greeting and JSON mapping consumers, artifact/catalogue hashes and reproducible tooling. Publish exact-scope tables on the Native compilation page, distinguishing application assemblies from complete executables and build-time SDK costs. Record default unstripped outputs and platform/cohort limits; this is not release or HTTP qualification.
 
 - Correct the second stale floating-display regression to assert boxed Double virtual ToString returns its numeric value; the focused integration test passes. Record editor/website validation and the unresolved HTTP JIT selection/startup and verifier cleanup findings without treating diagnostic experiments as release qualification.
