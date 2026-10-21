@@ -42,6 +42,8 @@
       href: features/time/index.md
     - name: "Localization"
       href: features/localization/index.md
+    - name: "Dependency injection"
+      href: features/dependency-injection/index.md
     - name: "Globalization"
       href: features/globalization/index.md
 - name: Runtime and tools
@@ -90,6 +92,8 @@
       href: docs/interface-variance.md
     - name: "Localization"
       href: docs/localization.md
+    - name: "Dependency injection"
+      href: docs/dependency-injection.md
     - name: "JSON serialization"
       href: docs/json.md
     - name: "Streams"

@@ -7,12 +7,11 @@ import System.Option.*
 import System.Result.*
 import System.Runtime.Reflection.*
 
-// Internal foundation: qualify activation before publishing container contracts.
+/// Reasons automatic constructor activation cannot prepare or invoke an implementation.
 public enum ActivationError {
     UnsupportedType
     MissingConstructor
     AmbiguousConstructor
-    MissingDependency
     InvocationFailed
 }
 
@@ -98,19 +97,9 @@ internal class ConstructorPlan {
 
     internal func ParameterType(index: int) -> TypeInfo => storedParameters[index].ParameterType
 
-    internal func Invoke(arguments: Sequence<Object?>) -> Result<Object, ActivationError> {
+    internal func Invoke(arguments: Object?[]) -> Result<Object, ActivationError> {
         if constructor.Invoke(arguments) is Ok(let instance) { return Ok(instance) }
         return Error(ActivationError.InvocationFailed)
     }
 
-    internal func Activate(resolve: (TypeInfo) -> Option<Object>) -> Result<Object, ActivationError> {
-        let arguments = ArrayList<Object?>(storedParameters.Count)
-        for parameter in storedParameters {
-            let Some(value) = resolve(parameter.ParameterType) else {
-                return Error(ActivationError.MissingDependency)
-            }
-            arguments.Add(value)
-        }
-        return Invoke(arguments)
-    }
 }

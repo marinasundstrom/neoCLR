@@ -450,7 +450,7 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
         for op in &mut f.body {
             if let Op::UnboxAny(t) = op
                 && (*t == Type::String
-                    || matches!(t, Type::ArrayRef(_))
+                    || matches!(t, Type::ArrayRef(_) | Type::Function(_))
                     || reference_types.contains(t))
             {
                 *op = Op::CastClass(t.clone());
@@ -555,6 +555,18 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
 #[cfg(test)]
 mod structural_union_tests {
     use super::*;
+
+    #[test]
+    fn function_unboxing_uses_checked_reference_cast() {
+        let mut input = neoclr::assemble(
+            ".module FunctionCast\n.type class System.Object\n.end\n.function Read(System.Object value) -> fn<Int32,Int32>\nldarg value\nunbox.any fn<Int32,Int32>\nret\n.end",
+        ).unwrap();
+        project_scalar_queries(&mut input, &mut json!({})).unwrap();
+        assert!(matches!(
+            &input.functions[0].body[1],
+            Op::CastClass(Type::Function(_))
+        ));
+    }
 
     #[test]
     fn whole_union_box_is_not_projected_to_a_payload_reference_cast() {

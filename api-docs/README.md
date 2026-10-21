@@ -2814,3 +2814,9 @@ Development (2026-10-21): System.Localization interfaces, diagnostics, JSON prov
 and error union are rendered from the native snapshot. The legacy CLI scaffold
 does not project these types; [the localization guide](localization.md) records
 contracts, assembly split, fallback and native host limits.
+
+The development System.DependencyInjection reference is rendered from production
+native metadata, with a linked [contract guide](dependency-injection.md). It is
+not added to the older CLI scaffold's selected type list: structural function
+factory signatures and native class-library types are represented by the matching
+native audit/snapshot instead. Constructor retention boundaries remain documented.

@@ -20751,3 +20751,27 @@ The assistant fixes Raven codex/neoclr (`d14b7340a`), with all 11 focused compil
 tests passing; ordinary .NET cases already pass. The author directs continuing
 through completion of DI, fixing general and native-specific compiler gaps along
 the way. Native activation, public integration and documentation remain next.
+
+### 2026-10-21 — Keyed services and bound functions
+
+The author requests keyed registrations so multiple instances of one service type
+can coexist, correcting “correction types” to “Funktion types”. The author clarifies
+that a method should be bound to a function type, then the function object/reference
+retrieved from the container. The assistant proposes ordinary keyed instance
+registration, distinct from a service-producing factory, and adds built-in tests
+for two static targets and a retained instance receiver sharing `(int) -> int`.
+The author then requests TryAdd helpers. The assistant proposes preserving an
+existing type/key registration and returning Result<bool, ServiceError> to report
+added, already present or invalid registration. The public class-library integration now passes 18 built-in tests on each of
+interpreter/native/JIT, including module-level and bound-instance function values
+and TryAdd preservation. API snapshots and the 5,564-page website build pass;
+website publication remains a separate operation.
+
+### Object graphs as DI qualification (2026-10-21)
+
+The author requested larger resolved object graphs as the practical test of scoping
+and overlooked edge cases. The assistant added a diamond graph with repeated
+transient roots/branches, shared scoped nodes and a cross-scope singleton. Checks
+cover deep scoped resolution rejection at the root, independent scopes created
+from scopes, repeated disposal, root invalidation and surviving scope ownership.
+Validation outcomes are recorded in the dependency-injection experiment evidence.

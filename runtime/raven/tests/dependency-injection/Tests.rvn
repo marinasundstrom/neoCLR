@@ -33,46 +33,63 @@ public class PrivateOnly {
 
 [Test("DI selects the greediest available public constructor")]
 func ASelect() -> Result<unit, TestFailure> {
-    let Ok(plan) = ConstructorPlan.Prepare(typeof(Greeting), type => type.Equals(typeof(Localizer<Feature>))) else {
-        return Assert.True(false, "Prepare typed localizer constructor")
-    }
-    _ = Assert.Equal(1, plan.ParameterCount)?
-    let Ok(empty) = ConstructorPlan.Prepare(typeof(Greeting), type => false) else {
-        return Assert.True(false, "Prepare parameterless fallback")
-    }
-    return Assert.Equal(0, empty.ParameterCount)
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<Localizer<Feature>>(Strings())
+    _ = services.AddTransient<Greeting>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build typed localizer constructor") }
+    let Ok(greeting) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Resolve greediest constructor") }
+    _ = Assert.Equal("Hello", greeting.Text)?
+    provider.Dispose()
+    let fallback: ServiceCollection = DefaultServiceCollection()
+    _ = fallback.AddTransient<Greeting>()
+    let Ok(other) = fallback.Build() else { return Assert.True(false, "Build fallback") }
+    let Ok(empty) = other.GetRequiredService<Greeting>() else { return Assert.True(false, "Resolve fallback") }
+    other.Dispose()
+    return Assert.Equal("Default", empty.Text)
 }
 
 [Test("DI activates typed localizer dependencies through a retained plan")]
 func BActivate() -> Result<unit, TestFailure> {
-    let Ok(plan) = ConstructorPlan.Prepare(typeof(Greeting), type => type.Equals(typeof(Localizer<Feature>))) else {
-        return Assert.True(false, "Prepare")
-    }
-    let strings = Strings()
-    let Ok(instance) = plan.Activate(type => Some<Object>(strings)) else {
-        return Assert.True(false, "Activate")
-    }
-    let greeting = (Greeting)instance
-    _ = Assert.Equal("Hello", greeting.Text)?
-    let Ok(second) = plan.Activate(type => Some<Object>(strings)) else {
-        return Assert.True(false, "Reuse plan")
-    }
-    return Assert.True(!Object.ReferenceEquals(instance, second), "Fresh transient instances")
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<Localizer<Feature>>(Strings())
+    _ = services.AddTransient<Greeting>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(first) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "First activation") }
+    let Ok(second) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Reuse plan") }
+    _ = Assert.Equal("Hello", first.Text)?
+    provider.Dispose()
+    return Assert.True(!Object.ReferenceEquals(first, second), "Fresh transient instances")
 }
 
 [Test("DI rejects ambiguous missing and inaccessible constructors")]
 func CReject() -> Result<unit, TestFailure> {
-    _ = Assert.True(ConstructorPlan.Prepare(typeof(Ambiguous), type => true) is Error(ActivationError.AmbiguousConstructor), "Ambiguous")?
-    _ = Assert.True(ConstructorPlan.Prepare(typeof(Missing), type => false) is Error(ActivationError.MissingConstructor), "Missing")?
-    _ = Assert.True(ConstructorPlan.Prepare(typeof(PrivateOnly), type => true) is Error(ActivationError.MissingConstructor), "Private")?
-    return Assert.True(ConstructorPlan.Prepare(typeof(Localizer), type => true) is Error(ActivationError.UnsupportedType), "Interface")
+    let ambiguous: ServiceCollection = DefaultServiceCollection()
+    _ = ambiguous.AddSingleton<Localizer<Feature>>(Strings())
+    _ = ambiguous.AddTransient<Feature>()
+    _ = ambiguous.AddTransient<Ambiguous>()
+    _ = Assert.True(ambiguous.Build() is Error(ServiceError.Activation(_, ActivationError.AmbiguousConstructor)), "Ambiguous")?
+    let missing: ServiceCollection = DefaultServiceCollection()
+    _ = missing.AddTransient<Missing>()
+    _ = Assert.True(missing.Build() is Error(ServiceError.Activation(_, ActivationError.MissingConstructor)), "Missing")?
+    let inaccessible: ServiceCollection = DefaultServiceCollection()
+    _ = inaccessible.AddTransient<PrivateOnly>()
+    _ = Assert.True(inaccessible.Build() is Error(ServiceError.Activation(_, ActivationError.MissingConstructor)), "Private")?
+    return Assert.True(inaccessible.AddTransient<Localizer>() is Error(ServiceError.InvalidRegistration(_)), "Interface")
 }
 
-[Test("DI activation reports missing and invalid dependency values")]
+[Test("DI builds plans without executing constructors or factories")]
 func DErrors() -> Result<unit, TestFailure> {
-    let Ok(plan) = ConstructorPlan.Prepare(typeof(Greeting), type => true) else {
-        return Assert.True(false, "Prepare")
-    }
-    _ = Assert.True(plan.Activate(type => None) is Error(ActivationError.MissingDependency), "Missing after preparation")?
-    return Assert.True(plan.Activate(type => Some<Object>(Feature())) is Error(ActivationError.InvocationFailed), "Wrong runtime value")
+    let log = DisposalLog()
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddTransient<Localizer<Feature>>(provider => {
+        log.Append("F")
+        return Ok<Localizer<Feature>>(Strings())
+    })
+    _ = services.AddTransient<Greeting>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    _ = Assert.Equal("", log.Text)?
+    let Ok(value) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Activate") }
+    _ = Assert.Equal("Hello", value.Text)?
+    provider.Dispose()
+    return Assert.Equal("F", log.Text)
 }

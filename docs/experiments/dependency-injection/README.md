@@ -2,12 +2,13 @@
 
 Author direction, 2026-10-21: commit localization first, then implement dependency
 injection including automatic constructor injection. Localization is committed as
-`da9e6aec7`. This increment starts with internal activation infrastructure and
-built-in contract tests; it does not publish ServiceCollection/ServiceProvider yet.
+`da9e6aec7`. The initial internal activation experiment is now integrated into the development
+class library. See the [public contract](../../../api-docs/dependency-injection.md)
+for the current API and limits.
 
 ## Constructor plans
 
-[ConstructorPlan.rvn](ConstructorPlan.rvn) separates availability checks from
+[ConstructorPlan.rvn](../../../runtime/raven/src/System/DependencyInjection/ConstructorPlan.rvn) separates availability checks from
 activation. Preparation selects the most-parameter public instance constructor
 whose dependency types are available, then checks competing applicable
 constructors. It retains the selected constructor and parameter metadata for reuse.
@@ -18,26 +19,25 @@ service or compiler-specific encoding is introduced.
 Compare the [.NET DI overview](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/)
 and [default container constructor selection](https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.DependencyInjection/src/ServiceLookup/CallSiteFactory.cs).
 The intended container follows registration, transient/scoped/singleton lifetime,
-and ownership conventions. This prototype uses Result errors instead of exceptions,
+and ownership conventions. The API uses Result errors instead of exceptions,
 consistent with current neoCLR APIs. Competing constructors are checked by their
 parameter-type sets, matching the default .NET container.
-Optional defaults, keyed services, enumerable injection and open registrations are
-not implemented. Closed typed dependencies such as Localizer<Feature> are ordinary
+Optional defaults, enumerable injection and open registrations are not implemented.
+Keyed services and conditional TryAdd registrations are supported. Closed typed dependencies such as Localizer<Feature> are ordinary
 service identities. Abstract/interface/unbound-generic/value implementation types are rejected.
 Inheritance-open classes remain valid; TypeInfo.IsOpen is not a generic-state flag.
 
-Preparation does not instantiate dependencies. Activation allocates its result and
-argument storage; currently the Sequence reflection overload also snapshots its
-arguments. This is a correctness foundation, not an allocation improvement claim.
-A subsequent container should cache plans and use indexed dependency slots; it
-must not share mutable argument arrays across concurrent resolutions.
+Preparation does not instantiate dependencies. Activation reserves one argument
+array and passes it directly to exact constructor invocation, avoiding an
+intermediate list and reflection snapshot. Plans are cached per provider snapshot.
 
-## Container prototype
+## Class-library integration
 
-[Services.rvn](Services.rvn) adds ServiceCollection, ServiceProvider and immutable
-ServiceDescriptor contracts to this unpublished test compilation. Registrations
-accept implementation types, factories or caller-owned instances. Generic
-AddTransient/AddScoped/AddSingleton helpers adapt to the same registration path.
+[Services.rvn](../../../runtime/raven/src/System/DependencyInjection/Services.rvn)
+provides public ServiceCollection, ServiceProvider and immutable ServiceDescriptor
+contracts. Registrations accept implementation types, factories or caller-owned
+instances, including module-level functions and bound instance methods. Generic
+Add/TryAdd lifetime helpers share the same registration and key-equality paths.
 Build snapshots descriptors and caches constructor plans without activating services.
 
 GetRequiredService reports Missing, GetService returns None only for an absent
@@ -54,18 +54,17 @@ registered instances remain caller-owned. Reentrant disposal during factory
 execution rejects publication and releases newly created results. Root disposal
 invalidates live scopes; callers still dispose those scopes to release their objects.
 
-This is serialized-use infrastructure: provider caches and resolution stacks are
-not thread-safe. Lookup is linear, and reflective activation allocates argument
-storage. There is no allocation-free or server-concurrency claim. Public keywords
-allow reflection over test fixtures; these contracts are not in the class library.
+This is invocation-owned infrastructure following serialized guest execution;
+isolated workers cannot share provider objects. Lookup is linear and reflective
+activation allocates argument storage. No allocation-free or shared-object
+concurrency claim is made.
 
-## Next integration gates
+## Remaining integration gaps
 
-- JIT qualification and class-library integration; native exact constructor invocation now passes.
-- Thread-safe provider state before advertising concurrent server use.
-- Class-library integration, public API reference and website documentation.
-- Generic-state reflection flags; open generic registration and enumerable
-  constructor injection remain beyond the current closed-service prototype.
+- Generic-state TypeInfo/MethodInfo reflection flags remain requested follow-up.
+- Native automatic construction currently retains nongeneric declarations only.
+- Open generic registration, enumerable constructor injection and keyed constructor
+  annotations remain beyond the closed-service foundation.
 
 ## Compiler gap fixed during integration
 
@@ -93,7 +92,7 @@ See [container test report](services-runtime-tests.json) and
 [output](services-runtime-tests.log). Earlier four-test activation evidence is
 retained separately. Native activation now also passes all 13 tests; see [native report](services-native-tests.json).
 Exact invocation uses schema-7 constructor and execution retention; final-image
-name resolution prevents stale discovery ordinals. JIT qualification is in progress.
+name resolution prevents stale discovery ordinals. The same 13-test prototype also passed JIT qualification before public integration.
 
 The native compiler correction substitutes explicit generic extension arguments
 inside structural-function signatures. Before the fix a block-bodied factory kept
@@ -101,7 +100,21 @@ an unsubstituted TService result; expression-bodied and .NET cases passed. All 1
 focused compiler tests pass afterward. Runtime Contract, metadata and ABI remain
 unchanged; see the [integration note](../../raven-cli-bridge.md).
 
-No shipped public API changed in this experiment, so no API snapshot refresh or
-website build is required. Run explicitly with `scripts/test-runtime-library.py
---suite dependency-injection --mode interpreter` and a matching bundle/output
-directory. This suite remains opt-in until native retention is qualified.
+The public integration refreshes native API documentation and the website. The
+suite now participates in the default qualified run and remains selectable with
+`--suite dependency-injection`. Historical
+prototype evidence above is retained separately from current public API evidence.
+
+## Public integration evidence
+
+The public suite has 18 built-in tests, including keyed function instances, TryAdd
+default preservation and a diamond graph across independent scopes. All 18 pass on each of the interpreter, native executable and JIT (54 executions).
+See the [interpreter report](public-interpreter-tests.json) and
+[native/JIT report](public-native-jit-tests.json). Native qualification initially exposed missing structural
+Function handling in reference `unbox.any` projection; the backend now routes it
+through the existing checked reference cast, retaining normal null/type behavior.
+The matching native API snapshot check passes and the website build checks 5,564 pages.
+
+Both focused backend projection regressions pass: function `unbox.any` becomes a
+checked reference cast, while whole-union boxing retains its structural identity
+restriction (`cargo test -p neoclr-codegen --lib boxing::structural_union_tests`).

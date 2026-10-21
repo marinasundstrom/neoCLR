@@ -4,8 +4,9 @@
 resources, optional typed scopes, per-key culture fallback, lookup-first formatting and diagnostics.
 Localization is committed as `da9e6aec7`. The author directs proceeding to DI with
 automatic constructor injection; [activation groundwork](experiments/dependency-injection/README.md)
-tracks the unpublished container, 13 passing interpreter tests and remaining
-native activation, concurrency and public integration gates.
+tracks the development public container, keyed and conditional registrations,
+function services and cached constructor activation. Generic reflection-state flags,
+generic implementation retention and broader release qualification remain open.
 [Scope and validation](experiments/localization/README.md) remain a bounded addition;
 this does not replace release qualification or expand arbitrary locale support.
 

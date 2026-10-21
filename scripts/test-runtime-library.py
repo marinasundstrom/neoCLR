@@ -309,7 +309,7 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI selects the greediest available public constructor',
     'DI activates typed localizer dependencies through a retained plan',
     'DI rejects ambiguous missing and inaccessible constructors',
-    'DI activation reports missing and invalid dependency values',
+    'DI builds plans without executing constructors or factories',
     'DI registry snapshots registrations and injects typed localizers',
     'DI isolates scopes and shares only singleton instances',
     'DI rejects cycles and captive scopes without poisoning resolution state',
@@ -319,6 +319,11 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI conventional lookups distinguish missing services from activation errors',
     'DI generic registrations preserve factory failures and plural singleton slots',
     'DI cleans up factory results when disposal reenters resolution',
+    'DI keyed lookups isolate registrations and preserve ordinary key equality',
+    'DI keyed factories and scopes preserve independent lifetime slots',
+    'DI retrieves keyed bound function objects without invoking them as factories',
+    'DI TryAdd preserves existing type and key registrations without activating factories',
+    'DI diamond graphs preserve lifetimes and independent scope ownership',
 ]
 
 LOCALIZATION_NAMES = [
@@ -479,7 +484,7 @@ def main():
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
               *sorted((TESTS / 'localization').rglob('*.json')),
-              *sorted((ROOT / 'docs/experiments/dependency-injection').glob('*.rvn'))]
+              *sorted((ROOT / 'runtime/raven/src/System/DependencyInjection').glob('*.rvn'))]
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
@@ -549,7 +554,7 @@ def main():
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
         # Internal DI activation remains opt-in until native retention is qualified.
         selected = [case for case in expected
-                    if (case[0] in args.suite if args.suite else case[0] != 'dependency-injection')]
+                    if not args.suite or case[0] in args.suite]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')

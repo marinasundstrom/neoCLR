@@ -14318,3 +14318,15 @@ metadata or closure ABI change; the existing function support boundaries remain.
 The native representation needs no replacement for this semantic correction. All
 11 focused compiler tests pass, and the built-in DI factory consumer passes in
 the interpreter using the rebuilt compiler.
+
+### DI constructor argument assignment (2026-10-21)
+
+Native Raven `793b71408` preserves array receiver/index temporaries while spilling
+a propagated RHS at the enclosing statement boundary. This enables ordinary
+`arguments[index] = Resolve(...) ?` activation code to pass one reserved argument
+array directly to ConstructorInfo.Invoke, without an intermediate list/snapshot.
+The fix belongs to the portable backend, absent from Raven main; ordinary .NET
+emission is unchanged. Nine focused prepared-expression/index tests pass. Runtime
+Contract, metadata and ABI are unchanged. Nested-expression propagation restrictions
+remain, and async suspension in this assignment path is not independently qualified.
+See Raven's `docs/compiler/neoclr-cli-bridge.md` for compiler-side evidence.
