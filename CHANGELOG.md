@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Record the typed-pointer and native-buffer ownership discussion, identifying existing NativeMemory allocation APIs and Ptr metadata. Keep proposed safe borrowing and ownership contracts explicitly unimplemented; no public API or pointer representation changes.
+
 - Record the completed older clean-source qualification run: four targets fail, including seven reflection snapshot cases and one type-token rejection expectation still requiring investigation. Distinguish the two previously repaired display assertions from unqualified current-source results; release qualification remains open.
 
 - Admit native imports with ordinary no-result Void metadata, fixing Raven-emitted C void calls without adding a guest stack result. All 28 native-import and 12 no-result tests pass, including a new pointer-write/caller-stack regression; an installed-SDK native-owned buffer consumer passes with the repaired interpreter. Record the native-buffer evaluation direction and distinguish existing interpreter pointer imports from pending JIT/AOT imports, scoped managed borrowing and native-backed Memory ownership.

@@ -20903,3 +20903,28 @@ The focused stack regression and installed-SDK C-buffer consumer pass with the
 repaired interpreter on macOS ARM64. The consumer checks native allocation, fill,
 sum and matching release, including a zero live-allocation count. It does not prove
 JIT/AOT import support or expose the native buffer as a managed Slice.
+
+
+## 2026-10-21 — Typed pointers, allocation and safe buffer borrowing
+
+The author asks about explicit heap allocation/free utilities, stack allocation,
+and converting pointers into slices. They propose a generic Ptr struct as a possible
+safe typed pointer and are still considering the design. Repository inspection finds
+existing Raven NativeMemory.Alloc/Free functions and fundamental Ptr<T>/T* metadata,
+separate from managed T& references. No new pointer representation is implemented.
+
+The assistant recommends retaining raw typed pointer identity, keeping managed
+references distinct, and putting ownership plus bounded borrowing in a separate
+native-buffer abstraction. A generic parameter alone cannot establish allocation
+size, initialization, lifetime or permission to free. Proposed safe owner-to-Slice
+borrowing must prevent release/reallocation during the borrow; arbitrary raw-pointer
+conversion remains unsafe. Native element support should initially exclude managed
+references. These are recommendations, not adopted API names or shipped contracts.
+
+Comparison sources: [.NET NativeMemory](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.nativememory?view=net-10.0),
+[Rust NonNull](https://doc.rust-lang.org/std/ptr/struct.NonNull.html), and
+[Rust raw mutable slice construction](https://doc.rust-lang.org/std/slice/fn.from_raw_parts_mut.html).
+Rust's typed non-null pointer may still dangle; safe borrowing requires stronger
+contracts than a raw pointer wrapper. Shared neoCLR Slice semantics do not imply
+Rust's exclusive mutable-reference aliasing rules. Ownership enforcement may need
+compiler restrictions or runtime leases, with costs to evaluate before implementation.
