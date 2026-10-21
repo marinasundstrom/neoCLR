@@ -8,6 +8,7 @@ internal static class PointerSignatureChecks
 {
     internal static void Run()
     {
+        GenericRoundTrips();
         var graph = new AssemblyBuilder(new("PointerSignatures", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var owner = graph.AddType("Example", "Pointers");
         var pointer = SignatureType.PointerTo(PrimitiveType.Void);
@@ -55,7 +56,17 @@ internal static class PointerSignatureChecks
             }
         }
         Reject(() => SignatureType.PointerTo(PrimitiveType.String));
-        Reject(() => SignatureType.PointerTo(SignatureType.TypeParameter(0)));
+        var genericPointer = SignatureType.PointerTo(SignatureType.MethodParameter(0));
+        var identity = graph.AddFunction("GenericIdentity", new(genericPointer, [genericPointer], ["T"]));
+        identity.GetILGenerator().LoadArgument(0); identity.GetILGenerator().Return();
+        var closed = identity.MakeGenericInstance(PrimitiveType.Int32);
+        if (closed.Signature.ReturnType != SignatureType.PointerTo(PrimitiveType.Int32) ||
+            closed.Signature.ParameterTypes.Single() != closed.Signature.ReturnType)
+            throw new Exception("generic pointer substitution");
+        Reject(() => identity.MakeGenericInstance(PrimitiveType.String));
+        var invalid = new AssemblyBuilder(new("InvalidPointerScope", new(1, 0, 0, 0)), graph.CoreLibrary);
+        Reject(() => invalid.AddFunction("Bad", new(genericPointer, [])));
+
         Reject(() => SignatureType.ArrayOf(pointer));
         Reject(() => SignatureType.Function(new(pointer, [])));
         var nested = pointer;
@@ -66,6 +77,51 @@ internal static class PointerSignatureChecks
         mismatch.GetILGenerator().LoadArgument(0); mismatch.GetILGenerator().Return();
         try { bad.Write(); throw new Exception("different pointer targets accepted"); }
         catch (InvalidDataException) { }
+    }
+
+    private static void GenericRoundTrips()
+    {
+        var graph = new AssemblyBuilder(new("GenericPointers", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var owner = graph.AddGenericClass("Example", "PointerBox", ["T"]);
+        var pointer = SignatureType.PointerTo(SignatureType.TypeParameter(0));
+        var field = owner.AddField("Pointer", pointer, FieldVisibility.Public);
+        var get = owner.AddInstanceMethod("Get", new(pointer, []));
+        get.LoadArgument(0); get.LoadField(field); get.Return();
+        owner.AddProperty("Value", pointer, get);
+        var expected = SignatureType.PointerTo(PrimitiveType.Int32);
+        if (field.MakeConstructedReference(PrimitiveType.Int32).FieldType != expected ||
+            get.MakeConstructedReference([PrimitiveType.Int32]).Signature.ReturnType != expected)
+            throw new Exception("owner pointer substitution");
+        Reject(() => field.MakeConstructedReference(PrimitiveType.String));
+        Reject(() => owner.AddField("Bad", SignatureType.PointerTo(SignatureType.TypeParameter(1))));
+        Reject(() => owner.AddField("BadMethodScope", SignatureType.PointerTo(SignatureType.MethodParameter(0))));
+        var identityPointer = SignatureType.PointerTo(SignatureType.MethodParameter(0));
+        var identity = graph.AddFunction("Identity", new(identityPointer, [identityPointer], ["U"]));
+        identity.LoadArgument(0); identity.Return();
+        foreach (var element in new[] { PrimitiveType.Byte, PrimitiveType.Int32 })
+        {
+            var argument = SignatureType.PointerTo(element);
+            var overload = graph.AddFunction("Overload", new(argument, [argument]));
+            overload.LoadArgument(0); overload.Return();
+        }
+        var cli = Assembly.Load(graph.Write());
+        if (cli.GetType("Example.PointerBox`1")!.MakeGenericType(typeof(int)).GetField("Pointer")!.FieldType != typeof(int).MakePointerType())
+            throw new Exception("CLI generic pointer field identity");
+        foreach (var snapshot in new[] { AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph)) })
+        {
+            var consumer = new AssemblyBuilder(new("GenericPointerConsumer", new(1, 0, 0, 0)), graph.CoreLibrary);
+            var definition = snapshot.MainModule.Types.Single(t => t.Name == "PointerBox`1");
+            var importedField = consumer.ImportReference(definition.Fields.Single(), graph.CoreLibrary);
+            if (importedField.MakeConstructedReference(PrimitiveType.Int32).FieldType != expected)
+                throw new Exception("imported generic pointer field substitution");
+            var importedGet = consumer.ImportReference(definition.Methods.Single(), graph.CoreLibrary);
+            if (importedGet.MakeConstructedReference([PrimitiveType.Int32]).Signature.ReturnType != expected)
+                throw new Exception("imported generic pointer method substitution");
+            var generic = snapshot.MainModule.Functions.Single(m => m.Name == "Identity");
+            var importedIdentity = consumer.ImportReference(generic, graph.CoreLibrary);
+            if (importedIdentity.MakeGenericInstance(PrimitiveType.Int32).Signature.ReturnType != expected)
+                throw new Exception("imported generic pointer function substitution");
+        }
     }
 
     internal static void WriteRuntime(string path)

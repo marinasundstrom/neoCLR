@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Preserve scoped generic pointer targets through metadata construction, substitution, native imports and overload identity; reject out-of-scope parameters and unsupported closed targets. Matching Raven native emission retains `*T` rather than erasing it. The focused metadata pointer group, ten compiler pointer tests and an interpreter source/native buffer consumer pass. No public Ptr library type or safe native Slice conversion is introduced by this foundation.
+
 - Record the typed-pointer and native-buffer ownership discussion, identifying existing NativeMemory allocation APIs and Ptr metadata. Keep proposed safe borrowing and ownership contracts explicitly unimplemented; no public API or pointer representation changes.
 
 - Record the completed older clean-source qualification run: four targets fail, including seven reflection snapshot cases and one type-token rejection expectation still requiring investigation. Distinguish the two previously repaired display assertions from unqualified current-source results; release qualification remains open.

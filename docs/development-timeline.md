@@ -20928,3 +20928,15 @@ Rust's typed non-null pointer may still dangle; safe borrowing requires stronger
 contracts than a raw pointer wrapper. Shared neoCLR Slice semantics do not imply
 Rust's exclusive mutable-reference aliasing rules. Ownership enforcement may need
 compiler restrictions or runtime leases, with costs to evaluate before implementation.
+
+
+## 2026-10-21 — Implement pointer support without erasing generic identity
+
+The author directs implementation for native interop, emphasizes that the gap must
+be solved properly, and asks to continue through native interop after this slice.
+The assistant reduces a generic pointer-backed struct and finds native emission and
+metadata substitution reject `*T`. The implementation preserves scoped generic pointer
+targets through fields, calls and dependency imports, with validation for invalid
+scopes/targets. Ten compiler pointer tests, the metadata pointer group, and an
+interpreter C-buffer forwarding/release consumer pass. The public Ptr wrapper and
+native view ownership remain subsequent work, not completed by the compiler fix.

@@ -92,7 +92,7 @@ public sealed partial class AssemblyBuilder
                 if (Interface(current)) yield return current;
                 var owner = current.GenericInstance?.Definition ?? current.ClassType;
                 var arguments = current.GenericInstance?.TypeArguments ?? current.ImportedType?.TypeArguments ?? [];
-                SignatureType Substitute(SignatureType part) => part.TypeParameterIndex is { } i && arguments.Count != 0 ? arguments[i]
+                SignatureType Substitute(SignatureType part) => part.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : part.TypeParameterIndex is { } i && arguments.Count != 0 ? arguments[i]
                     : part.GenericInstance is { } nested ? nested.Definition.MakeGenericInstance(nested.TypeArguments.Select(Substitute).ToArray())
                     : part.ImportedType is { } imported ? imported.Substitute(Substitute)
                     : part.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : part;

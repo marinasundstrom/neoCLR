@@ -142,7 +142,7 @@ public sealed partial class AssemblyBuilder
             if (authoredInterfaceBases.TryGetValue(InterfaceDefinition(current), out var bases))
                 foreach (var parent in bases)
                 {
-                    SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } index && current.TypeArguments.Count != 0
+                    SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.TypeParameterIndex is { } index && current.TypeArguments.Count != 0
                         ? current.TypeArguments[index] : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
                         : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type;
                     pending.Push(definitionsOnly ? InterfaceDefinition(parent) : parent.Substitute(Substitute));

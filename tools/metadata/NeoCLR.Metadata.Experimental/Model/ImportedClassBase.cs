@@ -53,7 +53,8 @@ public sealed partial class AssemblyBuilder
     {
         if (owner.TypeArguments.Count == 0) return part;
         SignatureType Substitute(SignatureType value) => SubstituteClassArgument(owner, value);
-        return part.TypeParameterIndex is { } index ? owner.TypeArguments[index]
+        return part.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer))
+            : part.TypeParameterIndex is { } index ? owner.TypeArguments[index]
             : part.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
             : part.ByReferenceElement is { } reference ? SignatureType.ByReference(Substitute(reference))
             : part.GenericInstance is { } local ? local.Definition.MakeGenericInstance(local.TypeArguments.Select(Substitute).ToArray())

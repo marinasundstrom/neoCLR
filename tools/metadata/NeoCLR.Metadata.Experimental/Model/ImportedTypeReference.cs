@@ -105,7 +105,7 @@ public sealed partial class AssemblyBuilder
             if (current.Equals(target)) return true;
             if (seen.Count > 4096) throw new InvalidDataException("interface conversion graph exceeds limit");
             if (!nativeImportedDefinitions.TryGetValue(InterfaceDefinition(current), out var definition)) return false;
-            SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } index && current.TypeArguments.Count != 0
+            SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.TypeParameterIndex is { } index && current.TypeArguments.Count != 0
                 ? current.TypeArguments[index] : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
                 : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type;
             foreach (var relationship in definition.Interfaces)
@@ -128,7 +128,7 @@ public sealed partial class AssemblyBuilder
             : type.FunctionSignature is { } function ? SignatureType.Function(new MethodSignature(
                 ImportNativeSignatureType(function.ReturnType, core, resolver, allowCompositions, allowTuples),
                 function.ParameterTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions, allowTuples))))
-            : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
+            : type.PointerElement is { } pointer ? SignatureType.PointerTo(ImportNativeSignatureType(pointer, core, resolver)) : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
             ? ImportNativeConstruction(constructed, core, resolver, allowCompositions, allowTuples)
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)

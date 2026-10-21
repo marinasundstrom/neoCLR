@@ -7,7 +7,7 @@ public sealed class ImportedConstructedFieldReference
     {
         Definition = definition;
         DeclaringType = owner;
-        SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } index ? owner.TypeArguments[index]
+        SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.TypeParameterIndex is { } index ? owner.TypeArguments[index]
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
             : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type;
         FieldType = Substitute(definition.FieldType);

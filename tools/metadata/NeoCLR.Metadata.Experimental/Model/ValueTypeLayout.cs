@@ -17,7 +17,7 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("value layout expansion exceeds limit");
             if (!active.Add(signature)) throw new InvalidDataException("recursive value-type storage");
             var arguments = signature.GenericInstance?.TypeArguments;
-            SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } position && arguments is not null
+            SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.TypeParameterIndex is { } position && arguments is not null
                 ? arguments[position]
                 : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
                 : type;

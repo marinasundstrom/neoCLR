@@ -6,8 +6,8 @@ public sealed partial record SignatureType
     private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null, bool isSelf = false, SignatureType? pointerElement = null, ReferenceCompositionSignature? composition = null, TupleSignature? tuple = null) { Tuple = tuple; Composition = composition; PointerElement = pointerElement; IsSelf = isSelf; ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the unmanaged pointer target, or null for other signatures.</summary>
     public SignatureType? PointerElement { get; }
-    /// <summary>Creates an unmanaged pointer to a supported scalar, Void, or another unmanaged pointer.</summary>
-    /// <remarks>Nominal, generic, managed and structural targets remain unsupported. No ownership or allocation is implied.</remarks>
+    /// <summary>Creates an unmanaged pointer to a supported scalar, Void, scoped generic parameter, or another unmanaged pointer.</summary>
+    /// <remarks>Nominal, managed and structural targets remain unsupported. Generic parameters must be in scope and their substituted targets must be supported. No ownership or allocation is implied.</remarks>
     /// <exception cref="ArgumentException">Target is unsupported or exceeds the nesting bound.</exception>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     public static SignatureType PointerTo(SignatureType elementType)
@@ -17,7 +17,7 @@ public sealed partial record SignatureType
             throw new ArgumentException("unsupported unmanaged pointer target", nameof(elementType));
         return new(null, null, pointerElement: elementType);
     }
-    internal static bool IsPointerTarget(SignatureType type) => type.PointerElement is not null ||
+    internal static bool IsPointerTarget(SignatureType type) => type.PointerElement is not null || type.TypeParameterIndex is not null || type.MethodParameterIndex is not null ||
         type.Primitive is { } primitive && primitive is not (PrimitiveType.String or PrimitiveType.RuntimeTypeHandle);
     /// <summary>Gets the interface-scoped implementing-type signature. It does not consume a generic parameter ordinal.</summary>
     /// <remarks>Valid in bodyless interface member contracts. Native encoding uses SelfType; executable CLI emission rejects it.</remarks>
@@ -114,6 +114,7 @@ public sealed partial record SignatureType
             if (!assembly.AdmitsCompositionStorage(composition)) throw new ArgumentException("experimental composition signatures require explicit storage admission");
             foreach (var bound in composition.Constituents) bound.ValidateOwner(assembly, genericArity, typeArity, complete);
         }
+        PointerElement?.ValidateOwner(assembly, genericArity, typeArity, complete);
         if (IsSelf && !allowSelf) throw new ArgumentException("Self requires an interface contract signature");
         if (ReferencedType is not null || ReferencedGenericInstance is not null) throw new ArgumentException("loaded nominal signatures must be imported before emission");
         if (FunctionSignature is { } function) foreach (var type in function.ParameterTypes.Append(function.ReturnType)) type.ValidateOwner(assembly, genericArity, typeArity, complete);

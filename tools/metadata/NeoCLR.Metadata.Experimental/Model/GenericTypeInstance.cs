@@ -9,7 +9,7 @@ public sealed class GenericTypeInstance : IEquatable<GenericTypeInstance>
     public TypeBuilder Definition { get; }
     /// <summary>Gets copied arguments in declaration order.</summary>
     public IReadOnlyList<SignatureType> TypeArguments { get; }
-    internal SignatureType Substitute(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Substitute)
+    internal SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.FunctionSignature is { } function ? function.Substitute(Substitute)
         : type.ByReferenceElement is { } byref ? SignatureType.ByReference(Substitute(byref))
         : type.ImportedType is { } imported ? imported.Substitute(Substitute)
         : type.TypeParameterIndex is { } index ? TypeArguments[index]

@@ -123,7 +123,7 @@ public sealed partial class TypeBuilder
                 yield break;
             }
             var owner = contract.GenericInstance?.Definition ?? contract.ClassType!;
-            SignatureType Substitute(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } byref ? SignatureType.ByReference(Substitute(byref)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } index && contract.GenericInstance is { } instance ? instance.TypeArguments[index]
+            SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } byref ? SignatureType.ByReference(Substitute(byref)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } index && contract.GenericInstance is { } instance ? instance.TypeArguments[index]
                 : type.GenericInstance is { } nested ? nested.Definition.MakeGenericInstance(nested.TypeArguments.Select(Substitute).ToArray())
                 : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
             foreach (var parent in owner.InterfaceSignatures)

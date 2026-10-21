@@ -14449,3 +14449,20 @@ The editor fixture uses the explicit native compiler command
 This new selector affects execution only; omitted selectors retain the existing
 interpreter command behavior for diagnostic consumers. No Runtime Contract,
 metadata representation or ABI changes.
+
+
+## Scoped generic unmanaged pointer emission — 2026-10-21
+
+The matching Raven native compiler opts into generic pointer targets instead of
+replacing `*T` with `void*`. The metadata SDK recursively substitutes scoped targets
+through owned/imported fields and methods, validates parameters inside pointers,
+and distinguishes pointer targets in overload identity. Native Ptr parameter metadata
+and ordinary CLI PTR VAR/MVAR projection retain type identity without a new format.
+Runtime Contract configuration is unchanged. The portable native layer is absent from
+Raven main; this is a native integration fix, not an ordinary .NET backend change.
+
+The focused metadata pointer group and ten Raven pointer tests pass; an independently
+compiled source wrapper forwards its native allocation to the matching C release API
+under the interpreter. Managed/nominal pointees, arbitrary JIT/AOT native imports,
+and safe pointer-to-Slice ownership remain separate gaps. This does not make a raw
+pointer safe or owning, nor does it introduce a new public Ptr library type yet.

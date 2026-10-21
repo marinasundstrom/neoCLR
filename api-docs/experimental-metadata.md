@@ -92,8 +92,10 @@ format, hierarchy table, compiler target switch or module reference table.
 
 `SignatureType.PointerTo(elementType)` creates an immutable unmanaged pointer signature.
 `PointerElement` exposes its target. Supported targets are scalar primitives (including
-Void), and nested pointers, up to sixteen pointer levels. String, RuntimeTypeHandle,
-nominal types, generic parameters, managed references and structural targets reject with
+Void), scoped type/method parameters, and nested pointers, up to sixteen pointer levels.
+Generic targets preserve their scope through substitution and native imports; closed
+substitutions must still have supported targets. String, RuntimeTypeHandle,
+nominal types, managed references and structural targets reject with
 `ArgumentException`; a null target throws `ArgumentNullException`. Pointer vectors,
 pointer generic arguments and pointer-bearing Function shapes are currently rejected.
 These bounds are library limitations, not changes to the CLI type system.

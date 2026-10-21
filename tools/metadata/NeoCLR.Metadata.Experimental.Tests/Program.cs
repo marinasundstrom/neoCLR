@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--pointer-signatures"]) { PointerSignatureChecks.Run(); return 0; }
+
 if (args is ["--generic-definition-tokens"]) { GenericDefinitionTokenChecks.Run(); return 0; }
 
 if (args is ["--function-count"]) { FunctionNamespaceChecks.FunctionCount(); return 0; }

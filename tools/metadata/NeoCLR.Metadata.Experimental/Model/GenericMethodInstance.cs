@@ -7,7 +7,7 @@ public sealed class GenericMethodInstance
     {
         Definition = definition;
         TypeArguments = Array.AsReadOnly(arguments);
-        SignatureType Substitute(SignatureType type) => type.Composition is { } composition
+        SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.Composition is { } composition
             ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(Substitute))
             : type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Substitute(target)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.MethodParameterIndex is { } index ? arguments[index]
             : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
