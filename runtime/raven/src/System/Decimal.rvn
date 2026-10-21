@@ -373,14 +373,17 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     /// Parses strict invariant decimal text with an optional sign and decimal point.
     /// Whitespace, exponent notation and group separators are not accepted.
-    static func Parse(text: string) -> Result<Decimal, NumberParseError> {
-        let bytes = text.Utf8Bytes
+    static func Parse(text: string) -> Result<Decimal, NumberParseError> => ParseBytes(text.Utf8Bytes, false, false, false)
+
+    internal static func ParseCurrencyDigits(bytes: ReadOnlySlice<byte>, culture: Globalization.Culture, negative: bool) -> Result<Decimal, NumberParseError> => ParseBytes(bytes, true, culture.Name == "sv-SE", negative)
+
+    private static func ParseBytes(bytes: ReadOnlySlice<byte>, grouping: bool, swedish: bool, sign: bool) -> Result<Decimal, NumberParseError> {
         if bytes.Length == 0 {
             return Error(NumberParseError.InvalidFormat())
         }
         var index = 0
-        var negative = false
-        if bytes[0] == (byte)45 || bytes[0] == (byte)43 {
+        var negative = sign
+        if !grouping && (bytes[0] == (byte)45 || bytes[0] == (byte)43) {
             negative = bytes[0] == (byte)45
             index = 1
         }
@@ -391,11 +394,25 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
         var significant = 0
         var discarded = 0
         var sticky = false
+        var groupSeen = false
+        var groupDigits = 0
         while index < bytes.Length {
             let digit = (int)bytes[index] - 48
-            if bytes[index] == (byte)46 && !point {
+            let group = grouping && (if swedish {
+                bytes[index] == (byte)194 && index + 1 < bytes.Length && bytes[index + 1] == (byte)160
+            } else { bytes[index] == (byte)44 })
+            if group {
+                if point || groupDigits == 0 || (groupSeen && groupDigits != 3) || (!groupSeen && groupDigits > 3) {
+                    return Error(NumberParseError.InvalidFormat())
+                }
+                groupSeen = true
+                groupDigits = 0
+                if swedish { index += 1 }
+            } else if bytes[index] == (if swedish { (byte)44 } else { (byte)46 }) && !point {
+                if groupSeen && groupDigits != 3 { return Error(NumberParseError.InvalidFormat()) }
                 point = true
             } else if digit >= 0 && digit <= 9 {
+                if !point { groupDigits += 1 }
                 any = true
                 if point {
                     fraction += 1
@@ -414,6 +431,9 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
                 }
             } else { return Error(NumberParseError.InvalidFormat()) }
             index += 1
+        }
+        if groupSeen && !point && groupDigits != 3 {
+            return Error(NumberParseError.InvalidFormat())
         }
         if !any {
             return Error(NumberParseError.InvalidFormat())
@@ -455,9 +475,9 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     /// Formats invariant general decimal text, preserving the stored scale.
     override func ToString() -> string => ToString("G", Globalization.Culture.Invariant)
-    /// Formats G/G0, F or N with Culture.Current; F/N precision is 0–99.
+    /// Formats G/G0, F, N or C with Culture.Current; F/N precision is 0–99.
     func ToString(format: string) -> string => ToString(format, Globalization.Culture.Current)
-    /// Formats G/G0, F or N with an explicit culture; unsupported formats fault.
+    /// Formats G/G0, F, N or C with an explicit culture; unsupported formats fault.
     func ToString(format: string, culture: Globalization.Culture) -> string {
         let spec = format.Utf8Bytes
         var code = 71
@@ -483,15 +503,27 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
                 }
             }
         }
-        if code != 71 && code != 70 && code != 78 {
+        if code != 71 && code != 70 && code != 78 && code != 67 {
             System.Fail("Unsupported Decimal format")
         }
         if code == 71 && precision > 0 {
             System.Fail("Unsupported Decimal general precision")
         }
+        let currency = Globalization.Currency.ForCulture(culture)
         if code != 71 && precision < 0 {
-            precision = Globalization.NumberFormat.DefaultDecimalDigits
+            precision = if code == 67 { currency.DecimalDigits } else { Globalization.NumberFormat.DefaultDecimalDigits }
         }
+        return FormatCore(code, precision, culture, currency)
+    }
+
+    internal func FormatCurrency(currency: Globalization.Currency, precision: int, culture: Globalization.Culture) -> string {
+        if precision < 0 || precision > 99 {
+            System.Fail("Unsupported Decimal currency precision")
+        }
+        return FormatCore(67, precision, culture, currency)
+    }
+
+    private func FormatCore(code: int, precision: int, culture: Globalization.Culture, currency: Globalization.Currency) -> string {
         let rounded = if code != 71 && precision < (int)Scale { Round(self, precision) } else { self }
         var magnitude = rounded.Magnitude
         var probe = magnitude
@@ -506,12 +538,32 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
         let negative = rounded.Negative && !magnitude.IsZero
         let separator = Globalization.NumberFormat.DecimalSeparator(culture).Utf8Bytes
         let group = Globalization.NumberFormat.GroupSeparator(culture).Utf8Bytes
-        let groups = if code == 78 { (integerDigits - 1) / 3 } else { 0 }
-        let sign = if negative { 1 } else { 0 }
+        let grouped = code == 78 || code == 67
+        let groups = if grouped { (integerDigits - 1) / 3 } else { 0 }
+        let symbol = if code == 67 { currency.GetSymbol(culture) } else { "" }
+        let after = code == 67 && Globalization.CurrencyFormatting.SymbolAfter(culture)
+        let direction = if code == 67 { Globalization.CurrencyFormatting.DirectionMark(culture) } else { "" }
+        let negativeToken = if code == 67 { Globalization.CurrencyFormatting.NegativeSign(culture) } else { "-" }
+        let sign = if negative { negativeToken } else { "" }
+        let prefixSymbol = if after { "" } else { symbol }
+        let prefixSpace = if code == 67 && !after { Globalization.CurrencyFormatting.PrefixSpace(symbol) } else { "" }
+        let suffixSpace = if after { " " } else { "" }
+        let suffixDirection = if after { direction } else { "" }
+        let suffixSymbol = if after { symbol } else { "" }
+        let prefixLength = direction.Utf8Bytes.Length + sign.Utf8Bytes.Length + prefixSymbol.Utf8Bytes.Length + prefixSpace.Utf8Bytes.Length
+        let suffixLength = suffixSpace.Utf8Bytes.Length + suffixDirection.Utf8Bytes.Length + suffixSymbol.Utf8Bytes.Length
         let fractionBytes = if fraction > 0 { separator.Length + fraction } else { 0 }
-        let length = sign + integerDigits + groups * group.Length + fractionBytes
+        let bodyLength = integerDigits + groups * group.Length + fractionBytes
+        let length = prefixLength + bodyLength + suffixLength
         let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(length)
-        var cursor = length
+        var prefixCursor = CopyText(buffer[..], 0, direction)
+        prefixCursor = CopyText(buffer[..], prefixCursor, sign)
+        prefixCursor = CopyText(buffer[..], prefixCursor, prefixSymbol)
+        _ = CopyText(buffer[..], prefixCursor, prefixSpace)
+        var suffixCursor = CopyText(buffer[..], prefixLength + bodyLength, suffixSpace)
+        suffixCursor = CopyText(buffer[..], suffixCursor, suffixDirection)
+        _ = CopyText(buffer[..], suffixCursor, suffixSymbol)
+        var cursor = prefixLength + bodyLength
         var index = fraction
         while index > 0 {
             cursor -= 1
@@ -531,7 +583,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
             cursor -= 1
             buffer[cursor] = (byte)(48 + (int)magnitude.DivideSmall((ulong)10))
             index += 1
-            if code == 78 && index < integerDigits && index % 3 == 0 {
+            if grouped && index < integerDigits && index % 3 == 0 {
                 var part = group.Length
                 while part > 0 {
                     part -= 1
@@ -540,9 +592,6 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
                 }
             }
         }
-        if negative {
-            buffer[0] = (byte)45
-        }
         let bytes: ReadOnlySlice<byte> = buffer
         let Ok(text) = Text.Utf8.Decode(bytes) else {
             System.Fail("Invalid Decimal formatting buffer")
@@ -550,4 +599,15 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
         }
         return text
     }
+
+    private static func CopyText(destination: Slice<byte>, offset: int, text: string) -> int {
+        let bytes = text.Utf8Bytes
+        var index = 0
+        while index < bytes.Length {
+            destination[offset + index] = bytes[index]
+            index += 1
+        }
+        return offset + bytes.Length
+    }
+
 }

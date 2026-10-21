@@ -1,0 +1,96 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Globalization.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("Currency identity is independent of culture and amount")]
+func AIdentity() -> Result<unit, TestFailure> {
+    let Ok(usd) = Currency.Parse("USD") else { return Assert.True(false, "Currency identity") }
+    _ = Assert.True(usd == Currency.USD && usd != Currency.SEK, "Code identity")?
+    _ = Assert.True(usd.GetHashCode() == Currency.USD.GetHashCode(), "Hash contract")?
+    let boxed: object = usd
+    _ = Assert.True(boxed.Equals(usd), "Boxed identity")?
+    _ = Assert.Equal("USD", usd.ToString())?
+    _ = Assert.True(default(Currency) == Currency.Unspecified, "Default is unspecified")?
+    _ = Assert.True(Currency.JPY.DecimalDigits == 0 && usd.DecimalDigits == 2, "Currency digits")?
+    let unsupported = Currency.Parse("usd")
+    return Assert.True(unsupported is Error(_), "Codes are explicit uppercase identifiers")
+}
+
+[Test("Currency formatting follows all five culture profiles")]
+func BProfiles() -> Result<unit, TestFailure> {
+    let amount = 1234.5m
+    _ = Assert.Equal("$1,234.50", amount.ToString("C", Culture.EnglishUnitedStates))?
+    _ = Assert.Equal("£1,234.50", amount.ToString("C", Culture.EnglishUnitedKingdom))?
+    _ = Assert.Equal("1 234,50 kr", amount.ToString("C", Culture.SwedishSweden))?
+    _ = Assert.Equal("‏1,234.50 ‏₪", amount.ToString("C", Culture.HebrewIsrael))?
+    _ = Assert.Equal("¤1,234.50", amount.ToString("C", Culture.Invariant))?
+    _ = Assert.Equal("−1 234,50 kr", (-amount).ToString("C", Culture.SwedishSweden))?
+    return Assert.Equal("‏‎-1,234.50 ‏₪", (-amount).ToString("C", Culture.HebrewIsrael))
+}
+
+[Test("Explicit currency formatting rounds display without changing the amount")]
+func CExplicit() -> Result<unit, TestFailure> {
+    let amount = 1234.5m
+    _ = Assert.Equal("1 234,50 US$", Currency.USD.Format(amount, Culture.SwedishSweden))?
+    _ = Assert.Equal("US$1,234.50", Currency.USD.Format(amount, Culture.EnglishUnitedKingdom))?
+    _ = Assert.Equal("¥1,234", Currency.JPY.Format(amount, Culture.EnglishUnitedStates))?
+    _ = Assert.Equal("JP¥1,234.500", Currency.JPY.Format(amount, 3, Culture.EnglishUnitedKingdom))?
+    _ = Assert.Equal("€1,234.50", Currency.EUR.Format(amount, Culture.EnglishUnitedStates))?
+    _ = Assert.Equal("SEK 1,234.50", Currency.SEK.Format(amount, Culture.EnglishUnitedStates))?
+    let formatted: Formattable = amount
+    _ = Assert.Equal("$1,234", formatted.ToString("C0", Culture.EnglishUnitedStates))?
+    return Assert.Equal("1234.5", amount.ToString())
+}
+
+[Test("Currency amount parsing validates identity grouping spacing and direction")]
+func DParsing() -> Result<unit, TestFailure> {
+    let Ok(usd) = Currency.USD.ParseAmount("USD 1,234.50", Culture.EnglishUnitedStates) else { return Assert.True(false, "USD code parse") }
+    _ = Assert.True(usd.Amount == 1234.50m && usd.Currency == Currency.USD, "USD value")?
+    let Ok(sek) = Currency.SEK.ParseAmount("−1 234,50 kr", Culture.SwedishSweden) else { return Assert.True(false, "SEK parse") }
+    _ = Assert.True(sek.Amount == -1234.50m, "SEK sign")?
+    let Ok(ils) = Currency.ILS.ParseAmount("‏‎-1,234.50 ‏₪", Culture.HebrewIsrael) else { return Assert.True(false, "Hebrew parse") }
+    _ = Assert.True(ils.Amount == sek.Amount && ils != sek, "Bidi marks do not change value")?
+    let wrong = Currency.USD.ParseAmount("€1,234.50", Culture.EnglishUnitedStates)
+    _ = Assert.True(wrong is Error(_), "Wrong currency rejected")?
+    let grouping = Currency.USD.ParseAmount("$12,34.50", Culture.EnglishUnitedStates)
+    _ = Assert.True(grouping is Error(_), "Malformed grouping rejected")?
+    let spacing = Currency.SEK.ParseAmount("1 234,50 kr", Culture.SwedishSweden)
+    _ = Assert.True(spacing is Error(_), "ASCII spaces do not replace NBSP")?
+    let bare = Currency.USD.ParseAmount("1234.50", Culture.EnglishUnitedStates)
+    return Assert.True(bare is Error(_), "Currency token required")
+}
+
+[Test("Currency data and language direction are explicit immutable policies")]
+func EPolicies() -> Result<unit, TestFailure> {
+    let format = Culture.SwedishSweden.NumberFormat
+    _ = Assert.True(format.Currency == Currency.SEK && format.CurrencyDecimalDigits == 2, "Default currency metadata")?
+    _ = Assert.Equal("kr", format.CurrencySymbol)?
+    _ = Assert.True(format.CurrencyPositivePattern == 3 && format.CurrencyNegativePattern == 8, "Placement patterns")?
+    _ = Assert.Equal("−", format.CurrencyNegativeSign)?
+    _ = Assert.Equal(" ", format.CurrencyGroupSeparator)?
+    _ = Assert.True(Language.Hebrew.IsRightToLeft && Culture.HebrewIsrael.Language.IsRightToLeft, "Hebrew direction")?
+    return Assert.True(!Language.English.IsRightToLeft && !Language.Swedish.IsRightToLeft && !Language.Undetermined.IsRightToLeft, "LTR defaults")
+}
+
+[Test("MonetaryAmount records preserve identity precision and deconstruction")]
+func FRecords() -> Result<unit, TestFailure> {
+    let money = MonetaryAmount(1234.500m, Currency.USD)
+    let MonetaryAmount(amount, currency) = money else { return Assert.True(false, "Record pattern") }
+    _ = Assert.True(amount == 1234.5m && currency == Currency.USD, "Positional components")?
+    let equal = MonetaryAmount(1234.5m, Currency.USD)
+    _ = Assert.True(money == equal && money.GetHashCode() == equal.GetHashCode(), "Numeric record equality and hash")?
+    _ = Assert.True(money != MonetaryAmount(amount, Currency.SEK), "Currency participates in equality")?
+    let boxed: object = money
+    _ = Assert.True(boxed.Equals(equal), "Boxed record equality")?
+    _ = Assert.Equal("1 234,50 US$", money.Format(Culture.SwedishSweden))?
+    let formatted: Formattable = money
+    _ = Assert.Equal("US$1,234", formatted.ToString("C0", Culture.EnglishUnitedKingdom))?
+    let Ok(parsed) = MonetaryAmount.Parse("¥1.2345", Currency.JPY, Culture.EnglishUnitedStates) else { return Assert.True(false, "Parse precision") }
+    _ = Assert.True(parsed.Amount == 1.2345m && parsed.Currency == Currency.JPY, "Parsing does not round to display precision")?
+    _ = Assert.True(default(MonetaryAmount) == MonetaryAmount(0m, Currency.Unspecified), "Default record")?
+    _ = Assert.Equal("MonetaryAmount { Amount = 1234.500, Currency = USD }", money.ToString())?
+    return Assert.Equal("1234.500", money.Amount.ToString())
+}

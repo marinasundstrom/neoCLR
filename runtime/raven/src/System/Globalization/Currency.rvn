@@ -1,0 +1,125 @@
+module System.Globalization
+
+import System.*
+import System.Result.*
+
+/// Immutable currency identity. Culture changes presentation, never the currency or amount.
+/// The bounded catalog contains SEK, ILS, GBP, USD, EUR, JPY and unspecified XXX.
+public struct Currency : EquatableTo<Currency> {
+    private val kind: int
+
+    private init(kind: int) {
+        self.kind = kind
+    }
+
+    /// Unspecified currency (XXX), also the default value and invariant formatting policy.
+    static val Unspecified: Currency => default(Currency)
+    /// Swedish krona.
+    static val SEK: Currency => Currency(1)
+    /// Israeli new shekel.
+    static val ILS: Currency => Currency(2)
+    /// Pound sterling.
+    static val GBP: Currency => Currency(3)
+    /// United States dollar.
+    static val USD: Currency => Currency(4)
+    /// Euro.
+    static val EUR: Currency => Currency(5)
+    /// Japanese yen.
+    static val JPY: Currency => Currency(6)
+
+    /// ISO 4217 identifier; XXX means that no currency has been specified.
+    val Code: string {
+        get {
+            if kind == 1 {
+                return "SEK"
+            }
+            if kind == 2 {
+                return "ILS"
+            }
+            if kind == 3 {
+                return "GBP"
+            }
+            if kind == 4 {
+                return "USD"
+            }
+            if kind == 5 {
+                return "EUR"
+            }
+            if kind == 6 {
+                return "JPY"
+            }
+            return "XXX"
+        }
+    }
+
+    /// Default display precision: zero for JPY, two for the other supported identities.
+    /// This does not constrain Decimal storage or specify cash rounding.
+    val DecimalDigits: int => if kind == 6 { 0 } else { 2 }
+
+    /// Parses an exact uppercase code from the bounded catalog; unsupported codes are errors.
+    static func Parse(code: string) -> Result<Currency, CurrencyError> {
+        if code == "SEK" {
+            return Ok(SEK)
+        }
+        if code == "ILS" {
+            return Ok(ILS)
+        }
+        if code == "GBP" {
+            return Ok(GBP)
+        }
+        if code == "USD" {
+            return Ok(USD)
+        }
+        if code == "EUR" {
+            return Ok(EUR)
+        }
+        if code == "JPY" {
+            return Ok(JPY)
+        }
+        if code == "XXX" {
+            return Ok(Unspecified)
+        }
+        return Error(CurrencyError.UnsupportedCode())
+    }
+
+    /// Tests currency identity, independently of culture and presentation.
+    func Equals(other: Currency) -> bool => kind == other.kind
+    /// Tests boxed currency identity.
+    override func Equals(other: Object?) -> bool => other is Currency value && Equals(value)
+    /// Returns the identity hash.
+    override func GetHashCode() -> int => kind
+    /// Returns the ISO code; no culture or currency symbol is inferred.
+    override func ToString() -> string => Code
+    static func ==(left: Currency, right: Currency) -> bool => left.Equals(right)
+    static func !=(left: Currency, right: Currency) -> bool => !left.Equals(right)
+
+    /// Formats an amount using this currency's display precision and explicit culture.
+    /// Display rounding leaves the input unchanged; no conversion or cash rounding occurs.
+    func Format(amount: Decimal, culture: Culture) -> string => amount.FormatCurrency(self, DecimalDigits, culture)
+
+    /// Formats with explicit fractional precision from zero through 99; invalid precision faults.
+    func Format(amount: Decimal, precision: int, culture: Culture) -> string => amount.FormatCurrency(self, precision, culture)
+
+    /// Parses an amount with this expected currency and exact culture punctuation.
+    /// Currency symbols/codes must match; an ambiguous symbol never selects another currency.
+    func ParseAmount(text: string, culture: Culture) -> Result<MonetaryAmount, NumberParseError> => MonetaryAmount.Parse(text, self, culture)
+
+    internal static func ForCulture(culture: Culture) -> Currency {
+        if culture.Name == "sv-SE" {
+            return SEK
+        }
+        if culture.Name == "he-IL" {
+            return ILS
+        }
+        if culture.Name == "en-GB" {
+            return GBP
+        }
+        if culture.Name == "en-US" {
+            return USD
+        }
+        return Unspecified
+    }
+
+    /// Returns the bounded locale's symbol, falling back to the unambiguous ISO code.
+    func GetSymbol(culture: Culture) -> string => CurrencyFormatting.Symbol(self, culture)
+}

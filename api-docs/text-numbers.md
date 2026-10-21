@@ -187,7 +187,7 @@ The explicit-culture overload uses the existing strict numeric grouping policy.
 Excess fractional precision is rounded; an unrepresentable magnitude is `Overflow`.
 
 `ToString()` is invariant. Format overloads use current or explicit culture and
-support G/G0 and F/N with precision 0–99. Custom patterns, exponential formatting,
+support G/G0 and F/N/C with precision 0–99. C is a lower-level convenience that uses the culture’s default currency. Custom patterns, exponential formatting,
 float conversions and integral extraction conversions are outside this foundation.
 Invalid format/scale, arithmetic overflow and division by zero use neoCLR's current
 terminal `System.Fail` contract, rather than recoverable CLR arithmetic exceptions.
@@ -201,3 +201,49 @@ The caller-storage `Slice<int>` overload currently requires interpreter executio
 native/JIT slice lowering supports byte views only. The allocating `GetBits(value)`
 overload is available across the execution modes. This is a backend gap, not a
 permanent Decimal restriction.
+
+
+## Monetary values (development)
+
+Prefer `System.Globalization.MonetaryAmount`, a record struct with readonly
+`Amount: Decimal` and `Currency: Currency` components. Construction preserves all
+Decimal precision. Equality and hashing include currency identity and numerical
+Decimal equality; positional deconstruction is supported. Named `let MonetaryAmount(amount, currency) = value` patterns currently require an `else` branch. The default is zero
+with `Currency.Unspecified` (XXX). No implicit conversion discards currency.
+
+`MonetaryAmount.Parse(text, currency, culture)` and
+`currency.ParseAmount(text, culture)` return
+`Result<MonetaryAmount, NumberParseError>`. An explicit expected currency is required:
+ambiguous symbols never select a denomination. Parsing accepts the expected symbol
+or uppercase ISO code, exact locale spacing and direction marks, and valid groups
+of three. Bare numbers, mismatched symbols and malformed grouping are rejected.
+Overflow is reported separately; fractional input retains Decimal precision rather
+than rounding to the currency's display digits.
+
+`Format(culture)` uses stored currency identity and default display precision;
+`Format(precision, culture)` selects 0–99 digits. `Formattable.ToString(format,
+culture)` accepts empty or C/c with optional precision. Unsupported formats fault.
+Parameterless `ToString()` retains the generated record diagnostic representation.
+Display rounding is ties-to-even and never changes the record. Culture affects
+presentation, never currency conversion. No cross-currency arithmetic, exchange
+rates or cash rounding are supplied.
+
+`Currency` is an immutable identity with `Code`, `DecimalDigits`, `GetSymbol(culture)`,
+typed/boxed equality, hash and code `ToString`. The bounded catalog is SEK, ILS,
+GBP, USD, EUR, JPY and Unspecified/XXX. `Currency.Parse(code)` requires exact uppercase
+codes and returns `Result<Currency, CurrencyError>` (`UnsupportedCode` otherwise).
+JPY defaults to zero fractional display digits, others to two. Lower-level
+`Currency.Format(decimal, culture)` and its explicit precision overload remain
+available, as does Decimal C formatting.
+
+`NumberFormat` exposes Currency, CurrencySymbol, CurrencyDecimalDigits,
+CurrencyDecimalSeparator, CurrencyGroupSeparator, CurrencyGroupSizes,
+CurrencyPositivePattern, CurrencyNegativePattern, CurrencyNegativeSign and
+CurrencyDirectionMark. Group sizes are fresh snapshots. Pattern indexes follow
+.NET numbering (positive 0/3, negative 1/8). Swedish uses NBSP and U+2212;
+Hebrew currency output includes U+200F and negative U+200E. Ordinary numeric signs
+remain ASCII. These bounded CLDR-derived policies are not full NumberFormatInfo,
+NumberStyles.Currency, accounting formats or customizable culture providers.
+
+`Language.IsRightToLeft` is true for Hebrew and false for English, Swedish and
+Undetermined. This is default writing direction, not a Unicode bidi layout engine.

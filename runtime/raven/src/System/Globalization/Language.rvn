@@ -14,4 +14,8 @@ public class Language {
     /// English language identity shared by the UK and US cultures.
     static val English: Language => Language("en")
     val Code: string => code
+    /// Default writing direction for the supported language profiles.
+    /// Hebrew is right-to-left; Swedish, English and Undetermined use left-to-right.
+    /// This does not replace bidirectional layout of mixed text or script-sensitive locale data.
+    val IsRightToLeft: bool => code == "he"
 }

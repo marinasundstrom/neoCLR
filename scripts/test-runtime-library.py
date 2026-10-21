@@ -304,6 +304,8 @@ PATH_VALUES_NAMES = [
     'Path equality distinguishes case roots and normalization',
     'Path equality agrees across typed interface and Object dispatch',
 ]
+CURRENCY_NAMES = ['Currency identity is independent of culture and amount', 'Currency formatting follows all five culture profiles', 'Explicit currency formatting rounds display without changing the amount', 'Currency amount parsing validates identity grouping spacing and direction', 'Currency data and language direction are explicit immutable policies', 'MonetaryAmount records preserve identity precision and deconstruction']
+
 DECIMAL_NAMES = ['Decimal arithmetic preserves exact base ten values', 'Decimal equality normalizes scale without changing storage', 'Decimal parsing formatting and rounding preserve precision', 'Decimal syntax uses ordinary value method contracts', 'Decimal boundaries reject overflow and round midpoint ties', 'Decimal arithmetic agrees with CLR boundary vectors', 'Decimal culture formatting and representation use existing contracts']
 
 FLOATING_SPECIAL_NAMES = [
@@ -413,7 +415,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'floating-special-values', 'decimal', 'currency', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -469,6 +471,7 @@ def main():
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('currency', 0, ''.join('PASS ' + n + '\n' for n in CURRENCY_NAMES) + f'Tests: {len(CURRENCY_NAMES)}, passed: {len(CURRENCY_NAMES)}, failed: 0, skipped: 0\n'),
         ('decimal', 0, ''.join('PASS ' + n + '\n' for n in DECIMAL_NAMES) + f'Tests: {len(DECIMAL_NAMES)}, passed: {len(DECIMAL_NAMES)}, failed: 0, skipped: 0\n'),
         ('floating-special-values', 0, ''.join('PASS ' + n + '\n' for n in FLOATING_SPECIAL_NAMES) + f'Tests: {len(FLOATING_SPECIAL_NAMES)}, passed: {len(FLOATING_SPECIAL_NAMES)}, failed: 0, skipped: 0\n'),
         ('record-formatting', 0, ''.join('PASS ' + n + '\n' for n in RECORD_FORMATTING_NAMES) + f'Tests: {len(RECORD_FORMATTING_NAMES)}, passed: {len(RECORD_FORMATTING_NAMES)}, failed: 0, skipped: 0\n'),

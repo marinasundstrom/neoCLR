@@ -1,0 +1,53 @@
+module System.Globalization
+
+import System.*
+import System.Result.*
+
+/// A monetary value with explicit currency identity and unchanged Decimal precision.
+/// Record equality, hashing and positional deconstruction include both components.
+/// The default value is zero in Currency.Unspecified; construction never rounds or converts.
+public record struct MonetaryAmount(val Amount: Decimal, val Currency: Currency) : Formattable {
+    /// Parses an explicitly expected currency; symbols never infer currency identity.
+    /// Exact culture punctuation, spacing and direction marks are required.
+    static func Parse(text: string, currency: Currency, culture: Culture) -> Result<MonetaryAmount, NumberParseError> {
+        let parsed = CurrencyFormatting.Parse(text, currency, culture)
+        if parsed is Ok(let amount) {
+            return Ok(MonetaryAmount(amount, currency))
+        }
+        let Error(error) = parsed else { return Error(NumberParseError.InvalidFormat()) }
+        return Error(error)
+    }
+
+    /// Formats the stored currency with its default display precision and explicit culture.
+    /// Display rounding never changes Amount; culture never changes Currency.
+    func Format(culture: Culture) -> string => Currency.Format(Amount, culture)
+
+    /// Formats the stored currency with fractional precision 0–99; invalid precision faults.
+    func Format(precision: int, culture: Culture) -> string => Currency.Format(Amount, precision, culture)
+
+    /// Formats empty or C/c with optional precision 0–99, always using the stored currency.
+    /// Other specifiers fault. Parameterless ToString retains the generated record representation.
+    func ToString(format: string, culture: Culture) -> string {
+        let bytes = format.Utf8Bytes
+        if bytes.Length == 0 {
+            return Format(culture)
+        }
+        if bytes.Length > 3 || (bytes[0] != (byte)67 && bytes[0] != (byte)99) {
+            System.Fail("Unsupported MonetaryAmount format")
+        }
+        if bytes.Length == 1 {
+            return Format(culture)
+        }
+        var precision = 0
+        var index = 1
+        while index < bytes.Length {
+            let digit = (int)bytes[index] - 48
+            if digit < 0 || digit > 9 {
+                System.Fail("Unsupported MonetaryAmount precision")
+            }
+            precision = precision * 10 + digit
+            index += 1
+        }
+        return Format(precision, culture)
+    }
+}

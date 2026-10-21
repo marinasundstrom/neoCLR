@@ -78,6 +78,7 @@ static class GlobalizationBindings
                 public static Language Hebrew => default;
                 public static Language English => default;
                 public string Code => default;
+                public bool IsRightToLeft => default;
             }
             public interface CultureProvider { Culture Current { get; } }
             public sealed class FixedCultureProvider : CultureProvider {
@@ -152,9 +153,11 @@ static class GlobalizationBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
-        (string Args, string Result, bool Static) expected = (owner, reference.Name) switch {
+        (string Args, string Result, bool Static) expected = (owner, reference.Name) switch
+        {
             (Language, "get_Undetermined" or "get_Swedish" or "get_Hebrew" or "get_English") => ("", Language, true),
             (Language, "get_Code") => ("", "String", false),
+            (Language, "get_IsRightToLeft") => ("", "Boolean", false),
             (Culture, "get_Language") => ("", Language, false),
             (Culture, "get_Current") => ("", Culture, true),
             (Provider or FixedProvider or SystemProvider, "get_Current") => ("", Culture, false),

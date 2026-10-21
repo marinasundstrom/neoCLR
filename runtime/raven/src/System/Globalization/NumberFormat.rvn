@@ -4,8 +4,10 @@ module System.Globalization
 /// This describes formatting data; primitive numeric format specifiers remain separate APIs.
 public class NumberFormat {
     private var swedish: bool
+    private val culture: Culture
 
     private init(culture: Culture) {
+        self.culture = culture
         swedish = culture.Name == "sv-SE"
     }
 
@@ -30,4 +32,28 @@ public class NumberFormat {
     val PositiveSign: string => "+"
     /// Negative sign used by the bounded numeric conventions; no bidi marks are inserted.
     val NegativeSign: string => "-"
+
+    /// Currency used by the culture's C-format convenience operation; invariant uses XXX.
+    val Currency: System.Globalization.Currency => System.Globalization.Currency.ForCulture(culture)
+    /// Local symbol for the culture's default currency; invariant uses the generic currency sign.
+    val CurrencySymbol: string => Currency.GetSymbol(culture)
+    /// Default currency display precision; this never changes stored amounts.
+    val CurrencyDecimalDigits: int => Currency.DecimalDigits
+    /// Decimal separator for the bounded currency policy.
+    val CurrencyDecimalSeparator: string => NumberDecimalSeparator
+    /// Group separator for the bounded currency policy.
+    val CurrencyGroupSeparator: string => NumberGroupSeparator
+    /// A fresh snapshot of currency grouping sizes.
+    val CurrencyGroupSizes: int[] => [3]
+    /// Familiar pattern index: 0 is symbol-number; 3 is number-space-symbol.
+    /// Spaces are NBSP; Hebrew also inserts CurrencyDirectionMark.
+    val CurrencyPositivePattern: int => if CurrencyFormatting.SymbolAfter(culture) { 3 } else { 0 }
+    /// Familiar pattern index: 1 is minus-symbol-number; 8 is minus-number-space-symbol.
+    /// The minus token comes from CurrencyNegativeSign, independently of ordinary number formatting.
+    val CurrencyNegativePattern: int => if CurrencyFormatting.SymbolAfter(culture) { 8 } else { 1 }
+    /// Currency minus token, including the Hebrew left-to-right mark where required.
+    val CurrencyNegativeSign: string => CurrencyFormatting.NegativeSign(culture)
+    /// Hebrew right-to-left mark placed before the amount and currency symbol; otherwise empty.
+    val CurrencyDirectionMark: string => CurrencyFormatting.DirectionMark(culture)
+
 }

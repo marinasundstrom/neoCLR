@@ -77,3 +77,20 @@ Development Formattable now receives the existing Culture explicitly. Culture-fi
 String.Format overloads and bounded date/time/duration formats connect composite
 formatting to these policies. See [supported time formats](/features/time/).
 This does not add numeric format providers or general locale-pattern data.
+
+
+## Monetary values (development)
+
+Use `MonetaryAmount`, a record struct combining Decimal and Currency, to keep
+money's denomination with its value. Parsing returns that record; equality and
+hashing include both components. Construction preserves precision, and changing
+the formatting culture never changes the currency. Display rounding leaves the
+stored amount untouched. Decimal C formatting remains a lower-level convenience.
+
+The bounded catalog covers SEK, ILS, GBP, USD, EUR and JPY, with XXX for unspecified
+currency. Exact expected-currency parsing and culture formatting cover the five
+built-in profiles. Exchange rates, cash rounding and full locale data are outside
+this foundation. See the [monetary API reference](/docs/text-numbers.html).
+
+`Language.IsRightToLeft` exposes Hebrew's default writing direction; the other
+supported languages default to left-to-right. It does not perform bidi layout.

@@ -1,0 +1,7 @@
+module System.Globalization
+
+/// Currency identity errors; amount syntax and overflow use NumberParseError separately.
+public union CurrencyError {
+    /// The input is not an exact uppercase identifier in the supported catalog.
+    case UnsupportedCode
+}

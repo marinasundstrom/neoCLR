@@ -2801,3 +2801,11 @@ System.Decimal; do not treat its type inventory as native coverage. Native
 RavenDoc selection includes Decimal automatically; the linked
 [numeric guide](text-numbers.md#decimal-development) records behavior and limits.
 The CLI scaffold limitation does not exclude any native Decimal member page.
+
+Development (2026-10-21): Currency, CurrencyError and MonetaryAmount, NumberFormat's
+currency metadata and Language.IsRightToLeft are covered by the native snapshot.
+The legacy CLI scaffold covers Language.IsRightToLeft but does not project Decimal,
+the monetary types or NumberFormat currency members. These exact legacy omissions
+are documented; no corresponding native type/member exclusion is intended.
+The [monetary guide](text-numbers.md#monetary-values-development) supplies contracts,
+strict parsing limitations and the distinction between identity and presentation.

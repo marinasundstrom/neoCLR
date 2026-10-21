@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Monetary foundation (author direction, 2026-10-21):** [Currency work](experiments/currency/README.md)
+adds a denomination-bearing MonetaryAmount record as the primary monetary API,
+retaining Decimal currency formatting as a lower-level convenience. Language gains
+default writing direction. This bounded addition does not expand the numeric
+interface hierarchy or replace remaining release qualification; final validation
+is tracked in the linked evidence. All 18 monetary test executions, 21 Decimal regression executions, three focused compiler tests, API snapshots and the 5,216-page website pass.
+
+
 **Bounded completion and return to main work (author direction, 2026-10-20):** The globalization/formatting/parsing increment now meets its bounded exit criterion: the five profiles, supported
 numeric formats and explicit-culture parsers pass focused built-in tests in the
 interpreter, JIT and native backend (23 tests, 69 executions), with matching API documentation. Defer custom

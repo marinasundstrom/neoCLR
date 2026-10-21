@@ -2626,11 +2626,12 @@
     <member name="P:System.Globalization.Culture.HebrewIsrael"><summary>Bounded Hebrew Israel conventions (he-IL), with Gregorian default. Select Calendar.Hebrew explicitly for Hebrew-calendar text.</summary></member>
     <member name="P:System.Globalization.Culture.Current"><summary>Resolves a fresh SystemCultureProvider snapshot; unsupported preferences fall back to invariant. There is no mutable ambient override.</summary></member>
     <member name="P:System.Globalization.Culture.Name"><summary>Empty for invariant, sv-SE for Swedish Sweden, or he-IL for Hebrew Israel.</summary></member>
-    <member name="P:System.Globalization.Culture.Language"><summary>Strongly typed language identity: und, sv or he. Invariant is not a natural language.</summary></member>
+    <member name="P:System.Globalization.Culture.Language"><summary>Strongly typed language identity: und, sv, he or en. Invariant is not a natural language.</summary></member>
     <member name="P:System.Globalization.Culture.DefaultCalendar"><summary>Gregorian for all currently supported culture profiles.</summary></member>
     <member name="P:System.Globalization.Culture.DateTimeFormat"><summary>Immutable formatter using this culture and its default calendar.</summary></member>
     <member name="T:System.Globalization.Language"><summary>Provisional immutable language identity for the bounded culture profiles. General language-tag parsing and registry validation remain planned.</summary></member>
-    <member name="P:System.Globalization.Language.Code"><summary>Language code: und, sv or he.</summary></member>
+    <member name="P:System.Globalization.Language.IsRightToLeft"><summary>True for Hebrew; false for English, Swedish and Undetermined. Default writing direction only, not bidi layout.</summary></member>
+    <member name="P:System.Globalization.Language.Code"><summary>Language code: und, sv, he or en.</summary></member>
     <member name="P:System.Globalization.Language.Undetermined"><summary>The undetermined language (und), used by invariant culture.</summary></member>
     <member name="P:System.Globalization.Language.Swedish"><summary>Swedish language identity (sv).</summary></member>
     <member name="P:System.Globalization.Language.Hebrew"><summary>Hebrew language identity (he).</summary></member>
@@ -4071,8 +4072,8 @@ No input is read or output written. Use one buffering wrapper per stream directi
     <member name="P:System.Globalization.NumberFormat.NumberGroupSeparator"><summary>U+00A0 nonbreaking space for Swedish, comma for the other profiles.</summary></member>
     <member name="P:System.Globalization.NumberFormat.NumberGroupSizes"><summary>Returns a fresh array containing 3, denoting repeated groups of three from the right. Mutating it does not change the policy.</summary></member>
     <member name="P:System.Globalization.NumberFormat.NumberDecimalDigits"><summary>Default fixed-point precision: two fractional digits. Used by Int32/Int64 F and N formats when precision is omitted.</summary></member>
-    <member name="P:System.Globalization.NumberFormat.PositiveSign"><summary>ASCII plus sign. Localized signs and bidi marks are not yet supported.</summary></member>
-    <member name="P:System.Globalization.NumberFormat.NegativeSign"><summary>ASCII minus sign. Localized signs and bidi marks are not yet supported.</summary></member>
+    <member name="P:System.Globalization.NumberFormat.PositiveSign"><summary>ASCII plus sign. Currency signs and direction marks are exposed separately.</summary></member>
+    <member name="P:System.Globalization.NumberFormat.NegativeSign"><summary>ASCII minus sign. Currency signs and direction marks are exposed separately.</summary></member>
     <member name="P:System.Globalization.DateTimeFormat.DateSeparator"><summary>Separator used by the selected numeric date convention; Hebrew-letter dates use spaces.</summary></member>
     <member name="P:System.Globalization.DateTimeFormat.TimeSeparator"><summary>Colon between time fields.</summary></member>
     <member name="P:System.Globalization.DateTimeFormat.FractionalSecondSeparator"><summary>Comma for Swedish; point for the other profiles. Used by default time formatting.</summary></member>

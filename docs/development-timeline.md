@@ -20638,3 +20638,26 @@ method bounds and the replacement release gates remain open.
 - **Subsequent author decision:** “OK add that support next”. Currency identity,
   culture formatting and expected-currency parsing are now authorized as the next
   bounded increment. Cash rounding and currency conversion remain separate.
+
+
+### 2026-10-21 — Monetary values and language direction
+
+- **Author:** Requested LTR/RTL metadata on Language, then questioned keeping monetary
+  values as plain Decimal with contextual currency. Explicitly chose a value object
+  as the primary API while retaining Decimal currency formatting as a lower-level option.
+- **Assistant:** Proposed amount plus currency identity, exact stored precision,
+  currency-aware equality and presentation independent of denomination.
+- **Author:** Required a record with positional destructuring, then suggested
+  `MonetaryAmount` as its name. The implementation adopts a record struct with
+  readonly Amount and Currency components; parsing returns the record.
+- **Implementation in progress:** The initial currency foundation passed 15 built-in
+  executions. Adding record methods exposed a native-emitter restriction; the fix
+  routes authored methods through ordinary callable lowering. Final qualification
+  is tracked with the currency evidence, not inferred from the earlier tests.
+
+- **Outcome:** All six monetary tests passed in native, JIT and interpreter. Raven
+  `ae1802eef` commits ordinary record methods, declared source component contracts
+  and shared value deconstruction lowering; three focused compiler tests pass.
+  Website/API documentation is refreshed. Named `let` patterns without `else`
+  remain a general Raven parser follow-up; the record uses the supported pattern
+  contract. Decimal regression results are recorded in the currency evidence.

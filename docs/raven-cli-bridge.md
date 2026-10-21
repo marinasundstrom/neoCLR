@@ -14239,3 +14239,20 @@ Floating conversions, integral extraction and decimal constant fields remain gap
 Built-in Decimal tests cover the supported native contracts and CLR arithmetic
 vectors. Native call optimization is a future backend concern; no replacement
 metadata encoding is required for the ordinary nominal value type.
+
+### Monetary records (development, 2026-10-21)
+
+Native record methods now use ordinary callable lowering. Source nominal record
+components with explicit equality/hash/display contracts use the same policy as
+imported values; MonetaryAmount exercises Decimal and Currency components.
+Runtime Contract selection is unchanged. There is no monetary CLI encoding or
+runtime intrinsic: the native path emits record storage and ordinary methods.
+Legacy CoreProbe does not project these monetary types; the native reference and
+built-in currency tests own coverage. Additional record storage declarations and
+explicit interface mappings remain bounded gaps. See [currency evidence](experiments/currency/README.md).
+
+Named value deconstruction patterns now share the declared Deconstruct call path
+with deconstruction assignment. Matching is bounded to the same non-nullable value
+type and simple/no outer capture. The current parser requires an `else` branch for
+`let MonetaryAmount(amount, currency) = value else { ... }`; allowing omission for
+an irrefutable named record pattern remains a separate general Raven syntax gap.
