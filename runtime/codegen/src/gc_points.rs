@@ -222,25 +222,24 @@ pub(super) fn point_at(
 ) -> Result<Option<Value>, Error> {
     let f = &p.input.functions[function];
     let mut plan = point(p, &f.body[pc], stack)?;
-    if pc == 0 {
-        if let Some(cctor) = crate::type_initialization::entry_owner(p.input, f)
+    if pc == 0
+        && let Some(cctor) = crate::type_initialization::entry_owner(p.input, f)
             .and_then(|owner| crate::type_initialization::initializer(p.input, owner))
-        {
-            let f = &p.input.functions[cctor];
-            if plan.is_none() {
-                let target = neoclr::metadata::FunctionRef {
-                    definition: f.definition.clone(),
-                    name: f.name.clone(),
-                    owner: f.owner.clone(),
-                    instance: false,
-                    generic_arguments: vec![],
-                    parameters: vec![],
-                };
-                plan = point(p, &Op::Call(target), stack)?;
-            }
-            if let Some(plan) = plan.as_mut() {
-                plan["typeInitializerBeforeEntry"] = json!(f.name);
-            }
+    {
+        let f = &p.input.functions[cctor];
+        if plan.is_none() {
+            let target = neoclr::metadata::FunctionRef {
+                definition: f.definition.clone(),
+                name: f.name.clone(),
+                owner: f.owner.clone(),
+                instance: false,
+                generic_arguments: vec![],
+                parameters: vec![],
+            };
+            plan = point(p, &Op::Call(target), stack)?;
+        }
+        if let Some(plan) = plan.as_mut() {
+            plan["typeInitializerBeforeEntry"] = json!(f.name);
         }
     }
     Ok(plan)
@@ -261,8 +260,8 @@ pub(super) fn report(
         }
         let shapes = p.analyze(i)?;
         let mut points = vec![];
-        for pc in 0..f.body.len() {
-            let Some(shape) = &shapes[pc] else {
+        for (pc, shape) in shapes.iter().enumerate().take(f.body.len()) {
+            let Some(shape) = shape else {
                 continue;
             };
             if let Some(mut plan) = point_at(p, i, pc, shape)? {

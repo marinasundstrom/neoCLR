@@ -75,10 +75,10 @@ pub fn bind(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error>
     let mut arrays = vec![];
     for f in &input.functions {
         for op in &f.body {
-            if let Op::LoadTypeToken(t @ Type::ArrayRef(_)) = op {
-                if !arrays.contains(t) {
-                    arrays.push(t.clone());
-                }
+            if let Op::LoadTypeToken(t @ Type::ArrayRef(_)) = op
+                && !arrays.contains(t)
+            {
+                arrays.push(t.clone());
             }
         }
     }

@@ -234,16 +234,15 @@ impl Specializer<'_> {
                 ) =>
             {
                 let lowered = self.lower(t)?;
-                if matches!(**t, Type::ArrayRef(_))
+                if (matches!(**t, Type::ArrayRef(_))
                     || self.source.type_definition(t).is_some_and(|t| {
                         (t.is_reference_type
                             && t.representation == neoclr::metadata::Representation::Record)
                             || t.representation == neoclr::metadata::Representation::Interface
-                    })
+                    }))
+                    && let Some(owner) = super::selection::array_owner(self.source, t)
                 {
-                    if let Some(owner) = super::selection::array_owner(self.source, t) {
-                        self.lower(&owner)?;
-                    }
+                    self.lower(&owner)?;
                 }
                 return Ok(Type::ArrayRef(Box::new(lowered)));
             }
@@ -409,28 +408,25 @@ impl Specializer<'_> {
         Ok(Type::Named(private_name))
     }
     fn owner(&mut self, ty: &Type, instance: bool) -> Result<Type, Error> {
-        if !instance {
-            if let Type::Named(name) = ty {
-                let i = self.type_index(name)?;
-                if super::selection::static_owner(&self.source.types[i]) {
-                    if !self.shapes.iter().any(|v| v.source == i)
-                        && self.shapes.len() >= MAX_SPECIALIZED_TYPES
-                    {
-                        return Err(format!(
-                            "specialized type count exceeds {MAX_SPECIALIZED_TYPES}"
-                        )
-                        .into());
-                    }
-                    if !self.shapes.iter().any(|v| v.source == i) {
-                        self.shapes.push(Shape {
-                            source: i,
-                            arguments: vec![],
-                            row: i,
-                            name: name.clone(),
-                        });
-                    }
-                    return Ok(ty.clone());
+        if !instance && let Type::Named(name) = ty {
+            let i = self.type_index(name)?;
+            if super::selection::static_owner(&self.source.types[i]) {
+                if !self.shapes.iter().any(|v| v.source == i)
+                    && self.shapes.len() >= MAX_SPECIALIZED_TYPES
+                {
+                    return Err(
+                        format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}").into(),
+                    );
                 }
+                if !self.shapes.iter().any(|v| v.source == i) {
+                    self.shapes.push(Shape {
+                        source: i,
+                        arguments: vec![],
+                        row: i,
+                        name: name.clone(),
+                    });
+                }
+                return Ok(ty.clone());
             }
         }
         self.lower(ty)
@@ -786,10 +782,10 @@ fn lowered_member_name(f: &Function, owner: Option<&Type>) -> String {
         Type::Named(n) | Type::Constructed { definition: n, .. } => Some(n.clone()),
         _ => None,
     };
-    if let (Some(old), Some(new)) = (f.owner.as_ref().and_then(name), owner.and_then(name)) {
-        if let Some(member) = f.name.strip_prefix(&format!("{old}.")) {
-            return format!("{new}.{member}");
-        }
+    if let (Some(old), Some(new)) = (f.owner.as_ref().and_then(name), owner.and_then(name))
+        && let Some(member) = f.name.strip_prefix(&format!("{old}."))
+    {
+        return format!("{new}.{member}");
     }
     f.name.clone()
 }
@@ -949,25 +945,25 @@ pub(crate) fn expand_with_conformance(
             if !instance.methods.is_empty() {
                 function.name = clone_name(&function.name, instance.row);
             }
-            if instance.row != instance.source {
-                if let Some(origin) = &mut function.origin {
-                    // Source tokens identify templates, not each private native body. Keep
-                    // access/owner facts, assign an unused private token, omit parameter
-                    // descriptors (custom attributes are removed during selection).
-                    let last = input
-                        .functions
-                        .iter()
-                        .filter_map(|f| f.origin.as_ref())
-                        .map(|o| o.token & 0x00ff_ffff)
-                        .max()
-                        .unwrap_or(0);
-                    let rid = last + (instance.row - input.functions.len()) as u32 + 1;
-                    if rid > 0x00ff_ffff {
-                        return Err("private method token range exhausted".into());
-                    }
-                    origin.token = 0x0600_0000 | rid;
-                    origin.parameter_tokens.fill(0);
+            if instance.row != instance.source
+                && let Some(origin) = &mut function.origin
+            {
+                // Source tokens identify templates, not each private native body. Keep
+                // access/owner facts, assign an unused private token, omit parameter
+                // descriptors (custom attributes are removed during selection).
+                let last = input
+                    .functions
+                    .iter()
+                    .filter_map(|f| f.origin.as_ref())
+                    .map(|o| o.token & 0x00ff_ffff)
+                    .max()
+                    .unwrap_or(0);
+                let rid = last + (instance.row - input.functions.len()) as u32 + 1;
+                if rid > 0x00ff_ffff {
+                    return Err("private method token range exhausted".into());
                 }
+                origin.token = 0x0600_0000 | rid;
+                origin.parameter_tokens.fill(0);
             }
             function.definition = Some(neoclr::metadata::MemberId {
                 module: input.name.clone(),
@@ -1040,12 +1036,10 @@ pub(crate) fn expand_with_conformance(
             if let Type::ArrayRef(element) =
                 substitute(&original.returns, &instance.types, &instance.methods)
                     .map_err(|e| e.to_string())?
+                && let Some(owner) = super::selection::array_owner(input, &element)
+                && !constructed.contains(&owner)
             {
-                if let Some(owner) = super::selection::array_owner(input, &element) {
-                    if !constructed.contains(&owner) {
-                        constructed.push(owner);
-                    }
-                }
+                constructed.push(owner);
             }
             for op in &original.body {
                 if let Op::BoxValue(ty) = op {
@@ -1078,10 +1072,9 @@ pub(crate) fn expand_with_conformance(
                                             == neoclr::metadata::Representation::Interface
                                 })
                         })
+                        && !constructed.contains(&owner)
                     {
-                        if !constructed.contains(&owner) {
-                            constructed.push(owner);
-                        }
+                        constructed.push(owner);
                     }
                 }
                 if let Op::Construct(target) = op {

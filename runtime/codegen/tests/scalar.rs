@@ -322,7 +322,8 @@ fn native_loops_locals_calls_and_early_returns_match_interpreter() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_comparison_branches_preserve_signedness() {
-    let cases: [(&str, fn(i32) -> bool); 10] = [
+    type BranchPredicate = fn(i32) -> bool;
+    let cases: [(&str, BranchPredicate); 10] = [
         ("beq", |x| x == 0),
         ("bne.un", |x| x != 0),
         ("bgt", |x| x > 0),
@@ -332,7 +333,7 @@ fn native_comparison_branches_preserve_signedness() {
         ("bge", |x| x >= 0),
         ("bge.un", |_| true),
         ("ble", |x| x <= 0),
-        ("ble.un", |x| (x as u32) <= 0),
+        ("ble.un", |x| (x as u32) == 0),
     ];
     for (op, predicate) in cases {
         // Both paths merge a live stack value, rather than returning immediately.

@@ -2997,11 +2997,12 @@ fn boxed_empty_profile_rejects_other_shapes_and_counts_generated_helpers() {
     )
     .unwrap();
     let source = include_str!("../../../docs/experiments/aot-console/boxed-empty.neoil");
-    for (source, flags, message) in [(
-        source.to_string(),
-        vec!["--compile-system"],
-        "requires --reference-arena",
-    )] {
+    {
+        let (source, flags, message) = (
+            source.to_string(),
+            vec!["--compile-system"],
+            "requires --reference-arena",
+        );
         let app = neoclr::assembler::read_modules(
             &[neoclr::assembler::ModuleInput::Source(&source)],
             &seed,
@@ -4125,7 +4126,8 @@ int main(int argc,char **argv) {
     let method = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
-    for value in [0] {
+    {
+        let value = 0;
         let expected = method
             .invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default())
             .unwrap();
@@ -4248,7 +4250,8 @@ int main(int argc,char **argv) {
     let method = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
-    for value in [0] {
+    {
+        let value = 0;
         let expected = method
             .invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default())
             .unwrap();
@@ -4381,7 +4384,8 @@ int main(int argc,char **argv) {
     let method = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
-    for value in [0] {
+    {
+        let value = 0;
         let expected = method
             .invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default())
             .unwrap();
@@ -11137,7 +11141,8 @@ int main(int argc,char **argv) {
         let method = program
             .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
             .unwrap();
-        for mode in [1] {
+        {
+            let mode = 1;
             let fault = method
                 .invoke(vec![neoclr::Value::Int32(mode)], neoclr::Limits::default())
                 .unwrap_err();
@@ -11952,7 +11957,8 @@ int main(int argc,char **argv) {
     let method = program
         .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
         .unwrap();
-    for value in [0] {
+    {
+        let value = 0;
         let expected = method
             .invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default())
             .unwrap();

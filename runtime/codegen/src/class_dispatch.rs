@@ -100,14 +100,13 @@ pub(super) fn project(module: &mut neoclr::Module, report: &mut Value) -> Result
         ));
         for function in &mut module.functions {
             for op in &mut function.body {
-                if let Op::CallVirtual(target) = op {
-                    if target
+                if let Op::CallVirtual(target) = op
+                    && target
                         .definition
                         .as_ref()
                         .is_some_and(|id| id.index as usize == contract)
-                    {
-                        *target = reference.clone();
-                    }
+                {
+                    *target = reference.clone();
                 }
             }
         }

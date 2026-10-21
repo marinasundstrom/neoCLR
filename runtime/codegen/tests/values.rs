@@ -1293,13 +1293,13 @@ fn closed_world_is_explicit_and_never_omits_called_unsupported_code() {
             called.functions[0]
                 .body
                 .splice(0..0, [Op::Int(42), Op::Return]);
-        } else if kind == 2 {
-            if let Op::Call(target) = &mut called.functions[0].body[0] {
-                target.definition = m.functions[1].definition.clone().map(|mut id| {
-                    id.index = 999;
-                    id
-                });
-            }
+        } else if kind == 2
+            && let Op::Call(target) = &mut called.functions[0].body[0]
+        {
+            target.definition = m.functions[1].definition.clone().map(|mut id| {
+                id.index = 999;
+                id
+            });
         }
         let temp = Temp::new();
         let result = compile_mode(

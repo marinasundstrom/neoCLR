@@ -3,6 +3,8 @@ use neoclr::metadata::Instruction as Op;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
+// The diagnostic entry point mirrors independently selected command-line capabilities.
+#[allow(clippy::too_many_arguments)]
 pub fn report(
     input: &neoclr::Module,
     root: &str,

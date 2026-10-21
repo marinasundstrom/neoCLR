@@ -107,11 +107,11 @@ pub(super) fn compile_for_target(
                 || input.functions.iter().any(|f| {
                     f.is_internal_call() || f.pinvoke.is_some() || f.owner.is_some() || f.instance
                         || f.parameters.iter().chain(&f.locals).chain([&f.returns]).any(|t| !admitted(t))
-                        || f.body.iter().any(|op| !matches!(op,
+                        || f.body.iter().any(|op| !(matches!(op,
                             Op::Int(_) | Op::Arg(_) | Op::Load(_) | Op::Store(_) |
                             Op::Add | Op::Sub | Op::Mul | Op::Equal | Op::Less | Op::Greater |
                             Op::Branch(_) | Op::BranchTrue(_) | Op::BranchFalse(_) |
-                            Op::Dup | Op::Pop | Op::Return | Op::Call(_)) && !(heap && matches!(op,
+                            Op::Dup | Op::Pop | Op::Return | Op::Call(_)) || heap && matches!(op,
                             Op::NewArray(Type::Int32) | Op::ArrayElement(Type::Int32) |
                             Op::StoreArrayElement(Type::Int32) | Op::ArrayLength | Op::ConvertInt32)))
                 }) {

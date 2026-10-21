@@ -13,10 +13,10 @@ fn public_type(source: &neoclr::Module, ty: &Type) -> bool {
         | Type::ReadOnlyByRef(t)
         | Type::Ptr(t) => public_type(source, t),
         _ => {
-            if let Type::Constructed { arguments, .. } = ty {
-                if !arguments.iter().all(|t| public_type(source, t)) {
-                    return false;
-                }
+            if let Type::Constructed { arguments, .. } = ty
+                && !arguments.iter().all(|t| public_type(source, t))
+            {
+                return false;
             }
             let Some(mut def) = source.type_definition(ty) else {
                 return ty

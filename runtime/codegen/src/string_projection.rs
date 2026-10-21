@@ -113,16 +113,15 @@ pub fn constructors(module: &mut neoclr::Module, report: &mut Value) -> Result<(
     }
     for f in &mut module.functions {
         for op in &mut f.body {
-            if let Op::Construct(target) = op {
-                if target
+            if let Op::Construct(target) = op
+                && target
                     .definition
                     .as_ref()
                     .is_some_and(|id| rows.contains(&(id.index as usize)))
-                {
-                    target.owner = None;
-                    target.instance = false;
-                    *op = Op::Call(target.clone());
-                }
+            {
+                target.owner = None;
+                target.instance = false;
+                *op = Op::Call(target.clone());
             }
         }
     }

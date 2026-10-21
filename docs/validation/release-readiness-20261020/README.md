@@ -34,14 +34,14 @@ Source-gate cleanup has resumed: formatting drift is corrected and the configure
 root-package Clippy gate passes, alongside 16 focused numeric/inheritance regressions,
 three host-validator tests and notice verification (139 packages, 256 files).
 [Retained source-gate evidence](source-gates-20261020.json) records the limited scope.
-An additional strict check of `neoclr-codegen` reports 75 existing library diagnostics
-(mostly collapsible conditions, redundant unit expressions and argument-count lints).
-That expanded backend gate is not green; retain it as separate cleanup work rather
-than suppressing its warnings or claiming workspace-wide Clippy success.
+The subsequent [backend cleanup](backend-gates-20261021.json) passes strict Clippy
+for all backend targets and 114 library unit tests; the existing multi-million-call
+performance test remains opt-in. Five argument-count exceptions remain documented
+at explicit compiler/GC lowering boundaries. Native consumer validation also caught
+and repaired a no-std build regression in the shared numeric formatter.
 
-The next bounded stabilization task is backend lint cleanup and resolution
-of the remaining record/display and generic-constraint scope before package freeze.
-Keep the follow-ups bounded: reproduce forwarded-out assignment on Raven main;
+The next bounded stabilization tasks are the remaining record/display and
+generic-constraint scope before package freeze. Continue to
 extend native method constraints through producer, reader, importer and emission
 without a Parse-specific exception; then qualify the remaining generated record
 formatting shapes. Each needs focused positive and rejection tests. Rebuild and

@@ -64,10 +64,10 @@ pub fn bind(
         match op {
             Op::LoadTypeToken(t) => inventory(t, &mut candidates),
             Op::Construct(t) => {
-                if let Some(owner) = &t.owner {
-                    if constructor_metadata(owner) {
-                        inventory(owner, &mut candidates);
-                    }
+                if let Some(owner) = &t.owner
+                    && constructor_metadata(owner)
+                {
+                    inventory(owner, &mut candidates);
                 }
                 for t in &t.generic_arguments {
                     inventory(t, &mut candidates);

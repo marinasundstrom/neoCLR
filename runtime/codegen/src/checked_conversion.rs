@@ -79,7 +79,7 @@ pub(crate) fn emit(
     } else {
         value
     };
-    if !source_unsigned && !(signed && bits == 64) {
+    if !(source_unsigned || signed && bits == 64) {
         let lower = if signed { -(1i64 << (bits - 1)) } else { 0 };
         let failed = b.ins().icmp_imm(IntCC::SignedLessThan, value, lower);
         crate::compiler::return_if_detailed(b, failed, status, site);

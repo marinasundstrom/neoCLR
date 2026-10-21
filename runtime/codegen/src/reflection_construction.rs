@@ -29,7 +29,7 @@ pub fn bind(
         } else {
             2
         }
-        || !matches!(version, 1 | 2 | 3 | 4 | 5 | 6 | 7)
+        || !matches!(version, 1..=7)
     {
         return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, 5 with moduleCatalogs and moduleFunctions, 6 additionally with typeCatalogs, or 7 with field and constructor retention".into());
     }
@@ -368,7 +368,7 @@ mod tests {
         let result = bind(
             &mut source.clone(),
             &source,
-            &[definition.clone()],
+            std::slice::from_ref(&definition),
             &[],
             &valid,
         )
@@ -381,7 +381,7 @@ mod tests {
                 bind(
                     &mut source.clone(),
                     &source,
-                    &[definition.clone()],
+                    std::slice::from_ref(&definition),
                     &[],
                     &invalid
                 )

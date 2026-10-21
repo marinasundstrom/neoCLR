@@ -655,7 +655,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     }
     let shifted = inspect || closed;
     let input_path = &args[usize::from(shifted)];
-    if !dependency_args.is_empty() && !(closed || inspect_closed) {
+    if !(dependency_args.is_empty() || closed || inspect_closed) {
         return Err("--module requires explicit closed-world emission or inspection".into());
     }
     let load_started = std::time::Instant::now();

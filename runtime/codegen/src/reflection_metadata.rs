@@ -367,10 +367,10 @@ pub fn bind_queries(
     }
     let mut open_tokens = Vec::new();
     for op in input.functions.iter().flat_map(|f| &f.body) {
-        if let Op::LoadMetadataToken(index) = op {
-            if !open_tokens.contains(index) {
-                open_tokens.push(*index);
-            }
+        if let Op::LoadMetadataToken(index) = op
+            && !open_tokens.contains(index)
+        {
+            open_tokens.push(*index);
         }
     }
     // An open definition's argument handles are descriptive, never executable
@@ -411,10 +411,10 @@ pub fn bind_queries(
     let mut tokens = vec![];
     for f in &input.functions {
         for op in &f.body {
-            if let Op::LoadTypeToken(t) = op {
-                if !tokens.contains(t) {
-                    tokens.push(t.clone());
-                }
+            if let Op::LoadTypeToken(t) = op
+                && !tokens.contains(t)
+            {
+                tokens.push(t.clone());
             }
         }
     }
@@ -1057,10 +1057,10 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
         .chain(report["arrayBackingProjection"]["compiledIndex"].as_u64())
     {
         let index = index as usize;
-        if let Some(field) = input.types[index].fields.first() {
-            if vector_tokens.contains(&field.ty) {
-                targets.push(json!({"typeCompiledIndex":index,"token":field.ty}));
-            }
+        if let Some(field) = input.types[index].fields.first()
+            && vector_tokens.contains(&field.ty)
+        {
+            targets.push(json!({"typeCompiledIndex":index,"token":field.ty}));
         }
     }
     for (key, primitive) in [
@@ -1086,10 +1086,10 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
     let mut function_tokens = vec![];
     for function in &input.functions {
         for op in &function.body {
-            if let Op::BindFunction { function_type, .. } = op {
-                if !function_tokens.contains(function_type) {
-                    function_tokens.push(function_type.clone());
-                }
+            if let Op::BindFunction { function_type, .. } = op
+                && !function_tokens.contains(function_type)
+            {
+                function_tokens.push(function_type.clone());
             }
         }
     }

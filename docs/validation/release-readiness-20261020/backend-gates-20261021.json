@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-21",
+  "baseRevision": "23b43abdf5aa306980d07189d2c8efd8745dddfd",
+  "host": "macOS ARM64",
+  "checks": {
+    "backendStrictClippyAllTargets": "passed",
+    "backendLibraryTests": {
+      "passed": 114,
+      "ignored": 1,
+      "ignoredReason": "Explicit multi-million-call native performance qualification"
+    },
+    "nativeTextNoStdBuild": "passed via enum built-in native consumer"
+  },
+  "argumentCountExceptions": 5,
+  "scope": "Development validation; extracted-source and matched release package/platform/performance gates remain open.",
+  "sourceSha256": {
+    "runtime/codegen/src/boxing.rs": "293d7349229ac91bfde3fd244bd315841c248aa7bcb60962fb96f0971428f67d",
+    "runtime/codegen/src/checked_conversion.rs": "7ce5335ec28e683a22cdb0c1f242bedad534fe9a23bcda82cb03ffc25e7dc795",
+    "runtime/codegen/src/class_dispatch.rs": "6cf7cc9892bfa24404f06412aae543dbf01a20af084c80a7b03f47e9ab5a31aa",
+    "runtime/codegen/src/compiler.rs": "c6818c45400f541335eac0ce75fa59ee5b1907bd3707377a1439dc573a5d2739",
+    "runtime/codegen/src/enum_queries.rs": "1c72f67459ec8b260a0a2ad5382fdf2b47a3f48cfa5f8cecef62963092f1b39b",
+    "runtime/codegen/src/gc_points.rs": "1373c65aac3e8735b29ccd1374ec204f92fa580a6ba0b7bf363ced96c80095c2",
+    "runtime/codegen/src/gc_probe.rs": "76d8d75387ad2e33e50acded02a4239101d0f9bafecf96387922bbbeeda18558",
+    "runtime/codegen/src/inspection.rs": "1c3fefe4820f279bc1ebbe613543cf2cdd3b1295b87a2d55dd84a03d605fbd9a",
+    "runtime/codegen/src/lib.rs": "80af65727464115fdedfa4cc67a404cd4652dc345e7d4bae2b6a7377a423c6c3",
+    "runtime/codegen/src/linking.rs": "43fe5a3205bb378be8510e2dc4d4dd12bc3b4a569a4fee0d1daa2ff2ef6994a4",
+    "runtime/codegen/src/reflection_arrays.rs": "208c0d71ee01a724c1b812e15d349ebd86dcead2d0a462e5873c865482c956c9",
+    "runtime/codegen/src/reflection_collections.rs": "ea49be5d150dc7ea428a3e134edc14ad27e6d9c0e3d6b4f51e4ce6d8bd10616d",
+    "runtime/codegen/src/reflection_construction.rs": "36f685991969f4fbea6ae5938384cc5a577823d71a53ac42a7a6024bcbde7e15",
+    "runtime/codegen/src/reflection_metadata.rs": "06d9c84e7ce42bbafcc0ad2ffbfad760fdb298e5d083c61e2e6a7d9bf1081aa6",
+    "runtime/codegen/src/reflection_properties.rs": "ce4f382d3c68a5fae63336db4cda24ea799f37757be162846324a104583a67ed",
+    "runtime/codegen/src/reflection_snapshots.rs": "f30ed76a50cc483b69e0d2f942f2443afef14fa049773dbbe61338f3eaf844c0",
+    "runtime/codegen/src/selection.rs": "82f1f1ff62c5fde08aa60c38f962273d54e69a49c08ce4c2e8f1ea48294ab6f5",
+    "runtime/codegen/src/specialization.rs": "33f08699c1a1cac0b84982cd8ffcb8bab4c9d5ccf967cdd3df014b08aeff223d",
+    "runtime/codegen/src/string_projection.rs": "70ece472ac10f15757df9581ca61b6309bc69a71be84c2935cdbe302134295e7",
+    "runtime/codegen/src/value_profile.rs": "c60e7c820a8754228012bfcc6f9a07577ecedf23d7aa96a9c2e4b81b1eed2a6a",
+    "runtime/codegen/src/values.rs": "2c0a249fce02d484e000a7b26467330d54ab1c7e7e77656700bdc63865399259",
+    "runtime/codegen/tests/console.rs": "55b739f81ac9576671d8193e64b4cf63c0abff7ea727aef38c8ffc7a9f438604",
+    "runtime/codegen/tests/linking.rs": "cc3fd331b6b17cab4af9534ec3c89d363a10856d31f93c20368f08668acf2066",
+    "runtime/codegen/tests/scalar.rs": "6173b9390501dd4294195a1ef9d6bfafecc32f03cdbc84a1e95757f672474b1d",
+    "runtime/codegen/tests/values.rs": "c983d79833c6e998375fd37dee237434b17d1a0ba05a71f9e0c8fcd9e15e743a",
+    "src/numeric_format_core.rs": "d59c24a7de474511844deee0f04e5a75f75bd19d3faa4ed9c3f2ed358adede1e"
+  }
+}

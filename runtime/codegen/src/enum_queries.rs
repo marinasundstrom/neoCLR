@@ -34,10 +34,10 @@ pub fn bind(
     let object = Type::Named(input.types[object_index].name.clone());
     let mut tokens = Vec::new();
     for op in input.functions.iter().flat_map(|f| &f.body) {
-        if let Op::LoadTypeToken(ty) = op {
-            if !tokens.contains(ty) {
-                tokens.push(ty.clone());
-            }
+        if let Op::LoadTypeToken(ty) = op
+            && !tokens.contains(ty)
+        {
+            tokens.push(ty.clone());
         }
     }
     let mut enums = Vec::new();

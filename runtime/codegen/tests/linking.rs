@@ -219,7 +219,7 @@ fn generic_library_specialization_preserves_library_identity_and_value_copies() 
             lib.to_vec()
         };
         let dir = Temp::new();
-        let inspect = invoke(&dir, &app, &[lib.clone()], "@entry", true);
+        let inspect = invoke(&dir, &app, std::slice::from_ref(&lib), "@entry", true);
         assert!(inspect.status.success());
         assert!(!dir.0.join("app.o").exists());
         let inspected: serde_json::Value = serde_json::from_slice(&inspect.stdout).unwrap();

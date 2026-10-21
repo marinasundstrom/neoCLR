@@ -266,6 +266,8 @@ impl Probes {
             publish,
         })
     }
+    // GC publication keeps frame, storage and instruction operands explicit at each emission site.
+    #[allow(clippy::too_many_arguments)]
     pub fn enter(
         &self,
         module: &mut impl Module,
@@ -327,6 +329,8 @@ impl Probes {
             .map(|(_, t)| (t.lanes.len().max(1) * 16) as u32)
             .max()
     }
+    // GC publication keeps frame, storage and instruction operands explicit at each emission site.
+    #[allow(clippy::too_many_arguments)]
     pub fn publish(
         &self,
         module: &mut impl Module,
@@ -368,6 +372,8 @@ impl Probes {
             .map(|(_, point)| (point.stack_lanes.max(1) * 8) as u32)
             .max()
     }
+    // GC publication keeps frame, storage and instruction operands explicit at each emission site.
+    #[allow(clippy::too_many_arguments)]
     pub fn emit(
         &self,
         module: &mut impl Module,

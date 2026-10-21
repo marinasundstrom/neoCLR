@@ -136,7 +136,7 @@ pub(crate) fn format(
                 for (index, digit) in digits[..count]
                     .iter()
                     .copied()
-                    .chain(std::iter::repeat(b'0'))
+                    .chain(core::iter::repeat(b'0'))
                     .take((point as usize).max(count))
                     .enumerate()
                 {

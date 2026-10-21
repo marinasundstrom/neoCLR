@@ -155,7 +155,7 @@ impl Factory<'_> {
                 };
                 let ctor = self.constructor(case, &args)?;
                 self.body.push(Op::Construct(ctor));
-                let ctor = self.constructor(expected, &[case.clone()])?;
+                let ctor = self.constructor(expected, std::slice::from_ref(case))?;
                 self.body.push(Op::Construct(ctor));
             }
             V::Array { elements, .. } => {
@@ -173,7 +173,7 @@ impl Factory<'_> {
                         return Err("invalid ParameterSnapshot field".into());
                     }
                     self.emit(value, &field.ty)?;
-                    let ctor = self.constructor(expected, &[field.ty.clone()])?;
+                    let ctor = self.constructor(expected, std::slice::from_ref(&field.ty))?;
                     self.body.push(Op::Construct(ctor));
                 } else {
                     let Type::ArrayRef(element) = expected else {
@@ -1313,14 +1313,15 @@ fn bind_attributes(
             .collect();
         // Match interpreter lookup, including callable and parameter tokens in this module.
         for f in &factory.source.functions {
-            if let Some(o) = &f.origin {
-                if o.assembly == origin.assembly && o.module == origin.module {
-                    tokens.extend(
-                        f.custom_attributes
-                            .iter()
-                            .map(|a| a.target_token.unwrap_or(o.token)),
-                    );
-                }
+            if let Some(o) = &f.origin
+                && o.assembly == origin.assembly
+                && o.module == origin.module
+            {
+                tokens.extend(
+                    f.custom_attributes
+                        .iter()
+                        .map(|a| a.target_token.unwrap_or(o.token)),
+                );
             }
         }
         tokens.sort_unstable();

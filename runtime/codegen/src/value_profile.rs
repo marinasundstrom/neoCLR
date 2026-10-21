@@ -98,6 +98,8 @@ fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
 }
 
 impl<'a> Profile<'a> {
+    // Profile admission receives independent optional projection tables; preserve explicit inputs.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         input: &'a neoclr::Module,
         references: bool,
@@ -683,12 +685,11 @@ impl<'a> Profile<'a> {
                     function_type,
                     target,
                 } = op
+                    && function_type == shape
                 {
-                    if function_type == shape {
-                        let c = self.callee(target)?;
-                        if !targets.contains(&c) {
-                            targets.push(c);
-                        }
+                    let c = self.callee(target)?;
+                    if !targets.contains(&c) {
+                        targets.push(c);
                     }
                 }
             }
@@ -1532,10 +1533,7 @@ impl<'a> Profile<'a> {
         for (pc, op) in f.body.iter().enumerate() {
             match op {
                 Op::IsInstance(t) | Op::UnboxAny(t)
-                    if crate::scalar_unions::value_only(self.input, t) =>
-                {
-                    ()
-                }
+                    if crate::scalar_unions::value_only(self.input, t) => {}
                 Op::IsInstance(t) if crate::scalar_unions::inline(self.input, t) => {
                     return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
                 }
@@ -1543,10 +1541,7 @@ impl<'a> Profile<'a> {
                 Op::UnboxAny(t) | Op::IsInstance(t)
                     if crate::scalar_unions::tag(t).is_some()
                         || crate::scalar_unions::bank_scalar(t)
-                        || crate::scalar_unions::record(self.input, t) =>
-                {
-                    ()
-                }
+                        || crate::scalar_unions::record(self.input, t) => {}
                 Op::CastClass(t) if crate::scalar_unions::inline(self.input, t) => (),
                 Op::Arg(n) | Op::ArgumentAddress(n) | Op::StoreArg(n)
                     if *n < self.args[i].len() =>
@@ -1641,26 +1636,17 @@ impl<'a> Profile<'a> {
                                 | Ty::Intersection(_)
                                 | Ty::ReferenceUnion(_)
                                 | Ty::Callable(_)
-                        ) || self.backing_for_array(&self.ty(t)?).is_some()) =>
-                {
-                    ()
-                }
+                        ) || self.backing_for_array(&self.ty(t)?).is_some()) => {}
                 Op::NewArray(t)
                 | Op::ReserveArray(t)
                 | Op::ArrayElement(t)
                 | Op::StoreArrayElement(t)
-                    if self.references && crate::selection::scalar_array_element(t) =>
-                {
-                    ()
-                }
+                    if self.references && crate::selection::scalar_array_element(t) => {}
                 Op::NewArray(Type::String | Type::Char)
                 | Op::ReserveArray(Type::String | Type::Char)
                 | Op::ArrayElement(Type::String | Type::Char)
                 | Op::StoreArrayElement(Type::String | Type::Char)
-                    if self.references =>
-                {
-                    ()
-                }
+                    if self.references => {}
                 Op::NewArray(t)
                 | Op::ReserveArray(t)
                 | Op::ArrayElement(t)
@@ -1675,30 +1661,21 @@ impl<'a> Profile<'a> {
                 | Op::StoreArrayElement(Type::Byte)
                 | Op::ArrayAddress(Type::Byte)
                 | Op::ArrayLength
-                    if self.references =>
-                {
-                    ()
-                }
+                    if self.references => {}
                 Op::NewArray(t) if self.references && matches!(t, Type::ArrayRef(_)) => {
                     self.ty(t)?;
                 }
                 Op::NewArray(t)
                     if self.references
                         && matches!(t, Type::Named(_))
-                        && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) =>
-                {
-                    ()
-                }
+                        && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) => {}
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references
                         && matches!(t, Type::Named(_))
                         && matches!(
                             self.ty(t)?,
                             Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)
-                        ) =>
-                {
-                    ()
-                }
+                        ) => {}
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
                     if self.references
                         && matches!(
@@ -1782,10 +1759,10 @@ impl<'a> Profile<'a> {
                             ));
                         }
                     }
-                    if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
-                        && source != self.ty(t)?
-                        && !self.widens_union(&source, &self.ty(t)?)
-                        && !(matches!(source, Ty::Callable(_) | Ty::Literal)
+                    if !(matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
+                        || source == self.ty(t)?
+                        || self.widens_union(&source, &self.ty(t)?)
+                        || matches!(source, Ty::Callable(_) | Ty::Literal)
                             && parts
                                 .iter()
                                 .any(|part| self.ty(part).ok().as_ref() == Some(&source)))
@@ -2071,7 +2048,7 @@ impl<'a> Profile<'a> {
                             "mixed union extraction requires a nominal reference view",
                         ));
                     }
-                    if !matches!(
+                    if !(matches!(
                         source,
                         Ty::ValueUnion(_)
                             | Ty::MixedUnion(_)
@@ -2080,7 +2057,7 @@ impl<'a> Profile<'a> {
                             | Ty::Intersection(_)
                             | Ty::ReferenceUnion(_)
                             | Ty::Callable(_)
-                    ) && !(source == Ty::Literal && self.references)
+                    ) || source == Ty::Literal && self.references)
                         && self.backing_for_array(&source).is_none()
                     {
                         return Err(fail(
@@ -2119,7 +2096,7 @@ impl<'a> Profile<'a> {
                 Op::ReferenceEqual => {
                     for _ in 0..2 {
                         let ty = pop(&mut stack)?;
-                        if !matches!(
+                        if !(matches!(
                             ty,
                             Ty::ScalarArray(_)
                                 | Ty::ReferenceArray(_)
@@ -2131,7 +2108,7 @@ impl<'a> Profile<'a> {
                                 | Ty::ByteArray
                                 | Ty::CharacterArray
                                 | Ty::StringArray
-                        ) && !(ty == Ty::Literal && self.references)
+                        ) || ty == Ty::Literal && self.references)
                         {
                             return Err(fail(
                                 pc,
@@ -2422,8 +2399,8 @@ impl<'a> Profile<'a> {
                 }
                 Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide)
-                        && !(matches!(t, Ty::Single | Ty::Double) && matches!(op, Op::Divide))
+                    if !(matches!(t, Ty::Int | Ty::Wide)
+                        || matches!(t, Ty::Single | Ty::Double) && matches!(op, Op::Divide))
                     {
                         return Err(fail(
                             pc,
@@ -2572,10 +2549,7 @@ fn leading_base_initializer(
             | Op::ConvertUInt64
             | Op::ConvertFloat32
             | Op::ConvertFloat64
-                if arguments >= 1 =>
-            {
-                ()
-            }
+                if arguments >= 1 => {}
             Op::Call(target)
                 if target.instance
                     && target.owner.as_ref() == Some(base)

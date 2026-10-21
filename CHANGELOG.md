@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-21
+
+- Complete native-backend strict all-targets Clippy cleanup, preserving lowering behavior and removing redundant temporary clones. Retain five documented argument-count exceptions at explicit compiler/GC emission boundaries. Qualify 114 backend unit tests (one existing performance test remains opt-in). Repair the shared numeric formatter’s no-std build by using core iterators; native enum consumer qualification passes after rebuilding the text support library. No public signature or ABI change.
+
 ### 2026-10-20
 
 - Resume release stabilization after enum parsing: apply workspace rustfmt, simplify existing value-receiver validation, remove redundant scalar casts and preserve numeric zero-padding through an iterator. Reconcile the release review with completed primitive/globalization/enum evidence and add the full on-site enum parsing contract. Pass workspace formatting, the configured root-package strict all-targets Clippy gate, 16 focused Rust regressions, three host-validator tests, notice verification and the 5,036-page website. Keep native-backend lint debt, generic enum constraints, record-formatting scope and matched-package/platform qualification explicitly open; no replacement release is selected.

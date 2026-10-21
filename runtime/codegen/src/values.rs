@@ -311,7 +311,7 @@ fn tag_array(b: &mut FunctionBuilder<'_>, p: &Profile<'_>, ty: &Ty, array: ir::V
         }
         let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
         let kind = b.ins().band_imm(kind, 0xffffffff);
-        let tagged = b.ins().bor_imm(kind, ((index as i64 + 1) << 32) as i64);
+        let tagged = b.ins().bor_imm(kind, (index as i64 + 1) << 32);
         b.ins().store(MemFlags::new(), tagged, array, 0);
     }
 }
@@ -505,10 +505,10 @@ pub(crate) fn compile_into(
     let mut type_tokens = Vec::new();
     for f in &input.functions {
         for op in &f.body {
-            if let Op::LoadTypeToken(t) = op {
-                if !type_tokens.contains(t) {
-                    type_tokens.push(t.clone());
-                }
+            if let Op::LoadTypeToken(t) = op
+                && !type_tokens.contains(t)
+            {
+                type_tokens.push(t.clone());
             }
         }
     }
@@ -3022,9 +3022,8 @@ pub(crate) fn compile_into(
                 continue;
             }
             if details.is_some_and(|d| d.entry_task_drain.contains(&i))
-                && runtime_async_callbacks.is_some()
+                && let Some((callback, drain, pump)) = runtime_async_callbacks
             {
-                let (callback, drain, pump) = runtime_async_callbacks.unwrap();
                 let callback = module.declare_func_in_func(callback, b.func);
                 let drain = module.declare_func_in_func(drain, b.func);
                 let callback = b.ins().func_addr(types::I64, callback);
@@ -3607,10 +3606,8 @@ pub(crate) fn compile_into(
                 {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![arena, output]
-                } else if details.unwrap().string_grapheme_at.contains(&i) {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![parameters[0], parameters[1], arena, output]
-                } else if details.unwrap().string_replace_line_endings.contains(&i)
+                } else if details.unwrap().string_grapheme_at.contains(&i)
+                    || details.unwrap().string_replace_line_endings.contains(&i)
                     || details.unwrap().string_concat.contains(&i)
                     || details.unwrap().path_combine.contains(&i)
                 {
@@ -3886,10 +3883,9 @@ pub(crate) fn compile_into(
                     .map(|d| d.site(module, &mut b, fault_context.unwrap(), i, pc));
                 if let Some(&adapter_pc) =
                     details.and_then(|d| d.reflection_array_sites.get(&(i, pc)))
+                    && let Some(site) = site.as_mut()
                 {
-                    if let Some(site) = site.as_mut() {
-                        site.remap_instruction(adapter_pc);
-                    }
+                    site.remap_instruction(adapter_pc);
                 }
                 if matches!(op, Op::Construct(_))
                     && details.is_some_and(|d| d.reflection_construction.contains(&i))
@@ -3900,10 +3896,10 @@ pub(crate) fn compile_into(
                     }
                 }
 
-                if !matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }) {
-                    if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                        probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
-                    }
+                if !matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
+                    && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
+                {
+                    probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
                 }
                 if !initialization_guards.is_empty() {
                     let initialization_owner = match op {
@@ -3924,18 +3920,10 @@ pub(crate) fn compile_into(
                         .and_then(|owner| owner.definition_name())
                         .and_then(|name| initialization_guards.get(name))
                     {
-                        if matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }) {
-                            if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                                probes.emit(
-                                    module,
-                                    &mut b,
-                                    i,
-                                    pc,
-                                    spill,
-                                    probe_frame.unwrap(),
-                                    &stack,
-                                );
-                            }
+                        if matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
+                            && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
+                        {
+                            probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
                         }
                         let callee = module.declare_func_in_func(*guard, b.func);
                         let call = b.ins().call(callee, &[fault_context.unwrap()]);
@@ -3990,10 +3978,7 @@ pub(crate) fn compile_into(
                     }
                     Op::IsInstance(neoclr::metadata::Type::String)
                     | Op::CastClass(neoclr::metadata::Type::String)
-                        if *top() == Ty::Literal =>
-                    {
-                        ()
-                    }
+                        if *top() == Ty::Literal => {}
                     Op::IsInstance(target) | Op::UnboxAny(target)
                         if crate::scalar_unions::value_only(input, target) =>
                     {
@@ -5145,27 +5130,26 @@ pub(crate) fn compile_into(
                             null_reference(&mut b, call_args[0], site.as_ref());
                         }
                         let result = b.ins().stack_addr(types::I64, call_result, 0);
-                        if !construct {
-                            if let (Some(probes), Some(t)) = (&root_probes, &p.results[c]) {
-                                // Seed only traceable scratch lanes; this does not publish
-                                // a guest result. The caller retains their addresses while
-                                // the callee writes and removes its diagnostic frame.
-                                let zero = b.ins().iconst(types::I64, 0);
-                                for lane in gc_layout::seed_lanes(&p, t) {
-                                    b.ins()
-                                        .store(MemFlags::new(), zero, result, (lane * 8) as i32);
-                                }
-                                probes.publish(
-                                    module,
-                                    &mut b,
-                                    i,
-                                    pc,
-                                    3,
-                                    probe_frame.unwrap(),
-                                    transient_table.unwrap(),
-                                    result,
-                                );
+                        if !construct && let (Some(probes), Some(t)) = (&root_probes, &p.results[c])
+                        {
+                            // Seed only traceable scratch lanes; this does not publish
+                            // a guest result. The caller retains their addresses while
+                            // the callee writes and removes its diagnostic frame.
+                            let zero = b.ins().iconst(types::I64, 0);
+                            for lane in gc_layout::seed_lanes(&p, t) {
+                                b.ins()
+                                    .store(MemFlags::new(), zero, result, (lane * 8) as i32);
                             }
+                            probes.publish(
+                                module,
+                                &mut b,
+                                i,
+                                pc,
+                                3,
+                                probe_frame.unwrap(),
+                                transient_table.unwrap(),
+                                result,
+                            );
                         }
                         call_args.push(result);
                         if let Some(context) = fault_context {

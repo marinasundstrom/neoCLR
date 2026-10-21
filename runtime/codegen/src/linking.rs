@@ -550,17 +550,16 @@ pub fn prepare(
         report["reflectionRetention"] = retention;
     }
     report["reflectionArrayHandleGetterDefinition"] = json!(array_handle_getter);
-    if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64() {
-        if let Some(row) = report["types"]
+    if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64()
+        && let Some(row) = report["types"]
             .as_array()
             .unwrap()
             .iter()
             .find(|r| r["compiledIndex"] == index)
             .cloned()
-        {
-            report["arrayBackingProjection"]["definition"] = row["definition"].clone();
-            report["arrayBackingProjection"]["sourceName"] = row["name"].clone();
-        }
+    {
+        report["arrayBackingProjection"]["definition"] = row["definition"].clone();
+        report["arrayBackingProjection"]["sourceName"] = row["name"].clone();
     }
     for (at, backing) in report["referenceArrayBackingProjections"]
         .as_array()
@@ -949,14 +948,13 @@ pub fn prepare(
             f.namespace = "System".into();
         }
         for op in &mut f.body {
-            if let Op::Call(target) = op {
-                if target
+            if let Op::Call(target) = op
+                && target
                     .definition
                     .as_ref()
                     .is_some_and(|id| primitive_static.contains(&(id.index as usize)))
-                {
-                    target.owner = None;
-                }
+            {
+                target.owner = None;
             }
         }
     }
@@ -1034,18 +1032,17 @@ pub fn prepare(
             }
         }
         for op in &mut f.body {
-            if let Op::Call(target) = op {
-                if let Some(owner) = target
+            if let Op::Call(target) = op
+                && let Some(owner) = target
                     .definition
                     .as_ref()
                     .and_then(|id| primitive_members.get(&(id.index as usize)))
-                {
-                    target.owner = None;
-                    target.instance = false;
-                    target
-                        .parameters
-                        .insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
-                }
+            {
+                target.owner = None;
+                target.instance = false;
+                target
+                    .parameters
+                    .insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
             }
         }
     }
@@ -1122,49 +1119,47 @@ pub fn prepare(
         }
         for (pc, op) in f.body.iter_mut().enumerate() {
             let checked_receiver = matches!(op, Op::CallVirtual(_));
-            if let Op::Call(target) | Op::CallVirtual(target) = op {
-                if target
+            if let Op::Call(target) | Op::CallVirtual(target) = op
+                && target
                     .definition
                     .as_ref()
                     .is_some_and(|id| string_members.contains(&(id.index as usize)))
-                {
-                    if checked_receiver {
-                        string_virtual_calls.push(json!({"compiledIndex": i, "instruction": pc}));
-                    }
-                    target.owner = None;
-                    target.instance = false;
-                    target.parameters.insert(0, neoclr::metadata::Type::String);
-                    *op = Op::Call(target.clone());
+            {
+                if checked_receiver {
+                    string_virtual_calls.push(json!({"compiledIndex": i, "instruction": pc}));
                 }
+                target.owner = None;
+                target.instance = false;
+                target.parameters.insert(0, neoclr::metadata::Type::String);
+                *op = Op::Call(target.clone());
             }
         }
     }
     report["stringVirtualCallSites"] = json!(string_virtual_calls);
     report["stringInstanceProjections"] = json!(string_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified public nonvirtual String wrapper; explicit receiver, unchanged CIL argument indices"})).collect::<Vec<_>>());
-    if reference_arena {
-        if let Some(index) = selected
+    if reference_arena
+        && let Some(index) = selected
             .types
             .iter()
             .position(|t| t.name == "System.Object")
-        {
-            let mut name = "$aot_ObjectBase".to_owned();
-            while selected.types.iter().any(|t| t.name == name) {
-                name.push('_');
-            }
-            // Keep the ordinary empty base and constructor, but do not ask the
-            // backend verifier to install a second runtime Object slot registry.
-            // The complete original Object contract was verified above.
-            neoclr::native_metadata::retain_object_reference_root(&mut selected.types[index])
-                .map_err(|error| error.to_string())?;
-            selected.types[index].name = name.clone();
-            rename_nominal(&mut selected, "System.Object", &name, root)?;
-            report["objectBaseProjection"] = json!({"compiledIndex": index, "sourceName": "System.Object", "compiledName": name,
+    {
+        let mut name = "$aot_ObjectBase".to_owned();
+        while selected.types.iter().any(|t| t.name == name) {
+            name.push('_');
+        }
+        // Keep the ordinary empty base and constructor, but do not ask the
+        // backend verifier to install a second runtime Object slot registry.
+        // The complete original Object contract was verified above.
+        neoclr::native_metadata::retain_object_reference_root(&mut selected.types[index])
+            .map_err(|error| error.to_string())?;
+        selected.types[index].name = name.clone();
+        rename_nominal(&mut selected, "System.Object", &name, root)?;
+        report["objectBaseProjection"] = json!({"compiledIndex": index, "sourceName": "System.Object", "compiledName": name,
                 "policy": "verified empty Object base/ordinary constructor; private nominal base, no virtual Object slots"});
-            for row in report["types"].as_array_mut().unwrap() {
-                if row["compiledIndex"] == index {
-                    row["compiledName"] = json!(name);
-                }
+        for row in report["types"].as_array_mut().unwrap() {
+            if row["compiledIndex"] == index {
+                row["compiledName"] = json!(name);
             }
         }
     }
@@ -1253,14 +1248,13 @@ pub fn prepare(
             );
             for f in &mut selected.functions {
                 for op in &mut f.body {
-                    if let Op::CallVirtual(target) = op {
-                        if target
+                    if let Op::CallVirtual(target) = op
+                        && target
                             .definition
                             .as_ref()
                             .is_some_and(|id| id.index as usize == contract)
-                        {
-                            target.name = name.clone();
-                        }
+                    {
+                        target.name = name.clone();
                     }
                 }
             }
@@ -1488,10 +1482,9 @@ pub fn prepare(
             | Op::CallVirtual(target)
             | Op::Construct(target)
             | Op::BindFunction { target, .. } = op
+                && let Some(id) = &target.definition
             {
-                if let Some(id) = &target.definition {
-                    target.name = private_names[id.index as usize].clone();
-                }
+                target.name = private_names[id.index as usize].clone();
             }
         }
     }
@@ -1519,14 +1512,12 @@ pub(crate) fn rename_nominal(
     fn rename(value: &mut Value, old: &str, new: &str, root: &str) {
         match value {
             Value::Object(object) => {
-                if object.get("owner") == Some(&json!({"Named":old})) {
-                    if let Some(Value::String(member)) = object.get_mut("name") {
-                        if member != root {
-                            if let Some(suffix) = member.strip_prefix(&format!("{old}.")) {
-                                *member = format!("{new}.{suffix}");
-                            }
-                        }
-                    }
+                if object.get("owner") == Some(&json!({"Named":old}))
+                    && let Some(Value::String(member)) = object.get_mut("name")
+                    && member != root
+                    && let Some(suffix) = member.strip_prefix(&format!("{old}."))
+                {
+                    *member = format!("{new}.{suffix}");
                 }
                 if object.get("Named") == Some(&json!(old)) {
                     object.insert("Named".into(), json!(new));
@@ -1570,7 +1561,7 @@ mod variance_projection_tests {
             &mut target.types[0],
             &source,
             0,
-            &[element.clone()],
+            std::slice::from_ref(&element),
         )
         .unwrap();
         assert_eq!(
@@ -1609,7 +1600,7 @@ mod variance_projection_tests {
                 &mut target.types[0],
                 &source,
                 0,
-                &[element.clone()]
+                std::slice::from_ref(&element)
             )
             .is_err()
         );
@@ -1861,7 +1852,7 @@ pub(crate) mod descriptor_token_tests {
         ))));
         let module = owner.0.as_mut().unwrap();
         crate::compiler::values::compile_into(
-            &input,
+            input,
             "Main",
             None,
             crate::compiler::Target::MacosArm64,

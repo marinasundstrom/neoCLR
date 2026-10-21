@@ -719,13 +719,12 @@ fn scalar_interface_targets(
     let mut primitives = vec![];
     for &index in reached {
         for op in &input.functions[index].body {
-            if let Op::BoxValue(ty) = op {
-                if projected_primitive(ty)
-                    && !primitives.contains(ty)
-                    && implements_interface(input, ty, f.owner.as_ref().unwrap())
-                {
-                    primitives.push(ty.clone());
-                }
+            if let Op::BoxValue(ty) = op
+                && projected_primitive(ty)
+                && !primitives.contains(ty)
+                && implements_interface(input, ty, f.owner.as_ref().unwrap())
+            {
+                primitives.push(ty.clone());
             }
         }
     }
@@ -779,10 +778,10 @@ pub(super) fn dispatch_targets_with_array(
         .map(|i| Type::Named(input.types[i].name.clone()))
         .or_else(|| byte_array_owner(input));
     for &i in reached {
-        if input.functions[i].returns == Type::ArrayRef(Box::new(Type::Byte)) {
-            if let Some(Type::Named(name)) = &array_owner {
-                constructed.insert(name.as_str());
-            }
+        if input.functions[i].returns == Type::ArrayRef(Box::new(Type::Byte))
+            && let Some(Type::Named(name)) = &array_owner
+        {
+            constructed.insert(name.as_str());
         }
         for &index in reference_backings {
             if input.types[index]
@@ -816,10 +815,10 @@ pub(super) fn dispatch_targets_with_array(
                     }
                 }
             }
-            if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
-                if let Some(Type::Named(name)) = &array_owner {
-                    constructed.insert(name.as_str());
-                }
+            if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte))
+                && let Some(Type::Named(name)) = &array_owner
+            {
+                constructed.insert(name.as_str());
             }
             if let Op::NewArray(element) | Op::ReserveArray(element) = op {
                 for &index in reference_backings {
@@ -833,10 +832,10 @@ pub(super) fn dispatch_targets_with_array(
                     }
                 }
             }
-            if let Op::Construct(target) = op {
-                if let Some(Type::Named(name)) = &target.owner {
-                    constructed.insert(name.as_str());
-                }
+            if let Op::Construct(target) = op
+                && let Some(Type::Named(name)) = &target.owner
+            {
+                constructed.insert(name.as_str());
             }
         }
     }
@@ -1035,10 +1034,7 @@ fn retained_types(
             Type::ByRef(t) => pending_types.push(*t),
             Type::Array(t) if matches!(*t, Type::Byte | Type::Char) => (),
             Type::ArrayRef(t)
-                if matches!(*t, Type::String | Type::Char) || scalar_array_element(&t) =>
-            {
-                ()
-            }
+                if matches!(*t, Type::String | Type::Char) || scalar_array_element(&t) => {}
             Type::ArrayRef(t)
                 if matches!(
                     *t,
@@ -1175,10 +1171,9 @@ pub(super) fn select_inventory_with_host_roots(
             if let Some(initializer) = crate::type_initialization::initializer(
                 input,
                 &crate::type_initialization::owner_type(&input.types[ty]),
-            ) {
-                if !functions.contains(&initializer) {
-                    pending.push(initializer);
-                }
+            ) && !functions.contains(&initializer)
+            {
+                pending.push(initializer);
             }
         }
         for &contract in &functions {
@@ -1187,22 +1182,20 @@ pub(super) fn select_inventory_with_host_roots(
                     pending.push(target);
                 }
             }
-            if let Some(target) = string_dispatch_target(input, contract)? {
-                if !functions.contains(&target) {
-                    pending.push(target);
-                }
+            if let Some(target) = string_dispatch_target(input, contract)?
+                && !functions.contains(&target)
+            {
+                pending.push(target);
             }
             if functions.iter().any(|i| {
                 input.functions[*i]
                     .body
                     .iter()
                     .any(|op| matches!(op, Op::BoxValue(Type::Char)))
-            }) {
-                if let Some(target) = char_dispatch_target(input, contract) {
-                    if !functions.contains(&target) {
-                        pending.push(target);
-                    }
-                }
+            }) && let Some(target) = char_dispatch_target(input, contract)
+                && !functions.contains(&target)
+            {
+                pending.push(target);
             }
             for (_, target) in dispatch_targets_with_array(
                 input,
@@ -1347,11 +1340,11 @@ pub(super) fn select_inventory_with_host_roots(
         if let Some(target) = string_dispatch_target(input, *source)? {
             string_dispatch.push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":rows.binary_search(&target).unwrap()}));
         }
-        if let Some(target) = char_dispatch_target(input, *source) {
-            if let Ok(target) = rows.binary_search(&target) {
-                char_dispatch
-                    .push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":target}));
-            }
+        if let Some(target) = char_dispatch_target(input, *source)
+            && let Ok(target) = rows.binary_search(&target)
+        {
+            char_dispatch
+                .push(json!({"contractCompiledIndex":compiled,"functionCompiledIndex":target}));
         }
         let display = object_dispatch_contract(&input.functions[*source]);
         let class = class_contract(input, &input.functions[*source]);
