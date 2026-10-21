@@ -20863,3 +20863,14 @@ development tasks named Build and Run (JIT) and Compile to Native, preserving th
 ordinary .NET path. The native task uses the existing separate build kit and its
 platform/profile limits; it does not imply arbitrary AOT support or a published
 release. See [editor actions](native-poc-bundle.md#development-editor-execution-actions-2026-10-21).
+
+### 2026-10-21 — Make native output and SDK footprint visible
+
+The author requested measuring AOT output versus assemblies and SDK installation,
+and publishing those numbers on the Native AOT page. The assistant separated
+application artifacts from shared execution dependencies and build-time tooling,
+then built and executed the Unicode greeting and JSON mapping samples. The
+measured development macOS ARM64 baseline and its reproduction procedure are in
+[the native size study](../benchmarks/native-size/README.md). The website table
+reports the large JSON footprint as measured, without claiming a size advantage
+or comparing unmatched .NET applications. HTTP/release qualification remains open.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-21
 
+- Measure development macOS ARM64 assembly/AOT output and SDK/toolchain installation sizes, with executed Unicode greeting and JSON mapping consumers, artifact/catalogue hashes and reproducible tooling. Publish exact-scope tables on the Native compilation page, distinguishing application assemblies from complete executables and build-time SDK costs. Record default unstripped outputs and platform/cohort limits; this is not release or HTTP qualification.
+
 - Correct the second stale floating-display regression to assert boxed Double virtual ToString returns its numeric value; the focused integration test passes. Record editor/website validation and the unresolved HTTP JIT selection/startup and verifier cleanup findings without treating diagnostic experiments as release qualification.
 
 - Make generated development VS Code tasks default to Build and Run (JIT), with explicit execution selection and a separate Compile to Native action using a matching build kit. Native compilation builds without launching and retains macOS ARM64/profile/fresh-output limits; ordinary .NET execution is unchanged. Six runner/task tests, exact collections output under JIT, and three CLI option rejection controls pass. Update development website guidance without relabeling published preview downloads; refreshed installed-editor/native-kit qualification remains pending.

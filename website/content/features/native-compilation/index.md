@@ -72,6 +72,46 @@ Coverage depends on the exact runtime, compiler and async lowering. See the
 and [runtime-await qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13)
 for tested builds. [Downloads](/try/) identify published availability.
 
+## Measured output and installation size
+
+Development measurements from **21 October 2026**, on **macOS ARM64**. These are
+real outputs from two tested programs, not promised sizes for every application.
+
+| Application | neoCLR application assembly | Complete AOT executable |
+| --- | ---: | ---: |
+| Unicode console greeting | 85.04 KiB | 94.96 KiB |
+| JSON object-mapping sample | 380.28 KiB | 9.37 MiB |
+
+Both executables ran successfully and depend only on macOS **libSystem**. The AOT
+column includes linked runtime services and selected application/library code.
+The assembly column excludes the shared class libraries and execution engine it
+needs to run; it is **not a complete deployment size**. These builds use the
+release backend and the default `clang -O2` link configuration, with no extra
+stripping step. The JSON sample retains its object-mapping metadata.
+
+### Build tools are a separate installation cost
+
+| Development package | Installed file bytes | Compressed archive |
+| --- | ---: | ---: |
+| Raven SDK: compiler and language server | 89.98 MiB | 31.69 MiB |
+| Complete neoCLR JIT toolchain bundle, including that SDK | 151.93 MiB | 53.48 MiB |
+
+The complete bundle also includes the runtime/backend, class libraries, editor
+extension, samples and documentation. Its class-library directory accounts for
+19.14 MiB, including documentation. These are overlapping quantities, not amounts
+to add together. Sizes use logical file lengths (1 KiB = 1,024 bytes;
+1 MiB = 1,048,576 bytes), excluding filesystem block rounding and generated caches.
+External .NET SDKs and Apple build tools are prerequisites and **are not included**
+in these installation figures. Neither SDK is needed to run the AOT executables.
+
+The JSON example is substantially larger than the greeting: this baseline makes
+that cost visible rather than implying that every native application is tiny.
+Further size optimization needs its own measurements. This study does not qualify
+HTTP workloads or establish Windows output sizes.
+
+[Exact byte counts, hashes and build inputs](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/native-size/macos-arm64-20261021.json) ·
+[Measurement method and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/native-size/README.md)
+
 ## Current limits
 
 Native support remains experimental. Generic virtual dispatch and some runtime
