@@ -40,6 +40,13 @@
     "change": "Narrow allow(deprecated) at fetch_update, following existing scheduler compatibility policy: try_update is newer than Rust 1.85. No operation, ordering or overflow behavior changes.",
     "failedJob": 120065652374,
     "logSha256": "42667066326a3c9dbae4f0a672f7c0fc59a057c1d28b3bc53f115cb96adc25b0",
-    "validation": "formatting passes; canonical rerun and queued local terminal tests pending"
+    "validation": "Hosted formatting and strict all-target Clippy pass; full source qualification running; local terminal tests queued.",
+    "hostedRerun": {
+      "run": 39849082702,
+      "event": "workflow_dispatch",
+      "revision": "bec78e0b4c730e12a47564105bc5d5af98de7bad",
+      "fullMatrix": false,
+      "status": "formatting and strict Clippy passed; full source qualification running"
+    }
   }
 }

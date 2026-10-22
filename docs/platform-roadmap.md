@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Archive identity checked (2026-10-22):** Both qualified development archives pass
+manifest hash verification and SDK/editor language-server pairing: 87 identical
+server files per platform, with explicit PDB/XML packaging exclusions. Hosted
+formatting and strict Clippy now pass; pinned full-source qualification is running.
+[Current gates](validation/release-stabilization-20261022/README.md).
+
 **Minimum-Rust gate repaired (2026-10-22):** All three Rust 1.85 jobs pass.
 Canonical CI next finds a terminal `fetch_update` deprecation on newer Rust;
 apply the same scoped MSRV compatibility annotation as the scheduler, preserving
