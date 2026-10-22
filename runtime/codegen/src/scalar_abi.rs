@@ -10,7 +10,7 @@ pub(crate) fn pointer_target(t: &Type) -> bool {
 pub(crate) fn scalar_type(t: &Type) -> Option<cranelift_codegen::ir::Type> {
     match t {
         Type::Int32 => Some(types::I32),
-        Type::IntPtr | Type::UIntPtr => Some(types::I64),
+        Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr => Some(types::I64),
         Type::Ptr(inner) if pointer_target(inner) => Some(types::I64),
         _ => None,
     }

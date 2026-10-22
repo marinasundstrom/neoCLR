@@ -17,7 +17,7 @@ clang host.c app.o runtime/native/interop/imports.c -pthread -o app
 
 The C host uses the existing `neoclr_entry_v2(Int32, Int32*) -> status` ABI from
 `docs/experiments/aot-scalar/abi.h`. Imported functions use the target C ABI directly:
-zero through sixteen Int32/native-sized-integer/pointer parameters and an Int32/native-sized-integer/pointer or no-result return, nongeneric free/static
+zero through sixteen Int32/Int64/UInt64/native-sized-integer/pointer parameters and an Int32/Int64/UInt64/native-sized-integer/pointer or no-result return, nongeneric free/static
 module functions, without marshalling. The root itself must be ordinary managed
 code. macOS Cdecl/System conventions coincide; unsupported convention metadata is
 rejected by ordinary validation. No source attribute or compiler Runtime Contract
@@ -26,7 +26,7 @@ configuration changes.
 The default rejects imports. The opt-in rejects other targets, managed JIT, closed-world
 composition, inspection and managed/value/context profiles before writing an object.
 This is a backend development capability, not a new default for installed SDKs or
-VS Code. Types other than Int32, IntPtr/UIntPtr and the supported pointers, member imports,
+VS Code. Types other than Int32, Int64/UInt64, IntPtr/UIntPtr and the supported pointers, member imports,
 managed allocation/pinning, callbacks and asynchronous work remain outside this profile.
 
 The generated thunk resolves `(library, exact entry point)` on first invocation and
@@ -424,3 +424,13 @@ capability or release-package certification.
 Validation: both focused Raven source integration tests pass with the explicit bundle
 opt-in, and all 24 website checks pass. The unchanged scalar backend regressions
 retain their preceding evidence. The compiler/SDK overlay revisions remain as above.
+
+
+Fixed-width 64-bit transport (development, 2026-10-22): the opt-in macOS ARM64
+scalar JIT/AOT import profile now admits Int64/UInt64 parameters, results and
+locals, including private helper calls, defaults and equality/zero checks. The
+shared Raven transport consumer exercises negative signed and high-bit unsigned
+values against C int64_t/uint64_t functions across interpreter, JIT and AOT.
+This follows ordinary .NET fixed-width integer ABI semantics; it adds no wrapper,
+marshalling allocation or new metadata representation. Arithmetic expansion,
+64-bit pointer dereference and broader managed import composition remain open.

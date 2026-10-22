@@ -6,7 +6,12 @@ unsafe func Main() -> int {
     let result = Read(pointer)
     Release(default(*unit))
     Release(pointer)
-    return result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
+    let signed = ForwardSigned(SignedWide())
+    let unsigned = ForwardUnsigned(UnsignedWide())
+    if signed == default(long) || unsigned == default(ulong) {
+        return -2
+    }
+    return CheckWide(signed, unsigned) + result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
 }
 
 func ForwardSize(value: nuint) -> nuint {
@@ -15,6 +20,17 @@ func ForwardSize(value: nuint) -> nuint {
 }
 
 func ForwardOffset(value: nint) -> nint {
+    let copy = value
+    return copy
+}
+
+
+func ForwardSigned(value: long) -> long {
+    let copy = value
+    return copy
+}
+
+func ForwardUnsigned(value: ulong) -> ulong {
     let copy = value
     return copy
 }

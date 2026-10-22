@@ -464,6 +464,11 @@ size_t large_size(void) { return (size_t)UINT64_C(0xfedcba9876543210); }
 int32_t check_size(size_t n) { return n == large_size() ? 0 : 100; }
 intptr_t signed_offset(void) { return -INT64_C(0x123456789); }
 int32_t check_offset(intptr_t n) { return n == signed_offset() ? 0 : 100; }
+int64_t signed_wide(void) { return INT64_MIN + INT64_C(123); }
+uint64_t unsigned_wide(void) { return UINT64_MAX - UINT64_C(456); }
+int32_t check_wide(int64_t s, uint64_t u) {
+    return s == signed_wide() && u == unsigned_wide() ? 0 : 100;
+}
 "#,
     )
     .unwrap();

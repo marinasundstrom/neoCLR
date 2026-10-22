@@ -75,6 +75,8 @@ three-engine qualification or start stable export-name design. A separate shared
 Raven transport consumer now passes 32 runs in each interpreter/scalar-JIT/AOT mode,
 using C-owned reads and release. Direct untracked foreign-buffer access remains an
 interpreter gap; the original direct pointer read/write proof stays JIT/AOT-only.
+Fixed-width Int64/UInt64 transport now uses the same scalar ABI mapping and is
+covered by that shared consumer; arithmetic expansion remains open.
 
 **Character naming (author direction, 2026-10-21):** Rename the development
 grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain

@@ -46,6 +46,7 @@ pub(super) fn analyze(
             Kind::Pointer
         } else {
             match t {
+                Type::Int64 | Type::UInt64 => Kind::Int64,
                 Type::IntPtr => Kind::NativeInt,
                 Type::UIntPtr => Kind::NativeUInt,
                 _ => Kind::Int32,
@@ -188,7 +189,7 @@ pub(super) fn analyze(
                         || (native_imports
                             && matches!(
                                 popped[0],
-                                Kind::Pointer | Kind::NativeInt | Kind::NativeUInt
+                                Kind::Pointer | Kind::Int64 | Kind::NativeInt | Kind::NativeUInt
                             )))
             }
             Op::BranchTrue(_) | Op::BranchFalse(_) => {
@@ -196,7 +197,7 @@ pub(super) fn analyze(
                     || (native_imports
                         && matches!(
                             popped[0],
-                            Kind::Pointer | Kind::NativeInt | Kind::NativeUInt
+                            Kind::Pointer | Kind::Int64 | Kind::NativeInt | Kind::NativeUInt
                         ))
             }
             Op::Call(target) if console_call(target) => popped == [Kind::Literal],

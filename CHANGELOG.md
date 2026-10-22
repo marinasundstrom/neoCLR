@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Admit fixed-width Int64/UInt64 transport in the opt-in macOS ARM64 scalar JIT/AOT native-import ABI, including locals, helper calls, defaults and equality/zero checks. The shared Raven consumer preserves negative signed and high-bit unsigned C values across all three engines; all 16 import tests pass. Reuse existing 64-bit lowering without new marshalling or metadata. Arithmetic expansion and general managed imports remain open.
+
 - Add a common Raven native-import transport consumer qualified across interpreter, scalar JIT and AOT, with 32 successful runs per engine. Cover C allocation/read/release, pointer casts/nulls, no-result calls and full-width signed/unsigned native integers, and assert explicit interpreter trust. Retain the separate direct read/write JIT/AOT consumer. Both focused source integration tests and 24 website checks pass. Document untracked foreign-memory dereference as an interpreter gap without weakening its checks; no new runtime capability or complete parity is claimed.
 
 - Accept explicit seed/core metadata contexts and @entry in the opt-in scalar JIT NativeImport path. Share dependency option parsing, Object-root selection and LoadedProgram construction with AOT instead of duplicating validation. The same Raven allocation/read/write/release assembly returns 42 across 32 JIT calls and 32 AOT calls; missing contexts, duplicate options and malformed pairs reject before execution. All 15 import tests, 24 scalar regressions, two closed-world runtime-context checks and 24 website checks pass. Dependency bodies remain verification-only; ordinary managed JIT/AOT imports and full cross-engine qualification remain open.

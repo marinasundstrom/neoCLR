@@ -23,3 +23,12 @@ unsafe extern func SignedOffset() -> nint;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "check_offset")]
 unsafe extern func CheckOffset(value: nint) -> int;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "signed_wide")]
+unsafe extern func SignedWide() -> long;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "unsigned_wide")]
+unsafe extern func UnsignedWide() -> ulong;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "check_wide")]
+unsafe extern func CheckWide(signed: long, unsigned: ulong) -> int;
