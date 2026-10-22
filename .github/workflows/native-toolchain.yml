@@ -20,7 +20,7 @@ on:
         type: boolean
         default: false
       bundle_run:
-        description: Optional prior run whose packaged bundle should receive editor-only requalification
+        description: Optional prior run whose packaged bundle should receive runtime-contract and editor requalification
         required: false
 permissions:
   contents: read
@@ -49,7 +49,6 @@ jobs:
           ref: ${{ inputs.raven_revision || '301e668a51beb6ba307d63b6912b144d8ad6a6b0' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
-        if: ${{ !inputs.bundle_run }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -129,22 +128,6 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python 'target/extracted bundle/neoclr-native-poc/tools/verify-native-bundle.py' --report target/windows-native-acceptance.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Qualify current runtime and extracted SDK contracts
-        if: ${{ !inputs.bundle_run }}
-        shell: pwsh
-        working-directory: neoclr
-        run: |
-          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-          if (!$vs) { throw 'MSVC x64 tools not found' }
-          $bundle = "$PWD/target/extracted bundle/neoclr-native-poc"
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-gc.py --output target/release-gc"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"$bundle`" --runtime `"$bundle/bin/neoclr.exe`" --aot target/release/neoclr-codegen.exe --output target/release-runtime-await"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-json-sample.py --bundle `"$bundle`" --aot target/release/neoclr-codegen.exe --output target/release-json"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-server/check-header-names.py --bundle `"$bundle`" --aot target/release/neoclr-codegen.exe --output target/release-headers"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/download-artifact@v4
         if: ${{ inputs.bundle_run != '' }}
         with:
@@ -157,10 +140,31 @@ jobs:
         shell: pwsh
         working-directory: neoclr
         run: |
-          $archive = (Get-ChildItem target/reused -Recurse -Filter neoclr-native-poc.tar.gz | Select-Object -First 1).FullName
-          if (!$archive) { throw 'The selected run has no packaged bundle' }
+          $archives = @(Get-ChildItem target/reused -Recurse -Filter neoclr-native-poc.tar.gz)
+          if ($archives.Count -ne 1) { throw 'Expected exactly one packaged bundle in the selected run' }
+          $archive = $archives[0].FullName
+          @{ packageRun = '${{ inputs.bundle_run }}'; qualificationRevision = '${{ github.sha }}'; archiveSha256 = (Get-FileHash $archive -Algorithm SHA256).Hash } | ConvertTo-Json | Set-Content target/windows-native-acceptance-inputs.json
           New-Item -ItemType Directory 'target/extracted bundle'
           tar -xzf $archive -C 'target/extracted bundle'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python 'target/extracted bundle/neoclr-native-poc/tools/verify-native-bundle.py' --report target/windows-native-acceptance-reused.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify current runtime and extracted SDK contracts
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$vs) { throw 'MSVC x64 tools not found' }
+          $bundle = "$PWD/target/extracted bundle/neoclr-native-poc"
+          $manifest = Get-Content "$bundle/manifest.json" | ConvertFrom-Json
+          $aot = Join-Path $bundle $manifest.jit.compiler
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-gc.py --output target/release-gc"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"$bundle`" --runtime `"$bundle/bin/neoclr.exe`" --aot `"$aot`" --output target/release-runtime-await"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-json-sample.py --bundle `"$bundle`" --aot `"$aot`" --output target/release-json"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-server/check-header-names.py --bundle `"$bundle`" --aot `"$aot`" --output target/release-headers"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Verify packaged extension in VS Code
         shell: pwsh

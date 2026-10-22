@@ -340,3 +340,25 @@ change, retaining both revisions; the default still requires identical revisions
 This permits fixture repair validation against the existing package without
 misrepresenting which runtime/library commit it contains. A new Windows benchmark
 run must pass before the two-platform refresh is complete.
+
+## Windows root fixture portability repair — 2026-10-22
+
+[Windows run 39835531991](https://github.com/marinasundstrom/neoCLR/actions/runs/39835531991)
+built the compiler/SDK and passed the extracted-package sample step, then failed
+root-validation-probe-build. MSVC C4996 on three strcpy calls became C2220 under
+warnings-as-errors. The fixture now copies the fixed test strings including their
+terminators with sizeof-bounded memcpy, preserving descriptor mutation cases.
+All 18 probe/GC cases pass locally under undefined/bounds sanitizers; no runtime
+contract or production native code changed. [Evidence](validation/release-stabilization-20261022/windows-root-fixture.json).
+
+The validator now surfaces the last 16 KiB of each failing output stream in CI,
+retaining full logs; its failure-path test passes. The dependent benchmark run
+39838157047 correctly rejected failed package qualification without measuring.
+
+The next Windows attempt may reuse the unchanged archived package. Reuse now
+verifies package integrity/samples and runs the full runtime-contract step before
+installed-editor checks, rather than skipping directly to editor validation. It
+resolves the AOT compiler from that package's manifest and records the original
+package run, archive hash and new qualification-source revision. This validates
+an existing artifact with repaired test tooling; it does not label that artifact
+as rebuilt from the new source revision. Windows results remain pending.

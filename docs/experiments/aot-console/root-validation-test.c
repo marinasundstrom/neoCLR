@@ -25,11 +25,11 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[1], "plan-length")) {
             neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan) - 1);
             return 0;
-        } else if (!strcmp(argv[1], "plan-short")) strcpy(plan, "{}");
+        } else if (!strcmp(argv[1], "plan-short")) memcpy(plan, "{}", sizeof("{}"));
         else if (!strcmp(argv[1], "plan-moved")) {
-            strcpy(plan, "{\"other\":0,\"requiredSpillLanes\":[]}");
+            memcpy(plan, "{\"other\":0,\"requiredSpillLanes\":[]}", sizeof("{\"other\":0,\"requiredSpillLanes\":[]}"));
             neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
-            strcpy(plan, "requiredSpillLanes"); /* Marker at both bounds. */
+            memcpy(plan, "requiredSpillLanes", sizeof("requiredSpillLanes")); /* Marker at both bounds. */
             neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
             neoclr_probe_leave_v1(&parent);
             return 0;

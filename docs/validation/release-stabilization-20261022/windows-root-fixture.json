@@ -1,0 +1,106 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "gc": false,
+      "case": "address",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "width",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "flags",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "fault",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "transient",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "plan-missing",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "plan-length",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "plan-short",
+      "exitCode": -6
+    },
+    {
+      "gc": false,
+      "case": "plan-moved",
+      "exitCode": 0
+    },
+    {
+      "gc": true,
+      "case": "address",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "width",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "flags",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "fault",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "transient",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "plan-missing",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "plan-length",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "plan-short",
+      "exitCode": -6
+    },
+    {
+      "gc": true,
+      "case": "plan-moved",
+      "exitCode": 0
+    }
+  ],
+  "sourceSha256": "7869e77eb5e846e56fba49586b6376a652f73d8914452923320ba7634b993d3d",
+  "scope": "Local macOS ARM64 root validation only; Windows rerun required",
+  "windowsFailure": {
+    "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/39835531991",
+    "step": "Qualify current runtime and extracted SDK contracts",
+    "fixture": "root-validation-probe-build",
+    "diagnostic": "MSVC C2220: warning treated as error; C4996 strcpy at root-validation-test.c lines 28, 30, 32",
+    "stageAlreadyPassed": "Compiler/SDK build and extracted package samples",
+    "benchmark": "https://github.com/marinasundstrom/neoCLR/actions/runs/39838157047",
+    "benchmarkOutcome": "Rejected unsuccessful qualification; no measurements"
+  }
+}

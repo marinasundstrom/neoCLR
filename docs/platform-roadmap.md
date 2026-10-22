@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Windows qualification follow-up (2026-10-22):** Compiler/SDK build and extracted
+samples pass; root-fixture compilation fails on MSVC-deprecated strcpy. Replace
+fixed-string copies without relaxing warnings; 18 local sanitized cases pass.
+The Windows benchmark gate correctly rejects the failed package run. Requalification
+can reuse the unchanged artifact while rerunning runtime/editor checks.
+[Evidence](release-readiness.md#windows-root-fixture-portability-repair--2026-10-22).
+
 **macOS benchmark refresh (2026-10-22):** CPU/JSON and plain/JSON HTTP reports pass:
 55 processes and 1,152 validated responses. Repair current content API/media-type
 fixtures, retain failed attempts and add separate development website tables.

@@ -7,6 +7,7 @@ from pathlib import Path
 import platform
 import signal
 import subprocess
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / 'docs/experiments/aot-console'
@@ -28,6 +29,11 @@ def main():
         (out / (label + '.stderr.log')).write_bytes(result.stderr)
         report['commands'].append(dict(label=label, command=command, exitCode=result.returncode, expected=expected))
         if result.returncode != expected:
+            # Surface compiler diagnostics in CI without downloading the SDK archive.
+            # Full streams remain in the retained logs.
+            for name, data in [('stdout', result.stdout), ('stderr', result.stderr)]:
+                if data:
+                    print(label + ' ' + name + ':\n' + data[-16384:].decode(errors='replace'), file=sys.stderr)
             raise RuntimeError(label + ' failed; see retained logs')
         return result.stdout.decode().strip()
 
