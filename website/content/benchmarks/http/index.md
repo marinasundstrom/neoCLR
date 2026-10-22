@@ -8,28 +8,33 @@ Preview 16 package with Raven `c0854cdda`. All **1,152 responses across
 <a id="plain-text-baseline"></a>
 <a id="publication-status"></a>
 
-## Development refresh — 22 October 2026
+## Complete SDK development refresh — 22 October 2026
 
-The current macOS ARM64 development candidate passes 55 CPU/JSON processes and
-1,152 HTTP response checks across the combined run. These Apple M1/macOS 27.0
-results are separate from the published Preview 16 measurements below. Windows
-qualification is ongoing; its historical rows do not qualify the new candidate.
+The complete macOS ARM64 development SDK passes the entire sequential benchmark
+runner: 55 CPU/JSON processes and 1,152 HTTP responses, with unchanged-input checks.
+Apple M1/macOS 27.0; Raven compiler `301e668a5`. This is a development candidate,
+not a published release or a controlled comparison with the earlier snapshot.
 
 | Workload | Mode | Median requests/s | Range | Median startup s |
 | --- | --- | ---: | ---: | ---: |
-| http-plain | interpreter | 3.56 | 3.44–3.57 | 4.506 |
-| http-plain | jit | 178.74 | 177.77–190.22 | 7.041 |
-| http-plain | aot | 188.82 | 188.08–199.09 | 0.007 |
-| http-json | interpreter | 1.74 | 1.73–1.74 | 4.535 |
-| http-json | jit | 96.22 | 95.34–99.56 | 11.484 |
-| http-json | aot | 99.62 | 99.36–104.01 | 0.013 |
+| http-plain | interpreter | 3.76 | 3.58–3.78 | 4.244 |
+| http-plain | jit | 189.95 | 189.69–190.90 | 6.685 |
+| http-plain | aot | 199.38 | 199.20–199.67 | 0.006 |
+| http-json | interpreter | 1.73 | 1.69–1.77 | 4.492 |
+| http-json | jit | 96.82 | 92.56–101.17 | 11.658 |
+| http-json | aot | 100.61 | 99.65–100.71 | 0.013 |
 
-The same short sequential workloads and round counts are used. HTTP fixtures were
-updated for the current content API and content-owned media type; failed attempts
-are preserved. No local builds or full test suites overlapped timings, but desktop
-and OS load remained active. These observations do not establish controlled
-speedups, sustained capacity or collector comparisons. Startup is reported separately.
-[Candidate identity, methodology and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos).
+Five measured rounds rotate modes. CPU/JSON uses 16 operations and two warmups;
+native CPU rows use a separate 10,000-operation, 20-warmup run. Each HTTP process
+validates 32 responses, discarding the first eight from timing; each mode also has
+one whole-process warmup. Requests are sequential loopback HTTP/1.1 with connection
+close, using a Python client on the same machine. Startup is separate and includes
+JIT compilation. No unrelated local builds or full suites overlapped timed workers;
+desktop and OS activity remained present. These results do not establish controlled
+speedups, peak concurrency, allocation rates, GC comparisons or HTTPS throughput.
+
+[Candidate identity and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos-complete).
+The [earlier development measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos) are preserved. Windows qualification has passed; its refreshed performance results are still pending.
 
 ## Published Preview 16 series
 

@@ -1,0 +1,327 @@
+{
+  "aggregate": {
+    "rawSha256": "53044818f2690f86b0d121e232a1d3bcb671641614db630f2f17f4ecbd640827",
+    "gzipSha256": "af39748e81c3636fd06e0fa6bd85112884e2b1a8826f8e68b677407bcb51d2a5",
+    "passed": true,
+    "summary": null
+  },
+  "execution": {
+    "rawSha256": "ec6c54ac066b16232299252b5ad70020950bf65fb2c661b6103abb59540e7f9e",
+    "gzipSha256": "6371ab5afa4699832eb528b8a57144ac7671f3407081b0e4518be0f7e1618b2a",
+    "passed": true,
+    "summary": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 4.405159709000003,
+            "minimum": 4.387600374999998,
+            "maximum": 4.902613083
+          },
+          "batchSeconds": {
+            "median": 3.159117500000008,
+            "minimum": 3.059281125,
+            "maximum": 3.4151003750000015
+          },
+          "operationsPerSecond": {
+            "median": 5.06470557046389,
+            "minimum": 4.685074593158918,
+            "maximum": 5.229986832282371
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.586727916000001,
+            "minimum": 3.554053666999991,
+            "maximum": 4.218878
+          },
+          "batchSeconds": {
+            "median": 0.00037112500000091586,
+            "minimum": 0.0003453750000019795,
+            "maximum": 0.0003790409999737676
+          },
+          "operationsPerSecond": {
+            "median": 43112.15897597983,
+            "minimum": 42211.79239477343,
+            "maximum": 46326.456749644
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.006902957999997739,
+            "minimum": 0.00584854200000251,
+            "maximum": 0.25958099999999895
+          },
+          "batchSeconds": {
+            "median": 0.00046504200000185847,
+            "minimum": 0.0003739169999974479,
+            "maximum": 0.0011297499999987082
+          },
+          "operationsPerSecond": {
+            "median": 34405.494557343336,
+            "minimum": 14162.425315351446,
+            "maximum": 42790.24489421237
+          }
+        }
+      },
+      "json.serialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 4.391291707999983,
+            "minimum": 4.3814214169999985,
+            "maximum": 4.412969
+          },
+          "batchSeconds": {
+            "median": 1.0934070420000026,
+            "minimum": 1.0907224999999983,
+            "maximum": 1.1167729999999985
+          },
+          "operationsPerSecond": {
+            "median": 14.633159825579359,
+            "minimum": 14.326993936995272,
+            "maximum": 14.669175706928229
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.55250108300001,
+            "minimum": 3.5332447910000013,
+            "maximum": 4.174908875
+          },
+          "batchSeconds": {
+            "median": 0.02219970800000226,
+            "minimum": 0.021982374999993226,
+            "maximum": 0.023875249999989023
+          },
+          "operationsPerSecond": {
+            "median": 720.7302005953578,
+            "minimum": 670.1500507851166,
+            "maximum": 727.8558390531019
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.007302584000001389,
+            "minimum": 0.006311124999999862,
+            "maximum": 0.02203837500000816
+          },
+          "batchSeconds": {
+            "median": 0.022606166999992183,
+            "minimum": 0.020613584000003016,
+            "maximum": 0.0380027080000076
+          },
+          "operationsPerSecond": {
+            "median": 707.7714678479342,
+            "minimum": 421.02262817683413,
+            "maximum": 776.1871977234846
+          }
+        }
+      },
+      "json.deserialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 4.377352166999998,
+            "minimum": 4.355823375,
+            "maximum": 4.892728874999989
+          },
+          "batchSeconds": {
+            "median": 1.3388015419999988,
+            "minimum": 1.3343844170000025,
+            "maximum": 1.3918120409999943
+          },
+          "operationsPerSecond": {
+            "median": 11.950987131444471,
+            "minimum": 11.495805129336473,
+            "maximum": 11.99054769836987
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.5616773340000023,
+            "minimum": 3.5393399999999993,
+            "maximum": 3.5968868329999992
+          },
+          "batchSeconds": {
+            "median": 0.030575165999977116,
+            "minimum": 0.030245041000000583,
+            "maximum": 0.030771208000004435
+          },
+          "operationsPerSecond": {
+            "median": 523.3005112715324,
+            "minimum": 519.9665869470479,
+            "maximum": 529.0123428829107
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.006845333000001119,
+            "minimum": 0.006611542000001691,
+            "maximum": 0.006947666999998603
+          },
+          "batchSeconds": {
+            "median": 0.03112191599998937,
+            "minimum": 0.030806750000003547,
+            "maximum": 0.03130695800000183
+          },
+          "operationsPerSecond": {
+            "median": 514.1071648675314,
+            "minimum": 511.0684979357964,
+            "maximum": 519.366697233501
+          }
+        }
+      }
+    }
+  },
+  "cpu-native": {
+    "rawSha256": "a4b11fd9be2d3d452cdb313d0ac33b6071675252cf6c2f4eaad00428416a1b5f",
+    "gzipSha256": "f1c42ca24ba95c8337342d6e5948628b9a7794d2250ce608180cc7b9e841e131",
+    "passed": true,
+    "summary": {
+      "cpu.sum": {
+        "jit": {
+          "startupSeconds": {
+            "median": 3.5653707499999996,
+            "minimum": 3.557301334000001,
+            "maximum": 3.590647417
+          },
+          "batchSeconds": {
+            "median": 0.23692804099999876,
+            "minimum": 0.2335230420000003,
+            "maximum": 0.2378303749999997
+          },
+          "operationsPerSecond": {
+            "median": 42206.90787714761,
+            "minimum": 42046.773882436224,
+            "maximum": 42822.32671497996
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.006844666999999305,
+            "minimum": 0.006029416000000509,
+            "maximum": 0.007623374999999655
+          },
+          "batchSeconds": {
+            "median": 0.2380515420000009,
+            "minimum": 0.23721854100000073,
+            "maximum": 0.24168745900000133
+          },
+          "operationsPerSecond": {
+            "median": 42007.709406057795,
+            "minimum": 41375.75048939525,
+            "maximum": 42155.22091083078
+          }
+        }
+      }
+    }
+  },
+  "http-plain": {
+    "rawSha256": "57829d61d9c9d1d4f5362311831dcd0736e9fdced9746c842efa5b709bd275b9",
+    "gzipSha256": "d179dbb3d036ae08ee121f4483da491e1c96e3c22ad2e4b4139ffd35a6b864c6",
+    "passed": true,
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 3.759508570223046,
+          "min": 3.5790231659155247,
+          "max": 3.7820783266892932
+        },
+        "startupSecondsMedian": 4.244379791,
+        "latencySeconds": {
+          "p50": 0.26518879200000356,
+          "p95": 0.27892095900000413,
+          "p99": 0.34163991700000906
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 189.94961847554322,
+          "min": 189.6903275369062,
+          "max": 190.89807218555885
+        },
+        "startupSecondsMedian": 6.6854965000000135,
+        "latencySeconds": {
+          "p50": 0.005249042000002646,
+          "p95": 0.005333458000009728,
+          "p99": 0.005425041000002295
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 199.37853709985723,
+          "min": 199.20009045677995,
+          "max": 199.6680485415606
+        },
+        "startupSecondsMedian": 0.006293291000005752,
+        "latencySeconds": {
+          "p50": 0.0050114999999948395,
+          "p95": 0.005056707999997911,
+          "p99": 0.005102000000000828
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    }
+  },
+  "http-json": {
+    "rawSha256": "4cbf85785884f3a9de0518f6c91ed94e2f468ad91af23326f4fab136e9c09115",
+    "gzipSha256": "cc961e1f5000b59158adff2bc23ac4c5aeb85fbfc44a30bc3694d5c797191049",
+    "passed": true,
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 1.7334075832404714,
+          "min": 1.6917848299496823,
+          "max": 1.7656781523784069
+        },
+        "startupSecondsMedian": 4.49173429199999,
+        "latencySeconds": {
+          "p50": 0.5751964579999935,
+          "p95": 0.6199127080000011,
+          "p99": 0.6802116670000089
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 96.82169317787624,
+          "min": 92.55698743357367,
+          "max": 101.1690479738572
+        },
+        "startupSecondsMedian": 11.657877083999978,
+        "latencySeconds": {
+          "p50": 0.01032024999999237,
+          "p95": 0.010762749999997823,
+          "p99": 0.01207366699999568
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 100.60947205983388,
+          "min": 99.65103246461418,
+          "max": 100.71012809451248
+        },
+        "startupSecondsMedian": 0.013376166000000467,
+        "latencySeconds": {
+          "p50": 0.00993816599999775,
+          "p95": 0.010310042000000408,
+          "p99": 0.010566707999998926
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    }
+  }
+}

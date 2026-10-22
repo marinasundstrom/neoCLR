@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Complete-package macOS measurements (2026-10-22):** The rebuilt matched SDK
+passes all benchmark stages: 55 CPU/JSON processes and 1,152 HTTP responses.
+Retain the earlier development series separately, update website development
+tables, and preserve raw reports/archive identity. No controlled speedup claim.
+[Results](../benchmarks/release-20261022/macos-complete/README.md).
+
 **Windows candidate qualified (2026-10-22):** Run 39841298887 passes extracted
 samples/HTTP, native GC, 24 await cases, JSON/header cases and installed-editor
 acceptance including two configuration recovery runs. It reuses the original

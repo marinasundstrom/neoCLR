@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Measure the rebuilt complete macOS SDK with the sequential release runner: all five stages, 55 CPU/JSON processes and 1,152 HTTP responses pass correctness and unchanged-input checks. Retain compressed raw reports and matching archive hashes separately from earlier development measurements. Update website development tables with distributions and limits; all 24 website tests and 5,703 pages pass. Windows HTTPS and measurements are running; no controlled speedup or new release is claimed.
+
 - Record successful Windows x64 requalification of the unchanged candidate package after the GC fixture and UTF-8 harness repairs: extracted samples/HTTP, native GC, all 24 await cases, three JSON cases, 132 header cases, 26 installed-editor checks, inlays and both ten-cycle configuration runs pass. Retain compressed raw reports, hashes and original package lineage. Matching Windows HTTPS and benchmark runs remain pending; this is not release publication.
 
 - Complete the rebuilt macOS package’s second ten-cycle installed-editor configuration run and matching HTTPS project qualification. All 15 AOT TLS/security/recovery/cleartext cases and native transport tests pass; retain raw evidence and build hashes. Add a current development qualification index distinct from published Preview 16 records. Windows and matching refreshed-package measurements remain open.

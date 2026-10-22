@@ -85,10 +85,18 @@
       "mode": "AOT project",
       "httpsBuildSha256": "663dfa62912b6e40d02f8ffb632d08d90ad03bf2948fdabcddc1c6912a0b3ee4",
       "cleartextBuildSha256": "39d27f78f1d94a1107e413ef272afc3f796a7b573353c54509a61e1ecea62bd5"
+    },
+    "benchmarks": {
+      "source": "target/release-complete-benchmarks-macos-20261022/release-benchmarks.json",
+      "sha256": "53044818f2690f86b0d121e232a1d3bcb671641614db630f2f17f4ecbd640827",
+      "passed": true,
+      "retained": "../../../benchmarks/release-20261022/macos-complete/aggregate.json.gz",
+      "cpuJsonProcesses": 55,
+      "httpResponses": 1152
     }
   },
   "limitations": [
-    "Windows qualification 39841298887 and benchmarks 39841353425 pending",
+    "Windows package qualification passes; Windows HTTPS 39843930421 and benchmarks 39841353425 pending",
     "Rebuilt library hashes differ from earlier measured development bundle; those measurements do not qualify this archive",
     "No release published"
   ]

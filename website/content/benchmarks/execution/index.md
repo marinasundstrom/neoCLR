@@ -4,31 +4,36 @@ CPU and JSON workloads run through the same Raven worker in interpreter, JIT and
 AOT. These **18 October 2026, Apple M1/macOS 27.0** measurements use the Preview 16 package with Raven `c0854cdda`. All 45 CPU/JSON processes and ten longer
 native CPU processes pass correctness and unchanged-input checks. Windows results follow below as a separate hosted-runner series.
 
-## Development refresh — 22 October 2026
+## Complete SDK development refresh — 22 October 2026
 
-The current macOS ARM64 development candidate passes 55 CPU/JSON processes and
-1,152 HTTP response checks across the combined run. These Apple M1/macOS 27.0
-results are separate from the published Preview 16 measurements below. Windows
-qualification is ongoing; its historical rows do not qualify the new candidate.
+The complete macOS ARM64 development SDK passes the entire sequential benchmark
+runner: 55 CPU/JSON processes and 1,152 HTTP responses, with unchanged-input checks.
+Apple M1/macOS 27.0; Raven compiler `301e668a5`. This is a development candidate,
+not a published release or a controlled comparison with the earlier snapshot.
 
 | Workload | Mode | Median operations/s | Range | Median startup s |
 | --- | --- | ---: | ---: | ---: |
-| cpu.sum | interpreter | 4.90 | 4.85–4.93 | 4.689 |
-| cpu.sum | jit | 39849.60 | 39016.93–39904.81 | 3.783 |
-| cpu.sum | aot | 39771.50 | 39631.77–39896.90 | 0.006 |
-| json.serialize | interpreter | 13.60 | 13.59–13.70 | 4.682 |
-| json.serialize | jit | 687.62 | 679.33–690.59 | 3.791 |
-| json.serialize | aot | 721.98 | 720.69–723.66 | 0.015 |
-| json.deserialize | interpreter | 11.19 | 11.17–11.25 | 4.666 |
-| json.deserialize | jit | 494.10 | 491.10–501.68 | 3.807 |
-| json.deserialize | aot | 518.33 | 514.60–522.75 | 0.015 |
+| cpu.sum | interpreter | 5.06 | 4.69–5.23 | 4.405 |
+| cpu.sum | jit | 42206.91 | 42046.77–42822.33 | 3.565 |
+| cpu.sum | aot | 42007.71 | 41375.75–42155.22 | 0.007 |
+| json.serialize | interpreter | 14.63 | 14.33–14.67 | 4.391 |
+| json.serialize | jit | 720.73 | 670.15–727.86 | 3.553 |
+| json.serialize | aot | 707.77 | 421.02–776.19 | 0.007 |
+| json.deserialize | interpreter | 11.95 | 11.50–11.99 | 4.377 |
+| json.deserialize | jit | 523.30 | 519.97–529.01 | 3.562 |
+| json.deserialize | aot | 514.11 | 511.07–519.37 | 0.007 |
 
-The same short sequential workloads and round counts are used. HTTP fixtures were
-updated for the current content API and content-owned media type; failed attempts
-are preserved. No local builds or full test suites overlapped timings, but desktop
-and OS load remained active. These observations do not establish controlled
-speedups, sustained capacity or collector comparisons. Startup is reported separately.
-[Candidate identity, methodology and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos).
+Five measured rounds rotate modes. CPU/JSON uses 16 operations and two warmups;
+native CPU rows use a separate 10,000-operation, 20-warmup run. Each HTTP process
+validates 32 responses, discarding the first eight from timing; each mode also has
+one whole-process warmup. Requests are sequential loopback HTTP/1.1 with connection
+close, using a Python client on the same machine. Startup is separate and includes
+JIT compilation. No unrelated local builds or full suites overlapped timed workers;
+desktop and OS activity remained present. These results do not establish controlled
+speedups, peak concurrency, allocation rates, GC comparisons or HTTPS throughput.
+
+[Candidate identity and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos-complete).
+The [earlier development measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos) are preserved. Windows qualification has passed; its refreshed performance results are still pending.
 
 ## Published Preview 16 series
 

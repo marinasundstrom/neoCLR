@@ -425,3 +425,15 @@ remain failed. [Compressed raw reports and lineage](validation/release-stabiliza
 retain independent hashes. [Windows HTTPS](https://github.com/marinasundstrom/neoCLR/actions/runs/39843930421)
 and [matching measurements](https://github.com/marinasundstrom/neoCLR/actions/runs/39841353425)
 are running; neither is counted as passed yet. No release is published.
+
+### Complete-package macOS measurements passed — 2026-10-22
+
+The sequential aggregate runner passes all five stages against the rebuilt complete
+SDK: 55 CPU/JSON processes and 1,152 HTTP responses, including unchanged-input
+checks. Source starts clean at `5ea8b4328`; archive and manifest identities match
+[the complete package record](validation/release-stabilization-20261022/complete-macos-package.json).
+[Tables, methodology and raw reports](../benchmarks/release-20261022/macos-complete/README.md)
+retain distributions, startup and throughput separately. Earlier development and
+published measurements remain available. The website development tables now use
+this matching archive; variable desktop load and changed library bytes prevent
+controlled speedup conclusions. Windows measurements remain pending.
