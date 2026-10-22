@@ -238,3 +238,13 @@ imports. With this opt-in it accepts trailing `--system`, `--module` and
 `--object-root` inputs and `@entry`, using the same verification rules as AOT.
 Dependencies are verification-only; this does not enable imports in the ordinary
 managed JIT/SDK pipeline.
+
+### Qualified transport across engines
+
+A common Raven consumer now passes in interpreter, scalar JIT and AOT for native
+allocation/read/release calls, pointer transport and null checks, no-result returns,
+and native-sized integers. Reads are performed by the C owner. Direct dereference
+of untracked foreign storage remains unsupported in the interpreter; a returned
+pointer does not establish bounds or lifetime. The separate direct Byte/Int32
+memory-access example is qualified only in the trusted scalar JIT/AOT profiles.
+This does not establish full managed-library, callback or pinning parity.

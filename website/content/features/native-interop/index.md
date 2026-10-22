@@ -213,3 +213,10 @@ faults. A tested Raven consumer now executes through both scalar JIT and AOT usi
 explicit seed/core verification inputs and `@entry`. Dependencies remain verification-only;
 this does not enable imports in the ordinary managed JIT pipeline. Default execution continues
 to reject imports unless explicitly enabled.
+
+A shared Raven transport sample is now tested across interpreter, scalar JIT and
+AOT: C allocation/read/release, pointer casts/nulls, no-result calls and native-sized
+integer values. C performs the reads in this shared sample. Direct access to
+untracked foreign storage remains an interpreter gap; the separate direct pointer
+read/write sample is qualified in scalar JIT/AOT only. This baseline does not mean
+that full NativeImport support is complete across engines.

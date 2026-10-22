@@ -417,6 +417,18 @@ ret
 #[ignore = "requires NEOCLR_RAVEN_BUNDLE with the matching native compiler and libraries"]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn raven_native_metadata_imports_execute_aot_and_jit_with_explicit_load_context() {
+    qualify_raven_imports("Main.rvn", false);
+}
+
+#[test]
+#[ignore = "requires NEOCLR_RAVEN_BUNDLE with the matching native compiler and libraries"]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_native_pointer_transport_executes_in_all_three_engines() {
+    qualify_raven_imports("Transport.rvn", true);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn qualify_raven_imports(source: &str, interpreter: bool) {
     let bundle =
         PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").expect("set NEOCLR_RAVEN_BUNDLE"))
             .canonicalize()
@@ -429,9 +441,8 @@ fn raven_native_metadata_imports_execute_aot_and_jit_with_explicit_load_context(
     let dir = Temp::new();
     let project = dir.0.join("raven");
     fs::create_dir(&project).unwrap();
-    for name in ["App.rvnproj", "Main.rvn"] {
-        fs::copy(sample.join(name), project.join(name)).unwrap();
-    }
+    fs::copy(sample.join("App.rvnproj"), project.join("App.rvnproj")).unwrap();
+    fs::copy(sample.join(source), project.join("Main.rvn")).unwrap();
     let fixture = dir.0.join("fixture.c");
     let library = dir.0.join("fixture.dylib");
     fs::write(
@@ -483,6 +494,51 @@ int32_t check_offset(intptr_t n) { return n == signed_offset() ? 0 : 100; }
         String::from_utf8_lossy(&result.stderr)
     );
     let artifact = project.join("bin/neoclr/RavenAotImports.dll");
+    if interpreter {
+        let decode = |path: &Path| {
+            let bytes = fs::read(path).unwrap();
+            if bytes.starts_with(b"NEOX") {
+                neoclr::metadata_container::decode_envelope(&bytes).unwrap()
+            } else {
+                neoclr::metadata_container::decode(&bytes).unwrap()
+            }
+        };
+        let app = decode(&artifact);
+        let system = decode(&bundle.join("lib/System.runtime.neox"));
+        let core = decode(&bundle.join("lib/System.Runtime.dll"));
+        let index = core
+            .types
+            .iter()
+            .position(|t| t.name == "System.Object")
+            .unwrap();
+        let object_root = neoclr::metadata::TypeDefId {
+            module: core.name.clone(),
+            revision: core.revision.clone(),
+            index: index as u32,
+        };
+        let program = neoclr::LoadedProgram::with_modules_and_object_root(
+            &app,
+            &system,
+            &[core],
+            &object_root,
+        )
+        .unwrap();
+        program.verify().unwrap();
+        assert!(
+            program
+                .run(neoclr::Limits::default())
+                .unwrap_err()
+                .message
+                .contains("run_with_native"),
+            "native execution must require explicit trust"
+        );
+        for _ in 0..32 {
+            // SAFETY: the test owns this C fixture and its exact scalar signatures;
+            // the guest frees its allocation and C never retains a managed pointer.
+            let result = unsafe { program.run_with_native(neoclr::Limits::default()) }.unwrap();
+            assert_eq!(result.value, neoclr::Value::Int32(42));
+        }
+    }
     let object = dir.0.join("app.o");
     let backend = |output: &Path, context: bool| {
         let mut cmd = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));

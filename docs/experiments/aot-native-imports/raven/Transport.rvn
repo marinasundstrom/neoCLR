@@ -1,0 +1,20 @@
+unsafe func Main() -> int {
+    let pointer = (*int)Allocate(42, (nuint)4)
+    if pointer == default(*int) {
+        return -1
+    }
+    let result = Read(pointer)
+    Release(default(*unit))
+    Release(pointer)
+    return result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
+}
+
+func ForwardSize(value: nuint) -> nuint {
+    let copy = value
+    return copy
+}
+
+func ForwardOffset(value: nint) -> nint {
+    let copy = value
+    return copy
+}

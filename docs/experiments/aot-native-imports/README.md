@@ -393,3 +393,34 @@ Validation: all 15 native-import tests (Raven opt-in enabled), 24 scalar regress
 two closed-world runtime-context tests and 24 website checks pass. The paired local
 bundle remains Raven `3fc2b6d0e` plus the metadata validator from neoCLR `417e7a451`;
 no rebuilt release package or wider native export contract is claimed.
+
+## Three-engine transport baseline (2026-10-22)
+
+`raven/Transport.rvn` now provides a shared source contract executed 32 times in
+each of the interpreter, scalar JIT and linked AOT modes. C owns allocation, reading
+and release. Raven checks a null return, casts/forwards the pointer, calls no-result
+release (including null release), and forwards high-bit unsigned sizes and negative
+signed offsets through locals/helpers. Each run returns 42 and the C live-allocation
+counter returns to zero. All engines consume the same Raven-produced metadata;
+the harness recognizes NEOX and PE/#Neo by content, not by a .dll filename suffix.
+Interpreter execution requires the explicit trusted-native API; the safe API rejects.
+
+The original `Main.rvn` remains a separate JIT/AOT direct pointer read/write proof.
+Interpreter pointer storage only permits dereference of runtime-tracked allocations;
+a foreign returned pointer does not acquire bounds, initialization or lifetime from
+its declared pointee type. Direct access to untracked foreign storage still rejects.
+That engine difference is an implementation/ownership-contract gap, not a proposed
+permanent split in language semantics. Do not remove the interpreter check merely
+to make the unsafe AOT example pass. Full foreign-buffer borrowing, managed-library
+integration, pinning, callbacks and broader scalar ABI coverage remain open before
+claiming complete three-engine NativeImport support or moving to export-name design.
+
+Both consumers use the repository Rust test framework because the bounded scalar
+backend cannot execute the managed built-in Raven runner. C fixtures exercise the
+actual ABI, and the harness compiles the Raven source once per consumer and cleans
+its temporary files. This is qualification of existing behavior, not new runtime
+capability or release-package certification.
+
+Validation: both focused Raven source integration tests pass with the explicit bundle
+opt-in, and all 24 website checks pass. The unchanged scalar backend regressions
+retain their preceding evidence. The compiler/SDK overlay revisions remain as above.
