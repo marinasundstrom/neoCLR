@@ -184,9 +184,13 @@ caller and the same Raven NativeImport consumer test the produced library.
 
 Export adapters return the declared native result on success. An escaping guest
 fault terminates execution: it does not unwind through C or return a fabricated
-value. NativeExportAttribute source integration is the next step; explicit CLI
-selection currently exercises the backend. Class/object mapping and metadata
-sidecars are future work.
+value. Apply `[NativeExport]` for a versioned name or
+`[NativeExport("native_name")]` for an explicit C symbol. The backend's
+`--header exports.h` option emits declarations usable from C and C++.
+The tested source sample exports numeric functions and pointer read/write helpers.
+Callback parameters, class/object mapping and metadata sidecars remain future work.
+All code inside the library retains neoCLR runtime conventions; only the exported
+adapters use the C ABI. Native pointers do not expose a managed object's layout.
 
 [Execution and attribute reference](/docs/native-interop.html) ·
 [Contract, tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)

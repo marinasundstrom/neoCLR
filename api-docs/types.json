@@ -317,6 +317,7 @@
   "System.Runtime.GC",
   "System.Runtime.InteropServices.MarshalAsAttribute",
   "System.Runtime.InteropServices.NativeCallingConvention",
+  "System.Runtime.InteropServices.NativeExportAttribute",
   "System.Runtime.InteropServices.NativeImportAttribute",
   "System.Runtime.InteropServices.NativeMemory",
   "System.Runtime.InteropServices.NativeStringMarshalling",

@@ -468,3 +468,20 @@ uses ordinary NativeImport declarations, with no additional runtime binding path
 documents the deliberate fault boundary and source identity rather than content
 hashes. The matched compiler/SDK overlay is unchanged; no compiler or binary
 encoding change is required for this backend increment.
+
+
+### Attribute-selected exports and headers (2026-10-22)
+
+The Exports.rvn fixture now uses NativeExportAttribute, including an explicit
+symbol with NativeCallingConvention.System. The native-library invocation discovers
+annotations through loaded source identity, and --header exports.h produces the
+declarations used by both C and C++17 consumers. Existing object/header paths
+reject without overwriting; invalid C identifier names reject when requesting a
+header. NativeExport does not change internal runtime calling conventions.
+
+Validation: all 19 native_imports integration tests and three native_exports unit
+tests pass with the native-export-bundle-20261022 local overlay (compiler 3fc2b6d0e,
+SDK 417e7a451, native-export-libraries-20261022-v2 Runtime artifacts; v3 adds the
+PostgreSql provider for the documentation audit). The generated library still
+round-trips in interpreter, scalar JIT and AOT. Callback parameters/returns remain
+outside this export profile.

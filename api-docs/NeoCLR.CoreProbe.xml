@@ -3471,6 +3471,12 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
     </member>
 
 
+    <member name="T:System.Runtime.InteropServices.NativeExportAttribute"><summary>Exports a supported free function through the native C boundary. Managed layouts and pointer ownership are not exported.</summary></member>
+    <member name="M:System.Runtime.InteropServices.NativeExportAttribute.#ctor"><summary>Uses versioned source-identity mangling and Cdecl.</summary></member>
+    <member name="M:System.Runtime.InteropServices.NativeExportAttribute.#ctor(System.String)"><summary>Uses an exact entry point, or versioned mangling for an empty string, and Cdecl.</summary><param name="entryPoint">Native symbol name.</param></member>
+    <member name="M:System.Runtime.InteropServices.NativeExportAttribute.#ctor(System.String,System.Runtime.InteropServices.NativeCallingConvention)"><summary>Selects a native name and calling convention.</summary><param name="entryPoint">Native symbol name; empty requests mangling.</param><param name="callingConvention">Cdecl or the supported platform System convention.</param></member>
+    <member name="P:System.Runtime.InteropServices.NativeExportAttribute.EntryPoint"><summary>Gets the exact symbol name, or empty for automatic mangling.</summary></member>
+    <member name="P:System.Runtime.InteropServices.NativeExportAttribute.CallingConvention"><summary>Gets the native convention.</summary></member>
     <member name="T:System.Runtime.InteropServices.NativeImportAttribute"><summary>Binds an extern static method or namespace function to a native export. Loading is lazy; callers must match the native ABI.</summary></member>
     <member name="M:System.Runtime.InteropServices.NativeImportAttribute.#ctor(System.String)"><summary>Records a nonempty library loader name or path. Does not load native code.</summary></member>
     <member name="P:System.Runtime.InteropServices.NativeImportAttribute.LibraryName"><summary>Gets the native library loader name or path.</summary></member>

@@ -1271,24 +1271,15 @@ fn qualify_aot_provider(
         String::from_utf8_lossy(&compiled.stderr)
     );
     let object = dir.0.join("exports.o");
+    let header = dir.0.join("exports.h");
     let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     command
         .arg("--native-library")
         .arg(project.join("bin/neoclr/RavenAotImports.dll"))
         .arg(&object)
-        .arg("--native-imports");
-    for name in [
-        "AllocateExport",
-        "ReadExport",
-        "WriteExport",
-        "ReleaseExport",
-        "SingleExport",
-        "DoubleExport",
-        "WideExport",
-        "DivideExport",
-    ] {
-        command.args(["--export", name]);
-    }
+        .arg("--native-imports")
+        .arg("--header")
+        .arg(&header);
     command
         .arg("--system")
         .arg(bundle.join("lib/System.runtime.neox"))
@@ -1343,10 +1334,7 @@ fn qualify_aot_provider(
         &host,
         format!(
             r#"
-#include <stdint.h>
-extern int32_t {read}(int32_t *);
-extern void {write}(int32_t *, int32_t);
-extern int32_t {divide}(int32_t);
+#include "exports.h"
 int main(int argc, char **argv) {{
     if (argc > 1) return {divide}(0);
     int32_t value = 10;
@@ -1363,6 +1351,11 @@ int main(int argc, char **argv) {{
     let host_app = dir.0.join("export-host");
     cc(&[&host, library], &[], &host_app);
     assert!(Command::new(&host_app).status().unwrap().success());
+    let cpp = dir.0.join("export-host.cpp");
+    fs::copy(&host, &cpp).unwrap();
+    let cpp_app = dir.0.join("export-host-cpp");
+    cc(&[&cpp, library], &["-std=c++17"], &cpp_app);
+    assert!(Command::new(&cpp_app).status().unwrap().success());
     use std::os::unix::process::ExitStatusExt;
     let fault = Command::new(&host_app).arg("fault").output().unwrap();
     assert!(

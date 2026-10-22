@@ -1,36 +1,46 @@
+import System.Runtime.InteropServices.*
+
 // The library test exports selected free functions, not this executable entry.
 func Main() -> int {
     return 0
 }
 
+[NativeExport]
 unsafe func AllocateExport(value: int, size: nuint) -> *unit {
     return Allocate(value, size)
 }
 
+[NativeExport]
 unsafe func ReadExport(pointer: *int) -> int {
     return *pointer
 }
 
+[NativeExport("neoclr_sample_write", NativeCallingConvention.System)]
 unsafe func WriteExport(pointer: *int, value: int) -> unit {
     *pointer = value
 }
 
+[NativeExport]
 unsafe func ReleaseExport(pointer: *unit) -> unit {
     Release(pointer)
 }
 
+[NativeExport]
 unsafe func SingleExport(index: int) -> float {
     return SingleValue(index)
 }
 
+[NativeExport]
 unsafe func DoubleExport(index: int) -> double {
     return DoubleValue(index)
 }
 
+[NativeExport]
 unsafe func WideExport() -> ulong {
     return UnsignedWide()
 }
 
+[NativeExport]
 func DivideExport(divisor: int) -> int {
     return 42 / divisor
 }

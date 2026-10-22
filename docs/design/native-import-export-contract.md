@@ -449,3 +449,29 @@ read/release and numeric returns through interpreter, scalar JIT and AOT. The ob
 symbol table is checked for exactly the requested exports. This establishes the
 bounded free-function round trip, not ordinary SDK integration or full marshalling
 and callback parity.
+
+
+### Source exports and generated headers — 2026-10-22
+
+NativeExportAttribute now selects source free functions in the opt-in macOS ARM64
+scalar native-library backend. Ordinary custom-attribute metadata is sufficient:
+the backend resolves the attribute owner through the loaded type's source identity,
+not an interpretation of content-hashed executable names. Constructors choose
+automatic versioned mangling or an exact name, with Cdecl/System conventions.
+The underlying native mapping is unchanged; no CLR managed layout crosses the
+boundary. Unlike .NET NativeAOT's explicit EntryPoint export selection, the default
+name here is versioned source/signature mangling. That supports automatic names
+at the cost of a neoCLR-specific symbol contract; explicit names remain available.
+
+Optional --header emits C/C++ declarations for admitted scalars and pointers.
+C/C++ identifier validation happens before output; existing files are preserved.
+The source fixture uses both automatic and explicit export names. Native C and C++
+consumers compile against the generated header, and NativeImport re-imports the
+same library in interpreter, scalar JIT and AOT. Escaping faults still terminate
+the process. This does not add callback parameters or managed-layout marshalling.
+
+The author's clarified boundary is C conventions first, with neoCLR runtime
+conventions inside AOT output. Opaque pointers can support C wrappers around C++
+objects without describing their layout; direct C++ ABI/vtable mapping is deferred.
+Callback signatures should eventually map to C function pointers and header
+typedefs, but retained callbacks/captured state require an explicit lifetime model.

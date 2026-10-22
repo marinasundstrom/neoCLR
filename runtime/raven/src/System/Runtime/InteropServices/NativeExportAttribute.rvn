@@ -1,0 +1,37 @@
+module System.Runtime.InteropServices
+
+import System.*
+
+/// Exposes a supported static function through the platform native calling convention.
+/// Exporting does not transfer pointer ownership or publish managed object layout.
+[AttributeUsage(AttributeTargets.Method, Inherited: false)]
+public class NativeExportAttribute : System.Attribute {
+    private val entryPoint: string
+    private val callingConvention: NativeCallingConvention
+
+    /// Uses versioned mangling and the platform C convention.
+    init() {
+        entryPoint = ""
+        callingConvention = NativeCallingConvention.Cdecl
+    }
+
+    /// Selects an exact export name and the platform C convention.
+    /// An empty name requests versioned mangling from source identity and signature.
+    init(entryPoint: string) {
+        self.entryPoint = entryPoint
+        callingConvention = NativeCallingConvention.Cdecl
+    }
+
+    /// Selects an exact export name and native convention.
+    /// Only supported native representations may cross the boundary.
+    init(entryPoint: string, callingConvention: NativeCallingConvention) {
+        self.entryPoint = entryPoint
+        self.callingConvention = callingConvention
+    }
+
+    /// Gets the exact native export name, or an empty string for automatic mangling.
+    val EntryPoint: string => entryPoint
+
+    /// Gets the native calling convention, defaulting to Cdecl.
+    val CallingConvention: NativeCallingConvention => callingConvention
+}

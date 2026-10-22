@@ -21160,3 +21160,23 @@ native view ownership remain subsequent work, not completed by the compiler fix.
 - **Evidence:** [export contract](design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22),
   [Raven fixture](experiments/aot-native-imports/raven/Exports.rvn) and
   [native import/export tests](../runtime/codegen/tests/native_imports.rs).
+
+
+## 2026-10-22 — C boundary, callback signatures and generated headers
+
+The author asked whether NativeExport can export callback signatures and suggested
+generating C/C++ headers during AOT. The assistant distinguished an exported callable
+entry point from a callback parameter/signature and proposed call-scoped callbacks
+first; callback export mapping remains unimplemented.
+
+The author clarified that NativeImport/NativeExport primarily follow C conventions,
+while code inside AOT output follows runtime conventions. Native pointers and
+functions could support C++ objects through wrappers; virtual tables and exposing
+managed layouts raise separate ABI, GC and sandbox concerns. The assistant agreed
+to keep these boundaries explicit. No direct C++ ABI commitment was made.
+
+Implemented now: NativeExportAttribute source discovery and optional generated
+C/C++ headers for the existing scalar/pointer export backend. The source library
+passes C and C++ callers plus NativeImport consumers in interpreter/scalar-JIT/AOT.
+See [contract](design/native-import-export-contract.md#source-exports-and-generated-headers--2026-10-22).
+Callback parity, pinning and broader managed-backend integration remain open.

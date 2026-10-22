@@ -4,7 +4,8 @@
 interpreter/JIT/AOT and re-import of AOT binaries now focuses on functions and pointer
 memory; class/object mapping is future work. NativeExportAttribute should mirror
 NativeImport in reverse. The scalar C-export backend and three-engine round-trip
-fixture are implemented; attribute/source integration remains the next step.
+fixture, source NativeExportAttribute discovery and generated C/C++ headers are
+implemented in the opt-in macOS ARM64 scalar profile. Callback parity remains open.
 [Contract and evidence](design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22).
 
 **Native export sequencing (author direction, 2026-10-22):** First qualify foreign

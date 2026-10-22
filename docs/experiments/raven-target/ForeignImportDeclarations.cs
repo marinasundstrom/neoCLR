@@ -13,6 +13,14 @@ static class ForeignImportDeclarations
                 public NativeCallingConvention CallingConvention { get; set; }
                 public NativeStringMarshalling StringMarshalling { get; set; }
             }
+            [System.AttributeUsage(System.AttributeTargets.Method, Inherited = false)]
+            public class NativeExportAttribute : System.Attribute {
+                public NativeExportAttribute() { }
+                public NativeExportAttribute(string entryPoint) { }
+                public NativeExportAttribute(string entryPoint, NativeCallingConvention callingConvention) { }
+                public string EntryPoint => default;
+                public NativeCallingConvention CallingConvention => default;
+            }
             [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue, Inherited = false)]
             public class MarshalAsAttribute : System.Attribute {
                 public MarshalAsAttribute(NativeType nativeType) { }

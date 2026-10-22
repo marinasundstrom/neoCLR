@@ -284,8 +284,29 @@ The backend `--native-library input output.o --export Function` command emits
 explicitly selected, nongeneric free functions using the platform C ABI on macOS
 ARM64. It admits the scalar numeric/pointer types listed above, with no-result
 returns mapped to C void. Helpers remain local; the experimental host entry is not
-exported. The native linker produces a library from this object. Source
-NativeExportAttribute integration remains pending in this backend increment.
+exported. The native linker produces a library from this object.
+Source functions annotated with NativeExportAttribute are selected automatically;
+explicit CLI selection remains available for backend fixtures.
+
+### NativeExportAttribute
+
+`System.Runtime.InteropServices.NativeExportAttribute` has three constructors:
+`NativeExportAttribute()`, `NativeExportAttribute(entryPoint: string)`, and
+`NativeExportAttribute(entryPoint: string, callingConvention: NativeCallingConvention)`.
+Its read-only `EntryPoint: string` and `CallingConvention: NativeCallingConvention`
+properties describe the requested boundary. An empty entry point uses versioned
+mangling; a nonempty name is exported exactly. Cdecl is the default; System is
+also accepted on macOS ARM64, where both use the same platform ABI.
+Duplicate attributes/symbols, null or NUL-containing names, unsupported conventions,
+managed signatures and instance methods reject before output.
+
+Pass `--header exports.h` to emit a matching C/C++ header. It uses fixed-width
+integer types, native pointer types and C linkage guards. Explicit names must be
+C/C++ identifiers and cannot be keywords when generating a header. Existing output
+files are preserved; failed header creation removes the newly created object.
+The header identifies its macOS ARM64 target. No function-pointer parameter,
+closure lifetime, managed object marshalling or metadata sidecar contract is
+introduced by this increment.
 
 Symbol names encode stable source identity and signature using the versioned
 `neoclr_c_v1_` convention. The JSON build report lists exact logical EntryPoint

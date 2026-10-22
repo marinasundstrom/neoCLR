@@ -2905,3 +2905,11 @@ The following native-result slice also adds the host FunctionReturn property and
 optional constructor descriptor, documented in experimental-metadata.md. The existing
 NativeImport manual page describes source Function results; guest type selection and
 signatures are unchanged. No API snapshot fingerprint is changed by this host-only API.
+
+
+Development (2026-10-22): NativeExportAttribute is selected and rendered with its
+three constructors and two read-only properties. Native documentation audit uses
+native-export-libraries-20261022-v3, including the PostgreSql provider; the pinned
+native snapshot is refreshed from that build. The manual native interop reference
+covers backend admission, errors, names and optional C/C++ headers. This attribute
+does not establish callback or managed-object export support.
