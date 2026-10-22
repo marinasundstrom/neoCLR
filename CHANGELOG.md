@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Repair the macOS native build kit's current HTTP dependency closure by packaging the separate TLS provider and adapter, enabling TLS bindings and checking the archive before compilation. Package an optimized AOT compiler. Replace stale HTTP fault injection and compare fault contracts while preserving engine-specific traces. Nine focused tooling tests and extracted console/HTTP/native import-export checks pass, including C/C++ callers, empty-environment execution, Cargo-free builds and TLS archive tamper rejection. HTTPS-server configuration stays source-only; Windows and refreshed timed benchmarks remain pending.
+
 - Add a shared sequential macOS ARM64/Windows x64 release benchmark runner for CPU, JSON and HTTP, preserving candidate/host provenance and failing on unsuccessful child evidence or manifest drift. Require explicit matching-revision Windows package selection instead of a historical default. Four focused runner tests pass; refreshed platform measurements remain pending and no new performance results are claimed.
 
 - Qualify the refreshed macOS ARM64 development JIT bundle after archive extraction outside the checkout: verify all 2,293 manifest files, compile/run packaged samples, pass HTTP JSON requests and the Raven client/server exchange, and execute the generated default JIT task with exact expected collections output. Record matching runtime/compiler/library/host hashes. Installed editor, native build-kit refresh, Windows and full-suite release gates remain open; no release is published.

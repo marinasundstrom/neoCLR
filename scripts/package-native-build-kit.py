@@ -38,9 +38,9 @@ def main():
                ROOT / 'docs/experiments/http-server/Server.rvn',
                *[ROOT / 'tools/native/samples/native-interop' / name for name in ('App.rvnproj', 'Main.rvn', 'consumer.c')],
                ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest,
-               Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources()]
+               Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources(), *builder.native_tls_sources()]
     inputs = {str(p.relative_to(ROOT)): builder.sha(p) for p in sources}
-    command = ['cargo', 'build', '--locked', '--manifest-path', str(cargo_manifest), '--message-format=json']
+    command = ['cargo', 'build', '--locked', '--release', '--manifest-path', str(cargo_manifest), '--message-format=json']
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=True, env=build_env)
     artifacts = [json.loads(line) for line in result.stdout.splitlines() if line.startswith('{')]
     binaries = [Path(a['executable']) for a in artifacts if a.get('reason') == 'compiler-artifact'
@@ -74,6 +74,9 @@ def main():
         kernel_command, archive = builder.native_kernel_build('aarch64-apple-darwin', time_zone_rules)
         subprocess.run(kernel_command, cwd=ROOT, check=True, env=build_env)
         copy(archive, 'lib/' + builder.native_kernel_archive_name(False, time_zone_rules))
+    tls_command, tls_archive = builder.native_tls_build()
+    subprocess.run(tls_command, cwd=ROOT, check=True, env=build_env)
+    copy(tls_archive, 'lib/libneoclr_native_tls.a')
     for source in builder.support_files():
         copy(source, source.relative_to(ROOT))
     for source in (ROOT / 'tools/native/samples/hello').iterdir():
@@ -141,7 +144,9 @@ The resulting app needs only macOS libSystem, not .NET or this kit.
 
 Experimental synchronous console profile: bounded 1 MiB nonmoving GC, UTF-8 text,
 Int32 formatting and fault diagnostics. The opt-in HTTP profile adds the existing
-private socket/task pump and guarded native stack, with a 15-second host deadline.
+private socket/task pump and guarded native stack, with a 15-second host deadline. The kit includes the separate native TLS provider
+and managed adapter needed by current networking code; explicit HTTPS-server
+configuration remains source-only.
 It is a bounded correctness host, not a production server or runtime Scheduler.
 No guest command-line arguments, general reflection or Windows native compilation. Import the
 kit's bundle/lib/NeoCLR.ClassLibrary.props in your executable Raven project.

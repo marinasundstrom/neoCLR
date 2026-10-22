@@ -262,3 +262,27 @@ UI/language-server behavior, the refreshed native build kit, Windows execution o
 the full extracted-source suite. Publication remains separate. Preparation first
 received incompatible recipe formats; the successful build uses the supported
 collector-walk-showcase async-host recipe and recompiles its native inputs.
+
+## Extracted native kit dependency closure — 2026-10-22
+
+Current HTTP source reaches TlsCreateSession, but the earlier kit neither enabled
+TLS bindings nor included its provider. The refreshed macOS ARM64 kit packages the
+separate native TLS archive and managed adapter, enables existing bindings, and
+requires the archive in its integrity manifest. Consumer builds link that archive
+without invoking Cargo. Native support remains a separate provider; runtime/ABI
+semantics are unchanged. The AOT compiler is now built with Cargo's release profile;
+no compiler speedup is claimed without a comparable timing run.
+
+The extracted archive passes console and plain HTTP cases (greeting, fragmented
+request, duplicate length, handler error and terminal guest fault), plus scalar
+native imports/exports and C/C++ callers. Builds occur outside the checkout in a
+path containing spaces, with Cargo absent; standalone consumers run with an empty
+environment. A modified TLS archive rejects before compilation. The stale
+Promise-based fault injection now targets the current handler; stack traces remain
+engine-specific while fault kind/message, exit status and response behavior match.
+Nine focused tooling tests pass. [Recorded evidence](validation/release-stabilization-20261022/extracted-native-kit.json).
+
+This qualifies the development kit on macOS ARM64, not TLS handshakes, the explicit
+source-only HTTPS-server profile, Windows or a published release. The benchmark
+CPU/JSON fixtures also compile successfully against the refreshed JIT bundle, but
+no timings were collected while the full source suite was running.

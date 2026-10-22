@@ -191,6 +191,14 @@ remains the default; native HTTP support is not inferred from an application's
 references. Use `--http` with `scripts/verify-native-build-kit.py` to include the
 HTTP consumers in extracted-kit acceptance.
 
+The refreshed macOS kit includes an optimized AOT compiler and the separately built
+TLS provider archive plus its managed adapter. Current HTTP code can reach these
+bindings even for a plain HTTP consumer. Kit builds link the recorded archive without
+invoking Cargo; its hash participates in pre-build integrity verification. This does
+not enable the explicit HTTPS-server profile or qualify TLS handshakes. The HTTP
+fault test compares fault kind/message, exit status and response behavior across
+engines; source-name and CLI-bridge stack frames are retained as distinct evidence.
+
 In a source checkout, `--profile http --https-server` (macOS ARM64) or
 `--profile windows-http --https-server` (Windows x64) selects the
 [development HTTPS host](experiments/https-server/README.md#source-project-build).

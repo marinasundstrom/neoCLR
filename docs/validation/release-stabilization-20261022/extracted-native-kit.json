@@ -1,0 +1,463 @@
+{
+  "platform": "macOS ARM64",
+  "passed": true,
+  "scope": "Extracted development native build kit: console, plain HTTP including handler fault, scalar native import/export and C/C++ callers. Not HTTPS handshake, Windows or full release approval.",
+  "archive": {
+    "path": "target/release-native-kit-20261022-v3/neoclr-native-build-kit-osx-arm64.tar.gz",
+    "sha256": "475ee437c43acaf4566e3727931b1bbe97d9b22ed64b202e99054fb891afb35b",
+    "bytes": 71275178
+  },
+  "verifierSha256": "522512dfff8ed55a3a37a87b79a9dd28eae2788d447dd715731ecbea5590ce8d",
+  "reports": {
+    "http": {
+      "passed": true,
+      "archiveSha256": "475ee437c43acaf4566e3727931b1bbe97d9b22ed64b202e99054fb891afb35b",
+      "kitManifestSha256": "f1aa89bb05f3993917b34afdb16fcf81a33350308fdb0b5b1b20c22ce984c7b0",
+      "profile": "macos-arm64-console-v1",
+      "sourceRevision": "56084fe307b8cbb3d9780da4790236afedb765b8",
+      "sourceDirty": true,
+      "bundleManifestSha256": "d1449571bc51af327a14b9a7d0b90e229d6e0bffd03d60d9e9cf676fbe127c91",
+      "packagedFileCount": 2869,
+      "execution": {
+        "exitCode": 0,
+        "stdout": "Hello, Caf\u00e9 \ud83c\udf0d\n",
+        "executableOnlyDirectory": true,
+        "emptyEnvironment": true,
+        "buildWithoutCargo": true,
+        "checkoutPathsAbsent": true
+      },
+      "httpTlsProvider": {
+        "prebuilt": true,
+        "archive": "lib/libneoclr_native_tls.a",
+        "transportTested": "plain HTTP only"
+      },
+      "httpCases": {
+        "greeting": {
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          }
+        },
+        "fragmented": {
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+            "stderr": "",
+            "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+          }
+        },
+        "duplicate-length": {
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+            "stderr": "",
+            "responseHex": ""
+          }
+        },
+        "handler-error": {
+          "interpreter": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 0,
+            "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+            "stderr": "",
+            "responseHex": ""
+          }
+        },
+        "guest-fault": {
+          "interpreter": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP handler failed\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_526573706F6E64 [instruction 6]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_48747470526573706F6E736543616C6C6261636B.Dispatch [instruction 5]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 91]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6E63757272656E63792E5461736B73_5461736B5175657565.M_447261696E [instruction 33]\n",
+            "responseHex": ""
+          },
+          "native": {
+            "exitCode": 1,
+            "stdout": "Other work runs while HTTP accept is pending\n",
+            "stderr": "UserFault: HTTP handler failed\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at Respond [instruction 6]\n   at System.Web.Http.HttpResponseCallback.Dispatch [instruction 5]\n   at System.Web.Http.HttpServeOperation.OnAccepted [instruction 91]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n   at System.Concurrency.Tasks.TaskQueue.Drain [instruction 33]\n   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n   at Raven.Generated.<AsyncEntry> [instruction 1]\n",
+            "responseHex": ""
+          }
+        }
+      },
+      "httpStandalone": {
+        "executableOnlyDirectory": true,
+        "emptyEnvironment": true,
+        "buildWithoutCargo": true,
+        "host": "existing bounded HTTP correctness host"
+      },
+      "sourceInputs": {
+        "scripts/package-native-build-kit.py": "201d6f931b720e717021ea38792866c5db249c77923e9cd44659bede609f8c88",
+        "scripts/build-native-project.py": "943e1bd1b3ecb4150abce3f25154b8b9b45466bf6a273ab8bbccc8e9e8a0dbd6"
+      },
+      "aotBuildCommand": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/runtime/codegen/Cargo.toml",
+        "--message-format=json"
+      ],
+      "rawEvidence": {
+        "path": "target/release-native-kit-http-20261022-v5/validation.json",
+        "sha256": "f3a7be668ee7e94579a9872f3db6b070be9df854cac0696269f7155c5117c19f"
+      },
+      "cases": [
+        {
+          "name": "native hello output",
+          "exitCode": 0,
+          "passed": true,
+          "managedTls": false,
+          "error": null,
+          "artifacts": {
+            "app.dll": "8a13f97fdc55c1ddaa117a722bcfdd3168d6fc08de32c23368c025fbe30225df",
+            "app.o": "6d3779677a2fe2cd46d0153061944322d34d71fac01aef832e75ba5929647325",
+            "app": "6673cd34cc196f004c6537ad3deb6c8142a4bca75a1f9a69e1bde04d9970ed08"
+          },
+          "commands": [
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.012548
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.009165
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.01018
+            },
+            {
+              "phase": "source-compilation",
+              "exitCode": 0,
+              "seconds": 4.09747
+            },
+            {
+              "phase": "native-compilation",
+              "exitCode": 0,
+              "seconds": 4.553729
+            },
+            {
+              "phase": "host-compile-link",
+              "exitCode": 0,
+              "seconds": 0.60904
+            },
+            {
+              "phase": "dependency-check",
+              "exitCode": 0,
+              "seconds": 0.023667
+            }
+          ]
+        },
+        {
+          "name": "reject changed adapter",
+          "exitCode": 1,
+          "passed": false,
+          "managedTls": null,
+          "error": "Package file mismatch: tools/native/console-host.c",
+          "artifacts": null,
+          "commands": []
+        },
+        {
+          "name": "reject changed backend",
+          "exitCode": 1,
+          "passed": false,
+          "managedTls": null,
+          "error": "Package file mismatch: bin/neoclr-codegen",
+          "artifacts": null,
+          "commands": []
+        },
+        {
+          "name": "reject changed compiler",
+          "exitCode": 1,
+          "passed": false,
+          "managedTls": null,
+          "error": "Package file mismatch: bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json",
+          "artifacts": null,
+          "commands": []
+        },
+        {
+          "name": "reject changed tls-provider",
+          "exitCode": 1,
+          "passed": false,
+          "managedTls": null,
+          "error": "Package file mismatch: lib/libneoclr_native_tls.a",
+          "artifacts": null,
+          "commands": []
+        },
+        {
+          "name": "native http output",
+          "exitCode": 0,
+          "passed": true,
+          "managedTls": true,
+          "error": null,
+          "artifacts": {
+            "app.dll": "da9bd04440a4979058467380e3dc7092b7617b54a34972f581d6222986d9a6a1",
+            "app.o": "9e7810937366e1deab2e81706232a08df839fa0dcfbaa7a4eb9307ba3582b13e",
+            "app": "5b00b137e3b7ec4a1cfc26412acc524bf2e1d55ef9fb83a7d0dfa2d9276dcaca"
+          },
+          "commands": [
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.008525
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.010325
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.007923
+            },
+            {
+              "phase": "source-compilation",
+              "exitCode": 0,
+              "seconds": 4.166732
+            },
+            {
+              "phase": "native-compilation",
+              "exitCode": 0,
+              "seconds": 13.272983
+            },
+            {
+              "phase": "host-compile-link",
+              "exitCode": 0,
+              "seconds": 1.164838
+            },
+            {
+              "phase": "dependency-check",
+              "exitCode": 0,
+              "seconds": 0.012009
+            }
+          ]
+        },
+        {
+          "name": "native http fault output",
+          "exitCode": 0,
+          "passed": true,
+          "managedTls": true,
+          "error": null,
+          "artifacts": {
+            "app.dll": "2f0d75cce816dea70dfd83a789e9f52f9357d0ba78436098f28b78db9c8d9dfa",
+            "app.o": "f58f30f43965c095edaf768aed77deed0bb066baefc746a15a4d3ca48c2ffe69",
+            "app": "0c051b8ab73e9e5343445326a67c7afcc00fd3cfd9474ca9870a561a79c629d5"
+          },
+          "commands": [
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.01596
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.018744
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.013726
+            },
+            {
+              "phase": "source-compilation",
+              "exitCode": 0,
+              "seconds": 6.751035
+            },
+            {
+              "phase": "native-compilation",
+              "exitCode": 0,
+              "seconds": 10.116827
+            },
+            {
+              "phase": "host-compile-link",
+              "exitCode": 0,
+              "seconds": 1.209903
+            },
+            {
+              "phase": "dependency-check",
+              "exitCode": 0,
+              "seconds": 0.01679
+            }
+          ]
+        }
+      ]
+    },
+    "interop": {
+      "passed": true,
+      "archiveSha256": "475ee437c43acaf4566e3727931b1bbe97d9b22ed64b202e99054fb891afb35b",
+      "kitManifestSha256": "f1aa89bb05f3993917b34afdb16fcf81a33350308fdb0b5b1b20c22ce984c7b0",
+      "profile": "macos-arm64-console-v1",
+      "sourceRevision": "56084fe307b8cbb3d9780da4790236afedb765b8",
+      "sourceDirty": true,
+      "bundleManifestSha256": "d1449571bc51af327a14b9a7d0b90e229d6e0bffd03d60d9e9cf676fbe127c91",
+      "packagedFileCount": 2869,
+      "nativeInterop": {
+        "executable": true,
+        "library": true,
+        "cConsumer": true,
+        "cppConsumer": true,
+        "emptyEnvironment": true,
+        "buildWithoutCargo": true,
+        "checkoutPathsAbsent": true,
+        "integrityRejection": true
+      },
+      "sourceInputs": {
+        "scripts/package-native-build-kit.py": "201d6f931b720e717021ea38792866c5db249c77923e9cd44659bede609f8c88",
+        "scripts/build-native-project.py": "943e1bd1b3ecb4150abce3f25154b8b9b45466bf6a273ab8bbccc8e9e8a0dbd6"
+      },
+      "aotBuildCommand": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/runtime/codegen/Cargo.toml",
+        "--message-format=json"
+      ],
+      "rawEvidence": {
+        "path": "target/release-native-kit-interop-20261022-v3/validation.json",
+        "sha256": "c0100bb244de5c00eea1eebe626acdf649b04146b87f359d4cb934b4c958168f"
+      },
+      "cases": [
+        {
+          "name": "native-interop output",
+          "exitCode": 0,
+          "passed": true,
+          "managedTls": null,
+          "error": null,
+          "artifacts": {
+            "app.dll": "3003bf33322adc214a95fe906324b758707e472f744495235d7c90b2652eed2c",
+            "app.o": "896ba0e1e430578eebd1117026ca65a73e3e75711854c1bad68bf54eb11a51ee",
+            "app": "ed42f277598d60ca41f2d69ac3d79e6ea27bc24188705c6e21a6a9deb9cd166c"
+          },
+          "commands": [
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.016078
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.017271
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.017169
+            },
+            {
+              "phase": "source-compilation",
+              "exitCode": 0,
+              "seconds": 5.658964
+            },
+            {
+              "phase": "native-compilation",
+              "exitCode": 0,
+              "seconds": 5.011331
+            },
+            {
+              "phase": "host-compile-link",
+              "exitCode": 0,
+              "seconds": 0.116363
+            },
+            {
+              "phase": "dependency-check",
+              "exitCode": 0,
+              "seconds": 0.018115
+            }
+          ]
+        },
+        {
+          "name": "native-library output",
+          "exitCode": 0,
+          "passed": true,
+          "managedTls": null,
+          "error": null,
+          "artifacts": {
+            "app.dll": "3003bf33322adc214a95fe906324b758707e472f744495235d7c90b2652eed2c",
+            "app.o": "9a6e544582087c0a0fbbbe1712751e4c30aeed697dc0d3b1a72e44063ac207a1",
+            "libapp.dylib": "5d4a6fa01e752e2de502f0770d45c540efa3e0c81d7a13a04e160a0a16af1faf",
+            "app.h": "fca095416d13494b5dbbac6230ea8a35f93a186f52338b49c293a2ce940b99db"
+          },
+          "commands": [
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.006791
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.006245
+            },
+            {
+              "phase": "toolchain",
+              "exitCode": 0,
+              "seconds": 0.006599
+            },
+            {
+              "phase": "source-compilation",
+              "exitCode": 0,
+              "seconds": 3.631683
+            },
+            {
+              "phase": "native-compilation",
+              "exitCode": 0,
+              "seconds": 5.077803
+            },
+            {
+              "phase": "host-compile-link",
+              "exitCode": 0,
+              "seconds": 0.107523
+            },
+            {
+              "phase": "dependency-check",
+              "exitCode": 0,
+              "seconds": 0.031104
+            }
+          ]
+        },
+        {
+          "name": "reject changed interop host",
+          "exitCode": 1,
+          "passed": false,
+          "managedTls": null,
+          "error": "Package file mismatch: tools/native/interop-host.c",
+          "artifacts": null,
+          "commands": []
+        }
+      ]
+    }
+  }
+}

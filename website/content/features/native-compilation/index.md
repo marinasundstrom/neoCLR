@@ -31,7 +31,9 @@ libraries. Build tooling requires the matching SDKs and native toolchain.
 | Windows x64 | `windows-console` | `windows-http` | MSVC x64 tools |
 
 The macOS development kit supports project builds without a source checkout or
-Cargo. Windows currently uses a source-checkout workflow. Windows ARM64 is not
+Cargo. Its development HTTP profile includes a prebuilt native TLS provider needed
+by the current networking code; explicit HTTPS-server configuration remains
+source-only. Windows currently uses a source-checkout workflow. Windows ARM64 is not
 qualified. See [development setup](/try/#development) and the
 [project-to-executable instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md).
 

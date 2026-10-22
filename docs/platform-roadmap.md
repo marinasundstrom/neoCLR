@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Extracted native kit repaired (2026-10-22):** The macOS ARM64 kit now includes
+its current HTTP TLS-provider dependency and an optimized compiler. Extracted
+console, plain HTTP/fault and native import/export C/C++ consumers pass without
+Cargo. Windows, HTTPS handshakes, timed benchmark refresh and remaining release
+gates are separate. [Evidence](release-readiness.md#extracted-native-kit-dependency-closure--2026-10-22).
+
 **Two-platform benchmark refresh (author direction, 2026-10-22):** Target both macOS
 and Windows releases, with refreshed measurements against matching candidates on
 each host. The shared [release benchmark runner](../benchmarks/release/README.md)

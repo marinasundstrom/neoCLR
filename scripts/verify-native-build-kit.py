@@ -58,6 +58,29 @@ def serve(command, directory, request, fragmented=False):
             process.communicate()
 
 
+def inject_http_handler_fault(source):
+    handler = 'func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n'
+    if source.count(handler) != 1:
+        raise ValueError('Expected exactly one HTTP Respond handler for fault injection')
+    return source.replace(handler, handler +
+                          '    if request.Target == "/fault" {\n'
+                          '        System.Fail("HTTP handler failed")\n'
+                          '    }\n', 1)
+
+
+def verify_http_handler_fault(interpreter, native):
+    # Engine frames differ: the interpreter preserves CLI bridge names while AOT
+    # renders source names and includes its async entry adapter. Compare the fault
+    # contract, retaining both complete traces in the qualification evidence.
+    for result in (interpreter, native):
+        assert result['exitCode'] == 1
+        assert not result['responseHex']
+        lines = result['stderr'].splitlines()
+        assert lines and lines[0] == 'UserFault: HTTP handler failed'
+        assert any(line.startswith('   at ') for line in lines[1:])
+    assert native['stdout'] == interpreter['stdout']
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--archive', type=Path, required=True)
@@ -124,7 +147,8 @@ def main():
                 report['execution'] = dict(exitCode=0, stdout=native.stdout.decode(), executableOnlyDirectory=True,
                                            emptyEnvironment=True, buildWithoutCargo=True, checkoutPathsAbsent=True)
                 for name, relative in [('adapter', 'tools/native/console-host.c'), ('backend', 'bin/neoclr-codegen'),
-                                       ('compiler', 'bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json')]:
+                                       ('compiler', 'bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json'),
+                                       ('tls-provider', 'lib/libneoclr_native_tls.a')]:
                     path = kit / relative
                     size = path.stat().st_size
                     with path.open('ab') as stream:
@@ -142,6 +166,10 @@ def main():
                 assert result.returncode == 0 and evidence['passed'], result.stderr
                 assert all(kit in Path(path).parents for path in evidence['inputs'])
                 assert all(str(ROOT) not in str(c['command']) for c in evidence['commands'])
+                assert evidence['managedTls']
+                assert not any('cargo' in str(c['command']) for c in evidence['commands'])
+                report['httpTlsProvider'] = dict(prebuilt=True, archive='lib/libneoclr_native_tls.a',
+                                                 transportTested='plain HTTP only')
                 http_dir = location / 'http standalone'
                 http_dir.mkdir()
                 shutil.copy2(destination / 'app', http_dir / 'app')
@@ -175,9 +203,7 @@ def main():
                 project.getroot().find('Import').set('Project', str(lib / catalog['projectConfiguration']))
                 project.write(fault_project / 'App.rvnproj', encoding='unicode')
                 source = (kit / 'samples/http/Main.rvn').read_text()
-                source = source.replace('    let source = Promise<Result<HttpResponse, HttpError>>()',
-                    '    if request.Target == "/fault" {\n        System.Fail("HTTP handler failed")\n    }\n'
-                    '    let source = Promise<Result<HttpResponse, HttpError>>()')
+                source = inject_http_handler_fault(source)
                 (fault_project / 'Main.rvn').write_text(source)
                 result, evidence, destination = build('native http fault output', 'http', fault_project / 'App.rvnproj')
                 assert result.returncode == 0 and evidence['passed'], result.stderr
@@ -186,8 +212,7 @@ def main():
                 vm = serve([kit / 'bundle/bin/neoclr', 'run', destination / 'app.dll', '--execution', 'interpreter', *context], http_dir, request)
                 native = serve([http_dir / 'app'], http_dir, request)
                 report['httpCases']['guest-fault'] = dict(interpreter=vm, native=native)
-                assert native == vm and native['exitCode'] == 1
-                assert 'HTTP handler failed' in native['stderr'] and not native['responseHex']
+                verify_http_handler_fault(vm, native)
                 report['httpStandalone'] = dict(executableOnlyDirectory=True, emptyEnvironment=True,
                                                 buildWithoutCargo=True, host='existing bounded HTTP correctness host')
             if args.interop_only:

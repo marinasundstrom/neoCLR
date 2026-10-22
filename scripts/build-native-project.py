@@ -144,6 +144,7 @@ def support_files():
               ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
                'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c', 'time-zone.c', 'file-input.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
+            base / 'aot-console/tls-managed.c', base / 'https-server/native-tls.h',
             *sorted((base / 'aot-console').glob('*.h')),
             *sorted((base / 'aot-scalar').glob('*.h')),
             *sorted((base / 'aot-fault-details').glob('*.h'))]
@@ -226,7 +227,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             if bundle != ROOT / 'bundle' or aot != ROOT / 'bin/neoclr-codegen':
                 raise ValueError('Packaged builds require the kit-owned bundle and AOT tool')
             required_files = {p.relative_to(ROOT).as_posix() for p in support_files()}
-            required_files |= {'bin/neoclr-codegen', 'bundle/manifest.json', 'bundle/lib/bundle.json'}
+            required_files |= {'bin/neoclr-codegen', 'bundle/manifest.json', 'bundle/lib/bundle.json',
+                               'lib/libneoclr_native_tls.a'}
             if not required_files <= kit['files'].keys():
                 raise ValueError('Native build kit omits required inputs')
             verify_files(ROOT, kit['files'])
@@ -332,7 +334,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
                  '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-time-zone-rules']
         if not kit_path.exists():
-            flags += ['--bind-cryptography', '--bind-tls']
+            flags += ['--bind-cryptography']
+        flags += ['--bind-tls']
         flags += ['--bind-scheduler', '--bind-task-queue', '--bind-timers']
         flags += ['--bind-runtime-async']
         if not windows:
@@ -435,15 +438,16 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         managed_tls = any(binding.get('implementation') == 'tls-v1'
                           for binding in selection.get('nativeBindings', []))
         if managed_tls:
-            if kit_path.exists():
-                raise ValueError('Managed TLS currently requires a source checkout, not a packaged build kit')
             adapters.append(base / 'tls-managed.c')
         report['managedTls'] = managed_tls
         if https_server or managed_tls:
-            for path in native_tls_sources():
-                report['inputs'][str(path)] = sha(path)
-            command, archive = native_tls_build(windows)
-            run(command, phase='native-tls-build')
+            if kit_path.exists():
+                archive = ROOT / 'lib/libneoclr_native_tls.a'
+            else:
+                for path in native_tls_sources():
+                    report['inputs'][str(path)] = sha(path)
+                command, archive = native_tls_build(windows)
+                run(command, phase='native-tls-build')
             report['inputs'][str(archive)] = sha(archive)
             native_tls.append(archive)
         if https_server:
