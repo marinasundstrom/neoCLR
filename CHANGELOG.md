@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
-- Retain before/after Git status records in future release benchmark reports, including individual untracked files and rename pairs. Preserve the initial dirty flag and worker failure evidence when final Git inspection fails. Eight focused runner tests pass; no timing or runtime behavior changes, and the historical Windows dirty-checkout limitation remains unresolved.
+- Retain before/after Git status records in future release benchmark reports, including individual untracked files and rename pairs. Preserve the initial dirty flag and worker failure evidence when final Git inspection fails. Eight focused runner tests pass; no timing or runtime behavior changes, and the historical Windows dirty-checkout limitation remains unresolved. Hosted strict Clippy replaces the stopped duplicate local run; focused local tests and full source/host qualification remain pending.
 
 - Refresh the unpublished next-preview draft against current qualification evidence: replace stale blanket numeric-formatting and generic-record gaps with bounded implemented contracts and their remaining limitations. Link current package/editor/HTTPS/benchmark gates while retaining the superseded candidate identity and leaving final version/publication unset.
 

@@ -13,13 +13,14 @@
   "localValidation": {
     "format": "passed",
     "minimumRust": "Not qualified locally: initial CommandLineTools SDK linking failure, then full-Xcode retry stalled in macOS dyld fcntl while loading dependency proc macros; terminated owned compiler processes. Hosted validation required.",
-    "clippy": "pending",
-    "typeIdentityTests": "pending",
+    "clippy": "Stopped the duplicate local all-target run after hosted strict Clippy passed in run 39849082702, freeing the artifact lock for focused tests. Not a local pass.",
+    "typeIdentityTests": "Compiling after artifact lock released; result pending",
     "minimumRustHosted": {
       "macOS": "passed",
       "Windows": "passed",
       "Linux": "passed"
-    }
+    },
+    "terminalTests": "Queued behind focused type-identity compilation; result pending"
   },
   "logs": {
     "/tmp/release-fmt-check.log": "1f4d0c6ed62d7dc5c720a8dc20f09d182f805e04e63f843061a28e5ceee3ea19",
