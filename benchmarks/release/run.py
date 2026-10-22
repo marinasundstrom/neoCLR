@@ -18,6 +18,15 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def source_status():
+    # Preserve Git's status columns and quoted paths, including rename pairs.
+    # This is diagnostic provenance, not a clean-checkout requirement: preparation
+    # can legitimately produce native support libraries and other build outputs.
+    return subprocess.check_output(
+        ['git', 'status', '--porcelain=v1', '--untracked-files=all'],
+        cwd=ROOT, text=True).splitlines()
+
+
 def steps(bundle, output, rounds):
     execution = output / 'execution'
     manifest = execution / 'manifest.json'
@@ -37,12 +46,13 @@ def run(bundle, output, rounds):
     host = target()
     manifest = bundle / 'manifest.json'
     digest = sha(manifest)
+    status_before = source_status()
     output.mkdir(parents=True, exist_ok=False)
     report = dict(schemaVersion=1, passed=False, platform=platform.platform(),
                   architecture=platform.machine(), cpu=cpu_description(), host=host,
                   rounds=rounds, bundleManifestSha256=digest, steps=[],
                   revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-                  dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip()),
+                  dirty=bool(status_before), sourceStatusBefore=status_before,
                   runnerSha256=sha(Path(__file__)), loadBefore=load_average())
     try:
         for name, command, result, measured in steps(bundle, output, rounds):
@@ -66,6 +76,11 @@ def run(bundle, output, rounds):
         raise
     finally:
         report['loadAfter'] = load_average()
+        try:
+            report['sourceStatusAfter'] = source_status()
+        except Exception as error:
+            # Always retain the measurement result, even if Git becomes unavailable.
+            report['sourceStatusAfterError'] = str(error)
         (output / 'release-benchmarks.json').write_text(json.dumps(report, indent=2) + '\n')
 
 

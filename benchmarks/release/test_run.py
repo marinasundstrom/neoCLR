@@ -12,7 +12,7 @@ spec.loader.exec_module(runner)
 
 
 class ReleaseRunnerTests(unittest.TestCase):
-    def exercise(self, outcome='pass'):
+    def exercise(self, outcome='pass', statuses=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             bundle = root / 'bundle'
@@ -29,7 +29,7 @@ class ReleaseRunnerTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 1 if outcome == 'exit' else 0)
             plan = [('first', ['worker1'], output / 'first.json', True),
                     ('second', ['worker2'], output / 'second.json', True)]
-            with patch.object(runner.platform, 'platform', return_value='test'), patch.object(runner, 'target', return_value={}), patch.object(runner, 'cpu_description', return_value='test'), patch.object(runner.subprocess, 'check_output', return_value='test'), patch.object(runner, 'steps', return_value=plan), patch.object(runner.subprocess, 'run', side_effect=execute):
+            with patch.object(runner.platform, 'platform', return_value='test'), patch.object(runner, 'target', return_value={}), patch.object(runner, 'cpu_description', return_value='test'), patch.object(runner.subprocess, 'check_output', return_value='test'), patch.object(runner, 'source_status', side_effect=statuses or [[], []]), patch.object(runner, 'steps', return_value=plan), patch.object(runner.subprocess, 'run', side_effect=execute):
                 if outcome == 'pass':
                     runner.run(bundle, output, 5)
                 else:
@@ -59,6 +59,32 @@ class ReleaseRunnerTests(unittest.TestCase):
     def test_plan_covers_execution_and_http(self):
         plan = runner.steps(Path('/bundle'), Path('/output'), 5)
         self.assertEqual([step[0] for step in plan], ['prepare', 'execution', 'cpu-native', 'http-plain', 'http-json'])
+
+    def test_provenance_retains_initial_and_generated_changes_on_failure(self):
+        before = [' M benchmarks/input.rvn']
+        after = [*before, '?? generated/support.lib']
+        _, report = self.exercise('exit', [before, after])
+        self.assertTrue(report['dirty'])
+        self.assertEqual(report['sourceStatusBefore'], before)
+        self.assertEqual(report['sourceStatusAfter'], after)
+        self.assertFalse(report['passed'])
+
+    def test_generated_files_do_not_relabel_initial_checkout(self):
+        _, report = self.exercise(statuses=[[], ['?? generated/support.lib']])
+        self.assertFalse(report['dirty'])
+        self.assertTrue(report['passed'])
+        self.assertEqual(report['sourceStatusAfter'], ['?? generated/support.lib'])
+
+    def test_final_status_failure_preserves_worker_failure(self):
+        _, report = self.exercise('exit', [[], OSError('Git unavailable')])
+        self.assertIn('first failed', report['error'])
+        self.assertEqual(report['sourceStatusAfterError'], 'Git unavailable')
+
+    def test_status_preserves_columns_quoted_paths_and_renames(self):
+        status = ' M "file with spaces"\nR  old -> new\n?? "line\\nname"\n'
+        with patch.object(runner.subprocess, 'check_output', return_value=status):
+            self.assertEqual(runner.source_status(),
+                             [' M "file with spaces"', 'R  old -> new', '?? "line\\nname"'])
 
 
 if __name__ == '__main__':

@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Benchmark provenance follow-up (2026-10-22):** Future release measurements
+retain before/after Git status so dirty inputs and generated outputs can be
+identified. Eight focused runner tests pass; measurements are unchanged and
+the historical Windows dirty-path limitation remains.
+[Runner contract](../benchmarks/release/README.md).
+
 **Archive identity checked (2026-10-22):** Both qualified development archives pass
 manifest hash verification and SDK/editor language-server pairing: 87 identical
 server files per platform, with explicit PDB/XML packaging exclusions. Hosted

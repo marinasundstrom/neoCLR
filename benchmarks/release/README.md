@@ -23,6 +23,14 @@ reports preserve sample distributions and compiler/library/input hashes. A nonze
 exit, nonpassing child report or changed manifest fails the refresh. Keep failed
 reports, logs and the candidate archive's hash with the release evidence.
 
+New reports retain `sourceStatusBefore` and `sourceStatusAfter` as Git porcelain-v1
+records, including individual untracked files, status columns and rename pairs.
+`dirty` describes the initial checkout; generated build outputs do not retroactively
+change it. Final Git inspection errors are recorded without discarding measurement
+results. A dirty checkout is disclosed rather than automatically rejected. Older
+reports without these fields retain their original provenance limitations; this
+change cannot recover the missing Windows dirty-path list.
+
 The Windows `Native release benchmarks` workflow requires an explicit successful
 `Native toolchain qualification` run from the same neoCLR commit by default. For a benchmark-only repair, explicitly
 supply `candidate_revision` as the package's full commit hash to reuse the unchanged
