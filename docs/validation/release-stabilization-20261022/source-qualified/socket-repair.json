@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-22",
+  "revision": "32184c938453e02680f9ae2c62fa35f7c0694b5e",
+  "format": "passed",
+  "localSocketTests": 37,
+  "refusalRounds": 32,
+  "refusalAttempts": 512,
+  "reports": {
+    "socket-tests.log": {
+      "sha256": "6eb4acd4dd72a2a0b93d7ab73993a9192ba9f5756da04cb8e53b6089e62fcb29",
+      "compressed": "socket-tests.log.gz"
+    },
+    "refusal-repeats.json": {
+      "sha256": "e00870a5091966eda4753c1441c227f6abc43f24ba7d5ca889169f970af76228",
+      "compressed": "refusal-repeats.json.gz"
+    }
+  },
+  "hostedRerun": 39853093086,
+  "hostedStatus": "running",
+  "packageRefresh": "macOS runtime build started; archive qualification pending",
+  "loaderNote": "Original test process initially stalled in dyld. Byte-identical /tmp copy passed; original process subsequently also completed with 37 passes."
+}

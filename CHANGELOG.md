@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
-- Record passing canonical full-source/25-smoke and Windows host/package qualification, all three minimum-Rust checks, and 19 focused local type-identity/terminal tests. macOS exposes a refused-connect classification failure; replace unconditional Unix connect readiness with nonblocking poll before SO_ERROR/peer inspection, retaining deadlines and exact error expectations. Add kernel-readiness coverage and 16 refusal lifecycle repetitions. Socket and repaired hosted qualification remain pending; affected release binaries must be refreshed.
+- Record passing canonical full-source/25-smoke and Windows host/package qualification, all three minimum-Rust checks, and 19 focused local type-identity/terminal tests. macOS exposes a refused-connect classification failure; replace unconditional Unix connect readiness with nonblocking poll before SO_ERROR/peer inspection, retaining deadlines and exact error expectations. Add kernel-readiness coverage and 16 refusal lifecycle repetitions. All 37 local socket tests and 512 repeated refusal attempts pass. Pinned hosted rerun 39853093086 is running; affected release binaries must be refreshed.
 
 - Retain before/after Git status records in future release benchmark reports, including individual untracked files and rename pairs. Preserve the initial dirty flag and worker failure evidence when final Git inspection fails. Eight focused runner tests pass; no timing or runtime behavior changes, and the historical Windows dirty-checkout limitation remains unresolved. Hosted strict Clippy replaces the stopped duplicate local run; focused local tests and full source/host qualification remain pending.
 

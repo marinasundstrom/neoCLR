@@ -28,8 +28,11 @@ connection inspection and no heap allocation; no throughput improvement is claim
 
 The regression checks actual writable/nonwritable socket states, and the refusal
 lifecycle check repeats 16 times while retaining its exact error and resource
-release assertions. Local socket validation and repaired hosted qualification are
-pending. Earlier local type-identity (9) and terminal (10) tests pass.
+release assertions. All 37 local socket tests pass, followed by 32 repeated refusal-test executions
+(512 connection attempts). [Logs and identities](socket-repair.json) are retained.
+Repaired hosted run [39853093086](https://github.com/marinasundstrom/neoCLR/actions/runs/39853093086)
+is pinned to `32184c938`; qualification is running. Earlier local type-identity (9)
+and terminal (10) tests pass.
 
 The change affects the Rust interpreter provider; existing package evidence remains
 tied to its original binaries. A release containing the repair must refresh affected

@@ -3,8 +3,8 @@
 **Canonical source passed; Unix socket repair (2026-10-22):** Full extracted-source
 validation and Windows host checks pass. macOS exposes a refused-connect
 classification failure; Unix readiness now uses nonblocking poll before completion
-inspection. Focused and hosted requalification plus affected package refresh remain
-open. [Evidence and contract](validation/release-stabilization-20261022/source-qualified/README.md).
+inspection. All 37 focused socket tests and 512 repeated refusal attempts pass;
+hosted requalification and affected package refresh remain open. [Evidence and contract](validation/release-stabilization-20261022/source-qualified/README.md).
 
 **Benchmark provenance follow-up (2026-10-22):** Future release measurements
 retain before/after Git status so dirty inputs and generated outputs can be
