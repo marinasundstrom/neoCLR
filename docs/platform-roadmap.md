@@ -2,9 +2,10 @@
 
 **Raven native callbacks (2026-10-22):** Author-directed continuation prioritizes
 Raven-authored interop consumers over new bootstrap neoIL. NativeImport now accepts
-scalar and unit-returning Raven Function parameters in the interpreter. Unit remains
+scalar and unit-returning Raven Function parameters and results in the interpreter. Unit remains
 Raven syntax, emitted as System.Void; native-boundary adaptation preserves generic
-value-return ABI. Five built-in tests pass, including forced GC and generic unit.
+value-return ABI. Seven built-in tests pass, including forced GC, generic unit and returned functions
+passed back as callbacks.
 [Evidence, allocation cost and remaining gaps](../runtime/raven/tests/native-callbacks/README.md).
 AOT/JIT callbacks, true pinning and full NativeImport qualification remain open.
 

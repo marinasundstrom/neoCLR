@@ -66,6 +66,18 @@ unit result at the native boundary. This currently allocates a managed adapter p
 call. Strings, pointers, nested callbacks and implicit Boolean widths inside callback
 signatures are rejected. Retained callbacks and JIT/AOT callback execution remain open.
 
+A native import can also return a function directly:
+
+```raven
+{{NATIVE_RETURN_IMPORT}}
+```
+
+The returned function remains callable after GC and can be passed back to C as a
+callback. The runtime retains its loaded code library; foreign state still follows
+the native library's lifetime contract. A returned `(int) -> unit` function maps C's
+no-result call to a logical System.Void value, with a compiler adapter allocated once
+per returned function. This source path is currently qualified in the interpreter.
+
 ## Managed and native buffers
 
 Native libraries can use explicit pointer-and-length parameters. A foreign-owned
@@ -119,7 +131,7 @@ pointers as Functions. Each callable has its own convention and conversion metad
 captured managed state stays alive through the call. The initial callback scope is
 same-thread scalar signatures. Native APIs that store callbacks need a future
 registration/unregistration lifetime contract. Raven scalar and unit callback parameters use
-the source syntax above; returned-function mapping and JIT/AOT support remain open. The longer-term goal is an AOT library plus versioned public-interface
+the source syntax above, including returned functions; JIT/AOT support remains open. The longer-term goal is an AOT library plus versioned public-interface
 metadata for runtime and native consumers. Export stubs and that sidecar format are
 not implemented yet.
 

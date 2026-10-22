@@ -53,8 +53,15 @@ Function and discards its unit value. This also preserves a generic return close
 unit. The source-facing wrapper is an ordinary managed method in emitted metadata;
 NativeImport metadata belongs to the internal thunk. The adapter currently allocates
 per call; no allocation-free callback claim is made. There are no new guest attributes.
-Callback strings, Boolean widths, pointers, nested callbacks, returned-function source
-mapping, retained registration lifetimes and JIT/AOT callback execution remain open.
+An import may also return `(int) -> int` or `(int) -> unit`, mapping the native function
+pointer to an ordinary Raven Function. The runtime retains loaded libraries through
+that binding; it does not own foreign context/state. Null or tracked-data addresses
+fault at binding. For unit results, the compiler emits an adapter around the returned
+no-result Function, materializing System.Void after each invocation. That adapter and
+binding allocate once per returned result; ordinary numeric results need no additional
+compiler adapter. The result can itself be passed as a call-scoped callback.
+Callback strings, Boolean widths, pointers, nested callbacks, retained registration
+lifetimes and JIT/AOT callable execution remain open.
 
 ## Structural pointer binding experiment
 
@@ -99,7 +106,9 @@ Both Rust `metadata::NativeImport` and `metadata::NativeAbi` additionally expose
 updates to Rust struct literals; wire records without them retain their previous
 meaning. A matching runtime is required for records containing them. No new guest
 attribute or generated RavenDoc type is introduced; this manual entry documents the
-experimental Rust API. The independent C# metadata API does not author these fields.
+experimental Rust API. The independent C# metadata API now authors the bounded
+scalar subset through NativeCallbackDefinition, CallbackParameters and FunctionReturn;
+see [host API reference](experimental-metadata.md#native-imports-development-2026-10-12).
 
 Callback parameters require an exact non-null Function and a scalar callable shape.
 Numeric types, explicit Bool8/Bool32 and void/no-result returns are supported. The

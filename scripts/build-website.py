@@ -292,6 +292,7 @@ def main():
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
         'NATIVE_CALLBACK_IMPORT': ('runtime/raven/tests/native-callbacks/Imports.rvn', 'import System.Runtime.InteropServices.*', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_callback_twice")]', False),
+        'NATIVE_RETURN_IMPORT': ('runtime/raven/tests/native-callbacks/Imports.rvn', '[NativeImport("native-callback-fixture", EntryPoint: "native_function_get")]', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_notification_get")]', False),
         'NATIVE_CALLBACK_FUNCTION': ('runtime/raven/tests/native-callbacks/Tests.rvn', 'func AddOne', '\n\n[Test("Native callbacks preserve', False),
         'NEOIL_TOUR': ('samples/neoil-tour/main.neoil', '.module ILTour', '\n.end', True),
         'NEOIL_FUNCTION': ('samples/neoil-tour/main.neoil', '.function Main', '\n.end', True),

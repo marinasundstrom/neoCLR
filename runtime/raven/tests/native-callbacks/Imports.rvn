@@ -8,3 +8,12 @@ unsafe extern func Twice(callback: (int) -> int, value: int) -> int;
 
 [NativeImport("native-callback-fixture", EntryPoint: "native_callback_notify")]
 unsafe extern func Notify(callback: (int) -> unit, value: int) -> unit;
+
+[NativeImport("native-callback-fixture", EntryPoint: "native_function_get")]
+unsafe extern func GetFunction() -> (int) -> int;
+
+[NativeImport("native-callback-fixture", EntryPoint: "native_notification_get")]
+unsafe extern func GetNotification() -> (int) -> unit;
+
+[NativeImport("native-callback-fixture", EntryPoint: "native_notification_value")]
+unsafe extern func NotificationValue() -> int;

@@ -46,3 +46,27 @@ returned-function source projection are not qualified here. A generic module-fun
 method-group lookup and direct unit equality encountered during test expansion remain
 separate compiler gaps; the generic ABI test uses a static class method and typed
 assignments, so it does not claim either gap is fixed.
+
+## Returned functions (2026-10-22)
+
+The follow-through adds two tests, bringing this suite to seven. C exports return
+`int (*)(int)` and `void (*)(int)`; Raven NativeImport signatures return `(int) -> int`
+and `(int) -> unit`. Tests force collection before invocation and pass each result
+back through the original callback imports. The unit case assigns the direct result
+to System.Void/unit and checks native side effects after both calling directions.
+
+The SDK preserves `function_return`; Raven inherits the import's convention. Numeric
+returns use the interpreter's native Function binding directly. Unit returns use an
+output-owned adapter that invokes a no-result Function then materializes System.Void.
+The adapter/binding allocate once per import result. Loaded library owners remain
+retained, but foreign context ownership is not transferred. Null and data pointers
+remain rejected by the existing runtime contract. Retained callback registrations,
+foreign threads and JIT/AOT execution remain separate gaps.
+
+Evidence: `target/native-return-tests-20261022/report.json` (7/7 interpreter tests),
+metadata SDK `--foreign-imports` (numeric/no-result roundtrip and descriptor rejection),
+and the website's focused tests. The local bundle compiler overlay was refreshed from
+Raven codex/neoclr `5966b5f84` (built before comment-only cleanup); no SDK release is claimed.
+The comparison remains .NET native function/delegate binding, using structural Function
+instead; explicit ABI metadata is retained rather than inferring a callable from an
+untyped pointer.

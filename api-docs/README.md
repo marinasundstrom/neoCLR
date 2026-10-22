@@ -2900,3 +2900,8 @@ rest of this .NET tooling SDK. NativeImport's source callback behavior and unit 
 are documented in native-interop.md; no guest member signatures change. Snapshot
 validation still reports the existing stale compiler reference inputs; hashes were not
 relabeled and no publication is claimed.
+
+The following native-result slice also adds the host FunctionReturn property and
+optional constructor descriptor, documented in experimental-metadata.md. The existing
+NativeImport manual page describes source Function results; guest type selection and
+signatures are unchanged. No API snapshot fingerprint is changed by this host-only API.

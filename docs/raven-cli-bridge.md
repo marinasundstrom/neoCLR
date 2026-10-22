@@ -14601,3 +14601,25 @@ per callback; Raven currently inherits it from the import. Each adapted unit par
 allocates an adapter object and Function binding per call. Retained callbacks, foreign
 threads, returned-function source projection and JIT/AOT callback stubs remain open.
 Built-in evidence and reproduction: [native callback tests](../runtime/raven/tests/native-callbacks/README.md).
+
+### Native function results (2026-10-22 follow-through)
+
+NativeImport declarations can now return a structural Function with numeric scalar
+arguments and numeric or unit result. The SDK's FunctionReturn descriptor carries
+`function_return` in native metadata; Raven uses the import's calling convention.
+Numeric returns use the runtime binding directly. A unit-returning Function result
+uses a source-facing wrapper and compiler adapter around a C no-result Function,
+materializing the configured System.Void value after invocation. Original managed
+Function/generic result conventions are unchanged. The adapter allocates once per
+returned import result, not on each invocation. Foreign context ownership is not
+transferred; the runtime retains loaded library owners. Passing the returned Function
+back as a call-scoped callback uses the same existing invocation machinery.
+
+No Runtime Contract configuration, source keyword or ordinary .NET behavior changes.
+The native metadata path is authoritative; CLI reference projection cannot transport
+foreign descriptors. No new raw-pointer conversion API is introduced. Runtime rejection
+of null/data addresses is retained. JIT/AOT callable support, retained registrations,
+foreign threads and richer ABI conversions remain open. All seven built-in Raven
+native-callback tests pass, including both return directions after GC and unit value
+assignment. Metadata roundtrip/rejection checks cover FunctionReturn. See neoCLR
+runtime/raven/tests/native-callbacks/README.md for reproduction and bundle limits.

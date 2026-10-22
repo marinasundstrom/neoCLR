@@ -65,6 +65,11 @@ internal static class ForeignImportChecks
         callbackDescriptors.Clear();
         callbacks.AddFunction("Notify", new(PrimitiveType.Void, [SignatureType.Function(new(PrimitiveType.Void, [PrimitiveType.Int32]))]))
             .SetNativeImport(new("fixture", "notify", callbackParameters: new Dictionary<int, NativeCallbackDefinition> { [0] = new() }));
+        callbacks.AddFunction("GetCallback", new(callbackShape, []))
+            .SetNativeImport(new("fixture", "get_callback", functionReturn: new("System")));
+        var voidShape = SignatureType.Function(new(PrimitiveType.Void, [PrimitiveType.Int32]));
+        callbacks.AddFunction("GetNotification", new(voidShape, []))
+            .SetNativeImport(new("fixture", "get_notification", functionReturn: new()));
         var callbackSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(callbacks));
         var apply = callbackSnapshot.MainModule.Methods.Single(m => m.Name == "Apply");
         if (apply.NativeImport?.CallbackParameters[0].CallingConvention != "System")
@@ -86,6 +91,18 @@ internal static class ForeignImportChecks
         Reject(() => Graph().AddFunction("F", new(PrimitiveType.Void, [callbackShape])).SetNativeImport(
             new("x", "y", parameterMarshalling: new Dictionary<int, string> { [0] = "Bool8" },
                 callbackParameters: new Dictionary<int, NativeCallbackDefinition> { [0] = new() })));
+        var getCallback = callbackSnapshot.MainModule.Methods.Single(m => m.Name == "GetCallback");
+        if (getCallback.NativeImport?.FunctionReturn?.CallingConvention != "System" ||
+            !getCallback.TryGetSignature(out var returnedSignature) || returnedSignature!.ReturnType != callbackShape)
+            throw new Exception("returned function ABI lost");
+        var getNotification = callbackSnapshot.MainModule.Methods.Single(m => m.Name == "GetNotification");
+        if (getNotification.NativeImport?.FunctionReturn?.CallingConvention != "Cdecl" ||
+            !getNotification.TryGetSignature(out var returnedVoid) || returnedVoid!.ReturnType != voidShape)
+            throw new Exception("returned no-result function ABI lost");
+        Reject(() => Graph().AddFunction("F", new(callbackShape, [])).SetNativeImport(new("x", "y")));
+        Reject(() => Graph().AddFunction("F", new(PrimitiveType.Int32, [])).SetNativeImport(new("x", "y", functionReturn: new())));
+        Reject(() => Graph().AddFunction("F", new(callbackShape, [])).SetNativeImport(new("x", "y", returnMarshalling: "Bool8", functionReturn: new())));
+        Reject(() => Graph().AddFunction("F", new(SignatureType.Function(new(PrimitiveType.String, [])), [])).SetNativeImport(new("x", "y", functionReturn: new())));
         Reject(() => new NativeCallbackDefinition("Stdcall"));
         Console.WriteLine("PASS native import authoring, reread and rejection checks");
     }

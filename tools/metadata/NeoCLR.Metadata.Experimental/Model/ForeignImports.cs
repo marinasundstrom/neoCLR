@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>ABI for a synchronous, call-scoped scalar callback. Native code must not retain it.</summary>
+/// <summary>Scalar callable ABI for call-scoped callback parameters or returned native function pointers.</summary>
 public sealed class NativeCallbackDefinition
 {
     /// <summary>Creates a scalar callback ABI with an explicit supported convention.</summary>
@@ -42,7 +42,7 @@ public sealed class NativeImportDefinition
 {
     /// <summary>Creates a native import with exact export spelling and optional input string encoding.</summary>
     /// <exception cref="ArgumentException">Names are empty/contain NUL, or encoding is unsupported.</exception>
-    public NativeImportDefinition(string library, string entryPoint, string? stringMarshalling = null, string callingConvention = "Cdecl", IReadOnlyDictionary<int, string>? parameterMarshalling = null, string? returnMarshalling = null, IReadOnlyDictionary<int, NativeCallbackDefinition>? callbackParameters = null)
+    public NativeImportDefinition(string library, string entryPoint, string? stringMarshalling = null, string callingConvention = "Cdecl", IReadOnlyDictionary<int, string>? parameterMarshalling = null, string? returnMarshalling = null, IReadOnlyDictionary<int, NativeCallbackDefinition>? callbackParameters = null, NativeCallbackDefinition? functionReturn = null)
     {
         if (string.IsNullOrEmpty(library) || library.Contains('\0') || string.IsNullOrEmpty(entryPoint) || entryPoint.Contains('\0'))
             throw new ArgumentException("native library and entry point must be nonempty and contain no NUL");
@@ -55,6 +55,7 @@ public sealed class NativeImportDefinition
         CallingConvention = callingConvention;
         ParameterMarshalling = new System.Collections.ObjectModel.ReadOnlyDictionary<int, string>(parameterMarshalling is null ? [] : new Dictionary<int, string>(parameterMarshalling));
         ReturnMarshalling = returnMarshalling;
+        FunctionReturn = functionReturn;
         if (callbackParameters?.Any(p => p.Key < 0 || p.Value is null) == true)
             throw new ArgumentException("invalid callback parameter descriptor");
         CallbackParameters = new System.Collections.ObjectModel.ReadOnlyDictionary<int, NativeCallbackDefinition>(
@@ -82,6 +83,9 @@ public sealed class NativeImportDefinition
     /// <summary>Gets zero-based call-scoped scalar callback ABI descriptors.</summary>
     [JsonPropertyName("callback_parameters")]
     public IReadOnlyDictionary<int, NativeCallbackDefinition> CallbackParameters { get; }
+    /// <summary>Gets the ABI of a returned native function pointer, or null for an ordinary result.</summary>
+    [JsonPropertyName("function_return"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NativeCallbackDefinition? FunctionReturn { get; }
     private static bool Valid(string value) => value is "Utf8" or "Utf16" or "Bool8" or "Bool32";
 
     internal void Validate(MethodSignature signature)
@@ -103,9 +107,14 @@ public sealed class NativeImportDefinition
                 throw new InvalidDataException("callback index outside signature or conflicting marshalling");
             callback.Validate(signature.ParameterTypes[index]);
         }
+        if (FunctionReturn is not null)
+        {
+            if (ReturnMarshalling is not null) throw new InvalidDataException("conflicting native function result marshalling");
+            FunctionReturn.Validate(signature.ReturnType);
+        }
         if (signature.GenericParameterNames.Count != 0 || signature.OutParameters.Count != 0 ||
             ParameterMarshalling.Keys.Any(i => i >= signature.ParameterTypes.Count) ||
-            !Slot(signature.ReturnType, ReturnMarshalling, true) ||
+            FunctionReturn is null && !Slot(signature.ReturnType, ReturnMarshalling, true) ||
             signature.ParameterTypes.Where((p, i) => !CallbackParameters.ContainsKey(i) && !Slot(p, ParameterMarshalling.GetValueOrDefault(i) ?? (p == PrimitiveType.String ? StringMarshalling : null), false)).Any())
             throw new InvalidDataException("unsupported native import signature or marshalling");
     }
@@ -114,7 +123,7 @@ public sealed class NativeImportDefinition
     {
         if (value.ValueKind != JsonValueKind.Object) throw new InvalidDataException("invalid native import");
         var fields = value.EnumerateObject().Select(p => p.Name).ToArray();
-        if (fields.Distinct().Count() != fields.Length || fields.Any(p => p is not ("library" or "entry_point" or "calling_convention" or "string_marshalling" or "parameter_marshalling" or "return_marshalling" or "callback_parameters")))
+        if (fields.Distinct().Count() != fields.Length || fields.Any(p => p is not ("library" or "entry_point" or "calling_convention" or "string_marshalling" or "parameter_marshalling" or "return_marshalling" or "callback_parameters" or "function_return")))
             throw new InvalidDataException("unsupported native import metadata");
         try
         {
@@ -136,7 +145,8 @@ public sealed class NativeImportDefinition
             return new(value.GetProperty("library").GetString()!, value.GetProperty("entry_point").GetString()!,
                 value.TryGetProperty("string_marshalling", out var encoding) ? encoding.GetString() : null,
                 value.GetProperty("calling_convention").GetString()!, parameters,
-                value.TryGetProperty("return_marshalling", out var result) ? result.GetString() : null, callbacks);
+                value.TryGetProperty("return_marshalling", out var result) ? result.GetString() : null, callbacks,
+                value.TryGetProperty("function_return", out var functionReturn) ? NativeCallbackDefinition.Read(functionReturn) : null);
         }
         catch (Exception error) when (error is ArgumentException or InvalidOperationException or KeyNotFoundException)
         { throw new InvalidDataException("invalid native import metadata", error); }

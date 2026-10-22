@@ -62,3 +62,23 @@ unsafe func GenericUnit() -> Result<unit, TestFailure> {
     _ = same
     return Ok(())
 }
+
+[Test("Native returned functions remain callable across collection")]
+unsafe func ReturnedFunction() -> Result<unit, TestFailure> {
+    let function = GetFunction()
+    System.Runtime.GC.Collect()
+    _ = Assert.Equal(42, function(41))?
+    return Assert.Equal(42, Apply(function, 41))
+}
+
+[Test("Native returned void functions produce logical unit values")]
+unsafe func ReturnedUnit() -> Result<unit, TestFailure> {
+    let function = GetNotification()
+    System.Runtime.GC.Collect()
+    let value: System.Void = function(42)
+    let same: unit = value
+    _ = same
+    _ = Assert.Equal(42, NotificationValue())?
+    Notify(function, 43)
+    return Assert.Equal(43, NotificationValue())
+}

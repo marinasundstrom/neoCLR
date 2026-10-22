@@ -8695,14 +8695,14 @@ metadata test executable's `--generic-object-roots` group.
 
 `NativeImportDefinition(library, entryPoint, stringMarshalling = null,
 callingConvention = "Cdecl", parameterMarshalling = null, returnMarshalling = null,
-callbackParameters = null)`
+callbackParameters = null, functionReturn = null)`
 records an immutable foreign ABI descriptor. Library/EntryPoint must be nonempty and
 NUL-free; conventions are Cdecl/System; string defaults are Utf8/Utf16; per-slot values
 are Utf8/Utf16/Bool8/Bool32. Parameter indices are zero-based and copied on construction.
 Invalid option values throw ArgumentException. No library is loaded.
 
 Development (2026-10-22): `NativeCallbackDefinition(string callingConvention = "Cdecl")`
-records a synchronous, same-thread, call-scoped callback ABI. Its read-only
+records a scalar callable ABI. Callback parameters are synchronous, same-thread and call-scoped. Its read-only
 `CallingConvention: string` accepts Cdecl or System; other values throw
 `ArgumentException`. `NativeImportDefinition.CallbackParameters` exposes a defensively
 copied, read-only `IReadOnlyDictionary<int, NativeCallbackDefinition>` supplied through
@@ -8716,6 +8716,17 @@ records outside this bounded subset. Raven handles logical unit returns through 
 adapter; the SDK does not silently erase a value-returning signature. Native code must
 not retain the callback or call it on another thread. This host API is documented here
 rather than in RavenDoc's guest-library type selection.
+
+`NativeImportDefinition.FunctionReturn: NativeCallbackDefinition?` exposes the optional
+constructor `functionReturn` descriptor for a returned native function pointer. The
+method result must be a supported structural Function shape; scalar/missing/incompatible
+shapes or simultaneous return marshalling throw `InvalidDataException` on attachment.
+JSON/binary preserve `function_return`. The interpreter rejects null/data addresses and
+retains loaded library owners through the returned Function. It does not take ownership
+of foreign state. Raven projects `(int) -> unit` results through an adapter that invokes
+the C no-result function and materializes logical System.Void. The returned adapter
+allocates once per import result, rather than on each invocation. This is distinct
+from callback-parameter adapters, which are scoped to each call.
 
 `MethodDefinition.NativeImport` exposes the descriptor after authoring or native reading.
 `Introspection.MethodInfo.NativeImport: NativeImportDefinition?` exposes that immutable
