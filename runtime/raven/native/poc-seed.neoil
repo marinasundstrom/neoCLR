@@ -97,12 +97,12 @@ ret
 .methodimpl InternalCall
 .end
 
-.function System.Fail(String message) -> Void
+.function System.Fail(String message) -> void
 ldarg 0
 call neoCLR.Runtime.Fault(String)
 ret
 .end
-.function neoCLR.Runtime.Fault(String message) -> Void
+.function neoCLR.Runtime.Fault(String message) -> void
 .methodimpl InternalCall
 .end
 

@@ -221,3 +221,30 @@ fn cli_runs_checks_and_compiles_neo_to_an_ordinary_artifact() {
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stderr).contains("one input file"));
 }
+
+#[test]
+fn no_result_namespace_calls_preserve_expression_stack_contracts() {
+    for call in [
+        "System.Fail(\"native failure\")",
+        "let result = System.Fail(\"native failure\")",
+    ] {
+        let source = format!("func Main() -> int {{ {call}; return 42 }}");
+        let module = frontend::compile(&source).unwrap();
+        let main = module
+            .functions
+            .iter()
+            .find(|function| function.name == "Main")
+            .unwrap();
+        assert_eq!(
+            main.body
+                .iter()
+                .any(|instruction| matches!(instruction, neoclr::metadata::Instruction::Void)),
+            call.starts_with("let ")
+        );
+        let program = LoadedProgram::new(&module).unwrap();
+        program.verify().unwrap();
+        let error = program.run(Limits::default()).unwrap_err();
+        assert_eq!(error.code, neoclr::FaultCode::UserFault);
+        assert!(error.message.contains("native failure"));
+    }
+}

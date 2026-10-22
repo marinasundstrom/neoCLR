@@ -2269,7 +2269,7 @@ impl Lowerer<'_> {
                 "call"
             }
         ));
-        Ok(Some(Ty::from_metadata(&function.returns)?))
+        Ok(Some(self.imported_call_result(&function)?))
     }
     fn array_owner(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         // Reading a local array element need not copy its whole value.
@@ -2479,7 +2479,7 @@ impl Lowerer<'_> {
                         "call"
                     };
                     self.body.push(format!("{opcode} {getter}"));
-                    return Ok(ty);
+                    return self.imported_call_result(&function);
                 }
                 if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = owner {
                     owner = *target;
@@ -2578,6 +2578,15 @@ impl Lowerer<'_> {
                 .map(|(ty, _)| ty),
         }
     }
+    // Source expressions have a logical value even when the ABI has no result.
+    // A generic value return closed over Void already supplies that value.
+    fn imported_call_result(&mut self, function: &crate::metadata::Function) -> Result<Ty, Fault> {
+        if function.no_result {
+            self.body.push("ldvoid".into());
+        }
+        Ty::from_metadata(&function.returns)
+    }
+
     fn function_signature(&self, ty: &Ty) -> Result<Option<(Vec<Field>, Ty)>, Fault> {
         let Some(f) = library::function(ty)? else {
             return Ok(None);
@@ -2605,7 +2614,7 @@ impl Lowerer<'_> {
             }
             _ => ty,
         };
-        let (parameters, returns) = self
+        let (parameters, _) = self
             .function_signature(target)?
             .ok_or_else(|| at.error("expected Function"))?;
         if parameters.len() != arguments.len() {
@@ -2623,7 +2632,8 @@ impl Lowerer<'_> {
                 .collect::<Vec<_>>()
                 .join(",")
         ));
-        Ok(returns)
+        let function = library::function(target)?.ok_or_else(|| at.error("expected Function"))?;
+        self.imported_call_result(&function)
     }
     fn bind_function(&mut self, name: &str, expression: &Expr) -> Result<Ty, Fault> {
         let (expression, arguments) = match &expression.kind {
@@ -3072,7 +3082,7 @@ impl Lowerer<'_> {
                     )?;
                 }
                 self.body.push(format!("call {signature}"));
-                return Ty::from_metadata(&method.returns);
+                return self.imported_call_result(&method);
             }
             return Err(callee
                 .at
@@ -3226,7 +3236,7 @@ impl Lowerer<'_> {
                     "call"
                 };
                 self.body.push(format!("{opcode} {signature}"));
-                return Ty::from_metadata(&function.returns);
+                return self.imported_call_result(&function);
             }
         }
         if bound_receiver {
@@ -3304,7 +3314,7 @@ impl Lowerer<'_> {
         if let Some(path) = Self::qualified_name(callee) {
             if path.contains('.') && !self.source.records.iter().any(|r| r.name.text == path) {
                 let (owner, member) = path.rsplit_once('.').unwrap();
-                let owner = if owner.starts_with("System.") {
+                let owner = if owner == "System" || owner.starts_with("System.") {
                     owner.to_owned()
                 } else {
                     format!("System.{owner}")
@@ -3335,21 +3345,29 @@ impl Lowerer<'_> {
                     );
                     library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
                     self.body.push(format!("call {signature}"));
-                    return Ty::from_metadata(&function.returns);
+                    return self.imported_call_result(&function);
                 }
                 let types = arguments
                     .iter()
                     .map(|a| self.library_argument(a))
                     .collect::<Result<Vec<_>, _>>()?;
-                let signature = format!(
-                    "{owner}::{member}({})",
-                    types.iter().map(Ty::il).collect::<Vec<_>>().join(",")
-                );
-                let function =
-                    library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                let parameters = types.iter().map(Ty::il).collect::<Vec<_>>().join(",");
+                let mut signature = format!("{owner}::{member}({parameters})");
+                let function = library::resolve(&signature)
+                    .or_else(|method_error| {
+                        let namespace_signature = format!("{owner}.{member}({parameters})");
+                        match library::resolve(&namespace_signature) {
+                            Ok(function) => {
+                                signature = namespace_signature;
+                                Ok(function)
+                            }
+                            Err(_) => Err(method_error),
+                        }
+                    })
+                    .map_err(|e| callee.at.error(e.message))?;
                 self.output_arguments(arguments, &function)?;
                 self.body.push(format!("call {signature}"));
-                return Ty::from_metadata(&function.returns);
+                return self.imported_call_result(&function);
             }
         }
         let ExprKind::Name(name) = &callee.kind else {
@@ -4022,7 +4040,15 @@ impl Lowerer<'_> {
                         returned = self.match_arms(value, arms, true, None, false)?.1;
                     } else {
                         self.expression(expression)?;
-                        self.body.push("pop".into());
+                        if self
+                            .body
+                            .last()
+                            .is_some_and(|instruction| instruction == "ldvoid")
+                        {
+                            self.body.pop();
+                        } else {
+                            self.body.push("pop".into());
+                        }
                     }
                 }
             }

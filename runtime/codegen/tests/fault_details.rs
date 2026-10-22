@@ -263,8 +263,7 @@ fn binding_rejects_missing_capability_duplicates_and_altered_service() {
                 ];
             }
             _ => {
-                seed.functions[1].no_result = true;
-                seed.functions[0].body.remove(2);
+                seed.functions[1].returns = neoclr::metadata::Type::Int32;
             }
         }
         let dir = Temp::new();
@@ -359,6 +358,35 @@ fn source_owned_noresult_failure_uses_its_original_identity() {
         assert!(
             String::from_utf8_lossy(&r.stderr)
                 .starts_with("UserFault: bound failure 🌍\n   at Calculate")
+        );
+    }
+}
+
+#[test]
+fn canonical_fault_binding_preserves_diagnostics_in_native_code() {
+    let dir = Temp::new();
+    let mut seed = seed();
+    seed.functions[1].no_result = true;
+    seed.functions[0].body.remove(2); // Remove the legacy caller's pop.
+    let result = binding(
+        &dir,
+        &seed,
+        APP,
+        &["--compile-system", "--bind-user-fault"],
+        false,
+    );
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    {
+        let result = Command::new(link(&dir, None)).env_clear().output().unwrap();
+        assert_eq!(result.status.code(), Some(1));
+        assert_eq!(
+            String::from_utf8(result.stderr).unwrap(),
+            "UserFault: bound failure 🌍\n   at System.Fail [instruction 1]\n   at Calculate [instruction 1]\n"
         );
     }
 }

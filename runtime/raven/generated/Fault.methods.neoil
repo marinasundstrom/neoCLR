@@ -6,7 +6,6 @@ M00000001_IL_0002:
 ldarg 0
 M00000001_IL_0003:
 call neoCLR.Runtime.Fault(String)
-pop
 M00000001_IL_0008:
 M00000001_IL_0009:
 ret

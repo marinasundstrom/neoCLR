@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Migrate the bootstrap Fault service, System.Fail wrapper, CLI intrinsic and seed copies to canonical no-result calls; remove obsolete caller pops. Honor imported no-result metadata in prototype frontend expressions and constrained calls, avoid immediate unit/discard pairs, and resolve System namespace functions. Preserve generic value returns and native fault diagnostics. All 70 focused interpreter tests and seven AOT fault tests pass; the CLI bridge builds with warnings. Callback projection and remaining legacy return migration are unfinished; this does not complete native interop.
+
 - Add a neoIL feature guide presenting the textual assembler representation of metadata and bytecode, distinct from native binary encoding and Raven direct emission. Demonstrate structural Function binding/invocation and inhabited Void versus no-result calls with shared executable excerpts. The interpreter round-trip sample and 24 website checks pass; full website rendering is blocked by an existing stale API reference snapshot. No runtime contract changes or publication.
 
 - Unify void and System.Void direct return/function-shape semantics in the assembler. Both produce no result; generic/storage uses remain inhabited and original generic returns retain their value ABI. Replace the qualified value-return fixture with canonical calls and add binding, rejection, storage and generic regression coverage. All 46 focused interpreter tests and seven AOT native-import tests pass, including qualified native release/helper declarations. Bare Void remains legacy migration debt pending coordinated body/caller conversion and rejection.

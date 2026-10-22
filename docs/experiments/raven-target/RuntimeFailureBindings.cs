@@ -19,6 +19,6 @@ static class RuntimeFailureBindings
         var signature = RuntimeSignatures.Match(reference, definition, map);
         if (!signature.Args.SequenceEqual(new[] { "String" }) || signature.Result != "void")
             throw new InvalidDataException("Invalid terminal failure signature.");
-        return new("", signature.Args, signature.Result, Instruction: "call neoCLR.Runtime.Fault(String)\npop");
+        return new("", signature.Args, signature.Result, Instruction: "call neoCLR.Runtime.Fault(String)");
     }
 }

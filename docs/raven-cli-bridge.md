@@ -14562,3 +14562,14 @@ preferred keyword for CLI VOID; Runtime Contract selection and Raven code are
 unchanged. Generic value returns closed over System.Void remain value returns.
 Legacy bare-Void text and generated bodies remain pending migration; this increment
 qualifies direct interpreter and bounded AOT imports, not a fresh native Raven bundle.
+
+### Canonical terminal failure calls — 2026-10-22
+
+The temporary CLI bridge now lowers RuntimeFailure.Terminate to a no-result
+`neoCLR.Runtime.Fault(String)` call, without a following `pop`. The bootstrap
+service, System.Fail wrapper and seed copies migrate together. The native semantic
+intent remains terminal UserFault with its original message and stack trace;
+no Runtime Contract configuration or Raven compiler behavior changes. Native
+metadata emission remains the replacement for this CLI-text projection.
+See [Void migration evidence](void-semantics.md#fault-call-migration-and-frontend-consumers--2026-10-22)
+for validation and remaining callback/legacy-return gaps.

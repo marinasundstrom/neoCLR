@@ -5,6 +5,7 @@ struct Member {
     owner: String,
     parameters: Vec<Field>,
     returns: Ty,
+    no_result: bool,
     interface: bool,
     virtual_call: bool,
     readonly: bool,
@@ -60,6 +61,7 @@ impl Lowerer<'_> {
                     owner,
                     parameters: method.parameters.clone(),
                     returns: method.returns.clone(),
+                    no_result: false,
                     interface,
                     virtual_call: interface || method.is_virtual,
                     readonly: method.receiver_readonly,
@@ -99,6 +101,7 @@ impl Lowerer<'_> {
                         })
                         .collect::<Result<_, Fault>>()?,
                     returns: Ty::from_metadata(&function.returns)?,
+                    no_result: function.no_result,
                     interface,
                     virtual_call: interface || function.is_virtual,
                     readonly: function.receiver_readonly,
@@ -161,6 +164,9 @@ impl Lowerer<'_> {
                 .collect::<Vec<_>>()
                 .join(",")
         ));
+        if method.no_result {
+            self.body.push("ldvoid".into());
+        }
         Ok(Some(method.returns))
     }
 }

@@ -104,3 +104,27 @@ The author considered introducing lowercase `void` in Raven, then selected the
 existing `unit` keyword for now. On neoCLR, `unit` and the value `()` use the
 configured System.Void representation. This is not a second platform type and
 does not change no-result call behavior. See [Raven conventions](raven-conventions.md).
+
+### Fault-call migration and frontend consumers — 2026-10-22
+
+The bootstrap `neoCLR.Runtime.Fault(String)` service and its `System.Fail` wrapper
+now use the canonical no-result contract. The CLI RuntimeFailure intrinsic emits
+the call without an obsolete `pop`; the migrated generated fragment and seed
+copies match that change. This is a text/ABI migration of existing behavior, not a
+fresh compilation of every bootstrap slice. The fragment digest is updated while
+its previous compiler/source provenance is retained.
+
+The prototype `.neo` frontend now respects imported no-result metadata for calls
+and constrained member calls. It materializes logical Void for stored expression
+results, removes immediate unit/discard pairs for expression statements, and
+resolves namespace functions such as `System.Fail` without inventing a nominal
+System owner. Generic value returns retain their existing result. This frontend
+is separate from Raven: Raven source semantics and Runtime Contract settings are
+unchanged. Canonical callback text projection and the remaining legacy producer
+migration are still open; signature checks have not been relaxed.
+
+The AOT fault binding admits the migrated service while retaining the explicit
+legacy fixture contract until its migration. Native diagnostics retain the same
+message, function identity and instruction trace. Validation: 70 focused frontend,
+constrained-call, Function, no-result and fault interpreter tests; seven native
+fault-details tests; CLI bridge build (warnings remain).

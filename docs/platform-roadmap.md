@@ -6,7 +6,9 @@ the syntax migration increment. InternalCall binding now admits ordinary no-resu
 execution from exact service signatures without a separate method-name allowlist.
 The accepted spellings `void` and `System.Void` now share direct-return and
 function-shape semantics. Legacy bare-Void bodies/callers and rejection of bare
-`Void` remain open before resuming native interop. See
+`Void` remain open before resuming native interop. The Fault service/wrapper and
+CLI intrinsic now migrate together; prototype frontend consumers preserve logical
+Void expressions and native fault diagnostics are qualified. See
 [contract and migration status](void-semantics.md).
 
 **Native interoperability sequence (author direction, 2026-10-22):** Complete

@@ -26,7 +26,7 @@ pub fn user_fault(input: &mut neoclr::Module, selection: &Value) -> Result<Value
             || f.receiver_readonly
             || f.parameters != [Type::String]
             || f.returns != Type::Void
-            || f.no_result != source_owned
+            || (source_owned && !f.no_result)
             || f.impl_flags != 0x1000
             || f.pinvoke.is_some()
             || !f.body.is_empty()
@@ -42,7 +42,7 @@ pub fn user_fault(input: &mut neoclr::Module, selection: &Value) -> Result<Value
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native UserFault binding requires exact neoCLR.Runtime.Fault(String) -> Void or neoCLR.Runtime.Fail(String) -> void InternalCall contract".into());
+            return Err("native UserFault binding requires exact neoCLR.Runtime.Fault(String) -> void (legacy value returns pending migration) or neoCLR.Runtime.Fail(String) -> void InternalCall contract".into());
         }
         // The supplied String remains a normal argument. Diagnostic lowering uses
         // the explicit binding index to capture that message at the terminal site.
