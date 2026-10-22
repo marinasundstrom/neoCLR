@@ -230,3 +230,13 @@ values against C int64_t/uint64_t functions across interpreter, JIT and AOT.
 This follows ordinary .NET fixed-width integer ABI semantics; it adds no wrapper,
 marshalling allocation or new metadata representation. Arithmetic expansion,
 64-bit pointer dereference and broader managed import composition remain open.
+
+
+Floating-point transport (development, 2026-10-22): the same opt-in scalar ABI
+now admits Single/Double parameters, returns, locals, constants and defaults.
+The shared Raven consumer checks negative zero, infinity, quiet-NaN payloads and
+finite values through helper calls and mixed C arguments, including floating-point
+arguments spilled to the stack. It preserves their declared F32/F64 representation,
+following the platform C ABI as .NET interop does; no marshalling allocations are
+introduced. Arithmetic, floating-point comparisons/conversions and pointer loads
+remain outside this bounded profile.

@@ -37,7 +37,7 @@ pub(crate) fn validate(f: &Function) -> Result<(), Error> {
         || !import.callback_parameters.is_empty()
         || import.function_return.is_some()
     {
-        return Err(format!("{}: native import profile requires free scalar functions with at most 16 Int32, Int64/UInt64, native-sized integer or supported pointer parameters and no marshalling", f.name).into());
+        return Err(format!("{}: native import profile requires free scalar functions with at most 16 Int32, Int64/UInt64, Single/Double, native-sized integer or supported pointer parameters and no marshalling", f.name).into());
     }
     // The ordinary metadata verifier validates names and calling conventions.
     Ok(())

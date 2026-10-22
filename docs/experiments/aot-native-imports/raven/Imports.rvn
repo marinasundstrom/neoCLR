@@ -32,3 +32,12 @@ unsafe extern func UnsignedWide() -> ulong;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "check_wide")]
 unsafe extern func CheckWide(signed: long, unsigned: ulong) -> int;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "single_value")]
+unsafe extern func SingleValue(index: int) -> float;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "double_value")]
+unsafe extern func DoubleValue(index: int) -> double;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "check_floating")]
+unsafe extern func CheckFloating(a: float, b: double, marker: int, c: float, d: double, e: float, f: double, g: float, h: double, i: float, j: double, end: long) -> int;

@@ -17,7 +17,7 @@ clang host.c app.o runtime/native/interop/imports.c -pthread -o app
 
 The C host uses the existing `neoclr_entry_v2(Int32, Int32*) -> status` ABI from
 `docs/experiments/aot-scalar/abi.h`. Imported functions use the target C ABI directly:
-zero through sixteen Int32/Int64/UInt64/native-sized-integer/pointer parameters and an Int32/Int64/UInt64/native-sized-integer/pointer or no-result return, nongeneric free/static
+zero through sixteen Int32/Int64/UInt64/Single/Double/native-sized-integer/pointer parameters and an Int32/Int64/UInt64/Single/Double/native-sized-integer/pointer or no-result return, nongeneric free/static
 module functions, without marshalling. The root itself must be ordinary managed
 code. macOS Cdecl/System conventions coincide; unsupported convention metadata is
 rejected by ordinary validation. No source attribute or compiler Runtime Contract
@@ -26,7 +26,7 @@ configuration changes.
 The default rejects imports. The opt-in rejects other targets, managed JIT, closed-world
 composition, inspection and managed/value/context profiles before writing an object.
 This is a backend development capability, not a new default for installed SDKs or
-VS Code. Types other than Int32, Int64/UInt64, IntPtr/UIntPtr and the supported pointers, member imports,
+VS Code. Types other than Int32, Int64/UInt64, Single/Double, IntPtr/UIntPtr and the supported pointers, member imports,
 managed allocation/pinning, callbacks and asynchronous work remain outside this profile.
 
 The generated thunk resolves `(library, exact entry point)` on first invocation and
@@ -434,3 +434,13 @@ values against C int64_t/uint64_t functions across interpreter, JIT and AOT.
 This follows ordinary .NET fixed-width integer ABI semantics; it adds no wrapper,
 marshalling allocation or new metadata representation. Arithmetic expansion,
 64-bit pointer dereference and broader managed import composition remain open.
+
+
+Floating-point transport (development, 2026-10-22): the same opt-in scalar ABI
+now admits Single/Double parameters, returns, locals, constants and defaults.
+The shared Raven consumer checks negative zero, infinity, quiet-NaN payloads and
+finite values through helper calls and mixed C arguments, including floating-point
+arguments spilled to the stack. It preserves their declared F32/F64 representation,
+following the platform C ABI as .NET interop does; no marshalling allocations are
+introduced. Arithmetic, floating-point comparisons/conversions and pointer loads
+remain outside this bounded profile.

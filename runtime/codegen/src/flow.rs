@@ -25,6 +25,8 @@ pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
 pub(super) enum Kind {
     Int32,
     Int64,
+    Single,
+    Double,
     NativeInt,
     NativeUInt,
     Pointer,
@@ -47,6 +49,8 @@ pub(super) fn analyze(
         } else {
             match t {
                 Type::Int64 | Type::UInt64 => Kind::Int64,
+                Type::Single => Kind::Single,
+                Type::Double => Kind::Double,
                 Type::IntPtr => Kind::NativeInt,
                 Type::UIntPtr => Kind::NativeUInt,
                 _ => Kind::Int32,
@@ -72,7 +76,7 @@ pub(super) fn analyze(
     for (pc, op) in function.body.iter().enumerate() {
         let effect = match op {
             Op::Int(_) | Op::Bool(_) | Op::String(_) => (0, 1),
-            Op::Int64(_) if native_imports => (0, 1),
+            Op::Int64(_) | Op::Float32 { .. } | Op::Float64 { .. } if native_imports => (0, 1),
             Op::ConvertInt64
             | Op::ConvertUInt64
             | Op::ConvertNativeInt
@@ -218,6 +222,8 @@ pub(super) fn analyze(
         }
         match op {
             Op::String(_) => stack.push(Kind::Literal),
+            Op::Float32 { .. } => stack.push(Kind::Single),
+            Op::Float64 { .. } => stack.push(Kind::Double),
             Op::Int64(_) | Op::ConvertInt64 | Op::ConvertUInt64 => stack.push(Kind::Int64),
             Op::ConvertNativeInt => stack.push(Kind::NativeInt),
             Op::ConvertNativeUInt => stack.push(Kind::NativeUInt),

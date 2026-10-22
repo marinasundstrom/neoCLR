@@ -76,7 +76,8 @@ Raven transport consumer now passes 32 runs in each interpreter/scalar-JIT/AOT m
 using C-owned reads and release. Direct untracked foreign-buffer access remains an
 interpreter gap; the original direct pointer read/write proof stays JIT/AOT-only.
 Fixed-width Int64/UInt64 transport now uses the same scalar ABI mapping and is
-covered by that shared consumer; arithmetic expansion remains open.
+covered by that shared consumer; Single/Double transport now also preserves
+floating-point register/stack arguments and IEEE payloads. Arithmetic expansion remains open.
 
 **Character naming (author direction, 2026-10-21):** Rename the development
 grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain

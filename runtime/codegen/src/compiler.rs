@@ -98,11 +98,13 @@ pub(super) fn compile_for_target_with_imports(
                 .chain(&f.locals)
                 .chain([&f.returns])
                 .any(|t| {
-                    matches!(t, Type::Value | Type::String | Type::Single | Type::Double | Type::RuntimeTypeHandle | Type::Tuple(_) | Type::Union(_))
+                    matches!(t, Type::Value | Type::String | Type::RuntimeTypeHandle | Type::Tuple(_) | Type::Union(_))
+                        || (!native_imports && matches!(t, Type::Single | Type::Double))
                         || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String | Type::Tuple(_) | Type::Union(_)))
                 })
                 || f.body.iter().any(|op| {
-                    matches!(op, Op::New(Type::Tuple(_)) | Op::CastClass(Type::Union(_)) | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::LoadMetadataToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                    matches!(op, Op::New(Type::Tuple(_)) | Op::CastClass(Type::Union(_)) | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::LoadMetadataToken(_) | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                        || (!native_imports && matches!(op, Op::Float32 { .. } | Op::Float64 { .. }))
                         || crate::checked_conversion::spec(op).is_some()
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
@@ -391,6 +393,8 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
                         builder.append_block_param(
                             blocks[pc],
                             match kind {
+                                flow::Kind::Single => types::F32,
+                                flow::Kind::Double => types::F64,
                                 flow::Kind::Literal
                                 | flow::Kind::Pointer
                                 | flow::Kind::Int64
@@ -436,12 +440,26 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
                             unreachable!("validated local initialization");
                         };
                         stack.pop().expect("validated stack");
-                        let zero = builder
-                            .ins()
-                            .iconst(crate::scalar_abi::scalar_type(ty).unwrap(), 0);
+                        let zero = match ty {
+                            Type::Single => builder.ins().f32const(0.0),
+                            Type::Double => builder.ins().f64const(0.0),
+                            _ => builder
+                                .ins()
+                                .iconst(crate::scalar_abi::scalar_type(ty).unwrap(), 0),
+                        };
                         builder.def_var(Variable::from_u32(*local as u32), zero);
                     }
                     Op::Int64(value) => stack.push(builder.ins().iconst(types::I64, *value)),
+                    Op::Float32 { bits } => stack.push(
+                        builder
+                            .ins()
+                            .f32const(ir::immediates::Ieee32::with_bits(*bits)),
+                    ),
+                    Op::Float64 { bits } => stack.push(
+                        builder
+                            .ins()
+                            .f64const(ir::immediates::Ieee64::with_bits(*bits)),
+                    ),
                     Op::ConvertInt64
                     | Op::ConvertUInt64
                     | Op::ConvertNativeInt

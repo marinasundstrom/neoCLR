@@ -469,6 +469,29 @@ uint64_t unsigned_wide(void) { return UINT64_MAX - UINT64_C(456); }
 int32_t check_wide(int64_t s, uint64_t u) {
     return s == signed_wide() && u == unsigned_wide() ? 0 : 100;
 }
+#include <string.h>
+static const uint32_t single_bits[] = {0x80000000, 0x7f800000, 0x7fc12345, 0xc1540000};
+static const uint64_t double_bits[] = {
+    UINT64_C(0x8000000000000000), UINT64_C(0x7ff0000000000000),
+    UINT64_C(0x7ff8123456789abc), UINT64_C(0xc02a800000000000)
+};
+float single_value(int32_t index) {
+    float value; memcpy(&value, &single_bits[index], sizeof(value)); return value;
+}
+double double_value(int32_t index) {
+    double value; memcpy(&value, &double_bits[index], sizeof(value)); return value;
+}
+int32_t check_floating(float a, double b, int32_t marker, float c, double d,
+                      float e, double f, float g, double h, float i, double j,
+                      int64_t end) {
+    float singles[] = {a, c, e, g};
+    double doubles[] = {b, d, f, h};
+    uint32_t iz; uint64_t jz;
+    memcpy(&iz, &i, sizeof(iz)); memcpy(&jz, &j, sizeof(jz));
+    return marker == 123 && end == signed_wide() && iz == 0 && jz == 0 &&
+        memcmp(singles, single_bits, sizeof(single_bits)) == 0 &&
+        memcmp(doubles, double_bits, sizeof(double_bits)) == 0 ? 0 : 100;
+}
 "#,
     )
     .unwrap();
@@ -1160,4 +1183,44 @@ ret
             .iter()
             .all(|i| i["status"] == 3 && i["value"].is_null())
     );
+}
+
+#[test]
+fn floating_transport_requires_opt_in_and_rejects_unimplemented_operations() {
+    for (ty, constant) in [("Single", "ldc.r4 -1.25"), ("Double", "ldc.r8 -1.25")] {
+        let valid = format!(
+            ".module FloatingTransport\n.function Unused({ty} value) -> {ty}\n.foreign \"unused\" \"unused\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\n.local {ty} number\nldloca number\ninitobj {ty}\nldloc number\npop\n{constant}\ncall Forward({ty})\npop\nldarg value\nret\n.end\n.function Forward({ty} value) -> {ty}\nldarg value\nret\n.end\n"
+        );
+        let dir = Temp::new();
+        let result = compile(&dir, &valid, &["--native-imports"]);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        for (text, flags) in [
+            (valid.clone(), vec![]),
+            (
+                valid.replace(
+                    "ldarg value\nret\n.end\n",
+                    "ldarg value\ndup\nadd\nret\n.end\n",
+                ),
+                vec!["--native-imports"],
+            ),
+            (
+                valid.replace("ldloc number\npop", "ldloc number\nconv.i4\npop"),
+                vec!["--native-imports"],
+            ),
+            (
+                valid.replace("ldloc number\npop", "ldloc number\ndup\nceq\npop"),
+                vec!["--native-imports"],
+            ),
+        ] {
+            let dir = Temp::new();
+            let result = compile(&dir, &text, &flags);
+            assert!(!result.status.success(), "unexpected admission: {text}");
+            assert!(!dir.0.join("app.o").exists());
+            assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+        }
+    }
 }

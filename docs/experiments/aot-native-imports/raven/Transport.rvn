@@ -11,7 +11,13 @@ unsafe func Main() -> int {
     if signed == default(long) || unsigned == default(ulong) {
         return -2
     }
-    return CheckWide(signed, unsigned) + result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
+    let floating = CheckFloating(
+        ForwardSingle(SingleValue(0)), ForwardDouble(DoubleValue(0)), 123,
+        ForwardSingle(SingleValue(1)), ForwardDouble(DoubleValue(1)),
+        ForwardSingle(SingleValue(2)), ForwardDouble(DoubleValue(2)),
+        ForwardSingle(SingleValue(3)), ForwardDouble(DoubleValue(3)),
+        default(float), default(double), signed)
+    return floating + CheckWide(signed, unsigned) + result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
 }
 
 func ForwardSize(value: nuint) -> nuint {
@@ -31,6 +37,16 @@ func ForwardSigned(value: long) -> long {
 }
 
 func ForwardUnsigned(value: ulong) -> ulong {
+    let copy = value
+    return copy
+}
+
+func ForwardSingle(value: float) -> float {
+    let copy = value
+    return copy
+}
+
+func ForwardDouble(value: double) -> double {
     let copy = value
     return copy
 }
