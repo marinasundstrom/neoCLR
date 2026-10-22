@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Select replacement Preview 17 SDK/editor candidate `0.1.17-neoclr.20261022.1`, pinned to neoCLR `8511834fa` and Raven `301e668a5`, and start matching macOS/Windows builds. Preserve the superseded unpublished candidate and development evidence separately. New artifacts are not yet qualified; no release tag or publication is performed.
+
 - Qualify the refreshed native build kit against the readiness-repaired macOS SDK: extracted console/HTTP, scalar native import/export C/C++ callers, Cargo-free builds and tamper rejection pass. Preserve matching manifest and raw report hashes. The repaired revision also passes both hosted OS suites and all minimum-Rust jobs; canonical full-source rerun and final release publication remain open.
 
 - Rebuild the optimized macOS runtime and development archive with the Unix socket readiness repair. All 2,283 manifest files verify; extracted samples and HTTP client/server exchanges pass in default JIT and interpreter modes. Preserve raw reports and hashes: only the runtime and rebuilt JIT host differ from the prior package. Earlier benchmark/editor/native-kit/HTTPS evidence retains its original identity; hosted qualification and final publication remain open.

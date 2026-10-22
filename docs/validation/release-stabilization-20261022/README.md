@@ -4,7 +4,9 @@ This record tracks the development candidate after Preview 16. It is not a
 published release or a declaration that every gate has passed. Historical
 [Preview 16 qualification](../release-20261018/README.md) remains unchanged.
 Targets are macOS ARM64 and Windows x64; Raven main and `codex/neoclr` remain
-separate. The current package compiler is Raven `301e668a5`.
+separate. The current package compiler is Raven `301e668a5`. The replacement
+[versioned candidate](candidate.json), `0.1.17-neoclr.20261022.1`, is building
+for both platforms; earlier development archive passes do not qualify these new bytes.
 
 | Gate | Current evidence | Remaining work |
 | --- | --- | --- |
@@ -15,7 +17,7 @@ separate. The current package compiler is Raven `301e668a5`.
 | Windows | [Qualification run 39841298887](https://github.com/marinasundstrom/neoCLR/actions/runs/39841298887) reuses package run 39835531991 with repaired GC fixture and UTF-8 client transport. | Runtime/editor qualification passes; [raw reports and lineage](windows-qualified/summary.json) retain 24 await, three JSON, 132 header and 26 editor checks plus both recovery runs. [Windows HTTPS run 39843930421](windows-https/summary.json) also passes. |
 | Performance | [Complete-package macOS measurements](../../../benchmarks/release-20261022/macos-complete/README.md) pass all five aggregate stages; the earlier development series is retained separately. [Windows measurements](../../../benchmarks/release-20261022/windows/README.md) also pass all stages against the qualified archive; their dirty-checkout limitation and source hash audit are retained. | Both platform measurements pass. Recheck final publication artifact identities against measured inputs. |
 | Archive identity | [Both development archives](archive-identity.json): all 2,283 macOS and 2,278 Windows manifest files verify; each SDK and VSIX share 87 identical language-server files and version `0.1.0-dev.20261021`. | Eleven PDB/XML files per SDK are intentionally excluded from VSIX by Raven packaging rules. These are development identities, not final publication assets. |
-| Publication | No new release published. | Complete remaining gates, select and verify final artifacts, then publish; website publication is separate. |
+| Publication | No new release published. Versioned candidate builds are started: [Windows run](https://github.com/marinasundstrom/neoCLR/actions/runs/39855375522), local macOS SDK. | Complete source and versioned-package gates, verify final artifacts, then publish; website publication is separate. |
 
 The platform/operating-system discovery and default line-ending API request is
 [planned work](../../platform-roadmap.md), not supplied by the test harness's

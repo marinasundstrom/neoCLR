@@ -1,0 +1,18 @@
+{
+  "status": "building; not published or qualified",
+  "selectedDate": "2026-10-22",
+  "proposedReleaseTag": "v0.1.0-preview.17",
+  "sdkEditorVersion": "0.1.17-neoclr.20261022.1",
+  "neoClrRevision": "8511834fada0d0aee97396558287867cb52f3fa3",
+  "ravenRevision": "301e668a51beb6ba307d63b6912b144d8ad6a6b0",
+  "sourceQualificationRun": 39853093086,
+  "windowsPackageRun": 39855375522,
+  "macOSOutput": "target/preview17-sdk-macos-20261022",
+  "supersedes": "0.1.17-neoclr.20261019.1 (never published)",
+  "remaining": [
+    "Canonical source qualification must pass.",
+    "Build and qualify matching versioned macOS/Windows SDK, libraries and editor assets.",
+    "Verify final archive identities and record which earlier evidence remains applicable.",
+    "Finalize release notes/changelog and publish only after required gates pass."
+  ]
+}

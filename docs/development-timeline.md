@@ -21368,3 +21368,16 @@ explicit matching-revision Windows package selection implement the measurement
 workflow. Its focused tests pass; new platform measurements remain pending. The
 extracted macOS build-kit HTTP check exposed an unsupported TlsCreateSession binding;
 that package gate remains open. No release or benchmark speedup is reported.
+
+
+## 2026-10-22 — Replacement release candidate after socket stabilization
+
+The author asked to continue the release. After the repaired Unix socket provider
+passed focused tests and both hosted OS suites, the assistant selected
+`0.1.17-neoclr.20261022.1` as the replacement SDK/editor candidate under the existing
+Preview 17 plan and started macOS and Windows builds, retaining Raven `301e668a5`
+on its separate neoCLR branch. The exact version selection is an assistant
+implementation decision, not a quoted author instruction. The earlier October 19
+candidate remains superseded and unpublished. Canonical source qualification and
+new versioned-package acceptance remain open; no release tag or publication was
+performed. See the [candidate record](validation/release-stabilization-20261022/candidate.json).

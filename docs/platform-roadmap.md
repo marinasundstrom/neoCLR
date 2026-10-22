@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Replacement Preview 17 candidate building (2026-10-22):** Select SDK/editor
+`0.1.17-neoclr.20261022.1` against neoCLR `8511834fa` and Raven `301e668a5`.
+Start matching macOS and Windows builds; this supersedes the unpublished October 19
+candidate. New package bytes require qualification. No tag or publication yet.
+[Candidate record](validation/release-stabilization-20261022/candidate.json).
+
 **Repaired native kit and host gates passed (2026-10-22):** The native build kit
 now embeds the readiness-repaired SDK and passes extracted console/HTTP and C/C++
 interop, Cargo-free builds and tamper rejection. Both hosted OS suites and all

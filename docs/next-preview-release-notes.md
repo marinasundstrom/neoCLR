@@ -1,7 +1,9 @@
 # Next preview — Preview 17 candidate
 
 This is an unpublished draft. Preview 16 and its assets remain unchanged.
-No replacement release version or publication date has been selected.
+Replacement SDK/editor candidate: `0.1.17-neoclr.20261022.1`, for proposed tag
+`v0.1.0-preview.17`. Publication date remains unset; no tag has been created.
+[Candidate inputs and outstanding gates](validation/release-stabilization-20261022/candidate.json).
 
 ## Current qualification (2026-10-22)
 
@@ -9,7 +11,7 @@ The initial 2026-10-19 candidate `0.1.17-neoclr.20261019.1`, using Raven
 `2d22055dca58dcf991c6001dfe5d93657577d9d6`, was superseded before publication.
 Do not reuse that identity or its checks for current source.
 
-The current development SDK/editor version is `0.1.0-dev.20261021`, using Raven
+The qualified development baseline SDK/editor version is `0.1.0-dev.20261021`, using Raven
 `301e668a51beb6ba307d63b6912b144d8ad6a6b0`. Extracted macOS ARM64 and Windows x64
 packages, installed-editor checks, HTTPS checks and refreshed platform benchmarks
 have passing evidence. Both archives pass manifest and SDK/editor identity audits.
