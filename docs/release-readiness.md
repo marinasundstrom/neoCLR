@@ -142,3 +142,32 @@ Validation: the regression fails before the fix and passes afterward. All 24
 specialization contract tests pass, including boundary native compilation; the
 timing-only probe is intentionally excluded. Rust formatting passes.
 [Before/after evidence](validation/release-stabilization-20261022/host-root-budget.json).
+
+### HTTP selection diagnosis and interface lookup — 2026-10-22
+
+The retained October 21 package cannot be combined directly with the current
+backend: its primitive metadata predates the Void/Character migrations. Rebuilding
+the unchanged HTTP JSON server sample with the matching native-layout compiler and
+library overlay reproduces the selected-function limit at 2,048 functions, 932
+clones and 661 shapes. The largest source-owner groups include Result, Promise,
+Task and ArrayList specializations. These counts do not prove that any particular
+body is redundant; the limit remains unchanged and HTTP startup is not qualified.
+
+A two-second sample of the unoptimized diagnostic backend found repeated interface
+owner resolution inside `has_self_contract` during source verification. The helper
+now rejects signatures without Self before resolving their owners across inherited
+interfaces. The same signature and exact definition-identity predicates remain;
+no cache, new storage or generated-code change is introduced. This preserves
+nominal interface contracts and the existing implementing-type extension; it does
+not introduce a new divergence from the .NET/CLR model.
+
+A five-round isolated unoptimized probe over approximately 4,100 methods reduces
+median time for 100 negative Self-contract queries from 195 ms to 4.5 ms. This
+synthetic lookup result is neither overall startup speedup nor HTTP throughput.
+Public APIs and website capability claims are unchanged. Further reachability
+analysis, matching native-host packaging and full release qualification remain open.
+
+Validation: 92 integration tests pass across Self, nominal/boxed/class/default/explicit
+interfaces, inheritance and variance, plus the new lookup contract test and timing
+probe. A current-backend HTTP rerun preserves the same selection failure counts.
+[Inputs, results and timing evidence](validation/release-stabilization-20261022/interface-self-lookup.json).

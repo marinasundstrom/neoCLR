@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Avoid resolving method owners during interface Self-contract detection when the signature has no Self placeholder. Preserve exact owner/inheritance checks without adding a cache or allocation. All 92 relevant interface integration tests and the focused lookup test pass; an unoptimized synthetic probe reduces median time for 100 queries from 195 ms to 4.5 ms. Rebuilt HTTP sample still reaches the unchanged 2,048-function budget; no HTTP startup/throughput improvement or release qualification is claimed.
+
 - Enforce the specialization selected-function budget for explicit host/reflection roots as well as discovered calls. Deduplicate roots before admission, including the entry point; reject excess roots before expanding their bodies. The regression reproduces the former bypass, and all 24 specialization contract tests pass (one timing-only probe excluded). Generated code and the 2,048-function budget are unchanged; HTTP startup and release qualification remain open.
 
 - Cache successful native import addresses atomically in each scalar JIT/AOT thunk. Warm calls bypass resolver locking/search; failed lookups remain retryable and concurrent cold resolution retains existing library ownership. An eight-thread regression checks failure output, publication and five million warm calls without resolver re-entry. Local instrumented median time per million calls improves from about 14.6 ms to 5.5 ms; this is not an HTTP or uninstrumented production performance claim. Record Reflection/InternalCall and module-native/NativeImport boundaries explicitly. All 26 native import/export tests and API/website checks (5,681 pages) pass.

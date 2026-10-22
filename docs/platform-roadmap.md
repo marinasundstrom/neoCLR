@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**HTTP startup investigation (2026-10-22):** A compatible source rebuild reproduces
+the function-budget failure. Profiling identified avoidable interface-owner lookups;
+Self-free signatures now skip them without changing contract checks or allocating
+new storage. The isolated lookup probe improves; HTTP startup remains unqualified.
+[Evidence and limits](release-readiness.md#http-selection-diagnosis-and-interface-lookup--2026-10-22).
+
 **Specialization root bounds (2026-10-22):** Explicit host/reflection roots now
 share the selected-function budget with discovered calls; duplicates do not consume
 extra slots. This bounds intermediate work and leaves the HTTP budget/startup

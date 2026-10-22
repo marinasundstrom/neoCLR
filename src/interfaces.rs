@@ -198,14 +198,17 @@ fn has_self_contract(module: &Module, interface: &Type) -> Result<bool, Fault> {
     let interfaces = closure(module, interface)?;
     Ok(interfaces.iter().any(Type::contains_self)
         || module.functions.iter().any(|method| {
-            method.owner.as_ref().is_some_and(|owner| {
-                interfaces.iter().any(|ty| {
-                    module
-                        .type_definition(owner)
-                        .zip(module.type_definition(ty))
-                        .is_some_and(|(left, right)| std::ptr::eq(left, right))
+            // Most methods have no implementing-type placeholders. Reject them
+            // before resolving owners across the inherited interface closure.
+            crate::self_types::signature_has_self(method)
+                && method.owner.as_ref().is_some_and(|owner| {
+                    interfaces.iter().any(|ty| {
+                        module
+                            .type_definition(owner)
+                            .zip(module.type_definition(ty))
+                            .is_some_and(|(left, right)| std::ptr::eq(left, right))
+                    })
                 })
-            }) && crate::self_types::signature_has_self(method)
         }))
 }
 
@@ -876,4 +879,72 @@ pub(crate) fn dispatch_targets(
         }
     }
     Ok(targets)
+}
+
+#[cfg(test)]
+mod self_contract_tests {
+    use super::*;
+
+    fn fixture() -> Module {
+        crate::assemble(
+            ".module SelfLookup\n\
+             .interface Plain\n.method instance Read() -> Int32\n.end\n.end\n\
+             .interface Related\n.method instance Copy() -> Self\n.end\n.end\n\
+             .interface Child\n.implements Related\n.end\n\
+             .interface Generic<T>\n.method instance Read() -> T\n.end\n.end\n\
+             .interface SelfArgument\n.implements Generic<Self>\n.end\n\
+             .type Noise\n.method static Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n",
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn self_contract_lookup_keeps_owner_and_inherited_signature_semantics() {
+        let module = fixture();
+        let check = || {
+            for (name, expected) in [
+                ("Plain", false),
+                ("Related", true),
+                ("Child", true),
+                ("Generic<Int32>", false),
+                ("SelfArgument", true),
+            ] {
+                let interface = crate::assembler::parse_type(name).unwrap();
+                assert_eq!(has_self_contract(&module, &interface).unwrap(), expected);
+            }
+        };
+        check();
+        crate::runtime_lookup::with_module(&module, check);
+    }
+
+    #[test]
+    #[ignore = "manual interface lookup timing probe"]
+    fn self_contract_lookup_timing() {
+        let mut module = fixture();
+        let noise = module.functions.last().unwrap().clone();
+        for index in 0..4096 {
+            let mut method = noise.clone();
+            method.name = format!("Noise.Read{index}");
+            module.functions.push(method);
+        }
+        let interface = Type::Named("Plain".into());
+        crate::runtime_lookup::with_module(&module, || {
+            for _ in 0..5 {
+                let start = std::time::Instant::now();
+                for _ in 0..100 {
+                    assert!(
+                        !has_self_contract(
+                            std::hint::black_box(&module),
+                            std::hint::black_box(&interface)
+                        )
+                        .unwrap()
+                    );
+                }
+                println!(
+                    "self_contract_100_seconds={:.9}",
+                    start.elapsed().as_secs_f64()
+                );
+            }
+        });
+    }
 }

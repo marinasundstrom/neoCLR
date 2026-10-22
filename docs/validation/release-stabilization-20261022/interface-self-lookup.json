@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-22",
+  "baseRevision": "ff8f03a1e695580e73006e6611c0f1fa171998aa",
+  "inputHashes": {
+    "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll": "49767246503e4c96979e88660e21f681c76e1323a5d809d9954b0827188c86d4",
+    "/Users/robert/Projects/neoclr/target/stabilization-extracted-20261021/neoclr-native-poc/bin/neoclr-jit-host.dylib": "d5600eb0f856b9479928eb7f3308e1e7797bfd5f650c996fb18b535b73ae678c",
+    "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll": "a51215732d7ce5eeccaee2b98ffe0df6637e7532067437fa462c99ba125202a6",
+    "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.dll": "c6490c47ffd1849819358b3079ce6d7c70fa7944ccf7e04ae55213eeb63b89d0",
+    "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Networking.dll": "fbd52d7223fb5d2ea4013efcd5d937c921a7f031c3def4dc6c53b5f613161187",
+    "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Web.dll": "6afaa0e1aec6ea91c6efd61d143a3d51ac4e9066d6cfac99358b7bc344da85c4",
+    "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.PostgreSql.dll": "934d1c70864416fed6b0f3da6dfcdd7681dd2eeab8e53683504aae0124476f14",
+    "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json": "a9449aa8f0f32e580bbdb699b17dd391ec235bfe2e531de11ca83a618cf974fd",
+    "src/interfaces.rs": "017a98071ef48179b5d399fa3d70fc10c6e9e09637f66e1e5efc9e6f143f95bf",
+    "target/interop-validation/debug/neoclr-codegen": "e6b3bbf531f85ac33fe44f519ef4c88a47f77e498f00de46fa806aece4edb06f"
+  },
+  "httpSelection": {
+    "command": [
+      "target/interop-validation/debug/neoclr-codegen",
+      "--jit-run",
+      "--closed-world",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+      "@entry",
+      "/Users/robert/Projects/neoclr/target/stabilization-extracted-20261021/neoclr-native-poc/bin/neoclr-jit-host.dylib",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.PostgreSql.dll",
+      "--compile-system",
+      "--bind-user-fault",
+      "--bind-stack-trace",
+      "--reference-arena",
+      "--native-gc",
+      "--bind-console-read-byte",
+      "--bind-console-write-line",
+      "--bind-console-stream-output",
+      "--bind-int32-to-string",
+      "--bind-utf8-text",
+      "--native-stack-budget",
+      "--bind-integer-text",
+      "--bind-character-text",
+      "--bind-system-culture",
+      "--bind-time-zone-rules",
+      "--bind-cryptography",
+      "--bind-tls",
+      "--bind-task-queue",
+      "--bind-scheduler",
+      "--bind-timers",
+      "--bind-socket-listener",
+      "--bind-socket-accept",
+      "--bind-socket-transfer",
+      "--bind-socket-client",
+      "--bind-runtime-async",
+      "--bind-file-input",
+      "--reflection-roots",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json",
+      "--jit-entry-argument",
+      "4"
+    ],
+    "exitCode": 1,
+    "seconds": 25.773737708,
+    "stdout": "",
+    "stderr": "neoclr-codegen: method specialization exceeds 2048 selected functions or 2048 clones (2048 functions, 932 clones, 661 types)\n",
+    "scope": "Selection diagnosis; outdated host adapter is not reached because specialization rejects before execution."
+  },
+  "diagnosticOwnerGroups": [
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Result`2\", arguments: [TypeParameter(0), TypeParameter(1)] })",
+      186
+    ],
+    [
+      "None",
+      143
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Concurrency.Tasks.Promise`1\", arguments: [TypeParameter(0)] })",
+      140
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Collections.ArrayList`1\", arguments: [TypeParameter(0)] })",
+      90
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Concurrency.Tasks.Task`1\", arguments: [TypeParameter(0)] })",
+      86
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1\", arguments: [TypeParameter(0)] })",
+      62
+    ],
+    [
+      "Some(Named(\"NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.System.Data.Json.CollectionAdapters\"))",
+      49
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Option`1\", arguments: [TypeParameter(0)] })",
+      43
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Array`1\", arguments: [TypeParameter(0)] })",
+      39
+    ],
+    [
+      "Some(Constructed { definition: \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Result.Ok`1\", arguments: [TypeParameter(0)] })",
+      38
+    ],
+    [
+      "Some(Named(\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.Runtime.CompilerServices.CheckedStorage\"))",
+      34
+    ],
+    [
+      "Some(Named(\"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.System.IO.TextReadError\"))",
+      29
+    ]
+  ],
+  "ownerGroupNote": "Temporary diagnostic instrumentation at the specialization budget failure, removed before commit; grouped by source owner, not concrete generic arguments. Counts do not prove redundant reachability.",
+  "profileObservation": "2-second macOS sample of unoptimized backend: 1375 samples under LoadedProgram.verify; 451 under has_self_contract owner scanning. Not a whole-program performance distribution.",
+  "beforeSeconds": [
+    0.194781125,
+    0.196029792,
+    0.195451166,
+    0.194795125,
+    0.19679625
+  ],
+  "afterSeconds": [
+    0.004525166,
+    0.00450275,
+    0.004518875,
+    0.004509292,
+    0.004465167
+  ],
+  "beforeMedian": 0.195451166,
+  "afterMedian": 0.004509292,
+  "beforeLog": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized] target(s) in 14.89s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr-2fea84289cb679e7)\n\nrunning 2 tests\ntest interfaces::self_contract_tests::self_contract_lookup_keeps_owner_and_inherited_signature_semantics ... ok\nself_contract_100_seconds=0.194781125\nself_contract_100_seconds=0.196029792\nself_contract_100_seconds=0.195451166\nself_contract_100_seconds=0.194795125\nself_contract_100_seconds=0.196796250\ntest interfaces::self_contract_tests::self_contract_lookup_timing ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 372 filtered out; finished in 1.21s\n\n",
+  "afterLog": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized] target(s) in 10.19s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr-2fea84289cb679e7)\n\nrunning 2 tests\ntest interfaces::self_contract_tests::self_contract_lookup_keeps_owner_and_inherited_signature_semantics ... ok\nself_contract_100_seconds=0.004525166\nself_contract_100_seconds=0.004502750\nself_contract_100_seconds=0.004518875\nself_contract_100_seconds=0.004509292\nself_contract_100_seconds=0.004465167\ntest interfaces::self_contract_tests::self_contract_lookup_timing ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 372 filtered out; finished in 0.24s\n\n",
+  "contractsLog": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized] target(s) in 10.62s\n     Running tests/boxed_interfaces.rs (target/interop-validation/debug/deps/boxed_interfaces-ab9f5e5df9a574dd)\n\nrunning 11 tests\ntest intrinsic_string_type_test_preserves_string_representation ... ok\ntest intrinsic_string_interface_dispatch_and_cast_back ... ok\ntest intrinsic_string_reference_receiver_dispatches_implicit_and_explicit_members ... ok\ntest returned_box_outlives_frame ... ok\ntest object_cast_cannot_expose_box_as_unboxed_value ... ok\ntest boxed_value_is_independent_but_interface_aliases_share_mutations ... ok\ntest type_test_accepts_an_interface_implemented_by_a_boxed_value ... ok\ntest boxed_value_type_test_recognizes_object_root ... ok\ntest box_is_rooted_across_gc_and_observes_heap_limit ... ok\ntest invalid_boxing_operand_and_interface_cast_are_rejected ... ok\ntest unboxed_primitives_use_normalized_evaluation_stack_types ... ok\n\ntest result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.22s\n\n     Running tests/class_interfaces.rs (target/interop-validation/debug/deps/class_interfaces-dd96ec52dc4ebeb1)\n\nrunning 7 tests\ntest readonly_interface_override_cannot_write_without_verification ... ok\ntest generic_base_mapping_infers_closed_override_target ... ok\ntest incomplete_or_incompatible_contracts_and_hidden_capabilities_are_rejected ... ok\ntest inherited_interface_diamonds_are_deduplicated_in_reflection ... ok\ntest frame_heap_abstract_base_and_closed_graph_roundtrip ... ok\ntest new_and_redeclared_conformance_can_use_inherited_public_body ... ok\ntest override_reference_from_base_interface_retains_complete_heap_owner ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s\n\n     Running tests/default_interfaces.rs (target/interop-validation/debug/deps/default_interfaces-d2922d153a77eec3)\n\nrunning 12 tests\ntest generic_default_body_and_closed_dynamic_targets ... ok\ntest default_bodies_reject_abstract_bodies_and_require_virtual_contract_calls ... ok\ntest complete_owner_selects_derived_interface_body_through_class_base_view ... ok\ntest readonly_default_cannot_call_writable_contract_without_verification ... ok\ntest reabstraction_requires_class_implementation_and_invalid_contracts_do_not_fallback ... ok\ntest output_default_and_identity_return_preserve_original_receiver ... ok\ntest reflection_distinguishes_default_body_and_abstract_contract_without_class_rows ... ok\ntest selected_default_fault_trace_has_executed_body_and_source ... ok\ntest default_reference_return_retains_heap_owner_and_frame_escape_faults ... ok\ntest inherited_mapping_stays_anchored_and_redeclaration_restarts_search ... ok\ntest source_artifact_readonly_frame_heap_nested_dispatch_and_graph ... ok\ntest most_specific_diamonds_and_class_precedence ... ok\n\ntest result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.26s\n\n     Running tests/explicit_interfaces.rs (target/interop-validation/debug/deps/explicit_interfaces-72d0a0e7e307a0b1)\n\nrunning 13 tests\ntest generic_explicit_mapping_substitution_and_closed_analysis ... ok\ntest accessor_contracts_map_to_private_bodies_without_public_accessor_names ... ok\ntest generic_mapping_collisions_after_substitution_fault ... ok\ntest mapping_uses_declaration_identity_not_body_name_and_direct_calls_are_private ... ok\ntest external_contract_mapping_preserves_module_identity_and_reference_requirements ... ok\ntest redeclaration_searches_each_ancestor_for_explicit_then_public_members ... ok\ntest explicit_readonly_and_output_contracts_survive_dispatch ... ok\ntest nominal_explicit_bodies_preserve_receiver_mapping_and_private_access ... ok\ntest reflection_keeps_qualified_private_names_and_public_surface_clean ... ok\ntest source_roundtrip_inherited_frame_heap_views_and_graph ... ok\ntest explicit_body_reference_return_retains_heap_owner_and_rejects_frame_escape ... ok\ntest explicit_mapping_is_separate_from_public_virtual_slot_and_can_be_reimplemented ... ok\ntest malformed_mapping_artifacts_are_rejected_on_load ... ok\n\ntest result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.73s\n\n     Running tests/interface_inheritance.rs (target/interop-validation/debug/deps/interface_inheritance-4b9e5aa072086409)\n\nrunning 11 tests\ntest conflicting_inherited_contracts_are_rejected_without_an_implementer ... ok\ntest base_view_cannot_downcast_even_when_concrete_receiver_implements_child ... ok\ntest generic_transitive_conformance_and_closed_dispatch_graph ... ok\ntest native_base_views_keep_existing_pointer_dispatch_rules ... ok\ntest neo_diamond_frame_heap_readonly_and_artifact ... ok\ntest ambiguous_names_require_base_projection ... ok\ntest inherited_views_preserve_heap_root_and_identity_under_pressure ... ok\ntest readonly_cannot_upgrade_and_base_views_cannot_escape_frames ... ok\ntest unchecked_base_projection_does_not_upgrade_readonly_access ... ok\ntest reflection_lists_transitive_interfaces_once_excluding_self ... ok\ntest cycles_duplicate_bases_noninterfaces_and_missing_inherited_members_fail ... ok\n\ntest result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.41s\n\n     Running tests/interface_variance.rs (target/interop-validation/debug/deps/interface_variance-67d467de0e1cad88)\n\nrunning 11 tests\ntest matching_methods_do_not_establish_nominal_conformance ... ok\ntest already_boxed_receiver_widens_without_allocating_another_box ... ok\ntest omitted_variance_remains_invariant_metadata ... ok\ntest closed_generic_execution_does_not_advertise_an_incomplete_dispatch_graph ... ok\ntest reference_covariance_and_contravariance_dispatch_without_copying_receiver ... ok\ntest variance_metadata_roundtrip_and_nested_polarity ... ok\ntest exact_view_wins_and_ambiguous_widening_fails ... ok\ntest string_variant_calls_materialize_identity_preserving_views ... ok\ntest malformed_and_unsafe_declarations_are_rejected ... ok\ntest reversed_and_value_argument_variance_are_rejected ... ok\ntest reference_variance_does_not_cross_invariant_boundaries ... ok\n\ntest result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.09s\n\n     Running tests/nominal_interfaces.rs (target/interop-validation/debug/deps/nominal_interfaces-0c3b5662c3b3f768)\n\nrunning 10 tests\ntest missing_class_implementation_is_rejected_before_execution ... ok\ntest interface_signature_distinguishes_no_result_from_inhabited_void ... ok\ntest null_interface_dispatch_faults_and_null_cast_is_preserved ... ok\ntest interface_alias_mutates_the_same_class_and_inherited_dispatch_works ... ok\ntest ordinary_interface_requires_an_object_not_an_owned_value ... ok\ntest interface_field_keeps_escaped_object_alive_across_collections ... ok\ntest incompatible_cast_faults_even_without_verifier ... ok\ntest returned_interface_retains_object_and_cast_back_preserves_identity ... ok\ntest wrong_nominal_receiver_cannot_dispatch_with_or_without_verification ... ok\ntest concrete_and_derived_interface_receivers_call_inherited_contract_directly ... ok\n\ntest result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.39s\n\n     Running tests/self_types.rs (target/interop-validation/debug/deps/self_types-fbf2f0ba646584c4)\n\nrunning 17 tests\ntest inherited_self_does_not_satisfy_derived_generic_bound_or_direct_dispatch ... ok\ntest native_self_rejects_missing_bound_mismatched_implementation_and_storage ... ok\ntest generic_clone_adapts_value_and_reference_receivers_without_boxing ... ok\ntest borrowed_self_mutation_preserves_the_original_value_slot ... ok\ntest generic_clone_checks_null_even_when_implementation_ignores_receiver ... ok\ntest borrowed_self_reference_dispatch_preserves_virtual_targets_in_execution_and_graph ... ok\ntest self_is_not_an_ordinary_generic_parameter_or_lowercase_alias ... ok\ntest serialized_self_cannot_forge_a_derived_bound_without_verification ... ok\ntest self_in_an_inherited_generic_contract_is_bound_to_implementer ... ok\ntest native_self_static_contract_executes_through_generic_bound ... ok\ntest system_clonable_uses_native_self_for_value_and_reference_clones ... ok\ntest native_self_substitutes_inside_array_and_constructed_signatures ... ok\ntest self_instance_clone_uses_concrete_receiver_and_result ... ok\ntest inherited_self_keeps_base_result_and_virtual_override_contract ... ok\ntest system_number_has_native_self_and_runs_a_constrained_numeric_algorithm ... ok\ntest generic_clone_rejects_unproven_copying_and_readonly_receivers ... ok\ntest derived_self_requires_redeclaration_and_exact_derived_result ... ok\n\ntest result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.24s\n\n",
+  "limits": [
+    "Five rounds of 100 negative Self-contract queries over roughly 4100 methods in one process per variant",
+    "Unoptimized synthetic lookup with scope-local type indexes; not release-build or HTTP throughput",
+    "HTTP selection still fails at unchanged budget; native host execution is not reached"
+  ],
+  "passedContractTests": 92,
+  "profileExcerpt": "      1375 start  (in dyld) + 6688  [0x1999ffe80]\n        1375 main  (in neoclr-codegen) + 36  [0x104f14e68]\n          1375 std::rt::lang_start::he0e8bb8815bbeed5  (in neoclr-codegen) + 60  [0x104f14744]\n            1375 _RNvNtCsg55jX0GwzBC_3std2rt19lang_start_internal  (in neoclr-codegen) + 952  [0x105e237c0]\n              1375 std::rt::lang_start::_$u7b$$u7b$closure$u7d$$u7d$::hf0abeefeccca5b4b  (in neoclr-codegen) + 16  [0x104f14760]\n                1375 std::sys::backtrace::__rust_begin_short_backtrace::h27f18abd14d71aaf  (in neoclr-codegen) + 12  [0x104f1477c]\n                  1375 core::ops::function::FnOnce::call_once::h5ae3563fc8e8c5b6  (in neoclr-codegen) + 16  [0x104f14800]\n                    1375 neoclr_codegen::main::he5b30cd00d88349d  (in neoclr-codegen) + 88  [0x104f145d0]\n                      1375 neoclr_codegen::run::he6edea9b6c73fb1f  (in neoclr-codegen) + 21060  [0x10522d48c]\n                        1375 neoclr_codegen::linking::prepare::h13d42a97c6d84183  (in neoclr-codegen) + 2444  [0x1052b3444]\n                          1375 core::result::Result$LT$T$C$E$GT$::and_then::h3f3ee8be85ae10d7  (in neoclr-codegen) + 164  [0x105347ed4]\n                            1375 neoclr_codegen::linking::prepare::_$u7b$$u7b$closure$u7d$$u7d$::h1d4af09347740ca6  (in neoclr-codegen) + 20  [0x1052cdb34]\n                              1375 neoclr::program::LoadedProgram::verify::h3c5b7daf7ff62907  (in neoclr-codegen) + 12  [0x105c48254]\n                                1375 neoclr::verifier::analyze::hec2d66383cf0a925  (in neoclr-codegen) + 20  [0x105b43878]\n                                  1375 neoclr::runtime_lookup::with_module::h0fba618ee767da26  (in neoclr-codegen) + 460  [0x105d50ee8]\n                                    1375 neoclr::verifier::analyze::_$u7b$$u7b$closure$u7d$$u7d$::h05ed3c82cb9ffa73  (in neoclr-codegen) + 12  [0x105b4388c]\n                                      1370 neoclr::verifier::analyze_indexed::hccc4861f74fc55f9  (in neoclr-codegen) + 724  [0x105b3c750]\n                                      + 1166 neoclr::verifier::analyze_function::hac40e4382b42397e  (in neoclr-codegen) + 7608  [0x105b3f000]\n                                      + ! 684 neoclr::verifier::typed_effect::h89d7ac0ebd0a6bc0  (in neoclr-codegen) + 16020  [0x105b308f0]\n                                      + ! : 684 neoclr::verifier::stored::hb51c2c31809f8f7c  (in neoclr-codegen) + 352  [0x105b434b0]\n                                      + ! :   684 core::result::Result$LT$T$C$E$GT$::is_ok_and::h2d8df1ea87b71e33  (in neoclr-codegen) + 72  [0x105cf36bc]\n                                      + ! :     684 neoclr::verifier::stored::_$u7b$$u7b$closure$u7d$$u7d$::hc31ef975641ebe87  (in neoclr-codegen) + 68  [0x105b436a0]\n                                      + ! :       683 neoclr::metadata::Module::reference_assignable::hdc3b994d7c3e582b  (in neoclr-codegen) + 624  [0x105a3ff24]\n                                      + ! :       | 681 neoclr::interfaces::ensure_reference_implementation::h546a2879bad7953e  (in neoclr-codegen) + 312  [0x105be1774]\n                                      + ! :       | + 452 neoclr::interfaces::ensure_members::h729f213f9d8c6307  (in neoclr-codegen) + 168  [0x105bdde18]\n                                      + ! :       | + ! 451 neoclr::interfaces::has_self_contract::h90c057312c52c80e  (in neoclr-codegen) + 384  [0x105be01dc]\n                                      + ! :       | + ! : 448 _$LT$core..slice..iter..Iter$LT$T$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::any::h38ee57ec33c5be31  (in neoclr-codegen) + 116  [0x105a7d3b0]\n                                      + ! :       | + ! : | 446 neoclr::interfaces::has_self_contract::_$u7b$$u7b$closure$u7d$$u7d$::h11d15f24391b2971  (in neoclr-codegen) + 44  [0x105be025c]\n                                      + ! :       | + ! : | + 446 core::option::Option$LT$T$GT$::is_some_and::h806351c8278963ae  (in neoclr-codegen) + 60  [0x105d13130]\n                                      + ! :       | + ! : | +   444 neoclr::interfaces::has_self_contract::_$u7b$$u7b$closure$u7d$$u7d$::_$u7b$$u7b$closure$u7d$$u7d$::hc8fb4bd1b9673d34  (in neoclr-codegen) + 60  [0x105be02cc]\n                                      + ! :       | + ! : | +   ! 440 _$LT$core..slice..iter..Iter$LT$T$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::any::hf3bff9dadaee3b37  (in neoclr-codegen) + 116  [0x105a7ff64]"
+}
