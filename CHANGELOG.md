@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Repair the retained Neo frontend character-classification sample to call `System.Character.FromString` after the public type rename. The fresh extracted-source run exposed the stale `System.Char` name; all five focused classification tests now pass. Full extracted-source and package release qualification remain open.
+
 - Add Raven-authored `PriorityArrayQueue<TElement, TPriority>` with explicit Comparer/FunctionComparer policies, a binary min-heap, Option-valued peek/dequeue, capacity reservation and reference-clearing reuse. Equal priorities have unspecified order; no default comparer, sorted indexing or per-entry heap nodes are introduced. Negative capacities and comparer reentry fault. All 23 collection tests, isolated guards and selection checks pass in interpreter and macOS ARM64 AOT. Comparison-count coverage bounds heap work; no wall-clock speedup is claimed. Refresh API references and the collections guide; snapshot checks and all 5,703 website pages pass.
 
 - Raise the native selected-method/clone budget and matching root-probe bound together from 2,048 to 4,096, admitting the measured 2,055-method HTTP sample. Add compiler/header agreement coverage and repair stale native index-bound tests. All 136 backend tests and native compilation/root-probe boundary tests pass. Rebuilt macOS ARM64 HTTP JSON server requests and the Raven client/server exchange pass in JIT and standalone AOT. Update website development status; API/source checks and all 5,681 pages pass. Matching rebuilt hosts are required above the old bound. Installed packages, Windows and full release qualification remain pending.

@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Fresh-source follow-up (2026-10-22):** The extracted archive exposes a retained
+Neo sample still calling System.Char. The sample now calls System.Character and
+all five focused classification tests pass. Full source/package qualification
+remains open. [Evidence](release-readiness.md#fresh-source-character-sample-repair--2026-10-22).
+
 **Priority collection before release (author direction, 2026-10-22):** Add
 `PriorityArrayQueue<TElement, TPriority>` with an explicit Comparer policy. Its
 array-backed binary heap follows existing Option-returning collection conventions;

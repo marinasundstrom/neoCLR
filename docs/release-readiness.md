@@ -216,3 +216,14 @@ steady-state throughput. The bound adds no per-call storage or GC frame-layout
 change; larger admitted programs can consume more compiler memory and output space.
 [Exact artifacts, test logs and HTTP results](validation/release-stabilization-20261022/http-function-budget.json).
 Fresh extracted-source, packaged/editor and Windows qualification remain open.
+
+### Fresh-source character sample repair — 2026-10-22
+
+The committed archive at `82819fa26` exposed a stale `System.Char.FromString`
+call in the retained Neo frontend sample. It now uses `System.Character`; the
+legacy frontend's char syntax is preserved independently of Raven's native target.
+All five focused classification tests pass. [Evidence](validation/release-stabilization-20261022/character-sample-repair.json)
+retains the original failure and corrected test output. This does not turn the
+unchanged extracted archive into a passing release gate. The first attempt also
+encountered an incompatible local Command Line Tools SDK/linker; the rerun selected
+the matching Xcode SDK and compiler explicitly.

@@ -1,9 +1,9 @@
 // Unicode classification now belongs to System.Text.UnicodeScalar's numeric API.
-// This archived frontend sample exercises the text-valued Char contract.
+// This archived frontend sample exercises the text-valued Character contract.
 func Main() -> int {
     let digit: char = '٧'
     if !digit.Equals('٧') { return -1 }
-    let accented = System.Char.FromString("é")
+    let accented = System.Character.FromString("é")
     if !accented.ToString().Equals("é") { return -2 }
     System.Console.WriteLine("Grapheme characters preserve their text")
     return 42
