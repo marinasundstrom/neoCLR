@@ -2511,12 +2511,11 @@ ret
                 assert_eq!(report["functionCount"], 1);
                 assert_eq!(report["functionCloneCount"], 0);
             } else {
-                assert!(
-                    result
-                        .err()
-                        .unwrap()
-                        .to_string()
-                        .contains("specialization input exceeds metadata limits")
+                // Source inventory has a separate, larger bound. This graph is
+                // admitted as input but exceeds the executable shape budget.
+                assert_eq!(
+                    result.err().unwrap().to_string(),
+                    format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}")
                 );
             }
         }
