@@ -26,6 +26,19 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Platform discovery and default line endings
+
+During Windows release qualification, the assistant reports a Python harness
+newline-translation mismatch and repairs byte transport without changing the
+reader's configured delimiter. The author observes that there is no public API to
+determine platform/operating system or the default line-ending sequence and says,
+“We will have to add it in the next release.” The assistant records this as planned
+next-release work and continues current qualification. The proposed design review
+will compare the .NET discovery and environment API roles, account for execution
+target versus build host, and preserve explicit text delimiters. No public API is
+implemented by this record; names, defaults and target validation remain open.
+
+
 ## 2026-10-22 — Qualify imports before stable AOT exports
 
 The author directs completing foreign function native imports across interpreter,

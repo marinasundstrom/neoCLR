@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Record author-requested next-release platform/operating-system discovery and default line-ending APIs as planned work. Public contracts and cross-engine validation remain open; current UTF-8 transport repair does not implement platform discovery.
+
 - Preserve UTF-8 bytes and exact input line delimiters in SDK runtime-await qualification. Windows requalification passes native GC and the language/cleanup/fault/server cases, then exposes CRLF translation in the Python HTTP-client harness; send bytes and decode output explicitly instead of using host text-mode translation. Two transport regression tests pass. Client and remaining Windows qualification are pending; production reader semantics are unchanged.
 
 - Repair Windows native GC qualification's root-validation fixture: replace three deprecated strcpy calls with fixed-size copies instead of suppressing MSVC warnings-as-errors. All 18 probe/GC cases pass locally with undefined/bounds sanitizers. Print bounded failure diagnostics in CI while retaining complete logs; the focused failure-path test passes. Reused Windows packages now rerun integrity/sample and runtime-contract checks before editor qualification, using the packaged compiler and recording the original run/archive hash. The prior Windows run and its dependent benchmarks remain failed; Windows requalification is still required.

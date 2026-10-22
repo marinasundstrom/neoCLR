@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Platform discovery backlog (author direction, 2026-10-22):** Add public platform
+and operating-system discovery and the default line-ending sequence in the next
+release. This is planned work, not an implemented capability. Evaluate the .NET
+`OperatingSystem`, `RuntimeInformation` and `Environment.NewLine` API roles against
+neoCLR hosting and cross-compilation: report the execution target, not the compiler
+host. Keep configured reader/writer delimiters explicit. Exact API placement and
+validation across interpreter, JIT and AOT remain to be designed; current release
+qualification continues without treating the transport-harness fix as this API.
+
 **Windows client harness follow-up (2026-10-22):** Requalification passes native
 GC and language/cleanup/fault/server runtime-await cases in all three engines.
 Client output exposes a test transport mismatch: Python translates LF input on
