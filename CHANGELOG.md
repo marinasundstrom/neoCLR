@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Reuse immutable type/interface compatibility answers within native selection and value-profile admission. Preserve growing receiver/dispatch sets, exact closed generic identities and module-scoped invalidation; temporary compiler storage is not emitted into applications. All 135 backend tests pass. A focused probe improves from 12.5 ms to 1.5 ms per 4,096 queries. Temporary higher-budget inspection admits the HTTP sample at 2,055 methods/662 types; shipped limits stay unchanged and native HTTP execution remains unqualified. Document AOT/JIT reachability and direct-call distinctions against .NET, Rust and Go.
+
 - Avoid resolving method owners during interface Self-contract detection when the signature has no Self placeholder. Preserve exact owner/inheritance checks without adding a cache or allocation. All 92 relevant interface integration tests and the focused lookup test pass; an unoptimized synthetic probe reduces median time for 100 queries from 195 ms to 4.5 ms. Rebuilt HTTP sample still reaches the unchanged 2,048-function budget; no HTTP startup/throughput improvement or release qualification is claimed.
 
 - Enforce the specialization selected-function budget for explicit host/reflection roots as well as discovered calls. Deduplicate roots before admission, including the entry point; reject excess roots before expanding their bodies. The regression reproduces the former bypass, and all 24 specialization contract tests pass (one timing-only probe excluded). Generated code and the 2,048-function budget are unchanged; HTTP startup and release qualification remain open.

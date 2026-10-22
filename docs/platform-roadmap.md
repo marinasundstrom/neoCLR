@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**HTTP inventory established (2026-10-22):** Compilation-scoped dispatch relationship
+reuse passes 135 backend tests. Diagnostic inspection with a temporary larger bound
+admits the HTTP sample at 2,055 methods, seven above the shipping limit. No budget
+or native-host contract is changed; coordinated qualification remains next.
+[Analysis and runtime comparison](design/native-reachability.md).
+
 **HTTP startup investigation (2026-10-22):** A compatible source rebuild reproduces
 the function-budget failure. Profiling identified avoidable interface-owner lookups;
 Self-free signatures now skip them without changing contract checks or allocating

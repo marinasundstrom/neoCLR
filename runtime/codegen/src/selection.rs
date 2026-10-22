@@ -739,17 +739,54 @@ fn scalar_interface_targets(
         .collect()
 }
 
+// Cache only immutable type relationships, never the growing set of reachable
+// receivers or selected method targets. The borrow prevents reuse after mutation.
+pub(super) struct DispatchRelations<'a> {
+    input: &'a neoclr::Module,
+    owners: std::collections::HashMap<Type, std::collections::HashMap<usize, bool>>,
+}
+
+impl<'a> DispatchRelations<'a> {
+    pub(super) fn new(input: &'a neoclr::Module) -> Self {
+        Self {
+            input,
+            owners: Default::default(),
+        }
+    }
+
+    fn implements(&mut self, concrete: usize, target: &Type) -> bool {
+        if let Some(result) = self
+            .owners
+            .get(target)
+            .and_then(|owners| owners.get(&concrete))
+        {
+            return *result;
+        }
+        let result = implements_interface(
+            self.input,
+            &Type::Named(self.input.types[concrete].name.clone()),
+            target,
+        );
+        self.owners
+            .entry(target.clone())
+            .or_default()
+            .insert(concrete, result);
+        result
+    }
+}
+
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Optional conformance types add verification-only roots; omit them for dispatch tables.
 /// Original conformance is verified before private projection; this is not a binder.
 pub(super) fn dispatch_targets_with_array(
-    input: &neoclr::Module,
+    relations: &mut DispatchRelations<'_>,
     contract: usize,
     reached: &BTreeSet<usize>,
     array_backing: Option<usize>,
     reference_backings: &[usize],
     conformance_types: Option<&BTreeSet<usize>>,
 ) -> Result<Vec<(usize, usize)>, Error> {
+    let input = relations.input;
     let f = &input.functions[contract];
     let display = object_dispatch_contract(f);
     let class = class_contract(input, f);
@@ -844,12 +881,7 @@ pub(super) fn dispatch_targets_with_array(
     let mut targets = vec![];
     for (ti, t) in input.types.iter().enumerate() {
         if !constructed.contains(t.name.as_str())
-            || (!display
-                && !implements_interface(
-                    input,
-                    &Type::Named(t.name.clone()),
-                    f.owner.as_ref().unwrap(),
-                ))
+            || (!display && !relations.implements(ti, f.owner.as_ref().unwrap()))
         {
             continue;
         }
@@ -1116,6 +1148,7 @@ pub(super) fn select_inventory_with_host_roots(
     let [root_index] = roots.as_slice() else {
         return Err("closed-world root must have one exact name match".into());
     };
+    let mut relations = DispatchRelations::new(input);
     let mut functions = BTreeSet::new();
     let mut pending = vec![*root_index];
     pending.extend_from_slice(host_roots);
@@ -1201,7 +1234,7 @@ pub(super) fn select_inventory_with_host_roots(
                 pending.push(target);
             }
             for (_, target) in dispatch_targets_with_array(
-                input,
+                &mut relations,
                 contract,
                 &functions,
                 None,
@@ -1353,7 +1386,7 @@ pub(super) fn select_inventory_with_host_roots(
         let class = class_contract(input, &input.functions[*source]);
         if interface_contract(input, &input.functions[*source]) || display || class {
             let targets = dispatch_targets_with_array(
-                input,
+                &mut relations,
                 *source,
                 &functions,
                 None,
@@ -1460,6 +1493,62 @@ ret
     }
 
     #[test]
+    fn dispatch_relationship_cache_preserves_closed_types_and_module_changes() {
+        let mut module = neoclr::assemble(
+            ".module Relations\n.interface Read<T>\n.end\n.type class Cell\n.implements Read<Int32>\n.end\n"
+        ).unwrap();
+        let cell = module.types.iter().position(|t| t.name == "Cell").unwrap();
+        let integer = neoclr::assembler::parse_type("Read<Int32>").unwrap();
+        let text = neoclr::assembler::parse_type("Read<String>").unwrap();
+        {
+            let mut relations = DispatchRelations::new(&module);
+            for _ in 0..3 {
+                assert!(relations.implements(cell, &integer));
+                assert!(!relations.implements(cell, &text));
+            }
+            assert_eq!(relations.owners.len(), 2);
+        }
+        module.types[cell].implements = vec![text.clone()];
+        let mut relations = DispatchRelations::new(&module);
+        assert!(!relations.implements(cell, &integer));
+        assert!(relations.implements(cell, &text));
+    }
+
+    #[test]
+    #[ignore = "manual dispatch relationship timing probe"]
+    fn dispatch_relationship_cache_timing() {
+        let mut source = String::from(".module Relations\n.interface Read\n.end\n");
+        for index in 0..128 {
+            source += &format!(".type class Cell{index}\n.implements Read\n.end\n");
+        }
+        let module = neoclr::assemble(&source).unwrap();
+        let target = Type::Named("Read".into());
+        let mut relations = DispatchRelations::new(&module);
+        for round in 0..5 {
+            for cached in [false, true] {
+                let start = std::time::Instant::now();
+                for _ in 0..32 {
+                    for concrete in 1..module.types.len() {
+                        assert!(if cached {
+                            relations.implements(concrete, std::hint::black_box(&target))
+                        } else {
+                            implements_interface(
+                                &module,
+                                &Type::Named(module.types[concrete].name.clone()),
+                                std::hint::black_box(&target),
+                            )
+                        });
+                    }
+                }
+                println!(
+                    "dispatch_cached={cached} round={round} seconds={:.9}",
+                    start.elapsed().as_secs_f64()
+                );
+            }
+        }
+    }
+
+    #[test]
     fn boxed_value_interface_targets_are_retained_without_a_constructor() {
         let module = neoclr::assemble(
             ".module BoxedInterface\n.type class System.Object\n.end\n.interface Format\n.method instance Render() -> Int32\n.end\n.end\n.type Payload\n.implements Format\n.method instance byref Render() -> Int32\nldc.i4 42\nret\n.end\n.end\n.function Main() -> Int32\n.local Payload value\nldloca value\ninitobj Payload\nldloc value\nbox Payload\npop\nldc.i4 0\nret\n.end",
@@ -1485,7 +1574,7 @@ ret
             .position(|t| t.name == "Payload")
             .unwrap();
         let targets = dispatch_targets_with_array(
-            &module,
+            &mut DispatchRelations::new(&module),
             contract,
             &BTreeSet::from([main]),
             None,
@@ -1493,11 +1582,32 @@ ret
             None,
         )
         .unwrap();
+        let mut relations = DispatchRelations::new(&module);
+        for reached in [BTreeSet::new(), BTreeSet::from([main]), BTreeSet::new()] {
+            let cached =
+                dispatch_targets_with_array(&mut relations, contract, &reached, None, &[], None)
+                    .unwrap();
+            assert_eq!(
+                cached,
+                if reached.is_empty() {
+                    vec![]
+                } else {
+                    vec![(value, method)]
+                }
+            );
+        }
         assert_eq!(targets, vec![(value, method)]);
         assert!(
-            dispatch_targets_with_array(&module, contract, &BTreeSet::new(), None, &[], None)
-                .unwrap()
-                .is_empty()
+            dispatch_targets_with_array(
+                &mut DispatchRelations::new(&module),
+                contract,
+                &BTreeSet::new(),
+                None,
+                &[],
+                None
+            )
+            .unwrap()
+            .is_empty()
         );
     }
 

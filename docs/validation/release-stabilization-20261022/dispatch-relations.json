@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-22",
+  "baseRevision": "fec682ff6e2719cfd7df102059658fdc9429955c",
+  "hashes": {
+    "runtime/codegen/src/selection.rs": "b668688a1658e8ceb6a68a2d7431d2c259325faa9423967d1f245d9011ade089",
+    "runtime/codegen/src/value_profile.rs": "4787edb4a8f5943a1ae937081153360de1f070acb0df252e4dce359975a8e8b7",
+    "/tmp/neoclr-codegen-expanded-cache": "501be341946aef656306cf98984a9cffd25f7190528e3eeae0e8f0ebd158198e",
+    "target/http-stabilization-20261022/bin/neoclr/App.dll": "49767246503e4c96979e88660e21f681c76e1323a5d809d9954b0827188c86d4",
+    "target/http-stabilization-20261022/bin/neoclr/App.reflection.json": "a9449aa8f0f32e580bbdb699b17dd391ec235bfe2e531de11ca83a618cf974fd"
+  },
+  "probe": {
+    "scenario": "128 concrete types, 32 repeated queries each, five rounds; first cached round includes cold fills; unoptimized Rust",
+    "samplesSeconds": {
+      "false": [
+        0.01276925,
+        0.012286667,
+        0.012462917,
+        0.012280292,
+        0.013033167
+      ],
+      "true": [
+        0.002044541,
+        0.001512917,
+        0.001516416,
+        0.001507417,
+        0.001488625
+      ]
+    },
+    "mediansSeconds": {
+      "false": 0.012462917,
+      "true": 0.001512917
+    },
+    "log": "    Finished `test` profile [unoptimized] target(s) in 2.09s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr_codegen-316d2b322a38be33)\n\nrunning 6 tests\ntest selection::composition_admission_tests::boxed_value_interface_targets_are_retained_without_a_constructor ... ok\ntest selection::composition_admission_tests::dispatch_relationship_cache_preserves_closed_types_and_module_changes ... ok\ntest selection::composition_admission_tests::structural_union_signatures_are_selected_without_nominal_carriers ... ok\ntest selection::composition_admission_tests::structural_tuple_storage_is_selected_without_nominal_carriers ... ok\ndispatch_cached=false round=0 seconds=0.012769250\ndispatch_cached=true round=0 seconds=0.002044541\ndispatch_cached=false round=1 seconds=0.012286667\ndispatch_cached=true round=1 seconds=0.001512917\ndispatch_cached=false round=2 seconds=0.012462917\ndispatch_cached=true round=2 seconds=0.001516416\ndispatch_cached=false round=3 seconds=0.012280292\ndispatch_cached=true round=3 seconds=0.001507417\ndispatch_cached=false round=4 seconds=0.013033167\ndispatch_cached=true round=4 seconds=0.001488625\ntest selection::composition_admission_tests::dispatch_relationship_cache_timing ... ok\ntest selection::composition_admission_tests::explicit_mapping_identity_follows_selected_rows ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 132 filtered out; finished in 0.39s\n\n"
+  },
+  "backendTests": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `test` profile [unoptimized] target(s) in 15.72s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr_codegen-316d2b322a38be33)\n\nrunning 138 tests\ntest bindings::task_queue_tests::entry_drain_requires_exact_service_and_marks_host_completion_work ... ok\ntest bindings::native_text_array_tests::source_owned_text_vectors_keep_exact_elements_and_internal_contracts ... ok\ntest bindings::task_queue_tests::queue_binding_preserves_closed_source_ownership_and_rejects_impostors ... ok\ntest bindings::cryptography_tests::crypto_binding_does_not_replace_managed_bodies_or_accept_changed_contracts ... ok\ntest bindings::tls_tests::tls_binding_does_not_replace_managed_bodies_or_accept_changed_contracts ... ok\ntest bindings::identity_tests::identity_binding_requires_exact_reserved_contract ... ok\ntest bindings::type_identity_tests::stack_trace_requires_exact_native_contract ... ok\ntest bindings::type_identity_tests::system_culture_requires_the_exact_internal_call_contract ... ok\ntest bindings::type_identity_tests::type_equals_requires_exact_reserved_contract ... ok\ntest bindings::terminal_tests::terminal_bindings_require_exact_internal_contracts ... ok\ntest bindings::utf8_slice_tests::utf8_slice_requires_exact_readonly_byte_internalcall ... ok\ntest compiler::values::gc_layout::tests::cyclic_objects_describe_edges_without_recursive_expansion ... ok\ntest compiler::values::gc_layout::tests::intersection_views_use_one_strong_reference_slot ... ok\ntest compiler::values::gc_layout::tests::local_seeding_clears_erased_tags_and_roots_but_not_integer_lanes ... ok\ntest compiler::values::gc_layout::tests::mixed_union_traces_only_its_separate_reference_lane ... ok\ntest compiler::values::gc_layout::tests::nested_records_preserve_reference_offsets_and_stop_at_reference_edges ... ok\ntest compiler::values::gc_layout::tests::nominal_array_backing_is_not_an_object_containing_itself ... ok\ntest compiler::values::gc_layout::tests::persistent_byte_memory_traces_only_owner_in_nested_storage ... ok\ntest compiler::values::gc_layout::tests::scalar_union_payloads_are_numeric_and_never_roots ... ok\ntest compiler::values::gc_layout::tests::structural_tuple_tracing_preserves_nested_offsets_and_excludes_numeric_lanes ... ok\ntest compiler::values::gc_layout::tests::union_reference_payload_uses_one_strong_slot_without_a_carrier ... ok\ntest compiler::values::gc_layout::tests::value_union_payload_regions_preserve_record_roots_and_bounds ... ok\ntest compiler::values::gc_layout::tests::wide_integers_are_not_roots_but_scalar_borrows_keep_owners ... ok\ntest bindings::type_identity_tests::time_zone_rules_require_exact_internal_call_contracts ... ok\ntest boxing::structural_union_tests::whole_union_box_is_not_projected_to_a_payload_reference_cast ... ok\ntest boxing::structural_union_tests::function_unboxing_uses_checked_reference_cast ... ok\ntest compiler::values::profile::object_assignment_tests::base_arguments_cannot_pass_uninitialized_receiver_to_helpers ... ok\ntest compiler::values::profile::object_assignment_tests::base_initializer_accepts_independent_expressions_without_exposing_receiver ... ok\ntest compiler::values::gc_points::tests::spill_selection_keeps_discriminators_and_excludes_wide_integers ... ok\ntest compiler::values::profile::object_assignment_tests::explicit_reference_methods_preserve_private_dispatch ... ok\ntest compiler::values::profile::object_assignment_tests::memory_views_never_receive_empty_record_layouts ... ok\ntest compiler::values::profile::object_assignment_tests::persistent_byte_memory_has_three_lanes_and_rejects_raw_construction ... ok\ntest compiler::values::gc_points::tests::root_plans_stage_constructor_receivers_arrays_and_output_borrows ... ok\ntest compiler::values::structural_jit_tests::structural_tuple_jit_costs_match_nominal_records ... ignored, explicit native performance qualification; runs millions of calls\ntest compiler::values::windows_frame_tests::windows_final_frame_limit_includes_machine_linkage_and_call_space ... ok\ntest compiler::values::profile::object_assignment_tests::interface_upcast_requires_the_explicit_object_base ... ok\ntest limits::layout_budgets_match_native_allocator_contract ... ok\ntest limits::type_budget_matches_native_collector_contract ... ok\ntest compiler::values::profile::object_assignment_tests::borrowed_byte_views_cannot_enter_native_fields ... ok\ntest enum_queries::tests::queries_require_exact_contract_and_fault_without_enum_tokens ... ok\ntest linking::inventory_bounds_tests::library_growth_keeps_explicit_load_set_limits ... ok\ntest linking::variance_projection_tests::array_argument_variance_preserves_closed_nominal_conformance ... ok\ntest linking::variance_projection_tests::memory_view_element_survives_private_rename_but_not_serialization ... ok\ntest bindings::type_identity_tests::runtime_async_requires_exact_native_contracts ... ok\ntest bindings::console_memory_tests::console_memory_requires_retained_readonly_byte_identity ... ok\ntest linking::variance_projection_tests::string_conformance_survives_private_projection ... ok\ntest memory_views::tests::byte_memory_bindings_reject_mutated_internalcall_contracts ... ok\ntest memory_views::tests::byte_memory_length_and_slice_bind_only_exact_view_signatures ... ok\ntest memory_views::tests::byte_memory_readonly_binding_only_restricts_exact_persistent_byte_views ... ok\ntest memory_views::tests::byte_view_access_requires_borrowed_and_writable_setter ... ok\ntest memory_views::tests::byte_view_conversions_follow_capabilities_not_layout ... ok\ntest memory_views::tests::persistent_byte_memory_requires_retained_exact_shape ... ok\ntest linking::variance_projection_tests::object_argument_variance_survives_private_root_renaming ... ok\ntest memory_views::tests::utf8_view_requires_exact_string_readonly_slice_contract ... ok\ntest linking::descriptor_token_tests::descriptor_tokens_keep_identity_in_native_execution ... ok\ntest memory_views::tests::view_bounds_fault_binds_only_exact_void_contract ... ok\ntest compiler::values::profile::static_token_tests::static_type_tokens_are_valid_without_admitting_static_values ... ok\ntest native_exports::tests::output_failures_preserve_existing_files ... ok\ntest native_exports::tests::annotation_arguments_and_header_contract ... ok\ntest memory_views::tests::persistent_byte_memory_verification_copy_keeps_initialization_checks ... ok\ntest linking::descriptor_token_tests::descriptor_tokens_survive_selection_rewrite_and_aot_emission ... ok\ntest native_exports::tests::names_encode_identity_without_platform_decoration_or_row_indices ... ok\ntest linking::variance_projection_tests::nominal_rename_preserves_native_variance_and_slot_identity ... ok\ntest native_layout::tests::nested_structs_and_self_pointers_have_checked_headers ... ok\ntest reflection_construction::tests::attributes_require_an_explicit_boolean_policy_without_constructor_roots ... ok\ntest native_layout::tests::loaded_attribute_identity_controls_field_marshalling ... ok\ntest native_layout::tests::defaults_overrides_packing_and_explicit_overlap ... ok\ntest reflection_construction::tests::field_retention_requires_explicit_metadata_and_boolean_policies ... ok\ntest reflection_construction::tests::function_retention_requires_exact_module_scope_and_attribute_policy ... ok\ntest reflection_construction::tests::method_retention_is_descriptive_and_accepts_generic_definitions ... ok\ntest reflection_construction::tests::module_catalogs_require_explicit_scoped_metadata_without_type_roots ... ok\ntest reflection_construction::tests::type_catalog_retention_is_explicit_and_does_not_select_layouts ... ok\ntest bindings::deadline_tests::deadlines_and_timers_require_exact_reserved_signatures_and_internal_bodies ... ok\ntest reflection_metadata::object_tests::object_query_requires_exact_contract_and_excludes_private_backings ... ok\ntest reflection_metadata::object_tests::object_query_retains_exact_function_shapes_without_nominal_rows ... ok\ntest reflection_constructors::tests::exact_constructor_invocation_preserves_arguments_and_result ... ok\ntest native_layout::tests::invalid_layouts_and_managed_fields_reject ... ok\ntest reflection_metadata::open_query_tests::open_argument_results_extend_the_inventory_and_coexist_with_closed_tokens ... ok\ntest reflection_metadata::open_query_tests::partial_generic_arguments_use_the_selected_nominal_identity ... ok\ntest reflection_metadata::open_query_tests::open_queries_preserve_source_metadata_without_executable_types ... ok\ntest reflection_metadata::tests::catalogue_retains_generic_declarations_across_distinct_constructions ... ok\ntest reflection_metadata::tests::array_construction_discovers_executable_cast_shapes ... ok\ntest reflection_metadata::shape_tests::source_shape_facts_preserve_closed_union_and_origin_visibility ... ok\ntest reflection_metadata::tests::function_generic_arguments_preserve_closed_identity_and_shape ... ok\ntest reflection_metadata::tests::descriptor_names_use_source_origin_and_require_exact_contract ... ok\ntest reflection_metadata::tests::metadata_tokens_preserve_source_rows_instead_of_native_type_indices ... ok\ntest reflection_constructors::tests::checks_reject_unretained_private_and_wrong_arity_without_execution_roots ... ok\ntest reflection_metadata::tests::union_generic_arguments_preserve_closed_identity_and_visibility ... ok\ntest reflection_metadata::tests::descriptor_queries_reject_missing_metadata_and_unadmitted_shapes ... ok\ntest reflection_snapshots::catalog_tests::declaring_type_requires_exact_contract_and_explicit_retention ... ok\ntest reflection_metadata::open_query_tests::open_queries_preserve_invalid_selector_and_argument_faults ... ok\ntest reflection_metadata::tests::relationship_queries_bind_identity_and_reject_inexact_contracts ... ok\ntest reflection_snapshots::catalog_tests::method_retention_projects_open_and_observed_closed_owners_without_invocation ... ok\ntest reflection_snapshots::catalog_tests::empty_function_scope_is_explicit_and_preserves_unretained_faults ... ok\ntest native_layout::tests::supported_packing_values_generate_portable_target_headers ... ok\ntest reflection_snapshots::catalog_tests::snapshot_tokens_keep_closed_identity_and_open_parameter_owners ... ok\ntest reflection_snapshots::catalog_tests::unrelated_type_retention_does_not_require_assembly_catalog_metadata ... ok\ntest reflection_snapshots::catalog_tests::type_discovery_requires_retention_and_exact_contracts ... ok\ntest runtime_context::tests::callers_keep_their_own_assembly_and_virtual_receiver_checks ... ok\ntest reflection_snapshots::catalog_tests::unretained_module_attributes_bind_an_explicit_fault_with_exact_contract ... ok\ntest selection::composition_admission_tests::dispatch_relationship_cache_timing ... ignored, manual dispatch relationship timing probe\ntest runtime_context::tests::changed_facades_and_indirect_getters_are_rejected ... ok\ntest runtime_context::tests::facade_scope_preserves_a_foreign_same_named_caller ... ok\ntest runtime_context::tests::native_direct_service_preserves_callers_and_rejects_non_intrinsics ... ok\ntest selection::composition_admission_tests::boxed_value_interface_targets_are_retained_without_a_constructor ... ok\ntest specialization::tests::boxed_scalar_interface_body_specializes_generic_helpers ... ok\ntest selection::composition_admission_tests::dispatch_relationship_cache_preserves_closed_types_and_module_changes ... ok\ntest selection::composition_admission_tests::structural_tuple_storage_is_selected_without_nominal_carriers ... ok\ntest selection::composition_admission_tests::structural_union_signatures_are_selected_without_nominal_carriers ... ok\ntest specialization::tests::deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack ... ok\ntest selection::composition_admission_tests::explicit_mapping_identity_follows_selected_rows ... ok\ntest specialization::tests::generic_class_override_without_base_call_retains_closed_slot ... ok\ntest specialization::tests::host_roots_share_selected_function_budget_and_ignore_duplicates ... ok\ntest specialization::tests::generic_shape_expansion_has_its_own_bound_before_selection ... ok\ntest specialization::tests::memory_view_shapes_retain_exact_elements_without_admitting_native_layout ... ok\ntest specialization::tests::function_kind_constraint_preserves_typed_calls_after_specialization ... ok\ntest specialization::tests::input_function_inventory_remains_bounded ... ok\ntest specialization::tests::closed_type_budget_includes_nongeneric_dependency_shapes ... ok\ntest reflection_properties::tests::empty_internal_retention_faults_instead_of_granting_property_access ... ok\ntest specialization::tests::method_class_bounds_validate_before_specialization ... ok\ntest specialization::tests::method_categories_use_runtime_constraint_validation ... ok\ntest specialization::tests::nominal_class_constraints_are_checked_before_specialization ... ok\ntest bindings::socket_memory_tests::socket_transfer_requires_exact_persistent_byte_capabilities ... ok\ntest specialization::tests::nominal_self_inheritance_closes_views_at_the_implementing_owner ... ok\ntest specialization::tests::specialization_lookup_timing ... ignored, focused specialization timing probe; run explicitly with --nocapture\ntest specialization::tests::init_accessor_authority_survives_specialization_and_selection ... ok\ntest specialization::tests::instance_methods_specialize_owner_and_method_parameters_independently ... ok\ntest specialization::tests::nested_generic_specializations_preserve_each_lexical_owner ... ok\ntest specialization::tests::nominal_static_self_methods_specialize_without_erasing_conformance ... ok\ntest string_projection::tests::string_factory_does_not_discard_base_constructor_effects ... ok\ntest specialization::tests::variant_interfaces_preserve_dispatch_and_identity_after_specialization ... ok\ntest specialization::tests::special_type_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::signature_only_classes_retain_closed_interface_conformance ... ok\ntest string_projection::tests::string_factory_removes_empty_base_initializer_and_relocates_branches ... ok\ntest specialization::tests::variant_interface_dispatch_closes_generic_implementations ... ok\ntest specialization::tests::variant_selection_ignores_unrelated_explicit_source_templates ... ok\ntest specialization::tests::specialized_interface_dispatch_ignores_unselected_open_overload ... ok\ntest specialization::tests::selected_function_budget_accepts_boundary_and_rejects_overflow ... ok\n\ntest result: ok. 135 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 10.27s\n\n",
+  "httpDiagnostic": {
+    "temporaryFunctionLimit": 4096,
+    "shippedFunctionLimit": 2048,
+    "nativeExecution": false,
+    "admission": {
+      "accepted": true
+    },
+    "selectedFunctions": 2055,
+    "selectedTypes": 662,
+    "specialization": {
+      "functionCloneCount": 932,
+      "functionCount": 2055,
+      "policy": "up to 1024 closed value/reference/interface shapes, 4096 function clones and 4096 selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; function-kind and nongeneric nominal interface method constraints",
+      "typeCount": 662
+    },
+    "run": {
+      "exitCode": 0,
+      "seconds": 157.946394208
+    },
+    "fullReportSha256": "6a1a42f0ead2d75675a5eb9b6e1cd24d27daf376ed7127b1d49c6a6cf7d14420",
+    "inspectionArguments": [
+      "--inspect",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+      "@entry",
+      "--closed-world",
+      "--fault-details",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.PostgreSql.dll",
+      "--compile-system",
+      "--bind-user-fault",
+      "--bind-stack-trace",
+      "--reference-arena",
+      "--native-gc",
+      "--bind-console-read-byte",
+      "--bind-console-write-line",
+      "--bind-console-stream-output",
+      "--bind-int32-to-string",
+      "--bind-utf8-text",
+      "--native-stack-budget",
+      "--bind-integer-text",
+      "--bind-character-text",
+      "--bind-system-culture",
+      "--bind-time-zone-rules",
+      "--bind-cryptography",
+      "--bind-tls",
+      "--bind-task-queue",
+      "--bind-scheduler",
+      "--bind-timers",
+      "--bind-socket-listener",
+      "--bind-socket-accept",
+      "--bind-socket-transfer",
+      "--bind-socket-client",
+      "--bind-runtime-async",
+      "--bind-file-input",
+      "--reflection-roots",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json"
+    ],
+    "baseline": "Diagnostic run with temporary tracing and 4096 limit timed out at 180 seconds; not a controlled overall speedup comparison"
+  },
+  "limitations": [
+    "No HTTP request execution or throughput qualification",
+    "Temporary 4096 budget is not shipped; native root-probe limit remains 2048",
+    "Cache changes compile-time work and storage only; no new devirtualization or generic code sharing"
+  ]
+}

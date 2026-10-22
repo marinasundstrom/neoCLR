@@ -345,6 +345,7 @@ impl<'a> Profile<'a> {
         for i in 0..input.types.len() {
             layout(&mut p, i, &mut states)?;
         }
+        let mut relations = crate::selection::DispatchRelations::new(input);
         for (i, f) in input.functions.iter().enumerate() {
             p.names.entry(&f.name).or_default().push(i);
             let interface = references && crate::selection::interface_contract(input, f);
@@ -356,7 +357,7 @@ impl<'a> Profile<'a> {
                 p.dispatch.insert(
                     i,
                     crate::selection::dispatch_targets_with_array(
-                        input,
+                        &mut relations,
                         i,
                         &reached,
                         array_backing,

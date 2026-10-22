@@ -21289,3 +21289,27 @@ adds an atomic per-import address cache, keeps successful library ownership in
 the resolver and leaves failures retryable. Concurrent initialization and warmed
 call counts are tested; timing evidence is a focused instrumented fixture rather
 than a request-throughput claim.
+
+### 2026-10-22 — Reachability, resource bounds and AOT calls
+
+During HTTP release investigation, the author asked how modern runtimes handle
+selected-code growth. The assistant compared .NET Native AOT trimming and generic
+instantiation, Rust monomorphization and Go interface/reflection reachability using
+primary sources. The assistant proposed distinguishing metadata retention,
+executable bodies and dispatch requirements, and treating 2,048 methods as a
+provisional implementation budget rather than a platform rule. Generic code
+sharing was described as a separate future investigation, not implemented support.
+
+The author then noted that native AOT should know addresses and avoid dispatch in
+most cases. The assistant distinguished a statically known target from its final
+link/load address, direct calls from genuinely polymorphic calls, and ordinary
+symbol linkage from the current cached NativeImport function-pointer path.
+Devirtualization requires proof of a unique target; it was not reported implemented
+by this exchange. The current work caches immutable type relationships during
+selection, not executable dispatch results. [Design and investigation](design/native-reachability.md).
+
+The author added that JIT should benefit as well. The assistant confirmed that the
+current managed JIT and AOT share selection, and distinguished statically proven
+direct calls from possible future profile-guided or guarded JIT specialization.
+Diagnostic inspection subsequently admitted 2,055 HTTP methods with a temporary
+larger budget; the shipped 2,048 bound remained unchanged.

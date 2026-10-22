@@ -171,3 +171,18 @@ Validation: 92 integration tests pass across Self, nominal/boxed/class/default/e
 interfaces, inheritance and variance, plus the new lookup contract test and timing
 probe. A current-backend HTTP rerun preserves the same selection failure counts.
 [Inputs, results and timing evidence](validation/release-stabilization-20261022/interface-self-lookup.json).
+
+### Dispatch relationship reuse and HTTP inventory — 2026-10-22
+
+Selection and value-profile admission now reuse immutable type-compatibility
+answers within a compilation scope. Reachable receivers and dispatch targets
+are still recomputed. Closed generic targets remain distinct and mutation requires
+a new scope. Temporary compiler storage replaces repeated relationship traversal;
+no cache or extra allocation is emitted into applications.
+
+All 135 backend unit tests pass; six focused selection checks including a manual
+timing probe pass. A diagnostic 4,096-budget build admits the rebuilt HTTP JSON
+server with **2,055 functions and 662 types**, including 932 generic clones. Native
+execution is not tested. The production budget and root-probe limit remain 2,048;
+a coordinated bound update and matching host qualification are still required.
+[Design comparison and evidence](design/native-reachability.md).
