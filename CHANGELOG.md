@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Qualify the versioned macOS Preview 17 package with 24 async, three JSON and 132 HTTP-header executions, 15 HTTPS cases and extracted native-kit HTTP/C/C++ interop checks. Retain exact report/archive hashes and the initial TLS build/test timeout separately from the passing cached retry. Windows editor qualification, final measurements and publication remain open.
+
 - Install the matching Preview 17 macOS candidate SDK side by side and upgrade the default VS Code extension, preserving Preview 16 rollback. Record archive identity, installed file verification, passing JIT/interpreter HTTP/sample checks, 26 editor checks, inlays and two ten-cycle recovery runs. Document local usage and confirm Raven branches remain in separate worktrees. Windows versioned qualification and release publication remain open.
 
 - Close repaired-source qualification: canonical full-source/25-smoke, both host suites, formatting, strict Clippy and all three minimum-Rust jobs pass in run 39853093086. Retain the canonical report. Publish and verify the website candidate notice via run 39856189825, preserving Preview 16 download links. Versioned package/local installation qualification remains open.

@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Versioned macOS package qualified (2026-10-22):** The installed Preview 17
+candidate passes 24 async, three JSON and 132 header executions, 15 HTTPS cases
+and extracted native-kit HTTP/C/C++ checks. Preserve the initial TLS harness
+timeout separately from the passing cached run. Windows editor qualification
+and final measurements/publication remain open.
+[Exact reports](validation/release-stabilization-20261022/versioned-macos/summary.json).
+
 **Source gates closed; candidate website live (2026-10-22):** Repaired-source
 run 39853093086 passes canonical tests/25 smoke programs, both host suites and all
 minimum-Rust jobs. The website candidate notice is published. Versioned SDK/editor
