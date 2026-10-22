@@ -2,10 +2,12 @@
 
 **Complete macOS package qualification (2026-10-22):** Matching rebuilt SDK,
 language server/VSIX and libraries pass extracted samples/HTTP, 26 installed-editor
-checks, inlays and ten configuration recovery rounds. The repaired client harness
+checks, inlays and two ten-cycle configuration recovery runs. Matching-package
+HTTPS passes 15 AOT security/recovery/cleartext cases. The repaired client harness
 passes locally in all three engines. Windows qualification and matching benchmark
 runs remain pending. Earlier measured library hashes differ from this new archive;
-retain their original provenance. [Evidence](release-readiness.md#complete-macos-sdk-and-editor--2026-10-22).
+retain their original provenance. [Current gate index](validation/release-stabilization-20261022/README.md) and
+[evidence](release-readiness.md#complete-macos-sdk-and-editor--2026-10-22).
 
 **Platform discovery backlog (author direction, 2026-10-22):** Add public platform
 and operating-system discovery and the default line-ending sequence in the next

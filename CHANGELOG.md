@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Complete the rebuilt macOS package’s second ten-cycle installed-editor configuration run and matching HTTPS project qualification. All 15 AOT TLS/security/recovery/cleartext cases and native transport tests pass; retain raw evidence and build hashes. Add a current development qualification index distinct from published Preview 16 records. Windows and matching refreshed-package measurements remain open.
+
 - Rebuild the complete macOS SDK, matching language server/VSIX and native libraries from Raven `301e668a5`; verify the resulting archive outside the checkout. Packaged samples/HTTP, all 26 installed-editor checks, inlays and ten configuration recovery rounds pass. The repaired HTTP-client harness also passes AOT/interpreter/JIT locally. Preserve archive/report hashes; earlier benchmark results remain tied to their original library bytes. Windows qualification and matching benchmarks are rerunning; no release is published.
 
 - Record author-requested next-release platform/operating-system discovery and default line-ending APIs as planned work. Public contracts and cross-engine validation remain open; current UTF-8 transport repair does not implement platform discovery.

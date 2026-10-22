@@ -64,11 +64,27 @@
         "jit"
       ]
     },
-    "configuration": {
-      "source": "target/editor-complete-macos-20261022-v2/vscode-configuration-acceptance.json",
+    "configuration1": {
+      "source": "target/editor-complete-macos-20261022-v2/vscode-configuration-1.json",
       "sha256": "0ae5cdc82863029072c32d5a8967afa4662f7b39e81e20bccc74847d0b34dc90",
       "passed": true,
       "rounds": 10
+    },
+    "configuration2": {
+      "source": "target/editor-complete-macos-20261022-v2/vscode-configuration-2.json",
+      "sha256": "560d37a968a31081a5b1f9c872303aaf6ce6a665d3dc1652636908fd6f3d8e99",
+      "passed": true,
+      "rounds": 10
+    },
+    "https": {
+      "source": "target/release-https-macos-20261022/validation/validation.json",
+      "retained": "macos-https-project.json",
+      "sha256": "debfa6608240547a483b9279e85acf8b595f7213bf48afd2375874499e1d7553",
+      "passed": true,
+      "cases": 15,
+      "mode": "AOT project",
+      "httpsBuildSha256": "663dfa62912b6e40d02f8ffb632d08d90ad03bf2948fdabcddc1c6912a0b3ee4",
+      "cleartextBuildSha256": "39d27f78f1d94a1107e413ef272afc3f796a7b573353c54509a61e1ecea62bd5"
     }
   },
   "limitations": [

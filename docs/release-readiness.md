@@ -397,3 +397,17 @@ as measurements of this package. [Windows qualification 39841298887](https://git
 reuses the original package with the UTF-8 transport repair; [benchmark run
 39841353425](https://github.com/marinasundstrom/neoCLR/actions/runs/39841353425)
 waits for its success. Both remain pending at this record. No release is published.
+
+### Matching-package security and editor follow-up — 2026-10-22
+
+The second ten-cycle configuration recovery run passes, giving two separate runs
+against the installed matching VSIX. The same rebuilt macOS package compiles HTTPS
+and cleartext controls; all 15 AOT TLS/security/recovery/isolation cases pass with
+OpenSSL 3.6.4, including TLS 1.2/1.3, untrusted/wrong-host rejection, protocol and
+connection failure recovery, timeout/cancel, credential failures and ordinary-host
+cleartext behavior. Native TLS fragmented/backpressure tests also pass. This is
+source-assisted HTTPS project qualification, not an extracted HTTPS build-kit or
+HTTPS throughput claim. [Raw report](validation/release-stabilization-20261022/macos-https-project.json)
+and [package/build identities](validation/release-stabilization-20261022/complete-macos-package.json)
+retain the exact inputs. The [current gate index](validation/release-stabilization-20261022/README.md)
+separates this candidate from published Preview 16 qualification.
