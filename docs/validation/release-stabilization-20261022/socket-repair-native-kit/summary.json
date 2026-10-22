@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "archive": {
+    "path": "target/release-socket-repair-native-kit-20261022/neoclr-native-build-kit-osx-arm64.tar.gz",
+    "sha256": "2d167d4e03a00a22e1fa1d150b351a9ca5b9b54307d5b4533cb05fdc94a5806e",
+    "bytes": 70436362
+  },
+  "reports": {
+    "http": {
+      "file": "http.json.gz",
+      "rawSha256": "36fdbd10386685b0ecb9d7e279261cc25520b7cf307630cb739c0571d2a021d7",
+      "gzipSha256": "0344aa37b97eeb5ead7f38b0b7ba93e177a3b76cb80147d44059a987e0838738",
+      "bundleManifestSha256": "2ad837462c0e5971fe34af805c7f4cdaaa9102195c466a5259200b26181a9996",
+      "sourceRevision": "0ba00cabd6b426be7ce249978c0b1d69bc24c380",
+      "sourceDirty": false,
+      "passed": true
+    },
+    "interop": {
+      "file": "interop.json.gz",
+      "rawSha256": "0d71d4c93fa976c392972bfd2caba3b8c8eb167bb47857779831b464861c622d",
+      "gzipSha256": "5cb32ee6517d07fd964dbb80dc3204dcc334c959be45991804684b4be00666ef",
+      "bundleManifestSha256": "2ad837462c0e5971fe34af805c7f4cdaaa9102195c466a5259200b26181a9996",
+      "sourceRevision": "0ba00cabd6b426be7ce249978c0b1d69bc24c380",
+      "sourceDirty": false,
+      "passed": true
+    }
+  },
+  "scope": "Extracted macOS native kit against readiness-repaired SDK: console/plain HTTP, scalar import/export C/C++ callers, Cargo-free builds and tamper rejection. Explicit HTTPS-server kit remains unsupported."
+}

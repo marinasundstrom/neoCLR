@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Repaired native kit and host gates passed (2026-10-22):** The native build kit
+now embeds the readiness-repaired SDK and passes extracted console/HTTP and C/C++
+interop, Cargo-free builds and tamper rejection. Both hosted OS suites and all
+minimum-Rust jobs pass. Canonical rerun and final publication remain open.
+[Kit evidence](validation/release-stabilization-20261022/socket-repair-native-kit/summary.json).
+
 **Readiness-repaired macOS archive (2026-10-22):** Rebuild the optimized runtime
 and development JIT archive; extracted default-JIT and interpreter samples/HTTP
 pass. Only runtime/JIT-host bytes change; compiler/library/editor inputs match.

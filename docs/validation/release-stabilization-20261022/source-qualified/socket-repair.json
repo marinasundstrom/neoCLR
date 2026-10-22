@@ -16,7 +16,7 @@
     }
   },
   "hostedRerun": 39853093086,
-  "hostedStatus": "running",
-  "packageRefresh": "macOS optimized runtime built; refreshed archive passes extracted default-JIT and interpreter samples/HTTP. See ../socket-repair-package/summary.json",
+  "hostedStatus": "Both macOS and Windows host jobs and all three minimum-Rust jobs passed; canonical full-source job running",
+  "packageRefresh": "macOS repaired archive passes extracted JIT/interpreter samples/HTTP; matching native kit passes HTTP and interop consumers. See ../socket-repair-package/summary.json and ../socket-repair-native-kit/summary.json",
   "loaderNote": "Original test process initially stalled in dyld. Byte-identical /tmp copy passed; original process subsequently also completed with 37 passes."
 }

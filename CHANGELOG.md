@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Qualify the refreshed native build kit against the readiness-repaired macOS SDK: extracted console/HTTP, scalar native import/export C/C++ callers, Cargo-free builds and tamper rejection pass. Preserve matching manifest and raw report hashes. The repaired revision also passes both hosted OS suites and all minimum-Rust jobs; canonical full-source rerun and final release publication remain open.
+
 - Rebuild the optimized macOS runtime and development archive with the Unix socket readiness repair. All 2,283 manifest files verify; extracted samples and HTTP client/server exchanges pass in default JIT and interpreter modes. Preserve raw reports and hashes: only the runtime and rebuilt JIT host differ from the prior package. Earlier benchmark/editor/native-kit/HTTPS evidence retains its original identity; hosted qualification and final publication remain open.
 
 - Record passing canonical full-source/25-smoke and Windows host/package qualification, all three minimum-Rust checks, and 19 focused local type-identity/terminal tests. macOS exposes a refused-connect classification failure; replace unconditional Unix connect readiness with nonblocking poll before SO_ERROR/peer inspection, retaining deadlines and exact error expectations. Add kernel-readiness coverage and 16 refusal lifecycle repetitions. All 37 local socket tests and 512 repeated refusal attempts pass. Pinned hosted rerun 39853093086 is running; affected release binaries must be refreshed.
