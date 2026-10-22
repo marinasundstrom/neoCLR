@@ -362,3 +362,19 @@ resolves the AOT compiler from that package's manifest and records the original
 package run, archive hash and new qualification-source revision. This validates
 an existing artifact with repaired test tooling; it does not label that artifact
 as rebuilt from the new source revision. Windows results remain pending.
+
+## Windows client transport repair — 2026-10-22
+
+[Requalification run 39839515444](https://github.com/marinasundstrom/neoCLR/actions/runs/39839515444)
+passes extracted samples, native GC and runtime-await language, cleanup, fault and
+server cases in AOT, interpreter and JIT. The client AOT exits zero but prints
+`Error: InvalidFormat` instead of the UTF-8 body. Its harness sends two LF-delimited
+lines using Python text mode, which translates them to CRLF on Windows. The
+binary console host and configured LF reader preserve the unwanted carriage return.
+
+The harness now sends UTF-8 bytes and explicitly decodes output without newline
+translation. Two regressions verify binary subprocess arguments and actual Unicode
+round-trip with mixed LF/CRLF delimiters, preserving output for assertions and
+reports. Client assertion failures now include stdout/stderr. This changes only
+qualification transport, not the reader's exact configured-delimiter contract.
+The failed run remains failed; renewed Windows execution and benchmarks are required.

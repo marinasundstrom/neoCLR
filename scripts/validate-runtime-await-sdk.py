@@ -30,6 +30,16 @@ class Peer(http.server.BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
+def run_utf8(command, **kwargs):
+    """Preserve configured line delimiters across hosts; console bytes are UTF-8."""
+    if isinstance(kwargs.get('input'), str):
+        kwargs['input'] = kwargs['input'].encode('utf-8')
+    result = subprocess.run(command, capture_output=True, **kwargs)
+    result.stdout = result.stdout.decode('utf-8')
+    result.stderr = result.stderr.decode('utf-8')
+    return result
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('bundle', 'runtime', 'aot', 'output'):
@@ -43,7 +53,7 @@ def main():
     report = dict(passed=False, platform=platform.platform(), commands=[], cases=[], inputs={})
     def run(command, expected=0, **kwargs):
         command = list(map(str, command))
-        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=600, **kwargs)
+        result = run_utf8(command, cwd=ROOT, timeout=600, **kwargs)
         report['commands'].append(dict(command=command, exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr))
         if result.returncode != expected:
             raise RuntimeError(result.stderr or result.stdout)
@@ -121,7 +131,7 @@ def main():
                         worker.start()
                         try:
                             result = run(command, input=f'http://localhost:{peer.server_port}/greeting\nnormal\n')
-                            assert result.stdout.strip() == BODY.decode() and not result.stderr
+                            assert result.stdout.strip() == BODY.decode() and not result.stderr, f'Unexpected client output: stdout={result.stdout!r}, stderr={result.stderr!r}'
                         finally:
                             peer.shutdown()
                             worker.join(timeout=5)

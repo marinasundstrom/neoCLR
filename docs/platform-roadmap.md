@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Windows client harness follow-up (2026-10-22):** Requalification passes native
+GC and language/cleanup/fault/server runtime-await cases in all three engines.
+Client output exposes a test transport mismatch: Python translates LF input on
+Windows, whereas the reader explicitly uses LF. Preserve UTF-8 bytes in the
+harness; two focused regressions pass. Remaining Windows gates stay open.
+[Evidence](release-readiness.md#windows-client-transport-repair--2026-10-22).
+
 **Windows qualification follow-up (2026-10-22):** Compiler/SDK build and extracted
 samples pass; root-fixture compilation fails on MSVC-deprecated strcpy. Replace
 fixed-string copies without relaxing warnings; 18 local sanitized cases pass.
