@@ -417,18 +417,25 @@ ret
 #[ignore = "requires NEOCLR_RAVEN_BUNDLE with the matching native compiler and libraries"]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn raven_native_metadata_imports_execute_aot_and_jit_with_explicit_load_context() {
-    qualify_raven_imports("Main.rvn", false);
+    qualify_raven_imports("Main.rvn", false, false);
 }
 
 #[test]
 #[ignore = "requires NEOCLR_RAVEN_BUNDLE with the matching native compiler and libraries"]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn raven_native_pointer_transport_executes_in_all_three_engines() {
-    qualify_raven_imports("Transport.rvn", true);
+    qualify_raven_imports("Transport.rvn", true, false);
+}
+
+#[test]
+#[ignore = "requires matching NEOCLR_RAVEN_BUNDLE"]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_aot_library_exports_are_callable_from_c_and_all_three_engines() {
+    qualify_raven_imports("Transport.rvn", true, true);
 }
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn qualify_raven_imports(source: &str, interpreter: bool) {
+fn qualify_raven_imports(source: &str, interpreter: bool, aot_provider: bool) {
     let bundle =
         PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").expect("set NEOCLR_RAVEN_BUNDLE"))
             .canonicalize()
@@ -512,6 +519,12 @@ int32_t check_floating(float a, double b, int32_t marker, float c, double d,
             ),
     )
     .unwrap();
+    if aot_provider {
+        qualify_aot_provider(
+            &project, &sample, &bundle, &imports, &fixture, &library, &root, &dir,
+        );
+        fs::copy(sample.join(source), project.join("Main.rvn")).unwrap();
+    }
     let result = Command::new("dotnet")
         .arg(bundle.join("sdk/tools/rvnc/rvnc.dll"))
         .args(["neoclr", "--project"])
@@ -1227,5 +1240,180 @@ fn floating_transport_requires_opt_in_and_rejects_unimplemented_operations() {
             assert!(!dir.0.join("app.o").exists());
             assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
         }
+    }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[allow(clippy::too_many_arguments)]
+fn qualify_aot_provider(
+    project: &Path,
+    sample: &Path,
+    bundle: &Path,
+    imports: &Path,
+    fixture: &Path,
+    library: &Path,
+    root: &Path,
+    dir: &Temp,
+) {
+    fs::copy(sample.join("Exports.rvn"), project.join("Main.rvn")).unwrap();
+    let compiled = Command::new("dotnet")
+        .arg(bundle.join("sdk/tools/rvnc/rvnc.dll"))
+        .args(["neoclr", "--project"])
+        .arg(project.join("App.rvnproj"))
+        .env("NeoClrBundleRoot", bundle)
+        .env("NeoClrAotImports", imports)
+        .output()
+        .unwrap();
+    assert!(
+        compiled.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&compiled.stdout),
+        String::from_utf8_lossy(&compiled.stderr)
+    );
+    let object = dir.0.join("exports.o");
+    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+    command
+        .arg("--native-library")
+        .arg(project.join("bin/neoclr/RavenAotImports.dll"))
+        .arg(&object)
+        .arg("--native-imports");
+    for name in [
+        "AllocateExport",
+        "ReadExport",
+        "WriteExport",
+        "ReleaseExport",
+        "SingleExport",
+        "DoubleExport",
+        "WideExport",
+        "DivideExport",
+    ] {
+        command.args(["--export", name]);
+    }
+    command
+        .arg("--system")
+        .arg(bundle.join("lib/System.runtime.neox"))
+        .arg("--module")
+        .arg(bundle.join("lib/System.Runtime.dll"))
+        .arg("--object-root")
+        .arg(bundle.join("lib/System.Runtime.dll"));
+    let output = command.output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let symbol = |name: &str| {
+        report["exports"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|entry| entry["function"] == name)
+            .unwrap()["symbol"]
+            .as_str()
+            .unwrap()
+    };
+    use object::{Object, ObjectSymbol};
+    let bytes = fs::read(&object).unwrap();
+    let binary = object::File::parse(bytes.as_slice()).unwrap();
+    let globals: Vec<_> = binary
+        .symbols()
+        .filter(|s| s.is_global() && s.is_definition())
+        .map(|s| s.name().unwrap().trim_start_matches('_').to_owned())
+        .collect();
+    assert_eq!(globals.len(), 8);
+    for entry in report["exports"].as_array().unwrap() {
+        assert!(
+            globals
+                .iter()
+                .any(|s| s == entry["symbol"].as_str().unwrap())
+        );
+    }
+    cc(
+        &[
+            fixture,
+            &object,
+            &root.join("runtime/native/interop/imports.c"),
+        ],
+        &["-dynamiclib", "-fPIC", "-pthread"],
+        library,
+    );
+    let host = dir.0.join("export-host.c");
+    fs::write(
+        &host,
+        format!(
+            r#"
+#include <stdint.h>
+extern int32_t {read}(int32_t *);
+extern void {write}(int32_t *, int32_t);
+extern int32_t {divide}(int32_t);
+int main(int argc, char **argv) {{
+    if (argc > 1) return {divide}(0);
+    int32_t value = 10;
+    {write}(&value, 42);
+    return {read}(&value) != 42 || {divide}(2) != 21;
+}}
+"#,
+            read = symbol("ReadExport"),
+            write = symbol("WriteExport"),
+            divide = symbol("DivideExport")
+        ),
+    )
+    .unwrap();
+    let host_app = dir.0.join("export-host");
+    cc(&[&host, library], &[], &host_app);
+    assert!(Command::new(&host_app).status().unwrap().success());
+    use std::os::unix::process::ExitStatusExt;
+    let fault = Command::new(&host_app).arg("fault").output().unwrap();
+    assert!(
+        fault.status.signal().is_some(),
+        "escaping guest fault must terminate at the C boundary"
+    );
+    let mut mapped = fs::read_to_string(imports).unwrap();
+    for (native, exported) in [
+        ("allocate_value", "AllocateExport"),
+        ("read_value", "ReadExport"),
+        ("release_value", "ReleaseExport"),
+        ("single_value", "SingleExport"),
+        ("double_value", "DoubleExport"),
+        ("unsigned_wide", "WideExport"),
+    ] {
+        mapped = mapped.replace(
+            &format!("EntryPoint: \"{native}\""),
+            &format!("EntryPoint: \"{}\"", symbol(exported)),
+        );
+    }
+    fs::write(imports, mapped).unwrap();
+}
+
+#[test]
+fn native_library_export_selection_rejects_invalid_contracts_before_output() {
+    let valid = ".module Library
+.function Echo(Int32 value) -> Int32
+ldarg value
+ret
+.end
+";
+    for (source, exports) in [
+        (valid.to_owned(), vec![]),
+        (valid.to_owned(), vec!["Missing"]),
+        (valid.to_owned(), vec!["Echo", "Echo"]),
+        (source("unused", "echo"), vec!["Imported"]),
+        (valid.replace("Int32", "String"), vec!["Echo"]),
+        (valid.replace("Int32", "Ptr<Int64>"), vec!["Echo"]),
+    ] {
+        let dir = Temp::new();
+        let input = dir.0.join("library.neoil");
+        let object = dir.0.join("library.o");
+        fs::write(&input, source).unwrap();
+        let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+        command.arg("--native-library").arg(&input).arg(&object);
+        for export in exports {
+            command.args(["--export", export]);
+        }
+        let output = command.output().unwrap();
+        assert!(!output.status.success());
+        assert!(!object.exists());
+        assert!(!String::from_utf8_lossy(&output.stderr).contains("panicked"));
     }
 }

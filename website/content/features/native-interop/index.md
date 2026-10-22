@@ -2,8 +2,8 @@
 
 **Development:** Raven `extern` functions and static methods can declare native
 imports through `System.Runtime.InteropServices` attributes. The interpreter executes
-these imports. A bounded development AOT profile additionally supports free Int32/pointer
-C imports on macOS ARM64; general AOT/JIT and installed-bundle support remain open.
+these imports. Development scalar JIT/AOT profiles also support numeric/pointer
+C imports on macOS ARM64; ordinary SDK integration remains open.
 The interface describes native libraries, ABI and value representation on any host.
 
 ## Declare the native contract
@@ -151,101 +151,48 @@ the bounded AOT profile transports raw pointer metadata but does not yet project
 this public wrapper automatically.
 
 
-## Development AOT import foundation
+## Development native execution
 
-The low-level macOS ARM64 scalar backend accepts `--native-imports` for free C
-functions taking up to sixteen Int32, native-sized integer or pointer arguments and
-returning those types or no value (C void). Pointer metadata targets are Void, Byte or Int32; address transport through
-locals/helpers is supported, with ownership remaining in the native contract. Generated code
-resolves symbols lazily and retains successfully loaded libraries until process exit.
-Lookup failures return a runtime fault without writing the result. The default
-continues to reject imports; this opt-in requires explicitly linking the native
-resolver. It is not yet available through the ordinary SDK application pipeline.
+The macOS ARM64 scalar JIT/AOT backend accepts `--native-imports` for free C
+functions with up to sixteen arguments. Supported numeric types are Int32/UInt32,
+Int64/UInt64, IntPtr/UIntPtr and Single/Double; pointer targets are Void, Byte and
+Int32. Returns use those types or C void. The shared Raven consumer is tested in
+all three engines, including unsigned widening/truncation, negative zero, infinity
+and quiet-NaN payloads through mixed register/stack arguments.
 
-A tested Raven consumer now goes directly from NativeImport declarations to native
-metadata and AOT machine code. It allocates, reads and releases C-owned memory through
-raw pointers and a `unit`-returning helper, including typed/void-pointer casts and
-null/default pointers and `nint`/`nuint` transport for C offsets and `size_t` values. The backend accepts an explicit seed/core
-load context for verification and uses `@entry` for the Raven entry point; dependency
-libraries are not compiled by this scalar profile.
+| Capability | Interpreter | Scalar JIT / AOT |
+| --- | --- | --- |
+| Tested numeric/pointer transport and no-result calls | Yes | Yes, explicit opt-in |
+| C-owned allocation/read/release | Yes | Yes |
+| Direct access to untracked foreign Byte/Int32 storage | Not yet | Trusted raw access; null/alignment checks |
+| String/Boolean marshalling and Function callbacks | Bounded support above | Not yet |
+| Managed-memory pinning and automatic Ptr<T> projection | Not yet | Not yet |
+| Import an AOT-built free-function library | Tested | Tested |
 
-Managed buffers, automatic Ptr<T> wrapper mapping, callbacks, other numeric types, full
-class-library composition and managed JIT imports remain future work for this path.
-[Execution contract](/docs/native-interop.html#aot-scalar-imports) ·
-[Tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)
+Libraries resolve lazily. The scalar resolver retains successful library handles for
+process lifetime; invalid addresses and native ABI violations remain the caller's
+responsibility. Explicit seed/core contexts verify Raven metadata, while dependency
+bodies remain outside this profile. These are development backend capabilities,
+not a claim that ordinary SDK/managed JIT imports are complete.
 
-### Development IL spelling
+## AOT libraries callable through NativeImport
 
-No-result imports and helpers use `-> void`; no-result function signatures use
-`fn<void>`. The obsolete `noresult` spelling is rejected. This syntax migration
-preserves the existing native call ABI. `System.Void` now has the same no-result return semantics as `void`, including
-function shapes. Removing the legacy bare `Void` spelling remains open; see the
-[Void contract and migration status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/void-semantics.md).
+A development `--native-library` mode emits selected free functions as platform C
+exports. Versioned names encode source assembly, namespace, function and scalar
+signature; content hashes and definition row numbers do not affect them. A native C
+caller and the same Raven NativeImport consumer test the produced library.
 
-### Development AOT pointer checks
+Export adapters return the declared native result on success. An escaping guest
+fault terminates execution: it does not unwind through C or return a fabricated
+value. NativeExportAttribute source integration is the next step; explicit CLI
+selection currently exercises the backend. Class/object mapping and metadata
+sidecars are future work.
 
-The opt-in macOS ARM64 scalar NativeImport profile accepts pointer equality and
-null checks, and equality/zero tests for native-sized integers. Comparisons preserve
-all address bits and do not dereference memory. Raven can check a native allocation
-against `default(*int)` before use. A non-null pointer does not prove ownership,
-allocation lifetime or accessible bounds; ordered pointer comparisons remain outside
-this profile. Managed memory pinning remains unimplemented.
+[Execution and attribute reference](/docs/native-interop.html) ·
+[Contract, tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)
 
-### Development AOT native memory access
+### Assembler spelling
 
-The same trusted scalar profile supports direct Byte/Int32 pointer reads and writes.
-Raven can dereference an imported allocation, update it and release it through the
-native owner. Null and misaligned Int32 access returns a runtime fault. Bounds,
-initialization and lifetime are the caller's responsibility; other invalid addresses
-can crash the process. This does not expose managed storage or provide pinning,
-native-backed Slice borrowing or managed-library AOT integration.
-
-Future work is ordered around qualifying NativeImport across interpreter, JIT and
-AOT first, followed by stable exported names and a callable ABI for AOT libraries.
-Those exports should be usable by native consumers and importable back into neoCLR.
-Metadata sidecars mapped to the native binaries are a later step; current internal
-AOT symbols are not a published export contract.
-
-The development `--jit-scalar` probe now accepts `--native-imports` on macOS ARM64,
-sharing the AOT import thunks, native resolver and process-lifetime library cache.
-Tests cover repeated allocation/read/write/release, native-sized results and loader
-faults. A tested Raven consumer now executes through both scalar JIT and AOT using
-explicit seed/core verification inputs and `@entry`. Dependencies remain verification-only;
-this does not enable imports in the ordinary managed JIT pipeline. Default execution continues
-to reject imports unless explicitly enabled.
-
-A shared Raven transport sample is now tested across interpreter, scalar JIT and
-AOT: C allocation/read/release, pointer casts/nulls, no-result calls and native-sized
-integer values. C performs the reads in this shared sample. Direct access to
-untracked foreign storage remains an interpreter gap; the separate direct pointer
-read/write sample is qualified in scalar JIT/AOT only. This baseline does not mean
-that full NativeImport support is complete across engines.
-
-
-Fixed-width 64-bit transport (development, 2026-10-22): the opt-in macOS ARM64
-scalar JIT/AOT import profile now admits Int64/UInt64 parameters, results and
-locals, including private helper calls, defaults and equality/zero checks. The
-shared Raven transport consumer exercises negative signed and high-bit unsigned
-values against C int64_t/uint64_t functions across interpreter, JIT and AOT.
-This follows ordinary .NET fixed-width integer ABI semantics; it adds no wrapper,
-marshalling allocation or new metadata representation. Arithmetic expansion,
-64-bit pointer dereference and broader managed import composition remain open.
-
-
-Floating-point transport (development, 2026-10-22): the same opt-in scalar ABI
-now admits Single/Double parameters, returns, locals, constants and defaults.
-The shared Raven consumer checks negative zero, infinity, quiet-NaN payloads and
-finite values through helper calls and mixed C arguments, including floating-point
-arguments spilled to the stack. It preserves their declared F32/F64 representation,
-following the platform C ABI as .NET interop does; no marshalling allocations are
-introduced. Arithmetic, floating-point comparisons/conversions and pointer loads
-remain outside this bounded profile.
-
-
-Unsigned 32-bit transport (development, 2026-10-22): UInt32 now shares the I32
-storage ABI with Int32 while retaining its metadata type. The existing conv.u4
-operation truncates wide values without changing their low bits; conv.u8/conv.u
-zero-extend 32-bit inputs. The Raven consumer checks a high-bit uint identifier
-through locals/helper calls, widening to ulong/nuint and narrowing from ulong
-against C uint32_t/uint64_t/uintptr_t parameters. This matches ordinary fixed-width
-.NET/C interop semantics without allocating wrappers or adding metadata.
+No-result imports and exports use `-> void`, an alias for `System.Void`.
+The obsolete `noresult` spelling is rejected. Remaining legacy spelling migration
+is tracked in the [Void contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/void-semantics.md).

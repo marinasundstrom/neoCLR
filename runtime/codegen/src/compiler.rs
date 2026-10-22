@@ -184,6 +184,61 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
     native_imports: bool,
     verification: Option<&neoclr::LoadedProgram>,
 ) -> Result<(), Error> {
+    compile_scalar_impl(
+        input,
+        Some(root),
+        console,
+        module,
+        long_range_calls,
+        native_imports,
+        verification,
+        &[],
+    )
+}
+
+pub(super) fn compile_native_library(
+    input: &neoclr::Module,
+    exports: &[(usize, String)],
+    native_imports: bool,
+    verification: Option<&neoclr::LoadedProgram>,
+) -> Result<Vec<u8>, Error> {
+    if !native_imports && input.functions.iter().any(|f| f.pinvoke.is_some()) {
+        return Err("native library imports require --native-imports".into());
+    }
+    let mut flags = settings::builder();
+    flags.set("is_pic", "true")?;
+    let isa = isa::lookup(Target::MacosArm64.triple().parse().unwrap())?
+        .finish(settings::Flags::new(flags))?;
+    let mut module = ObjectModule::new(ObjectBuilder::new(
+        isa,
+        "neoclr_native_library",
+        cranelift_module::default_libcall_names(),
+    )?);
+    // Native exports admit the same scalar/pointer representation as imports.
+    compile_scalar_impl(
+        input,
+        None,
+        false,
+        &mut module,
+        false,
+        true,
+        verification,
+        exports,
+    )?;
+    finish(module)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn compile_scalar_impl<M: Module>(
+    input: &neoclr::Module,
+    root: Option<&str>,
+    console: bool,
+    module: &mut M,
+    long_range_calls: bool,
+    native_imports: bool,
+    verification: Option<&neoclr::LoadedProgram>,
+    exports: &[(usize, String)],
+) -> Result<(), Error> {
     if !input.types.is_empty() {
         return Err("scalar profile does not support type definitions".into());
     }
@@ -214,15 +269,19 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
             flows.push(check_function(function, &input.functions, native_imports)?);
         }
     }
-    let root_index = *names.get(root).ok_or("root function not found")?;
-    if input.functions[root_index].pinvoke.is_some() {
-        return Err("native import cannot be the managed AOT root".into());
-    }
-    let parameterless_root = input.functions[root_index].parameters.is_empty();
-    if input.functions[root_index].returns != Type::Int32
-        || (!parameterless_root && input.functions[root_index].parameters != [Type::Int32])
-    {
-        return Err("root must have signature () -> Int32 or (Int32) -> Int32".into());
+    let root_index = root
+        .map(|name| names.get(name).copied().ok_or("root function not found"))
+        .transpose()?;
+    let parameterless_root = root_index.is_some_and(|i| input.functions[i].parameters.is_empty());
+    if let Some(i) = root_index {
+        if input.functions[i].pinvoke.is_some() {
+            return Err("native import cannot be the managed AOT root".into());
+        }
+        if input.functions[i].returns != Type::Int32
+            || (!parameterless_root && input.functions[i].parameters != [Type::Int32])
+        {
+            return Err("root must have signature () -> Int32 or (Int32) -> Int32".into());
+        }
     }
     // Validate every declared body, including unreachable functions/instructions.
     // Resolve only unqualified local calls; no ad-hoc cross-module name lookup.
@@ -352,7 +411,7 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
             .collect();
         sig.params.push(AbiParam::new(types::I64)); // writable typed result pointer
         sig.returns.push(AbiParam::new(types::I32)); // status: 0 success, 1 zero, 2 overflow
-        let (name, linkage) = if index == root_index && !parameterless_root {
+        let (name, linkage) = if Some(index) == root_index && !parameterless_root {
             ("neoclr_entry_v2".to_owned(), Linkage::Export)
         } else {
             (format!("neoclr_scalar_{index}"), Linkage::Local)
@@ -701,6 +760,9 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
         prepare_calls(&mut context, long_range_calls);
         module.define_function(ids[index], &mut context)?;
     }
+    for (index, name) in exports {
+        crate::native_exports::emit(module, &input.functions[*index], ids[*index], name)?;
+    }
     if parameterless_root {
         // Preserve the v2 host ABI while calling the actual parameterless Raven entry.
         // Internal calls keep the function's declared signature and target its local symbol.
@@ -715,7 +777,7 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
             module.declare_function("neoclr_entry_v2", Linkage::Export, &context.func.signature)?;
         let mut builder_context = FunctionBuilderContext::new();
         {
-            let callee = module.declare_func_in_func(ids[root_index], &mut context.func);
+            let callee = module.declare_func_in_func(ids[root_index.unwrap()], &mut context.func);
             let mut builder = FunctionBuilder::new(&mut context.func, &mut builder_context);
             let entry = builder.create_block();
             builder.append_block_params_for_function_params(entry);

@@ -21140,3 +21140,23 @@ native view ownership remain subsequent work, not completed by the compiler fix.
 - **Open:** Each unit callback adaptation allocates; retained callbacks, JIT/AOT callback
   stubs, returned-function source mapping, pinning and complete release qualification
   remain unfinished. No new source keyword or permanent milestone reprioritization.
+
+## 2026-10-22 — Native functions in every execution mode and reverse exports
+
+- **Author:** asks to continue until native functions can be invoked in interpreted,
+  JIT and AOT modes, including calls into an AOT-compiled binary using the same
+  conventions and pointer-based memory. Explicitly defers class/object mapping.
+- **Assistant:** narrows the immediate work to free functions and C-compatible
+  pointers, proposes versioned signature-based export names and C adapters around
+  the private status/result convention. An escaping guest fault terminates rather
+  than unwinding through C or manufacturing a result.
+- **Author:** specifies NativeExportAttribute as the reverse of NativeImport, with
+  the same type mappings and calling conventions.
+- **Action/outcome:** a Raven AOT-library proof passes a native C caller and
+  NativeImport consumers in all three modes. Its first run exposed content-hashed
+  executable names; the implementation now uses preserved source identity.
+  Source-attribute integration remains in progress. The current CLI export selection
+  is backend plumbing, not a substitute for the requested attribute.
+- **Evidence:** [export contract](design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22),
+  [Raven fixture](experiments/aot-native-imports/raven/Exports.rvn) and
+  [native import/export tests](../runtime/codegen/tests/native_imports.rs).

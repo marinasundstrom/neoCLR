@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Free-function scope (author clarification, 2026-10-22):** Native invocation across
+interpreter/JIT/AOT and re-import of AOT binaries now focuses on functions and pointer
+memory; class/object mapping is future work. NativeExportAttribute should mirror
+NativeImport in reverse. The scalar C-export backend and three-engine round-trip
+fixture are implemented; attribute/source integration remains the next step.
+[Contract and evidence](design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22).
+
 **Native export sequencing (author direction, 2026-10-22):** First qualify foreign
 function NativeImport across interpreter, JIT and AOT. Then define stable AOT export
 names/name mangling and the accompanying native ABI so external native libraries

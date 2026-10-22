@@ -453,3 +453,18 @@ zero-extend 32-bit inputs. The Raven consumer checks a high-bit uint identifier
 through locals/helper calls, widening to ulong/nuint and narrowing from ulong
 against C uint32_t/uint64_t/uintptr_t parameters. This matches ordinary fixed-width
 .NET/C interop semantics without allocating wrappers or adding metadata.
+
+## Raven AOT library round trip
+
+The additional `Exports.rvn` consumer is compiled with explicit
+`--native-library ... --export ...` selections, linked with the C ownership fixture
+and the shared resolver, and imported by `Transport.rvn` in all three modes.
+Its eight exported symbols are checked against the build report; internal helpers
+and the old host entry remain local/absent. A C consumer tests pointer read/write
+and a separate process verifies escaping-fault termination. Importing these symbols
+uses ordinary NativeImport declarations, with no additional runtime binding path.
+
+[Export ABI, naming and source-attribute follow-through](../../design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22)
+documents the deliberate fault boundary and source identity rather than content
+hashes. The matched compiler/SDK overlay is unchanged; no compiler or binary
+encoding change is required for this backend increment.

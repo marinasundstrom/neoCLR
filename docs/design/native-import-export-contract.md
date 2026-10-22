@@ -387,3 +387,65 @@ review should compare .NET-style explicitly named C exports with encoded identit
 for overloads and generic specializations, including collision handling, reproducible
 builds, runtime entry/ownership and library versioning. This is planned design work;
 existing experimental AOT symbols do not become public exports through this note.
+
+## Free-function C export increment — 2026-10-22
+
+The author now makes the immediate scope explicit: native functions and pointer
+memory must work across interpreter, JIT and AOT, including importing an AOT-built
+binary through the same mechanisms. Class/object mapping is future work. The author
+also requests NativeExportAttribute as the reverse source contract to NativeImport.
+The backend increment below precedes that attribute; it is not the complete source API.
+
+The assistant selects platform C calling conventions for direct exports, following
+[.NET Native AOT C entry points](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/interop).
+[Rust likewise separates symbol names from ABI](https://doc.rust-lang.org/reference/abi.html).
+neoCLR's private status/result ABI stays internal. Each exported adapter calls it,
+returns the declared C result on success and traps on an escaping fault. There is
+no invented zero result, foreign unwinding or hidden thread-local error channel.
+Callers needing recoverable failures must design an explicit result/status contract
+in their exported function. Fault termination is a material limitation of this first
+direct-export boundary; no recoverable public fault ABI is introduced here.
+
+The macOS ARM64 development driver accepts:
+`--native-library input output.o --export Function [--export Other ...]`.
+It emits a relocatable object for the native linker, requires explicit selections
+and never exports private helpers or the experimental neoclr_entry_v2 entry.
+Libraries containing NativeImport declarations additionally require --native-imports
+and link the same imports.c resolver. Existing explicit metadata load contexts apply.
+No managed object layout, heap initialization, thread attachment or callback
+registration is implied by this scalar library mode.
+
+### Symbol identity v1
+
+Logical names have this ASCII form:
+
+`neoclr_c_v1_m<assembly-utf8-hex>_n<namespace-utf8-hex>_f<function-utf8-hex>_a<parameter-tags>_r<return-tag>`
+
+Parameter tags are separated by underscores; an empty parameter list has no tags.
+Tags are i32/u32/i64/u64/is/us/f32/f64, with v for a no-result return and pv/pu8/pi32
+for the admitted pointers. This is a versioned development contract, not an encoded
+managed object ABI. Native linkers may apply their normal object-format decoration;
+NativeImport.EntryPoint uses the logical name without the Mach-O underscore.
+
+Assembly simple name and preserved source function identity are used for native
+metadata. Executable content hashes, definition row numbers, revision hashes,
+body contents and file paths do not participate. Legacy assembler modules use their
+declared module and function names. UTF-8 is encoded exactly; no Unicode normalization
+or hashing introduces collisions. Full signatures distinguish scalar types and return
+contracts. Overloaded source selection remains unsupported by the scalar backend;
+the naming scheme does not claim otherwise.
+
+Benefits over opaque content-derived names are deterministic interfaces and no hash
+collision policy. Costs are long, less readable names and a convention that must be
+versioned when changed. Explicit entry-point overrides belong to the forthcoming
+attribute, analogous to .NET's named exports. Duplicate exports and unsupported
+signatures reject before object output. The JSON stdout report is build output only,
+not the future runtime metadata sidecar.
+
+The Raven Exports.rvn fixture is compiled to a shared library. A native C consumer
+reads/writes pointer storage and a subprocess checks escaping-fault termination.
+The shared Raven transport consumer imports the generated names for allocation,
+read/release and numeric returns through interpreter, scalar JIT and AOT. The object
+symbol table is checked for exactly the requested exports. This establishes the
+bounded free-function round trip, not ordinary SDK integration or full marshalling
+and callback parity.

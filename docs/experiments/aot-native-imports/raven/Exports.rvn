@@ -1,0 +1,36 @@
+// The library test exports selected free functions, not this executable entry.
+func Main() -> int {
+    return 0
+}
+
+unsafe func AllocateExport(value: int, size: nuint) -> *unit {
+    return Allocate(value, size)
+}
+
+unsafe func ReadExport(pointer: *int) -> int {
+    return *pointer
+}
+
+unsafe func WriteExport(pointer: *int, value: int) -> unit {
+    *pointer = value
+}
+
+unsafe func ReleaseExport(pointer: *unit) -> unit {
+    Release(pointer)
+}
+
+unsafe func SingleExport(index: int) -> float {
+    return SingleValue(index)
+}
+
+unsafe func DoubleExport(index: int) -> double {
+    return DoubleValue(index)
+}
+
+unsafe func WideExport() -> ulong {
+    return UnsignedWide()
+}
+
+func DivideExport(divisor: int) -> int {
+    return 42 / divisor
+}

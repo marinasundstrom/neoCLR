@@ -4,7 +4,7 @@
 NativeImportAttribute, MarshalAsAttribute, NativeCallingConvention,
 NativeStringMarshalling and NativeType. Matching source compiler/runtime changes are
 required; installed bundles and general JIT/AOT imports are not yet qualified.
-A separate [bounded scalar AOT profile](#aot-scalar-imports) supports Int32/pointer C imports.
+A separate [bounded scalar AOT profile](#aot-scalar-imports) supports numeric/pointer C imports and scalar JIT execution.
 
 | API | Contract |
 | --- | --- |
@@ -169,7 +169,7 @@ and persistent native-backed Memory ownership remain open.
 
 `neoclr-codegen --native-imports` enables the macOS ARM64 scalar AOT backend's
 existing NativeImport descriptors for nongeneric free functions with at most 16
-parameters, using Int32, IntPtr/UIntPtr or raw pointer metadata to Void, Byte or Int32 for parameters
+parameters, using Int32/UInt32, Int64/UInt64, Single/Double, IntPtr/UIntPtr or raw pointer metadata to Void, Byte or Int32 for parameters
 and results, or no-result Void returns, without marshalling. Pointer locals and helper calls preserve native
 address width. Explicit pointer casts, implicit void-pointer erasure and null/default
 pointer values are supported within the same pointee set. Casts retain address bits
@@ -177,9 +177,8 @@ without reading storage. Raven's local-address/default initialization is lowered
 for exact scalar locals; managed local addresses cannot escape as native pointers.
 Unsupported layouts, mismatched types and integer-to-pointer conversion still reject.
 IntPtr/UIntPtr transport uses 64-bit registers/storage on this target. Unchecked
-integer widening/narrowing is supported for native sizes, including Int64 conversion
-temporaries; native-width arithmetic, checked conversions, pointer/integer conversion
-and Int64/UInt64 signatures remain rejected in this profile. The public Ptr<T> wrapper
+integer widening/narrowing is supported for native sizes, including unsigned widening and low-bit truncation; native-width arithmetic, checked
+conversions and pointer/integer conversion remain rejected in this profile. The public Ptr<T> wrapper
 is not automatically projected yet.
 Managed/value profiles, class members, other types, callbacks, managed JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
@@ -277,3 +276,20 @@ zero-extend 32-bit inputs. The Raven consumer checks a high-bit uint identifier
 through locals/helper calls, widening to ulong/nuint and narrowing from ulong
 against C uint32_t/uint64_t/uintptr_t parameters. This matches ordinary fixed-width
 .NET/C interop semantics without allocating wrappers or adding metadata.
+
+
+## Development native library exports
+
+The backend `--native-library input output.o --export Function` command emits
+explicitly selected, nongeneric free functions using the platform C ABI on macOS
+ARM64. It admits the scalar numeric/pointer types listed above, with no-result
+returns mapped to C void. Helpers remain local; the experimental host entry is not
+exported. The native linker produces a library from this object. Source
+NativeExportAttribute integration remains pending in this backend increment.
+
+Symbol names encode stable source identity and signature using the versioned
+`neoclr_c_v1_` convention. The JSON build report lists exact logical EntryPoint
+names for NativeImport; it is not a runtime metadata sidecar. Guest faults escaping
+an export trap and terminate the process. Pointer bounds and lifetime remain the
+native caller's responsibility. Existing files and invalid export selections are
+not overwritten. [Detailed ABI and naming contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22).
