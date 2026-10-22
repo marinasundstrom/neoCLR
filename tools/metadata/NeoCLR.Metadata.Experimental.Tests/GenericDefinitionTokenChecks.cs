@@ -14,7 +14,7 @@ internal static class GenericDefinitionTokenChecks
         var loaded = Assembly.Load(graph.Write());
         var tokenType = loaded.GetType("Example.Tokens")!;
         var ownType = Type.GetTypeFromHandle((RuntimeTypeHandle)tokenType.GetMethod("Owned")!.Invoke(null, null)!);
-        if (ownType != loaded.GetType("Example.Box`1") || !ownType.IsGenericTypeDefinition)
+        if (ownType is null || ownType != loaded.GetType("Example.Box`1") || !ownType.IsGenericTypeDefinition)
             throw new Exception("Generic definition token identity");
         var external = graph.ImportTypeIdentity(new AssemblyIdentity("GenericDependency", new Version(1, 0, 0, 0)), "System.Collections.Generic", "List`1", 1);
         var imported = tokens.AddMethod("Imported", new MethodSignature(PrimitiveType.RuntimeTypeHandle, []));

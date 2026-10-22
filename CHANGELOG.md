@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Repair metadata SDK validation build blockers: document the existing generic-definition token operation and explicitly reject a missing reflected type in its test. No token semantics or API signatures change.
+
 - Record the canonical Void contract: void aliases System.Void, direct Void returns have no result, and language-required values remain compiler-generated; reject case/qualification-based return distinctions and the noresult keyword. Verify Raven source already distinguishes preserved no-result expressions from generic value returns. The coordinated IL migration and end-to-end qualification remain pending; no runtime semantics change in this decision record.
 
 - Record the author correction that neoCLR Void remains a normal inhabited type; withdraw the proposed Unit rename. Separate language-required Void values from no-result native call conventions in interop guidance. Return representation/syntax standardization remains open; this documentation correction changes no runtime semantics.

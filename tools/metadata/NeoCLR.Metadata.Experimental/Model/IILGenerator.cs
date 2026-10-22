@@ -33,6 +33,8 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Foreign/unscoped type or unsupported operand category.</exception>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     void LoadTypeToken(SignatureType type);
+    /// <summary>Loads the runtime type handle for the definition of a generic nominal type.</summary>
+    /// <param name="type">The nominal signature whose generic definition is requested.</param>
     void LoadTypeDefinitionToken(SignatureType type);
     /// <summary>Gets declared locals in slot order. ClearBody retains them.</summary>
     IReadOnlyList<LocalDefinition> Locals { get; }
