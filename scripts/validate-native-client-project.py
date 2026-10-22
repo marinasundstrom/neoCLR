@@ -223,7 +223,7 @@ def main():
         row = dict(name='paired-raven-server'); report['cases'].append(row)
         for mode in commands:
             command = [isolated['server']] if mode == 'native' else [vm, 'run', builds['server'] / 'app.dll', *context]
-            server = subprocess.Popen(list(map(str, command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
+            server = http.start_process(list(map(str, command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
                                       cwd=isolated['server'].parent if mode == 'native' else ROOT, env=environment if mode == 'native' else None)
             try:
                 port = http.read_port(server.stdout, timeout=30)
@@ -232,7 +232,7 @@ def main():
                 stdout, stderr = server.communicate(timeout=20)
                 row[mode + 'Server'] = dict(exitCode=server.returncode, stdout=stdout.decode(), stderr=stderr.decode())
             finally:
-                if server.poll() is None: server.kill(); server.communicate()
+                http.stop_process(server)
             if row[mode] != dict(exitCode=0, stdout='Café 🌍\n', stderr='') or row[mode+'Server'] != dict(exitCode=0, stdout='Other work runs while HTTP accept is pending\nServed greeting; server closed\n', stderr=''): raise ValueError('Paired Raven server/client mismatch')
         row['passed'] = True
         report['cases'].extend(qualify_reuse(run, out, builds['client'], commands, environment, response))

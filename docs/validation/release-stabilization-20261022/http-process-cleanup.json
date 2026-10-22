@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-22",
+  "baseRevision": "e23a6da2c81cc507737a2d77ba165bbd1b0e91d1",
+  "sourceState": "working tree; exact modified inputs hashed below",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "python": "3.9.6 (default, Dec  2 2025, 07:27:58) \n[Clang 17.0.0 (clang-1700.6.3.2)]",
+  "sourceHashes": {
+    "scripts/verify-native-http-json.py": "da4ca74c6380993616972334cdce12bcc5d68a211932dfe84ccdde56e3266018",
+    "scripts/test_native_http_readiness.py": "04a161eda94e4615e43fe519168746cdd7e4954f270eb8e1b299a2e7005f4736",
+    "scripts/validate-native-http-project.py": "93f26e2b883dc45ece67f3a25c5920f136a855c685e598d4e649332177d7beaa",
+    "scripts/validate-native-client-project.py": "c16e8d077c70089c063d0529a0da748d965cc96ad932f44cca330adbd3db5ee5",
+    "scripts/validate-http-foundation.py": "e0410e3360c59ea5e1003d21630585af9d85bda31e1f9254190563da783e2efd",
+    "scripts/validate-http-method.py": "ac53a1d3931e5984552326c5c435bc98a72c158a4dd7702dfec1b624c0d69cdf",
+    "scripts/validate-retained-http.py": "45d4b3dee1926f9d51f42c78e17095e28ab71ed3e620daaad74ebc3cbd39c7c4"
+  },
+  "command": "python3 -m unittest discover -s scripts -p 'test_native_http_*.py' -v",
+  "passed": true,
+  "testCount": 7,
+  "cleanupSeconds": {
+    "False": 0.001066,
+    "True": 0.000622
+  },
+  "limitations": [
+    "Two local cleanup observations, not a throughput benchmark",
+    "Windows process-tree cleanup remains target-host unqualified",
+    "Detached descendants that deliberately leave the POSIX session are outside this ownership contract; pipe draining has a deadline"
+  ],
+  "output": "test_engine_frames_do_not_change_http_fault_outcome (test_native_http_outcomes.HttpFaultParityTests) ... ok\ntest_cleanup_releases_descendant_pipes_and_listener_after_launcher_exit (test_native_http_readiness.ProcessTreeTests) ... Process-tree cleanup launcher_exited=False: 0.001066s\nProcess-tree cleanup launcher_exited=True: 0.000622s\nok\ntest_client_timeout_kills_pipe_inheriting_descendant (test_native_http_readiness.ProcessTreeTests) ... ok\ntest_success_retains_output_and_exit_status (test_native_http_readiness.ProcessTreeTests) ... ok\ntest_exit_without_port (test_native_http_readiness.ReadinessTests) ... ok\ntest_partial_line_has_deadline (test_native_http_readiness.ReadinessTests) ... ok\ntest_port_and_remaining_output (test_native_http_readiness.ReadinessTests) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.373s\n\nOK\n"
+}

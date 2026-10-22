@@ -69,3 +69,18 @@ do not describe the extracted full-suite run as passing.
 The corrected boxed-Double integration test passes; production behavior is unchanged.
 
 [Slice/Span release review](validation/release-readiness-20261020/slice-span-review-20261021.md) records the supported-type/lifetime gates, missing buffer helpers and by-reference indexing distinction. It is a review, not completed API expansion.
+
+### Qualification cleanup repair — 2026-10-22
+
+The HTTP validator cleanup gap recorded above is repaired on POSIX: launches own
+a new session and cleanup kills that process group even after the launcher exits.
+Pipe draining is bounded. HTTP client timeouts use the same ownership, and the
+HTTP foundation/method/retained-session/project validators share the implementation.
+Seven focused tests pass, including a real child retaining inherited pipes and a
+listening socket. Windows uses bounded `taskkill /T /F` for a live launcher; the
+exited-launcher case is not qualified there and needs target-host follow-up.
+
+[Evidence and cleanup timings](validation/release-stabilization-20261022/http-process-cleanup.json)
+record the exact working inputs. These observations measure validation cleanup,
+not runtime request throughput. The selected-function budget/startup blocker,
+fresh source suite, matched packages and installed-editor gates remain open.

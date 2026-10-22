@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Bound HTTP qualification cleanup and terminate owned JIT descendants, including POSIX children whose launcher has exited. Share process-tree cleanup across HTTP server/client, foundation, method and retained-session validators; client timeouts use the same ownership. Seven focused tests pass and modified validators compile. Local listener/pipe cleanup observations are recorded separately from runtime throughput; Windows target-host qualification remains pending.
+
 - Enable generated struct-pointer imports in the opt-in scalar JIT/AOT executable profiles: resolve loaded layout attributes and select entry-root dependencies after full-source verification. Unused valid constructors no longer block lowering; invalid source and unsupported import declarations still reject. Add private Boolean scalar storage without changing C Boolean marshalling. All 24 interop integration tests plus the new Boolean regression pass; API/website validation passes. Ordinary managed JIT/AOT, by-value struct transport, callbacks and pinning remain separate gaps.
 
 - Qualify generated Raven native imports for nested value fields and self/mutually referencing struct pointers. C/C++ headers check native sizes and offsets; generated consumers round-trip null and live caller-owned allocations through AOT exports, then free them. Correct the test harness to select the exported pointee from its signature rather than header order. All six Raven-source interop tests pass. This extends validation, not managed marshalling or executable-mode support.

@@ -22,7 +22,7 @@ sha = common.sha
 
 
 def serve(command, targets, fragmented, cwd, env=None):
-    process = subprocess.Popen(list(map(str, command)), cwd=cwd, env=env,
+    process = common.http_process.start_process(list(map(str, command)), cwd=cwd, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
     responses = []
     try:
@@ -62,15 +62,11 @@ def serve(command, targets, fragmented, cwd, env=None):
         return dict(exitCode=process.returncode, stdout=stdout.decode().replace('\r\n', '\n'),
                     stderr=stderr.decode().replace('\r\n', '\n'), responses=responses)
     except Exception as error:
-        if process.poll() is None:
-            process.kill()
-        stdout, stderr = process.communicate()
+        stdout, stderr = common.http_process.stop_process(process)
         raise RuntimeError(f'HTTP sequence failed: {error}; exit={process.returncode}; '
                            f'stdout={stdout!r}; stderr={stderr!r}; responses={responses!r}') from error
     finally:
-        if process.poll() is None:
-            process.kill()
-            process.communicate()
+        common.http_process.stop_process(process)
 
 
 def main():

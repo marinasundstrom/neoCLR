@@ -109,7 +109,7 @@ def main():
             if args.part in ('all', 'json'):
                 result = subprocess.run(command('Json', mode, []), cwd=ROOT, capture_output=True, text=True, timeout=60)
                 record('json-content', mode, result)
-                process = subprocess.Popen(command('JsonServer', mode, []), cwd=ROOT,
+                process = http_json.start_process(command('JsonServer', mode, []), cwd=ROOT,
                                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
                 try:
                     port = int(http_json.read_port(process.stdout, timeout=120))
@@ -126,9 +126,7 @@ def main():
                     if not response.startswith(b'HTTP/1.1 201 ') or b'application/json; charset=utf-8' not in response or json.loads(response.split(b'\r\n\r\n', 1)[1]) != {"message": "hello"}:
                         raise RuntimeError('JSON response wire mismatch')
                 finally:
-                    if process.poll() is None:
-                        process.kill()
-                        process.communicate()
+                    http_json.stop_process(process)
             if args.part == 'json':
                 continue
             # Interpreter validates the same parser at useful small boundaries;
@@ -235,7 +233,7 @@ def main():
                 if mode == 'interpreter' and name == 'header-byte-limit':
                     report['skips'].append(dict(case='server-' + name, mode=mode, reason='32 KiB parsing exceeds fixed transport deadline; covered in native mode'))
                     continue
-                process = subprocess.Popen(command('Server', mode, [expected]), cwd=ROOT,
+                process = http_json.start_process(command('Server', mode, [expected]), cwd=ROOT,
                                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
                 try:
                     port = int(http_json.read_port(process.stdout, timeout=120))
@@ -266,9 +264,7 @@ def main():
                     elif response:
                         raise RuntimeError('Rejected request unexpectedly produced a response')
                 finally:
-                    if process.poll() is None:
-                        process.kill()
-                        process.communicate()
+                    http_json.stop_process(process)
             print('PASS HTTP foundation in ' + mode, flush=True)
         report['passed'] = True
     finally:

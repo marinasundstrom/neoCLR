@@ -98,7 +98,7 @@ def main():
                 record['peer'] = peer
                 if record['exitCode'] or 'PASS custom method client' not in record['stdout'] or not peer.get('validated'):
                     raise RuntimeError('Custom client request failed: ' + repr(record))
-            process = subprocess.Popen(commands['Server'][mode], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+            process = http_json.start_process(commands['Server'][mode], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
             try:
                 port = int(http_json.read_port(process.stdout, timeout=30))
                 with socket.create_connection(('127.0.0.1', port), timeout=10) as connection:
@@ -115,9 +115,7 @@ def main():
                 if process.returncode or b'PASS custom method server' not in stdout or b'X-Method: m-SEARCH\r\n' not in response or not response.endswith(b'\r\n\r\nbody'):
                     raise RuntimeError('Custom server response failed: ' + repr(record))
             finally:
-                if process.poll() is None:
-                    process.kill()
-                    process.communicate()
+                http_json.stop_process(process)
         report['passed'] = True
     finally:
         (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

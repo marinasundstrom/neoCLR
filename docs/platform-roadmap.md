@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Release stabilization (2026-10-22):** HTTP qualification now owns POSIX JIT
+process groups and bounds cleanup, including launcher-exit cases. Seven focused
+tests pass. Per-slice performance review is author-directed; cleanup timings are
+harness evidence, not runtime throughput. HTTP selection/startup and matching
+package/editor qualification remain open. [Release status](release-readiness.md#qualification-cleanup-repair--2026-10-22).
+
 **Struct interop follow-up (2026-10-22):** Backend struct-pointer/layout/header tests
 pass, and Raven/SDK nominal pointer emission plus native-library export reachability
 are repaired. Raven struct-pointer exports execute from C/C++; layout attribute

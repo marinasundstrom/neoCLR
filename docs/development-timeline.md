@@ -21237,3 +21237,14 @@ field-attribute/array-suffix parser bug; it was repaired on Raven main (2073ee76
 and carried deliberately to codex/neoclr. Packed/explicit layouts and generated
 imports pass C/C++ and interpreter-to-AOT round trips. Managed struct conversion,
 by-value ABI and full JIT/AOT executable integration remain outside this increment.
+
+## 2026-10-22 — Stabilization with performance review per slice
+
+The author asked to continue stabilization towards release and to investigate each
+slice for optimization opportunities in Rust or Raven. The assistant proposed
+reviewing the changed path rather than treating every slice as a new benchmark,
+starting with bounded HTTP validation cleanup and then the recorded JIT startup
+blocker. The cleanup implementation and seven tests are complete; local timings
+measure only process teardown. Runtime startup/selection analysis, Windows cleanup
+qualification and fresh release-package validation remain open. See the
+[release follow-up](release-readiness.md#qualification-cleanup-repair--2026-10-22).

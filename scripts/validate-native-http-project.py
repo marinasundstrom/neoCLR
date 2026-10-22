@@ -24,7 +24,8 @@ def load(name, path):
     return module
 
 windows_project = load('windows_project', ROOT / 'scripts/validate-windows-project.py')
-read_port = load('http_json', ROOT / 'scripts/verify-native-http-json.py').read_port
+http_process = load('http_json', ROOT / 'scripts/verify-native-http-json.py')
+read_port = http_process.read_port
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -42,7 +43,7 @@ def rebuild_libraries(run, bundle, output):
     return output / 'bundle'
 
 def serve(command, request, fragmented, cwd, env=None):
-    process = subprocess.Popen(list(map(str, command)), cwd=cwd, env=env,
+    process = http_process.start_process(list(map(str, command)), cwd=cwd, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
     response = b''
     try:
@@ -70,9 +71,7 @@ def serve(command, request, fragmented, cwd, env=None):
         stdout, stderr = process.communicate(timeout=20)
         return dict(exitCode=process.returncode, stdout=stdout.decode(), stderr=stderr.decode(), responseHex=response.hex())
     finally:
-        if process.poll() is None:
-            process.kill()
-            process.communicate()
+        http_process.stop_process(process)
 
 def same_outcome(native, interpreted, fault=False):
     if not fault:

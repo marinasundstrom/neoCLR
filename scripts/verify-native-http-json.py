@@ -3,12 +3,43 @@
 import argparse
 import hashlib
 import json
+import os
+import signal
 from pathlib import Path
 import queue
 import threading
 import subprocess
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+
+
+def start_process(command, **kwargs):
+    """Own the server and its JIT descendants, not just the launcher PID."""
+    return subprocess.Popen(command, start_new_session=os.name != 'nt', **kwargs)
+
+
+def stop_process(process, timeout=5):
+    """Stop owned descendants even when the launcher has already exited."""
+    if os.name == 'nt':
+        if process.poll() is None:
+            subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
+                           capture_output=True, timeout=timeout)
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    # Always bound pipe draining: an escaped descendant must not hang qualification.
+    return process.communicate(timeout=timeout)
+
+
+def run_process(command, timeout, **kwargs):
+    process = start_process(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+    finally:
+        stop_process(process)
 
 
 def read_port(stream, timeout=60):
@@ -68,7 +99,7 @@ def main():
         for paired in (False, True):
             run = {'serverCommand': command(args.server, '2' if paired else '4'), 'requests': []}
             report['runs'].append(run)
-            server = subprocess.Popen(run['serverCommand'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+            server = start_process(run['serverCommand'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
             try:
                 port = read_port(server.stdout)
                 run['port'] = port
@@ -77,7 +108,7 @@ def main():
                 base = f'http://127.0.0.1:{port}'
                 if paired:
                     run['clientCommand'] = command(args.client, base + '/')
-                    client = subprocess.run(run['clientCommand'], capture_output=True, text=True, encoding='utf-8', timeout=60)
+                    client = run_process(run['clientCommand'], text=True, encoding='utf-8', timeout=60)
                     run['client'] = {'exitCode': client.returncode, 'stdout': client.stdout, 'stderr': client.stderr}
                     assert client.returncode == 0 and not client.stderr, run['client']
                     assert json.loads(client.stdout) == {'accepted': True}, run['client']
@@ -102,10 +133,8 @@ def main():
                 assert server.returncode == 0 and stdout == 'Reports served\n' and not stderr, run['server']
                 print('Native HTTP/JSON ' + ('client/server pair' if paired else 'server requests') + ' passed', flush=True)
             finally:
-                if server.poll() is None:
-                    server.kill()
+                stdout, stderr = stop_process(server)
                 if 'server' not in run:
-                    stdout, stderr = server.communicate()
                     run['server'] = {'exitCode': server.returncode, 'stdout': stdout, 'stderr': stderr}
         report['passed'] = True
     finally:
