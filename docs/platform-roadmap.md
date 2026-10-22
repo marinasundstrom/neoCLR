@@ -2,8 +2,9 @@
 
 **Struct interop follow-up (2026-10-22):** Backend struct-pointer/layout/header tests
 pass, and Raven/SDK nominal pointer emission plus native-library export reachability
-are repaired. Raven struct-pointer exports execute from C/C++. Next address source
-layout/marshalling attributes;
+are repaired. Raven struct-pointer exports execute from C/C++; layout attribute
+owners now resolve through supplied System.Runtime source identities. Next address
+public source layout/marshalling declarations and field attribute admission;
 aggregate-by-value ABI and callback parity remain separate gaps.
 [Evidence and limits](experiments/aot-native-imports/README.md#struct-layout-and-nominal-pointer-foundation-2026-10-22).
 

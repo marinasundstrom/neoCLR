@@ -25,6 +25,49 @@ pub(crate) struct Layout {
 }
 pub(crate) struct Layouts(pub BTreeMap<String, Layout>);
 
+/// Normalize only the three layout annotations in a private emission copy.
+/// Source verification must continue to use the original loaded program: these
+/// canonical names are decoder tags, not replacement executable type identities.
+pub(crate) fn normalize_annotations<'a>(
+    input: &Module,
+    modules: impl Iterator<Item = &'a Module>,
+) -> Result<Module, Error> {
+    const NAMES: [&str; 3] = [
+        "System.Runtime.InteropServices.StructLayoutAttribute",
+        "System.Runtime.InteropServices.FieldOffsetAttribute",
+        "System.Runtime.InteropServices.MarshalAsAttribute",
+    ];
+    let mut identities = BTreeMap::new();
+    for module in modules {
+        for ty in &module.types {
+            let Some(origin) = &ty.origin else { continue };
+            if !NAMES.contains(&origin.name.as_str())
+                || !module.assemblies.iter().any(|assembly| {
+                    assembly.full_name == origin.assembly && assembly.name == "System.Runtime"
+                })
+            {
+                continue;
+            }
+            if identities
+                .insert(ty.name.as_str(), origin.name.as_str())
+                .is_some_and(|previous| previous != origin.name)
+            {
+                return Err("ambiguous native layout attribute identity".into());
+            }
+        }
+    }
+    let mut projected = input.clone();
+    for ty in &mut projected.types {
+        for attribute in &mut ty.custom_attributes {
+            if let Some(canonical) = attribute_name(attribute).and_then(|name| identities.get(name))
+            {
+                attribute.constructor.owner = Some(Type::Named((*canonical).to_owned()));
+            }
+        }
+    }
+    Ok(projected)
+}
+
 fn identifier(name: &str) -> String {
     // Encode rather than guess whether a source identifier is a C keyword.
     name.as_bytes().iter().map(|b| format!("{b:02x}")).collect()
@@ -435,6 +478,49 @@ mod tests {
             .unwrap(),
         );
     }
+    #[test]
+    fn loaded_attribute_identity_controls_field_marshalling() {
+        let mut input = module();
+        origin(&mut input);
+        input.types[0].packing = Some(1);
+        let mut attribute = annotation("MarshalAs", 2, Some(67108865));
+        attribute.constructor.owner = Some(Type::Named("Physical.Attribute".into()));
+        input.types[0].custom_attributes.push(attribute);
+        assert!(Layouts::build(&input).is_err());
+        let mut dependency = module();
+        dependency.types[0].name = "Physical.Attribute".into();
+        origin(&mut dependency);
+        let source = dependency.types[0].origin.as_mut().unwrap();
+        source.name = "System.Runtime.InteropServices.MarshalAsAttribute".into();
+        source.assembly = "System.Runtime, Version=1.0.0.0".into();
+        dependency.assemblies = vec![
+            serde_json::from_value(serde_json::json!({
+                "name": "System.Runtime", "full_name": "System.Runtime, Version=1.0.0.0",
+                "modules": [], "references": []
+            }))
+            .unwrap(),
+        ];
+        let projected = normalize_annotations(&input, std::iter::once(&dependency)).unwrap();
+        let layouts = Layouts::build(&projected).unwrap();
+        assert_eq!(layouts.0["Pair"].size, 5);
+        assert_eq!(layouts.0["Pair"].fields[1].offset, 1);
+        assert_eq!(
+            attribute_name(&input.types[0].custom_attributes[0]),
+            Some("Physical.Attribute")
+        );
+        dependency.assemblies[0].name = "Unrelated".into();
+        let unrelated = normalize_annotations(&input, std::iter::once(&dependency)).unwrap();
+        assert!(Layouts::build(&unrelated).is_err());
+        // A canonical-looking source name without a matching assembly scope is
+        // not enough to authorize a physical attribute owner.
+        dependency.assemblies[0].name = "System.Runtime".into();
+        dependency.assemblies[0].full_name = "OtherRevision".into();
+        assert!(
+            Layouts::build(&normalize_annotations(&input, std::iter::once(&dependency)).unwrap())
+                .is_err()
+        );
+    }
+
     #[test]
     fn defaults_overrides_packing_and_explicit_overlap() {
         let mut m = module();

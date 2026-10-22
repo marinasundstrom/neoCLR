@@ -14781,7 +14781,10 @@ codex/neoclr. Existing pointer metadata is reused, with ordinary nominal identit
 no new Runtime Contract option or lossy CLI bridge encoding is introduced.
 
 Limits: Raven source StructLayout/FieldOffset APIs and field MarshalAs admission are
-still pending, including physical attribute-owner resolution. Raven Point pointer exports now compile and execute from C11/C++17 callers.
+still pending. The native-library backend now resolves physical layout attribute
+owners through matching System.Runtime source metadata in the supplied load context.
+Only a private layout-decoding copy is normalized; source verification retains the
+original constructor and owner references. This does not change Raven emission. Raven Point pointer exports now compile and execute from C11/C++17 callers.
 The native-library backend verifies the original source, then selects exported
 functions and their direct-call dependencies. Unused synthesized constructors remain
 in source metadata but do not enter scalar code generation. Unsupported selected

@@ -300,7 +300,7 @@ pub(super) fn run(mut args: Vec<OsString>, imports: bool) -> Result<i32, Error> 
         .map(|p| crate::read_module(Path::new(p)))
         .transpose()?;
     let verification = if dependency_args.is_empty() {
-        None
+        Some(neoclr::LoadedProgram::new(&input).map_err(|error| error.to_string())?)
     } else {
         Some(load_context::verification(
             &input,
@@ -316,6 +316,14 @@ pub(super) fn run(mut args: Vec<OsString>, imports: bool) -> Result<i32, Error> 
             .chain(system.iter())
             .chain(dependencies.iter()),
     );
+    // Keep the loaded source program for verification; normalize layout decoder
+    // tags only in the private emission inventory, using supplied source identity.
+    let input = crate::native_layout::normalize_annotations(
+        &input,
+        std::iter::once(&input)
+            .chain(system.iter())
+            .chain(dependencies.iter()),
+    )?;
     let mut selected = HashSet::new();
     let mut exports = Vec::new();
     for (index, f) in input.functions.iter().enumerate() {

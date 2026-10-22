@@ -282,8 +282,9 @@ unsafe func Echo(pointer: *Point) -> *Point {
 ```
 
 The caller owns the pointed-to memory. This example preserves the pointer and
-introduces no managed object conversion. Source layout/marshalling attributes and
-structs passed by value are not yet supported. This is not part of the qualified
+introduces no managed object conversion. The native-library backend resolves layout
+attribute identities from its supplied runtime metadata. Public source layout/marshalling
+attribute support and structs passed by value are still incomplete. This is not part of the qualified
 extracted-kit sample above.
 
 ### Scope of the foundation

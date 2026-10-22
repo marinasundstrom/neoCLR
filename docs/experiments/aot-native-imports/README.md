@@ -506,3 +506,17 @@ All 22 native-import/export integration tests pass with this overlay.
 The SDK pointer contract tests cover CLI/native encoding and importing value pointers;
 Raven portable tests cover capability admission and preserved symbol identity.
 See the [contract and remaining gaps](../../design/native-import-export-contract.md#native-struct-layout-and-pointer-metadata--2026-10-22).
+
+### Loaded layout attribute identities (2026-10-22)
+
+Native-library header generation and code generation now normalize recognized
+StructLayout, FieldOffset and MarshalAs owners using supplied System.Runtime source
+identities. The source LoadedProgram remains separate and is always verified,
+including runs without explicit dependency arguments. This removes the canonical-name
+assumption without exposing new source attributes yet.
+
+Five focused native-layout tests pass, including checked Bool8 field layout through
+a physical attribute name, preservation of original metadata, rejection of unrelated
+assemblies and rejection of mismatched full assembly identity. Existing C11/C++17
+packing and explicit-layout assertions remain part of these tests. All 22 interop
+integration tests also pass with the same paired compiler/SDK overlay.
