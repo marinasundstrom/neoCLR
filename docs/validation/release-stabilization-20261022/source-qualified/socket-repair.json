@@ -17,6 +17,6 @@
   },
   "hostedRerun": 39853093086,
   "hostedStatus": "running",
-  "packageRefresh": "macOS runtime build started; archive qualification pending",
+  "packageRefresh": "macOS optimized runtime built; refreshed archive passes extracted default-JIT and interpreter samples/HTTP. See ../socket-repair-package/summary.json",
   "loaderNote": "Original test process initially stalled in dyld. Byte-identical /tmp copy passed; original process subsequently also completed with 37 passes."
 }

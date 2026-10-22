@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-22",
+  "passed": true,
+  "scope": "macOS refreshed development archive: manifest and extracted default-JIT/interpreter samples including HTTP exchange",
+  "runtimeSourceRevision": "32184c938453e02680f9ae2c62fa35f7c0694b5e",
+  "archive": "target/release-socket-repair-jit-macos-20261022/neoclr-jit.tar.gz",
+  "archiveSha256": "d9cc84d7b47991a20ce100b7199b99fba86b4d6e8e24451cd90dc98fd8440856",
+  "manifestSha256": "2ad837462c0e5971fe34af805c7f4cdaaa9102195c466a5259200b26181a9996",
+  "changedFiles": {
+    "bin/neoclr": {
+      "old": "6e6bc861e2c4cdfacb605937a670831f068581a8a01273797f19eabc9929d6ea",
+      "new": "36507000af245f990c77202e39debfbb9f1cb0c05d438022b96ac4db3fb547a5"
+    },
+    "bin/neoclr-jit-host.dylib": {
+      "old": "97618355319426b1a499aef80496129a7c7a9aa67ec5652106aa93e185c09dd2",
+      "new": "7939831ac3bc9f827a5b410bfcd547da89b3c71028970e91722e665c200090bd"
+    }
+  },
+  "removedFiles": [],
+  "reports": {
+    "preparation": {
+      "sha256": "c3ac356b2b9bd65ddb9fba7bc6e8da49bb426b42eca442884626eedfdb6423b2",
+      "compressed": "preparation.json.gz"
+    },
+    "extracted-jit": {
+      "sha256": "6531b8390c65944ea1f6fbe4f53d7ec218122d27e7cf37d119492ef1e38fcb87",
+      "compressed": "extracted-jit.json.gz"
+    },
+    "extracted-interpreter": {
+      "sha256": "f018d806812df2522ed633be4f7271d2af8c68d202f6bb773d9965c0cc2c482d",
+      "compressed": "extracted-interpreter.json.gz"
+    }
+  },
+  "limitations": [
+    "Development version unchanged; no publication identity selected.",
+    "Earlier benchmarks and editor/native-kit/HTTPS evidence retain original archive identities; no new measurements claimed.",
+    "Hosted source qualification still running at recording."
+  ]
+}

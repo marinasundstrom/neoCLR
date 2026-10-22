@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Readiness-repaired macOS archive (2026-10-22):** Rebuild the optimized runtime
+and development JIT archive; extracted default-JIT and interpreter samples/HTTP
+pass. Only runtime/JIT-host bytes change; compiler/library/editor inputs match.
+Prior measurements retain their original identities. Hosted qualification and
+final publication remain open. [Evidence](validation/release-stabilization-20261022/socket-repair-package/summary.json).
+
 **Canonical source passed; Unix socket repair (2026-10-22):** Full extracted-source
 validation and Windows host checks pass. macOS exposes a refused-connect
 classification failure; Unix readiness now uses nonblocking poll before completion
