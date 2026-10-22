@@ -191,7 +191,6 @@ ldloc buffer
 newobj CopyCompletion
 function.bind fn<Void> = instance CopyCompletion::Complete()
 call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)
-pop
 ldvoid
 ret
 .end
@@ -241,7 +240,7 @@ ldstr "entry"
 
 #[test]
 fn notification_rejects_missing_dispatcher_unknown_and_duplicate_handles() {
-    let call = "ldc.i4 0\nfunction.bind fn<Void> = Ready()\ncall neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop\nldstr \"done\"";
+    let call = "ldc.i4 0\nfunction.bind fn<Void> = Ready()\ncall neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\nldstr \"done\"";
     assert!(
         execute(call, NOTIFY_TYPES)
             .unwrap_err()
@@ -515,7 +514,6 @@ ldfld BusyQueue::Handle
 ldloc state
 function.bind fn<Void> = instance BusyQueue::Complete()
 call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)
-pop
 ldloc queue
 ldloc state
 function.bind fn<Void> = instance BusyQueue::Tick()
@@ -643,15 +641,19 @@ fn cancelled_notification_keeps_receiver_alive_until_acknowledged_join() {
 
 #[test]
 fn no_result_worker_notification_dispatches_without_a_stack_result() {
-    let types = NOTIFY_TYPES.replace(
-        "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop",
-        "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)",
-    ) + r#"
-.function neoCLR.Runtime.NotifyWorker(Int32 worker,fn<Void> callback) -> void
-.methodimpl InternalCall
-.end
-"#;
-    let result = execute("call Launch()\npop\nldstr \"entry\"", &types).unwrap();
+    let types = NOTIFY_TYPES;
+    let services = neoclr::assemble(concat!(
+        ".module WorkerServices\n",
+        include_str!("../runtime/neoCLR/Runtime/Workers.neoil")
+    ))
+    .unwrap();
+    let service = services
+        .functions
+        .iter()
+        .find(|function| function.name == "neoCLR.Runtime.NotifyWorker")
+        .unwrap();
+    assert!(service.no_result);
+    let result = execute("call Launch()\npop\nldstr \"entry\"", types).unwrap();
     assert_eq!(result.value, Value::String("entry".into()));
     assert_eq!(result.output, ["copied"]);
     assert_eq!(result.heap.statistics().live_objects, 0);

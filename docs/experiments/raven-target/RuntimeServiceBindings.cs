@@ -259,9 +259,9 @@ static partial class RuntimeServiceBindings
         if (reference.Name == "StringEquals")
             return new("", args, result, Instruction: "ceq");
         if (reference.Name is "GCCollect" or "GCKeepAlive")
-            return new("", args, result, Instruction: $"call neoCLR.Runtime.{reference.Name}({string.Join(',', args)})\npop");
+            return new("", args, result, Instruction: $"call neoCLR.Runtime.{reference.Name}({string.Join(',', args)})");
         if (reference.Name == "NotifyWorker")
-            return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop");
+            return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)");
         if (reference.Name == "ScheduleTask")
             return new("", args, result, Instruction: "call neoCLR.Runtime.ScheduleTask(fn<Void>)\npop");
         if (reference.Name == "RegisterDefaultTaskQueue")

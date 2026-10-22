@@ -157,10 +157,10 @@ fn tuple_default_and_managed_element_address_preserve_storage() {
 
 #[test]
 fn tuple_reference_element_survives_collection_and_retains_identity() {
-    let helpers = ".type class Cell\n.field Number Int32\n.end\n.function neoCLR.Runtime.GCCollect() -> Void\n.methodimpl InternalCall\n.end";
+    let helpers = ".type class Cell\n.field Number Int32\n.end\n.function neoCLR.Runtime.GCCollect() -> void\n.methodimpl InternalCall\n.end";
     assert_eq!(
         execute(
-            ".local tuple<Cell> pair\nldc.i4 40\nnewobj Cell\nnewobj tuple<Cell>\nstloc pair\ncall neoCLR.Runtime.GCCollect()\npop\nldloc pair\nldfld 0\nldc.i4 42\nstfld 0\nldloc pair\nldfld 0\nldfld 0",
+            ".local tuple<Cell> pair\nldc.i4 40\nnewobj Cell\nnewobj tuple<Cell>\nstloc pair\ncall neoCLR.Runtime.GCCollect()\nldloc pair\nldfld 0\nldc.i4 42\nstfld 0\nldloc pair\nldfld 0\nldfld 0",
             helpers
         ),
         neoclr::Value::Int32(42)

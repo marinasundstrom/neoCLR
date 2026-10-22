@@ -128,3 +128,22 @@ legacy fixture contract until its migration. Native diagnostics retain the same
 message, function identity and instruction trace. Validation: 70 focused frontend,
 constrained-call, Function, no-result and fault interpreter tests; seven native
 fault-details tests; CLI bridge build (warnings remain).
+
+### Worker notification return migration — 2026-10-22
+
+The bootstrap NotifyWorker service now returns `void`; the CLI intrinsic and its
+worker/socket-completion callers no longer pop a nonexistent result. Its callback
+parameter remains `fn<Void>` because the bootstrap TaskQueue.Post contract still
+uses the legacy value-returning callback ABI. This increment deliberately migrates
+the registration call's result separately from the completion callback contract.
+The receiver remains traced through notification and queue dispatch. No native C
+callback support or pinning is implied. RuntimeContract configuration and Raven
+compiler semantics do not change.
+
+GCCollect and GCKeepAlive now also use canonical no-result declarations. Their
+bootstrap wrappers and CLI intrinsic mappings remove the old pops; GC roots,
+collection behavior and KeepAlive's lifetime contract do not change. The migrated
+fragment digest is updated without claiming a fresh complete bootstrap build.
+Ten GC (including the real bootstrap facade), sixteen structural-tuple, twelve
+service and seventeen worker tests pass across the main and focused corrected
+runs. The bridge builds with eleven existing warnings.

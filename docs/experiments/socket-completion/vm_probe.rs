@@ -387,7 +387,7 @@ fn pending_worker_does_not_prevent_socket_dispatch() {
     });
     let types = TYPES.to_string()
         + "\n.function Spin(String input) -> String\nAgain:\nbr Again\n.end\n.function WorkerDone() -> Void\nldvoid\nret\n.end\n";
-    let body = "call Launch()\npop\nfunction.bind fn<String,String> = Spin(String)\nldstr \"\"\ncall neoCLR.Runtime.StartWorker(fn<String,String>,String)\nfunction.bind fn<Void> = WorkerDone()\ncall neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop\ncall Ready()\npop\nldstr \"entry\"";
+    let body = "call Launch()\npop\nfunction.bind fn<String,String> = Spin(String)\nldstr \"\"\ncall neoCLR.Runtime.StartWorker(fn<String,String>,String)\nfunction.bind fn<Void> = WorkerDone()\ncall neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\ncall Ready()\npop\nldstr \"entry\"";
     let fault = execute_types(
         body,
         crate::ExecutionOptions {

@@ -16,9 +16,9 @@
 .function neoCLR.Runtime.GCHeapObjectLimit() -> Int64
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.GCCollect() -> Void
+.function neoCLR.Runtime.GCCollect() -> void
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> Void
+.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> void
 .methodimpl InternalCall
 .end

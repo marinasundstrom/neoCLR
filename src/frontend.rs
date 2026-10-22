@@ -2460,7 +2460,7 @@ impl Lowerer<'_> {
                         .push(format!("call instance {}::get_Value()", target.il()));
                     return Ok(Ty::Int);
                 }
-                if let Some((ty, getter, function)) =
+                if let Some((_, getter, function)) =
                     library::property(target, &field.text).map_err(|e| field.error(e.message))?
                 {
                     let interface = library::is_interface(target)?;

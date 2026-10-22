@@ -14573,3 +14573,11 @@ no Runtime Contract configuration or Raven compiler behavior changes. Native
 metadata emission remains the replacement for this CLI-text projection.
 See [Void migration evidence](void-semantics.md#fault-call-migration-and-frontend-consumers--2026-10-22)
 for validation and remaining callback/legacy-return gaps.
+
+The NotifyWorker bridge intrinsic likewise emits a no-result registration call
+without a trailing pop. Its callback shape still follows the bootstrap TaskQueue
+ABI; migrating that shape is separate from the registration function's return.
+
+GCCollect/GCKeepAlive intrinsic calls likewise have no trailing pop. Bootstrap
+wrappers match the migrated service declarations; this changes their stack
+contract, not GC policy or the KeepAlive lifetime guarantee.

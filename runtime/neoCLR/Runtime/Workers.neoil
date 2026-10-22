@@ -8,7 +8,7 @@
 .methodimpl InternalCall
 .end
 
-.function neoCLR.Runtime.NotifyWorker(Int32 handle,fn<Void> callback) -> Void
+.function neoCLR.Runtime.NotifyWorker(Int32 handle,fn<Void> callback) -> void
 .methodimpl InternalCall
 .end
 

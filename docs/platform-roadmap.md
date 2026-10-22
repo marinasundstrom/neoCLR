@@ -8,7 +8,9 @@ The accepted spellings `void` and `System.Void` now share direct-return and
 function-shape semantics. Legacy bare-Void bodies/callers and rejection of bare
 `Void` remain open before resuming native interop. The Fault service/wrapper and
 CLI intrinsic now migrate together; prototype frontend consumers preserve logical
-Void expressions and native fault diagnostics are qualified. See
+Void expressions and native fault diagnostics are qualified. Worker notification
+and GC control returns/callers are also migrated, retaining the legacy TaskQueue
+callback ABI until its coordinated conversion. See
 [contract and migration status](void-semantics.md).
 
 **Native interoperability sequence (author direction, 2026-10-22):** Complete

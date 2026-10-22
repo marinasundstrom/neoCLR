@@ -1,7 +1,7 @@
 use neoclr::{CollectionReason, Limits, LoadedProgram, Value, assemble};
 
 const SERVICES: &str = r#"
-.function neoCLR.Runtime.GCCollect() -> Void
+.function neoCLR.Runtime.GCCollect() -> void
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.GCCollectionCount() -> Int64
@@ -31,7 +31,7 @@ fn program(extra: &str, body: &str, returns: &str) -> LoadedProgram {
 }
 #[test]
 fn explicit_collection_reclaims_garbage_and_preserves_stack_roots() {
-    let result = program("", "ldc.i4 42\nheap.new\nldc.i4 99\nheap.new\npop\ncall neoCLR.Runtime.GCCollect()\npop\nldobj Int32", "Int32").run(Limits::default()).unwrap();
+    let result = program("", "ldc.i4 42\nheap.new\nldc.i4 99\nheap.new\npop\ncall neoCLR.Runtime.GCCollect()\nldobj Int32", "Int32").run(Limits::default()).unwrap();
     assert_eq!(result.value, Value::Int32(42));
     let event = result
         .heap
@@ -43,7 +43,7 @@ fn explicit_collection_reclaims_garbage_and_preserves_stack_roots() {
 }
 #[test]
 fn counters_are_execution_local_and_queries_do_not_collect() {
-    let body = "ldc.i4 1\nheap.new\npop\ncall neoCLR.Runtime.GCAllocatedObjectCount()\ncall neoCLR.Runtime.GCHeapObjectCount()\nadd\ncall neoCLR.Runtime.GCPeakHeapObjectCount()\nadd\ncall neoCLR.Runtime.GCCollect()\npop\ncall neoCLR.Runtime.GCCollectionCount()\nadd\ncall neoCLR.Runtime.GCReclaimedObjectCount()\nadd\ncall neoCLR.Runtime.GCHeapObjectCount()\nadd";
+    let body = "ldc.i4 1\nheap.new\npop\ncall neoCLR.Runtime.GCAllocatedObjectCount()\ncall neoCLR.Runtime.GCHeapObjectCount()\nadd\ncall neoCLR.Runtime.GCPeakHeapObjectCount()\nadd\ncall neoCLR.Runtime.GCCollect()\ncall neoCLR.Runtime.GCCollectionCount()\nadd\ncall neoCLR.Runtime.GCReclaimedObjectCount()\nadd\ncall neoCLR.Runtime.GCHeapObjectCount()\nadd";
     let p = program("", body, "Int64");
     for _ in 0..2 {
         let result = p.run(Limits::default()).unwrap();
@@ -60,7 +60,7 @@ fn counters_are_execution_local_and_queries_do_not_collect() {
 }
 #[test]
 fn collection_preserves_caller_locals_and_interior_references() {
-    let extra = ".function Read(Int32& value) -> Int32\ncall neoCLR.Runtime.GCCollect()\npop\nldarg value\nldobj Int32\nret\n.end";
+    let extra = ".function Read(Int32& value) -> Int32\ncall neoCLR.Runtime.GCCollect()\nldarg value\nldobj Int32\nret\n.end";
     let result = program(
         extra,
         ".local Int32& value\nldc.i4 42\nheap.new\nstloc value\nldloc value\ncall Read(Int32&)",
@@ -74,7 +74,7 @@ fn collection_preserves_caller_locals_and_interior_references() {
 fn explicit_collection_cannot_evade_heap_limit() {
     let result = program(
         "",
-        "ldc.i4 1\nheap.new\ncall neoCLR.Runtime.GCCollect()\npop\nldc.i4 2\nheap.new\npop",
+        "ldc.i4 1\nheap.new\ncall neoCLR.Runtime.GCCollect()\nldc.i4 2\nheap.new\npop",
         "Int32&",
     )
     .run(Limits {
@@ -117,7 +117,7 @@ fn construction_and_keep_alive_use_the_same_heap_roots() {
 ret
 .end
 .end
-.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> Void
+.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> void
 .methodimpl InternalCall
 .end
 .type class Item
@@ -127,7 +127,6 @@ ret
 ldarg this
 call instance System.Object::.ctor()
 call neoCLR.Runtime.GCCollect()
-pop
 ldarg this
 ldc.i4 42
 stfld Item::Value
@@ -135,7 +134,7 @@ ret
 .end
 .end
 "#;
-    let result = program(extra, "newobj instance Item::.ctor()\ndup\ncastclass System.Object\ncall neoCLR.Runtime.GCKeepAlive(System.Object)\npop\nldfld Item::Value", "Int32").run(Limits::default()).unwrap();
+    let result = program(extra, "newobj instance Item::.ctor()\ndup\ncastclass System.Object\ncall neoCLR.Runtime.GCKeepAlive(System.Object)\nldfld Item::Value", "Int32").run(Limits::default()).unwrap();
     assert_eq!(result.value, Value::Int32(42));
     assert!(
         result
@@ -148,7 +147,7 @@ ret
 #[test]
 fn explicit_collection_reclaims_unreachable_cycles() {
     let cycle = ".function Cycle() -> System.Value&\n.local System.Value& node\nldvoid\nvalue.pack Void\nheap.new\nstloc node\nldloc node\nldloc node\nvalue.pack System.Value&\nstobj System.Value\nldloc node\nret\n.end";
-    let result = program(cycle, "call Cycle()\npop\ncall neoCLR.Runtime.GCCollect()\npop\ncall neoCLR.Runtime.GCHeapObjectCount()", "Int64").run(Limits::default()).unwrap();
+    let result = program(cycle, "call Cycle()\npop\ncall neoCLR.Runtime.GCCollect()\ncall neoCLR.Runtime.GCHeapObjectCount()", "Int64").run(Limits::default()).unwrap();
     assert_eq!(result.value, Value::Int64(0));
     assert_eq!(result.heap.statistics().reclaimed_objects, 1);
 }
@@ -157,7 +156,7 @@ fn explicit_collection_reclaims_unreachable_cycles() {
 fn gc_control_reports_heap_requirement_and_consumes_instruction_budget() {
     let p = program(
         "",
-        "again:\ncall neoCLR.Runtime.GCCollect()\npop\nbr again",
+        "again:\ncall neoCLR.Runtime.GCCollect()\nbr again",
         "Int32",
     );
     let graph = p
@@ -220,5 +219,24 @@ ret
             .heap
             .collection_events()
             .any(|event| event.reason == CollectionReason::ExplicitRequest && event.after == 1)
+    );
+}
+
+#[test]
+fn bundled_gc_facade_matches_canonical_service_returns() {
+    let module = assemble(concat!(
+        ".module App\n.entry Main\n.type class System.Object\n.end\n",
+        include_str!("../runtime/neoCLR/Runtime/GC.neoil"),
+        ".type System.Runtime.GC\n",
+        include_str!("../runtime/raven/generated/GC.methods.neoil"),
+        ".end\n",
+        include_str!("../runtime/raven/generated/GC.helpers.neoil"),
+        ".function Main() -> Int32\n.local System.Object empty\nldloca empty\ninitobj System.Object\nldc.i4 42\nheap.new\ncall System.Runtime.GC::Collect()\nldloc empty\ncall System.Runtime.GC::KeepAlive(System.Object)\nldobj Int32\nret\n.end"
+    )).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
     );
 }
