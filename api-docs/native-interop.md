@@ -234,5 +234,7 @@ native-backed Slice borrowing or managed-library AOT integration.
 `--jit-scalar <input> <root> <Int32 argument> --native-imports` enables the same
 bounded import signatures and pointer operations in the macOS ARM64 development
 JIT probe. It shares the AOT C resolver and library ownership; the default rejects
-imports. This CLI path does not yet accept seed/core verification inputs for Raven
-assemblies, and does not enable imports in the ordinary managed JIT/SDK pipeline.
+imports. With this opt-in it accepts trailing `--system`, `--module` and
+`--object-root` inputs and `@entry`, using the same verification rules as AOT.
+Dependencies are verification-only; this does not enable imports in the ordinary
+managed JIT/SDK pipeline.

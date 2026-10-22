@@ -49,6 +49,7 @@ pub(super) fn execute(
     argument: i32,
     repetitions: usize,
     native_imports: bool,
+    verification: Option<&neoclr::LoadedProgram>,
 ) -> Result<serde_json::Value, Error> {
     let target = host_target()?;
     if native_imports && target != crate::compiler::Target::MacosArm64 {
@@ -86,7 +87,15 @@ pub(super) fn execute(
     let mut owner = CodeOwner(Some(JITModule::new(builder)));
     let module = owner.0.as_mut().expect("owned module");
     if native_imports {
-        crate::compiler::compile_scalar_with_imports(input, root, false, module, true, true, None)?;
+        crate::compiler::compile_scalar_with_imports(
+            input,
+            root,
+            false,
+            module,
+            true,
+            true,
+            verification,
+        )?;
     } else {
         crate::compiler::compile_scalar(input, root, false, module, true)?;
     }

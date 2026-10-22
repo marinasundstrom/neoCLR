@@ -12,6 +12,7 @@ mod inspection;
 mod jit;
 mod limits;
 mod linking;
+mod load_context;
 mod memory_views;
 mod native_imports;
 mod reflection_arrays;
@@ -59,17 +60,19 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     args.retain(|a| a != "--native-imports");
     if native_imports
         && args.iter().any(|a| {
-            a == "--jit-managed"
-                || a == "--jit-run"
-                || a == "--inspect"
-                || a == "--closed-world"
+            a == "--jit-managed" || a == "--jit-run" || a == "--inspect" || a == "--closed-world"
         })
     {
         return Err("--native-imports requires scalar AOT emission or --jit-scalar, not managed JIT, inspection or closed-world profiles".into());
     }
     if args.first().is_some_and(|arg| arg == "--jit-scalar") {
+        let dependency_args = load_context::split(&mut args);
+        if !dependency_args.is_empty() && !native_imports {
+            return Err("scalar JIT load contexts require --native-imports".into());
+        }
+        let paths = load_context::parse(&dependency_args)?;
         if args.len() != 4 && !(args.len() == 6 && args[4] == "--repetitions") {
-            return Err("usage: neoclr-codegen --jit-scalar <input.neoil|input.neox|input.dll> <root-name> <Int32 argument> [--repetitions 1..1000] [--native-imports]".into());
+            return Err("usage: neoclr-codegen --jit-scalar <input.neoil|input.neox|input.dll> <root-name|@entry> <Int32 argument> [--repetitions 1..1000] [--native-imports] [--system <seed> --module <dependency> --object-root <dependency>]".into());
         }
         let repetitions = if args.len() == 6 {
             args[5]
@@ -84,10 +87,40 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         }
         let started = std::time::Instant::now();
         let input = read_module(Path::new(&args[1]))?;
+        let dependencies = paths
+            .modules
+            .iter()
+            .map(|path| read_module(Path::new(path)))
+            .collect::<Result<Vec<_>, _>>()?;
+        let object_root = load_context::object_root(&paths.modules, paths.object, &dependencies)?;
+        let system = paths
+            .system
+            .map(|path| read_module(Path::new(path)))
+            .transpose()?;
+        let verification = if dependency_args.is_empty() {
+            None
+        } else {
+            Some(load_context::verification(
+                &input,
+                system
+                    .as_ref()
+                    .ok_or("native-import load context requires explicit --system")?,
+                &dependencies,
+                object_root.as_ref(),
+            )?)
+        };
         let load_seconds = started.elapsed().as_secs_f64();
         let root = args[2].to_str().ok_or("root must be UTF-8")?;
+        let root = if root == "@entry" { &input.entry } else { root };
         let argument: i32 = args[3].to_str().ok_or("argument must be Int32")?.parse()?;
-        let mut result = jit::execute(&input, root, argument, repetitions, native_imports)?;
+        let mut result = jit::execute(
+            &input,
+            root,
+            argument,
+            repetitions,
+            native_imports,
+            verification.as_ref(),
+        )?;
         result["loadSeconds"] = serde_json::json!(load_seconds);
         println!("{result}");
         return Ok(0);
@@ -615,33 +648,14 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
             );
         }
     }
-    let dependency_args = args
-        .iter()
-        .position(|a| a == "--module" || a == "--system" || a == "--object-root")
-        .map(|i| args.split_off(i))
-        .unwrap_or_default();
-    if dependency_args.len() > 20 || dependency_args.len() % 2 != 0 {
-        return Err("expected trailing --module, --system or --object-root input pairs".into());
-    }
-    let mut module_paths = vec![];
-    let mut system_path = None;
-    let mut object_path = None;
-    for pair in dependency_args.chunks(2) {
-        match pair[0].to_str() {
-            Some("--module") if module_paths.len() < 8 => module_paths.push(&pair[1]),
-            Some("--system") if system_path.is_none() => system_path = Some(&pair[1]),
-            Some("--object-root") if object_path.is_none() => object_path = Some(&pair[1]),
-            _ => return Err("invalid, duplicate or excessive load-context option".into()),
-        }
-    }
+    let dependency_args = load_context::split(&mut args);
+    let load_context::Paths {
+        modules: module_paths,
+        system: system_path,
+        object: object_path,
+    } = load_context::parse(&dependency_args)?;
     if compile_system && system_path.is_none() {
         return Err("--compile-system requires explicit --system".into());
-    }
-    if object_path.is_some() && system_path.is_none() {
-        return Err("--object-root requires explicit --system".into());
-    }
-    if system_path.is_some() && module_paths.is_empty() {
-        return Err("explicit runtime context requires at least one --module dependency".into());
     }
     let inspect = args.first().is_some_and(|a| a == "--inspect");
     let inspect_closed = inspect && args.get(3).is_some_and(|a| a == "--closed-world");
@@ -683,39 +697,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         .iter()
         .map(|path| read_module(Path::new(path)))
         .collect::<Result<Vec<_>, _>>()?;
-    let object_root = if let Some(path) = object_path {
-        if Path::new(path).extension().is_some_and(|e| e == "neoil") {
-            return Err("--object-root requires compiled metadata".into());
-        }
-        let selected = fs::canonicalize(path)?;
-        let matches: Vec<_> = module_paths
-            .iter()
-            .enumerate()
-            .filter(|(_, p)| fs::canonicalize(p).is_ok_and(|p| p == selected))
-            .map(|(i, _)| i)
-            .collect();
-        let [index] = matches.as_slice() else {
-            return Err("--object-root must identify exactly one explicit --module input".into());
-        };
-        let module = &dependencies[*index];
-        let roots: Vec<_> = module
-            .types
-            .iter()
-            .enumerate()
-            .filter(|(_, t)| t.name == "System.Object")
-            .map(|(i, _)| i)
-            .collect();
-        let [index] = roots.as_slice() else {
-            return Err("Object root artifact must contain exactly one System.Object".into());
-        };
-        Some(neoclr::metadata::TypeDefId {
-            module: module.name.clone(),
-            revision: module.revision.clone(),
-            index: *index as u32,
-        })
-    } else {
-        None
-    };
+    let object_root = load_context::object_root(&module_paths, object_path, &dependencies)?;
     let context = system_path
         .map(|path| {
             read_module(Path::new(path)).map(|system| linking::RuntimeContext {
@@ -835,19 +817,12 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         let context = context
             .as_ref()
             .ok_or("native-import load context requires explicit --system")?;
-        Some(
-            if let Some(root) = &context.object_root {
-                neoclr::LoadedProgram::with_modules_and_object_root(
-                    &input,
-                    &context.system,
-                    &dependencies,
-                    root,
-                )
-            } else {
-                neoclr::LoadedProgram::with_modules(&input, &context.system, &dependencies)
-            }
-            .map_err(|error| error.to_string())?,
-        )
+        Some(load_context::verification(
+            &input,
+            &context.system,
+            &dependencies,
+            context.object_root.as_ref(),
+        )?)
     } else {
         None
     };

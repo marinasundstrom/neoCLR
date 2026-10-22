@@ -145,7 +145,8 @@ JIT and interpretation remain useful execution options. Development NativeImport
 support covers the interpreter and an opt-in macOS ARM64 scalar AOT proof for free
 Int32/native-sized-integer/pointer C functions, now qualified from Raven source with explicit metadata
 dependencies and C allocation/release. The development scalar JIT probe now reuses
-the same import path behind explicit opt-in. Full managed-program AOT imports,
+the same import path behind explicit opt-in, including Raven source metadata with
+explicit verification dependencies. Full managed-program AOT imports,
 managed JIT imports and managed-memory
 pinning remain gaps. [Current scope](/features/native-interop/#development-aot-import-foundation).
 

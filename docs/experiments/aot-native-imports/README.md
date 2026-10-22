@@ -369,3 +369,27 @@ consumer), 24 scalar regressions and 24 website checks pass. The AOT consumer us
 Raven `3fc2b6d0e` and the metadata SDK from neoCLR `417e7a451` in a local bundle overlay.
 Building the codegen host on macOS ARM64 now also compiles the shared C resolver;
 use a matching C toolchain/SDK. Interpreter-only builds are unaffected.
+
+## Raven metadata contexts in scalar JIT (2026-10-22)
+
+The scalar JIT now accepts `@entry` and the same explicit trailing `--system`,
+`--module` and `--object-root` inputs as AOT when `--native-imports` is enabled.
+Path-option parsing, Object-root selection and LoadedProgram construction are shared
+with the existing AOT/closed-world driver. Full dependency verification is retained;
+dependency bodies do not become compiled callees in this scalar profile. Missing
+seed/core references, duplicate options and malformed trailing pairs reject before
+execution. Object roots still must identify exactly one explicit compiled dependency.
+
+The existing Raven allocation/read/write/release consumer is compiled once and run
+32 times under scalar JIT and 32 times as linked AOT code, preserving the result 42.
+It also covers null/default pointers, unit/no-result release, high-bit native sizes
+and negative offsets. The explicit Rust-framework integration test continues to
+require the matching local Raven bundle; built-in Raven test-runner managed types
+remain outside this profile. No source/compiler/metadata encoding or Runtime Contract
+change is required. This closes a driver verification-context gap, not full managed
+JIT/AOT NativeImport qualification or the subsequent export-name design milestone.
+
+Validation: all 15 native-import tests (Raven opt-in enabled), 24 scalar regressions,
+two closed-world runtime-context tests and 24 website checks pass. The paired local
+bundle remains Raven `3fc2b6d0e` plus the metadata validator from neoCLR `417e7a451`;
+no rebuilt release package or wider native export contract is claimed.

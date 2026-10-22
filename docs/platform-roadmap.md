@@ -69,7 +69,8 @@ execute successfully; dependency libraries remain verification-only for this sca
 profile. The opt-in Rust framework test documents its external compiler requirement.
 The macOS ARM64 scalar JIT probe now shares the AOT import thunks and C resolver
 behind `--native-imports`, with repeated native-memory and fault tests. Raven load
-contexts and ordinary managed JIT imports are still gaps; this does not close
+contexts and `@entry` now work in both scalar backends, qualifying the same source
+consumer under JIT and AOT. Ordinary managed JIT imports remain a gap; this does not close
 three-engine qualification or start stable export-name design.
 
 **Character naming (author direction, 2026-10-21):** Rename the development

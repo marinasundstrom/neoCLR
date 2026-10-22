@@ -416,7 +416,7 @@ ret
 #[test]
 #[ignore = "requires NEOCLR_RAVEN_BUNDLE with the matching native compiler and libraries"]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn raven_native_metadata_imports_execute_aot_with_explicit_load_context() {
+fn raven_native_metadata_imports_execute_aot_and_jit_with_explicit_load_context() {
     let bundle =
         PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").expect("set NEOCLR_RAVEN_BUNDLE"))
             .canonicalize()
@@ -506,6 +506,55 @@ int32_t check_offset(intptr_t n) { return n == signed_offset() ? 0 : 100; }
         !missing.exists(),
         "unresolved source references must not produce an object"
     );
+    let jit = |context: bool, extra: &[&str]| {
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+        cmd.arg("--jit-scalar").arg(&artifact).args([
+            "@entry",
+            "0",
+            "--repetitions",
+            "32",
+            "--native-imports",
+        ]);
+        if context {
+            cmd.arg("--system")
+                .arg(bundle.join("lib/System.runtime.neox"))
+                .arg("--module")
+                .arg(bundle.join("lib/System.Runtime.dll"))
+                .arg("--object-root")
+                .arg(bundle.join("lib/System.Runtime.dll"));
+        }
+        cmd.args(extra).output().unwrap()
+    };
+    assert!(
+        !jit(false, &[]).status.success(),
+        "unresolved Raven dependencies must reject before JIT execution"
+    );
+    let executed = jit(true, &[]);
+    assert!(
+        executed.status.success(),
+        "{}",
+        String::from_utf8_lossy(&executed.stderr)
+    );
+    let result: serde_json::Value = serde_json::from_slice(&executed.stdout).unwrap();
+    let invocations = result["invocations"].as_array().unwrap();
+    assert_eq!(invocations.len(), 32);
+    assert!(
+        invocations
+            .iter()
+            .all(|i| i["status"] == 0 && i["value"] == 42)
+    );
+    for extra in [
+        vec!["--system", "duplicate"],
+        vec!["--object-root", "duplicate"],
+        vec!["--module"],
+    ] {
+        let rejected = jit(true, &extra);
+        assert!(!rejected.status.success());
+        assert!(
+            rejected.stdout.is_empty(),
+            "invalid contexts must not execute"
+        );
+    }
     let emitted = backend(&object, true);
     assert!(
         emitted.status.success(),

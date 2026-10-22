@@ -209,6 +209,7 @@ AOT symbols are not a published export contract.
 The development `--jit-scalar` probe now accepts `--native-imports` on macOS ARM64,
 sharing the AOT import thunks, native resolver and process-lifetime library cache.
 Tests cover repeated allocation/read/write/release, native-sized results and loader
-faults. This does not enable imports in the ordinary managed JIT pipeline; the scalar
-JIT probe still lacks Raven seed/core load-context inputs. Default execution continues
+faults. A tested Raven consumer now executes through both scalar JIT and AOT using
+explicit seed/core verification inputs and `@entry`. Dependencies remain verification-only;
+this does not enable imports in the ordinary managed JIT pipeline. Default execution continues
 to reject imports unless explicitly enabled.
