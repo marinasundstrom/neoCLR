@@ -67,6 +67,10 @@ explicit trusted-address responsibility; managed Slice borrowing and pinning rem
 Its C-owned allocation, pointer transport and no-result release
 execute successfully; dependency libraries remain verification-only for this scalar
 profile. The opt-in Rust framework test documents its external compiler requirement.
+The macOS ARM64 scalar JIT probe now shares the AOT import thunks and C resolver
+behind `--native-imports`, with repeated native-memory and fault tests. Raven load
+contexts and ordinary managed JIT imports are still gaps; this does not close
+three-engine qualification or start stable export-name design.
 
 **Character naming (author direction, 2026-10-21):** Rename the development
 grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain

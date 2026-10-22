@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Enable explicit --native-imports in the macOS ARM64 scalar JIT probe, sharing AOT validation, import thunks and the C resolver rather than adding a second loader. Link the resolver into the codegen host with the existing locked cc dependency; successful libraries remain process-owned while generated code remains invocation-owner scoped. Repeated native allocation/read/write/release, native-sized return, missing-symbol and null-fault tests pass. All 15 import tests (including the Raven AOT consumer), 24 scalar regressions and 24 website checks pass. Ordinary managed JIT imports and Raven JIT verification contexts remain open; no three-engine completion or export ABI is claimed.
+
 - Add direct Byte/Int32 pointer loads and stores to the opt-in macOS ARM64 scalar AOT NativeImport profile. Preserve unsigned byte and signed Int32 storage, fault on null/misaligned accesses, and retain caller responsibility for foreign bounds/lifetime. Repair metadata SDK typed-pointer LoadObject/StoreObject admission and pair with Raven 3fc2b6d0e pointer-value lowering. All 14 import tests pass across focused runs, plus 24 scalar regressions, 22 compiler pointer tests, the SDK pointer/local/byref/out group and 24 website checks. Document paired local overlay validation and remaining managed Slice/pinning gaps; no release qualification is claimed.
 
 - Record the author's next interop sequence: qualify NativeImport across interpreter/JIT/AOT, then design stable AOT export naming and calling contracts for native consumers and re-import through NativeImport, followed later by metadata sidecars. No mangling scheme or export ABI is implemented by this direction note.

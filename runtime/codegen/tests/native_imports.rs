@@ -928,3 +928,126 @@ int main(void) {
         assert!(Command::new(&app).status().unwrap().success());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn scalar_jit_imports_share_pointer_access_and_loader_fault_contracts() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("jit.c");
+    let library = dir.0.join("jit.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdint.h>
+#include <stdlib.h>
+static int live;
+void *allocate(size_t size) {
+    if (size != sizeof(int32_t) || live) return NULL;
+    int32_t *p = malloc(size);
+    if (p) { *p = 41; ++live; }
+    return p;
+}
+void release(void *p) { if (p) { --live; free(p); } }
+uintptr_t high(void) { return UINT64_C(0x123456780000002a); }
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    let source = format!(
+        r#".module JitImports
+.function Allocate(UIntPtr size) -> Ptr<Int32>
+.foreign {library:?} "allocate" cdecl
+.end
+.function Release(Ptr<Void> pointer) -> void
+.foreign {library:?} "release" cdecl
+.end
+.function High() -> UIntPtr
+.foreign {library:?} "high" cdecl
+.end
+.function Calculate(Int32 size) -> Int32
+.local Ptr<Int32> pointer
+.local Int32 result
+ldarg size
+conv.u
+call Allocate(UIntPtr)
+stloc pointer
+ldloc pointer
+ldloc pointer
+ldobj Int32
+ldc.i4 1
+add
+stobj Int32
+ldloc pointer
+ldobj Int32
+stloc result
+ldloc pointer
+ptr.cast Void
+call Release(Ptr<Void>)
+call High()
+ldc.i8 1311768464867721258
+conv.u
+ceq
+brfalse failure
+ldloc result
+ret
+failure:
+ldc.i4 -1
+ret
+.end
+"#,
+        library = library.to_str().unwrap()
+    );
+    let input = dir.0.join("jit.neoil");
+    fs::write(&input, &source).unwrap();
+    let run = |enabled: bool, argument: &str| {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+        command.arg("--jit-scalar").arg(&input).args([
+            "Calculate",
+            argument,
+            "--repetitions",
+            "32",
+        ]);
+        if enabled {
+            command.arg("--native-imports");
+        }
+        command.output().unwrap()
+    };
+    assert!(
+        !run(false, "4").status.success(),
+        "native imports must remain opt-in"
+    );
+    for (argument, status, value) in [("4", 0, Some(42)), ("0", 3, None)] {
+        let output = run(true, argument);
+        assert!(
+            output.status.success(),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let result: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        let invocations = result["invocations"].as_array().unwrap();
+        assert_eq!(invocations.len(), 32);
+        for invocation in invocations {
+            assert_eq!(invocation["status"], status);
+            assert_eq!(invocation["value"], serde_json::json!(value));
+        }
+    }
+    fs::write(
+        &input,
+        source.replace("\"allocate\"", "\"missing_allocate\""),
+    )
+    .unwrap();
+    let output = run(true, "4");
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let result: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(
+        result["invocations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|i| i["status"] == 3 && i["value"].is_null())
+    );
+}

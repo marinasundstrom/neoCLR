@@ -170,7 +170,7 @@ load context for verification and uses `@entry` for the Raven entry point; depen
 libraries are not compiled by this scalar profile.
 
 Managed buffers, automatic Ptr<T> wrapper mapping, callbacks, other numeric types, full
-class-library composition and JIT imports remain future work for this path.
+class-library composition and managed JIT imports remain future work for this path.
 [Execution contract](/docs/native-interop.html#aot-scalar-imports) ·
 [Tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)
 
@@ -205,3 +205,10 @@ AOT first, followed by stable exported names and a callable ABI for AOT librarie
 Those exports should be usable by native consumers and importable back into neoCLR.
 Metadata sidecars mapped to the native binaries are a later step; current internal
 AOT symbols are not a published export contract.
+
+The development `--jit-scalar` probe now accepts `--native-imports` on macOS ARM64,
+sharing the AOT import thunks, native resolver and process-lifetime library cache.
+Tests cover repeated allocation/read/write/release, native-sized results and loader
+faults. This does not enable imports in the ordinary managed JIT pipeline; the scalar
+JIT probe still lacks Raven seed/core load-context inputs. Default execution continues
+to reject imports unless explicitly enabled.

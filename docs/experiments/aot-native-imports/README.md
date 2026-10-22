@@ -23,7 +23,7 @@ code. macOS Cdecl/System conventions coincide; unsupported convention metadata i
 rejected by ordinary validation. No source attribute or compiler Runtime Contract
 configuration changes.
 
-The default rejects imports. The opt-in rejects other targets, JIT, closed-world
+The default rejects imports. The opt-in rejects other targets, managed JIT, closed-world
 composition, inspection and managed/value/context profiles before writing an object.
 This is a backend development capability, not a new default for installed SDKs or
 VS Code. Types other than Int32, IntPtr/UIntPtr and the supported pointers, member imports,
@@ -336,3 +336,36 @@ net10.0 host corrected that setup error. This is a local paired overlay, not an
 installed-SDK or release qualification.
 
 Compiler pairing: Raven `3fc2b6d0e` with the metadata validator in this slice.
+
+## Shared scalar JIT import execution (2026-10-22)
+
+`neoclr-codegen --jit-scalar input.neoil Calculate 4 --native-imports` now uses the
+same scalar validation, import thunk generation and C resolver as AOT on macOS ARM64.
+The codegen build links `runtime/native/interop/imports.c` through the existing locked
+cc dependency on that target; AOT consumers still link the same adapter explicitly.
+The JIT binds only the resolver's exact private symbol. Compilation/finalization do
+not load foreign libraries; resolution happens on invocation. The shared cache owns
+successful foreign libraries for process lifetime, independently of each JIT code
+owner. Generated callable addresses do not escape the synchronous execution scope.
+
+The default JIT rejects imports. Other targets, managed JIT, callbacks and managed
+class-library composition remain excluded. The scalar JIT CLI does not yet accept
+Raven's seed/core verification context; the source consumer remains AOT-qualified.
+This is a development probe, not ordinary SDK/runtime JIT NativeImport completion.
+The Int32 entry ABI, private status/result convention, bounds/lifetime responsibilities
+and scalar signature restrictions are unchanged. No new public import declaration,
+Runtime Contract setting or bytecode encoding is introduced.
+
+The Rust integration test invokes C allocation/release and high-bit native-integer
+returns through the JIT, with direct pointer reads/writes. Thirty-two repeated calls
+check successful reuse without outstanding allocations; null access and missing
+symbols return RuntimeError, and absence of the explicit flag rejects before execution.
+This shares .NET-style platform-ABI binding across compilation modes while retaining
+neoCLR's explicit trusted-native opt-in and limited profile; full cross-engine parity
+and export-name design remain later work.
+
+Validation: all 15 native-import tests (including the explicitly enabled Raven AOT
+consumer), 24 scalar regressions and 24 website checks pass. The AOT consumer uses
+Raven `3fc2b6d0e` and the metadata SDK from neoCLR `417e7a451` in a local bundle overlay.
+Building the codegen host on macOS ARM64 now also compiles the shared C resolver;
+use a matching C toolchain/SDK. Interpreter-only builds are unaffected.

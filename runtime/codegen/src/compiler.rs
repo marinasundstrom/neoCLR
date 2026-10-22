@@ -172,7 +172,7 @@ pub(super) fn compile_scalar<M: Module>(
     compile_scalar_with_imports(input, root, console, module, long_range_calls, false, None)
 }
 
-fn compile_scalar_with_imports<M: Module>(
+pub(super) fn compile_scalar_with_imports<M: Module>(
     input: &neoclr::Module,
     root: &str,
     console: bool,

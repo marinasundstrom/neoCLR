@@ -5,6 +5,16 @@ use cranelift_module::{FuncOrDataId, Module};
 use std::time::Instant;
 
 type Error = Box<dyn std::error::Error>;
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+unsafe extern "C" {
+    fn neoclr_native_import_resolve_v1(
+        library: *const std::ffi::c_char,
+        symbol: *const std::ffi::c_char,
+        output: *mut *mut std::ffi::c_void,
+    ) -> i32;
+}
+
 #[cfg(windows)]
 type EntryChar = u16;
 #[cfg(not(windows))]
@@ -38,8 +48,12 @@ pub(super) fn execute(
     root: &str,
     argument: i32,
     repetitions: usize,
+    native_imports: bool,
 ) -> Result<serde_json::Value, Error> {
     let target = host_target()?;
+    if native_imports && target != crate::compiler::Target::MacosArm64 {
+        return Err("native imports currently require macOS ARM64".into());
+    }
     if input.functions.iter().any(|function| {
         function
             .body
@@ -57,11 +71,25 @@ pub(super) fn execute(
     target.configure_stack(&mut settings)?;
     let isa = isa::lookup(target.triple().parse().expect("fixed target triple"))?
         .finish(settings::Flags::new(settings))?;
-    let builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
-    // Shared scalar validation rejects all external calls before finalization.
+    #[allow(unused_mut)]
+    let mut builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
+    // Bind only the shared resolver, not arbitrary process symbols. Its cache owns
+    // foreign libraries for process lifetime, independently of generated JIT code.
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    if native_imports {
+        builder.symbol(
+            "neoclr_native_import_resolve_v1",
+            neoclr_native_import_resolve_v1 as *const u8,
+        );
+    }
+    // Shared validation rejects other external services before finalization.
     let mut owner = CodeOwner(Some(JITModule::new(builder)));
     let module = owner.0.as_mut().expect("owned module");
-    crate::compiler::compile_scalar(input, root, false, module, true)?;
+    if native_imports {
+        crate::compiler::compile_scalar_with_imports(input, root, false, module, true, true, None)?;
+    } else {
+        crate::compiler::compile_scalar(input, root, false, module, true)?;
+    }
     module.finalize_definitions()?;
     let Some(FuncOrDataId::Func(entry)) = module.get_name("neoclr_entry_v2") else {
         return Err("scalar JIT entry was not emitted".into());

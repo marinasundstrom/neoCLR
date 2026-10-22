@@ -593,6 +593,7 @@ dependencies = [
 name = "neoclr-codegen"
 version = "0.0.0"
 dependencies = [
+ "cc",
  "cranelift-codegen",
  "cranelift-frontend",
  "cranelift-jit",

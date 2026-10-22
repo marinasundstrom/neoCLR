@@ -181,7 +181,7 @@ integer widening/narrowing is supported for native sizes, including Int64 conver
 temporaries; native-width arithmetic, checked conversions, pointer/integer conversion
 and Int64/UInt64 signatures remain rejected in this profile. The public Ptr<T> wrapper
 is not automatically projected yet.
-Managed/value profiles, class members, other types, callbacks, JIT and SDK integration remain
+Managed/value profiles, class members, other types, callbacks, managed JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
 
 Development source qualification accepts explicit `--system`, `--module` and
@@ -228,3 +228,11 @@ native owner. Null and misaligned Int32 access returns a runtime fault. Bounds,
 initialization and lifetime are the caller's responsibility; other invalid addresses
 can crash the process. This does not expose managed storage or provide pinning,
 native-backed Slice borrowing or managed-library AOT integration.
+
+### Development scalar JIT imports
+
+`--jit-scalar <input> <root> <Int32 argument> --native-imports` enables the same
+bounded import signatures and pointer operations in the macOS ARM64 development
+JIT probe. It shares the AOT C resolver and library ownership; the default rejects
+imports. This CLI path does not yet accept seed/core verification inputs for Raven
+assemblies, and does not enable imports in the ordinary managed JIT/SDK pipeline.
