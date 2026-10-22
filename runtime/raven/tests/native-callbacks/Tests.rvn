@@ -1,0 +1,64 @@
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+class CallbackState {
+    var Value: int = 0
+    func Add(value: int) -> int {
+        Value += value
+        return Value
+    }
+}
+
+func AddOne(value: int) -> int => value + 1
+
+[Test("Native callbacks accept Raven module functions")]
+unsafe func ModuleFunction() -> Result<unit, TestFailure> {
+    return Assert.Equal(42, Apply(AddOne, 41))
+}
+
+[Test("Native callbacks preserve captures across repeated calls")]
+unsafe func Captures() -> Result<unit, TestFailure> {
+    let state = CallbackState()
+    let callback: (int) -> int = value => {
+        state.Value += 1
+        System.Runtime.GC.Collect()
+        return value + state.Value
+    }
+    let result = Twice(callback, 19)
+    _ = Assert.Equal(42, result)?
+    return Assert.Equal(2, state.Value)
+}
+
+[Test("Native callbacks retain bound receivers for the call")]
+unsafe func Receiver() -> Result<unit, TestFailure> {
+    let state = CallbackState()
+    let result = Apply(state.Add, 42)
+    _ = Assert.Equal(42, state.Value)?
+    return Assert.Equal(42, result)
+}
+
+[Test("Native unit callbacks discard the logical Void result")]
+unsafe func Notification() -> Result<unit, TestFailure> {
+    let state = CallbackState()
+    let callback: (int) -> unit = value => {
+        System.Runtime.GC.Collect()
+        state.Value = value
+    }
+    Notify(callback, 42)
+    return Assert.Equal(42, state.Value)
+}
+
+static class CallbackResults {
+    static func Empty<T>(value: int) -> T => default(T)
+}
+
+[Test("Native callbacks preserve generic unit value returns")]
+unsafe func GenericUnit() -> Result<unit, TestFailure> {
+    let callback: (int) -> unit = CallbackResults.Empty<unit>
+    let value: System.Void = callback(1)
+    Notify(callback, 2)
+    let same: unit = value
+    _ = same
+    return Ok(())
+}

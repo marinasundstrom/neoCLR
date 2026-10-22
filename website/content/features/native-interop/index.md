@@ -38,6 +38,34 @@ not modify, free, retain or return addresses into temporary string buffers. Embe
 NULs fault instead of silently truncating text. UTF-16 is 16-bit code units on every
 host, not C's host-dependent wchar_t.
 
+## Pass a Raven function to C
+
+A development interpreter import can take a structural function type directly:
+
+```raven
+{{NATIVE_CALLBACK_IMPORT}}
+```
+
+The native fixture accepts an `int (*)(int)` and invokes it synchronously. The
+built-in Raven test passes an ordinary module function:
+
+```raven
+{{NATIVE_CALLBACK_FUNCTION}}
+```
+
+The compiler records an explicit callback ABI using the import's calling convention.
+The runtime keeps captured state and bound receivers alive for the call, including
+across collection. Native code must call back on the same thread and must not retain
+the callback after the imported function returns. Managed faults are reported after
+control returns from native code; they do not unwind through C.
+
+Numeric scalar parameters/results and no-result callbacks are supported. Raven keeps
+`unit` as its keyword, mapped to neoCLR `System.Void`. A `(int) -> unit` parameter
+can receive a Raven callback for C `void (*)(int)`; the compiler adapts its logical
+unit result at the native boundary. This currently allocates a managed adapter per
+call. Strings, pointers, nested callbacks and implicit Boolean widths inside callback
+signatures are rejected. Retained callbacks and JIT/AOT callback execution remain open.
+
 ## Managed and native buffers
 
 Native libraries can use explicit pointer-and-length parameters. A foreign-owned
@@ -90,8 +118,8 @@ managed Functions as call-scoped native callbacks and wraps returned native call
 pointers as Functions. Each callable has its own convention and conversion metadata;
 captured managed state stays alive through the call. The initial callback scope is
 same-thread scalar signatures. Native APIs that store callbacks need a future
-registration/unregistration lifetime contract. Raven mapping syntax and JIT/AOT support
-remain next. The longer-term goal is an AOT library plus versioned public-interface
+registration/unregistration lifetime contract. Raven scalar and unit callback parameters use
+the source syntax above; returned-function mapping and JIT/AOT support remain open. The longer-term goal is an AOT library plus versioned public-interface
 metadata for runtime and native consumers. Export stubs and that sidecar format are
 not implemented yet.
 

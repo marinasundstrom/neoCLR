@@ -14581,3 +14581,23 @@ ABI; migrating that shape is separate from the registration function's return.
 GCCollect/GCKeepAlive intrinsic calls likewise have no trailing pop. Bootstrap
 wrappers match the migrated service declarations; this changes their stack
 contract, not GC policy or the KeepAlive lifetime guarantee.
+
+## Native callback parameters and unit (2026-10-22)
+
+Raven `codex/neoclr` commit `18dd51f62` emits callback ABI descriptors for NativeImport structural
+Function parameters. Raven keeps `unit` syntax and the configured System.Void logical
+type; no `void` source keyword is added. Ordinary .NET targets are unchanged. Numeric
+callbacks preserve their structural signatures. For unit-returning callbacks the
+native emitter owns a managed wrapper/internal foreign thunk and a call-scoped adapter
+that invokes the value-returning Function and discards its logical unit. The foreign
+Function uses canonical no-result metadata. Original generic value-return contracts
+are preserved. The wrapper remains callable with its source signature across metadata
+references; it is no longer itself an extern metadata method.
+
+This uses native PE/#Neo metadata, not a new CLI delegate/marshalling encoding. CLI
+reference projection cannot carry callback ABI descriptors; native metadata is authoritative.
+No Runtime Contract setting changes. The bounded metadata SDK records the convention
+per callback; Raven currently inherits it from the import. Each adapted unit parameter
+allocates an adapter object and Function binding per call. Retained callbacks, foreign
+threads, returned-function source projection and JIT/AOT callback stubs remain open.
+Built-in evidence and reproduction: [native callback tests](../runtime/raven/tests/native-callbacks/README.md).

@@ -57,6 +57,36 @@ internal static class ForeignImportChecks
         Reject(() => new NativeImportDefinition("", "f"));
         Reject(() => new NativeImportDefinition("x", "f\0"));
         Reject(() => new NativeImportDefinition("x", "f", "Ansi"));
+        var callbacks = Graph();
+        var callbackShape = SignatureType.Function(new(PrimitiveType.Int32, [PrimitiveType.Int32]));
+        var callbackDescriptors = new Dictionary<int, NativeCallbackDefinition> { [0] = new("System") };
+        callbacks.AddFunction("Apply", new(PrimitiveType.Int32, [callbackShape, PrimitiveType.Int32]))
+            .SetNativeImport(new("fixture", "apply", callbackParameters: callbackDescriptors));
+        callbackDescriptors.Clear();
+        callbacks.AddFunction("Notify", new(PrimitiveType.Void, [SignatureType.Function(new(PrimitiveType.Void, [PrimitiveType.Int32]))]))
+            .SetNativeImport(new("fixture", "notify", callbackParameters: new Dictionary<int, NativeCallbackDefinition> { [0] = new() }));
+        var callbackSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(callbacks));
+        var apply = callbackSnapshot.MainModule.Methods.Single(m => m.Name == "Apply");
+        if (apply.NativeImport?.CallbackParameters[0].CallingConvention != "System")
+            throw new Exception("callback ABI lost or not defensively copied");
+        var notify = callbackSnapshot.MainModule.Methods.Single(m => m.Name == "Notify");
+        if (!notify.TryGetSignature(out var notifySignature) ||
+            notifySignature!.ParameterTypes[0].FunctionSignature is not { NoResult: true } ||
+            notify.NativeImport?.CallbackParameters[0].CallingConvention != "Cdecl")
+            throw new Exception("no-result callback ABI lost");
+        Reject(() => Graph().AddFunction("F", new(PrimitiveType.Int32, [callbackShape])).SetNativeImport(new("x", "y")));
+        foreach (var badType in new SignatureType[] {
+            PrimitiveType.Int32,
+            SignatureType.Function(new(PrimitiveType.String, [])),
+            SignatureType.Function(new(PrimitiveType.Boolean, [])) })
+            Reject(() => Graph().AddFunction("F", new(PrimitiveType.Void, [badType])).SetNativeImport(
+                new("x", "y", callbackParameters: new Dictionary<int, NativeCallbackDefinition> { [0] = new() })));
+        Reject(() => Graph().AddFunction("F", new(PrimitiveType.Void, [callbackShape])).SetNativeImport(
+            new("x", "y", callbackParameters: new Dictionary<int, NativeCallbackDefinition> { [1] = new() })));
+        Reject(() => Graph().AddFunction("F", new(PrimitiveType.Void, [callbackShape])).SetNativeImport(
+            new("x", "y", parameterMarshalling: new Dictionary<int, string> { [0] = "Bool8" },
+                callbackParameters: new Dictionary<int, NativeCallbackDefinition> { [0] = new() })));
+        Reject(() => new NativeCallbackDefinition("Stdcall"));
         Console.WriteLine("PASS native import authoring, reread and rejection checks");
     }
     private static void Reject(Action action)

@@ -2891,3 +2891,12 @@ with XML summaries, parameters and lifetime limitations. The manual
 [native interop reference](native-interop.md#native-byte-copies) records
 faults, initialization tracking and interpreter-only execution. The historical CLI
 reference is not extended with development native-only members.
+
+### Native callback descriptor increment (2026-10-22)
+
+The host-only NativeCallbackDefinition and NativeImportDefinition.CallbackParameters
+are covered in experimental-metadata.md, outside guest RavenDoc selection as for the
+rest of this .NET tooling SDK. NativeImport's source callback behavior and unit adapter
+are documented in native-interop.md; no guest member signatures change. Snapshot
+validation still reports the existing stale compiler reference inputs; hashes were not
+relabeled and no publication is claimed.

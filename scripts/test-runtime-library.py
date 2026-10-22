@@ -468,7 +468,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -538,6 +538,7 @@ def main():
         ('floating-special-values', 0, ''.join('PASS ' + n + '\n' for n in FLOATING_SPECIAL_NAMES) + f'Tests: {len(FLOATING_SPECIAL_NAMES)}, passed: {len(FLOATING_SPECIAL_NAMES)}, failed: 0, skipped: 0\n'),
         ('record-allocations', 0, 'PASS Record class equality avoids reflection descriptor allocations\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
         ('record-formatting', 0, ''.join('PASS ' + n + '\n' for n in RECORD_FORMATTING_NAMES) + f'Tests: {len(RECORD_FORMATTING_NAMES)}, passed: {len(RECORD_FORMATTING_NAMES)}, failed: 0, skipped: 0\n'),
+        ('native-callbacks', 0, 'PASS Native callbacks preserve captures across repeated calls\nPASS Native callbacks preserve generic unit value returns\nPASS Native callbacks accept Raven module functions\nPASS Native unit callbacks discard the logical Void result\nPASS Native callbacks retain bound receivers for the call\nTests: 5, passed: 5, failed: 0, skipped: 0\n'),
         ('native-buffers', 0, 'PASS Repeated native byte copies allocate no managed transfer buffers\nPASS Empty native byte copies never dereference null pointers\nPASS Native buffer copies bridge Memory windows through a C import\nPASS Native byte copies accept borrowed UTF8 without a temporary array\nTests: 4, passed: 4, failed: 0, skipped: 0\n'),
         ('native-pointers', 0, 'PASS Default typed native pointers preserve null and generic forwarding\nPASS Typed native pointers compare addresses and preserve borrowed storage\nPASS Typed native pointer hashes match aliases without reading storage\nTests: 3, passed: 3, failed: 0, skipped: 0\n'),
         ('enum-parsing', 0, ''.join('PASS ' + n + '\n' for n in ENUM_PARSING_NAMES) + f'Tests: {len(ENUM_PARSING_NAMES)}, passed: {len(ENUM_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
@@ -573,7 +574,7 @@ def main():
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
         # Only explicitly qualified suites enter the default release gate.
         selected = [case for case in expected
-                    if (not args.suite and case[0] not in ('record-allocations', 'native-pointers', 'native-buffers')) or (args.suite and case[0] in args.suite)]
+                    if (not args.suite and case[0] not in ('record-allocations', 'native-pointers', 'native-buffers', 'native-callbacks')) or (args.suite and case[0] in args.suite)]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')
@@ -581,6 +582,21 @@ def main():
             build = out / (name + '-build')
             environment = dict(os.environ)
             fixture_environment = {}
+            if name == 'native-callbacks':
+                if modes != ['interpreter'] or os.name == 'nt':
+                    raise ValueError('native-callbacks currently requires the Unix interpreter profile')
+                fixture = out / ('native-callback-fixture.dylib' if sys.platform == 'darwin' else 'native-callback-fixture.so')
+                subprocess.run([os.environ.get('CC', 'cc'), '-dynamiclib' if sys.platform == 'darwin' else '-shared',
+                                '-fPIC', str(TESTS / name / 'fixture.c'), '-o', str(fixture)], check=True)
+                imports = out / 'NativeCallbackImports.rvn'
+                template = TESTS / name / 'Imports.rvn'
+                imports.write_text(template.read_text().replace('"native-callback-fixture"', json.dumps(str(fixture.resolve()))))
+                for source in (TESTS / name).iterdir():
+                    if source.is_file():
+                        report['inputs'][str(source.relative_to(ROOT))] = sha(source)
+                fixture_environment['NeoClrNativeCallbackImports'] = str(imports.resolve())
+                environment.update(fixture_environment)
+                report['nativeCallbackFixtureSha256'] = sha(fixture)
             if name == 'native-buffers':
                 if modes != ['interpreter'] or os.name == 'nt':
                     raise ValueError('native-buffers currently requires the Unix interpreter profile')

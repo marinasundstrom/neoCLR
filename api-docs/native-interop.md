@@ -38,6 +38,24 @@ See the [tested source shape and full contract](https://github.com/marinasundstr
 length/ownership, record layout, platform-error capture and retained callbacks remain open.
 The generated type/member reference includes all five types; no API is excluded.
 
+## Raven callback parameters (development, 2026-10-22)
+
+A NativeImport parameter may be a structural function, such as `(int) -> int` or
+`(int) -> unit`. The callback uses the import's convention. Numeric scalar arguments
+and numeric/no-result returns are supported; native code must invoke it synchronously
+on the calling thread and must not retain it. Captures and receivers remain rooted
+through the call. Callback faults are delivered after native code returns.
+
+Raven retains `unit` syntax, mapping logical values to `System.Void`. For a unit
+callback the native emitter generates a managed source-facing wrapper and an internal
+C import with a true no-result Function parameter. The adapter invokes the managed
+Function and discards its unit value. This also preserves a generic return closed over
+unit. The source-facing wrapper is an ordinary managed method in emitted metadata;
+NativeImport metadata belongs to the internal thunk. The adapter currently allocates
+per call; no allocation-free callback claim is made. There are no new guest attributes.
+Callback strings, Boolean widths, pointers, nested callbacks, returned-function source
+mapping, retained registration lifetimes and JIT/AOT callback execution remain open.
+
 ## Structural pointer binding experiment
 
 Main includes development interpreter/neoIL address mapping

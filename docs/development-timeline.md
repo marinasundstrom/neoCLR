@@ -21108,3 +21108,23 @@ native view ownership remain subsequent work, not completed by the compiler fix.
   remaining release qualification are recorded with the implementation changelog.
 - **Open:** Native borrowing, native Memory ownership and broader release
   qualification remain separate work; this naming request does not close them.
+
+## 2026-10-22 — Raven-first native interop and unit mapping
+
+- **Author:** Asked to keep runtime behavior in Raven and reserve neoIL for necessary
+  bootstrap or assembler/disassembler tests. Directed continuation through native interop.
+- **Assistant:** Implemented source callback descriptors and numeric callback tests;
+  initially identified unit-returning C callbacks as a remaining compiler gap.
+- **Author:** “Then we need to fix Raven neoclr target.” Subsequently preferred keeping
+  the Raven `unit` keyword mapped to System.Void rather than introducing `void` syntax.
+  Clarified: “Even if we use unit in raven, the compiler will emit System.Void and the runtime will see that”.
+- **Action/outcome:** Target-specific native emission now adapts unit-returning
+  structural Functions at the C boundary. The emitted runtime type remains System.Void;
+  logical values and no-result calls have distinct execution conventions. Ordinary .NET
+  behavior is unchanged. Five built-in Raven callback tests pass with a native C fixture,
+  including GC and a generic return closed over unit. [Evidence and costs](../runtime/raven/tests/native-callbacks/README.md).
+- **Author follow-up:** Open to adding `void` as a Raven keyword later. This is a
+  future syntax possibility, not a request to change the current slice.
+- **Open:** Each unit callback adaptation allocates; retained callbacks, JIT/AOT callback
+  stubs, returned-function source mapping, pinning and complete release qualification
+  remain unfinished. No new source keyword or permanent milestone reprioritization.

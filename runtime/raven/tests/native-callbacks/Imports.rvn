@@ -1,0 +1,10 @@
+import System.Runtime.InteropServices.*
+
+[NativeImport("native-callback-fixture", EntryPoint: "native_callback_apply")]
+unsafe extern func Apply(callback: (int) -> int, value: int) -> int;
+
+[NativeImport("native-callback-fixture", EntryPoint: "native_callback_twice")]
+unsafe extern func Twice(callback: (int) -> int, value: int) -> int;
+
+[NativeImport("native-callback-fixture", EntryPoint: "native_callback_notify")]
+unsafe extern func Notify(callback: (int) -> unit, value: int) -> unit;

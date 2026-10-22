@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Raven native callbacks (2026-10-22):** Author-directed continuation prioritizes
+Raven-authored interop consumers over new bootstrap neoIL. NativeImport now accepts
+scalar and unit-returning Raven Function parameters in the interpreter. Unit remains
+Raven syntax, emitted as System.Void; native-boundary adaptation preserves generic
+value-return ABI. Five built-in tests pass, including forced GC and generic unit.
+[Evidence, allocation cost and remaining gaps](../runtime/raven/tests/native-callbacks/README.md).
+AOT/JIT callbacks, true pinning and full NativeImport qualification remain open.
+
 **Void IL migration (2026-10-22):** Active no-result producers and fixtures now use
 `void`, including `fn<void>`; the obsolete `noresult` spelling is rejected. This is
 the syntax migration increment. InternalCall binding now admits ordinary no-result

@@ -8694,11 +8694,28 @@ metadata test executable's `--generic-object-roots` group.
 ## Native imports
 
 `NativeImportDefinition(library, entryPoint, stringMarshalling = null,
-callingConvention = "Cdecl", parameterMarshalling = null, returnMarshalling = null)`
+callingConvention = "Cdecl", parameterMarshalling = null, returnMarshalling = null,
+callbackParameters = null)`
 records an immutable foreign ABI descriptor. Library/EntryPoint must be nonempty and
 NUL-free; conventions are Cdecl/System; string defaults are Utf8/Utf16; per-slot values
 are Utf8/Utf16/Bool8/Bool32. Parameter indices are zero-based and copied on construction.
 Invalid option values throw ArgumentException. No library is loaded.
+
+Development (2026-10-22): `NativeCallbackDefinition(string callingConvention = "Cdecl")`
+records a synchronous, same-thread, call-scoped callback ABI. Its read-only
+`CallingConvention: string` accepts Cdecl or System; other values throw
+`ArgumentException`. `NativeImportDefinition.CallbackParameters` exposes a defensively
+copied, read-only `IReadOnlyDictionary<int, NativeCallbackDefinition>` supplied through
+the constructor's optional `callbackParameters` argument. Negative indices or null
+entries throw `ArgumentException`; out-of-range indices, conflicting per-parameter
+marshalling and unsupported Function shapes throw `InvalidDataException` when attached.
+Numeric scalar parameters with numeric or no-result returns are supported. Boolean,
+String, pointer, nested Function and nominal value-returning Void slots are rejected.
+The binary/JSON reader preserves these descriptors and rejects richer callback ABI
+records outside this bounded subset. Raven handles logical unit returns through an
+adapter; the SDK does not silently erase a value-returning signature. Native code must
+not retain the callback or call it on another thread. This host API is documented here
+rather than in RavenDoc's guest-library type selection.
 
 `MethodDefinition.NativeImport` exposes the descriptor after authoring or native reading.
 `Introspection.MethodInfo.NativeImport: NativeImportDefinition?` exposes that immutable
