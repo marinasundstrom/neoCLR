@@ -33,7 +33,43 @@ desktop and OS activity remained present. These results do not establish control
 speedups, peak concurrency, allocation rates, GC comparisons or HTTPS throughput.
 
 [Candidate identity and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos-complete).
-The [earlier development measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos) are preserved. Windows qualification has passed; its refreshed performance results are still pending.
+The [earlier development measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos) are preserved. Windows qualification and the matching performance run have passed; results follow below.
+
+## Windows development refresh — 22 October 2026
+
+Windows x64 hosted runner, Windows Server build 26100, AMD64 Family 25 Model 1.
+All five aggregate stages pass: 55 CPU/JSON processes and 1,152 HTTP responses.
+This series uses the package qualified by run 39841298887 (original package run
+39835531991), with benchmark source `69441f2fd`. It is separate from macOS and
+published Preview 16 measurements; host differences prevent platform rankings.
+
+| Workload | Mode | Median operations/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| cpu.sum | interpreter | 5.08 | 4.48–5.34 | 7.527 |
+| cpu.sum | jit | 42245.41 | 41560.15–42727.94 | 6.219 |
+| cpu.sum | aot | 43193.06 | 43100.68–43290.72 | 0.012 |
+| json.serialize | interpreter | 9.60 | 8.22–9.98 | 7.634 |
+| json.serialize | jit | 281.55 | 198.75–287.40 | 6.376 |
+| json.serialize | aot | 251.35 | 195.55–285.68 | 0.013 |
+| json.deserialize | interpreter | 7.47 | 6.74–7.77 | 7.685 |
+| json.deserialize | jit | 205.44 | 136.87–213.24 | 6.765 |
+| json.deserialize | aot | 199.89 | 184.79–216.20 | 0.014 |
+
+Five rounds rotate modes. CPU/JSON uses 16 operations and two warmups; native CPU
+uses a separate 10,000-operation, 20-warmup series. HTTP validates 32 responses per
+process, discards the first eight from timing and uses one whole-process warmup
+per mode. Requests are sequential loopback HTTP/1.1 with connection close. Startup
+is separate from throughput and includes JIT compilation. These results do not
+measure peak concurrency, allocation/GC rates, HTTPS throughput or production load.
+
+The aggregate reports a dirty checkout. This is retained, not relabeled clean:
+an audit of recorded source hashes matches 85 tracked inputs at the recorded
+revision (exact bytes or Windows CRLF checkout). Two generated native archives
+are hashed separately and have no tracked-source equivalent. The raw report does
+not retain the dirty path list, so its cause is not established. Every measurement's
+input-integrity and correctness checks pass; no controlled speedup is claimed.
+
+[Candidate identity, source audit and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/windows).
 
 ## Published Preview 16 series
 

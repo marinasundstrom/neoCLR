@@ -1,0 +1,602 @@
+{
+  "aggregate": {
+    "rawSha256": "f26cbf7b648d8c6ac6129ffe9c79ead5f893a39cc9d376f4adb522afe08b3471",
+    "gzipSha256": "e52593a5171863ae72d53b1a94e8ce6f9d8d79701c2fc5fbdcb80016a52ef454",
+    "passed": true,
+    "summary": null
+  },
+  "execution": {
+    "rawSha256": "d355edb7478d5dbc88b9ad91bdcbb7729fbf2d6dfc56ac61242ebc93d9bec0a7",
+    "gzipSha256": "6c14f680fb116a909779afc17f43685bd8559585abfa4a40a6997228aa747773",
+    "passed": true,
+    "summary": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 7.5274001999998745,
+            "minimum": 7.358192400000007,
+            "maximum": 7.586986300000035
+          },
+          "batchSeconds": {
+            "median": 3.152243300000009,
+            "minimum": 2.994188900000154,
+            "maximum": 3.5687778000001344
+          },
+          "operationsPerSecond": {
+            "median": 5.07575033944872,
+            "minimum": 4.4833275974759195,
+            "maximum": 5.3436842278051255
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 6.365810199999942,
+            "minimum": 6.298237700000072,
+            "maximum": 6.879328800000167
+          },
+          "batchSeconds": {
+            "median": 0.00039209999999911815,
+            "minimum": 0.00031569999987368647,
+            "maximum": 0.0008146999998643878
+          },
+          "operationsPerSecond": {
+            "median": 40805.91685803617,
+            "minimum": 19639.13097172371,
+            "maximum": 50681.02631106018
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.01307930000007218,
+            "minimum": 0.012514100000089456,
+            "maximum": 0.017742099999850325
+          },
+          "batchSeconds": {
+            "median": 0.0004372000000785192,
+            "minimum": 0.0003044000000045344,
+            "maximum": 0.00045440000008056813
+          },
+          "operationsPerSecond": {
+            "median": 36596.523323711044,
+            "minimum": 35211.26759939061,
+            "maximum": 52562.4178704391
+          }
+        }
+      },
+      "json.serialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 7.634143900000026,
+            "minimum": 7.276351800000157,
+            "maximum": 8.611866799999916
+          },
+          "batchSeconds": {
+            "median": 1.6671201999999994,
+            "minimum": 1.603786499999842,
+            "maximum": 1.9466539999998531
+          },
+          "operationsPerSecond": {
+            "median": 9.59738835867984,
+            "minimum": 8.21923156349367,
+            "maximum": 9.97639024895245
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 6.376213700000108,
+            "minimum": 6.245224499999949,
+            "maximum": 7.571516499999916
+          },
+          "batchSeconds": {
+            "median": 0.056828900000027716,
+            "minimum": 0.05567210000003797,
+            "maximum": 0.08050230000003467
+          },
+          "operationsPerSecond": {
+            "median": 281.5468889947227,
+            "minimum": 198.75208534405985,
+            "maximum": 287.3970983668496
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.013120200000003024,
+            "minimum": 0.012980799999922965,
+            "maximum": 0.015978899999936402
+          },
+          "batchSeconds": {
+            "median": 0.06365649999997913,
+            "minimum": 0.0560069000000567,
+            "maximum": 0.08182239999996455
+          },
+          "operationsPerSecond": {
+            "median": 251.3490374118157,
+            "minimum": 195.5454741000867,
+            "maximum": 285.6790859694752
+          }
+        }
+      },
+      "json.deserialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 7.6851429999999255,
+            "minimum": 7.3314353000000665,
+            "maximum": 8.60118220000004
+          },
+          "batchSeconds": {
+            "median": 2.1415643999998792,
+            "minimum": 2.0595210999999836,
+            "maximum": 2.3729571999999735
+          },
+          "operationsPerSecond": {
+            "median": 7.4711738764432685,
+            "minimum": 6.742641628766073,
+            "maximum": 7.768796347850055
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 6.76527840000017,
+            "minimum": 6.494536900000185,
+            "maximum": 7.587130200000047
+          },
+          "batchSeconds": {
+            "median": 0.07788219999997636,
+            "minimum": 0.07503160000010212,
+            "maximum": 0.1169027000000824
+          },
+          "operationsPerSecond": {
+            "median": 205.43846989433857,
+            "minimum": 136.86595775793648,
+            "maximum": 213.24348674396154
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.013546200000064346,
+            "minimum": 0.012773899999956484,
+            "maximum": 0.01409590000002936
+          },
+          "batchSeconds": {
+            "median": 0.08004219999997986,
+            "minimum": 0.07400550000011208,
+            "maximum": 0.08658279999986007
+          },
+          "operationsPerSecond": {
+            "median": 199.89455562195974,
+            "minimum": 184.7942085498027,
+            "maximum": 216.2001472860229
+          }
+        }
+      }
+    }
+  },
+  "cpu-native": {
+    "rawSha256": "45886b54e2b4675794aaa20f57668f71546f3f807ecf2e8b203084f1a61505da",
+    "gzipSha256": "e06050c2affabc9c17d8f20cbeaf92bc3c64c02bd0f72b01ef68c67697ece270",
+    "passed": true,
+    "summary": {
+      "cpu.sum": {
+        "jit": {
+          "startupSeconds": {
+            "median": 6.2188851000000795,
+            "minimum": 6.052527299999838,
+            "maximum": 6.512861999999814
+          },
+          "batchSeconds": {
+            "median": 0.236712099999977,
+            "minimum": 0.23403890000008687,
+            "maximum": 0.24061510000001363
+          },
+          "operationsPerSecond": {
+            "median": 42245.411197826266,
+            "minimum": 41560.151461813635,
+            "maximum": 42727.93967155156
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.012323899999955756,
+            "minimum": 0.012280200000077457,
+            "maximum": 0.012433999999984735
+          },
+          "batchSeconds": {
+            "median": 0.23151869999992414,
+            "minimum": 0.23099640000009458,
+            "maximum": 0.23201489999996738
+          },
+          "operationsPerSecond": {
+            "median": 43193.05524781919,
+            "minimum": 43100.68017183985,
+            "maximum": 43290.71795056506
+          }
+        }
+      }
+    }
+  },
+  "http-plain": {
+    "rawSha256": "4d26dbdd4bb19fddf89856346c4be3e5681373e639add876633cd5e14ff76a6d",
+    "gzipSha256": "d75d65f1f77cc1f28aa1749964aefc3b4083c9f12bda519cdbb16ac5c01407a3",
+    "passed": true,
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 2.4524000643143156,
+          "min": 1.8453163422345578,
+          "max": 2.5295198657212374
+        },
+        "startupSecondsMedian": 7.2988849999999275,
+        "latencySeconds": {
+          "p50": 0.40579219999995075,
+          "p95": 0.4375279999999293,
+          "p99": 0.5199847999999747
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 42.76390227739579,
+          "min": 40.95176683835374,
+          "max": 57.36797179598437
+        },
+        "startupSecondsMedian": 12.268285400000195,
+        "latencySeconds": {
+          "p50": 0.017284199999949124,
+          "p95": 0.036102800000207935,
+          "p99": 0.039548599999989165
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 40.04018700104149,
+          "min": 37.78736107236495,
+          "max": 58.89142776363042
+        },
+        "startupSecondsMedian": 0.009696200000007593,
+        "latencySeconds": {
+          "p50": 0.023005900000043766,
+          "p95": 0.0359009999999671,
+          "p99": 0.039546199999904275
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    }
+  },
+  "http-json": {
+    "rawSha256": "7701ba09366c3bf09bcbe6c4595bcdc4db0c869b68ee472ea620b64d3af4add4",
+    "gzipSha256": "3aeae580d7a85abe0833bdcd5b3d9a50315f3fe6154c2a025929c270889f6d53",
+    "passed": true,
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 1.2695804953206853,
+          "min": 1.2450676063150454,
+          "max": 1.2885294049336322
+        },
+        "startupSecondsMedian": 7.143150600000354,
+        "latencySeconds": {
+          "p50": 0.7902764000000388,
+          "p95": 0.812528100000236,
+          "p99": 0.8203002000000197
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 28.87202762472325,
+          "min": 26.169923713560827,
+          "max": 29.746802652496502
+        },
+        "startupSecondsMedian": 19.27375350000011,
+        "latencySeconds": {
+          "p50": 0.03378969999994297,
+          "p95": 0.04791320000003907,
+          "p99": 0.04890299999988201
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 28.18306592302975,
+          "min": 26.19391024336198,
+          "max": 28.429581880216826
+        },
+        "startupSecondsMedian": 0.009447899999941,
+        "latencySeconds": {
+          "p50": 0.03664870000011433,
+          "p95": 0.048019599999861384,
+          "p99": 0.05042430000003151
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    }
+  },
+  "sourceAudit": {
+    "revision": "69441f2fd260e2f9eae84e4758665f39cdeb826f",
+    "matches": {
+      "tools/native/interop-host.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/async/native-runtime.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/async/native-runtime.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/diagnostics/attach.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/diagnostics/attach.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/faults/fault-details.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/faults/render.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/gc/native-gc.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/gc/native-gc.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/gc/root-probe.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/gc/root-probe.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/interop/imports.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/memory/memory-views-test.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/memory/memory-views.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/memory/static-storage-test.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/memory/text-arena.c": [
+        "CRLF checkout"
+      ],
+      "runtime/native/memory/text-arena.h": [
+        "CRLF checkout"
+      ],
+      "runtime/native/text/numeric-format.c": [
+        "CRLF checkout"
+      ],
+      "scripts/build-native-project.py": [
+        "CRLF checkout"
+      ],
+      "tools/native/windows-console-host.c": [
+        "CRLF checkout"
+      ],
+      "tools/native/windows-gc-host.c": [
+        "CRLF checkout"
+      ],
+      "tools/native/windows-host-memory.c": [
+        "CRLF checkout"
+      ],
+      "tools/native/windows-native-stack.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/root-probe.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/native-gc.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/text-arena.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/console.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-fault-details/render.c": [
+        "CRLF checkout"
+      ],
+      "tools/native/entry-arguments.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/console.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/entry-arguments.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/file-input.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/file-output.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/native-gc.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/native-session.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/native-stack.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/root-probe.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/socket-client-internal.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/socket-listener.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/socket-os.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/string-unicode.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/task-queue.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/text-arena.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/tls-managed.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-scalar/abi.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-scalar/console.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-fault-details/fault-details.h": [
+        "CRLF checkout"
+      ],
+      "tools/native/windows-gc-host.h": [
+        "CRLF checkout"
+      ],
+      "tools/native/windows-host-memory.h": [
+        "CRLF checkout"
+      ],
+      "tools/aot-native-text/Cargo.toml": [
+        "CRLF checkout"
+      ],
+      "tools/aot-native-text/Cargo.lock": [
+        "CRLF checkout"
+      ],
+      "tools/aot-native-text/src/lib.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_search.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_normalization.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_normalization_data.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_comparison.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_case_folding.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_casing_data.rs": [
+        "CRLF checkout"
+      ],
+      "src/string_casing_kernel.rs": [
+        "CRLF checkout"
+      ],
+      "src/numeric_parse_core.rs": [
+        "CRLF checkout"
+      ],
+      "src/numeric_format_core.rs": [
+        "CRLF checkout"
+      ],
+      "src/time_zone_rules.rs": [
+        "CRLF checkout"
+      ],
+      "benchmarks/execution/prepare.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/framework/host.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/execution/Worker.rvn": [
+        "CRLF checkout"
+      ],
+      "benchmarks/framework/Worker.rvn": [
+        "CRLF checkout"
+      ],
+      "benchmarks/framework/runner.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/framework/process.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/framework/configuration.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/http-server/benchmark.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/jit-http/benchmark.py": [
+        "CRLF checkout"
+      ],
+      "benchmarks/jit-http/Server.rvn": [
+        "CRLF checkout"
+      ],
+      "benchmarks/native-web/http-host.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/task-queue.c": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/socket-listener.c": [
+        "CRLF checkout"
+      ],
+      "tools/native-tls/Cargo.toml": [
+        "CRLF checkout"
+      ],
+      "Cargo.toml": [
+        "CRLF checkout"
+      ],
+      "Cargo.lock": [
+        "CRLF checkout"
+      ],
+      "tools/native-tls/src/buffered_tests.rs": [
+        "CRLF checkout"
+      ],
+      "tools/native-tls/src/configuration.rs": [
+        "CRLF checkout"
+      ],
+      "tools/native-tls/src/lib.rs": [
+        "CRLF checkout"
+      ],
+      "tools/native-tls/src/resources.rs": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/https-server/native-tls.h": [
+        "CRLF checkout"
+      ],
+      "docs/experiments/aot-console/tls-managed.c": [
+        "CRLF checkout"
+      ],
+      "benchmarks/http-server/JsonServer.rvn": [
+        "CRLF checkout"
+      ]
+    },
+    "unresolved": {
+      "tools/aot-native-text/target/text-only/x86_64-pc-windows-msvc/release/neoclr_aot_native_text.lib": "not tracked at revision",
+      "tools/native-tls/target/x86_64-pc-windows-msvc/native-ffi/neoclr_native_tls.lib": "not tracked at revision"
+    }
+  },
+  "sourceRevisions": {
+    "benchmarkRevision": "69441f2fd260e2f9eae84e4758665f39cdeb826f",
+    "candidateRevision": "69441f2fd260e2f9eae84e4758665f39cdeb826f"
+  },
+  "archive": {
+    "Algorithm": "SHA256",
+    "Hash": "A30D423DF6B6B16D98EDBA2CC8D8D5174014548C8647B0E82FC0EE1EA47F7CA8",
+    "Path": "D:\\a\\neoCLR\\neoCLR\\target\\qualification\\reused\\jit-package\\neoclr-native-poc.tar.gz"
+  },
+  "dirty": true,
+  "run": 39841353425
+}

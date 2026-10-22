@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Two-platform measurements completed (2026-10-22):** Windows now also passes
+55 CPU/JSON processes and 1,152 HTTP responses against its qualified archive.
+Record distributions separately from macOS. Preserve the dirty-checkout flag:
+85 recorded tracked-source hashes match the benchmark revision, but the dirty
+path list was not captured. No cross-platform ranking or controlled speedup claim.
+[Windows results](../benchmarks/release-20261022/windows/README.md).
+
 **Complete-SDK native kit qualified (2026-10-22):** Refreshed macOS build kit
 passes extracted console/HTTP and scalar native import/export C/C++ consumers,
 Cargo-free builds and tamper rejection. Its SDK manifest matches the qualified

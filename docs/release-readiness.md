@@ -459,3 +459,15 @@ execution and tamper rejection for packaged inputs. [Archive and raw report hash
 preserve exact identities. This replaces the earlier development kit for the
 current candidate; its evidence remains unchanged. Explicit HTTPS-server kit
 support is still source-only, and final publication checks remain open.
+
+### Windows measurements passed — 2026-10-22
+
+[Run 39841353425](https://github.com/marinasundstrom/neoCLR/actions/runs/39841353425)
+passes all five aggregate stages: 55 CPU/JSON processes and 1,152 HTTP responses
+against the qualified Windows archive. [Raw reports, tables and provenance](../benchmarks/release-20261022/windows/README.md)
+retain five-round distributions and separate startup from throughput. The aggregate
+records a dirty checkout. An audit matches 85 tracked source inputs at `69441f2fd`
+(exact bytes or CRLF checkout); two generated native archives remain separate
+hashed build inputs. The report did not capture dirty paths, so no clean-checkout
+claim is made. Both platform measurement gates now have passing reports; source
+CI repairs and final artifact/publication checks remain open.

@@ -81,8 +81,8 @@
     }
   },
   "remaining": [
-    "Windows benchmark run 39841353425",
     "Final release publication gates"
   ],
-  "httpsEvidence": "../windows-https/summary.json"
+  "httpsEvidence": "../windows-https/summary.json",
+  "benchmarkEvidence": "../../../../benchmarks/release-20261022/windows/README.md"
 }

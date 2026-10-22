@@ -101,7 +101,7 @@
     }
   },
   "limitations": [
-    "Windows package and HTTPS qualification pass; benchmarks 39841353425 pending",
+    "Windows package, HTTPS and benchmark qualification pass; source CI and final publication remain open",
     "Rebuilt library hashes differ from earlier measured development bundle; those measurements do not qualify this archive",
     "No release published"
   ]
