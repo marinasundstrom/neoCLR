@@ -257,3 +257,30 @@ binding was not the cause. A subsequent default-pointer failure reproduces on or
 fa8ecb50c). Native 21c279632 also closes empty-slice literal lowering. The
 [copy API evidence](../experiments/native-buffers/README.md) now qualifies the bounded
 interpreter fallback; real pinning and AOT imports remain separate gates.
+
+
+## Declaration-level projections
+
+Author clarification, 2026-10-22: map language types at the NativeImport declaration
+so callers need not manually unwrap raw pointers. `Ptr<T>` should project to one
+native pointer when its pointee contract is supported. A structural Function should
+project to a compatible native callable through an adapter where required, rather
+than requiring callers to manufacture an integer address.
+
+Keep source types and ABI descriptors separate. Recognize the exact pointer wrapper
+contract; do not infer ABI compatibility from arbitrary one-field structs or from
+`T: struct`. Unsupported layouts and calling conventions must fail before invocation.
+A typed pointer improves expressiveness but does not validate foreign memory.
+
+For foreign function pointers, the callable must retain the library owner. For
+managed callbacks, the adapter must retain captures, arrange runtime/thread entry,
+and contain managed faults at the native boundary. A call-scoped callback may not
+escape; a retained callback requires explicit registration and release. Neither
+mapping implies automatic ownership transfer or permanent pinning.
+
+Compared with .NET's explicit interop declarations and marshalling adapters (see the existing research references), the intended benefit is consistent use of neoCLR's existing
+Ptr and structural Function types. Costs include adapter generation, lifetime
+metadata, validation and backend qualification. This is a provisional mapping design,
+not a claim that typed signatures alone make native interop safe. The current
+[scalar AOT proof](../experiments/aot-native-imports/README.md) handles Int32 only;
+full declaration projections, retained callbacks and pinning remain validation gates.

@@ -3,7 +3,8 @@
 **Development, interpreter execution:** `System.Runtime.InteropServices` contains
 NativeImportAttribute, MarshalAsAttribute, NativeCallingConvention,
 NativeStringMarshalling and NativeType. Matching source compiler/runtime changes are
-required; installed bundles and JIT/AOT imports are not yet qualified.
+required; installed bundles and general JIT/AOT imports are not yet qualified.
+A separate [bounded scalar AOT profile](#aot-scalar-imports) supports Int32 C imports.
 
 | API | Contract |
 | --- | --- |
@@ -133,3 +134,26 @@ mutate it; a C output write alone does not qualify an uninitialized range for Co
 The built-in native-buffers fixture copies input first, invokes an in-place C byte
 increment, and copies back into a Memory subview. JIT/AOT execution, true pinning
 and persistent native-backed Memory ownership remain open.
+
+
+<a id="aot-scalar-imports"></a>
+
+## Bounded AOT import execution (development)
+
+`neoclr-codegen --native-imports` enables the macOS ARM64 scalar AOT backend's
+existing NativeImport descriptors for nongeneric free Int32 functions with at most
+16 Int32 parameters, without marshalling. Managed/value profiles, class members,
+other types, no-result calls, pointers, callbacks, JIT and SDK integration remain
+unsupported. The flag is required; the default still rejects imports.
+
+Link `runtime/native/interop/imports.c` into the executable. Its private adapter
+`neoclr_native_import_resolve_v1(const char *library, const char *symbol, void **output)`
+returns 0 on success and 3 (RuntimeError) on failure, leaving output unchanged on
+failure. Inputs are valid NUL-terminated UTF-8 metadata strings; output points to
+writable pointer storage. This helper is a provisional runtime implementation ABI,
+not the future public native hosting API. Successful lookups retain code ownership
+until process exit, with a 256-entry library/symbol cache. Failed lookups can retry.
+
+Generated thunks preserve the existing private managed status/result ABI while
+calling the native C ABI. No interpreter fallback, managed object marshalling or
+sandbox guarantee is provided. See [reproduction and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md).

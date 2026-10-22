@@ -2,8 +2,10 @@
 
 **Development (2026-10-12):** Raven `extern` declarations can use neutral native-import
 attributes, lowered to explicit runtime metadata. The interpreter supports C ABI
-scalars, pointers, input text and explicitly sized booleans. JIT/AOT import lowering
-and installed compiler-bundle qualification remain open. This is trusted native
+scalars, pointers, input text and explicitly sized booleans. A bounded development
+[AOT scalar profile](experiments/aot-native-imports/README.md) now supports free Int32
+imports on macOS ARM64 with explicit opt-in. General AOT/JIT import lowering and
+installed compiler-bundle qualification remain open. This is trusted native
 execution, not a sandbox or a complete FFI.
 
 ## Author-directed next foundation (2026-10-22)
@@ -56,7 +58,7 @@ NativeType choices are:
 
 Boolean input becomes exactly 0 or 1; every nonzero native result becomes true.
 Boolean without an explicit descriptor is rejected. These widths avoid an ambiguous
-platform-dependent `Bool` default. Numeric scalar types and Ptr<T> use direct ABI
+platform-dependent `Bool` default. Numeric scalar types and raw pointer metadata (`Type::Ptr`) use direct ABI
 storage and reject incompatible conversion annotations. Void is return-only.
 Unsupported combinations are diagnosed before output and also rejected by runtime
 metadata validation; hand-authored artifacts cannot bypass the contract.
@@ -472,3 +474,24 @@ slice overloads keep the managed extent available for validation. The interprete
 must read/write tagged byte slots, so avoiding a temporary array does not establish
 memcpy performance. Foreign-owned pointers remain outside this checked allocation
 profile; native writes alone do not update its initialization bitmap.
+
+
+## Declaration-level type projections (author direction, 2026-10-22)
+
+Import declarations should accept useful language types with explicit native ABI
+mappings. The public `System.Runtime.InteropServices.Ptr<T>` wrapper is intended to
+map to a native pointer without callers manually extracting its raw pointer.
+This is not yet implemented by the scalar AOT profile. Its `struct` constraint alone
+does not establish a native-compatible pointee layout; supported layouts still need
+validation. The wrapper remains non-owning and carries no bounds or lifetime proof.
+
+Structural Function types should map in both directions: a foreign function pointer
+becomes a callable retaining its library, and a managed callable becomes a native
+callback through an adapter retaining captured state. Call-scoped callbacks and
+retained callbacks require different lifetime contracts; retained callbacks need
+explicit registration/release and runtime-entry coordination. Existing interpreter
+metadata support does not imply complete Raven declaration or AOT support.
+
+See the [mapping design](design/native-import-export-contract.md#declaration-level-projections)
+for the intended contract and the [AOT proof](experiments/aot-native-imports/README.md)
+for the implemented subset.

@@ -16,6 +16,13 @@ It avoids intermediate managed transfer arrays; it does not supply pinning or cl
 AOT imports. Main-first pointer-default and native empty-slice lowering repairs are
 recorded with their compiler revisions.
 
+**Bounded AOT imports (2026-10-22):** The opt-in macOS ARM64 scalar backend now
+emits thunks for free Int32 C imports with lazy cached library ownership. The
+[contract and evidence](experiments/aot-native-imports/README.md) distinguish this
+ABI proof from pending closed-world/class-library integration, pointers and buffers,
+pinning, no-result calls, JIT and release packaging. It advances the AOT-first gate
+without declaring the NativeImport foundation complete.
+
 **Character naming (author direction, 2026-10-21):** Rename the development
 grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain
 ordinary .NET `Char`. This bounded API clarification preserves storage and text

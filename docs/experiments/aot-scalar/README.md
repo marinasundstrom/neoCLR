@@ -33,7 +33,9 @@ contract below remains unchanged for modules without declarations.
 
 - One source or decoded native module, no declared types; at most 128 uniquely named functions.
 - Nongeneric free functions with Int32 parameters/results and up to 1,024 Int32
-  locals; no general native imports or special parameter contracts. `--console`
+  locals; no general native imports or special parameter contracts. The opt-in
+  [native-import profile](../aot-native-imports/README.md) adds bounded macOS ARM64
+  Int32 C calls. `--console`
   enables the existing `neoCLR.Runtime.WriteLine(String)` service and checked
   bundled `System.Console.WriteLine(String)` wrapper.
 - `ldc.i4`, `ldarg`, `ldloc`, `stloc`, `dup`, `pop`, wrapping `add`/`sub`/`mul`,

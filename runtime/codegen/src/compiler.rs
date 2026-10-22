@@ -74,6 +74,22 @@ pub(super) fn compile_for_target(
     details: Option<&crate::fault_details::Options>,
     target: Target,
 ) -> Result<Vec<u8>, Error> {
+    compile_for_target_with_imports(input, root, console, details, target, false)
+}
+
+pub(super) fn compile_for_target_with_imports(
+    input: &neoclr::Module,
+    root: &str,
+    console: bool,
+    details: Option<&crate::fault_details::Options>,
+    target: Target,
+    native_imports: bool,
+) -> Result<Vec<u8>, Error> {
+    if native_imports
+        && (target != Target::MacosArm64 || details.is_some() || !input.types.is_empty())
+    {
+        return Err("native imports currently require the macOS ARM64 scalar AOT profile".into());
+    }
     if details.is_some() || !input.types.is_empty()
         || input.functions.iter().any(|f| {
             f.parameters
@@ -118,6 +134,9 @@ pub(super) fn compile_for_target(
                 return Err("Windows stack experiment admits only Int32 functions and bounded integer control flow with GC frames and stack budget".into());
             }
         }
+        if native_imports {
+            return Err("native imports currently require the scalar AOT profile".into());
+        }
         return values::compile(input, root, details, target);
     }
     let target = target.triple().parse().expect("fixed valid target triple");
@@ -129,7 +148,7 @@ pub(super) fn compile_for_target(
         "neoclr_scalar",
         cranelift_module::default_libcall_names(),
     )?);
-    compile_scalar(input, root, console, &mut module, false)?;
+    compile_scalar_with_imports(input, root, console, &mut module, false, native_imports)?;
     finish(module)
 }
 
@@ -140,6 +159,17 @@ pub(super) fn compile_scalar<M: Module>(
     console: bool,
     module: &mut M,
     long_range_calls: bool,
+) -> Result<(), Error> {
+    compile_scalar_with_imports(input, root, console, module, long_range_calls, false)
+}
+
+fn compile_scalar_with_imports<M: Module>(
+    input: &neoclr::Module,
+    root: &str,
+    console: bool,
+    module: &mut M,
+    long_range_calls: bool,
+    native_imports: bool,
 ) -> Result<(), Error> {
     if !input.types.is_empty() {
         return Err("scalar profile does not support type definitions".into());
@@ -164,9 +194,17 @@ pub(super) fn compile_scalar<M: Module>(
         if names.insert(function.name.as_str(), index).is_some() {
             return Err("scalar profile does not support overloaded names".into());
         }
-        flows.push(check_function(function)?);
+        if native_imports && function.pinvoke.is_some() {
+            crate::native_imports::validate(function)?;
+            flows.push(Vec::new());
+        } else {
+            flows.push(check_function(function)?);
+        }
     }
     let root_index = *names.get(root).ok_or("root function not found")?;
+    if input.functions[root_index].pinvoke.is_some() {
+        return Err("native import cannot be the managed AOT root".into());
+    }
     let parameterless_root = input.functions[root_index].parameters.is_empty();
     if !parameterless_root && input.functions[root_index].parameters != [Type::Int32] {
         return Err("root must have signature () -> Int32 or (Int32) -> Int32".into());
@@ -296,6 +334,10 @@ pub(super) fn compile_scalar<M: Module>(
         ids.push(module.declare_function(&name, linkage, &sig)?);
     }
     for (index, function) in input.functions.iter().enumerate() {
+        if function.pinvoke.is_some() {
+            crate::native_imports::emit(module, function, ids[index], index)?;
+            continue;
+        }
         let mut context = module.make_context();
         context.func.signature = module
             .declarations()

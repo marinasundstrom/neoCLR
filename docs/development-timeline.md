@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Typed native import declarations
+
+The author clarifies that native imports should map useful types in their declarations:
+`Ptr<T>` avoids unnecessary raw-pointer handling, and native function pointers should
+map to function objects for callbacks. The assistant distinguishes a non-owning typed
+pointer from a lifetime guarantee, and proposes explicit ABI projections plus adapters
+that preserve library/capture ownership. Call-scoped and retained callbacks require
+separate lifetime contracts; no retained-callback implementation is claimed.
+
+The assistant implements and validates a bounded macOS ARM64 scalar AOT import path:
+three native-import tests and 24 scalar regressions pass. This establishes direct C
+calls and lazy library ownership, not the requested Ptr/Function AOT projections.
+Those remain the next extensions in the [design](design/native-import-export-contract.md#declaration-level-projections).
+See [implementation evidence](experiments/aot-native-imports/README.md).
+
 ## 2026-10-22 — NativeImport first, language-neutral components later
 
 The author pauses implementation to design native interop, asks what Rust, Go and
