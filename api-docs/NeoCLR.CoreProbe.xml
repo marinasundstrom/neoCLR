@@ -4169,5 +4169,17 @@ No input is read or output written. Use one buffering wrapper per stream directi
     <member name="M:System.Double.IsPositiveInfinity(System.Double)"><summary>Tests for positive infinity.</summary><param name="value">The value to classify.</param><returns>True when the classification matches.</returns><remarks>Does not allocate or change the value.</remarks></member>
     <member name="M:System.Double.IsNegativeInfinity(System.Double)"><summary>Tests for negative infinity.</summary><param name="value">The value to classify.</param><returns>True when the classification matches.</returns><remarks>Does not allocate or change the value.</remarks></member>
     <member name="M:System.Double.IsFinite(System.Double)"><summary>Tests for finite values, including positive and negative zero.</summary><param name="value">The value to classify.</param><returns>True when the classification matches.</returns><remarks>Does not allocate or change the value.</remarks></member>
+  <member name="T:System.Collections.PriorityArrayQueue`2"><summary>An array-backed binary min-heap with an explicit priority comparer. Equal priorities have unspecified order.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.#ctor(System.Collections.Comparer{`1})"><summary>Creates an empty queue with the required ordering policy.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.#ctor(System.Int32,System.Collections.Comparer{`1})"><summary>Reserves initial capacity. A negative capacity faults.</summary></member>
+  <member name="P:System.Collections.PriorityArrayQueue`2.Count"><summary>Number of queued elements.</summary></member>
+  <member name="P:System.Collections.PriorityArrayQueue`2.Capacity"><summary>Number of entries that fit without growing storage.</summary></member>
+  <member name="P:System.Collections.PriorityArrayQueue`2.Comparer"><summary>The supplied ordering policy.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.EnsureCapacity(System.Int32)"><summary>Reserves at least the requested non-negative capacity and returns the resulting capacity.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.Enqueue(`0,`1)"><summary>Inserts an element with its priority. Lowest priorities leave first.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.Dequeue"><summary>Removes the minimal element, or returns None when empty. Clears vacated references.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.Peek"><summary>Returns the minimal element without removing it, or None when empty.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.PeekPriority"><summary>Returns the minimal priority without removing it, or None when empty.</summary></member>
+  <member name="M:System.Collections.PriorityArrayQueue`2.Clear"><summary>Removes all entries and releases references, retaining capacity.</summary></member>
 </members>
 </doc>

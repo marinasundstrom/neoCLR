@@ -16,5 +16,6 @@
     <Compile Include="ObservedNumbers.rvn" />
     <Compile Include="MapMaterialization.rvn" />
     <Compile Include="QueueStack.rvn" />
+    <Compile Include="PriorityArrayQueue.rvn" />
   </ItemGroup>
 </Project>

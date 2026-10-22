@@ -42,6 +42,7 @@
   "System.Collections.MutableSequence`1",
   "System.Collections.MutableSetExtensions",
   "System.Collections.MutableSet`1",
+  "System.Collections.PriorityArrayQueue`2",
   "System.Collections.Queue`1",
   "System.Collections.SequenceAccess",
   "System.Collections.Sequence`1",

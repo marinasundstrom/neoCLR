@@ -28,3 +28,7 @@ reentry, failures, allocation and the lack of atomicity.
 Development KeyValuePair records now have generated equality and hashing. See the
 [pair reference](/docs/key-value-pair.html) for the supported component contracts
 and current generic allocation costs. HashMap still uses its explicit comparer.
+
+Development `PriorityArrayQueue<TElement, TPriority>` adds min-priority removal
+with an explicit Comparer policy and Option results. It is an array-backed heap,
+not an indexed sorted list.

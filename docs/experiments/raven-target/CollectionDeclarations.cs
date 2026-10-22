@@ -36,6 +36,19 @@ static class CollectionDeclarations
                 public void Clear() { }
                 public Iterator<T> GetIterator() => default;
             }
+            public class PriorityArrayQueue<TElement, TPriority> {
+                public PriorityArrayQueue(Comparer<TPriority> comparer) { }
+                public PriorityArrayQueue(int capacity, Comparer<TPriority> comparer) { }
+                public int Count => default;
+                public int Capacity => default;
+                public Comparer<TPriority> Comparer => default;
+                public int EnsureCapacity(int capacity) => default;
+                public void Enqueue(TElement element, TPriority priority) { }
+                public Option<TElement> Dequeue() => default;
+                public Option<TElement> Peek() => default;
+                public Option<TPriority> PeekPriority() => default;
+                public void Clear() { }
+            }
             public interface Stack<T> : Collection<T> {
                 void Push(T value);
                 Option<T> Pop();

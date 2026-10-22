@@ -138,6 +138,11 @@ COLLECTION_NAMES = [
     'ToMap materializes pair queries and selectors',
     'HashMap copies preserve reference values and comparer',
     'Predicate Any stops at its first match',
+    'PriorityArrayQueue clear retains capacity and permits reuse',
+    'PriorityArrayQueue accepts reversed ordering and preserves reference identity',
+    'PriorityArrayQueue duplicate priorities neither lose nor duplicate entries',
+    'PriorityArrayQueue interleaved insertions preserve the heap',
+    'PriorityArrayQueue grows and removes the lowest priority first',
     'Queue growth preserves wrapped FIFO contents',
     'ArrayQueue preserves FIFO',
     'Queue preserves references through clear and reuse',
@@ -762,7 +767,7 @@ def main():
                 print(name + ' (' + mode + '):\n' + record['stdout'], end='', flush=True)
                 if (record['exitCode'], record['stdout'], record['stderr']) != (exit_code, stdout, ''):
                     raise RuntimeError(name + ' ' + mode + ' did not match the runner contract')
-            if name == 'index-range':
+            if name in ('index-range', 'collections'):
                 guards = {
                     'negative-index': 'Index value must be nonnegative',
                     'negative-conversion': 'Index value must be nonnegative',
@@ -775,6 +780,9 @@ def main():
                     'past-end': 'Range is outside the value',
                     'before-start': 'Range is outside the value',
                 }
+                if name == 'collections':
+                    guards = {'priority-capacity': 'PriorityArrayQueue capacity must be non-negative',
+                              'priority-reentry': 'PriorityArrayQueue callbacks must not reenter the queue'}
                 for guard, message in guards.items():
                     for mode, command, cwd, environment in executions:
                         arguments = [*command, *(['--'] if mode in ('interpreter', 'jit') else []), '--guard', guard]
@@ -784,10 +792,10 @@ def main():
                                       stdout=result.stdout.decode('utf-8'), stderr=result.stderr.decode('utf-8'))
                         report['cases'].append(record)
                         if not record['exitCode'] or message not in record['stderr'] or record['stdout']:
-                            raise RuntimeError('Index/Range guard did not fault as expected: ' + repr(record))
-                print('index-range: bounds guards passed in selected modes', flush=True)
+                            raise RuntimeError(name + ' guard did not fault as expected: ' + repr(record))
+                print(name + ': guards passed in selected modes', flush=True)
             selections = {
-                'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                'collections': [(['--filter', 'ArrayQueue preserves FIFO'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],
                 'discovery-contract': [(['--category', 'fast'], 0, 'PASS first discovered test\nPASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nPASS NeoClr.DiscoveryTests.EInline(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n'),
                                        (['--category', 'data'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[0]\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),

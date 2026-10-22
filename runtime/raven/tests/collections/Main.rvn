@@ -1,8 +1,26 @@
 module NeoClr.RuntimeTests
 
 import NeoClr.Testing.*
+import System.*
+import System.Collections.*
+import System.Option.*
 
 func Main(arguments: string[]) -> int {
+    // Terminal Faults require process isolation, outside the assertion runner.
+    if arguments.Length == 2 && arguments[0] == "--guard" {
+        if arguments[1] == "priority-capacity" {
+            let queue = PriorityArrayQueue<int, int>(-1,
+                FunctionComparer<int>((left, right) => left.CompareTo(right)))
+        }
+        if arguments[1] == "priority-reentry" {
+            let comparer = ReentrantPriorityComparer()
+            let queue = PriorityArrayQueue<int, int>(comparer)
+            comparer.Queue = Some(queue)
+            queue.Enqueue(1, 1)
+            queue.Enqueue(2, 2)
+        }
+        return 1
+    }
     let suite = TestSuite()
     RegisterDiscoveredTests(suite)
     return TestRunner.Run(suite, arguments)

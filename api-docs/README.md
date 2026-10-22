@@ -2922,3 +2922,12 @@ native-layout-api-audit-20261022; the legacy reference was regenerated from the
 matching ForeignImportDeclarations scaffold. No new renderer exclusions are used.
 The manual native interop guide covers exact validation limits and generated Raven
 imports. Snapshot checks accompany this public API change.
+
+Development (2026-10-22): `PriorityArrayQueue<TElement, TPriority>` is included in
+both native and CLI reference snapshots. Its Raven XML and type-specific website
+content document constructors, capacity, comparison, empty results, callback guards,
+reference clearing, complexity and unsupported operations. The native snapshot is
+produced from priority-array-queue-libraries-20261022 with the matching field-marshalling
+compiler. The CLI declarations are documentation projections, not a second queue
+implementation. The generated type inventory includes the new type; no exclusion
+is needed. Primary comparison: [.NET PriorityQueue](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.priorityqueue-2?view=net-10.0).

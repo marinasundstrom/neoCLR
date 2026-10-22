@@ -1,0 +1,193 @@
+{
+  "passed": true,
+  "modes": [
+    "interpreter",
+    "native"
+  ],
+  "jitHostSha256": null,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 6.944,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS PriorityArrayQueue clear retains capacity and permits reuse\nPASS PriorityArrayQueue accepts reversed ordering and preserves reference identity\nPASS PriorityArrayQueue duplicate priorities neither lose nor duplicate entries\nPASS PriorityArrayQueue interleaved insertions preserve the heap\nPASS PriorityArrayQueue grows and removes the lowest priority first\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 23, passed: 23, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 0.288,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS PriorityArrayQueue clear retains capacity and permits reuse\nPASS PriorityArrayQueue accepts reversed ordering and preserves reference identity\nPASS PriorityArrayQueue duplicate priorities neither lose nor duplicate entries\nPASS PriorityArrayQueue interleaved insertions preserve the heap\nPASS PriorityArrayQueue grows and removes the lowest priority first\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 23, passed: 23, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "guard": "priority-capacity",
+      "exitCode": 1,
+      "elapsedSeconds": 4.973997,
+      "stdout": "",
+      "stderr": "UserFault: PriorityArrayQueue capacity must be non-negative\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_5072696F72697479417272617951756575656032.M_456E737572654361706163697479 [instruction 7]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_5072696F72697479417272617951756575656032..ctor [instruction 41]\n   at NeoMetadata_A50D18844342F9C41520B462582998FF942257C9A43816B181B34ADCCDDA7148.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 22]\n"
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "guard": "priority-capacity",
+      "exitCode": 1,
+      "elapsedSeconds": 0.004528,
+      "stdout": "",
+      "stderr": "UserFault: PriorityArrayQueue capacity must be non-negative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Collections.PriorityArrayQueue`2.EnsureCapacity [instruction 7]\n   at System.Collections.PriorityArrayQueue`2..ctor [instruction 41]\n   at NeoClr.RuntimeTests.Main [instruction 22]\n"
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "guard": "priority-reentry",
+      "exitCode": 1,
+      "elapsedSeconds": 4.922083,
+      "stdout": "",
+      "stderr": "UserFault: PriorityArrayQueue callbacks must not reenter the queue\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_5072696F72697479417272617951756575656032.M_436865636B417661696C61626C65 [instruction 4]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_5072696F72697479417272617951756575656032.M_436C656172 [instruction 1]\n   at NeoMetadata_A50D18844342F9C41520B462582998FF942257C9A43816B181B34ADCCDDA7148.T_4E656F436C722E52756E74696D655465737473_5265656E7472616E745072696F72697479436F6D7061726572.M_436F6D70617265 [instruction 11]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_5072696F72697479417272617951756575656032.M_456E7175657565 [instruction 63]\n   at NeoMetadata_A50D18844342F9C41520B462582998FF942257C9A43816B181B34ADCCDDA7148.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 48]\n"
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "guard": "priority-reentry",
+      "exitCode": 1,
+      "elapsedSeconds": 0.004037,
+      "stdout": "",
+      "stderr": "UserFault: PriorityArrayQueue callbacks must not reenter the queue\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Collections.PriorityArrayQueue`2.CheckAvailable [instruction 4]\n   at System.Collections.PriorityArrayQueue`2.Clear [instruction 1]\n   at NeoClr.RuntimeTests.ReentrantPriorityComparer.Compare [instruction 11]\n   at System.Collections.PriorityArrayQueue`2.Enqueue [instruction 63]\n   at NeoClr.RuntimeTests.Main [instruction 48]\n"
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "ArrayQueue preserves FIFO"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.434631,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "ArrayQueue preserves FIFO"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.008629,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.789648,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.01042,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "phases": [
+    {
+      "suite": "collections",
+      "phase": "discovery",
+      "elapsedSeconds": 11.618462,
+      "details": {
+        "sourceCompilationSeconds": 6.725724,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.889237
+      }
+    },
+    {
+      "suite": "collections",
+      "phase": "native-project-build",
+      "elapsedSeconds": 15.515097,
+      "commands": [
+        {
+          "phase": "toolchain",
+          "elapsedSeconds": 0.009828
+        },
+        {
+          "phase": "toolchain",
+          "elapsedSeconds": 0.012193
+        },
+        {
+          "phase": "toolchain",
+          "elapsedSeconds": 0.012816
+        },
+        {
+          "phase": "source-compilation",
+          "elapsedSeconds": 6.565759
+        },
+        {
+          "phase": "native-compilation",
+          "elapsedSeconds": 7.0544
+        },
+        {
+          "phase": "native-kernel-build",
+          "elapsedSeconds": 0.08298
+        },
+        {
+          "phase": "host-compile-link",
+          "elapsedSeconds": 1.06228
+        },
+        {
+          "phase": "dependency-check",
+          "elapsedSeconds": 0.025131
+        }
+      ]
+    },
+    {
+      "suite": "collections",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.278728
+    }
+  ],
+  "executionRepetitions": 1,
+  "bundleManifestSha256": "cff5be8fb762276b0f1db95d5a51f5ea54f8552bdaa4f6908237af9632d8de52",
+  "aotSha256": "03e7f50bf4c06c68fbf73b86fc5b39d395271fa81e9365c64879174b81f86cd2",
+  "interpreterSha256": "6e6bc861e2c4cdfacb605937a670831f068581a8a01273797f19eabc9929d6ea",
+  "suites": [
+    "collections"
+  ],
+  "totalElapsedSeconds": 59.022946,
+  "sourceInputs": {
+    "scripts/test-runtime-library.py": "f0733ad02466c3a93598d31ba64988a2480dc2c257d03185a5e25b4b077ee6a7",
+    "runtime/raven/tests/collections/Collections.rvn": "2793973c50d8501998f3de17ac6d1be149e6f1a3b34229372c90c0897d280c2b",
+    "runtime/raven/tests/collections/Main.rvn": "8c24841cc7900f2e9e01a4e4bf412bf27900a9b36008ca4e476276d7a9e01bd0",
+    "runtime/raven/tests/collections/MapMaterialization.rvn": "363ee1bc09ec13e638cd7abbad69b2f96c15597fea44d9a2b137ce110124cc8e",
+    "runtime/raven/tests/collections/ObservedNumbers.rvn": "c42f57095c9d357cec05baaa3a17f127a7b6fff23385b95f5a4a9157b32729b4",
+    "runtime/raven/tests/collections/PriorityArrayQueue.rvn": "9d98ab180883eaf58c6583bbde3910c5078dc1e7d576dae163161e2b822cebec",
+    "runtime/raven/tests/collections/QueueStack.rvn": "36f9b8623731832ef8599273bb9307d03ccce62f1cd1e912c5edb7fca7612f75",
+    "runtime/raven/tests/collections/Tests.rvnproj": "69193243dda6de640b87a6df8bf8c45d445a38a7113c652c46cb5a871907d270"
+  },
+  "libraryBuildEvidenceSha256": "10bcd1682d2595ab18530c6f183211bd8e70f513d3afd5f9d2c285bdd860747b",
+  "librarySourceSha256": "c1064b5698eceebdedd76aad7246cf05dd037e61d05d96a9be5ac8ac387a0f08",
+  "fullReportSha256": "8a4e8481aaee2e3d4293bc91e42870417a2e83c9542fcad3988cfe2c1cacfe68",
+  "comparison": "https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.priorityqueue-2?view=net-10.0",
+  "performanceScope": "Counting comparer bounds total comparisons for 127 permuted entries; execution times include full-suite/runtime startup, not isolated queue benchmarks.",
+  "websitePages": 5703,
+  "scope": "macOS ARM64 source-built interpreter and standalone AOT; no Windows/package or full release qualification claim."
+}

@@ -13,10 +13,31 @@ adds growth. A read-only view can still observe changes through another alias.
 | Keep unique elements | HashSet | MutableSet / Set |
 | First-in, first-out work | ArrayQueue | Queue |
 | Last-in, first-out work | ArrayStack | Stack |
+| Lowest-priority work (development) | PriorityArrayQueue | Explicit Comparer |
 
 These are ordinary mutable collections, not concurrent collections. Struct elements
 are copied; class elements retain shared identity. Collection constructors accept
 iterables for initialization or copying where the contract provides that overload.
+
+## Priority ordering (development)
+
+`PriorityArrayQueue<TElement, TPriority>` stores an array-backed min-heap. Supply
+an explicit `Comparer<TPriority>`, or wrap a comparison callback in
+`FunctionComparer<TPriority>`. `Peek` and `Dequeue` return `Option<TElement>`;
+`PeekPriority` exposes the leading priority. Equal priorities have unspecified order.
+
+```raven
+let queue = PriorityArrayQueue<int, int>(
+    FunctionComparer<int>((left, right) => left.CompareTo(right)))
+queue.Enqueue(30, 30)
+queue.Enqueue(10, 10)
+let next = queue.Dequeue() // Some(10)
+```
+
+This pattern is covered by the built-in collection tests. Enqueue and dequeue use
+O(log n) comparisons, with no per-entry wrapper objects. Capacity can be reserved;
+removal clears references and Clear retains storage for reuse. See the
+[API contract](/docs/api/System/Collections/PriorityArrayQueue%602/index.html).
 
 ## Use capabilities
 

@@ -21313,3 +21313,18 @@ current managed JIT and AOT share selection, and distinguished statically proven
 direct calls from possible future profile-guided or guarded JIT specialization.
 Diagnostic inspection subsequently admitted 2,055 HTTP methods with a temporary
 larger budget; the shipped 2,048 bound remained unchanged.
+
+### 2026-10-22 — Priority queue before release
+
+The author requested a priority queue implementation with a supplied comparer before
+release. The assistant initially proposed PriorityQueue, then ArrayPriorityQueue
+when the author asked for implementation-oriented naming. The author clarified:
+“PriorityArrayQueue, I meant”. The implementation uses that name.
+
+The assistant proposed a binary array-backed min-heap, matching .NET's lowest-first
+and unspecified equal-priority ordering, while following neoCLR's explicit Comparer
+and Option-returning queue conventions. SortedArrayList was distinguished from a
+heap because a heap does not maintain indexed sorted order. This is a bounded
+addition before resuming release stabilization, not a change to the roadmap's
+long-term priorities. See the collection source/tests and development API reference;
+validation outcomes are recorded in the changelog rather than inferred here.

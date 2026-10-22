@@ -1,0 +1,154 @@
+module System.Collections
+
+import System.*
+import System.Option.*
+
+/// <summary>An unsynchronized binary min-heap with an explicit priority comparer.</summary>
+/// <remarks>Lowest priorities leave first. Equal priorities have no FIFO guarantee. Priorities and the comparer must retain stable ordering while queued. Comparer callbacks must not reenter queue operations (a terminal Fault). Storage grows geometrically; entries are stored inline without wrapper objects.</remarks>
+public class PriorityArrayQueue<TElement, TPriority> {
+    private var elements: TElement[] = System.Runtime.CompilerServices.CheckedStorage.Reserve<TElement>(0)
+    private var priorities: TPriority[] = System.Runtime.CompilerServices.CheckedStorage.Reserve<TPriority>(0)
+    private var count = 0
+    private var busy = false
+    private field comparer: Comparer<TPriority>
+
+    /// Creates an empty queue using the required ordering policy.
+    init(comparer: Comparer<TPriority>) {
+        self.comparer = comparer
+    }
+
+    /// Reserves capacity; a negative capacity causes a terminal Fault.
+    init(capacity: int, comparer: Comparer<TPriority>) {
+        self.comparer = comparer
+        EnsureCapacity(capacity)
+    }
+
+    private func CheckAvailable() {
+        if busy {
+            System.Fail("PriorityArrayQueue callbacks must not reenter the queue")
+        }
+    }
+
+    /// Number of queued elements.
+    val Count: int => count
+    /// Number of entries that fit without growing storage.
+    val Capacity: int => elements.Length
+    /// The ordering policy supplied at construction.
+    val Comparer: Comparer<TPriority> => comparer
+
+    /// Reserves at least capacity entries and returns the resulting capacity. Negative capacity faults.
+    func EnsureCapacity(capacity: int) -> int {
+        CheckAvailable()
+        if capacity < 0 {
+            System.Fail("PriorityArrayQueue capacity must be non-negative")
+        }
+        if capacity > elements.Length {
+            let newElements = System.Runtime.CompilerServices.CheckedStorage.Reserve<TElement>(capacity)
+            let newPriorities = System.Runtime.CompilerServices.CheckedStorage.Reserve<TPriority>(capacity)
+            var index = 0
+            while index < count {
+                newElements[index] = elements[index]
+                newPriorities[index] = priorities[index]
+                index = index + 1
+            }
+            elements = newElements
+            priorities = newPriorities
+        }
+        return elements.Length
+    }
+
+    /// Inserts an element in O(log Count) comparisons; growing storage takes O(Count).
+    func Enqueue(element: TElement, priority: TPriority) {
+        CheckAvailable()
+        if count == elements.Length {
+            if count > 1073741823 {
+                System.Fail("PriorityArrayQueue capacity overflow")
+            }
+            var capacity = 4
+            if count != 0 {
+                capacity = count * 2
+            }
+            EnsureCapacity(capacity)
+        }
+        busy = true
+        var index = count
+        while index > 0 {
+            let parent = (index - 1) / 2
+            if comparer.Compare(priority, priorities[parent]) >= 0 {
+                break
+            }
+            elements[index] = elements[parent]
+            priorities[index] = priorities[parent]
+            index = parent
+        }
+        elements[index] = element
+        priorities[index] = priority
+        count = count + 1
+        busy = false
+    }
+
+    /// Returns the minimal element without removing it, or None when empty.
+    func Peek() -> Option<TElement> {
+        CheckAvailable()
+        if count == 0 {
+            return None
+        }
+        return Some(elements[0])
+    }
+
+    /// Returns the minimal priority without removing it, or None when empty.
+    func PeekPriority() -> Option<TPriority> {
+        CheckAvailable()
+        if count == 0 {
+            return None
+        }
+        return Some(priorities[0])
+    }
+
+    /// Removes the minimal element in O(log Count), or returns None when empty. Releases vacated storage references.
+    func Dequeue() -> Option<TElement> {
+        CheckAvailable()
+        if count == 0 {
+            return None
+        }
+        busy = true
+        let result = elements[0]
+        count = count - 1
+        let element = elements[count]
+        let priority = priorities[count]
+        elements[count] = default(TElement)
+        priorities[count] = default(TPriority)
+        if count > 0 {
+            var index = 0
+            while index < count / 2 {
+                var child = index * 2 + 1
+                let right = child + 1
+                if right < count && comparer.Compare(priorities[right], priorities[child]) < 0 {
+                    child = right
+                }
+                if comparer.Compare(priority, priorities[child]) <= 0 {
+                    break
+                }
+                elements[index] = elements[child]
+                priorities[index] = priorities[child]
+                index = child
+            }
+            elements[index] = element
+            priorities[index] = priority
+        }
+        busy = false
+        return Some(result)
+    }
+
+    /// Removes all entries and releases their references, retaining capacity for reuse.
+    func Clear() {
+        CheckAvailable()
+        var index = 0
+        while index < count {
+            elements[index] = default(TElement)
+            priorities[index] = default(TPriority)
+            index = index + 1
+        }
+        count = 0
+    }
+}

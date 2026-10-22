@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Priority collection before release (author direction, 2026-10-22):** Add
+`PriorityArrayQueue<TElement, TPriority>` with an explicit Comparer policy. Its
+array-backed binary heap follows existing Option-returning collection conventions;
+it does not promise sorted indexing or stable ties. This bounded library addition
+precedes resuming package/editor and platform qualification. The built-in collection
+suite and [API reference](../website/api-content/system.collections.priorityarrayqueue.md)
+cover its contract. All 23 collection tests, fault guards and selection checks pass
+in interpreter and macOS ARM64 AOT; [evidence](validation/release-stabilization-20261022/priority-array-queue.json).
+
 **HTTP JIT/AOT gate repaired locally (2026-10-22):** Compiler and native root-probe
 bounds now agree at 4,096 methods. All 136 backend tests and both native boundary
 tests pass. Matching macOS ARM64 source builds pass HTTP JSON server requests and

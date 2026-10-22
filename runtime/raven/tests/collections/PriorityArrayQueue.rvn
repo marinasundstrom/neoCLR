@@ -1,0 +1,127 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Option.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test("PriorityArrayQueue grows and removes the lowest priority first")]
+func PriorityArrayQueueOrder() -> Result<unit, TestFailure> {
+    let comparer = CountingPriorityComparer()
+    let queue = PriorityArrayQueue<int, int>(1, comparer)
+    _ = Assert.True(queue.Peek() is None, "New queue is empty")?
+    _ = Assert.True(queue.Dequeue() is None, "Empty removal is safe")?
+    // A permutation exercises both child branches and many heap levels.
+    var index = 0
+    while index < 127 {
+        let priority = (index * 53) % 127
+        queue.Enqueue(priority + 1000, priority)
+        index = index + 1
+    }
+    _ = Assert.Equal(127, queue.Count)?
+    _ = Assert.True(queue.Capacity >= 127, "Storage grows")?
+    index = 0
+    while index < 127 {
+        _ = Assert.True(queue.PeekPriority() is Some(let priority) && priority == index, "Priority order")?
+        _ = Assert.True(queue.Peek() is Some(let value) && value == index + 1000, "Element stays paired with priority")?
+        _ = Assert.True(queue.Dequeue() is Some(let value) && value == index + 1000, "Removal order")?
+        index = index + 1
+    }
+    _ = Assert.Equal(0, queue.Count)?
+    _ = Assert.True(queue.PeekPriority() is None, "Drained priority is absent")?
+    return Assert.True(comparer.Count <= 254 * 14, "Heap operations must not scan the whole queue")
+}
+
+[Test("PriorityArrayQueue accepts reversed ordering and preserves reference identity")]
+func PriorityArrayQueueCustomComparer() -> Result<unit, TestFailure> {
+    let comparer = FunctionComparer<int>((left, right) => right.CompareTo(left))
+    let queue = PriorityArrayQueue<QueueStackItem, int>(comparer)
+    let first = QueueStackItem()
+    let second = QueueStackItem()
+    first.Value = 42
+    second.Value = 17
+    queue.Enqueue(first, 10)
+    queue.Enqueue(second, 20)
+    _ = Assert.True(Object.ReferenceEquals(comparer, queue.Comparer), "Comparer identity")?
+    if queue.Dequeue() is Some(let value) {
+        _ = Assert.True(Object.ReferenceEquals(second, value), "Highest priority with reverse comparer")?
+    } else {
+        return Assert.True(false, "Missing reference")
+    }
+    if queue.Dequeue() is Some(let value) {
+        return Assert.True(Object.ReferenceEquals(first, value), "Original reference preserved")
+    }
+    return Assert.True(false, "Missing remaining reference")
+}
+
+[Test("PriorityArrayQueue duplicate priorities neither lose nor duplicate entries")]
+func PriorityArrayQueueDuplicates() -> Result<unit, TestFailure> {
+    let queue = PriorityArrayQueue<int, int>(FunctionComparer<int>((left, right) => left.CompareTo(right)))
+    var index = 1
+    while index <= 32 {
+        queue.Enqueue(index, 7)
+        index = index + 1
+    }
+    let seen = ArrayList<int>()
+    var sum = 0
+    while queue.Count > 0 {
+        if queue.Dequeue() is Some(let value) {
+            _ = Assert.True(!seen.Exists(item => item == value), "No duplicate removal")?
+            seen.Add(value)
+            sum = sum + value
+        }
+    }
+    _ = Assert.Equal(32, seen.Count)?
+    return Assert.Equal(528, sum)
+}
+
+[Test("PriorityArrayQueue clear retains capacity and permits reuse")]
+func PriorityArrayQueueClear() -> Result<unit, TestFailure> {
+    let queue = PriorityArrayQueue<string, int>(8, FunctionComparer<int>((left, right) => left.CompareTo(right)))
+    queue.Enqueue("old", 1)
+    queue.Enqueue("other", 2)
+    queue.Clear()
+    _ = Assert.Equal(0, queue.Count)?
+    _ = Assert.Equal(8, queue.Capacity)?
+    _ = Assert.Equal(8, queue.EnsureCapacity(2))?
+    _ = Assert.Equal(16, queue.EnsureCapacity(16))?
+    _ = Assert.True(queue.Peek() is None, "Clear removes entries")?
+    queue.Enqueue("new", -1)
+    return Assert.True(queue.Dequeue() is Some("new"), "Storage is reusable")
+}
+
+[Test("PriorityArrayQueue interleaved insertions preserve the heap")]
+func PriorityArrayQueueInterleaved() -> Result<unit, TestFailure> {
+    let queue = PriorityArrayQueue<int, int>(FunctionComparer<int>((left, right) => left.CompareTo(right)))
+    queue.Enqueue(30, 30)
+    queue.Enqueue(10, 10)
+    _ = Assert.True(queue.Dequeue() is Some(10), "First minimum")?
+    queue.Enqueue(20, 20)
+    queue.Enqueue(5, 5)
+    _ = Assert.True(queue.Dequeue() is Some(5), "New minimum")?
+    _ = Assert.True(queue.Dequeue() is Some(20), "Single-child repair")?
+    _ = Assert.True(queue.Dequeue() is Some(30), "Last element")?
+    queue.Enqueue(1, 1)
+    return Assert.True(queue.Dequeue() is Some(1), "Reuse after drain")
+}
+
+class CountingPriorityComparer : Comparer<int> {
+    var Count: int { get; set; } = 0
+
+    func Compare(left: int, right: int) -> int {
+        Count = Count + 1
+        return left.CompareTo(right)
+    }
+}
+
+class ReentrantPriorityComparer : Comparer<int> {
+    var Queue: Option<PriorityArrayQueue<int, int>> { get; set; } = None
+
+    func Compare(left: int, right: int) -> int {
+        if Queue is Some(let queue) {
+            queue.Clear()
+        }
+        return left.CompareTo(right)
+    }
+}

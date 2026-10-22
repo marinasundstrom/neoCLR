@@ -733,3 +733,20 @@ its runtime/codegen/JIT host. See [contracts and evidence](../../../docs/experim
 case selection, aliases, lists, signed boundaries, malformed input and TryParse
 output reset. It uses the same interpreter/JIT/native runner as numeric/globalization
 tests. Current metadata supports ASCII member names and Int32 storage.
+
+### PriorityArrayQueue (2026-10-22)
+
+The collections suite adds five attributed tests for minimum-priority ordering,
+permuted growth across heap levels, duplicates, reversed comparison, reference
+identity, capacity/clear/reuse and interleaved operations. A counting comparer
+bounds comparison work for the 127-entry workload; this is an algorithmic guard,
+not a wall-clock benchmark. Comparer objects and FunctionComparer callbacks both
+participate. The queue stores elements and priorities in separate arrays without
+per-entry wrapper nodes; Option-return and runtime allocation costs remain explicit.
+
+Negative capacity and mutation from a comparer cause terminal Faults, so the same
+suite executable exposes isolated `--guard priority-capacity` and
+`--guard priority-reentry` cases. The host harness requires their diagnostics and
+nonzero exits in each selected execution mode. Stateful comparer objects avoid the
+current native compiler's mutable captured-local limitation; this change does not
+claim that compiler gap is fixed.
