@@ -1587,6 +1587,27 @@ fn raven_layout_attributes_control_native_headers_and_reject_invalid_contracts()
     }
 }
 
+#[test]
+#[ignore = "requires matching NEOCLR_RAVEN_BUNDLE with layout attributes"]
+fn generated_raven_bindings_preserve_nested_and_recursive_pointer_layouts() {
+    for (declaration, size) in [
+        (
+            "public struct Inner { field Value: long }\npublic struct Point {\n    field Tag: byte\n    field Data: Inner\n}",
+            16,
+        ),
+        (
+            "public struct Point {\n    field Value: int\n    field Next: *Point\n}",
+            16,
+        ),
+        (
+            "public struct Point { field Other: *Other }\npublic struct Other { field Back: *Point }",
+            8,
+        ),
+    ] {
+        qualify_raven_layout(declaration, Some(size));
+    }
+}
+
 fn qualify_raven_layout(declaration: &str, expected_size: Option<usize>) {
     let bundle = PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").unwrap())
         .canonicalize()
@@ -1683,10 +1704,10 @@ func Main() -> int { return 0 }
     let text = fs::read_to_string(&header).unwrap();
     let name = text
         .lines()
-        .find(|line| line.starts_with("typedef struct ") || line.starts_with("typedef union "))
+        .find(|line| line.contains(" point_identity("))
         .unwrap()
         .split_whitespace()
-        .nth(2)
+        .next()
         .unwrap();
     let host = dir.0.join("caller.c");
     fs::write(&host, format!("#include \"exports.h\"\nint main(void) {{ {name} p = {{0}}; return sizeof(p) != {} || point_identity(&p) != &p || point_identity(0) != 0; }}\n", expected_size.unwrap())).unwrap();
@@ -1702,7 +1723,39 @@ func Main() -> int { return 0 }
     fs::create_dir(&consumer).unwrap();
     fs::copy(dir.0.join("App.rvnproj"), consumer.join("App.rvnproj")).unwrap();
     fs::copy(&raven, consumer.join("Imports.rvn")).unwrap();
-    fs::write(consumer.join("Main.rvn"), format!("unsafe func Main() -> int {{\n    let value = NativeExport0(default(*{name}))\n    if value == default(*{name}) {{ return 0 }}\n    return 1\n}}\n")).unwrap();
+    fs::write(
+        consumer.join("Main.rvn"),
+        format!(
+            r#"
+import System.Runtime.InteropServices.*
+
+[NativeImport("/usr/lib/libSystem.B.dylib", EntryPoint: "malloc")]
+unsafe extern func Allocate(size: nuint) -> *unit;
+
+[NativeImport("/usr/lib/libSystem.B.dylib", EntryPoint: "free")]
+unsafe extern func Release(pointer: *unit) -> unit;
+
+unsafe func Main() -> int {{
+    if NativeExport0(default(*{name})) != default(*{name}) {{
+        return 1
+    }}
+    let storage = Allocate((nuint){size})
+    if storage == default(*unit) {{
+        return 2
+    }}
+    let pointer = (*{name})storage
+    let same = NativeExport0(pointer) == pointer
+    Release(storage)
+    if same {{
+        return 0
+    }}
+    return 3
+}}
+"#,
+            size = expected_size.unwrap()
+        ),
+    )
+    .unwrap();
     let result = Command::new("dotnet")
         .arg(bundle.join("sdk/tools/rvnc/rvnc.dll"))
         .args(["neoclr", "--project"])
@@ -1740,7 +1793,7 @@ func Main() -> int { return 0 }
         neoclr::LoadedProgram::with_modules_and_object_root(&app, &seed, &[core], &object_root)
             .unwrap();
     program.verify().unwrap();
-    // SAFETY: the fixture owns the exact C ABI export and passes only a null pointer.
+    // SAFETY: exact C ABI exports receive null or a live C allocation; the consumer frees it.
     let result = unsafe { program.run_with_native(neoclr::Limits::default()) }.unwrap();
     assert_eq!(result.value, neoclr::Value::Int32(0));
 }

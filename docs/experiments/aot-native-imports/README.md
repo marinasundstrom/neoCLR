@@ -556,3 +556,25 @@ AOT library. All supported pack values produce C/C++ headers without unsupported
 packing pragmas. Built-in Rust integration tests are used because the scalar backend
 cannot execute the managed Raven test runner. Generated struct imports are not yet
 qualified through the ordinary managed JIT/AOT executable pipeline.
+
+### Generated binding graph qualification — 2026-10-22
+
+The built-in `generated_raven_bindings_preserve_nested_and_recursive_pointer_layouts`
+integration test covers nested value fields, self-referencing native pointers and
+mutually referencing native pointers. Each source fixture produces C11/C++17 headers
+with checked size/offset assertions, an AOT library and generated Raven imports.
+The Raven consumer checks both null and a live `malloc` allocation through the
+export, then releases the allocation with `free`. The fixture selects its exported
+pointee from the function declaration rather than assuming the first header type
+is the exported type.
+
+This qualifies C-compatible storage graphs using existing layout contracts, without
+introducing managed object graph marshalling or ownership inference. Nested values
+are fields in native storage; aggregate parameters/results passed by value remain
+unsupported. The generated consumer runs in the interpreter; ordinary managed
+JIT/AOT executable integration remains a separate gap.
+
+Validation: all six Raven-source interop integration tests pass with the matching
+`target/native-layout-bundle-20261022` overlay, including the prior layout rejection
+cases and three-engine pointer/export tests. Existing website scope remains accurate;
+no public API or snapshot changed in this qualification increment.
