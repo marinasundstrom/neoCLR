@@ -113,11 +113,35 @@ fn handles_are_owned_after_execution_and_do_not_define_identity_by_name() {
 }
 
 #[test]
+fn open_generic_definition_tokens_are_valid_descriptors() {
+    let Value::RuntimeTypeHandle(handle) =
+        execute("ldtoken Box", "System.RuntimeTypeHandle").unwrap()
+    else {
+        panic!("expected runtime type handle");
+    };
+    let neoclr::TypeIdentity::Definition {
+        definition,
+        arguments,
+    } = &handle.identity
+    else {
+        panic!("expected nominal definition");
+    };
+    assert_eq!(
+        arguments,
+        &vec![neoclr::TypeIdentity::GenericParameter {
+            definition: definition.clone(),
+            index: 0,
+        }]
+    );
+    // Describing an open definition does not allow allocating its open storage.
+    assert!(execute("newobj Box", "Box").is_err());
+}
+
+#[test]
 fn invalid_tokens_layouts_and_host_handle_imports_are_rejected() {
     for body in [
         "ldtoken Missing",
         "ldtoken !0",
-        "ldtoken Box",
         "ldtoken Box<Int32,Byte>",
         "sizeof System.RuntimeTypeHandle",
         "newobj System.RuntimeTypeHandle",

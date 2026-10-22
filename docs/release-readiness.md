@@ -107,3 +107,18 @@ adapter allocates rooted managed text and must retain runtime integration. The T
 provider already has a separate native adapter with host-owned socket/scheduler
 callbacks. Any move requires all-engine import support, matched packaging and
 measured call/marshalling cost; no service was relocated in this increment.
+
+### Reflection fixture gate repair — 2026-10-22
+
+The current-source run reproduced all seven recorded Raven reflection failures.
+The archived test profile lacked the three generic-method fields now supplied by
+runtime snapshots. Its adaptation now follows the current Raven provider layout;
+production Raven sources and generated legacy artifacts remain unchanged. The old
+open-generic-token rejection expectation is replaced with descriptor identity and
+open-storage rejection checks. All 26 reflection and seven type-inspection tests
+pass. [Evidence](validation/release-stabilization-20261022/reflection-fixture-repair.json).
+
+Performance review: this repair changes test fixtures only, so it introduces no
+production Rust/Raven allocation or execution changes. Test-run duration is not a
+runtime benchmark. This closes the focused failures, not the fresh extracted-source
+release suite or pending HTTP startup/package gates.

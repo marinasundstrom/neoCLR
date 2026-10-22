@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Repair release-test scaffolding: align archived RuntimeMethodInfo storage with the three generic-method flags supplied by runtime snapshots, and accept open generic definition tokens while retaining rejection of open storage allocation. All 26 Raven reflection and seven type-inspection tests pass. Production reflection behavior and allocation paths are unchanged; a fresh full-source release run remains required.
+
 - Record the author-directed runtime/module native boundary: Rust runtime mechanisms use InternalCall; module-owned support libraries use NativeImport with explicit ABI dependencies, including AOT. Document dependency direction, migration validation and current dynamic-linking limits. No service relocation or static import implementation is claimed.
 
 - Index source methods by name during Rust native specialization, retaining source-order overload candidates and exact owner/signature/definition checks. All 24 focused specialization tests pass. A five-round unoptimized synthetic probe reduces median expansion time from 45.6 ms to 13.6 ms; this is not an HTTP or release-build performance claim. The index adds bounded temporary compiler storage; selection limits and native call boundaries are unchanged.
