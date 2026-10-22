@@ -2,7 +2,9 @@
 // HTTP + JSON + managed TLS requires more than the original small POC budget.
 // Match NEOCLR_NATIVE_TYPE_LIMIT in the native host header.
 pub const TYPES: usize = 1024;
-pub const FUNCTIONS: usize = 2048;
+// Match NEOCLR_NATIVE_FUNCTION_LIMIT in the native root-probe header.
+// The source-built HTTP JSON sample currently selects 2,055 methods.
+pub const FUNCTIONS: usize = 4096;
 // Every generic clone also counts toward FUNCTIONS.
 pub const FUNCTION_CLONES: usize = FUNCTIONS;
 // The intermediate inventory contains source declarations plus specialized
@@ -32,4 +34,10 @@ fn layout_budgets_match_native_allocator_contract() {
     assert!(header.contains(&format!(
         "#define NEOCLR_NATIVE_OBJECT_LANES {OBJECT_LANES}"
     )));
+}
+
+#[test]
+fn function_budget_matches_native_root_probe_contract() {
+    let header = include_str!("../../native/gc/root-probe.h");
+    assert!(header.contains(&format!("#define NEOCLR_NATIVE_FUNCTION_LIMIT {FUNCTIONS}")));
 }

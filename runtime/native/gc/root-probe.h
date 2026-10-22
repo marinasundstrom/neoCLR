@@ -1,7 +1,7 @@
 #ifndef NEOCLR_AOT_ROOT_PROBE_H
 #define NEOCLR_AOT_ROOT_PROBE_H
 /* Match the compiler selected-function budget in runtime/codegen/src/limits.rs. */
-#define NEOCLR_NATIVE_FUNCTION_LIMIT 2048
+#define NEOCLR_NATIVE_FUNCTION_LIMIT 4096
 #include "../faults/fault-details.h"
 #include <stdint.h>
 #include <stddef.h>

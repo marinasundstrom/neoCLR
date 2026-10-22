@@ -1,0 +1,615 @@
+{
+  "date": "2026-10-22",
+  "baseRevision": "8f954dcc6f06a4e0962487820db994a5bd6865de",
+  "functionLimit": 4096,
+  "inputHashes": {
+    "runtime/codegen/src/limits.rs": "c4d47dd6d0333e775dccdc7ac7cb7c1cfa99b7bb1a1e3b2cd6a0083ec4be72d6",
+    "runtime/native/gc/root-probe.h": "5c247269c702898e675439db37b1c8b62db7b44e0160c5043c89d93cd4c2881f",
+    "runtime/codegen/tests/root_probes.rs": "d1770ede182dc377df84872aa27aafbaa0f1719ec6b6c9555d33d3500529e96a",
+    "runtime/codegen/tests/values.rs": "1f03635990c9a11944c28a312113e6224fafaf658c56ebe2d920e59ebb0080fd",
+    "target/release/neoclr-codegen": "03e7f50bf4c06c68fbf73b86fc5b39d395271fa81e9365c64879174b81f86cd2",
+    "target/http-stabilization-20261022/host.dylib": "018136b830847dd7083256636b4565fb65b92110f8bd9329ed25e513a4301e84",
+    "target/http-stabilization-20261022/runtime.py": "1ce23475bf4b7232cb2175b0280ba217e3da5f72dd85c6030b874f92848cd9af",
+    "target/http-stabilization-20261022/aot-runtime.py": "bcb9b28e209b362195794e3d7cc422c2f3a08192ead216f92bb7f839991728d7",
+    "target/http-stabilization-20261022/server-aot": "a77c85af73b076215913bfd3ad2f82e171e90a33c72687b35865e1e13c12f8b4",
+    "target/http-stabilization-20261022/client-aot": "b09b99d712f0f3a0e9d44b457e9ed96b98941d18c2ab230591922ae9e5abe97a",
+    "target/native-layout-bundle-20261022/lib/System.Web.dll": "6afaa0e1aec6ea91c6efd61d143a3d51ac4e9066d6cfac99358b7bc344da85c4",
+    "target/native-layout-bundle-20261022/lib/System.Networking.dll": "fbd52d7223fb5d2ea4013efcd5d937c921a7f031c3def4dc6c53b5f613161187",
+    "target/native-layout-bundle-20261022/lib/System.Runtime.dll": "a51215732d7ce5eeccaee2b98ffe0df6637e7532067437fa462c99ba125202a6",
+    "target/native-layout-bundle-20261022/lib/System.Data.dll": "c6490c47ffd1849819358b3079ce6d7c70fa7944ccf7e04ae55213eeb63b89d0",
+    "target/native-layout-bundle-20261022/lib/System.Data.PostgreSql.dll": "934d1c70864416fed6b0f3da6dfcdd7681dd2eeab8e53683504aae0124476f14",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/RavenDoc.dll": "59b67bf315b17ceebdca351071a5efc8f26c228545099308e49fd9d19e10264a",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Raven.CodeAnalysis.Console.dll": "bd0dfab30f152c704f282f05b147bfa0e3653401d72fef99b8ba114c95c33698",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "6f71281889a7b3bd1360463a20025bc7335f0c9bceced6af1b1b717505b7f500",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/rvnc.dll": "ea571cd21115d3e5d241cef2d25da4d948a66b576e203fdd1fc568fef59242c5",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "e76316cb537280bc408bd603252b17d49f22f52dafadc6c7921c03134627e75c",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "390e693beaff34f0245d4f3b9966cd09941a7c9768ff2eff3c2e776603d59ad7",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Raven.Core.dll": "18b6a717c1e380c1dfebe6b841f8b67a4d0a972289f93402c7f52fbf4e5c6f34",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "target/native-layout-bundle-20261022/sdk/tools/rvnc/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "target/http-stabilization-20261022/bin/neoclr/App.dll": "49767246503e4c96979e88660e21f681c76e1323a5d809d9954b0827188c86d4",
+    "target/http-stabilization-20261022/bin/neoclr/App.reflection.json": "a9449aa8f0f32e580bbdb699b17dd391ec235bfe2e531de11ca83a618cf974fd",
+    "target/http-stabilization-20261022/client/bin/neoclr/App.dll": "a2e324862107b01d048f9966d668762bed206c1f0553e0cda24f8755a971d26f",
+    "target/http-stabilization-20261022/client/bin/neoclr/App.reflection.json": "c6b3b67396913f841d45bd6ea0603192c28fb203a6fe9feef64d938a7b26138e"
+  },
+  "backendTests": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `test` profile [unoptimized] target(s) in 15.13s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr_codegen-316d2b322a38be33)\n\nrunning 139 tests\ntest bindings::native_text_array_tests::source_owned_text_vectors_keep_exact_elements_and_internal_contracts ... ok\ntest bindings::task_queue_tests::entry_drain_requires_exact_service_and_marks_host_completion_work ... ok\ntest bindings::task_queue_tests::queue_binding_preserves_closed_source_ownership_and_rejects_impostors ... ok\ntest bindings::identity_tests::identity_binding_requires_exact_reserved_contract ... ok\ntest bindings::cryptography_tests::crypto_binding_does_not_replace_managed_bodies_or_accept_changed_contracts ... ok\ntest bindings::tls_tests::tls_binding_does_not_replace_managed_bodies_or_accept_changed_contracts ... ok\ntest bindings::type_identity_tests::stack_trace_requires_exact_native_contract ... ok\ntest bindings::type_identity_tests::system_culture_requires_the_exact_internal_call_contract ... ok\ntest bindings::type_identity_tests::type_equals_requires_exact_reserved_contract ... ok\ntest bindings::terminal_tests::terminal_bindings_require_exact_internal_contracts ... ok\ntest bindings::utf8_slice_tests::utf8_slice_requires_exact_readonly_byte_internalcall ... ok\ntest compiler::values::gc_layout::tests::cyclic_objects_describe_edges_without_recursive_expansion ... ok\ntest compiler::values::gc_layout::tests::intersection_views_use_one_strong_reference_slot ... ok\ntest compiler::values::gc_layout::tests::local_seeding_clears_erased_tags_and_roots_but_not_integer_lanes ... ok\ntest compiler::values::gc_layout::tests::mixed_union_traces_only_its_separate_reference_lane ... ok\ntest compiler::values::gc_layout::tests::nested_records_preserve_reference_offsets_and_stop_at_reference_edges ... ok\ntest compiler::values::gc_layout::tests::nominal_array_backing_is_not_an_object_containing_itself ... ok\ntest compiler::values::gc_layout::tests::persistent_byte_memory_traces_only_owner_in_nested_storage ... ok\ntest compiler::values::gc_layout::tests::scalar_union_payloads_are_numeric_and_never_roots ... ok\ntest compiler::values::gc_layout::tests::structural_tuple_tracing_preserves_nested_offsets_and_excludes_numeric_lanes ... ok\ntest compiler::values::gc_layout::tests::union_reference_payload_uses_one_strong_slot_without_a_carrier ... ok\ntest compiler::values::gc_layout::tests::value_union_payload_regions_preserve_record_roots_and_bounds ... ok\ntest compiler::values::gc_layout::tests::wide_integers_are_not_roots_but_scalar_borrows_keep_owners ... ok\ntest boxing::structural_union_tests::whole_union_box_is_not_projected_to_a_payload_reference_cast ... ok\ntest boxing::structural_union_tests::function_unboxing_uses_checked_reference_cast ... ok\ntest compiler::values::profile::object_assignment_tests::base_arguments_cannot_pass_uninitialized_receiver_to_helpers ... ok\ntest compiler::values::profile::object_assignment_tests::base_initializer_accepts_independent_expressions_without_exposing_receiver ... ok\ntest bindings::type_identity_tests::time_zone_rules_require_exact_internal_call_contracts ... ok\ntest compiler::values::gc_points::tests::spill_selection_keeps_discriminators_and_excludes_wide_integers ... ok\ntest compiler::values::gc_points::tests::root_plans_stage_constructor_receivers_arrays_and_output_borrows ... ok\ntest compiler::values::profile::object_assignment_tests::memory_views_never_receive_empty_record_layouts ... ok\ntest compiler::values::profile::object_assignment_tests::persistent_byte_memory_has_three_lanes_and_rejects_raw_construction ... ok\ntest compiler::values::profile::object_assignment_tests::interface_upcast_requires_the_explicit_object_base ... ok\ntest compiler::values::structural_jit_tests::structural_tuple_jit_costs_match_nominal_records ... ignored, explicit native performance qualification; runs millions of calls\ntest compiler::values::windows_frame_tests::windows_final_frame_limit_includes_machine_linkage_and_call_space ... ok\ntest compiler::values::profile::object_assignment_tests::borrowed_byte_views_cannot_enter_native_fields ... ok\ntest limits::function_budget_matches_native_root_probe_contract ... ok\ntest limits::layout_budgets_match_native_allocator_contract ... ok\ntest limits::type_budget_matches_native_collector_contract ... ok\ntest compiler::values::profile::object_assignment_tests::explicit_reference_methods_preserve_private_dispatch ... ok\ntest enum_queries::tests::queries_require_exact_contract_and_fault_without_enum_tokens ... ok\ntest linking::inventory_bounds_tests::library_growth_keeps_explicit_load_set_limits ... ok\ntest linking::variance_projection_tests::array_argument_variance_preserves_closed_nominal_conformance ... ok\ntest linking::variance_projection_tests::memory_view_element_survives_private_rename_but_not_serialization ... ok\ntest bindings::console_memory_tests::console_memory_requires_retained_readonly_byte_identity ... ok\ntest bindings::type_identity_tests::runtime_async_requires_exact_native_contracts ... ok\ntest linking::variance_projection_tests::string_conformance_survives_private_projection ... ok\ntest memory_views::tests::byte_memory_bindings_reject_mutated_internalcall_contracts ... ok\ntest memory_views::tests::byte_memory_length_and_slice_bind_only_exact_view_signatures ... ok\ntest memory_views::tests::byte_memory_readonly_binding_only_restricts_exact_persistent_byte_views ... ok\ntest memory_views::tests::byte_view_access_requires_borrowed_and_writable_setter ... ok\ntest memory_views::tests::byte_view_conversions_follow_capabilities_not_layout ... ok\ntest memory_views::tests::persistent_byte_memory_requires_retained_exact_shape ... ok\ntest linking::variance_projection_tests::object_argument_variance_survives_private_root_renaming ... ok\ntest memory_views::tests::utf8_view_requires_exact_string_readonly_slice_contract ... ok\ntest linking::descriptor_token_tests::descriptor_tokens_keep_identity_in_native_execution ... ok\ntest memory_views::tests::view_bounds_fault_binds_only_exact_void_contract ... ok\ntest native_exports::tests::annotation_arguments_and_header_contract ... ok\ntest native_exports::tests::output_failures_preserve_existing_files ... ok\ntest native_exports::tests::names_encode_identity_without_platform_decoration_or_row_indices ... ok\ntest linking::variance_projection_tests::nominal_rename_preserves_native_variance_and_slot_identity ... ok\ntest memory_views::tests::persistent_byte_memory_verification_copy_keeps_initialization_checks ... ok\ntest linking::descriptor_token_tests::descriptor_tokens_survive_selection_rewrite_and_aot_emission ... ok\ntest compiler::values::profile::static_token_tests::static_type_tokens_are_valid_without_admitting_static_values ... ok\ntest reflection_construction::tests::attributes_require_an_explicit_boolean_policy_without_constructor_roots ... ok\ntest native_layout::tests::nested_structs_and_self_pointers_have_checked_headers ... ok\ntest native_layout::tests::defaults_overrides_packing_and_explicit_overlap ... ok\ntest native_layout::tests::loaded_attribute_identity_controls_field_marshalling ... ok\ntest reflection_construction::tests::field_retention_requires_explicit_metadata_and_boolean_policies ... ok\ntest reflection_construction::tests::function_retention_requires_exact_module_scope_and_attribute_policy ... ok\ntest reflection_construction::tests::method_retention_is_descriptive_and_accepts_generic_definitions ... ok\ntest reflection_construction::tests::module_catalogs_require_explicit_scoped_metadata_without_type_roots ... ok\ntest reflection_construction::tests::type_catalog_retention_is_explicit_and_does_not_select_layouts ... ok\ntest reflection_metadata::object_tests::object_query_requires_exact_contract_and_excludes_private_backings ... ok\ntest reflection_metadata::object_tests::object_query_retains_exact_function_shapes_without_nominal_rows ... ok\ntest bindings::deadline_tests::deadlines_and_timers_require_exact_reserved_signatures_and_internal_bodies ... ok\ntest reflection_constructors::tests::exact_constructor_invocation_preserves_arguments_and_result ... ok\ntest native_layout::tests::invalid_layouts_and_managed_fields_reject ... ok\ntest reflection_metadata::open_query_tests::partial_generic_arguments_use_the_selected_nominal_identity ... ok\ntest reflection_metadata::open_query_tests::open_argument_results_extend_the_inventory_and_coexist_with_closed_tokens ... ok\ntest reflection_metadata::shape_tests::source_shape_facts_preserve_closed_union_and_origin_visibility ... ok\ntest reflection_metadata::tests::array_construction_discovers_executable_cast_shapes ... ok\ntest reflection_metadata::tests::catalogue_retains_generic_declarations_across_distinct_constructions ... ok\ntest reflection_metadata::open_query_tests::open_queries_preserve_source_metadata_without_executable_types ... ok\ntest reflection_constructors::tests::checks_reject_unretained_private_and_wrong_arity_without_execution_roots ... ok\ntest reflection_metadata::tests::descriptor_names_use_source_origin_and_require_exact_contract ... ok\ntest reflection_metadata::tests::function_generic_arguments_preserve_closed_identity_and_shape ... ok\ntest reflection_metadata::tests::metadata_tokens_preserve_source_rows_instead_of_native_type_indices ... ok\ntest reflection_metadata::tests::union_generic_arguments_preserve_closed_identity_and_visibility ... ok\ntest reflection_metadata::tests::descriptor_queries_reject_missing_metadata_and_unadmitted_shapes ... ok\ntest native_layout::tests::supported_packing_values_generate_portable_target_headers ... ok\ntest reflection_metadata::open_query_tests::open_queries_preserve_invalid_selector_and_argument_faults ... ok\ntest reflection_snapshots::catalog_tests::declaring_type_requires_exact_contract_and_explicit_retention ... ok\ntest reflection_snapshots::catalog_tests::method_retention_projects_open_and_observed_closed_owners_without_invocation ... ok\ntest reflection_metadata::tests::relationship_queries_bind_identity_and_reject_inexact_contracts ... ok\ntest reflection_snapshots::catalog_tests::empty_function_scope_is_explicit_and_preserves_unretained_faults ... ok\ntest reflection_snapshots::catalog_tests::snapshot_tokens_keep_closed_identity_and_open_parameter_owners ... ok\ntest reflection_snapshots::catalog_tests::type_discovery_requires_retention_and_exact_contracts ... ok\ntest reflection_snapshots::catalog_tests::unrelated_type_retention_does_not_require_assembly_catalog_metadata ... ok\ntest runtime_context::tests::changed_facades_and_indirect_getters_are_rejected ... ok\ntest reflection_snapshots::catalog_tests::unretained_module_attributes_bind_an_explicit_fault_with_exact_contract ... ok\ntest selection::composition_admission_tests::dispatch_relationship_cache_timing ... ignored, manual dispatch relationship timing probe\ntest runtime_context::tests::callers_keep_their_own_assembly_and_virtual_receiver_checks ... ok\ntest runtime_context::tests::facade_scope_preserves_a_foreign_same_named_caller ... ok\ntest runtime_context::tests::native_direct_service_preserves_callers_and_rejects_non_intrinsics ... ok\ntest specialization::tests::boxed_scalar_interface_body_specializes_generic_helpers ... ok\ntest selection::composition_admission_tests::boxed_value_interface_targets_are_retained_without_a_constructor ... ok\ntest selection::composition_admission_tests::dispatch_relationship_cache_preserves_closed_types_and_module_changes ... ok\ntest selection::composition_admission_tests::structural_tuple_storage_is_selected_without_nominal_carriers ... ok\ntest selection::composition_admission_tests::structural_union_signatures_are_selected_without_nominal_carriers ... ok\ntest specialization::tests::deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack ... ok\ntest selection::composition_admission_tests::explicit_mapping_identity_follows_selected_rows ... ok\ntest specialization::tests::generic_class_override_without_base_call_retains_closed_slot ... ok\ntest specialization::tests::function_kind_constraint_preserves_typed_calls_after_specialization ... ok\ntest specialization::tests::input_function_inventory_remains_bounded ... ok\ntest specialization::tests::memory_view_shapes_retain_exact_elements_without_admitting_native_layout ... ok\ntest specialization::tests::generic_shape_expansion_has_its_own_bound_before_selection ... ok\ntest specialization::tests::host_roots_share_selected_function_budget_and_ignore_duplicates ... ok\ntest specialization::tests::closed_type_budget_includes_nongeneric_dependency_shapes ... ok\ntest reflection_properties::tests::empty_internal_retention_faults_instead_of_granting_property_access ... ok\ntest specialization::tests::method_class_bounds_validate_before_specialization ... ok\ntest bindings::socket_memory_tests::socket_transfer_requires_exact_persistent_byte_capabilities ... ok\ntest specialization::tests::nominal_class_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::method_categories_use_runtime_constraint_validation ... ok\ntest specialization::tests::init_accessor_authority_survives_specialization_and_selection ... ok\ntest specialization::tests::specialization_lookup_timing ... ignored, focused specialization timing probe; run explicitly with --nocapture\ntest specialization::tests::nominal_self_inheritance_closes_views_at_the_implementing_owner ... ok\ntest specialization::tests::instance_methods_specialize_owner_and_method_parameters_independently ... ok\ntest specialization::tests::nested_generic_specializations_preserve_each_lexical_owner ... ok\ntest specialization::tests::nominal_static_self_methods_specialize_without_erasing_conformance ... ok\ntest specialization::tests::variant_interfaces_preserve_dispatch_and_identity_after_specialization ... ok\ntest string_projection::tests::string_factory_does_not_discard_base_constructor_effects ... ok\ntest specialization::tests::special_type_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::variant_interface_dispatch_closes_generic_implementations ... ok\ntest specialization::tests::variant_selection_ignores_unrelated_explicit_source_templates ... ok\ntest string_projection::tests::string_factory_removes_empty_base_initializer_and_relocates_branches ... ok\ntest specialization::tests::signature_only_classes_retain_closed_interface_conformance ... ok\ntest specialization::tests::specialized_interface_dispatch_ignores_unselected_open_overload ... ok\ntest specialization::tests::selected_function_budget_accepts_boundary_and_rejects_overflow ... ok\n\ntest result: ok. 136 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 13.50s\n\n",
+  "boundaryTests": "   Compiling ring v0.17.14\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n   Compiling rustls v0.23.45\n   Compiling rustls-webpki v0.103.15\n   Compiling neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n   Compiling neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `test` profile [unoptimized] target(s) in 33.61s\n     Running tests/root_probes.rs (target/interop-validation/debug/deps/root_probes-dba419b77e42ad8d)\n\nrunning 1 test\ntest published_frame_function_bound_matches_native_selection ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.65s\n\n     Running tests/values.rs (target/interop-validation/debug/deps/values-e30b93f233850bd2)\n\nrunning 1 test\ntest expanded_value_function_budget_accepts_4096_and_rejects_4097 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 74 filtered out; finished in 6.47s\n\n",
+  "compilerBuild": "   Compiling ring v0.17.14\n   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n   Compiling rustls v0.23.45\n   Compiling rustls-webpki v0.103.15\n   Compiling neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n   Compiling neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n    Finished `release` profile [optimized] target(s) in 56.48s\n",
+  "hostBuild": [
+    {
+      "command": [
+        "/Users/robert/.rustup/toolchains/stable-aarch64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--target",
+        "aarch64-apple-darwin",
+        "--target-dir",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/time-zone-rules",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/Cargo.toml",
+        "--features",
+        "time-zone-rules"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "    Finished `release` profile [optimized] target(s) in 0.01s\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.rustup/toolchains/stable-aarch64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--target",
+        "aarch64-apple-darwin",
+        "--target-dir",
+        "/Users/robert/Projects/neoclr/tools/native-crypto/target",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/native-crypto/Cargo.toml"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "   Compiling ring v0.17.14\n   Compiling neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n   Compiling neoclr-native-crypto v0.0.0 (/Users/robert/Projects/neoclr/tools/native-crypto)\n    Finished `release` profile [optimized] target(s) in 3.83s\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.rustup/toolchains/stable-aarch64-apple-darwin/bin/cargo",
+        "build",
+        "--locked",
+        "--profile",
+        "native-ffi",
+        "--target",
+        "aarch64-apple-darwin",
+        "--target-dir",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target",
+        "--manifest-path",
+        "/Users/robert/Projects/neoclr/tools/native-tls/Cargo.toml"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "   Compiling ring v0.17.14\n   Compiling rustls v0.23.45\n   Compiling rustls-webpki v0.103.15\n   Compiling neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n    Finished `native-ffi` profile [optimized] target(s) in 10.49s\n"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+        "-I/Users/robert/Projects/neoclr/runtime/native/async",
+        "-DNEOCLR_MANAGED_TLS",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-managed/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/host.dylib",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/system-culture.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/time-zone.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/time-zone-rules/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/cryptography.c",
+        "/Users/robert/Projects/neoclr/tools/native-crypto/target/aarch64-apple-darwin/release/libneoclr_native_crypto.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/native-ffi/libneoclr_native_tls.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.c",
+        "-framework",
+        "CoreFoundation"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "aotBuild": [
+    {
+      "phase": "compile",
+      "role": "server",
+      "command": [
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/server.o",
+        "--fault-details",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.PostgreSql.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-stack-trace",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-cryptography",
+        "--bind-tls",
+        "--bind-task-queue",
+        "--bind-scheduler",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-runtime-async",
+        "--bind-file-input",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "seconds": 19.712321000000003
+    },
+    {
+      "phase": "link",
+      "role": "server",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+        "-I/Users/robert/Projects/neoclr/runtime/native/async",
+        "-DNEOCLR_MANAGED_TLS",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/server-aot",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/system-culture.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/time-zone.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/time-zone-rules/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/cryptography.c",
+        "/Users/robert/Projects/neoclr/tools/native-crypto/target/aarch64-apple-darwin/release/libneoclr_native_crypto.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/native-ffi/libneoclr_native_tls.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.c",
+        "-framework",
+        "CoreFoundation",
+        "-DNEOCLR_ENTRY_ARGUMENTS",
+        "-I",
+        "/Users/robert/Projects/neoclr/tools/native",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/server.o"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "phase": "compile",
+      "role": "client",
+      "command": [
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client.o",
+        "--fault-details",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/native-layout-bundle-20261022/lib/System.Data.PostgreSql.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--bind-stack-trace",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-cryptography",
+        "--bind-tls",
+        "--bind-task-queue",
+        "--bind-scheduler",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-runtime-async",
+        "--bind-file-input",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "seconds": 19.806745125000003
+    },
+    {
+      "phase": "link",
+      "role": "client",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+        "-I/Users/robert/Projects/neoclr/runtime/native/async",
+        "-DNEOCLR_MANAGED_TLS",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client-aot",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/system-culture.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/time-zone.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/time-zone-rules/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/cryptography.c",
+        "/Users/robert/Projects/neoclr/tools/native-crypto/target/aarch64-apple-darwin/release/libneoclr_native_crypto.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/native-ffi/libneoclr_native_tls.a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.c",
+        "-framework",
+        "CoreFoundation",
+        "-DNEOCLR_ENTRY_ARGUMENTS",
+        "-I",
+        "/Users/robert/Projects/neoclr/tools/native",
+        "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client.o"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "inventoryAndSize": {
+    "server": {
+      "functions": 2055,
+      "types": 662,
+      "executableBytes": 28149544,
+      "objectBytes": 26217304
+    },
+    "client": {
+      "functions": 1988,
+      "types": 674,
+      "executableBytes": 28647976,
+      "objectBytes": 26408680
+    }
+  },
+  "jit": {
+    "execution": "default",
+    "inputs": {
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/runtime.py": "1ce23475bf4b7232cb2175b0280ba217e3da5f72dd85c6030b874f92848cd9af",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll": "49767246503e4c96979e88660e21f681c76e1323a5d809d9954b0827188c86d4",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.dll": "a2e324862107b01d048f9966d668762bed206c1f0553e0cda24f8755a971d26f",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Runtime.dll": "a51215732d7ce5eeccaee2b98ffe0df6637e7532067437fa462c99ba125202a6",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Data.dll": "c6490c47ffd1849819358b3079ce6d7c70fa7944ccf7e04ae55213eeb63b89d0",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Networking.dll": "fbd52d7223fb5d2ea4013efcd5d937c921a7f031c3def4dc6c53b5f613161187",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Web.dll": "6afaa0e1aec6ea91c6efd61d143a3d51ac4e9066d6cfac99358b7bc344da85c4",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Data.PostgreSql.dll": "934d1c70864416fed6b0f3da6dfcdd7681dd2eeab8e53683504aae0124476f14",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json": "a9449aa8f0f32e580bbdb699b17dd391ec235bfe2e531de11ca83a618cf974fd",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.reflection.json": "c6b3b67396913f841d45bd6ea0603192c28fb203a6fe9feef64d938a7b26138e"
+    },
+    "runs": [
+      {
+        "serverCommand": [
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/runtime.py",
+          "run",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json",
+          "--",
+          "4"
+        ],
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/report",
+            "status": 200,
+            "body": {
+              "station": "Caf\u00e9"
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 201,
+            "body": {
+              "accepted": true
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 400,
+            "body": {
+              "error": "Invalid report"
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/missing",
+            "status": 404,
+            "body": {
+              "error": "Not found"
+            }
+          }
+        ],
+        "port": "51891",
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      },
+      {
+        "serverCommand": [
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/runtime.py",
+          "run",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json",
+          "--",
+          "2"
+        ],
+        "requests": [],
+        "port": "51899",
+        "clientCommand": [
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/runtime.py",
+          "run",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.reflection.json",
+          "--",
+          "http://127.0.0.1:51899/"
+        ],
+        "client": {
+          "exitCode": 0,
+          "stdout": "{\"accepted\":true}\n",
+          "stderr": ""
+        },
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true
+  },
+  "aot": {
+    "execution": "default",
+    "inputs": {
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/aot-runtime.py": "bcb9b28e209b362195794e3d7cc422c2f3a08192ead216f92bb7f839991728d7",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll": "49767246503e4c96979e88660e21f681c76e1323a5d809d9954b0827188c86d4",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.dll": "a2e324862107b01d048f9966d668762bed206c1f0553e0cda24f8755a971d26f",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Runtime.dll": "a51215732d7ce5eeccaee2b98ffe0df6637e7532067437fa462c99ba125202a6",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Data.dll": "c6490c47ffd1849819358b3079ce6d7c70fa7944ccf7e04ae55213eeb63b89d0",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Networking.dll": "fbd52d7223fb5d2ea4013efcd5d937c921a7f031c3def4dc6c53b5f613161187",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Web.dll": "6afaa0e1aec6ea91c6efd61d143a3d51ac4e9066d6cfac99358b7bc344da85c4",
+      "/Users/robert/Projects/neoclr/target/native-layout-libraries-20261022/System.Data.PostgreSql.dll": "934d1c70864416fed6b0f3da6dfcdd7681dd2eeab8e53683504aae0124476f14",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json": "a9449aa8f0f32e580bbdb699b17dd391ec235bfe2e531de11ca83a618cf974fd",
+      "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.reflection.json": "c6b3b67396913f841d45bd6ea0603192c28fb203a6fe9feef64d938a7b26138e"
+    },
+    "runs": [
+      {
+        "serverCommand": [
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/aot-runtime.py",
+          "run",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json",
+          "--",
+          "4"
+        ],
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/report",
+            "status": 200,
+            "body": {
+              "station": "Caf\u00e9"
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 201,
+            "body": {
+              "accepted": true
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 400,
+            "body": {
+              "error": "Invalid report"
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/missing",
+            "status": 404,
+            "body": {
+              "error": "Not found"
+            }
+          }
+        ],
+        "port": "51957",
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      },
+      {
+        "serverCommand": [
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/aot-runtime.py",
+          "run",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/bin/neoclr/App.reflection.json",
+          "--",
+          "2"
+        ],
+        "requests": [],
+        "port": "51962",
+        "clientCommand": [
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/aot-runtime.py",
+          "run",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/Projects/neoclr/target/http-stabilization-20261022/client/bin/neoclr/App.reflection.json",
+          "--",
+          "http://127.0.0.1:51962/"
+        ],
+        "client": {
+          "exitCode": 0,
+          "stdout": "{\"accepted\":true}\n",
+          "stderr": ""
+        },
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true
+  },
+  "performanceReview": "Bound changes no frame layout and allocates no new per-call storage. Larger admitted graphs can increase compiler memory/time and executable size. Recorded compilation times are single optimized-tool observations including load/verification/emission, not steady-state HTTP measurements or a comparative benchmark. Executables include their linked support libraries; no size reduction claimed.",
+  "scope": "macOS ARM64 rebuilt source-overlay compiler/libraries/host; direct backend adapters invoke the same JIT entry profile and the standalone AOT executables. Not refreshed installed/extracted packages or Windows qualification.",
+  "websiteValidation": {
+    "apiSourceAndReferenceChecks": "passed",
+    "pagesChecked": 5681
+  }
+}

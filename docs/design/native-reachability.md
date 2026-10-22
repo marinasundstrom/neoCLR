@@ -72,3 +72,13 @@ selection checks including the manual probe pass. The five-round unoptimized
 relationship probe changes median time for 4,096 queries from about 12.5 ms to
 1.5 ms, including cold entries in the first cached round.
 [Evidence and limitations](../validation/release-stabilization-20261022/dispatch-relations.json).
+
+## Coordinated capacity follow-up
+
+The subsequent implementation raises the compiler and native root-probe limits to
+4,096 together, based on the measured 2,055-method HTTP input. A compiler/header
+agreement test and last-valid/first-invalid native tests cover the new boundary.
+This supersedes the unchanged-limit status above. It neither adds devirtualization
+nor changes which methods are retained. Larger admitted programs may consume more
+compiler memory, compilation time and output space; the bound itself adds no
+per-invocation allocation and does not change the GC frame representation.

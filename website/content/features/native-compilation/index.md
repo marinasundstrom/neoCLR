@@ -114,6 +114,13 @@ HTTP workloads or establish Windows output sizes.
 
 ## Current limits
 
+Development after Preview 16: the native backend and matching host now admit up to
+4,096 selected methods. The rebuilt macOS ARM64 HTTP JSON sample uses 2,055 methods
+and passes server requests and a client/server exchange in both JIT and standalone
+AOT. This is source-build validation; refreshed installed packages and Windows
+qualification remain pending. The bound is an experimental backend limit, not a
+Raven language rule.
+
 Native support remains experimental. Generic virtual dispatch and some runtime
 services have incomplete target coverage. The HTTP showcases are bounded HTTP/1.1
 applications, not a promise of arbitrary concurrent server support. HTTPS needs

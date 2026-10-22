@@ -401,8 +401,8 @@ int main(int argc, char **argv) {
     neoclr_aot_context context = {0};
     neoclr_probe_frame frame;
     neoclr_probe_storage empty = {0};
-    neoclr_probe_enter_v3(&frame, &context, argc > 1 ? 1024 : 1023, &empty, 0, "", 0);
-    if (frame.function != 1023 || neoclr_root_probe_depth_v1() != 1) return 2;
+    neoclr_probe_enter_v3(&frame, &context, argc > 1 ? NEOCLR_NATIVE_FUNCTION_LIMIT : NEOCLR_NATIVE_FUNCTION_LIMIT - 1, &empty, 0, "", 0);
+    if (frame.function != NEOCLR_NATIVE_FUNCTION_LIMIT - 1 || neoclr_root_probe_depth_v1() != 1) return 2;
     neoclr_probe_leave_v1(&frame);
     return neoclr_root_probe_depth_v1() != 0;
 }

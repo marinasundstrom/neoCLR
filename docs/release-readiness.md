@@ -186,3 +186,33 @@ server with **2,055 functions and 662 types**, including 932 generic clones. Nat
 execution is not tested. The production budget and root-probe limit remain 2,048;
 a coordinated bound update and matching host qualification are still required.
 [Design comparison and evidence](design/native-reachability.md).
+
+### Coordinated native method budget — 2026-10-22
+
+The source-built HTTP JSON server requires 2,055 selected methods, seven above the
+previous experimental bound. The compiler's selected-method/clone bounds and native
+root-probe index bound now agree at 4,096. Input inventory, type, object and inline
+layout limits are unchanged. This is a backend capacity change, not a managed type
+system restriction or a change in method/GC frame layout. A newly compiled program
+that exceeds the old bound requires the matching rebuilt host; an older installed
+host is not qualified by this change.
+
+A new compiler/header agreement test prevents drift. The native frame test now
+checks the configured last valid index and the next invalid index rather than its
+stale hard-coded 1,023/1,024 pair. The sanitized C test accepts 4,095 and aborts for
+4,096, with GC enabled and disabled. Native compilation accepts 4,096 selected
+methods and rejects 4,097 without writing an object. All 136 backend unit tests
+pass, including explicit host-root, specialization and selection boundaries.
+
+The current optimized backend and rebuilt native helper pass the four-request
+HTTP JSON server check and the Raven client/server exchange. These are local macOS
+ARM64 source-overlay checks, not an extracted/installed SDK or Windows qualification.
+
+Standalone AOT now passes the same server and client/server checks. The server
+selects 2,055 methods/662 types and the client 1,988 methods/674 types. Single
+optimized compiler runs take about 19.7 and 19.8 seconds respectively (loading,
+verification and emission, excluding linking). These are build observations, not
+steady-state throughput. The bound adds no per-call storage or GC frame-layout
+change; larger admitted programs can consume more compiler memory and output space.
+[Exact artifacts, test logs and HTTP results](validation/release-stabilization-20261022/http-function-budget.json).
+Fresh extracted-source, packaged/editor and Windows qualification remain open.

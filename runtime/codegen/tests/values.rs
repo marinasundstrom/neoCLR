@@ -2129,8 +2129,8 @@ ret
 }
 
 #[test]
-fn expanded_value_function_budget_accepts_2048_and_rejects_2049() {
-    for count in [2048, 2049] {
+fn expanded_value_function_budget_accepts_4096_and_rejects_4097() {
+    for count in [4096, 4097] {
         let mut source = String::from(".module FunctionBudget\n.function Main() -> Int32\n");
         for n in 1..count {
             source.push_str(&format!("call F{n}()\npop\n"));
@@ -2150,11 +2150,11 @@ fn expanded_value_function_budget_accepts_2048_and_rejects_2049() {
         );
         assert_eq!(
             r.status.success(),
-            count == 2048,
+            count == 4096,
             "{}",
             String::from_utf8_lossy(&r.stderr)
         );
-        if count == 2049 {
+        if count == 4097 {
             assert!(!temp.0.join("value.o").exists());
             assert!(String::from_utf8_lossy(&r.stderr).contains("selected functions exceed"));
         }

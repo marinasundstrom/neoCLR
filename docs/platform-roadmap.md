@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**HTTP JIT/AOT gate repaired locally (2026-10-22):** Compiler and native root-probe
+bounds now agree at 4,096 methods. All 136 backend tests and both native boundary
+tests pass. Matching macOS ARM64 source builds pass HTTP JSON server requests and
+the client/server exchange in JIT and standalone AOT. Packaged/editor, Windows
+and fresh-source qualification remain open.
+[Evidence](release-readiness.md#coordinated-native-method-budget--2026-10-22).
+
 **HTTP inventory established (2026-10-22):** Compilation-scoped dispatch relationship
 reuse passes 135 backend tests. Diagnostic inspection with a temporary larger bound
 admits the HTTP sample at 2,055 methods, seven above the shipping limit. No budget
