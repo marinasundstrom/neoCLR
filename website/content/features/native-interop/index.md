@@ -240,3 +240,12 @@ arguments spilled to the stack. It preserves their declared F32/F64 representati
 following the platform C ABI as .NET interop does; no marshalling allocations are
 introduced. Arithmetic, floating-point comparisons/conversions and pointer loads
 remain outside this bounded profile.
+
+
+Unsigned 32-bit transport (development, 2026-10-22): UInt32 now shares the I32
+storage ABI with Int32 while retaining its metadata type. The existing conv.u4
+operation truncates wide values without changing their low bits; conv.u8/conv.u
+zero-extend 32-bit inputs. The Raven consumer checks a high-bit uint identifier
+through locals/helper calls, widening to ulong/nuint and narrowing from ulong
+against C uint32_t/uint64_t/uintptr_t parameters. This matches ordinary fixed-width
+.NET/C interop semantics without allocating wrappers or adding metadata.

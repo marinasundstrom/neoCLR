@@ -41,3 +41,9 @@ unsafe extern func DoubleValue(index: int) -> double;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "check_floating")]
 unsafe extern func CheckFloating(a: float, b: double, marker: int, c: float, d: double, e: float, f: double, g: float, h: double, i: float, j: double, end: long) -> int;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "unsigned_id")]
+unsafe extern func UnsignedId() -> uint;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "check_id")]
+unsafe extern func CheckId(value: uint, wide: ulong, native: nuint, narrowed: uint) -> int;

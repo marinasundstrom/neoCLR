@@ -469,6 +469,11 @@ uint64_t unsigned_wide(void) { return UINT64_MAX - UINT64_C(456); }
 int32_t check_wide(int64_t s, uint64_t u) {
     return s == signed_wide() && u == unsigned_wide() ? 0 : 100;
 }
+uint32_t unsigned_id(void) { return UINT32_C(0xf1234567); }
+int32_t check_id(uint32_t id, uint64_t wide, uintptr_t native, uint32_t narrowed) {
+    return id == unsigned_id() && wide == unsigned_id() && native == unsigned_id() &&
+        narrowed == (uint32_t)unsigned_wide() ? 0 : 100;
+}
 #include <string.h>
 static const uint32_t single_bits[] = {0x80000000, 0x7f800000, 0x7fc12345, 0xc1540000};
 static const uint64_t double_bits[] = {

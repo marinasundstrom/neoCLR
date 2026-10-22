@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Admit UInt32 native-import signatures and locals using I32 storage, and lower unchecked conv.u4 truncation in the scalar JIT/AOT profile. The shared Raven consumer checks high-bit uint identifiers, unsigned widening to ulong/nuint and narrowing from ulong against C in all three engines. All 17 import tests pass; no compiler, metadata or allocation changes.
+
 - Add Single/Double transport to the opt-in macOS ARM64 scalar native-import profile, with typed arguments/results, locals, constants and defaults. Correct AOT profile selection only under native-import opt-in. The shared Raven consumer preserves negative zero, infinity, quiet-NaN payloads and finite values through mixed C register/stack arguments across interpreter/JIT/AOT. All 17 import tests, three existing managed floating-point regressions and 24 website checks pass. Unsupported floating-point operations still reject before output; no compiler or metadata encoding changes.
 
 - Admit fixed-width Int64/UInt64 transport in the opt-in macOS ARM64 scalar JIT/AOT native-import ABI, including locals, helper calls, defaults and equality/zero checks. The shared Raven consumer preserves negative signed and high-bit unsigned C values across all three engines; all 16 import tests pass. Reuse existing 64-bit lowering without new marshalling or metadata. Arithmetic expansion and general managed imports remain open.

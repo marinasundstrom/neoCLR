@@ -17,7 +17,9 @@ unsafe func Main() -> int {
         ForwardSingle(SingleValue(2)), ForwardDouble(DoubleValue(2)),
         ForwardSingle(SingleValue(3)), ForwardDouble(DoubleValue(3)),
         default(float), default(double), signed)
-    return floating + CheckWide(signed, unsigned) + result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
+    let id = ForwardId(UnsignedId())
+    let idResult = CheckId(id, (ulong)id, (nuint)id, (uint)unsigned)
+    return idResult + floating + CheckWide(signed, unsigned) + result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
 }
 
 func ForwardSize(value: nuint) -> nuint {
@@ -47,6 +49,11 @@ func ForwardSingle(value: float) -> float {
 }
 
 func ForwardDouble(value: double) -> double {
+    let copy = value
+    return copy
+}
+
+func ForwardId(value: uint) -> uint {
     let copy = value
     return copy
 }

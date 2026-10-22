@@ -132,7 +132,8 @@ pub(super) fn compile_for_target_with_imports(
                             Op::Branch(_) | Op::BranchTrue(_) | Op::BranchFalse(_) |
                             Op::Dup | Op::Pop | Op::Return | Op::Call(_)) || heap && matches!(op,
                             Op::NewArray(Type::Int32) | Op::ArrayElement(Type::Int32) |
-                            Op::StoreArrayElement(Type::Int32) | Op::ArrayLength | Op::ConvertInt32)))
+                            Op::StoreArrayElement(Type::Int32) | Op::ArrayLength | Op::ConvertUInt32
+            | Op::ConvertInt32)))
                 }) {
                 return Err("Windows stack experiment admits only Int32 functions and bounded integer control flow with GC frames and stack budget".into());
             }
@@ -464,10 +465,11 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
                     | Op::ConvertUInt64
                     | Op::ConvertNativeInt
                     | Op::ConvertNativeUInt
+                    | Op::ConvertUInt32
                     | Op::ConvertInt32 => {
                         let value = stack.pop().expect("validated integer conversion");
                         let source = builder.func.dfg.value_type(value);
-                        let target = if matches!(op, Op::ConvertInt32) {
+                        let target = if matches!(op, Op::ConvertInt32 | Op::ConvertUInt32) {
                             types::I32
                         } else {
                             types::I64

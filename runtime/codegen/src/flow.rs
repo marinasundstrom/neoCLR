@@ -81,6 +81,7 @@ pub(super) fn analyze(
             | Op::ConvertUInt64
             | Op::ConvertNativeInt
             | Op::ConvertNativeUInt
+            | Op::ConvertUInt32
             | Op::ConvertInt32
                 if native_imports =>
             {
@@ -183,6 +184,7 @@ pub(super) fn analyze(
             | Op::ConvertUInt64
             | Op::ConvertNativeInt
             | Op::ConvertNativeUInt
+            | Op::ConvertUInt32
             | Op::ConvertInt32 => popped.iter().copied().all(integer),
             Op::InitializeObject(t) => {
                 matches!(popped.as_slice(), [Kind::LocalAddress(index)] if function.locals[*index] == *t)
