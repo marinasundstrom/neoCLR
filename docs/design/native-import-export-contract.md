@@ -284,3 +284,20 @@ metadata, validation and backend qualification. This is a provisional mapping de
 not a claim that typed signatures alone make native interop safe. The current
 [scalar AOT proof](../experiments/aot-native-imports/README.md) handles Int32 only;
 full declaration projections, retained callbacks and pinning remain validation gates.
+
+
+## Void values and native no-result calls
+
+Author clarification, 2026-10-22: neoCLR Void is deliberately an inhabited normal
+type. Raven's separate Unit representation on .NET addresses a CLR restriction;
+it is not a reason to introduce Unit into neoIL. The assistant's earlier suggestion
+to rename the inhabited type is withdrawn.
+
+A Void value result and a no-result call still have different operand-stack effects.
+A C void signature has no return register. When language semantics need a Void value
+from such an operation, the compiler must explicitly adapt the no-result call to
+that value contract; otherwise it must not manufacture an unused result. Structural
+callable identity and verification must preserve the difference. The implementation
+currently records Void plus a no_result flag for no-result calls. Standardization
+of the representation/spelling remains open; no type rename, new schema or automatic
+adapter is claimed by the bounded native-call increment.

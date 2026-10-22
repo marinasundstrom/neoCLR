@@ -26,6 +26,19 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Preserve neoCLR Void as a normal type
+
+The author corrects the assistant's proposed Unit/Void split: Raven on .NET uses
+Unit because CLR Void cannot be used as a normal value type; neoCLR deliberately
+allows Void as a normal type. The compiler materializes a Void value only when
+language semantics require it. The assistant withdraws the proposed rename and
+clarifies that standardization must distinguish a Void value result from absence
+of a result without introducing a separate Unit type. Native C void still has no
+result register; any language-required Void value is an explicit adaptation at the
+managed boundary. No return-schema or text-syntax migration has been implemented;
+the current Void plus no_result return convention remains in use pending that work.
+The preceding entry preserves the earlier proposal and its correction sequence.
+
 ## 2026-10-22 — Void and no-result terminology
 
 While the assistant extends native AOT calls to C void returns, the author asks why

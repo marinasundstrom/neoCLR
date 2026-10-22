@@ -153,7 +153,8 @@ These are local build options, not changes to runtime behavior or system setting
 Terminology: neoIL's existing Void is inhabited unit; `noresult` denotes Void with
 `no_result: true`, not a new type. Structural Function signatures distinguish both
 contracts. The author questioned this naming during this work; Unit/Void naming is
-an open proposal, not part of this implementation or a compatibility requirement.
+a withdrawn proposal: the author clarifies below that neoCLR Void must remain a
+normal inhabited type. No type rename or return-schema migration was implemented.
 
 
 Qualification completed on 2026-10-22: seven import tests and all 24 scalar regressions
@@ -165,3 +166,9 @@ pass. This closes the prior pointer-increment regression gate. The clean target 
 Cargo/rustc and matching Xcode SDK/clang. The default deps directory contained at least
 400,000 generated entries; a compiler sample showed dependency-directory scanning.
 Existing artifacts were preserved. General managed imports and packaging remain open.
+
+
+Author clarification after qualification: preserve neoCLR Void as a normal type.
+Only language-required values should be materialized. Native no-result calls remain
+stack-empty; a value context needs an explicit compiler adaptation, not a native
+return-register read. See the [corrected design](../../design/native-import-export-contract.md#void-values-and-native-no-result-calls).

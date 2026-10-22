@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Record the author correction that neoCLR Void remains a normal inhabited type; withdraw the proposed Unit rename. Separate language-required Void values from no-result native call conventions in interop guidance. Return representation/syntax standardization remains open; this documentation correction changes no runtime semantics.
+
 - Admit no-result C imports and scalar helpers in the opt-in macOS ARM64 AOT profile, using the existing Void/no_result metadata contract. Emit no native return register or operand-stack result; preserve loader-fault output and ordinary host entry semantics. Add native allocation/release, side-effect, live caller-stack and invalid-result regression tests. All seven import tests, 24 scalar regressions and 24 website checks pass using a fresh non-incremental target directory, closing prior pointer qualification. Update the manual API reference, roadmap and website; class-library projection, callbacks and pinning remain open.
 
 - Extend opt-in macOS ARM64 scalar AOT imports with raw Void/Byte/Int32 pointer parameters, results and helper/local transport. Share scalar ABI widths between private calls and C thunks; keep the exported Int32 entry ABI and exact metadata validation. Add native allocation/release, null, helper forwarding and rejection regressions. Five import tests pass before mapper extraction, 13 scalar regressions pass, and all 24 website tests pass; final rebuild succeeds but macOS loader startup stalls the final test harness, leaving full final-source qualification outstanding. Nominal Ptr<T> projection, managed pinning, no-result imports and callbacks remain open; native ownership stays explicit.
