@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Complete macOS package qualification (2026-10-22):** Matching rebuilt SDK,
+language server/VSIX and libraries pass extracted samples/HTTP, 26 installed-editor
+checks, inlays and ten configuration recovery rounds. The repaired client harness
+passes locally in all three engines. Windows qualification and matching benchmark
+runs remain pending. Earlier measured library hashes differ from this new archive;
+retain their original provenance. [Evidence](release-readiness.md#complete-macos-sdk-and-editor--2026-10-22).
+
 **Platform discovery backlog (author direction, 2026-10-22):** Add public platform
 and operating-system discovery and the default line-ending sequence in the next
 release. This is planned work, not an implemented capability. Evaluate the .NET

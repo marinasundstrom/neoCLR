@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Rebuild the complete macOS SDK, matching language server/VSIX and native libraries from Raven `301e668a5`; verify the resulting archive outside the checkout. Packaged samples/HTTP, all 26 installed-editor checks, inlays and ten configuration recovery rounds pass. The repaired HTTP-client harness also passes AOT/interpreter/JIT locally. Preserve archive/report hashes; earlier benchmark results remain tied to their original library bytes. Windows qualification and matching benchmarks are rerunning; no release is published.
+
 - Record author-requested next-release platform/operating-system discovery and default line-ending APIs as planned work. Public contracts and cross-engine validation remain open; current UTF-8 transport repair does not implement platform discovery.
 
 - Preserve UTF-8 bytes and exact input line delimiters in SDK runtime-await qualification. Windows requalification passes native GC and the language/cleanup/fault/server cases, then exposes CRLF translation in the Python HTTP-client harness; send bytes and decode output explicitly instead of using host text-mode translation. Two transport regression tests pass. Client and remaining Windows qualification are pending; production reader semantics are unchanged.

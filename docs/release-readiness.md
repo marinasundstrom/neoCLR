@@ -378,3 +378,22 @@ round-trip with mixed LF/CRLF delimiters, preserving output for assertions and
 reports. Client assertion failures now include stdout/stderr. This changes only
 qualification transport, not the reader's exact configured-delimiter contract.
 The failed run remains failed; renewed Windows execution and benchmarks are required.
+
+## Complete macOS SDK and editor — 2026-10-22
+
+The complete SDK and VSIX are rebuilt together from Raven `301e668a5`, with
+matching native libraries and the already rebuilt runtime. The 56,234,478-byte
+JIT archive is extracted outside the checkout and passes manifest verification,
+packaged samples and HTTP JSON exchange. Installed VS Code in an isolated profile
+passes all 26 acceptance checks, inlay acceptance and ten configuration
+invalidation/recovery rounds across two native projects. The reader transport
+repair separately passes the HTTP client in AOT, interpreter and JIT locally.
+[Hashes and evidence](validation/release-stabilization-20261022/complete-macos-package.json).
+
+This closes these macOS package/editor checks, not every release gate. Rebuilt
+library hashes differ from the earlier timed development archive, so published
+development measurements retain their original provenance and are not represented
+as measurements of this package. [Windows qualification 39841298887](https://github.com/marinasundstrom/neoCLR/actions/runs/39841298887)
+reuses the original package with the UTF-8 transport repair; [benchmark run
+39841353425](https://github.com/marinasundstrom/neoCLR/actions/runs/39841353425)
+waits for its success. Both remain pending at this record. No release is published.

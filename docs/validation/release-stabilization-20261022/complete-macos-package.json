@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-22",
+  "platform": "macOS ARM64",
+  "compilerRevision": "301e668a51beb6ba307d63b6912b144d8ad6a6b0",
+  "runtimeRevision": "f3c26cd5918d06c1399063ac1647ecc418c42267",
+  "archive": {
+    "path": "target/release-complete-jit-macos-20261022-v2/neoclr-jit.tar.gz",
+    "bytes": 56234478,
+    "sha256": "5749e3aa28590aeafec67940134db49fcf3762398f5c5d2ddaffbb86ff6346a6"
+  },
+  "manifestSha256": "15c3ff3f20364b999fc31091b47046251ed0bf24258bc36208d27de204727a47",
+  "reports": {
+    "package": {
+      "source": "target/release-complete-jit-macos-20261022-v2/extracted-validation.json",
+      "sha256": "8aca4916b9b2ff30ca514bd9bc4afa887506a840c1d0e46bf09578c916f22ce6",
+      "passed": true,
+      "verifiedFiles": 2283
+    },
+    "editor": {
+      "source": "target/editor-complete-macos-20261022-v2/vscode-acceptance.json",
+      "sha256": "574982773f981f174ae87623bf48249bc85661491c2d70db56512f8eaa69bfcc",
+      "passed": true,
+      "checks": [
+        "native imported hover",
+        "native imported Markdown documentation hover",
+        "native Markdown sidecar edit refreshes hover",
+        "native XML fallback after Markdown member deletion",
+        "read-only metadata declaration navigation",
+        "native imported completion",
+        "native imported completion documentation",
+        "actual file watcher invalidates replaced native library",
+        "unsaved buffer survives native workspace reload",
+        "missing native reference produces a project diagnostic",
+        "native dependency recovery clears the project diagnostic",
+        "System.Data.Json.JsonValue native hover and metadata navigation",
+        "shipped native Networking documentation appears in hover",
+        "System.Networking.IPAddress native hover and metadata navigation",
+        "System.Web.Http.HttpClient native hover and metadata navigation",
+        "imported bundle configuration edit produces project diagnostic",
+        "restored bundle configuration recovers the workspace",
+        "unchanged broad sample imports source-built class library",
+        "native Option and Result type hovers retain union kind and constructed arguments",
+        "repeated broad-sample type and query hovers return symbols",
+        "broad-sample hovers return after unsaved edits",
+        "configured VS Code native build task",
+        "VS Code task executes exact broad-sample output on native runtime",
+        "failed build preserves last successful artifact",
+        "ordinary .NET editor hover and diagnostics",
+        "unchanged Tasks/await sample builds and executes from VS Code"
+      ]
+    },
+    "inlays": {
+      "source": "target/editor-complete-macos-20261022-v2/vscode-inlay-acceptance.json",
+      "sha256": "1eef2ae4e560b871bdcc38ad16981f346c8b94294e717eca9d9ffd0312b0a388",
+      "passed": true
+    },
+    "clientTransport": {
+      "source": "target/runtime-await-client-20261022-utf8/validation.json",
+      "sha256": "dbadda8c7a76e337003d4a58c4035af580c476b2d3774e3bff0227b450af1d0d",
+      "passed": true,
+      "modes": [
+        "aot",
+        "interpreter",
+        "jit"
+      ]
+    },
+    "configuration": {
+      "source": "target/editor-complete-macos-20261022-v2/vscode-configuration-acceptance.json",
+      "sha256": "0ae5cdc82863029072c32d5a8967afa4662f7b39e81e20bccc74847d0b34dc90",
+      "passed": true,
+      "rounds": 10
+    }
+  },
+  "limitations": [
+    "Windows qualification 39841298887 and benchmarks 39841353425 pending",
+    "Rebuilt library hashes differ from earlier measured development bundle; those measurements do not qualify this archive",
+    "No release published"
+  ]
+}
