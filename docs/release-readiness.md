@@ -286,3 +286,13 @@ This qualifies the development kit on macOS ARM64, not TLS handshakes, the expli
 source-only HTTPS-server profile, Windows or a published release. The benchmark
 CPU/JSON fixtures also compile successfully against the refreshed JIT bundle, but
 no timings were collected while the full source suite was running.
+
+### Windows compiler input for the next candidate
+
+The native-toolchain workflow now defaults to Raven `301e668a51beb6ba307d63b6912b144d8ad6a6b0`
+on the separate neoCLR compiler line, replacing the earlier `328349bf7c` input. The
+new revision commits native field-marshalling support and the carried general field
+attribute parser repair used by the local candidate. The Raven checkout is clean.
+This is input preparation only: the matching Windows package/editor and benchmark
+runs must still succeed. Both repositories' candidate commits must be available to
+GitHub Actions before dispatch; no historical Windows run qualifies these changes.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Refresh the Windows qualification workflow's default Raven revision to `301e668a5`, including committed native field-marshalling and field-attribute parser support. Retain explicit revision override and separate platform evidence; this updates the next build input, not Windows qualification status.
+
 - Repair the macOS native build kit's current HTTP dependency closure by packaging the separate TLS provider and adapter, enabling TLS bindings and checking the archive before compilation. Package an optimized AOT compiler. Replace stale HTTP fault injection and compare fault contracts while preserving engine-specific traces. Nine focused tooling tests and extracted console/HTTP/native import-export checks pass, including C/C++ callers, empty-environment execution, Cargo-free builds and TLS archive tamper rejection. HTTPS-server configuration stays source-only; Windows and refreshed timed benchmarks remain pending.
 
 - Add a shared sequential macOS ARM64/Windows x64 release benchmark runner for CPU, JSON and HTTP, preserving candidate/host provenance and failing on unsuccessful child evidence or manifest drift. Require explicit matching-revision Windows package selection instead of a historical default. Four focused runner tests pass; refreshed platform measurements remain pending and no new performance results are claimed.

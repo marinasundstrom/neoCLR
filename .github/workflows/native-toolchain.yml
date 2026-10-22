@@ -10,7 +10,7 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: 328349bf7c55049bd90759b3803aeb0b69b959b7
+        default: 301e668a51beb6ba307d63b6912b144d8ad6a6b0
       package_version:
         description: Internal SDK and VSIX version; does not select or publish a release tag
         required: true
@@ -46,7 +46,7 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || '328349bf7c55049bd90759b3803aeb0b69b959b7' }}
+          ref: ${{ inputs.raven_revision || '301e668a51beb6ba307d63b6912b144d8ad6a6b0' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
         if: ${{ !inputs.bundle_run }}
