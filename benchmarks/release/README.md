@@ -24,7 +24,10 @@ exit, nonpassing child report or changed manifest fails the refresh. Keep failed
 reports, logs and the candidate archive's hash with the release evidence.
 
 The Windows `Native release benchmarks` workflow requires an explicit successful
-`Native toolchain qualification` run from the same neoCLR commit. It no longer
+`Native toolchain qualification` run from the same neoCLR commit by default. For a benchmark-only repair, explicitly
+supply `candidate_revision` as the package's full commit hash to reuse the unchanged
+candidate. Both candidate and benchmark-source revisions are retained; do not use
+this override to qualify runtime/library changes absent from the package. It no longer
 silently benchmarks a historical package. Run it on the candidate ref; its artifact
 retains both the package run and archive hash. macOS uses the same runner locally
 against its separately qualified candidate.

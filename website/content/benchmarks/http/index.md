@@ -8,6 +8,31 @@ Preview 16 package with Raven `c0854cdda`. All **1,152 responses across
 <a id="plain-text-baseline"></a>
 <a id="publication-status"></a>
 
+## Development refresh — 22 October 2026
+
+The current macOS ARM64 development candidate passes 55 CPU/JSON processes and
+1,152 HTTP response checks across the combined run. These Apple M1/macOS 27.0
+results are separate from the published Preview 16 measurements below. Windows
+qualification is ongoing; its historical rows do not qualify the new candidate.
+
+| Workload | Mode | Median requests/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| http-plain | interpreter | 3.56 | 3.44–3.57 | 4.506 |
+| http-plain | jit | 178.74 | 177.77–190.22 | 7.041 |
+| http-plain | aot | 188.82 | 188.08–199.09 | 0.007 |
+| http-json | interpreter | 1.74 | 1.73–1.74 | 4.535 |
+| http-json | jit | 96.22 | 95.34–99.56 | 11.484 |
+| http-json | aot | 99.62 | 99.36–104.01 | 0.013 |
+
+The same short sequential workloads and round counts are used. HTTP fixtures were
+updated for the current content API and content-owned media type; failed attempts
+are preserved. No local builds or full test suites overlapped timings, but desktop
+and OS load remained active. These observations do not establish controlled
+speedups, sustained capacity or collector comparisons. Startup is reported separately.
+[Candidate identity, methodology and raw reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos).
+
+## Published Preview 16 series
+
 ## Workloads and results
 
 Plain text returns ten UTF-8 bytes, `Café 🌍`. Typed JSON creates a `Person` and

@@ -314,3 +314,29 @@ is running; [matching benchmark refresh](https://github.com/marinasundstrom/neoC
 waits for that exact package to succeed. These links identify pending evidence, not
 successful qualification. The macOS refresh started only after the local full suite
 completed. No release tag or website publication was performed.
+
+## Development benchmark refresh — 2026-10-22
+
+The macOS ARM64 refresh now has four passing reports: 45 CPU/JSON processes, ten
+longer native CPU processes and 1,152 validated plain/JSON HTTP responses. The
+aggregate run stopped on an obsolete HttpContent.FromText call; after fixing the
+fixture, JSON warmup exposed a text/plain Content-Type from HttpStringContent.
+Explicit content media type fixes it without changing the serialized Person
+workload. Retain both failures and the original aggregate failure; the combined
+summary uses passing independent reruns, not an altered original result.
+[Reports, hashes and methodology](../benchmarks/release-20261022/macos/README.md).
+
+The website adds development measurements separately from published Preview 16
+results. No local builds/full suites overlapped timed workers; desktop and OS load
+remained active. Native CPU throughput is broadly similar to the old series,
+interpreter CPU cost/startup increased, and JSON/HTTP rates increased in this run.
+These observations are not controlled causal comparisons or release-performance
+thresholds; allocation/GC rates, concurrency and HTTPS remain unmeasured here.
+
+Windows package run 39835531991 remains in progress. Benchmark run 39835576608 was
+cancelled before measurement because it selected the stale fixture. The workflow
+now supports an explicitly pinned candidate commit when only benchmark sources
+change, retaining both revisions; the default still requires identical revisions.
+This permits fixture repair validation against the existing package without
+misrepresenting which runtime/library commit it contains. A new Windows benchmark
+run must pass before the two-platform refresh is complete.

@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**macOS benchmark refresh (2026-10-22):** CPU/JSON and plain/JSON HTTP reports pass:
+55 processes and 1,152 validated responses. Repair current content API/media-type
+fixtures, retain failed attempts and add separate development website tables.
+Windows package qualification is running; its stale-fixture benchmark job was
+cancelled and must be rerun. [Results and limits](../benchmarks/release-20261022/macos/README.md).
+
 **Source-suite completion and platform CI (2026-10-22):** The archived root suite
 finishes with 2,233 passes, four ignored tests and only the already repaired
 Character sample failure. Preserve the failed baseline and separate focused repair.

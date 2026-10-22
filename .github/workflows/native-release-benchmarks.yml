@@ -5,6 +5,9 @@ on:
       bundle_run:
         description: Successful native-toolchain run containing windows-native-qualification
         required: true
+      candidate_revision:
+        description: Exact package commit; omit to require this workflow commit. Override for benchmark-only repairs against an unchanged candidate.
+        required: false
 permissions:
   contents: read
   actions: read
@@ -15,6 +18,7 @@ jobs:
     env:
       PYTHONUTF8: '1'
       BUNDLE_RUN: ${{ inputs.bundle_run }}
+      CANDIDATE_REVISION: ${{ inputs.candidate_revision || github.sha }}
     steps:
       - uses: actions/checkout@v4
       - name: Wait for matching package qualification
@@ -30,9 +34,10 @@ jobs:
             if ((Get-Date) -gt $deadline) { throw 'Timed out waiting for package qualification' }
             Start-Sleep -Seconds 30
           } while ($true)
-          if ($run.head_sha -ne '${{ github.sha }}') { throw 'Package and benchmark source revisions must match' }
+          if ($run.head_sha -ne $env:CANDIDATE_REVISION) { throw 'Package revision differs from the explicitly selected candidate' }
           if ($run.conclusion -ne 'success') { throw "Package qualification failed: $($run.conclusion)" }
           New-Item -ItemType Directory target/benchmarks -Force
+          @{ candidateRevision = $run.head_sha; benchmarkRevision = '${{ github.sha }}' } | ConvertTo-Json | Set-Content target/benchmarks/source-revisions.json
           $run | ConvertTo-Json -Depth 20 | Set-Content target/benchmarks/package-run.json
       - uses: actions/download-artifact@v4
         with:

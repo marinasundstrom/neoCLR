@@ -1,0 +1,347 @@
+{
+  "execution": {
+    "passed": true,
+    "rawSha256": "bd4c138759792849f18116ffded981290f76e490484bdd3c71d4f1348bde0039",
+    "gzipSha256": "19f93cde0b3de728be30f098b9aa6e5245ddaf7f64f45838b4ac15331f32fd42",
+    "summary": {
+      "cpu.sum": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 4.689140625000007,
+            "minimum": 4.611475292000023,
+            "maximum": 5.126009916999999
+          },
+          "batchSeconds": {
+            "median": 3.267794291999998,
+            "minimum": 3.2425398750000056,
+            "maximum": 3.2973818340000065
+          },
+          "operationsPerSecond": {
+            "median": 4.896269033571104,
+            "minimum": 4.852334611363656,
+            "maximum": 4.934403466665147
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.8640954999999977,
+            "minimum": 3.805417707999993,
+            "maximum": 3.986449499999999
+          },
+          "batchSeconds": {
+            "median": 0.0003552499999983638,
+            "minimum": 0.00031570900000055246,
+            "maximum": 0.0003897499999965248
+          },
+          "operationsPerSecond": {
+            "median": 45038.70513743474,
+            "minimum": 41051.95638266238,
+            "maximum": 50679.58151326697
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.0061806660000058855,
+            "minimum": 0.005870041999997966,
+            "maximum": 0.19698687500000034
+          },
+          "batchSeconds": {
+            "median": 0.00040416699999923367,
+            "minimum": 0.000398208999996541,
+            "maximum": 0.00040566699999544653
+          },
+          "operationsPerSecond": {
+            "median": 39587.59621649055,
+            "minimum": 39441.21656476764,
+            "maximum": 40179.90552734615
+          }
+        }
+      },
+      "json.serialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 4.682002582999999,
+            "minimum": 4.641736249999999,
+            "maximum": 4.734991749999999
+          },
+          "batchSeconds": {
+            "median": 1.176868749999997,
+            "minimum": 1.1674685840000052,
+            "maximum": 1.1777415829999995
+          },
+          "operationsPerSecond": {
+            "median": 13.595398807216217,
+            "minimum": 13.58532315658248,
+            "maximum": 13.704865569213405
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.790821875000006,
+            "minimum": 3.7638717080000106,
+            "maximum": 3.853656917000002
+          },
+          "batchSeconds": {
+            "median": 0.023268541000000198,
+            "minimum": 0.023168709000003673,
+            "maximum": 0.023552459000001136
+          },
+          "operationsPerSecond": {
+            "median": 687.6236889970826,
+            "minimum": 679.3345866773074,
+            "maximum": 690.5866010919065
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.014532833000004075,
+            "minimum": 0.00597879100000398,
+            "maximum": 0.015550791999999092
+          },
+          "batchSeconds": {
+            "median": 0.02216120900000007,
+            "minimum": 0.02210991700000875,
+            "maximum": 0.02220087499999579
+          },
+          "operationsPerSecond": {
+            "median": 721.9822709131054,
+            "minimum": 720.6923150552865,
+            "maximum": 723.6571715757083
+          }
+        }
+      },
+      "json.deserialize": {
+        "interpreter": {
+          "startupSeconds": {
+            "median": 4.665601584000001,
+            "minimum": 4.658201500000004,
+            "maximum": 4.7018497079999975
+          },
+          "batchSeconds": {
+            "median": 1.4294407909999975,
+            "minimum": 1.4225534170000032,
+            "maximum": 1.432182250000011
+          },
+          "operationsPerSecond": {
+            "median": 11.193188343818592,
+            "minimum": 11.171762532317292,
+            "maximum": 11.247380807493407
+          }
+        },
+        "jit": {
+          "startupSeconds": {
+            "median": 3.8065443750000014,
+            "minimum": 3.7555903340000008,
+            "maximum": 4.023193374999998
+          },
+          "batchSeconds": {
+            "median": 0.03238237499999741,
+            "minimum": 0.031892833000000564,
+            "maximum": 0.03257970900000373
+          },
+          "operationsPerSecond": {
+            "median": 494.0959395350489,
+            "minimum": 491.1032201054395,
+            "maximum": 501.6801110142745
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.014521709000000271,
+            "minimum": 0.006231415999991441,
+            "maximum": 0.017022416999999734
+          },
+          "batchSeconds": {
+            "median": 0.030868542000007437,
+            "minimum": 0.030607083000006696,
+            "maximum": 0.031092250000000377
+          },
+          "operationsPerSecond": {
+            "median": 518.3270398710812,
+            "minimum": 514.597689134746,
+            "maximum": 522.7548146289047
+          }
+        }
+      }
+    },
+    "error": null
+  },
+  "cpu-native-longer": {
+    "passed": true,
+    "rawSha256": "dc0c33898a91438d817d31cf94fdc7a41614ffab1a899683fae0696f7d0c249e",
+    "gzipSha256": "3aabfd727e71a0642ef33b4bd1c011ccc92ab4e520247f025becec5407d32469",
+    "summary": {
+      "cpu.sum": {
+        "jit": {
+          "startupSeconds": {
+            "median": 3.7834306249999994,
+            "minimum": 3.7737928750000016,
+            "maximum": 3.900639083
+          },
+          "batchSeconds": {
+            "median": 0.25094354099999805,
+            "minimum": 0.2505963329999972,
+            "maximum": 0.2562990000000003
+          },
+          "operationsPerSecond": {
+            "median": 39849.6010702267,
+            "minimum": 39016.929445686445,
+            "maximum": 39904.81377075902
+          }
+        },
+        "aot": {
+          "startupSeconds": {
+            "median": 0.006251249999999153,
+            "minimum": 0.006073499999999399,
+            "maximum": 0.00657087500000042
+          },
+          "batchSeconds": {
+            "median": 0.2514363340000001,
+            "minimum": 0.2506460419999996,
+            "maximum": 0.2523228339999992
+          },
+          "operationsPerSecond": {
+            "median": 39771.49937287901,
+            "minimum": 39631.76792790791,
+            "maximum": 39896.899708474215
+          }
+        }
+      }
+    },
+    "error": null
+  },
+  "http-plain": {
+    "passed": true,
+    "rawSha256": "e5094b298bf0cddb054eb102d9505c93d9810a8800804d118401c7ebb4e4a9f9",
+    "gzipSha256": "28188b8ea93f3d64915b3012d7d6e9f8f982ecfb66fd375450a3170fb4b13565",
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 3.560994930998034,
+          "min": 3.4415286827828364,
+          "max": 3.573519060935364
+        },
+        "startupSecondsMedian": 4.506384709000002,
+        "latencySeconds": {
+          "p50": 0.2810316669999935,
+          "p95": 0.2974571250000082,
+          "p99": 0.3242070419999976
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 178.74437572440178,
+          "min": 177.76801238831524,
+          "max": 190.22425505726918
+        },
+        "startupSecondsMedian": 7.040541791999999,
+        "latencySeconds": {
+          "p50": 0.005552832999995871,
+          "p95": 0.005656500000000619,
+          "p99": 0.005733583000001374
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 188.82057421705437,
+          "min": 188.08390501371778,
+          "max": 199.08964930588004
+        },
+        "startupSecondsMedian": 0.00731216700000914,
+        "latencySeconds": {
+          "p50": 0.005270125000009784,
+          "p95": 0.005381916000004594,
+          "p99": 0.005604999999988536
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    },
+    "error": null
+  },
+  "http-json": {
+    "passed": true,
+    "rawSha256": "e09768ebed65b37307db8ec56dbd823b5f4f1419959312f8b5215b6171140aa5",
+    "gzipSha256": "60588e8ea89d2179acc9049c970be023a23729bcdad98209089de7a690c8f780",
+    "summary": {
+      "interpreter": {
+        "requestsPerSecond": {
+          "median": 1.73622753305458,
+          "min": 1.7294031114797328,
+          "max": 1.740402099681658
+        },
+        "startupSecondsMedian": 4.535059042,
+        "latencySeconds": {
+          "p50": 0.5756343329999822,
+          "p95": 0.5849141669999938,
+          "p99": 0.630963874999992
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "jit": {
+        "requestsPerSecond": {
+          "median": 96.22347941586516,
+          "min": 95.34490309568329,
+          "max": 99.56330290801995
+        },
+        "startupSecondsMedian": 11.484256875,
+        "latencySeconds": {
+          "p50": 0.010351415999991787,
+          "p95": 0.010738083000006782,
+          "p99": 0.010814833999987172
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      },
+      "aot": {
+        "requestsPerSecond": {
+          "median": 99.62150635058352,
+          "min": 99.36029852602313,
+          "max": 104.0089491033474
+        },
+        "startupSecondsMedian": 0.012698415999977897,
+        "latencySeconds": {
+          "p50": 0.009934791999995696,
+          "p95": 0.010308042000019668,
+          "p99": 0.01038887500000385
+        },
+        "validatedRequests": 192,
+        "measuredRequests": 120,
+        "errors": 0
+      }
+    },
+    "error": null
+  },
+  "initial-run-failure": {
+    "passed": false,
+    "rawSha256": "13ca5cc41126f807efa91f9b340dc310d8af68af5eec14aa47cd7cf700d31718",
+    "gzipSha256": "f8ff656488ebac624490af7d9b4f2e7877fdcccdac15028ff54271ce2470fa57",
+    "summary": {},
+    "error": "http-plain failed; see http-plain.log"
+  },
+  "http-plain-stale-api": {
+    "passed": false,
+    "rawSha256": "4a9814146efd6117f1f27cb0ff78ce591c65dfff41ef037829211691c45edf47",
+    "gzipSha256": "74d463a2e6a620e8d82e20e34e138cca677610bdbaba743ff3d6b1a7fde9e81c",
+    "summary": {},
+    "error": "Command '['/Applications/Xcode.app/Contents/Developer/usr/bin/python3', '/Users/robert/Projects/neoclr/scripts/build-native-project.py', '--profile', 'http', '--project', '/Users/robert/Projects/neoclr/target/release-benchmarks-macos-20261022/http-plain/project/App.rvnproj', '--bundle', '/Users/robert/Projects/neoclr/target/release-jit-20261022-v3/bundle', '--aot', '/Users/robert/Projects/neoclr/target/release-jit-20261022-v3/bundle/bin/neoclr-codegen', '--output', '/Users/robert/Projects/neoclr/target/release-benchmarks-macos-20261022/http-plain/native', '--http-heap-bytes', '33554432', '--byte-array-limit', '4194304', '--command-timeout', '600']' returned non-zero exit status 1."
+  },
+  "http-json-content-type-failure": {
+    "passed": false,
+    "rawSha256": "5fe3544f0eb2809a89a7673e1d4d3418c11443709f51f01b2cc85abf0ac93d02",
+    "gzipSha256": "8876ba441eb372ccb83c0553171caaa7aa0658e0ed6c736810ae8b4cf0dc6d3f",
+    "summary": {},
+    "error": "Invalid JSON body"
+  },
+  "scope": "Development macOS ARM64 candidate; CPU/JSON retained from initial run, HTTP rerun after fixture-only repairs; not Windows or release approval."
+}

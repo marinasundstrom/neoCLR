@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Refresh macOS ARM64 development CPU/JSON and plain/JSON HTTP benchmarks: 55 worker processes and 1,152 responses pass validation. Repair stale HttpContent.FromText and content-owned JSON media-type fixture usage; retain failed attempts and original aggregate failure separately from passing reruns. Add development website tables without replacing Preview 16 results. Allow an explicitly pinned package revision for benchmark-only CI repairs, recording candidate and harness commits while preserving same-revision selection by default. Four runner tests and all 5,703 website pages pass. Windows refresh remains pending; interactive-host results do not establish controlled speedups or production capacity.
+
 - Record completion of the fresh-source root-package suite: 2,233 tests pass, four are ignored, and the sole failure is the archived pre-repair Character sample (all five focused tests already pass after `300ebf792`). Preserve the failed original archive result rather than claiming a clean rerun. Push the candidate and separate Raven compiler branch; Windows package qualification and its matching benchmark workflow are running/pending, not qualified.
 
 - Refresh the Windows qualification workflow's default Raven revision to `301e668a5`, including committed native field-marshalling and field-attribute parser support. Retain explicit revision override and separate platform evidence; this updates the next build input, not Windows qualification status.
