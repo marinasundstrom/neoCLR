@@ -104,7 +104,11 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
             .map(|path| read_module(Path::new(path)))
             .transpose()?;
         let verification = if dependency_args.is_empty() {
-            None
+            if native_imports {
+                Some(neoclr::LoadedProgram::new(&input).map_err(|error| error.to_string())?)
+            } else {
+                None
+            }
         } else {
             Some(load_context::verification(
                 &input,
@@ -119,8 +123,20 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         let root = args[2].to_str().ok_or("root must be UTF-8")?;
         let root = if root == "@entry" { &input.entry } else { root };
         let argument: i32 = args[3].to_str().ok_or("argument must be Int32")?.parse()?;
+        let native_input = if native_imports {
+            Some(compiler::prepare_native_entry(
+                &input,
+                root,
+                std::iter::once(&input)
+                    .chain(system.iter())
+                    .chain(dependencies.iter()),
+                verification.as_ref().expect("native verification context"),
+            )?)
+        } else {
+            None
+        };
         let mut result = jit::execute(
-            &input,
+            native_input.as_ref().unwrap_or(&input),
             root,
             argument,
             repetitions,
@@ -829,11 +845,27 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
             &dependencies,
             context.object_root.as_ref(),
         )?)
+    } else if native_imports {
+        Some(neoclr::LoadedProgram::new(&input).map_err(|error| error.to_string())?)
+    } else {
+        None
+    };
+    let native_input = if native_imports {
+        Some(compiler::prepare_native_entry(
+            compile_input,
+            root,
+            std::iter::once(&input)
+                .chain(context.iter().map(|c| &c.system))
+                .chain(dependencies.iter()),
+            import_verification
+                .as_ref()
+                .expect("native verification context"),
+        )?)
     } else {
         None
     };
     let object = compiler::compile_for_target_with_imports(
-        compile_input,
+        native_input.as_ref().unwrap_or(compile_input),
         root,
         !closed && args.len() == 4,
         details.as_ref(),

@@ -300,7 +300,10 @@ neoclr-codegen --native-library App.dll exports.o --export point_identity --head
 Supply the eventual library loader name or path explicitly. Generated `NativeExport0`,
 `NativeExport1`, and subsequent imports bind the exact exported symbols and include
 native-layout struct declarations. This is useful for round-trip tests; callers still
-own pointer lifetimes. See the [layout and binding reference](/docs/native-interop.html). This is not part of the qualified
+own pointer lifetimes. Generated struct consumers are tested in the interpreter and
+the opt-in macOS ARM64 scalar JIT/AOT profiles, including nested fields and recursive
+pointer layouts. The ordinary managed executable pipeline remains a separate gap.
+See the [layout and binding reference](/docs/native-interop.html). This is not part of the qualified
 extracted-kit sample above.
 
 ### Scope of the foundation

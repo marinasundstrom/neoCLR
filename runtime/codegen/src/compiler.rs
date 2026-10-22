@@ -194,6 +194,34 @@ pub(super) fn compile_scalar_with_imports<M: Module>(
     )
 }
 
+/// Select native executable bodies only after verifying the entire source program.
+/// Attribute normalization affects the private emission copy, never verification.
+pub(super) fn prepare_native_entry<'a>(
+    input: &neoclr::Module,
+    root: &str,
+    modules: impl Iterator<Item = &'a neoclr::Module>,
+    verification: &neoclr::LoadedProgram,
+) -> Result<neoclr::Module, Error> {
+    verification.verify().map_err(|error| error.to_string())?;
+    let input = crate::native_layout::normalize_annotations(input, modules)?;
+    // Unused bodies may be outside the scalar subset, but declarations must not
+    // hide an unsupported native ABI contract behind reachability.
+    for function in input.functions.iter().filter(|f| f.pinvoke.is_some()) {
+        crate::native_imports::validate(function)?;
+    }
+    let roots: Vec<_> = input
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, function)| function.name == root)
+        .map(|(index, _)| (index, String::new()))
+        .collect();
+    if roots.len() != 1 {
+        return Err("native executable root must identify exactly one function".into());
+    }
+    Ok(select_native_exports(&input, &roots)?.0)
+}
+
 pub(super) fn compile_native_library(
     input: &neoclr::Module,
     exports: &[(usize, String)],
@@ -478,7 +506,7 @@ fn compile_scalar_impl<M: Module>(
         sig.params = function
             .parameters
             .iter()
-            .map(|t| AbiParam::new(crate::scalar_abi::scalar_type(t).unwrap()))
+            .map(|t| AbiParam::new(crate::scalar_abi::managed_scalar_type(t).unwrap()))
             .collect();
         sig.params.push(AbiParam::new(types::I64)); // writable typed result pointer
         sig.returns.push(AbiParam::new(types::I32)); // status: 0 success, 1 zero, 2 overflow
@@ -543,7 +571,7 @@ fn compile_scalar_impl<M: Module>(
             for local in 0..function.locals.len() {
                 builder.declare_var(
                     Variable::from_u32(local as u32),
-                    crate::scalar_abi::scalar_type(&function.locals[local]).unwrap(),
+                    crate::scalar_abi::managed_scalar_type(&function.locals[local]).unwrap(),
                 );
             }
             builder.ins().jump(blocks[0], &[]);
@@ -576,7 +604,7 @@ fn compile_scalar_impl<M: Module>(
                             Type::Double => builder.ins().f64const(0.0),
                             _ => builder
                                 .ins()
-                                .iconst(crate::scalar_abi::scalar_type(ty).unwrap(), 0),
+                                .iconst(crate::scalar_abi::managed_scalar_type(ty).unwrap(), 0),
                         };
                         builder.def_var(Variable::from_u32(*local as u32), zero);
                     }
@@ -758,7 +786,7 @@ fn compile_scalar_impl<M: Module>(
                         if !input.functions[callee].no_result {
                             stack.push(
                                 builder.ins().stack_load(
-                                    crate::scalar_abi::scalar_type(
+                                    crate::scalar_abi::managed_scalar_type(
                                         &input.functions[callee].returns,
                                     )
                                     .unwrap(),
@@ -885,7 +913,7 @@ fn check_function(
     native_imports: bool,
 ) -> Result<flow::Stacks, Error> {
     let admitted = |t: &Type| {
-        *t == Type::Int32 || native_imports && crate::scalar_abi::scalar_type(t).is_some()
+        *t == Type::Int32 || native_imports && crate::scalar_abi::managed_scalar_type(t).is_some()
     };
     if function.owner.is_some()
         || function.instance

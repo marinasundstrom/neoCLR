@@ -49,6 +49,7 @@ pub(super) fn analyze(
         } else {
             match t {
                 Type::Int64 | Type::UInt64 => Kind::Int64,
+                Type::Boolean => Kind::Boolean,
                 Type::Single => Kind::Single,
                 Type::Double => Kind::Double,
                 Type::IntPtr => Kind::NativeInt,
@@ -89,7 +90,7 @@ pub(super) fn analyze(
             }
             Op::LocalAddress(index) if native_imports && *index < function.locals.len() => (0, 1),
             Op::InitializeObject(t)
-                if native_imports && crate::scalar_abi::scalar_type(t).is_some() =>
+                if native_imports && crate::scalar_abi::managed_scalar_type(t).is_some() =>
             {
                 (1, 0)
             }

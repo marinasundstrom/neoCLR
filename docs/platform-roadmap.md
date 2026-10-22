@@ -6,7 +6,9 @@ are repaired. Raven struct-pointer exports execute from C/C++; layout attribute
 owners resolve through supplied System.Runtime source identities. Public Raven
 layout attributes and field MarshalAs now pass source-to-header tests; optional
 Raven import generation passes an AOT-library round trip, including nested fields
-and recursive pointer graphs with caller-owned native allocations. Aggregate-by-value ABI,
+and recursive pointer graphs with caller-owned native allocations. Generated consumers
+now execute in interpreter, scalar JIT and scalar AOT after full-source verification
+and entry-root selection. Aggregate-by-value ABI,
 ordinary managed executable integration and callback parity remain separate gaps.
 [Evidence and limits](experiments/aot-native-imports/README.md#struct-layout-and-nominal-pointer-foundation-2026-10-22).
 

@@ -14827,3 +14827,14 @@ AOT library. All supported pack values produce C/C++ headers without unsupported
 packing pragmas. Built-in Rust integration tests are used because the scalar backend
 cannot execute the managed Raven test runner. Generated struct imports are not yet
 qualified through the ordinary managed JIT/AOT executable pipeline.
+
+### Native generated-import executable selection (2026-10-22)
+
+The scalar JIT/AOT entry paths now resolve source layout attributes from the same
+explicit runtime load context used by native-library emission. They verify the
+original program before selecting entry-root direct-call dependencies. Source
+constructors outside that set remain verified metadata. Boolean locals use private
+I32 storage without changing native marshalling defaults. Raven emission and the
+temporary CLI/native metadata representation are unchanged; the normal managed
+backend is not enabled by this scalar-profile repair. See the
+[qualification evidence](experiments/aot-native-imports/README.md#generated-struct-imports-in-scalar-executable-profiles--2026-10-22).

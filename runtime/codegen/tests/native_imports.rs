@@ -1796,6 +1796,45 @@ unsafe func Main() -> int {{
     // SAFETY: exact C ABI exports receive null or a live C allocation; the consumer frees it.
     let result = unsafe { program.run_with_native(neoclr::Limits::default()) }.unwrap();
     assert_eq!(result.value, neoclr::Value::Int32(0));
+    let artifact = consumer.join("bin/neoclr/NativeInteropSample.dll");
+    let context = |command: &mut Command| {
+        command
+            .arg("--native-imports")
+            .arg("--system")
+            .arg(bundle.join("lib/System.runtime.neox"))
+            .arg("--module")
+            .arg(bundle.join("lib/System.Runtime.dll"))
+            .arg("--object-root")
+            .arg(bundle.join("lib/System.Runtime.dll"));
+    };
+    let mut jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+    jit.arg("--jit-scalar").arg(&artifact).args(["@entry", "0"]);
+    context(&mut jit);
+    let executed = jit.output().unwrap();
+    assert!(
+        executed.status.success(),
+        "{}",
+        String::from_utf8_lossy(&executed.stderr)
+    );
+    let result: serde_json::Value = serde_json::from_slice(&executed.stdout).unwrap();
+    assert_eq!(result["invocations"][0]["status"], 0);
+    assert_eq!(result["invocations"][0]["value"], 0);
+    let object = consumer.join("app.o");
+    let mut aot = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+    aot.arg(&artifact).arg("@entry").arg(&object);
+    context(&mut aot);
+    let emitted = aot.output().unwrap();
+    assert!(
+        emitted.status.success(),
+        "{}",
+        String::from_utf8_lossy(&emitted.stderr)
+    );
+    let host = consumer.join("host.c");
+    fs::write(&host, "#include <stdint.h>\nextern int32_t neoclr_entry_v2(int32_t, int32_t *);\nint main(void) { int32_t result = -1; return neoclr_entry_v2(0, &result) || result != 0; }\n").unwrap();
+    let resolver = root.join("runtime/native/interop/imports.c");
+    let executable = consumer.join("app");
+    cc(&[&host, &object, &resolver], &[], &executable);
+    assert!(Command::new(executable).status().unwrap().success());
 }
 
 #[test]
@@ -1831,5 +1870,61 @@ fn export_selection_preserves_source_verification_and_selected_admission() {
             String::from_utf8_lossy(&output.stderr)
         );
         assert_eq!(object.exists(), succeeds);
+        let executable_object = dir.0.join("executable.o");
+        for jit in [false, true] {
+            let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+            if jit {
+                command.arg("--jit-scalar").arg(&input).args([export, "0"]);
+            } else {
+                command.arg(&input).arg(export).arg(&executable_object);
+            }
+            let output = command.arg("--native-imports").output().unwrap();
+            assert_eq!(
+                output.status.success(),
+                succeeds,
+                "jit={jit}: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            if !jit {
+                assert_eq!(executable_object.exists(), succeeds);
+            }
+        }
     }
+}
+
+#[test]
+fn private_boolean_calls_and_defaults_do_not_admit_native_boolean_abi() {
+    let dir = Temp::new();
+    let source = ".module BooleanStorage\n.function Forward(Boolean value) -> Boolean\nldarg value\nret\n.end\n.function Calculate(Int32 value) -> Int32\n.local Boolean flag\nldloca flag\ninitobj Boolean\nldloc flag\nbrtrue fail\nldc.bool true\ncall Forward(Boolean)\nstloc flag\nldloc flag\nbrfalse fail\nldarg value\nret\nfail:\nldc.i4 -1\nret\n.end\n";
+    let emitted = compile(&dir, source, &["--native-imports"]);
+    assert!(
+        emitted.status.success(),
+        "{}",
+        String::from_utf8_lossy(&emitted.stderr)
+    );
+    let output = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
+        .arg("--jit-scalar")
+        .arg(dir.0.join("app.neoil"))
+        .args(["Calculate", "7", "--native-imports"])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let result: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(result["invocations"][0]["status"], 0);
+    assert_eq!(result["invocations"][0]["value"], 7);
+    let rejected = Temp::new();
+    let imported = source.replace(
+        "ldarg value\nret\n.end\n.function Calculate",
+        ".foreign \"unused\" \"forward\" cdecl\n.end\n.function Calculate",
+    );
+    assert!(
+        !compile(&rejected, &imported, &["--native-imports"])
+            .status
+            .success()
+    );
+    assert!(!rejected.0.join("app.o").exists());
 }

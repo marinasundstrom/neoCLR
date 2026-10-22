@@ -368,3 +368,10 @@ types describe native storage widths (for example a Bool8 field is `byte`), rath
 than promising managed conversion. Symbol order follows the export report. Pointer
 ownership remains the caller's responsibility. This is binding source, not a runtime
 metadata sidecar or a general C header importer.
+
+Generated struct consumers are qualified in the interpreter and opt-in macOS ARM64
+scalar JIT/AOT executable profiles, including nested fields and recursive pointer
+layouts. Supply matching runtime metadata with the explicit load-context options.
+Executable generation verifies the full source before selecting the entry point
+and direct-call dependencies. This does not enable the ordinary managed JIT/AOT
+pipeline or automatic managed-storage conversion.

@@ -17,3 +17,13 @@ pub(crate) fn scalar_type(t: &Type) -> Option<cranelift_codegen::ir::Type> {
         _ => None,
     }
 }
+
+// Private managed calls store Boolean as an I32. This does not select a C bool
+// width: native signatures still require an explicit supported boundary mapping.
+pub(crate) fn managed_scalar_type(t: &Type) -> Option<cranelift_codegen::ir::Type> {
+    if *t == Type::Boolean {
+        Some(types::I32)
+    } else {
+        scalar_type(t)
+    }
+}

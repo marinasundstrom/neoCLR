@@ -578,3 +578,31 @@ Validation: all six Raven-source interop integration tests pass with the matchin
 `target/native-layout-bundle-20261022` overlay, including the prior layout rejection
 cases and three-engine pointer/export tests. Existing website scope remains accurate;
 no public API or snapshot changed in this qualification increment.
+
+### Generated struct imports in scalar executable profiles — 2026-10-22
+
+Generated layout consumers now run through the interpreter, opt-in scalar JIT and
+scalar AOT executable profiles on macOS ARM64. Both executable paths resolve
+layout attribute identities from supplied runtime metadata, verify the complete
+original program and select the entry point plus direct-call dependencies for
+emission. This shares native-library root selection; unused valid synthesized
+constructors need not fit scalar lowering. Invalid unused IL and unsupported native
+import declarations still reject before execution/output.
+
+Ordinary Boolean locals, arguments and results use I32 storage in the private
+scalar ABI; the existing flow verifier retains their Boolean identity. This does
+not choose a C Boolean width or enable native Boolean parameters/results. Native
+boundary signatures continue to use their existing separately validated mapping.
+
+The source-to-generated-import fixtures cover flat, packed, explicit, nested and
+recursive pointer layouts, null and live allocated addresses, C/C++ export callers,
+and calls into the AOT library from all three execution engines. This closes the
+generated struct consumer gap in the development scalar profiles. The ordinary
+managed JIT/AOT pipeline, by-value structs, callback parity and pinning remain gaps.
+No Raven compiler, Runtime Contract configuration or metadata format changed.
+
+Validation: all 24 native import/export integration tests pass with the matching
+Raven layout bundle; the additional private-Boolean regression also passes. The
+selection regression checks both executable engines as well as native-library
+emission, including rejection of invalid unused IL. API source/reference checks
+and all 5,681 website pages pass.
