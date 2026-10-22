@@ -16,7 +16,8 @@
     }
   },
   "hostedRerun": 39853093086,
-  "hostedStatus": "Both macOS and Windows host jobs and all three minimum-Rust jobs passed; canonical full-source job running",
+  "hostedStatus": "passed: canonical full-source/25-smoke, both host suites, strict Clippy/formatting and all three minimum-Rust jobs",
   "packageRefresh": "macOS repaired archive passes extracted JIT/interpreter samples/HTTP; matching native kit passes HTTP and interop consumers. See ../socket-repair-package/summary.json and ../socket-repair-native-kit/summary.json",
-  "loaderNote": "Original test process initially stalled in dyld. Byte-identical /tmp copy passed; original process subsequently also completed with 37 passes."
+  "loaderNote": "Original test process initially stalled in dyld. Byte-identical /tmp copy passed; original process subsequently also completed with 37 passes.",
+  "canonicalReport": "repaired-canonical.json.gz"
 }

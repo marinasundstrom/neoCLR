@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Source gates closed; candidate website live (2026-10-22):** Repaired-source
+run 39853093086 passes canonical tests/25 smoke programs, both host suites and all
+minimum-Rust jobs. The website candidate notice is published. Versioned SDK/editor
+packages and the requested local installation remain in qualification.
+[Current release gates](validation/release-stabilization-20261022/README.md).
+
 **Replacement Preview 17 candidate building (2026-10-22):** Select SDK/editor
 `0.1.17-neoclr.20261022.1` against neoCLR `8511834fa` and Raven `301e668a5`.
 Start matching macOS and Windows builds; this supersedes the unpublished October 19

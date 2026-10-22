@@ -21381,3 +21381,17 @@ implementation decision, not a quoted author instruction. The earlier October 19
 candidate remains superseded and unpublished. Canonical source qualification and
 new versioned-package acceptance remain open; no release tag or publication was
 performed. See the [candidate record](validation/release-stabilization-20261022/candidate.json).
+
+
+## 2026-10-22 — Website and local installation; Raven worktree check
+
+The author asked to continue release work with the website and locally installed
+SDK/extension, then expressed concern that the branch had changed in the same
+worktree. The assistant inspected Raven HEAD, status, reflog and worktree list:
+`/Users/robert/Projects/Raven` remained clean on `codex/neoclr` at `301e668a5`;
+`main` was in `/Users/robert/Projects/Raven-checked-conversions`. No later checkout
+appeared after the 18:41 commit. The earlier shared-checkout packaging failure had
+no diagnostic; shared build output interference was only a hypothesis, not a
+confirmed cause. Packaging was retried from an isolated archive of the pinned
+Raven commit. Website candidate status was published and verified; the local
+SDK/extension upgrade remained pending package checks at recording.

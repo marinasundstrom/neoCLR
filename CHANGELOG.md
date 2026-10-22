@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Close repaired-source qualification: canonical full-source/25-smoke, both host suites, formatting, strict Clippy and all three minimum-Rust jobs pass in run 39853093086. Retain the canonical report. Publish and verify the website candidate notice via run 39856189825, preserving Preview 16 download links. Versioned package/local installation qualification remains open.
+
 - Update the website installation page with the versioned Preview 17 candidate and qualification link, retaining working Preview 16 downloads until publication. All 24 website tests and 5,703 pages pass. Retry macOS SDK packaging from an isolated pinned Raven snapshot after a diagnostic-free shared-checkout failure; the requested local SDK/extension upgrade remains pending qualification.
 
 - Select replacement Preview 17 SDK/editor candidate `0.1.17-neoclr.20261022.1`, pinned to neoCLR `8511834fa` and Raven `301e668a5`, and start matching macOS/Windows builds. Preserve the superseded unpublished candidate and development evidence separately. New artifacts are not yet qualified; no release tag or publication is performed.

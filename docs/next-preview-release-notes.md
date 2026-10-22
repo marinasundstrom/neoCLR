@@ -17,8 +17,9 @@ packages, installed-editor checks, HTTPS checks and refreshed platform benchmark
 have passing evidence. Both archives pass manifest and SDK/editor identity audits.
 These development packages are not published release assets. The
 [current gate index](validation/release-stabilization-20261022/README.md) records
-exact inputs, reports and limits. Canonical full-source qualification is running;
-formatting, strict Clippy and Rust 1.85 checks now pass.
+exact inputs, reports and limits. Canonical full-source qualification, both host suites, formatting, strict Clippy
+and all Rust 1.85 checks pass at the repaired runtime revision. Versioned package
+qualification remains separate.
 
 ## Implemented scope for replacement review
 
