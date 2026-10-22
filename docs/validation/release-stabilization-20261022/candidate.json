@@ -7,12 +7,14 @@
   "ravenRevision": "301e668a51beb6ba307d63b6912b144d8ad6a6b0",
   "sourceQualificationRun": 39853093086,
   "windowsPackageRun": 39855375522,
-  "macOSOutput": "target/preview17-sdk-macos-20261022",
+  "macOSOutput": "target/preview17-sdk-macos-isolated-20261022",
   "supersedes": "0.1.17-neoclr.20261019.1 (never published)",
   "remaining": [
     "Canonical source qualification must pass.",
     "Build and qualify matching versioned macOS/Windows SDK, libraries and editor assets.",
     "Verify final archive identities and record which earlier evidence remains applicable.",
     "Finalize release notes/changelog and publish only after required gates pass."
-  ]
+  ],
+  "macOSBuildNote": "Shared-checkout attempt exited during language-server packaging without a diagnostic; retry from an isolated git archive of the exact Raven revision. No compiler-source change inferred.",
+  "localInstallation": "Requested by author; pending matching SDK/VSIX and package checks. Preserve previous installation for rollback."
 }

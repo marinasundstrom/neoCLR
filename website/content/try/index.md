@@ -5,6 +5,14 @@ Preview 16 provides matching packages for **Windows x64** and **macOS on Apple s
 JIT is the default on both; interpreter execution remains available explicitly.
 AOT is a separate experimental publishing workflow for supported applications.
 
+## Preview 17 candidate
+
+The next matched SDK/editor candidate is `0.1.17-neoclr.20261022.1` for macOS ARM64
+and Windows x64. It is undergoing package qualification and is not yet a published
+download. The links below continue to install Preview 16.
+[Candidate status and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/release-stabilization-20261022/README.md)
+record the exact compiler, runtime and artifact identities.
+
 ## 1. Install prerequisites
 
 Install the [.NET 11 SDK and .NET 10 SDK](https://dotnet.microsoft.com/download),
